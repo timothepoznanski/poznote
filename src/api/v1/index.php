@@ -628,6 +628,11 @@ $router->post('/backups', function($params) use ($backupController) {
     echo json_encode($backupController->create());
 });
 
+// Upload a backup ZIP and save it in the backups directory (must be before {filename} routes)
+$router->post('/backups/upload', function($params) use ($backupController) {
+    echo json_encode($backupController->upload());
+});
+
 // Download a backup file
 $router->get('/backups/{filename}', function($params) use ($backupController) {
     echo json_encode($backupController->download($params['filename']));

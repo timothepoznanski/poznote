@@ -1395,6 +1395,62 @@ paths:
                   download_url:
                     type: string
 
+  /backups/upload:
+    post:
+      tags: [Backups]
+      summary: Upload a backup ZIP to the server
+      description: |
+        Uploads a local backup ZIP file to the server's backup directory.
+        The file is stored with a standard timestamped name.
+        Use the returned `filename` with `POST /backups/{filename}/restore` to restore it.
+      parameters:
+        - name: X-User-ID
+          in: header
+          required: true
+          schema:
+            type: integer
+          description: ID of the user who owns this backup
+          example: 9
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The backup ZIP file to upload
+      responses:
+        '201':
+          description: Backup uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  filename:
+                    type: string
+                    example: "poznote_backup_2025-01-05_12-00-00.zip"
+                  size:
+                    type: integer
+                  size_mb:
+                    type: number
+                  restore_url:
+                    type: string
+                    example: "/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip/restore"
+                  download_url:
+                    type: string
+                    example: "/api/v1/backups/poznote_backup_2025-01-05_12-00-00.zip"
+        '400':
+          description: No valid file uploaded or not a ZIP archive
+        '500':
+          description: Failed to save the uploaded file
+
   /backups/{filename}:
     get:
       tags: [Backups]
