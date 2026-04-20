@@ -31,7 +31,7 @@ This project started from a simple personal need: a practical way to write, orga
 
 Try it at https://demo.poznote.com
 
-Login : poznote 
+Login : poznote<br>
 Password : poznote
 
 ### Features
