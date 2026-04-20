@@ -2374,5 +2374,13 @@
       "select_date": "Bitte wählen Sie Datum und Uhrzeit",
       "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt"
     }
+  },
+  "settings_password": {
+    "title": "Einstellungen geschützt",
+    "heading": "Zugang zu den Einstellungen",
+    "description": "Für den Zugriff auf die Einstellungsseite ist ein Passwort erforderlich.",
+    "placeholder": "Passwort eingeben",
+    "unlock": "Entsperren",
+    "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut."
   }
 }

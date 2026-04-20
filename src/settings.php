@@ -25,6 +25,54 @@ $pageWorkspace = trim(getWorkspaceFilter());
 // Check if current user is admin (used multiple times in template)
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 
+// ============================================================
+// SETTINGS PASSWORD PROTECTION
+// ============================================================
+if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
+    $settingsPasswordError = false;
+
+    if (isset($_POST['settings_password'])) {
+        if (hash_equals(SETTINGS_PASSWORD, $_POST['settings_password'])) {
+            $_SESSION['settings_password_authenticated'] = true;
+        } else {
+            $settingsPasswordError = true;
+        }
+    }
+
+    if (empty($_SESSION['settings_password_authenticated'])) {
+        $spCacheV = @file_get_contents('version.txt');
+        if ($spCacheV === false) { $spCacheV = time(); }
+        $spCacheV = urlencode(trim($spCacheV));
+        ?>
+        <!doctype html>
+        <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title><?php echo t_h('settings_password.title', [], 'Settings Protected', $currentLang); ?></title>
+            <meta name="color-scheme" content="dark light">
+            <script src="js/theme-init.js?v=<?php echo $spCacheV; ?>"></script>
+            <link rel="stylesheet" href="css/public_folder.css?v=<?php echo $spCacheV; ?>">
+        </head>
+        <body class="password-page-body">
+            <div class="password-container">
+                <h2><?php echo t_h('settings_password.heading', [], 'Settings Access', $currentLang); ?></h2>
+                <p><?php echo t_h('settings_password.description', [], 'A password is required to access the settings page.', $currentLang); ?></p>
+                <?php if ($settingsPasswordError): ?>
+                    <div class="error"><?php echo t_h('settings_password.error_incorrect', [], 'Incorrect password. Please try again.', $currentLang); ?></div>
+                <?php endif; ?>
+                <form method="POST" class="password-form">
+                    <input type="password" name="settings_password" placeholder="<?php echo t_h('settings_password.placeholder', [], 'Enter settings password', $currentLang); ?>" required autofocus>
+                    <button type="submit"><?php echo t_h('settings_password.unlock', [], 'Unlock', $currentLang); ?></button>
+                </form>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+}
+
 // Get cache version for assets
 $cache_v = @file_get_contents('version.txt');
 if ($cache_v === false) {

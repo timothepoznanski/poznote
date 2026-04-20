@@ -152,6 +152,9 @@ define('OIDC_ALLOWED_USERS', _oidc('oidc_allowed_users', ''));
 // The preferred source is the Advanced section in settings.php.
 define('CUSTOM_CSS_PATH', poznoteResolveCustomCssPath());
 
+// Optional password to protect access to the Settings page.
+define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
+
 /**
  * Resolve a global setting from the database with environment variable fallback.
  */

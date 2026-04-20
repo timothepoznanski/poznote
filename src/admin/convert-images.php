@@ -10,6 +10,9 @@
 // === Authentication & Authorization ===
 require_once __DIR__ . '/../auth.php';
 requireAuth();
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../functions.php';
+requireSettingsPassword();
 
 if (!isCurrentUserAdmin()) {
     header('HTTP/1.1 403 Forbidden');
@@ -17,8 +20,6 @@ if (!isCurrentUserAdmin()) {
     exit;
 }
 
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../version_helper.php';
 

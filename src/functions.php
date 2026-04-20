@@ -1980,3 +1980,18 @@ function sanitizeMarkdownContent($markdown) {
 
     return $markdown;
 }
+
+/**
+ * Gate access behind the SETTINGS_PASSWORD when configured.
+ * Redirects to settings.php if the session has not been unlocked.
+ */
+function requireSettingsPassword() {
+    if (!defined('SETTINGS_PASSWORD') || SETTINGS_PASSWORD === '') {
+        return;
+    }
+    if (!empty($_SESSION['settings_password_authenticated'])) {
+        return;
+    }
+    header('Location: ' . (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/admin/') !== false ? '../' : '') . 'settings.php');
+    exit;
+}
