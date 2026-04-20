@@ -29,8 +29,8 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Demo
 
-Login : poznote<br>
-Password : poznote
+**Login**: poznote<br>
+**Password**: poznote
 
 Play with Poznote at https://demo.poznote.com
 
