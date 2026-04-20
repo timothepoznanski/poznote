@@ -31,6 +31,9 @@ This project started from a simple personal need: a practical way to write, orga
 
 Try it at https://demo.poznote.com
 
+Login : poznote 
+Password : poznote
+
 ### Features
 
 Discover all the features [here](https://poznote.com/index.html#features).
