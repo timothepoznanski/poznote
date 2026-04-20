@@ -27,12 +27,6 @@ This project started from a simple personal need: a practical way to write, orga
   <img src="images/poznote-light.png" alt="Poznote-light" width="100%">
 </p>
 
-### Demo
-
-**URL**: https://demo.poznote.com<br>
-**Login**: poznote<br>
-**Password**: poznote
-
 ### Features
 
 Discover all the features [here](https://poznote.com/index.html#features).
@@ -41,6 +35,13 @@ Detailed documentation of advanced features is available in [docs/FEATURES.md](d
 <p align="center">
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
 </p>
+
+### Demo
+
+https://demo.poznote.com
+
+**Login**: poznote<br>
+**Password**: poznote
 
 ## Table of content
 
