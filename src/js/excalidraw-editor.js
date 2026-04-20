@@ -316,6 +316,19 @@
             }
         }, 1000);
 
+        // Intercept "Browse Libraries" clicks in the Excalidraw library panel
+        var appContainer = document.getElementById('app');
+        if (appContainer) {
+            appContainer.addEventListener('click', function(event) {
+                var target = event.target.closest('a[href*="libraries.excalidraw.com"]');
+                if (target) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.showLibraryWarning(target.href);
+                }
+            }, true);
+        }
+
         // Save button handler
         var saveBtn = document.getElementById('saveBtn');
         if (saveBtn) {
