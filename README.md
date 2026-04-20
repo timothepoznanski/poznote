@@ -36,6 +36,13 @@ Detailed documentation of advanced features is available in [docs/FEATURES.md](d
   <img src="images/poznote-features.png" alt="Poznote Features" width="100%">
 </p>
 
+### Demo
+
+https://demo.poznote.com
+
+**Login**: poznote<br>
+**Password**: poznote
+
 ## Table of content
 
 - [Install](#install)
