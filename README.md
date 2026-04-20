@@ -29,10 +29,10 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Demo
 
-Try it at https://demo.poznote.com
-
 Login : poznote<br>
 Password : poznote
+
+Play with Poznote at https://demo.poznote.com
 
 ### Features
 
