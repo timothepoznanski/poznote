@@ -29,7 +29,7 @@ This project started from a simple personal need: a practical way to write, orga
 
 ### Demo
 
-**URL**: https://demo.poznote.com
+**URL**: https://demo.poznote.com<br>
 **Login**: poznote<br>
 **Password**: poznote
 
