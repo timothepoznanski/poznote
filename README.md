@@ -1014,7 +1014,6 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Python 3.12 (Alpine)** - MCP server runtime with httpx, uvicorn, fastmcp, and mcp libraries for AI assistant integration
 </details>
 
-### About
-<p align="center">
-  <a href="https://poznote.com/about.html">Learn more about the project and its background on the Poznote About page</a>
-</p>
+## About
+
+Learn more about the project and its background on <a href="https://poznote.com/about.html"> the Poznote About page</a>.
