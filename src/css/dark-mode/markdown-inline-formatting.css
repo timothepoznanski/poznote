@@ -2,83 +2,105 @@
  * Markdown Inline Formatting - Dark Mode
  *
  * Overrides for the inline markdown visual formatting when the dark theme
- * is active.
+ * is active. Both `html[data-theme='dark']` and `body.dark-mode` selectors
+ * are supported since either can be used to activate the dark theme.
  */
 
-html[data-theme='dark'] .markdown-editor .md-syntax {
-    color: #6e7785;
+html[data-theme='dark'] .markdown-editor .md-syntax,
+body.dark-mode .markdown-editor .md-syntax {
+    color: #3f454d;
 }
 
-html[data-theme='dark'] .markdown-editor .md-heading {
+html[data-theme='dark'] .markdown-editor .md-heading,
+body.dark-mode .markdown-editor .md-heading {
     color: var(--dm-text, #e6edf3);
 }
 
-html[data-theme='dark'] .markdown-editor .md-h6 {
+html[data-theme='dark'] .markdown-editor .md-h6,
+body.dark-mode .markdown-editor .md-h6 {
     color: #8b949e;
 }
 
-html[data-theme='dark'] .markdown-editor .md-inline-code {
+html[data-theme='dark'] .markdown-editor .md-inline-code,
+body.dark-mode .markdown-editor .md-inline-code {
     background-color: rgba(110, 118, 129, 0.3);
     color: #ff7b72;
 }
 
 html[data-theme='dark'] .markdown-editor .md-code-block,
-html[data-theme='dark'] .markdown-editor .md-code-fence {
+html[data-theme='dark'] .markdown-editor .md-code-fence,
+body.dark-mode .markdown-editor .md-code-block,
+body.dark-mode .markdown-editor .md-code-fence {
     color: var(--dm-text, #e6edf3);
 }
 
-html[data-theme='dark'] .markdown-editor .md-code-fence {
+html[data-theme='dark'] .markdown-editor .md-code-fence,
+body.dark-mode .markdown-editor .md-code-fence {
     color: #8b949e;
 }
 
-html[data-theme='dark'] .markdown-editor .md-link-text {
+html[data-theme='dark'] .markdown-editor .md-link-text,
+body.dark-mode .markdown-editor .md-link-text {
     color: #58a6ff;
 }
 
-html[data-theme='dark'] .markdown-editor .md-link-url {
+html[data-theme='dark'] .markdown-editor .md-link-url,
+body.dark-mode .markdown-editor .md-link-url {
     color: #8b949e;
 }
 
-html[data-theme='dark'] .markdown-editor .md-blockquote {
+html[data-theme='dark'] .markdown-editor .md-blockquote,
+body.dark-mode .markdown-editor .md-blockquote {
     color: #8b949e;
 }
 
 html[data-theme='dark'] .markdown-editor .md-list-marker,
-html[data-theme='dark'] .markdown-editor .md-task-checkbox {
+html[data-theme='dark'] .markdown-editor .md-task-checkbox,
+body.dark-mode .markdown-editor .md-list-marker,
+body.dark-mode .markdown-editor .md-task-checkbox {
     color: #58a6ff;
 }
 
-html[data-theme='dark'] .markdown-editor .md-highlight {
+html[data-theme='dark'] .markdown-editor .md-highlight,
+body.dark-mode .markdown-editor .md-highlight {
     background-color: #5a4a00;
     color: #e6edf3;
 }
 
-html[data-theme='dark'] .markdown-editor .md-strike {
+html[data-theme='dark'] .markdown-editor .md-strike,
+body.dark-mode .markdown-editor .md-strike {
     text-decoration-color: #8b949e;
 }
 
-html[data-theme='dark'] .markdown-editor .md-task-done .md-task-text {
+html[data-theme='dark'] .markdown-editor .md-task-done .md-task-text,
+body.dark-mode .markdown-editor .md-task-done .md-task-text {
     color: #6e7785;
 }
 
-html[data-theme='dark'] .markdown-editor .md-hr {
-    color: #6e7785;
+html[data-theme='dark'] .markdown-editor .md-hr,
+body.dark-mode .markdown-editor .md-hr {
+    color: #3f454d;
 }
 
 /* Tables */
 html[data-theme='dark'] .markdown-editor .md-table-pipe,
-html[data-theme='dark'] .markdown-editor .md-table-separator .md-table-sep-bar {
+html[data-theme='dark'] .markdown-editor .md-table-separator .md-table-sep-bar,
+body.dark-mode .markdown-editor .md-table-pipe,
+body.dark-mode .markdown-editor .md-table-separator .md-table-sep-bar {
     color: #4a525e;
 }
 
-html[data-theme='dark'] .markdown-editor .md-table-header .md-table-cell {
+html[data-theme='dark'] .markdown-editor .md-table-header .md-table-cell,
+body.dark-mode .markdown-editor .md-table-header .md-table-cell {
     color: var(--dm-text, #e6edf3);
 }
 
-html[data-theme='dark'] .markdown-editor .md-table-separator {
+html[data-theme='dark'] .markdown-editor .md-table-separator,
+body.dark-mode .markdown-editor .md-table-separator {
     color: #6e7785;
 }
 
-html[data-theme='dark'] .markdown-editor .md-table-body .md-table-cell {
+html[data-theme='dark'] .markdown-editor .md-table-body .md-table-cell,
+body.dark-mode .markdown-editor .md-table-body .md-table-cell {
     color: var(--dm-text, #e6edf3);
 }
