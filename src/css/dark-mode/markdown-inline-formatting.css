@@ -24,7 +24,6 @@ html[data-theme='dark'] .markdown-editor .md-inline-code {
 
 html[data-theme='dark'] .markdown-editor .md-code-block,
 html[data-theme='dark'] .markdown-editor .md-code-fence {
-    background-color: rgba(110, 118, 129, 0.2);
     color: var(--dm-text, #e6edf3);
 }
 

@@ -55,10 +55,7 @@
 
 .markdown-editor .md-code-block,
 .markdown-editor .md-code-fence {
-    background-color: rgba(175, 184, 193, 0.12);
     color: #24292f;
-    border-radius: 2px;
-    padding: 0 2px;
 }
 
 .markdown-editor .md-code-fence {
