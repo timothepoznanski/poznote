@@ -507,6 +507,7 @@
       "note_font_size": "Taille de police",
       "note_sort_order": "Tri des notes",
       "tasklist_insert_order": "Ordre d'insertion des tâches",
+      "markdown_live_formatting": "Formatage live du markdown",
       "timezone": "Fuseau horaire",
       "show_note_created": "Afficher la date de création",
       "show_folder_counts": "Afficher le nombre de notes par dossier",

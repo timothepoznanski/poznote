@@ -121,11 +121,12 @@ $settings = [
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
-    'markdown_split_card_view' => '0'
+    'markdown_split_card_view' => '0',
+    'markdown_live_formatting' => '1'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'markdown_live_formatting')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -309,6 +310,9 @@ if ($settings['code_block_word_wrap'] === '0' || $settings['code_block_word_wrap
 }
 if ($settings['markdown_split_card_view'] === '1' || $settings['markdown_split_card_view'] === 'true') {
     $extra_body_classes .= ' markdown-split-card-view';
+}
+if ($settings['markdown_live_formatting'] === '0' || $settings['markdown_live_formatting'] === 'false') {
+    $extra_body_classes .= ' markdown-live-formatting-disabled';
 }
 
 // Load note list sort preference using previously loaded settings

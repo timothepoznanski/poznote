@@ -275,8 +275,29 @@
         };
     }
 
+    function isLiveFormattingDisabled() {
+        return !!(document.body && document.body.classList.contains('markdown-live-formatting-disabled'));
+    }
+
+    function clearFormatting(editor) {
+        if (!editor || rebuildingEditors.has(editor)) return;
+        var text = extractSourceText(editor);
+        rebuildingEditors.add(editor);
+        try {
+            editor.textContent = text;
+        } finally {
+            rebuildingEditors.delete(editor);
+        }
+    }
+
     function applyFormatting(editor) {
         if (!editor || rebuildingEditors.has(editor)) return;
+
+        // User-level kill switch (display settings card).
+        if (isLiveFormattingDisabled()) {
+            clearFormatting(editor);
+            return;
+        }
 
         // Never rebuild the DOM while the slash command menu is open: it
         // stores a reference to the text node containing the "/", and
