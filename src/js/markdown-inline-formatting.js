@@ -284,6 +284,11 @@
         // selection.
         if (document.querySelector('.slash-command-menu')) return;
 
+        // Similarly, never rebuild while the emoji picker is open: the
+        // toolbar saves a Range to restore the caret when an emoji is
+        // clicked, and a DOM rebuild would detach that Range's containers.
+        if (document.querySelector('.emoji-picker')) return;
+
         var hadFocus = (document.activeElement === editor);
         var captured = hadFocus ? captureCursorOffset(editor) : null;
         var text = captured ? captured.text : getNormalizedText(editor);
