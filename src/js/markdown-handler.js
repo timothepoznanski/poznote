@@ -2610,28 +2610,23 @@ function navigateToEditorLine(lineNumber, noteEntry) {
         charOffset += lines[i].length + 1; // +1 for newline
     }
 
-    // Focus the editor
-    editorDiv.focus();
-
-    // Set cursor position using Selection API
     try {
-        var textNode = editorDiv.firstChild;
-        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-            var range = document.createRange();
-            var selection = window.getSelection();
+        // Use the tree-walking selection helper so this works regardless of the
+        // editor's internal structure (plain text node vs. live-formatted
+        // `.md-line` spans with inter-span "\n" text nodes).
+        setSelectionOffsetsInTextElement(editorDiv, charOffset, charOffset);
 
-            // Clamp the offset to valid range
-            var maxOffset = textNode.textContent.length;
-            charOffset = Math.min(charOffset, maxOffset);
-
-            range.setStart(textNode, charOffset);
-            range.collapse(true);
-
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            // Scroll the editor to show the cursor
-            // Calculate approximate scroll position
+        // Prefer scrolling the live-formatted `.md-line` span into view when
+        // available; its geometry matches the visual line. Fall back to the
+        // approximate line-height computation otherwise.
+        var lineSpans = editorDiv.querySelectorAll(':scope > .md-line');
+        if (lineSpans && lineSpans.length > lineNumber && lineSpans[lineNumber]) {
+            try {
+                lineSpans[lineNumber].scrollIntoView({ block: 'center', inline: 'nearest' });
+            } catch (e2) {
+                lineSpans[lineNumber].scrollIntoView(true);
+            }
+        } else {
             var lineHeight = parseInt(window.getComputedStyle(editorDiv).lineHeight) || 20;
             var scrollTop = lineNumber * lineHeight - editorDiv.clientHeight / 2;
             editorDiv.scrollTop = Math.max(0, scrollTop);
