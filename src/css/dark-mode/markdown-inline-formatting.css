@@ -64,3 +64,21 @@ html[data-theme='dark'] .markdown-editor .md-task-done .md-task-text {
 html[data-theme='dark'] .markdown-editor .md-hr {
     color: #6e7785;
 }
+
+/* Tables */
+html[data-theme='dark'] .markdown-editor .md-table-pipe,
+html[data-theme='dark'] .markdown-editor .md-table-separator .md-table-sep-bar {
+    color: #4a525e;
+}
+
+html[data-theme='dark'] .markdown-editor .md-table-header .md-table-cell {
+    color: var(--dm-text, #e6edf3);
+}
+
+html[data-theme='dark'] .markdown-editor .md-table-separator {
+    color: #6e7785;
+}
+
+html[data-theme='dark'] .markdown-editor .md-table-body .md-table-cell {
+    color: var(--dm-text, #e6edf3);
+}

@@ -183,6 +183,129 @@
         return out;
     }
 
+    // Detects a markdown table separator row like:
+    //   | --- | --- |
+    //   |:----|----:|:---:|
+    //   ---|---
+    // The line must contain at least one '|' or a dash run, be composed
+    // solely of pipes, dashes, colons and whitespace, and have at least
+    // one '---'-style run.
+    function isTableSeparator(line) {
+        if (!line) return false;
+        var stripped = line.replace(/^\s+|\s+$/g, '');
+        if (stripped.length === 0) return false;
+        if (!/[-|]/.test(stripped)) return false;
+        if (!/^[|:\- \t]+$/.test(stripped)) return false;
+        if (!/-{3,}/.test(stripped)) return false;
+        // Must have at least 2 "cells" separated by | or at least one | anywhere.
+        return /\|/.test(stripped) || /-{3,}\s+-{3,}/.test(stripped);
+    }
+
+    function isTableRow(line) {
+        if (!line) return false;
+        // At least one pipe that is not escaped, not purely inside a code span.
+        return /\|/.test(line);
+    }
+
+    // Split a table row into [cell0, pipe, cell1, pipe, ...] preserving
+    // the original text exactly. Pipes escaped with a backslash are kept
+    // inside the surrounding cell.
+    function splitTableRow(line) {
+        var parts = [];
+        var cur = '';
+        for (var i = 0; i < line.length; i++) {
+            var ch = line.charAt(i);
+            if (ch === '\\' && i + 1 < line.length) {
+                cur += ch + line.charAt(i + 1);
+                i++;
+                continue;
+            }
+            if (ch === '|') {
+                parts.push({ type: 'cell', text: cur });
+                parts.push({ type: 'pipe', text: '|' });
+                cur = '';
+            } else {
+                cur += ch;
+            }
+        }
+        parts.push({ type: 'cell', text: cur });
+        return parts;
+    }
+
+    function formatTableLine(line, role) {
+        var segments = splitTableRow(line);
+        var html = '<span class="md-line md-table-row md-table-' + role + '">';
+        for (var i = 0; i < segments.length; i++) {
+            var seg = segments[i];
+            if (seg.type === 'pipe') {
+                html += '<span class="md-syntax md-table-pipe">|</span>';
+            } else {
+                // Preserve leading/trailing whitespace inside the cell by
+                // wrapping it; CSS gives the cell its visual padding and
+                // alignment. Empty cells (outer pipes) render as zero-width.
+                var inner = seg.text;
+                var leading = inner.match(/^\s*/)[0];
+                var trailing = inner.match(/\s*$/)[0];
+                var core = inner.substring(leading.length, inner.length - trailing.length);
+                var cellClass = 'md-table-cell';
+                if (role === 'separator') cellClass += ' md-table-sep-cell';
+                html += '<span class="' + cellClass + '">';
+                if (leading) html += escapeHtml(leading);
+                if (core !== '') {
+                    if (role === 'separator') {
+                        html += '<span class="md-table-sep-bar">' + escapeHtml(core) + '</span>';
+                    } else {
+                        html += formatInline(core);
+                    }
+                }
+                if (trailing) html += escapeHtml(trailing);
+                html += '</span>';
+            }
+        }
+        html += '</span>';
+        return html;
+    }
+
+    // Scan all lines and return a parallel array of roles:
+    //   'header' | 'separator' | 'body' | null
+    // A table is recognized when a separator line is preceded by a
+    // non-empty line that contains a pipe.
+    function detectTableRoles(lines, state) {
+        var roles = new Array(lines.length);
+        var inCodeBlock = !!state.inCodeBlock;
+        // First pass: track code block boundaries so we don't format
+        // tables inside ``` fences.
+        var codeFlags = new Array(lines.length);
+        for (var i = 0; i < lines.length; i++) {
+            if (/^\s*```/.test(lines[i])) {
+                codeFlags[i] = inCodeBlock || true; // fence line itself: still code
+                inCodeBlock = !inCodeBlock;
+            } else {
+                codeFlags[i] = inCodeBlock;
+            }
+        }
+        for (var j = 0; j < lines.length; j++) {
+            if (roles[j]) continue;
+            if (codeFlags[j]) continue;
+            if (!isTableSeparator(lines[j])) continue;
+            if (j === 0) continue;
+            var header = lines[j - 1];
+            if (codeFlags[j - 1]) continue;
+            if (!header || !isTableRow(header)) continue;
+            roles[j - 1] = 'header';
+            roles[j] = 'separator';
+            // Consume body rows
+            for (var k = j + 1; k < lines.length; k++) {
+                if (codeFlags[k]) break;
+                var ln = lines[k];
+                if (ln === '' || /^\s*$/.test(ln)) break;
+                if (!isTableRow(ln)) break;
+                roles[k] = 'body';
+            }
+        }
+        return roles;
+    }
+
     function formatLine(line, state) {
         // Fenced code block toggle
         if (/^\s*```/.test(line)) {
@@ -333,9 +456,17 @@
 
             var lines = text.split('\n');
             var state = { inCodeBlock: false };
+            var tableRoles = detectTableRoles(lines, state);
             var pieces = [];
             for (var i = 0; i < lines.length; i++) {
-                pieces.push(formatLine(lines[i], state));
+                if (tableRoles[i]) {
+                    // Keep the code-block toggle state in sync: table lines
+                    // never live inside a code block (detectTableRoles
+                    // already skips fenced regions).
+                    pieces.push(formatTableLine(lines[i], tableRoles[i]));
+                } else {
+                    pieces.push(formatLine(lines[i], state));
+                }
             }
 
             // Build via a detached container for a single DOM swap. Pieces

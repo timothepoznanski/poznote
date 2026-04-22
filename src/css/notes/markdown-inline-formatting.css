@@ -118,3 +118,42 @@
     color: #9aa3ad;
     letter-spacing: 2px;
 }
+
+/* Tables
+   ------------------------------------------------------------------
+   Markdown tables: each source line remains a span so the raw text
+   stays fully editable. We just style the pipes and cell content so
+   the block reads like a table. */
+.markdown-editor .md-table-row {
+    display: inline;
+}
+
+.markdown-editor .md-table-pipe {
+    color: #c8cdd4;
+    padding: 0 4px;
+}
+
+.markdown-editor .md-table-cell {
+    display: inline;
+    padding: 0 2px;
+}
+
+.markdown-editor .md-table-header .md-table-cell {
+    font-weight: 700;
+    color: #1f2328;
+}
+
+.markdown-editor .md-table-separator {
+    color: #9aa3ad;
+}
+
+.markdown-editor .md-table-separator .md-table-sep-bar {
+    /* Keep characters visible and editable, but dim them so the row
+       reads as a visual divider. */
+    color: #c8cdd4;
+    letter-spacing: 1px;
+}
+
+.markdown-editor .md-table-body .md-table-cell {
+    color: #24292f;
+}
