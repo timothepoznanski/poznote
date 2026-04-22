@@ -278,6 +278,12 @@
     function applyFormatting(editor) {
         if (!editor || rebuildingEditors.has(editor)) return;
 
+        // Never rebuild the DOM while the slash command menu is open: it
+        // stores a reference to the text node containing the "/", and
+        // swapping that node would break both filter typing and item
+        // selection.
+        if (document.querySelector('.slash-command-menu')) return;
+
         var hadFocus = (document.activeElement === editor);
         var captured = hadFocus ? captureCursorOffset(editor) : null;
         var text = captured ? captured.text : getNormalizedText(editor);
