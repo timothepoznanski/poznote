@@ -143,6 +143,10 @@
        from collapsing inside the cell so the raw text is preserved. */
     white-space: pre;
     vertical-align: baseline;
+    /* Let bold header text paint past its exact ch-based box width
+       without stretching the cell. Visually, monospace glyphs stay
+       close enough to the box edge that this is invisible. */
+    overflow: visible;
 }
 
 .markdown-editor .md-table-header .md-table-cell {

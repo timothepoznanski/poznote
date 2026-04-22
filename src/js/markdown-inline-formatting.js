@@ -253,10 +253,13 @@
                 var style = '';
                 var w = widths ? widths[colIndex] : 0;
                 if (w && w > 0) {
-                    // inline-block + min-width in ch lets the pipes line
-                    // up across rows when the row is rendered with a
-                    // monospace font (see CSS).
-                    style = ' style="min-width:' + w + 'ch"';
+                    // inline-block + fixed width in ch locks the cell's
+                    // box so the pipes line up vertically across rows,
+                    // even when some rows render the content bold (header)
+                    // and others don't — bold glyphs in a monospace font
+                    // may have a slightly larger advance width, which
+                    // would otherwise stretch the cell.
+                    style = ' style="width:' + w + 'ch"';
                 }
                 html += '<span class="' + cellClass + '"' + style + '>';
                 if (leading) html += escapeHtml(leading);
