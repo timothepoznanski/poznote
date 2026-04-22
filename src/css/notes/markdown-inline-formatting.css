@@ -123,9 +123,12 @@
    ------------------------------------------------------------------
    Markdown tables: each source line remains a span so the raw text
    stays fully editable. We just style the pipes and cell content so
-   the block reads like a table. */
+   the block reads like a table. Rows are rendered with a monospace
+   font so that `ch`-based min-widths on the cells line up vertically
+   across rows — that way the pipes form neat column dividers. */
 .markdown-editor .md-table-row {
     display: inline;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 .markdown-editor .md-table-pipe {
@@ -134,8 +137,12 @@
 }
 
 .markdown-editor .md-table-cell {
-    display: inline;
+    display: inline-block;
     padding: 0 2px;
+    /* Cells can wrap if the column is very wide; but keep whitespace
+       from collapsing inside the cell so the raw text is preserved. */
+    white-space: pre;
+    vertical-align: baseline;
 }
 
 .markdown-editor .md-table-header .md-table-cell {

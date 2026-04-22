@@ -232,9 +232,10 @@
         return parts;
     }
 
-    function formatTableLine(line, role) {
+    function formatTableLine(line, role, widths) {
         var segments = splitTableRow(line);
         var html = '<span class="md-line md-table-row md-table-' + role + '">';
+        var colIndex = 0;
         for (var i = 0; i < segments.length; i++) {
             var seg = segments[i];
             if (seg.type === 'pipe') {
@@ -249,7 +250,15 @@
                 var core = inner.substring(leading.length, inner.length - trailing.length);
                 var cellClass = 'md-table-cell';
                 if (role === 'separator') cellClass += ' md-table-sep-cell';
-                html += '<span class="' + cellClass + '">';
+                var style = '';
+                var w = widths ? widths[colIndex] : 0;
+                if (w && w > 0) {
+                    // inline-block + min-width in ch lets the pipes line
+                    // up across rows when the row is rendered with a
+                    // monospace font (see CSS).
+                    style = ' style="min-width:' + w + 'ch"';
+                }
+                html += '<span class="' + cellClass + '"' + style + '>';
                 if (leading) html += escapeHtml(leading);
                 if (core !== '') {
                     if (role === 'separator') {
@@ -260,6 +269,7 @@
                 }
                 if (trailing) html += escapeHtml(trailing);
                 html += '</span>';
+                colIndex++;
             }
         }
         html += '</span>';
@@ -304,6 +314,39 @@
             }
         }
         return roles;
+    }
+
+    // For each line belonging to a table, returns the per-column max
+    // cell width (in characters) shared by every row of that table.
+    // Lines not in any table get a null entry.
+    function computeTableColumnWidths(lines, roles) {
+        var widthsByLine = new Array(lines.length);
+        var i = 0;
+        while (i < lines.length) {
+            if (!roles[i]) { i++; continue; }
+            var start = i;
+            var end = i;
+            while (end + 1 < lines.length && roles[end + 1]) end++;
+
+            var widths = [];
+            for (var r = start; r <= end; r++) {
+                var segs = splitTableRow(lines[r]);
+                var col = 0;
+                for (var s = 0; s < segs.length; s++) {
+                    if (segs[s].type !== 'cell') continue;
+                    var len = segs[s].text.length;
+                    if (widths[col] == null || len > widths[col]) {
+                        widths[col] = len;
+                    }
+                    col++;
+                }
+            }
+            for (var r2 = start; r2 <= end; r2++) {
+                widthsByLine[r2] = widths;
+            }
+            i = end + 1;
+        }
+        return widthsByLine;
     }
 
     function formatLine(line, state) {
@@ -457,13 +500,14 @@
             var lines = text.split('\n');
             var state = { inCodeBlock: false };
             var tableRoles = detectTableRoles(lines, state);
+            var tableWidths = computeTableColumnWidths(lines, tableRoles);
             var pieces = [];
             for (var i = 0; i < lines.length; i++) {
                 if (tableRoles[i]) {
                     // Keep the code-block toggle state in sync: table lines
                     // never live inside a code block (detectTableRoles
                     // already skips fenced regions).
-                    pieces.push(formatTableLine(lines[i], tableRoles[i]));
+                    pieces.push(formatTableLine(lines[i], tableRoles[i], tableWidths[i]));
                 } else {
                     pieces.push(formatLine(lines[i], state));
                 }
