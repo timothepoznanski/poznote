@@ -293,9 +293,15 @@
     function applyFormatting(editor) {
         if (!editor || rebuildingEditors.has(editor)) return;
 
-        // User-level kill switch (display settings card).
+        // User-level kill switch (display settings card). If the editor
+        // still carries previously-formatted spans, flatten it once so
+        // the user sees raw markdown; otherwise do nothing — rewriting
+        // textContent on every keystroke would reset the caret to the
+        // start of the editor.
         if (isLiveFormattingDisabled()) {
-            clearFormatting(editor);
+            if (editor.querySelector && editor.querySelector('.md-line, .md-syntax, .md-bold, .md-italic, .md-inline-code, .md-code-block, .md-heading, .md-link-text')) {
+                clearFormatting(editor);
+            }
             return;
         }
 
@@ -384,6 +390,12 @@
     function scheduleFormat(editor) {
         var existing = debounceTimers.get(editor);
         if (existing) clearTimeout(existing);
+        // When the kill switch is on, skip the debounce entirely: there is
+        // nothing to reformat, and a rebuild would reset the caret.
+        if (isLiveFormattingDisabled()) {
+            debounceTimers.delete(editor);
+            return;
+        }
         var t = setTimeout(function () {
             debounceTimers.delete(editor);
             applyFormatting(editor);
