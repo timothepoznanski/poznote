@@ -1,0 +1,123 @@
+/**
+ * Markdown Inline Formatting
+ *
+ * Visual styling applied to the raw markdown source inside the
+ * `.markdown-editor` contentEditable div. The markdown syntax characters
+ * (**, __, #, etc.) remain visible and editable; only visual styling is
+ * layered on top by `markdown-inline-formatting.js`.
+ */
+
+/* Line wrapper - each source line is wrapped in a span so we can apply
+   block-level styling while keeping everything inline for cursor/newline
+   handling via literal "\n" text nodes in pre-wrap whitespace mode. */
+.markdown-editor .md-line {
+    display: inline;
+}
+
+/* Markdown syntax characters (the decorative delimiters) */
+.markdown-editor .md-syntax {
+    color: #9aa3ad;
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Inline formatting */
+.markdown-editor .md-bold {
+    font-weight: 700;
+}
+
+.markdown-editor .md-italic {
+    font-style: italic;
+}
+
+.markdown-editor .md-bold.md-italic {
+    font-weight: 700;
+    font-style: italic;
+}
+
+.markdown-editor .md-strike {
+    text-decoration: line-through;
+    text-decoration-color: #8a8f97;
+}
+
+.markdown-editor .md-highlight {
+    background-color: #fff3a3;
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+.markdown-editor .md-inline-code {
+    background-color: rgba(175, 184, 193, 0.2);
+    padding: 0 3px;
+    border-radius: 3px;
+    color: #a3324c;
+}
+
+.markdown-editor .md-code-block,
+.markdown-editor .md-code-fence {
+    background-color: rgba(175, 184, 193, 0.12);
+    color: #24292f;
+    border-radius: 2px;
+    padding: 0 2px;
+}
+
+.markdown-editor .md-code-fence {
+    color: #6e7781;
+}
+
+/* Links */
+.markdown-editor .md-link-text {
+    color: #0969da;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+}
+
+.markdown-editor .md-link-url {
+    color: #6e7781;
+}
+
+/* Headings — use size to establish a visual hierarchy. Kept monospace
+   so horizontal alignment of syntax characters stays predictable. */
+.markdown-editor .md-heading {
+    font-weight: 700;
+    color: #1f2328;
+}
+
+.markdown-editor .md-h1 { font-size: 1.7em; line-height: 1.25; }
+.markdown-editor .md-h2 { font-size: 1.45em; line-height: 1.25; }
+.markdown-editor .md-h3 { font-size: 1.25em; line-height: 1.3; }
+.markdown-editor .md-h4 { font-size: 1.1em;  line-height: 1.35; }
+.markdown-editor .md-h5 { font-size: 1em;    line-height: 1.4; }
+.markdown-editor .md-h6 {
+    font-size: 0.95em;
+    color: #6e7781;
+    line-height: 1.4;
+}
+
+/* Blockquotes */
+.markdown-editor .md-blockquote {
+    color: #6e7781;
+    font-style: italic;
+}
+
+/* List markers */
+.markdown-editor .md-list-marker {
+    color: #0969da;
+    font-weight: 700;
+}
+
+.markdown-editor .md-task-checkbox {
+    color: #0969da;
+    font-weight: 700;
+}
+
+.markdown-editor .md-task-done .md-task-text {
+    text-decoration: line-through;
+    color: #8a8f97;
+}
+
+/* Horizontal rule */
+.markdown-editor .md-hr {
+    color: #9aa3ad;
+    letter-spacing: 2px;
+}

@@ -241,6 +241,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/notes/markdown-inline-formatting.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/excalidraw-unified.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $v; ?>"/>
@@ -257,6 +258,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown-inline-formatting.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/calendar.css?v=<?php echo $v; ?>"/>
@@ -275,6 +277,7 @@ if ($width_value !== false && $width_value !== '' && $width_value !== '0' && $wi
     <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
+    <script src="js/markdown-inline-formatting.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/auto-render.min.js?v=<?php echo $v; ?>"></script>
