@@ -45,8 +45,8 @@ body.dark-mode .noteentry {
 }
 
 /* Readable text colors: preserve inline color styles, links, and syntax highlighting */
-html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active),
-body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active) {
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]),
+body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]) {
     color: var(--dm-text) !important;
 }
 

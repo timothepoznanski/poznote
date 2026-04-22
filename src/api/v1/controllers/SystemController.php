@@ -82,23 +82,36 @@ class SystemController {
             'http' => [
                 'method' => 'GET',
                 'header' => ['User-Agent: Poznote-App/1.0', 'Accept: application/vnd.github.v3+json'],
-                'timeout' => 10
+                'timeout' => 10,
+                'ignore_errors' => true
             ]
         ]);
         
         $response = @file_get_contents('https://api.github.com/repos/timothepoznanski/poznote/releases/latest', false, $context);
         
-        if ($response !== false) {
-            $release = json_decode($response, true);
-            $remoteVersion = ltrim($release['tag_name'], 'v');
-            
-            // Skip pre-releases
-            if (strpos($remoteVersion, '-test') === false && strpos($remoteVersion, '-beta') === false) {
-                $result['remote_version'] = $remoteVersion;
-                $result['has_updates'] = version_compare($result['current_version'], $remoteVersion, '<');
-            }
+        if ($response === false) {
+            $err = error_get_last();
+            $result['success'] = false;
+            $result['error'] = 'Unable to reach update server (no network or GitHub unreachable)'
+                . (isset($err['message']) ? ': ' . $err['message'] : '');
+            return $result;
         }
-        
+
+        $release = json_decode($response, true);
+        if (!is_array($release) || empty($release['tag_name'])) {
+            $result['success'] = false;
+            $result['error'] = 'Invalid response from update server';
+            return $result;
+        }
+
+        $remoteVersion = ltrim($release['tag_name'], 'v');
+
+        // Skip pre-releases
+        if (strpos($remoteVersion, '-test') === false && strpos($remoteVersion, '-beta') === false) {
+            $result['remote_version'] = $remoteVersion;
+            $result['has_updates'] = version_compare($result['current_version'], $remoteVersion, '<');
+        }
+
         return $result;
     }
     

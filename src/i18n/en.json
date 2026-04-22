@@ -156,6 +156,7 @@
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
       "tasklist_insert_order": "Task list insert order",
+      "markdown_live_formatting": "Live markdown formatting",
       "timezone": "Timezone",
       "show_note_created": "Show creation date",
       "show_folder_counts": "Show folder note counts",
