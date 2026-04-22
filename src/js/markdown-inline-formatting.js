@@ -367,13 +367,16 @@
             scheduleFormat(editor);
         });
 
-        // Re-format on blur so the displayed text reflects any final edits
-        // performed by other handlers (list auto-continuation, etc.).
+        // Cancel any pending reformat when the editor loses focus. This
+        // avoids rebuilding the DOM (and wiping the selection) while the
+        // user is interacting with the toolbar — which would otherwise
+        // cause execCommand('insertText') to fire at the wrong location.
         editor.addEventListener('blur', function () {
             var existing = debounceTimers.get(editor);
-            if (existing) clearTimeout(existing);
-            debounceTimers.delete(editor);
-            applyFormatting(editor);
+            if (existing) {
+                clearTimeout(existing);
+                debounceTimers.delete(editor);
+            }
         });
 
         // Initial pass
