@@ -30,6 +30,47 @@
         return editor.innerText || editor.textContent || '';
     }
 
+    // Like normalizeContentEditableText but DOES preserve trailing newlines.
+    // We need this because if the user has just pressed Enter at the end of
+    // the document, the trailing newline is the cursor's current line — we
+    // must keep it to restore the cursor correctly.
+    function extractSourceText(element) {
+        var parts = [];
+        if (element.childNodes.length === 0) {
+            return element.innerText || element.textContent || '';
+        }
+        for (var i = 0; i < element.childNodes.length; i++) {
+            var node = element.childNodes[i];
+            if (node.nodeType === Node.TEXT_NODE) {
+                parts.push(node.textContent || node.nodeValue || '');
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                var tagName = node.tagName;
+                if (['DIV', 'P', 'LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'].indexOf(tagName) !== -1) {
+                    var divText = node.textContent || '';
+                    var hasBr = !!node.querySelector('br');
+                    if (parts.length > 0) {
+                        var lastPart = parts[parts.length - 1];
+                        if (lastPart && !lastPart.endsWith('\n')) {
+                            parts.push('\n');
+                        }
+                    }
+                    if (divText === '' && hasBr) {
+                        parts.push('\n');
+                    } else {
+                        parts.push(divText);
+                        parts.push('\n');
+                    }
+                } else if (tagName === 'BR') {
+                    parts.push('\n');
+                } else {
+                    parts.push(node.textContent || '');
+                }
+            }
+        }
+        var content = parts.join('');
+        return content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    }
+
     function formatInline(text) {
         var tokens = [];
         function store(html) {
@@ -220,7 +261,7 @@
             return null;
         }
 
-        var fullText = getNormalizedText(editor);
+        var fullText = extractSourceText(editor);
         var idx = fullText.indexOf(CURSOR_MARKER);
 
         if (markerNode.parentNode) {
