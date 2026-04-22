@@ -395,26 +395,98 @@ function handleMarkdownOrderedListEnter(event, editorDiv, noteEntry, noteId) {
     var lineIndex = getMarkdownLineIndexForOffset(lineStarts, selectionOffsets.start);
     var currentLine = lines[lineIndex] || '';
     var currentLineEnd = (lineStarts[lineIndex] || 0) + currentLine.length;
-    var orderedMatch = currentLine.match(/^([ \t]*)(\d+(?:\.\d+)*)(\.\s+)(.*)$/);
-
-    if (!orderedMatch || selectionOffsets.start !== currentLineEnd || orderedMatch[4].trim() === '') {
+    if (selectionOffsets.start !== currentLineEnd) {
         return false;
     }
 
-    event.preventDefault();
-    event.stopPropagation();
+    // Task list: "- [ ] " / "- [x] " / "1. [ ] " etc.
+    var taskMatch = currentLine.match(/^([ \t]*)([-*+]|\d+(?:\.\d+)*\.)(\s+)(\[[ xX]\])(\s+)(.*)$/);
+    if (taskMatch) {
+        event.preventDefault();
+        event.stopPropagation();
 
-    lines.splice(lineIndex + 1, 0, orderedMatch[1] + orderedMatch[2] + orderedMatch[3]);
-    lines = renumberMarkdownOrderedListLines(lines);
+        // Empty task item -> exit the list (remove the marker)
+        if (taskMatch[6].trim() === '') {
+            lines[lineIndex] = '';
+            var newContent = lines.join('\n');
+            var caret = (getMarkdownLineStartOffsets(newContent)[lineIndex] || 0);
+            updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContent, caret, caret);
+            return true;
+        }
 
-    var newContent = lines.join('\n');
-    var newLineStarts = getMarkdownLineStartOffsets(newContent);
-    var insertedLine = lines[lineIndex + 1] || '';
-    var insertedPrefixMatch = insertedLine.match(/^[ \t]*\d+(?:\.\d+)*\.\s+/);
-    var caretOffset = (newLineStarts[lineIndex + 1] || newContent.length) + (insertedPrefixMatch ? insertedPrefixMatch[0].length : insertedLine.length);
+        var emptyCheckbox = '[ ]';
+        var isOrdered = /^\d/.test(taskMatch[2]);
+        var marker = isOrdered ? taskMatch[2] : taskMatch[2];
+        var insertedLine = taskMatch[1] + marker + taskMatch[3] + emptyCheckbox + taskMatch[5];
+        lines.splice(lineIndex + 1, 0, insertedLine);
+        if (isOrdered) {
+            lines = renumberMarkdownOrderedListLines(lines);
+        }
+        var newContent2 = lines.join('\n');
+        var newLineStarts2 = getMarkdownLineStartOffsets(newContent2);
+        var insertedLine2 = lines[lineIndex + 1] || '';
+        var caret2 = (newLineStarts2[lineIndex + 1] || newContent2.length) + insertedLine2.length;
+        updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContent2, caret2, caret2);
+        return true;
+    }
 
-    updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContent, caretOffset, caretOffset);
-    return true;
+    // Ordered list: "1. ", "2.1. ", etc.
+    var orderedMatch = currentLine.match(/^([ \t]*)(\d+(?:\.\d+)*)(\.\s+)(.*)$/);
+    if (orderedMatch) {
+        // Empty item -> exit the list
+        if (orderedMatch[4].trim() === '') {
+            event.preventDefault();
+            event.stopPropagation();
+            lines[lineIndex] = '';
+            var newContentE = lines.join('\n');
+            var caretE = (getMarkdownLineStartOffsets(newContentE)[lineIndex] || 0);
+            updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContentE, caretE, caretE);
+            return true;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        lines.splice(lineIndex + 1, 0, orderedMatch[1] + orderedMatch[2] + orderedMatch[3]);
+        lines = renumberMarkdownOrderedListLines(lines);
+
+        var newContent = lines.join('\n');
+        var newLineStarts = getMarkdownLineStartOffsets(newContent);
+        var insertedLine = lines[lineIndex + 1] || '';
+        var insertedPrefixMatch = insertedLine.match(/^[ \t]*\d+(?:\.\d+)*\.\s+/);
+        var caretOffset = (newLineStarts[lineIndex + 1] || newContent.length) + (insertedPrefixMatch ? insertedPrefixMatch[0].length : insertedLine.length);
+
+        updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContent, caretOffset, caretOffset);
+        return true;
+    }
+
+    // Unordered list: "- ", "* ", "+ "
+    var unorderedMatch = currentLine.match(/^([ \t]*)([-*+])(\s+)(.*)$/);
+    if (unorderedMatch) {
+        // Empty item -> exit the list
+        if (unorderedMatch[4].trim() === '') {
+            event.preventDefault();
+            event.stopPropagation();
+            lines[lineIndex] = '';
+            var newContentU0 = lines.join('\n');
+            var caretU0 = (getMarkdownLineStartOffsets(newContentU0)[lineIndex] || 0);
+            updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContentU0, caretU0, caretU0);
+            return true;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        var insertedLineU = unorderedMatch[1] + unorderedMatch[2] + unorderedMatch[3];
+        lines.splice(lineIndex + 1, 0, insertedLineU);
+        var newContentU = lines.join('\n');
+        var newLineStartsU = getMarkdownLineStartOffsets(newContentU);
+        var caretU = (newLineStartsU[lineIndex + 1] || newContentU.length) + insertedLineU.length;
+        updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContentU, caretU, caretU);
+        return true;
+    }
+
+    return false;
 }
 
 function initMermaid(retryCount) {
@@ -2538,28 +2610,23 @@ function navigateToEditorLine(lineNumber, noteEntry) {
         charOffset += lines[i].length + 1; // +1 for newline
     }
 
-    // Focus the editor
-    editorDiv.focus();
-
-    // Set cursor position using Selection API
     try {
-        var textNode = editorDiv.firstChild;
-        if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-            var range = document.createRange();
-            var selection = window.getSelection();
+        // Use the tree-walking selection helper so this works regardless of the
+        // editor's internal structure (plain text node vs. live-formatted
+        // `.md-line` spans with inter-span "\n" text nodes).
+        setSelectionOffsetsInTextElement(editorDiv, charOffset, charOffset);
 
-            // Clamp the offset to valid range
-            var maxOffset = textNode.textContent.length;
-            charOffset = Math.min(charOffset, maxOffset);
-
-            range.setStart(textNode, charOffset);
-            range.collapse(true);
-
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-            // Scroll the editor to show the cursor
-            // Calculate approximate scroll position
+        // Prefer scrolling the live-formatted `.md-line` span into view when
+        // available; its geometry matches the visual line. Fall back to the
+        // approximate line-height computation otherwise.
+        var lineSpans = editorDiv.querySelectorAll(':scope > .md-line');
+        if (lineSpans && lineSpans.length > lineNumber && lineSpans[lineNumber]) {
+            try {
+                lineSpans[lineNumber].scrollIntoView({ block: 'center', inline: 'nearest' });
+            } catch (e2) {
+                lineSpans[lineNumber].scrollIntoView(true);
+            }
+        } else {
             var lineHeight = parseInt(window.getComputedStyle(editorDiv).lineHeight) || 20;
             var scrollTop = lineNumber * lineHeight - editorDiv.clientHeight / 2;
             editorDiv.scrollTop = Math.max(0, scrollTop);
