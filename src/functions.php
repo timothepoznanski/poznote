@@ -440,10 +440,20 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#createModal ' . $createModalOptionSelectors[$key] . ' { display: none !important; }';
             }
         } elseif ($type === 'toolbar') {
-            $rules[] = '.note-edit-toolbar .' . $id . ' { display: none !important; }';
+            $rules[] = '.note-edit-toolbar .' . $id . ', .note-edit-toolbar .' . $id . ':not(.hide-on-selection) { display: none !important; }';
             $rules[] = '.mobile-toolbar-menu [data-selector=".' . $id . '"] { display: none !important; }';
             if ($id === 'btn-snapshot') {
                 $rules[] = '.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }';
+            } elseif ($id === 'btn-split-view') {
+                $rules[] = '.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }';
+            } elseif ($id === 'btn-tasklist-actions') {
+                $rules[] = '.tasklist-actions-dropdown { display: none !important; }';
+            } elseif ($id === 'btn-audio') {
+                $rules[] = '.mobile-toolbar-menu [data-action="insert-audio-file"] { display: none !important; }';
+            } elseif ($id === 'btn-clear-completed') {
+                $rules[] = '.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }';
+            } elseif ($id === 'btn-uncheck-all') {
+                $rules[] = '.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }';
             }
         } elseif ($type === 'folder') {
             $rules[] = '.folder-actions-menu-item[data-action="' . $id . '"] { display: none !important; }';

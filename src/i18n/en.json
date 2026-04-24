@@ -43,7 +43,7 @@
     "link_copied": "Link copied"
   },
   "snapshot": {
-    "menu_item": "Snapshot",
+    "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
       "loading": "Loading snapshot...",
@@ -351,7 +351,9 @@
         "folder_actions": "Folder Actions"
       },
       "badge_all_visible": "All visible",
-      "badge_hidden_count": "{{count}} hidden"
+      "badge_hidden_count": "{{count}} hidden",
+      "check_all": "Check all",
+      "uncheck_all": "Uncheck all"
     },
     "theme": {
       "title": "Theme Selection",
@@ -933,7 +935,8 @@
       "insert_note_reference": "Insert note reference",
       "open_in_new_tab": "Open in new tab",
       "create_linked_note": "Create shortcut",
-      "search_replace": "Search and replace"
+      "search_replace": "Search and replace",
+      "split_view": "Toggle split view"
     },
     "link": {
       "add_title": "Add link",

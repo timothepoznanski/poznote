@@ -98,8 +98,8 @@ function addFrontMatterToMarkdown($content, $metadata, $con) {
     $title = $metadata['heading'] ?? 'New note';
     $tags = $metadata['tags'] ?? '';
     $favorite = !empty($metadata['favorite']) ? 'true' : 'false';
-    $created = $metadata['created'] ?? '';
-    $updated = $metadata['updated'] ?? '';
+    $created = convertUtcToUserTimezone($metadata['created'] ?? '');
+    $updated = convertUtcToUserTimezone($metadata['updated'] ?? '');
     $folder_id = $metadata['folder_id'] ?? null;
     $noteType = $metadata['type'] ?? 'note';
     

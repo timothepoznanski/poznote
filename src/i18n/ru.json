@@ -43,7 +43,7 @@
     "link_copied": "Ссылка скопирована"
   },
   "snapshot": {
-    "menu_item": "Снимок",
+    "menu_item": "Снимки",
     "modal": {
       "title": "Снимки",
       "loading": "Загрузка снимка...",
@@ -349,6 +349,8 @@
         "panels": "Другое",
         "folder_actions": "Действия с папками"
       },
+      "check_all": "Выбрать все",
+      "uncheck_all": "Снять все",
       "badge_all_visible": "Всё видимо",
       "badge_hidden_count": "{{count}} скрыто"
     },
@@ -932,6 +934,7 @@
       "insert_note_reference": "Вставить ссылку на заметку",
       "open_in_new_tab": "Открыть в новой вкладке",
       "create_linked_note": "Создать ярлык",
+      "split_view": "Переключить раздельный вид",
       "search_replace": "Поиск и замена"
     },
     "link": {

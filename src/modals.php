@@ -1035,7 +1035,7 @@
 
                 <!-- Dashboard Cards Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.home_cards', [], 'Dashboard Cards'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.home_cards', [], 'Dashboard Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notes-card" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-tags-card" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
@@ -1056,7 +1056,7 @@
 
                 <!-- Create Cards Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.create_cards', [], 'Create Cards'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.create_cards', [], 'Create Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-note-card" checked><span><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-markdown-note-card" checked><span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span></label>
@@ -1072,7 +1072,7 @@
 
                 <!-- Settings Cards Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspaces-card" checked><span><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
@@ -1107,7 +1107,7 @@
 
                 <!-- Toolbar Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-bold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-italic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
@@ -1124,6 +1124,7 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-eraser" checked><span><?php echo t_h('editor.toolbar.clear_formatting', [], 'Clear formatting'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-search-replace" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and Replace'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-checklist" checked><span><?php echo t_h('editor.toolbar.insert_checklist', [], 'Checklist'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-tasklist-actions" checked><span><?php echo t_h('tasklist.actions', [], 'Task list actions'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-share" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>
@@ -1134,7 +1135,12 @@
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-create-linked-note" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create linked note'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-download" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-convert" checked><span><?php echo t_h('modals.convert.title', [], 'Convert'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshot'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-audio" checked><span><?php echo t_h('slash_menu.audio', [], 'Audio'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-clear-completed" checked><span><?php echo t_h('tasklist.clear_completed', [], 'Clear completed tasks'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-uncheck-all" checked><span><?php echo t_h('tasklist.uncheck_all', [], 'Uncheck all tasks'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshots'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-split-view" checked><span><?php echo t_h('editor.toolbar.split_view', [], 'Toggle split view'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-home"><span>Home</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
                 </div>
@@ -1142,7 +1148,7 @@
 
                 <!-- Slash Menu Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.slash_menu', [], 'Slash Menu'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.slash_menu', [], 'Slash Menu'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:normal" checked><span><?php echo t_h('slash_menu.back_to_normal', [], 'Back to normal text'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:title" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
@@ -1168,7 +1174,7 @@
 
                 <!-- Other Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-icon-kanban" checked><span><?php echo t_h('home.kanban', [], 'Kanban'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
@@ -1178,7 +1184,7 @@
 
                 <!-- Folder Actions Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><?php echo t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions'); ?></h4>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:create-note-in-folder" checked><span><?php echo t_h('notes_list.folder_actions.create', [], 'Create note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-kanban-view" checked><span><?php echo t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view'); ?></span></label>

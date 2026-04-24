@@ -29,6 +29,7 @@
         'btn-eraser': 'format',
         'btn-search-replace': 'action',
         'btn-checklist': 'action',
+        'btn-tasklist-actions': 'action',
         'btn-favorite': 'action',
         'btn-share': 'action',
         'btn-attachment': 'action',
@@ -40,7 +41,10 @@
         'btn-download': 'action',
         'btn-convert': 'action',
         'btn-trash': 'action',
-        'btn-info': 'action'
+        'btn-info': 'action',
+        'btn-split-view': 'action',
+        'btn-home': 'action',
+        'btn-audio': 'action'
     };
 
     var CREATE_MODAL_OPTION_SELECTORS = {
@@ -110,6 +114,39 @@
         return style.display !== 'none' && style.visibility !== 'hidden';
     }
 
+    function isToolbarMenuItemVisible(item) {
+        if (!item) return false;
+
+        var config = window.PoznoteUiCustomization;
+        var hiddenKeyMap = config && config.hiddenKeyMap ? config.hiddenKeyMap : null;
+
+        if (hiddenKeyMap) {
+            var selector = item.getAttribute('data-selector');
+            if (selector && selector.charAt(0) === '.' && hiddenKeyMap['toolbar:' + selector.slice(1)]) {
+                return false;
+            }
+
+            var action = item.getAttribute('data-action');
+            if (action === 'show-snapshot' && hiddenKeyMap['toolbar:btn-snapshot']) {
+                return false;
+            }
+
+            if (action === 'insert-audio-file' && hiddenKeyMap['toolbar:btn-audio']) {
+                return false;
+            }
+
+            if (action === 'clear-completed-tasks' && hiddenKeyMap['toolbar:btn-clear-completed']) {
+                return false;
+            }
+
+            if (action === 'uncheck-all-tasks' && hiddenKeyMap['toolbar:btn-uncheck-all']) {
+                return false;
+            }
+        }
+
+        return isVisibleElement(item);
+    }
+
     function getCustomizableToolbarClass(button) {
         if (!button || !button.classList) return null;
 
@@ -167,7 +204,7 @@
 
             var visibleMenuItems = Array.prototype.some.call(
                 menu.querySelectorAll('.dropdown-item'),
-                isVisibleElement
+                isToolbarMenuItemVisible
             );
 
             if (!visibleButtons || !visibleMenuItems) {
@@ -302,8 +339,21 @@
                         rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
                     }
                 } else if (type === 'toolbar') {
-                    rules.push('.note-edit-toolbar .' + id + ' { display: none !important; }');
+                    rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
                     rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
+                    if (id === 'btn-snapshot') {
+                        rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
+                    } else if (id === 'btn-split-view') {
+                        rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
+                    } else if (id === 'btn-tasklist-actions') {
+                        rules.push('.tasklist-actions-dropdown { display: none !important; }');
+                    } else if (id === 'btn-audio') {
+                        rules.push('.mobile-toolbar-menu [data-action="insert-audio-file"] { display: none !important; }');
+                    } else if (id === 'btn-clear-completed') {
+                        rules.push('.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }');
+                    } else if (id === 'btn-uncheck-all') {
+                        rules.push('.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }');
+                    }
                 } else if (type === 'folder') {
                     rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
                     if (id === 'toggle-sort-submenu') {
