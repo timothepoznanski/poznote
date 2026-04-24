@@ -8,6 +8,10 @@
         txtError:       body.getAttribute('data-txt-error') || 'Error',
         txtUntitled:    body.getAttribute('data-txt-untitled') || 'Untitled',
         txtNoFolder:    body.getAttribute('data-txt-no-folder') || 'No folder',
+        txtTypeHtml:    body.getAttribute('data-txt-type-html') || 'HTML',
+        txtTypeMarkdown: body.getAttribute('data-txt-type-markdown') || 'Markdown',
+        txtTypeTasklist: body.getAttribute('data-txt-type-tasklist') || 'Tasklist',
+        txtTypeExcalidraw: body.getAttribute('data-txt-type-excalidraw') || 'Excalidraw',
         txtSelected:    body.getAttribute('data-txt-selected') || 'selected',
         txtSelectAll:   body.getAttribute('data-txt-select-all') || 'Select all visible',
         txtDeselectAll: body.getAttribute('data-txt-deselect-all') || 'Deselect all',
@@ -29,11 +33,12 @@
     };
 
     // ── State ────────────────────────────────────────────────────────────────
-    var allNotes = [];      // [{id, heading, folder, folder_id, updated, workspace, tags}, …]
+    var allNotes = [];      // [{id, heading, type, folder, folder_id, updated, workspace, tags}, …]
     var allFolders = [];    // [{id, name, parent_id, path}, …]
     var filteredNotes = []; // Currently visible notes after filter
     var selectedIds = new Set();
     var filterText = '';
+    var filterType = '';
     var movingToFolderId = null; // null = root; number = folder id
     var currentTagAction = '';
 
@@ -42,6 +47,7 @@
     var nmContainer      = document.getElementById('nmNotesContainer');
     var nmEmptyMessage   = document.getElementById('nmEmptyMessage');
     var nmFilterInput    = document.getElementById('nmFilterInput');
+    var nmTypeFilter     = document.getElementById('nmTypeFilter');
     var nmClearFilter    = document.getElementById('nmClearFilter');
     var nmFilterStats    = document.getElementById('nmFilterStats');
     var nmBulkBar        = document.getElementById('nmBulkBar');
@@ -78,6 +84,27 @@
         var d = new Date(dateStr.replace(' ', 'T') + 'Z');
         if (isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString();
+    }
+
+    function normalizeNoteType(noteType) {
+        var normalized = String(noteType || 'note').toLowerCase();
+        return normalized === 'note' ? 'html' : normalized;
+    }
+
+    function getNoteTypeLabel(noteType) {
+        var normalized = normalizeNoteType(noteType);
+        if (normalized === 'markdown') return cfg.txtTypeMarkdown;
+        if (normalized === 'tasklist') return cfg.txtTypeTasklist;
+        if (normalized === 'excalidraw') return cfg.txtTypeExcalidraw;
+        return cfg.txtTypeHtml;
+    }
+
+    function getNoteTypeIcon(noteType) {
+        var normalized = normalizeNoteType(noteType);
+        if (normalized === 'markdown') return 'lucide-file-code';
+        if (normalized === 'tasklist') return 'lucide-list-todo';
+        if (normalized === 'excalidraw') return 'lucide-brush';
+        return 'lucide-file-text';
     }
 
     function fetchJson(url, options) {
@@ -212,13 +239,23 @@
     // ── Filter ────────────────────────────────────────────────────────────────
     function applyFilter() {
         var q = filterText.toLowerCase();
-        if (!q) {
+        if (!q && !filterType) {
             filteredNotes = allNotes.slice();
         } else {
             filteredNotes = allNotes.filter(function (n) {
+                var noteType = normalizeNoteType(n.type);
+                if (filterType && noteType !== filterType) {
+                    return false;
+                }
+
+                if (!q) {
+                    return true;
+                }
+
                 var title = (n.heading || '').toLowerCase();
                 var tags  = (n.tags   || '').toLowerCase();
-                return title.indexOf(q) !== -1 || tags.indexOf(q) !== -1;
+                var typeLabel = getNoteTypeLabel(n.type).toLowerCase();
+                return title.indexOf(q) !== -1 || tags.indexOf(q) !== -1 || typeLabel.indexOf(q) !== -1;
             });
         }
 
@@ -234,7 +271,7 @@
     }
 
     function updateFilterStats() {
-        if (filterText && filteredNotes.length < allNotes.length) {
+        if (filterText || filterType) {
             nmFilterStats.textContent = filteredNotes.length + ' / ' + allNotes.length;
             show(nmFilterStats);
         } else {
@@ -390,6 +427,19 @@
         link.href = 'index.php?note=' + note.id + (cfg.workspace ? '&workspace=' + encodeURIComponent(cfg.workspace) : '');
         link.textContent = note.heading || cfg.txtUntitled;
 
+        var noteType = normalizeNoteType(note.type);
+        var titleWrap = document.createElement('div');
+        titleWrap.className = 'nm-note-title-wrap';
+
+        var typeEl = document.createElement('span');
+        typeEl.className = 'nm-note-type-icon nm-note-type-' + noteType.replace(/[^a-z0-9_-]/g, '-');
+        typeEl.title = getNoteTypeLabel(note.type);
+        typeEl.setAttribute('aria-label', getNoteTypeLabel(note.type));
+        typeEl.innerHTML = '<i class="lucide ' + escHtml(getNoteTypeIcon(note.type)) + '"></i>';
+
+        titleWrap.appendChild(typeEl);
+        titleWrap.appendChild(link);
+
         // Tags chips
         var tagsEl = document.createElement('span');
         tagsEl.className = 'nm-note-tags';
@@ -410,7 +460,7 @@
         meta.textContent = formatDate(note.updated);
 
         row.appendChild(cb);
-        row.appendChild(link);
+        row.appendChild(titleWrap);
         row.appendChild(tagsEl);
         row.appendChild(meta);
         return row;
@@ -754,6 +804,10 @@
     nmFilterInput.addEventListener('input', function () {
         filterText = this.value.trim().toLowerCase();
         nmClearFilter.style.display = filterText ? 'flex' : 'none';
+        applyFilter();
+    });
+    nmTypeFilter.addEventListener('change', function () {
+        filterType = this.value;
         applyFilter();
     });
     nmClearFilter.addEventListener('click', function () {

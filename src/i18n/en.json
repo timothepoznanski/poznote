@@ -628,6 +628,7 @@
   },
   "notes_manager": {
     "actions": "Bulk actions",
+    "all_types": "All types",
     "choose_action": "Choose an action...",
     "select_folder": "Select a target folder",
     "add_tag": "Add tag",
@@ -648,7 +649,12 @@
     "moved": "Moved successfully",
     "root": "Root (no folder)",
     "filter_folders": "Filter folders...",
-    "filter_placeholder": "Filter notes by title or tags..."
+    "filter_placeholder": "Filter notes by title or tags...",
+    "filter_type": "Filter by type",
+    "type_html": "HTML",
+    "type_markdown": "Markdown",
+    "type_tasklist": "Tasklist",
+    "type_excalidraw": "Excalidraw"
   },
   "update": {
     "new_available": "🎉 New update available!",
