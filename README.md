@@ -264,31 +264,6 @@ docker compose up -d
 
 ## Update application
 
-In most cases, updating Poznote is simple and does not require editing `.env`.
-
-### Simple update (default)
-
-Use this when the release notes do not mention changes to `.env`.
-
-Navigate to your Poznote directory:
-```bash
-cd poznote
-```
-
-Download the latest Poznote Webserver and Poznote MCP images:
-```bash
-docker compose pull
-```
-
-Start the updated containers:
-```bash
-docker compose up -d
-```
-
-### If the release notes mention `.env` changes
-
-When a release explicitly asks you to update `.env`, refresh the reference files and compare them before restarting:
-
 Navigate to your Poznote directory:
 ```bash
 cd poznote
@@ -309,7 +284,7 @@ Download the latest `.env.template`:
 curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
 ```
 
-Review `.env.template` and add any new variables to your `.env` file if needed:
+Use sdiff to review `.env.template` and add any new variables to your `.env` file if needed:
 ```bash
 sdiff .env .env.template
 ```

@@ -65,7 +65,7 @@
     "link_copied": "Link copiado"
   },
   "snapshot": {
-    "menu_item": "Instantâneo",
+    "menu_item": "Instantâneos",
     "modal": {
       "title": "Instantâneos",
       "loading": "Carregando instantâneo...",
@@ -722,6 +722,7 @@
       "insert_note_reference": "Inserir referência de nota",
       "create_linked_note": "Criar atalho",
       "open_in_new_tab": "Abrir em nova aba",
+      "split_view": "Alternar vista dividida",
       "search_replace": "Pesquisar e substituir"
     },
     "link": {
@@ -814,6 +815,8 @@
         "panels": "Outros",
         "folder_actions": "Ações de pasta"
       },
+      "check_all": "Marcar todos",
+      "uncheck_all": "Desmarcar todos",
       "badge_all_visible": "Tudo visível",
       "badge_hidden_count": "{{count}} oculto(s)"
     },

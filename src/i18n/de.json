@@ -66,7 +66,7 @@
     "link_copied": "Link kopiert"
   },
   "snapshot": {
-    "menu_item": "Schnappschuss",
+    "menu_item": "Schnappschüsse",
     "modal": {
       "title": "Schnappschüsse",
       "loading": "Schnappschuss wird geladen...",
@@ -722,6 +722,7 @@
       "insert_note_reference": "Notiz-Referenz einfügen",
       "create_linked_note": "Verknüpfung erstellen",
       "open_in_new_tab": "In neuem Tab öffnen",
+      "split_view": "Geteilte Ansicht umschalten",
       "search_replace": "Suchen und ersetzen"
     },
     "link": {
@@ -814,6 +815,8 @@
         "panels": "Sonstiges",
         "folder_actions": "Ordneraktionen"
       },
+      "check_all": "Alle auswählen",
+      "uncheck_all": "Alle abwählen",
       "badge_all_visible": "Alle sichtbar",
       "badge_hidden_count": "{{count}} ausgeblendet"
     },

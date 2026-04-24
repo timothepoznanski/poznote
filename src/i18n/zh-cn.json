@@ -814,6 +814,8 @@
         "panels": "其他",
         "folder_actions": "文件夹操作"
       },
+      "check_all": "全选",
+      "uncheck_all": "取消全选",
       "badge_all_visible": "全部可见",
       "badge_hidden_count": "{{count}} 个已隐藏"
     },

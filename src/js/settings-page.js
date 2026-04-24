@@ -798,6 +798,12 @@
             uiCustomizationCard.addEventListener('click', showUiCustomizationModal);
         }
 
+        // Init section toggle-all buttons (event delegation, one-time setup)
+        var uiCustomModal = document.getElementById('uiCustomizationModal');
+        if (uiCustomModal) {
+            initSectionToggleButtons(uiCustomModal);
+        }
+
         // Save UI Customization modal button
         var saveUiCustomBtn = document.getElementById('saveUiCustomizationBtn');
         if (saveUiCustomBtn) {
@@ -1217,6 +1223,45 @@
         });
     }
 
+    function updateSectionToggleBtn(section) {
+        var btn = section.querySelector('.ui-custom-toggle-all');
+        if (!btn) return;
+
+        var checkboxes = section.querySelectorAll('[data-ui-key]');
+        var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+
+        btn.textContent = allChecked
+            ? (btn.getAttribute('data-label-uncheck') || 'Uncheck all')
+            : (btn.getAttribute('data-label-check') || 'Check all');
+    }
+
+    function initSectionToggleButtons(modal) {
+        // Update button labels based on current state
+        modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+
+        // Click: toggle all checkboxes in the section
+        modal.addEventListener('click', function (e) {
+            var btn = e.target.closest('.ui-custom-toggle-all');
+            if (!btn) return;
+
+            var section = btn.closest('.ui-custom-section');
+            if (!section) return;
+
+            var checkboxes = section.querySelectorAll('[data-ui-key]');
+            var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+            checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
+            updateSectionToggleBtn(section);
+        });
+
+        // Change: keep button label in sync when individual checkboxes change
+        modal.addEventListener('change', function (e) {
+            if (!e.target || !e.target.getAttribute('data-ui-key')) return;
+
+            var section = e.target.closest('.ui-custom-section');
+            if (section) updateSectionToggleBtn(section);
+        });
+    }
+
     function showUiCustomizationModal() {
         var modal = document.getElementById('uiCustomizationModal');
         if (!modal) return;
@@ -1229,6 +1274,9 @@
             checkboxes.forEach(function (cb) {
                 cb.checked = hidden.indexOf(cb.getAttribute('data-ui-key')) === -1;
             });
+
+            // Update toggle-all buttons to reflect current state
+            modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
 
             var filterInput = document.getElementById('uiCustomizationFilterInput');
             if (filterInput) {

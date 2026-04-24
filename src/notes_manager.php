@@ -47,6 +47,10 @@ $currentLang = getUserLanguage();
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
       data-txt-loading="<?php echo t_h('common.loading', [], 'Loading...'); ?>"
       data-txt-no-folder="<?php echo t_h('notes_list.system_folders.no_folder', [], 'No folder'); ?>"
+	data-txt-type-html="<?php echo t_h('notes_manager.type_html', [], 'HTML'); ?>"
+	data-txt-type-markdown="<?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?>"
+	data-txt-type-tasklist="<?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?>"
+	data-txt-type-excalidraw="<?php echo t_h('notes_manager.type_excalidraw', [], 'Excalidraw'); ?>"
       data-txt-select-folder="<?php echo t_h('notes_manager.select_folder', [], 'Select a target folder'); ?>"
       data-txt-move="<?php echo t_h('notes_manager.move', [], 'Move'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
@@ -97,6 +101,16 @@ $currentLang = getUserLanguage();
 					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
+			<select
+				id="nmTypeFilter"
+				class="nm-filter-select"
+				aria-label="<?php echo t_h('notes_manager.filter_type', [], 'Filter by type'); ?>"
+			>
+				<option value=""><?php echo t_h('notes_manager.all_types', [], 'All types'); ?></option>
+				<option value="html"><?php echo t_h('notes_manager.type_html', [], 'HTML'); ?></option>
+				<option value="markdown"><?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?></option>
+				<option value="tasklist"><?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?></option>
+			</select>
 			<div id="nmFilterStats" class="filter-stats initially-hidden"></div>
 		</div>
 

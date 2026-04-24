@@ -832,8 +832,8 @@ function exportAsMarkdown($content, $note, $con) {
     $title = $note['heading'] ?? 'New note';
     $tags = $note['tags'] ?? '';
     $favorite = !empty($note['favorite']) ? 'true' : 'false';
-    $created = $note['created'] ?? '';
-    $updated = $note['updated'] ?? '';
+    $created = convertUtcToUserTimezone($note['created'] ?? '');
+    $updated = convertUtcToUserTimezone($note['updated'] ?? '');
     $folder_id = $note['folder_id'] ?? null;
     
     // Parse tags (stored as comma-separated string)
@@ -907,8 +907,8 @@ function exportAsMarkdownZip($content, $note, $con) {
     // Prepare markdown content
     $tags = $note['tags'] ?? '';
     $favorite = !empty($note['favorite']) ? 'true' : 'false';
-    $created = $note['created'] ?? '';
-    $updated = $note['updated'] ?? '';
+    $created = convertUtcToUserTimezone($note['created'] ?? '');
+    $updated = convertUtcToUserTimezone($note['updated'] ?? '');
     $folder_id = $note['folder_id'] ?? null;
     
     // Parse tags

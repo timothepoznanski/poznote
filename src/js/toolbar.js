@@ -1707,6 +1707,10 @@ window.insertTable = insertTable;
     const menu = getMenu(toolbar);
     if (!menu) return;
     menu.hidden = true;
+    menu.style.position = '';
+    menu.style.top = '';
+    menu.style.right = '';
+    menu.style.left = '';
     const toggleBtn = toolbar.querySelector('.mobile-more-btn');
     if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
   }
@@ -1714,6 +1718,22 @@ window.insertTable = insertTable;
   function openMenu(toolbar) {
     const menu = getMenu(toolbar);
     if (!menu) return;
+
+    // On desktop, use position:fixed to escape overflow clipping ancestors
+    const anchor = toolbar.querySelector('.toolbar-menu-anchor');
+    if (anchor && window.innerWidth >= 800) {
+      const rect = anchor.getBoundingClientRect();
+      menu.style.position = 'fixed';
+      menu.style.top = rect.bottom + 4 + 'px';
+      menu.style.right = (window.innerWidth - rect.right) + 'px';
+      menu.style.left = 'auto';
+    } else {
+      menu.style.position = '';
+      menu.style.top = '';
+      menu.style.right = '';
+      menu.style.left = '';
+    }
+
     menu.hidden = false;
     const toggleBtn = toolbar.querySelector('.mobile-more-btn');
     if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');

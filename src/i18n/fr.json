@@ -68,7 +68,7 @@
     "link_copied": "Lien copié"
   },
   "snapshot": {
-    "menu_item": "Snapshot",
+    "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
       "loading": "Chargement du snapshot...",
@@ -735,6 +735,7 @@
       "insert_note_reference": "Insérer une référence de note",
       "create_linked_note": "Créer un raccourci",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
+      "split_view": "Activer/désactiver la vue divisée",
       "search_replace": "Rechercher et remplacer"
     },
     "link": {
@@ -833,7 +834,9 @@
         "folder_actions": "Actions des dossiers"
       },
       "badge_all_visible": "Tout visible",
-      "badge_hidden_count": "{{count}} masqué(s)"
+      "badge_hidden_count": "{{count}} masqué(s)",
+      "check_all": "Tout cocher",
+      "uncheck_all": "Tout décocher"
     },
     "theme": {
       "title": "Sélection du thème",
@@ -1113,6 +1116,7 @@
   },
   "notes_manager": {
     "actions": "Actions groupées",
+    "all_types": "Tous les types",
     "choose_action": "Choisir une action...",
     "select_folder": "Sélectionnez un dossier de destination",
     "add_tag": "Ajouter un tag",
@@ -1133,7 +1137,12 @@
     "moved": "Déplacé avec succès",
     "root": "Racine (aucun dossier)",
     "filter_folders": "Filtrer les dossiers...",
-    "filter_placeholder": "Filtrer les notes par titre ou tags..."
+    "filter_placeholder": "Filtrer les notes par titre ou tags...",
+    "filter_type": "Filtrer par type",
+    "type_html": "HTML",
+    "type_markdown": "Markdown",
+    "type_tasklist": "Tasklist",
+    "type_excalidraw": "Excalidraw"
   },
   "update": {
     "new_available": "🎉 Nouvelle mise à jour disponible !",

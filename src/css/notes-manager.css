@@ -20,6 +20,7 @@ body.notes-manager-page {
     margin: 0 auto 20px;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 15px;
 }
 
@@ -72,6 +73,23 @@ body.notes-manager-page {
     font-size: 13px;
     color: var(--muted-color, #6b7280);
     white-space: nowrap;
+}
+
+.nm-filter-select {
+    min-width: 170px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color, #333333);
+    background-color: var(--input-bg, #ffffff);
+    box-sizing: border-box;
+}
+
+.nm-filter-select:focus {
+    outline: none;
+    border-color: #007DB8;
+    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
 }
 
 /* Bulk action bar */
@@ -343,6 +361,7 @@ body.dark-mode .nm-folder-option-selected {
 
 .nm-note-link {
     flex: 1;
+    min-width: 0;
     font-size: 14px;
     color: var(--link-color, #007DB8);
     text-decoration: none;
@@ -353,6 +372,40 @@ body.dark-mode .nm-folder-option-selected {
 
 .nm-note-link:hover {
     text-decoration: underline;
+}
+
+.nm-note-title-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nm-note-type-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted-color, #6b7280);
+}
+
+.nm-note-type-html {
+    color: #0f766e;
+}
+
+.nm-note-type-markdown {
+    color: #1d4ed8;
+}
+
+.nm-note-type-tasklist {
+    color: #15803d;
+}
+
+.nm-note-type-excalidraw {
+    color: #7c3aed;
 }
 
 .nm-note-tags {
@@ -394,6 +447,34 @@ body.dark-mode .nm-folder-option-selected {
     flex-shrink: 0;
     font-size: 12px;
     color: var(--muted-color, #9ca3af);
+}
+
+@media (max-width: 768px) {
+    .nm-filter-bar {
+        align-items: stretch;
+    }
+
+    .nm-filter-select {
+        width: 100%;
+    }
+
+    .nm-note-row {
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .nm-note-title-wrap {
+        min-width: calc(100% - 26px);
+    }
+
+    .nm-note-tags,
+    .nm-note-meta {
+        margin-left: 26px;
+    }
+
+    .nm-note-tags {
+        max-width: 100%;
+    }
 }
 
 /* ── Move modal ──────────────────────────────────────────────────────── */
