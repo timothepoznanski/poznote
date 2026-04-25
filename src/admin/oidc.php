@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Save each setting
         $booleanKeys = ['oidc_enabled', 'oidc_disable_basic_auth', 'oidc_auto_create_users'];
-        $textKeys = ['oidc_provider_name', 'oidc_issuer', 'oidc_scopes', 'oidc_discovery_url', 'oidc_redirect_uri', 'oidc_end_session_endpoint', 'oidc_post_logout_redirect_uri', 'oidc_groups_claim', 'oidc_allowed_groups', 'oidc_allowed_users'];
+        $textKeys = ['oidc_provider_name', 'oidc_issuer', 'oidc_scopes', 'oidc_api_audience', 'oidc_discovery_url', 'oidc_redirect_uri', 'oidc_end_session_endpoint', 'oidc_post_logout_redirect_uri', 'oidc_groups_claim', 'oidc_allowed_groups', 'oidc_allowed_users'];
 
         $allOk = true;
         foreach ($booleanKeys as $key) {
@@ -91,6 +91,7 @@ $settings = [
     'oidc_provider_name' => getOidcSetting('oidc_provider_name', 'SSO'),
     'oidc_issuer' => getOidcSetting('oidc_issuer', ''),
     'oidc_scopes' => getOidcSetting('oidc_scopes', 'openid profile email'),
+    'oidc_api_audience' => getOidcSetting('oidc_api_audience', ''),
     'oidc_discovery_url' => getOidcSetting('oidc_discovery_url', ''),
     'oidc_redirect_uri' => getOidcSetting('oidc_redirect_uri', ''),
     'oidc_end_session_endpoint' => getOidcSetting('oidc_end_session_endpoint', ''),
@@ -471,6 +472,12 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                                 <strong><?php echo t_h('oidc_admin.hints.disable_normal_login_active', [], '(Currently active)'); ?></strong>
                             <?php endif; ?>
                         </span>
+                    </div>
+
+                    <div class="oidc-field">
+                        <label for="oidc_api_audience"><?php echo t_h('oidc_admin.fields.api_audience', [], 'API JWT audience'); ?></label>
+                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.api_audience', [], 'Accepted aud claim for OIDC Bearer JWT API requests. Leave empty to use the Client ID. Use commas for multiple audiences.'); ?></span>
+                        <input type="text" id="oidc_api_audience" name="oidc_api_audience" value="<?php echo h($settings['oidc_api_audience']); ?>" placeholder="api://poznote">
                     </div>
 
                     <div class="oidc-field">

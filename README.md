@@ -354,12 +354,15 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 4. After authentication, Poznote links the identity in this order: `sub` (`oidc_subject`), then `preferred_username`, then `email`.
 5. If auto-create users is enabled and no profile matches, Poznote creates one automatically.
 6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
+7. REST API clients can authenticate with `Authorization: Bearer <OIDC JWT>` when OIDC is enabled; Poznote validates the provider JWKS, issuer, expiration, audience, and configured access controls.
 
 #### Configuration
 
 OIDC is configured from the **admin UI**: go to **Settings > Admin Tools > OIDC / SSO**.
 
 Most settings (enabled, issuer, provider name, scopes, access control, allowed groups/users, auto-create users, HTTP Basic Auth behavior, etc.) are managed from this page and stored in the database.
+
+For REST API Bearer JWT authentication, configure **API JWT audience** if your provider issues access tokens for a dedicated API audience. When it is empty, Poznote accepts the configured OIDC Client ID as the JWT audience.
 
 The following settings remain in the `.env` file:
 

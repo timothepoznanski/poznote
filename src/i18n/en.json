@@ -1991,6 +1991,7 @@
       "allowed_groups": "Allowed groups",
       "auto_create_users": "Auto-create user profiles on first OIDC login",
       "allowed_users": "Allowed users",
+      "api_audience": "API JWT audience",
       "disable_normal_login": "Disable username/password login (SSO only)",
       "disable_basic_auth": "Disable HTTP Basic Auth for API"
     },
@@ -2007,6 +2008,7 @@
       "allowed_groups": "Comma-separated list of allowed groups. Leave empty to allow all authenticated users.",
       "auto_create_users": "Recommended when using group-based access control",
       "allowed_users": "Comma-separated emails/usernames. Leave empty to allow all authenticated users.",
+      "api_audience": "Accepted aud claim for OIDC Bearer JWT API requests. Leave empty to use the Client ID. Use commas for multiple audiences.",
       "disable_normal_login": "When enabled, only OIDC login is available on the login page",
       "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
     }

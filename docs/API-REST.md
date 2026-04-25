@@ -33,7 +33,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 
 ## Authentication
 
-All API endpoints (except public ones) require authentication. For user-facing integrations, use HTTP Basic Authentication. Poznote also accepts the internal Bearer token used by the MCP server.
+All API endpoints (except public ones) require authentication. Poznote supports HTTP Basic Authentication, OIDC Bearer JWT tokens, and the internal Bearer token used by the MCP server.
 
 ```bash
 curl -u 'username:password' http://YOUR_SERVER/api/v1/notes
@@ -41,20 +41,31 @@ curl -u 'username:password' http://YOUR_SERVER/api/v1/notes
 
 Use the current password of the profile you authenticate with. Default local passwords are `admin` for administrators and `user` for standard users until they are changed in the Poznote UI.
 
+OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then `preferred_username`, then `email`). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
+
+```bash
+curl -H "Authorization: Bearer $OIDC_ACCESS_TOKEN" -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes
+```
+
+For OIDC Bearer JWT requests, data endpoints default to the profile linked to the token subject when `X-User-ID` is omitted. Admin JWTs may still include `X-User-ID` to access another profile.
+
+By default, the accepted JWT `aud` claim is the configured OIDC Client ID. If your identity provider issues API access tokens with a dedicated audience, set **API JWT audience** in `Settings > Admin Tools > OIDC / SSO`. Multiple accepted audiences can be separated with commas.
+
 ### Authentication Levels
 
 | Level | Description | Used by |
 |-------|-------------|---------|
 | **No auth** | No credentials needed | `GET /api/v1/users/profiles`, `GET /api_health.php`, Public tasks |
 | **User auth** | Valid credentials, no `X-User-ID` needed | `/api/v1/users/me`, `/api/v1/system/*`, `/api/v1/shared/*` |
-| **Data auth** | Valid credentials + `X-User-ID` header | All user data endpoints (notes, folders, tags, etc.) |
+| **Data auth** | Valid credentials; `X-User-ID` required for Basic/service token, optional for OIDC JWT own profile | All user data endpoints (notes, folders, tags, etc.) |
 | **Admin auth** | Admin credentials, no `X-User-ID` needed | `/api/v1/admin/*`, `/api/v1/users/lookup/*` |
 
 ---
 
 ## Multi-User Mode
 
-Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), you must include the `X-User-ID` header:
+Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), Basic Auth and internal service-token requests must include the `X-User-ID` header. OIDC Bearer JWT requests use the token-linked profile by default and only need `X-User-ID` when an admin token targets another profile.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \

@@ -2333,6 +2333,7 @@
       "allowed_groups": "Grupos permitidos",
       "auto_create_users": "Crear perfiles de usuario automáticamente en el primer inicio de sesión OIDC",
       "allowed_users": "Usuarios permitidos",
+      "api_audience": "Audiencia JWT de la API",
       "disable_normal_login": "Desactivar inicio de sesión con usuario/contraseña (solo SSO)",
       "disable_basic_auth": "Desactivar HTTP Basic Auth para la API"
     },
@@ -2349,6 +2350,7 @@
       "allowed_groups": "Lista de grupos permitidos separada por comas. Déjelo vacío para permitir a todos los usuarios autenticados.",
       "auto_create_users": "Recomendado al usar control de acceso basado en grupos",
       "allowed_users": "Correos electrónicos/nombres de usuario separados por comas. Déjelo vacío para permitir a todos los usuarios autenticados.",
+      "api_audience": "Claim aud aceptado para solicitudes API con Bearer JWT OIDC. Déjelo vacío para usar el Client ID. Use comas para varias audiencias.",
       "disable_normal_login": "Si está activado, solo el inicio de sesión OIDC estará disponible en la página de acceso",
       "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
     }

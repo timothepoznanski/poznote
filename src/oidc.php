@@ -407,10 +407,52 @@ function oidc_public_key_from_jwk($jwk) {
     return null;
 }
 
-function oidc_parse_and_verify_id_token($idToken) {
-    $parts = explode('.', (string)$idToken);
+function oidc_supported_jwt_algorithms() {
+    return [
+        'RS256' => OPENSSL_ALGO_SHA256,
+    ];
+}
+
+function oidc_jwt_audience_matches($aud, $expectedAudiences) {
+    $expected = [];
+    if (is_string($expectedAudiences)) {
+        $expectedAudiences = [$expectedAudiences];
+    }
+    if (is_array($expectedAudiences)) {
+        foreach ($expectedAudiences as $candidate) {
+            if (is_string($candidate) && trim($candidate) !== '') {
+                $expected[] = trim($candidate);
+            }
+        }
+    }
+
+    if (empty($expected)) {
+        return true;
+    }
+
+    if (is_string($aud)) {
+        return in_array($aud, $expected, true);
+    }
+
+    if (is_array($aud)) {
+        foreach ($aud as $value) {
+            if (is_string($value) && in_array($value, $expected, true)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+function oidc_parse_and_verify_jwt($jwt, $options = []) {
+    $tokenLabel = isset($options['token_label']) && is_string($options['token_label']) && $options['token_label'] !== ''
+        ? $options['token_label']
+        : 'JWT';
+
+    $parts = explode('.', (string)$jwt);
     if (count($parts) !== 3) {
-        throw new Exception('Invalid id_token format');
+        throw new Exception('Invalid ' . $tokenLabel . ' format');
     }
 
     $headerJson = oidc_base64url_decode($parts[0]);
@@ -418,18 +460,19 @@ function oidc_parse_and_verify_id_token($idToken) {
     $sig = oidc_base64url_decode($parts[2]);
 
     if ($headerJson === false || $payloadJson === false || $sig === false) {
-        throw new Exception('Invalid id_token encoding');
+        throw new Exception('Invalid ' . $tokenLabel . ' encoding');
     }
 
     $header = json_decode($headerJson, true);
     $claims = json_decode($payloadJson, true);
     if (!is_array($header) || !is_array($claims)) {
-        throw new Exception('Invalid id_token JSON');
+        throw new Exception('Invalid ' . $tokenLabel . ' JSON');
     }
 
     $alg = $header['alg'] ?? '';
-    if ($alg !== 'RS256') {
-        throw new Exception('Unsupported id_token alg (only RS256 supported)');
+    $supportedAlgorithms = oidc_supported_jwt_algorithms();
+    if (!is_string($alg) || !isset($supportedAlgorithms[$alg])) {
+        throw new Exception('Unsupported ' . $tokenLabel . ' alg (only RS256 supported)');
     }
 
     $jwk = oidc_find_jwk_for_jwt_header($header);
@@ -443,37 +486,89 @@ function oidc_parse_and_verify_id_token($idToken) {
     }
 
     $signed = $parts[0] . '.' . $parts[1];
-    $ok = openssl_verify($signed, $sig, $pubKey, OPENSSL_ALGO_SHA256);
+    $ok = openssl_verify($signed, $sig, $pubKey, $supportedAlgorithms[$alg]);
     if ($ok !== 1) {
-        throw new Exception('Invalid id_token signature');
+        throw new Exception('Invalid ' . $tokenLabel . ' signature');
     }
 
-    // Claims validation
     $cfg = oidc_get_provider_config();
     $iss = $claims['iss'] ?? '';
     if (!is_string($iss) || $iss !== $cfg['issuer']) {
         throw new Exception('Invalid issuer');
     }
 
-    $aud = $claims['aud'] ?? null;
-    $audOk = false;
-    if (is_string($aud)) {
-        $audOk = ($aud === OIDC_CLIENT_ID);
-    } elseif (is_array($aud)) {
-        $audOk = in_array(OIDC_CLIENT_ID, $aud, true);
-    }
-    if (!$audOk) {
+    $expectedAudiences = $options['expected_audiences'] ?? (defined('OIDC_CLIENT_ID') ? [OIDC_CLIENT_ID] : []);
+    if (!oidc_jwt_audience_matches($claims['aud'] ?? null, $expectedAudiences)) {
         throw new Exception('Invalid audience');
     }
 
     $now = time();
+    $leeway = isset($options['leeway']) ? max(0, (int)$options['leeway']) : 60;
     $exp = $claims['exp'] ?? null;
     if (!is_int($exp) && !is_float($exp)) {
         throw new Exception('Missing exp');
     }
-    if ($now >= (int)$exp) {
+    if (($now - $leeway) >= (int)$exp) {
         throw new Exception('Token expired');
     }
+
+    $nbf = $claims['nbf'] ?? null;
+    if (($nbf !== null) && (!is_int($nbf) && !is_float($nbf))) {
+        throw new Exception('Invalid nbf');
+    }
+    if (($nbf !== null) && ((int)$nbf > ($now + $leeway))) {
+        throw new Exception('Token not yet valid');
+    }
+
+    $iat = $claims['iat'] ?? null;
+    if (($iat !== null) && (!is_int($iat) && !is_float($iat))) {
+        throw new Exception('Invalid iat');
+    }
+    if (($iat !== null) && ((int)$iat > ($now + $leeway))) {
+        throw new Exception('Token issued in the future');
+    }
+
+    return $claims;
+}
+
+function oidc_get_api_jwt_audiences() {
+    $configuredAudience = defined('OIDC_API_AUDIENCE') ? OIDC_API_AUDIENCE : '';
+    $audiences = oidc_parse_csv_list($configuredAudience);
+    if (!empty($audiences)) {
+        return $audiences;
+    }
+
+    $clientId = defined('OIDC_CLIENT_ID') ? trim((string)OIDC_CLIENT_ID) : '';
+    return $clientId !== '' ? [$clientId] : [];
+}
+
+function oidc_parse_and_verify_api_token($jwt) {
+    if (!oidc_is_enabled()) {
+        throw new Exception('OIDC is not enabled');
+    }
+
+    $claims = oidc_parse_and_verify_jwt($jwt, [
+        'token_label' => 'JWT Bearer token',
+        'expected_audiences' => oidc_get_api_jwt_audiences(),
+    ]);
+
+    $sub = $claims['sub'] ?? '';
+    if (!is_string($sub) || trim($sub) === '') {
+        throw new Exception('Missing sub');
+    }
+
+    if (!oidc_is_user_allowed($claims)) {
+        throw new Exception('User not authorized to access this application (group or allowlist restriction)');
+    }
+
+    return $claims;
+}
+
+function oidc_parse_and_verify_id_token($idToken) {
+    $claims = oidc_parse_and_verify_jwt($idToken, [
+        'token_label' => 'id_token',
+        'expected_audiences' => defined('OIDC_CLIENT_ID') ? [OIDC_CLIENT_ID] : [],
+    ]);
 
     $nonce = $claims['nonce'] ?? '';
     $expectedNonce = $_SESSION['oidc_nonce'] ?? '';

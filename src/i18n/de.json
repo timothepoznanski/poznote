@@ -2334,6 +2334,7 @@
       "allowed_groups": "Erlaubte Gruppen",
       "auto_create_users": "Benutzerprofile bei der ersten OIDC-Anmeldung automatisch erstellen",
       "allowed_users": "Erlaubte Benutzer",
+      "api_audience": "JWT-Audience der API",
       "disable_normal_login": "Anmeldung mit Benutzername/Passwort deaktivieren (nur SSO)",
       "disable_basic_auth": "HTTP Basic Auth für die API deaktivieren"
     },
@@ -2350,6 +2351,7 @@
       "allowed_groups": "Kommagetrennte Liste erlaubter Gruppen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "auto_create_users": "Empfohlen bei gruppenbasierter Zugriffskontrolle",
       "allowed_users": "Kommagetrennte E-Mails/Benutzernamen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
+      "api_audience": "Akzeptierter aud-Claim für API-Anfragen mit OIDC Bearer JWT. Leer lassen, um die Client ID zu verwenden. Mehrere Audiences mit Kommas trennen.",
       "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",
       "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
     }
