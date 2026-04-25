@@ -5,16 +5,20 @@ FROM php:8.3.27-fpm-alpine
 # Install system dependencies and PHP extensions
 RUN apk add --no-cache \
     nginx \
-    sqlite \
-    sqlite-dev \
-    libzip-dev \
+    sqlite-libs \
     libzip \
-    curl-dev \
+    libcurl \
     ca-certificates \
     supervisor \
+    && apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS \
+    sqlite-dev \
+    libzip-dev \
+    curl-dev \
     && docker-php-ext-configure zip \
     && docker-php-ext-install pdo pdo_sqlite zip curl \
-    && apk del --no-cache sqlite-dev libzip-dev curl-dev
+    && docker-php-source delete \
+    && apk del --no-cache .build-deps
 
 # Copy configuration files
 RUN mkdir -p /etc/nginx/http.d /usr/local/etc/php-fpm.d /usr/local/etc/php /etc/supervisor/conf.d
@@ -30,26 +34,23 @@ ARG APP_VERSION=unknown
 LABEL build_date="${BUILD_DATE}"
 LABEL version="${VERSION}"
 
-# Force cache invalidation by using BUILD_DATE in a RUN command
-RUN echo "Build timestamp: ${BUILD_DATE:-$(date +%s)}" > /tmp/build_timestamp.txt
-
 # Copy application source
-COPY ./src /var/www/html
+COPY --chown=www-data:www-data ./src /var/www/html
 
 # Copy initialization script
 COPY init.sh /usr/local/bin/init.sh
 
 # Finalize filesystem: init script, writable data dir, and build-time version marker
 RUN chmod +x /usr/local/bin/init.sh \
-    && mkdir -p /var/www/html/data \
+    && install -d -o www-data -g www-data /var/www/html/data \
     && mkdir -p /var/log/supervisor /var/run \
     && printf '%s\n' "<?php" "define('APP_VERSION', '${APP_VERSION}');" > /var/www/html/version.php \
-    && chown -R www-data:www-data /var/www/html \
+    && chown www-data:www-data /var/www/html/version.php \
     && chmod 755 /var/www/html
 
 # Add OCI standard labels
 LABEL org.opencontainers.image.title="Poznote"
-LABEL org.opencontainers.image.description="Poznote is a lightweight, open-source personal note-taking and documentation platform."
+LABEL org.opencontainers.image.description="Poznote is a personal note-taking and documentation platform."
 LABEL org.opencontainers.image.authors="Timothé Poznanski"
 LABEL org.opencontainers.image.url="https://github.com/timothepoznanski/poznote"
 LABEL org.opencontainers.image.source="https://github.com/timothepoznanski/poznote"

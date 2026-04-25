@@ -4,6 +4,10 @@
 # --- Stage 1: Build ---
 FROM python:3.12-alpine AS builder
 
+ENV PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 # Labels
 LABEL org.opencontainers.image.title="Poznote MCP Server"
 LABEL org.opencontainers.image.description="MCP server for Poznote - enables AI assistants to read, search and write notes"
@@ -22,11 +26,13 @@ COPY pyproject.toml ./
 COPY src/ ./src/
 
 # Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir .
+RUN pip install --prefix=/install .
 
 # --- Stage 2: Runtime ---
 FROM python:3.12-alpine
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 # Create non-root user for security
 RUN addgroup -g 1000 mcp && adduser -u 1000 -G mcp -s /bin/sh -D mcp
@@ -34,8 +40,7 @@ RUN addgroup -g 1000 mcp && adduser -u 1000 -G mcp -s /bin/sh -D mcp
 WORKDIR /app
 
 # Copy installed packages and entrypoint from builder
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin/poznote-mcp /usr/local/bin/poznote-mcp
+COPY --from=builder /install /usr/local
 
 # Switch to non-root user
 USER mcp

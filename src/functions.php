@@ -1238,19 +1238,17 @@ function restoreDatabaseFromFile($sqlFile) {
         }
     }
     
-    // Restore database
-    $command = "sqlite3 {$dbPath} < {$sqlFile} 2>&1";
-    
-    exec($command, $output, $returnCode);
-    
-    if ($returnCode === 0) {
+    try {
+        $restoreCon = new PDO('sqlite:' . $dbPath);
+        $restoreCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $restoreCon->exec($content);
+
         // Ensure proper permissions on restored database
         setFilePermissions($dbPath, 0664);
-        
+
         return ['success' => true];
-    } else {
-        $errorMessage = implode("\n", $output);
-        return ['success' => false, 'error' => $errorMessage];
+    } catch (Throwable $e) {
+        return ['success' => false, 'error' => $e->getMessage()];
     }
 }
 

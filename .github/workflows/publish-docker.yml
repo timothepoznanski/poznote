@@ -38,8 +38,52 @@ jobs:
           latest_version=$(echo $latest_tag | sed 's/v//')
           echo "Latest tag version: $latest_version"
 
-          # Compare versions
-          if [ "$(printf '%s\n' "$latest_version" "$new_version" | sort -V | head -n1)" = "$latest_version" ] && [ "$latest_version" != "$new_version" ]; then
+          # Compare versions so stable releases outrank beta/test prereleases
+          version_is_newer=$(python3 - "$latest_version" "$new_version" <<'PY'
+          import re
+          import sys
+
+          def parse_version(value):
+              match = re.fullmatch(r'(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?', value)
+              if not match:
+                  return None
+
+              major, minor, patch, prerelease = match.groups()
+              prerelease_tokens = []
+              if prerelease:
+                  prerelease_tokens = [
+                      (0, int(token)) if token.isdigit() else (1, token)
+                      for token in re.findall(r'[A-Za-z]+|\d+', prerelease.lower())
+                  ]
+
+              # Stable releases compare higher than prereleases for the same base version.
+              return (
+                  int(major),
+                  int(minor),
+                  int(patch),
+                  1 if prerelease is None else 0,
+                  prerelease_tokens,
+              )
+
+          latest = parse_version(sys.argv[1])
+          new = parse_version(sys.argv[2])
+
+          if latest is None or new is None:
+              print('fallback')
+          else:
+              print('true' if new > latest else 'false')
+          PY
+          )
+
+          if [ "$version_is_newer" = "fallback" ]; then
+              if [ "$(printf '%s\n' "$latest_version" "$new_version" | sort -V | head -n1)" = "$latest_version" ] && [ "$latest_version" != "$new_version" ]; then
+                  version_is_newer=true
+              else
+                  version_is_newer=false
+              fi
+          fi
+
+          if [ "$version_is_newer" = "true" ]; then
               echo "needs_update=true" >> $GITHUB_OUTPUT
               echo "version=$new_version" >> $GITHUB_OUTPUT
               echo "version_clean=$new_version" >> $GITHUB_OUTPUT
