@@ -35,6 +35,7 @@ tags:
 
 security:
   - BasicAuth: []
+  - BearerAuth: []
   - SessionAuth: []
 
 components:
@@ -43,6 +44,11 @@ components:
       type: http
       scheme: basic
       description: HTTP Basic Auth with global username/password. Include X-User-ID header for data endpoints.
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OIDC Bearer JWT when OIDC is enabled, or the internal MCP Bearer token. For data endpoints, X-User-ID is optional for the OIDC token-linked profile and required for the internal service token.
     SessionAuth:
       type: apiKey
       in: cookie
@@ -55,7 +61,7 @@ components:
       required: true
       schema:
         type: integer
-      description: User profile ID to access. Required for all data endpoints (notes, folders, etc.). Use GET /users/profiles to list available profiles.
+      description: User profile ID to access. Required for Basic Auth and internal service-token data requests. OIDC Bearer JWT requests default to the token-linked profile when omitted. Use GET /users/profiles to list available profiles.
 
   schemas:
     Note:

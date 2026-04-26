@@ -137,6 +137,7 @@ define('OIDC_DISCOVERY_URL', trim(_oidc('oidc_discovery_url', '')));
 define('OIDC_CLIENT_ID', trim(_env('POZNOTE_OIDC_CLIENT_ID', '')));
 define('OIDC_CLIENT_SECRET', trim(_env('POZNOTE_OIDC_CLIENT_SECRET', '')));
 define('OIDC_SCOPES', _oidc('oidc_scopes', 'openid profile email'));
+define('OIDC_API_AUDIENCE', trim(_oidc('oidc_api_audience', '')));
 define('OIDC_REDIRECT_URI', _oidc('oidc_redirect_uri', ''));
 define('OIDC_END_SESSION_ENDPOINT', _oidc('oidc_end_session_endpoint', ''));
 define('OIDC_POST_LOGOUT_REDIRECT_URI', _oidc('oidc_post_logout_redirect_uri', ''));

@@ -435,6 +435,10 @@ function hasApiAuthCredentials(): bool {
     return getApiBearerToken() !== null || getApiBasicCredentials() !== null;
 }
 
+function isApiJwtBearerToken(string $token): bool {
+    return substr_count($token, '.') === 2;
+}
+
 function setApiAuthenticatedUser(array $user): void {
     $_SESSION['authenticated'] = true;
     $_SESSION['user_id'] = (int) $user['id'];
@@ -470,33 +474,32 @@ function getDefaultApiAdminProfile(): ?array {
     return null;
 }
 
-/**
- * Authenticate via the internal MCP Bearer token.
- * Returns null when no Bearer token is provided.
- */
-function authenticateApiBearerToken(bool $requireAdmin = false): ?array {
-    $providedToken = getApiBearerToken();
-    if ($providedToken === null) {
+function authenticateApiOidcJwtBearerToken(string $providedToken, bool $requireAdmin = false): ?array {
+    if (!isApiJwtBearerToken($providedToken)) {
         return null;
     }
 
-    $expectedToken = getMcpServiceToken();
-    if (!is_string($expectedToken) || $expectedToken === '' || !hash_equals($expectedToken, $providedToken)) {
+    $oidcPath = __DIR__ . '/oidc.php';
+    if (!is_file($oidcPath)) {
+        return null;
+    }
+
+    require_once $oidcPath;
+    if (!function_exists('oidc_is_enabled') || !oidc_is_enabled()) {
+        return null;
+    }
+
+    try {
+        $claims = oidc_parse_and_verify_api_token($providedToken);
+        $authUser = oidc_find_or_provision_user($claims);
+        $authUser['_api_auth_method'] = 'oidc_jwt';
+    } catch (Throwable $e) {
+        error_log('Poznote API OIDC Bearer authentication failed: ' . $e->getMessage());
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');
         echo json_encode(['error' => $msg]);
         exit;
-    }
-
-    $authUser = getDefaultApiAdminProfile();
-    if ($authUser === null) {
-        $authUser = [
-            'id' => 1,
-            'username' => 'mcp-service',
-            'is_admin' => true,
-            'active' => true,
-        ];
     }
 
     if ($requireAdmin && !(bool) $authUser['is_admin']) {
@@ -507,7 +510,54 @@ function authenticateApiBearerToken(bool $requireAdmin = false): ?array {
         exit;
     }
 
+    updateUserLastLogin((int)$authUser['id']);
     return $authUser;
+}
+
+/**
+ * Authenticate via the internal MCP Bearer token or an OIDC JWT Bearer token.
+ * Returns null when no Bearer token is provided.
+ */
+function authenticateApiBearerToken(bool $requireAdmin = false): ?array {
+    $providedToken = getApiBearerToken();
+    if ($providedToken === null) {
+        return null;
+    }
+
+    $expectedToken = getMcpServiceToken();
+    if (is_string($expectedToken) && $expectedToken !== '' && hash_equals($expectedToken, $providedToken)) {
+        $authUser = getDefaultApiAdminProfile();
+        if ($authUser === null) {
+            $authUser = [
+                'id' => 1,
+                'username' => 'mcp-service',
+                'is_admin' => true,
+                'active' => true,
+            ];
+        }
+        $authUser['_api_auth_method'] = 'service_token';
+
+        if ($requireAdmin && !(bool) $authUser['is_admin']) {
+            $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+            header('HTTP/1.1 401 Unauthorized');
+            header('Content-Type: application/json');
+            echo json_encode(['error' => $msg]);
+            exit;
+        }
+
+        return $authUser;
+    }
+
+    $oidcUser = authenticateApiOidcJwtBearerToken($providedToken, $requireAdmin);
+    if ($oidcUser !== null) {
+        return $oidcUser;
+    }
+
+    $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
+    header('HTTP/1.1 401 Unauthorized');
+    header('Content-Type: application/json');
+    echo json_encode(['error' => $msg]);
+    exit;
 }
 
 function getApiAuthenticatedUser(bool $requireAdmin = false): array {
@@ -563,6 +613,8 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         echo json_encode(['error' => $msg]);
         exit;
     }
+
+    $authUser['_api_auth_method'] = 'basic';
     
     return $authUser;
 }
@@ -580,6 +632,9 @@ function requireApiAuth() {
     // For Basic Auth, require X-User-ID header to specify which user profile to use
     // This is needed because with multi-user, each user has their own data
     $userId = $_SERVER['HTTP_X_USER_ID'] ?? null;
+    if ($userId === null && ($authUser['_api_auth_method'] ?? '') === 'oidc_jwt') {
+        $userId = (string)$authUser['id'];
+    }
     
     if ($userId === null) {
         header('HTTP/1.1 400 Bad Request');

@@ -2476,6 +2476,7 @@
       "allowed_groups": "允许的组",
       "auto_create_users": "首次通过 OIDC 登录时自动创建用户资料",
       "allowed_users": "允许的用户",
+      "api_audience": "API JWT 受众",
       "disable_normal_login": "禁用用户名/密码登录（仅 SSO）",
       "disable_basic_auth": "为 API 禁用 HTTP Basic Auth"
     },
@@ -2492,6 +2493,7 @@
       "allowed_groups": "以逗号分隔的允许组列表。留空则允许所有已认证用户。",
       "auto_create_users": "使用基于组的访问控制时推荐启用",
       "allowed_users": "以逗号分隔的邮箱/用户名。留空则允许所有已认证用户。",
+      "api_audience": "OIDC Bearer JWT API 请求接受的 aud claim。留空则使用 Client ID。多个 audience 请用逗号分隔。",
       "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",
       "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
     }

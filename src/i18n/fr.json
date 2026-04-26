@@ -2538,6 +2538,7 @@
       "allowed_groups": "Groupes autorisés",
       "auto_create_users": "Créer automatiquement les profils à la première connexion OIDC",
       "allowed_users": "Utilisateurs autorisés",
+      "api_audience": "Audience JWT de l'API",
       "disable_normal_login": "Désactiver la connexion par mot de passe (SSO uniquement)",
       "disable_basic_auth": "Désactiver l'authentification HTTP Basic pour l'API"
     },
@@ -2554,6 +2555,7 @@
       "allowed_groups": "Liste de groupes autorisés séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "auto_create_users": "Recommandé avec le contrôle d'accès par groupes",
       "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
+      "api_audience": "Claim aud accepté pour les requêtes API avec Bearer JWT OIDC. Laisser vide pour utiliser le Client ID. Séparer plusieurs audiences par des virgules.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
     }

@@ -755,6 +755,19 @@ body.dark-mode #deleteAttachmentConfirmModal .btn-cancel:hover {
     border-color: #c43b3b !important;
 }
 
+html[data-theme='dark'] #deleteFolderModal .btn-cancel,
+body.dark-mode #deleteFolderModal .btn-cancel {
+    background-color: var(--dm-border) !important;
+    color: var(--dm-text) !important;
+    border-color: #555 !important;
+}
+
+html[data-theme='dark'] #deleteFolderModal .btn-cancel:hover,
+body.dark-mode #deleteFolderModal .btn-cancel:hover {
+    background-color: #4a4a4a !important;
+    border-color: #4a4a4a !important;
+}
+
 /* Snapshot Modal Dark Mode */
 html[data-theme='dark'] .snapshot-modal-header,
 body.dark-mode .snapshot-modal-header {

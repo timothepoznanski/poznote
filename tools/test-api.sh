@@ -28,6 +28,11 @@ ADMIN_PASS="admin"
 USER_ID="1"
 SKIP_DESTRUCTIVE=false
 VERBOSE=false
+AUTH_MODE="basic"
+AUTH_LABEL="HTTP Basic"
+EFFECTIVE_USER_ID="1"
+IS_ADMIN_AUTH=true
+BEARER_TOKEN=""
 
 while getopts "H:u:p:U:svh" opt; do
   case $opt in
@@ -43,14 +48,21 @@ while getopts "H:u:p:U:svh" opt; do
 done
 
 API="${BASE_URL}/api/v1"
-AUTH=(-u "${ADMIN_USER}:${ADMIN_PASS}")
-DATA_H=(-H "X-User-ID: ${USER_ID}" -H "Content-Type: application/json")
+AUTH=()
+USER_H=()
+DATA_H=()
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'
 CYAN='\033[0;36m'; BOLD='\033[1m'; RESET='\033[0m'
 
 PASS=0; FAIL=0; SKIP=0
 LAST_BODY=""
+
+cleanup_tempfiles() {
+  rm -f /tmp/_apibody /tmp/_api_attach.txt /tmp/_ur_backup.zip
+}
+
+trap cleanup_tempfiles EXIT
 
 section() { echo; echo -e "${CYAN}${BOLD}══ $1 ══${RESET}"; }
 
@@ -98,16 +110,117 @@ skip_test() { echo -e "  ${YELLOW}SKIP${RESET}        $1"; (( SKIP++ )) || true;
 
 json_field() { printf '%s' "$2" | grep -oP "\"$1\"\s*:\s*\K[^\s,\}\]]+" | head -1 | tr -d '"'; }
 
+reset_counters() {
+  PASS=0
+  FAIL=0
+  SKIP=0
+  LAST_BODY=""
+}
+
+setup_basic_auth() {
+  AUTH_MODE="basic"
+  AUTH_LABEL="HTTP Basic"
+  EFFECTIVE_USER_ID="$USER_ID"
+  IS_ADMIN_AUTH=true
+  AUTH=(-u "${ADMIN_USER}:${ADMIN_PASS}")
+  USER_H=(-H "X-User-ID: ${EFFECTIVE_USER_ID}")
+  DATA_H=("${USER_H[@]}" -H "Content-Type: application/json")
+}
+
+setup_bearer_auth() {
+  local token="$1"
+  local code body token_user_id token_is_admin
+
+  AUTH_MODE="bearer"
+  AUTH_LABEL="OIDC Bearer"
+  EFFECTIVE_USER_ID=""
+  IS_ADMIN_AUTH=false
+  AUTH=(-H "Authorization: Bearer ${token}")
+  USER_H=()
+  DATA_H=(-H "Content-Type: application/json")
+
+  code=$(curl -s -o /tmp/_apibody -w "%{http_code}" \
+    --connect-timeout 5 --max-time 30 "${AUTH[@]}" "${API}/users/me" 2>/dev/null) || code="000"
+  body=$(cat /tmp/_apibody 2>/dev/null || true)
+
+  if [[ "$code" != "200" ]]; then
+    echo -e "  ${RED}FAIL${RESET}  [${code}]  Bearer setup: GET /users/me  (expected 200)"
+    $VERBOSE && [[ -n "$body" ]] && echo "         $(printf '%s' "$body" | head -c 300)"
+    return 1
+  fi
+
+  token_user_id=$(json_field "id" "$body")
+  if ! [[ "$token_user_id" =~ ^[0-9]+$ ]]; then
+    echo -e "  ${RED}FAIL${RESET}        Bearer setup: could not parse user ID from /users/me"
+    $VERBOSE && [[ -n "$body" ]] && echo "         $(printf '%s' "$body" | head -c 300)"
+    return 1
+  fi
+
+  token_is_admin=$(json_field "is_admin" "$body")
+  if [[ "$token_is_admin" == "true" ]]; then
+    IS_ADMIN_AUTH=true
+    EFFECTIVE_USER_ID="$USER_ID"
+  else
+    EFFECTIVE_USER_ID="$token_user_id"
+    if [[ "$USER_ID" != "$token_user_id" ]]; then
+      echo -e "  ${YELLOW}INFO${RESET}        Non-admin Bearer token detected – using token-linked user ID ${token_user_id} instead of requested ${USER_ID}"
+    fi
+  fi
+
+  USER_H=(-H "X-User-ID: ${EFFECTIVE_USER_ID}")
+  DATA_H=("${USER_H[@]}" -H "Content-Type: application/json")
+  return 0
+}
+
 silent_delete() {
   curl -s -o /dev/null "${AUTH[@]}" "${DATA_H[@]}" -X DELETE "$1" 2>/dev/null || true
 }
 
-# =============================================================================
-echo -e "${BOLD}Poznote API Test Suite${RESET}"
-echo "  Target  : ${BASE_URL}"
-echo "  Admin   : ${ADMIN_USER}"
-echo "  User-ID : ${USER_ID}"
-echo "  Date    : $(date '+%Y-%m-%d %H:%M:%S')"
+print_run_header() {
+  echo -e "${BOLD}Poznote API Test Suite${RESET}"
+  echo "  Target  : ${BASE_URL}"
+  echo "  Auth    : ${AUTH_LABEL}"
+  if [[ "$AUTH_MODE" == "basic" ]]; then
+    echo "  Admin   : ${ADMIN_USER}"
+  else
+    if $IS_ADMIN_AUTH; then
+      echo "  Token   : admin-linked"
+    else
+      echo "  Token   : user-linked"
+    fi
+  fi
+  echo "  User-ID : ${EFFECTIVE_USER_ID}"
+  echo "  Date    : $(date '+%Y-%m-%d %H:%M:%S')"
+}
+
+print_summary() {
+  echo
+  echo -e "${BOLD}══════════════════════════════════════${RESET}"
+  echo -e "${BOLD}  Results (${AUTH_LABEL})${RESET}"
+  printf "  ${GREEN}PASS${RESET}  : %d\n" "$PASS"
+  printf "  ${RED}FAIL${RESET}  : %d\n" "$FAIL"
+  printf "  ${YELLOW}SKIP${RESET}  : %d\n" "$SKIP"
+  printf "  Total : %d\n" "$((PASS + FAIL + SKIP))"
+  echo -e "${BOLD}══════════════════════════════════════${RESET}"
+}
+
+prompt_for_bearer_token() {
+  if [[ ! -t 0 ]]; then
+    return 1
+  fi
+
+  echo
+  read -r -p "Enter an OIDC Bearer token to rerun the suite (leave empty to skip): " BEARER_TOKEN
+  [[ -n "$BEARER_TOKEN" ]]
+}
+
+run_test_suite() {
+  local WS FOLDER_ID SUB_ID FOLDER2_ID MF_NOTE_ID NOTE_ID DUP_ID ATT_ID
+  local BACKUP_FILE UR_BACKUP_FILE UPLOADED_FILE TUSER TUSER_ID
+
+  cleanup_tempfiles
+  reset_counters
+  print_run_header
 
 # ── Health Check (no auth) ──────────────────────────────────────────────────
 section "Health Check"
@@ -124,6 +237,14 @@ section "Current User"
 expect_status "GET /users/me" "200" "${AUTH[@]}" "${API}/users/me" || true
 expect_status "GET /users/me/password-status" "200" \
   "${AUTH[@]}" "${API}/users/me/password-status" || true
+
+if [[ "$AUTH_MODE" == "bearer" ]]; then
+  section "Bearer Defaults"
+  expect_status "GET /notes (no X-User-ID)" "200" \
+    "${AUTH[@]}" "${API}/notes" || true
+  expect_status "GET /workspaces (no X-User-ID)" "200" \
+    "${AUTH[@]}" "${API}/workspaces" || true
+fi
 
 # ── Workspaces ────────────────────────────────────────────────────────────
 section "Workspaces"
@@ -297,7 +418,7 @@ if [[ "$NOTE_ID" =~ ^[0-9]+$ ]]; then
   printf 'API test attachment content' > /tmp/_api_attach.txt
   # Upload returns 201; attachment_id is a hex string
   expect_status "POST /notes/{id}/attachments (upload)" "201" \
-    "${AUTH[@]}" -H "X-User-ID: ${USER_ID}" \
+    "${AUTH[@]}" "${USER_H[@]}" \
     -X POST -F "file=@/tmp/_api_attach.txt" \
     "${API}/notes/${NOTE_ID}/attachments" || true
   rm -f /tmp/_api_attach.txt
@@ -410,7 +531,7 @@ else
       if [[ -s /tmp/_ur_backup.zip ]]; then
         # Step 1: upload
         expect_status "POST /backups/upload (upload ZIP)" "201" \
-          "${AUTH[@]}" -H "X-User-ID: ${USER_ID}" \
+          "${AUTH[@]}" "${USER_H[@]}" \
           -X POST -F "file=@/tmp/_ur_backup.zip" \
           "${API}/backups/upload" || true
         UPLOADED_FILE=$(json_field "filename" "$LAST_BODY")
@@ -434,54 +555,71 @@ fi
 
 # ── Admin ─────────────────────────────────────────────────────────────────
 section "Admin"
-expect_status "GET /admin/users" "200" "${AUTH[@]}" "${API}/admin/users" || true
-expect_status "GET /admin/users/{id}" "200" \
-  "${AUTH[@]}" "${API}/admin/users/${USER_ID}" || true
-expect_status "GET /admin/users/{id}/password-status" "200" \
-  "${AUTH[@]}" "${API}/admin/users/${USER_ID}/password-status" || true
-expect_status "GET /admin/stats" "200" "${AUTH[@]}" "${API}/admin/stats" || true
-expect_status "GET /users/lookup/{username}" "200" \
-  "${AUTH[@]}" "${API}/users/lookup/${ADMIN_USER}" || true
-
-TUSER="apitestuser$$"
-expect_status "POST /admin/users (create temp)" "201" \
-  "${AUTH[@]}" -H "Content-Type: application/json" \
-  -X POST -d "{\"username\":\"${TUSER}\"}" "${API}/admin/users" || true
-TUSER_ID=$(json_field "id" "$LAST_BODY")
-
-if [[ "$TUSER_ID" =~ ^[0-9]+$ ]]; then
-  expect_status "PATCH /admin/users/{id} (update)" "200" \
-    "${AUTH[@]}" -H "Content-Type: application/json" \
-    -X PATCH -d '{"active":true}' "${API}/admin/users/${TUSER_ID}" || true
-  expect_status "GET /admin/users/{id} (get temp user)" "200" \
-    "${AUTH[@]}" "${API}/admin/users/${TUSER_ID}" || true
-  expect_status "POST /admin/users/{id}/reset-password" "200" \
-    "${AUTH[@]}" -H "Content-Type: application/json" \
-    -X POST -d '{"password":"Temp@Test1234"}' \
-    "${API}/admin/users/${TUSER_ID}/reset-password" || true
-  expect_status "DELETE /admin/users/{id}" "200" \
-    "${AUTH[@]}" -X DELETE "${API}/admin/users/${TUSER_ID}" || true
+if [[ "$AUTH_MODE" == "bearer" && "$IS_ADMIN_AUTH" != "true" ]]; then
+  skip_test "Admin endpoints — skipped for non-admin Bearer token"
 else
-  echo -e "  ${YELLOW}WARN${RESET}  Could not parse temp user ID – skipping admin user sub-tests"
+  expect_status "GET /admin/users" "200" "${AUTH[@]}" "${API}/admin/users" || true
+  expect_status "GET /admin/users/{id}" "200" \
+    "${AUTH[@]}" "${API}/admin/users/${USER_ID}" || true
+  expect_status "GET /admin/users/{id}/password-status" "200" \
+    "${AUTH[@]}" "${API}/admin/users/${USER_ID}/password-status" || true
+  expect_status "GET /admin/stats" "200" "${AUTH[@]}" "${API}/admin/stats" || true
+  expect_status "GET /users/lookup/{username}" "200" \
+    "${AUTH[@]}" "${API}/users/lookup/${ADMIN_USER}" || true
+
+  TUSER="apitestuser$$"
+  expect_status "POST /admin/users (create temp)" "201" \
+    "${AUTH[@]}" -H "Content-Type: application/json" \
+    -X POST -d "{\"username\":\"${TUSER}\"}" "${API}/admin/users" || true
+  TUSER_ID=$(json_field "id" "$LAST_BODY")
+
+  if [[ "$TUSER_ID" =~ ^[0-9]+$ ]]; then
+    expect_status "PATCH /admin/users/{id} (update)" "200" \
+      "${AUTH[@]}" -H "Content-Type: application/json" \
+      -X PATCH -d '{"active":true}' "${API}/admin/users/${TUSER_ID}" || true
+    expect_status "GET /admin/users/{id} (get temp user)" "200" \
+      "${AUTH[@]}" "${API}/admin/users/${TUSER_ID}" || true
+    expect_status "POST /admin/users/{id}/reset-password" "200" \
+      "${AUTH[@]}" -H "Content-Type: application/json" \
+      -X POST -d '{"password":"Temp@Test1234"}' \
+      "${API}/admin/users/${TUSER_ID}/reset-password" || true
+    expect_status "DELETE /admin/users/{id}" "200" \
+      "${AUTH[@]}" -X DELETE "${API}/admin/users/${TUSER_ID}" || true
+  else
+    echo -e "  ${YELLOW}WARN${RESET}  Could not parse temp user ID – skipping admin user sub-tests"
+  fi
 fi
 
 # ── Legacy Export Endpoints ───────────────────────────────────────────────
 section "Legacy Export Endpoints"
 expect_status "GET /api_export_entries.php (all notes ZIP)" "200" \
-  "${AUTH[@]}" -H "X-User-ID: ${USER_ID}" \
+  "${AUTH[@]}" "${USER_H[@]}" \
   "${BASE_URL}/api_export_entries.php" || true
 
 # ── Cleanup test folder ──────────────────────────────────────────────────
 [[ "$FOLDER_ID" =~ ^[0-9]+$ ]] && silent_delete "${API}/folders/${FOLDER_ID}"
 
-# =============================================================================
-echo
-echo -e "${BOLD}══════════════════════════════════════${RESET}"
-echo -e "${BOLD}  Results${RESET}"
-printf "  ${GREEN}PASS${RESET}  : %d\n" "$PASS"
-printf "  ${RED}FAIL${RESET}  : %d\n" "$FAIL"
-printf "  ${YELLOW}SKIP${RESET}  : %d\n" "$SKIP"
-printf "  Total : %d\n" "$((PASS + FAIL + SKIP))"
-echo -e "${BOLD}══════════════════════════════════════${RESET}"
-[[ $FAIL -gt 0 ]] && exit 1
-exit 0
+  print_summary
+  [[ $FAIL -gt 0 ]] && return 1
+  return 0
+}
+
+main() {
+  local overall_status=0
+
+  setup_basic_auth
+  run_test_suite || overall_status=1
+
+  if prompt_for_bearer_token; then
+    if setup_bearer_auth "$BEARER_TOKEN"; then
+      run_test_suite || overall_status=1
+    else
+      overall_status=1
+    fi
+  fi
+
+  return $overall_status
+}
+
+main
+exit $?
