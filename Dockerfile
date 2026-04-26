@@ -1,6 +1,6 @@
 # Dockerfile for Poznote - Alpine Linux
 # Use Alpine Linux for minimal, secure image
-FROM php:8.4.27-fpm-alpine3.23
+FROM php:8.4-fpm-alpine3.23
 
 # Install system dependencies and PHP extensions
 RUN apk add --no-cache \
