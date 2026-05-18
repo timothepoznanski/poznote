@@ -2676,7 +2676,7 @@ function openKanbanView(folderId, folderName) {
                 '<i class="lucide lucide-alert-triangle-triangle" style="font-size: 3rem; margin-bottom: 16px; color: #f59e0b;"></i>' +
                 '<p>' + (window.t ? window.t('common.error', null, 'Error') : 'Error') + '</p>' +
                 '<button onclick="closeKanbanView()" class="btn btn-primary" style="margin-top: 16px;">' +
-                (window.t ? window.t('common.back_to_notes', null, 'Back to Notes') : 'Back to Notes') + '</button></div>';
+                (window.t ? window.t('common.back_to_notes', null, 'Notes') : 'Notes') + '</button></div>';
         });
 }
 

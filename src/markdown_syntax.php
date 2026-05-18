@@ -403,8 +403,8 @@ $examples = [
 <body>
     <div class="info-page markdown-syntax-page">
         <div class="info-buttons-back-container">
-            <a class="btn btn-secondary" href="<?php echo htmlspecialchars($backUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" title="<?php echo t_h('common.back_to_notes', [], 'Go to Notes'); ?>">
-                <?php echo t_h('common.back_to_notes', [], 'Go to Notes'); ?>
+            <a class="btn btn-secondary" href="<?php echo htmlspecialchars($backUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
+                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </a>
         </div>
 

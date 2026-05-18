@@ -180,7 +180,7 @@ if ($isAdmin) {
             </a>
             <a id="backToHomeLink" href="home.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
     				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_home', [], 'Back to Dashboard', $currentLang); ?>
+                <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
             </a>
         </div>
 
@@ -534,16 +534,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- Base64 Image Converter -->
-            <div class="home-card settings-card-clickable" id="convert-images-card" data-href="admin/convert-images.php">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-image"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.convert_images', [], 'Base64 Image Converter'); ?></span>
-                </div>
-            </div>
-
             <!-- Orphan Scanner -->
             <div class="home-card settings-card-clickable" id="orphan-scanner-card" data-href="admin/orphan-scanner.php">
                 <div class="home-card-icon">
@@ -551,16 +541,6 @@ if ($isAdmin) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span>
-                </div>
-            </div>
-
-            <!-- Attachment URL Repair -->
-            <div class="home-card settings-card-clickable" id="repair-attachments-card" data-href="admin/repair-attachments.php">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-wrench"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.repair_attachments', [], 'Repair attachment images'); ?></span>
                 </div>
             </div>
 

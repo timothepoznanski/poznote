@@ -47,9 +47,9 @@ $currentLang = getUserLanguage();
 				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>">
+			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
 				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Back to Dashboard'); ?>
+				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
 			</button>
 		</div>
 		

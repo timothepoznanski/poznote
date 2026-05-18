@@ -18,9 +18,24 @@ if [ ! -s "$MCP_TOKEN_FILE" ]; then
 fi
 
 # Ensure data directory and all its contents are owned by www-data
-echo "Setting correct permissions recursively on $DATA_DIR..."
 # Create essential subdirectories if they don't exist
 mkdir -p "$DATA_DIR/users" "$DATA_DIR/backups"
+
+echo "Running automatic base64 image conversion..."
+if php /var/www/html/maintenance/convert-base64-images.php "$DATA_DIR"; then
+    echo "Automatic base64 image conversion completed."
+else
+    echo "Warning: automatic base64 image conversion failed; continuing startup."
+fi
+
+echo "Running automatic attachment URL repair..."
+if php /var/www/html/maintenance/repair-attachment-urls.php "$DATA_DIR"; then
+    echo "Automatic attachment URL repair completed."
+else
+    echo "Warning: automatic attachment URL repair failed; continuing startup."
+fi
+
+echo "Setting correct permissions recursively on $DATA_DIR..."
 
 # Fix ownership and permissions for the entire data tree
 chown -R www-data:www-data "$DATA_DIR"

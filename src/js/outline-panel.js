@@ -837,6 +837,11 @@ function initTouchSupport() {
             return null;
         }
 
+        const titleScroller = target.closest('.css-title');
+        if (titleScroller) {
+            return titleScroller;
+        }
+
         // Any touch that starts inside a code block should never trigger the
         // outline/sommaire swipe gesture, regardless of whether the block is
         // currently overflowing. Without a language label the inner <code>

@@ -299,7 +299,7 @@ try {
             <?php echo htmlspecialchars($e->getMessage()); ?>
         </p>
         <button type="button" class="btn btn-primary" onclick="window.closeKanbanView ? window.closeKanbanView() : window.location.reload();">
-            <i class="lucide lucide-arrow-left"></i> <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+            <i class="lucide lucide-arrow-left"></i> <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
         </button>
     </div>
     <?php

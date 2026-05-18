@@ -329,11 +329,11 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
     <div class="workspaces-nav">
             <a href="../index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary">
                 <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Back to Notes'); ?>
+                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </a>
             <a href="../settings.php" class="btn btn-secondary">
                 <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings', [], 'Back to Settings'); ?>
+                <?php echo t_h('common.back_to_settings', [], 'Settings'); ?>
             </a>
     </div>
 
