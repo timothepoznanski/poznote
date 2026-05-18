@@ -564,7 +564,7 @@ function renderPublicWorkspaceAccessDeniedPage(array $workspaceAccess = []): voi
         'actions' => [
             [
                 'href' => '/index.php',
-                'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
+                'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
             ],
         ],
     ]);

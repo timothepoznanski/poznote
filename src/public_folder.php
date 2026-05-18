@@ -64,7 +64,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
+                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
                 ],
             ],
         ]);
@@ -146,7 +146,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Go to Dashboard', $currentLang),
+                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
                 ],
             ],
         ]);

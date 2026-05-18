@@ -9,9 +9,9 @@
   },
   "common": {
     "notes": "笔记",
-    "back_to_home": "前往仪表盘",
-    "back_to_notes": "前往笔记",
-    "back_to_settings": "前往设置",
+    "back_to_home": "仪表盘",
+    "back_to_notes": "笔记",
+    "back_to_settings": "设置",
     "close": "关闭",
     "disable": "disable",
     "cancel": "取消",
@@ -332,7 +332,7 @@
     "list": {
       "title": "包含附件的笔记",
       "no_attachments": "目前没有笔记包含附件。",
-      "back_to_notes": "返回笔记",
+      "back_to_notes": "笔记",
       "manage_attachments": "管理附件",
       "attachment_count_singular": "1个附件",
       "attachment_count_plural": "{{count}}个附件",
@@ -736,7 +736,7 @@
       "insert": "插入"
     },
     "toolbar": {
-      "back_to_notes": "返回笔记",
+      "back_to_notes": "笔记",
       "bold": "加粗",
       "italic": "斜体",
       "underline": "下划线",

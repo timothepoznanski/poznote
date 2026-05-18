@@ -22,9 +22,9 @@
     "disabled": "Disabled",
     "not_defined": "Not defined",
     "loading": "Loading...",
-    "back_to_notes": "Go to Notes",
-    "back_to_home": "Go to Dashboard",
-    "back_to_settings": "Go to Settings",
+    "back_to_notes": "Notes",
+    "back_to_home": "Dashboard",
+    "back_to_settings": "Settings",
     "back": "Back",
     "error": "Error",
     "success": "Success",
@@ -327,7 +327,7 @@
     "list": {
       "title": "Notes with attachments",
       "no_attachments": "No notes with attachments yet.",
-      "back_to_notes": "Go to notes",
+      "back_to_notes": "Notes",
       "manage_attachments": "Manage attachments",
       "attachment_count_singular": "1 attachment",
       "attachment_count_plural": "{{count}} attachments",
@@ -1001,7 +1001,7 @@
       "insert": "Insert"
     },
     "toolbar": {
-      "back_to_notes": "Go to notes",
+      "back_to_notes": "Notes",
       "bold": "Bold",
       "italic": "Italic",
       "underline": "Underline",

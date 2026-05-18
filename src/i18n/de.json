@@ -9,9 +9,9 @@
   },
   "common": {
     "notes": "Notizen",
-    "back_to_home": "Zum Dashboard gehen",
-    "back_to_notes": "Zu den Notizen gehen",
-    "back_to_settings": "Zu den Einstellungen gehen",
+    "back_to_home": "Dashboard",
+    "back_to_notes": "Notizen",
+    "back_to_settings": "Einstellungen",
     "close": "Schließen",
     "disable": "disable",
     "cancel": "Abbrechen",
@@ -331,7 +331,7 @@
     "list": {
       "title": "Notizen mit Anhängen",
       "no_attachments": "Noch keine Notizen mit Anhängen.",
-      "back_to_notes": "Zurück zu den Notizen",
+      "back_to_notes": "Notizen",
       "manage_attachments": "Anhänge verwalten",
       "attachment_count_singular": "1 Anhang",
       "attachment_count_plural": "{{count}} Anhänge",
@@ -740,7 +740,7 @@
       "insert": "Einfügen"
     },
     "toolbar": {
-      "back_to_notes": "Zurück zu den Notizen",
+      "back_to_notes": "Notizen",
       "bold": "Fett",
       "italic": "Kursiv",
       "underline": "Unterstrichen",

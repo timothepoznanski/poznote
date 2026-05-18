@@ -225,15 +225,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <div class="git-sync-nav">
             <a id="backToHomeLink" href="home.php" class="btn btn-secondary go-to-nav-btn">
     				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_home', [], 'Back to Dashboard', $currentLang); ?>
+                <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
             </a>
             <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
                 <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Back to Notes', $currentLang); ?>
+                <?php echo t_h('common.back_to_notes', [], 'Notes', $currentLang); ?>
             </a>
             <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary go-to-nav-btn">
                 <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings', [], 'Back to Settings', $currentLang); ?>
+                <?php echo t_h('common.back_to_settings', [], 'Settings', $currentLang); ?>
             </a>
             <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
             <form method="post" class="sync-form">
@@ -445,7 +445,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             <span>
                 <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from Dashboard.', $currentLang); ?></strong>
                 <a href="home.php" style="margin-left: 8px; font-weight: 600; text-decoration: underline; color: inherit;">
-                    <?php echo t_h('common.back_to_home', [], 'Back to Dashboard', $currentLang); ?>
+                    <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
                 </a>
             </span>
         </div>

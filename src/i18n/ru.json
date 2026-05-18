@@ -22,9 +22,9 @@
     "disabled": "Отключено",
     "not_defined": "Не определено",
     "loading": "Загрузка...",
-    "back_to_notes": "К заметкам",
-    "back_to_home": "На панель",
-    "back_to_settings": "В настройки",
+    "back_to_notes": "Заметки",
+    "back_to_home": "Панель",
+    "back_to_settings": "Настройки",
     "back": "Назад",
     "error": "Ошибка",
     "success": "Успешно",
@@ -327,7 +327,7 @@
     "list": {
       "title": "Заметки с вложениями",
       "no_attachments": "Пока нет заметок с вложениями.",
-      "back_to_notes": "Перейти к заметкам",
+      "back_to_notes": "Заметки",
       "manage_attachments": "Управление вложениями",
       "attachment_count_singular": "1 вложение",
       "attachment_count_plural": "{{count}} вложений",
@@ -994,7 +994,7 @@
       "insert": "Вставить"
     },
     "toolbar": {
-      "back_to_notes": "К заметкам",
+      "back_to_notes": "Заметки",
       "bold": "Жирный",
       "italic": "Курсив",
       "underline": "Подчеркнутый",

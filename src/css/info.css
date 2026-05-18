@@ -131,8 +131,8 @@ body {
         gap: 8px;
     }
 
-    /* Hide the "Back to notes" button on mobile */
-    .info-buttons-container .btn[title="Back to notes"] {
+    /* Hide the "Notes" button on mobile */
+    .info-buttons-container .btn[title="Notes"] {
         display: none !important;
     }
 

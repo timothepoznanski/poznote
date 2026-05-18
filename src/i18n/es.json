@@ -9,9 +9,9 @@
   },
   "common": {
     "notes": "Notas",
-    "back_to_home": "Ir al panel",
-    "back_to_notes": "Ir a las notas",
-    "back_to_settings": "Ir a la configuración",
+    "back_to_home": "Panel",
+    "back_to_notes": "Notas",
+    "back_to_settings": "Configuración",
     "close": "Cerrar",
     "disable": "disable",
     "cancel": "Cancelar",
@@ -331,7 +331,7 @@
     "list": {
       "title": "Notas con archivos adjuntos",
       "no_attachments": "Aún no hay notas con archivos adjuntos.",
-      "back_to_notes": "Volver a las notas",
+      "back_to_notes": "Notas",
       "manage_attachments": "Gestionar archivos adjuntos",
       "attachment_count_singular": "1 archivo adjunto",
       "attachment_count_plural": "{{count}} archivos adjuntos",
@@ -739,7 +739,7 @@
       "insert": "Insertar"
     },
     "toolbar": {
-      "back_to_notes": "Volver a notas",
+      "back_to_notes": "Notas",
       "bold": "Negrita",
       "italic": "Cursiva",
       "underline": "Subrayado",
