@@ -548,26 +548,26 @@ body.dark-mode #fontSizeModal .modal-footer .btn-primary:hover {
     background-color: #2a4a7f;
 }
 
-html[data-theme='dark'] #fontSizeModal .modal-footer .btn-cancel,
-body.dark-mode #fontSizeModal .modal-footer .btn-cancel {
+html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary,
+body.dark-mode #fontSizeModal .modal-buttons .btn-primary {
     background-color: #dc3545 !important;
     color: white !important;
     border-color: #dc3545 !important;
 }
-
-html[data-theme='dark'] #fontSizeModal .modal-footer .btn-cancel:hover,
+html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary:hover,
+body.dark-mode #fontSizeModal .modal-buttons .btn-primary:hover {
 body.dark-mode #fontSizeModal .modal-footer .btn-cancel:hover {
     background-color: #c82333 !important;
     border-color: #bd2130 !important;
-    opacity: 1 !important;
-}
+html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel,
+body.dark-mode #fontSizeModal .modal-buttons .btn-cancel {
 
 /* ============================================
    Share Modal
    ============================================ */
 
-html[data-theme='dark'] #shareModal .modal-content,
-body.dark-mode #shareModal .modal-content {
+html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel:hover,
+body.dark-mode #fontSizeModal .modal-buttons .btn-cancel:hover {
     background-color: #333333;
     color: #e0e0e0;
 }

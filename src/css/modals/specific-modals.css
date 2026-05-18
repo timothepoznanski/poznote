@@ -175,37 +175,8 @@
     line-height: 1.5;
 }
 
-#fontSizeModal .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
+#fontSizeModal .modal-buttons {
     margin-top: 20px;
-}
-
-#fontSizeModal button {
-    padding: 8px 15px;
-    cursor: pointer;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
-    margin-left: 10px;
-}
-
-#fontSizeModal #saveFontSizeBtn {
-    background-color: #007DB8 !important;
-    color: white !important;
-    border: none !important;
-    padding: 8px 14px !important;
-    border-radius: 4px !important;
-}
-
-#fontSizeModal #saveFontSizeBtn:hover {
-    background-color: #005a8a !important;
-}
-
-#fontSizeModal #cancelFontSizeBtn {
-    background-color: #f1f1f1;
-    color: #333;
 }
 
 /* ============================================

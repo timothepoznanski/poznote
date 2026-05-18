@@ -154,9 +154,9 @@
                 </div>
             </div>
         </div>
-        <div class="modal-footer">
-            <button id="cancelFontSizeBtn" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
-            <button id="saveFontSizeBtn" class="btn-primary"><?php echo t_h('common.save'); ?></button>
+        <div class="modal-buttons">
+            <button type="button" id="cancelFontSizeBtn" class="btn-cancel"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" id="saveFontSizeBtn" class="btn-primary"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
