@@ -162,7 +162,7 @@ usort($shared_folders, function($a, $b) {
 	data-txt-folder-shared-through-parent="<?php echo t_h('public.folder_shared_through_parent', [], 'Folder shared through parent folder'); ?>"
       data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
 	data-txt-table-name="<?php echo t_h('public.table.name', [], 'Name'); ?>"
-	data-txt-table-folder="<?php echo t_h('public.table.path', [], 'Path'); ?>"
+	data-txt-table-folder="<?php echo t_h('public.table.path', [], 'Path / Folder'); ?>"
 	data-txt-table-token="<?php echo t_h('public.table.token', [], 'Token'); ?>"
 	data-txt-token-help="<?php echo t_h('public.token_help', [], 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.'); ?>"
 	data-txt-table-actions="<?php echo t_h('public.table.actions', [], 'Actions'); ?>"
@@ -176,8 +176,8 @@ usort($shared_folders, function($a, $b) {
 	data-txt-no-shared-folders="<?php echo t_h('public.no_shared_folders', [], 'No shared folders yet.'); ?>"
 	data-txt-restrict-users="<?php echo t_h('public.restrict_users', [], 'Restrict to specific users'); ?>"
 	data-txt-restrict-users-mobile="<?php echo t_h('public.restrict_users_mobile', [], 'Restrict'); ?>"
-      data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"
-      data-txt-restricted-help="<?php echo t_h('public.restricted_help', [], 'When restricted, only the listed users can access this share after logging in.'); ?>"
+	data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"
+	data-txt-restricted-help="<?php echo t_h('public.restricted_help', [], 'When restricted, only the listed users can access this share after logging in.'); ?>"
       data-txt-no-users-found="<?php echo t_h('public.no_users_found', [], 'No other users found'); ?>"
       data-txt-users-loading="<?php echo t_h('public.users_loading', [], 'Loading users...'); ?>"
       data-txt-shared-by="<?php echo t_h('public.shared_by', [], 'Shared by'); ?>"
@@ -185,7 +185,9 @@ usort($shared_folders, function($a, $b) {
       data-txt-copy-url="<?php echo t_h('public.actions.copy_url', [], 'Copy URL'); ?>"
       data-txt-url-copied="<?php echo t_h('public.actions.url_copied', [], 'URL copied!'); ?>"
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
-      data-txt-access-denied-title="<?php echo t_h('public.access_denied_title', [], 'Access Denied'); ?>">
+	data-txt-access-denied-title="<?php echo t_h('public.access_denied_title', [], 'Access Denied'); ?>"
+	data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"
+	data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>">
 
 	<!-- Shared folders data from PHP -->
 	<script>
@@ -236,6 +238,16 @@ usort($shared_folders, function($a, $b) {
 					</button>
 				</div>
 				<div id="filterStats" class="filter-stats initially-hidden"></div>
+				<div class="shared-filter-tree-actions initially-hidden" id="sharedTreeToolbar">
+					<button type="button" id="expandAllFoldersBtn" class="btn btn-secondary">
+						<i class="lucide lucide-chevron-down" style="margin-right: 6px;"></i>
+						<?php echo t_h('public.expand_all', [], 'Expand all'); ?>
+					</button>
+					<button type="button" id="collapseAllFoldersBtn" class="btn btn-secondary">
+						<i class="lucide lucide-chevron-up" style="margin-right: 6px;"></i>
+						<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>
+					</button>
+				</div>
 			</div>
 		</div>
 		

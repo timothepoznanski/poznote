@@ -9,10 +9,6 @@
     color: #e0e0e0;
 }
 
-[data-theme="dark"] .shared-header {
-    color: #ffffff;
-}
-
 [data-theme="dark"] .shared-info {
     background-color: #1e3a52;
     color: #e0e0e0;
@@ -87,6 +83,34 @@
     border-color: #444444;
 }
 
+[data-theme="dark"] .shared-note-item:hover {
+    background-color: rgba(77, 185, 235, 0.08);
+}
+
+[data-theme="dark"] .shared-filter-bar {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .shared-filter-tree-actions .btn {
+    background: rgba(51, 65, 85, 0.38);
+    border-color: rgba(148, 163, 184, 0.22);
+    color: #c8d0d8;
+}
+
+[data-theme="dark"] .shared-filter-tree-actions .btn:hover {
+    background: rgba(77, 185, 235, 0.12);
+    border-color: rgba(77, 185, 235, 0.24);
+    color: #a9e2ff;
+}
+
+[data-theme="dark"] .shared-filter-tree-actions .btn:disabled {
+    background: rgba(51, 65, 85, 0.26);
+    border-color: rgba(148, 163, 184, 0.14);
+    color: rgba(200, 208, 216, 0.54);
+}
+
 [data-theme="dark"] .shared-notes-header {
     border-bottom-color: rgba(255, 255, 255, 0.12);
 }
@@ -97,11 +121,9 @@
 
 [data-theme="dark"] .shared-notes-header-folder,
 [data-theme="dark"] .shared-notes-header-token,
-[data-theme="dark"] .shared-notes-header-restricted,
 [data-theme="dark"] .shared-notes-header-actions,
 [data-theme="dark"] .note-folder-container,
 [data-theme="dark"] .note-token-wrap,
-[data-theme="dark"] .note-restricted-cell,
 [data-theme="dark"] .note-actions {
     border-left-color: #444444;
 }
@@ -119,33 +141,34 @@
 }
 
 [data-theme="dark"] .note-token-wrap {
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .note-token-wrap.is-editable {
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .note-token-wrap.is-editable:hover {
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
+    border-color: transparent;
 }
 
 [data-theme="dark"] .note-token-wrap.is-editable:focus-within {
-    border-top-color: transparent;
-    border-right-color: transparent;
-    border-bottom-color: transparent;
+    border-color: transparent;
     box-shadow: none;
 }
 
 [data-theme="dark"] .folder-badge {
     color: #c6d0da;
     background-color: transparent;
+}
+
+[data-theme="dark"] .shared-folder-toggle {
+    background: rgba(77, 185, 235, 0.1);
+    color: #a9e2ff;
+}
+
+[data-theme="dark"] .shared-folder-toggle:hover {
+    background: rgba(77, 185, 235, 0.18);
 }
 
 [data-theme="dark"] .folder-badge:hover {

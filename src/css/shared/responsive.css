@@ -81,15 +81,9 @@
         padding-bottom: 20px !important;
     }
 
-    .shared-header {
-        font-size: 1.8em;
-        margin-top: 20px;
-        margin-bottom: 15px;
-    }
-
     .shared-buttons-container {
         justify-content: center;
-        margin: 15px 10px;
+        margin: 0 10px 15px 10px;
         gap: 10px;
         flex-wrap: wrap;
     }
@@ -104,6 +98,21 @@
         padding: 10px;
     }
 
+    .shared-filter-bar {
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .shared-filter-tree-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .shared-filter-tree-actions .btn {
+        flex: 1 1 0;
+        justify-content: center;
+    }
+
     .filter-type-buttons {
         flex-wrap: wrap;
     }
@@ -112,6 +121,7 @@
         flex-direction: row;
         align-items: center;
         gap: 8px;
+        flex-wrap: wrap;
     }
 
     .filter-type-btn {
@@ -133,16 +143,15 @@
     /* Simplified mobile layout */
     .shared-note-item {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(0, 1fr);
         grid-template-areas:
-            "name restricted"
-            "folder folder"
-            "token token"
-            "actions actions";
+            "name"
+            "folder"
+            "token"
+            "actions";
         align-items: start;
         gap: 10px 12px;
         padding: 16px;
-        border: 1px solid var(--border-color, #e0e0e0);
         border-radius: 14px;
         margin-bottom: 12px;
         background: var(--input-bg, #ffffff);
@@ -162,10 +171,6 @@
         padding-left: 0;
     }
 
-    .shared-note-item.shared-note-child {
-        border-left: 3px solid rgba(13, 110, 253, 0.22);
-    }
-
     .shared-notes-header {
         display: none;
     }
@@ -179,14 +184,17 @@
     }
 
     .note-name-container,
-    .note-folder-container {
+    .note-folder-container,
+    .note-token-wrap,
+    .note-actions {
         min-width: 0;
         width: 100%;
+        max-width: 100%;
+        flex: 1 1 auto;
     }
 
     .note-folder-container,
     .note-token-wrap,
-    .note-restricted-cell,
     .note-actions {
         border-left: none;
         padding-left: 0;
@@ -196,6 +204,12 @@
         grid-area: name;
         align-items: flex-start;
         width: 100%;
+    }
+
+    .shared-folder-toggle {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
     }
 
     .note-folder-container {
@@ -212,6 +226,7 @@
     .note-token-wrap {
         grid-area: token;
         width: 100%;
+        min-width: 0;
         padding: 10px 12px;
         border-radius: 10px;
         background: transparent;
@@ -231,18 +246,10 @@
         height: 28px;
     }
 
-    .note-restricted-cell {
-        grid-area: restricted;
-        flex: 0 0 auto;
-        width: auto;
-        min-height: 0;
-        justify-content: flex-end;
-        align-self: start;
-    }
-
     .note-actions {
         grid-area: actions;
         width: 100%;
+        min-width: 0;
         justify-content: flex-end;
         align-items: center;
         flex-wrap: wrap;

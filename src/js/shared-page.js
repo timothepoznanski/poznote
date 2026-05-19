@@ -40,7 +40,7 @@
             txtFolderSharedThroughParent: body.getAttribute('data-txt-folder-shared-through-parent') || 'Folder shared through parent folder',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No items match your search.',
             txtTableName: body.getAttribute('data-txt-table-name') || 'Name',
-            txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Folder',
+            txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Path / Folder',
             txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
 
             txtTokenHelp: body.getAttribute('data-txt-token-help') || 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.',
@@ -54,14 +54,15 @@
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
             txtRestrictUsersMobile: body.getAttribute('data-txt-restrict-users-mobile') || 'Restrict',
-
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
             txtRestrictedHelp: body.getAttribute('data-txt-restricted-help') || 'When restricted, only the listed users can access this share after logging in.',
             txtNoUsersFound: body.getAttribute('data-txt-no-users-found') || 'No other users found',
             txtUsersLoading: body.getAttribute('data-txt-users-loading') || 'Loading users...',
 
             txtSharedBy: body.getAttribute('data-txt-shared-by') || 'Shared by',
-            txtNoSharedWithMe: body.getAttribute('data-txt-no-shared-with-me') || 'Nothing has been shared with you yet.'
+            txtNoSharedWithMe: body.getAttribute('data-txt-no-shared-with-me') || 'Nothing has been shared with you yet.',
+            txtExpandFolder: body.getAttribute('data-txt-expand-folder') || 'Expand folder',
+            txtCollapseFolder: body.getAttribute('data-txt-collapse-folder') || 'Collapse folder'
         };
     }
 
@@ -78,6 +79,81 @@
     var filterType = 'all';
     var pendingEditorRequest = null;
     var pendingEditorHandled = false;
+    var sharedFolderLookup = {};
+    var COLLAPSED_FOLDERS_STORAGE_KEY = 'poznote.shared.collapsedFolders';
+    var currentHierarchyBranchMeta = {};
+    var currentCollapsibleFolderIds = [];
+    var collapsedFolderIds = loadCollapsedFolderIds();
+
+    function loadCollapsedFolderIds() {
+        try {
+            var stored = window.localStorage ? window.localStorage.getItem(COLLAPSED_FOLDERS_STORAGE_KEY) : null;
+            var parsed = stored ? JSON.parse(stored) : [];
+            if (!Array.isArray(parsed)) {
+                return {};
+            }
+
+            return parsed.reduce(function(accumulator, folderId) {
+                accumulator[String(folderId)] = true;
+                return accumulator;
+            }, {});
+        } catch (error) {
+            return {};
+        }
+    }
+
+    function saveCollapsedFolderIds() {
+        try {
+            if (!window.localStorage) {
+                return;
+            }
+
+            window.localStorage.setItem(COLLAPSED_FOLDERS_STORAGE_KEY, JSON.stringify(Object.keys(collapsedFolderIds)));
+        } catch (error) {
+            // Ignore storage failures and keep the UI functional.
+        }
+    }
+
+    function isFolderCollapsed(folderId) {
+        return !!collapsedFolderIds[String(folderId)];
+    }
+
+    function setFolderCollapsed(folderId, collapsed) {
+        var folderKey = String(folderId);
+
+        if (collapsed) {
+            collapsedFolderIds[folderKey] = true;
+        } else {
+            delete collapsedFolderIds[folderKey];
+        }
+
+        saveCollapsedFolderIds();
+    }
+
+    function toggleFolderCollapsed(folderId) {
+        setFolderCollapsed(folderId, !isFolderCollapsed(folderId));
+        renderItems();
+    }
+
+    function pruneCollapsedFolderIds() {
+        var validFolderIds = {};
+        var changed = false;
+
+        sharedFolders.forEach(function(folder) {
+            validFolderIds[String(folder.folder_id)] = true;
+        });
+
+        Object.keys(collapsedFolderIds).forEach(function(folderId) {
+            if (!validFolderIds[folderId]) {
+                delete collapsedFolderIds[folderId];
+                changed = true;
+            }
+        });
+
+        if (changed) {
+            saveCollapsedFolderIds();
+        }
+    }
 
     function isMobileShareModalView() {
         return !!(window.matchMedia && window.matchMedia('(max-width: 680px)').matches);
@@ -266,11 +342,28 @@
         updateFilterStats();
     }
 
+    function getCurrentScopeTotal() {
+        if (filterType === 'notes') {
+            return sharedNotes.length;
+        }
+
+        if (filterType === 'folders') {
+            return sharedFolders.length;
+        }
+
+        if (filterType === 'shared_with_me') {
+            return sharedWithMe.length;
+        }
+
+        return allItems.length;
+    }
+
     function updateFilterStats() {
         var statsDiv = document.getElementById('filterStats');
+        var totalCount = getCurrentScopeTotal();
         if (statsDiv) {
-            if (allItems.length > 0) {
-                statsDiv.textContent = filteredItems.length + ' / ' + allItems.length;
+            if (totalCount > 0) {
+                statsDiv.textContent = filteredItems.length + ' / ' + totalCount;
                 statsDiv.style.display = 'block';
             } else {
                 statsDiv.style.display = 'none';
@@ -282,12 +375,43 @@
 
     function mergeItems() {
         allItems = [];
+        sharedFolderLookup = {};
         sharedFolders.forEach(function(folder) {
             folder.public_url = normalizePublicUrl(folder.public_url || buildFolderPublicUrl(folder.token || ''));
+            sharedFolderLookup[String(folder.folder_id)] = folder;
         });
         sharedNotes.forEach(function(note) { note._type = 'note'; allItems.push(note); });
         sharedFolders.forEach(function(folder) { folder._type = 'folder'; allItems.push(folder); });
         sharedWithMe.forEach(function(item) { allItems.push(item); });
+        pruneCollapsedFolderIds();
+    }
+
+    function propagateInheritedFolderAllowedUsers(folderId, allowedUsers) {
+        var childrenByParentId = {};
+        var normalizedAllowedUsers = Array.isArray(allowedUsers) && allowedUsers.length > 0
+            ? allowedUsers.slice()
+            : null;
+
+        sharedFolders.forEach(function(folder) {
+            var parentKey = folder.parent_id != null ? String(folder.parent_id) : '';
+            if (!childrenByParentId[parentKey]) {
+                childrenByParentId[parentKey] = [];
+            }
+            childrenByParentId[parentKey].push(folder);
+        });
+
+        function updateDescendants(parentKey) {
+            (childrenByParentId[parentKey] || []).forEach(function(childFolder) {
+                if (childFolder.is_direct) {
+                    return;
+                }
+
+                childFolder.allowed_users = normalizedAllowedUsers ? normalizedAllowedUsers.slice() : null;
+                updateDescendants(String(childFolder.folder_id));
+            });
+        }
+
+        updateDescendants(String(folderId));
     }
 
     function sortByFolderPathAndName(items, getName) {
@@ -422,6 +546,75 @@
         });
 
         return orderedItems;
+    }
+
+    function getHierarchyDepth(item) {
+        var depth = parseInt(item && item._hierarchyDepth, 10);
+        return Number.isFinite(depth) && depth > 0 ? depth : 0;
+    }
+
+    function buildHierarchyPresentation(items) {
+        var branchMeta = {};
+        var ancestorStack = [];
+        var collapseEnabled = !filterText;
+        var visibleItems = [];
+        var collapsedStack = [];
+
+        items.forEach(function(item) {
+            var depth = getHierarchyDepth(item);
+
+            while (ancestorStack.length > depth) {
+                ancestorStack.pop();
+            }
+
+            ancestorStack.forEach(function(folderId) {
+                if (branchMeta[folderId]) {
+                    branchMeta[folderId].descendantCount += 1;
+                }
+            });
+
+            if (item && item._type === 'folder') {
+                var folderKey = String(item.folder_id);
+                branchMeta[folderKey] = {
+                    descendantCount: 0,
+                    depth: depth
+                };
+                ancestorStack[depth] = folderKey;
+                ancestorStack.length = depth + 1;
+            }
+        });
+
+        items.forEach(function(item) {
+            var depth = getHierarchyDepth(item);
+
+            while (collapsedStack.length > 0 && depth <= collapsedStack[collapsedStack.length - 1].depth) {
+                collapsedStack.pop();
+            }
+
+            if (!collapseEnabled || collapsedStack.length === 0) {
+                visibleItems.push(item);
+            }
+
+            if (collapseEnabled && item && item._type === 'folder') {
+                var folderKey = String(item.folder_id);
+                var branchInfo = branchMeta[folderKey];
+                if (branchInfo && branchInfo.descendantCount > 0 && isFolderCollapsed(folderKey)) {
+                    collapsedStack.push({
+                        folderId: folderKey,
+                        depth: depth
+                    });
+                }
+            }
+        });
+
+        return {
+            branchMeta: branchMeta,
+            collapsibleFolderIds: Object.keys(branchMeta).filter(function(folderKey) {
+                return branchMeta[folderKey].descendantCount > 0;
+            }),
+            visibleItems: collapseEnabled ? visibleItems : items.slice(),
+            searchExpanded: !collapseEnabled && !!filterText
+        };
     }
 
     function applyHierarchyDepth(element, depth, isChildNote) {
@@ -672,7 +865,8 @@
                     folder.passwordValue = data.passwordValue || '';
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users') && updates.allowed_users !== undefined) {
-                    folder.allowed_users = updates.allowed_users;
+                    folder.allowed_users = Array.isArray(data.allowed_users) ? data.allowed_users.slice() : null;
+                    propagateInheritedFolderAllowedUsers(folderId, folder.allowed_users);
                 }
             }
             mergeItems();
@@ -707,6 +901,82 @@
             return new URL(url, window.location.origin + '/').href;
         } catch (error) {
             return url;
+        }
+    }
+
+    function updateTreeToolbar(presentation) {
+        var toolbar = document.getElementById('sharedTreeToolbar');
+        var searchHint = document.getElementById('sharedTreeSearchHint');
+        var expandBtn = document.getElementById('expandAllFoldersBtn');
+        var collapseBtn = document.getElementById('collapseAllFoldersBtn');
+        var showToolbar = !!(presentation && presentation.collapsibleFolderIds.length > 0 && (filterType === 'all' || filterType === 'folders'));
+
+        currentHierarchyBranchMeta = presentation ? presentation.branchMeta : {};
+        currentCollapsibleFolderIds = presentation ? presentation.collapsibleFolderIds.slice() : [];
+
+        if (!toolbar) {
+            return;
+        }
+
+        toolbar.classList.toggle('initially-hidden', !showToolbar);
+        if (!showToolbar) {
+            return;
+        }
+
+        if (searchHint) {
+            searchHint.classList.toggle('initially-hidden', !presentation.searchExpanded);
+        }
+
+        if (expandBtn) {
+            expandBtn.disabled = presentation.searchExpanded || !currentCollapsibleFolderIds.some(function(folderId) {
+                return isFolderCollapsed(folderId);
+            });
+        }
+
+        if (collapseBtn) {
+            collapseBtn.disabled = presentation.searchExpanded || !currentCollapsibleFolderIds.some(function(folderId) {
+                return !isFolderCollapsed(folderId);
+            });
+        }
+    }
+
+    function expandAllFolders() {
+        var changed = false;
+
+        if (filterText) {
+            return;
+        }
+
+        currentCollapsibleFolderIds.forEach(function(folderId) {
+            if (isFolderCollapsed(folderId)) {
+                delete collapsedFolderIds[String(folderId)];
+                changed = true;
+            }
+        });
+
+        if (changed) {
+            saveCollapsedFolderIds();
+            renderItems();
+        }
+    }
+
+    function collapseAllFolders() {
+        var changed = false;
+
+        if (filterText) {
+            return;
+        }
+
+        currentCollapsibleFolderIds.forEach(function(folderId) {
+            if (!isFolderCollapsed(folderId)) {
+                collapsedFolderIds[String(folderId)] = true;
+                changed = true;
+            }
+        });
+
+        if (changed) {
+            saveCollapsedFolderIds();
+            renderItems();
         }
     }
 
@@ -1361,28 +1631,6 @@
         headerUrl.appendChild(tokenHelp);
         header.appendChild(headerUrl);
 
-        var headerRestricted = document.createElement('div');
-        headerRestricted.className = 'shared-notes-header-cell shared-notes-header-restricted';
-
-        var headerRestrictedLabel = document.createElement('span');
-        headerRestrictedLabel.textContent = config.txtRestrictedBadge;
-        headerRestricted.appendChild(headerRestrictedLabel);
-
-        var restrictedHelp = document.createElement('span');
-        restrictedHelp.className = 'shared-header-help';
-        restrictedHelp.tabIndex = 0;
-        restrictedHelp.setAttribute('role', 'button');
-        restrictedHelp.setAttribute('aria-label', config.txtRestrictedHelp);
-        restrictedHelp.innerHTML = '<i class="lucide lucide-help-circle"></i>';
-
-        var restrictedHelpTooltip = document.createElement('span');
-        restrictedHelpTooltip.className = 'shared-header-help-tooltip';
-        restrictedHelpTooltip.textContent = config.txtRestrictedHelp;
-        restrictedHelp.appendChild(restrictedHelpTooltip);
-        headerRestricted.appendChild(restrictedHelp);
-
-        header.appendChild(headerRestricted);
-
         var headerActions = document.createElement('div');
         headerActions.className = 'shared-notes-header-cell shared-notes-header-actions';
         headerActions.textContent = config.txtTableActions;
@@ -1390,7 +1638,15 @@
 
         list.appendChild(header);
 
-        var itemsToRender = filterType === 'all' ? buildAllViewSequence(filteredItems) : filteredItems;
+        var itemsToRender = filteredItems;
+
+        if (filterType === 'all' || filterType === 'folders') {
+            var hierarchyPresentation = buildHierarchyPresentation(buildAllViewSequence(filteredItems));
+            updateTreeToolbar(hierarchyPresentation);
+            itemsToRender = hierarchyPresentation.visibleItems;
+        } else {
+            updateTreeToolbar(null);
+        }
 
         itemsToRender.forEach(function(item) {
             if (item._type === 'note') {
@@ -1405,17 +1661,57 @@
         container.appendChild(list);
     }
 
-    function buildRestrictedCell(isRestricted) {
-        var cell = document.createElement('div');
-        cell.className = 'note-restricted-cell';
-        if (isRestricted) {
-            cell.innerHTML = '<i class="lucide lucide-check-circle" title="' + config.txtRestrictedBadge + '"></i>';
-        }
-        return cell;
-    }
-
     function noteHasVisiblePasswordProtection(note) {
         return !!Number(note && note.hasPassword) || !!note.shared_folder_has_password;
+    }
+
+    function hasRestrictedAllowedUsers(allowedUsers) {
+        return Array.isArray(allowedUsers) && allowedUsers.length > 0;
+    }
+
+    function getSharedFolderShareById(folderId) {
+        if (folderId === null || folderId === undefined) {
+            return null;
+        }
+
+        return sharedFolderLookup[String(folderId)] || null;
+    }
+
+    function noteHasVisibleRestriction(note) {
+        if (!note) {
+            return false;
+        }
+
+        if (hasRestrictedAllowedUsers(note.allowed_users)) {
+            return true;
+        }
+
+        if (!note.share_id && note.shared_via_folder) {
+            var sharedFolder = getSharedFolderShareById(note.folder_id);
+            return !!(sharedFolder && hasRestrictedAllowedUsers(sharedFolder.allowed_users));
+        }
+
+        return false;
+    }
+
+    function folderHasVisibleRestriction(folder) {
+        return hasRestrictedAllowedUsers(folder && folder.allowed_users);
+    }
+
+    function sharedItemHasVisibleRestriction(sharedItem) {
+        return !!sharedItem && (sharedItem._type === 'shared_with_me_note' || sharedItem._type === 'shared_with_me_folder');
+    }
+
+    function appendRestrictedIndicator(container) {
+        var restrictedIcon = document.createElement('i');
+        restrictedIcon.className = 'lucide lucide-shield shared-restricted-icon';
+        restrictedIcon.classList.add('is-restricted');
+        restrictedIcon.style.marginLeft = '6px';
+        restrictedIcon.style.fontSize = '14px';
+        restrictedIcon.style.opacity = '1';
+        restrictedIcon.title = config.txtRestrictedHelp || config.txtRestrictedBadge;
+        restrictedIcon.setAttribute('aria-label', config.txtRestrictedHelp || config.txtRestrictedBadge);
+        container.appendChild(restrictedIcon);
     }
 
     function renderNoteItem(note) {
@@ -1452,6 +1748,10 @@
             nameContainer.appendChild(lockIcon);
         }
 
+        if (noteHasVisibleRestriction(note)) {
+            appendRestrictedIndicator(nameContainer);
+        }
+
         item.appendChild(nameContainer);
 
         var folderContainer = document.createElement('div');
@@ -1471,8 +1771,6 @@
         item.appendChild(folderContainer);
 
         item.appendChild(renderTokenCell(note.token, note.shared_via_folder ? config.txtViaFolder : ''));
-
-        item.appendChild(buildRestrictedCell(Array.isArray(note.allowed_users) && note.allowed_users.length > 0));
 
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'note-actions';
@@ -1537,16 +1835,51 @@
 
     function renderFolderItem(folder) {
         var item = document.createElement('div');
+        var folderKey = String(folder.folder_id);
+        var branchInfo = currentHierarchyBranchMeta[folderKey] || { descendantCount: 0 };
+        var isCollapsible = branchInfo.descendantCount > 0;
+        var isCollapsed = isCollapsible && !filterText && isFolderCollapsed(folderKey);
+
         item.className = 'shared-item shared-note-item shared-folder-row';
         item.dataset.folderId = folder.folder_id;
         item.dataset.folderName = folder.folder_name;
         item.dataset.itemType = 'folder';
         item.dataset.hasPassword = folder.password ? '1' : '0';
+        item.dataset.collapsible = isCollapsible ? '1' : '0';
+        item.dataset.collapsed = isCollapsed ? '1' : '0';
         if (!folder.is_direct) item.classList.add('shared-via-parent');
+        if (isCollapsible) item.classList.add('is-collapsible');
+        if (isCollapsed) item.classList.add('is-collapsed');
         applyHierarchyDepth(item, folder._hierarchyDepth || 0, false);
 
         var nameContainer = document.createElement('div');
         nameContainer.className = 'note-name-container';
+
+        var toggleButton = document.createElement('button');
+        toggleButton.type = 'button';
+        toggleButton.className = 'shared-folder-toggle' + (isCollapsible ? '' : ' is-placeholder');
+
+        if (isCollapsible) {
+            toggleButton.title = isCollapsed ? config.txtExpandFolder : config.txtCollapseFolder;
+            toggleButton.setAttribute('aria-label', isCollapsed ? config.txtExpandFolder : config.txtCollapseFolder);
+            toggleButton.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+            toggleButton.innerHTML = isCollapsed
+                ? '<i class="lucide lucide-chevron-right"></i>'
+                : '<i class="lucide lucide-chevron-down"></i>';
+            (function(folderId) {
+                toggleButton.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    toggleFolderCollapsed(folderId);
+                });
+            })(folder.folder_id);
+        } else {
+            toggleButton.setAttribute('aria-hidden', 'true');
+            toggleButton.tabIndex = -1;
+            toggleButton.innerHTML = '<span class="shared-folder-toggle-placeholder"></span>';
+        }
+
+        nameContainer.appendChild(toggleButton);
 
         var typeIcon = document.createElement('i');
         typeIcon.className = 'lucide lucide-folder shared-type-icon';
@@ -1570,6 +1903,10 @@
             nameContainer.appendChild(lockIcon);
         }
 
+        if (folderHasVisibleRestriction(folder)) {
+            appendRestrictedIndicator(nameContainer);
+        }
+
         item.appendChild(nameContainer);
 
         var folderContainer = document.createElement('div');
@@ -1584,8 +1921,6 @@
         item.appendChild(folderContainer);
 
         item.appendChild(renderTokenCell(folder.token, !folder.is_direct ? config.txtViaFolder : ''));
-
-        item.appendChild(buildRestrictedCell(Array.isArray(folder.allowed_users) && folder.allowed_users.length > 0));
 
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'note-actions';
@@ -1674,6 +2009,10 @@
         bindPwaAwareLink(nameEl, sharedItem.url || '');
         nameContainer.appendChild(nameEl);
 
+        if (sharedItemHasVisibleRestriction(sharedItem)) {
+            appendRestrictedIndicator(nameContainer);
+        }
+
         item.appendChild(nameContainer);
 
         var ownerContainer = document.createElement('div');
@@ -1688,8 +2027,6 @@
 
         // Token cell — show the actual token (read-only)
         item.appendChild(renderTokenCell(sharedItem.token || '', ''));
-
-        item.appendChild(buildRestrictedCell(true));
 
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'note-actions';
@@ -1727,6 +2064,16 @@
         var backBtn = document.getElementById('backToNotesBtn');
         if (backBtn) {
             backBtn.addEventListener('click', goBackToNotes);
+        }
+
+        var expandAllFoldersBtn = document.getElementById('expandAllFoldersBtn');
+        if (expandAllFoldersBtn) {
+            expandAllFoldersBtn.addEventListener('click', expandAllFolders);
+        }
+
+        var collapseAllFoldersBtn = document.getElementById('collapseAllFoldersBtn');
+        if (collapseAllFoldersBtn) {
+            collapseAllFoldersBtn.addEventListener('click', collapseAllFolders);
         }
 
         // Type filter buttons
@@ -1783,7 +2130,7 @@
         }
 
         var initialType = urlParams.get('type');
-        if (initialType && ['all', 'notes', 'folders'].indexOf(initialType) !== -1) {
+        if (initialType && ['all', 'notes', 'folders', 'shared_with_me'].indexOf(initialType) !== -1) {
             filterType = initialType;
             filterBtns.forEach(function(btn) {
                 btn.classList.toggle('active', btn.getAttribute('data-filter') === filterType);
