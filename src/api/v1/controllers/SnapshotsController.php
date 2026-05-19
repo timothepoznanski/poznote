@@ -2,15 +2,15 @@
 /**
  * Snapshots Controller for Poznote REST API v1
  * 
- * Manages daily snapshots of note content.
+ * Manages automatic daily snapshots and extra manual snapshots of note content.
  * A snapshot captures the note content at first open of the day,
- * allowing users to revert to the state before any edits were made that day.
- * Keeps up to 7 days of history per note.
+ * and users can also add more snapshots manually during the same day.
+ * Keeps up to 7 snapshots of history per note.
  */
 
 class SnapshotsController {
     private PDO $con;
-    private int $maxDays = 7;
+     private int $maxSnapshots = 7;
     
     public function __construct(PDO $con) {
         $this->con = $con;
@@ -27,35 +27,431 @@ class SnapshotsController {
     }
     
     /**
-     * Purge snapshots older than $maxDays for a given note.
+     * Purge snapshots beyond the newest $maxSnapshots for a given note.
      */
     private function purgeOldSnapshots(string $noteSnapshotDir): void {
         if (!is_dir($noteSnapshotDir)) return;
-        
-        $cutoff = date('Y-m-d', strtotime('-' . $this->maxDays . ' days'));
+
+        $this->normalizeMalformedSnapshotFiles($noteSnapshotDir);
+
         $files = scandir($noteSnapshotDir);
         if ($files === false) return;
-        
+
+        $snapshots = [];
+
         foreach ($files as $file) {
             if ($file === '.' || $file === '..') continue;
-            // Match date-based filenames: YYYY-MM-DD.html, YYYY-MM-DD.md, YYYY-MM-DD.meta.json
-            if (preg_match('/^(\d{4}-\d{2}-\d{2})\.(html|md|meta\.json)$/', $file, $m)) {
-                if ($m[1] < $cutoff) {
-                    @unlink($noteSnapshotDir . '/' . $file);
+
+            $parsed = $this->parseSnapshotFilename($file);
+            if ($parsed === null) {
+                continue;
+            }
+
+            $snapshotFile = $noteSnapshotDir . '/' . $file;
+            if (!is_file($snapshotFile)) {
+                continue;
+            }
+
+            $paths = $this->getSnapshotPaths($noteSnapshotDir, $parsed['key'], $parsed['extension']);
+            $meta = $this->readSnapshotMeta($paths['meta']);
+
+            $snapshots[] = [
+                'key' => $parsed['key'],
+                'snapshot_file' => $snapshotFile,
+                'meta_file' => $paths['meta'],
+                'created_at_raw' => (string) ($meta['created_at'] ?? ''),
+                'date' => $parsed['date']
+            ];
+        }
+
+        if (count($snapshots) <= $this->maxSnapshots) {
+            return;
+        }
+
+        usort($snapshots, function (array $a, array $b): int {
+            $sortA = trim((string) ($a['created_at_raw'] ?? ''));
+            $sortB = trim((string) ($b['created_at_raw'] ?? ''));
+
+            if ($sortA !== '' || $sortB !== '') {
+                $createdCompare = strcmp($sortB, $sortA);
+                if ($createdCompare !== 0) {
+                    return $createdCompare;
                 }
+            }
+
+            $dateCompare = strcmp((string) ($b['date'] ?? ''), (string) ($a['date'] ?? ''));
+            if ($dateCompare !== 0) {
+                return $dateCompare;
+            }
+
+            return strcmp((string) ($b['key'] ?? ''), (string) ($a['key'] ?? ''));
+        });
+
+        foreach (array_slice($snapshots, $this->maxSnapshots) as $snapshot) {
+            @unlink((string) $snapshot['snapshot_file']);
+            @unlink((string) $snapshot['meta_file']);
+        }
+    }
+
+    /**
+     * Get the current snapshot date in the user's configured timezone.
+     */
+    private function getSnapshotDateForUser(int $relativeDays = 0): string {
+        try {
+            $now = new DateTimeImmutable('now', new DateTimeZone(getUserTimezone()));
+        } catch (Exception $e) {
+            $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        }
+
+        if ($relativeDays !== 0) {
+            $modifier = ($relativeDays > 0 ? '+' : '') . $relativeDays . ' days';
+            $now = $now->modify($modifier);
+        }
+
+        return $now->format('Y-m-d');
+    }
+
+    /**
+     * Format a stored UTC snapshot timestamp for the user's timezone.
+     */
+    private function formatSnapshotCreatedAt(string $createdAt): string {
+        $createdAt = trim($createdAt);
+        if ($createdAt === '') {
+            return '';
+        }
+
+        return convertUtcToUserTimezone($createdAt);
+    }
+
+    /**
+     * Convert a stored UTC snapshot timestamp to the user's local day.
+     */
+    private function getUserDateFromSnapshotTimestamp(string $createdAt): string {
+        $createdAt = trim($createdAt);
+        if ($createdAt === '') {
+            return '';
+        }
+
+        try {
+            $date = new DateTimeImmutable($createdAt, new DateTimeZone('UTC'));
+            return $date->setTimezone(new DateTimeZone(getUserTimezone()))->format('Y-m-d');
+        } catch (Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Read snapshot metadata if present.
+     */
+    private function readSnapshotMeta(string $metaFile): array {
+        if (!is_file($metaFile) || !is_readable($metaFile)) {
+            return [];
+        }
+
+        $metaContent = file_get_contents($metaFile);
+        if ($metaContent === false) {
+            return [];
+        }
+
+        return json_decode($metaContent, true) ?: [];
+    }
+
+    /**
+     * Validate a snapshot key from the request.
+     */
+    private function isValidSnapshotKey(string $snapshotKey): bool {
+        return (bool) preg_match('/^\d{4}-\d{2}-\d{2}(?:--[A-Za-z0-9_-]+)?$/', $snapshotKey);
+    }
+
+    /**
+     * Normalize a snapshot file extension with or without a leading dot.
+     */
+    private function normalizeSnapshotExtension(string $extension): string {
+        return ltrim($extension, '.');
+    }
+
+    /**
+     * Parse a snapshot filename into its date/key components.
+     */
+    private function parseSnapshotFilename(string $file, ?string $expectedExtension = null): ?array {
+        if (!preg_match('/^(\d{4}-\d{2}-\d{2})(?:--([A-Za-z0-9_-]+))?\.\.?(html|md)$/', $file, $matches)) {
+            return null;
+        }
+
+        if ($expectedExtension !== null && $matches[3] !== $expectedExtension) {
+            return null;
+        }
+
+        $key = $matches[1] . (!empty($matches[2]) ? '--' . $matches[2] : '');
+
+        return [
+            'date' => $matches[1],
+            'key' => $key,
+            'extension' => $matches[3],
+            'manual' => !empty($matches[2])
+        ];
+    }
+
+    /**
+     * Build a unique key for an extra snapshot created manually.
+     */
+    private function buildManualSnapshotKey(string $date): string {
+        try {
+            $now = new DateTimeImmutable('now', new DateTimeZone(getUserTimezone()));
+        } catch (Exception $e) {
+            $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        }
+
+        $suffix = $now->format('Hisv');
+
+        try {
+            $suffix .= '-' . bin2hex(random_bytes(2));
+        } catch (Exception $e) {
+            $suffix .= '-' . substr(str_replace('.', '', uniqid('', true)), -6);
+        }
+
+        return $date . '--' . $suffix;
+    }
+
+    /**
+     * Get the data and metadata file paths for a snapshot key.
+     */
+    private function getSnapshotPaths(string $noteSnapshotDir, string $snapshotKey, string $extension): array {
+        $normalizedExtension = $this->normalizeSnapshotExtension($extension);
+
+        return [
+            'snapshot' => $noteSnapshotDir . '/' . $snapshotKey . '.' . $normalizedExtension,
+            'meta' => $noteSnapshotDir . '/' . $snapshotKey . '.meta.json'
+        ];
+    }
+
+    /**
+     * Rename legacy malformed snapshot files written with a double dot before the extension.
+     */
+    private function normalizeMalformedSnapshotFiles(string $noteSnapshotDir): void {
+        if (!is_dir($noteSnapshotDir)) {
+            return;
+        }
+
+        $files = scandir($noteSnapshotDir);
+        if ($files === false) {
+            return;
+        }
+
+        foreach ($files as $file) {
+            if (!preg_match('/^(\d{4}-\d{2}-\d{2}(?:--[A-Za-z0-9_-]+)?)\.\.(html|md)$/', $file, $matches)) {
+                continue;
+            }
+
+            $source = $noteSnapshotDir . '/' . $file;
+            $target = $noteSnapshotDir . '/' . $matches[1] . '.' . $matches[2];
+
+            if (!is_file($source) || is_file($target)) {
+                continue;
+            }
+
+            @rename($source, $target);
+        }
+    }
+
+    /**
+     * Sort snapshots from newest to oldest.
+     */
+    private function sortSnapshotsNewestFirst(array &$snapshots): void {
+        usort($snapshots, function (array $a, array $b): int {
+            $sortA = trim((string) ($a['created_at_raw'] ?? ''));
+            $sortB = trim((string) ($b['created_at_raw'] ?? ''));
+
+            if ($sortA !== '' || $sortB !== '') {
+                $createdCompare = strcmp($sortB, $sortA);
+                if ($createdCompare !== 0) {
+                    return $createdCompare;
+                }
+            }
+
+            return strcmp((string) ($b['key'] ?? ''), (string) ($a['key'] ?? ''));
+        });
+    }
+
+    /**
+     * Collect snapshots for a note/type, including manual snapshots on the same day.
+     */
+    private function collectSnapshots(string $noteSnapshotDir, string $expectedExtension): array {
+        $snapshots = [];
+
+        $this->normalizeMalformedSnapshotFiles($noteSnapshotDir);
+
+        if (!is_dir($noteSnapshotDir)) {
+            return $snapshots;
+        }
+
+        $files = scandir($noteSnapshotDir);
+        if ($files === false) {
+            return $snapshots;
+        }
+
+        foreach ($files as $file) {
+            $parsed = $this->parseSnapshotFilename($file, $expectedExtension);
+            if ($parsed === null) {
+                continue;
+            }
+
+            $snapshotFile = $noteSnapshotDir . '/' . $file;
+            if (!is_file($snapshotFile) || !is_readable($snapshotFile)) {
+                continue;
+            }
+
+            $paths = $this->getSnapshotPaths($noteSnapshotDir, $parsed['key'], $expectedExtension);
+            $meta = $this->readSnapshotMeta($paths['meta']);
+
+            $snapshots[] = [
+                'key' => $parsed['key'],
+                'snapshot_key' => $parsed['key'],
+                'date' => $parsed['date'],
+                'heading' => $meta['heading'] ?? '',
+                'type' => $meta['type'] ?? 'note',
+                'manual' => (bool) ($meta['manual'] ?? $parsed['manual']),
+                'created_at_raw' => (string) ($meta['created_at'] ?? ''),
+                'created_at' => $this->formatSnapshotCreatedAt((string) ($meta['created_at'] ?? '')),
+                'snapshot_file' => $paths['snapshot'],
+                'meta_file' => $paths['meta']
+            ];
+        }
+
+        $this->sortSnapshotsNewestFirst($snapshots);
+
+        return $snapshots;
+    }
+
+    /**
+     * Resolve a requested snapshot by key or by date.
+     */
+    private function findSnapshotRecord(string $noteSnapshotDir, string $expectedExtension, ?string $snapshotKey, ?string $date): ?array {
+        $snapshots = $this->collectSnapshots($noteSnapshotDir, $expectedExtension);
+
+        if ($snapshotKey !== null && $snapshotKey !== '') {
+            foreach ($snapshots as $snapshot) {
+                if (($snapshot['key'] ?? '') === $snapshotKey) {
+                    return $snapshot;
+                }
+            }
+
+            return null;
+        }
+
+        if ($date !== null && $date !== '') {
+            foreach ($snapshots as $snapshot) {
+                if (($snapshot['date'] ?? '') === $date) {
+                    return $snapshot;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Migrate legacy UTC-dated snapshots that belong to the same local day.
+     */
+    private function normalizeLegacySnapshotsForUserDate(string $noteSnapshotDir, string $extension, string $userDate): void {
+        if (!is_dir($noteSnapshotDir)) {
+            return;
+        }
+
+        $pattern = '/^(\d{4}-\d{2}-\d{2})' . preg_quote($extension, '/') . '$/';
+        $files = scandir($noteSnapshotDir);
+        if ($files === false) {
+            return;
+        }
+
+        $canonicalSnapshotFile = $noteSnapshotDir . '/' . $userDate . $extension;
+        $canonicalMetaFile = $noteSnapshotDir . '/' . $userDate . '.meta.json';
+        $legacySnapshots = [];
+
+        foreach ($files as $file) {
+            if (!preg_match($pattern, $file, $matches)) {
+                continue;
+            }
+
+            $fileDate = $matches[1];
+            if ($fileDate === $userDate) {
+                continue;
+            }
+
+            $metaFile = $noteSnapshotDir . '/' . $fileDate . '.meta.json';
+            $meta = $this->readSnapshotMeta($metaFile);
+            $effectiveDate = $this->getUserDateFromSnapshotTimestamp((string) ($meta['created_at'] ?? ''));
+
+            if ($effectiveDate !== $userDate) {
+                continue;
+            }
+
+            $legacySnapshots[] = [
+                'file_date' => $fileDate,
+                'snapshot_file' => $noteSnapshotDir . '/' . $file,
+                'meta_file' => $metaFile,
+                'meta' => $meta,
+                'created_at' => (string) ($meta['created_at'] ?? '')
+            ];
+        }
+
+        if (empty($legacySnapshots)) {
+            return;
+        }
+
+        usort($legacySnapshots, function (array $a, array $b): int {
+            $createdAtCompare = strcmp($b['created_at'], $a['created_at']);
+            if ($createdAtCompare !== 0) {
+                return $createdAtCompare;
+            }
+
+            return strcmp($b['file_date'], $a['file_date']);
+        });
+
+        $canonicalExists = is_file($canonicalSnapshotFile);
+
+        if (!$canonicalExists) {
+            $primary = array_shift($legacySnapshots);
+            if ($primary && @rename($primary['snapshot_file'], $canonicalSnapshotFile)) {
+                $canonicalExists = true;
+
+                $meta = $primary['meta'];
+                if (!empty($meta)) {
+                    $meta['snapshot_date'] = $userDate;
+                    file_put_contents($canonicalMetaFile, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                } elseif (is_file($primary['meta_file']) && $primary['meta_file'] !== $canonicalMetaFile) {
+                    @rename($primary['meta_file'], $canonicalMetaFile);
+                }
+
+                if ($primary['meta_file'] !== $canonicalMetaFile && is_file($primary['meta_file'])) {
+                    @unlink($primary['meta_file']);
+                }
+            } elseif ($primary) {
+                array_unshift($legacySnapshots, $primary);
+            }
+        }
+
+        if (!$canonicalExists) {
+            return;
+        }
+
+        foreach ($legacySnapshots as $legacy) {
+            @unlink($legacy['snapshot_file']);
+            if ($legacy['meta_file'] !== $canonicalMetaFile) {
+                @unlink($legacy['meta_file']);
             }
         }
     }
     
     /**
      * POST /api/v1/notes/{id}/snapshot
-     * Create a daily snapshot for a note.
-     * When ?force=1 is provided, today's snapshot is overwritten.
+      * Create a daily snapshot for a note.
+      * When ?manual=1 is provided, an extra snapshot is added for today.
      */
     public function create(string $id): void {
         $noteId = (int)$id;
-        $forceParam = strtolower((string) ($_GET['force'] ?? '0'));
-        $force = in_array($forceParam, ['1', 'true', 'yes'], true);
+          $manualParam = strtolower((string) ($_GET['manual'] ?? $_GET['force'] ?? '0'));
+          $manual = in_array($manualParam, ['1', 'true', 'yes'], true);
 
         if ($noteId <= 0) {
             $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid note ID'));
@@ -74,16 +470,20 @@ class SnapshotsController {
             }
             
             $noteType = $note['type'] ?? 'note';
-            $today = date('Y-m-d');
+            $today = $this->getSnapshotDateForUser();
             $snapshotsDir = $this->getSnapshotsPath();
             $noteSnapshotDir = $snapshotsDir . '/' . $noteId;
-            
-            // Check if snapshot already exists for today
             $extension = ($noteType === 'markdown') ? '.md' : '.html';
-            $snapshotFile = $noteSnapshotDir . '/' . $today . $extension;
-            $snapshotExists = file_exists($snapshotFile);
+
+            $this->normalizeMalformedSnapshotFiles($noteSnapshotDir);
+
+            $this->normalizeLegacySnapshotsForUserDate($noteSnapshotDir, $extension, $today);
             
-            if ($snapshotExists && !$force) {
+            // Check if the automatic daily snapshot already exists for today.
+            $dailyPaths = $this->getSnapshotPaths($noteSnapshotDir, $today, $extension);
+            $snapshotExists = file_exists($dailyPaths['snapshot']);
+            
+            if ($snapshotExists && !$manual) {
                 echo json_encode(['success' => true, 'exists' => true, 'message' => t('snapshot.api.already_exists', [], 'Snapshot already exists for today')]);
                 return;
             }
@@ -117,34 +517,40 @@ class SnapshotsController {
             if ($noteType === 'tasklist') {
                 $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
             }
+
+            $snapshotKey = $manual ? $this->buildManualSnapshotKey($today) : $today;
+            $snapshotPaths = $this->getSnapshotPaths($noteSnapshotDir, $snapshotKey, $extension);
             
             // Also save heading metadata
-            $metaFile = $noteSnapshotDir . '/' . $today . '.meta.json';
             $meta = [
                 'note_id' => $noteId,
+                'snapshot_key' => $snapshotKey,
                 'heading' => $note['heading'] ?? '',
                 'type' => $noteType,
                 'snapshot_date' => $today,
-                'created_at' => date('Y-m-d H:i:s')
+                'manual' => $manual,
+                'created_at' => gmdate('Y-m-d H:i:s')
             ];
             
             // Write snapshot file
-            if (file_put_contents($snapshotFile, $content) === false) {
+            if (file_put_contents($snapshotPaths['snapshot'], $content) === false) {
                 $this->sendError(500, t('snapshot.api.write_file_failed', [], 'Failed to write snapshot file'));
                 return;
             }
             
             // Write meta file
-            file_put_contents($metaFile, json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            file_put_contents($snapshotPaths['meta'], json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             
             // Purge snapshots older than 7 days
             $this->purgeOldSnapshots($noteSnapshotDir);
             
             echo json_encode([
                 'success' => true,
-                'created' => !$snapshotExists,
-                'updated' => $snapshotExists,
-                'date' => $today
+                'created' => true,
+                'updated' => false,
+                'date' => $today,
+                'snapshot_key' => $snapshotKey,
+                'manual' => $manual
             ]);
             
         } catch (Exception $e) {
@@ -155,7 +561,7 @@ class SnapshotsController {
     
     /**
      * GET /api/v1/notes/{id}/snapshots
-     * List all available snapshot dates for a note (last 7 days max).
+    * List all available snapshots for a note (latest 7 snapshots max).
      */
     public function listSnapshots(string $id): void {
         $noteId = (int)$id;
@@ -182,51 +588,21 @@ class SnapshotsController {
             // Purge old snapshots first
             $this->purgeOldSnapshots($noteSnapshotDir);
             
-            $snapshots = [];
-            
-            if (is_dir($noteSnapshotDir)) {
-                $files = scandir($noteSnapshotDir);
-                if ($files !== false) {
-                    foreach ($files as $file) {
-                        // Match content files only (not .meta.json)
-                        if (preg_match('/^(\d{4}-\d{2}-\d{2})\.(html|md)$/', $file, $m)) {
-                            if ($m[2] !== $expectedExtension) {
-                                continue;
-                            }
-
-                            $snapshotFile = $noteSnapshotDir . '/' . $file;
-                            if (!is_file($snapshotFile) || !is_readable($snapshotFile)) {
-                                continue;
-                            }
-
-                            $date = $m[1];
-                            $metaFile = $noteSnapshotDir . '/' . $date . '.meta.json';
-                            $meta = [];
-                            if (file_exists($metaFile)) {
-                                $metaContent = file_get_contents($metaFile);
-                                if ($metaContent !== false) {
-                                    $meta = json_decode($metaContent, true) ?: [];
-                                }
-                            }
-                            $snapshots[] = [
-                                'date' => $date,
-                                'heading' => $meta['heading'] ?? '',
-                                'type' => $meta['type'] ?? 'note',
-                                'created_at' => $meta['created_at'] ?? ''
-                            ];
-                        }
-                    }
-                }
-            }
-            
-            // Sort by date descending (most recent first)
-            usort($snapshots, function($a, $b) {
-                return strcmp($b['date'], $a['date']);
-            });
+            $snapshots = $this->collectSnapshots($noteSnapshotDir, $expectedExtension);
+            $publicSnapshots = array_map(function (array $snapshot): array {
+                return [
+                    'snapshot_key' => $snapshot['key'],
+                    'date' => $snapshot['date'],
+                    'heading' => $snapshot['heading'],
+                    'type' => $snapshot['type'],
+                    'manual' => $snapshot['manual'],
+                    'created_at' => $snapshot['created_at']
+                ];
+            }, $snapshots);
             
             echo json_encode([
                 'success' => true,
-                'snapshots' => $snapshots
+                'snapshots' => $publicSnapshots
             ], JSON_UNESCAPED_UNICODE);
             
         } catch (Exception $e) {
@@ -237,7 +613,7 @@ class SnapshotsController {
     
     /**
      * GET /api/v1/notes/{id}/snapshot
-     * Get a snapshot for a note. Accepts ?date=YYYY-MM-DD (defaults to today).
+    * Get a snapshot for a note. Accepts ?snapshot_key=... or ?date=YYYY-MM-DD.
      */
     public function show(string $id): void {
         $noteId = (int)$id;
@@ -258,7 +634,13 @@ class SnapshotsController {
             }
             
             $noteType = $note['type'] ?? 'note';
-            $date = $_GET['date'] ?? date('Y-m-d');
+            $snapshotKey = trim((string) ($_GET['snapshot_key'] ?? ''));
+            $date = $_GET['date'] ?? $this->getSnapshotDateForUser();
+
+            if ($snapshotKey !== '' && !$this->isValidSnapshotKey($snapshotKey)) {
+                $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid snapshot key'));
+                return;
+            }
             
             // Validate date format
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
@@ -270,10 +652,14 @@ class SnapshotsController {
             $noteSnapshotDir = $snapshotsDir . '/' . $noteId;
             
             $extension = ($noteType === 'markdown') ? '.md' : '.html';
-            $snapshotFile = $noteSnapshotDir . '/' . $date . $extension;
-            $metaFile = $noteSnapshotDir . '/' . $date . '.meta.json';
+            $snapshotRecord = $this->findSnapshotRecord(
+                $noteSnapshotDir,
+                ltrim($extension, '.'),
+                $snapshotKey !== '' ? $snapshotKey : null,
+                $date
+            );
             
-            if (!file_exists($snapshotFile)) {
+            if ($snapshotRecord === null || !file_exists((string) $snapshotRecord['snapshot_file'])) {
                 echo json_encode([
                     'success' => true,
                     'exists' => false,
@@ -283,7 +669,7 @@ class SnapshotsController {
                 return;
             }
             
-            $content = file_get_contents($snapshotFile);
+            $content = file_get_contents((string) $snapshotRecord['snapshot_file']);
             if ($content === false) {
                 $this->sendError(500, t('snapshot.api.read_failed', [], 'Failed to read snapshot'));
                 return;
@@ -293,24 +679,20 @@ class SnapshotsController {
                 $content = resolveTasklistStoredContent($content, $content);
             }
             
-            $meta = [];
-            if (file_exists($metaFile)) {
-                $metaContent = file_get_contents($metaFile);
-                if ($metaContent !== false) {
-                    $meta = json_decode($metaContent, true) ?: [];
-                }
-            }
+            $meta = $this->readSnapshotMeta((string) ($snapshotRecord['meta_file'] ?? ''));
             
             echo json_encode([
                 'success' => true,
                 'exists' => true,
                 'snapshot' => [
                     'note_id' => $noteId,
-                    'date' => $date,
-                    'heading' => $meta['heading'] ?? '',
-                    'type' => $noteType,
+                    'snapshot_key' => $snapshotRecord['key'],
+                    'date' => $snapshotRecord['date'],
+                    'heading' => $meta['heading'] ?? ($snapshotRecord['heading'] ?? ''),
+                    'type' => $meta['type'] ?? ($snapshotRecord['type'] ?? $noteType),
+                    'manual' => (bool) ($meta['manual'] ?? ($snapshotRecord['manual'] ?? false)),
                     'content' => $content,
-                    'created_at' => $meta['created_at'] ?? ''
+                    'created_at' => $this->formatSnapshotCreatedAt((string) ($meta['created_at'] ?? ''))
                 ]
             ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
             
@@ -322,7 +704,7 @@ class SnapshotsController {
     
     /**
      * POST /api/v1/notes/{id}/snapshot/restore
-     * Restore a note to a snapshot state. Accepts ?date=YYYY-MM-DD (defaults to today).
+    * Restore a note to a snapshot state. Accepts ?snapshot_key=... or ?date=YYYY-MM-DD.
      */
     public function restore(string $id): void {
         $noteId = (int)$id;
@@ -343,7 +725,13 @@ class SnapshotsController {
             }
             
             $noteType = $note['type'] ?? 'note';
-            $date = $_GET['date'] ?? date('Y-m-d');
+            $snapshotKey = trim((string) ($_GET['snapshot_key'] ?? ''));
+            $date = $_GET['date'] ?? $this->getSnapshotDateForUser();
+
+            if ($snapshotKey !== '' && !$this->isValidSnapshotKey($snapshotKey)) {
+                $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid snapshot key'));
+                return;
+            }
             
             // Validate date format
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
@@ -355,14 +743,19 @@ class SnapshotsController {
             $noteSnapshotDir = $snapshotsDir . '/' . $noteId;
             
             $extension = ($noteType === 'markdown') ? '.md' : '.html';
-            $snapshotFile = $noteSnapshotDir . '/' . $date . $extension;
+            $snapshotRecord = $this->findSnapshotRecord(
+                $noteSnapshotDir,
+                ltrim($extension, '.'),
+                $snapshotKey !== '' ? $snapshotKey : null,
+                $date
+            );
             
-            if (!file_exists($snapshotFile)) {
+            if ($snapshotRecord === null || !file_exists((string) $snapshotRecord['snapshot_file'])) {
                 $this->sendError(404, t('snapshot.api.not_found_today', [], 'No snapshot found for today'));
                 return;
             }
             
-            $snapshotContent = file_get_contents($snapshotFile);
+            $snapshotContent = file_get_contents((string) $snapshotRecord['snapshot_file']);
             if ($snapshotContent === false) {
                 $this->sendError(500, t('snapshot.api.read_failed', [], 'Failed to read snapshot'));
                 return;

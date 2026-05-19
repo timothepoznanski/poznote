@@ -765,9 +765,26 @@ body.dark-mode #deleteFolderModal .btn-cancel:hover {
 }
 
 /* Snapshot Modal Dark Mode */
+html[data-theme='dark'] #snapshotModal .snapshot-modal-content,
+body.dark-mode #snapshotModal .snapshot-modal-content {
+    background: linear-gradient(180deg, #262a31 0%, #1f2329 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+}
+
 html[data-theme='dark'] .snapshot-modal-header,
 body.dark-mode .snapshot-modal-header {
     border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-modal-header h3,
+body.dark-mode #snapshotModal .snapshot-modal-header h3 {
+    color: #f2f5f8;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-modal-description,
+body.dark-mode #snapshotModal .snapshot-modal-description {
+    color: var(--dm-text-muted, #b5beca);
 }
 
 html[data-theme='dark'] .snapshot-close-btn:hover,
@@ -783,34 +800,109 @@ body.dark-mode .snapshot-meta {
 
 html[data-theme='dark'] .snapshot-meta-item,
 body.dark-mode .snapshot-meta-item {
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(232, 238, 247, 0.86);
 }
 
-html[data-theme='dark'] .snapshot-content-preview,
-body.dark-mode .snapshot-content-preview {
+html[data-theme='dark'] #snapshotModal .snapshot-meta-item .lucide,
+body.dark-mode #snapshotModal .snapshot-meta-item .lucide {
+    opacity: 0.72;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview,
+body.dark-mode #snapshotModal .snapshot-content-preview {
     border-color: var(--dm-border);
-    background: var(--dm-surface, #1a1a1a);
-    color: var(--dm-text);
+    background: #11161d !important;
+    color: var(--dm-text, #e6edf3) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
-html[data-theme='dark'] .snapshot-content-preview p,
-html[data-theme='dark'] .snapshot-content-preview div,
-html[data-theme='dark'] .snapshot-content-preview li,
-html[data-theme='dark'] .snapshot-content-preview span,
-html[data-theme='dark'] .snapshot-content-preview strong,
-html[data-theme='dark'] .snapshot-content-preview em,
-body.dark-mode .snapshot-content-preview p,
-body.dark-mode .snapshot-content-preview div,
-body.dark-mode .snapshot-content-preview li,
-body.dark-mode .snapshot-content-preview span,
-body.dark-mode .snapshot-content-preview strong,
-body.dark-mode .snapshot-content-preview em {
-    color: inherit;
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview h1,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview h2,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview h3,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview h4,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview h5,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview h6,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview p,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview div,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview li,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview span,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview strong,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview em,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview section,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview article,
+body.dark-mode #snapshotModal .snapshot-content-preview h1,
+body.dark-mode #snapshotModal .snapshot-content-preview h2,
+body.dark-mode #snapshotModal .snapshot-content-preview h3,
+body.dark-mode #snapshotModal .snapshot-content-preview h4,
+body.dark-mode #snapshotModal .snapshot-content-preview h5,
+body.dark-mode #snapshotModal .snapshot-content-preview h6,
+body.dark-mode #snapshotModal .snapshot-content-preview p,
+body.dark-mode #snapshotModal .snapshot-content-preview div,
+body.dark-mode #snapshotModal .snapshot-content-preview li,
+body.dark-mode #snapshotModal .snapshot-content-preview span,
+body.dark-mode #snapshotModal .snapshot-content-preview strong,
+body.dark-mode #snapshotModal .snapshot-content-preview em,
+body.dark-mode #snapshotModal .snapshot-content-preview section,
+body.dark-mode #snapshotModal .snapshot-content-preview article {
+    color: inherit !important;
+    background: transparent !important;
 }
 
 html[data-theme='dark'] .snapshot-content-preview:empty::before,
 body.dark-mode .snapshot-content-preview:empty::before {
-    color: #666;
+    color: #7e8793;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview a,
+body.dark-mode #snapshotModal .snapshot-content-preview a {
+    color: var(--dm-accent, #64B5F6) !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview blockquote,
+body.dark-mode #snapshotModal .snapshot-content-preview blockquote {
+    border-left-color: var(--dm-border, #30363d) !important;
+    color: var(--dm-text-muted, #b5beca) !important;
+    background: transparent !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview pre,
+body.dark-mode #snapshotModal .snapshot-content-preview pre {
+    background-color: var(--dm-surface, #1b222c) !important;
+    border-color: var(--dm-border, #30363d) !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode #snapshotModal .snapshot-content-preview code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: var(--dm-surface, #1b222c) !important;
+    color: var(--dm-text, #e6edf3) !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview pre code:not([class*="hljs"]):not([class*="language-"]),
+body.dark-mode #snapshotModal .snapshot-content-preview pre code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: transparent !important;
+    color: var(--dm-text-muted, #c7d0db) !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview table,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview th,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview td,
+body.dark-mode #snapshotModal .snapshot-content-preview table,
+body.dark-mode #snapshotModal .snapshot-content-preview th,
+body.dark-mode #snapshotModal .snapshot-content-preview td {
+    border-color: var(--dm-border, #30363d) !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview th,
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview td,
+body.dark-mode #snapshotModal .snapshot-content-preview th,
+body.dark-mode #snapshotModal .snapshot-content-preview td {
+    background-color: var(--dm-surface, #1b222c) !important;
+    color: var(--dm-text, #e6edf3) !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-content-preview hr,
+body.dark-mode #snapshotModal .snapshot-content-preview hr {
+    border-top-color: var(--dm-border, #30363d) !important;
 }
 
 html[data-theme='dark'] .snapshot-modal-actions,
@@ -830,12 +922,18 @@ body.dark-mode .snapshot-date-list {
 
 html[data-theme='dark'] .snapshot-date-btn,
 body.dark-mode .snapshot-date-btn {
-    color: rgba(255, 255, 255, 0.88);
+    color: rgba(239, 244, 250, 0.92);
 }
 
 html[data-theme='dark'] .snapshot-date-list-header,
 body.dark-mode .snapshot-date-list-header {
-    color: rgba(255, 255, 255, 0.72);
+    color: rgba(213, 220, 230, 0.8);
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-date-secondary,
+body.dark-mode #snapshotModal .snapshot-date-secondary {
+    color: rgba(181, 190, 202, 0.88);
+    opacity: 1;
 }
 
 html[data-theme='dark'] .snapshot-date-btn:hover,
@@ -852,6 +950,17 @@ body.dark-mode .snapshot-date-btn.active {
 html[data-theme='dark'] #snapshotModal .snapshot-date-btn [class*="lucide-"],
 body.dark-mode #snapshotModal .snapshot-date-btn [class*="lucide-"] {
     filter: none !important;
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-state-title,
+body.dark-mode #snapshotModal .snapshot-state-title {
+    color: var(--dm-text, #e6edf3);
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-state-hint,
+body.dark-mode #snapshotModal .snapshot-state-hint {
+    color: var(--dm-text-muted, #b5beca);
+    opacity: 1;
 }
 
 /* Update Modal Specific */

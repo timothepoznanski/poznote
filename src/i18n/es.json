@@ -74,11 +74,12 @@
     "menu_item": "Instantáneas",
     "modal": {
       "title": "Instantáneas",
+      "description": "Las instantáneas se crean automáticamente la primera vez que abres esta nota cada día.\nUsa «Tomar instantánea ahora» para añadir una instantánea extra sin reemplazar las que ya existen hoy.",
       "loading": "Cargando instantánea...",
-      "history": "Historial (7 días)",
+      "history": "Historial (7 instantáneas)",
       "today": "Hoy",
       "empty_title": "No hay instantánea disponible",
-      "empty_hint": "Se crea automáticamente una instantánea cuando la nota se abre por primera vez durante el día.",
+      "empty_hint": "Se crea automáticamente una instantánea cuando la nota se abre por primera vez durante el día. También puedes añadir instantáneas extra manualmente en cualquier momento.",
       "empty_content": "(Contenido vacío)",
       "take_now": "Tomar instantánea ahora",
       "copy_content": "Copiar contenido",
@@ -86,7 +87,7 @@
     },
     "messages": {
       "content_copied": "Contenido copiado",
-      "created_now": "Instantánea guardada"
+      "created_now": "Instantánea añadida"
     },
     "errors": {
       "restore_failed": "No se pudo restaurar la instantánea",
@@ -97,7 +98,7 @@
       "title": "Confirmación",
       "restore_message": "¿Restaurar la nota al estado de la instantánea? Los cambios actuales se perderán.",
       "restore_button": "Volver a este estado",
-      "take_now_message": "¿Crear o reemplazar la instantánea de hoy con el contenido actual de la nota?",
+      "take_now_message": "¿Crear una instantánea adicional con el contenido actual de la nota? Las instantáneas que ya existen hoy se conservarán.",
       "take_now_button": "Tomar instantánea ahora"
     },
     "api": {
