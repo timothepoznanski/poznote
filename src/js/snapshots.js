@@ -27,11 +27,55 @@
         return '/api/v1/notes/' + noteId + '/snapshots';
     }
 
+    function isDarkThemeActive() {
+        if (typeof window.getCurrentTheme === 'function') {
+            return window.getCurrentTheme() === 'dark';
+        }
+
+        return document.documentElement.getAttribute('data-theme') === 'dark' ||
+            document.body.classList.contains('dark-mode') ||
+            document.documentElement.classList.contains('theme-dark');
+    }
+
+    function syncSnapshotModalTheme(modal) {
+        if (!modal) return;
+
+        modal.classList.toggle('snapshot-modal-dark', isDarkThemeActive());
+    }
+
+    function normalizeSnapshotPreviewTheme(contentEl) {
+        if (!contentEl) return;
+
+        var isDark = isDarkThemeActive();
+        contentEl.classList.toggle('snapshot-content-preview-dark', isDark);
+
+        if (!isDark) {
+            contentEl.style.removeProperty('background');
+            contentEl.style.removeProperty('background-color');
+            contentEl.style.removeProperty('border-color');
+            contentEl.style.removeProperty('color');
+            return;
+        }
+
+        contentEl.style.setProperty('background', '#11161d', 'important');
+        contentEl.style.setProperty('border-color', 'rgba(255, 255, 255, 0.14)', 'important');
+        contentEl.style.setProperty('color', '#e6edf3', 'important');
+
+        contentEl.querySelectorAll('[style]').forEach(function (element) {
+            var tagName = element.tagName ? element.tagName.toLowerCase() : '';
+            if (tagName === 'img' || tagName === 'svg' || tagName === 'canvas' || tagName === 'video') return;
+
+            element.style.setProperty('background', 'transparent', 'important');
+            element.style.setProperty('background-color', 'transparent', 'important');
+            element.style.setProperty('color', 'inherit', 'important');
+        });
+    }
+
     function getAvailableSnapshots(snapshots) {
         if (!Array.isArray(snapshots)) return [];
 
         return snapshots.filter(function (snap) {
-            return snap && snap.date && snap.exists !== false && snap.available !== false && snap.has_snapshot !== false;
+            return snap && (snap.snapshot_key || snap.date) && snap.exists !== false && snap.available !== false && snap.has_snapshot !== false;
         });
     }
 
@@ -53,8 +97,8 @@
         return pending ? pending.catch(function () { return null; }) : Promise.resolve();
     }
 
-    function requestSnapshotCreate(noteId, force) {
-        return fetch(getSnapshotUrl(noteId, force ? 'force=1' : ''), {
+    function requestSnapshotCreate(noteId, manual) {
+        return fetch(getSnapshotUrl(noteId, manual ? 'manual=1' : ''), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -100,9 +144,12 @@
 
         if (!modal) return;
 
+        syncSnapshotModalTheme(modal);
+
         // Store current note id for restore
         modal.dataset.noteId = noteId;
         modal.dataset.selectedDate = '';
+        modal.dataset.selectedSnapshotKey = '';
 
         // Show modal with loading state
         modal.style.display = 'flex';
@@ -135,7 +182,7 @@
             renderSnapshotDates(snapshots, noteId);
 
             // Load the most recent snapshot
-            loadSnapshotForDate(noteId, snapshots[0].date);
+            loadSnapshot(noteId, snapshots[0].snapshot_key || snapshots[0].date, snapshots[0].date);
         })
         .catch(function () {
             if (loadingEl) loadingEl.style.display = 'none';
@@ -154,28 +201,40 @@
         var today = new Date().toISOString().slice(0, 10);
 
         snapshots.forEach(function (snap) {
+            var snapshotKey = snap.snapshot_key || snap.key || snap.date;
             var btn = document.createElement('button');
             btn.className = 'snapshot-date-btn';
+            btn.dataset.snapshotKey = snapshotKey;
             btn.dataset.date = snap.date;
             btn.type = 'button';
 
-            var label = snap.date;
+            var primaryLabel = snap.date;
             if (snap.date === today) {
-                label = tr('snapshot.modal.today', 'Today');
+                primaryLabel = tr('snapshot.modal.today', 'Today');
             } else {
                 // Format as readable date (e.g. "Apr 17")
                 try {
                     var d = new Date(snap.date + 'T00:00:00');
-                    label = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                    primaryLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
                 } catch (e) {
-                    label = snap.date;
+                    primaryLabel = snap.date;
                 }
             }
 
-            btn.innerHTML = '<i class="lucide lucide-calendar"></i> <span>' + escapeHtml(label) + '</span>';
+            var secondaryLabel = '';
+            if (snap.created_at) {
+                var createdParts = String(snap.created_at).trim().split(' ');
+                secondaryLabel = createdParts[createdParts.length - 1] || '';
+            }
+
+            btn.innerHTML = '<i class="lucide lucide-calendar"></i>' +
+                '<span class="snapshot-date-labels">' +
+                    '<span class="snapshot-date-primary">' + escapeHtml(primaryLabel) + '</span>' +
+                    (secondaryLabel ? '<span class="snapshot-date-secondary">' + escapeHtml(secondaryLabel) + '</span>' : '') +
+                '</span>';
 
             btn.addEventListener('click', function () {
-                loadSnapshotForDate(noteId, snap.date);
+                loadSnapshot(noteId, snapshotKey, snap.date);
             });
 
             container.appendChild(btn);
@@ -185,7 +244,7 @@
     /**
      * Load and display the snapshot for a specific date.
      */
-    function loadSnapshotForDate(noteId, date) {
+    function loadSnapshot(noteId, snapshotKey, date) {
         var modal = document.getElementById('snapshotModal');
         var contentEl = document.getElementById('snapshotContent');
         var loadingEl = document.getElementById('snapshotLoading');
@@ -196,19 +255,27 @@
 
         if (!modal || !contentEl) return;
 
+        syncSnapshotModalTheme(modal);
+
+        snapshotKey = snapshotKey || date || '';
         modal.dataset.selectedDate = date;
+        modal.dataset.selectedSnapshotKey = snapshotKey;
 
         // Highlight selected date in the list
         var allBtns = document.querySelectorAll('#snapshotDates .snapshot-date-btn');
         allBtns.forEach(function (btn) {
-            btn.classList.toggle('active', btn.dataset.date === date);
+            btn.classList.toggle('active', btn.dataset.snapshotKey === snapshotKey);
         });
 
         // Show loading
         if (loadingEl) loadingEl.style.display = 'flex';
         if (snapshotBodyEl) snapshotBodyEl.style.display = 'none';
 
-        fetch(getSnapshotUrl(noteId, 'date=' + encodeURIComponent(date)), {
+        var query = snapshotKey
+            ? 'snapshot_key=' + encodeURIComponent(snapshotKey)
+            : 'date=' + encodeURIComponent(date);
+
+        fetch(getSnapshotUrl(noteId, query), {
             method: 'GET',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
@@ -225,6 +292,13 @@
             if (snapshotBodyEl) snapshotBodyEl.style.display = 'flex';
 
             var snapshot = data.snapshot;
+
+            if (snapshot.snapshot_key) {
+                modal.dataset.selectedSnapshotKey = snapshot.snapshot_key;
+            }
+            if (snapshot.date) {
+                modal.dataset.selectedDate = snapshot.date;
+            }
 
             if (snapshotDateEl) {
                 snapshotDateEl.textContent = snapshot.date + (snapshot.created_at ? ' (' + snapshot.created_at + ')' : '');
@@ -260,6 +334,8 @@
                 contentEl.style.whiteSpace = '';
                 contentEl.style.fontFamily = '';
             }
+
+            normalizeSnapshotPreviewTheme(contentEl);
 
             // Store raw content for copy
             modal.dataset.snapshotContent = snapshot.content || '';
@@ -301,7 +377,7 @@
     };
 
     /**
-     * Create or refresh today's snapshot immediately.
+     * Create an additional snapshot immediately.
      */
     window.takeSnapshotNow = function () {
         var modal = document.getElementById('snapshotModal');
@@ -322,7 +398,7 @@
                     return;
                 }
 
-                showSnapshotToast(tr('snapshot.messages.created_now', 'Snapshot saved'));
+                showSnapshotToast(tr('snapshot.messages.created_now', 'Snapshot added'));
                 showSnapshotModal(noteId);
             })
             .catch(function () {
@@ -337,7 +413,7 @@
 
         if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
             window.modalAlert.confirm(
-                tr('snapshot.confirm.take_now_message', 'Create or replace today\'s snapshot with the current note content?'),
+                tr('snapshot.confirm.take_now_message', 'Create an additional snapshot with the current note content? Existing snapshots for today will be kept.'),
                 tr('snapshot.confirm.title', 'Confirmation'),
                 {
                     modalClass: 'snapshot-restore-confirm',
@@ -349,7 +425,7 @@
                     executeTakeSnapshot();
                 }
             });
-        } else if (confirm(tr('snapshot.confirm.take_now_message', 'Create or replace today\'s snapshot with the current note content?'))) {
+        } else if (confirm(tr('snapshot.confirm.take_now_message', 'Create an additional snapshot with the current note content? Existing snapshots for today will be kept.'))) {
             executeTakeSnapshot();
         }
     };
@@ -364,8 +440,13 @@
         var noteId = modal.dataset.noteId;
         if (!noteId) return;
 
+        var selectedSnapshotKey = modal.dataset.selectedSnapshotKey || '';
         var selectedDate = modal.dataset.selectedDate || '';
-        var restoreQuery = selectedDate ? '?date=' + encodeURIComponent(selectedDate) : '';
+        var restoreQuery = selectedSnapshotKey
+            ? '?snapshot_key=' + encodeURIComponent(selectedSnapshotKey)
+            : selectedDate
+                ? '?date=' + encodeURIComponent(selectedDate)
+                : '';
 
         var confirmRestore = function () {
             fetch('/api/v1/notes/' + noteId + '/snapshot/restore' + restoreQuery, {

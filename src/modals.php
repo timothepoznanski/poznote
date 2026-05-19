@@ -1226,12 +1226,15 @@
 <div id="snapshotModal" class="modal" style="display:none;">
     <div class="modal-content snapshot-modal-content">
         <div class="snapshot-modal-header">
-            <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
+            <div class="snapshot-modal-header-copy">
+                <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
+                <p class="snapshot-modal-description"><?php echo t_h('snapshot.modal.description', [], "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones."); ?></p>
+            </div>
         </div>
 
         <div class="snapshot-modal-body">
             <div id="snapshotDateList" class="snapshot-date-list">
-                <div class="snapshot-date-list-header"><?php echo t_h('snapshot.modal.history', [], 'History (7 days)'); ?></div>
+                <div class="snapshot-date-list-header"><?php echo t_h('snapshot.modal.history', [], 'History (7 snapshots)'); ?></div>
                 <div id="snapshotDates" class="snapshot-dates"></div>
             </div>
 
@@ -1244,7 +1247,7 @@
                 <div id="snapshotNoData" class="snapshot-state" style="display:none;">
                     <div><i class="lucide lucide-alert-circle"></i></div>
                     <p class="snapshot-state-title"><?php echo t_h('snapshot.modal.empty_title', [], 'No snapshot available'); ?></p>
-                    <p class="snapshot-state-hint"><?php echo t_h('snapshot.modal.empty_hint', [], 'A snapshot is created automatically when the note is first opened during the day.'); ?></p>
+                    <p class="snapshot-state-hint"><?php echo t_h('snapshot.modal.empty_hint', [], 'A snapshot is created automatically when the note is first opened during the day. You can also add extra snapshots manually at any time.'); ?></p>
                     <div class="modal-buttons" style="margin-top:20px;">
                         <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
                         <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>

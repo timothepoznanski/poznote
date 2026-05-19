@@ -76,11 +76,12 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
+      "description": "Les snapshots sont créés automatiquement à la première ouverture de cette note chaque jour.\nUtilisez « Prendre un snapshot maintenant » pour ajouter un snapshot supplémentaire sans remplacer ceux déjà pris aujourd'hui.",
       "loading": "Chargement du snapshot...",
-      "history": "Historique (7 jours)",
+      "history": "Historique (7 snapshots)",
       "today": "Aujourd'hui",
       "empty_title": "Aucun snapshot disponible",
-      "empty_hint": "Un snapshot est créé automatiquement lors de la première ouverture de la note dans la journée.",
+      "empty_hint": "Un snapshot est créé automatiquement lors de la première ouverture de la note dans la journée. Vous pouvez aussi ajouter des snapshots supplémentaires manuellement à tout moment.",
       "empty_content": "(Contenu vide)",
       "take_now": "Prendre un snapshot maintenant",
       "copy_content": "Copier le contenu",
@@ -88,7 +89,7 @@
     },
     "messages": {
       "content_copied": "Contenu copié",
-      "created_now": "Snapshot enregistré"
+      "created_now": "Snapshot ajouté"
     },
     "errors": {
       "restore_failed": "Échec de la restauration du snapshot",
@@ -99,7 +100,7 @@
       "title": "Confirmation",
       "restore_message": "Restaurer la note à l'état du snapshot ? Les modifications actuelles seront perdues.",
       "restore_button": "Revenir à cet état",
-      "take_now_message": "Créer ou remplacer le snapshot du jour avec le contenu actuel de la note ?",
+      "take_now_message": "Créer un snapshot supplémentaire avec le contenu actuel de la note ? Les snapshots déjà pris aujourd'hui seront conservés.",
       "take_now_button": "Prendre un snapshot maintenant"
     },
     "api": {
@@ -1815,6 +1816,12 @@
     "shared_with_me": "Partagé avec moi",
     "shared_by": "Partagé par",
     "no_shared_with_me": "Rien n'a encore été partagé avec vous.",
+    "tree_tools": "Arborescence",
+    "expand_all": "Tout déplier",
+    "collapse_all": "Tout replier",
+    "tree_search_hint": "Les résultats de recherche sont affichés dépliés automatiquement.",
+    "expand_folder": "Déplier le dossier",
+    "collapse_folder": "Replier le dossier",
     "login_required_title": "Connexion requise",
     "login_required_message": "Ce contenu est réservé à des utilisateurs spécifiques. Veuillez vous connecter pour y accéder.",
     "access_denied_title": "Accès refusé",
@@ -1822,7 +1829,7 @@
     "table": {
       "name": "Nom",
       "note": "Note",
-      "path": "Chemin",
+      "path": "Chemin / Dossier",
       "url": "URL partagée",
       "folder": "Dossier",
       "token": "Jeton",

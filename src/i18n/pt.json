@@ -73,11 +73,12 @@
     "menu_item": "Instantâneos",
     "modal": {
       "title": "Instantâneos",
+      "description": "Os instantâneos são criados automaticamente na primeira vez que você abre esta nota em cada dia.\nUse «Criar instantâneo agora» para adicionar um instantâneo extra sem substituir os que já existem hoje.",
       "loading": "Carregando instantâneo...",
-      "history": "Histórico (7 dias)",
+      "history": "Histórico (7 instantâneos)",
       "today": "Hoje",
       "empty_title": "Nenhum instantâneo disponível",
-      "empty_hint": "Um instantâneo é criado automaticamente quando a nota é aberta pela primeira vez durante o dia.",
+      "empty_hint": "Um instantâneo é criado automaticamente quando a nota é aberta pela primeira vez durante o dia. Você também pode adicionar instantâneos extras manualmente a qualquer momento.",
       "empty_content": "(Conteúdo vazio)",
       "take_now": "Criar instantâneo agora",
       "copy_content": "Copiar conteúdo",
@@ -85,7 +86,7 @@
     },
     "messages": {
       "content_copied": "Conteúdo copiado",
-      "created_now": "Instantâneo salvo"
+      "created_now": "Instantâneo adicionado"
     },
     "errors": {
       "restore_failed": "Não foi possível restaurar o instantâneo",
@@ -96,7 +97,7 @@
       "title": "Confirmação",
       "restore_message": "Restaurar a nota para o estado do instantâneo? As alterações atuais serão perdidas.",
       "restore_button": "Voltar para este estado",
-      "take_now_message": "Criar ou substituir o instantâneo de hoje com o conteúdo atual da nota?",
+      "take_now_message": "Criar um instantâneo adicional com o conteúdo atual da nota? Os instantâneos que já existem hoje serão mantidos.",
       "take_now_button": "Criar instantâneo agora"
     },
     "api": {

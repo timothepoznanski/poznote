@@ -239,7 +239,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/snapshot.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/snapshot.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/modals/snapshot.css') ?: time(); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
@@ -256,7 +256,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/dark-mode/modals.css') ?: time(); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
@@ -1139,7 +1139,7 @@ window.calendarTranslations = {
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
 <script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
-<script src="js/snapshots.js?v=<?php echo $v; ?>"></script>
+<script src="js/snapshots.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/snapshots.js') ?: time(); ?>"></script>
 <script src="js/ui-customization.js?v=<?php echo $v; ?>"></script>
 
 <?php if ($note && is_numeric($note)): ?>

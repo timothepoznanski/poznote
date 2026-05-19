@@ -389,7 +389,6 @@ function buildSharedManagementUrl(options) {
     const sharedUrl = new URL('shared.php', window.location.href);
     const itemType = options && options.itemType ? options.itemType : 'note';
     const itemId = options && options.itemId ? options.itemId : null;
-    const token = options && options.token ? options.token : '';
     const workspace = options && options.workspace ? options.workspace : '';
     const autoEdit = options && Object.prototype.hasOwnProperty.call(options, 'autoEdit')
         ? !!options.autoEdit
@@ -397,9 +396,6 @@ function buildSharedManagementUrl(options) {
 
     if (itemType === 'folder') {
         sharedUrl.searchParams.set('type', 'folders');
-    }
-    if (token) {
-        sharedUrl.searchParams.set('filter', token);
     }
     if (workspace) {
         sharedUrl.searchParams.set('workspace', workspace);

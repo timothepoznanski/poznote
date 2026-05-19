@@ -30,8 +30,8 @@
 .snapshot-date-list {
     display: flex;
     flex-direction: column;
-    width: 160px;
-    min-width: 160px;
+    width: 190px;
+    min-width: 190px;
     border-right: 1px solid #e5e5e5;
     overflow-y: auto;
     flex-shrink: 0;
@@ -56,7 +56,7 @@
 
 .snapshot-date-btn {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     width: 100%;
     padding: 8px 12px;
@@ -68,7 +68,30 @@
     color: #344054;
     font-weight: 500;
     text-align: left;
+    line-height: 1.3;
     transition: background-color 0.12s;
+}
+
+.snapshot-date-labels {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.snapshot-date-primary {
+    display: block;
+}
+
+.snapshot-date-secondary {
+    display: block;
+    margin-top: 1px;
+    font-size: 11px;
+    font-weight: 400;
+    opacity: 0.72;
+}
+
+.snapshot-date-btn.active .snapshot-date-secondary {
+    opacity: 0.9;
 }
 
 .snapshot-date-btn:hover {
@@ -120,12 +143,27 @@
     flex-shrink: 0;
 }
 
+.snapshot-modal-header-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .snapshot-modal-header h3 {
     margin: 0 !important;
     display: flex;
     align-items: center;
     gap: 10px;
     font-size: 17px;
+}
+
+.snapshot-modal-description {
+    margin: 0;
+    max-width: 680px;
+    color: #667085;
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-line;
 }
 
 .snapshot-close-btn {
@@ -270,10 +308,113 @@
     border-radius: 4px;
 }
 
+.snapshot-content-preview pre {
+    margin: 1em 0 !important;
+    padding: 18px 20px;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    background: #f8fafc;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
+.snapshot-content-preview pre code,
+.snapshot-content-preview pre code.hljs,
+.snapshot-content-preview pre .hljs {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
 .snapshot-content-preview:empty::before {
     content: attr(data-empty-text);
     color: #999;
     font-style: italic;
+}
+
+/* ---- Local dark mode fallback ---- */
+#snapshotModal.snapshot-modal-dark .snapshot-modal-content {
+    background: linear-gradient(180deg, #262a31 0%, #1f2329 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-modal-header h3 {
+    color: #f2f5f8 !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-modal-description,
+#snapshotModal.snapshot-modal-dark .snapshot-date-list-header,
+#snapshotModal.snapshot-modal-dark .snapshot-meta-item {
+    color: rgba(218, 226, 237, 0.82) !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-date-list {
+    border-right-color: rgba(255, 255, 255, 0.14);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-date-btn {
+    color: rgba(239, 244, 250, 0.92);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-date-btn:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-date-secondary {
+    color: rgba(218, 226, 237, 0.72);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: #11161d !important;
+    color: #e6edf3 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview > *:not(img):not(svg):not(canvas):not(video),
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview > *:not(img):not(svg):not(canvas):not(video) *:not(img):not(svg):not(canvas):not(video) {
+    background-color: transparent !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview p,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview div,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview li,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview span,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview strong,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview em,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview h1,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview h2,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview h3,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview h4,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview h5,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview h6 {
+    color: inherit !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview pre {
+    background-color: #161d27 !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview pre code.hljs,
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview pre .hljs {
+    background: transparent !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: #1b2430 !important;
+    color: #e6edf3 !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview pre code:not([class*="hljs"]):not([class*="language-"]) {
+    background-color: transparent !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-content-preview:empty::before {
+    color: rgba(218, 226, 237, 0.6);
 }
 
 /* ---- Actions bar ---- */

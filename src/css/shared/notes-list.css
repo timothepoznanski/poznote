@@ -11,8 +11,8 @@
     --shared-divider-padding: 14px;
     --shared-name-width: 220px;
     --shared-folder-width: 190px;
-    --shared-restricted-width: 112px;
-    --shared-actions-width: 152px;
+    --shared-token-width: 210px;
+    --shared-actions-width: 228px;
     max-width: var(--shared-content-max-width, 980px);
     margin: 0 auto;
 }
@@ -22,7 +22,6 @@
     align-items: center;
     gap: var(--shared-column-gap);
     padding: 0 0 12px 0;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
     margin-bottom: 4px;
 }
 
@@ -36,9 +35,9 @@
 }
 
 .shared-notes-header-note {
-    flex: 0 0 var(--shared-name-width);
+    flex: 1 1 var(--shared-name-width);
     min-width: var(--shared-name-width);
-    width: var(--shared-name-width);
+    width: auto;
     box-sizing: border-box;
 }
 
@@ -48,19 +47,18 @@
     width: var(--shared-folder-width);
     box-sizing: border-box;
     padding-left: var(--shared-divider-padding);
-    border-left: 1px solid var(--border-color, #e0e0e0);
 }
 
 .shared-notes-header-token {
-    flex: 1;
-    min-width: 0;
+    flex: 0 0 var(--shared-token-width);
+    min-width: var(--shared-token-width);
+    width: var(--shared-token-width);
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding-left: var(--shared-divider-padding);
-    border-left: 1px solid var(--border-color, #e0e0e0);
 }
 
 .shared-header-help {
@@ -116,45 +114,24 @@
     box-sizing: border-box;
     text-align: center;
     padding: 0 8px;
-    border-left: 1px solid var(--border-color, #e0e0e0);
-}
-
-.shared-notes-header-restricted {
-    flex: 0 0 var(--shared-restricted-width);
-    width: var(--shared-restricted-width);
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding-left: var(--shared-divider-padding);
-    border-left: 1px solid var(--border-color, #e0e0e0);
-}
-
-.note-restricted-cell {
-    flex: 0 0 var(--shared-restricted-width);
-    width: var(--shared-restricted-width);
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 30px;
-    font-size: 16px;
-    color: var(--primary, #0d6efd);
-    padding-left: var(--shared-divider-padding);
-    border-left: 1px solid var(--border-color, #e0e0e0);
 }
 
 .shared-note-item {
     display: flex;
     align-items: center;
     gap: var(--shared-column-gap);
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    padding: 5px;
+    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.shared-note-item:hover {
+    background-color: rgba(0, 125, 184, 0.035);
 }
 
 .shared-note-item.shared-hierarchy-item {
     position: relative;
+    --shared-hierarchy-line-color: rgba(13, 110, 253, 0.14);
+    --shared-ancestor-guide-count: var(--shared-indent-level, 0);
 }
 
 .shared-note-item.shared-hierarchy-item::before {
@@ -162,13 +139,21 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: calc(var(--shared-indent-level, 0) * 22px);
-    border-left: 2px solid rgba(13, 110, 253, 0.14);
+    left: 0;
+    right: 0;
+    background-image: repeating-linear-gradient(
+        to right,
+        var(--shared-hierarchy-line-color) 0 2px,
+        transparent 2px 22px
+    );
+    background-size: calc(var(--shared-ancestor-guide-count) * 22px) 100%;
+    background-position: 22px 0;
+    background-repeat: no-repeat;
     pointer-events: none;
 }
 
-.shared-note-item.shared-note-child::before {
-    border-left-color: rgba(13, 110, 253, 0.22);
+.shared-note-item.shared-note-child {
+    --shared-hierarchy-line-color: rgba(13, 110, 253, 0.22);
 }
 
 #foldersList .shared-folder-icon {
@@ -176,14 +161,54 @@
 }
 
 .note-name-container {
-    flex: 0 0 var(--shared-name-width);
+    flex: 1 1 var(--shared-name-width);
     box-sizing: border-box;
     min-width: var(--shared-name-width);
-    width: var(--shared-name-width);
+    width: auto;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 8px;
+}
+
+.shared-folder-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 7px;
+    background: rgba(0, 125, 184, 0.08);
+    color: var(--link-color, #007bff);
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.shared-folder-toggle:hover {
+    background: rgba(0, 125, 184, 0.14);
+}
+
+.shared-folder-toggle:focus-visible {
+    outline: 2px solid rgba(0, 123, 255, 0.45);
+    outline-offset: 2px;
+}
+
+.shared-folder-toggle i {
+    font-size: 13px;
+}
+
+.shared-folder-toggle.is-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.shared-folder-toggle-placeholder {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .shared-note-item.shared-hierarchy-item .note-name-container {
@@ -197,10 +222,9 @@
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    min-height: 30px;
+    min-height: 26px;
     overflow: hidden;
     padding-left: var(--shared-divider-padding);
-    border-left: 1px solid var(--border-color, #e0e0e0);
 }
 
 .note-folder-container.is-empty {
@@ -223,7 +247,8 @@
     text-decoration: underline;
 }
 
-.shared-password-icon.is-password-protected {
+.shared-password-icon.is-password-protected,
+.shared-restricted-icon.is-restricted {
     filter: none !important;
     color: #ef4444 !important;
 }
@@ -256,38 +281,32 @@
 }
 
 .note-token-wrap {
-    flex: 1;
-    min-width: 0;
+    flex: 0 0 var(--shared-token-width);
+    min-width: var(--shared-token-width);
+    width: var(--shared-token-width);
     box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 4px 8px 4px var(--shared-divider-padding);
-    border: 1px solid transparent;
-    border-left: 1px solid var(--border-color, #e0e0e0);
+    border: none;
     border-radius: 0;
     transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
 .note-token-wrap.is-editable {
+    border: 1px solid rgba(0, 123, 255, 0.15);
     background-color: rgba(0, 123, 255, 0.04);
-    border-top-color: rgba(0, 123, 255, 0.15);
-    border-right-color: rgba(0, 123, 255, 0.15);
-    border-bottom-color: rgba(0, 123, 255, 0.15);
 }
 
 .note-token-wrap.is-editable:hover {
     background-color: rgba(0, 123, 255, 0.08);
-    border-top-color: rgba(0, 123, 255, 0.25);
-    border-right-color: rgba(0, 123, 255, 0.25);
-    border-bottom-color: rgba(0, 123, 255, 0.25);
+    border-color: rgba(0, 123, 255, 0.25);
 }
 
 .note-token-wrap.is-editable:focus-within {
     background-color: rgba(0, 123, 255, 0.05);
-    border-top-color: #007bff;
-    border-right-color: #007bff;
-    border-bottom-color: #007bff;
+    border-color: #007bff;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
 }
 
@@ -395,6 +414,10 @@
 
 .folder-name-path:hover {
     text-decoration: underline;
+}
+
+.shared-folder-row[data-collapsible="1"] .folder-name-path {
+    font-weight: 600;
 }
 
 [data-theme="dark"] .folder-name-path {
@@ -513,8 +536,7 @@
     display: flex;
     gap: 6px;
     justify-content: flex-end;
-    padding-left: var(--shared-divider-padding);
-    border-left: 1px solid var(--border-color, #e0e0e0);
+    padding-left: 0;
 }
 
 .note-actions .btn-sm {
@@ -527,6 +549,7 @@
     font-style: italic;
     color: var(--text-muted, #666666);
     text-align: right;
+    white-space: nowrap;
 }
 
 .empty-message {

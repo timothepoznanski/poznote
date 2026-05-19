@@ -74,11 +74,12 @@
     "menu_item": "Schnappschüsse",
     "modal": {
       "title": "Schnappschüsse",
+      "description": "Schnappschüsse werden automatisch erstellt, wenn du diese Notiz an einem Tag zum ersten Mal öffnest.\nMit „Jetzt Schnappschuss erstellen“ fügst du einen zusätzlichen Schnappschuss hinzu, ohne die heutigen vorhandenen zu ersetzen.",
       "loading": "Schnappschuss wird geladen...",
-      "history": "Verlauf (7 Tage)",
+      "history": "Verlauf (7 Schnappschüsse)",
       "today": "Heute",
       "empty_title": "Kein Schnappschuss verfügbar",
-      "empty_hint": "Ein Schnappschuss wird automatisch erstellt, wenn die Notiz tagsüber zum ersten Mal geöffnet wird.",
+      "empty_hint": "Ein Schnappschuss wird automatisch erstellt, wenn die Notiz tagsüber zum ersten Mal geöffnet wird. Du kannst jederzeit weitere Schnappschüsse manuell hinzufügen.",
       "empty_content": "(Leerer Inhalt)",
       "take_now": "Jetzt Schnappschuss erstellen",
       "copy_content": "Inhalt kopieren",
@@ -86,7 +87,7 @@
     },
     "messages": {
       "content_copied": "Inhalt kopiert",
-      "created_now": "Schnappschuss gespeichert"
+      "created_now": "Schnappschuss hinzugefügt"
     },
     "errors": {
       "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
@@ -97,7 +98,7 @@
       "title": "Bestätigung",
       "restore_message": "Die Notiz auf den Stand des Schnappschusses zurücksetzen? Aktuelle Änderungen gehen verloren.",
       "restore_button": "Zu diesem Zustand zurückkehren",
-      "take_now_message": "Den heutigen Schnappschuss mit dem aktuellen Notizinhalt erstellen oder ersetzen?",
+      "take_now_message": "Einen zusätzlichen Schnappschuss mit dem aktuellen Notizinhalt erstellen? Bereits vorhandene Schnappschüsse von heute bleiben erhalten.",
       "take_now_button": "Jetzt Schnappschuss erstellen"
     },
     "api": {

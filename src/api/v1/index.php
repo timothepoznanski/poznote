@@ -349,7 +349,7 @@ $router->post('/notes/{id}/convert', function($params) use ($notesController) {
 // Snapshots Routes
 // ======================
 
-// Create a daily snapshot for a note
+// Create a daily snapshot for a note (?manual=1 adds an extra snapshot)
 $router->post('/notes/{id}/snapshot', function($params) use ($snapshotsController) {
     $snapshotsController->create($params['id']);
 });
@@ -359,12 +359,12 @@ $router->get('/notes/{id}/snapshots', function($params) use ($snapshotsControlle
     $snapshotsController->listSnapshots($params['id']);
 });
 
-// Get a snapshot for a note (?date=YYYY-MM-DD, defaults to today)
+// Get a snapshot for a note (?snapshot_key=... or ?date=YYYY-MM-DD)
 $router->get('/notes/{id}/snapshot', function($params) use ($snapshotsController) {
     $snapshotsController->show($params['id']);
 });
 
-// Restore a note to a snapshot state (?date=YYYY-MM-DD, defaults to today)
+// Restore a note to a snapshot state (?snapshot_key=... or ?date=YYYY-MM-DD)
 $router->post('/notes/{id}/snapshot/restore', function($params) use ($snapshotsController) {
     $snapshotsController->restore($params['id']);
 });
