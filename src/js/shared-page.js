@@ -414,6 +414,48 @@
         updateDescendants(String(folderId));
     }
 
+    function propagateInheritedFolderPasswordState(folderId, hasPassword, passwordValue) {
+        var childrenByParentId = {};
+        var normalizedHasPassword = !!Number(hasPassword);
+        var normalizedPasswordValue = normalizedHasPassword ? (passwordValue || '') : '';
+        var effectiveFolderPasswordById = {};
+
+        sharedFolders.forEach(function(folder) {
+            var parentKey = folder.parent_id != null ? String(folder.parent_id) : '';
+            if (!childrenByParentId[parentKey]) {
+                childrenByParentId[parentKey] = [];
+            }
+            childrenByParentId[parentKey].push(folder);
+        });
+
+        function updateDescendants(parentKey) {
+            (childrenByParentId[parentKey] || []).forEach(function(childFolder) {
+                if (childFolder.is_direct) {
+                    return;
+                }
+
+                childFolder.password = normalizedHasPassword ? 1 : 0;
+                childFolder.passwordValue = normalizedPasswordValue;
+                updateDescendants(String(childFolder.folder_id));
+            });
+        }
+
+        updateDescendants(String(folderId));
+
+        sharedFolders.forEach(function(folder) {
+            effectiveFolderPasswordById[String(folder.folder_id)] = !!Number(folder.password);
+        });
+
+        sharedNotes.forEach(function(note) {
+            var noteFolderId = note && note.folder_id != null ? String(note.folder_id) : '';
+            if (!note.shared_via_folder || !noteFolderId || !Object.prototype.hasOwnProperty.call(effectiveFolderPasswordById, noteFolderId)) {
+                return;
+            }
+
+            note.shared_folder_has_password = effectiveFolderPasswordById[noteFolderId];
+        });
+    }
+
     function sortByFolderPathAndName(items, getName) {
         return items.slice().sort(function(a, b) {
             var pathA = (a.folder_path || '').toLowerCase();
@@ -695,10 +737,7 @@
         .then(function(data) {
             if (data.error) throw new Error(data.error);
             if (data.revoked) {
-                sharedNotes = sharedNotes.filter(function(n) { return n.note_id !== noteId; });
-                mergeItems();
-                applyFilter();
-                checkEmpty();
+                loadSharedNotes();
             }
         })
         .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
@@ -863,6 +902,7 @@
                 if (Object.prototype.hasOwnProperty.call(updates, 'password') && updates.password !== undefined) {
                     folder.password = data.hasPassword ? 1 : 0;
                     folder.passwordValue = data.passwordValue || '';
+                    propagateInheritedFolderPasswordState(folderId, folder.password, folder.passwordValue);
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users') && updates.allowed_users !== undefined) {
                     folder.allowed_users = Array.isArray(data.allowed_users) ? data.allowed_users.slice() : null;

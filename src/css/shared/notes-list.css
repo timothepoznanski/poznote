@@ -120,7 +120,7 @@
     display: flex;
     align-items: center;
     gap: var(--shared-column-gap);
-    padding: px 0;
+    padding: 5px;
     transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
