@@ -29,6 +29,10 @@ https://demo.poznote.com
 **Login**: poznote<br>
 **Password**: poznote
 
+### They talk about Poznote
+
+https://poznote.com/index.html#press
+
 ## Table of content
 
 - [Install](#install)
