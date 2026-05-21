@@ -918,8 +918,7 @@ function oidc_finish_login($claims, $tokens) {
         $secretToUse = getRememberMeSecret($user);
         
         // Format: actual_username:user_id:timestamp:hash
-        $hash = hash('sha256', $actualUsername . $user['id'] . $timestamp . $secretToUse);
-        $token = base64_encode($actualUsername . ':' . $user['id'] . ':' . $timestamp . ':' . $hash);
+        $token = buildRememberMeToken($actualUsername, (int)$user['id'], $timestamp, $secretToUse);
         
         setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
     }

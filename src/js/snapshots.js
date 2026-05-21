@@ -325,12 +325,12 @@
                     }
                     contentEl.innerHTML = html || escapeHtml(snapshot.content);
                 } catch (e) {
-                    contentEl.innerHTML = snapshot.content || '';
+                    contentEl.textContent = snapshot.content || '';
                 }
                 contentEl.style.whiteSpace = '';
                 contentEl.style.fontFamily = '';
             } else {
-                contentEl.innerHTML = snapshot.content || '';
+                contentEl.textContent = snapshot.content || '';
                 contentEl.style.whiteSpace = '';
                 contentEl.style.fontFamily = '';
             }

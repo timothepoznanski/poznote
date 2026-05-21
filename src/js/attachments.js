@@ -268,14 +268,16 @@ function loadAttachments(noteId) {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(function (response) {
+            if (!response.ok) throw new Error('Failed to load attachments');
+            return response.json();
+        })
         .then(function (data) {
             if (data.success) {
                 displayAttachments(data.attachments);
             }
         })
-        .catch(function (error) {
-            console.log('Error loading attachments:', error);
+        .catch(function () {
         });
 }
 
@@ -339,7 +341,10 @@ function deleteAttachment(attachmentId, noteId) {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(function (response) {
+            if (!response.ok) throw new Error('Failed to delete attachment');
+            return response.json();
+        })
         .then(function (data) {
             if (data.success) {
                 // Remove the attachment from the note editor DOM (HTML notes)
@@ -399,7 +404,10 @@ function updateAttachmentCountInMenu(noteId) {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(function (response) {
+            if (!response.ok) throw new Error('Failed to update attachment count');
+            return response.json();
+        })
         .then(function (data) {
             if (data.success) {
                 var count = data.attachments.length;
@@ -417,7 +425,7 @@ function updateAttachmentCountInMenu(noteId) {
                     var attachment = data.attachments[j];
                     if (attachment.id && attachment.original_filename) {
                         var isActuallyInline = false;
-                        var mimeType = attachment.mime_type || '';
+                        var mimeType = attachment.mime_type || attachment.file_type || '';
                         var isImage = mimeType.startsWith('image/');
                         if (!isImage && attachment.original_filename) {
                             var ext = attachment.original_filename.split('.').pop().toLowerCase();
@@ -522,7 +530,7 @@ function updateAttachmentCountInMenu(noteId) {
                                 // Check if this is an image that's displayed inline in the note content
                                 // Inline images (pasted) are hidden from the attachments list
                                 var isInline = false;
-                                var mime = att.mime_type || '';
+                                var mime = att.mime_type || att.file_type || '';
                                 var isImg = mime.startsWith('image/');
 
                                 // Fallback to extension check
@@ -564,8 +572,7 @@ function updateAttachmentCountInMenu(noteId) {
                 }
             }
         })
-        .catch(function (error) {
-            console.log('Counter update error:', error);
+        .catch(function () {
         });
 }
 
@@ -633,6 +640,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
         body: formData
     })
         .then(function (response) {
+            if (!response.ok) throw new Error('Failed to upload attachment');
             return response.json();
         })
         .then(function (data) {
@@ -869,6 +877,7 @@ function handleHTMLImageInsert(file, dropTarget) {
         body: formData
     })
         .then(function (response) {
+            if (!response.ok) throw new Error('Failed to upload attachment');
             return response.json();
         })
         .then(function (data) {

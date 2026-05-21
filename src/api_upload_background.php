@@ -23,31 +23,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 }
 
-// Sanitize workspace name for filesystem use
-if ($workspace) {
-    // Allow letters (including accented), digits, underscore, and hyphen. Replace others with underscore.
-    $workspace = preg_replace('/[^\p{L}0-9_\-]/u', '_', $workspace);
-} else {
-    $workspace = 'default';
-}
+$workspace = trim((string)($workspace ?? ''));
+$workspaceSegment = getWorkspaceBackgroundSegment($workspace);
+$responseWorkspace = $workspace !== '' ? $workspace : 'default';
 
 // Create user backgrounds directory with workspace subdirectory if it doesn't exist
 $user_dir = __DIR__ . '/data/users/' . $user_id;
 $backgrounds_dir = $user_dir . '/backgrounds';
-$workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspace;
+$workspace_backgrounds_dir = $backgrounds_dir . '/' . $workspaceSegment;
 
 if (!createDirectoryWithPermissions($user_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to create user directory: ' . $user_dir]);
+    echo json_encode(['success' => false, 'error' => 'Failed to prepare background storage']);
     exit;
 }
 
 if (!createDirectoryWithPermissions($backgrounds_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to create backgrounds directory: ' . $backgrounds_dir]);
+    echo json_encode(['success' => false, 'error' => 'Failed to prepare background storage']);
     exit;
 }
 
 if (!createDirectoryWithPermissions($workspace_backgrounds_dir)) {
-    echo json_encode(['success' => false, 'error' => 'Failed to create workspace backgrounds directory: ' . $workspace_backgrounds_dir]);
+    echo json_encode(['success' => false, 'error' => 'Failed to prepare background storage']);
     exit;
 }
 
@@ -56,13 +52,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
     $file = $_FILES['background'];
     
     // Validate file
-    $allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    $allowedTypes = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/gif' => 'gif',
+        'image/webp' => 'webp',
+    ];
     $max_size = 5 * 1024 * 1024; // 5MB
-    
-    if (!in_array($file['type'], $allowed_types)) {
-        echo json_encode(['success' => false, 'error' => 'Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.']);
-        exit;
-    }
     
     if ($file['size'] > $max_size) {
         echo json_encode(['success' => false, 'error' => 'File too large. Maximum size is 5MB.']);
@@ -73,6 +69,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
         echo json_encode(['success' => false, 'error' => 'Upload failed with error code: ' . $file['error']]);
         exit;
     }
+
+    if (!is_uploaded_file($file['tmp_name'])) {
+        echo json_encode(['success' => false, 'error' => 'Invalid uploaded file.']);
+        exit;
+    }
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mimeType = $finfo ? finfo_file($finfo, $file['tmp_name']) : false;
+    if ($finfo) {
+        finfo_close($finfo);
+    }
+
+    if (!is_string($mimeType) || !isset($allowedTypes[$mimeType])) {
+        echo json_encode(['success' => false, 'error' => 'Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.']);
+        exit;
+    }
     
     // Delete old background if exists
     $old_files = glob($workspace_backgrounds_dir . '/background.*');
@@ -81,19 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
     }
     
     // Save new background
-    $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $filename = 'background.' . $extension;
+    $filename = 'background.' . $allowedTypes[$mimeType];
     $destination = $workspace_backgrounds_dir . '/' . $filename;
     
     if (move_uploaded_file($file['tmp_name'], $destination)) {
-        $url = '/data/users/' . $user_id . '/backgrounds/' . $workspace . '/' . $filename . '?v=' . time();
-        echo json_encode(['success' => true, 'url' => $url, 'workspace' => $workspace]);
+        $url = '/data/users/' . $user_id . '/backgrounds/' . rawurlencode($workspaceSegment) . '/' . $filename . '?v=' . time();
+        echo json_encode(['success' => true, 'url' => $url, 'workspace' => $responseWorkspace]);
     } else {
-        $error_msg = 'Failed to save file';
-        if (!is_writable($workspace_backgrounds_dir)) {
-            $error_msg .= ': Directory not writable (' . $workspace_backgrounds_dir . ')';
-        }
-        echo json_encode(['success' => false, 'error' => $error_msg]);
+        echo json_encode(['success' => false, 'error' => 'Failed to save file']);
     }
     exit;
 }
@@ -104,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || (isset($_POST['_method']) && $_PO
     foreach ($files as $file) {
         @unlink($file);
     }
-    echo json_encode(['success' => true, 'workspace' => $workspace]);
+    echo json_encode(['success' => true, 'workspace' => $responseWorkspace]);
     exit;
 }
 
@@ -113,10 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $files = glob($workspace_backgrounds_dir . '/background.*');
     if (!empty($files)) {
         $file = basename($files[0]);
-        $url = '/data/users/' . $user_id . '/backgrounds/' . $workspace . '/' . $file . '?v=' . filemtime($files[0]);
-        echo json_encode(['success' => true, 'url' => $url, 'exists' => true, 'workspace' => $workspace]);
+        $url = '/data/users/' . $user_id . '/backgrounds/' . rawurlencode($workspaceSegment) . '/' . $file . '?v=' . filemtime($files[0]);
+        echo json_encode(['success' => true, 'url' => $url, 'exists' => true, 'workspace' => $responseWorkspace]);
     } else {
-        echo json_encode(['success' => true, 'exists' => false, 'workspace' => $workspace]);
+        echo json_encode(['success' => true, 'exists' => false, 'workspace' => $responseWorkspace]);
     }
     exit;
 }

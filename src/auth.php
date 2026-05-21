@@ -111,6 +111,19 @@ function setRememberMeCookie(string $value, int $expires): void {
     ]);
 }
 
+function createRememberMeHash(string $username, int $userId, int $timestamp, string $secret): string {
+    return hash_hmac('sha256', $username . ':' . $userId . ':' . $timestamp, $secret);
+}
+
+function createLegacyRememberMeHash(string $username, int $userId, int $timestamp, string $secret): string {
+    return hash('sha256', $username . $userId . $timestamp . $secret);
+}
+
+function buildRememberMeToken(string $username, int $userId, int $timestamp, string $secret): string {
+    $hash = createRememberMeHash($username, $userId, $timestamp, $secret);
+    return base64_encode($username . ':' . $userId . ':' . $timestamp . ':' . $hash);
+}
+
 function api_t($key, $vars = [], $default = null) {
     // Lazy-load i18n helpers when auth.php is used standalone
     if (!function_exists('t')) {
@@ -166,13 +179,22 @@ function isAuthenticated() {
                     
                     if ($user && $user['active'] && $user['username'] === $username) {
                         $secretToUse = getRememberMeSecret($user);
-                        $expectedHash = hash('sha256', $username . $userId . $timestamp . $secretToUse);
+                        $expectedHash = createRememberMeHash($username, (int)$userId, (int)$timestamp, $secretToUse);
+                        $legacyExpectedHash = createLegacyRememberMeHash($username, (int)$userId, (int)$timestamp, $secretToUse);
+                        $validHash = hash_equals($expectedHash, $hash);
+                        $validLegacyHash = !$validHash && hash_equals($legacyExpectedHash, $hash);
                         
-                        if (hash_equals($expectedHash, $hash)) {
+                        if ($validHash || $validLegacyHash) {
                             $_SESSION['authenticated'] = true;
                             $_SESSION['user_id'] = (int)$userId;
                             $_SESSION['user'] = $user;
                             updateUserLastLogin((int)$userId);
+
+                            if ($validLegacyHash) {
+                                $newTimestamp = time();
+                                setRememberMeCookie(buildRememberMeToken($username, (int)$userId, $newTimestamp, $secretToUse), time() + REMEMBER_ME_DURATION);
+                            }
+
                             return true;
                         }
                     }
@@ -221,8 +243,8 @@ function isAuthenticated() {
                         
                         // Upgrade the cookie to the new format with user_id
                         $newTimestamp = time();
-                        $newHash = hash('sha256', $username . $firstUser['id'] . $newTimestamp . AUTH_PASSWORD);
-                        $newToken = base64_encode($username . ':' . $firstUser['id'] . ':' . $newTimestamp . ':' . $newHash);
+                        $secretToUse = getRememberMeSecret($firstUser);
+                        $newToken = buildRememberMeToken($username, (int)$firstUser['id'], $newTimestamp, $secretToUse);
                         setRememberMeCookie($newToken, time() + REMEMBER_ME_DURATION);
                         
                         return true;
@@ -860,8 +882,7 @@ function authenticate($username, $password, $rememberMe = false) {
             $secretToUse = getRememberMeSecret($user);
             
             // Format: actual_username:user_id:timestamp:hash
-            $hash = hash('sha256', $actualUsername . $userId . $timestamp . $secretToUse);
-            $token = base64_encode($actualUsername . ':' . $userId . ':' . $timestamp . ':' . $hash);
+            $token = buildRememberMeToken($actualUsername, (int)$userId, $timestamp, $secretToUse);
             setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
         }
 
