@@ -12,9 +12,65 @@
 
 var NoteHistory = (function () {
     var MAX_HISTORY = 50;
+    var STORAGE_KEY = 'poznote_note_history_state';
     var history = [];    // Array of note IDs
     var currentIndex = -1;
     var navigating = false; // Flag to prevent recording during back/forward
+
+    function getStorage() {
+        try {
+            if (typeof sessionStorage !== 'undefined') {
+                return sessionStorage;
+            }
+        } catch (e) { /* ignore storage access errors */ }
+        return null;
+    }
+
+    function saveState() {
+        var storage = getStorage();
+        if (!storage) return;
+
+        try {
+            storage.setItem(STORAGE_KEY, JSON.stringify({
+                history: history,
+                currentIndex: currentIndex
+            }));
+        } catch (e) { /* ignore storage write errors */ }
+    }
+
+    function loadState() {
+        var storage = getStorage();
+        var raw;
+        var parsedIndex;
+
+        if (!storage) return;
+
+        try {
+            raw = storage.getItem(STORAGE_KEY);
+            if (!raw) return;
+
+            raw = JSON.parse(raw);
+            if (!raw || !Array.isArray(raw.history)) return;
+
+            history = raw.history
+                .map(function (noteId) { return String(noteId); })
+                .filter(function (noteId) {
+                    return !!noteId && noteId !== '-1' && noteId !== 'search';
+                });
+
+            if (!history.length) {
+                currentIndex = -1;
+                return;
+            }
+
+            parsedIndex = parseInt(raw.currentIndex, 10);
+            if (isNaN(parsedIndex)) {
+                parsedIndex = history.length - 1;
+            }
+
+            currentIndex = Math.max(0, Math.min(parsedIndex, history.length - 1));
+        } catch (e) { /* ignore storage parse errors */ }
+    }
 
     /**
      * Push a new note onto the history stack.
@@ -40,6 +96,7 @@ var NoteHistory = (function () {
         }
 
         currentIndex = history.length - 1;
+        saveState();
         updateButtons();
     }
 
@@ -49,6 +106,7 @@ var NoteHistory = (function () {
     function goBack() {
         if (!canGoBack()) return;
         currentIndex--;
+        saveState();
         navigateTo(history[currentIndex]);
     }
 
@@ -58,6 +116,7 @@ var NoteHistory = (function () {
     function goForward() {
         if (!canGoForward()) return;
         currentIndex++;
+        saveState();
         navigateTo(history[currentIndex]);
     }
 
@@ -115,6 +174,8 @@ var NoteHistory = (function () {
      * Initialize: record the currently open note and bind button events.
      */
     function init() {
+        loadState();
+
         // Record the initially loaded note
         var dataEl = document.getElementById('current-note-data');
         if (dataEl) {

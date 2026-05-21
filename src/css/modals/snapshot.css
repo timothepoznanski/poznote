@@ -273,24 +273,46 @@
 
 .snapshot-content-wrapper {
     flex: 1;
+    display: flex;
+    flex-direction: column;
     overflow: hidden;
-    padding: 0 24px;
+    padding: 16px 24px 0;
     min-height: 0;
+    box-sizing: border-box;
 }
 
 .snapshot-content-preview {
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
-    max-height: calc(85vh - 260px);
+    max-height: none;
     padding: 20px;
-    margin: 16px 0;
+    margin: 0;
     border: 1px solid #e5e5e5;
     border-radius: 8px;
     background: #fcfcfc;
     color: #1f2937;
-    font-size: 14px;
-    line-height: 1.7;
+    font-size: var(--note-font-size, 15px);
+    line-height: normal;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    box-sizing: border-box;
+}
+
+#snapshotModal .snapshot-content-preview.markdown-preview {
+    box-sizing: border-box;
+    scrollbar-gutter: stable;
+    padding-bottom: 20px;
+}
+
+#snapshotModal .snapshot-content-preview.markdown-preview > :last-child {
+    margin-bottom: 0 !important;
+}
+
+.snapshot-content-preview:not(.markdown-preview) p,
+.snapshot-content-preview:not(.markdown-preview) div {
+    margin: 0;
+    padding: 0;
 }
 
 .snapshot-content-preview p,
@@ -417,6 +439,12 @@
     color: rgba(218, 226, 237, 0.6);
 }
 
+#snapshotModal.snapshot-modal-dark .snapshot-markdown-preview-btn.active {
+    background-color: inherit !important;
+    border-color: inherit !important;
+    color: inherit !important;
+}
+
 /* ---- Actions bar ---- */
 .snapshot-modal-actions {
     padding: 16px 24px !important;
@@ -428,6 +456,30 @@
 .snapshot-restore-btn {
     display: inline-flex !important;
     align-items: center;
+}
+
+.snapshot-markdown-preview-btn {
+    align-items: center;
+    gap: 6px;
+}
+
+.snapshot-markdown-preview-btn:not([hidden]) {
+    display: inline-flex;
+}
+
+.snapshot-modal-actions button i.lucide {
+    display: none;
+}
+
+.snapshot-markdown-preview-btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+.snapshot-markdown-preview-btn.active {
+    background-color: inherit !important;
+    border-color: inherit !important;
+    color: inherit !important;
 }
 
 .snapshot-restore-btn {
@@ -486,22 +538,64 @@
     }
 
     .snapshot-content-wrapper {
-        padding: 0 16px;
+        padding: 14px 16px 0;
     }
 
     .snapshot-content-preview {
-        max-height: calc(92vh - 280px);
         padding: 14px;
     }
 
-    .snapshot-modal-actions {
+    #snapshotModal .snapshot-modal-actions {
         padding: 12px 16px !important;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 10px !important;
+        flex-wrap: nowrap !important;
     }
 
-    .snapshot-modal-actions button {
-        width: 100%;
-        justify-content: center;
+    #snapshotModal .snapshot-modal-actions button {
+        width: auto !important;
+        min-width: 36px !important;
+        flex: 0 0 auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 6px !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        height: 36px !important;
+    }
+
+    #snapshotModal .snapshot-modal-actions button i.lucide {
+        display: inline-block;
+        margin: 0 !important;
+        width: 18px;
+        height: 18px;
+    }
+
+    #snapshotModal .snapshot-modal-actions .snapshot-restore-btn i.lucide {
+        color: #007DB8 !important;
+    }
+
+    #snapshotModal .snapshot-modal-actions .btn-danger i.lucide {
+        color: #d11a2a !important;
+    }
+
+    #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide {
+        color: #6b7280 !important;
+    }
+
+    #snapshotModal .snapshot-modal-actions .snapshot-markdown-preview-btn i.lucide {
+        color: #007DB8 !important;
+    }
+
+    #snapshotModal .snapshot-modal-actions button span {
+        display: none !important;
     }
 
     .snapshot-meta {

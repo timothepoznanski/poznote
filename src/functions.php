@@ -721,6 +721,40 @@ function getEntriesPath() { return getDataPath('entries'); }
 function getAttachmentsPath() { return getDataPath('attachments'); }
 function getBackupsPath() { return getDataPath('backups'); }
 
+function deleteNoteSnapshots($noteId) {
+    $noteId = (int) $noteId;
+    if ($noteId <= 0) {
+        return;
+    }
+
+    $snapshotDir = dirname(getEntriesPath()) . '/snapshots/' . $noteId;
+    if (!is_dir($snapshotDir)) {
+        return;
+    }
+
+    $deletePath = static function (string $path) use (&$deletePath): void {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            if ($entries !== false) {
+                foreach ($entries as $entry) {
+                    if ($entry === '.' || $entry === '..') {
+                        continue;
+                    }
+
+                    $deletePath($path . '/' . $entry);
+                }
+            }
+
+            @rmdir($path);
+            return;
+        }
+
+        @unlink($path);
+    };
+
+    $deletePath($snapshotDir);
+}
+
 /**
  * Get the appropriate file extension based on note type
  * @param string $type The note type (note, markdown, tasklist)
@@ -1875,6 +1909,15 @@ function sanitizeHtml($html) {
     @$dom->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     
     $xpath = new DOMXPath($dom);
+
+    // Heading anchors are runtime UI controls added by the outline panel.
+    // They must never be persisted as note content.
+    $runtimeHeadingAnchors = $xpath->query('//a[contains(concat(" ", normalize-space(@class), " "), " heading-anchor ") or @data-heading-anchor="true"]');
+    foreach ($runtimeHeadingAnchors as $anchor) {
+        if ($anchor->parentNode) {
+            $anchor->parentNode->removeChild($anchor);
+        }
+    }
     
     // Remove all disallowed tags
     $allElements = $xpath->query('//body//*');

@@ -51,9 +51,11 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.",
+      "description": "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.\nOnly the 7 most recent snapshots are kept, including those created manually.",
       "loading": "Loading snapshot...",
-      "history": "History (7 snapshots)",
+      "history": "History",
+      "markdown_preview": "Preview",
+      "markdown_source": "Source view",
       "today": "Today",
       "empty_title": "No snapshot available",
       "empty_hint": "A snapshot is created automatically when the note is first opened during the day. You can also add extra snapshots manually at any time.",

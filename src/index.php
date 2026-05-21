@@ -191,7 +191,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <script src="pwa/pwa.js?v=<?php echo $v; ?>" defer></script>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
-    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo file_exists(__DIR__ . '/css/lucide.css') ? filemtime(__DIR__ . '/css/lucide.css') : $v; ?>"/>
     <!-- Modular CSS - Imported directly (previously via index.css) -->
     <link type="text/css" rel="stylesheet" href="css/variables.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/base.css?v=<?php echo $v; ?>"/>
@@ -219,7 +219,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/folders/search.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/animations.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/toolbar-icons.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo file_exists(__DIR__ . '/css/lucide.css') ? filemtime(__DIR__ . '/css/lucide.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
@@ -548,7 +548,7 @@ if ($isPublicWorkspaceReadonly) {
                     echo '<div class="note-edit-toolbar">';
                     
                     // Back/Forward navigation buttons (desktop only)
-                    echo '<button type="button" id="note-history-back" class="toolbar-btn btn-history-nav btn-history-back history-disabled" title="' . t_h('editor.toolbar.go_back', [], 'Go back') . '" disabled><i class="lucide lucide-chevron-left"></i></button>';
+                    echo '<button type="button" id="note-history-back" class="toolbar-btn btn-history-nav btn-history-back history-disabled" title="' . t_h('editor.toolbar.go_back', [], 'Go back') . '" disabled><i class="lucide lucide-circle-chevron-left"></i></button>';
                     
                     // Build home URL with search preservation
                     $home_url = 'index.php';
@@ -756,11 +756,12 @@ if ($isPublicWorkspaceReadonly) {
                     }
 
                     if (!$isPublicWorkspaceReadonly) {
+                        echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
                         echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
                     }
                     
                     // Forward navigation button (desktop only)
-                    echo '<button type="button" id="note-history-forward" class="toolbar-btn btn-history-nav btn-history-forward history-disabled" title="' . t_h('editor.toolbar.go_forward', [], 'Go forward') . '" disabled><i class="lucide lucide-chevron-right"></i></button>';
+                    echo '<button type="button" id="note-history-forward" class="toolbar-btn btn-history-nav btn-history-forward history-disabled" title="' . t_h('editor.toolbar.go_forward', [], 'Go forward') . '" disabled><i class="lucide lucide-circle-chevron-right"></i></button>';
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="lucide lucide-info-circle"></i></button>';
                 
@@ -800,8 +801,7 @@ if ($isPublicWorkspaceReadonly) {
                     } elseif ($note_type === 'note') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
                     }
-                    
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="lucide lucide-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
+
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
                     }

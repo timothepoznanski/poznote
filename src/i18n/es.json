@@ -74,9 +74,11 @@
     "menu_item": "Instantáneas",
     "modal": {
       "title": "Instantáneas",
-      "description": "Las instantáneas se crean automáticamente la primera vez que abres esta nota cada día.\nUsa «Tomar instantánea ahora» para añadir una instantánea extra sin reemplazar las que ya existen hoy.",
+      "description": "Las instantáneas se crean automáticamente la primera vez que abres esta nota cada día.\nUsa «Tomar instantánea ahora» para añadir una instantánea extra sin reemplazar las que ya existen hoy.\nSolo se conservan las 7 instantáneas más recientes, incluidas las creadas manualmente.",
       "loading": "Cargando instantánea...",
-      "history": "Historial (7 instantáneas)",
+      "history": "Historial",
+      "markdown_preview": "Vista previa",
+      "markdown_source": "Vista source",
       "today": "Hoy",
       "empty_title": "No hay instantánea disponible",
       "empty_hint": "Se crea automáticamente una instantánea cuando la nota se abre por primera vez durante el día. También puedes añadir instantáneas extra manualmente en cualquier momento.",

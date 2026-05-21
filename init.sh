@@ -35,6 +35,13 @@ else
     echo "Warning: automatic attachment URL repair failed; continuing startup."
 fi
 
+echo "Running automatic orphan snapshot cleanup..."
+if php /var/www/html/maintenance/cleanup-orphan-snapshots.php "$DATA_DIR"; then
+    echo "Automatic orphan snapshot cleanup completed."
+else
+    echo "Warning: automatic orphan snapshot cleanup failed; continuing startup."
+fi
+
 echo "Setting correct permissions recursively on $DATA_DIR..."
 
 # Fix ownership and permissions for the entire data tree

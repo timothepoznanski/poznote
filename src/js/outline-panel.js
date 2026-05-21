@@ -273,12 +273,19 @@ function showHeadingCopiedToast() {
 function stripRuntimeHeadingAnchorsFromElement(element) {
     if (!element) return element;
 
-    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR);
+    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
     for (var i = 0; i < anchors.length; i++) {
         anchors[i].remove();
     }
 
     return element;
+}
+
+function isHeadingInsideEditableHtmlNote(heading) {
+    if (!heading || !heading.closest) return false;
+
+    var editableNote = heading.closest('.noteentry[contenteditable="true"]');
+    return !!(editableNote && !heading.closest('.markdown-preview'));
 }
 
 function getHeadingTextContent(heading) {
@@ -292,12 +299,12 @@ function getHeadingTextContent(heading) {
 function cleanupStaleHeadingAnchorLinks(element) {
     if (!element) return;
 
-    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR);
+    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
     for (var i = 0; i < anchors.length; i++) {
         var anchor = anchors[i];
         var heading = anchor.closest('h1, h2, h3, h4, h5, h6');
 
-        if (!heading || !getHeadingTextContent(heading)) {
+        if (!heading || isHeadingInsideEditableHtmlNote(heading) || !getHeadingTextContent(heading)) {
             anchor.remove();
         }
     }
@@ -345,6 +352,11 @@ function initHeadingAnchorInteractions() {
  */
 function addHeadingAnchorLink(heading) {
     if (!heading) return;
+
+    if (isHeadingInsideEditableHtmlNote(heading)) {
+        stripRuntimeHeadingAnchorsFromElement(heading);
+        return;
+    }
 
     if (!heading.id) {
         const headingText = getHeadingTextContent(heading);
