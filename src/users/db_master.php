@@ -247,7 +247,7 @@ function updateUserOidcSubject(int $userId, string $oidcSubject): void {
  * Create a new user profile
  */
 
-function createUserProfile(string $username, string $email = null): array {
+function createUserProfile(string $username, ?string $email = null): array {
     try {
         $con = getMasterConnection();
         
