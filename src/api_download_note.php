@@ -35,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 // Validate note ID parameter
 $noteId = $_GET['id'] ?? '';
+$workspace = trim($_GET['workspace'] ?? '') ?: getWorkspaceFilter();
 
 if (empty($noteId) || !is_numeric($noteId)) {
     http_response_code(400);
@@ -46,10 +47,20 @@ if (empty($noteId) || !is_numeric($noteId)) {
     exit;
 }
 
+if ($workspace === '') {
+    http_response_code(400);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => false,
+        'error' => 'Missing required parameter: workspace'
+    ]);
+    exit;
+}
+
 // Fetch note from database to verify access and get metadata
 try {
-    $stmt = $con->prepare('SELECT id, heading, type, tags, entry FROM entries WHERE id = ? AND trash = 0');
-    $stmt->execute([$noteId]);
+    $stmt = $con->prepare('SELECT id, heading, type, tags, entry FROM entries WHERE id = ? AND workspace = ? AND trash = 0');
+    $stmt->execute([$noteId, $workspace]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if (!$row) {

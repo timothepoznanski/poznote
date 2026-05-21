@@ -25,11 +25,22 @@ $import_attachments_error = '';
 $import_individual_notes_message = '';
 $import_individual_notes_error = '';
 
+if (empty($_SESSION['restore_import_csrf_token'])) {
+    $_SESSION['restore_import_csrf_token'] = bin2hex(random_bytes(32));
+}
+$restoreImportCsrfToken = $_SESSION['restore_import_csrf_token'];
+$restoreImportPostAllowed = false;
+
 // Process actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
-    
-    switch ($action) {
+    $postedCsrfToken = $_POST['csrf_token'] ?? '';
+
+    if (!hash_equals($restoreImportCsrfToken, $postedCsrfToken)) {
+        $restore_error = t('restore_import.errors.invalid_form_submission', [], 'Invalid form submission. Please try again.');
+    } else {
+        $restoreImportPostAllowed = true;
+        switch ($action) {
         case 'restore':
             if (isset($_FILES['backup_file']) && $_FILES['backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreBackup($_FILES['backup_file']);
@@ -121,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $import_individual_notes_error = t('restore_import.errors.no_notes_selected_or_upload');
             }
             break;
+        }
     }
 }
 
@@ -1898,6 +1910,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 
             <form method="post" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="complete_restore">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <div class="form-group">
                     <input type="file" id="complete_backup_file" name="complete_backup_file" accept=".zip" required>
                     <small class="form-text text-muted"><?php echo t_h('restore_import.sections.standard_restore.helper'); ?></small>
@@ -1934,12 +1947,13 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 
             <form method="post">
                 <input type="hidden" name="action" value="check_cli_upload">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <button type="button" class="btn btn-primary" data-action="show-direct-copy-restore-confirmation">
                     <?php echo t_h('restore_import.buttons.start_restore'); ?>
                 </button>
             </form>
 
-            <?php if (isset($_POST['action']) && $_POST['action'] === 'check_cli_upload'): ?>
+            <?php if ($restoreImportPostAllowed && isset($_POST['action']) && $_POST['action'] === 'check_cli_upload'): ?>
                 <?php
                 $cliBackupPath = '/tmp/backup_restore.zip';
                 if (file_exists($cliBackupPath)) {
@@ -1953,6 +1967,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     // Show confirmation form
                     echo "<form method='post' id='directCopyRestoreForm' class='form-with-margin-top'>";
                     echo "<input type='hidden' name='action' value='restore_cli_upload'>";
+                    echo "<input type='hidden' name='csrf_token' value='" . htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8') . "'>";
                     echo "<button type='button' class='btn btn-warning' data-action='show-direct-copy-restore-confirmation'>";
                     echo t_h('restore_import.direct_copy.buttons.yes_restore_direct_copy');
                     echo "</button>";
@@ -1966,7 +1981,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 ?>
             <?php endif; ?>
 
-            <?php if (isset($_POST['action']) && $_POST['action'] === 'restore_cli_upload'): ?>
+            <?php if ($restoreImportPostAllowed && isset($_POST['action']) && $_POST['action'] === 'restore_cli_upload'): ?>
                 <?php
                 $cliBackupPath = '/tmp/backup_restore.zip';
                 if (file_exists($cliBackupPath)) {
@@ -2001,6 +2016,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 
                 <div class="form-group form-group-spaced">
                     <label for="target_workspace_select" class="form-label">

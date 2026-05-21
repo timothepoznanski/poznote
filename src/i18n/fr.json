@@ -13,7 +13,7 @@
     "back_to_notes": "Notes",
     "back_to_settings": "Paramètres",
     "close": "Fermer",
-    "disable": "disable",
+    "disable": "Désactiver",
     "cancel": "Annuler",
     "confirm": "Confirmer",
     "confirm_action": "Confirmer l'action",
@@ -600,7 +600,9 @@
     "note": "note",
     "notes": "notes",
     "support_poznote": "Soutenir Poznote",
-    "version": "Version"
+    "version": "Version",
+    "filter_placeholder": "Filtrer",
+    "no_filter_results": "Aucun résultat trouvé."
   },
   "search": {
     "placeholder": "Rechercher...",

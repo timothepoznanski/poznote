@@ -632,6 +632,7 @@
                 window.userEntriesPath = config.userEntriesPath;
                 window.defaultNoteSortType = config.defaultNoteSortType || 'updated_desc';
                 window.isAdmin = config.isAdmin || false;
+                window.isPublicWorkspaceAccess = config.isPublicWorkspaceAccess || false;
             } catch (e) {
                 console.error('Error parsing page config data:', e);
             }

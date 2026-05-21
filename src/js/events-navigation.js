@@ -118,7 +118,9 @@ function setupNoteNavigationInterceptor() {
  */
 function loadNoteById(noteId) {
     var workspace = selectedWorkspace || getSelectedWorkspace();
-    var url = 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
+    var url = (typeof window.buildNoteNavigationUrl === 'function')
+        ? window.buildNoteNavigationUrl(noteId, workspace)
+        : 'index.php?workspace=' + encodeURIComponent(workspace) + '&note=' + noteId;
 
     // Use the existing loadNoteDirectly function if available
     if (typeof window.loadNoteDirectly === 'function') {

@@ -38,6 +38,47 @@
         }
     }
 
+    function isPublicWorkspaceActive() {
+        if (document.body && document.body.classList.contains('public-workspace-readonly')) {
+            return true;
+        }
+
+        if (typeof window.isPublicWorkspaceNavigationActive === 'function') {
+            return window.isPublicWorkspaceNavigationActive();
+        }
+
+        return typeof window.isPublicWorkspaceAccess !== 'undefined' && window.isPublicWorkspaceAccess;
+    }
+
+    function getWorkspaceName() {
+        if (typeof window.getSelectedWorkspace === 'function') {
+            return window.getSelectedWorkspace();
+        }
+
+        if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+            return selectedWorkspace;
+        }
+
+        return window.selectedWorkspace || '';
+    }
+
+    function buildBacklinksUrl(noteId) {
+        var url = '/api/v1/notes/' + encodeURIComponent(noteId) + '/backlinks';
+        var params = new URLSearchParams();
+        var workspace = getWorkspaceName();
+
+        if (workspace) {
+            params.set('workspace', workspace);
+        }
+
+        if (isPublicWorkspaceActive()) {
+            params.set('public_workspace', '1');
+        }
+
+        var query = params.toString();
+        return query ? url + '?' + query : url;
+    }
+
     /* --------------------------------------------------------------------- */
     /* Rendering                                                               */
     /* --------------------------------------------------------------------- */
@@ -77,8 +118,10 @@
 
         backlinks.forEach(function (link) {
             var ws = (typeof selectedWorkspace !== 'undefined') ? selectedWorkspace : '';
-            var href = 'index.php?note=' + encodeURIComponent(link.id) +
-                       (ws ? '&workspace=' + encodeURIComponent(ws) : '');
+            var href = (typeof window.buildNoteNavigationUrl === 'function')
+                ? window.buildNoteNavigationUrl(link.id, ws)
+                : 'index.php?note=' + encodeURIComponent(link.id) +
+                    (ws ? '&workspace=' + encodeURIComponent(ws) : '');
 
             var a = document.createElement('a');
             a.href      = href;
@@ -121,7 +164,7 @@
     function loadBacklinks(noteId) {
         removePanel();
 
-        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/backlinks', {
+        fetch(buildBacklinksUrl(noteId), {
             method: 'GET',
             credentials: 'same-origin',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }

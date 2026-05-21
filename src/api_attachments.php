@@ -68,6 +68,35 @@ if ($action !== 'download' && ob_get_level()) {
     ob_end_flush();
 }
 
+function resolveAttachmentNote($note_id, $workspace = null) {
+    global $con;
+
+    $noteId = (int)$note_id;
+    if ($noteId <= 0) {
+        return null;
+    }
+
+    $workspaceName = trim((string)($workspace ?? ''));
+    if ($workspaceName === '') {
+        $workspaceName = getWorkspaceFilter();
+    }
+
+    if ($workspaceName === '') {
+        return null;
+    }
+
+    $stmt = $con->prepare('SELECT id, workspace, attachments FROM entries WHERE id = ? AND workspace = ? AND trash = 0');
+    $stmt->execute([$noteId, $workspaceName]);
+    $note = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $note ?: null;
+}
+
+function decodeAttachmentList($attachmentsJson) {
+    $attachments = $attachmentsJson ? json_decode($attachmentsJson, true) : [];
+    return is_array($attachments) ? $attachments : [];
+}
+
 function handleUpload() {
     global $con, $attachments_dir;
     
@@ -83,6 +112,12 @@ function handleUpload() {
     if (!isset($_FILES['file'])) {
         error_log("Upload failed: No file uploaded");
         echo json_encode(['success' => false, 'message' => 'No file uploaded']);
+        return;
+    }
+
+    $note = resolveAttachmentNote($note_id, $workspace);
+    if (!$note) {
+        echo json_encode(['success' => false, 'message' => 'Note not found']);
         return;
     }
     
@@ -153,88 +188,50 @@ function handleUpload() {
         return;
     }
     
-    // Log the attempted file move
-    error_log("Attempting to move uploaded file from: " . $file['tmp_name'] . " to: " . $file_path);
-    
     // Move uploaded file
     if (move_uploaded_file($file['tmp_name'], $file_path)) {
-        error_log("Successfully moved uploaded file to: $file_path");
-        
         // Set file permissions
         chmod($file_path, 0644);
-        
-        // Get current attachments (restrict by workspace if provided)
-        if ($workspace) {
-            $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
-            $stmt = $con->prepare($query);
-            $stmt->execute([$note_id, $workspace]);
+
+        $current_attachments = decodeAttachmentList($note['attachments'] ?? '');
+
+        // Add new attachment
+        $new_attachment = [
+            'id' => uniqid(),
+            'filename' => $unique_filename,
+            'original_filename' => $original_name,
+            'file_size' => $file_size,
+            'file_type' => $file_type,
+            'uploaded_at' => date('Y-m-d H:i:s')
+        ];
+
+        $current_attachments[] = $new_attachment;
+
+        // Update database
+        $attachments_json = json_encode($current_attachments);
+        $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0";
+        $update_stmt = $con->prepare($update_query);
+        $success = $update_stmt->execute([$attachments_json, $note_id, $note['workspace']]);
+
+        if ($success) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'File uploaded successfully',
+                'attachment_id' => $new_attachment['id'],
+                'filename' => $original_name
+            ]);
         } else {
-            $query = "SELECT attachments FROM entries WHERE id = ?";
-            $stmt = $con->prepare($query);
-            $stmt->execute([$note_id]);
-        }
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($result) {
-            $current_attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
-            
-            // Add new attachment
-            $new_attachment = [
-                'id' => uniqid(),
-                'filename' => $unique_filename,
-                'original_filename' => $original_name,
-                'file_size' => $file_size,
-                'file_type' => $file_type,
-                'uploaded_at' => date('Y-m-d H:i:s')
-            ];
-            
-            $current_attachments[] = $new_attachment;
-            
-            // Update database
-            $attachments_json = json_encode($current_attachments);
-            if ($workspace) {
-                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ?";
-                $update_stmt = $con->prepare($update_query);
-                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace]);
-            } else {
-                $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
-                $update_stmt = $con->prepare($update_query);
-                $success = $update_stmt->execute([$attachments_json, $note_id]);
-            }
-            
-            if ($success) {
-                error_log("File uploaded successfully: $original_name");
-                echo json_encode([
-                    'success' => true, 
-                    'message' => 'File uploaded successfully',
-                    'attachment_id' => $new_attachment['id'],
-                    'filename' => $original_name
-                ]);
-            } else {
-                unlink($file_path); // Clean up file if database update fails
-                error_log("Database update failed for file: $original_name");
-                echo json_encode(['success' => false, 'message' => 'Database update failed']);
-            }
-        } else {
-            unlink($file_path);
-            error_log("Note not found for file upload: note_id=$note_id");
-            echo json_encode(['success' => false, 'message' => 'Note not found']);
+            unlink($file_path); // Clean up file if database update fails
+            error_log("Attachment database update failed");
+            echo json_encode(['success' => false, 'message' => 'Database update failed']);
         }
     } else {
-        $error_msg = 'Failed to save file to: ' . $file_path;
-        if (!is_dir($attachments_dir)) {
-            $error_msg .= ' (directory does not exist)';
-        } elseif (!is_writable($attachments_dir)) {
-            $error_msg .= ' (directory not writable)';
-        }
-        error_log("File move failed: " . $error_msg);
-        echo json_encode(['success' => false, 'message' => $error_msg]);
+        error_log("Attachment file move failed");
+        echo json_encode(['success' => false, 'message' => 'Failed to save file']);
     }
 }
 
 function handleList() {
-    global $con;
-    
     $note_id = $_GET['note_id'] ?? '';
     $workspace = $_GET['workspace'] ?? null;
     
@@ -242,20 +239,10 @@ function handleList() {
         echo json_encode(['success' => false, 'message' => 'Note ID is required']);
         return;
     }
-    
-    if ($workspace) {
-        $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id, $workspace]);
-    } else {
-        $query = "SELECT attachments FROM entries WHERE id = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id]);
-    }
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($result) {
-        $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
+
+    $note = resolveAttachmentNote($note_id, $workspace);
+    if ($note) {
+        $attachments = decodeAttachmentList($note['attachments'] ?? '');
         echo json_encode(['success' => true, 'attachments' => $attachments]);
     } else {
         echo json_encode(['success' => false, 'message' => 'Note not found']);
@@ -274,20 +261,9 @@ function handleDelete() {
         return;
     }
     
-    // Get current attachments
-    if ($workspace) {
-        $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id, $workspace]);
-    } else {
-        $query = "SELECT attachments FROM entries WHERE id = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id]);
-    }
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($result) {
-        $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
+    $note = resolveAttachmentNote($note_id, $workspace);
+    if ($note) {
+        $attachments = decodeAttachmentList($note['attachments'] ?? '');
         
         // Find and remove attachment
         $file_to_delete = null;
@@ -309,15 +285,9 @@ function handleDelete() {
             
             // Update database
             $attachments_json = json_encode($updated_attachments);
-            if ($workspace) {
-                $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ?";
-                $update_stmt = $con->prepare($update_query);
-                $success = $update_stmt->execute([$attachments_json, $note_id, $workspace]);
-            } else {
-                $update_query = "UPDATE entries SET attachments = ? WHERE id = ?";
-                $update_stmt = $con->prepare($update_query);
-                $success = $update_stmt->execute([$attachments_json, $note_id]);
-            }
+            $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0";
+            $update_stmt = $con->prepare($update_query);
+            $success = $update_stmt->execute([$attachments_json, $note_id, $note['workspace']]);
             
             if ($success) {
                 echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully']);
@@ -345,19 +315,9 @@ function handleDownload() {
     }
     
     // Get attachment info
-    if ($workspace) {
-        $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id, $workspace]);
-    } else {
-        $query = "SELECT attachments FROM entries WHERE id = ?";
-        $stmt = $con->prepare($query);
-        $stmt->execute([$note_id]);
-    }
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($result) {
-        $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
+    $note = resolveAttachmentNote($note_id, $workspace);
+    if ($note) {
+        $attachments = decodeAttachmentList($note['attachments'] ?? '');
         
         foreach ($attachments as $attachment) {
             if ($attachment['id'] === $attachment_id) {

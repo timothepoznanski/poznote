@@ -27,6 +27,18 @@
         return '/api/v1/notes/' + noteId + '/snapshots';
     }
 
+    function isSnapshotAccessBlocked() {
+        if (document.body && document.body.classList.contains('public-workspace-readonly')) {
+            return true;
+        }
+
+        if (typeof window.isPublicWorkspaceNavigationActive === 'function') {
+            return window.isPublicWorkspaceNavigationActive();
+        }
+
+        return typeof window.isPublicWorkspaceAccess !== 'undefined' && window.isPublicWorkspaceAccess;
+    }
+
     function isDarkThemeActive() {
         if (typeof window.getCurrentTheme === 'function') {
             return window.getCurrentTheme() === 'dark';
@@ -119,7 +131,7 @@
      * Only creates one snapshot per note per day.
      */
     window.createNoteSnapshot = function (noteId) {
-        if (!noteId || noteId === -1 || noteId === 'search') return;
+        if (isSnapshotAccessBlocked() || !noteId || noteId === -1 || noteId === 'search') return;
 
         rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, false)).catch(function () {
             // Silently ignore - snapshots are best-effort
@@ -131,6 +143,8 @@
      * Loads the list of available snapshots and selects the most recent one.
      */
     window.showSnapshotModal = function (noteId) {
+        if (isSnapshotAccessBlocked()) return;
+
         if (!noteId) {
             noteId = window.noteid;
         }
@@ -325,12 +339,12 @@
                     }
                     contentEl.innerHTML = html || escapeHtml(snapshot.content);
                 } catch (e) {
-                    contentEl.innerHTML = snapshot.content || '';
+                    contentEl.textContent = snapshot.content || '';
                 }
                 contentEl.style.whiteSpace = '';
                 contentEl.style.fontFamily = '';
             } else {
-                contentEl.innerHTML = snapshot.content || '';
+                contentEl.textContent = snapshot.content || '';
                 contentEl.style.whiteSpace = '';
                 contentEl.style.fontFamily = '';
             }
@@ -380,6 +394,8 @@
      * Create an additional snapshot immediately.
      */
     window.takeSnapshotNow = function () {
+        if (isSnapshotAccessBlocked()) return;
+
         var modal = document.getElementById('snapshotModal');
         var noteId = modal && modal.dataset.noteId ? modal.dataset.noteId : window.noteid;
         var buttons = document.querySelectorAll('#snapshotModal .snapshot-take-btn');
@@ -434,6 +450,8 @@
      * Restore note to snapshot state
      */
     window.restoreSnapshot = function () {
+        if (isSnapshotAccessBlocked()) return;
+
         var modal = document.getElementById('snapshotModal');
         if (!modal) return;
 

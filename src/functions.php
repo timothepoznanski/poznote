@@ -131,16 +131,6 @@ function getProtocol() {
 }
 
 /**
- * Get the full base URL for the application, supporting reverse proxies
- */
-function getBaseUrl() {
-    $protocol = getProtocol();
-    $host = !empty($_SERVER['HTTP_X_FORWARDED_HOST']) ? $_SERVER['HTTP_X_FORWARDED_HOST'] : 
-            (!empty($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost');
-    return $protocol . '://' . $host;
-}
-
-/**
  * Convert Font Awesome icon classes to Lucide icon classes
  * This handles the migration from Font Awesome to Lucide icons
  * 
@@ -978,6 +968,29 @@ function getWorkspaceFilter() {
 }
 
 /**
+ * Return a filesystem-safe, deterministic segment for workspace background files.
+ */
+function getWorkspaceBackgroundSegment($workspace) {
+    $workspace = trim((string)$workspace);
+    if ($workspace === '') {
+        return 'default';
+    }
+
+    $segment = preg_replace('/[^A-Za-z0-9_-]/', '_', $workspace);
+    $segment = trim((string)$segment, '_');
+
+    if ($segment === '') {
+        $segment = 'workspace';
+    }
+
+    if ($segment !== $workspace) {
+        $segment .= '_' . substr(hash('sha256', $workspace), 0, 8);
+    }
+
+    return $segment;
+}
+
+/**
  * Save the last opened workspace to the database
  * This is called when a workspace is opened/selected
  * 
@@ -1473,7 +1486,7 @@ function ensureDataPermissions() {
         if (is_dir($userDir)) {
             if (function_exists('posix_getuid') && posix_getuid() === 0) {
                 // Use shell command for recursive chown
-                exec("chown -R www-data:www-data {$userDir} 2>/dev/null");
+                exec('chown -R www-data:www-data ' . escapeshellarg($userDir) . ' 2>/dev/null');
             }
             if (file_exists($dbPath)) {
                 chmod($dbPath, 0664);
@@ -1487,7 +1500,7 @@ function ensureDataPermissions() {
             $dataGroup = filegroup($dataDir);
             
             // Use shell command for recursive chown
-            exec("chown -R {$dataOwner}:{$dataGroup} {$dataDir} 2>/dev/null");
+            exec('chown -R ' . (int)$dataOwner . ':' . (int)$dataGroup . ' ' . escapeshellarg($dataDir) . ' 2>/dev/null');
             
             // Ensure database file has write permissions
             $dbPath = $dataDir . '/database/poznote.db';

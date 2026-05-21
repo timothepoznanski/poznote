@@ -26,10 +26,34 @@ if ($action === 'save_embedded_diagram') {
 
 // Continue with regular full note save
 $note_id = intval($_POST['note_id'] ?? 0);
-$workspace = trim($_POST['workspace'] ?? '') ?: getFirstWorkspaceName();
+$workspace = trim($_POST['workspace'] ?? '') ?: getWorkspaceFilter();
 $heading = trim($_POST['heading'] ?? '') ?: 'New note';
 $diagram_data = $_POST['diagram_data'] ?? '';
 $preview_image = $_FILES['preview_image'] ?? null;
+
+if ($workspace === '') {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => t('api.errors.workspace_required', [], 'Workspace is required')]);
+    exit;
+}
+
+$wsStmt = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
+$wsStmt->execute([$workspace]);
+if ((int)$wsStmt->fetchColumn() === 0) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
+    exit;
+}
+
+if ($note_id > 0) {
+    $existingNoteStmt = $con->prepare('SELECT id FROM entries WHERE id = ? AND workspace = ? AND trash = 0');
+    $existingNoteStmt->execute([$note_id, $workspace]);
+    if (!$existingNoteStmt->fetch(PDO::FETCH_ASSOC)) {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'message' => 'Note not found']);
+        exit;
+    }
+}
 
 // Save preview image as attachment if provided
 $attachmentId = null;
@@ -37,10 +61,12 @@ $mime_type = '';
 if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
     // Validate it's an image
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime_type = finfo_file($finfo, $preview_image['tmp_name']);
-    finfo_close($finfo);
+    $mime_type = $finfo ? finfo_file($finfo, $preview_image['tmp_name']) : false;
+    if ($finfo) {
+        finfo_close($finfo);
+    }
     
-    if (!in_array($mime_type, ['image/png', 'image/jpeg', 'image/gif'])) {
+    if (!is_string($mime_type) || !in_array($mime_type, ['image/png', 'image/jpeg', 'image/gif'], true)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Invalid image type']);
         exit;
@@ -82,17 +108,6 @@ if ($note_id === 0) {
         }
     }
     
-    // Validate workspace exists
-    if (!empty($workspace)) {
-        $wsStmt = $con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
-        $wsStmt->execute([$workspace]);
-        if ($wsStmt->fetchColumn() == 0) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'message' => t('api.errors.workspace_not_found', [], 'Workspace not found')]);
-            exit;
-        }
-    }
-    
     // Generate unique title (folder-aware)
     $uniqueTitle = generateUniqueTitle($heading, null, $workspace, $folder_id);
     
@@ -110,8 +125,8 @@ if ($note_id === 0) {
     }
 } else {
     // Update existing note
-    $stmt = $con->prepare('UPDATE entries SET heading = ?, entry = ?, updated = datetime("now") WHERE id = ?');
-    if (!$stmt->execute([$heading, $diagram_data, $note_id])) {
+    $stmt = $con->prepare('UPDATE entries SET heading = ?, entry = ?, updated = datetime("now") WHERE id = ? AND workspace = ? AND trash = 0');
+    if (!$stmt->execute([$heading, $diagram_data, $note_id, $workspace])) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Error updating note']);
         exit;
@@ -122,10 +137,10 @@ if ($note_id === 0) {
 if ($note_id > 0) {
     // Excalidraw notes always use .html extension regardless of the getFileExtensionForType function
     // because they contain complex HTML with embedded SVG/PNG diagrams
-    $filename = getEntriesPath() . '/' . $note_id . ".html";
+    $noteFilename = getEntriesPath() . '/' . $note_id . ".html";
     
     // Ensure the entries directory exists
-    $entriesDir = dirname($filename);
+    $entriesDir = dirname($noteFilename);
     if (!is_dir($entriesDir)) {
         mkdir($entriesDir, 0755, true);
     }
@@ -134,8 +149,8 @@ if ($note_id > 0) {
     $existing_content = '';
     $existing_img_classes = '';
     $existing_img_style = '';
-    if (file_exists($filename)) {
-        $existing_content = file_get_contents($filename);
+    if (file_exists($noteFilename)) {
+        $existing_content = file_get_contents($noteFilename);
         
         // Extract existing image classes and style to preserve border settings
         if (preg_match('/<img[^>]+class="([^"]*)"[^>]*\/?>/', $existing_content, $class_matches)) {
@@ -149,8 +164,8 @@ if ($note_id > 0) {
     // Handle attachment if preview image was provided
     if ($attachmentId && isset($image_data)) {
         // Get existing attachments
-        $stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
-        $stmt->execute([$note_id]);
+        $stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ? AND workspace = ? AND trash = 0");
+        $stmt->execute([$note_id, $workspace]);
         $noteData = $stmt->fetch(PDO::FETCH_ASSOC);
         $existingAttachments = $noteData && $noteData['attachments'] ? json_decode($noteData['attachments'], true) : [];
         if (!is_array($existingAttachments)) $existingAttachments = [];
@@ -183,8 +198,8 @@ if ($note_id > 0) {
         
         // Save new image as attachment
         $extension = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/jpeg') ? 'jpg' : 'gif');
-        $filename = $attachmentId . '_' . time() . '.' . $extension;
-        $filePath = $attachmentsPath . '/' . $filename;
+        $attachmentFilename = $attachmentId . '_' . time() . '.' . $extension;
+        $filePath = $attachmentsPath . '/' . $attachmentFilename;
         
         if (file_put_contents($filePath, $image_data) !== false) {
             chmod($filePath, 0644);
@@ -192,7 +207,7 @@ if ($note_id > 0) {
             // Add to attachments list
             $existingAttachments[] = [
                 'id' => $attachmentId,
-                'filename' => $filename,
+                'filename' => $attachmentFilename,
                 'original_filename' => 'excalidraw_preview.' . $extension,
                 'file_size' => strlen($image_data),
                 'file_type' => $mime_type,
@@ -200,8 +215,8 @@ if ($note_id > 0) {
             ];
             
             // Update attachments in database
-            $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
-            $updateStmt->execute([json_encode($existingAttachments), $note_id]);
+            $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0");
+            $updateStmt->execute([json_encode($existingAttachments), $note_id, $workspace]);
         }
     }
     
@@ -257,8 +272,8 @@ if ($note_id > 0) {
     }
     
     // Write HTML content to file
-    if (file_put_contents($filename, $html_content) === false) {
-        error_log("Failed to write HTML file for Excalidraw note ID $note_id: $filename");
+    if (file_put_contents($noteFilename, $html_content) === false) {
+        error_log("Failed to write HTML file for Excalidraw note ID $note_id");
     }
 }
 
@@ -273,7 +288,7 @@ function saveEmbeddedDiagram() {
     
     $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
     $diagram_id = isset($_POST['diagram_id']) ? trim($_POST['diagram_id']) : '';
-    $workspace = isset($_POST['workspace']) ? trim($_POST['workspace']) : getFirstWorkspaceName();
+    $workspace = trim($_POST['workspace'] ?? '') ?: getWorkspaceFilter();
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
     $preview_image_base64 = isset($_POST['preview_image_base64']) ? $_POST['preview_image_base64'] : '';
     $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;
@@ -289,8 +304,8 @@ function saveEmbeddedDiagram() {
     try {
         // Load the existing note content using the note's native storage file.
         require_once 'functions.php';
-        $stmt = $con->prepare("SELECT entry, type FROM entries WHERE id = ?");
-        $stmt->execute([$note_id]);
+        $stmt = $con->prepare("SELECT entry, type, attachments FROM entries WHERE id = ? AND workspace = ? AND trash = 0");
+        $stmt->execute([$note_id, $workspace]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) {
@@ -334,11 +349,8 @@ function saveEmbeddedDiagram() {
             $image_data = base64_decode($base64_data);
             
             if ($image_data !== false) {
-                // Get existing attachments
-                $stmt = $con->prepare("SELECT attachments FROM entries WHERE id = ?");
-                $stmt->execute([$note_id]);
-                $noteData = $stmt->fetch(PDO::FETCH_ASSOC);
-                $existingAttachments = $noteData && $noteData['attachments'] ? json_decode($noteData['attachments'], true) : [];
+                // Get existing attachments from the already validated note row.
+                $existingAttachments = !empty($row['attachments']) ? json_decode($row['attachments'], true) : [];
                 if (!is_array($existingAttachments)) $existingAttachments = [];
                 
                 // Find and remove old Excalidraw image for this diagram
@@ -389,8 +401,8 @@ function saveEmbeddedDiagram() {
                     ];
                     
                     // Update attachments in database
-                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
-                    $updateStmt->execute([json_encode($existingAttachments), $note_id]);
+                    $updateStmt = $con->prepare("UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0");
+                    $updateStmt->execute([json_encode($existingAttachments), $note_id, $workspace]);
                 }
             }
         }
@@ -553,8 +565,8 @@ function saveEmbeddedDiagram() {
         }
         
         // Update the database with the new content and last modified time
-        $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
-        $stmt->execute([$content_to_save, $note_id]);
+        $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ? AND workspace = ? AND trash = 0");
+        $stmt->execute([$content_to_save, $note_id, $workspace]);
         
         echo json_encode([
             'success' => true,
@@ -566,7 +578,7 @@ function saveEmbeddedDiagram() {
     } catch (Exception $e) {
         error_log("Error saving embedded diagram: " . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Server error']);
     }
 }
 

@@ -431,8 +431,13 @@ try {
         <div class="home-search-container">
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
-                <input type="text" id="home-search-input" class="home-search-input" placeholder="Filtrer" autocomplete="off">
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter'); ?>" autocomplete="off">
             </div>
+        </div>
+
+        <div id="no-results" class="home-no-results" style="display: none; grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #6b7280;">
+            <i class="lucide lucide-search" style="font-size: 24px; display: block; margin-bottom: 10px; opacity: 0.5;"></i>
+            <?php echo t_h('home.no_filter_results', [], 'No results found.'); ?>
         </div>
 
         <div class="home-grid" style="margin-top: 16px;">
@@ -885,7 +890,7 @@ try {
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const searchInput = document.getElementById('home-search');
+        const searchInput = document.getElementById('home-search-input');
         const cards = document.querySelectorAll('.home-card');
         const noResults = document.getElementById('no-results');
         const apiRestCard = document.getElementById('api-rest-card');

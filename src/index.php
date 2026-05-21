@@ -802,7 +802,9 @@ if ($isPublicWorkspaceReadonly) {
                     }
                     
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-open-new-tab"><i class="lucide lucide-external-link"></i> '.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
+                    if (!$isPublicWorkspaceReadonly) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
+                    }
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-info"><i class="lucide lucide-info"></i> '.t_h('common.information', [], 'Information').'</button>';
                     echo '</div>';
                     echo '</div>';
@@ -1138,11 +1140,11 @@ window.calendarTranslations = {
 };
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
-<script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
+<script src="js/backlinks.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/backlinks.js') ?: time(); ?>"></script>
 <script src="js/snapshots.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/snapshots.js') ?: time(); ?>"></script>
 <script src="js/ui-customization.js?v=<?php echo $v; ?>"></script>
 
-<?php if ($note && is_numeric($note)): ?>
+<?php if (!$isPublicWorkspaceReadonly && $note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
 <script type="application/json" id="current-note-data"><?php echo json_encode(['noteId' => (string)$note]); ?></script>
 <!-- Create daily snapshot on note load -->

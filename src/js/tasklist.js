@@ -152,16 +152,27 @@ function extractTasksFromHTML(noteEntry) {
     }
 }
 
+function escapeAttribute(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
 // Render the task list interface
 function renderTaskList(noteId, tasks) {
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
+    const inputPlaceholder = window.t ? window.t('tasklist.input_placeholder', null, 'Write a new task and press enter to add it to the list...') : 'Write a new task and press enter to add it to the list...';
+
     const taskListHtml = `
         <div class="task-list-container" id="tasklist-${noteId}">
             <div class="task-input-container">
           <input type="text" class="task-input" id="task-input-${noteId}"
-              placeholder="${window.t ? window.t('tasklist.input_placeholder', null, 'Write a new task and press enter to add it to the list...') : 'Write a new task and press enter to add it to the list...'}" maxlength="4000">
+              placeholder="${escapeAttribute(inputPlaceholder)}" maxlength="4000">
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
                 ${renderTasks(tasks, noteId)}

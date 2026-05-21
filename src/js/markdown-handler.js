@@ -1731,9 +1731,31 @@ function parseMarkdown(text) {
 
     function decodeHtmlEntities(value) {
         if (!value || value.indexOf('&') === -1) return value || '';
-        var textarea = document.createElement('textarea');
-        textarea.innerHTML = value;
-        return textarea.value;
+        var namedEntities = {
+            amp: '&',
+            lt: '<',
+            gt: '>',
+            quot: '"',
+            apos: "'",
+            nbsp: ' '
+        };
+
+        return String(value).replace(/&(#x[0-9a-f]+|#\d+|[a-z][a-z0-9]+);/gi, function (match, entity) {
+            var normalized = entity.toLowerCase();
+            if (normalized.charAt(0) === '#') {
+                var codePoint = normalized.charAt(1) === 'x'
+                    ? parseInt(normalized.slice(2), 16)
+                    : parseInt(normalized.slice(1), 10);
+
+                if (Number.isFinite(codePoint) && codePoint >= 0 && codePoint <= 0x10ffff) {
+                    return String.fromCodePoint(codePoint);
+                }
+
+                return match;
+            }
+
+            return Object.prototype.hasOwnProperty.call(namedEntities, normalized) ? namedEntities[normalized] : match;
+        });
     }
 
     function getTagAttribute(attrs, name) {

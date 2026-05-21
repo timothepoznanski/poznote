@@ -561,7 +561,8 @@ function updateWorkspaceShareToggleButton(button, isShared, shareState) {
     button.textContent = isShared
         ? getWorkspaceShareText('workspace-share-edit-btn', 'Edit share')
         : getWorkspaceShareText('workspace-share-enable-btn', 'Share');
-    button.classList.toggle('btn-success', true);
+    button.classList.toggle('btn-orange', isShared);
+    button.classList.toggle('btn-success', !isShared);
     button.classList.remove('btn-danger');
     button.classList.remove('btn-warning');
     button.classList.remove('btn-primary');
