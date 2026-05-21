@@ -345,7 +345,11 @@ function loadNoteCommon(url, noteId, options) {
 
                                 reinitializeNoteContent();
 
-                                if (typeof window.createNoteSnapshot === 'function') {
+                                const isPublicWorkspaceReadonly =
+                                    (typeof window.isPublicWorkspaceNavigationActive === 'function' && window.isPublicWorkspaceNavigationActive()) ||
+                                    (document.body && document.body.classList.contains('public-workspace-readonly'));
+
+                                if (typeof window.createNoteSnapshot === 'function' && !isPublicWorkspaceReadonly) {
                                     window.createNoteSnapshot(noteId);
                                 }
 
@@ -722,9 +726,9 @@ function updateBrowserUrl(url, noteId) {
         NoteHistory.push(noteId);
     }
     try {
-        // Merge existing search params (search, tags_search, workspace, preserve_notes, preserve_tags, search_combined) into the target URL
+        // Merge existing search params (search, tags_search, workspace, public_workspace, preserve_notes, preserve_tags, search_combined) into the target URL
         const currentParams = new URLSearchParams(window.location.search || '');
-        const preserveKeys = ['search', 'tags_search', 'workspace', 'preserve_notes', 'preserve_tags', 'search_combined'];
+        const preserveKeys = ['search', 'tags_search', 'workspace', 'public_workspace', 'preserve_notes', 'preserve_tags', 'search_combined'];
 
         const target = new URL(url, window.location.origin);
         const targetParams = new URLSearchParams(target.search || '');

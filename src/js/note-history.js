@@ -77,10 +77,9 @@ var NoteHistory = (function () {
         var workspace = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace)
             ? selectedWorkspace
             : (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '');
-        var url = 'index.php?note=' + encodeURIComponent(noteId);
-        if (workspace) {
-            url += '&workspace=' + encodeURIComponent(workspace);
-        }
+        var url = (typeof window.buildNoteNavigationUrl === 'function')
+            ? window.buildNoteNavigationUrl(noteId, workspace)
+            : 'index.php?note=' + encodeURIComponent(noteId) + (workspace ? '&workspace=' + encodeURIComponent(workspace) : '');
 
         if (typeof window.loadNoteDirectly === 'function') {
             window.loadNoteDirectly(url, noteId, null);

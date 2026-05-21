@@ -23,7 +23,14 @@ function loadNoteData($con, &$note, $workspace_filter) {
             if ($note_data['type'] === 'linked' && !empty($note_data['linked_note_id'])) {
                 $linked_note_id = intval($note_data['linked_note_id']);
                 $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['select_linked_note']) : $note_id;
-                $redirect_url = "index.php?note=" . $linked_note_id . "&workspace=" . urlencode($workspace_filter);
+                $redirect_params = [
+                    'note=' . $linked_note_id,
+                    'workspace=' . urlencode($workspace_filter),
+                ];
+                if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+                    $redirect_params[] = 'public_workspace=1';
+                }
+                $redirect_url = 'index.php?' . implode('&', $redirect_params);
                 if ($selected_linked_note_id > 0) {
                     $redirect_url .= "&select_linked_note=" . $selected_linked_note_id;
                 }

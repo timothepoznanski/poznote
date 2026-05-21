@@ -36,29 +36,54 @@ class BacklinksController
         $noteId = (int) $noteId;
 
         try {
+            $workspace = '';
+            if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+                $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
+            } elseif (isset($_GET['workspace']) && is_string($_GET['workspace'])) {
+                $workspace = trim($_GET['workspace']);
+            }
+
+            $targetSql = 'SELECT id, heading FROM entries WHERE id = ? AND trash = 0';
+            $targetParams = [$noteId];
+            if ($workspace !== '') {
+                $targetSql .= ' AND workspace = ?';
+                $targetParams[] = $workspace;
+            }
+
             // --- Fetch the target note (we need its heading for wiki-link matching)
-            $stmt = $this->con->prepare(
-                'SELECT id, heading FROM entries WHERE id = ? AND trash = 0'
-            );
-            $stmt->execute([$noteId]);
+            $stmt = $this->con->prepare($targetSql);
+            $stmt->execute($targetParams);
             $targetNote = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$targetNote) {
+                if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+                    $this->sendSuccess([
+                        'backlinks' => [],
+                        'count' => 0,
+                    ]);
+                    return;
+                }
+
                 $this->sendError(404, 'Note not found');
                 return;
             }
 
             $targetHeading = (string) ($targetNote['heading'] ?? '');
 
-            // --- Fetch all non-trash candidate notes (exclude the target itself)
-            $stmt = $this->con->prepare(
-                "SELECT id, heading, type
+            $candidateSql = "SELECT id, heading, type
                    FROM entries
                   WHERE trash = 0
                     AND id != ?
-                    AND type IN ('note', 'markdown', 'tasklist')"
-            );
-            $stmt->execute([$noteId]);
+                    AND type IN ('note', 'markdown', 'tasklist')";
+            $candidateParams = [$noteId];
+            if ($workspace !== '') {
+                $candidateSql .= ' AND workspace = ?';
+                $candidateParams[] = $workspace;
+            }
+
+            // --- Fetch all non-trash candidate notes (exclude the target itself)
+            $stmt = $this->con->prepare($candidateSql);
+            $stmt->execute($candidateParams);
             $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $entriesPath = getEntriesPath();

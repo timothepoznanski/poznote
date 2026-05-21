@@ -39,6 +39,68 @@ function getSelectedWorkspace() {
     return selectedWorkspace || (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace ? window.selectedWorkspace : '') || _dataWorkspace || '';
 }
 
+function isPublicWorkspaceNavigationActive() {
+    if (typeof window.isPublicWorkspaceAccess !== 'undefined' && window.isPublicWorkspaceAccess) {
+        return true;
+    }
+
+    var configElement = document.getElementById('page-config-data');
+    if (configElement) {
+        try {
+            var config = JSON.parse(configElement.textContent);
+            if (config && config.isPublicWorkspaceAccess) {
+                return true;
+            }
+        } catch (e) {
+            // Ignore malformed config and fall back to URL inspection.
+        }
+    }
+
+    try {
+        var params = new URLSearchParams(window.location.search || '');
+        var value = params.get('public_workspace');
+        if (!value) {
+            return false;
+        }
+
+        value = String(value).toLowerCase();
+        return value === '1' || value === 'true' || value === 'yes';
+    } catch (e) {
+        return false;
+    }
+}
+
+function buildNoteNavigationUrl(noteId, workspace, extraParams) {
+    var params = [];
+    var effectiveWorkspace = workspace || getSelectedWorkspace();
+
+    if (effectiveWorkspace) {
+        params.push('workspace=' + encodeURIComponent(effectiveWorkspace));
+    }
+
+    if (isPublicWorkspaceNavigationActive()) {
+        params.push('public_workspace=1');
+    }
+
+    if (extraParams && typeof extraParams === 'object') {
+        Object.keys(extraParams).forEach(function (key) {
+            var value = extraParams[key];
+            if (value !== '' && value !== null && value !== undefined) {
+                params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+            }
+        });
+    }
+
+    if (noteId !== '' && noteId !== null && noteId !== undefined) {
+        params.push('note=' + encodeURIComponent(noteId));
+    }
+
+    return 'index.php?' + params.join('&');
+}
+
+window.isPublicWorkspaceNavigationActive = isPublicWorkspaceNavigationActive;
+window.buildNoteNavigationUrl = buildNoteNavigationUrl;
+
 // Apply global preferences on load
 document.addEventListener('DOMContentLoaded', function () {
     try {

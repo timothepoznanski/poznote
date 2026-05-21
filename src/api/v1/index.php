@@ -53,7 +53,27 @@ $isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
 $isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
 $isAttachmentDownload = $_SERVER['REQUEST_METHOD'] === 'GET' && preg_match('#/api/v1/notes/\d+/attachments/[^/]+#', $uri);
 
+if (function_exists('maybeAuthenticatePublicWorkspaceRequest')
+    && function_exists('isExplicitPublicWorkspaceRequest')
+    && isExplicitPublicWorkspaceRequest()
+    && (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive())) {
+    maybeAuthenticatePublicWorkspaceRequest();
+}
+
 if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+    $isAutomaticSnapshotCreate = $_SERVER['REQUEST_METHOD'] === 'POST'
+        && preg_match('#/api/v1/notes/\d+/snapshot$#', $uri)
+        && strtolower((string)($_GET['manual'] ?? $_GET['force'] ?? '0')) === '0';
+
+    if ($isAutomaticSnapshotCreate) {
+        echo json_encode([
+            'success' => true,
+            'skipped' => true,
+            'read_only' => true,
+        ]);
+        exit;
+    }
+
     if ($isPublicProfilesEndpoint || $isMeEndpoint || $isSharedEndpoint || $isLookupEndpoint || $isAdminEndpoint) {
         denyPublicWorkspaceAccessResponse('This endpoint is not available in public workspace mode', 403);
     }
