@@ -17,7 +17,7 @@
     "rename": "Rename",
     "move": "Move",
     "close": "Close",
-    "disable": "disable",
+    "disable": "Disable",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "not_defined": "Not defined",
@@ -1546,7 +1546,9 @@
     "note": "note",
     "notes": "notes",
     "support_poznote": "Support Poznote",
-    "version": "Version"
+    "version": "Version",
+    "filter_placeholder": "Filter",
+    "no_filter_results": "No results found."
   },
   "search": {
     "placeholder": "Search...",
