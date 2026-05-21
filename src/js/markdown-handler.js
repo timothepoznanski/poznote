@@ -3813,6 +3813,7 @@ window.exitSplitMode = exitSplitMode;
 window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.parseMarkdown = parseMarkdown;
+window.renderMarkdownPreview = renderMarkdownPreview;
 window.renderMarkdownEditorContent = renderMarkdownEditorContent;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;

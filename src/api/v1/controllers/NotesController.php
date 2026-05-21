@@ -1094,6 +1094,10 @@ class NotesController {
                 $this->sendError(404, 'Note not found');
                 return;
             }
+
+            if ($noteType === 'note' && $content !== '') {
+                $content = sanitizeHtml($content);
+            }
             
             // Write file
             $filename = getEntryFilename($noteId, $noteType);

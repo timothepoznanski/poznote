@@ -1875,6 +1875,15 @@ function sanitizeHtml($html) {
     @$dom->loadHTML($wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     
     $xpath = new DOMXPath($dom);
+
+    // Heading anchors are runtime UI controls added by the outline panel.
+    // They must never be persisted as note content.
+    $runtimeHeadingAnchors = $xpath->query('//a[contains(concat(" ", normalize-space(@class), " "), " heading-anchor ") or @data-heading-anchor="true"]');
+    foreach ($runtimeHeadingAnchors as $anchor) {
+        if ($anchor->parentNode) {
+            $anchor->parentNode->removeChild($anchor);
+        }
+    }
     
     // Remove all disallowed tags
     $allElements = $xpath->query('//body//*');

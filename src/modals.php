@@ -1234,7 +1234,7 @@
 
         <div class="snapshot-modal-body">
             <div id="snapshotDateList" class="snapshot-date-list">
-                <div class="snapshot-date-list-header"><?php echo t_h('snapshot.modal.history', [], 'History (7 snapshots)'); ?></div>
+                <div class="snapshot-date-list-header"><?php echo t_h('snapshot.modal.history', [], 'History'); ?></div>
                 <div id="snapshotDates" class="snapshot-dates"></div>
             </div>
 
@@ -1269,9 +1269,10 @@
                         <div id="snapshotContent" class="snapshot-content-preview" data-empty-text="<?php echo t_h('snapshot.modal.empty_content', [], '(Empty content)'); ?>"></div>
                     </div>
                     <div class="modal-buttons snapshot-modal-actions">
-                        <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
-                        <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
-                        <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></button>
+                        <button type="button" id="snapshotMarkdownPreviewToggle" class="btn-cancel snapshot-markdown-preview-btn" onclick="toggleSnapshotMarkdownPreview()" hidden data-preview-label="<?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?>" data-source-label="<?php echo t_h('snapshot.modal.markdown_source', [], 'Source'); ?>"><?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?></button>
+                        <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><i class="lucide lucide-x"></i><span><?php echo t_h('common.close'); ?></span></button>
+                        <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><i class="lucide lucide-camera"></i><span><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></span></button>
+                        <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><i class="lucide lucide-rotate-ccw"></i><span><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></span></button>
                     </div>
                 </div>
             </div>

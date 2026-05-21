@@ -487,6 +487,12 @@ function stripSearchHighlights(element) {
     if (!element) return null;
 
     var clonedElement = element.cloneNode(true);
+    var headingAnchors = clonedElement.querySelectorAll('.heading-anchor, [data-heading-anchor="true"]');
+
+    for (var h = 0; h < headingAnchors.length; h++) {
+        headingAnchors[h].remove();
+    }
+
     var highlights = clonedElement.querySelectorAll('.search-highlight');
 
     for (var i = 0; i < highlights.length; i++) {
@@ -494,10 +500,6 @@ function stripSearchHighlights(element) {
         var parent = highlight.parentNode;
         parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
         parent.normalize();
-    }
-
-    if (typeof window.stripRuntimeHeadingAnchorsFromElement === 'function') {
-        window.stripRuntimeHeadingAnchorsFromElement(clonedElement);
     }
 
     return clonedElement;
