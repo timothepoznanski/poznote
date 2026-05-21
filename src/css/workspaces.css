@@ -850,6 +850,15 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     background: #e0a800;
 }
 
+.btn-orange {
+    background: #e67e22;
+    color: white;
+}
+
+.btn-orange:hover {
+    background: #d35400;
+}
+
 .btn:disabled {
     background: #ccc;
     cursor: not-allowed;

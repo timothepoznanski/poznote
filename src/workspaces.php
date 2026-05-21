@@ -833,7 +833,7 @@ try {
                                 </div>
                                 <div class="ws-col ws-col-share">
                                     <button type="button"
-                                            class="btn action-btn btn-share-toggle btn-success"
+                                            class="btn action-btn btn-share-toggle <?php echo $workspaceReadonlyEnabled ? 'btn-orange' : 'btn-success'; ?>"
                                             data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
                                             data-shared="<?php echo $workspaceReadonlyEnabled ? '1' : '0'; ?>"
                                             data-url="<?php echo htmlspecialchars((string)($workspaceRow['readonly_url'] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"

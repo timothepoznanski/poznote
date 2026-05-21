@@ -336,6 +336,19 @@ body.dark-mode .btn-warning {
     border-color: #ffc107 !important;
 }
 
+html[data-theme='dark'] .btn-orange,
+body.dark-mode .btn-orange {
+    background-color: #e67e22 !important;
+    color: #ffffff !important;
+    border-color: #e67e22 !important;
+}
+
+html[data-theme='dark'] .btn-orange:hover,
+body.dark-mode .btn-orange:hover {
+    background-color: #d35400 !important;
+    border-color: #d35400 !important;
+}
+
 html[data-theme='dark'] .btn-rename,
 body.dark-mode .btn-rename {
     background-color: #ffc107 !important;
