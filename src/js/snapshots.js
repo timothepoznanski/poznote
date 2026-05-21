@@ -99,7 +99,7 @@
         if (!button) return;
 
         var previewLabel = button.getAttribute('data-preview-label') || tr('snapshot.modal.markdown_preview', 'Preview');
-        var sourceLabel = button.getAttribute('data-source-label') || tr('snapshot.modal.markdown_source', 'Source');
+        var sourceLabel = button.getAttribute('data-source-label') || tr('snapshot.modal.markdown_source', 'Source view');
         var label = isPreview ? sourceLabel : previewLabel;
         var icon = isPreview ? 'lucide-file-code' : 'lucide-eye';
 
