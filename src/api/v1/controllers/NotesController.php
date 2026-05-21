@@ -853,6 +853,8 @@ class NotesController {
                     }
                 }
             }
+
+            deleteNoteSnapshots($linkedId);
             
             // Delete linked note from database
             if ($workspace) {
@@ -897,6 +899,8 @@ class NotesController {
         if (file_exists($png_file_path)) {
             $png_deleted = unlink($png_file_path);
         }
+
+        deleteNoteSnapshots($noteId);
 
         // Delete database entry
         if ($workspace) {

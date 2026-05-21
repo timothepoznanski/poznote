@@ -174,6 +174,8 @@ class TrashController {
                         }
                     }
                 }
+
+                deleteNoteSnapshots((int) $row['id']);
                 
                 $deletedCount++;
             }
@@ -253,6 +255,8 @@ class TrashController {
             if (file_exists($filename)) {
                 @unlink($filename);
             }
+
+            deleteNoteSnapshots($noteId);
             
             // Delete database entry
             if ($workspace) {

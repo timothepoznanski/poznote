@@ -51,7 +51,7 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.",
+      "description": "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.\nOnly the 7 most recent snapshots are kept, including those created manually.",
       "loading": "Loading snapshot...",
       "history": "History",
       "markdown_preview": "Preview",

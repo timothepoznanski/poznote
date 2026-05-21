@@ -721,6 +721,40 @@ function getEntriesPath() { return getDataPath('entries'); }
 function getAttachmentsPath() { return getDataPath('attachments'); }
 function getBackupsPath() { return getDataPath('backups'); }
 
+function deleteNoteSnapshots($noteId) {
+    $noteId = (int) $noteId;
+    if ($noteId <= 0) {
+        return;
+    }
+
+    $snapshotDir = dirname(getEntriesPath()) . '/snapshots/' . $noteId;
+    if (!is_dir($snapshotDir)) {
+        return;
+    }
+
+    $deletePath = static function (string $path) use (&$deletePath): void {
+        if (is_dir($path)) {
+            $entries = scandir($path);
+            if ($entries !== false) {
+                foreach ($entries as $entry) {
+                    if ($entry === '.' || $entry === '..') {
+                        continue;
+                    }
+
+                    $deletePath($path . '/' . $entry);
+                }
+            }
+
+            @rmdir($path);
+            return;
+        }
+
+        @unlink($path);
+    };
+
+    $deletePath($snapshotDir);
+}
+
 /**
  * Get the appropriate file extension based on note type
  * @param string $type The note type (note, markdown, tasklist)
