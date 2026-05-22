@@ -4,6 +4,7 @@
  * Manages a browser-like tab bar inside #right_col.
  * - First note opened auto-creates a tab.
  * - Sidebar navigation updates the active tab's note.
+ * - Kanban folder views can live in the same tab bar as notes.
  * - "Open in new tab" creates an additional tab.
  * - Tabs are persisted per-workspace in localStorage.
  *
@@ -21,11 +22,14 @@
 
     // ── State ──────────────────────────────────────────────────────────────
 
-    /** @type {Array<{id: string, noteId: string, title: string}>} */
+    /** @type {Array<{id: string, type?: string, noteId?: string, folderId?: string, title: string}>} */
     var tabs = [];
 
     /** ID of the currently active tab, or null when no tabs exist. */
     var activeTabId = null;
+
+    /** Whether persisted tabs have been restored for this page load. */
+    var hasInitialized = false;
 
     /**
      * Set before calling loadNoteDirectly from switchToTab().
@@ -94,6 +98,46 @@
         return 'tab_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
     }
 
+    function _getTabType(tab) {
+        return tab && tab.type === 'kanban' ? 'kanban' : 'note';
+    }
+
+    function _isNoteTab(tab) {
+        return _getTabType(tab) === 'note';
+    }
+
+    function _isKanbanTab(tab) {
+        return _getTabType(tab) === 'kanban';
+    }
+
+    function _getDefaultKanbanTitle() {
+        return window.t ? window.t('notes_list.folder_actions.kanban_view', null, 'Kanban view') : 'Kanban view';
+    }
+
+    function _readFolderTitle(folderId, fallback) {
+        folderId = String(folderId);
+        var selectors = [
+            '.folder-list-click-action[data-folder-id="' + folderId + '"][data-folder-name]',
+            '[data-action="open-kanban-view"][data-folder-id="' + folderId + '"][data-folder-name]',
+            '[data-action="select-folder"][data-folder-id="' + folderId + '"][data-folder]'
+        ];
+
+        for (var i = 0; i < selectors.length; i++) {
+            var el = document.querySelector(selectors[i]);
+            if (!el) continue;
+            var name = el.getAttribute('data-folder-name') || el.getAttribute('data-folder');
+            if (name && name.trim()) return name.trim();
+        }
+
+        return fallback || '';
+    }
+
+    function _formatKanbanTitle(folderId, folderName) {
+        var folderTitle = folderName || _readFolderTitle(folderId, '');
+        var kanbanTitle = _getDefaultKanbanTitle();
+        return folderTitle ? kanbanTitle + ' - ' + folderTitle : kanbanTitle;
+    }
+
     /** Read a note's current title from the DOM, fallback to stored value. */
     function _readTitle(noteId, fallback) {
         var el = document.getElementById('inp' + noteId);
@@ -127,6 +171,15 @@
         var workspace = _getWorkspace();
         return 'index.php?workspace=' + encodeURIComponent(workspace) +
             '&note=' + encodeURIComponent(noteId);
+    }
+
+    function _buildKanbanUrl(folderId) {
+        var workspace = _getWorkspace();
+        var params = ['kanban=' + encodeURIComponent(folderId)];
+        if (workspace) {
+            params.push('workspace=' + encodeURIComponent(workspace));
+        }
+        return 'index.php?' + params.join('&');
     }
 
     function _isSearchFilteringActive() {
@@ -192,7 +245,7 @@
             var tab = _findTabById(tabEl.getAttribute('data-tab-id'));
             if (!tab) continue;
 
-            var shouldHideTab = hideFilteredTabs && !_isNoteVisibleInSidebar(tab.noteId);
+            var shouldHideTab = hideFilteredTabs && _isNoteTab(tab) && !_isNoteVisibleInSidebar(tab.noteId);
             tabEl.style.display = shouldHideTab ? 'none' : '';
         }
     }
@@ -209,12 +262,19 @@
 
         var bar = document.getElementById('app-tab-bar');
 
+        if (tabs.length === 0) {
+            if (bar) bar.style.display = 'none';
+            document.body.classList.remove('has-internal-tabs');
+            return;
+        }
+
         if (!_areTabsEnabled()) {
             if (bar) bar.style.display = 'none';
             document.body.classList.remove('has-internal-tabs');
             return;
         }
         document.body.classList.add('has-internal-tabs');
+        if (bar) bar.style.display = '';
         if (!bar) {
             bar = document.createElement('div');
             bar.id = 'app-tab-bar';
@@ -300,13 +360,16 @@
 
         tabs.forEach(function (tab) {
             var el = document.createElement('div');
-            el.className = 'app-tab' + (tab.id === activeTabId ? ' active' : '');
+            var tabType = _getTabType(tab);
+            var fallbackTitle = tabType === 'kanban' ? _getDefaultKanbanTitle() : _getDefaultTitle();
+            el.className = 'app-tab app-tab-' + tabType + (tab.id === activeTabId ? ' active' : '');
             el.setAttribute('data-tab-id', tab.id);
+            el.setAttribute('data-tab-type', tabType);
 
             var titleSpan = document.createElement('span');
             titleSpan.className = 'app-tab-title';
-            titleSpan.textContent = tab.title || _getDefaultTitle();
-            titleSpan.title = tab.title || _getDefaultTitle();
+            titleSpan.textContent = tab.title || fallbackTitle;
+            titleSpan.title = tab.title || fallbackTitle;
 
             el.appendChild(titleSpan);
 
@@ -333,6 +396,40 @@
         updateOpenInNewTabButtons();
     }
 
+    function _loadNoteTab(tab) {
+        if (!tab || !tab.noteId) return;
+        _pendingTabSwitch = tab.id;
+        var url = _buildUrl(tab.noteId);
+        if (typeof window.loadNoteDirectly === 'function') {
+            window.loadNoteDirectly(url, tab.noteId, null, null);
+        } else {
+            window.location.href = url;
+        }
+    }
+
+    function _loadKanbanTab(tab) {
+        if (!tab || !tab.folderId) return;
+        activeTabId = tab.id;
+        _pendingTabSwitch = null;
+        _saveToStorage();
+        render();
+
+        if (typeof window.openKanbanView === 'function') {
+            window.openKanbanView(tab.folderId, tab.title, { skipTabManager: true, fromTabManager: true });
+        } else {
+            window.location.href = _buildKanbanUrl(tab.folderId);
+        }
+    }
+
+    function _loadTabContent(tab) {
+        if (!tab) return;
+        if (_isKanbanTab(tab)) {
+            _loadKanbanTab(tab);
+            return;
+        }
+        _loadNoteTab(tab);
+    }
+
     // ── Public API ─────────────────────────────────────────────────────────
 
     /**
@@ -340,14 +437,15 @@
      * Creates a new tab for the given note and makes it active.
      * If the note is not currently displayed, loads it via AJAX.
      */
-    function openInNewTab(noteId, title) {
+    function openInNewTab(noteId, title, options) {
+        options = options || {};
         // Internal tabs are always enabled (except on mobile where this won't be called)
         noteId = String(noteId);
 
         // Check if tab already exists for this note
         var existingTab = null;
         for (var i = 0; i < tabs.length; i++) {
-            if (tabs[i].noteId === noteId) {
+            if (_isNoteTab(tabs[i]) && tabs[i].noteId === noteId) {
                 existingTab = tabs[i];
                 break;
             }
@@ -358,8 +456,17 @@
             return;
         }
 
-        var newTab = { id: _generateId(), noteId: noteId, title: title || _getDefaultTitle() };
-        tabs.push(newTab);
+        var newTab = { id: _generateId(), type: 'note', noteId: noteId, title: title || _getDefaultTitle() };
+        if (options.insertAfterActive && activeTabId) {
+            var activeIndex = _indexById(activeTabId);
+            if (activeIndex !== -1) {
+                tabs.splice(activeIndex + 1, 0, newTab);
+            } else {
+                tabs.push(newTab);
+            }
+        } else {
+            tabs.push(newTab);
+        }
         activeTabId = newTab.id;
         _saveToStorage();
         render();
@@ -378,6 +485,41 @@
     }
 
     /**
+     * Open a folder Kanban view in an internal tab.
+     * @param {string|number} folderId
+     * @param {string} folderName
+     */
+    function openKanbanTab(folderId, folderName) {
+        folderId = String(folderId);
+        var title = _formatKanbanTitle(folderId, folderName);
+
+        var existingTab = null;
+        for (var i = 0; i < tabs.length; i++) {
+            if (_isKanbanTab(tabs[i]) && tabs[i].folderId === folderId) {
+                existingTab = tabs[i];
+                break;
+            }
+        }
+
+        if (existingTab) {
+            if (folderName && existingTab.title !== title) {
+                existingTab.title = title;
+                _saveToStorage();
+                render();
+            }
+            switchToTab(existingTab.id);
+            return;
+        }
+
+        var newTab = { id: _generateId(), type: 'kanban', folderId: folderId, title: title };
+        tabs.push(newTab);
+        activeTabId = newTab.id;
+        _saveToStorage();
+        render();
+        _loadKanbanTab(newTab);
+    }
+
+    /**
      * Called when a tab is clicked.
      * Sets _pendingTabSwitch so _onNoteLoaded knows not to update tab state,
      * then loads the tab's note.
@@ -387,15 +529,7 @@
         if (!tab) return;
         if (tab.id === activeTabId) return; // already active
 
-        _pendingTabSwitch = tabId;
-
-        var url = _buildUrl(tab.noteId);
-        if (typeof window.loadNoteDirectly === 'function') {
-            window.loadNoteDirectly(url, tab.noteId, null, null);
-        } else {
-            // Fallback — full page navigation
-            window.location.href = url;
-        }
+        _loadTabContent(tab);
     }
 
     /**
@@ -404,9 +538,9 @@
      * The last remaining tab cannot be closed unless force is true.
      */
     function closeTab(tabId, force) {
-        if (!force && tabs.length <= 1) return; // cannot close the last tab via UI
+        if (!force && tabs.length <= 1) return false; // cannot close the last tab via UI
         var idx = _indexById(tabId);
-        if (idx === -1) return;
+        if (idx === -1) return false;
 
         var wasActive = (tabId === activeTabId);
         tabs.splice(idx, 1);
@@ -416,7 +550,7 @@
             activeTabId = null;
             _saveToStorage();
             render();
-            return;
+            return true;
         }
 
         if (wasActive) {
@@ -426,16 +560,18 @@
             activeTabId = nextTab.id;
             _saveToStorage();
             render();
-            // Load the tab's note
-            _pendingTabSwitch = nextTab.id;
-            var url = _buildUrl(nextTab.noteId);
-            if (typeof window.loadNoteDirectly === 'function') {
-                window.loadNoteDirectly(url, nextTab.noteId, null, null);
-            }
+            _loadTabContent(nextTab);
         } else {
             _saveToStorage();
             render();
         }
+
+        return true;
+    }
+
+    function closeActiveTab(force) {
+        if (!activeTabId) return false;
+        return closeTab(activeTabId, force);
     }
 
     /**
@@ -446,7 +582,7 @@
         noteId = String(noteId);
         // Iterate backwards to avoid index shifting issues
         for (var i = tabs.length - 1; i >= 0; i--) {
-            if (tabs[i].noteId === noteId) {
+            if (_isNoteTab(tabs[i]) && tabs[i].noteId === noteId) {
                 closeTab(tabs[i].id, true); // true = force close even if it's the last one
             }
         }
@@ -467,7 +603,7 @@
             activeTabId = _pendingTabSwitch;
             _pendingTabSwitch = null;
             var switchedTab = _findTabById(activeTabId);
-            if (switchedTab && switchedTab.noteId === noteId) {
+            if (switchedTab && _isNoteTab(switchedTab) && switchedTab.noteId === noteId) {
                 var sidebarTitleForSwitch = _readSidebarTitle(noteId);
                 var freshTitle = _readTitle(noteId, sidebarTitleForSwitch || switchedTab.title || _getDefaultTitle());
                 switchedTab.title = freshTitle;
@@ -484,7 +620,7 @@
         // If so, just activate it
         var existingTabWithNote = null;
         for (var i = 0; i < tabs.length; i++) {
-            if (tabs[i].noteId === noteId) {
+            if (_isNoteTab(tabs[i]) && tabs[i].noteId === noteId) {
                 existingTabWithNote = tabs[i];
                 break;
             }
@@ -498,12 +634,14 @@
             // Update the active tab to the new note
             var tab = _findTabById(activeTabId);
             if (tab) {
+                tab.type = 'note';
                 tab.noteId = noteId;
+                delete tab.folderId;
                 tab.title = title;
             }
         } else {
             // No active tab — create the first tab
-            var newTab = { id: _generateId(), noteId: noteId, title: title };
+            var newTab = { id: _generateId(), type: 'note', noteId: noteId, title: title };
             tabs.push(newTab);
             activeTabId = newTab.id;
         }
@@ -520,7 +658,7 @@
 
         var changed = false;
         tabs.forEach(function (tab) {
-            if (tab.noteId === noteId) {
+            if (_isNoteTab(tab) && tab.noteId === noteId) {
                 tab.title = e.target.value.trim() || _getDefaultTitle();
                 changed = true;
             }
@@ -535,20 +673,51 @@
     // ── Initialisation ─────────────────────────────────────────────────────
 
     function _init() {
+        hasInitialized = true;
+
         // Read current note from page config
         var currentNoteId = null;
+        var currentKanbanFolderId = null;
         try {
             var configEl = document.getElementById('current-note-data');
             if (configEl) {
                 var config = JSON.parse(configEl.textContent);
                 currentNoteId = config.noteId ? String(config.noteId) : null;
             }
+            var params = new URLSearchParams(window.location.search || '');
+            currentKanbanFolderId = params.get('kanban') ? String(params.get('kanban')) : null;
         } catch (e) { }
 
         // Try to restore from localStorage
         var stored = _loadFromStorage();
         if (stored && stored.tabs.length > 0) {
-            tabs = stored.tabs;
+            tabs = stored.tabs.filter(function (tab) {
+                if (!tab) return false;
+                if (!tab.id) tab.id = _generateId();
+
+                if (_isKanbanTab(tab)) {
+                    if (!tab.folderId) return false;
+                    tab.folderId = String(tab.folderId);
+                    delete tab.noteId;
+                    tab.title = tab.title || _formatKanbanTitle(tab.folderId, null);
+                    return true;
+                }
+
+                if (!tab.noteId) return false;
+                tab.type = 'note';
+                tab.noteId = String(tab.noteId);
+                delete tab.folderId;
+                tab.title = tab.title || _getDefaultTitle();
+                return true;
+            });
+
+            if (tabs.length === 0) {
+                activeTabId = null;
+                _saveToStorage();
+                render();
+                return;
+            }
+
             activeTabId = stored.activeTabId || null;
 
             // Validate activeTabId is still in the list
@@ -560,7 +729,7 @@
                 // Find a tab whose noteId matches the current URL note
                 var matchingTab = null;
                 for (var i = 0; i < tabs.length; i++) {
-                    if (tabs[i].noteId === currentNoteId) {
+                    if (_isNoteTab(tabs[i]) && tabs[i].noteId === currentNoteId) {
                         matchingTab = tabs[i];
                         break;
                     }
@@ -573,8 +742,30 @@
                     // Active tab's note doesn't match URL — update it
                     var activeTab = _findTabById(activeTabId);
                     if (activeTab) {
+                        activeTab.type = 'note';
                         activeTab.noteId = currentNoteId;
+                        delete activeTab.folderId;
                         activeTab.title = _readTitle(currentNoteId, _getDefaultTitle());
+                    }
+                }
+            } else if (currentKanbanFolderId) {
+                var matchingKanbanTab = null;
+                for (var j = 0; j < tabs.length; j++) {
+                    if (_isKanbanTab(tabs[j]) && tabs[j].folderId === currentKanbanFolderId) {
+                        matchingKanbanTab = tabs[j];
+                        break;
+                    }
+                }
+
+                if (matchingKanbanTab) {
+                    activeTabId = matchingKanbanTab.id;
+                } else if (activeTabId) {
+                    var activeKanbanTab = _findTabById(activeTabId);
+                    if (activeKanbanTab) {
+                        activeKanbanTab.type = 'kanban';
+                        activeKanbanTab.folderId = currentKanbanFolderId;
+                        delete activeKanbanTab.noteId;
+                        activeKanbanTab.title = _formatKanbanTitle(currentKanbanFolderId, null);
                     }
                 }
             }
@@ -591,7 +782,12 @@
         // No stored tabs — create first tab from the current note
         if (currentNoteId) {
             var title = _readTitle(currentNoteId, _getDefaultTitle());
-            tabs = [{ id: _generateId(), noteId: currentNoteId, title: title }];
+            tabs = [{ id: _generateId(), type: 'note', noteId: currentNoteId, title: title }];
+            activeTabId = tabs[0].id;
+            _saveToStorage();
+            render();
+        } else if (currentKanbanFolderId) {
+            tabs = [{ id: _generateId(), type: 'kanban', folderId: currentKanbanFolderId, title: _formatKanbanTitle(currentKanbanFolderId, null) }];
             activeTabId = tabs[0].id;
             _saveToStorage();
             render();
@@ -614,6 +810,7 @@
             var newDefaultTitle = _getDefaultTitle();
 
             tabs.forEach(function (tab) {
+                if (!_isNoteTab(tab)) return;
                 var match = defaultTitlePattern.exec(tab.title);
                 if (match) {
                     var number = match[1]; // Captured number, e.g., "10" from "New note (10)"
@@ -680,12 +877,31 @@
         // Load tabs for the new workspace (selectedWorkspace is now updated)
         var stored = _loadFromStorage();
         if (stored && stored.tabs.length > 0) {
-            tabs = stored.tabs;
+            tabs = stored.tabs.filter(function (tab) {
+                if (!tab) return false;
+                if (!tab.id) tab.id = _generateId();
+                if (_isKanbanTab(tab)) {
+                    if (!tab.folderId) return false;
+                    tab.folderId = String(tab.folderId);
+                    delete tab.noteId;
+                    tab.title = tab.title || _formatKanbanTitle(tab.folderId, null);
+                    return true;
+                }
+                if (!tab.noteId) return false;
+                tab.type = 'note';
+                tab.noteId = String(tab.noteId);
+                delete tab.folderId;
+                tab.title = tab.title || _getDefaultTitle();
+                return true;
+            });
             activeTabId = stored.activeTabId || null;
 
             // Validate activeTabId
-            if (activeTabId && !_findTabById(activeTabId)) {
+            if (activeTabId && !_findTabById(activeTabId) && tabs.length > 0) {
                 activeTabId = tabs[0].id;
+            }
+            if (tabs.length === 0) {
+                activeTabId = null;
             }
         }
 
@@ -697,16 +913,10 @@
             window.miniCalendar.refresh();
         }
 
-        // Load the active tab's note if we have one
+        // Load the active tab if we have one
         if (activeTabId) {
             var activeTab = _findTabById(activeTabId);
-            if (activeTab && activeTab.noteId) {
-                _pendingTabSwitch = activeTabId;
-                var url = _buildUrl(activeTab.noteId);
-                if (typeof window.loadNoteDirectly === 'function') {
-                    window.loadNoteDirectly(url, activeTab.noteId, null, null);
-                }
-            }
+            _loadTabContent(activeTab);
         }
     }
 
@@ -721,7 +931,16 @@
         if (!_areTabsEnabled()) return false;
         noteId = String(noteId);
         for (var i = 0; i < tabs.length; i++) {
-            if (tabs[i].noteId === noteId) return true;
+            if (_isNoteTab(tabs[i]) && tabs[i].noteId === noteId) return true;
+        }
+        return false;
+    }
+
+    function isKanbanOpen(folderId) {
+        if (!_areTabsEnabled()) return false;
+        folderId = String(folderId);
+        for (var i = 0; i < tabs.length; i++) {
+            if (_isKanbanTab(tabs[i]) && tabs[i].folderId === folderId) return true;
         }
         return false;
     }
@@ -754,7 +973,7 @@
                 var isOpen = false;
                 // Manual check instead of calling isNoteOpen to avoid potential scope issues
                 for (var i = 0; i < tabs.length; i++) {
-                    if (tabs[i].noteId === String(noteId)) {
+                    if (_isNoteTab(tabs[i]) && tabs[i].noteId === String(noteId)) {
                         isOpen = true;
                         break;
                     }
@@ -778,16 +997,38 @@
     function getActiveNoteId() {
         if (!activeTabId) return null;
         var tab = _findTabById(activeTabId);
-        return tab ? tab.noteId : null;
+        return tab && _isNoteTab(tab) ? tab.noteId : null;
+    }
+
+    function getActiveTabType() {
+        if (!activeTabId) return null;
+        var tab = _findTabById(activeTabId);
+        return tab ? _getTabType(tab) : null;
+    }
+
+    function getActiveKanbanFolderId() {
+        if (!activeTabId) return null;
+        var tab = _findTabById(activeTabId);
+        return tab && _isKanbanTab(tab) ? tab.folderId : null;
+    }
+
+    function isInitialized() {
+        return hasInitialized;
     }
 
     window.tabManager = {
         openInNewTab: openInNewTab,
+        openKanbanTab: openKanbanTab,
         switchToTab: switchToTab,
         closeTab: closeTab,
+        closeActiveTab: closeActiveTab,
         closeTabByNoteId: closeTabByNoteId,
         isNoteOpen: isNoteOpen,
+        isKanbanOpen: isKanbanOpen,
         getActiveNoteId: getActiveNoteId,
+        getActiveTabType: getActiveTabType,
+        getActiveKanbanFolderId: getActiveKanbanFolderId,
+        isInitialized: isInitialized,
         render: render,
         updateUI: updateOpenInNewTabButtons, // Expose for external calls
         _onNoteLoaded: _onNoteLoaded,

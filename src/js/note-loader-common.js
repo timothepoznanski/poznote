@@ -333,9 +333,13 @@ function loadNoteCommon(url, noteId, options) {
 
                                 // Clear Kanban view flags if requested
                                 if (options.clearKanbanFlags) {
-                                    window._isKanbanViewActive = false;
-                                    window._kanbanFolderId = null;
-                                    window._originalRightColContent = null;
+                                    if (typeof window.resetKanbanViewState === 'function') {
+                                        window.resetKanbanViewState();
+                                    } else {
+                                        window._isKanbanViewActive = false;
+                                        window._kanbanFolderId = null;
+                                        window._originalRightColContent = null;
+                                    }
                                 }
 
                                 // Update URL (skip if coming from popstate)
