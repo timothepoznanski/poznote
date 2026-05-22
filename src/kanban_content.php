@@ -173,7 +173,7 @@ try {
     /**
      * Render task rows in a scrollable Kanban card preview.
      */
-    function renderKanbanTasklistPreview($content, $visibleRows = 5, $noteId = null) {
+    function renderKanbanTasklistPreview($content, $visibleRows = 3, $noteId = null) {
         $tasks = getKanbanTasklistPreviewTasks($content);
         if ($tasks === null) {
             return false;
@@ -244,7 +244,7 @@ try {
 
             <div class="kanban-card-snippet<?php echo $isTasklistPreview ? ' kanban-card-tasklist' : ''; ?>">
                 <?php 
-                if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 5, $note['kanban_preview_note_id'] ?? $note['id'])) {
+                if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 3, $note['kanban_preview_note_id'] ?? $note['id'])) {
                     $snippet = strip_tags($note['entry'] ?? '');
                     $snippet = html_entity_decode($snippet);
                     echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
