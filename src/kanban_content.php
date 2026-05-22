@@ -66,12 +66,15 @@ try {
 
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
-            $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+            $targetStmt = $con->prepare("SELECT type, tags FROM entries WHERE id = ? AND trash = 0");
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
             $contentType = $targetNote['type'] ?? 'note';
             $previewNoteId = $targetNote ? $note['linked_note_id'] : $previewNoteId;
             $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $contentType) : '';
+            if ($targetNote && trim((string) ($note['tags'] ?? '')) === '' && trim((string) ($targetNote['tags'] ?? '')) !== '') {
+                $note['tags'] = $targetNote['tags'];
+            }
         } else {
             $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
         }
@@ -130,6 +133,20 @@ try {
     }
 
     /**
+     * Parse note tags for Kanban badges. Tags are stored comma-separated, but older UI values may be space-separated.
+     */
+    function getKanbanTags($tags) {
+        $tags = trim((string) ($tags ?? ''));
+        if ($tags === '') {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', preg_split('/\s*,\s*|\s+/', $tags)), static function ($tag) {
+            return $tag !== '';
+        }));
+    }
+
+    /**
      * Decode normalized tasklist content for compact Kanban previews.
      */
     function getKanbanTasklistPreviewTasks($content) {
@@ -154,19 +171,19 @@ try {
     }
 
     /**
-     * Render up to five task rows in a Kanban card.
+     * Render task rows in a scrollable Kanban card preview.
      */
-    function renderKanbanTasklistPreview($content, $limit = 5, $noteId = null) {
+    function renderKanbanTasklistPreview($content, $visibleRows = 5, $noteId = null) {
         $tasks = getKanbanTasklistPreviewTasks($content);
         if ($tasks === null) {
             return false;
         }
 
-        $limit = max(1, (int) $limit);
-        $visibleTasks = array_slice($tasks, 0, $limit, true);
+        $visibleRows = max(1, (int) $visibleRows);
+        $maxHeight = ($visibleRows * 20) + (($visibleRows - 1) * 4);
 
-        echo '<div class="kanban-tasklist-preview' . (empty($visibleTasks) ? ' is-empty' : '') . '" data-task-note-id="' . (int) $noteId . '">';
-        foreach ($visibleTasks as $taskIndex => $task) {
+        echo '<div class="kanban-tasklist-preview' . (empty($tasks) ? ' is-empty' : '') . '" data-task-note-id="' . (int) $noteId . '" style="--kanban-task-preview-max-height: ' . (int) $maxHeight . 'px;">';
+        foreach ($tasks as $taskIndex => $task) {
             $text = $task['text'] ?? ($task['content'] ?? '');
             if (!is_scalar($text)) {
                 $text = '';
@@ -183,11 +200,6 @@ try {
             echo '<span class="kanban-task-preview-text">' . htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
             echo '</label>';
         }
-
-        $remaining = count($tasks) - count($visibleTasks);
-        if ($remaining > 0) {
-            echo '<div class="kanban-task-preview-more">+' . (int) $remaining . '</div>';
-        }
         echo '</div>';
 
         return true;
@@ -198,29 +210,30 @@ try {
      */
     function renderKanbanCard($note, $folderId) {
         $isTasklistPreview = (($note['kanban_preview_type'] ?? ($note['type'] ?? 'note')) === 'tasklist');
+        $kanbanTags = getKanbanTags($note['tags'] ?? '');
+        $kanbanDate = formatKanbanDate($note['updated'] ?? '');
         ?>
         <div class="kanban-card" 
              data-note-id="<?php echo $note['id']; ?>" 
              data-folder-id="<?php echo $folderId; ?>"
              draggable="true">
-            <?php if (!empty($note['tags'])): ?>
-            <div class="kanban-card-tags">
-                <?php 
-                $tags = explode(',', $note['tags']);
-                foreach ($tags as $tag): 
-                    $tag = trim($tag);
-                    if ($tag === '') continue;
-                ?>
-                    <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
-                <?php endforeach; ?>
+            <?php if ($kanbanDate !== '' || !empty($kanbanTags)): ?>
+            <div class="kanban-card-topline">
+                <?php if ($kanbanDate !== ''): ?>
+                <span class="kanban-card-date">
+                    <?php echo htmlspecialchars($kanbanDate, ENT_QUOTES); ?>
+                </span>
+                <?php endif; ?>
+
+                <?php if (!empty($kanbanTags)): ?>
+                <div class="kanban-card-tags">
+                    <?php foreach ($kanbanTags as $tag): ?>
+                        <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
-
-            <div class="kanban-card-meta">
-                <span class="kanban-card-date">
-                    <?php echo htmlspecialchars(formatKanbanDate($note['updated'] ?? ''), ENT_QUOTES); ?>
-                </span>
-            </div>
 
             <div class="kanban-card-title">
                 <?php 
