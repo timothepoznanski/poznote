@@ -111,6 +111,18 @@ body.dark-mode .kanban-card-snippet {
     color: var(--dm-text-muted);
 }
 
+html[data-theme='dark'] .kanban-task-preview-item,
+body.dark-mode .kanban-task-preview-item {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-task-preview-item.completed .kanban-task-preview-text,
+body.dark-mode .kanban-task-preview-item.completed .kanban-task-preview-text,
+html[data-theme='dark'] .kanban-task-preview-more,
+body.dark-mode .kanban-task-preview-more {
+    color: #808080;
+}
+
 html[data-theme='dark'] .kanban-card-meta,
 body.dark-mode .kanban-card-meta {
     color: #808080;

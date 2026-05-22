@@ -61,19 +61,28 @@ try {
      * Modifies the note array in-place, adding an 'entry' key.
      */
     $loadNoteSnippet = function (&$note) use ($con) {
+        $contentType = $note['type'] ?? 'note';
+
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
             $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
-            $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note') : '';
+            $contentType = $targetNote['type'] ?? 'note';
+            $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $contentType) : '';
         } else {
             $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
         }
 
+        $note['kanban_preview_type'] = $contentType;
+
         if ($filename && file_exists($filename)) {
             $content = file_get_contents($filename);
-            $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+            if ($contentType === 'tasklist') {
+                $note['entry'] = resolveTasklistStoredContent($content, '');
+            } else {
+                $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+            }
         } else {
             $note['entry'] = '';
         }
@@ -118,9 +127,72 @@ try {
     }
 
     /**
+     * Decode normalized tasklist content for compact Kanban previews.
+     */
+    function getKanbanTasklistPreviewTasks($content) {
+        $normalized = resolveTasklistStoredContent((string) ($content ?? ''), '');
+        $tasks = json_decode($normalized, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($tasks)) {
+            return null;
+        }
+
+        if (isset($tasks['tasks']) && is_array($tasks['tasks'])) {
+            $tasks = $tasks['tasks'];
+        }
+
+        if ($tasks !== [] && !isset($tasks[0])) {
+            return null;
+        }
+
+        return array_values(array_filter($tasks, static function ($task) {
+            return is_array($task);
+        }));
+    }
+
+    /**
+     * Render up to five task rows in a Kanban card.
+     */
+    function renderKanbanTasklistPreview($content, $limit = 5) {
+        $tasks = getKanbanTasklistPreviewTasks($content);
+        if ($tasks === null) {
+            return false;
+        }
+
+        $limit = max(1, (int) $limit);
+        $visibleTasks = array_slice($tasks, 0, $limit);
+
+        echo '<div class="kanban-tasklist-preview' . (empty($visibleTasks) ? ' is-empty' : '') . '">';
+        foreach ($visibleTasks as $task) {
+            $text = $task['text'] ?? ($task['content'] ?? '');
+            if (!is_scalar($text)) {
+                $text = '';
+            }
+
+            $completed = !empty($task['completed']) || !empty($task['checked']) || !empty($task['done']);
+            $important = !empty($task['important']);
+            $className = 'kanban-task-preview-item' . ($completed ? ' completed' : '') . ($important ? ' important' : '');
+
+            echo '<div class="' . $className . '">';
+            echo '<input type="checkbox" disabled tabindex="-1"' . ($completed ? ' checked' : '') . '>';
+            echo '<span class="kanban-task-preview-text">' . htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
+            echo '</div>';
+        }
+
+        $remaining = count($tasks) - count($visibleTasks);
+        if ($remaining > 0) {
+            echo '<div class="kanban-task-preview-more">+' . (int) $remaining . '</div>';
+        }
+        echo '</div>';
+
+        return true;
+    }
+
+    /**
      * Render a single kanban card HTML for a note.
      */
     function renderKanbanCard($note, $folderId) {
+        $isTasklistPreview = (($note['kanban_preview_type'] ?? ($note['type'] ?? 'note')) === 'tasklist');
         ?>
         <div class="kanban-card" 
              data-note-id="<?php echo $note['id']; ?>" 
@@ -152,11 +224,13 @@ try {
                 ?>
             </div>
 
-            <div class="kanban-card-snippet">
+            <div class="kanban-card-snippet<?php echo $isTasklistPreview ? ' kanban-card-tasklist' : ''; ?>">
                 <?php 
-                $snippet = strip_tags($note['entry'] ?? '');
-                $snippet = html_entity_decode($snippet);
-                echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 5)) {
+                    $snippet = strip_tags($note['entry'] ?? '');
+                    $snippet = html_entity_decode($snippet);
+                    echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                }
                 ?>
             </div>
         </div>

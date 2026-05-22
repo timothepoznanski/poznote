@@ -304,6 +304,65 @@
     word-break: break-word;
 }
 
+.kanban-card-tasklist {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: initial;
+}
+
+.kanban-tasklist-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.kanban-tasklist-preview.is-empty {
+    display: none;
+}
+
+.kanban-task-preview-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+    color: #475569;
+}
+
+.kanban-task-preview-item input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    margin: 2px 0 0;
+    accent-color: #6366f1;
+    pointer-events: none;
+}
+
+.kanban-task-preview-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kanban-task-preview-item.completed .kanban-task-preview-text {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.kanban-task-preview-item.important .kanban-task-preview-text {
+    font-weight: 600;
+}
+
+.kanban-task-preview-more {
+    padding-left: 20px;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #64748b;
+}
+
 .kanban-card-tags {
     display: flex;
     flex-wrap: wrap;
