@@ -260,6 +260,9 @@ try {
     <div id="kanban-view-container" class="kanban-inline-view" data-folder-id="<?php echo $folder_id; ?>">
         <!-- Kanban Header -->
         <div class="kanban-inline-header">
+            <button class="kanban-scroll-btn-header left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
+                <i class="lucide lucide-chevron-left"></i>
+            </button>
             <h1 class="kanban-title">
                 <?php 
                 $pFolderIconRaw = $parentFolder['icon'] ?? null;
@@ -279,6 +282,9 @@ try {
                       style="cursor: pointer;"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
             </h1>
             <div class="kanban-header-actions">
+                <button class="kanban-scroll-btn-header right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
+                    <i class="lucide lucide-chevron-right"></i>
+                </button>
                 <button class="kanban-add-column-btn" 
                         data-action="create-kanban-column" 
                         data-parent-id="<?php echo $folder_id; ?>" 
@@ -290,14 +296,6 @@ try {
 
         <!-- Kanban Board Wrapper -->
         <div class="kanban-board-wrapper">
-            <!-- Scroll Buttons -->
-            <button class="kanban-scroll-btn left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
-                <i class="lucide lucide-chevron-left"></i>
-            </button>
-            <button class="kanban-scroll-btn right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
-                <i class="lucide lucide-chevron-right"></i>
-            </button>
-
             <!-- Kanban Board -->
             <div class="kanban-board" id="kanbanBoard">
             

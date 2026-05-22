@@ -139,12 +139,25 @@ body.dark-mode .kanban-tag {
 html[data-theme='dark'] .kanban-scroll-btn,
 body.dark-mode .kanban-scroll-btn {
     background: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn:hover,
 body.dark-mode .kanban-scroll-btn:hover {
+    background: var(--dm-border);
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .kanban-scroll-btn-header,
+body.dark-mode .kanban-scroll-btn-header {
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-scroll-btn-header:hover,
+body.dark-mode .kanban-scroll-btn-header:hover {
     background: var(--dm-border);
     color: #ffffff;
 }

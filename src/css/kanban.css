@@ -583,6 +583,35 @@
     gap: 12px;
 }
 
+.kanban-scroll-btn-header {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-secondary, #f1f5f9);
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.kanban-scroll-btn-header.is-unavailable,
+.kanban-scroll-btn-header:disabled {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.kanban-scroll-btn-header:hover {
+    background: var(--bg-tertiary, #e2e8f0);
+    color: var(--text-primary, #1e293b);
+    border-color: #64748b;
+}
+
 .kanban-add-column-btn {
     display: flex;
     align-items: center;
@@ -666,25 +695,7 @@
 }
 
 .kanban-scroll-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--bg-primary, #ffffff);
-    color: var(--text-primary, #1e293b);
-    border: 1px solid var(--border-color, #e2e8f0);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 101;
-    transition: all 0.2s ease;
-    opacity: 0;
-    pointer-events: none;
-    font-size: 0.7rem;
+    display: none;
 }
 
 .kanban-board-wrapper:hover .kanban-scroll-btn {
@@ -739,6 +750,10 @@ body.dark-mode .kanban-inline-header .kanban-title {
 /* Responsive for inline view */
 @media (max-width: 800px) {
     .kanban-scroll-btn {
+        display: none !important;
+    }
+
+    .kanban-scroll-btn-header {
         display: none !important;
     }
 

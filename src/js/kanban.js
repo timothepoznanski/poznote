@@ -10,6 +10,8 @@
     let draggedCard = null;
     let draggedFromFolderId = null;
     let pointerStartedInTaskPreview = false;
+    let trackedKanbanBoard = null;
+    let kanbanScrollResizeObserver = null;
 
     function isPublicWorkspaceReadOnly() {
         return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
@@ -30,6 +32,7 @@
      */
     function init() {
         syncKanbanCardDragState();
+        bindKanbanScrollButtons();
 
         // Document-level delegation ensures listeners work even when content is replaced
         if (window._kanbanInitialized) {
@@ -289,8 +292,10 @@
 
         // Kanban Scroll Buttons
         document.addEventListener('click', (e) => {
-            const btn = e.target.closest('.kanban-scroll-btn');
+            const btn = e.target.closest('.kanban-scroll-btn, .kanban-scroll-btn-header');
             if (!btn) return;
+
+            if (btn.disabled) return;
 
             const board = document.getElementById('kanbanBoard');
             if (!board) return;
@@ -301,6 +306,8 @@
             } else if (btn.classList.contains('right')) {
                 board.scrollBy({ left: scrollAmount, behavior: 'smooth' });
             }
+
+            requestAnimationFrame(syncKanbanScrollButtons);
         });
 
         // Kanban Add Card Button
@@ -421,6 +428,73 @@
             console.error('Kanban API error:', error);
             return false;
         }
+    }
+
+    function setKanbanScrollButtonState(button, isAvailable) {
+        if (!button) return;
+
+        button.disabled = !isAvailable;
+        button.classList.toggle('is-unavailable', !isAvailable);
+        button.setAttribute('aria-hidden', isAvailable ? 'false' : 'true');
+        button.tabIndex = isAvailable ? 0 : -1;
+    }
+
+    function syncKanbanScrollButtons() {
+        const board = document.getElementById('kanbanBoard');
+        const leftButton = document.getElementById('kanbanScrollLeft');
+        const rightButton = document.getElementById('kanbanScrollRight');
+
+        if (!leftButton && !rightButton) {
+            return;
+        }
+
+        if (!board) {
+            setKanbanScrollButtonState(leftButton, false);
+            setKanbanScrollButtonState(rightButton, false);
+            return;
+        }
+
+        const maxScrollLeft = Math.max(0, board.scrollWidth - board.clientWidth);
+        const tolerance = 2;
+        const canScroll = maxScrollLeft > tolerance;
+        const canScrollLeft = canScroll && board.scrollLeft > tolerance;
+        const canScrollRight = canScroll && board.scrollLeft < (maxScrollLeft - tolerance);
+
+        setKanbanScrollButtonState(leftButton, canScrollLeft);
+        setKanbanScrollButtonState(rightButton, canScrollRight);
+    }
+
+    function bindKanbanScrollButtons() {
+        const board = document.getElementById('kanbanBoard');
+
+        if (trackedKanbanBoard === board) {
+            requestAnimationFrame(syncKanbanScrollButtons);
+            return;
+        }
+
+        if (trackedKanbanBoard) {
+            trackedKanbanBoard.removeEventListener('scroll', syncKanbanScrollButtons);
+        }
+
+        if (kanbanScrollResizeObserver) {
+            kanbanScrollResizeObserver.disconnect();
+            kanbanScrollResizeObserver = null;
+        }
+
+        trackedKanbanBoard = board;
+
+        if (trackedKanbanBoard) {
+            trackedKanbanBoard.addEventListener('scroll', syncKanbanScrollButtons, { passive: true });
+
+            if (typeof ResizeObserver === 'function') {
+                kanbanScrollResizeObserver = new ResizeObserver(() => {
+                    syncKanbanScrollButtons();
+                });
+                kanbanScrollResizeObserver.observe(trackedKanbanBoard);
+            }
+        }
+
+        requestAnimationFrame(syncKanbanScrollButtons);
     }
 
     function getTaskByIdOrIndex(tasks, taskId, taskIndex) {
@@ -612,6 +686,9 @@
             console.error(message);
         }
     }
+
+    window.bindKanbanScrollButtons = bindKanbanScrollButtons;
+    window.syncKanbanScrollButtons = syncKanbanScrollButtons;
 
     // Auto-init on load
     if (document.readyState === 'loading') {
