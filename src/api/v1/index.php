@@ -482,6 +482,11 @@ $router->post('/folders/move-files', function($params) use ($foldersController) 
     $foldersController->moveFiles();
 });
 
+// Reorder folders before/after a sibling
+$router->post('/folders/reorder', function($params) use ($foldersController) {
+    $foldersController->reorder();
+});
+
 // Create a Kanban structure
 $router->post('/folders/kanban-structure', function($params) use ($foldersController) {
     $foldersController->createKanbanStructure();

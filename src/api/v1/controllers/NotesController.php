@@ -142,7 +142,7 @@ class NotesController {
      * Helper to list folders (used when get_folders param is set)
      */
     private function listFolders(?string $workspace): void {
-        $sql = "SELECT id, name, parent_id FROM folders";
+        $sql = "SELECT id, name, parent_id, display_order FROM folders";
         $params = [];
         
         if ($workspace) {
@@ -150,7 +150,7 @@ class NotesController {
             $params[] = $workspace;
         }
         
-        $sql .= " ORDER BY name";
+        $sql .= " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE";
         
         $stmt = $this->con->prepare($sql);
         $stmt->execute($params);

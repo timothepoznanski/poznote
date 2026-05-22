@@ -177,6 +177,7 @@ try {
         name TEXT NOT NULL,
         workspace TEXT DEFAULT "Poznote",
         parent_id INTEGER DEFAULT NULL,
+        display_order INTEGER DEFAULT 0,
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
     )');
@@ -253,7 +254,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 11;
+    $CURRENT_SCHEMA_VERSION = 12;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -301,6 +302,9 @@ try {
             }
             if (!in_array('sort_setting', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN sort_setting TEXT");
+            }
+            if (!in_array('display_order', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN display_order INTEGER DEFAULT 0");
             }
         } catch (Exception $e) {
             error_log('Could not add missing columns to folders: ' . $e->getMessage());
@@ -413,6 +417,7 @@ try {
                     WHERE parent_id IS NULL');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_workspace ON folders(workspace)');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_parent_id ON folders(parent_id)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_parent_order ON folders(workspace, parent_id, display_order)');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_folders_name ON folders(name COLLATE NOCASE)');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_trash_workspace ON entries(trash, workspace)');
         $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_updated ON entries(updated DESC)');

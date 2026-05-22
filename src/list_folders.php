@@ -11,7 +11,7 @@ require_once 'version_helper.php';
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
 
 // Build query to get all folders
-$select_query = "SELECT f.id, f.name, f.icon, f.icon_color, 
+$select_query = "SELECT f.id, f.name, f.icon, f.icon_color, f.display_order,
                  (SELECT COUNT(*) FROM entries e WHERE e.folder_id = f.id AND e.trash = 0) as note_count
                  FROM folders f";
 
@@ -23,7 +23,7 @@ if (!empty($workspace)) {
 	$search_params[] = $workspace;
 }
 
-$select_query .= " ORDER BY f.name";
+$select_query .= " ORDER BY CASE WHEN f.display_order > 0 THEN 0 ELSE 1 END, f.display_order, f.name COLLATE NOCASE";
 
 $stmt = $con->prepare($select_query);
 $stmt->execute($search_params);

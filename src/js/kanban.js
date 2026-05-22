@@ -266,6 +266,15 @@
             }
 
             const noteId = card.dataset.noteId;
+            const titleEl = card.querySelector('.kanban-card-title');
+            const noteTitle = titleEl && titleEl.textContent ? titleEl.textContent.trim() : '';
+
+            if (window.innerWidth > 800 && window.tabManager && typeof window.tabManager.openInNewTab === 'function') {
+                e.preventDefault();
+                e.stopPropagation();
+                window.tabManager.openInNewTab(noteId, noteTitle, { insertAfterActive: true });
+                return;
+            }
 
             // Get workspace
             let workspace = '';

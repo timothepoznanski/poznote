@@ -18,12 +18,13 @@ $currentLang = getUserLanguage();
 // ── Fetch shared folders server-side for the unified shares page ──
 $workspace = $pageWorkspace;
 
-$query = "SELECT id, name, parent_id, workspace, icon FROM folders";
+$query = "SELECT id, name, parent_id, workspace, icon, display_order FROM folders";
 $params = [];
 if (!empty($workspace)) {
 	$query .= " WHERE workspace = ?";
 	$params[] = $workspace;
 }
+$query .= " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE";
 $stmt = $con->prepare($query);
 $stmt->execute($params);
 $allFolders = [];
@@ -52,7 +53,7 @@ foreach ($allFolders as $fid => $f) {
 			break;
 		}
 		if (!isset($allFolders[$parentId])) {
-			$stmtP = $con->prepare("SELECT id, name, parent_id, workspace, icon FROM folders WHERE id = ?");
+			$stmtP = $con->prepare("SELECT id, name, parent_id, workspace, icon, display_order FROM folders WHERE id = ?");
 			$stmtP->execute([$parentId]);
 			$pCell = $stmtP->fetch(PDO::FETCH_ASSOC);
 			if ($pCell) {

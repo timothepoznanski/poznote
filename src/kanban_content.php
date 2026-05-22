@@ -47,7 +47,7 @@ try {
     }
 
     // Get subfolders
-    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE parent_id = ? ORDER BY name");
+    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE parent_id = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE");
     $stmt->execute([$folder_id]);
     $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

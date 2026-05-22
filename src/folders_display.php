@@ -42,7 +42,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -56,7 +56,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             'icon' => $folder_row['icon'] ?? null,
             'icon_color' => $folder_row['icon_color'] ?? null,
             'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0),
-            'sort_setting' => $folder_row['sort_setting'] ?? null
+            'sort_setting' => $folder_row['sort_setting'] ?? null,
+            'display_order' => (int)($folder_row['display_order'] ?? 0)
         ];
     }
     
@@ -75,6 +76,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
         $folderIconColor = null;
         $kanbanEnabled = 0;
         $sortSetting = null;
+        $displayOrder = 0;
         
         if (isset($folders_cache[$folderId])) {
             $folderName = $folders_cache[$folderId]['name'];
@@ -82,6 +84,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             $folderIconColor = $folders_cache[$folderId]['icon_color'];
             $kanbanEnabled = $folders_cache[$folderId]['kanban_enabled'];
             $sortSetting = $folders_cache[$folderId]['sort_setting'];
+            $displayOrder = $folders_cache[$folderId]['display_order'];
         }
 
         if (!isset($folders[$folderId])) {
@@ -92,6 +95,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
                 'icon_color' => $folderIconColor,
                 'kanban_enabled' => $kanbanEnabled,
                 'sort_setting' => $sortSetting,
+                'display_order' => $displayOrder,
                 'notes' => []
             ];
         }
@@ -168,13 +172,13 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
  * @return array Updated folders array including empty folders
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
         $params[] = $workspace_filter;
     }
-    $folders_sql .= " ORDER BY name";
+    $folders_sql .= " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE";
 
     $empty_folders_query = $con->prepare($folders_sql);
     $empty_folders_query->execute($params);
@@ -185,6 +189,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderIconColor = $folder_row['icon_color'] ?? null;
         $kanbanEnabled = (int)($folder_row['kanban_enabled'] ?? 0);
         $sortSetting = $folder_row['sort_setting'] ?? null;
+        $displayOrder = (int)($folder_row['display_order'] ?? 0);
 
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
@@ -194,6 +199,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'icon_color' => $folderIconColor,
                 'kanban_enabled' => $kanbanEnabled,
                 'sort_setting' => $sortSetting,
+                'display_order' => $displayOrder,
                 'notes' => []
             ];
         } else {
@@ -202,6 +208,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
             $folders[$folderId]['icon_color'] = $folderIconColor;
             $folders[$folderId]['kanban_enabled'] = $kanbanEnabled;
             $folders[$folderId]['sort_setting'] = $sortSetting;
+            $folders[$folderId]['display_order'] = $displayOrder;
         }
     }
 
@@ -230,6 +237,7 @@ function ensureFavoritesFolder($folders) {
         $folders['favorites'] = [
             'id' => null,  // No real DB ID for Favorites pseudo-folder
             'name' => FAVORITES_FOLDER_NAME,
+            'display_order' => 0,
             'notes' => []
         ];
     }
@@ -238,7 +246,7 @@ function ensureFavoritesFolder($folders) {
 }
 
 /**
- * Sort folders (Favorites first, then alphabetically by name)
+ * Sort folders (Favorites first, then saved display order, then alphabetically by name)
  * Works with folder arrays containing 'id' and 'name'
  * 
  * @param array $folders Folders to sort
@@ -250,9 +258,16 @@ function sortFolders($folders) {
         $folderB = $folders[$b];
         $nameA = $folderA['name'];
         $nameB = $folderB['name'];
+        $orderA = isset($folderA['display_order']) ? (int)$folderA['display_order'] : 0;
+        $orderB = isset($folderB['display_order']) ? (int)$folderB['display_order'] : 0;
         
         if ($nameA === FAVORITES_FOLDER_NAME) return -1;
         if ($nameB === FAVORITES_FOLDER_NAME) return 1;
+        if ($orderA > 0 || $orderB > 0) {
+            if ($orderA <= 0) return 1;
+            if ($orderB <= 0) return -1;
+            if ($orderA !== $orderB) return $orderA <=> $orderB;
+        }
         return strcasecmp($nameA, $nameB);
     });
     
@@ -564,23 +579,23 @@ function buildFolderHierarchy($folders) {
 }
 
 /**
- * Enrich folders with parent_id from database
- * OPTIMIZED: Uses a single query to fetch all parent_ids at once
+ * Enrich folders with parent_id and display_order from database
+ * OPTIMIZED: Uses a single query to fetch all metadata at once
  * 
  * @param array $folders Folders array
  * @param PDO $con Database connection
  * @param string|null $workspace_filter Optional workspace filter
- * @return array Folders with parent_id enriched
+ * @return array Folders with parent_id and display_order enriched
  */
 function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
     if (empty($folders)) {
         return $folders;
     }
     
-    // Pre-load all folder parent_ids in one query
+    // Pre-load all folder metadata in one query
     $parentIdCache = [];
     try {
-        $query = "SELECT id, parent_id FROM folders";
+        $query = "SELECT id, parent_id, display_order FROM folders";
         if ($workspace_filter) {
             $query .= " WHERE workspace = ?";
             $stmt = $con->prepare($query);
@@ -589,15 +604,23 @@ function enrichFoldersWithParentId($folders, $con, $workspace_filter) {
             $stmt = $con->query($query);
         }
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $parentIdCache[(int)$row['id']] = $row['parent_id'] !== null ? (int)$row['parent_id'] : null;
+            $parentIdCache[(int)$row['id']] = [
+                'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
+                'display_order' => (int)($row['display_order'] ?? 0)
+            ];
         }
     } catch (Exception $e) {
         // On error, leave parent_id as null
     }
     
-    // Enrich folders with cached parent_ids
+    // Enrich folders with cached metadata
     foreach ($folders as $folderId => &$folderData) {
-        $folderData['parent_id'] = isset($parentIdCache[(int)$folderId]) ? $parentIdCache[(int)$folderId] : null;
+        if (isset($parentIdCache[(int)$folderId])) {
+            $folderData['parent_id'] = $parentIdCache[(int)$folderId]['parent_id'];
+            $folderData['display_order'] = $parentIdCache[(int)$folderId]['display_order'];
+        } else {
+            $folderData['parent_id'] = null;
+        }
     }
     
     return $folders;

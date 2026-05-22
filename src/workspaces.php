@@ -432,8 +432,8 @@ if ($_POST) {
             // preserving the full parent-child hierarchy.
             try {
                 // Fetch all source folders with their hierarchy
-                $sourceFolders = []; // id => [name, parent_id, icon, icon_color]
-                $srcStmt = $con->prepare('SELECT id, name, parent_id, icon, icon_color FROM folders WHERE workspace = ?');
+                $sourceFolders = []; // id => [name, parent_id, icon, icon_color, display_order]
+                $srcStmt = $con->prepare('SELECT id, name, parent_id, icon, icon_color, display_order FROM folders WHERE workspace = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE');
                 $srcStmt->execute([$name]);
                 while ($row = $srcStmt->fetch(PDO::FETCH_ASSOC)) {
                     $sourceFolders[(int)$row['id']] = [
@@ -441,6 +441,7 @@ if ($_POST) {
                         'parent_id'  => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
                         'icon'       => $row['icon'],
                         'icon_color' => $row['icon_color'],
+                        'display_order' => (int)($row['display_order'] ?? 0),
                     ];
                 }
 
@@ -470,7 +471,7 @@ if ($_POST) {
                 }
 
                 $folderIdMap     = []; // source_id => target_id
-                $insertFolder    = $con->prepare('INSERT OR IGNORE INTO folders (name, workspace, parent_id, icon, icon_color) VALUES (?, ?, ?, ?, ?)');
+                $insertFolder    = $con->prepare('INSERT OR IGNORE INTO folders (name, workspace, parent_id, icon, icon_color, display_order) VALUES (?, ?, ?, ?, ?, ?)');
                 $getExistingId   = $con->prepare('SELECT id FROM folders WHERE name = ? AND workspace = ? AND (parent_id IS ? OR parent_id = ?)');
                 $lastInsertStmt  = null;
 
@@ -490,7 +491,7 @@ if ($_POST) {
                     if ($existingId !== false) {
                         $folderIdMap[$srcId] = (int)$existingId;
                     } else {
-                        $insertFolder->execute([$data['name'], $target, $tgtParentId, $data['icon'], $data['icon_color']]);
+                        $insertFolder->execute([$data['name'], $target, $tgtParentId, $data['icon'], $data['icon_color'], $data['display_order']]);
                         $newId = (int)$con->lastInsertId();
                         if ($newId > 0) {
                             $folderIdMap[$srcId] = $newId;
