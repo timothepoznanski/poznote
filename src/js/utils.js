@@ -2630,6 +2630,10 @@ function openKanbanView(folderId, folderName) {
         .then(function (html) {
             rightCol.innerHTML = html;
 
+            if (typeof window.bindKanbanScrollButtons === 'function') {
+                window.bindKanbanScrollButtons();
+            }
+
             // Mark that we're in Kanban view
             window._isKanbanViewActive = true;
             window._kanbanFolderId = folderId;

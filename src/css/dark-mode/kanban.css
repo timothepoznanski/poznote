@@ -111,6 +111,18 @@ body.dark-mode .kanban-card-snippet {
     color: var(--dm-text-muted);
 }
 
+html[data-theme='dark'] .kanban-task-preview-item,
+body.dark-mode .kanban-task-preview-item {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-task-preview-item.completed .kanban-task-preview-text,
+body.dark-mode .kanban-task-preview-item.completed .kanban-task-preview-text,
+html[data-theme='dark'] .kanban-task-preview-more,
+body.dark-mode .kanban-task-preview-more {
+    color: #808080;
+}
+
 html[data-theme='dark'] .kanban-card-meta,
 body.dark-mode .kanban-card-meta {
     color: #808080;
@@ -127,12 +139,25 @@ body.dark-mode .kanban-tag {
 html[data-theme='dark'] .kanban-scroll-btn,
 body.dark-mode .kanban-scroll-btn {
     background: var(--dm-surface);
-    color: var(--dm-text);
-    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .kanban-scroll-btn:hover,
 body.dark-mode .kanban-scroll-btn:hover {
+    background: var(--dm-border);
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .kanban-scroll-btn-header,
+body.dark-mode .kanban-scroll-btn-header {
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-scroll-btn-header:hover,
+body.dark-mode .kanban-scroll-btn-header:hover {
     background: var(--dm-border);
     color: #ffffff;
 }

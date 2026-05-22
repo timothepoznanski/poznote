@@ -61,19 +61,34 @@ try {
      * Modifies the note array in-place, adding an 'entry' key.
      */
     $loadNoteSnippet = function (&$note) use ($con) {
+        $contentType = $note['type'] ?? 'note';
+        $previewNoteId = $note['id'];
+
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
-            $targetStmt = $con->prepare("SELECT type FROM entries WHERE id = ?");
+            $targetStmt = $con->prepare("SELECT type, tags FROM entries WHERE id = ? AND trash = 0");
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
-            $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $targetNote['type'] ?? 'note') : '';
+            $contentType = $targetNote['type'] ?? 'note';
+            $previewNoteId = $targetNote ? $note['linked_note_id'] : $previewNoteId;
+            $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $contentType) : '';
+            if ($targetNote && trim((string) ($note['tags'] ?? '')) === '' && trim((string) ($targetNote['tags'] ?? '')) !== '') {
+                $note['tags'] = $targetNote['tags'];
+            }
         } else {
             $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
         }
 
+        $note['kanban_preview_type'] = $contentType;
+        $note['kanban_preview_note_id'] = $previewNoteId;
+
         if ($filename && file_exists($filename)) {
             $content = file_get_contents($filename);
-            $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+            if ($contentType === 'tasklist') {
+                $note['entry'] = resolveTasklistStoredContent($content, '');
+            } else {
+                $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+            }
         } else {
             $note['entry'] = '';
         }
@@ -118,32 +133,107 @@ try {
     }
 
     /**
+     * Parse note tags for Kanban badges. Tags are stored comma-separated, but older UI values may be space-separated.
+     */
+    function getKanbanTags($tags) {
+        $tags = trim((string) ($tags ?? ''));
+        if ($tags === '') {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', preg_split('/\s*,\s*|\s+/', $tags)), static function ($tag) {
+            return $tag !== '';
+        }));
+    }
+
+    /**
+     * Decode normalized tasklist content for compact Kanban previews.
+     */
+    function getKanbanTasklistPreviewTasks($content) {
+        $normalized = resolveTasklistStoredContent((string) ($content ?? ''), '');
+        $tasks = json_decode($normalized, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($tasks)) {
+            return null;
+        }
+
+        if (isset($tasks['tasks']) && is_array($tasks['tasks'])) {
+            $tasks = $tasks['tasks'];
+        }
+
+        if ($tasks !== [] && !isset($tasks[0])) {
+            return null;
+        }
+
+        return array_values(array_filter($tasks, static function ($task) {
+            return is_array($task);
+        }));
+    }
+
+    /**
+     * Render task rows in a scrollable Kanban card preview.
+     */
+    function renderKanbanTasklistPreview($content, $visibleRows = 3, $noteId = null) {
+        $tasks = getKanbanTasklistPreviewTasks($content);
+        if ($tasks === null) {
+            return false;
+        }
+
+        $visibleRows = max(1, (int) $visibleRows);
+        $maxHeight = ($visibleRows * 20) + (($visibleRows - 1) * 4);
+
+        echo '<div class="kanban-tasklist-preview' . (empty($tasks) ? ' is-empty' : '') . '" data-task-note-id="' . (int) $noteId . '" style="--kanban-task-preview-max-height: ' . (int) $maxHeight . 'px;">';
+        foreach ($tasks as $taskIndex => $task) {
+            $text = $task['text'] ?? ($task['content'] ?? '');
+            if (!is_scalar($text)) {
+                $text = '';
+            }
+
+            $completed = !empty($task['completed']) || !empty($task['checked']) || !empty($task['done']);
+            $important = !empty($task['important']);
+            $className = 'kanban-task-preview-item' . ($completed ? ' completed' : '') . ($important ? ' important' : '');
+            $taskId = $task['id'] ?? '';
+            $taskIdAttr = is_scalar($taskId) ? htmlspecialchars((string) $taskId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
+
+            echo '<label class="' . $className . '">';
+            echo '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' . (int) $taskIndex . '" data-task-id="' . $taskIdAttr . '"' . ($completed ? ' checked' : '') . '>';
+            echo '<span class="kanban-task-preview-text">' . htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
+            echo '</label>';
+        }
+        echo '</div>';
+
+        return true;
+    }
+
+    /**
      * Render a single kanban card HTML for a note.
      */
     function renderKanbanCard($note, $folderId) {
+        $isTasklistPreview = (($note['kanban_preview_type'] ?? ($note['type'] ?? 'note')) === 'tasklist');
+        $kanbanTags = getKanbanTags($note['tags'] ?? '');
+        $kanbanDate = formatKanbanDate($note['updated'] ?? '');
         ?>
         <div class="kanban-card" 
              data-note-id="<?php echo $note['id']; ?>" 
              data-folder-id="<?php echo $folderId; ?>"
              draggable="true">
-            <?php if (!empty($note['tags'])): ?>
-            <div class="kanban-card-tags">
-                <?php 
-                $tags = explode(',', $note['tags']);
-                foreach ($tags as $tag): 
-                    $tag = trim($tag);
-                    if ($tag === '') continue;
-                ?>
-                    <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
-                <?php endforeach; ?>
+            <?php if ($kanbanDate !== '' || !empty($kanbanTags)): ?>
+            <div class="kanban-card-topline">
+                <?php if ($kanbanDate !== ''): ?>
+                <span class="kanban-card-date">
+                    <?php echo htmlspecialchars($kanbanDate, ENT_QUOTES); ?>
+                </span>
+                <?php endif; ?>
+
+                <?php if (!empty($kanbanTags)): ?>
+                <div class="kanban-card-tags">
+                    <?php foreach ($kanbanTags as $tag): ?>
+                        <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
-
-            <div class="kanban-card-meta">
-                <span class="kanban-card-date">
-                    <?php echo htmlspecialchars(formatKanbanDate($note['updated'] ?? ''), ENT_QUOTES); ?>
-                </span>
-            </div>
 
             <div class="kanban-card-title">
                 <?php 
@@ -152,11 +242,13 @@ try {
                 ?>
             </div>
 
-            <div class="kanban-card-snippet">
+            <div class="kanban-card-snippet<?php echo $isTasklistPreview ? ' kanban-card-tasklist' : ''; ?>">
                 <?php 
-                $snippet = strip_tags($note['entry'] ?? '');
-                $snippet = html_entity_decode($snippet);
-                echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 3, $note['kanban_preview_note_id'] ?? $note['id'])) {
+                    $snippet = strip_tags($note['entry'] ?? '');
+                    $snippet = html_entity_decode($snippet);
+                    echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                }
                 ?>
             </div>
         </div>
@@ -168,6 +260,9 @@ try {
     <div id="kanban-view-container" class="kanban-inline-view" data-folder-id="<?php echo $folder_id; ?>">
         <!-- Kanban Header -->
         <div class="kanban-inline-header">
+            <button class="kanban-scroll-btn-header left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
+                <i class="lucide lucide-chevron-left"></i>
+            </button>
             <h1 class="kanban-title">
                 <?php 
                 $pFolderIconRaw = $parentFolder['icon'] ?? null;
@@ -187,6 +282,9 @@ try {
                       style="cursor: pointer;"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
             </h1>
             <div class="kanban-header-actions">
+                <button class="kanban-scroll-btn-header right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
+                    <i class="lucide lucide-chevron-right"></i>
+                </button>
                 <button class="kanban-add-column-btn" 
                         data-action="create-kanban-column" 
                         data-parent-id="<?php echo $folder_id; ?>" 
@@ -198,14 +296,6 @@ try {
 
         <!-- Kanban Board Wrapper -->
         <div class="kanban-board-wrapper">
-            <!-- Scroll Buttons -->
-            <button class="kanban-scroll-btn left" id="kanbanScrollLeft" title="<?php echo t_h('common.scroll_left', [], 'Scroll Left'); ?>">
-                <i class="lucide lucide-chevron-left"></i>
-            </button>
-            <button class="kanban-scroll-btn right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
-                <i class="lucide lucide-chevron-right"></i>
-            </button>
-
             <!-- Kanban Board -->
             <div class="kanban-board" id="kanbanBoard">
             
