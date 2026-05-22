@@ -9,6 +9,10 @@ let isResizingOutline = false;
 let currentNoteId = null;
 let hasInitializedOutlinePanel = false;
 let hasInitializedHeadingAnchorHandlers = false;
+let floatingHeadingAnchor = null;
+let floatingHeadingAnchorTarget = null;
+let floatingHeadingAnchorHideTimeout = null;
+const HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6';
 const HEADING_ANCHOR_SELECTOR = '.heading-anchor';
 const HEADING_ANCHOR_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
 
@@ -288,6 +292,21 @@ function isHeadingInsideEditableHtmlNote(heading) {
     return !!(editableNote && !heading.closest('.markdown-preview'));
 }
 
+function isActiveEditableHtmlHeading(heading) {
+    return !!(
+        heading &&
+        heading.matches &&
+        heading.matches(HEADING_SELECTOR) &&
+        document.contains(heading) &&
+        isHeadingInsideEditableHtmlNote(heading) &&
+        getHeadingTextContent(heading)
+    );
+}
+
+function slugifyHeadingText(text) {
+    return (text || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+}
+
 function getHeadingTextContent(heading) {
     if (!heading) return '';
 
@@ -296,18 +315,211 @@ function getHeadingTextContent(heading) {
     return (clone.textContent || '').trim();
 }
 
+function ensureHeadingId(heading, prefix) {
+    if (!heading) return '';
+
+    if (!heading.id) {
+        var headingText = getHeadingTextContent(heading);
+        if (!headingText) return '';
+        heading.id = (prefix || 'heading') + '-' + slugifyHeadingText(headingText);
+    }
+
+    return heading.id;
+}
+
+function getHeadingIndexWithinNote(heading) {
+    if (!heading || !heading.closest) return -1;
+
+    var noteElement = heading.closest('.noteentry, .public-note .content');
+    if (!noteElement) return -1;
+
+    var headings = noteElement.querySelectorAll(HEADING_SELECTOR);
+    for (var i = 0; i < headings.length; i++) {
+        if (headings[i] === heading) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+function getHeadingForAnchor(anchor) {
+    if (!anchor) return null;
+
+    if (anchor.classList.contains('heading-anchor--floating')) {
+        if (isActiveEditableHtmlHeading(anchor._headingElement)) {
+            return anchor._headingElement;
+        }
+
+        hideFloatingHeadingAnchor();
+        return null;
+    }
+
+    var heading = anchor.closest(HEADING_SELECTOR);
+    if (heading) return heading;
+
+    if (anchor._headingElement && document.contains(anchor._headingElement)) {
+        return anchor._headingElement;
+    }
+
+    var headingId = anchor.getAttribute('data-heading-id');
+    return headingId ? document.getElementById(headingId) : null;
+}
+
 function cleanupStaleHeadingAnchorLinks(element) {
     if (!element) return;
+
+    if (floatingHeadingAnchorTarget && (!element.contains(floatingHeadingAnchorTarget) || !isActiveEditableHtmlHeading(floatingHeadingAnchorTarget))) {
+        hideFloatingHeadingAnchor();
+    }
 
     var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
     for (var i = 0; i < anchors.length; i++) {
         var anchor = anchors[i];
-        var heading = anchor.closest('h1, h2, h3, h4, h5, h6');
+        var heading = anchor.closest(HEADING_SELECTOR);
 
         if (!heading || isHeadingInsideEditableHtmlNote(heading) || !getHeadingTextContent(heading)) {
             anchor.remove();
         }
     }
+}
+
+function cancelFloatingHeadingAnchorHide() {
+    clearTimeout(floatingHeadingAnchorHideTimeout);
+    floatingHeadingAnchorHideTimeout = null;
+}
+
+function hideFloatingHeadingAnchor() {
+    cancelFloatingHeadingAnchorHide();
+
+    if (floatingHeadingAnchor) {
+        floatingHeadingAnchor.hidden = true;
+        floatingHeadingAnchor._headingElement = null;
+        floatingHeadingAnchor.removeAttribute('data-heading-id');
+        floatingHeadingAnchor.removeAttribute('href');
+    }
+
+    floatingHeadingAnchorTarget = null;
+}
+
+function scheduleFloatingHeadingAnchorHide() {
+    cancelFloatingHeadingAnchorHide();
+    floatingHeadingAnchorHideTimeout = setTimeout(hideFloatingHeadingAnchor, 120);
+}
+
+function getHeadingTextEndRect(heading) {
+    if (!heading) return null;
+
+    var range = document.createRange();
+    range.selectNodeContents(heading);
+    var rects = range.getClientRects();
+    var lastRect = null;
+
+    for (var i = 0; i < rects.length; i++) {
+        if (rects[i].width > 0 || rects[i].height > 0) {
+            lastRect = rects[i];
+        }
+    }
+
+    if (range.detach) {
+        range.detach();
+    }
+
+    return lastRect || heading.getBoundingClientRect();
+}
+
+function createFloatingHeadingAnchor() {
+    if (floatingHeadingAnchor) {
+        return floatingHeadingAnchor;
+    }
+
+    floatingHeadingAnchor = document.createElement('a');
+    floatingHeadingAnchor.className = 'heading-anchor heading-anchor--floating';
+    floatingHeadingAnchor.innerHTML = HEADING_ANCHOR_SVG;
+    floatingHeadingAnchor.title = 'Copy section link';
+    floatingHeadingAnchor.hidden = true;
+    floatingHeadingAnchor.setAttribute('aria-hidden', 'true');
+    floatingHeadingAnchor.setAttribute('contenteditable', 'false');
+    floatingHeadingAnchor.setAttribute('draggable', 'false');
+    floatingHeadingAnchor.setAttribute('data-heading-anchor', 'true');
+    floatingHeadingAnchor.addEventListener('mouseenter', cancelFloatingHeadingAnchorHide);
+    floatingHeadingAnchor.addEventListener('mouseleave', scheduleFloatingHeadingAnchorHide);
+    document.body.appendChild(floatingHeadingAnchor);
+
+    return floatingHeadingAnchor;
+}
+
+function positionFloatingHeadingAnchor() {
+    if (!floatingHeadingAnchor || !floatingHeadingAnchorTarget || floatingHeadingAnchor.hidden) {
+        return;
+    }
+
+    if (!isActiveEditableHtmlHeading(floatingHeadingAnchorTarget)) {
+        hideFloatingHeadingAnchor();
+        return;
+    }
+
+    var rect = getHeadingTextEndRect(floatingHeadingAnchorTarget);
+    if (!rect || rect.bottom < 0 || rect.top > window.innerHeight || rect.right < 0 || rect.left > window.innerWidth) {
+        hideFloatingHeadingAnchor();
+        return;
+    }
+
+    var computedStyle = window.getComputedStyle(floatingHeadingAnchorTarget);
+    var left = window.scrollX + rect.right + 6;
+    var maxLeft = window.scrollX + window.innerWidth - 24;
+    floatingHeadingAnchor.style.left = Math.round(Math.min(left, maxLeft)) + 'px';
+    floatingHeadingAnchor.style.top = Math.round(window.scrollY + rect.top + (rect.height / 2)) + 'px';
+    floatingHeadingAnchor.style.color = computedStyle.color;
+}
+
+function showFloatingHeadingAnchor(heading) {
+    if (!heading || !isHeadingInsideEditableHtmlNote(heading)) return;
+
+    stripRuntimeHeadingAnchorsFromElement(heading);
+
+    var headingText = getHeadingTextContent(heading);
+    if (!headingText) return;
+
+    var headingIndex = getHeadingIndexWithinNote(heading);
+    var headingId = ensureHeadingId(heading, headingIndex >= 0 ? 'heading-' + headingIndex : 'heading');
+    if (!headingId) return;
+
+    var anchor = createFloatingHeadingAnchor();
+    floatingHeadingAnchorTarget = heading;
+    anchor._headingElement = heading;
+    anchor.href = '#' + headingId;
+    anchor.setAttribute('data-heading-id', headingId);
+    anchor.hidden = false;
+    cancelFloatingHeadingAnchorHide();
+    positionFloatingHeadingAnchor();
+}
+
+function handleEditableHtmlHeadingMouseOver(e) {
+    if (!e.target.closest) return;
+
+    var heading = e.target.closest(HEADING_SELECTOR);
+    if (!heading || !isHeadingInsideEditableHtmlNote(heading)) return;
+
+    if (e.relatedTarget && heading.contains(e.relatedTarget)) {
+        return;
+    }
+
+    showFloatingHeadingAnchor(heading);
+}
+
+function handleEditableHtmlHeadingMouseOut(e) {
+    if (!e.target.closest || !floatingHeadingAnchorTarget) return;
+
+    var heading = e.target.closest(HEADING_SELECTOR);
+    if (heading !== floatingHeadingAnchorTarget) return;
+
+    var relatedTarget = e.relatedTarget;
+    if (relatedTarget && (heading.contains(relatedTarget) || (floatingHeadingAnchor && floatingHeadingAnchor.contains(relatedTarget)))) {
+        return;
+    }
+
+    scheduleFloatingHeadingAnchorHide();
 }
 
 function initHeadingAnchorInteractions() {
@@ -329,7 +541,7 @@ function initHeadingAnchorInteractions() {
         var anchor = e.target.closest(HEADING_ANCHOR_SELECTOR);
         if (!anchor) return;
 
-        var heading = anchor.closest('h1, h2, h3, h4, h5, h6');
+        var heading = getHeadingForAnchor(anchor);
         if (!heading || !heading.id) return;
 
         e.preventDefault();
@@ -344,6 +556,14 @@ function initHeadingAnchorInteractions() {
             });
         }
     }, true);
+
+    document.addEventListener('mouseover', handleEditableHtmlHeadingMouseOver, true);
+    document.addEventListener('mouseout', handleEditableHtmlHeadingMouseOut, true);
+    document.addEventListener('input', function () {
+        positionFloatingHeadingAnchor();
+    }, true);
+    window.addEventListener('scroll', positionFloatingHeadingAnchor, true);
+    window.addEventListener('resize', positionFloatingHeadingAnchor);
 }
 
 /**
@@ -361,7 +581,7 @@ function addHeadingAnchorLink(heading) {
     if (!heading.id) {
         const headingText = getHeadingTextContent(heading);
         if (!headingText) return;
-        heading.id = 'heading-' + headingText.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        heading.id = 'heading-' + slugifyHeadingText(headingText);
     }
 
     let anchor = heading.querySelector(HEADING_ANCHOR_SELECTOR);
@@ -431,7 +651,7 @@ function extractHeadings(noteElement) {
                     // Find corresponding element in preview if available
                     let previewElement = null;
                     if (markdownPreview) {
-                        const previewHeadings = markdownPreview.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                        const previewHeadings = markdownPreview.querySelectorAll(HEADING_SELECTOR);
                         // Try to find matching heading by text content
                         for (const h of previewHeadings) {
                             if (getHeadingTextContent(h) === text) {
@@ -460,16 +680,14 @@ function extractHeadings(noteElement) {
     }
 
     // Default: extract from HTML headings (regular HTML notes)
-    const headingElements = noteElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const headingElements = noteElement.querySelectorAll(HEADING_SELECTOR);
     headingElements.forEach((heading, index) => {
         const level = parseInt(heading.tagName.substring(1)); // h1 -> 1, h2 -> 2, etc.
         const text = getHeadingTextContent(heading);
 
         if (text) {
             // Add an ID to the heading if it doesn't have one (for navigation)
-            if (!heading.id) {
-                heading.id = `heading-${index}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-            }
+            ensureHeadingId(heading, `heading-${index}`);
 
             addHeadingAnchorLink(heading);
 
@@ -640,7 +858,7 @@ function scrollToHeading(heading) {
         if (markdownPreview && markdownPreview.offsetParent !== null) {
             // Try to find the heading element in preview if not already set
             if (!heading.element) {
-                const previewHeadings = markdownPreview.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                const previewHeadings = markdownPreview.querySelectorAll(HEADING_SELECTOR);
                 for (const h of previewHeadings) {
                     if (h.textContent.trim() === heading.text) {
                         heading.element = h;
