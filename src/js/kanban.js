@@ -474,6 +474,38 @@
         return [].concat(groups.important, groups.normal, groups.completed);
     }
 
+    function escapeKanbanHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function renderKanbanTaskPreview(preview, tasks) {
+        if (!preview || !Array.isArray(tasks)) return;
+
+        const previousScrollTop = preview.scrollTop;
+
+        preview.classList.toggle('is-empty', tasks.length === 0);
+        preview.innerHTML = tasks.map((task, index) => {
+            const taskObject = task && typeof task === 'object' ? task : {};
+            const text = taskObject.text ?? taskObject.content ?? '';
+            const completed = !!(taskObject.completed || taskObject.checked || taskObject.done);
+            const important = !!taskObject.important;
+            const taskId = taskObject.id ?? '';
+            const className = 'kanban-task-preview-item' + (completed ? ' completed' : '') + (important ? ' important' : '');
+
+            return '<label class="' + className + '">'
+                + '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' + index + '" data-task-id="' + escapeKanbanHtml(taskId) + '"' + (completed ? ' checked' : '') + '>'
+                + '<span class="kanban-task-preview-text">' + escapeKanbanHtml(text) + '</span>'
+                + '</label>';
+        }).join('');
+
+        preview.scrollTop = previousScrollTop;
+    }
+
     async function toggleKanbanTaskFromCard(checkbox) {
         if (isPublicWorkspaceReadOnly()) {
             checkbox.checked = !checkbox.checked;
@@ -545,14 +577,8 @@
                 window.setNeedsAutoPush(true);
             }
 
-            if (typeof window.refreshKanbanView === 'function') {
-                window.refreshKanbanView();
-            } else {
-                checkbox.disabled = false;
-                if (preview) preview.classList.remove('is-saving');
-                const item = checkbox.closest('.kanban-task-preview-item');
-                if (item) item.classList.toggle('completed', completed);
-            }
+            renderKanbanTaskPreview(preview, tasks);
+            if (preview) preview.classList.remove('is-saving');
         } catch (error) {
             console.error('Kanban task toggle error:', error);
             checkbox.checked = !completed;
