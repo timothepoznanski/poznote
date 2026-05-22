@@ -9,6 +9,7 @@
     // State
     let draggedCard = null;
     let draggedFromFolderId = null;
+    let pointerStartedInTaskPreview = false;
 
     function isPublicWorkspaceReadOnly() {
         return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
@@ -43,10 +44,26 @@
      * Setup drag and drop functionality using document delegation
      */
     function setupDelegatedEvents() {
+        document.addEventListener('pointerdown', (e) => {
+            pointerStartedInTaskPreview = !!e.target.closest('.kanban-tasklist-preview');
+        }, true);
+
+        document.addEventListener('pointerup', () => {
+            pointerStartedInTaskPreview = false;
+        }, true);
+
         // Drag Start
         document.addEventListener('dragstart', (e) => {
             if (isPublicWorkspaceReadOnly()) {
                 e.preventDefault();
+                return;
+            }
+
+            if (pointerStartedInTaskPreview || e.target.closest('.kanban-tasklist-preview')) {
+                e.preventDefault();
+                draggedCard = null;
+                draggedFromFolderId = null;
+                pointerStartedInTaskPreview = false;
                 return;
             }
 
@@ -88,6 +105,7 @@
 
             draggedCard = null;
             draggedFromFolderId = null;
+            pointerStartedInTaskPreview = false;
         });
 
         // Drag Over - CRITICAL: must prevent default to allow drop
@@ -217,10 +235,23 @@
             }
         });
 
+        // Task checkbox delegation. The task area is interactive but the rest of the card still opens/drags normally.
+        document.addEventListener('change', (e) => {
+            const checkbox = e.target.closest('.kanban-task-checkbox');
+            if (!checkbox) return;
+
+            e.stopPropagation();
+            toggleKanbanTaskFromCard(checkbox);
+        });
+
         // Card Click Delegation
         document.addEventListener('click', (e) => {
             const card = e.target.closest('.kanban-card');
             if (!card) return;
+
+            if (e.target.closest('.kanban-tasklist-preview')) {
+                return;
+            }
 
             // Don't trigger if dragging
             if (card.classList.contains('dragging')) return;
@@ -389,6 +420,145 @@
         } catch (error) {
             console.error('Kanban API error:', error);
             return false;
+        }
+    }
+
+    function getTaskByIdOrIndex(tasks, taskId, taskIndex) {
+        if (!Array.isArray(tasks)) return -1;
+
+        if (taskId !== '') {
+            const numericTaskId = Number(taskId);
+            const hasNumericTaskId = Number.isFinite(numericTaskId);
+
+            const idIndex = tasks.findIndex((task) => {
+                if (!task || typeof task !== 'object' || task.id === undefined || task.id === null) return false;
+
+                if (String(task.id) === String(taskId)) return true;
+
+                const numericCandidate = Number(task.id);
+                return hasNumericTaskId && Number.isFinite(numericCandidate) && Math.abs(numericCandidate - numericTaskId) < 0.000001;
+            });
+
+            if (idIndex !== -1) return idIndex;
+        }
+
+        return Number.isInteger(taskIndex) && taskIndex >= 0 && taskIndex < tasks.length ? taskIndex : -1;
+    }
+
+    function groupKanbanTasksByStatus(tasks) {
+        const important = [];
+        const normal = [];
+        const completed = [];
+
+        tasks.forEach((task) => {
+            if (task && task.completed) completed.push(task);
+            else if (task && task.important) important.push(task);
+            else if (task) normal.push(task);
+        });
+
+        return { important, normal, completed };
+    }
+
+    function reorderKanbanTasksAfterToggle(tasks, toggledTask) {
+        const remainingTasks = tasks.filter((task) => task !== toggledTask);
+        const groups = groupKanbanTasksByStatus(remainingTasks);
+
+        if (toggledTask.completed) {
+            groups.completed.unshift(toggledTask);
+        } else if (toggledTask.important) {
+            groups.important.push(toggledTask);
+        } else {
+            groups.normal.push(toggledTask);
+        }
+
+        return [].concat(groups.important, groups.normal, groups.completed);
+    }
+
+    async function toggleKanbanTaskFromCard(checkbox) {
+        if (isPublicWorkspaceReadOnly()) {
+            checkbox.checked = !checkbox.checked;
+            return;
+        }
+
+        const preview = checkbox.closest('.kanban-tasklist-preview');
+        const card = checkbox.closest('.kanban-card');
+        const taskNoteId = preview?.dataset.taskNoteId || card?.dataset.noteId;
+        const taskId = checkbox.dataset.taskId || '';
+        const taskIndex = Number.parseInt(checkbox.dataset.taskIndex || '', 10);
+        const completed = checkbox.checked;
+
+        if (!taskNoteId) {
+            checkbox.checked = !completed;
+            showError('Unable to update task');
+            return;
+        }
+
+        checkbox.disabled = true;
+        if (preview) preview.classList.add('is-saving');
+
+        try {
+            const noteResponse = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            });
+
+            if (!noteResponse.ok) throw new Error('HTTP error: ' + noteResponse.status);
+
+            const noteData = await noteResponse.json();
+            if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
+                throw new Error('Invalid tasklist note response');
+            }
+
+            let tasks = JSON.parse(noteData.note.content || '[]');
+            if (!Array.isArray(tasks)) throw new Error('Invalid tasklist content');
+
+            const targetIndex = getTaskByIdOrIndex(tasks, taskId, Number.isNaN(taskIndex) ? -1 : taskIndex);
+            if (targetIndex === -1) throw new Error('Task not found');
+
+            const toggledTask = tasks[targetIndex];
+            toggledTask.completed = completed;
+            tasks = reorderKanbanTasksAfterToggle(tasks, toggledTask);
+
+            const updateResponse = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ content: JSON.stringify(tasks) })
+            });
+
+            if (!updateResponse.ok) throw new Error('HTTP error: ' + updateResponse.status);
+
+            const updateData = await updateResponse.json();
+            if (!updateData || !updateData.success) {
+                throw new Error(updateData?.error || 'Unable to update task');
+            }
+
+            if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                window.setNeedsAutoPush(true);
+            }
+
+            if (typeof window.refreshKanbanView === 'function') {
+                window.refreshKanbanView();
+            } else {
+                checkbox.disabled = false;
+                if (preview) preview.classList.remove('is-saving');
+                const item = checkbox.closest('.kanban-task-preview-item');
+                if (item) item.classList.toggle('completed', completed);
+            }
+        } catch (error) {
+            console.error('Kanban task toggle error:', error);
+            checkbox.checked = !completed;
+            checkbox.disabled = false;
+            if (preview) preview.classList.remove('is-saving');
+            showError('Unable to update task');
         }
     }
 

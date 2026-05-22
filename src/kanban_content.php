@@ -62,6 +62,7 @@ try {
      */
     $loadNoteSnippet = function (&$note) use ($con) {
         $contentType = $note['type'] ?? 'note';
+        $previewNoteId = $note['id'];
 
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
@@ -69,12 +70,14 @@ try {
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
             $contentType = $targetNote['type'] ?? 'note';
+            $previewNoteId = $targetNote ? $note['linked_note_id'] : $previewNoteId;
             $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $contentType) : '';
         } else {
             $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
         }
 
         $note['kanban_preview_type'] = $contentType;
+        $note['kanban_preview_note_id'] = $previewNoteId;
 
         if ($filename && file_exists($filename)) {
             $content = file_get_contents($filename);
@@ -153,17 +156,17 @@ try {
     /**
      * Render up to five task rows in a Kanban card.
      */
-    function renderKanbanTasklistPreview($content, $limit = 5) {
+    function renderKanbanTasklistPreview($content, $limit = 5, $noteId = null) {
         $tasks = getKanbanTasklistPreviewTasks($content);
         if ($tasks === null) {
             return false;
         }
 
         $limit = max(1, (int) $limit);
-        $visibleTasks = array_slice($tasks, 0, $limit);
+        $visibleTasks = array_slice($tasks, 0, $limit, true);
 
-        echo '<div class="kanban-tasklist-preview' . (empty($visibleTasks) ? ' is-empty' : '') . '">';
-        foreach ($visibleTasks as $task) {
+        echo '<div class="kanban-tasklist-preview' . (empty($visibleTasks) ? ' is-empty' : '') . '" data-task-note-id="' . (int) $noteId . '">';
+        foreach ($visibleTasks as $taskIndex => $task) {
             $text = $task['text'] ?? ($task['content'] ?? '');
             if (!is_scalar($text)) {
                 $text = '';
@@ -172,11 +175,13 @@ try {
             $completed = !empty($task['completed']) || !empty($task['checked']) || !empty($task['done']);
             $important = !empty($task['important']);
             $className = 'kanban-task-preview-item' . ($completed ? ' completed' : '') . ($important ? ' important' : '');
+            $taskId = $task['id'] ?? '';
+            $taskIdAttr = is_scalar($taskId) ? htmlspecialchars((string) $taskId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
 
-            echo '<div class="' . $className . '">';
-            echo '<input type="checkbox" disabled tabindex="-1"' . ($completed ? ' checked' : '') . '>';
+            echo '<label class="' . $className . '">';
+            echo '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' . (int) $taskIndex . '" data-task-id="' . $taskIdAttr . '"' . ($completed ? ' checked' : '') . '>';
             echo '<span class="kanban-task-preview-text">' . htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
-            echo '</div>';
+            echo '</label>';
         }
 
         $remaining = count($tasks) - count($visibleTasks);
@@ -226,7 +231,7 @@ try {
 
             <div class="kanban-card-snippet<?php echo $isTasklistPreview ? ' kanban-card-tasklist' : ''; ?>">
                 <?php 
-                if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 5)) {
+                if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 5, $note['kanban_preview_note_id'] ?? $note['id'])) {
                     $snippet = strip_tags($note['entry'] ?? '');
                     $snippet = html_entity_decode($snippet);
                     echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
