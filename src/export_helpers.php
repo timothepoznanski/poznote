@@ -14,7 +14,7 @@ function buildFolderTree($con, $workspace = null) {
         $query .= ' WHERE workspace = ?';
         $params[] = $workspace;
     }
-    $query .= ' ORDER BY name ASC';
+    $query .= ' ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE ASC';
     
     $stmt = $con->prepare($query);
     $stmt->execute($params);

@@ -8,6 +8,7 @@
  *   GET    /api/v1/folders              - List all folders
  *   GET    /api/v1/folders/{id}         - Get a specific folder
  *   POST   /api/v1/folders              - Create a new folder
+ *   POST   /api/v1/folders/reorder      - Move a folder before/after another folder
  *   PATCH  /api/v1/folders/{id}         - Update/rename a folder
  *   DELETE /api/v1/folders/{id}         - Delete a folder
  *   POST   /api/v1/folders/{id}/move    - Move folder to new parent
@@ -96,9 +97,16 @@ class FoldersController {
         }
         unset($folder);
         
-        // Sort folders at each level alphabetically
+        // Sort folders at each level by saved order, with name as a fallback
         $sortFolders = function(&$folders) use (&$sortFolders) {
             usort($folders, function($a, $b) {
+                $orderA = isset($a['display_order']) ? (int)$a['display_order'] : 0;
+                $orderB = isset($b['display_order']) ? (int)$b['display_order'] : 0;
+                if ($orderA > 0 || $orderB > 0) {
+                    if ($orderA <= 0) return 1;
+                    if ($orderB <= 0) return -1;
+                    if ($orderA !== $orderB) return $orderA <=> $orderB;
+                }
                 return strcasecmp($a['name'], $b['name']);
             });
             
@@ -210,6 +218,51 @@ class FoldersController {
         return ['', []];
     }
 
+    private function wouldCreateCycle(int $folderId, ?int $targetParentId): bool {
+        if ($targetParentId === null) {
+            return false;
+        }
+        if ($targetParentId === $folderId) {
+            return true;
+        }
+
+        $cur = $targetParentId;
+        $depth = 0;
+        while ($cur !== null && $depth < 50) {
+            if ($cur === $folderId) {
+                return true;
+            }
+            $stmt = $this->db->prepare('SELECT parent_id FROM folders WHERE id = ?');
+            $stmt->execute([$cur]);
+            $parent = $stmt->fetchColumn();
+            $cur = ($parent !== false && $parent !== null) ? (int)$parent : null;
+            $depth++;
+        }
+
+        return false;
+    }
+
+    private function getOrderedSiblingIds(string $workspace, ?int $parentId, ?int $excludeFolderId = null): array {
+        if ($parentId === null) {
+            $sql = 'SELECT id FROM folders WHERE workspace = ? AND parent_id IS NULL';
+            $params = [$workspace];
+        } else {
+            $sql = 'SELECT id FROM folders WHERE workspace = ? AND parent_id = ?';
+            $params = [$workspace, $parentId];
+        }
+
+        if ($excludeFolderId !== null) {
+            $sql .= ' AND id != ?';
+            $params[] = $excludeFolderId;
+        }
+
+        $sql .= ' ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE, id';
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    }
+
     /**
      * Normalize stored folder icon classes for API consumers.
      */
@@ -284,7 +337,7 @@ class FoldersController {
             return;
         }
         
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created FROM folders WHERE workspace = ?');
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, display_order, created FROM folders WHERE workspace = ?');
         $stmt->execute([$workspace]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -297,6 +350,7 @@ class FoldersController {
                 'parent_id' => $r['parent_id'] !== null ? (int)$r['parent_id'] : null,
                 'icon' => $this->normalizeFolderIcon($r['icon'] ?? null),
                 'icon_color' => $r['icon_color'] ?? null,
+                'display_order' => (int)($r['display_order'] ?? 0),
                 'created' => $r['created'] ?? null,
             ];
         }
@@ -310,6 +364,7 @@ class FoldersController {
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
                     'icon_color' => $f['icon_color'],
+                    'display_order' => $f['display_order'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
@@ -331,6 +386,7 @@ class FoldersController {
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
                     'icon_color' => $f['icon_color'],
+                    'display_order' => $f['display_order'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
             }
@@ -354,7 +410,7 @@ class FoldersController {
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, created, workspace FROM folders WHERE id = ?' . $wsCond);
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, display_order, created, workspace FROM folders WHERE id = ?' . $wsCond);
         $stmt->execute(array_merge([$folderId], $wsParams));
 
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -388,6 +444,7 @@ class FoldersController {
                 'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
                 'icon' => $this->normalizeFolderIcon($folder['icon'] ?? null),
                 'icon_color' => $folder['icon_color'],
+                'display_order' => (int)($folder['display_order'] ?? 0),
                 'workspace' => $folder['workspace'],
                 'path' => $this->computeFolderPath($folderId, $foldersById),
                 'created' => $folder['created'],
@@ -876,8 +933,8 @@ class FoldersController {
             
             foreach ($allAffectedFolderIds as $fid) {
                 if ($fid === $folderId) {
-                    // Main folder: update parent_id AND workspace
-                    $uStmt = $this->db->prepare('UPDATE folders SET parent_id = ?, workspace = ? WHERE id = ?');
+                    // Main folder: update parent_id, workspace and clear manual sibling order
+                    $uStmt = $this->db->prepare('UPDATE folders SET parent_id = ?, workspace = ?, display_order = 0 WHERE id = ?');
                     $uStmt->execute([$targetParentId, $targetWorkspace, $fid]);
                 } else {
                     // Subfolder: only update workspace
@@ -922,7 +979,127 @@ class FoldersController {
                 'name' => $folderName,
                 'workspace' => $targetWorkspace,
                 'parent_id' => $targetParentId,
+                'display_order' => 0,
                 'path' => $this->computeFolderPath($folderId, $byId),
+            ]
+        ]);
+    }
+
+    /**
+     * POST /api/v1/folders/reorder - Move a folder before/after another folder
+     */
+    public function reorder(): void {
+        $data = $this->getInputData();
+
+        $folderId = isset($data['folder_id']) ? (int)$data['folder_id'] : 0;
+        $targetFolderId = isset($data['target_folder_id']) ? (int)$data['target_folder_id'] : 0;
+        $position = isset($data['position']) ? strtolower(trim((string)$data['position'])) : '';
+        $workspaceParam = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
+
+        if ($folderId <= 0 || $targetFolderId <= 0) {
+            $this->sendError('folder_id and target_folder_id are required', 400);
+            return;
+        }
+
+        if (!in_array($position, ['before', 'after'], true)) {
+            $this->sendError('position must be before or after', 400);
+            return;
+        }
+
+        if ($folderId === $targetFolderId) {
+            $this->sendError('Folder cannot be reordered relative to itself', 400);
+            return;
+        }
+
+        $stmt = $this->db->prepare('SELECT id, name, workspace, parent_id FROM folders WHERE id = ?');
+        $stmt->execute([$folderId]);
+        $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $targetStmt = $this->db->prepare('SELECT id, name, workspace, parent_id FROM folders WHERE id = ?');
+        $targetStmt->execute([$targetFolderId]);
+        $targetFolder = $targetStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$folder || !$targetFolder) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+
+        $targetWorkspace = (string)$targetFolder['workspace'];
+        if ((string)$folder['workspace'] !== $targetWorkspace) {
+            $this->sendError('Folders must be in the same workspace', 400);
+            return;
+        }
+
+        if ($workspaceParam !== null && $workspaceParam !== '' && $workspaceParam !== $targetWorkspace) {
+            $this->sendError('Workspace does not match target folder', 400);
+            return;
+        }
+
+        $targetParentId = $targetFolder['parent_id'] !== null ? (int)$targetFolder['parent_id'] : null;
+
+        if ($this->wouldCreateCycle($folderId, $targetParentId)) {
+            $this->sendError('Invalid move: would create a cycle', 409);
+            return;
+        }
+
+        if ($targetParentId === null) {
+            $duplicateStmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE workspace = ? AND parent_id IS NULL AND name = ? AND id != ?');
+            $duplicateStmt->execute([$targetWorkspace, (string)$folder['name'], $folderId]);
+        } else {
+            $duplicateStmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE workspace = ? AND parent_id = ? AND name = ? AND id != ?');
+            $duplicateStmt->execute([$targetWorkspace, $targetParentId, (string)$folder['name'], $folderId]);
+        }
+
+        if ((int)$duplicateStmt->fetchColumn() > 0) {
+            $this->sendError('A folder with this name already exists in the destination', 409);
+            return;
+        }
+
+        $orderedIds = $this->getOrderedSiblingIds($targetWorkspace, $targetParentId, $folderId);
+        $targetIndex = array_search($targetFolderId, $orderedIds, true);
+
+        if ($targetIndex === false) {
+            $this->sendError('Target folder is not available in the destination order', 404);
+            return;
+        }
+
+        $insertIndex = $position === 'before' ? $targetIndex : $targetIndex + 1;
+        array_splice($orderedIds, $insertIndex, 0, [$folderId]);
+
+        try {
+            $this->db->beginTransaction();
+
+            $updateDragged = $this->db->prepare('UPDATE folders SET parent_id = ?, workspace = ?, display_order = ? WHERE id = ?');
+            $updateOrder = $this->db->prepare('UPDATE folders SET display_order = ? WHERE id = ?');
+
+            foreach ($orderedIds as $index => $id) {
+                $displayOrder = $index + 1;
+                if ($id === $folderId) {
+                    $updateDragged->execute([$targetParentId, $targetWorkspace, $displayOrder, $folderId]);
+                } else {
+                    $updateOrder->execute([$displayOrder, $id]);
+                }
+            }
+
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Failed to reorder folder: ' . $e->getMessage(), 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Folder reordered successfully',
+            'folder' => [
+                'id' => $folderId,
+                'name' => (string)$folder['name'],
+                'workspace' => $targetWorkspace,
+                'parent_id' => $targetParentId,
+                'position' => $position,
+                'target_folder_id' => $targetFolderId,
             ]
         ]);
     }

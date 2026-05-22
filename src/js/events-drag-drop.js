@@ -409,12 +409,18 @@ function handleNoteDragEnd(e) {
     cleanupDraggingNotes();
 
     // Remove drag-over class from all folders
-    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-source-drag').forEach(function (header) {
+    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-drop-before, .folder-header.folder-drop-after, .folder-header.folder-drop-inside, .folder-header.folder-source-drag').forEach(function (header) {
         header.classList.remove('drag-over');
         header.classList.remove('folder-drop-target');
+        header.classList.remove('folder-drop-before');
+        header.classList.remove('folder-drop-after');
+        header.classList.remove('folder-drop-inside');
         header.classList.remove('folder-source-drag');
         if (header.dataset && header.dataset.dragEnterCount) {
             delete header.dataset.dragEnterCount;
+        }
+        if (header.dataset && header.dataset.folderDropPosition) {
+            delete header.dataset.folderDropPosition;
         }
     });
 
@@ -636,11 +642,18 @@ function handleFolderDragEnd(e) {
     }
 
     // Clean up all folder drag-over states
-    document.querySelectorAll('.folder-header.folder-drop-target, .folder-header.folder-source-drag').forEach(function (header) {
+    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-drop-before, .folder-header.folder-drop-after, .folder-header.folder-drop-inside, .folder-header.folder-source-drag').forEach(function (header) {
+        header.classList.remove('drag-over');
         header.classList.remove('folder-drop-target');
+        header.classList.remove('folder-drop-before');
+        header.classList.remove('folder-drop-after');
+        header.classList.remove('folder-drop-inside');
         header.classList.remove('folder-source-drag');
         if (header.dataset && header.dataset.dragEnterCount) {
             delete header.dataset.dragEnterCount;
+        }
+        if (header.dataset && header.dataset.folderDropPosition) {
+            delete header.dataset.folderDropPosition;
         }
     });
 
@@ -652,6 +665,113 @@ function handleFolderDragEnd(e) {
     }, 100);
 }
 
+function getFolderToggleElement(folderHeader) {
+    if (!folderHeader || !folderHeader.children) return null;
+    for (var i = 0; i < folderHeader.children.length; i++) {
+        if (folderHeader.children[i].classList && folderHeader.children[i].classList.contains('folder-toggle')) {
+            return folderHeader.children[i];
+        }
+    }
+    return folderHeader.querySelector ? folderHeader.querySelector('.folder-toggle') : null;
+}
+
+function clearFolderDropIndicator(folderHeader) {
+    if (!folderHeader) return;
+    folderHeader.classList.remove('drag-over');
+    folderHeader.classList.remove('folder-drop-target');
+    folderHeader.classList.remove('folder-drop-before');
+    folderHeader.classList.remove('folder-drop-after');
+    folderHeader.classList.remove('folder-drop-inside');
+    if (folderHeader.dataset && folderHeader.dataset.folderDropPosition) {
+        delete folderHeader.dataset.folderDropPosition;
+    }
+}
+
+function clearOtherFolderDropIndicators(activeHeader) {
+    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target, .folder-header.folder-drop-before, .folder-header.folder-drop-after, .folder-header.folder-drop-inside').forEach(function (header) {
+        if (header === activeHeader) return;
+        clearFolderDropIndicator(header);
+        if (header.dataset && header.dataset.dragEnterCount) {
+            delete header.dataset.dragEnterCount;
+        }
+    });
+}
+
+function getFolderDropPosition(e, folderHeader) {
+    var folderToggle = getFolderToggleElement(folderHeader);
+    if (!folderToggle) return 'inside';
+
+    var rect = folderToggle.getBoundingClientRect();
+    if (e.clientY < rect.top || e.clientY > rect.bottom) {
+        return 'inside';
+    }
+
+    var ratio = (e.clientY - rect.top) / Math.max(rect.height, 1);
+    var previousPosition = folderHeader.dataset ? (folderHeader.dataset.folderDropPosition || '') : '';
+
+    if (previousPosition === 'before') {
+        return ratio <= 0.36 ? 'before' : 'inside';
+    }
+    if (previousPosition === 'after') {
+        return ratio >= 0.64 ? 'after' : 'inside';
+    }
+
+    if (ratio <= 0.24) return 'before';
+    if (ratio >= 0.76) return 'after';
+    return 'inside';
+}
+
+function canDropFolderOnHeader(dragData, folderHeader, targetFolderId) {
+    if (!dragData || dragData.type !== 'folder' || !folderHeader) return false;
+    if (folderHeader.classList.contains('system-folder')) return false;
+
+    var sourceFolderId = parseInt(dragData.folderId, 10);
+    var targetNumericId = parseInt(targetFolderId, 10);
+    if (!sourceFolderId || !targetNumericId || sourceFolderId === targetNumericId) return false;
+
+    var sourceHeader = document.querySelector('.folder-header[data-folder-id="' + sourceFolderId + '"]');
+    if (sourceHeader && sourceHeader.contains(folderHeader)) return false;
+
+    return true;
+}
+
+function applyFolderDropIndicator(folderHeader, position) {
+    clearOtherFolderDropIndicators(folderHeader);
+
+    if (position !== 'before' && position !== 'after') {
+        position = 'inside';
+    }
+
+    var currentPosition = folderHeader.dataset ? (folderHeader.dataset.folderDropPosition || '') : '';
+    if (currentPosition === position) {
+        return;
+    }
+
+    if (position === 'before') {
+        folderHeader.classList.remove('drag-over');
+        folderHeader.classList.remove('folder-drop-target');
+        folderHeader.classList.remove('folder-drop-inside');
+        folderHeader.classList.add('folder-drop-before');
+        folderHeader.classList.remove('folder-drop-after');
+    } else if (position === 'after') {
+        folderHeader.classList.remove('drag-over');
+        folderHeader.classList.remove('folder-drop-target');
+        folderHeader.classList.remove('folder-drop-inside');
+        folderHeader.classList.remove('folder-drop-before');
+        folderHeader.classList.add('folder-drop-after');
+    } else {
+        folderHeader.classList.add('drag-over');
+        folderHeader.classList.add('folder-drop-target');
+        folderHeader.classList.add('folder-drop-inside');
+        folderHeader.classList.remove('folder-drop-before');
+        folderHeader.classList.remove('folder-drop-after');
+    }
+
+    if (folderHeader.dataset) {
+        folderHeader.dataset.folderDropPosition = position;
+    }
+}
+
 // Enhanced folder drag enter handler to avoid flicker on nested elements
 function handleFolderDragEnterEnhanced(e) {
     var folderHeader = e.target.closest('.folder-header');
@@ -661,14 +781,7 @@ function handleFolderDragEnterEnhanced(e) {
         return;
     }
 
-    document.querySelectorAll('.folder-header.drag-over, .folder-header.folder-drop-target').forEach(function (header) {
-        if (header === folderHeader) return;
-        header.classList.remove('drag-over');
-        header.classList.remove('folder-drop-target');
-        if (header.dataset && header.dataset.dragEnterCount) {
-            delete header.dataset.dragEnterCount;
-        }
-    });
+    clearOtherFolderDropIndicators(folderHeader);
 
     folderHeader.dataset.dragEnterCount = '1';
 
@@ -678,14 +791,10 @@ function handleFolderDragEnterEnhanced(e) {
     var dragData = window.currentDragData;
 
     if (dragData && dragData.type === 'folder') {
-        if (dragData.folderId === targetFolderId) {
+        if (!canDropFolderOnHeader(dragData, folderHeader, targetFolderId)) {
             return;
         }
-        if (folderHeader.classList.contains('system-folder')) {
-            return;
-        }
-        folderHeader.classList.add('folder-drop-target');
-        folderHeader.classList.add('drag-over');
+        applyFolderDropIndicator(folderHeader, getFolderDropPosition(e, folderHeader));
         return;
     }
 
@@ -711,21 +820,14 @@ function handleFolderDragOverEnhanced(e) {
 
     // If dragging a folder
     if (dragData && dragData.type === 'folder') {
-        // Prevent dropping folder on itself
-        if (dragData.folderId === targetFolderId) {
+        if (!canDropFolderOnHeader(dragData, folderHeader, targetFolderId)) {
             e.dataTransfer.dropEffect = 'none';
-            return;
-        }
-
-        // Prevent dropping on system folders
-        if (folderHeader.classList.contains('system-folder')) {
-            e.dataTransfer.dropEffect = 'none';
+            clearFolderDropIndicator(folderHeader);
             return;
         }
 
         e.dataTransfer.dropEffect = 'move';
-        folderHeader.classList.add('folder-drop-target');
-        folderHeader.classList.add('drag-over');
+        applyFolderDropIndicator(folderHeader, getFolderDropPosition(e, folderHeader));
         return;
     }
 
@@ -759,8 +861,7 @@ function handleFolderDragLeaveEnhanced(e) {
             delete folderHeader.dataset.dragEnterCount;
         }
 
-        folderHeader.classList.remove('drag-over');
-        folderHeader.classList.remove('folder-drop-target');
+        clearFolderDropIndicator(folderHeader);
     }
 }
 
@@ -773,8 +874,14 @@ function handleFolderDropEnhanced(e) {
 
     folderHeader.classList.remove('drag-over');
     folderHeader.classList.remove('folder-drop-target');
+    folderHeader.classList.remove('folder-drop-before');
+    folderHeader.classList.remove('folder-drop-after');
+    folderHeader.classList.remove('folder-drop-inside');
     if (folderHeader.dataset && folderHeader.dataset.dragEnterCount) {
         delete folderHeader.dataset.dragEnterCount;
+    }
+    if (folderHeader.dataset && folderHeader.dataset.folderDropPosition) {
+        delete folderHeader.dataset.folderDropPosition;
     }
 
     try {
@@ -793,13 +900,14 @@ function handleFolderDropEnhanced(e) {
                 header.style.transform = '';
             });
 
-            // Prevent dropping folder on itself
-            if (data.folderId === targetFolderId) {
+            if (!canDropFolderOnHeader(data, folderHeader, targetFolderId)) {
                 return;
             }
 
-            // Prevent dropping on system folders
-            if (folderHeader.classList.contains('system-folder')) {
+            var dropPosition = getFolderDropPosition(e, folderHeader);
+
+            if (dropPosition === 'before' || dropPosition === 'after') {
+                moveFolderBesideTarget(data.folderId, targetFolderId, dropPosition);
                 return;
             }
 
@@ -858,6 +966,21 @@ function moveFolderToParent(folderId, newParentFolderId) {
         { workspace: selectedWorkspace || getSelectedWorkspace(), new_parent_folder_id: newParentFolderId },
         function () { location.reload(); },
         'Error moving folder: '
+    );
+}
+
+// Move folder before or after a target folder and persist sibling order
+function moveFolderBesideTarget(folderId, targetFolderId, position) {
+    apiPostJson(
+        '/api/v1/folders/reorder',
+        {
+            workspace: selectedWorkspace || getSelectedWorkspace(),
+            folder_id: folderId,
+            target_folder_id: targetFolderId,
+            position: position
+        },
+        function () { location.reload(); },
+        'Error reordering folder: '
     );
 }
 

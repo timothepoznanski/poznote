@@ -895,7 +895,7 @@ class GitSync {
                 $maxPasses = 10;
                 $folderParentStmt = $this->con->prepare('SELECT id FROM folders WHERE id = ?');
                 $folderInsertStmt = $this->con->prepare(
-                    'INSERT OR IGNORE INTO folders (id, name, workspace, parent_id, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?)'
+                    'INSERT OR IGNORE INTO folders (id, name, workspace, parent_id, icon, icon_color, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)'
                 );
                 while (!empty($toInsert) && $maxPasses-- > 0) {
                     $remaining = [];
@@ -916,6 +916,7 @@ class GitSync {
                             $folder['parent_id'],
                             $folder['icon'],
                             $folder['icon_color'],
+                            (int)($folder['display_order'] ?? 0),
                         ]);
                         $results['debug'][] = "  Folder #{$folder['id']} '{$folder['name']}' → restored";
                     }
@@ -1461,7 +1462,7 @@ class GitSync {
 
         // Folders (full list so the hierarchy can be restored)
         $fstmt   = $this->con->query(
-            'SELECT id, name, workspace, parent_id, icon, icon_color FROM folders ORDER BY id'
+            'SELECT id, name, workspace, parent_id, icon, icon_color, display_order FROM folders ORDER BY id'
         );
         $folders = [];
         foreach ($fstmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -1472,6 +1473,7 @@ class GitSync {
                 'parent_id'  => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
                 'icon'       => $row['icon'],
                 'icon_color' => $row['icon_color'],
+                'display_order' => (int)($row['display_order'] ?? 0),
             ];
         }
 

@@ -154,7 +154,7 @@ try {
 
     // Faster approach: fetch all folders to build hierarchy in memory
     $allFoldersPool = [];
-    $stmt = $con->prepare('SELECT id, name, parent_id FROM folders WHERE workspace = ?');
+    $stmt = $con->prepare('SELECT id, name, parent_id, display_order FROM folders WHERE workspace = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE');
     $stmt->execute([$folder['workspace']]);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $allFoldersPool[$row['id']] = $row;

@@ -104,6 +104,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Check if this is a system folder (not draggable)
         $systemFolders = ['Favorites', 'Tags', 'Trash', 'Public'];
         $isSystemFolder = in_array($folderName, $systemFolders);
+        if ($isSystemFolder) $folderClass .= ' system-folder';
         $draggableAttr = $isSystemFolder ? '' : " draggable='true'";
         
         // Escape for HTML attributes
