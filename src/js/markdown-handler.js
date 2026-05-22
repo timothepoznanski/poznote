@@ -617,6 +617,135 @@ function setSelectionOffsetsInTextElement(element, startOffset, endOffset) {
     selection.addRange(range);
 }
 
+function isElementVerticallyScrollable(element) {
+    if (!element) {
+        return false;
+    }
+
+    var overflowY = '';
+    try {
+        overflowY = window.getComputedStyle(element).overflowY;
+    } catch (error) {
+        overflowY = '';
+    }
+
+    return element.scrollHeight > element.clientHeight && overflowY !== 'visible' && overflowY !== 'hidden';
+}
+
+function getMarkdownEditorScrollContainer(editorDiv) {
+    if (!editorDiv) {
+        return null;
+    }
+
+    if (isElementVerticallyScrollable(editorDiv)) {
+        return editorDiv;
+    }
+
+    var editorContainer = editorDiv.closest ? editorDiv.closest('.markdown-editor-container') : null;
+    if (isElementVerticallyScrollable(editorContainer)) {
+        return editorContainer;
+    }
+
+    var scrollContainer = document.getElementById('right_col');
+    if (isElementVerticallyScrollable(scrollContainer)) {
+        return scrollContainer;
+    }
+
+    return scrollContainer || editorContainer || editorDiv;
+}
+
+function getMarkdownCaretClientRect(editorDiv) {
+    var selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+        return null;
+    }
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed || !editorDiv.contains(range.startContainer)) {
+        return null;
+    }
+
+    var clientRects = range.getClientRects();
+    if (clientRects && clientRects.length > 0) {
+        return clientRects[clientRects.length - 1];
+    }
+
+    var boundingRect = range.getBoundingClientRect();
+    if (boundingRect && (boundingRect.top || boundingRect.bottom || boundingRect.height)) {
+        return boundingRect;
+    }
+
+    var marker = document.createElement('span');
+    marker.setAttribute('data-markdown-caret-scroll-marker', 'true');
+    marker.style.display = 'inline-block';
+    marker.style.width = '0';
+    marker.style.height = '1em';
+    marker.style.overflow = 'hidden';
+    marker.textContent = '\u200b';
+
+    var markerRange = range.cloneRange();
+    markerRange.insertNode(marker);
+
+    var markerRect = marker.getBoundingClientRect();
+    var markerParent = marker.parentNode;
+    var markerOffset = markerParent ? Array.prototype.indexOf.call(markerParent.childNodes, marker) : 0;
+
+    if (markerParent) {
+        markerParent.removeChild(marker);
+
+        var restoreRange = document.createRange();
+        restoreRange.setStart(markerParent, Math.min(markerOffset, markerParent.childNodes.length));
+        restoreRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(restoreRange);
+    }
+
+    return markerRect;
+}
+
+function scrollMarkdownCaretIntoView(editorDiv) {
+    if (!editorDiv || document.activeElement !== editorDiv) {
+        return;
+    }
+
+    var scrollContainer = getMarkdownEditorScrollContainer(editorDiv);
+    var caretRect = getMarkdownCaretClientRect(editorDiv);
+    if (!scrollContainer || !caretRect) {
+        return;
+    }
+
+    var containerRect = scrollContainer.getBoundingClientRect();
+    var bottomPadding = 48;
+    var topPadding = 24;
+    var scrollDelta = 0;
+
+    if (caretRect.bottom > containerRect.bottom - bottomPadding) {
+        scrollDelta = caretRect.bottom - containerRect.bottom + bottomPadding;
+    } else if (caretRect.top < containerRect.top + topPadding) {
+        scrollDelta = caretRect.top - containerRect.top - topPadding;
+    }
+
+    if (scrollDelta !== 0) {
+        scrollContainer.scrollTop += scrollDelta;
+    }
+}
+
+function scheduleMarkdownCaretScrollIntoView(editorDiv) {
+    if (!editorDiv) {
+        return;
+    }
+
+    var runScroll = function () {
+        scrollMarkdownCaretIntoView(editorDiv);
+    };
+
+    if (typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(runScroll);
+    } else {
+        setTimeout(runScroll, 0);
+    }
+}
+
 function getMarkdownLineStartOffsets(text) {
     var offsets = [0];
     for (var i = 0; i < text.length; i++) {
@@ -653,6 +782,7 @@ function updateMarkdownEditorContent(editorDiv, noteEntry, noteId, content, sele
 
     editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
     setSelectionOffsetsInTextElement(editorDiv, selectionStart, selectionEnd);
+    scheduleMarkdownCaretScrollIntoView(editorDiv);
 }
 
 function renumberMarkdownOrderedListLines(lines) {
@@ -3116,11 +3246,6 @@ function setupMarkdownEditorListeners(noteId) {
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     if (!editorDiv) return;
 
-    // Get the scrollable parent container
-    var scrollContainer = document.getElementById('right_col');
-    var preventScroll = false;
-    var savedScrollTop = 0;
-
     // Set noteid on focus (like normal notes)
     editorDiv.addEventListener('focus', function () {
         if (typeof noteid !== 'undefined') {
@@ -3130,18 +3255,7 @@ function setupMarkdownEditorListeners(noteId) {
         window.noteid = noteId;
     });
 
-    // Before keydown, save scroll position
     editorDiv.addEventListener('keydown', function (e) {
-        if (scrollContainer) {
-            savedScrollTop = scrollContainer.scrollTop;
-            preventScroll = true;
-
-            // After a short delay, stop preventing scroll
-            setTimeout(function () {
-                preventScroll = false;
-            }, 100);
-        }
-
         if (handleMarkdownOrderedListTab(e, editorDiv, noteEntry, noteId)) {
             return;
         }
@@ -3152,16 +3266,6 @@ function setupMarkdownEditorListeners(noteId) {
 
         handleMarkdownOrderedListEnter(e, editorDiv, noteEntry, noteId);
     });
-
-    // Prevent unwanted scroll during input
-    if (scrollContainer) {
-        scrollContainer.addEventListener('scroll', function (e) {
-            if (preventScroll) {
-                // Restore the scroll position
-                scrollContainer.scrollTop = savedScrollTop;
-            }
-        }, { passive: false });
-    }
 
     editorDiv.addEventListener('input', function () {
         // Update the data attribute with current content
@@ -3179,6 +3283,8 @@ function setupMarkdownEditorListeners(noteId) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
+
+        scheduleMarkdownCaretScrollIntoView(editorDiv);
     });
 }
 
