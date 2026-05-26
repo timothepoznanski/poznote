@@ -1503,6 +1503,7 @@
     "spinner": {
       "processing": "Wiederherstellung wird verarbeitet...",
       "processing_long": "Wiederherstellung wird verarbeitet... Dies kann einige Momente dauern.",
+      "direct_copy_restoring": "Wiederherstellung läuft... Bitte warten.",
       "importing_notes": "Notizen werden importiert..."
     },
     "units": {
@@ -1513,8 +1514,6 @@
     },
     "direct_copy": {
       "backup_file_found": "Sicherungsdatei gefunden:",
-      "ready_to_restore": "Bereit zur Wiederherstellung?",
-      "replace_all_data_warning": "Dies ersetzt alle Daten in ALLEN Arbeitsbereichen.",
       "no_backup_found_prefix": "Keine Sicherungsdatei im Container gefunden unter",
       "no_backup_found_hint": "Bitte führen Sie zuerst den docker cp-Befehl aus.",
       "completed_successfully_prefix": "Direkte Dateikopie-Wiederherstellung erfolgreich abgeschlossen!",

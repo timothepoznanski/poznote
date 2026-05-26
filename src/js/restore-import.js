@@ -119,7 +119,7 @@ function handleRestoreImportClick(e) {
 
         // Direct copy restore actions
         case 'show-direct-copy-restore-confirmation':
-            showDirectCopyRestoreConfirmation();
+            showDirectCopyRestoreConfirmation(target);
             break;
         case 'hide-direct-copy-restore-confirmation':
             hideDirectCopyRestoreConfirmation();
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Close modal when clicking outside
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('import-confirm-modal') || e.target.classList.contains('custom-alert')) {
+        if ((e.target.classList.contains('import-confirm-modal') || e.target.classList.contains('custom-alert')) && !e.target.classList.contains('is-submitting')) {
             e.target.style.display = 'none';
         }
     });
@@ -552,34 +552,77 @@ function hideIndividualNotesImportSpinner() {
 }
 
 // Direct Copy Restore Functions
-function showDirectCopyRestoreConfirmation() {
+let directCopyRestorePendingForm = null;
+let directCopyRestoreSubmitting = false;
+
+function showDirectCopyRestoreConfirmation(trigger) {
+    resetDirectCopyRestoreProcessing();
+    directCopyRestorePendingForm = trigger ? trigger.closest('form') : null;
     document.getElementById('directCopyRestoreConfirmModal').style.display = 'flex';
 }
 
 function hideDirectCopyRestoreConfirmation() {
+    if (directCopyRestoreSubmitting) return;
+    directCopyRestorePendingForm = null;
+    resetDirectCopyRestoreProcessing();
     document.getElementById('directCopyRestoreConfirmModal').style.display = 'none';
 }
 
-function proceedWithDirectCopyRestore() {
-    hideDirectCopyRestoreConfirmation();
-    // Submit the direct copy restore form
-    let form = document.getElementById('directCopyRestoreForm');
-    if (!form) {
-        // Create the form if it doesn't exist
-        form = document.createElement('form');
-        form.method = 'post';
-        form.id = 'directCopyRestoreForm';
-        form.style.display = 'none';
-
-        const actionInput = document.createElement('input');
-        actionInput.type = 'hidden';
-        actionInput.name = 'action';
-        actionInput.value = 'restore_cli_upload';
-
-        form.appendChild(actionInput);
-        document.body.appendChild(form);
+function showDirectCopyRestoreProcessing() {
+    const modal = document.getElementById('directCopyRestoreConfirmModal');
+    const processing = document.getElementById('directCopyRestoreProcessing');
+    if (modal) {
+        modal.classList.add('is-submitting');
+        modal.querySelectorAll('button').forEach(function (button) {
+            button.disabled = true;
+            button.setAttribute('aria-disabled', 'true');
+        });
     }
-    form.submit();
+    if (processing) {
+        processing.style.display = 'inline-flex';
+        processing.setAttribute('aria-hidden', 'false');
+    }
+}
+
+function resetDirectCopyRestoreProcessing() {
+    directCopyRestoreSubmitting = false;
+    const modal = document.getElementById('directCopyRestoreConfirmModal');
+    const processing = document.getElementById('directCopyRestoreProcessing');
+    if (modal) {
+        modal.classList.remove('is-submitting');
+        modal.querySelectorAll('button').forEach(function (button) {
+            button.disabled = false;
+            button.setAttribute('aria-disabled', 'false');
+        });
+    }
+    if (processing) {
+        processing.style.display = 'none';
+        processing.setAttribute('aria-hidden', 'true');
+    }
+}
+
+function proceedWithDirectCopyRestore() {
+    const form = directCopyRestorePendingForm || document.getElementById('directCopyRestoreForm');
+    directCopyRestorePendingForm = null;
+    if (!form) {
+        hideDirectCopyRestoreConfirmation();
+        return;
+    }
+
+    directCopyRestoreSubmitting = true;
+    showDirectCopyRestoreProcessing();
+
+    if (window.requestAnimationFrame) {
+        window.requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
+                form.submit();
+            });
+        });
+    } else {
+        setTimeout(function () {
+            form.submit();
+        }, 0);
+    }
 }
 
 // Restore spinner functions

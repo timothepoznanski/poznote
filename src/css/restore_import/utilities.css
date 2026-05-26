@@ -67,6 +67,20 @@
     margin-top: 10px;
 }
 
+.direct-copy-command {
+    background-color: #f5f5f5;
+    color: #1f2937;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.direct-copy-command code {
+    color: inherit;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
 /* Text colors */
 .text-danger {
     color: #dc3545;
@@ -101,4 +115,11 @@ html[data-theme='dark'] .maintenance-subtitle {
 
 html[data-theme='dark'] .maintenance-description {
     color: #a0a0a0;
+}
+
+html[data-theme='dark'] .direct-copy-command,
+body.dark-mode .direct-copy-command {
+    background-color: #1f2937;
+    border-color: #4b5563;
+    color: #f3f4f6;
 }

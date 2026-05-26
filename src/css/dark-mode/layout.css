@@ -197,28 +197,6 @@ body.dark-mode .system-menu-item span:not(.menu-item-count) {
 }
 
 /* Favorites */
-html[data-theme='dark'] .favorites-separator,
-body.dark-mode .favorites-separator {
-    background: var(--dm-border);
-}
-
-html[data-theme='dark'] .favorites-toggle-btn,
-body.dark-mode .favorites-toggle-btn {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .favorites-toggle-btn:hover,
-body.dark-mode .favorites-toggle-btn:hover {
-    background: #3a3a3a;
-    border-color: #606060;
-}
-
-html[data-theme='dark'] .favorites-toggle-btn i,
-body.dark-mode .favorites-toggle-btn i {
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] #folder-favorites,
 body.dark-mode #folder-favorites {
     border-bottom-color: var(--dm-border);

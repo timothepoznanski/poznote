@@ -196,7 +196,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/variables.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/base.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/utilities.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo file_exists(__DIR__ . '/css/layout.css') ? filemtime(__DIR__ . '/css/layout.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/sidebar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo file_exists(__DIR__ . '/css/outline.css') ? filemtime(__DIR__ . '/css/outline.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
@@ -221,7 +221,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/folders/toolbar-icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo file_exists(__DIR__ . '/css/lucide.css') ? filemtime(__DIR__ . '/css/lucide.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo file_exists(__DIR__ . '/css/folders/system-folders.css') ? filemtime(__DIR__ . '/css/folders/system-folders.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/table-picker.css?v=<?php echo $v; ?>"/>
@@ -253,7 +253,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/public-workspace-readonly.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/dark-mode/modals.css') ?: time(); ?>"/>
@@ -1073,7 +1073,7 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>
-<script src="js/utils.js?v=<?php echo $v; ?>"></script>
+<script src="js/utils.js?v=<?php echo file_exists(__DIR__ . '/js/utils.js') ? filemtime(__DIR__ . '/js/utils.js') : $v; ?>"></script>
 <script src="js/search-highlight.js?v=<?php echo $v; ?>"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/pwa-helpers.js?v=<?php echo $v; ?>"></script>
@@ -1096,7 +1096,7 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
-<script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
+<script src="js/notes-list-events.js?v=<?php echo file_exists(__DIR__ . '/js/notes-list-events.js') ? filemtime(__DIR__ . '/js/notes-list-events.js') : $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
 <script src="js/tabs.js?v=<?php echo $v; ?>"></script>

@@ -1180,6 +1180,7 @@
     "spinner": {
       "processing": "Processing restoration...",
       "processing_long": "Processing restoration... This may take a few moments.",
+      "direct_copy_restoring": "Restoration in progress... Please wait.",
       "importing_notes": "Importing notes..."
     },
     "units": {
@@ -1190,8 +1191,6 @@
     },
     "direct_copy": {
       "backup_file_found": "Backup file found:",
-      "ready_to_restore": "Ready to restore?",
-      "replace_all_data_warning": "This will replace all data in ALL workspaces.",
       "no_backup_found_prefix": "No backup file found in container at",
       "no_backup_found_hint": "Please run the docker cp command first.",
       "completed_successfully_prefix": "Direct file copy restoration completed successfully!",

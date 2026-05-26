@@ -435,13 +435,6 @@
                     window.clearUnifiedSearch();
                 }
             },
-            'toggle-favorites': function () {
-                event.preventDefault();
-                event.stopPropagation();
-                if (typeof window.toggleFavorites === 'function') {
-                    window.toggleFavorites(actionElement);
-                }
-            },
             'close-kanban-view': function () {
                 event.preventDefault();
                 event.stopPropagation();
@@ -683,14 +676,7 @@
         // Initialize search type button states
         initializeSearchTypeButtons();
 
-        // Ensure favorites section is visible
-        var favoritesFolder = document.getElementById('folder-favorites');
-        if (favoritesFolder) {
-            favoritesFolder.style.display = 'block';
-            localStorage.setItem('folder_folder-favorites', 'open');
-        }
-
-        // Restore favorites collapsed/expanded state
+        // Clean up the old favorites section collapsed state
         restoreFavoritesState();
 
         // Attach event listeners
@@ -722,28 +708,13 @@
     }
 
     /**
-     * Restore favorites section collapsed/expanded state from localStorage
+     * Keep favorites visible now that the separator toggle has been removed.
      */
     function restoreFavoritesState() {
-        var favoritesCollapsed = localStorage.getItem('favorites_collapsed') === 'true';
         var favoritesHeader = document.querySelector('[data-folder="Favorites"]');
-        var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
-
         if (!favoritesHeader) return;
-
-        if (favoritesCollapsed) {
-            favoritesHeader.classList.add('favorites-collapsed');
-            if (favoritesToggleBtn) {
-                favoritesToggleBtn.classList.add('collapsed');
-                favoritesToggleBtn.classList.remove('favorites-expanded');
-            }
-        } else {
-            favoritesHeader.classList.remove('favorites-collapsed');
-            if (favoritesToggleBtn) {
-                favoritesToggleBtn.classList.remove('collapsed');
-                favoritesToggleBtn.classList.add('favorites-expanded');
-            }
-        }
+        favoritesHeader.classList.remove('favorites-collapsed');
+        localStorage.removeItem('favorites_collapsed');
     }
 
     /**
