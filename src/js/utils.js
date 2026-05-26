@@ -1505,35 +1505,6 @@ function toggleFolder(folderId) {
 }
 
 /**
- * Toggle favorites visibility
- */
-function toggleFavorites(buttonElement) {
-    // Find the favorites folder
-    var favoritesFolder = document.querySelector('[data-folder="Favorites"]');
-    if (!favoritesFolder) return;
-
-    var isCollapsed = favoritesFolder.classList.contains('favorites-collapsed');
-
-    if (isCollapsed) {
-        // Show favorites
-        favoritesFolder.classList.remove('favorites-collapsed');
-        if (buttonElement) {
-            buttonElement.classList.remove('collapsed');
-            buttonElement.classList.add('favorites-expanded');
-        }
-        localStorage.setItem('favorites_collapsed', 'false');
-    } else {
-        // Hide favorites
-        favoritesFolder.classList.add('favorites-collapsed');
-        if (buttonElement) {
-            buttonElement.classList.add('collapsed');
-            buttonElement.classList.remove('favorites-expanded');
-        }
-        localStorage.setItem('favorites_collapsed', 'true');
-    }
-}
-
-/**
  * Persist current folder open/closed states to localStorage
  * Useful before actions that reload the page (e.g., drag & drop moves)
  */
@@ -1609,22 +1580,11 @@ function restoreFolderStates() {
         // This preserves the smart PHP logic for determining initial folder states
     });
 
-    // Restore favorites collapsed state
-    var favoritesCollapsed = localStorage.getItem('favorites_collapsed') === 'true';
+    // Favorites are always visible; the old separator toggle is no longer rendered.
     var favoritesHeader = document.querySelector('[data-folder="Favorites"]');
-    var favoritesToggleBtn = document.querySelector('[data-action="toggle-favorites"]');
-    if (favoritesCollapsed && favoritesHeader) {
-        favoritesHeader.classList.add('favorites-collapsed');
-        if (favoritesToggleBtn) {
-            favoritesToggleBtn.classList.add('collapsed');
-            favoritesToggleBtn.classList.remove('favorites-expanded');
-        }
-    } else if (favoritesHeader) {
+    if (favoritesHeader) {
         favoritesHeader.classList.remove('favorites-collapsed');
-        if (favoritesToggleBtn) {
-            favoritesToggleBtn.classList.remove('collapsed');
-            favoritesToggleBtn.classList.add('favorites-expanded');
-        }
+        localStorage.removeItem('favorites_collapsed');
     }
 }
 
@@ -3004,4 +2964,3 @@ function openAllFolderNotesInTabs(folderId, folderName) {
 window.openKanbanView = openKanbanView;
 window.openAllFolderNotesInTabs = openAllFolderNotesInTabs;
 window.showInfoModal = showInfoModal;
-window.toggleFavorites = toggleFavorites;

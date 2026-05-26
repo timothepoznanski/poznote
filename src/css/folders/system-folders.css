@@ -72,7 +72,7 @@
 }
 
 /* Dossiers système: affichage en icônes uniquement */
-.system-folder .folder-toggle {
+.system-folder:not([data-folder="Favorites"]) .folder-toggle {
     padding: 3px;
     justify-content: center;
     width: auto;
@@ -83,19 +83,23 @@
 }
 
 /* Cacher le nom des dossiers système */
-.system-folder .folder-name {
+.system-folder:not([data-folder="Favorites"]) .folder-name {
     display: none !important;
 }
 
 /* System folder icons */
-.system-folder [class*="lucide-"].folder-icon {
+.system-folder:not([data-folder="Favorites"]) [class*="lucide-"].folder-icon {
     font-size: clamp(11px, 2vw, 14px) !important;
     margin-right: 0 !important;
     color: #007DB8;
 }
 
+.system-folder[data-folder="Favorites"] [class*="lucide-"].folder-icon {
+    font-size: 0.8em !important;
+}
+
 /* Afficher le compteur à droite de l'icône - toujours visible */
-.system-folder .folder-note-count {
+.system-folder:not([data-folder="Favorites"]) .folder-note-count {
     display: inline-block !important;
     opacity: 1 !important;
     position: absolute;
@@ -115,11 +119,11 @@
 }
 
 /* Effet hover sur les icônes système */
-.system-folder .folder-toggle:hover {
+.system-folder:not([data-folder="Favorites"]) .folder-toggle:hover {
     background-color: transparent;
 }
 
-.system-folder .folder-toggle:hover .folder-icon {
+.system-folder:not([data-folder="Favorites"]) .folder-toggle:hover .folder-icon {
     color: #005a8a;
     transform: scale(1.15);
 }
