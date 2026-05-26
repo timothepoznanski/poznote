@@ -1553,6 +1553,7 @@
     "spinner": {
       "processing": "Restauration en cours...",
       "processing_long": "Restauration en cours... Cela peut prendre quelques instants.",
+      "direct_copy_restoring": "Restauration en cours... Veuillez patienter.",
       "importing_notes": "Importation des notes en cours..."
     },
     "units": {
@@ -1563,8 +1564,6 @@
     },
     "direct_copy": {
       "backup_file_found": "Fichier de sauvegarde trouvé :",
-      "ready_to_restore": "Prêt à restaurer ?",
-      "replace_all_data_warning": "Cela remplacera toutes les données dans TOUS les espaces de travail.",
       "no_backup_found_prefix": "Aucun fichier de sauvegarde trouvé dans le conteneur à",
       "no_backup_found_hint": "Veuillez exécuter d’abord la commande docker cp.",
       "completed_successfully_prefix": "Restauration par copie directe terminée avec succès !",

@@ -1501,6 +1501,7 @@
     "spinner": {
       "processing": "正在处理还原...",
       "processing_long": "正在处理还原... 这可能需要一些时间。",
+      "direct_copy_restoring": "正在恢复... 请稍候。",
       "importing_notes": "正在导入笔记..."
     },
     "units": {
@@ -1511,8 +1512,6 @@
     },
     "direct_copy": {
       "backup_file_found": "已找到备份文件：",
-      "ready_to_restore": "准备好还原了吗？",
-      "replace_all_data_warning": "这将替换所有工作区中的所有数据。",
       "no_backup_found_prefix": "在容器中未找到备份文件：",
       "no_backup_found_hint": "请先运行 docker cp 命令。",
       "completed_successfully_prefix": "直接文件复制还原成功完成！",

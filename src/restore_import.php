@@ -136,6 +136,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$restoreImportAction = $_POST['action'] ?? '';
+$directCopyRestoreSubmitted = $restoreImportPostAllowed && $restoreImportAction === 'restore_cli_upload';
+$restoreBackupContentOpen = $restoreImportPostAllowed && in_array($restoreImportAction, ['restore', 'complete_restore', 'check_cli_upload', 'restore_cli_upload'], true);
+$standardRestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'complete_restore';
+$directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPostAllowed && $restoreImportAction === 'check_cli_upload');
+
 function extractTaskListFromHTML($htmlContent) {
     $tasks = [];
     
@@ -1788,10 +1794,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
     <link rel="stylesheet" href="css/restore_import/base.css">
     <link rel="stylesheet" href="css/restore_import/cards.css">
     <link rel="stylesheet" href="css/restore_import/forms-buttons.css">
-    <link rel="stylesheet" href="css/restore_import/modals.css">
+    <link rel="stylesheet" href="css/restore_import/modals.css?v=<?php echo file_exists(__DIR__ . '/css/restore_import/modals.css') ? filemtime(__DIR__ . '/css/restore_import/modals.css') : getAppVersion(); ?>">
     <link rel="stylesheet" href="css/restore_import/progress.css">
     <link rel="stylesheet" href="css/restore_import/drag-drop.css">
-    <link rel="stylesheet" href="css/restore_import/utilities.css">
+    <link rel="stylesheet" href="css/restore_import/utilities.css?v=<?php echo file_exists(__DIR__ . '/css/restore_import/utilities.css') ? filemtime(__DIR__ . '/css/restore_import/utilities.css') : getAppVersion(); ?>">
     <link rel="stylesheet" href="css/restore_import/responsive.css">
     <link rel="stylesheet" href="css/modals/base.css">
     <link rel="stylesheet" href="css/modals/specific-modals.css">
@@ -1883,7 +1889,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                         <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
                     </h3>
                 </div>
-                <div class="card-content" id="restoreBackupContent">
+                <div class="card-content<?php echo $restoreBackupContentOpen ? ' open' : ''; ?>" id="restoreBackupContent">
             
         <!-- Standard Complete Restore Section -->
         <div class="sub-card">
@@ -1892,7 +1898,7 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
                 </h4>
             </div>
-            <div class="sub-card-content" id="standardRestoreContent">
+            <div class="sub-card-content<?php echo $standardRestoreContentOpen ? ' open' : ''; ?>" id="standardRestoreContent">
                 <p><?php echo t_h('restore_import.sections.standard_restore.description'); ?></p>
 
             <form method="post" enctype="multipart/form-data">
@@ -1923,54 +1929,34 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
                 </h4>
             </div>
-            <div class="sub-card-content" id="directCopyRestoreContent">
+            <div class="sub-card-content<?php echo $directCopyRestoreContentOpen ? ' open' : ''; ?>" id="directCopyRestoreContent">
                 <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.step1'); ?>
             </p>
-            <pre style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"><code style="font-family: 'Consolas', 'Monaco', 'Courier New', monospace;"><?php echo t_h('restore_import.sections.direct_copy_restore.docker_command'); ?></code></pre>
+            <pre class="direct-copy-command"><code><?php echo t_h('restore_import.sections.direct_copy_restore.docker_command'); ?></code></pre>
             <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.step2'); ?>
             </p>
 
-            <form method="post">
-                <input type="hidden" name="action" value="check_cli_upload">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-                <button type="button" class="btn btn-primary" data-action="show-direct-copy-restore-confirmation">
-                    <?php echo t_h('restore_import.buttons.start_restore'); ?>
-                </button>
-            </form>
-
-            <?php if ($restoreImportPostAllowed && isset($_POST['action']) && $_POST['action'] === 'check_cli_upload'): ?>
-                <?php
+            <?php
                 $cliBackupPath = '/tmp/backup_restore.zip';
-                if (file_exists($cliBackupPath)) {
+
+                if (!$directCopyRestoreSubmitted && file_exists($cliBackupPath)) {
                     $fileSize = filesize($cliBackupPath);
                     $fileSizeMB = round($fileSize / 1024 / 1024, 2);
                     echo "<div class='alert alert-info'>";
-                    echo "<strong>" . t_h('restore_import.direct_copy.backup_file_found') . "</strong> {$fileSizeMB}MB<br>";
-                    echo "<strong>" . t_h('restore_import.direct_copy.ready_to_restore') . "</strong> " . t_h('restore_import.direct_copy.replace_all_data_warning');
+                    echo "<strong>" . t_h('restore_import.direct_copy.backup_file_found') . "</strong> {$fileSizeMB}MB";
                     echo "</div>";
-
-                    // Show confirmation form
-                    echo "<form method='post' id='directCopyRestoreForm' class='form-with-margin-top'>";
-                    echo "<input type='hidden' name='action' value='restore_cli_upload'>";
-                    echo "<input type='hidden' name='csrf_token' value='" . htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8') . "'>";
-                    echo "<button type='button' class='btn btn-warning' data-action='show-direct-copy-restore-confirmation'>";
-                    echo t_h('restore_import.direct_copy.buttons.yes_restore_direct_copy');
-                    echo "</button>";
-                    echo "</form>";
-                } else {
+                } elseif (!$directCopyRestoreSubmitted) {
                     echo "<div class='alert alert-warning'>";
                     echo t_h('restore_import.direct_copy.no_backup_found_prefix') . " <code>/tmp/backup_restore.zip</code><br>";
                     echo t_h('restore_import.direct_copy.no_backup_found_hint');
                     echo "</div>";
                 }
-                ?>
-            <?php endif; ?>
+            ?>
 
-            <?php if ($restoreImportPostAllowed && isset($_POST['action']) && $_POST['action'] === 'restore_cli_upload'): ?>
+            <?php if ($directCopyRestoreSubmitted): ?>
                 <?php
-                $cliBackupPath = '/tmp/backup_restore.zip';
                 if (file_exists($cliBackupPath)) {
                     $result = restoreCompleteBackup(['tmp_name' => $cliBackupPath, 'name' => 'cli_backup.zip'], true);
                     if ($result['success']) {
@@ -1985,6 +1971,14 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                 }
                 ?>
             <?php endif; ?>
+
+            <form method="post" action="#directCopyRestoreContent" id="directCopyRestoreForm" class="form-with-margin-top">
+                <input type="hidden" name="action" value="restore_cli_upload">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                <button type="button" class="btn btn-primary" data-action="show-direct-copy-restore-confirmation">
+                    <?php echo t_h('restore_import.buttons.start_restore'); ?>
+                </button>
+            </form>
             </div>
         </div>
         
@@ -2150,6 +2144,10 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
                     <?php echo t_h('restore_import.modals.complete_restore_direct_copy.confirm'); ?>
                 </button>
             </div>
+            <div id="directCopyRestoreProcessing" class="direct-copy-restore-processing initially-hidden" role="status" aria-live="polite" aria-hidden="true">
+                <span class="direct-copy-restore-spinner" aria-hidden="true"></span>
+                <span><?php echo t_h('restore_import.spinner.direct_copy_restoring'); ?></span>
+            </div>
         </div>
     </div>
 
@@ -2198,6 +2196,6 @@ function importIndividualNotes($uploadedFiles, $workspace = null, $folder = null
             'maxZipFiles' => (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'))
         ]);
     ?></script>
-    <script src="js/restore-import.js"></script>
+    <script src="js/restore-import.js?v=<?php echo file_exists(__DIR__ . '/js/restore-import.js') ? filemtime(__DIR__ . '/js/restore-import.js') : getAppVersion(); ?>"></script>
 </body>
 </html>
