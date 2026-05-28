@@ -48,6 +48,14 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        if ($key === 'note_age_filter_days') {
+            $intVal = (int) $value;
+            if ($intVal < 0 || $intVal > 36500) {
+                throw new InvalidArgumentException('value must be between 0 and 36500', 400);
+            }
+            return (string) $intVal;
+        }
+
         if ($key === 'mcp_user_id') {
             $intVal = (int) $value;
             if ($intVal < 1) {

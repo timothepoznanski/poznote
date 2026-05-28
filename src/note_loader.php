@@ -3,6 +3,54 @@
  * Gestion du chargement et de la sélection des notes
  */
 
+function normalizeNoteAgeFilterDays($value) {
+    $days = filter_var($value, FILTER_VALIDATE_INT, ['options' => ['default' => 0]]);
+    if ($days < 1) {
+        return 0;
+    }
+
+    return min($days, 36500);
+}
+
+function getNoteAgeFilterDays($con) {
+    static $cachedDays = null;
+    if ($cachedDays !== null) {
+        return $cachedDays;
+    }
+
+    $cachedDays = 0;
+    try {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute(['note_age_filter_days']);
+        $cachedDays = normalizeNoteAgeFilterDays($stmt->fetchColumn());
+    } catch (Exception $e) {
+        $cachedDays = 0;
+    }
+
+    return $cachedDays;
+}
+
+function getNoteAgeFilterCutoff($days) {
+    $days = normalizeNoteAgeFilterDays($days);
+    if ($days === 0) {
+        return null;
+    }
+
+    return (new DateTimeImmutable('now', new DateTimeZone('UTC')))
+        ->modify('-' . $days . ' days')
+        ->format('Y-m-d H:i:s');
+}
+
+function appendNoteAgeFilter(&$where_clause, &$params, $days) {
+    $cutoff = getNoteAgeFilterCutoff($days);
+    if ($cutoff === null) {
+        return;
+    }
+
+    $where_clause .= ' AND updated >= ?';
+    $params[] = $cutoff;
+}
+
 /**
  * Determine the note to display and prepare queries
  */
@@ -14,8 +62,14 @@ function loadNoteData($con, &$note, $workspace_filter) {
     if($note != '') {
         // If the note is not empty, it means we have just clicked on a note (now using ID)
         $note_id = intval($note);
-        $stmt = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND workspace = ?");
-        $stmt->execute([$note_id, $workspace_filter]);
+        $note_where_clause = 'trash = 0 AND id = ? AND workspace = ?';
+        $note_params = [$note_id, $workspace_filter];
+        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+            appendNoteAgeFilter($note_where_clause, $note_params, getNoteAgeFilterDays($con));
+        }
+
+        $stmt = $con->prepare("SELECT * FROM entries WHERE $note_where_clause");
+        $stmt->execute($note_params);
         $note_data = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($note_data) {
@@ -40,8 +94,8 @@ function loadNoteData($con, &$note, $workspace_filter) {
             
             $current_note_folder = $note_data["folder"] ?: null;
             // Prepare result for right column (ensure it's in the workspace)
-            $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND id = ? AND workspace = ?");
-            $stmt_right->execute([$note_id, $workspace_filter]);
+            $stmt_right = $con->prepare("SELECT * FROM entries WHERE $note_where_clause");
+            $stmt_right->execute($note_params);
             $res_right = $stmt_right;
         } else {
             // If the requested note doesn't exist, display the last updated note
@@ -68,8 +122,12 @@ function loadNoteData($con, &$note, $workspace_filter) {
  * Récupère la dernière note mise à jour
  */
 function getLatestNote($con, $workspace_filter) {
-    $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE trash = 0 AND workspace = ?");
-    $check_stmt->execute([$workspace_filter]);
+    $where_clause = 'trash = 0 AND workspace = ?';
+    $params = [$workspace_filter];
+    appendNoteAgeFilter($where_clause, $params, getNoteAgeFilterDays($con));
+
+    $check_stmt = $con->prepare("SELECT COUNT(*) as note_count FROM entries WHERE $where_clause");
+    $check_stmt->execute($params);
     $note_count = $check_stmt->fetch(PDO::FETCH_ASSOC)['note_count'];
     
     $res_right = null;
@@ -77,16 +135,16 @@ function getLatestNote($con, $workspace_filter) {
     
     if ($note_count > 0) {
         // Show the most recently updated note in the selected workspace
-        $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND workspace = ? ORDER BY updated DESC LIMIT 1");
-        $stmt_right->execute([$workspace_filter]);
+        $stmt_right = $con->prepare("SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1");
+        $stmt_right->execute($params);
         $latest_note = $stmt_right->fetch(PDO::FETCH_ASSOC);
         
         if ($latest_note) {
             $default_note_folder = $latest_note["folder"] ?: null;
             // Re-execute query so $res_right is a fresh PDOStatement for the display loop
             // (PDO cursors cannot be reset after fetch)
-            $stmt_right = $con->prepare("SELECT * FROM entries WHERE trash = 0 AND workspace = ? ORDER BY updated DESC LIMIT 1");
-            $stmt_right->execute([$workspace_filter]);
+            $stmt_right = $con->prepare("SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1");
+            $stmt_right->execute($params);
             $res_right = $stmt_right;
         }
     }

@@ -7,6 +7,7 @@
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
+require_once 'note_loader.php';
 require_once 'markdown_parser.php';
 require_once 'public_helpers.php';
 
@@ -159,8 +160,16 @@ try {
             
             // Verify note exists and belongs to this folder or its descendants
             // We need to fetch the workspace to be safe or just trust the folder tree
-            $stmt = $con->prepare('SELECT id, folder_id FROM entries WHERE id = ? AND trash = 0');
-            $stmt->execute([$noteIdParam]);
+            $noteEntryWhereClause = 'id = ? AND trash = 0';
+            $noteEntryParams = [$noteIdParam];
+            $noteAgeCutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($con));
+            if ($noteAgeCutoff !== null) {
+                $noteEntryWhereClause .= ' AND updated >= ?';
+                $noteEntryParams[] = $noteAgeCutoff;
+            }
+
+            $stmt = $con->prepare("SELECT id, folder_id FROM entries WHERE $noteEntryWhereClause");
+            $stmt->execute($noteEntryParams);
             $noteEntry = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($noteEntry) {

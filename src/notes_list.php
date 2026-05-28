@@ -14,6 +14,9 @@ try {
             $query .= " AND workspace = ?";
             $params[] = $workspace_filter;
         }
+        if (function_exists('appendNoteAgeFilter') && function_exists('getNoteAgeFilterDays')) {
+            appendNoteAgeFilter($query, $params, getNoteAgeFilterDays($con));
+        }
         $stmtFavorites = $con->prepare($query);
         $stmtFavorites->execute($params);
         $favorites_count = (int)$stmtFavorites->fetchColumn();

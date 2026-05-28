@@ -279,6 +279,38 @@
         });
     }
 
+    function getNoteAgeFilterLabel(value) {
+        var days = parseInt(value, 10);
+        if (isNaN(days) || days <= 0) {
+            return tr('modals.note_age_filter.options.all', {}, 'All notes');
+        }
+
+        switch (days) {
+            case 30:
+                return tr('modals.note_age_filter.options.last_30_days', {}, 'Last 30 days');
+            case 90:
+                return tr('modals.note_age_filter.options.last_3_months', {}, 'Last 3 months');
+            case 180:
+                return tr('modals.note_age_filter.options.last_6_months', {}, 'Last 6 months');
+            case 365:
+                return tr('modals.note_age_filter.options.last_12_months', {}, 'Last 12 months');
+            case 730:
+                return tr('modals.note_age_filter.options.last_2_years', {}, 'Last 2 years');
+            default:
+                return tr('modals.note_age_filter.options.custom_days', { days: days }, 'Last ' + days + ' days');
+        }
+    }
+
+    function refreshNoteAgeFilterBadge() {
+        getSetting('note_age_filter_days', function (value) {
+            var badge = document.getElementById('note-age-filter-badge');
+            if (!badge) return;
+
+            badge.textContent = getNoteAgeFilterLabel(value || '0');
+            badge.className = 'setting-status enabled';
+        });
+    }
+
     function refreshTasklistInsertOrderBadge() {
         getSetting('tasklist_insert_order', function (value) {
             var badge = document.getElementById('tasklist-insert-order-badge');
@@ -592,6 +624,32 @@
         });
     }
 
+    function openNoteAgeFilterModal() {
+        var modal = document.getElementById('noteAgeFilterModal');
+        if (!modal) return;
+        getSetting('note_age_filter_days', function (value) {
+            var v = value || '0';
+            var radios = document.getElementsByName('noteAgeFilter');
+            var matched = false;
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].value === 'custom') continue;
+                radios[i].checked = (radios[i].value === v);
+                matched = matched || radios[i].checked;
+            }
+            if (!matched) {
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].value === 'custom') {
+                        radios[i].checked = true;
+                        var customInput = document.getElementById('noteAgeFilterCustomDays');
+                        if (customInput) customInput.value = (v && v !== '0') ? v : '';
+                        break;
+                    }
+                }
+            }
+            modal.style.display = 'flex';
+        });
+    }
+
     function showTimezonePrompt() {
         var modal = document.getElementById('timezoneModal');
         if (!modal) return;
@@ -715,6 +773,11 @@
         var noteSortCard = document.getElementById('note-sort-card');
         if (noteSortCard) {
             noteSortCard.addEventListener('click', openNoteSortModal);
+        }
+
+        var noteAgeFilterCard = document.getElementById('note-age-filter-card');
+        if (noteAgeFilterCard) {
+            noteAgeFilterCard.addEventListener('click', openNoteAgeFilterModal);
         }
 
         var timezoneCard = document.getElementById('timezone-card');
@@ -865,6 +928,41 @@
                         try { closeModal('noteSortModal'); } catch (e) { }
                         reloadOpener();
                         refreshNoteSortBadge();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
+        var customDaysInput = document.getElementById('noteAgeFilterCustomDays');
+        if (customDaysInput) {
+            customDaysInput.addEventListener('focus', function () {
+                var radios = document.getElementsByName('noteAgeFilter');
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].value === 'custom') { radios[i].checked = true; break; }
+                }
+            });
+        }
+
+        var saveNoteAgeFilterBtn = document.getElementById('saveNoteAgeFilterModalBtn');
+        if (saveNoteAgeFilterBtn) {
+            saveNoteAgeFilterBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('noteAgeFilter');
+                var selected = '0';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+                if (selected === 'custom') {
+                    var customInput = document.getElementById('noteAgeFilterCustomDays');
+                    var customVal = customInput ? parseInt(customInput.value, 10) : 0;
+                    selected = (customVal > 0 && customVal <= 36500) ? String(customVal) : '0';
+                }
+                setSetting('note_age_filter_days', selected, function (success) {
+                    if (success) {
+                        try { closeModal('noteAgeFilterModal'); } catch (e) { }
+                        reloadOpener();
+                        refreshNoteAgeFilterBadge();
                     } else {
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
                     }
@@ -1051,6 +1149,7 @@
         refreshLoginDisplayBadge();
         refreshFontSizeBadge();
         refreshNoteSortBadge();
+        refreshNoteAgeFilterBadge();
         refreshTasklistInsertOrderBadge();
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
@@ -1123,6 +1222,7 @@
             refreshLanguageBadge();
             refreshFontSizeBadge();
             refreshNoteSortBadge();
+            refreshNoteAgeFilterBadge();
             refreshTasklistInsertOrderBadge();
             refreshToolbarModeBadge();
             refreshInstallAppBadge();
@@ -1292,11 +1392,13 @@
     // Expose functions for external access and inline HTML handlers
     window.showLanguageModal = showLanguageModal;
     window.openNoteSortModal = openNoteSortModal;
+    window.openNoteAgeFilterModal = openNoteAgeFilterModal;
     window.showTimezonePrompt = showTimezonePrompt;
     window.refreshLanguageBadge = refreshLanguageBadge;
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
     window.refreshNoteSortBadge = refreshNoteSortBadge;
+    window.refreshNoteAgeFilterBadge = refreshNoteAgeFilterBadge;
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;

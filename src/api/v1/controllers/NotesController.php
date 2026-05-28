@@ -5,11 +5,27 @@
  * Handles all CRUD operations for notes.
  */
 
+require_once __DIR__ . '/../../../note_loader.php';
+
 class NotesController {
     private PDO $con;
     
     public function __construct(PDO $con) {
         $this->con = $con;
+    }
+
+    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void {
+        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
+            return;
+        }
+
+        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
+        if ($cutoff === null) {
+            return;
+        }
+
+        $sql .= " AND $column >= ?";
+        $params[] = $cutoff;
     }
     
     /**
@@ -82,6 +98,8 @@ class NotesController {
                 $params[] = '%' . $search . '%';
                 $params[] = '%' . $search . '%';
             }
+
+            $this->appendPublicWorkspaceAgeFilter($sql, $params);
             
             // Handle sorting
             $notes_without_folders_after = false;
@@ -218,11 +236,17 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
-                    $stmt->execute([$noteId, $workspace]);
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $params = [$noteId, $workspace];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0");
-                    $stmt->execute([$noteId]);
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0";
+                    $params = [$noteId];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
             } else {
@@ -236,11 +260,18 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
-                    $stmt->execute([$refId, $workspace]);
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $params = [$refId, $workspace];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
-                    $stmt->execute(['%' . $reference . '%', $workspace]);
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $params = ['%' . $reference . '%', $workspace];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $sql .= " ORDER BY updated DESC LIMIT 1";
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 }
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
             }
@@ -1403,19 +1434,33 @@ class NotesController {
             if (is_numeric($reference)) {
                 $noteId = intval($reference);
                 if ($workspace) {
-                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ? AND workspace = ?");
-                    $stmt->execute([$noteId, $workspace]);
+                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND id = ? AND workspace = ?";
+                    $params = [$noteId, $workspace];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND id = ?");
-                    $stmt->execute([$noteId]);
+                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND id = ?";
+                    $params = [$noteId];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 }
             } else {
                 if ($workspace) {
-                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ? ORDER BY updated DESC LIMIT 1");
-                    $stmt->execute(['%' . $reference . '%', $workspace]);
+                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $params = ['%' . $reference . '%', $workspace];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $sql .= " ORDER BY updated DESC LIMIT 1";
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 } else {
-                    $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) ORDER BY updated DESC LIMIT 1");
-                    $stmt->execute(['%' . $reference . '%']);
+                    $sql = "SELECT id, heading FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)";
+                    $params = ['%' . $reference . '%'];
+                    $this->appendPublicWorkspaceAgeFilter($sql, $params);
+                    $sql .= " ORDER BY updated DESC LIMIT 1";
+                    $stmt = $this->con->prepare($sql);
+                    $stmt->execute($params);
                 }
             }
             
@@ -1455,6 +1500,8 @@ class NotesController {
                 $query .= " AND workspace = ?";
                 $params[] = $workspace;
             }
+
+            $this->appendPublicWorkspaceAgeFilter($query, $params);
             
             $query .= " ORDER BY updated DESC";
             
@@ -1960,6 +2007,8 @@ class NotesController {
                 $sql .= " AND workspace = ?";
                 $params[] = $workspace;
             }
+
+            $this->appendPublicWorkspaceAgeFilter($sql, $params);
             
             $sql .= " ORDER BY 
                         CASE WHEN remove_accents(heading) LIKE remove_accents(?) THEN 0 ELSE 1 END,

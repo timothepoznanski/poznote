@@ -9,6 +9,8 @@
  *   DELETE /api/v1/notes/{noteId}/attachments/{attachmentId}    - Delete an attachment
  */
 
+require_once __DIR__ . '/../../../note_loader.php';
+
 class AttachmentsController {
     private $con;
     private $attachmentsDir;
@@ -37,6 +39,30 @@ class AttachmentsController {
                 chmod($this->attachmentsDir, 0755);
             }
         }
+    }
+
+    private function appendPublicWorkspaceAgeFilter(string &$query, array &$params, string $column = 'updated'): void {
+        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
+            return;
+        }
+
+        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
+        if ($cutoff === null) {
+            return;
+        }
+
+        $query .= " AND $column >= ?";
+        $params[] = $cutoff;
+    }
+
+    private function appendConfiguredNoteAgeFilter(string &$query, array &$params, string $column = 'updated'): void {
+        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
+        if ($cutoff === null) {
+            return;
+        }
+
+        $query .= " AND $column >= ?";
+        $params[] = $cutoff;
     }
 
     private function getSafeInlineTextContentType(array $attachment): ?string {
@@ -79,12 +105,16 @@ class AttachmentsController {
         try {
             if ($workspace) {
                 $query = "SELECT entry, attachments FROM entries WHERE id = ? AND workspace = ?";
+                $params = [$noteId, $workspace];
+                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
-                $stmt->execute([$noteId, $workspace]);
+                $stmt->execute($params);
             } else {
                 $query = "SELECT entry, attachments FROM entries WHERE id = ?";
+                $params = [$noteId];
+                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
-                $stmt->execute([$noteId]);
+                $stmt->execute($params);
             }
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -314,12 +344,16 @@ class AttachmentsController {
             // Get attachment info
             if ($workspace) {
                 $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
+                $params = [$noteId, $workspace];
+                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
-                $stmt->execute([$noteId, $workspace]);
+                $stmt->execute($params);
             } else {
                 $query = "SELECT attachments FROM entries WHERE id = ?";
+                $params = [$noteId];
+                $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
-                $stmt->execute([$noteId]);
+                $stmt->execute($params);
             }
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -623,8 +657,11 @@ class AttachmentsController {
     }
 
     private function noteBelongsToSharedFolder(int $noteId, int $sharedFolderId): bool {
-        $stmt = $this->con->prepare('SELECT folder_id FROM entries WHERE id = ? AND trash = 0');
-        $stmt->execute([$noteId]);
+        $query = 'SELECT folder_id FROM entries WHERE id = ? AND trash = 0';
+        $params = [$noteId];
+        $this->appendConfiguredNoteAgeFilter($query, $params);
+        $stmt = $this->con->prepare($query);
+        $stmt->execute($params);
         $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$noteRow || $noteRow['folder_id'] === null) {
             return false;

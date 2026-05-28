@@ -70,7 +70,16 @@ $currentLang = getUserLanguage();
 	data-txt-applying="<?php echo t_h('notes_manager.applying', [], 'Applying...'); ?>"
       data-txt-moving="<?php echo t_h('notes_manager.moving', [], 'Moving...'); ?>"
       data-txt-moved="<?php echo t_h('notes_manager.moved', [], 'Moved successfully'); ?>"
-      data-txt-root="<?php echo t_h('notes_manager.root', [], 'Root (no folder)'); ?>">
+      data-txt-root="<?php echo t_h('notes_manager.root', [], 'Root (no folder)'); ?>"
+      data-txt-age-labels="<?php echo htmlspecialchars(json_encode([
+          '0'   => t('modals.note_age_filter.options.all', [], 'All notes'),
+          '30'  => t('modals.note_age_filter.options.last_30_days', [], 'Last 30 days'),
+          '90'  => t('modals.note_age_filter.options.last_3_months', [], 'Last 3 months'),
+          '180' => t('modals.note_age_filter.options.last_6_months', [], 'Last 6 months'),
+          '365' => t('modals.note_age_filter.options.last_12_months', [], 'Last 12 months'),
+          '730' => t('modals.note_age_filter.options.last_2_years', [], 'Last 2 years'),
+      ]), ENT_QUOTES, 'UTF-8'); ?>"
+      data-txt-age-custom="<?php echo t_h('modals.note_age_filter.options.custom_days', ['days' => '{days}'], 'Last {days} days'); ?>">
 
 	<div class="notes-manager-container">
 
@@ -110,6 +119,14 @@ $currentLang = getUserLanguage();
 				<option value="html"><?php echo t_h('notes_manager.type_html', [], 'HTML'); ?></option>
 				<option value="markdown"><?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?></option>
 				<option value="tasklist"><?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?></option>
+			</select>
+			<select
+				id="nmAgeFilter"
+				class="nm-filter-select"
+				aria-label="<?php echo t_h('notes_manager.filter_age', [], 'Filter by age'); ?>"
+			>
+				<option value=""><?php echo t_h('notes_manager.age_all', [], 'All notes'); ?></option>
+				<option value="filtered"><?php echo t_h('notes_manager.age_recent', [], 'Recent only'); ?></option>
 			</select>
 			<div id="nmFilterStats" class="filter-stats initially-hidden"></div>
 		</div>

@@ -30,6 +30,8 @@
         txtMoving:      body.getAttribute('data-txt-moving') || 'Moving...',
         txtMoved:       body.getAttribute('data-txt-moved') || 'Moved successfully',
         txtRoot:        body.getAttribute('data-txt-root') || 'Root (no folder)',
+        ageLabels:      (function() { try { return JSON.parse(body.getAttribute('data-txt-age-labels') || '{}'); } catch(e) { return {}; } })(),
+        ageCustom:      body.getAttribute('data-txt-age-custom') || 'Last {days} days',
     };
 
     // ── State ────────────────────────────────────────────────────────────────
@@ -39,6 +41,8 @@
     var selectedIds = new Set();
     var filterText = '';
     var filterType = '';
+    var filterAge  = '';       // '' = all, 'filtered' = apply age cutoff
+    var noteAgeFilterDays = 0; // loaded from settings
     var movingToFolderId = null; // null = root; number = folder id
     var currentTagAction = '';
 
@@ -48,6 +52,7 @@
     var nmEmptyMessage   = document.getElementById('nmEmptyMessage');
     var nmFilterInput    = document.getElementById('nmFilterInput');
     var nmTypeFilter     = document.getElementById('nmTypeFilter');
+    var nmAgeFilter      = document.getElementById('nmAgeFilter');
     var nmClearFilter    = document.getElementById('nmClearFilter');
     var nmFilterStats    = document.getElementById('nmFilterStats');
     var nmBulkBar        = document.getElementById('nmBulkBar');
@@ -219,13 +224,39 @@
 
         Promise.all([
             fetchJson(notesUrl),
-            fetchJson(foldersUrl)
+            fetchJson(foldersUrl),
+            fetchJson(apiUrl('settings/note_age_filter_days' + wsQuery())).catch(function () { return { value: '0' }; })
         ]).then(function (results) {
             var notesData   = results[0];
             var foldersData = results[1];
+            var ageSetting  = results[2];
 
             allNotes   = notesData.notes   || [];
             allFolders = foldersData.folders || [];
+            noteAgeFilterDays = Math.max(0, parseInt(ageSetting.value || '0', 10) || 0);
+
+            // Update the "filtered" option label with the configured period
+            if (nmAgeFilter) {
+                if (noteAgeFilterDays > 0) {
+                    var filteredOpt = nmAgeFilter.querySelector('option[value="filtered"]');
+                    if (filteredOpt) {
+                        var label = cfg.ageLabels[String(noteAgeFilterDays)];
+                        if (!label) {
+                            label = cfg.ageCustom.replace('{days}', noteAgeFilterDays);
+                        }
+                        filteredOpt.textContent = label;
+                    }
+                    nmAgeFilter.style.display = '';
+                    // Default to the configured filter
+                    filterAge = 'filtered';
+                    nmAgeFilter.value = 'filtered';
+                } else {
+                    // No age filter configured in settings — hide the selector
+                    nmAgeFilter.style.display = 'none';
+                    filterAge = '';
+                    nmAgeFilter.value = '';
+                }
+            }
 
             hide(nmSpinner);
             applyFilter();
@@ -256,6 +287,15 @@
                 var tags  = (n.tags   || '').toLowerCase();
                 var typeLabel = getNoteTypeLabel(n.type).toLowerCase();
                 return title.indexOf(q) !== -1 || tags.indexOf(q) !== -1 || typeLabel.indexOf(q) !== -1;
+            });
+        }
+
+        // Apply age filter
+        if (filterAge === 'filtered' && noteAgeFilterDays > 0) {
+            var cutoff = new Date(Date.now() - noteAgeFilterDays * 86400000);
+            filteredNotes = filteredNotes.filter(function (n) {
+                if (!n.updated) return true;
+                return new Date(n.updated) >= cutoff;
             });
         }
 
@@ -810,6 +850,12 @@
         filterType = this.value;
         applyFilter();
     });
+    if (nmAgeFilter) {
+        nmAgeFilter.addEventListener('change', function () {
+            filterAge = this.value;
+            applyFilter();
+        });
+    }
     nmClearFilter.addEventListener('click', function () {
         nmFilterInput.value = '';
         filterText = '';

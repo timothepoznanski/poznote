@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
+require_once 'note_loader.php';
 require_once 'markdown_parser.php';
 require_once 'public_helpers.php';
 
@@ -200,14 +201,22 @@ try {
     // IMPORTANT: Include notes even without individual tokens if they belong to this shared folder hierarchy?
     // Keep explicit note shares when they exist, but inherited folder access must not create implicit note shares.
     // However, we'll try to be more inclusive in the query.
+    $notesWhereClause = "e.folder_id IN ($placeholders) AND e.trash = 0";
+    $notesQueryParams = $allRelevantFolderIds;
+    $noteAgeCutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($con));
+    if ($noteAgeCutoff !== null) {
+        $notesWhereClause .= ' AND e.updated >= ?';
+        $notesQueryParams[] = $noteAgeCutoff;
+    }
+
     $stmt = $con->prepare("
         SELECT e.id, e.heading, e.created, e.type, e.folder_id, sn.token 
         FROM entries e 
         LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
-        WHERE e.folder_id IN ($placeholders) AND e.trash = 0 
+        WHERE $notesWhereClause
         ORDER BY e.created DESC
     ");
-    $stmt->execute($allRelevantFolderIds);
+    $stmt->execute($notesQueryParams);
     $allNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $sharedNotes = [];

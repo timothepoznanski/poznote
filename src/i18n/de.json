@@ -538,6 +538,7 @@
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_sort_order": "Notizen-Sortierreihenfolge",
+      "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "timezone": "Zeitzone",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
@@ -1081,6 +1082,21 @@
         "alphabetical": "Alphabetisch"
       }
     },
+    "note_age_filter": {
+      "title": "Altersfilter für Notizen",
+      "description": "Wählen Sie, wie weit zurück geänderte Notizen in der Liste angezeigt werden:",
+      "options": {
+        "all": "Alle Notizen",
+        "last_30_days": "Letzte 30 Tage",
+        "last_3_months": "Letzte 3 Monate",
+        "last_6_months": "Letzte 6 Monate",
+        "last_12_months": "Letzte 12 Monate",
+        "last_2_years": "Letzte 2 Jahre",
+        "custom_days": "Letzte {{days}} Tage",
+        "custom_label": "Benutzerdefiniert",
+        "days": "Tage"
+      }
+    },
     "timezone": {
       "title": "Zeitzone",
       "description": "Wählen Sie Ihre Zeitzone:",
@@ -1160,7 +1176,10 @@
     "moved": "Erfolgreich verschoben",
     "root": "Stammverzeichnis (kein Ordner)",
     "filter_folders": "Ordner filtern...",
-    "filter_placeholder": "Notizen nach Titel oder Tags filtern..."
+    "filter_placeholder": "Notizen nach Titel oder Tags filtern...",
+    "filter_age": "Nach Alter filtern",
+    "age_all": "Alle Notizen",
+    "age_recent": "Nur aktuelle"
   },
   "update": {
     "new_available": "🎉 Neues Update verfügbar!",
