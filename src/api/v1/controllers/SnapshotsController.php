@@ -141,6 +141,86 @@ class SnapshotsController {
     }
 
     /**
+     * Determine whether a stored UTC datetime belongs to the current user-local day.
+     */
+    private function isCreatedTodayForUser(?string $createdAt): bool {
+        $createdDate = $this->getUserDateFromSnapshotTimestamp((string) $createdAt);
+
+        return $createdDate !== '' && $createdDate === $this->getSnapshotDateForUser();
+    }
+
+    private function isSnapshotContentEmpty(string $content, string $noteType): bool {
+        $content = trim($content);
+        if ($content === '') {
+            return true;
+        }
+
+        if ($noteType === 'markdown') {
+            return false;
+        }
+
+        if ($noteType === 'tasklist') {
+            $decoded = json_decode($content, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $task) {
+                    if (is_array($task)) {
+                        foreach (['text', 'content', 'title', 'label'] as $field) {
+                            if (trim((string) ($task[$field] ?? '')) !== '') {
+                                return false;
+                            }
+                        }
+                    } elseif (trim((string) $task) !== '') {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        if (preg_match('/<(img|svg|canvas|video|audio|iframe|object|embed|table|ul|ol|li|input)\b/i', $content)) {
+            return false;
+        }
+
+        $text = html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/[\s\x{00A0}]+/u', '', $text);
+
+        return $text === '';
+    }
+
+    private function getCurrentNoteContent(array $note): string {
+        $noteType = $note['type'] ?? 'note';
+        $entriesPath = getEntriesPath();
+        $noteExtension = ($noteType === 'markdown') ? '.md' : '.html';
+        $noteFile = $entriesPath . '/' . (int) ($note['id'] ?? 0) . $noteExtension;
+
+        $content = '';
+        if (file_exists($noteFile) && is_readable($noteFile)) {
+            $content = file_get_contents($noteFile);
+            if ($content === false) {
+                $content = '';
+            }
+        }
+
+        if ($content === '' && !empty($note['entry'])) {
+            $content = $note['entry'];
+        }
+
+        if ($noteType === 'tasklist') {
+            $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
+        }
+
+        return $content;
+    }
+
+    private function shouldSkipAutomaticSnapshotForEmptyNewNote(array $note, string $content): bool {
+        $noteType = $note['type'] ?? 'note';
+
+        return $this->isCreatedTodayForUser($note['created'] ?? '')
+            && $this->isSnapshotContentEmpty($content, $noteType);
+    }
+
+    /**
      * Read snapshot metadata if present.
      */
     private function readSnapshotMeta(string $metaFile): array {
@@ -457,7 +537,7 @@ class SnapshotsController {
         
         try {
             // Get note data
-            $stmt = $this->con->prepare("SELECT id, heading, type, entry FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT id, heading, type, entry, created FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$noteId]);
             $note = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -490,6 +570,19 @@ class SnapshotsController {
                     'message' => t('snapshot.api.already_exists', [], 'Snapshot already exists for today')
                 ];
             }
+
+            // Get current note content from file
+            $content = $this->getCurrentNoteContent($note);
+
+            if (!$manual && $this->shouldSkipAutomaticSnapshotForEmptyNewNote($note, $content)) {
+                return [
+                    'success' => true,
+                    'skipped' => true,
+                    'reason' => 'empty_new_note',
+                    'empty_new_note' => true,
+                    'message' => t('snapshot.api.skipped_empty_new_note', [], 'No automatic snapshot yet because this new note is empty')
+                ];
+            }
             
             // Create directories if needed
             if (!is_dir($noteSnapshotDir)) {
@@ -500,28 +593,6 @@ class SnapshotsController {
                         'error' => t('snapshot.api.create_directory_failed', [], 'Failed to create snapshot directory')
                     ];
                 }
-            }
-            
-            // Get current note content from file
-            $entriesPath = getEntriesPath();
-            $noteExtension = ($noteType === 'markdown') ? '.md' : '.html';
-            $noteFile = $entriesPath . '/' . $noteId . $noteExtension;
-            
-            $content = '';
-            if (file_exists($noteFile) && is_readable($noteFile)) {
-                $content = file_get_contents($noteFile);
-                if ($content === false) {
-                    $content = '';
-                }
-            }
-            
-            // If no file content, fallback to database entry
-            if ($content === '' && !empty($note['entry'])) {
-                $content = $note['entry'];
-            }
-
-            if ($noteType === 'tasklist') {
-                $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
             }
 
             $snapshotKey = $manual ? $this->buildManualSnapshotKey($today) : $today;
@@ -612,7 +683,7 @@ class SnapshotsController {
         }
         
         try {
-            $stmt = $this->con->prepare("SELECT id, type FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT id, type, entry, created FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$noteId]);
             $note = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -640,9 +711,12 @@ class SnapshotsController {
                     'created_at' => $snapshot['created_at']
                 ];
             }, $snapshots);
+            $emptyNewNote = empty($publicSnapshots)
+                && $this->shouldSkipAutomaticSnapshotForEmptyNewNote($note, $this->getCurrentNoteContent($note));
             
             echo json_encode([
                 'success' => true,
+                'empty_new_note' => $emptyNewNote,
                 'snapshots' => $publicSnapshots
             ], JSON_UNESCAPED_UNICODE);
             

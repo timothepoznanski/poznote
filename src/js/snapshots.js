@@ -7,6 +7,7 @@
     'use strict';
 
     var pendingSnapshotCreates = Object.create(null);
+    var snapshotEmptyStateDefaults = null;
 
     function tr(key, fallback, vars) {
         if (typeof window.t === 'function') {
@@ -189,6 +190,40 @@
         });
     }
 
+    function getSnapshotEmptyStateDefaults(noSnapshotEl) {
+        if (!snapshotEmptyStateDefaults) {
+            var titleEl = noSnapshotEl.querySelector('.snapshot-state-title');
+            var hintEl = noSnapshotEl.querySelector('.snapshot-state-hint');
+            snapshotEmptyStateDefaults = {
+                title: titleEl ? titleEl.textContent : 'No snapshot available',
+                hint: hintEl ? hintEl.textContent : 'No snapshot for now, but you can create one manually right away.'
+            };
+        }
+
+        return snapshotEmptyStateDefaults;
+    }
+
+    function setSnapshotEmptyState(isEmptyNewNote) {
+        var noSnapshotEl = document.getElementById('snapshotNoData');
+        if (!noSnapshotEl) return;
+
+        var titleEl = noSnapshotEl.querySelector('.snapshot-state-title');
+        var hintEl = noSnapshotEl.querySelector('.snapshot-state-hint');
+        var defaults = getSnapshotEmptyStateDefaults(noSnapshotEl);
+
+        if (titleEl) {
+            titleEl.textContent = isEmptyNewNote
+                ? tr('snapshot.modal.new_note_empty_title', defaults.title)
+                : tr('snapshot.modal.empty_title', defaults.title);
+        }
+
+        if (hintEl) {
+            hintEl.textContent = isEmptyNewNote
+                ? tr('snapshot.modal.new_note_empty_hint', defaults.hint)
+                : tr('snapshot.modal.empty_hint', defaults.hint);
+        }
+    }
+
     function rememberPendingSnapshotCreate(noteId, promise) {
         var key = String(noteId);
         pendingSnapshotCreates[key] = promise;
@@ -257,6 +292,7 @@
         if (!modal) return;
 
         syncSnapshotModalTheme(modal);
+        setSnapshotEmptyState(false);
 
         // Store current note id for restore
         modal.dataset.noteId = noteId;
@@ -286,6 +322,7 @@
             var snapshots = getAvailableSnapshots(data.snapshots);
 
             if (!data.success || snapshots.length === 0) {
+                setSnapshotEmptyState(data && data.empty_new_note === true);
                 if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
                 if (dateListEl) dateListEl.style.display = 'none';
                 return;
