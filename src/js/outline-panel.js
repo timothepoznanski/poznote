@@ -15,6 +15,8 @@ let floatingHeadingAnchorHideTimeout = null;
 const HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6';
 const HEADING_ANCHOR_SELECTOR = '.heading-anchor';
 const HEADING_ANCHOR_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
+const OUTLINE_PAGE_SCROLL_TOP_OFFSET = 100;
+const OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET = 20;
 
 function isPublicOutlinePage() {
     return !!(window.isPublicNotePage || document.querySelector('.public-note-page .public-note .content'));
@@ -68,6 +70,164 @@ function getMarkdownEditorContent(markdownEditor) {
 
 function isMarkdownFence(line) {
     return /^\s*```/.test(line);
+}
+
+function getMarkdownSourceOffsetForLine(markdownContent, lineNumber) {
+    const lines = String(markdownContent || '').split('\n');
+    const targetLine = Math.max(0, Math.min(lineNumber, Math.max(lines.length - 1, 0)));
+    let sourceOffset = 0;
+
+    for (let i = 0; i < targetLine; i++) {
+        sourceOffset += lines[i].length + 1;
+    }
+
+    return sourceOffset;
+}
+
+function getMarkdownEditorPlaceholderSource(node) {
+    if (!node || node.nodeType !== Node.ELEMENT_NODE || !node.classList || !node.classList.contains('markdown-excalidraw-placeholder')) {
+        return null;
+    }
+
+    return node.getAttribute('data-markdown-source') || node.textContent || '';
+}
+
+function findMarkdownEditorDomPositionForSourceOffset(editor, sourceOffset) {
+    if (!editor) return null;
+
+    const targetOffset = Math.max(0, sourceOffset || 0);
+    let traversed = 0;
+
+    function walk(node) {
+        if (!node) return null;
+
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent || '';
+            const nextTraversed = traversed + text.length;
+            if (targetOffset <= nextTraversed) {
+                return {
+                    node: node,
+                    offset: Math.max(0, Math.min(targetOffset - traversed, text.length))
+                };
+            }
+            traversed = nextTraversed;
+            return null;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            return null;
+        }
+
+        const placeholderSource = getMarkdownEditorPlaceholderSource(node);
+        if (placeholderSource !== null) {
+            const nextTraversed = traversed + placeholderSource.length;
+            if (targetOffset <= nextTraversed) {
+                const parent = node.parentNode || editor;
+                const childIndex = Array.prototype.indexOf.call(parent.childNodes, node);
+                return {
+                    node: parent,
+                    offset: targetOffset <= traversed ? childIndex : childIndex + 1
+                };
+            }
+            traversed = nextTraversed;
+            return null;
+        }
+
+        if (node.tagName === 'BR') {
+            const nextTraversed = traversed + 1;
+            if (targetOffset <= nextTraversed) {
+                const parent = node.parentNode || editor;
+                const childIndex = Array.prototype.indexOf.call(parent.childNodes, node);
+                return {
+                    node: parent,
+                    offset: targetOffset <= traversed ? childIndex : childIndex + 1
+                };
+            }
+            traversed = nextTraversed;
+            return null;
+        }
+
+        for (let child = node.firstChild; child; child = child.nextSibling) {
+            const match = walk(child);
+            if (match) return match;
+        }
+
+        return null;
+    }
+
+    return walk(editor) || {
+        node: editor,
+        offset: editor.childNodes.length
+    };
+}
+
+function getMarkdownEditorSourceOffsetRect(editor, sourceOffset) {
+    const startPosition = findMarkdownEditorDomPositionForSourceOffset(editor, sourceOffset);
+    if (!startPosition) return null;
+
+    const range = document.createRange();
+    range.setStart(startPosition.node, startPosition.offset);
+
+    const endPosition = findMarkdownEditorDomPositionForSourceOffset(editor, sourceOffset + 1);
+    if (endPosition) {
+        try {
+            range.setEnd(endPosition.node, endPosition.offset);
+        } catch (_error) {
+            range.collapse(true);
+        }
+    } else {
+        range.collapse(true);
+    }
+
+    const rects = range.getClientRects();
+    for (let i = 0; i < rects.length; i++) {
+        if (rects[i].width > 0 || rects[i].height > 0) {
+            const rect = rects[i];
+            if (range.detach) range.detach();
+            return rect;
+        }
+    }
+
+    const rect = range.getBoundingClientRect();
+    if (range.detach) range.detach();
+
+    return (rect && (rect.top || rect.bottom || rect.height)) ? rect : null;
+}
+
+function scrollMarkdownEditorLineToTop(markdownEditor, lineNumber, scrollContainer, topOffset) {
+    if (!markdownEditor || !scrollContainer) return false;
+
+    const safeTopOffset = typeof topOffset === 'number' ? topOffset : OUTLINE_PAGE_SCROLL_TOP_OFFSET;
+
+    const markdownContent = getMarkdownEditorContent(markdownEditor);
+    const sourceOffset = getMarkdownSourceOffsetForLine(markdownContent, lineNumber);
+    const targetRect = getMarkdownEditorSourceOffsetRect(markdownEditor, sourceOffset);
+    const containerRect = scrollContainer.getBoundingClientRect();
+
+    if (targetRect && containerRect) {
+        const targetScrollTop = scrollContainer.scrollTop + targetRect.top - containerRect.top - safeTopOffset;
+        scrollContainer.scrollTo({
+            top: Math.max(0, targetScrollTop),
+            behavior: 'smooth'
+        });
+        return true;
+    }
+
+    const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
+    const targetLinePosition = lineNumber * lineHeight;
+    let fallbackScrollTop = targetLinePosition - safeTopOffset;
+
+    if (scrollContainer !== markdownEditor) {
+        const editorRect = markdownEditor.getBoundingClientRect();
+        const editorOffsetInContainer = editorRect.top - containerRect.top + scrollContainer.scrollTop;
+        fallbackScrollTop = editorOffsetInContainer + targetLinePosition - safeTopOffset;
+    }
+
+    scrollContainer.scrollTo({
+        top: Math.max(0, fallbackScrollTop),
+        behavior: 'smooth'
+    });
+    return true;
 }
 
 function setDesktopOutlineCollapsedState(isCollapsed) {
@@ -786,19 +946,7 @@ function scrollToHeading(heading) {
         if (heading.isSplitMode) {
             // Scroll editor to line
             if (markdownEditor && markdownEditor.offsetParent !== null) {
-                const lines = getMarkdownEditorContent(markdownEditor).split('\n');
-                const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
-                const targetPosition = heading.lineNumber * lineHeight;
-
-                markdownEditor.scrollTop = Math.max(0, targetPosition - 100);
-
-                // Set cursor position
-                if (markdownEditor.setSelectionRange) {
-                    const textBeforeHeading = lines.slice(0, heading.lineNumber).join('\n');
-                    const cursorPosition = textBeforeHeading.length + (heading.lineNumber > 0 ? 1 : 0);
-                    markdownEditor.focus();
-                    markdownEditor.setSelectionRange(cursorPosition, cursorPosition);
-                }
+                scrollMarkdownEditorLineToTop(markdownEditor, heading.lineNumber, markdownEditor, OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET);
             }
 
             // Scroll preview to heading element
@@ -806,7 +954,7 @@ function scrollToHeading(heading) {
                 const previewRect = markdownPreview.getBoundingClientRect();
                 const headingRect = heading.element.getBoundingClientRect();
                 const scrollTop = markdownPreview.scrollTop;
-                const offset = headingRect.top - previewRect.top + scrollTop - 20;
+                const offset = headingRect.top - previewRect.top + scrollTop - OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET;
 
                 markdownPreview.scrollTop = Math.max(0, offset);
 
@@ -822,35 +970,9 @@ function scrollToHeading(heading) {
 
         // Edit mode only (no preview visible)
         if (markdownEditor && (!markdownPreview || markdownPreview.offsetParent === null)) {
-            const lines = getMarkdownEditorContent(markdownEditor).split('\n');
-            const lineHeight = parseFloat(getComputedStyle(markdownEditor).lineHeight) || 20;
-            const targetLinePosition = heading.lineNumber * lineHeight;
-
             // In edit mode, the main container (right_col) scrolls, not the editor itself
             const scrollContainer = getOutlineScrollContainer();
-
-            if (scrollContainer) {
-                // Calculate the editor's position in the container
-                const containerRect = scrollContainer.getBoundingClientRect();
-                const editorRect = markdownEditor.getBoundingClientRect();
-                const editorOffsetInContainer = editorRect.top - containerRect.top + scrollContainer.scrollTop;
-
-                // Target position = editor position + line position - padding
-                const targetScrollPosition = editorOffsetInContainer + targetLinePosition - 100;
-
-                scrollContainer.scrollTo({
-                    top: Math.max(0, targetScrollPosition),
-                    behavior: 'smooth'
-                });
-            }
-
-            // Set cursor position
-            if (markdownEditor.setSelectionRange) {
-                const textBeforeHeading = lines.slice(0, heading.lineNumber).join('\n');
-                const cursorPosition = textBeforeHeading.length + (heading.lineNumber > 0 ? 1 : 0);
-                markdownEditor.focus();
-                markdownEditor.setSelectionRange(cursorPosition, cursorPosition);
-            }
+            scrollMarkdownEditorLineToTop(markdownEditor, heading.lineNumber, scrollContainer);
             return;
         }
 
@@ -900,7 +1022,7 @@ function scrollToElement(element) {
     const containerRect = scrollContainer.getBoundingClientRect();
     const elementRect = element.getBoundingClientRect();
     const scrollTop = scrollContainer.scrollTop;
-    const offset = elementRect.top - containerRect.top + scrollTop - 100; // 100px padding to avoid toolbar
+    const offset = elementRect.top - containerRect.top + scrollTop - OUTLINE_PAGE_SCROLL_TOP_OFFSET;
 
     // Smooth scroll
     scrollContainer.scrollTo({
