@@ -38,7 +38,6 @@
       }
     },
     "download": "Baixar",
-    "convert": "Converter",
     "create": "Criar",
     "duplicate": "Duplicar",
     "move": "Mover",
@@ -1083,7 +1082,7 @@
     },
     "note_age_filter": {
       "title": "Filtro de antiguidade das notas",
-      "description": "Escolha até quando as notas modificadas devem aparecer na lista:",
+      "description": "Escolha até quando as notas modificadas devem aparecer",
       "options": {
         "all": "Todas as notas",
         "last_30_days": "Últimos 30 dias",

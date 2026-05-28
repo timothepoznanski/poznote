@@ -1083,7 +1083,7 @@
     },
     "note_age_filter": {
       "title": "笔记时间筛选",
-      "description": "选择笔记列表中显示最近修改的时间范围：",
+      "description": "选择显示最近修改笔记的时间范围",
       "options": {
         "all": "所有笔记",
         "last_30_days": "最近 30 天",

@@ -1083,7 +1083,7 @@
     },
     "note_age_filter": {
       "title": "Filtro de antigüedad de notas",
-      "description": "Elige hasta qué fecha atrás se muestran las notas modificadas en la lista:",
+      "description": "Elige hasta qué fecha atrás se muestran las notas modificadas",
       "options": {
         "all": "Todas las notas",
         "last_30_days": "Últimos 30 días",

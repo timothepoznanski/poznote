@@ -38,7 +38,6 @@
       }
     },
     "download": "Herunterladen",
-    "convert": "Konvertieren",
     "create": "Erstellen",
     "delete": "Löschen",
     "duplicate": "Duplizieren",
@@ -1084,7 +1083,7 @@
     },
     "note_age_filter": {
       "title": "Altersfilter für Notizen",
-      "description": "Wählen Sie, wie weit zurück geänderte Notizen in der Liste angezeigt werden:",
+      "description": "Wählen Sie, wie weit zurück geänderte Notizen angezeigt werden",
       "options": {
         "all": "Alle Notizen",
         "last_30_days": "Letzte 30 Tage",

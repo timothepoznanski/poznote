@@ -668,7 +668,7 @@
     },
     "note_age_filter": {
       "title": "Note age filter",
-      "description": "Choose how far back modified notes should appear in the notes list:",
+      "description": "Choose how far back modified notes should appear",
       "options": {
         "all": "All notes",
         "last_30_days": "Last 30 days",

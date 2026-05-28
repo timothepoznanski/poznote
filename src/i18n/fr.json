@@ -1110,7 +1110,7 @@
     },
     "note_age_filter": {
       "title": "Filtre d’ancienneté des notes",
-      "description": "Afficher uniquement les notes modifiées dans la période choisie :",
+      "description": "Choisissez jusqu’où remonter pour afficher les notes modifiées",
       "options": {
         "all": "Toutes les notes",
         "last_30_days": "30 derniers jours",
