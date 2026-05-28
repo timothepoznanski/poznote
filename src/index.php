@@ -501,6 +501,10 @@ if ($isPublicWorkspaceReadonly) {
             if ($res_right) {
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
+                    if (!$isPublicWorkspaceReadonly && function_exists('ensureAutomaticSnapshotForOpenedNote')) {
+                        ensureAutomaticSnapshotForOpenedNote($con, (int)$row['id']);
+                    }
+
                     // Check if note is shared
                     $is_shared = false;
                     try {

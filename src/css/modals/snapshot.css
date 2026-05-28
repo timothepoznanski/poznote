@@ -12,6 +12,7 @@
     max-width: 950px !important;
     width: 94% !important;
     max-height: 85vh;
+    margin: 12px auto 0 !important;
     display: flex;
     flex-direction: column;
     padding: 0 !important;
@@ -149,6 +150,13 @@
     gap: 6px;
 }
 
+.snapshot-modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
 .snapshot-modal-header h3 {
     margin: 0 !important;
     display: flex;
@@ -157,13 +165,76 @@
     font-size: 17px;
 }
 
-.snapshot-modal-description {
-    margin: 0;
-    max-width: 680px;
+.snapshot-help-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
     color: #667085;
-    font-size: 13px;
+    cursor: help;
+    flex: 0 0 auto;
+}
+
+.snapshot-help-btn:hover,
+.snapshot-help-btn:focus-visible {
+    background: rgba(0, 0, 0, 0.06);
+    color: #344054;
+    outline: none;
+}
+
+.snapshot-help-btn .lucide {
+    width: 18px;
+    height: 18px;
+}
+
+.snapshot-help-btn::before,
+.snapshot-help-btn::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-2px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 30;
+}
+
+.snapshot-help-btn::before {
+    content: '';
+    left: 8px;
+    top: calc(100% + 2px);
+    border: 6px solid transparent;
+    border-bottom-color: #111827;
+}
+
+.snapshot-help-btn::after {
+    content: attr(data-tooltip);
+    left: 0;
+    top: calc(100% + 14px);
+    width: max-content;
+    max-width: min(420px, calc(100vw - 64px));
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #111827;
+    color: #ffffff;
+    box-shadow: 0 10px 26px rgba(16, 24, 40, 0.22);
+    font-size: 12px;
+    font-weight: 500;
     line-height: 1.45;
+    text-align: left;
     white-space: pre-line;
+}
+
+.snapshot-help-btn:hover::before,
+.snapshot-help-btn:hover::after,
+.snapshot-help-btn:focus-visible::before,
+.snapshot-help-btn:focus-visible::after {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .snapshot-close-btn {
@@ -239,14 +310,14 @@
 /* ---- Meta bar ---- */
 .snapshot-meta {
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 0 24px 2px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 0 24px 8px;
     background: transparent;
     border-bottom: none;
     font-size: 12px;
     flex-shrink: 0;
-    flex-wrap: wrap;
 }
 
 .snapshot-meta-item {
@@ -260,6 +331,27 @@
     width: 13px;
     height: 13px;
     opacity: 0.55;
+}
+
+.snapshot-meta-title {
+    max-width: 100%;
+    align-items: flex-start;
+    color: #1d2939;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.28;
+}
+
+.snapshot-meta-title .lucide {
+    width: 17px;
+    height: 17px;
+    margin-top: 2px;
+    opacity: 0.7;
+    flex: 0 0 auto;
+}
+
+#snapshotHeading {
+    overflow-wrap: anywhere;
 }
 
 /* ---- Content preview ---- */
@@ -366,10 +458,23 @@
     color: #f2f5f8 !important;
 }
 
-#snapshotModal.snapshot-modal-dark .snapshot-modal-description,
 #snapshotModal.snapshot-modal-dark .snapshot-date-list-header,
 #snapshotModal.snapshot-modal-dark .snapshot-meta-item {
     color: rgba(218, 226, 237, 0.82) !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-help-btn {
+    color: rgba(218, 226, 237, 0.82);
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-help-btn:hover,
+#snapshotModal.snapshot-modal-dark .snapshot-help-btn:focus-visible {
+    background: rgba(255, 255, 255, 0.1);
+    color: #f2f5f8;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-meta-title {
+    color: #f2f5f8 !important;
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-date-list {
@@ -505,6 +610,7 @@
     .snapshot-modal-content {
         width: 100% !important;
         max-height: 92vh;
+        margin-top: 0 !important;
         border-radius: 10px;
     }
 
@@ -600,6 +706,10 @@
 
     .snapshot-meta {
         padding: 10px 16px;
-        gap: 12px;
+        gap: 6px;
+    }
+
+    .snapshot-meta-title {
+        font-size: 15px;
     }
 }

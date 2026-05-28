@@ -1251,8 +1251,13 @@
     <div class="modal-content snapshot-modal-content">
         <div class="snapshot-modal-header">
             <div class="snapshot-modal-header-copy">
-                <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
-                <p class="snapshot-modal-description"><?php echo t_h('snapshot.modal.description', [], "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones."); ?></p>
+                <?php $snapshotDescription = t('snapshot.modal.description', [], "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.\nOnly the 7 most recent snapshots are kept, including those created manually."); ?>
+                <div class="snapshot-modal-title-row">
+                    <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
+                    <button type="button" class="snapshot-help-btn" aria-label="<?php echo htmlspecialchars($snapshotDescription, ENT_QUOTES); ?>" data-tooltip="<?php echo htmlspecialchars($snapshotDescription, ENT_QUOTES); ?>">
+                        <i class="lucide lucide-help-circle"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1280,11 +1285,11 @@
 
                 <div id="snapshotBody" style="display:none;">
                     <div class="snapshot-meta">
-                        <div class="snapshot-meta-item">
+                        <div class="snapshot-meta-item snapshot-meta-date">
                             <i class="lucide lucide-calendar"></i>
                             <span id="snapshotDate"></span>
                         </div>
-                        <div class="snapshot-meta-item">
+                        <div class="snapshot-meta-item snapshot-meta-title">
                             <i class="lucide lucide-file-text"></i>
                             <span id="snapshotHeading"></span>
                         </div>

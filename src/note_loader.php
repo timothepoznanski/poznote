@@ -52,6 +52,40 @@ function appendNoteAgeFilter(&$where_clause, &$params, $days) {
 }
 
 /**
+ * Ensure the automatic daily snapshot exists before exposing a note for editing.
+ */
+function ensureAutomaticSnapshotForOpenedNote($con, $noteId) {
+    static $snapshotController = null;
+    static $processedNoteIds = [];
+
+    $noteId = (int) $noteId;
+    if ($noteId <= 0 || isset($processedNoteIds[$noteId])) {
+        return;
+    }
+
+    $processedNoteIds[$noteId] = true;
+
+    if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+        return;
+    }
+
+    try {
+        require_once __DIR__ . '/api/v1/controllers/SnapshotsController.php';
+
+        if (!$snapshotController instanceof SnapshotsController) {
+            $snapshotController = new SnapshotsController($con);
+        }
+
+        $result = $snapshotController->ensureAutomaticSnapshot($noteId);
+        if (empty($result['success'])) {
+            error_log('Automatic snapshot failed for note ' . $noteId . ': ' . ($result['error'] ?? 'unknown error'));
+        }
+    } catch (Throwable $e) {
+        error_log('Automatic snapshot failed for note ' . $noteId . ': ' . $e->getMessage());
+    }
+}
+
+/**
  * Determine the note to display and prepare queries
  */
 function loadNoteData($con, &$note, $workspace_filter) {
