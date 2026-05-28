@@ -3805,6 +3805,156 @@ function toggleMarkdownCheckbox(checkbox, lineNumber) {
     }
 }
 
+function _mdGetSourceOffsetForLine(markdownContent, lineNumber) {
+    var lines = String(markdownContent || '').split('\n');
+    var targetLine = Math.max(0, Math.min(lineNumber, Math.max(lines.length - 1, 0)));
+    var sourceOffset = 0;
+
+    for (var i = 0; i < targetLine; i++) {
+        sourceOffset += lines[i].length + 1;
+    }
+
+    return sourceOffset;
+}
+
+function _mdFindEditorPositionForSourceOffset(editorDiv, sourceOffset) {
+    if (!editorDiv) return null;
+
+    var targetOffset = Math.max(0, sourceOffset || 0);
+    var traversed = 0;
+
+    function walk(node) {
+        if (!node) return null;
+
+        if (node.nodeType === Node.TEXT_NODE) {
+            var text = node.textContent || '';
+            var nextTraversed = traversed + text.length;
+            if (targetOffset <= nextTraversed) {
+                return {
+                    node: node,
+                    offset: Math.max(0, Math.min(targetOffset - traversed, text.length))
+                };
+            }
+
+            traversed = nextTraversed;
+            return null;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            return null;
+        }
+
+        if (_mdIsExcalidrawEditorPlaceholder(node)) {
+            var rawSource = _mdGetExcalidrawEditorPlaceholderSource(node);
+            var nextPlaceholderOffset = traversed + rawSource.length;
+            if (targetOffset <= nextPlaceholderOffset) {
+                var parentNode = node.parentNode || editorDiv;
+                var childIndex = Array.prototype.indexOf.call(parentNode.childNodes, node);
+                return {
+                    node: parentNode,
+                    offset: targetOffset <= traversed ? childIndex : childIndex + 1
+                };
+            }
+
+            traversed = nextPlaceholderOffset;
+            return null;
+        }
+
+        if (node.tagName === 'BR') {
+            var nextLineBreakOffset = traversed + 1;
+            if (targetOffset <= nextLineBreakOffset) {
+                var brParentNode = node.parentNode || editorDiv;
+                var brChildIndex = Array.prototype.indexOf.call(brParentNode.childNodes, node);
+                return {
+                    node: brParentNode,
+                    offset: targetOffset <= traversed ? brChildIndex : brChildIndex + 1
+                };
+            }
+
+            traversed = nextLineBreakOffset;
+            return null;
+        }
+
+        for (var child = node.firstChild; child; child = child.nextSibling) {
+            var match = walk(child);
+            if (match) return match;
+        }
+
+        return null;
+    }
+
+    return walk(editorDiv) || {
+        node: editorDiv,
+        offset: editorDiv.childNodes.length
+    };
+}
+
+function _mdSetSelectionToSourceOffset(editorDiv, sourceOffset) {
+    if (!editorDiv) return false;
+
+    if (editorDiv.childNodes.length === 0) {
+        editorDiv.appendChild(document.createTextNode(''));
+    }
+
+    var position = _mdFindEditorPositionForSourceOffset(editorDiv, sourceOffset);
+    var selection = window.getSelection();
+    if (!position || !selection) return false;
+
+    var range = document.createRange();
+
+    try {
+        editorDiv.focus({ preventScroll: true });
+    } catch (e) {
+        editorDiv.focus();
+    }
+
+    range.setStart(position.node, position.offset);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+    return true;
+}
+
+function _mdGetEditorNavigationTopOffset(editorDiv, scrollContainer) {
+    if (!scrollContainer || scrollContainer === editorDiv || scrollContainer.classList && scrollContainer.classList.contains('markdown-editor-container')) {
+        return 0;
+    }
+
+    return 100;
+}
+
+function _mdScrollEditorCaretToTop(editorDiv, lineNumber, scrollContainer) {
+    if (!editorDiv || !scrollContainer) return;
+
+    var topOffset = _mdGetEditorNavigationTopOffset(editorDiv, scrollContainer);
+    var caretRect = getMarkdownCaretClientRect(editorDiv);
+    var containerRect = scrollContainer.getBoundingClientRect();
+
+    if (caretRect && containerRect) {
+        scrollContainer.scrollTo({
+            top: Math.max(0, scrollContainer.scrollTop + caretRect.top - containerRect.top - topOffset),
+            behavior: 'smooth'
+        });
+        return;
+    }
+
+    var lineHeight = parseFloat(window.getComputedStyle(editorDiv).lineHeight) || 20;
+    var targetLinePosition = lineNumber * lineHeight;
+    var fallbackScrollTop = targetLinePosition - topOffset;
+
+    if (scrollContainer !== editorDiv) {
+        var editorRect = editorDiv.getBoundingClientRect();
+        var editorOffsetInContainer = editorRect.top - containerRect.top + scrollContainer.scrollTop;
+        fallbackScrollTop = editorOffsetInContainer + targetLinePosition - topOffset;
+    }
+
+    scrollContainer.scrollTo({
+        top: Math.max(0, fallbackScrollTop),
+        behavior: 'smooth'
+    });
+}
+
 /**
  * Navigate to a specific line in the markdown editor
  * @param {number} lineNumber - The line number to navigate to
@@ -3814,21 +3964,16 @@ function navigateToEditorLine(lineNumber, noteEntry) {
     var editorDiv = noteEntry.querySelector('.markdown-editor');
     if (!editorDiv) return;
 
-    var content = editorDiv.textContent || '';
-    var lines = content.split('\n');
-
-    // Calculate character offset for the target line
-    var charOffset = 0;
-    for (var i = 0; i < lineNumber && i < lines.length; i++) {
-        charOffset += lines[i].length + 1; // +1 for newline
-    }
+    var content = normalizeContentEditableText(editorDiv);
+    var charOffset = _mdGetSourceOffsetForLine(content, lineNumber);
 
     try {
-        setSelectionOffsetsInTextElement(editorDiv, charOffset, charOffset);
+        if (!_mdSetSelectionToSourceOffset(editorDiv, charOffset)) {
+            setSelectionOffsetsInTextElement(editorDiv, charOffset, charOffset);
+        }
 
-        var lineHeight = parseInt(window.getComputedStyle(editorDiv).lineHeight) || 20;
-        var scrollTop = lineNumber * lineHeight - editorDiv.clientHeight / 2;
-        editorDiv.scrollTop = Math.max(0, scrollTop);
+        var scrollContainer = getMarkdownEditorScrollContainer(editorDiv);
+        _mdScrollEditorCaretToTop(editorDiv, lineNumber, scrollContainer);
     } catch (e) {
         console.warn('Could not set cursor position:', e);
     }
