@@ -444,18 +444,15 @@ class SnapshotsController {
     }
     
     /**
-     * POST /api/v1/notes/{id}/snapshot
-      * Create a daily snapshot for a note.
-      * When ?manual=1 is provided, an extra snapshot is added for today.
+     * Create a snapshot for a note and return an API-compatible result.
      */
-    public function create(string $id): void {
-        $noteId = (int)$id;
-          $manualParam = strtolower((string) ($_GET['manual'] ?? $_GET['force'] ?? '0'));
-          $manual = in_array($manualParam, ['1', 'true', 'yes'], true);
-
+    public function createSnapshotForNote(int $noteId, bool $manual = false): array {
         if ($noteId <= 0) {
-            $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid note ID'));
-            return;
+            return [
+                'success' => false,
+                'status' => 400,
+                'error' => t('snapshot.api.invalid_note_id', [], 'Invalid note ID')
+            ];
         }
         
         try {
@@ -465,8 +462,11 @@ class SnapshotsController {
             $note = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if (!$note) {
-                $this->sendError(404, t('snapshot.api.note_not_found', [], 'Note not found'));
-                return;
+                return [
+                    'success' => false,
+                    'status' => 404,
+                    'error' => t('snapshot.api.note_not_found', [], 'Note not found')
+                ];
             }
             
             $noteType = $note['type'] ?? 'note';
@@ -484,15 +484,21 @@ class SnapshotsController {
             $snapshotExists = file_exists($dailyPaths['snapshot']);
             
             if ($snapshotExists && !$manual) {
-                echo json_encode(['success' => true, 'exists' => true, 'message' => t('snapshot.api.already_exists', [], 'Snapshot already exists for today')]);
-                return;
+                return [
+                    'success' => true,
+                    'exists' => true,
+                    'message' => t('snapshot.api.already_exists', [], 'Snapshot already exists for today')
+                ];
             }
             
             // Create directories if needed
             if (!is_dir($noteSnapshotDir)) {
                 if (!mkdir($noteSnapshotDir, 0755, true)) {
-                    $this->sendError(500, t('snapshot.api.create_directory_failed', [], 'Failed to create snapshot directory'));
-                    return;
+                    return [
+                        'success' => false,
+                        'status' => 500,
+                        'error' => t('snapshot.api.create_directory_failed', [], 'Failed to create snapshot directory')
+                    ];
                 }
             }
             
@@ -534,8 +540,11 @@ class SnapshotsController {
             
             // Write snapshot file
             if (file_put_contents($snapshotPaths['snapshot'], $content) === false) {
-                $this->sendError(500, t('snapshot.api.write_file_failed', [], 'Failed to write snapshot file'));
-                return;
+                return [
+                    'success' => false,
+                    'status' => 500,
+                    'error' => t('snapshot.api.write_file_failed', [], 'Failed to write snapshot file')
+                ];
             }
             
             // Write meta file
@@ -544,19 +553,51 @@ class SnapshotsController {
             // Purge snapshots older than 7 days
             $this->purgeOldSnapshots($noteSnapshotDir);
             
-            echo json_encode([
+            return [
                 'success' => true,
                 'created' => true,
                 'updated' => false,
                 'date' => $today,
                 'snapshot_key' => $snapshotKey,
                 'manual' => $manual
-            ]);
+            ];
             
         } catch (Exception $e) {
             error_log("Snapshot create error: " . $e->getMessage());
-            $this->sendError(500, t('snapshot.api.create_failed', [], 'Failed to create snapshot'));
+            return [
+                'success' => false,
+                'status' => 500,
+                'error' => t('snapshot.api.create_failed', [], 'Failed to create snapshot')
+            ];
         }
+    }
+
+    /**
+     * Ensure the automatic daily snapshot exists for a note.
+     */
+    public function ensureAutomaticSnapshot(int $noteId): array {
+        return $this->createSnapshotForNote($noteId, false);
+    }
+
+    /**
+     * POST /api/v1/notes/{id}/snapshot
+      * Create a daily snapshot for a note.
+      * When ?manual=1 is provided, an extra snapshot is added for today.
+     */
+    public function create(string $id): void {
+        $noteId = (int)$id;
+        $manualParam = strtolower((string) ($_GET['manual'] ?? $_GET['force'] ?? '0'));
+        $manual = in_array($manualParam, ['1', 'true', 'yes'], true);
+
+        $result = $this->createSnapshotForNote($noteId, $manual);
+
+        if (empty($result['success'])) {
+            $this->sendError((int) ($result['status'] ?? 500), (string) ($result['error'] ?? t('snapshot.api.create_failed', [], 'Failed to create snapshot')));
+            return;
+        }
+
+        unset($result['status']);
+        echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
     }
     
     /**

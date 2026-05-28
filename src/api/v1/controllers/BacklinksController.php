@@ -9,6 +9,8 @@
  *   2. URL-based link                — ?note={id} or &note={id}
  *   3. Wiki-link syntax              — [[Note Title]]
  */
+require_once __DIR__ . '/../../../note_loader.php';
+
 class BacklinksController
 {
     private PDO $con;
@@ -16,6 +18,21 @@ class BacklinksController
     public function __construct(PDO $con)
     {
         $this->con = $con;
+    }
+
+    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void
+    {
+        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
+            return;
+        }
+
+        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->con));
+        if ($cutoff === null) {
+            return;
+        }
+
+        $sql .= " AND $column >= ?";
+        $params[] = $cutoff;
     }
 
     // -------------------------------------------------------------------------
@@ -49,6 +66,7 @@ class BacklinksController
                 $targetSql .= ' AND workspace = ?';
                 $targetParams[] = $workspace;
             }
+            $this->appendPublicWorkspaceAgeFilter($targetSql, $targetParams);
 
             // --- Fetch the target note (we need its heading for wiki-link matching)
             $stmt = $this->con->prepare($targetSql);
@@ -80,6 +98,7 @@ class BacklinksController
                 $candidateSql .= ' AND workspace = ?';
                 $candidateParams[] = $workspace;
             }
+            $this->appendPublicWorkspaceAgeFilter($candidateSql, $candidateParams);
 
             // --- Fetch all non-trash candidate notes (exclude the target itself)
             $stmt = $this->con->prepare($candidateSql);

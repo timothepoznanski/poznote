@@ -369,6 +369,7 @@ if ($isPublicWorkspaceReadonly) {
     $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined ?? false);
     $where_clause = $search_conditions['where_clause'];
     $search_params = $search_conditions['search_params'];
+    appendNoteAgeFilter($where_clause, $search_params, getNoteAgeFilterDays($con));
     
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
@@ -414,7 +415,7 @@ if ($isPublicWorkspaceReadonly) {
         
         // Execute query for right column - only override if in search mode
         if ($is_search_mode) {
-            $res_right = prepareSearchResults($con, $is_search_mode, $note, $search_conditions['where_clause'], $search_conditions['search_params'], $workspace_filter);
+            $res_right = prepareSearchResults($con, $is_search_mode, $note, $where_clause, $search_params, $workspace_filter);
         }
     ?>
 
@@ -500,6 +501,10 @@ if ($isPublicWorkspaceReadonly) {
             if ($res_right) {
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
+                    if (!$isPublicWorkspaceReadonly && function_exists('ensureAutomaticSnapshotForOpenedNote')) {
+                        ensureAutomaticSnapshotForOpenedNote($con, (int)$row['id']);
+                    }
+
                     // Check if note is shared
                     $is_shared = false;
                     try {

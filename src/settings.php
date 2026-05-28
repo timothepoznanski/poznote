@@ -385,6 +385,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Note Age Filter -->
+            <div class="home-card" id="note-age-filter-card">
+                <div class="home-card-icon"><i class="lucide lucide-filter"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span>
+                    <span id="note-age-filter-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Tasklist Insert Order -->
             <div class="home-card" id="tasklist-insert-order-card">
                 <div class="home-card-icon"><i class="lucide lucide-arrow-down"></i></div>

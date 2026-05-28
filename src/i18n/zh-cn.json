@@ -537,6 +537,7 @@
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_sort_order": "笔记排序规则",
+      "note_age_filter": "笔记时间筛选",
       "tasklist_insert_order": "任务列表插入顺序",
       "timezone": "时区",
       "show_note_created": "显示笔记创建日期",
@@ -1080,6 +1081,21 @@
         "alphabetical": "字母顺序"
       }
     },
+    "note_age_filter": {
+      "title": "笔记时间筛选",
+      "description": "选择显示最近修改笔记的时间范围",
+      "options": {
+        "all": "所有笔记",
+        "last_30_days": "最近 30 天",
+        "last_3_months": "最近 3 个月",
+        "last_6_months": "最近 6 个月",
+        "last_12_months": "最近 12 个月",
+        "last_2_years": "最近 2 年",
+        "custom_days": "最近 {{days}} 天",
+        "custom_label": "自定义",
+        "days": "天"
+      }
+    },
     "timezone": {
       "title": "时区",
       "description": "选择您的时区：",
@@ -1148,7 +1164,10 @@
     "moved": "成功移动",
     "root": "根目录 (无文件夹)",
     "filter_folders": "筛选文件夹...",
-    "filter_placeholder": "按标题或标签筛选..."
+    "filter_placeholder": "按标题或标签筛选...",
+    "filter_age": "按时间筛选",
+    "age_all": "所有笔记",
+    "age_recent": "仅近期"
   },
   "update": {
     "new_available": "🎉 有新版本可用！",

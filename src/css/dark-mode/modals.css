@@ -782,9 +782,17 @@ body.dark-mode #snapshotModal .snapshot-modal-header h3 {
     color: #f2f5f8;
 }
 
-html[data-theme='dark'] #snapshotModal .snapshot-modal-description,
-body.dark-mode #snapshotModal .snapshot-modal-description {
+html[data-theme='dark'] #snapshotModal .snapshot-help-btn,
+body.dark-mode #snapshotModal .snapshot-help-btn {
     color: var(--dm-text-muted, #b5beca);
+}
+
+html[data-theme='dark'] #snapshotModal .snapshot-help-btn:hover,
+html[data-theme='dark'] #snapshotModal .snapshot-help-btn:focus-visible,
+body.dark-mode #snapshotModal .snapshot-help-btn:hover,
+body.dark-mode #snapshotModal .snapshot-help-btn:focus-visible {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--dm-text, #f2f5f8);
 }
 
 html[data-theme='dark'] .snapshot-close-btn:hover,

@@ -537,6 +537,7 @@
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_sort_order": "Orden de clasificación de notas",
+      "note_age_filter": "Filtro de antigüedad",
       "tasklist_insert_order": "Orden de inserción de tareas",
       "timezone": "Zona horaria",
       "show_note_created": "Mostrar fecha de creación de la nota",
@@ -1080,6 +1081,21 @@
         "alphabetical": "Alfabético"
       }
     },
+    "note_age_filter": {
+      "title": "Filtro de antigüedad de notas",
+      "description": "Elige hasta qué fecha atrás se muestran las notas modificadas",
+      "options": {
+        "all": "Todas las notas",
+        "last_30_days": "Últimos 30 días",
+        "last_3_months": "Últimos 3 meses",
+        "last_6_months": "Últimos 6 meses",
+        "last_12_months": "Últimos 12 meses",
+        "last_2_years": "Últimos 2 años",
+        "custom_days": "Últimos {{days}} días",
+        "custom_label": "Personalizado",
+        "days": "días"
+      }
+    },
     "timezone": {
       "title": "Zona horaria",
       "description": "Selecciona tu zona horaria:",
@@ -1159,7 +1175,10 @@
     "moved": "Movido con éxito",
     "root": "Raíz (sin carpeta)",
     "filter_folders": "Filtrar carpetas...",
-    "filter_placeholder": "Filtrar notas por título o etiquetas..."
+    "filter_placeholder": "Filtrar notas por título o etiquetas...",
+    "filter_age": "Filtrar por antigüedad",
+    "age_all": "Todas las notas",
+    "age_recent": "Solo recientes"
   },
   "update": {
     "new_available": "🎉 ¡Nueva actualización disponible!",

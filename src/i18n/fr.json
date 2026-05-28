@@ -549,6 +549,7 @@
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
       "note_sort_order": "Tri des notes",
+      "note_age_filter": "Filtre d’ancienneté",
       "tasklist_insert_order": "Ordre d'insertion des tâches",
       "timezone": "Fuseau horaire",
       "show_note_created": "Afficher la date de création",
@@ -1107,6 +1108,21 @@
         "alphabetical": "Alphabétique"
       }
     },
+    "note_age_filter": {
+      "title": "Filtre d’ancienneté des notes",
+      "description": "Choisissez jusqu’où remonter pour afficher les notes modifiées",
+      "options": {
+        "all": "Toutes les notes",
+        "last_30_days": "30 derniers jours",
+        "last_3_months": "3 derniers mois",
+        "last_6_months": "6 derniers mois",
+        "last_12_months": "12 derniers mois",
+        "last_2_years": "2 dernières années",
+        "custom_days": "{{days}} derniers jours",
+        "custom_label": "Personnalisé",
+        "days": "jours"
+      }
+    },
     "timezone": {
       "title": "Fuseau horaire",
       "description": "Sélectionnez votre fuseau horaire :",
@@ -1192,7 +1208,10 @@
     "type_html": "HTML",
     "type_markdown": "Markdown",
     "type_tasklist": "Tasklist",
-    "type_excalidraw": "Excalidraw"
+    "type_excalidraw": "Excalidraw",
+    "filter_age": "Filtrer par ancienneté",
+    "age_all": "Toutes les notes",
+    "age_recent": "Récentes seulement"
   },
   "update": {
     "new_available": "🎉 Nouvelle mise à jour disponible !",

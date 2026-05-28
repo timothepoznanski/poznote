@@ -603,6 +603,29 @@
     </div>
 </div>
 
+<!-- Note age filter modal -->
+<div id="noteAgeFilterModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.note_age_filter.title', [], 'Note age filter'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.note_age_filter.description', [], 'Choose how far back modified notes should appear in the notes list:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="noteAgeFilter" value="0"> <?php echo t_h('modals.note_age_filter.options.all', [], 'All notes'); ?></label>
+                <label><input type="radio" name="noteAgeFilter" value="30"> <?php echo t_h('modals.note_age_filter.options.last_30_days', [], 'Last 30 days'); ?></label>
+                <label><input type="radio" name="noteAgeFilter" value="90"> <?php echo t_h('modals.note_age_filter.options.last_3_months', [], 'Last 3 months'); ?></label>
+                <label><input type="radio" name="noteAgeFilter" value="180"> <?php echo t_h('modals.note_age_filter.options.last_6_months', [], 'Last 6 months'); ?></label>
+                <label><input type="radio" name="noteAgeFilter" value="365"> <?php echo t_h('modals.note_age_filter.options.last_12_months', [], 'Last 12 months'); ?></label>
+                <label><input type="radio" name="noteAgeFilter" value="730"> <?php echo t_h('modals.note_age_filter.options.last_2_years', [], 'Last 2 years'); ?></label>
+                <label><input type="radio" name="noteAgeFilter" value="custom"> <?php echo t_h('modals.note_age_filter.options.custom_label', [], 'Custom'); ?>: <input type="number" id="noteAgeFilterCustomDays" min="1" max="36500" step="1" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.note_age_filter.options.days', [], 'days'); ?></label>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteAgeFilterModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveNoteAgeFilterModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Language selection modal -->
 <div id="languageModal" class="modal">
     <div class="modal-content">
@@ -1101,6 +1124,7 @@
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-sort-card" checked><span><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:show-created-card" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-counts-card" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
@@ -1227,8 +1251,13 @@
     <div class="modal-content snapshot-modal-content">
         <div class="snapshot-modal-header">
             <div class="snapshot-modal-header-copy">
-                <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
-                <p class="snapshot-modal-description"><?php echo t_h('snapshot.modal.description', [], "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones."); ?></p>
+                <?php $snapshotDescription = t('snapshot.modal.description', [], "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.\nOnly the 7 most recent snapshots are kept, including those created manually."); ?>
+                <div class="snapshot-modal-title-row">
+                    <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
+                    <button type="button" class="snapshot-help-btn" aria-label="<?php echo htmlspecialchars($snapshotDescription, ENT_QUOTES); ?>" data-tooltip="<?php echo htmlspecialchars($snapshotDescription, ENT_QUOTES); ?>">
+                        <i class="lucide lucide-help-circle"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -1256,11 +1285,11 @@
 
                 <div id="snapshotBody" style="display:none;">
                     <div class="snapshot-meta">
-                        <div class="snapshot-meta-item">
+                        <div class="snapshot-meta-item snapshot-meta-date">
                             <i class="lucide lucide-calendar"></i>
                             <span id="snapshotDate"></span>
                         </div>
-                        <div class="snapshot-meta-item">
+                        <div class="snapshot-meta-item snapshot-meta-title">
                             <i class="lucide lucide-file-text"></i>
                             <span id="snapshotHeading"></span>
                         </div>

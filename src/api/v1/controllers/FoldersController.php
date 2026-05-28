@@ -22,11 +22,27 @@
  *   POST   /api/v1/notes/{id}/folder    - Move note to folder (in NotesController)
  */
 
+require_once __DIR__ . '/../../../note_loader.php';
+
 class FoldersController {
     private PDO $db;
     
     public function __construct(PDO $db) {
         $this->db = $db;
+    }
+
+    private function appendPublicWorkspaceAgeFilter(string &$sql, array &$params, string $column = 'updated'): void {
+        if (!function_exists('isPublicWorkspaceAccessActive') || !isPublicWorkspaceAccessActive()) {
+            return;
+        }
+
+        $cutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($this->db));
+        if ($cutoff === null) {
+            return;
+        }
+
+        $sql .= " AND $column >= ?";
+        $params[] = $cutoff;
     }
     
     /**
@@ -173,8 +189,11 @@ class FoldersController {
         $count = 0;
         [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
         
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0" . $wsCond);
-        $stmt->execute(array_merge([$folderId], $wsParams));
+        $query = "SELECT COUNT(*) FROM entries WHERE folder_id = ? AND trash = 0" . $wsCond;
+        $params = array_merge([$folderId], $wsParams);
+        $this->appendPublicWorkspaceAgeFilter($query, $params);
+        $stmt = $this->db->prepare($query);
+        $stmt->execute($params);
         $count += (int)$stmt->fetchColumn();
         
         $subStmt = $this->db->prepare("SELECT id FROM folders WHERE parent_id = ?" . $wsCond);
@@ -1248,21 +1267,27 @@ class FoldersController {
             $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
             
             $query = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)" . $wsCond;
+            $countParams = array_merge($allFolderIds, $wsParams);
+            $this->appendPublicWorkspaceAgeFilter($query, $countParams);
             $countStmt = $this->db->prepare($query);
-            $countStmt->execute(array_merge($allFolderIds, $wsParams));
+            $countStmt->execute($countParams);
             $counts[$folderId] = (int)$countStmt->fetchColumn();
         }
         
         // Get uncategorized count
         $uncategorizedQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND folder_id IS NULL" . $wsCond;
+        $uncatParams = $wsParams;
+        $this->appendPublicWorkspaceAgeFilter($uncategorizedQuery, $uncatParams);
         $uncatStmt = $this->db->prepare($uncategorizedQuery);
-        $uncatStmt->execute($wsParams);
+        $uncatStmt->execute($uncatParams);
         $counts['uncategorized'] = (int)$uncatStmt->fetchColumn();
         
         // Get favorites count
         $favoriteQuery = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND favorite = 1" . $wsCond;
+        $favoriteParams = $wsParams;
+        $this->appendPublicWorkspaceAgeFilter($favoriteQuery, $favoriteParams);
         $favStmt = $this->db->prepare($favoriteQuery);
-        $favStmt->execute($wsParams);
+        $favStmt->execute($favoriteParams);
         $counts['Favorites'] = (int)$favStmt->fetchColumn();
         
         $this->sendJson(['success' => true, 'counts' => $counts]);

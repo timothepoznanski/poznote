@@ -38,7 +38,6 @@
       }
     },
     "download": "Baixar",
-    "convert": "Converter",
     "create": "Criar",
     "duplicate": "Duplicar",
     "move": "Mover",
@@ -536,6 +535,7 @@
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_sort_order": "Ordem de classificação das notas",
+      "note_age_filter": "Filtro de antiguidade",
       "tasklist_insert_order": "Ordem de inserção das tarefas",
       "timezone": "Fuso Horário",
       "show_note_created": "Mostrar Data de Criação da Nota",
@@ -1080,6 +1080,21 @@
         "alphabetical": "Alfabética"
       }
     },
+    "note_age_filter": {
+      "title": "Filtro de antiguidade das notas",
+      "description": "Escolha até quando as notas modificadas devem aparecer",
+      "options": {
+        "all": "Todas as notas",
+        "last_30_days": "Últimos 30 dias",
+        "last_3_months": "Últimos 3 meses",
+        "last_6_months": "Últimos 6 meses",
+        "last_12_months": "Últimos 12 meses",
+        "last_2_years": "Últimos 2 anos",
+        "custom_days": "Últimos {{days}} dias",
+        "custom_label": "Personalizado",
+        "days": "dias"
+      }
+    },
     "timezone": {
       "title": "Fuso Horário",
       "description": "Selecione seu fuso horário:",
@@ -1159,7 +1174,10 @@
     "moved": "Movido com sucesso",
     "root": "Raiz (sem pasta)",
     "filter_folders": "Filtrar pastas...",
-    "filter_placeholder": "Filtrar notas por título ou etiquetas..."
+    "filter_placeholder": "Filtrar notas por título ou etiquetas...",
+    "filter_age": "Filtrar por antiguidade",
+    "age_all": "Todas as notas",
+    "age_recent": "Apenas recentes"
   },
   "update": {
     "new_available": "🎉 Nova Atualização Disponível!",

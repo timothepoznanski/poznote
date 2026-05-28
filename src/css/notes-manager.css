@@ -33,7 +33,9 @@ body.notes-manager-page {
 
 .nm-filter-bar .filter-input-wrapper {
     position: relative;
-    flex: 1;
+    flex: 1 1 180px;
+    min-width: 150px;
+    max-width: 360px;
     display: flex;
     align-items: center;
 }
@@ -76,7 +78,8 @@ body.notes-manager-page {
 }
 
 .nm-filter-select {
-    min-width: 170px;
+    min-width: 130px;
+    flex: 0 0 auto;
     padding: 10px 12px;
     border: 1px solid var(--border-color, #e0e0e0);
     border-radius: 8px;

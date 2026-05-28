@@ -199,6 +199,7 @@
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
+      "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
       "timezone": "Timezone",
       "show_note_created": "Show creation date",
@@ -665,6 +666,21 @@
         "alphabetical": "Alphabetical"
       }
     },
+    "note_age_filter": {
+      "title": "Note age filter",
+      "description": "Choose how far back modified notes should appear",
+      "options": {
+        "all": "All notes",
+        "last_30_days": "Last 30 days",
+        "last_3_months": "Last 3 months",
+        "last_6_months": "Last 6 months",
+        "last_12_months": "Last 12 months",
+        "last_2_years": "Last 2 years",
+        "custom_days": "Last {{days}} days",
+        "custom_label": "Custom",
+        "days": "days"
+      }
+    },
     "timezone": {
       "title": "Timezone",
       "description": "Select your timezone:",
@@ -739,7 +755,10 @@
     "type_html": "HTML",
     "type_markdown": "Markdown",
     "type_tasklist": "Tasklist",
-    "type_excalidraw": "Excalidraw"
+    "type_excalidraw": "Excalidraw",
+    "filter_age": "Filter by age",
+    "age_all": "All notes",
+    "age_recent": "Recent only"
   },
   "update": {
     "new_available": "🎉 New update available!",
