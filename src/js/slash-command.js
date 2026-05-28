@@ -459,8 +459,10 @@
             }
         }
 
-        // Add a line break inside code element for cursor positioning
+        // Keep a real text insertion point before the visual empty line.
+        const caretTextNode = document.createTextNode('');
         const br = document.createElement('br');
+        code.appendChild(caretTextNode);
         code.appendChild(br);
         pre.appendChild(code);
 
@@ -468,38 +470,66 @@
         range.deleteContents();
         range.insertNode(pre);
 
-        // Prepare selection inside code element
-        const newRange = document.createRange();
-        newRange.setStart(code, 0);
-        newRange.collapse(true);
+        function focusNoteEntry() {
+            const noteEntry = pre.closest('.noteentry');
+            if (!noteEntry) return null;
+
+            try {
+                noteEntry.focus({ preventScroll: true });
+            } catch (err) {
+                noteEntry.focus();
+            }
+
+            return noteEntry;
+        }
+
+        function placeCaretInsideCodeBlock() {
+            const sel = window.getSelection();
+            if (!sel) return;
+
+            const newRange = document.createRange();
+            if (caretTextNode.parentNode === code) {
+                newRange.setStart(caretTextNode, 0);
+            } else {
+                newRange.setStart(code, 0);
+            }
+            newRange.collapse(true);
+
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+        }
+
+        function applyHighlightingIfNeeded() {
+            if (language && !disableHighlight && isSyntaxHighlightLanguage(language) && typeof window.applySyntaxHighlighting === 'function') {
+                window.applySyntaxHighlighting(pre);
+            }
+        }
+
+        function isCodeBlockEmpty() {
+            return (code.textContent || '').length === 0;
+        }
 
         // Ensure the containing noteentry is focused
-        const noteEntry = pre.closest('.noteentry');
+        const noteEntry = focusNoteEntry();
         if (noteEntry) {
-            try { noteEntry.focus({ preventScroll: true }); } catch (err) { noteEntry.focus(); }
-            // Apply selection after a short timeout to ensure it's not overridden by executeCommand's focus
+            placeCaretInsideCodeBlock();
+
             setTimeout(function () {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(newRange);
-
-                // Trigger syntax highlighting if available
-                if (language && !disableHighlight && isSyntaxHighlightLanguage(language) && typeof window.applySyntaxHighlighting === 'function') {
-                    window.applySyntaxHighlighting(pre);
-                }
-
-                // Trigger input event for autosave
+                focusNoteEntry();
+                placeCaretInsideCodeBlock();
+                applyHighlightingIfNeeded();
                 noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+            }, 0);
+
+            setTimeout(function () {
+                if (!isCodeBlockEmpty()) return;
+                focusNoteEntry();
+                placeCaretInsideCodeBlock();
             }, 50);
         } else {
-            selection.removeAllRanges();
-            selection.addRange(newRange);
+            placeCaretInsideCodeBlock();
 
-            if (language && !disableHighlight && isSyntaxHighlightLanguage(language) && typeof window.applySyntaxHighlighting === 'function') {
-                setTimeout(function () {
-                    window.applySyntaxHighlighting(pre);
-                }, 10);
-            }
+            setTimeout(applyHighlightingIfNeeded, 10);
         }
     }
 
