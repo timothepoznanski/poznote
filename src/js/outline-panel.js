@@ -1189,6 +1189,11 @@ function initTouchSupport() {
             return null;
         }
 
+        const imageResizeSurface = target.closest('.image-resize-wrapper, .image-resize-handle');
+        if (imageResizeSurface || window.isImageResizeInProgress) {
+            return imageResizeSurface || target;
+        }
+
         const titleScroller = target.closest('.css-title');
         if (titleScroller) {
             return titleScroller;
@@ -1231,6 +1236,10 @@ function initTouchSupport() {
 
     // Swipe from anywhere on the note content area to open outline
     document.addEventListener('touchstart', function(e) {
+        if (window.isImageResizeInProgress) {
+            return;
+        }
+
         // Don't track swipes that start on the outline panel itself
         if (e.target.closest('#outline-panel')) {
             return;

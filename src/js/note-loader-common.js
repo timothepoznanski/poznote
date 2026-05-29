@@ -884,8 +884,8 @@ function buildImageMenuHTML(img) {
         </div>
     `;
 
-    // Add Resize option only on desktop. Markdown preview images are supported when backed by source syntax.
-    const canResizeImage = !isMobile && (!isMarkdownNote || isSourceBackedMarkdownPreviewImage);
+    // Markdown preview images are supported when backed by source syntax.
+    const canResizeImage = !isMarkdownNote || isSourceBackedMarkdownPreviewImage;
     if (canResizeImage) {
         menuHTML += `
         <div class="image-menu-item" data-action="resize">
@@ -2023,7 +2023,13 @@ function enableImageResize(img) {
 
     // Remove any existing resize handles first
     const existingHandles = document.querySelectorAll('.image-resize-handle');
-    existingHandles.forEach(handle => handle.remove());
+    existingHandles.forEach(handle => {
+        if (typeof handle._cleanupImageResize === 'function') {
+            handle._cleanupImageResize();
+        }
+        handle.remove();
+    });
+    window.isImageResizeInProgress = false;
 
     // Create resize handle
     const resizeHandle = document.createElement('div');
@@ -2068,20 +2074,94 @@ function enableImageResize(img) {
         window.markNoteAsModified();
     }
 
-    // Store original dimensions
-    const originalWidth = img.width || img.naturalWidth;
-    const aspectRatio = img.naturalHeight / img.naturalWidth;
-
     let isResizing = false;
-    let startX, startWidth;
+    let startX = 0;
+    let startWidth = 0;
+    let activeTouchId = null;
+    const minResizeWidth = 50;
 
-    // Mouse down on handle
-    resizeHandle.addEventListener('mousedown', function (e) {
+    function setImageResizeInProgress(isActive) {
+        window.isImageResizeInProgress = isActive;
+    }
+
+    function cleanupImageResizeListeners() {
+        document.removeEventListener('mousemove', handleImageResizeMove);
+        document.removeEventListener('touchmove', handleImageResizeMove);
+        document.removeEventListener('mouseup', finishImageResize);
+        document.removeEventListener('touchend', finishImageResize);
+        document.removeEventListener('touchcancel', finishImageResize);
+    }
+
+    resizeHandle._cleanupImageResize = function () {
+        setImageResizeInProgress(false);
+        cleanupImageResizeListeners();
+    };
+
+    function findActiveTouch(touchList) {
+        if (!touchList || touchList.length === 0) {
+            return null;
+        }
+
+        if (activeTouchId === null) {
+            return touchList[0];
+        }
+
+        for (let i = 0; i < touchList.length; i++) {
+            if (touchList[i].identifier === activeTouchId) {
+                return touchList[i];
+            }
+        }
+
+        return null;
+    }
+
+    function getResizeClientX(e) {
+        const activeTouch = findActiveTouch(e.touches) || findActiveTouch(e.changedTouches);
+        if (activeTouch) {
+            return activeTouch.clientX;
+        }
+
+        return typeof e.clientX === 'number' ? e.clientX : null;
+    }
+
+    function eventIncludesActiveTouch(e) {
+        if (activeTouchId === null || !e.changedTouches || e.changedTouches.length === 0) {
+            return true;
+        }
+
+        return !!findActiveTouch(e.changedTouches);
+    }
+
+    function applyResizeWidth(clientX) {
+        const deltaX = clientX - startX;
+        const newWidth = Math.max(minResizeWidth, startWidth + deltaX);
+
+        img.style.width = newWidth + 'px';
+        img.style.height = 'auto';
+        img.setAttribute('width', Math.round(newWidth));
+
+        // Update wrapper size
+        wrapper.style.width = newWidth + 'px';
+    }
+
+    function startImageResize(e) {
+        if (e.type === 'mousedown' && e.button !== 0) {
+            return;
+        }
+
         e.preventDefault();
         e.stopPropagation();
+
+        const clientX = getResizeClientX(e);
+        if (clientX === null) {
+            return;
+        }
+
         isResizing = true;
-        startX = e.clientX;
+        activeTouchId = e.touches && e.touches.length ? e.touches[0].identifier : null;
+        startX = clientX;
         startWidth = img.offsetWidth;
+        setImageResizeInProgress(true);
 
         document.body.style.cursor = 'nwse-resize';
         document.body.style.userSelect = 'none';
@@ -2090,28 +2170,34 @@ function enableImageResize(img) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
-    });
+    }
 
-    // Mouse move
-    document.addEventListener('mousemove', function handleMouseMove(e) {
+    function handleImageResizeMove(e) {
         if (!isResizing) return;
 
-        const deltaX = e.clientX - startX;
-        const newWidth = Math.max(50, startWidth + deltaX); // Minimum 50px
+        e.preventDefault();
+        e.stopPropagation();
 
-        img.style.width = newWidth + 'px';
-        img.style.height = 'auto';
-        img.setAttribute('width', Math.round(newWidth));
+        const clientX = getResizeClientX(e);
+        if (clientX === null) {
+            return;
+        }
 
-        // Update wrapper size
-        wrapper.style.width = newWidth + 'px';
-    });
+        applyResizeWidth(clientX);
+    }
 
-    // Mouse up
-    document.addEventListener('mouseup', function handleMouseUp(e) {
+    function finishImageResize(e) {
         if (!isResizing) return;
+        if (e && !eventIncludesActiveTouch(e)) return;
+
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
         isResizing = false;
+        activeTouchId = null;
+        resizeHandle._cleanupImageResize();
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
 
@@ -2157,13 +2243,22 @@ function enableImageResize(img) {
         } else if (typeof window.saveNoteToServer === 'function') {
             window.saveNoteToServer();
         }
-    });
+    }
+
+    resizeHandle.addEventListener('mousedown', startImageResize);
+    resizeHandle.addEventListener('touchstart', startImageResize, { passive: false });
+    document.addEventListener('mousemove', handleImageResizeMove);
+    document.addEventListener('touchmove', handleImageResizeMove, { passive: false });
+    document.addEventListener('mouseup', finishImageResize);
+    document.addEventListener('touchend', finishImageResize, { passive: false });
+    document.addEventListener('touchcancel', finishImageResize, { passive: false });
 
     // Click outside to remove handle
     setTimeout(() => {
         document.addEventListener('click', function closeResize(e) {
             if (!wrapper.contains(e.target) && e.target !== resizeHandle) {
                 resizeHandle.remove();
+                resizeHandle._cleanupImageResize();
                 document.removeEventListener('click', closeResize);
             }
         });
