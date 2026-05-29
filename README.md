@@ -501,21 +501,26 @@ Notes:
 
 ## Multi-users
 
-Poznote features a multi-user architecture with isolated data space for each user (ideal for families, teams, or personal personas).
+> Not to be confused with the [Multiple Instances](#multiple-instances) feature.
 
-- **Data Isolation**: Each user has their own separate notes, workspaces, tags, folders and attachments.
-- **Hybrid Password Model**: Access uses per-profile credentials with custom passwords stored in the database. Until a password is changed in the UI, built-in defaults are used (`admin` for administrators, `user` for standard users).
-- **User Management**: Administrators can manage profiles via the Settings panel.
-- **Collaboration**: While data is isolated, you can share notes, folders, or entire workspaces in **Read-only** mode with other users of the same instance or publicly with a specific url.
+Poznote features a multi-user architecture with isolated data spaces for each profile while still allowing controlled collaboration on the same instance.
+
+- **Data isolation**: Each profile has its own notes, workspaces, tags, folders, attachments, and user settings.
+- **Per-profile authentication**: Users sign in with their own username or email address and password. Until a password is changed in the UI, built-in defaults are used (`admin` for administrators, `user` for standard users).
+- **User management**: Administrators can create, disable, and manage profiles from **Settings > Admin Tools > Users**.
+- **Delegated account access**: Administrators can grant one user access to another user's account. When a user can open multiple accounts, Poznote asks which account to use after login and clearly indicates when the session is **acting as** another user.
+- **Owner/admin safeguards**: Opening another user's account does not transfer ownership. Sensitive actions such as password changes, backup/restore, Git Sync configuration, and global admin settings remain restricted to the appropriate owner or administrator.
+- **Read-only sharing**: Notes, folders, and entire workspaces can be shared in **Read-only** mode with other users of the same instance or publicly through dedicated links.
+- **Single-editor locking**: When several users can access the same note, Poznote allows only one active editor at a time. Other users can still open the note in read-only mode, see who currently holds the lock, and take over editing after reopening the note once the lock is released or expires.
 
 
 ### Architecture & Structure
 
-Poznote uses a master database (`data/master.db`) to track profiles and global settings, and individual databases for each user.
+Poznote uses a master database (`data/master.db`) for shared coordination data, and separate per-user databases and files for actual note content.
 
 ```
 data/
-├── master.db                    # Master database (profiles, global settings)
+├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database
@@ -777,6 +782,8 @@ updated: 2024-01-20 15:45:00
 The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser. This allows you to read your notes offline, but without the full Poznote functionality, it's a read-only export.
 
 ## Multiple Instances
+
+> Not to be confused with the [Multi-users](#multi-users) feature.
 
 You can run multiple isolated Poznote instances on the same server. Each instance has its own data, port, and credentials.
 
