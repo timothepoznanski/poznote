@@ -243,6 +243,91 @@ input[type="password"]::placeholder {
     transform: translateY(1px);
 }
 
+.account-select-panel {
+    text-align: left;
+}
+
+.account-select-intro {
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0 0 1rem;
+    text-align: center;
+}
+
+.account-select-error {
+    margin: 0 0 1rem;
+    text-align: center;
+}
+
+.account-select-form {
+    margin: 0;
+}
+
+.account-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.account-option {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    color: #252526;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.account-option:hover,
+.account-option:focus {
+    border-color: #3182ce;
+    background: #f7fafc;
+    outline: none;
+}
+
+.account-option:active {
+    transform: translateY(1px);
+}
+
+.account-option-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-weight: 600;
+}
+
+.account-option-badge {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    background: #ebf8ff;
+    color: #2b6cb0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.account-select-logout {
+    display: block;
+    margin-top: 1rem;
+    color: #4a5568;
+    font-size: 0.9rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+.account-select-logout:hover {
+    color: #2c5282;
+    text-decoration: underline;
+}
+
 .error {
     color: #e53e3e;
     margin-top: 0.5rem;
@@ -445,6 +530,32 @@ html[data-theme='dark'] .admin-warning {
 html[data-theme='dark'] .admin-warning code {
     background: rgba(254, 215, 215, 0.2);
     color: #fff;
+}
+
+html[data-theme='dark'] .account-select-intro,
+html[data-theme='dark'] .account-select-logout {
+    color: #a0aec0;
+}
+
+html[data-theme='dark'] .account-select-logout:hover {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .account-option {
+    background: #333333;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+html[data-theme='dark'] .account-option:hover,
+html[data-theme='dark'] .account-option:focus {
+    background: #3a3a3a;
+    border-color: #4a9eff;
+}
+
+html[data-theme='dark'] .account-option-badge {
+    background: rgba(74, 158, 255, 0.16);
+    color: #9cc7ff;
 }
 
 html[data-theme='dark'] .language-select option {

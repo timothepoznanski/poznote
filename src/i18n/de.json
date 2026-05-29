@@ -1486,6 +1486,12 @@
       "oidc_no_profile": "Kein Benutzerprofil für \"{{identifier}}\" gefunden. Bitte kontaktieren Sie einen Administrator, um Ihr Profil zu erstellen.",
       "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
       "oidc_unauthorized": "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen. Bitte wenden Sie sich an Ihren Administrator."
+    },
+    "account_select": {
+      "intro": "Wählen Sie das Notizkonto aus, das geöffnet werden soll.",
+      "own_account": "Ihr Konto",
+      "sign_out": "Abmelden",
+      "invalid": "Dieses Konto kann nicht ausgewählt werden."
     }
   },
   "restore_import": {
@@ -2136,6 +2142,7 @@
     "replaced_all": "{{count}} Ersetzung(en) durchgeführt"
   },
   "multiuser": {
+    "acting_as": "als {{user}}",
     "admin": {
       "id": "ID",
       "username": "Benutzer",
@@ -2153,6 +2160,14 @@
       "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
       "admin_id_1_locked": "Die Administrator-Rolle kann für Benutzer-ID 1 nicht entfernt werden",
       "admin_note": "Verwenden Sie das Admin-Kontrollkästchen, um Administrator-Berechtigungen für einen anderen Benutzer zu gewähren oder zu entziehen.",
+      "account_access": {
+        "column": "Notizzugriff",
+        "title": "Notizzugriff",
+        "manage": "Notizzugriff verwalten",
+        "help": "Wählen Sie aus, welche Notizkonten dieser Benutzer nach der Anmeldung öffnen kann.",
+        "own_only": "Nur eigenes Konto",
+        "own_account": "Eigenes Konto"
+      },
       "errors": {
         "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
         "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
@@ -2304,6 +2319,7 @@
     }
   },
   "workspace_menu": {
+    "acting_as": " (als {{user}})",
     "workspaces": "Arbeitsbereiche",
     "logout": "Abmelden"
   },
@@ -2431,5 +2447,13 @@
     "placeholder": "Passwort eingeben",
     "unlock": "Entsperren",
     "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut."
+  },
+  "note_lock": {
+    "banner": "Nur lesen: {{user}} bearbeitet diese Notiz gerade.",
+    "current_user_other_tab": "Nur lesen: Diese Notiz wird bereits in einem anderen Tab bearbeitet.",
+    "another_user": "ein anderer Benutzer",
+    "popup_title": "Achtung",
+    "lost_to_other_tab": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. Sie wird jetzt in einem anderen Tab bearbeitet.",
+    "lost_to_user": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. {{user}} bearbeitet sie jetzt."
   }
 }

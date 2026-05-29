@@ -429,6 +429,17 @@ try {
         </div>
 
         <div class="home-search-container">
+            <?php
+            $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+            if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+                $authUser = getAuthenticatedUser();
+                if ($authUser) {
+                    $authDisplayName = htmlspecialchars($authUser['display_name'] ?: $authUser['username']);
+                    $username .= ' ' . t('multiuser.acting_as', ['user' => $authDisplayName], 'acting as {{user}}');
+                }
+            }
+            $homeTitleSuffix = $username !== '' ? ' - ' . $username : '';
+            ?>
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter'); ?>" autocomplete="off">
@@ -506,8 +517,7 @@ try {
             <?php endif; ?>
         </div>
 
-        <?php $username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']); ?>
-        <h2 class="settings-category-title" id="home-dashboard-section-title"><?php echo t_h('home.dashboard', [], 'Dashboard') . ' (' . $username . ')'; ?></h2>
+        <h2 class="settings-category-title" id="home-dashboard-section-title"><?php echo t_h('home.dashboard', [], 'Dashboard') . $homeTitleSuffix; ?></h2>
         <div class="home-grid" id="home-dashboard-section-grid">
 
             <!-- Notes -->
@@ -601,7 +611,7 @@ try {
 
         </div>
 
-        <h2 class="settings-category-title" id="home-actions-section-title"><?php echo t_h('settings.categories.actions', [], 'Actions') . ' (' . $username . ')'; ?></h2>
+        <h2 class="settings-category-title" id="home-actions-section-title"><?php echo t_h('settings.categories.actions', [], 'Actions') . $homeTitleSuffix; ?></h2>
         <div class="home-grid" id="home-actions-section-grid">
 
             <?php if ($showGitTiles): ?>
@@ -742,7 +752,7 @@ try {
     <?php endif; ?>
     
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/workspaces.js"></script>
+    <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
     <script src="js/navigation.js"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>

@@ -18,11 +18,22 @@ class BackupController {
         $this->con = $con;
         $this->backupsDir = getBackupsPath();
     }
+
+    private function requireActiveAccountOwner() {
+        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+            http_response_code(403);
+            return ['success' => false, 'error' => 'Settings are only available for your own account'];
+        }
+
+        return null;
+    }
     
     /**
      * GET /api/v1/backups - List all backups
      */
     public function index() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         // Create backups directory if it doesn't exist
         if (!createDirectoryWithPermissions($this->backupsDir)) {
             http_response_code(500);
@@ -75,6 +86,8 @@ class BackupController {
      * POST /api/v1/backups - Create a new backup
      */
     public function create() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         // Create backups directory if it doesn't exist
         if (!createDirectoryWithPermissions($this->backupsDir)) {
             http_response_code(500);
@@ -179,6 +192,8 @@ class BackupController {
      * GET /api/v1/backups/{filename} - Download a backup file
      */
     public function download($filename) {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         $filename = basename($filename); // Security: prevent path traversal
         
         // Validate filename format
@@ -214,6 +229,8 @@ class BackupController {
      * DELETE /api/v1/backups/{filename} - Delete a backup file
      */
     public function destroy($filename) {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         $filename = basename($filename); // Security: prevent path traversal
         
         // Validate filename format
@@ -241,6 +258,8 @@ class BackupController {
      * POST /api/v1/backups/upload - Upload a backup ZIP and save it in the backups directory
      */
     public function upload() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         if (empty($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
             $uploadError = $_FILES['file']['error'] ?? -1;
             http_response_code(400);
@@ -298,6 +317,8 @@ class BackupController {
      * POST /api/v1/backups/{filename}/restore - Restore a backup file
      */
     public function restore($filename) {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         $filename = basename($filename); // Security: prevent path traversal
         
         // Validate filename format

@@ -7,6 +7,7 @@
 
 require_once __DIR__ . '/../auth.php';
 requireAuth();
+requireActiveAccountOwner();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 requireSettingsPassword();

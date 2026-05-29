@@ -35,9 +35,17 @@ try {
 
     $redirectAfter = $_SESSION['oidc_redirect_after'] ?? null;
     unset($_SESSION['oidc_redirect_after']);
+    $sanitizedRedirectAfter = oidc_sanitize_redirect($redirectAfter);
 
     // CSP-compliant redirect using external script with JSON config
-    $redirectConfig = ['redirectAfter' => oidc_sanitize_redirect($redirectAfter)];
+    if (isAccountSelectionRequired()) {
+        if ($sanitizedRedirectAfter !== null) {
+            $_SESSION['post_login_redirect'] = $sanitizedRedirectAfter;
+        }
+        $redirectConfig = ['redirectAfter' => 'login.php?select_account=1'];
+    } else {
+        $redirectConfig = ['redirectAfter' => $sanitizedRedirectAfter];
+    }
     
     echo '<!DOCTYPE html><html><head>';
     echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';

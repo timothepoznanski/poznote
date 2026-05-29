@@ -110,12 +110,45 @@ function initializeMasterDatabase(PDO $con): void {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ");
+
+    // Account access grants: one authenticated user can open another user's note space.
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS user_account_access (
+            accessor_user_id INTEGER NOT NULL,
+            target_user_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (accessor_user_id, target_user_id),
+            FOREIGN KEY (accessor_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            CHECK (accessor_user_id != target_user_id)
+        )
+    ");
+
+    // Transient edit locks for notes shared across users.
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS note_edit_locks (
+            target_user_id INTEGER NOT NULL,
+            note_id INTEGER NOT NULL,
+            holder_login_user_id INTEGER NOT NULL,
+            holder_session_id TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires_at DATETIME NOT NULL,
+            PRIMARY KEY (target_user_id, note_id),
+            FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (holder_login_user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    ");
     
     // Create indexes
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_active ON users(active)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_token ON shared_links(token)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_user_account_access_accessor ON user_account_access(accessor_user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_user_account_access_target ON user_account_access(target_user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_note_edit_locks_holder ON note_edit_locks(holder_login_user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_note_edit_locks_expires ON note_edit_locks(expires_at)");
     
     // Create default user if none exist
     createDefaultUserIfNeeded($con);
@@ -152,6 +185,403 @@ function getAllUserProfiles(): array {
     } catch (Exception $e) {
         error_log("Error getting user profiles: " . $e->getMessage());
         return [];
+    }
+}
+
+/**
+ * Return explicit target account IDs a user may access, excluding their own implicit account.
+ */
+function getUserAccountAccessTargetIds(int $accessorUserId): array {
+    if ($accessorUserId <= 0) {
+        return [];
+    }
+
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            SELECT target_user_id
+            FROM user_account_access
+            WHERE accessor_user_id = ?
+            ORDER BY target_user_id
+        ");
+        $stmt->execute([$accessorUserId]);
+
+        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+    } catch (Exception $e) {
+        error_log("Error getting account access grants: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Return all active account IDs a user can open. Their own account is always included.
+ */
+function getUserAccessibleAccountIds(int $accessorUserId): array {
+    if ($accessorUserId <= 0) {
+        return [];
+    }
+
+    try {
+        $con = getMasterConnection();
+        $ids = [$accessorUserId];
+
+        $stmt = $con->prepare("
+            SELECT u.id
+            FROM user_account_access a
+            INNER JOIN users u ON u.id = a.target_user_id
+            WHERE a.accessor_user_id = ? AND u.active = 1
+            ORDER BY u.username
+        ");
+        $stmt->execute([$accessorUserId]);
+
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $targetId) {
+            $ids[] = (int)$targetId;
+        }
+
+        return array_values(array_unique(array_filter($ids, function ($id) {
+            return (int)$id > 0;
+        })));
+    } catch (Exception $e) {
+        error_log("Error getting accessible accounts: " . $e->getMessage());
+        return [$accessorUserId];
+    }
+}
+
+/**
+ * Return active user profiles a user can open, with their own account first.
+ */
+function getUserAccessibleProfiles(int $accessorUserId): array {
+    $ids = getUserAccessibleAccountIds($accessorUserId);
+    if (empty($ids)) {
+        return [];
+    }
+
+    try {
+        $con = getMasterConnection();
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $con->prepare("
+            SELECT *
+            FROM users
+            WHERE active = 1 AND id IN ($placeholders)
+            ORDER BY CASE WHEN id = ? THEN 0 ELSE 1 END, username
+        ");
+        $params = array_merge($ids, [$accessorUserId]);
+        $stmt->execute($params);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error getting accessible account profiles: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
+ * Check whether an authenticated user may open a target account.
+ */
+function canUserAccessAccount(int $accessorUserId, int $targetUserId): bool {
+    if ($accessorUserId <= 0 || $targetUserId <= 0) {
+        return false;
+    }
+
+    if ($accessorUserId === $targetUserId) {
+        $user = getUserProfileById($targetUserId);
+        return $user !== null && (bool)($user['active'] ?? false);
+    }
+
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            SELECT COUNT(*)
+            FROM user_account_access a
+            INNER JOIN users u ON u.id = a.target_user_id
+            WHERE a.accessor_user_id = ? AND a.target_user_id = ? AND u.active = 1
+        ");
+        $stmt->execute([$accessorUserId, $targetUserId]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        error_log("Error checking account access: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Replace the explicit target account grants for one user.
+ */
+function setUserAccountAccessTargets(int $accessorUserId, array $targetUserIds): array {
+    if ($accessorUserId <= 0) {
+        return ['success' => false, 'error' => 'Invalid user profile'];
+    }
+
+    try {
+        $con = getMasterConnection();
+
+        $accessor = getUserProfileById($accessorUserId);
+        if (!$accessor) {
+            return ['success' => false, 'error' => 'User profile not found'];
+        }
+
+        $normalizedTargetIds = [];
+        foreach ($targetUserIds as $targetUserId) {
+            $targetUserId = (int)$targetUserId;
+            if ($targetUserId > 0 && $targetUserId !== $accessorUserId) {
+                $normalizedTargetIds[$targetUserId] = true;
+            }
+        }
+
+        $validTargetIds = [];
+        if (!empty($normalizedTargetIds)) {
+            $ids = array_keys($normalizedTargetIds);
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $con->prepare("SELECT id FROM users WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+            $validTargetIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
+        }
+
+        $con->beginTransaction();
+
+        $stmt = $con->prepare("DELETE FROM user_account_access WHERE accessor_user_id = ?");
+        $stmt->execute([$accessorUserId]);
+
+        if (!empty($validTargetIds)) {
+            $stmt = $con->prepare("INSERT OR IGNORE INTO user_account_access (accessor_user_id, target_user_id) VALUES (?, ?)");
+            foreach ($validTargetIds as $targetUserId) {
+                $stmt->execute([$accessorUserId, $targetUserId]);
+            }
+        }
+
+        $con->commit();
+
+        return ['success' => true];
+    } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
+}
+
+/**
+ * Return all explicit access grants grouped by accessor user ID.
+ */
+function getUserAccountAccessMap(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT accessor_user_id, target_user_id
+            FROM user_account_access
+            ORDER BY accessor_user_id, target_user_id
+        ");
+
+        $map = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $accessorUserId = (int)$row['accessor_user_id'];
+            $targetUserId = (int)$row['target_user_id'];
+            if (!isset($map[$accessorUserId])) {
+                $map[$accessorUserId] = [];
+            }
+            $map[$accessorUserId][] = $targetUserId;
+        }
+
+        return $map;
+    } catch (Exception $e) {
+        error_log("Error getting account access map: " . $e->getMessage());
+        return [];
+    }
+}
+
+function pruneExpiredNoteEditLocks(?PDO $con = null): void {
+    try {
+        $con = $con ?? getMasterConnection();
+        $stmt = $con->prepare("DELETE FROM note_edit_locks WHERE expires_at <= ?");
+        $stmt->execute([gmdate('Y-m-d H:i:s')]);
+    } catch (Exception $e) {
+        error_log("Error pruning note edit locks: " . $e->getMessage());
+    }
+}
+
+function normalizeNoteEditLockRow(array $row): array {
+    return [
+        'target_user_id' => (int)($row['target_user_id'] ?? 0),
+        'note_id' => (int)($row['note_id'] ?? 0),
+        'holder_login_user_id' => (int)($row['holder_login_user_id'] ?? 0),
+        'holder_session_id' => (string)($row['holder_session_id'] ?? ''),
+        'holder_username' => (string)($row['holder_username'] ?? ''),
+        'created_at' => (string)($row['created_at'] ?? ''),
+        'last_seen_at' => (string)($row['last_seen_at'] ?? ''),
+        'expires_at' => (string)($row['expires_at'] ?? ''),
+    ];
+}
+
+function getNoteEditLock(int $targetUserId, int $noteId): ?array {
+    if ($targetUserId <= 0 || $noteId <= 0) {
+        return null;
+    }
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $stmt = $con->prepare("
+            SELECT l.target_user_id,
+                   l.note_id,
+                   l.holder_login_user_id,
+                   l.holder_session_id,
+                   l.created_at,
+                   l.last_seen_at,
+                   l.expires_at,
+                   u.username AS holder_username
+            FROM note_edit_locks l
+            INNER JOIN users u ON u.id = l.holder_login_user_id
+            WHERE l.target_user_id = ? AND l.note_id = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$targetUserId, $noteId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? normalizeNoteEditLockRow($row) : null;
+    } catch (Exception $e) {
+        error_log("Error getting note edit lock: " . $e->getMessage());
+        return null;
+    }
+}
+
+function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90): array {
+    if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
+        return ['success' => false, 'error' => 'Invalid note edit lock parameters'];
+    }
+
+    $holderSessionId = trim($holderSessionId);
+    if ($holderSessionId === '') {
+        return ['success' => false, 'error' => 'Missing editor session'];
+    }
+
+    $ttlSeconds = max(15, min(300, $ttlSeconds));
+    $now = gmdate('Y-m-d H:i:s');
+    $expiresAt = gmdate('Y-m-d H:i:s', time() + $ttlSeconds);
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $con->beginTransaction();
+
+        $stmt = $con->prepare("
+            SELECT target_user_id, note_id, holder_login_user_id, holder_session_id, created_at, last_seen_at, expires_at
+            FROM note_edit_locks
+            WHERE target_user_id = ? AND note_id = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$targetUserId, $noteId]);
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$existing) {
+            $insert = $con->prepare("
+                INSERT INTO note_edit_locks (
+                    target_user_id,
+                    note_id,
+                    holder_login_user_id,
+                    holder_session_id,
+                    created_at,
+                    last_seen_at,
+                    expires_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            $insert->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $now, $now, $expiresAt]);
+            $con->commit();
+
+            return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
+        }
+
+        if ((int)$existing['holder_login_user_id'] === $holderLoginUserId && (string)$existing['holder_session_id'] === $holderSessionId) {
+            $update = $con->prepare("
+                UPDATE note_edit_locks
+                SET last_seen_at = ?, expires_at = ?
+                WHERE target_user_id = ? AND note_id = ?
+            ");
+            $update->execute([$now, $expiresAt, $targetUserId, $noteId]);
+            $con->commit();
+
+            return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
+        }
+
+        $con->rollBack();
+        return [
+            'success' => false,
+            'error' => 'Note is currently locked for editing',
+            'lock' => getNoteEditLock($targetUserId, $noteId),
+        ];
+    } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        error_log("Error acquiring note edit lock: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Failed to acquire note edit lock'];
+    }
+}
+
+function refreshNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90): array {
+    return acquireNoteEditLock($targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $ttlSeconds);
+}
+
+function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId): bool {
+    if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
+        return false;
+    }
+
+    $holderSessionId = trim($holderSessionId);
+    if ($holderSessionId === '') {
+        return false;
+    }
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $stmt = $con->prepare("
+            DELETE FROM note_edit_locks
+            WHERE target_user_id = ?
+              AND note_id = ?
+              AND holder_login_user_id = ?
+              AND holder_session_id = ?
+        ");
+        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId]);
+
+        return true;
+    } catch (Exception $e) {
+        error_log("Error releasing note edit lock: " . $e->getMessage());
+        return false;
+    }
+}
+
+function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId): bool {
+    if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
+        return false;
+    }
+
+    $holderSessionId = trim($holderSessionId);
+    if ($holderSessionId === '') {
+        return false;
+    }
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $stmt = $con->prepare("
+            SELECT COUNT(*)
+            FROM note_edit_locks
+            WHERE target_user_id = ?
+              AND note_id = ?
+              AND holder_login_user_id = ?
+              AND holder_session_id = ?
+        ");
+        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        error_log("Error validating note edit lock: " . $e->getMessage());
+        return false;
     }
 }
 
@@ -354,14 +784,25 @@ function updateUserProfile(int $id, array $data): array {
         $stmt = $masterCon->prepare($sql);
         $stmt->execute($params);
         
-        // If updating the current user, refresh the session data
+        // If updating the current active account or authenticated identity, refresh the session data
         $isCurrentUser = (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $id);
+        $isAuthenticatedUser = (isset($_SESSION['login_user_id']) && (int)$_SESSION['login_user_id'] === $id);
         if ($isCurrentUser) {
             $stmt = $masterCon->prepare("SELECT * FROM users WHERE id = ?");
             $stmt->execute([$id]);
             $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($updatedUser) {
                 $_SESSION['user'] = $updatedUser;
+                if ($isAuthenticatedUser) {
+                    $_SESSION['login_user'] = $updatedUser;
+                }
+            }
+        } elseif ($isAuthenticatedUser) {
+            $stmt = $masterCon->prepare("SELECT * FROM users WHERE id = ?");
+            $stmt->execute([$id]);
+            $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($updatedUser) {
+                $_SESSION['login_user'] = $updatedUser;
             }
         }
         
@@ -423,6 +864,10 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
         // Delete user's shared links from global registry
         $stmt = $con->prepare("DELETE FROM shared_links WHERE user_id = ?");
         $stmt->execute([$id]);
+
+        // Delete account access grants involving this user.
+        $stmt = $con->prepare("DELETE FROM user_account_access WHERE accessor_user_id = ? OR target_user_id = ?");
+        $stmt->execute([$id, $id]);
         
         $stmt = $con->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$id]);

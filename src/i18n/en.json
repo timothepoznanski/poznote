@@ -1164,6 +1164,12 @@
       "oidc_no_profile": "No user profile found for \"{{identifier}}\". Please contact an administrator to create your profile.",
       "oidc_failed": "SSO login failed. Please try again.",
       "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
+    },
+    "account_select": {
+      "intro": "Choose the note account to open.",
+      "own_account": "Your account",
+      "sign_out": "Sign out",
+      "invalid": "Unable to select this account."
     }
   },
   "restore_import": {
@@ -1944,6 +1950,7 @@
     }
   },
   "workspace_menu": {
+    "acting_as": " (acting as {{user}})",
     "workspaces": "Workspaces",
     "logout": "Logout"
   },
@@ -1972,6 +1979,7 @@
     "title": "Backlinks"
   },
   "multiuser": {
+    "acting_as": "acting as {{user}}",
     "admin": {
       "maintenance": {
         "title": "Rebuild Master Database",
@@ -1999,6 +2007,14 @@
       "admin_id_1_locked": "Administrator role cannot be removed from user ID 1",
       "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
       "admin_note": "Use the Admin checkbox to grant or revoke administrator privileges for another user.",
+      "account_access": {
+        "column": "Note access",
+        "title": "Note access",
+        "manage": "Manage note access",
+        "help": "Choose which note accounts this user can open after login.",
+        "own_only": "Own account only",
+        "own_account": "Own account"
+      },
       "confirm_admin": {
         "title": "Confirm Promotion to Administrator",
         "message": "Are you sure you want to grant administrator privileges to \"{{username}}\" ?",
@@ -2134,5 +2150,13 @@
     "placeholder": "Enter settings password",
     "unlock": "Unlock",
     "error_incorrect": "Incorrect password. Please try again."
+  },
+  "note_lock": {
+    "banner": "Read only: {{user}} is currently editing this note.",
+    "current_user_other_tab": "Read only: this note is already being edited in another tab.",
+    "another_user": "another user",
+    "popup_title": "Attention",
+    "lost_to_other_tab": "You no longer hold the edit lock for this note. It is now being edited in another tab.",
+    "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it."
   }
 }

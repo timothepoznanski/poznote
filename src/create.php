@@ -159,7 +159,7 @@ $currentLang = getUserLanguage();
     <?php include 'modals.php'; ?>
     
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/workspaces.js"></script>
+    <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
     <script src="js/navigation.js"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>

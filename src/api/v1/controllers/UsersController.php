@@ -24,6 +24,14 @@ class UsersController {
         }
         return null;
     }
+
+    private function requireActiveAccountOwner() {
+        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+            http_response_code(403);
+            return ['error' => 'Settings are only available for your own account'];
+        }
+        return null;
+    }
     
     /**
      * GET /api/v1/users/me - Get current authenticated user's profile
@@ -247,6 +255,8 @@ class UsersController {
      * POST /api/v1/users/me/password - Change current user's password
      */
     public function changePassword() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $userId = getCurrentUserId();
@@ -294,6 +304,8 @@ class UsersController {
      * GET /api/v1/users/me/password-status - Check if current user has a custom password
      */
     public function passwordStatus() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
         
         $userId = getCurrentUserId();

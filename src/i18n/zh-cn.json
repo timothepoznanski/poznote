@@ -1485,6 +1485,12 @@
       "oidc_no_profile": "未找到 \"{{identifier}}\" 的用户个人资料。请联系管理员创建您的个人资料。",
       "oidc_failed": "SSO 登录失败。请稍后再试。",
       "oidc_unauthorized": "您无权访问此应用程序。请联系您的管理员。"
+    },
+    "account_select": {
+      "intro": "选择要打开的笔记账户。",
+      "own_account": "您的账户",
+      "sign_out": "退出登录",
+      "invalid": "无法选择此账户。"
     }
   },
   "restore_import": {
@@ -2135,6 +2141,7 @@
     "replaced_all": "已替换 {{count}} 个匹配项"
   },
   "multiuser": {
+    "acting_as": "以 {{user}} 身份",
     "admin": {
       "title": "用户管理",
       "subtitle": "管理用户及其访问权限",
@@ -2160,6 +2167,14 @@
       "actions": "操作",
       "not_defined": "未定义",
       "email_usage_note": "邮箱地址仅在配置 OIDC 转换身份验证时使用。Poznote 不会发送任何电子邮件。",
+      "account_access": {
+        "column": "笔记访问",
+        "title": "笔记访问",
+        "manage": "管理笔记访问",
+        "help": "选择该用户登录后可以打开哪些笔记账户。",
+        "own_only": "仅自己的账户",
+        "own_account": "自己的账户"
+      },
       "id": "ID",
       "administrator": "管理员",
       "click_to_activate": "点击激活",
@@ -2448,6 +2463,7 @@
     }
   },
   "workspace_menu": {
+    "acting_as": "（以 {{user}} 身份）",
     "workspaces": "工作区",
     "logout": "退出登录"
   },
@@ -2572,5 +2588,13 @@
     "placeholder": "请输入密码",
     "unlock": "解锁",
     "error_incorrect": "密码错误，请重试。"
+  },
+  "note_lock": {
+    "banner": "只读：{{user}} 当前正在编辑这条笔记。",
+    "current_user_other_tab": "只读：这条笔记已在另一个标签页中编辑。",
+    "another_user": "另一位用户",
+    "popup_title": "注意",
+    "lost_to_other_tab": "您已不再持有这条笔记的编辑锁。现在它正在另一个标签页中被编辑。",
+    "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。"
   }
 }

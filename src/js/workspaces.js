@@ -144,7 +144,7 @@ function loadAndShowWorkspaceMenu(menu) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
-                displayWorkspaceMenu(menu, data.workspaces, data.username);
+                displayWorkspaceMenu(menu, data.workspaces, data.username, data.acting_as);
             } else {
                 menu.innerHTML = '<div class="workspace-menu-item"><i class="lucide lucide-alert-triangle"></i>' + wsTr('workspaces.menu.error_loading', {}, 'Error loading workspaces') + '</div>';
             }
@@ -154,16 +154,23 @@ function loadAndShowWorkspaceMenu(menu) {
         });
 }
 
-function displayWorkspaceMenu(menu, workspaces, username) {
+function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     // Use window.selectedWorkspace first (set by PHP), then fall back to selectedWorkspace variable
     var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || '');
     var menuHtml = '';
 
     // Add username at the top if available
     if (username) {
+        var displayText = username.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        if (actingAs) {
+            var safeActingAs = String(actingAs).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            var actingText = wsTr('workspace_menu.acting_as', { user: safeActingAs }, ' (acting as {{user}})');
+            displayText += actingText;
+        }
+
         menuHtml += '<div class="workspace-menu-item workspace-menu-username" data-action="user-settings">';
         menuHtml += '<i class="lucide lucide-user"></i>';
-        menuHtml += '<span>' + username.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') + '</span>';
+        menuHtml += '<span>' + displayText + '</span>';
         menuHtml += '</div>';
         menuHtml += '<div class="workspace-menu-divider"></div>';
     }

@@ -880,15 +880,8 @@ function oidc_finish_login($claims, $tokens) {
 
     $user = oidc_find_or_provision_user($claims);
     
-    // Set up session with user profile
-    $_SESSION['authenticated'] = true;
-    $_SESSION['auth_method'] = 'oidc';
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['user'] = [
-        'id' => $user['id'],
-        'username' => $user['username'],
-        'is_admin' => (bool)$user['is_admin']
-    ];
+    // Set up session with authenticated identity and, if needed, defer active account selection.
+    startAuthenticatedUserSession($user, 'oidc');
     
     // Update last login
     updateUserLastLogin($user['id']);

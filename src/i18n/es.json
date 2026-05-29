@@ -1486,6 +1486,12 @@
       "oidc_no_profile": "No se encontró ningún perfil de usuario para \"{{identifier}}\". Por favor, contacta con un administrador para crear tu perfil.",
       "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo.",
       "oidc_unauthorized": "No estás autorizado para acceder a esta aplicación. Por favor, contacta con tu administrador."
+    },
+    "account_select": {
+      "intro": "Elige la cuenta de notas que deseas abrir.",
+      "own_account": "Tu cuenta",
+      "sign_out": "Cerrar sesión",
+      "invalid": "No se puede seleccionar esta cuenta."
     }
   },
   "restore_import": {
@@ -2136,6 +2142,7 @@
     "replaced_all": "{{count}} reemplazo(s) realizado(s)"
   },
   "multiuser": {
+    "acting_as": "como {{user}}",
     "admin": {
       "id": "ID",
       "username": "Usuario",
@@ -2153,6 +2160,14 @@
       "toggle_admin": "Conceder o revocar privilegios de administrador",
       "admin_id_1_locked": "El rol de administrador no se puede eliminar del ID de usuario 1",
       "admin_note": "Use la casilla de Admin para otorgar o revocar privilegios de administrador a otro usuario.",
+      "account_access": {
+        "column": "Acceso a notas",
+        "title": "Acceso a las notas",
+        "manage": "Gestionar el acceso a las notas",
+        "help": "Elige qué cuentas de notas podrá abrir este usuario después de iniciar sesión.",
+        "own_only": "Solo su cuenta",
+        "own_account": "Su cuenta"
+      },
       "errors": {
         "cannot_delete_self": "No puedes borrar tu propio perfil",
         "cannot_change_self": "No puedes cambiar tu propio estado/rol",
@@ -2303,6 +2318,7 @@
     }
   },
   "workspace_menu": {
+    "acting_as": " (como {{user}})",
     "workspaces": "Espacios de trabajo",
     "logout": "Cerrar sesión"
   },
@@ -2430,5 +2446,13 @@
     "placeholder": "Introduzca la contraseña",
     "unlock": "Desbloquear",
     "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo."
+  },
+  "note_lock": {
+    "banner": "Solo lectura: {{user}} está editando esta nota en este momento.",
+    "current_user_other_tab": "Solo lectura: esta nota ya se está editando en otra pestaña.",
+    "another_user": "otro usuario",
+    "popup_title": "Atención",
+    "lost_to_other_tab": "Ya no tiene el bloqueo de edición de esta nota. Ahora se está editando en otra pestaña.",
+    "lost_to_user": "Ya no tiene el bloqueo de edición de esta nota. {{user}} la está editando ahora."
   }
 }

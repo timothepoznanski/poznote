@@ -62,15 +62,6 @@ body.dark-mode {
     margin-top: 5px;
 }
 
-.email-note {
-    /* font-size: 0.8rem; */
-    color: var(--text-muted, #666);
-    margin-top: 18px;
-    margin-bottom: 18px;
-    line-height: 1.7;
-    text-align: center;
-}
-
 /* Buttons */
 .btn {
     padding: 10px 20px;
@@ -243,6 +234,14 @@ html[data-theme='dark'] .users-table td {
 
 .user-email-empty {
     opacity: 0.8;
+}
+
+.account-access-summary {
+    color: var(--text-muted, #666);
+    font-size: 0.9em;
+    line-height: 1.45;
+    max-width: 260px;
+    overflow-wrap: anywhere;
 }
 
 /* Badges */
@@ -450,6 +449,91 @@ html[data-theme='dark'] .users-table td {
 .password-modal-content .form-actions .btn {
     padding: 8px 14px;
     min-width: 0;
+}
+
+.account-access-modal-content {
+    max-width: 560px;
+}
+
+.account-access-help {
+    color: var(--text-muted, #666);
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 14px 0 18px;
+}
+
+.account-access-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 18px 0 24px;
+    max-height: 42vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.account-access-option {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    color: var(--text-color, #333);
+    cursor: pointer;
+}
+
+.account-access-option:hover {
+    background: var(--bg-hover, rgba(0, 0, 0, 0.02));
+}
+
+.account-access-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.account-access-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.account-access-state,
+.account-access-own-label {
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.account-access-state {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.account-access-own-label {
+    display: none;
+    background: #e7f1ff;
+    color: #0b5cad;
+}
+
+.account-access-own .account-access-own-label {
+    display: inline-block;
+}
+
+.account-access-own {
+    cursor: not-allowed;
+    opacity: 0.82;
+}
+
+html[data-theme='dark'] .account-access-state {
+    background: rgba(220, 53, 69, 0.18);
+    color: #ffb3bd;
+}
+
+html[data-theme='dark'] .account-access-own-label {
+    background: rgba(74, 158, 255, 0.16);
+    color: #9cc7ff;
 }
 
 .modal-title {

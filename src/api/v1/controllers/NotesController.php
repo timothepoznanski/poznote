@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/../../../note_loader.php';
+require_once __DIR__ . '/../../../users/db_master.php';
 
 class NotesController {
     private PDO $con;
@@ -26,6 +27,215 @@ class NotesController {
 
         $sql .= " AND $column >= ?";
         $params[] = $cutoff;
+    }
+
+    private function getNoteLockTargetUserId(): int {
+        return (int) (getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+    }
+
+    private function getNoteLockHolderUserId(): int {
+        return (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+    }
+
+    private function getEditorSessionId(?array $input = null): string {
+        if (is_array($input) && isset($input['editor_session_id'])) {
+            return trim((string) $input['editor_session_id']);
+        }
+
+        if (isset($_POST['editor_session_id'])) {
+            return trim((string) $_POST['editor_session_id']);
+        }
+
+        if (isset($_SERVER['HTTP_X_EDITOR_SESSION_ID'])) {
+            return trim((string) $_SERVER['HTTP_X_EDITOR_SESSION_ID']);
+        }
+
+        return '';
+    }
+
+    private function decodeOptionalJsonBody(): ?array {
+        $raw = file_get_contents('php://input');
+        if ($raw === false || trim($raw) === '') {
+            return [];
+        }
+
+        $input = json_decode($raw, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input)) {
+            return null;
+        }
+
+        return $input;
+    }
+
+    private function noteExistsForEditing(int $noteId): bool {
+        $stmt = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE id = ? AND trash = 0");
+        $stmt->execute([$noteId]);
+        return (int) $stmt->fetchColumn() > 0;
+    }
+
+    private function buildNoteEditLockPayload(?array $lock): ?array {
+        if (!$lock) {
+            return null;
+        }
+
+        $currentHolderUserId = $this->getNoteLockHolderUserId();
+
+        return [
+            'target_user_id' => (int) ($lock['target_user_id'] ?? 0),
+            'note_id' => (int) ($lock['note_id'] ?? 0),
+            'holder_login_user_id' => (int) ($lock['holder_login_user_id'] ?? 0),
+            'holder_username' => (string) ($lock['holder_username'] ?? ''),
+            'holder_is_current_user' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId,
+            'expires_at' => (string) ($lock['expires_at'] ?? ''),
+            'last_seen_at' => (string) ($lock['last_seen_at'] ?? ''),
+        ];
+    }
+
+    private function sendLockConflict(string $message, ?array $lock = null): void {
+        http_response_code(423);
+        echo json_encode([
+            'success' => false,
+            'error' => $message,
+            'lock' => $this->buildNoteEditLockPayload($lock),
+        ]);
+    }
+
+    private function validateCurrentNoteEditLock(int $noteId, string $editorSessionId): bool {
+        $targetUserId = $this->getNoteLockTargetUserId();
+        $holderUserId = $this->getNoteLockHolderUserId();
+
+        if ($targetUserId <= 0 || $holderUserId <= 0) {
+            $this->sendLockConflict('Missing edit lock for this note', getNoteEditLock($targetUserId, $noteId));
+            return false;
+        }
+
+        if ($editorSessionId === '') {
+            $lock = getNoteEditLock($targetUserId, $noteId);
+            if (!$lock) {
+                return true;
+            }
+
+            $this->sendLockConflict('This note is currently locked for editing', $lock);
+            return false;
+        }
+
+        if (noteEditLockBelongsTo($targetUserId, $noteId, $holderUserId, $editorSessionId)) {
+            return true;
+        }
+
+        $lock = getNoteEditLock($targetUserId, $noteId);
+        $message = $lock
+            ? 'This note is currently locked for editing'
+            : 'You no longer hold the edit lock for this note';
+
+        $this->sendLockConflict($message, $lock);
+        return false;
+    }
+
+    public function acquireLock(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int) $id;
+        $input = $this->decodeOptionalJsonBody();
+        if ($input === null) {
+            $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        if (!$this->noteExistsForEditing($noteId)) {
+            $this->sendError(404, 'Note not found');
+            return;
+        }
+
+        $editorSessionId = $this->getEditorSessionId($input);
+        if ($editorSessionId === '') {
+            $this->sendError(400, 'Missing editor session');
+            return;
+        }
+
+        $result = acquireNoteEditLock(
+            $this->getNoteLockTargetUserId(),
+            $noteId,
+            $this->getNoteLockHolderUserId(),
+            $editorSessionId
+        );
+
+        if (!empty($result['success'])) {
+            $this->sendSuccess([
+                'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null),
+            ]);
+            return;
+        }
+
+        $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null);
+    }
+
+    public function heartbeatLock(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int) $id;
+        $input = $this->decodeOptionalJsonBody();
+        if ($input === null) {
+            $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        $editorSessionId = $this->getEditorSessionId($input);
+        if ($editorSessionId === '') {
+            $this->sendError(400, 'Missing editor session');
+            return;
+        }
+
+        $result = refreshNoteEditLock(
+            $this->getNoteLockTargetUserId(),
+            $noteId,
+            $this->getNoteLockHolderUserId(),
+            $editorSessionId
+        );
+
+        if (!empty($result['success'])) {
+            $this->sendSuccess([
+                'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null),
+            ]);
+            return;
+        }
+
+        $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null);
+    }
+
+    public function releaseLock(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int) $id;
+        $input = $this->decodeOptionalJsonBody();
+        if ($input === null) {
+            $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        $editorSessionId = $this->getEditorSessionId($input);
+        if ($editorSessionId === '') {
+            $this->sendError(400, 'Missing editor session');
+            return;
+        }
+
+        $released = releaseNoteEditLock(
+            $this->getNoteLockTargetUserId(),
+            $noteId,
+            $this->getNoteLockHolderUserId(),
+            $editorSessionId
+        );
+
+        $this->sendSuccess(['released' => $released]);
     }
     
     /**
@@ -533,6 +743,11 @@ class NotesController {
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        $editorSessionId = $this->getEditorSessionId($input);
+        if (!$this->validateCurrentNoteEditLock($noteId, $editorSessionId)) {
             return;
         }
         
@@ -1113,9 +1328,14 @@ class NotesController {
         // sendBeacon sends FormData, not JSON
         $content = $_POST['content'] ?? '';
         $workspace = $_POST['workspace'] ?? null;
+        $editorSessionId = $this->getEditorSessionId();
         
         if (empty($content)) {
             $this->sendError(400, 'Content is required');
+            return;
+        }
+
+        if (!$this->validateCurrentNoteEditLock($noteId, $editorSessionId)) {
             return;
         }
         

@@ -158,10 +158,115 @@ function api_t($key, $vars = [], $default = null) {
     return $text;
 }
 
+function getAuthenticatedUser() {
+    return $_SESSION['login_user'] ?? $_SESSION['user'] ?? null;
+}
+
+function getAuthenticatedUserId() {
+    return $_SESSION['login_user_id'] ?? ($_SESSION['user_id'] ?? null);
+}
+
+function setAuthenticatedIdentity(array $authUser, ?string $authMethod = null): void {
+    $authUserId = (int)($authUser['id'] ?? 0);
+    if ($authUserId <= 0) {
+        return;
+    }
+
+    $_SESSION['authenticated'] = true;
+    $_SESSION['login_user_id'] = $authUserId;
+    $_SESSION['login_user'] = $authUser;
+
+    if ($authMethod !== null && $authMethod !== '') {
+        $_SESSION['auth_method'] = $authMethod;
+    } elseif (($_SESSION['auth_method'] ?? '') !== 'public_workspace') {
+        unset($_SESSION['auth_method']);
+    }
+}
+
+function setActiveUserAccount(array $targetUser): bool {
+    $targetUserId = (int)($targetUser['id'] ?? 0);
+    if ($targetUserId <= 0 || empty($targetUser['active'])) {
+        return false;
+    }
+
+    $_SESSION['user_id'] = $targetUserId;
+    $_SESSION['user'] = $targetUser;
+    unset($_SESSION['account_selection_required']);
+
+    return true;
+}
+
+function startAuthenticatedUserSession(array $authUser, ?string $authMethod = null): bool {
+    $authUserId = (int)($authUser['id'] ?? 0);
+    if ($authUserId <= 0) {
+        return false;
+    }
+
+    setAuthenticatedIdentity($authUser, $authMethod);
+
+    require_once __DIR__ . '/users/db_master.php';
+    $accessibleProfiles = getUserAccessibleProfiles($authUserId);
+
+    if (count($accessibleProfiles) > 1) {
+        unset($_SESSION['user_id'], $_SESSION['user']);
+        $_SESSION['account_selection_required'] = true;
+        return false;
+    }
+
+    $targetUser = $accessibleProfiles[0] ?? $authUser;
+    return setActiveUserAccount($targetUser);
+}
+
+function isAccountSelectionRequired(): bool {
+    return !empty($_SESSION['account_selection_required'])
+        && isset($_SESSION['login_user_id'])
+        && (!isset($_SESSION['user_id']) || (int)$_SESSION['user_id'] <= 0);
+}
+
+function getPendingAccountSelectionProfiles(): array {
+    $authUserId = (int)($_SESSION['login_user_id'] ?? 0);
+    if ($authUserId <= 0) {
+        return [];
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    return getUserAccessibleProfiles($authUserId);
+}
+
+function selectAuthenticatedAccount(int $targetUserId): bool {
+    $authUserId = (int)getAuthenticatedUserId();
+    if ($authUserId <= 0 || $targetUserId <= 0) {
+        return false;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    if (!canUserAccessAccount($authUserId, $targetUserId)) {
+        return false;
+    }
+
+    $targetUser = getUserProfileById($targetUserId);
+    if (!$targetUser || empty($targetUser['active'])) {
+        return false;
+    }
+
+    return setActiveUserAccount($targetUser);
+}
+
 function isAuthenticated() {
     // Check session first
     if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
-        return true;
+        if (!isset($_SESSION['login_user_id']) && isset($_SESSION['user_id'])) {
+            $_SESSION['login_user_id'] = (int)$_SESSION['user_id'];
+            if (isset($_SESSION['user']) && is_array($_SESSION['user'])) {
+                $_SESSION['login_user'] = $_SESSION['user'];
+            }
+        }
+
+        if (isAccountSelectionRequired()) {
+            return false;
+        }
+
+        return isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] > 0;
     }
     
     // Check remember me cookie
@@ -185,9 +290,7 @@ function isAuthenticated() {
                         $validLegacyHash = !$validHash && hash_equals($legacyExpectedHash, $hash);
                         
                         if ($validHash || $validLegacyHash) {
-                            $_SESSION['authenticated'] = true;
-                            $_SESSION['user_id'] = (int)$userId;
-                            $_SESSION['user'] = $user;
+                            $activeAccountSelected = startAuthenticatedUserSession($user);
                             updateUserLastLogin((int)$userId);
 
                             if ($validLegacyHash) {
@@ -195,7 +298,7 @@ function isAuthenticated() {
                                 setRememberMeCookie(buildRememberMeToken($username, (int)$userId, $newTimestamp, $secretToUse), time() + REMEMBER_ME_DURATION);
                             }
 
-                            return true;
+                            return $activeAccountSelected;
                         }
                     }
                 }
@@ -236,9 +339,8 @@ function isAuthenticated() {
                     $profiles = getAllUserProfiles();
                     if (!empty($profiles)) {
                         $firstUser = $profiles[0];
-                        $_SESSION['authenticated'] = true;
-                        $_SESSION['user_id'] = (int)$firstUser['id'];
-                        $_SESSION['user'] = getUserProfileById((int)$firstUser['id']);
+                        $firstUser = getUserProfileById((int)$firstUser['id']) ?: $firstUser;
+                        $activeAccountSelected = startAuthenticatedUserSession($firstUser);
                         updateUserLastLogin((int)$firstUser['id']);
                         
                         // Upgrade the cookie to the new format with user_id
@@ -247,12 +349,11 @@ function isAuthenticated() {
                         $newToken = buildRememberMeToken($username, (int)$firstUser['id'], $newTimestamp, $secretToUse);
                         setRememberMeCookie($newToken, time() + REMEMBER_ME_DURATION);
                         
-                        return true;
+                        return $activeAccountSelected;
                     }
                     
                     // Fallback if no profiles exist (shouldn't happen)
-                    $_SESSION['authenticated'] = true;
-                    return true;
+                    return false;
                 }
             }
         }
@@ -433,6 +534,14 @@ function clearPublicWorkspaceAuthentication(): void {
         $_SESSION['user_id'] = (int)$originalAuth['user_id'];
         $_SESSION['user'] = $originalAuth['user'];
 
+        if (isset($originalAuth['login_user_id'], $originalAuth['login_user']) && is_array($originalAuth['login_user'])) {
+            $_SESSION['login_user_id'] = (int)$originalAuth['login_user_id'];
+            $_SESSION['login_user'] = $originalAuth['login_user'];
+        } else {
+            $_SESSION['login_user_id'] = (int)$originalAuth['user_id'];
+            $_SESSION['login_user'] = $originalAuth['user'];
+        }
+
         if (array_key_exists('auth_method', $originalAuth)) {
             if ($originalAuth['auth_method'] === null || $originalAuth['auth_method'] === '') {
                 unset($_SESSION['auth_method']);
@@ -450,7 +559,7 @@ function clearPublicWorkspaceAuthentication(): void {
         return;
     }
 
-    unset($_SESSION['authenticated'], $_SESSION['user_id'], $_SESSION['user'], $_SESSION['auth_method']);
+    unset($_SESSION['authenticated'], $_SESSION['user_id'], $_SESSION['user'], $_SESSION['login_user_id'], $_SESSION['login_user'], $_SESSION['auth_method'], $_SESSION['account_selection_required']);
 }
 
 function storeOriginalAuthForPublicWorkspace(): void {
@@ -469,6 +578,8 @@ function storeOriginalAuthForPublicWorkspace(): void {
         'authenticated' => true,
         'user_id' => (int)($_SESSION['user_id'] ?? 0),
         'user' => is_array($_SESSION['user'] ?? null) ? $_SESSION['user'] : [],
+        'login_user_id' => (int)($_SESSION['login_user_id'] ?? ($_SESSION['user_id'] ?? 0)),
+        'login_user' => is_array($_SESSION['login_user'] ?? null) ? $_SESSION['login_user'] : (is_array($_SESSION['user'] ?? null) ? $_SESSION['user'] : []),
         'auth_method' => $_SESSION['auth_method'] ?? null,
         'extra_session_keys' => $extraSessionKeys,
     ];
@@ -486,7 +597,7 @@ function hasStoredOriginalAuthForPublicWorkspace(): bool {
 
 function getPublicWorkspaceViewerUserId(): int {
     if (isRealUserAuthenticated()) {
-        return isset($_SESSION['user_id']) ? max(0, (int)$_SESSION['user_id']) : 0;
+        return max(0, (int)getAuthenticatedUserId());
     }
 
     $access = getPublicWorkspaceAccess();
@@ -691,7 +802,7 @@ function activatePublicWorkspaceAccess(array $workspaceAccess, int $viewerUserId
     storeOriginalAuthForPublicWorkspace();
 
     if ($viewerUserId <= 0 && isRealUserAuthenticated()) {
-        $viewerUserId = isset($_SESSION['user_id']) ? max(0, (int)$_SESSION['user_id']) : 0;
+        $viewerUserId = max(0, (int)getAuthenticatedUserId());
     }
 
     $_SESSION['authenticated'] = true;
@@ -702,7 +813,10 @@ function activatePublicWorkspaceAccess(array $workspaceAccess, int $viewerUserId
         'is_admin' => false,
         '_public_workspace' => true,
     ];
+    $_SESSION['login_user_id'] = $userId;
+    $_SESSION['login_user'] = $_SESSION['user'];
     $_SESSION['auth_method'] = 'public_workspace';
+    unset($_SESSION['account_selection_required']);
     $_SESSION['public_workspace_access'] = [
         'user_id' => $userId,
         'workspace_name' => $workspaceName,
@@ -786,7 +900,64 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
             'error' => $message,
         ]);
     } else {
-        echo htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $v = @file_get_contents(__DIR__ . '/version.txt') ?: time();
+        $v = urlencode(trim($v));
+        $currentLang = (function_exists('getUserLanguage')) ? getUserLanguage() : 'en';
+        $title = (function_exists('t')) ? t('common.access_denied', [], 'Access Denied') : 'Access Denied';
+        $isSubdir = strpos($_SERVER['SCRIPT_NAME'] ?? '', '/admin/') !== false;
+        $prefix = $isSubdir ? '../' : '';
+        ?>
+        <!doctype html>
+        <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title><?php echo htmlspecialchars($title); ?></title>
+            <meta name="color-scheme" content="dark light">
+            <script src="<?php echo $prefix; ?>js/theme-init.js?v=<?php echo $v; ?>"></script>
+            <link rel="stylesheet" href="<?php echo $prefix; ?>css/public_folder.css?v=<?php echo $v; ?>">
+            <link rel="stylesheet" href="<?php echo $prefix; ?>css/lucide.css?v=<?php echo $v; ?>">
+            <style>
+                .error-container {
+                    width: min(420px, 100%);
+                    padding: 32px;
+                    border: 1px solid var(--password-border, #dddddd);
+                    border-radius: 10px;
+                    background: var(--password-card-bg, #ffffff);
+                    box-shadow: var(--password-shadow, 0 6px 24px rgba(0,0,0,0.08));
+                    text-align: center;
+                }
+                .error-icon { font-size: 48px; color: #ef4444; margin-bottom: 20px; }
+                .error-title { font-size: 24px; font-weight: 600; margin-bottom: 12px; color: var(--password-text, #333333); }
+                .error-message { color: var(--password-muted, #666666); margin-bottom: 30px; line-height: 1.5; }
+                .back-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 10px 24px;
+                    background: var(--password-accent, #3182ce);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 6px;
+                    font-weight: 500;
+                    transition: background 0.2s;
+                }
+                .back-link:hover { background: var(--password-accent-hover, #2563eb); }
+            </style>
+        </head>
+        <body class="password-page-body">
+            <div class="error-container">
+                <div class="error-icon"><i class="lucide lucide-shield"></i></div>
+                <h1 class="error-title"><?php echo htmlspecialchars($title); ?></h1>
+                <p class="error-message"><?php echo htmlspecialchars($message); ?></p>
+                <a href="<?php echo $prefix; ?>index.php" class="back-link">
+                    <i class="lucide lucide-arrow-left"></i>
+                    <?php echo (function_exists('t')) ? t('common.back_to_notes', [], 'Back to Notes') : 'Back to Notes'; ?>
+                </a>
+            </div>
+        </body>
+        </html>
+        <?php
     }
 
     exit;
@@ -870,9 +1041,7 @@ function authenticate($username, $password, $rememberMe = false) {
     }
 
     if ($authenticated) {
-        $_SESSION['authenticated'] = true;
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['user'] = $user;
+        startAuthenticatedUserSession($user);
         updateUserLastLogin($userId);
 
         // Set remember me cookie if requested
@@ -926,7 +1095,7 @@ function requireAuth() {
     }
 
     if (!isAuthenticated()) {
-        header('Location: login.php');
+        header('Location: ' . (isAccountSelectionRequired() ? 'login.php?select_account=1' : 'login.php'));
         exit;
     }
 
@@ -1044,14 +1213,18 @@ function isApiJwtBearerToken(string $token): bool {
     return substr_count($token, '.') === 2;
 }
 
-function setApiAuthenticatedUser(array $user): void {
+function setApiAuthenticatedUser(array $user, ?array $authUser = null): void {
+    $authUser = $authUser ?? $user;
     $_SESSION['authenticated'] = true;
+    $_SESSION['login_user_id'] = (int) $authUser['id'];
+    $_SESSION['login_user'] = $authUser;
     $_SESSION['user_id'] = (int) $user['id'];
     $_SESSION['user'] = [
         'id' => $user['id'],
         'username' => $user['username'],
         'is_admin' => (bool) $user['is_admin']
     ];
+    unset($_SESSION['account_selection_required']);
 }
 
 function getDefaultApiAdminProfile(): ?array {
@@ -1288,7 +1461,7 @@ function requireApiAuth() {
     }
     
     // Set up session with the specified user profile
-    setApiAuthenticatedUser($user);
+    setApiAuthenticatedUser($user, $authUser);
 }
 
 /**
@@ -1329,7 +1502,7 @@ function requireApiAuthUser() {
         exit;
     }
 
-    setApiAuthenticatedUser($user);
+    setApiAuthenticatedUser($user, $authUser);
 }
 
 /**
@@ -1347,10 +1520,33 @@ function getCurrentUserId() {
 }
 
 /**
+ * True when the active note account is the authenticated user's own account.
+ */
+function isActiveAccountOwnedByAuthenticatedUser(): bool {
+    $authenticatedUserId = (int)(getAuthenticatedUserId() ?? 0);
+    $activeUserId = (int)(getCurrentUserId() ?? 0);
+
+    return $authenticatedUserId > 0 && $activeUserId > 0 && $authenticatedUserId === $activeUserId;
+}
+
+/**
+ * Settings and account-management surfaces must not operate on borrowed accounts.
+ */
+function requireActiveAccountOwner(string $message = 'Settings are only available for your own account'): void {
+    requireAuth();
+
+    if (isActiveAccountOwnedByAuthenticatedUser()) {
+        return;
+    }
+
+    denyPublicWorkspaceAccessResponse($message, 403);
+}
+
+/**
  * Check if current user is admin
  */
 function isCurrentUserAdmin() {
-    $user = getCurrentUser();
+    $user = getAuthenticatedUser();
     return $user && ($user['is_admin'] ?? false);
 }
 
@@ -1392,7 +1588,7 @@ function requireApiAuthAdmin() {
         $user = getUserProfileById((int)$userId);
         
         if ($user && $user['active']) {
-            setApiAuthenticatedUser($user);
+            setApiAuthenticatedUser($user, $authUser);
             return;
         }
 
@@ -1401,6 +1597,6 @@ function requireApiAuthAdmin() {
         echo json_encode(['error' => 'User profile not found: ' . $userId]);
         exit;
     } else {
-        setApiAuthenticatedUser($authUser);
+        setApiAuthenticatedUser($authUser, $authUser);
     }
 }
