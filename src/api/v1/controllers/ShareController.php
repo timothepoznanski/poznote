@@ -363,7 +363,7 @@ class ShareController {
      * Build public URLs from token
      */
     private function buildUrls($token) {
-        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        $host = getExternalHostWithPort();
         $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
         if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
             $scriptDir = '';

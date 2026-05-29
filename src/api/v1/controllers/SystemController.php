@@ -303,7 +303,7 @@ class SystemController {
             });
 
             // Build URLs and path for each shared note
-            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+            $host = getExternalHostWithPort();
             $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
             if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
                 $scriptDir = '';
@@ -312,7 +312,7 @@ class SystemController {
             $scriptDir = rtrim($scriptDir, '/\\');
             // Remove /api/v1 from the path
             $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
-            $base = ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https://' : 'http://';
+            $base = getProtocol() . '://';
             $base .= $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
             
             foreach ($shared_notes as &$note) {
@@ -439,14 +439,14 @@ class SystemController {
 
         $allUsers = getAllUserProfiles();
 
-        $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost');
+        $host = getExternalHostWithPort();
         $scriptDir = dirname($_SERVER['SCRIPT_NAME']);
         if ($scriptDir === '/' || $scriptDir === '\\' || $scriptDir === '.') {
             $scriptDir = '';
         }
         $scriptDir = rtrim($scriptDir, '/\\');
         $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
-        $base = ($_SERVER['HTTPS'] ?? '') === 'on' ? 'https://' : 'http://';
+        $base = getProtocol() . '://';
         $base .= $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
 
         $results = [];

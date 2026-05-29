@@ -110,6 +110,7 @@ function isSecureConnection() {
     return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PORT']) && $_SERVER['HTTP_X_FORWARDED_PORT'] === '443')
         || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
 }
 
@@ -128,6 +129,52 @@ function getGitProviderName($provider = null) {
  */
 function getProtocol() {
     return isSecureConnection() ? 'https' : 'http';
+}
+
+/**
+ * Get the external request host, preserving a forwarded non-default port when provided.
+ */
+function getExternalHostWithPort() {
+    $forwardedHost = trim((string)($_SERVER['HTTP_X_FORWARDED_HOST'] ?? ''));
+    if ($forwardedHost !== '') {
+        $forwardedHostParts = array_values(array_filter(array_map('trim', explode(',', $forwardedHost)), 'strlen'));
+        $host = $forwardedHostParts ? (string)$forwardedHostParts[0] : '';
+    } else {
+        $host = trim((string)($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost')));
+    }
+
+    if ($host === '') {
+        $host = 'localhost';
+    }
+
+    $forwardedPort = trim((string)($_SERVER['HTTP_X_FORWARDED_PORT'] ?? ''));
+    if ($forwardedPort !== '') {
+        $forwardedPortParts = array_values(array_filter(array_map('trim', explode(',', $forwardedPort)), 'strlen'));
+        $port = $forwardedPortParts ? (string)$forwardedPortParts[0] : '';
+    } else {
+        $port = isset($_SERVER['SERVER_PORT']) ? trim((string)$_SERVER['SERVER_PORT']) : '';
+    }
+
+    if ($port === '' || !ctype_digit($port)) {
+        return $host;
+    }
+
+    if (preg_match('/^\[[^\]]+\](?::\d+)?$/', $host) === 1) {
+        if (preg_match('/\]:\d+$/', $host) === 1) {
+            return $host;
+        }
+    } elseif (preg_match('/^[^:]+:\d+$/', $host) === 1) {
+        return $host;
+    } elseif (substr_count($host, ':') > 1) {
+        $host = '[' . $host . ']';
+    }
+
+    $defaultPort = getProtocol() === 'https' ? '443' : '80';
+    if ($port === $defaultPort) {
+        return $host;
+    }
+
+    return $host . ':' . $port;
 }
 
 /**
