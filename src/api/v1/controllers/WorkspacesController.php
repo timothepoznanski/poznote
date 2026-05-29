@@ -15,6 +15,16 @@ class WorkspacesController {
     public function __construct($con) {
         $this->con = $con;
     }
+
+    private function requireActiveAccountOwner(): bool {
+        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Settings are only available for your own account']);
+            return false;
+        }
+
+        return true;
+    }
     
     /**
      * GET /api/v1/workspaces
@@ -42,10 +52,20 @@ class WorkspacesController {
                 ? null
                 : ($currentUser['username'] ?? null);
             
+            // Acting as
+            $actingAs = null;
+            if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+                 $authUser = getAuthenticatedUser();
+                 if ($authUser) {
+                     $actingAs = $authUser['display_name'] ?: $authUser['username'];
+                 }
+            }
+            
             echo json_encode([
                 'success' => true,
                 'workspaces' => $rows,
-                'username' => $username
+                'username' => $username,
+                'acting_as' => $actingAs
             ]);
         } catch (Exception $e) {
             http_response_code(500);
@@ -62,6 +82,10 @@ class WorkspacesController {
      * Body: { "name": "workspace_name" }
      */
     public function store() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         $input = json_decode(file_get_contents('php://input'), true);
         
         if (!$input) {
@@ -117,6 +141,10 @@ class WorkspacesController {
      * Body: { "new_name": "new_workspace_name" }
      */
     public function update($name) {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         $name = urldecode($name);
         $input = json_decode(file_get_contents('php://input'), true);
         
@@ -207,6 +235,10 @@ class WorkspacesController {
      * Delete a workspace
      */
     public function destroy($name) {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         $name = urldecode($name);
         
         if ($name === '') {

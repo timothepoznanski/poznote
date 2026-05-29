@@ -1,5 +1,7 @@
 <?php
 require_once 'auth.php';
+requireAuth();
+requireActiveAccountOwner();
 require_once 'config.php';
 require_once 'functions.php';
 requireSettingsPassword();
@@ -7,12 +9,6 @@ require_once 'db_connect.php';
 require_once 'users/db_master.php';
 require_once 'users/UserDataManager.php';
 require_once 'version_helper.php';
-
-// Check if user is logged in
-if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
-    header('Location: login.php');
-    exit;
-}
 
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());

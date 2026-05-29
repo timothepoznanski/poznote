@@ -1065,7 +1065,7 @@ if ($isPublicWorkspaceReadonly) {
 </body>
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js?v=<?php echo $v; ?>"></script>
-<script src="js/workspaces.js"></script>
+<script src="js/workspaces.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/attachments.js"></script>

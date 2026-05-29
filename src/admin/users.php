@@ -29,6 +29,7 @@ require_once __DIR__ . '/../version_helper.php';
 // === Initialize Variables ===
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());
+$currentAuthUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? 0);
 $error = '';
 
 // === Handle Form Actions ===
@@ -90,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $deleteData = true; // Always delete data when deleting a user
             
             // Cannot delete yourself
-            if ($userId === getCurrentUserId()) {
+            if ($userId === $currentAuthUserId) {
                 $error = t('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile');
                 break;
             }
@@ -113,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $value = $_POST['value'] ?? 0;
             
             // Cannot modify yourself
-            if ($userId === getCurrentUserId()) {
+            if ($userId === $currentAuthUserId) {
                 $error = t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role');
                 break;
             }
@@ -132,11 +133,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             break;
+
+        // Update which note accounts this user can open after login
+        case 'update_account_access':
+            $userId = (int)($_POST['user_id'] ?? 0);
+            $allowedUserIds = $_POST['allowed_user_ids'] ?? [];
+            if (!is_array($allowedUserIds)) {
+                $allowedUserIds = [];
+            }
+
+            $result = setUserAccountAccessTargets($userId, $allowedUserIds);
+
+            if ($result['success']) {
+                header('Location: ' . $_SERVER['PHP_SELF']);
+                exit;
+            } else {
+                $error = $result['error'];
+            }
+            break;
     }
 }
 
 // === Get User List ===
 $users = listAllUserProfiles();
+$accountAccessMap = getUserAccountAccessMap();
+$userNamesById = [];
+foreach ($users as $listedUser) {
+    $userNamesById[(int)$listedUser['id']] = (string)$listedUser['username'];
+}
 
 ?>
 <?php 
@@ -261,6 +285,26 @@ $v = getAppVersion();
             oidc_subject: document.getElementById('rename_oidc_subject').value
         });
     }
+
+    function openAccessModal(userId, username, accessIds) {
+        const normalizedAccessIds = (Array.isArray(accessIds) ? accessIds : []).map(Number);
+        document.getElementById('access_user_id').value = userId;
+        document.getElementById('access_title_user').textContent = username || '';
+
+        document.querySelectorAll('#accessModal input[name="allowed_user_ids[]"]').forEach(function (checkbox) {
+            const accountId = Number(checkbox.value);
+            const isOwnAccount = accountId === Number(userId);
+            checkbox.checked = isOwnAccount || normalizedAccessIds.includes(accountId);
+            checkbox.disabled = isOwnAccount;
+
+            const option = checkbox.closest('.account-access-option');
+            if (option) {
+                option.classList.toggle('account-access-own', isOwnAccount);
+            }
+        });
+
+        document.getElementById('accessModal').classList.add('active');
+    }
     </script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -284,11 +328,6 @@ $v = getAppVersion();
                         <i class="lucide lucide-plus" style="margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
                     </button>
                 </div>
-                <p class="email-note">
-                    <?php echo t_h('multiuser.admin.email_usage_note', [], 'Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.'); ?>
-                    <br>
-                    <?php echo t_h('multiuser.admin.admin_note', [], 'Use the Admin checkbox to grant or revoke administrator privileges for another user.'); ?>
-                </p>
             </div>
         </div>
         
@@ -304,7 +343,11 @@ $v = getAppVersion();
                     <tr>
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
-                        <th><?php echo t_h('multiuser.admin.email', [], 'Email'); ?></th>
+                        <th>
+                            <?php echo t_h('multiuser.admin.email', [], 'Email'); ?>
+                            <i class="lucide lucide-help-circle" style="width: 14px; height: 14px; vertical-align: middle; cursor: help; margin-left: 4px;" title="<?php echo t_h('multiuser.admin.email_usage_note', [], 'Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.'); ?>"></i>
+                        </th>
+                        <th><?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
@@ -332,15 +375,34 @@ $v = getAppVersion();
                                 </div>
                             </td>
 
+                            <td data-label="<?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?>">
+                                <?php
+                                    $accessIds = $accountAccessMap[(int)$user['id']] ?? [];
+                                    $accessNames = [];
+                                    foreach ($accessIds as $accessId) {
+                                        if (isset($userNamesById[(int)$accessId])) {
+                                            $accessNames[] = $userNamesById[(int)$accessId];
+                                        }
+                                    }
+                                ?>
+                                <div class="account-access-summary">
+                                    <?php if (empty($accessNames)): ?>
+                                        <?php echo t_h('multiuser.admin.account_access.own_only', [], 'Own account only'); ?>
+                                    <?php else: ?>
+                                        <?php echo htmlspecialchars(implode(', ', $accessNames), ENT_QUOTES, 'UTF-8'); ?>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>">
                                 <input
                                     type="checkbox"
                                     <?php echo $user['is_admin'] ? 'checked' : ''; ?>
-                                    <?php echo ($user['id'] === 1 || $user['id'] === getCurrentUserId()) ? 'disabled' : ''; ?>
+                                    <?php echo ($user['id'] === 1 || $user['id'] === $currentAuthUserId) ? 'disabled' : ''; ?>
                                     title="<?php echo htmlspecialchars(
                                         $user['id'] === 1
                                             ? t('multiuser.admin.admin_id_1_locked', [], 'Administrator role cannot be removed from user ID 1')
-                                            : ($user['id'] === getCurrentUserId()
+                                            : ($user['id'] === $currentAuthUserId
                                                 ? t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role')
                                                 : t('multiuser.admin.toggle_admin', [], 'Grant or revoke administrator privileges')),
                                         ENT_QUOTES,
@@ -351,7 +413,7 @@ $v = getAppVersion();
     
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
     
-                                <?php if ($user['id'] === getCurrentUserId()): ?>
+                                <?php if ($user['id'] === $currentAuthUserId): ?>
                                     <span class="badge badge-active badge-not-allowed" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
                                         <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
                                     </span>
@@ -375,6 +437,11 @@ $v = getAppVersion();
     
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
+                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.account_access.manage', [], 'Manage note access'); ?>"
+                                            onclick="openAccessModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($accessIds), ENT_QUOTES); ?>)">
+                                        <i class="lucide-users"></i>
+                                    </button>
+
                                         <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
                                             onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
                                         <i class="lucide-pencil"></i>
@@ -386,7 +453,7 @@ $v = getAppVersion();
                                         <i class="lucide-key"></i>
                                     </button>
 
-                                    <?php if ($user['id'] !== 1 && $user['id'] !== getCurrentUserId()): ?>
+                                    <?php if ($user['id'] !== 1 && $user['id'] !== $currentAuthUserId): ?>
                                         <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
                                             onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <i class="lucide-trash-2"></i>
@@ -458,6 +525,38 @@ $v = getAppVersion();
         </div>
     </div>
     
+    <!-- Account Access Modal -->
+    <div class="modal" id="accessModal">
+        <div class="modal-content account-access-modal-content">
+            <h2 class="modal-title"><?php echo t_h('multiuser.admin.account_access.title', [], 'Note access'); ?>&nbsp;: <span id="access_title_user"></span></h2>
+            <p class="account-access-help">
+                <?php echo t_h('multiuser.admin.account_access.help', [], 'Choose which note accounts this user can open after login.'); ?>
+            </p>
+            <form method="POST">
+                <input type="hidden" name="action" value="update_account_access">
+                <input type="hidden" name="user_id" id="access_user_id">
+
+                <div class="account-access-list">
+                    <?php foreach ($users as $accessUser): ?>
+                        <label class="account-access-option">
+                            <input type="checkbox" name="allowed_user_ids[]" value="<?php echo (int)$accessUser['id']; ?>">
+                            <span class="account-access-name"><?php echo htmlspecialchars($accessUser['username'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            <?php if (empty($accessUser['active'])): ?>
+                                <span class="account-access-state"><?php echo t_h('multiuser.admin.inactive', [], 'Inactive'); ?></span>
+                            <?php endif; ?>
+                            <span class="account-access-own-label"><?php echo t_h('multiuser.admin.account_access.own_account', [], 'Own account'); ?></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('accessModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                    <button type="submit" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Delete Confirmation Modal -->
     <div class="modal" id="deleteModal">
         <div class="modal-content">

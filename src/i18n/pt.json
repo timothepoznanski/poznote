@@ -1490,6 +1490,12 @@
       "oidc_no_profile": "Nenhum perfil de utilizador encontrado para \"{{identifier}}\". Por favor, contacte um administrador para criar o seu perfil.",
       "oidc_failed": "Falha no login SSO. Por favor, tente novamente.",
       "oidc_unauthorized": "Você não está autorizado a acessar esta aplicação. Por favor, entre em contato com o administrador."
+    },
+    "account_select": {
+      "intro": "Escolha a conta de notas a abrir.",
+      "own_account": "Sua conta",
+      "sign_out": "Sair",
+      "invalid": "Não foi possível selecionar esta conta."
     }
   },
   "restore_import": {
@@ -2140,6 +2146,7 @@
     "replaced_all": "{{count}} substituição(ões) realizada(s)"
   },
   "multiuser": {
+    "acting_as": "como {{user}}",
     "admin": {
       "id": "ID",
       "username": "Usuário",
@@ -2157,6 +2164,14 @@
       "toggle_admin": "Conceder ou revogar privilégios de administrador",
       "admin_id_1_locked": "O perfil de administrador não pode ser removido do usuário com ID 1",
       "admin_note": "Use a caixa de seleção Admin para conceder ou revogar privilégios de administrador para outro usuário.",
+      "account_access": {
+        "column": "Acesso às notas",
+        "title": "Acesso às notas",
+        "manage": "Gerir acesso às notas",
+        "help": "Escolha quais contas de notas este utilizador poderá abrir após iniciar sessão.",
+        "own_only": "Apenas a própria conta",
+        "own_account": "A própria conta"
+      },
       "errors": {
         "cannot_delete_self": "Você não pode excluir seu próprio perfil",
         "cannot_change_self": "Você não pode alterar seu próprio status/função",
@@ -2307,6 +2322,7 @@
     }
   },
   "workspace_menu": {
+    "acting_as": " (como {{user}})",
     "workspaces": "Espaços de trabalho",
     "logout": "Sair"
   },

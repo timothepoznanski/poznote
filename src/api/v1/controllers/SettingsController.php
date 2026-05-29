@@ -27,6 +27,12 @@ class SettingsController {
         }
     }
 
+    private function requireActiveAccountOwner(): void {
+        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+            throw new RuntimeException('settings are only available for your own account', 403);
+        }
+    }
+
     private function normalizeSettingValue(string $key, $value): string {
         if ($key === 'custom_css_path') {
             $normalized = poznoteNormalizeCustomCssPath($value);
@@ -89,6 +95,8 @@ class SettingsController {
         }
         
         try {
+            $this->requireActiveAccountOwner();
+
             // For global settings, use getGlobalSetting function
             if ($this->isGlobalSetting($key)) {
                 $this->requireGlobalSettingsAdmin();
@@ -138,6 +146,8 @@ class SettingsController {
         $value = $input['value'] ?? '';
         
         try {
+            $this->requireActiveAccountOwner();
+
             $value = $this->normalizeSettingValue($key, $value);
 
             // For global settings, use setGlobalSetting function

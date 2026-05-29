@@ -17,12 +17,26 @@ class GitSyncController {
     public function __construct($con) {
         $this->con = $con;
     }
+
+    private function requireActiveAccountOwner(): bool {
+        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'error' => 'Settings are only available for your own account']);
+            return false;
+        }
+
+        return true;
+    }
     
     /**
      * GET /api/v1/git-sync/status
      * Get sync status and configuration (without sensitive data)
      */
     public function status() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
@@ -51,6 +65,10 @@ class GitSyncController {
      * Test Git connection
      */
     public function test() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
@@ -74,6 +92,10 @@ class GitSyncController {
      * Body: { "workspace": "optional_workspace_filter" }
      */
     public function push() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
@@ -115,6 +137,10 @@ class GitSyncController {
      * Body: { "workspace": "target_workspace" }
      */
     public function pull() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {
@@ -155,6 +181,10 @@ class GitSyncController {
      * Get current sync progress from session
      */
     public function progress() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -337,6 +367,10 @@ class GitSyncController {
      * Body: { "provider": "github", "repo": "owner/repo", "token": "...", "branch": "main", "api_base": "", "author_name": "...", "author_email": "..." }
      */
     public function saveConfig() {
+        if (!$this->requireActiveAccountOwner()) {
+            return;
+        }
+
         require_once dirname(__DIR__, 3) . '/GitSync.php';
         
         if (!GitSync::isEnabled()) {

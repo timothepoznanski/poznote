@@ -1,6 +1,7 @@
 <?php
 require 'auth.php';
 requireAuth();
+requireActiveAccountOwner();
 
 require_once 'config.php';
 require_once 'db_connect.php';

@@ -278,7 +278,7 @@ $currentLang = getUserLanguage();
     
     <!-- JavaScript modules -->
     <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
-    <script src="js/workspaces.js"></script>
+    <script src="js/workspaces.js?v=<?php echo getAppVersion(); ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
     <script src="js/notes.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/attachments.js"></script>

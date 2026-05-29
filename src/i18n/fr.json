@@ -485,7 +485,8 @@
     "menu": {
       "loading": "Chargement des espaces de travail...",
       "error_loading": "Erreur lors du chargement des espaces de travail",
-      "logout": "Déconnexion"
+      "logout": "Déconnexion",
+      "acting_as": " (en tant que {{user}})"
     },
     "errors": {
       "name_empty": "Le nom de l’espace de travail ne peut pas être vide",
@@ -1537,6 +1538,12 @@
       "oidc_no_profile": "Aucun profil utilisateur trouvé pour \"{{identifier}}\". Veuillez contacter un administrateur pour créer votre profil.",
       "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer.",
       "oidc_unauthorized": "Vous n'êtes pas autorisé à accéder à cette application. Veuillez contacter votre administrateur."
+    },
+    "account_select": {
+      "intro": "Choisissez le compte de notes à ouvrir.",
+      "own_account": "Votre compte",
+      "sign_out": "Se déconnecter",
+      "invalid": "Impossible de sélectionner ce compte."
     }
   },
   "restore_import": {
@@ -2193,6 +2200,7 @@
     "replaced_all": "{{count}} remplacement(s) effectué(s)"
   },
   "multiuser": {
+    "acting_as": "en tant que {{user}}",
     "admin": {
       "title": "Gestion des utilisateurs",
       "subtitle": "Gérer les utilisateurs et leurs accès",
@@ -2218,6 +2226,14 @@
       "actions": "Actions",
       "not_defined": "non défini",
       "email_usage_note": "Les adresses email sont uniquement utilisées pour la connexion OIDC si configurée. Poznote n'envoie aucun email.",
+      "account_access": {
+        "column": "Accès notes",
+        "title": "Accès aux notes",
+        "manage": "Gérer l'accès aux notes",
+        "help": "Choisissez les comptes de notes que cet utilisateur pourra ouvrir après connexion.",
+        "own_only": "Son compte uniquement",
+        "own_account": "Son compte"
+      },
       "password_management": {
         "manage_password": "Mot de passe",
         "reset_password": "Réinitialiser le mot de passe",
@@ -2517,6 +2533,7 @@
     }
   },
   "workspace_menu": {
+    "acting_as": " (en tant que {{user}})",
     "workspaces": "Espaces de travail",
     "logout": "Déconnexion"
   },
