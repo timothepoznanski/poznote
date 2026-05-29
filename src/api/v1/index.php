@@ -313,6 +313,21 @@ $router->get('/notes/{id}', function($params) use ($notesController) {
     $notesController->show($params['id']);
 });
 
+// Acquire an exclusive edit lock for a note
+$router->post('/notes/{id}/lock', function($params) use ($notesController) {
+    $notesController->acquireLock($params['id']);
+});
+
+// Refresh an existing note edit lock
+$router->post('/notes/{id}/lock/heartbeat', function($params) use ($notesController) {
+    $notesController->heartbeatLock($params['id']);
+});
+
+// Release a note edit lock
+$router->post('/notes/{id}/lock/release', function($params) use ($notesController) {
+    $notesController->releaseLock($params['id']);
+});
+
 // Create a new note
 $router->post('/notes', function($params) use ($notesController) {
     $notesController->create();

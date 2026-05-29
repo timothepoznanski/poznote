@@ -2446,5 +2446,13 @@
     "placeholder": "Introduzca la contraseña",
     "unlock": "Desbloquear",
     "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo."
+  },
+  "note_lock": {
+    "banner": "Solo lectura: {{user}} está editando esta nota en este momento.",
+    "current_user_other_tab": "Solo lectura: esta nota ya se está editando en otra pestaña.",
+    "another_user": "otro usuario",
+    "popup_title": "Atención",
+    "lost_to_other_tab": "Ya no tiene el bloqueo de edición de esta nota. Ahora se está editando en otra pestaña.",
+    "lost_to_user": "Ya no tiene el bloqueo de edición de esta nota. {{user}} la está editando ahora."
   }
 }

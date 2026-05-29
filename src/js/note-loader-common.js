@@ -1556,6 +1556,16 @@ function reinitializeNoteContent() {
         window.initBacklinksPanel();
     }
 
+    try {
+        document.dispatchEvent(new CustomEvent('noteLoaded', {
+            detail: {
+                noteId: (typeof window.noteid !== 'undefined' && window.noteid !== null) ? String(window.noteid) : null
+            }
+        }));
+    } catch (e) {
+        // Ignore event dispatch issues
+    }
+
     // Mark that note loading is complete
     window.isLoadingNote = false;
 }

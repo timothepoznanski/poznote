@@ -1068,6 +1068,7 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/workspaces.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/note-edit-lock.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/note-edit-lock.js') ?: time(); ?>"></script>
 <script src="js/attachments.js"></script>
 <script src="js/tags-modal.js"></script>
 <!-- Event management modules -->

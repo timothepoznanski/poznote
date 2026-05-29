@@ -2450,5 +2450,13 @@
     "placeholder": "Digite a senha",
     "unlock": "Desbloquear",
     "error_incorrect": "Senha incorreta. Tente novamente."
+  },
+  "note_lock": {
+    "banner": "Somente leitura: {{user}} está editando esta nota no momento.",
+    "current_user_other_tab": "Somente leitura: esta nota já está sendo editada em outra aba.",
+    "another_user": "outro usuário",
+    "popup_title": "Atenção",
+    "lost_to_other_tab": "Você não tem mais o bloqueio de edição desta nota. Ela agora está sendo editada em outra aba.",
+    "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora."
   }
 }

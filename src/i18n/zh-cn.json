@@ -2588,5 +2588,13 @@
     "placeholder": "请输入密码",
     "unlock": "解锁",
     "error_incorrect": "密码错误，请重试。"
+  },
+  "note_lock": {
+    "banner": "只读：{{user}} 当前正在编辑这条笔记。",
+    "current_user_other_tab": "只读：这条笔记已在另一个标签页中编辑。",
+    "another_user": "另一位用户",
+    "popup_title": "注意",
+    "lost_to_other_tab": "您已不再持有这条笔记的编辑锁。现在它正在另一个标签页中被编辑。",
+    "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。"
   }
 }

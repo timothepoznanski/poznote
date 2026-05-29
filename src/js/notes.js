@@ -147,6 +147,10 @@ function saveNoteToServer() {
         return;
     }
 
+    if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteid)) {
+        return;
+    }
+
     // Get note elements of the note
     var elements = getNoteElements(noteid);
     var titleInput = elements.title;
@@ -212,7 +216,8 @@ function saveNoteToServer() {
         content: ent,
         tags: tags,
         folder_id: folderId,
-        workspace: selectedWorkspace || getSelectedWorkspace()
+        workspace: selectedWorkspace || getSelectedWorkspace(),
+        editor_session_id: (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : ''
     };
 
     // Use RESTful API: PATCH /api/v1/notes/{id}
@@ -224,9 +229,19 @@ function saveNoteToServer() {
         },
         body: JSON.stringify(updates)
     })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (data.success) {
+        .then(function (response) {
+            return response.json().catch(function () {
+                return {};
+            }).then(function (data) {
+                return {
+                    ok: response.ok,
+                    data: data || {}
+                };
+            });
+        })
+        .then(function (result) {
+            var data = result.data || {};
+            if (result.ok && data.success) {
                 var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
                 handleSaveResponse(JSON.stringify({ date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi }));
 
@@ -256,6 +271,11 @@ function saveNoteToServer() {
                     window.refreshKanbanView();
                 }
             } else {
+                if (data.lock && typeof window.handleNoteEditLockConflict === 'function') {
+                    window.handleNoteEditLockConflict(noteid, data.lock, data.error || 'This note is currently locked for editing.');
+                    return;
+                }
+
                 // Show user-visible error notification
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(data.error || data.message || 'Error saving note', 'error');

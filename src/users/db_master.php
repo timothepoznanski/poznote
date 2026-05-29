@@ -123,6 +123,22 @@ function initializeMasterDatabase(PDO $con): void {
             CHECK (accessor_user_id != target_user_id)
         )
     ");
+
+    // Transient edit locks for notes shared across users.
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS note_edit_locks (
+            target_user_id INTEGER NOT NULL,
+            note_id INTEGER NOT NULL,
+            holder_login_user_id INTEGER NOT NULL,
+            holder_session_id TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires_at DATETIME NOT NULL,
+            PRIMARY KEY (target_user_id, note_id),
+            FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE,
+            FOREIGN KEY (holder_login_user_id) REFERENCES users(id) ON DELETE CASCADE
+        )
+    ");
     
     // Create indexes
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
@@ -131,6 +147,8 @@ function initializeMasterDatabase(PDO $con): void {
     $con->exec("CREATE INDEX IF NOT EXISTS idx_shared_links_user ON shared_links(user_id)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_user_account_access_accessor ON user_account_access(accessor_user_id)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_user_account_access_target ON user_account_access(target_user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_note_edit_locks_holder ON note_edit_locks(holder_login_user_id)");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_note_edit_locks_expires ON note_edit_locks(expires_at)");
     
     // Create default user if none exist
     createDefaultUserIfNeeded($con);
@@ -369,6 +387,201 @@ function getUserAccountAccessMap(): array {
     } catch (Exception $e) {
         error_log("Error getting account access map: " . $e->getMessage());
         return [];
+    }
+}
+
+function pruneExpiredNoteEditLocks(?PDO $con = null): void {
+    try {
+        $con = $con ?? getMasterConnection();
+        $stmt = $con->prepare("DELETE FROM note_edit_locks WHERE expires_at <= ?");
+        $stmt->execute([gmdate('Y-m-d H:i:s')]);
+    } catch (Exception $e) {
+        error_log("Error pruning note edit locks: " . $e->getMessage());
+    }
+}
+
+function normalizeNoteEditLockRow(array $row): array {
+    return [
+        'target_user_id' => (int)($row['target_user_id'] ?? 0),
+        'note_id' => (int)($row['note_id'] ?? 0),
+        'holder_login_user_id' => (int)($row['holder_login_user_id'] ?? 0),
+        'holder_session_id' => (string)($row['holder_session_id'] ?? ''),
+        'holder_username' => (string)($row['holder_username'] ?? ''),
+        'created_at' => (string)($row['created_at'] ?? ''),
+        'last_seen_at' => (string)($row['last_seen_at'] ?? ''),
+        'expires_at' => (string)($row['expires_at'] ?? ''),
+    ];
+}
+
+function getNoteEditLock(int $targetUserId, int $noteId): ?array {
+    if ($targetUserId <= 0 || $noteId <= 0) {
+        return null;
+    }
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $stmt = $con->prepare("
+            SELECT l.target_user_id,
+                   l.note_id,
+                   l.holder_login_user_id,
+                   l.holder_session_id,
+                   l.created_at,
+                   l.last_seen_at,
+                   l.expires_at,
+                   u.username AS holder_username
+            FROM note_edit_locks l
+            INNER JOIN users u ON u.id = l.holder_login_user_id
+            WHERE l.target_user_id = ? AND l.note_id = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$targetUserId, $noteId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? normalizeNoteEditLockRow($row) : null;
+    } catch (Exception $e) {
+        error_log("Error getting note edit lock: " . $e->getMessage());
+        return null;
+    }
+}
+
+function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90): array {
+    if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
+        return ['success' => false, 'error' => 'Invalid note edit lock parameters'];
+    }
+
+    $holderSessionId = trim($holderSessionId);
+    if ($holderSessionId === '') {
+        return ['success' => false, 'error' => 'Missing editor session'];
+    }
+
+    $ttlSeconds = max(15, min(300, $ttlSeconds));
+    $now = gmdate('Y-m-d H:i:s');
+    $expiresAt = gmdate('Y-m-d H:i:s', time() + $ttlSeconds);
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $con->beginTransaction();
+
+        $stmt = $con->prepare("
+            SELECT target_user_id, note_id, holder_login_user_id, holder_session_id, created_at, last_seen_at, expires_at
+            FROM note_edit_locks
+            WHERE target_user_id = ? AND note_id = ?
+            LIMIT 1
+        ");
+        $stmt->execute([$targetUserId, $noteId]);
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$existing) {
+            $insert = $con->prepare("
+                INSERT INTO note_edit_locks (
+                    target_user_id,
+                    note_id,
+                    holder_login_user_id,
+                    holder_session_id,
+                    created_at,
+                    last_seen_at,
+                    expires_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            ");
+            $insert->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $now, $now, $expiresAt]);
+            $con->commit();
+
+            return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
+        }
+
+        if ((int)$existing['holder_login_user_id'] === $holderLoginUserId && (string)$existing['holder_session_id'] === $holderSessionId) {
+            $update = $con->prepare("
+                UPDATE note_edit_locks
+                SET last_seen_at = ?, expires_at = ?
+                WHERE target_user_id = ? AND note_id = ?
+            ");
+            $update->execute([$now, $expiresAt, $targetUserId, $noteId]);
+            $con->commit();
+
+            return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
+        }
+
+        $con->rollBack();
+        return [
+            'success' => false,
+            'error' => 'Note is currently locked for editing',
+            'lock' => getNoteEditLock($targetUserId, $noteId),
+        ];
+    } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        error_log("Error acquiring note edit lock: " . $e->getMessage());
+        return ['success' => false, 'error' => 'Failed to acquire note edit lock'];
+    }
+}
+
+function refreshNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90): array {
+    return acquireNoteEditLock($targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $ttlSeconds);
+}
+
+function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId): bool {
+    if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
+        return false;
+    }
+
+    $holderSessionId = trim($holderSessionId);
+    if ($holderSessionId === '') {
+        return false;
+    }
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $stmt = $con->prepare("
+            DELETE FROM note_edit_locks
+            WHERE target_user_id = ?
+              AND note_id = ?
+              AND holder_login_user_id = ?
+              AND holder_session_id = ?
+        ");
+        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId]);
+
+        return true;
+    } catch (Exception $e) {
+        error_log("Error releasing note edit lock: " . $e->getMessage());
+        return false;
+    }
+}
+
+function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId): bool {
+    if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
+        return false;
+    }
+
+    $holderSessionId = trim($holderSessionId);
+    if ($holderSessionId === '') {
+        return false;
+    }
+
+    try {
+        $con = getMasterConnection();
+        pruneExpiredNoteEditLocks($con);
+
+        $stmt = $con->prepare("
+            SELECT COUNT(*)
+            FROM note_edit_locks
+            WHERE target_user_id = ?
+              AND note_id = ?
+              AND holder_login_user_id = ?
+              AND holder_session_id = ?
+        ");
+        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        error_log("Error validating note edit lock: " . $e->getMessage());
+        return false;
     }
 }
 

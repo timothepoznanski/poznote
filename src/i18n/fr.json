@@ -2661,5 +2661,13 @@
     "placeholder": "Entrez le mot de passe",
     "unlock": "Déverrouiller",
     "error_incorrect": "Mot de passe incorrect. Veuillez réessayer."
+  },
+  "note_lock": {
+    "banner": "Lecture seule : {{user}} modifie actuellement cette note.",
+    "current_user_other_tab": "Lecture seule : cette note est déjà en cours d'édition dans un autre onglet.",
+    "another_user": "un autre utilisateur",
+    "popup_title": "Attention",
+    "lost_to_other_tab": "Vous n'avez plus le verrou d'édition sur cette note. Elle est maintenant modifiée dans un autre onglet.",
+    "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant."
   }
 }

@@ -2150,5 +2150,13 @@
     "placeholder": "Enter settings password",
     "unlock": "Unlock",
     "error_incorrect": "Incorrect password. Please try again."
+  },
+  "note_lock": {
+    "banner": "Read only: {{user}} is currently editing this note.",
+    "current_user_other_tab": "Read only: this note is already being edited in another tab.",
+    "another_user": "another user",
+    "popup_title": "Attention",
+    "lost_to_other_tab": "You no longer hold the edit lock for this note. It is now being edited in another tab.",
+    "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it."
   }
 }

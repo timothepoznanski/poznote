@@ -194,6 +194,10 @@ function markNoteAsModified() {
         return;
     }
 
+    if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteid)) {
+        return;
+    }
+
     // Throttle expensive innerHTML comparisons to avoid lag when typing
     const now = Date.now();
     if (now - lastChangeCheckTime < CHANGE_CHECK_INTERVAL) {
@@ -336,6 +340,10 @@ function saveToServerDebounced() {
         return;
     }
 
+    if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteid)) {
+        return;
+    }
+
     // Clear the timeout since we're executing the save now
     clearTimeout(saveTimeout);
     saveTimeout = null;
@@ -413,6 +421,10 @@ function hasUnsavedChanges(noteId) {
  */
 function emergencySave(noteId) {
     if (!noteId || noteId === -1 || noteId === 'search') {
+        return;
+    }
+
+    if (typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId)) {
         return;
     }
 
@@ -504,7 +516,8 @@ function emergencySave(noteId) {
         tags: tags,
         folder: folder,
         folder_id: folder_id,
-        workspace: (window.selectedWorkspace || getSelectedWorkspace())
+        workspace: (window.selectedWorkspace || getSelectedWorkspace()),
+        editor_session_id: (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : ''
     };
 
     // Strategy 1: Try fetch with keepalive (most reliable)
@@ -530,6 +543,7 @@ function emergencySave(noteId) {
         const formData = new FormData();
         formData.append('content', ent);
         formData.append('workspace', window.selectedWorkspace || getSelectedWorkspace());
+        formData.append('editor_session_id', (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : '');
 
         if (navigator.sendBeacon('/api/v1/notes/' + noteId + '/beacon', formData)) {
             return; // Successfully queued
@@ -545,6 +559,7 @@ function emergencySave(noteId) {
         const formData = new FormData();
         formData.append('content', ent);
         formData.append('workspace', window.selectedWorkspace || getSelectedWorkspace());
+        formData.append('editor_session_id', (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : '');
 
         xhr.open('POST', '/api/v1/notes/' + noteId + '/beacon', false);
         xhr.send(formData);
