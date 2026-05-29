@@ -147,6 +147,11 @@ function getExternalHostWithPort() {
         $host = 'localhost';
     }
 
+    // If host already contains a port, don't try to append another one
+    if (strpos($host, ':') !== false && preg_match('/:\d+$/', $host)) {
+        return $host;
+    }
+
     $forwardedPort = trim((string)($_SERVER['HTTP_X_FORWARDED_PORT'] ?? ''));
     if ($forwardedPort !== '') {
         $forwardedPortParts = array_values(array_filter(array_map('trim', explode(',', $forwardedPort)), 'strlen'));
@@ -159,17 +164,15 @@ function getExternalHostWithPort() {
         return $host;
     }
 
-    if (preg_match('/^\[[^\]]+\](?::\d+)?$/', $host) === 1) {
-        if (preg_match('/\]:\d+$/', $host) === 1) {
-            return $host;
-        }
-    } elseif (preg_match('/^[^:]+:\d+$/', $host) === 1) {
+    // Special case for Docker/internal mapping: if port is 80 but we are in HTTPS, 
+    // it probably means we are behind a proxy that talks to Nginx on port 80.
+    // In this case, adding :80 would be wrong for the external URL.
+    $isSecure = getProtocol() === 'https';
+    if ($port === '80' && $isSecure) {
         return $host;
-    } elseif (substr_count($host, ':') > 1) {
-        $host = '[' . $host . ']';
     }
 
-    $defaultPort = getProtocol() === 'https' ? '443' : '80';
+    $defaultPort = $isSecure ? '443' : '80';
     if ($port === $defaultPort) {
         return $host;
     }
