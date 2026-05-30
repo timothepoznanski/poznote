@@ -257,6 +257,10 @@
         return fallbackMessage;
     }
 
+    function isLockHeldByDifferentUser(lock) {
+        return !!(lock && !lock.holder_is_current_user && !lock.holder_is_current_editor_session);
+    }
+
     function showLockConflictNotification(message) {
         if (!message) {
             return;
@@ -521,12 +525,19 @@
             }
 
             var lock = result.data.lock || null;
-            if (lock && !lock.holder_is_current_editor_session) {
+            if (isLockHeldByDifferentUser(lock)) {
                 if (noteStates[noteId] && noteStates[noteId].editable === false) {
                     setNoteLockedState(noteId, lock);
                 } else {
                     handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'lost');
                 }
+                return;
+            }
+
+            if (lock && lock.holder_is_current_user && noteStates[noteId] && noteStates[noteId].editable === false) {
+                clearNoteLockedState(noteId);
+                startHeartbeat(noteId);
+                startStatusChecks(noteId);
                 return;
             }
 
@@ -566,8 +577,9 @@
                 return;
             }
 
-            if (result.status === 423 || (result.data && result.data.lock)) {
-                handleLockConflict(noteId, result.data.lock || null, result.data.error || 'This note is currently locked for editing.', 'lost');
+            var responseLock = result.data ? (result.data.lock || null) : null;
+            if ((result.status === 423 || responseLock) && isLockHeldByDifferentUser(responseLock)) {
+                handleLockConflict(noteId, responseLock, (result.data && result.data.error) || 'This note is currently locked for editing.', 'lost');
             }
         }).catch(function () {
             return null;
@@ -611,15 +623,16 @@
                 return;
             }
 
-            if (result.status === 423 || (result.data && result.data.lock)) {
-                handleLockConflict(noteId, result.data.lock || null, result.data.error || 'This note is currently locked for editing.', 'acquire');
+            var responseLock = result.data ? (result.data.lock || null) : null;
+            if ((result.status === 423 || responseLock) && isLockHeldByDifferentUser(responseLock)) {
+                handleLockConflict(noteId, responseLock, (result.data && result.data.error) || 'This note is currently locked for editing.', 'acquire');
                 return;
             }
 
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(result.data.error || 'Unable to acquire the edit lock for this note.', 'error');
+                showNotificationPopup((result.data && result.data.error) || 'Unable to acquire the edit lock for this note.', 'error');
             }
-            setNoteLockUnavailableState(noteId, result.data.error || getLockUnavailableMessage());
+            setNoteLockUnavailableState(noteId, (result.data && result.data.error) || getLockUnavailableMessage());
             startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
         }).catch(function () {
             if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
