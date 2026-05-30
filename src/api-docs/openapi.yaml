@@ -61,7 +61,7 @@ components:
       required: true
       schema:
         type: integer
-      description: User profile ID to access. Required for Basic Auth and internal service-token data requests. OIDC Bearer JWT requests default to the token-linked profile when omitted. Use GET /users/profiles to list available profiles.
+      description: User profile ID to access. Required for Basic Auth and internal service-token data requests. OIDC Bearer JWT requests default to the token-linked profile when omitted. Account-access grants from the web UI do not allow non-admin API credentials to target another profile; use admin credentials or the internal service token for cross-profile API access. Use GET /users/profiles to list available profiles.
 
   schemas:
     Note:

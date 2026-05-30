@@ -67,6 +67,8 @@ By default, the accepted JWT `aud` claim is the configured OIDC Client ID. If yo
 
 Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), Basic Auth and internal service-token requests must include the `X-User-ID` header. OIDC Bearer JWT requests use the token-linked profile by default and only need `X-User-ID` when an admin token targets another profile.
 
+Account-access grants configured in the web admin UI only apply to interactive browser sessions after login account selection. They do not allow non-admin API credentials to use `X-User-ID` for another profile. API access to another user's data requires administrator credentials or the internal service token.
+
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes
