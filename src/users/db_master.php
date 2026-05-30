@@ -493,7 +493,7 @@ function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
             return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
         }
 
-        if ((int)$existing['holder_login_user_id'] === $holderLoginUserId && (string)$existing['holder_session_id'] === $holderSessionId) {
+        if ((int)$existing['holder_login_user_id'] === $holderLoginUserId) {
             $update = $con->prepare("
                 UPDATE note_edit_locks
                 SET last_seen_at = ?, expires_at = ?
@@ -574,9 +574,8 @@ function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginU
             WHERE target_user_id = ?
               AND note_id = ?
               AND holder_login_user_id = ?
-              AND holder_session_id = ?
         ");
-        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId]);
+        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId]);
 
         return (int)$stmt->fetchColumn() > 0;
     } catch (Exception $e) {
