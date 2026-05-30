@@ -252,6 +252,28 @@ function selectAuthenticatedAccount(int $targetUserId): bool {
     return setActiveUserAccount($targetUser);
 }
 
+function validateActiveAccountAccess(): bool {
+    $authUserId = (int)getAuthenticatedUserId();
+    $activeUserId = (int)getCurrentUserId();
+
+    if ($authUserId <= 0 || $activeUserId <= 0) {
+        return false;
+    }
+
+    if ($authUserId === $activeUserId) {
+        return true;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    if (canUserAccessAccount($authUserId, $activeUserId)) {
+        return true;
+    }
+
+    unset($_SESSION['user_id'], $_SESSION['user']);
+    $_SESSION['account_selection_required'] = true;
+    return false;
+}
+
 function isAuthenticated() {
     // Check session first
     if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
@@ -266,7 +288,7 @@ function isAuthenticated() {
             return false;
         }
 
-        return isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] > 0;
+        return validateActiveAccountAccess();
     }
     
     // Check remember me cookie
