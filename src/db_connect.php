@@ -168,7 +168,9 @@ try {
         workspace TEXT DEFAULT "Poznote",
         favorite INTEGER DEFAULT 0,
         attachments TEXT,
-        type TEXT DEFAULT "note"
+        type TEXT DEFAULT "note",
+        created_by_user_id INTEGER,
+        updated_by_user_id INTEGER
     )');
 
     // Create folders table for empty folders (scoped by workspace)
@@ -254,7 +256,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 12;
+    $CURRENT_SCHEMA_VERSION = 13;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -278,6 +280,16 @@ try {
             }
             if (!in_array('type', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
+            }
+            if (!in_array('created_by_user_id', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN created_by_user_id INTEGER");
+            }
+            if (!in_array('updated_by_user_id', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN updated_by_user_id INTEGER");
+            }
+            if ($activeUserId) {
+                $fallbackUserId = (int)$activeUserId;
+                $con->exec("UPDATE entries SET created_by_user_id = COALESCE(created_by_user_id, $fallbackUserId), updated_by_user_id = COALESCE(updated_by_user_id, $fallbackUserId)");
             }
 
         } catch (Exception $e) {
@@ -493,8 +505,8 @@ try {
 
             // Insert the welcome note
             $now_utc = gmdate('Y-m-d H:i:s', time());
-            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc]);
+            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc, $activeUserId, $activeUserId]);
             
             $welcomeNoteId = $con->lastInsertId();
             

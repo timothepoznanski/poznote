@@ -1,8 +1,11 @@
 (function () {
     var HEARTBEAT_INTERVAL_MS = 20000;
+    var STATUS_CHECK_INTERVAL_MS = 10000;
+    var LOCKED_STATUS_CHECK_INTERVAL_MS = 3000;
     var SESSION_STORAGE_KEY = 'poznote_editor_session_id';
     var activeNoteId = null;
     var heartbeatTimer = null;
+    var statusCheckTimer = null;
     var acquireRequestId = 0;
     var noteStates = Object.create(null);
 
@@ -180,7 +183,17 @@
             return;
         }
 
-        var allowToolbarClasses = ['btn-home', 'btn-history-nav', 'btn-download', 'btn-info', 'btn-open-new-tab', 'btn-share'];
+        var allowToolbarClasses = [
+            'btn-home',
+            'btn-history-nav',
+            'btn-download',
+            'btn-info',
+            'btn-open-new-tab',
+            'markdown-view-mode-btn',
+            'markdown-split-btn',
+            'markdown-edit-btn',
+            'markdown-preview-btn'
+        ];
         noteCard.querySelectorAll('.note-edit-toolbar .toolbar-btn').forEach(function (button) {
             var keepEnabled = allowToolbarClasses.some(function (className) {
                 return button.classList.contains(className);
@@ -199,7 +212,11 @@
             var selector = element.getAttribute('data-selector') || '';
             var keepEnabled = element.getAttribute('data-action') === 'open-markdown-syntax'
                 || selector === '.btn-download'
-                || selector === '.btn-info';
+                || selector === '.btn-info'
+                || selector === '.markdown-view-mode-btn'
+                || selector === '.markdown-split-btn'
+                || selector === '.markdown-edit-btn'
+                || selector === '.markdown-preview-btn';
             if (!keepEnabled) {
                 setTemporarilyDisabled(element, locked);
             }
@@ -208,11 +225,19 @@
 
     function getLockBannerMessage(lock) {
         if (lock && lock.holder_is_current_user) {
-            return t('note_lock.current_user_other_tab', {}, 'Read only: this note is already being edited in another tab.');
+            return t('note_lock.current_user_other_tab', {}, 'Read only: this note is already being edited in another tab or on another device by the same user.');
         }
 
         var holder = (lock && lock.holder_username) ? lock.holder_username : t('note_lock.another_user', {}, 'another user');
         return t('note_lock.banner', { user: holder }, 'Read only: {{user}} is currently editing this note.');
+    }
+
+    function getLockCheckingMessage() {
+        return t('note_lock.checking', {}, 'Checking edit access...');
+    }
+
+    function getLockUnavailableMessage() {
+        return t('note_lock.unavailable', {}, 'Read only: unable to verify edit access for this note.');
     }
 
     function getLockConflictMessage(lock, fallbackMessage, reason) {
@@ -324,6 +349,63 @@
         }
     }
 
+    function setNoteCheckingState(noteId) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId) {
+            return;
+        }
+
+        var noteCard = document.getElementById('note' + noteId);
+        var titleInput = document.getElementById('inp' + noteId);
+        var entry = document.getElementById('entry' + noteId);
+
+        noteStates[noteId] = {
+            editable: false,
+            lock: noteStates[noteId] ? noteStates[noteId].lock : null,
+            checking: true
+        };
+
+        if (noteCard) {
+            noteCard.classList.add('note-edit-locked');
+            ensureLockBanner(noteCard, getLockCheckingMessage());
+            updateToolbarState(noteCard, true);
+        }
+
+        if (titleInput) {
+            titleInput.readOnly = true;
+            titleInput.classList.add('note-lock-readonly');
+        }
+
+        if (entry) {
+            setContentEditableState(entry, false);
+            entry.querySelectorAll('[contenteditable="true"]').forEach(function (element) {
+                setContentEditableState(element, false);
+            });
+            entry.querySelectorAll('input, textarea, select, button').forEach(function (element) {
+                setTemporarilyDisabled(element, true);
+            });
+        }
+    }
+
+    function setNoteLockUnavailableState(noteId, message) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId) {
+            return;
+        }
+
+        noteStates[noteId] = {
+            editable: false,
+            lock: noteStates[noteId] ? noteStates[noteId].lock : null
+        };
+
+        var noteCard = document.getElementById('note' + noteId);
+        if (noteCard) {
+            noteCard.classList.add('note-edit-locked');
+            ensureLockBanner(noteCard, message || getLockUnavailableMessage());
+            updateToolbarState(noteCard, true);
+        }
+    }
+
     function clearNoteLockedState(noteId) {
         noteId = normalizeNoteId(noteId);
         if (!noteId) {
@@ -368,11 +450,25 @@
         }
     }
 
+    function stopStatusChecks() {
+        if (statusCheckTimer) {
+            window.clearInterval(statusCheckTimer);
+            statusCheckTimer = null;
+        }
+    }
+
     function startHeartbeat(noteId) {
         stopHeartbeat();
         heartbeatTimer = window.setInterval(function () {
             refreshLock(noteId);
         }, HEARTBEAT_INTERVAL_MS);
+    }
+
+    function startStatusChecks(noteId, intervalMs) {
+        stopStatusChecks();
+        statusCheckTimer = window.setInterval(function () {
+            checkLockStatus(noteId);
+        }, intervalMs || STATUS_CHECK_INTERVAL_MS);
     }
 
     function releaseLock(noteId) {
@@ -391,6 +487,9 @@
     function handleLockConflict(noteId, lock, message, reason) {
         stopHeartbeat();
         setNoteLockedState(noteId, lock || null);
+        if (normalizeNoteId(activeNoteId) === normalizeNoteId(noteId)) {
+            startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
+        }
 
         if ((reason || 'lost') === 'acquire') {
             return;
@@ -400,6 +499,49 @@
         if (popupMessage) {
             showLockConflictNotification(popupMessage);
         }
+    }
+
+    function checkLockStatus(noteId) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId || String(activeNoteId) !== noteId || isReadonlyWorkspace()) {
+            return;
+        }
+
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Editor-Session-ID': getEditorSessionId()
+            },
+            credentials: 'same-origin'
+        }).then(parseResponse).then(function (result) {
+            if (String(activeNoteId) !== noteId || !result.ok || !result.data || !result.data.success) {
+                return;
+            }
+
+            var lock = result.data.lock || null;
+            if (lock && !lock.holder_is_current_editor_session) {
+                if (noteStates[noteId] && noteStates[noteId].editable === false) {
+                    setNoteLockedState(noteId, lock);
+                } else {
+                    handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'lost');
+                }
+                return;
+            }
+
+            if (!lock && noteStates[noteId] && noteStates[noteId].editable === false) {
+                acquireLock(noteId);
+                return;
+            }
+
+            if (lock && lock.holder_is_current_editor_session && noteStates[noteId] && noteStates[noteId].editable === false) {
+                clearNoteLockedState(noteId);
+                startHeartbeat(noteId);
+            }
+        }).catch(function () {
+            return null;
+        });
     }
 
     function refreshLock(noteId) {
@@ -420,6 +562,7 @@
                     editable: true,
                     lock: result.data.lock || null
                 };
+                clearNoteLockedState(noteId);
                 return;
             }
 
@@ -444,9 +587,11 @@
         }
 
         stopHeartbeat();
+        stopStatusChecks();
         activeNoteId = noteId;
         acquireRequestId += 1;
         var requestId = acquireRequestId;
+        setNoteCheckingState(noteId);
 
         postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
             editor_session_id: getEditorSessionId()
@@ -462,6 +607,7 @@
                 };
                 clearNoteLockedState(noteId);
                 startHeartbeat(noteId);
+                startStatusChecks(noteId);
                 return;
             }
 
@@ -473,10 +619,18 @@
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(result.data.error || 'Unable to acquire the edit lock for this note.', 'error');
             }
+            setNoteLockUnavailableState(noteId, result.data.error || getLockUnavailableMessage());
+            startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
         }).catch(function () {
+            if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
+                return;
+            }
+
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup('Unable to acquire the edit lock for this note.', 'error');
             }
+            setNoteLockUnavailableState(noteId);
+            startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
         });
     }
 
@@ -484,6 +638,7 @@
         noteId = normalizeNoteId(noteId || window.noteid || getCurrentDomNoteId());
         if (!noteId) {
             stopHeartbeat();
+            stopStatusChecks();
             activeNoteId = null;
             return;
         }
@@ -502,13 +657,29 @@
     };
     window.acquireNoteEditLockForCurrentNote = handleCurrentNoteLoaded;
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function initializeCurrentNoteLock() {
         ensureStyles();
         handleCurrentNoteLoaded();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeCurrentNoteLock);
+    } else {
+        initializeCurrentNoteLock();
+    }
 
     document.addEventListener('noteLoaded', function (event) {
         var detail = event && event.detail ? event.detail : {};
         handleCurrentNoteLoaded(detail.noteId || null);
+    });
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') {
+            checkLockStatus(activeNoteId);
+        }
+    });
+
+    window.addEventListener('focus', function () {
+        checkLockStatus(activeNoteId);
     });
 })();

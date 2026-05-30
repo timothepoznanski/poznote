@@ -185,6 +185,73 @@ body.dark-mode {
     width: 60px;
 }
 
+.users-table-header-with-help {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.users-header-help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted, #666);
+    cursor: help;
+}
+
+.users-header-help i {
+    font-size: 14px;
+}
+
+.users-header-help-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 300px;
+    max-width: 380px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(20, 20, 20, 0.94);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.45;
+    text-transform: none;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.16s ease, visibility 0.16s ease;
+    z-index: 20;
+}
+
+.users-header-help:hover .users-header-help-tooltip,
+.users-header-help:focus .users-header-help-tooltip,
+.users-header-help:focus-visible .users-header-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+html[data-theme='dark'] .users-header-help,
+body.dark-mode .users-header-help {
+    color: #d6dde6;
+}
+
+html[data-theme='dark'] .users-header-help:hover,
+html[data-theme='dark'] .users-header-help:focus,
+html[data-theme='dark'] .users-header-help:focus-visible,
+body.dark-mode .users-header-help:hover,
+body.dark-mode .users-header-help:focus,
+body.dark-mode .users-header-help:focus-visible {
+    color: #ffffff;
+}
+
 .users-table td.user-id-cell {
     font-family: monospace;
     color: var(--text-color, #333);

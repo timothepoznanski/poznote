@@ -318,6 +318,11 @@ $router->post('/notes/{id}/lock', function($params) use ($notesController) {
     $notesController->acquireLock($params['id']);
 });
 
+// Get the current edit lock status for a note
+$router->get('/notes/{id}/lock', function($params) use ($notesController) {
+    $notesController->lockStatus($params['id']);
+});
+
 // Refresh an existing note edit lock
 $router->post('/notes/{id}/lock/heartbeat', function($params) use ($notesController) {
     $notesController->heartbeatLock($params['id']);

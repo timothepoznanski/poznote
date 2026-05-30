@@ -2166,7 +2166,7 @@
       "attachments_count": "附件数",
       "actions": "操作",
       "not_defined": "未定义",
-      "email_usage_note": "邮箱地址仅在配置 OIDC 转换身份验证时使用。Poznote 不会发送任何电子邮件。",
+      "email_usage_note": "用户可以使用邮箱地址而不是用户名登录。如果配置了 OIDC，邮箱地址也会用于 OIDC 身份验证。Poznote 不会发送任何电子邮件。",
       "account_access": {
         "column": "笔记访问",
         "title": "笔记访问",
@@ -2589,9 +2589,14 @@
     "unlock": "解锁",
     "error_incorrect": "密码错误，请重试。"
   },
+  "account_access": {
+    "owner_only_settings": "此账户的设置无法访问，因为您不是此账户的所有者。"
+  },
   "note_lock": {
     "banner": "只读：{{user}} 当前正在编辑这条笔记。",
-    "current_user_other_tab": "只读：这条笔记已在另一个标签页中编辑。",
+    "current_user_other_tab": "只读：这条笔记已由同一用户在另一个标签页或另一台设备上编辑。",
+    "checking": "正在检查编辑权限...",
+    "unavailable": "只读：无法验证这条笔记的编辑权限。",
     "another_user": "另一位用户",
     "popup_title": "注意",
     "lost_to_other_tab": "您已不再持有这条笔记的编辑锁。现在它正在另一个标签页中被编辑。",

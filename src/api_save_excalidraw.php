@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Check if this is an embedded diagram save
 $action = isset($_POST['action']) ? $_POST['action'] : 'save_full_note';
+$actor_user_id = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
 
 if ($action === 'save_embedded_diagram') {
     // Handle embedded diagram save
@@ -113,10 +114,10 @@ if ($note_id === 0) {
     
     // Create new note - store diagram data in entry column for backward compatibility
     $created_date = date("Y-m-d H:i:s");
-    $query = "INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated) VALUES (?, ?, ?, ?, ?, 'note', ?, ?)";
+    $query = "INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, 'note', ?, ?, ?, ?)";
     $stmt = $con->prepare($query);
     
-    if ($stmt->execute([$uniqueTitle, $diagram_data, $folder, $folder_id, $workspace, $created_date, $created_date])) {
+    if ($stmt->execute([$uniqueTitle, $diagram_data, $folder, $folder_id, $workspace, $created_date, $created_date, $actor_user_id, $actor_user_id])) {
         $note_id = $con->lastInsertId();
     } else {
         http_response_code(500);
@@ -125,8 +126,8 @@ if ($note_id === 0) {
     }
 } else {
     // Update existing note
-    $stmt = $con->prepare('UPDATE entries SET heading = ?, entry = ?, updated = datetime("now") WHERE id = ? AND workspace = ? AND trash = 0');
-    if (!$stmt->execute([$heading, $diagram_data, $note_id, $workspace])) {
+    $stmt = $con->prepare('UPDATE entries SET heading = ?, entry = ?, updated = datetime("now"), updated_by_user_id = ? WHERE id = ? AND workspace = ? AND trash = 0');
+    if (!$stmt->execute([$heading, $diagram_data, $actor_user_id, $note_id, $workspace])) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Error updating note']);
         exit;
@@ -284,7 +285,7 @@ echo json_encode([
 ]);
 
 function saveEmbeddedDiagram() {
-    global $con;
+    global $con, $actor_user_id;
     
     $note_id = isset($_POST['note_id']) ? intval($_POST['note_id']) : 0;
     $diagram_id = isset($_POST['diagram_id']) ? trim($_POST['diagram_id']) : '';
@@ -565,8 +566,8 @@ function saveEmbeddedDiagram() {
         }
         
         // Update the database with the new content and last modified time
-        $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ? AND workspace = ? AND trash = 0");
-        $stmt->execute([$content_to_save, $note_id, $workspace]);
+        $stmt = $con->prepare("UPDATE entries SET entry = ?, updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ? AND trash = 0");
+        $stmt->execute([$content_to_save, $actor_user_id, $note_id, $workspace]);
         
         echo json_encode([
             'success' => true,

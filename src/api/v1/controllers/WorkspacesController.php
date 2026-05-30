@@ -19,7 +19,10 @@ class WorkspacesController {
     private function requireActiveAccountOwner(): bool {
         if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
             http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'Settings are only available for your own account']);
+            $message = function_exists('getActiveAccountOwnerRequiredMessage')
+                ? getActiveAccountOwnerRequiredMessage()
+                : 'This account\'s settings are not accessible because you are not the owner of this account.';
+            echo json_encode(['success' => false, 'message' => $message]);
             return false;
         }
 

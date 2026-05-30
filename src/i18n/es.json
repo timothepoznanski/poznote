@@ -2159,6 +2159,7 @@
       "click_to_deactivate": "Haga clic para desactivar",
       "toggle_admin": "Conceder o revocar privilegios de administrador",
       "admin_id_1_locked": "El rol de administrador no se puede eliminar del ID de usuario 1",
+      "email_usage_note": "Los usuarios pueden iniciar sesión con su correo electrónico en lugar de su nombre de usuario. Las direcciones de correo electrónico también se usan para la autenticación OIDC si está configurada. Poznote no envía correos electrónicos.",
       "admin_note": "Use la casilla de Admin para otorgar o revocar privilegios de administrador a otro usuario.",
       "account_access": {
         "column": "Acceso a notas",
@@ -2447,9 +2448,14 @@
     "unlock": "Desbloquear",
     "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo."
   },
+  "account_access": {
+    "owner_only_settings": "Los ajustes de esta cuenta no son accesibles porque usted no es el propietario de esta cuenta."
+  },
   "note_lock": {
     "banner": "Solo lectura: {{user}} está editando esta nota en este momento.",
-    "current_user_other_tab": "Solo lectura: esta nota ya se está editando en otra pestaña.",
+    "current_user_other_tab": "Solo lectura: esta nota ya se está editando en otra pestaña o en otro dispositivo por el mismo usuario.",
+    "checking": "Comprobando el acceso de edición...",
+    "unavailable": "Solo lectura: no se puede comprobar el acceso de edición para esta nota.",
     "another_user": "otro usuario",
     "popup_title": "Atención",
     "lost_to_other_tab": "Ya no tiene el bloqueo de edición de esta nota. Ahora se está editando en otra pestaña.",

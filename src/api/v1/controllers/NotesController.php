@@ -37,6 +37,10 @@ class NotesController {
         return (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
     }
 
+    private function getActorUserId(): int {
+        return $this->getNoteLockHolderUserId();
+    }
+
     private function getEditorSessionId(?array $input = null): string {
         if (is_array($input) && isset($input['editor_session_id'])) {
             return trim((string) $input['editor_session_id']);
@@ -79,6 +83,7 @@ class NotesController {
         }
 
         $currentHolderUserId = $this->getNoteLockHolderUserId();
+        $currentEditorSessionId = $this->getEditorSessionId();
 
         return [
             'target_user_id' => (int) ($lock['target_user_id'] ?? 0),
@@ -86,6 +91,9 @@ class NotesController {
             'holder_login_user_id' => (int) ($lock['holder_login_user_id'] ?? 0),
             'holder_username' => (string) ($lock['holder_username'] ?? ''),
             'holder_is_current_user' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId,
+            'holder_is_current_editor_session' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId
+                && $currentEditorSessionId !== ''
+                && (string) ($lock['holder_session_id'] ?? '') === $currentEditorSessionId,
             'expires_at' => (string) ($lock['expires_at'] ?? ''),
             'last_seen_at' => (string) ($lock['last_seen_at'] ?? ''),
         ];
@@ -124,6 +132,15 @@ class NotesController {
         }
 
         $lock = getNoteEditLock($targetUserId, $noteId);
+        if (!$lock) {
+            $result = acquireNoteEditLock($targetUserId, $noteId, $holderUserId, $editorSessionId);
+            if (!empty($result['success'])) {
+                return true;
+            }
+
+            $lock = $result['lock'] ?? null;
+        }
+
         $message = $lock
             ? 'This note is currently locked for editing'
             : 'You no longer hold the edit lock for this note';
@@ -171,6 +188,23 @@ class NotesController {
         }
 
         $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null);
+    }
+
+    public function lockStatus(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int) $id;
+        if (!$this->noteExistsForEditing($noteId)) {
+            $this->sendError(404, 'Note not found');
+            return;
+        }
+
+        $this->sendSuccess([
+            'lock' => $this->buildNoteEditLockPayload(getNoteEditLock($this->getNoteLockTargetUserId(), $noteId)),
+        ]);
     }
 
     public function heartbeatLock(string $id): void {
@@ -660,9 +694,10 @@ class NotesController {
                 }
             }
             
-            $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, linked_note_id, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $actorUserId = $this->getActorUserId();
+            $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, linked_note_id, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $now_utc, $now_utc])) {
+            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $now_utc, $now_utc, $actorUserId, $actorUserId])) {
                 $id = $this->con->lastInsertId();
                 
                 // Notes in a shared folder inherit access through the folder only.
@@ -893,6 +928,8 @@ class NotesController {
             
             $updateFields = ["heading = ?", "updated = ?"];
             $updateParams = [$heading, $now_utc];
+            $updateFields[] = "updated_by_user_id = ?";
+            $updateParams[] = $this->getActorUserId();
             
             if ($entry !== null) {
                 $updateFields[] = "entry = ?";
@@ -929,8 +966,8 @@ class NotesController {
                     $linkedNoteIds = $linkIdsStmt->fetchAll(PDO::FETCH_COLUMN);
                     
                     if (!empty($linkedNoteIds)) {
-                        $linkStmt = $this->con->prepare("UPDATE entries SET heading = ?, updated = ? WHERE linked_note_id = ? AND trash = 0");
-                        $linkStmt->execute([$heading, $now_utc, $noteId]);
+                        $linkStmt = $this->con->prepare("UPDATE entries SET heading = ?, updated = ?, updated_by_user_id = ? WHERE linked_note_id = ? AND trash = 0");
+                        $linkStmt->execute([$heading, $now_utc, $this->getActorUserId(), $noteId]);
                         $updatedLinkedNotes = $linkedNoteIds;
                     }
                 }
@@ -1026,22 +1063,22 @@ class NotesController {
                 foreach ($linkedNotes as $linkedNote) {
                     $linkedId = $linkedNote['id'];
                     if ($workspace) {
-                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
-                        $delStmt->execute([$linkedId, $workspace]);
+                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ?");
+                        $delStmt->execute([$this->getActorUserId(), $linkedId, $workspace]);
                     } else {
-                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
-                        $delStmt->execute([$linkedId]);
+                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
+                        $delStmt->execute([$this->getActorUserId(), $linkedId]);
                     }
                     $deletedLinkedCount++;
                 }
                 
                 // Then delete the main note
                 if ($workspace) {
-                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ? AND workspace = ?");
-                    $success = $stmt->execute([$noteId, $workspace]);
+                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ?");
+                    $success = $stmt->execute([$this->getActorUserId(), $noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now') WHERE id = ?");
-                    $success = $stmt->execute([$noteId]);
+                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
+                    $success = $stmt->execute([$this->getActorUserId(), $noteId]);
                 }
                 
                 if ($success) {
@@ -1292,11 +1329,11 @@ class NotesController {
             
             // Update tags
             if ($workspace) {
-                $stmt = $this->con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ? AND workspace = ?");
-                $stmt->execute([$tags_string, $noteId, $workspace]);
+                $stmt = $this->con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ? AND workspace = ?");
+                $stmt->execute([$tags_string, $this->getActorUserId(), $noteId, $workspace]);
             } else {
-                $stmt = $this->con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
-                $stmt->execute([$tags_string, $noteId]);
+                $stmt = $this->con->prepare("UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ?");
+                $stmt->execute([$tags_string, $this->getActorUserId(), $noteId]);
             }
             
             $this->sendSuccess([
@@ -1367,9 +1404,9 @@ class NotesController {
             
             // Update database
             $now_utc = gmdate('Y-m-d H:i:s', time());
-            $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = ? WHERE id = ?");
+            $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = ?, updated_by_user_id = ? WHERE id = ?");
             
-            if ($stmt->execute([$content, $now_utc, $noteId])) {
+            if ($stmt->execute([$content, $now_utc, $this->getActorUserId(), $noteId])) {
                 $this->sendSuccess(['id' => $noteId]);
                 
                 // Trigger auto Git sync on emergency save (leaving page)
@@ -1534,7 +1571,8 @@ class NotesController {
             }
 
             // Insert new note
-            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0)");
+            $actorUserId = $this->getActorUserId();
+            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
             $insertStmt->execute([
                 $newHeading,
                 $originalNote['tags'],
@@ -1542,7 +1580,9 @@ class NotesController {
                 $folderId,
                 $workspace,
                 $originalNote['type'],
-                $newAttachments
+                $newAttachments,
+                $actorUserId,
+                $actorUserId
             ]);
 
             $newId = $this->con->lastInsertId();
@@ -1903,8 +1943,8 @@ class NotesController {
             
             // Update database
             $attachmentsJson = !empty($attachments) ? json_encode($attachments) : null;
-            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, attachments = ?, updated = datetime('now') WHERE id = ?");
-            $updateStmt->execute([$newType, $attachmentsJson, $id]);
+            $updateStmt = $this->con->prepare("UPDATE entries SET type = ?, attachments = ?, updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
+            $updateStmt->execute([$newType, $attachmentsJson, $this->getActorUserId(), $id]);
             
             // Delete old file if extension changed
             if ($currentFilePath !== $newFilePath && file_exists($currentFilePath)) {

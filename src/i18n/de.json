@@ -2159,6 +2159,7 @@
       "click_to_deactivate": "Zum Deaktivieren klicken",
       "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
       "admin_id_1_locked": "Die Administrator-Rolle kann für Benutzer-ID 1 nicht entfernt werden",
+      "email_usage_note": "Benutzer können sich mit ihrer E-Mail-Adresse statt mit ihrem Benutzernamen anmelden. E-Mail-Adressen werden außerdem für die OIDC-Authentifizierung verwendet, wenn diese konfiguriert ist. Poznote sendet keine E-Mails.",
       "admin_note": "Verwenden Sie das Admin-Kontrollkästchen, um Administrator-Berechtigungen für einen anderen Benutzer zu gewähren oder zu entziehen.",
       "account_access": {
         "column": "Notizzugriff",
@@ -2448,9 +2449,14 @@
     "unlock": "Entsperren",
     "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut."
   },
+  "account_access": {
+    "owner_only_settings": "Die Einstellungen dieses Kontos sind nicht zugänglich, da Sie nicht der Besitzer dieses Kontos sind."
+  },
   "note_lock": {
     "banner": "Nur lesen: {{user}} bearbeitet diese Notiz gerade.",
-    "current_user_other_tab": "Nur lesen: Diese Notiz wird bereits in einem anderen Tab bearbeitet.",
+    "current_user_other_tab": "Nur lesen: Diese Notiz wird bereits in einem anderen Tab oder auf einem anderen Gerät vom selben Benutzer bearbeitet.",
+    "checking": "Bearbeitungszugriff wird geprüft...",
+    "unavailable": "Nur lesen: Der Bearbeitungszugriff für diese Notiz konnte nicht geprüft werden.",
     "another_user": "ein anderer Benutzer",
     "popup_title": "Achtung",
     "lost_to_other_tab": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. Sie wird jetzt in einem anderen Tab bearbeitet.",

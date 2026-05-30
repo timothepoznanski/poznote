@@ -252,6 +252,28 @@ function selectAuthenticatedAccount(int $targetUserId): bool {
     return setActiveUserAccount($targetUser);
 }
 
+function validateActiveAccountAccess(): bool {
+    $authUserId = (int)getAuthenticatedUserId();
+    $activeUserId = (int)getCurrentUserId();
+
+    if ($authUserId <= 0 || $activeUserId <= 0) {
+        return false;
+    }
+
+    if ($authUserId === $activeUserId) {
+        return true;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    if (canUserAccessAccount($authUserId, $activeUserId)) {
+        return true;
+    }
+
+    unset($_SESSION['user_id'], $_SESSION['user']);
+    $_SESSION['account_selection_required'] = true;
+    return false;
+}
+
 function isAuthenticated() {
     // Check session first
     if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
@@ -266,7 +288,7 @@ function isAuthenticated() {
             return false;
         }
 
-        return isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] > 0;
+        return validateActiveAccountAccess();
     }
     
     // Check remember me cookie
@@ -1532,11 +1554,23 @@ function isActiveAccountOwnedByAuthenticatedUser(): bool {
 /**
  * Settings and account-management surfaces must not operate on borrowed accounts.
  */
-function requireActiveAccountOwner(string $message = 'Settings are only available for your own account'): void {
+function getActiveAccountOwnerRequiredMessage(): string {
+    return api_t(
+        'account_access.owner_only_settings',
+        [],
+        'This account\'s settings are not accessible because you are not the owner of this account.'
+    );
+}
+
+function requireActiveAccountOwner(?string $message = null): void {
     requireAuth();
 
     if (isActiveAccountOwnedByAuthenticatedUser()) {
         return;
+    }
+
+    if ($message === null) {
+        $message = getActiveAccountOwnerRequiredMessage();
     }
 
     denyPublicWorkspaceAccessResponse($message, 403);

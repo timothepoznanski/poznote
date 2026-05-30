@@ -421,6 +421,7 @@ if ($isPublicWorkspaceReadonly) {
 
     <!-- Page configuration data (CSP compliant) -->
     <script type="application/json" id="page-config-data"><?php 
+        $currentWorkspaceOpacityKey = 'background_opacity_' . (string)($workspace_filter ?? '');
         $config_data = [
             'isSearchMode' => !empty($search) || !empty($tags_search),
             'currentNoteFolder' => null, // Will be set below
@@ -429,7 +430,12 @@ if ($isPublicWorkspaceReadonly) {
             'userEntriesPath' => "data/users/{$_SESSION['user_id']}/entries/",
             'defaultNoteSortType' => $note_list_sort_type,
             'isAdmin' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin(),
-            'isPublicWorkspaceAccess' => $isPublicWorkspaceReadonly
+            'isPublicWorkspaceAccess' => $isPublicWorkspaceReadonly,
+            'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
+            'settings' => [
+                'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
+                $currentWorkspaceOpacityKey => getSetting($currentWorkspaceOpacityKey, '25')
+            ]
         ];
         if ($note != '') {
             $config_data['currentNoteFolder'] = $current_note_folder ?? '';
