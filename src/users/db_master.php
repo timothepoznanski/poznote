@@ -333,7 +333,7 @@ function setUserAccountAccessTargets(int $accessorUserId, array $targetUserIds):
         if (!empty($normalizedTargetIds)) {
             $ids = array_keys($normalizedTargetIds);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
-            $stmt = $con->prepare("SELECT id FROM users WHERE id IN ($placeholders)");
+            $stmt = $con->prepare("SELECT id FROM users WHERE active = 1 AND id IN ($placeholders)");
             $stmt->execute($ids);
             $validTargetIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
         }

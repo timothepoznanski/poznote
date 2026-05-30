@@ -309,12 +309,14 @@ $v = getAppVersion();
         document.querySelectorAll('#accessModal input[name="allowed_user_ids[]"]').forEach(function (checkbox) {
             const accountId = Number(checkbox.value);
             const isOwnAccount = accountId === Number(userId);
-            checkbox.checked = isOwnAccount || normalizedAccessIds.includes(accountId);
-            checkbox.disabled = isOwnAccount;
+            const isInactiveAccount = checkbox.dataset.active !== '1';
+            checkbox.checked = isOwnAccount || (!isInactiveAccount && normalizedAccessIds.includes(accountId));
+            checkbox.disabled = isOwnAccount || isInactiveAccount;
 
             const option = checkbox.closest('.account-access-option');
             if (option) {
                 option.classList.toggle('account-access-own', isOwnAccount);
+                option.classList.toggle('account-access-inactive', isInactiveAccount);
             }
         });
 
@@ -557,7 +559,7 @@ $v = getAppVersion();
                 <div class="account-access-list">
                     <?php foreach ($users as $accessUser): ?>
                         <label class="account-access-option">
-                            <input type="checkbox" name="allowed_user_ids[]" value="<?php echo (int)$accessUser['id']; ?>">
+                            <input type="checkbox" name="allowed_user_ids[]" value="<?php echo (int)$accessUser['id']; ?>" data-active="<?php echo !empty($accessUser['active']) ? '1' : '0'; ?>">
                             <span class="account-access-name"><?php echo htmlspecialchars($accessUser['username'], ENT_QUOTES, 'UTF-8'); ?></span>
                             <?php if (empty($accessUser['active'])): ?>
                                 <span class="account-access-state"><?php echo t_h('multiuser.admin.inactive', [], 'Inactive'); ?></span>
@@ -838,4 +840,3 @@ $v = getAppVersion();
     </script>
 </body>
 </html>
-
