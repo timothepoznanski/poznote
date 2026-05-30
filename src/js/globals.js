@@ -101,9 +101,48 @@ function buildNoteNavigationUrl(noteId, workspace, extraParams) {
 window.isPublicWorkspaceNavigationActive = isPublicWorkspaceNavigationActive;
 window.buildNoteNavigationUrl = buildNoteNavigationUrl;
 
+function getPoznotePageConfig() {
+    var configElement = document.getElementById('page-config-data');
+    if (!configElement) return {};
+
+    try {
+        return JSON.parse(configElement.textContent || '{}') || {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function getPoznoteInitialSetting(key) {
+    var config = getPoznotePageConfig();
+    if (!config.settings || !Object.prototype.hasOwnProperty.call(config.settings, key)) {
+        return null;
+    }
+
+    return config.settings[key];
+}
+
+function canUsePoznoteSettingsApi() {
+    var config = getPoznotePageConfig();
+    return config.canUseSettingsApi !== false;
+}
+
+window.getPoznotePageConfig = getPoznotePageConfig;
+window.getPoznoteInitialSetting = getPoznoteInitialSetting;
+window.canUsePoznoteSettingsApi = canUsePoznoteSettingsApi;
+
 // Apply global preferences on load
 document.addEventListener('DOMContentLoaded', function () {
     try {
+        var initialEmojiSetting = getPoznoteInitialSetting('emoji_icons_enabled');
+        if (initialEmojiSetting !== null) {
+            var initialEnabled = initialEmojiSetting === '1' || initialEmojiSetting === 'true' || initialEmojiSetting === true;
+            if (!initialEnabled) document.body.classList.add('emoji-hidden');
+            else document.body.classList.remove('emoji-hidden');
+            return;
+        }
+
+        if (!canUsePoznoteSettingsApi()) return;
+
         fetch('/api/v1/settings/emoji_icons_enabled', {
             method: 'GET',
             credentials: 'same-origin'

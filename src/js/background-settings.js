@@ -27,6 +27,19 @@
 
     function getBackgroundOpacity(workspace, callback) {
         var key = buildOpacitySettingKey(workspace);
+        if (typeof window.getPoznoteInitialSetting === 'function') {
+            var initialValue = window.getPoznoteInitialSetting(key);
+            if (initialValue !== null) {
+                callback(normalizeOpacity(initialValue));
+                return;
+            }
+        }
+
+        if (typeof window.canUsePoznoteSettingsApi === 'function' && !window.canUsePoznoteSettingsApi()) {
+            callback(OPACITY_DEFAULT);
+            return;
+        }
+
         fetch('/api/v1/settings/' + encodeURIComponent(key), {
             method: 'GET',
             headers: { 'Accept': 'application/json' },

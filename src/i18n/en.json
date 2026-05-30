@@ -258,7 +258,9 @@
       "workspace": "Workspace:",
       "folder": "Folder:",
       "created": "Created:",
+      "created_by": "Created by:",
       "last_modified": "Last Modified:",
+      "last_modified_by": "Last modified by:",
       "tags": "Tags:",
       "favorite": "Favorite:",
       "attachments": "Attachments:",
@@ -271,6 +273,10 @@
     },
     "empty": {
       "no_tags": "No tags"
+    },
+    "users": {
+      "user_id": "User #{{id}}",
+      "deleted": "User #{{id}}"
     },
     "errors": []
   },
@@ -2005,7 +2011,7 @@
       "click_to_deactivate": "Click to deactivate",
       "toggle_admin": "Grant or revoke administrator privileges",
       "admin_id_1_locked": "Administrator role cannot be removed from user ID 1",
-      "email_usage_note": "Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.",
+      "email_usage_note": "Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication if configured. Poznote does not send any emails.",
       "admin_note": "Use the Admin checkbox to grant or revoke administrator privileges for another user.",
       "account_access": {
         "column": "Note access",
@@ -2156,7 +2162,7 @@
   },
   "note_lock": {
     "banner": "Read only: {{user}} is currently editing this note.",
-    "current_user_other_tab": "Read only: this note is already being edited in another tab.",
+    "current_user_other_tab": "Read only: this note is already being edited in another tab or on another device by the same user.",
     "checking": "Checking edit access...",
     "unavailable": "Read only: unable to verify edit access for this note.",
     "another_user": "another user",

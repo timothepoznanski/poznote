@@ -362,8 +362,15 @@ $v = getAppVersion();
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
                         <th>
-                            <?php echo t_h('multiuser.admin.email', [], 'Email'); ?>
-                            <i class="lucide lucide-help-circle" style="width: 14px; height: 14px; vertical-align: middle; cursor: help; margin-left: 4px;" title="<?php echo t_h('multiuser.admin.email_usage_note', [], 'Email addresses are only used for OIDC authentication if configured. Poznote does not send any emails.'); ?>"></i>
+                            <span class="users-table-header-with-help">
+                                <?php echo t_h('multiuser.admin.email', [], 'Email'); ?>
+                                <span class="users-header-help" tabindex="0" role="img" aria-label="<?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication if configured. Poznote does not send any emails.'); ?>">
+                                    <i class="lucide lucide-help-circle"></i>
+                                    <span class="users-header-help-tooltip">
+                                        <?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication if configured. Poznote does not send any emails.'); ?>
+                                    </span>
+                                </span>
+                            </span>
                         </th>
                         <th><?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>

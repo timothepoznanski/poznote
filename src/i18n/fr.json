@@ -814,7 +814,9 @@
       "workspace": "Espace de travail :",
       "folder": "Dossier :",
       "created": "Créée :",
+      "created_by": "Créée par :",
       "last_modified": "Dernière modification :",
+      "last_modified_by": "Dernière modification par :",
       "tags": "Tags :",
       "favorite": "Favori :",
       "attachments": "Pièces jointes :",
@@ -827,6 +829,10 @@
     },
     "empty": {
       "no_tags": "Aucun tag"
+    },
+    "users": {
+      "user_id": "Utilisateur #{{id}}",
+      "deleted": "Utilisateur #{{id}}"
     },
     "errors": []
   },
@@ -2225,7 +2231,7 @@
       "attachments_count": "Pièces jointes",
       "actions": "Actions",
       "not_defined": "non défini",
-      "email_usage_note": "Les adresses email sont uniquement utilisées pour la connexion OIDC si configurée. Poznote n'envoie aucun email.",
+      "email_usage_note": "Un utilisateur peut se connecter avec son adresse email plutôt qu'avec son nom d'utilisateur. Les adresses email sont aussi utilisées pour la connexion OIDC si elle est configurée. Poznote n'envoie aucun email.",
       "account_access": {
         "column": "Accès notes",
         "title": "Accès aux notes",
@@ -2667,7 +2673,7 @@
   },
   "note_lock": {
     "banner": "Lecture seule : {{user}} modifie actuellement cette note.",
-    "current_user_other_tab": "Lecture seule : cette note est déjà en cours d'édition dans un autre onglet.",
+    "current_user_other_tab": "Lecture seule : cette note est déjà en cours d'édition dans un autre onglet ou sur un autre appareil par le même utilisateur.",
     "checking": "Vérification de l'accès en édition...",
     "unavailable": "Lecture seule : impossible de vérifier l'accès en édition pour cette note.",
     "another_user": "un autre utilisateur",

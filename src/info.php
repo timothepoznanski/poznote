@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
+require_once __DIR__ . '/users/db_master.php';
 
 // Get note ID from URL parameter
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -21,10 +22,10 @@ if (!$note_id) {
 // Get note details from database
 try {
     if ($workspace) {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type, workspace FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, created_by_user_id, updated_by_user_id, favorite, tags, attachments, type, workspace FROM entries WHERE id = ? AND trash = 0 AND workspace = ?");
         $stmt->execute([$note_id, $workspace]);
     } else {
-        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, favorite, tags, attachments, type, workspace FROM entries WHERE id = ? AND trash = 0");
+        $stmt = $con->prepare("SELECT heading, folder, folder_id, created, updated, created_by_user_id, updated_by_user_id, favorite, tags, attachments, type, workspace FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$note_id]);
     }
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -59,8 +60,40 @@ function formatDateString($dateStr) {
     }
 }
 
+function formatUserString($userId) {
+    $userId = (int)($userId ?? 0);
+    if ($userId <= 0) return t('common.not_available', [], 'Not available');
+
+    $user = function_exists('getUserProfileById') ? getUserProfileById($userId) : null;
+    if (!$user) {
+        return t('info.users.deleted', ['id' => $userId], 'User #{{id}}');
+    }
+
+    $name = trim((string)($user['display_name'] ?? ''));
+    if ($name === '') {
+        $name = trim((string)($user['username'] ?? ''));
+    }
+    if ($name === '' && !empty($user['email'])) {
+        $name = trim((string)$user['email']);
+    }
+
+    return $name !== '' ? $name : t('info.users.user_id', ['id' => $userId], 'User #{{id}}');
+}
+
+$fallbackUserId = (int)(getCurrentUserId() ?? 0);
+$createdByUserId = (int)($note['created_by_user_id'] ?? 0);
+if ($createdByUserId <= 0) {
+    $createdByUserId = $fallbackUserId;
+}
+$updatedByUserId = (int)($note['updated_by_user_id'] ?? 0);
+if ($updatedByUserId <= 0) {
+    $updatedByUserId = $createdByUserId;
+}
+
 $createdText = formatDateString($note['created']);
 $updatedText = formatDateString($note['updated']);
+$createdByText = formatUserString($createdByUserId);
+$updatedByText = formatUserString($updatedByUserId);
 
 // Build full folder path using the shared helper function
 $folderText = t('modals.folder.no_folder', [], 'No folder');
@@ -117,7 +150,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js"></script>
     <link rel="stylesheet" href="css/lucide.css">
-    <link rel="stylesheet" href="css/info.css">
+    <link rel="stylesheet" href="css/info.css?v=<?php echo filemtime(__DIR__ . '/css/info.css'); ?>">
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
@@ -162,8 +195,18 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
             </div>
 
             <div class="info-row">
+                <div class="info-label"><?php echo t_h('info.labels.created_by', [], 'Created by:'); ?></div>
+                <div class="info-value"><?php echo htmlspecialchars($createdByText); ?></div>
+            </div>
+
+            <div class="info-row">
                 <div class="info-label"><?php echo t_h('info.labels.last_modified', [], 'Last Modified:'); ?></div>
                 <div class="info-value"><?php echo htmlspecialchars($updatedText); ?></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label"><?php echo t_h('info.labels.last_modified_by', [], 'Last modified by:'); ?></div>
+                <div class="info-value"><?php echo htmlspecialchars($updatedByText); ?></div>
             </div>
 
             <div class="info-row">

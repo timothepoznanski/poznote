@@ -2163,6 +2163,7 @@
       "click_to_deactivate": "Clique para desativar",
       "toggle_admin": "Conceder ou revogar privilégios de administrador",
       "admin_id_1_locked": "O perfil de administrador não pode ser removido do usuário com ID 1",
+      "email_usage_note": "Os utilizadores podem iniciar sessão com o endereço de e-mail em vez do nome de utilizador. Os endereços de e-mail também são usados para autenticação OIDC, se estiver configurada. O Poznote não envia e-mails.",
       "admin_note": "Use a caixa de seleção Admin para conceder ou revogar privilégios de administrador para outro usuário.",
       "account_access": {
         "column": "Acesso às notas",
@@ -2456,7 +2457,7 @@
   },
   "note_lock": {
     "banner": "Somente leitura: {{user}} está editando esta nota no momento.",
-    "current_user_other_tab": "Somente leitura: esta nota já está sendo editada em outra aba.",
+    "current_user_other_tab": "Somente leitura: esta nota já está sendo editada em outra aba ou em outro dispositivo pelo mesmo usuário.",
     "checking": "Verificando acesso de edição...",
     "unavailable": "Somente leitura: não foi possível verificar o acesso de edição desta nota.",
     "another_user": "outro usuário",

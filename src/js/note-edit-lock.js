@@ -183,7 +183,17 @@
             return;
         }
 
-        var allowToolbarClasses = ['btn-home', 'btn-history-nav', 'btn-download', 'btn-info', 'btn-open-new-tab', 'btn-share'];
+        var allowToolbarClasses = [
+            'btn-home',
+            'btn-history-nav',
+            'btn-download',
+            'btn-info',
+            'btn-open-new-tab',
+            'markdown-view-mode-btn',
+            'markdown-split-btn',
+            'markdown-edit-btn',
+            'markdown-preview-btn'
+        ];
         noteCard.querySelectorAll('.note-edit-toolbar .toolbar-btn').forEach(function (button) {
             var keepEnabled = allowToolbarClasses.some(function (className) {
                 return button.classList.contains(className);
@@ -202,7 +212,11 @@
             var selector = element.getAttribute('data-selector') || '';
             var keepEnabled = element.getAttribute('data-action') === 'open-markdown-syntax'
                 || selector === '.btn-download'
-                || selector === '.btn-info';
+                || selector === '.btn-info'
+                || selector === '.markdown-view-mode-btn'
+                || selector === '.markdown-split-btn'
+                || selector === '.markdown-edit-btn'
+                || selector === '.markdown-preview-btn';
             if (!keepEnabled) {
                 setTemporarilyDisabled(element, locked);
             }
@@ -211,7 +225,7 @@
 
     function getLockBannerMessage(lock) {
         if (lock && lock.holder_is_current_user) {
-            return t('note_lock.current_user_other_tab', {}, 'Read only: this note is already being edited in another tab.');
+            return t('note_lock.current_user_other_tab', {}, 'Read only: this note is already being edited in another tab or on another device by the same user.');
         }
 
         var holder = (lock && lock.holder_username) ? lock.holder_username : t('note_lock.another_user', {}, 'another user');
