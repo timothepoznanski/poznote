@@ -1,8 +1,10 @@
 (function () {
     var HEARTBEAT_INTERVAL_MS = 20000;
+    var STATUS_CHECK_INTERVAL_MS = 10000;
     var SESSION_STORAGE_KEY = 'poznote_editor_session_id';
     var activeNoteId = null;
     var heartbeatTimer = null;
+    var statusCheckTimer = null;
     var acquireRequestId = 0;
     var noteStates = Object.create(null);
 
@@ -368,11 +370,25 @@
         }
     }
 
+    function stopStatusChecks() {
+        if (statusCheckTimer) {
+            window.clearInterval(statusCheckTimer);
+            statusCheckTimer = null;
+        }
+    }
+
     function startHeartbeat(noteId) {
         stopHeartbeat();
         heartbeatTimer = window.setInterval(function () {
             refreshLock(noteId);
         }, HEARTBEAT_INTERVAL_MS);
+    }
+
+    function startStatusChecks(noteId) {
+        stopStatusChecks();
+        statusCheckTimer = window.setInterval(function () {
+            checkLockStatus(noteId);
+        }, STATUS_CHECK_INTERVAL_MS);
     }
 
     function releaseLock(noteId) {
@@ -390,6 +406,7 @@
 
     function handleLockConflict(noteId, lock, message, reason) {
         stopHeartbeat();
+        stopStatusChecks();
         setNoteLockedState(noteId, lock || null);
 
         if ((reason || 'lost') === 'acquire') {
@@ -400,6 +417,34 @@
         if (popupMessage) {
             showLockConflictNotification(popupMessage);
         }
+    }
+
+    function checkLockStatus(noteId) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId || String(activeNoteId) !== noteId || isReadonlyWorkspace()) {
+            return;
+        }
+
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Editor-Session-ID': getEditorSessionId()
+            },
+            credentials: 'same-origin'
+        }).then(parseResponse).then(function (result) {
+            if (String(activeNoteId) !== noteId || !result.ok || !result.data || !result.data.success) {
+                return;
+            }
+
+            var lock = result.data.lock || null;
+            if (lock && !lock.holder_is_current_editor_session) {
+                handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'lost');
+            }
+        }).catch(function () {
+            return null;
+        });
     }
 
     function refreshLock(noteId) {
@@ -420,6 +465,7 @@
                     editable: true,
                     lock: result.data.lock || null
                 };
+                clearNoteLockedState(noteId);
                 return;
             }
 
@@ -444,6 +490,7 @@
         }
 
         stopHeartbeat();
+        stopStatusChecks();
         activeNoteId = noteId;
         acquireRequestId += 1;
         var requestId = acquireRequestId;
@@ -462,6 +509,7 @@
                 };
                 clearNoteLockedState(noteId);
                 startHeartbeat(noteId);
+                startStatusChecks(noteId);
                 return;
             }
 
@@ -484,6 +532,7 @@
         noteId = normalizeNoteId(noteId || window.noteid || getCurrentDomNoteId());
         if (!noteId) {
             stopHeartbeat();
+            stopStatusChecks();
             activeNoteId = null;
             return;
         }
@@ -510,5 +559,15 @@
     document.addEventListener('noteLoaded', function (event) {
         var detail = event && event.detail ? event.detail : {};
         handleCurrentNoteLoaded(detail.noteId || null);
+    });
+
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') {
+            checkLockStatus(activeNoteId);
+        }
+    });
+
+    window.addEventListener('focus', function () {
+        checkLockStatus(activeNoteId);
     });
 })();

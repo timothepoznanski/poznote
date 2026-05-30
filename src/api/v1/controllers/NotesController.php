@@ -79,6 +79,7 @@ class NotesController {
         }
 
         $currentHolderUserId = $this->getNoteLockHolderUserId();
+        $currentEditorSessionId = $this->getEditorSessionId();
 
         return [
             'target_user_id' => (int) ($lock['target_user_id'] ?? 0),
@@ -86,6 +87,9 @@ class NotesController {
             'holder_login_user_id' => (int) ($lock['holder_login_user_id'] ?? 0),
             'holder_username' => (string) ($lock['holder_username'] ?? ''),
             'holder_is_current_user' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId,
+            'holder_is_current_editor_session' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId
+                && $currentEditorSessionId !== ''
+                && (string) ($lock['holder_session_id'] ?? '') === $currentEditorSessionId,
             'expires_at' => (string) ($lock['expires_at'] ?? ''),
             'last_seen_at' => (string) ($lock['last_seen_at'] ?? ''),
         ];
@@ -171,6 +175,23 @@ class NotesController {
         }
 
         $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null);
+    }
+
+    public function lockStatus(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int) $id;
+        if (!$this->noteExistsForEditing($noteId)) {
+            $this->sendError(404, 'Note not found');
+            return;
+        }
+
+        $this->sendSuccess([
+            'lock' => $this->buildNoteEditLockPayload(getNoteEditLock($this->getNoteLockTargetUserId(), $noteId)),
+        ]);
     }
 
     public function heartbeatLock(string $id): void {
