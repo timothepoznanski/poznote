@@ -2589,6 +2589,9 @@
     "unlock": "解锁",
     "error_incorrect": "密码错误，请重试。"
   },
+  "account_access": {
+    "owner_only_settings": "此账户的设置无法访问，因为您不是此账户的所有者。"
+  },
   "note_lock": {
     "banner": "只读：{{user}} 当前正在编辑这条笔记。",
     "current_user_other_tab": "只读：这条笔记已在另一个标签页中编辑。",

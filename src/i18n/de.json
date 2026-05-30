@@ -2448,6 +2448,9 @@
     "unlock": "Entsperren",
     "error_incorrect": "Falsches Passwort. Bitte versuchen Sie es erneut."
   },
+  "account_access": {
+    "owner_only_settings": "Die Einstellungen dieses Kontos sind nicht zugänglich, da Sie nicht der Besitzer dieses Kontos sind."
+  },
   "note_lock": {
     "banner": "Nur lesen: {{user}} bearbeitet diese Notiz gerade.",
     "current_user_other_tab": "Nur lesen: Diese Notiz wird bereits in einem anderen Tab bearbeitet.",

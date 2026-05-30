@@ -2451,6 +2451,9 @@
     "unlock": "Desbloquear",
     "error_incorrect": "Senha incorreta. Tente novamente."
   },
+  "account_access": {
+    "owner_only_settings": "As configurações desta conta não estão acessíveis porque você não é o proprietário desta conta."
+  },
   "note_lock": {
     "banner": "Somente leitura: {{user}} está editando esta nota no momento.",
     "current_user_other_tab": "Somente leitura: esta nota já está sendo editada em outra aba.",

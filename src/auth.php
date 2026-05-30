@@ -1554,11 +1554,23 @@ function isActiveAccountOwnedByAuthenticatedUser(): bool {
 /**
  * Settings and account-management surfaces must not operate on borrowed accounts.
  */
-function requireActiveAccountOwner(string $message = 'Settings are only available for your own account'): void {
+function getActiveAccountOwnerRequiredMessage(): string {
+    return api_t(
+        'account_access.owner_only_settings',
+        [],
+        'This account\'s settings are not accessible because you are not the owner of this account.'
+    );
+}
+
+function requireActiveAccountOwner(?string $message = null): void {
     requireAuth();
 
     if (isActiveAccountOwnedByAuthenticatedUser()) {
         return;
+    }
+
+    if ($message === null) {
+        $message = getActiveAccountOwnerRequiredMessage();
     }
 
     denyPublicWorkspaceAccessResponse($message, 403);

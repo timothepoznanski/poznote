@@ -2662,6 +2662,9 @@
     "unlock": "Déverrouiller",
     "error_incorrect": "Mot de passe incorrect. Veuillez réessayer."
   },
+  "account_access": {
+    "owner_only_settings": "Les paramètres de ce compte ne sont pas accessibles, car vous n'êtes pas le propriétaire de ce compte."
+  },
   "note_lock": {
     "banner": "Lecture seule : {{user}} modifie actuellement cette note.",
     "current_user_other_tab": "Lecture seule : cette note est déjà en cours d'édition dans un autre onglet.",

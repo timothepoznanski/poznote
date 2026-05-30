@@ -29,7 +29,10 @@ class SettingsController {
 
     private function requireActiveAccountOwner(): void {
         if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
-            throw new RuntimeException('settings are only available for your own account', 403);
+            $message = function_exists('getActiveAccountOwnerRequiredMessage')
+                ? getActiveAccountOwnerRequiredMessage()
+                : 'This account\'s settings are not accessible because you are not the owner of this account.';
+            throw new RuntimeException($message, 403);
         }
     }
 

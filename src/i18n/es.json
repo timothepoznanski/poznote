@@ -2447,6 +2447,9 @@
     "unlock": "Desbloquear",
     "error_incorrect": "Contraseña incorrecta. Inténtelo de nuevo."
   },
+  "account_access": {
+    "owner_only_settings": "Los ajustes de esta cuenta no son accesibles porque usted no es el propietario de esta cuenta."
+  },
   "note_lock": {
     "banner": "Solo lectura: {{user}} está editando esta nota en este momento.",
     "current_user_other_tab": "Solo lectura: esta nota ya se está editando en otra pestaña.",

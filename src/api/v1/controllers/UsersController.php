@@ -28,7 +28,10 @@ class UsersController {
     private function requireActiveAccountOwner() {
         if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
             http_response_code(403);
-            return ['error' => 'Settings are only available for your own account'];
+            $message = function_exists('getActiveAccountOwnerRequiredMessage')
+                ? getActiveAccountOwnerRequiredMessage()
+                : 'This account\'s settings are not accessible because you are not the owner of this account.';
+            return ['error' => $message];
         }
         return null;
     }
