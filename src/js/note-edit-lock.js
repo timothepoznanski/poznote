@@ -371,7 +371,7 @@
 
         if (noteCard) {
             noteCard.classList.add('note-edit-locked');
-            ensureLockBanner(noteCard, getLockCheckingMessage());
+            clearLockBanner(noteCard);
             updateToolbarState(noteCard, true);
         }
 
