@@ -2665,6 +2665,8 @@
   "note_lock": {
     "banner": "Lecture seule : {{user}} modifie actuellement cette note.",
     "current_user_other_tab": "Lecture seule : cette note est déjà en cours d'édition dans un autre onglet.",
+    "checking": "Vérification de l'accès en édition...",
+    "unavailable": "Lecture seule : impossible de vérifier l'accès en édition pour cette note.",
     "another_user": "un autre utilisateur",
     "popup_title": "Attention",
     "lost_to_other_tab": "Vous n'avez plus le verrou d'édition sur cette note. Elle est maintenant modifiée dans un autre onglet.",

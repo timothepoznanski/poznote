@@ -2454,6 +2454,8 @@
   "note_lock": {
     "banner": "Somente leitura: {{user}} está editando esta nota no momento.",
     "current_user_other_tab": "Somente leitura: esta nota já está sendo editada em outra aba.",
+    "checking": "Verificando acesso de edição...",
+    "unavailable": "Somente leitura: não foi possível verificar o acesso de edição desta nota.",
     "another_user": "outro usuário",
     "popup_title": "Atenção",
     "lost_to_other_tab": "Você não tem mais o bloqueio de edição desta nota. Ela agora está sendo editada em outra aba.",

@@ -1,6 +1,7 @@
 (function () {
     var HEARTBEAT_INTERVAL_MS = 20000;
     var STATUS_CHECK_INTERVAL_MS = 10000;
+    var LOCKED_STATUS_CHECK_INTERVAL_MS = 3000;
     var SESSION_STORAGE_KEY = 'poznote_editor_session_id';
     var activeNoteId = null;
     var heartbeatTimer = null;
@@ -217,6 +218,14 @@
         return t('note_lock.banner', { user: holder }, 'Read only: {{user}} is currently editing this note.');
     }
 
+    function getLockCheckingMessage() {
+        return t('note_lock.checking', {}, 'Checking edit access...');
+    }
+
+    function getLockUnavailableMessage() {
+        return t('note_lock.unavailable', {}, 'Read only: unable to verify edit access for this note.');
+    }
+
     function getLockConflictMessage(lock, fallbackMessage, reason) {
         if (reason === 'acquire') {
             return lock ? getLockBannerMessage(lock) : fallbackMessage;
@@ -326,6 +335,63 @@
         }
     }
 
+    function setNoteCheckingState(noteId) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId) {
+            return;
+        }
+
+        var noteCard = document.getElementById('note' + noteId);
+        var titleInput = document.getElementById('inp' + noteId);
+        var entry = document.getElementById('entry' + noteId);
+
+        noteStates[noteId] = {
+            editable: false,
+            lock: noteStates[noteId] ? noteStates[noteId].lock : null,
+            checking: true
+        };
+
+        if (noteCard) {
+            noteCard.classList.add('note-edit-locked');
+            ensureLockBanner(noteCard, getLockCheckingMessage());
+            updateToolbarState(noteCard, true);
+        }
+
+        if (titleInput) {
+            titleInput.readOnly = true;
+            titleInput.classList.add('note-lock-readonly');
+        }
+
+        if (entry) {
+            setContentEditableState(entry, false);
+            entry.querySelectorAll('[contenteditable="true"]').forEach(function (element) {
+                setContentEditableState(element, false);
+            });
+            entry.querySelectorAll('input, textarea, select, button').forEach(function (element) {
+                setTemporarilyDisabled(element, true);
+            });
+        }
+    }
+
+    function setNoteLockUnavailableState(noteId, message) {
+        noteId = normalizeNoteId(noteId);
+        if (!noteId) {
+            return;
+        }
+
+        noteStates[noteId] = {
+            editable: false,
+            lock: noteStates[noteId] ? noteStates[noteId].lock : null
+        };
+
+        var noteCard = document.getElementById('note' + noteId);
+        if (noteCard) {
+            noteCard.classList.add('note-edit-locked');
+            ensureLockBanner(noteCard, message || getLockUnavailableMessage());
+            updateToolbarState(noteCard, true);
+        }
+    }
+
     function clearNoteLockedState(noteId) {
         noteId = normalizeNoteId(noteId);
         if (!noteId) {
@@ -384,11 +450,11 @@
         }, HEARTBEAT_INTERVAL_MS);
     }
 
-    function startStatusChecks(noteId) {
+    function startStatusChecks(noteId, intervalMs) {
         stopStatusChecks();
         statusCheckTimer = window.setInterval(function () {
             checkLockStatus(noteId);
-        }, STATUS_CHECK_INTERVAL_MS);
+        }, intervalMs || STATUS_CHECK_INTERVAL_MS);
     }
 
     function releaseLock(noteId) {
@@ -406,8 +472,10 @@
 
     function handleLockConflict(noteId, lock, message, reason) {
         stopHeartbeat();
-        stopStatusChecks();
         setNoteLockedState(noteId, lock || null);
+        if (normalizeNoteId(activeNoteId) === normalizeNoteId(noteId)) {
+            startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
+        }
 
         if ((reason || 'lost') === 'acquire') {
             return;
@@ -440,7 +508,22 @@
 
             var lock = result.data.lock || null;
             if (lock && !lock.holder_is_current_editor_session) {
-                handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'lost');
+                if (noteStates[noteId] && noteStates[noteId].editable === false) {
+                    setNoteLockedState(noteId, lock);
+                } else {
+                    handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'lost');
+                }
+                return;
+            }
+
+            if (!lock && noteStates[noteId] && noteStates[noteId].editable === false) {
+                acquireLock(noteId);
+                return;
+            }
+
+            if (lock && lock.holder_is_current_editor_session && noteStates[noteId] && noteStates[noteId].editable === false) {
+                clearNoteLockedState(noteId);
+                startHeartbeat(noteId);
             }
         }).catch(function () {
             return null;
@@ -494,6 +577,7 @@
         activeNoteId = noteId;
         acquireRequestId += 1;
         var requestId = acquireRequestId;
+        setNoteCheckingState(noteId);
 
         postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
             editor_session_id: getEditorSessionId()
@@ -521,10 +605,18 @@
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(result.data.error || 'Unable to acquire the edit lock for this note.', 'error');
             }
+            setNoteLockUnavailableState(noteId, result.data.error || getLockUnavailableMessage());
+            startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
         }).catch(function () {
+            if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
+                return;
+            }
+
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup('Unable to acquire the edit lock for this note.', 'error');
             }
+            setNoteLockUnavailableState(noteId);
+            startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
         });
     }
 
@@ -551,10 +643,16 @@
     };
     window.acquireNoteEditLockForCurrentNote = handleCurrentNoteLoaded;
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function initializeCurrentNoteLock() {
         ensureStyles();
         handleCurrentNoteLoaded();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeCurrentNoteLock);
+    } else {
+        initializeCurrentNoteLock();
+    }
 
     document.addEventListener('noteLoaded', function (event) {
         var detail = event && event.detail ? event.detail : {};
