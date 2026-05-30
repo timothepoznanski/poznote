@@ -1,7 +1,7 @@
 <?php
 /**
  * User Profiles Administration Page
- * 
+ *
  * Manage user profiles.
  * Note: This is NOT about passwords - there's one global password.
  * This is about user profiles that each have their own data space.
@@ -32,98 +32,60 @@ $pageWorkspace = trim(getWorkspaceFilter());
 $currentAuthUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? 0);
 $error = '';
 
+if (empty($_SESSION['admin_users_csrf_token'])) {
+    $_SESSION['admin_users_csrf_token'] = bin2hex(random_bytes(32));
+}
+$adminUsersCsrfToken = $_SESSION['admin_users_csrf_token'];
+
 // === Handle Form Actions ===
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
-    
-    switch ($action) {
-        // Create new user profile
-        case 'create':
-            $username = trim($_POST['username'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            
-            if (empty($username)) {
-                $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
+    $postedCsrfToken = $_POST['csrf_token'] ?? '';
+
+    if (!is_string($postedCsrfToken) || !hash_equals($adminUsersCsrfToken, $postedCsrfToken)) {
+        $error = t('oidc_admin.error_csrf', [], 'Invalid form submission. Please try again.');
+    } else {
+        $action = $_POST['action'] ?? '';
+
+        switch ($action) {
+            // Create new user profile
+            case 'create':
+                $username = trim($_POST['username'] ?? '');
+                $email = trim($_POST['email'] ?? '');
+
+                if (empty($username)) {
+                    $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
+                    break;
+                }
+
+                $result = createUserProfile($username, $email);
+
+                if ($result['success']) {
+                    // Redirect to refresh the page and show the new user
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    exit;
+                } else {
+                    $error = $result['error'];
+                }
                 break;
-            }
-            
-            $result = createUserProfile($username, $email);
-            
-            if ($result['success']) {
-                // Redirect to refresh the page and show the new user
-                header('Location: ' . $_SERVER['PHP_SELF']);
-                exit;
-            } else {
-                $error = $result['error'];
-            }
-            break;
-            
-        // Update existing user profile (username, email, OIDC subject)
-        case 'update_profile':
-            $userId = (int)($_POST['user_id'] ?? 0);
-            $username = trim($_POST['username'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $oidcSubject = trim($_POST['oidc_subject'] ?? '');
-            
-            if (empty($username)) {
-                $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
-                break;
-            }
-            
-            $result = updateUserProfile($userId, [
-                'username' => $username,
-                'email' => $email,
-                'oidc_subject' => $oidcSubject
-            ]);
-            
-            if ($result['success']) {
-                // Redirect to refresh the page
-                header('Location: ' . $_SERVER['PHP_SELF']);
-                exit;
-            } else {
-                $error = $result['error'];
-            }
-            break;
-            
-        // Delete user profile and all associated data
-        case 'delete':
-            $userId = (int)($_POST['user_id'] ?? 0);
-            $deleteData = true; // Always delete data when deleting a user
-            
-            // Cannot delete yourself
-            if ($userId === $currentAuthUserId) {
-                $error = t('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile');
-                break;
-            }
-            
-            $result = deleteUserProfile($userId, $deleteData);
-            
-            if ($result['success']) {
-                // Redirect to refresh the page
-                header('Location: ' . $_SERVER['PHP_SELF']);
-                exit;
-            } else {
-                $error = $result['error'];
-            }
-            break;
-            
-        // Toggle user status or admin role
-        case 'toggle_status':
-            $userId = (int)($_POST['user_id'] ?? 0);
-            $field = $_POST['field'] ?? '';
-            $value = $_POST['value'] ?? 0;
-            
-            // Cannot modify yourself
-            if ($userId === $currentAuthUserId) {
-                $error = t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role');
-                break;
-            }
-            
-            // Only allow toggling active/admin fields
-            if ($field === 'active' || $field === 'is_admin') {
-                $data = [$field => (int)$value];
-                $result = updateUserProfile($userId, $data);
-                
+
+            // Update existing user profile (username, email, OIDC subject)
+            case 'update_profile':
+                $userId = (int)($_POST['user_id'] ?? 0);
+                $username = trim($_POST['username'] ?? '');
+                $email = trim($_POST['email'] ?? '');
+                $oidcSubject = trim($_POST['oidc_subject'] ?? '');
+
+                if (empty($username)) {
+                    $error = t('multiuser.admin.errors.username_required', [], 'Username is required');
+                    break;
+                }
+
+                $result = updateUserProfile($userId, [
+                    'username' => $username,
+                    'email' => $email,
+                    'oidc_subject' => $oidcSubject
+                ]);
+
                 if ($result['success']) {
                     // Redirect to refresh the page
                     header('Location: ' . $_SERVER['PHP_SELF']);
@@ -131,26 +93,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $error = $result['error'];
                 }
-            }
-            break;
+                break;
 
-        // Update which note accounts this user can open after login
-        case 'update_account_access':
-            $userId = (int)($_POST['user_id'] ?? 0);
-            $allowedUserIds = $_POST['allowed_user_ids'] ?? [];
-            if (!is_array($allowedUserIds)) {
-                $allowedUserIds = [];
-            }
+            // Delete user profile and all associated data
+            case 'delete':
+                $userId = (int)($_POST['user_id'] ?? 0);
+                $deleteData = true; // Always delete data when deleting a user
 
-            $result = setUserAccountAccessTargets($userId, $allowedUserIds);
+                // Cannot delete yourself
+                if ($userId === $currentAuthUserId) {
+                    $error = t('multiuser.admin.errors.cannot_delete_self', [], 'You cannot delete your own profile');
+                    break;
+                }
 
-            if ($result['success']) {
-                header('Location: ' . $_SERVER['PHP_SELF']);
-                exit;
-            } else {
-                $error = $result['error'];
-            }
-            break;
+                $result = deleteUserProfile($userId, $deleteData);
+
+                if ($result['success']) {
+                    // Redirect to refresh the page
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    exit;
+                } else {
+                    $error = $result['error'];
+                }
+                break;
+
+            // Toggle user status or admin role
+            case 'toggle_status':
+                $userId = (int)($_POST['user_id'] ?? 0);
+                $field = $_POST['field'] ?? '';
+                $value = $_POST['value'] ?? 0;
+
+                // Cannot modify yourself
+                if ($userId === $currentAuthUserId) {
+                    $error = t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role');
+                    break;
+                }
+
+                // Only allow toggling active/admin fields
+                if ($field === 'active' || $field === 'is_admin') {
+                    $data = [$field => (int)$value];
+                    $result = updateUserProfile($userId, $data);
+
+                    if ($result['success']) {
+                        // Redirect to refresh the page
+                        header('Location: ' . $_SERVER['PHP_SELF']);
+                        exit;
+                    } else {
+                        $error = $result['error'];
+                    }
+                }
+                break;
+
+            // Update which note accounts this user can open after login
+            case 'update_account_access':
+                $userId = (int)($_POST['user_id'] ?? 0);
+                $allowedUserIds = $_POST['allowed_user_ids'] ?? [];
+                if (!is_array($allowedUserIds)) {
+                    $allowedUserIds = [];
+                }
+
+                $result = setUserAccountAccessTargets($userId, $allowedUserIds);
+
+                if ($result['success']) {
+                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    exit;
+                } else {
+                    $error = $result['error'];
+                }
+                break;
+        }
     }
 }
 
@@ -163,7 +174,7 @@ foreach ($users as $listedUser) {
 }
 
 ?>
-<?php 
+<?php
 // Cache busting: version based on app version to force reload on updates
 $v = getAppVersion();
 ?>
@@ -209,14 +220,18 @@ $v = getAppVersion();
         const form = document.createElement('form');
         form.method = 'POST';
         form.style.display = 'none';
-        
+
+        if (!Object.prototype.hasOwnProperty.call(formData, 'csrf_token')) {
+            formData.csrf_token = document.body.dataset.csrfToken || '';
+        }
+
         for (const [name, value] of Object.entries(formData)) {
             const input = document.createElement('input');
             input.name = name;
             input.value = value;
             form.appendChild(input);
         }
-        
+
         document.body.appendChild(form);
         form.submit();
     }
@@ -272,7 +287,7 @@ $v = getAppVersion();
         updateRenameModalTitle(currentUsername);
         document.getElementById('renameModal').classList.add('active');
     }
-    
+
     /**
      * Submit the rename form with updated user profile data
      */
@@ -307,7 +322,8 @@ $v = getAppVersion();
     }
     </script>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
+      data-csrf-token="<?php echo htmlspecialchars($adminUsersCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
     <!-- ========================================
          ADMIN CONTAINER - User Management
          ======================================== -->
@@ -330,12 +346,12 @@ $v = getAppVersion();
                 </div>
             </div>
         </div>
-        
+
         <!-- Error Messages -->
         <?php if ($error): ?>
             <div class="message message-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
-        
+
         <!-- Users Table -->
         <div class="table-responsive">
             <table class="users-table">
@@ -410,22 +426,22 @@ $v = getAppVersion();
                                     ); ?>"
                                     onchange="this.checked ? toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 1, false, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>) : toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 0); if(!this.checked) { /* unchecking is direct */ } else { this.checked = false; }">
                             </td>
-    
+
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
-    
+
                                 <?php if ($user['id'] === $currentAuthUserId): ?>
                                     <span class="badge badge-active badge-not-allowed" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
                                         <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
                                     </span>
                                 <?php else: ?>
                                     <?php if ($user['active']): ?>
-                                        <span class="badge badge-active clickable-badge" 
+                                        <span class="badge badge-active clickable-badge"
                                               title="<?php echo t_h('multiuser.admin.click_to_deactivate', [], 'Click to deactivate'); ?>"
                                               onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 0)">
                                             <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
                                         </span>
                                     <?php else: ?>
-                                        <span class="badge badge-inactive clickable-badge" 
+                                        <span class="badge badge-inactive clickable-badge"
                                               title="<?php echo t_h('multiuser.admin.click_to_activate', [], 'Click to activate'); ?>"
                                               onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 1)">
                                             <?php echo t_h('multiuser.admin.inactive', [], 'Inactive'); ?>
@@ -433,8 +449,8 @@ $v = getAppVersion();
                                     <?php endif; ?>
                                 <?php endif; ?>
                             </td>
-    
-    
+
+
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
                                         <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.account_access.manage', [], 'Manage note access'); ?>"
@@ -442,11 +458,11 @@ $v = getAppVersion();
                                         <i class="lucide-users"></i>
                                     </button>
 
-                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>" 
+                                        <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>"
                                             onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
                                         <i class="lucide-pencil"></i>
                                     </button>
-                                    
+
                                         <button type="button" class="btn btn-secondary btn-small password-action-btn" title="<?php echo t_h('multiuser.admin.password_management.reset_password', [], 'Reset Password'); ?>"
                                             data-user-id="<?php echo (int)$user['id']; ?>"
                                             data-username="<?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -454,7 +470,7 @@ $v = getAppVersion();
                                     </button>
 
                                     <?php if ($user['id'] !== 1 && $user['id'] !== $currentAuthUserId): ?>
-                                        <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>" 
+                                        <button class="btn btn-danger btn-small" title="<?php echo t_h('common.delete', [], 'Delete'); ?>"
                                             onclick="openDeleteModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <i class="lucide-trash-2"></i>
                                         </button>
@@ -473,25 +489,26 @@ $v = getAppVersion();
             </table>
         </div>
     </div>
-    
+
     <!-- ========================================
          MODALS
          ======================================== -->
-    
+
     <!-- Create User Modal -->
     <div class="modal" id="createModal">
         <div class="modal-content">
             <h2 class="modal-title"><?php echo t_h('multiuser.admin.create_user', [], 'Create User Profile'); ?></h2>
             <form method="POST">
                 <input type="hidden" name="action" value="create">
-                
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($adminUsersCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+
                 <div class="form-group">
                     <input type="text" id="create_username" name="username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?> *" required>
                 </div>
                 <div class="form-group">
                     <input type="email" id="create_email" name="email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
                 </div>
-                
+
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('createModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                     <button type="submit" class="btn btn-primary"><?php echo t_h('common.create', [], 'Create'); ?></button>
@@ -499,7 +516,7 @@ $v = getAppVersion();
             </form>
         </div>
     </div>
-    
+
     <!-- Rename/Edit User Modal -->
     <div class="modal" id="renameModal">
         <div class="modal-content profile-modal-content">
@@ -508,10 +525,10 @@ $v = getAppVersion();
                 <input type="hidden" id="rename_user_id">
                 <label class="profile-modal-label"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?>&nbsp;:</label>
                 <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" oninput="updateRenameModalTitle(this.value)" onkeydown="if(event.key==='Enter') submitRename()">
-                
+
                 <label class="profile-modal-label"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?>&nbsp;:</label>
                 <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
-                
+
                 <label class="profile-modal-label"><?php echo t_h('multiuser.admin.oidc_subject', [], 'OIDC Subject (UUID)'); ?>&nbsp;:</label>
                 <small class="profile-modal-help">
                     <?php echo t_h('multiuser.admin.oidc_subject_help', [], 'Optional: UUID from your OIDC provider (LLDAP, Authelia, etc.)'); ?>
@@ -524,7 +541,7 @@ $v = getAppVersion();
             </div>
         </div>
     </div>
-    
+
     <!-- Account Access Modal -->
     <div class="modal" id="accessModal">
         <div class="modal-content account-access-modal-content">
@@ -534,6 +551,7 @@ $v = getAppVersion();
             </p>
             <form method="POST">
                 <input type="hidden" name="action" value="update_account_access">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($adminUsersCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <input type="hidden" name="user_id" id="access_user_id">
 
                 <div class="account-access-list">
@@ -564,13 +582,14 @@ $v = getAppVersion();
             <p id="delete_message"></p>
             <form method="POST">
                 <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($adminUsersCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <input type="hidden" name="user_id" id="delete_user_id">
-                
+
                 <p class="delete-warning">
-                    <i class="lucide-alert-triangle"></i> 
+                    <i class="lucide-alert-triangle"></i>
                     <?php echo t_h('multiuser.admin.delete_warning_all_data', [], 'All user data (notes, attachments, etc.) will be permanently deleted.'); ?>
                 </p>
-                
+
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                     <button type="submit" class="btn btn-danger"><?php echo t_h('common.delete', [], 'Delete'); ?></button>
@@ -584,7 +603,7 @@ $v = getAppVersion();
         <div class="modal-content" style="max-width: 600px;">
             <h2 class="modal-title"><?php echo t_h('multiuser.admin.confirm_admin.title', [], 'Confirm Promotion to Administrator'); ?></h2>
             <p id="admin_confirm_message"></p>
-            
+
             <div class="admin-privileges-box" style="background: var(--bg-secondary); padding: 15px; border-radius: 8px; margin: 15px 0; border: 1px solid var(--border-color);">
                 <p style="font-weight: bold; margin-bottom: 10px; color: var(--text-primary);">
                     <?php echo t_h('multiuser.admin.confirm_admin.privileges_title', [], 'The administrator will be able to:'); ?>
@@ -603,7 +622,7 @@ $v = getAppVersion();
             </div>
         </div>
     </div>
-    
+
     <!-- Password Management Modal -->
     <div class="modal" id="passwordModal">
         <div class="modal-content password-modal-content">
@@ -617,14 +636,14 @@ $v = getAppVersion();
             <div class="password-meta-row">
                 <div id="pw_status" class="password-status-text"></div>
             </div>
-            
+
             <div class="form-group password-form-group">
                 <input type="password" id="pw_new_password" placeholder="<?php echo t_h('multiuser.admin.new_password', [], 'New password'); ?>" autocomplete="new-password">
             </div>
-            
+
             <div id="pw_error" class="password-feedback password-feedback-error" style="display: none;"></div>
             <div id="pw_success" class="password-feedback password-feedback-success" style="display: none;"></div>
-            
+
             <div class="form-actions password-modal-actions">
                 <button type="button" class="btn btn-danger" onclick="closeModal('passwordModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-secondary" id="pw_reset_btn" onclick="resetPasswordToDefault()"><?php echo t_h('multiuser.admin.password_management.reset_to_default', [], 'Reset to default'); ?></button>
@@ -638,7 +657,7 @@ $v = getAppVersion();
          ======================================== -->
     <script>
         // === Modal Management ===
-        
+
         /**
          * Open the create user modal
          */
@@ -646,7 +665,7 @@ $v = getAppVersion();
             document.getElementById('createModal').classList.add('active');
 
         }
-        
+
         /**
          * Open the delete user confirmation modal
          */
@@ -656,16 +675,16 @@ $v = getAppVersion();
             document.getElementById('delete_message').textContent = messageTemplate.replace('NAME_HOLDER', username);
             document.getElementById('deleteModal').classList.add('active');
         }
-        
+
         /**
          * Close a modal by ID
          */
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
-        
+
         // === Password Management ===
-        
+
         function setPasswordStatusDisplay(data) {
             var statusEl = document.getElementById('pw_status');
             var statusSummary = document.getElementById('pw_status_summary');
@@ -725,22 +744,22 @@ $v = getAppVersion();
             document.getElementById('passwordModal').classList.add('active');
             loadPasswordStatus(userId);
         }
-        
+
         function setNewPassword() {
             var userId = document.getElementById('pw_user_id').value;
             var newPw = document.getElementById('pw_new_password').value;
             var errorEl = document.getElementById('pw_error');
             var successEl = document.getElementById('pw_success');
-            
+
             errorEl.style.display = 'none';
             successEl.style.display = 'none';
-            
+
             if (!newPw || newPw.length < 4) {
                 errorEl.textContent = <?php echo json_encode(t('password.errors.too_short', [], 'Password must be at least 4 characters')); ?>;
                 errorEl.style.display = 'block';
                 return;
             }
-            
+
             fetch('/api/v1/admin/users/' + userId + '/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -761,15 +780,15 @@ $v = getAppVersion();
                 errorEl.style.display = 'block';
             });
         }
-        
+
         function resetPasswordToDefault() {
             var userId = document.getElementById('pw_user_id').value;
             var errorEl = document.getElementById('pw_error');
             var successEl = document.getElementById('pw_success');
-            
+
             errorEl.style.display = 'none';
             successEl.style.display = 'none';
-            
+
             fetch('/api/v1/admin/users/' + userId + '/reset-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -792,7 +811,7 @@ $v = getAppVersion();
         }
 
         // === Event Listeners ===
-        
+
         // Close modal when clicking outside
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', function(e) {
@@ -807,7 +826,7 @@ $v = getAppVersion();
                 openPasswordModal(this.getAttribute('data-user-id'), this.getAttribute('data-username'));
             });
         });
-        
+
         // Close modal when pressing Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
@@ -819,6 +838,4 @@ $v = getAppVersion();
     </script>
 </body>
 </html>
-
-
 
