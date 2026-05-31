@@ -22,17 +22,11 @@ if (!oidc_is_enabled()) {
 // This specifies where to redirect the user after successful authentication
 $redirectAfter = $_GET['redirect'] ?? null;
 
-// Retrieve the remember me parameter
-$rememberMe = isset($_GET['remember_me']) && $_GET['remember_me'] === '1';
-
 // Sanitize and validate redirect parameter to prevent open redirect vulnerabilities
 // Only allow relative paths within the application (no external URLs or protocol-relative URLs)
 $redirectAfter = oidc_sanitize_redirect($redirectAfter);
 
 try {
-    // Store remember me preference in session
-    $_SESSION['oidc_remember_me'] = $rememberMe;
-    
     // Build the OIDC authorization URL and redirect the user to the identity provider
     $url = oidc_build_authorization_url($redirectAfter);
     header('Location: ' . $url);
