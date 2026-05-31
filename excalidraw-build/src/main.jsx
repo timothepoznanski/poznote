@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Excalidraw, exportToCanvas } from '@excalidraw/excalidraw';
 import _ from 'lodash';

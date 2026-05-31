@@ -1,4 +1,4 @@
-import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import { useRef, useImperativeHandle, forwardRef } from 'react';
 import { Excalidraw, exportToCanvas } from '@excalidraw/excalidraw';
 
 const PoznoteExcalidraw = forwardRef((props, ref) => {
