@@ -698,14 +698,121 @@ function getUserTimezone() {
     }
     
     // Use the global settings cache
-    $timezone = getSetting('timezone', '');
-    if ($timezone && $timezone !== '') {
-        $cached = $timezone;
-        return $cached;
+    $timezone = trim((string) getSetting('timezone', ''));
+    if ($timezone !== '') {
+        try {
+            new DateTimeZone($timezone);
+            $cached = $timezone;
+            return $cached;
+        } catch (Exception $e) {
+            // Fall back below if an old or manually edited setting is invalid.
+        }
     }
     
-    $cached = defined('DEFAULT_TIMEZONE') ? DEFAULT_TIMEZONE : 'UTC';
+    $fallbackTimezone = defined('DEFAULT_TIMEZONE') ? DEFAULT_TIMEZONE : 'UTC';
+    try {
+        new DateTimeZone($fallbackTimezone);
+        $cached = $fallbackTimezone;
+    } catch (Exception $e) {
+        $cached = 'UTC';
+    }
     return $cached;
+}
+
+/**
+ * Date/time display formats supported by the user preference.
+ */
+function getDateTimeFormatPatterns() {
+    return [
+        'default' => 'Y-m-d H:i',
+        'ymd_hi' => 'Y-m-d H:i',
+        'ymd_his' => 'Y-m-d H:i:s',
+        'dmy_hi' => 'd/m/Y H:i',
+        'mdy_hia' => 'm/d/Y h:i A',
+    ];
+}
+
+function isCustomDateTimeFormat($format) {
+    return is_string($format) && strpos($format, 'custom:') === 0;
+}
+
+function getCustomDateTimeFormatPattern($format) {
+    return trim(substr((string) $format, 7));
+}
+
+function normalizeCustomDateTimePattern($pattern) {
+    $pattern = trim((string) $pattern);
+    $pattern = preg_replace('/\\b(HH|hh|h):MM:SS\\b/', '$1:mm:ss', $pattern);
+    $pattern = preg_replace('/\\b(HH|hh|h):MM\\b/', '$1:mm', $pattern);
+    return $pattern;
+}
+
+function customDateTimePatternToPhpFormat($pattern) {
+    $pattern = normalizeCustomDateTimePattern($pattern);
+    $tokens = [
+        'YYYY' => 'Y',
+        'YY' => 'y',
+        'MM' => 'm',
+        'DD' => 'd',
+        'HH' => 'H',
+        'hh' => 'h',
+        'h' => 'g',
+        'mm' => 'i',
+        'ss' => 's',
+        'SS' => 's',
+        'A' => 'A',
+        'a' => 'a',
+    ];
+
+    $format = '';
+    $length = strlen($pattern);
+    for ($i = 0; $i < $length; $i++) {
+        $matched = false;
+        foreach ($tokens as $token => $phpToken) {
+            $tokenLength = strlen($token);
+            if (substr($pattern, $i, $tokenLength) === $token) {
+                $format .= $phpToken;
+                $i += $tokenLength - 1;
+                $matched = true;
+                break;
+            }
+        }
+        if ($matched) {
+            continue;
+        }
+
+        $char = $pattern[$i];
+        $format .= ctype_alpha($char) ? '\\' . $char : $char;
+    }
+
+    return $format;
+}
+
+function getUserDateTimeFormat() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $format = getSetting('date_time_format', 'default');
+    $patterns = getDateTimeFormatPatterns();
+    if (isCustomDateTimeFormat($format) && getCustomDateTimeFormatPattern($format) !== '') {
+        $cached = $format;
+        return $cached;
+    }
+
+    $cached = array_key_exists($format, $patterns) ? $format : 'default';
+    return $cached;
+}
+
+function getUserDateTimeFormatPattern() {
+    $format = getUserDateTimeFormat();
+    if (isCustomDateTimeFormat($format)) {
+        return customDateTimePatternToPhpFormat(getCustomDateTimeFormatPattern($format));
+    }
+
+    $patterns = getDateTimeFormatPatterns();
+    return $patterns[$format] ?? null;
 }
 
 /**
@@ -727,6 +834,22 @@ function convertUtcToUserTimezone($utcDatetime, $format = 'Y-m-d H:i:s') {
 }
 
 /**
+ * Format a UTC datetime string for display using the user's timezone and format preference.
+ */
+function formatUtcDateTimeForDisplay($utcDatetime, $defaultFormat = 'Y-m-d H:i') {
+    if (empty($utcDatetime)) return '';
+    try {
+        $userTz = getUserTimezone();
+        $date = new DateTime($utcDatetime, new DateTimeZone('UTC'));
+        $date->setTimezone(new DateTimeZone($userTz));
+        $pattern = getUserDateTimeFormatPattern();
+        return $date->format($pattern ?: $defaultFormat);
+    } catch (Exception $e) {
+        return '';
+    }
+}
+
+/**
  * Format a timestamp for display (with i18n support)
  * @param int $timestamp Unix timestamp
  * @param string $format Date format (default: 'j M Y H:i')
@@ -737,9 +860,14 @@ function formatDateTime($timestamp) {
     try {
         $date = new DateTime('@' . $timestamp);
         $date->setTimezone(new DateTimeZone($timezone));
+        $pattern = getUserDateTimeFormatPattern();
+        if ($pattern) {
+            return $date->format($pattern);
+        }
         return $date->format('j M Y') . ' ' . t('common.at', [], 'at') . ' ' . $date->format('H:i');
     } catch (Exception $e) {
-        return date('j M Y H:i', $timestamp);
+        $pattern = getUserDateTimeFormatPattern();
+        return date($pattern ?: 'j M Y H:i', $timestamp);
     }
 }
 

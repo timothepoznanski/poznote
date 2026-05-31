@@ -296,7 +296,9 @@ function displayAttachments(attachments) {
     for (var i = 0; i < attachments.length; i++) {
         var attachment = attachments[i];
         var fileSize = formatFileSize(attachment.file_size);
-        var uploadDate = new Date(attachment.uploaded_at).toLocaleDateString();
+        var uploadDate = typeof window.poznoteFormatDateTime === 'function'
+            ? window.poznoteFormatDateTime(attachment.uploaded_at, { defaultDateOnly: true })
+            : new Date(attachment.uploaded_at).toLocaleDateString();
 
         html += '<div class="attachment-item">';
         html += '<div class="attachment-info">';

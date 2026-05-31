@@ -43,6 +43,7 @@ $currentLang = getUserLanguage();
 </head>
 <body class="notes-manager-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
+      data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
       data-txt-loading="<?php echo t_h('common.loading', [], 'Loading...'); ?>"
@@ -231,6 +232,7 @@ $currentLang = getUserLanguage();
 	</div>
 
 	<script src="js/navigation.js"></script>
+	<script src="js/date-time-format.js"></script>
 	<script src="js/notes-manager.js"></script>
 </body>
 </html>

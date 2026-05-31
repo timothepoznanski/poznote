@@ -98,7 +98,7 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
     <script src="js/theme-manager.js"></script>
 </head>
-<body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">
     <div class="trash-container">
         
         <?php if (!empty($search)): ?>
@@ -281,6 +281,7 @@ $currentLang = getUserLanguage();
     <script src="js/workspaces.js?v=<?php echo getAppVersion(); ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
     <script src="js/notes.js"></script>
     <script src="js/ui.js"></script>
+    <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : getAppVersion(); ?>"></script>
     <script src="js/attachments.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/search-highlight.js"></script>

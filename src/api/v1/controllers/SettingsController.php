@@ -65,6 +65,38 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        if ($key === 'date_time_format') {
+            $normalized = trim((string) $value);
+            $allowedFormats = ['default', 'ymd_hi', 'ymd_his', 'dmy_hi', 'mdy_hia'];
+            if (strpos($normalized, 'custom:') === 0) {
+                $customPattern = trim(substr($normalized, 7));
+                if ($customPattern === '' || strlen($customPattern) > 80) {
+                    throw new InvalidArgumentException('invalid date time format', 400);
+                }
+                if (!preg_match('/^[A-Za-z0-9\\s:\\/.,_\\-()]+$/', $customPattern)) {
+                    throw new InvalidArgumentException('invalid date time format', 400);
+                }
+                return 'custom:' . $customPattern;
+            }
+            if (!in_array($normalized, $allowedFormats, true)) {
+                throw new InvalidArgumentException('invalid date time format', 400);
+            }
+            return $normalized;
+        }
+
+        if ($key === 'timezone') {
+            $normalized = trim((string) $value);
+            if ($normalized === '') {
+                return '';
+            }
+            try {
+                new DateTimeZone($normalized);
+            } catch (Exception $e) {
+                throw new InvalidArgumentException('invalid timezone', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'mcp_user_id') {
             $intVal = (int) $value;
             if ($intVal < 1) {

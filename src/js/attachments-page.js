@@ -276,7 +276,9 @@
         var html = '';
         visibleAttachments.forEach(function (attachment) {
             var fileSize = formatFileSize(attachment.file_size);
-            var uploadDate = new Date(attachment.uploaded_at).toLocaleDateString();
+            var uploadDate = typeof window.poznoteFormatDateTime === 'function'
+                ? window.poznoteFormatDateTime(attachment.uploaded_at, { defaultDateOnly: true })
+                : new Date(attachment.uploaded_at).toLocaleDateString();
             var fileName = attachment.original_filename;
             var shortName = fileName.length > 40 ? fileName.substring(0, 40) + '...' : fileName;
 

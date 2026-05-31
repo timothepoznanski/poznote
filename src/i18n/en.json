@@ -205,6 +205,7 @@
       "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
       "timezone": "Timezone",
+      "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",
       "show_folder_counts": "Show folder note counts",
       "notes_without_folders_after": "Show notes after folders",
@@ -700,6 +701,21 @@
         "pacific": "Pacific",
         "africa": "Africa"
       }
+    },
+    "date_time_format": {
+      "title": "Date & time format",
+      "description": "Choose how dates and times are displayed:",
+      "options": {
+        "default": "YYYY-MM-DD HH:mm",
+        "ymd_hi": "YYYY-MM-DD HH:mm",
+        "ymd_his": "YYYY-MM-DD HH:mm:ss",
+        "dmy_hi": "DD/MM/YYYY HH:mm",
+        "mdy_hia": "MM/DD/YYYY hh:mm AM/PM",
+        "custom": "Custom"
+      },
+      "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
+      "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
+      "custom_invalid": "Enter a valid custom format."
     }
   },
   "notes_list": {

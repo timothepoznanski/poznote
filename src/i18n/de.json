@@ -543,6 +543,7 @@
       "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "timezone": "Zeitzone",
+      "date_time_format": "Datums- und Uhrzeitformat",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
       "show_folder_counts": "Ordner-Notizzähler anzeigen",
       "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
@@ -1109,6 +1110,21 @@
         "pacific": "Pazifik",
         "africa": "Afrika"
       }
+    },
+    "date_time_format": {
+      "title": "Datums- und Uhrzeitformat",
+      "description": "Wählen Sie, wie Datum und Uhrzeit angezeigt werden:",
+      "options": {
+        "default": "YYYY-MM-DD HH:mm",
+        "ymd_hi": "YYYY-MM-DD HH:mm",
+        "ymd_his": "YYYY-MM-DD HH:mm:ss",
+        "dmy_hi": "DD/MM/YYYY HH:mm",
+        "mdy_hia": "MM/DD/YYYY hh:mm AM/PM",
+        "custom": "Benutzerdefiniert"
+      },
+      "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
+      "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
+      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format ein."
     },
     "move_folder": {
       "title": "Ordner verschieben",

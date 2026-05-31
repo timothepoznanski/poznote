@@ -345,7 +345,8 @@ if ($isPublicWorkspaceReadonly) {
     <!-- Global configuration (CSP compliant) -->
     <script type="application/json" id="poznote-config"><?php
         echo json_encode([
-            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled())
+            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
+            'dateTimeFormat' => getUserDateTimeFormat()
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
@@ -947,14 +948,11 @@ if ($isPublicWorkspaceReadonly) {
                     echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
-                    if (!empty($final_created)) {
-                        try {
-                            // Use the already-converted timezone date from above
-                            $dt = new DateTime($final_created);
-                            $created_display = $dt->format('d/m/Y H:i');
-                        } catch (Exception $e) {
-                            $created_display = '';
-                        }
+                    if (!empty($created_clean)) {
+                        $created_display = formatUtcDateTimeForDisplay($created_clean, 'd/m/Y H:i');
+                    }
+                    if ($created_display === '' && !empty($final_created)) {
+                        $created_display = $final_created;
                     }
                 
                     $has_created = !empty($created_display) && $show_note_created_setting;
@@ -1075,6 +1073,7 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/notes.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/note-edit-lock.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/note-edit-lock.js') ?: time(); ?>"></script>
+<script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : $v; ?>"></script>
 <script src="js/attachments.js"></script>
 <script src="js/tags-modal.js"></script>
 <!-- Event management modules -->

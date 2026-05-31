@@ -377,6 +377,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Date and Time Format -->
+            <div class="home-card" id="date-time-format-card">
+                <div class="home-card-icon"><i class="lucide lucide-calendar"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span>
+                    <span id="date-time-format-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Note Sort Order -->
             <div class="home-card" id="note-sort-card">
                 <div class="home-card-icon"><i class="lucide lucide-arrow-up-down-amount-down"></i></div>

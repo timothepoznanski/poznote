@@ -205,6 +205,7 @@
       "note_age_filter": "Фильтр по дате",
       "tasklist_insert_order": "Позиция новых задач",
       "timezone": "Часовой пояс",
+      "date_time_format": "Формат даты и времени",
       "show_note_created": "Показывать дату создания",
       "show_folder_counts": "Показывать количество заметок в папках",
       "notes_without_folders_after": "Показывать заметки после папок",
@@ -693,6 +694,21 @@
         "pacific": "Тихий океан",
         "africa": "Африка"
       }
+    },
+    "date_time_format": {
+      "title": "Формат даты и времени",
+      "description": "Выберите, как отображаются даты и время:",
+      "options": {
+        "default": "YYYY-MM-DD HH:mm",
+        "ymd_hi": "YYYY-MM-DD HH:mm",
+        "ymd_his": "YYYY-MM-DD HH:mm:ss",
+        "dmy_hi": "DD/MM/YYYY HH:mm",
+        "mdy_hia": "MM/DD/YYYY hh:mm AM/PM",
+        "custom": "Пользовательский"
+      },
+      "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
+      "custom_hint": "Токены: YYYY, MM, DD, HH, h, hh, mm, ss, A",
+      "custom_invalid": "Введите допустимый пользовательский формат."
     }
   },
   "notes_list": {

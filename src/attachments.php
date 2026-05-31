@@ -198,7 +198,8 @@ try {
     <!-- Global configuration (CSP compliant) -->
     <script type="application/json" id="poznote-config"><?php
         echo json_encode([
-            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled())
+            'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
+            'dateTimeFormat' => getUserDateTimeFormat()
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
@@ -267,6 +268,7 @@ try {
         <div class="section-bottom-spacer"></div>
     </div>
 
+    <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : $v; ?>"></script>
     <script src="js/attachments-page.js?v=<?php echo $v; ?>"></script>
     
     <!-- Delete Attachment Confirmation Modal -->

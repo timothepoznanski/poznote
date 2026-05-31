@@ -751,6 +751,29 @@
     </div>
 </div>
 
+<!-- Date and time format modal -->
+<div id="dateTimeFormatModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.date_time_format.title', [], 'Date & time format'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.date_time_format.description', [], 'Choose how dates and times are displayed:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="dateTimeFormat" value="default"> <?php echo t_h('modals.date_time_format.options.default', [], 'YYYY-MM-DD HH:mm'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="ymd_his"> <?php echo t_h('modals.date_time_format.options.ymd_his', [], 'YYYY-MM-DD HH:mm:ss'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="dmy_hi"> <?php echo t_h('modals.date_time_format.options.dmy_hi', [], 'DD/MM/YYYY HH:mm'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="mdy_hia"> <?php echo t_h('modals.date_time_format.options.mdy_hia', [], 'MM/DD/YYYY hh:mm AM/PM'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="custom"> <?php echo t_h('modals.date_time_format.options.custom', [], 'Custom'); ?></label>
+                <input type="text" id="dateTimeFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.date_time_format.custom_placeholder', [], 'YYYY-MM-DD HH:mm:ss'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
+                <small style="display: block; margin: 4px 0 0 24px; color: #6b7280;"><?php echo t_h('modals.date_time_format.custom_hint', [], 'Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A'); ?></small>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="dateTimeFormatModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveDateTimeFormatModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note Reference Modal -->
 <div id="noteReferenceModal" class="modal">
     <div class="modal-content note-reference-modal-content">
@@ -1123,6 +1146,7 @@
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-sort-card" checked><span><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>

@@ -38,6 +38,13 @@ function toLocalDateTimeInputValue(date) {
         .toISOString().slice(0, 16);
 }
 
+function formatReminderDateTime(date) {
+    if (typeof window.poznoteFormatDateTime === 'function') {
+        return window.poznoteFormatDateTime(date);
+    }
+    return date.toLocaleString();
+}
+
 function restoreInitialReminderPreview(currentInfo, currentDate) {
     if (reminderHasInitialReminder && reminderInitialDisplayText) {
         currentDate.textContent = reminderInitialDisplayText;
@@ -120,7 +127,7 @@ function syncReminderPreviewFromInput() {
         return false;
     }
 
-    currentDate.textContent = selectedDate.toLocaleString();
+    currentDate.textContent = formatReminderDateTime(selectedDate);
     currentInfo.classList.remove('initially-hidden');
     return canSave;
 }
@@ -151,7 +158,7 @@ function openReminderModal(noteId, currentReminderAt) {
     // Show current reminder if exists
     if (currentReminderAt) {
         const reminderDate = parseReminderDate(currentReminderAt);
-        reminderInitialDisplayText = reminderDate ? reminderDate.toLocaleString() : currentReminderAt;
+        reminderInitialDisplayText = reminderDate ? formatReminderDateTime(reminderDate) : currentReminderAt;
         reminderHasInitialReminder = true;
         currentDate.textContent = reminderInitialDisplayText;
         currentInfo.classList.remove('initially-hidden');
@@ -233,7 +240,7 @@ function saveReminder() {
             closeReminderModal();
             if (typeof showNotification === 'function') {
                 showNotification(
-                    (window.t?.('reminder.set_success') || 'Reminder set for') + ' ' + localDate.toLocaleString(),
+                    (window.t?.('reminder.set_success') || 'Reminder set for') + ' ' + formatReminderDateTime(localDate),
                     'success'
                 );
             }

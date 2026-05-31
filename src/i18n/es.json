@@ -543,6 +543,7 @@
       "note_age_filter": "Filtro de antigüedad",
       "tasklist_insert_order": "Orden de inserción de tareas",
       "timezone": "Zona horaria",
+      "date_time_format": "Formato de fecha y hora",
       "show_note_created": "Mostrar fecha de creación de la nota",
       "show_folder_counts": "Mostrar conteo de notas de carpetas",
       "notes_without_folders_after": "Mostrar notas después de las carpetas",
@@ -1109,6 +1110,21 @@
         "pacific": "Pacífico",
         "africa": "África"
       }
+    },
+    "date_time_format": {
+      "title": "Formato de fecha y hora",
+      "description": "Elige cómo se muestran las fechas y horas:",
+      "options": {
+        "default": "YYYY-MM-DD HH:mm",
+        "ymd_hi": "YYYY-MM-DD HH:mm",
+        "ymd_his": "YYYY-MM-DD HH:mm:ss",
+        "dmy_hi": "DD/MM/YYYY HH:mm",
+        "mdy_hia": "MM/DD/YYYY hh:mm AM/PM",
+        "custom": "Personalizado"
+      },
+      "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
+      "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
+      "custom_invalid": "Introduce un formato personalizado válido."
     },
     "move_folder": {
       "title": "Mover carpeta",

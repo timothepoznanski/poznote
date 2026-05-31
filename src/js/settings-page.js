@@ -376,6 +376,65 @@
         });
     }
 
+    function normalizeDateTimeFormat(value) {
+        if (typeof value === 'string' && value.indexOf('custom:') === 0 && value.slice(7).trim() !== '') {
+            return 'custom:' + value.slice(7).trim();
+        }
+
+        var allowed = {
+            default: true,
+            ymd_hi: true,
+            ymd_his: true,
+            dmy_hi: true,
+            mdy_hia: true
+        };
+        return allowed[value] ? value : 'default';
+    }
+
+    function getCustomDateTimeFormatPattern(value) {
+        return (typeof value === 'string' && value.indexOf('custom:') === 0) ? value.slice(7).trim() : '';
+    }
+
+    function isValidCustomDateTimeFormat(pattern) {
+        return typeof pattern === 'string'
+            && pattern.trim() !== ''
+            && pattern.trim().length <= 80
+            && /^[A-Za-z0-9\s:\/.,_\-()]+$/.test(pattern.trim());
+    }
+
+    function getDateTimeFormatLabel(value) {
+        var normalized = normalizeDateTimeFormat(value);
+        var customPattern = getCustomDateTimeFormatPattern(normalized);
+        if (customPattern) {
+            return customPattern;
+        }
+
+        switch (normalized) {
+            case 'ymd_hi':
+                return tr('modals.date_time_format.options.ymd_hi', {}, 'YYYY-MM-DD HH:mm');
+            case 'ymd_his':
+                return tr('modals.date_time_format.options.ymd_his', {}, 'YYYY-MM-DD HH:mm:ss');
+            case 'dmy_hi':
+                return tr('modals.date_time_format.options.dmy_hi', {}, 'DD/MM/YYYY HH:mm');
+            case 'mdy_hia':
+                return tr('modals.date_time_format.options.mdy_hia', {}, 'MM/DD/YYYY hh:mm AM/PM');
+            case 'default':
+            default:
+                return tr('modals.date_time_format.options.default', {}, 'YYYY-MM-DD HH:mm');
+        }
+    }
+
+    function refreshDateTimeFormatBadge() {
+        getSetting('date_time_format', function (value) {
+            var badge = document.getElementById('date-time-format-badge');
+            if (!badge) return;
+
+            var format = normalizeDateTimeFormat(value || 'default');
+            badge.textContent = getDateTimeFormatLabel(format);
+            badge.className = 'setting-status enabled';
+        });
+    }
+
     function refreshCustomCssBadge() {
         var badge = document.getElementById('custom-css-badge');
         if (!badge) return;
@@ -663,6 +722,31 @@
         });
     }
 
+    function openDateTimeFormatModal() {
+        var modal = document.getElementById('dateTimeFormatModal');
+        if (!modal) return;
+
+        getSetting('date_time_format', function (value) {
+            var currentValue = normalizeDateTimeFormat(value || 'default');
+            var customPattern = getCustomDateTimeFormatPattern(currentValue);
+            var customInput = document.getElementById('dateTimeFormatCustomInput');
+            if (currentValue === 'ymd_hi') {
+                currentValue = 'default';
+            }
+            if (customPattern) {
+                currentValue = 'custom';
+            }
+            var radios = document.getElementsByName('dateTimeFormat');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].checked = (radios[i].value === currentValue);
+            }
+            if (customInput) {
+                customInput.value = customPattern;
+            }
+            modal.style.display = 'flex';
+        });
+    }
+
 
 
     // ========== Initialization ==========
@@ -783,6 +867,19 @@
         var timezoneCard = document.getElementById('timezone-card');
         if (timezoneCard) {
             timezoneCard.addEventListener('click', showTimezonePrompt);
+        }
+
+        var dateTimeFormatCard = document.getElementById('date-time-format-card');
+        if (dateTimeFormatCard) {
+            dateTimeFormatCard.addEventListener('click', openDateTimeFormatModal);
+        }
+
+        var customDateTimeFormatInput = document.getElementById('dateTimeFormatCustomInput');
+        if (customDateTimeFormatInput) {
+            customDateTimeFormatInput.addEventListener('focus', function () {
+                var customRadio = document.querySelector('input[name="dateTimeFormat"][value="custom"]');
+                if (customRadio) customRadio.checked = true;
+            });
         }
 
         // Import limits card - opens modal
@@ -1010,6 +1107,41 @@
             });
         }
 
+        // Save date and time format modal button
+        var saveDateTimeFormatBtn = document.getElementById('saveDateTimeFormatModalBtn');
+        if (saveDateTimeFormatBtn) {
+            saveDateTimeFormatBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('dateTimeFormat');
+                var selected = 'default';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+
+                if (selected === 'custom') {
+                    var customInput = document.getElementById('dateTimeFormatCustomInput');
+                    var customPattern = customInput ? customInput.value.trim() : '';
+                    if (!isValidCustomDateTimeFormat(customPattern)) {
+                        alert(tr('modals.date_time_format.custom_invalid', {}, 'Enter a valid custom format.'));
+                        if (customInput) customInput.focus();
+                        return;
+                    }
+                    selected = 'custom:' + customPattern;
+                } else {
+                    selected = normalizeDateTimeFormat(selected);
+                }
+
+                setSetting('date_time_format', selected, function (success) {
+                    if (success) {
+                        try { closeModal('dateTimeFormatModal'); } catch (e) { }
+                        refreshDateTimeFormatBadge();
+                        reloadOpener();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
         // Save theme modal button
         var saveThemeBtn = document.getElementById('saveThemeModalBtn');
         if (saveThemeBtn) {
@@ -1153,6 +1285,7 @@
         refreshTasklistInsertOrderBadge();
         refreshToolbarModeBadge();
         refreshTimezoneBadge();
+        refreshDateTimeFormatBadge();
         refreshNoteWidthBadge();
         refreshIndexIconScaleBadge();
         refreshCustomCssBadge();
@@ -1225,6 +1358,7 @@
             refreshNoteAgeFilterBadge();
             refreshTasklistInsertOrderBadge();
             refreshToolbarModeBadge();
+            refreshDateTimeFormatBadge();
             refreshInstallAppBadge();
             refreshCustomCssBadge();
         });
@@ -1394,6 +1528,7 @@
     window.openNoteSortModal = openNoteSortModal;
     window.openNoteAgeFilterModal = openNoteAgeFilterModal;
     window.showTimezonePrompt = showTimezonePrompt;
+    window.openDateTimeFormatModal = openDateTimeFormatModal;
     window.refreshLanguageBadge = refreshLanguageBadge;
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
@@ -1402,6 +1537,7 @@
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
+    window.refreshDateTimeFormatBadge = refreshDateTimeFormatBadge;
     window.refreshNoteWidthBadge = refreshNoteWidthBadge;
     window.refreshCustomCssBadge = refreshCustomCssBadge;
     window.getSetting = getSetting;

@@ -543,6 +543,7 @@
       "note_age_filter": "笔记时间筛选",
       "tasklist_insert_order": "任务列表插入顺序",
       "timezone": "时区",
+      "date_time_format": "日期和时间格式",
       "show_note_created": "显示笔记创建日期",
       "show_folder_counts": "显示文件夹笔记数量",
       "notes_without_folders_after": "在文件夹后显示笔记",
@@ -1109,6 +1110,21 @@
         "pacific": "太平洋",
         "africa": "非洲"
       }
+    },
+    "date_time_format": {
+      "title": "日期和时间格式",
+      "description": "选择日期和时间的显示方式：",
+      "options": {
+        "default": "YYYY-MM-DD HH:mm",
+        "ymd_hi": "YYYY-MM-DD HH:mm",
+        "ymd_his": "YYYY-MM-DD HH:mm:ss",
+        "dmy_hi": "DD/MM/YYYY HH:mm",
+        "mdy_hia": "MM/DD/YYYY hh:mm AM/PM",
+        "custom": "自定义"
+      },
+      "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
+      "custom_hint": "标记：YYYY、MM、DD、HH、h、hh、mm、ss、A",
+      "custom_invalid": "请输入有效的自定义格式。"
     }
   },
   "notes_list": {

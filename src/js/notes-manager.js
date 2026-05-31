@@ -86,6 +86,9 @@
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
+        if (typeof window.poznoteFormatDateTime === 'function') {
+            return window.poznoteFormatDateTime(dateStr, { defaultDateOnly: true, utc: true });
+        }
         var d = new Date(dateStr.replace(' ', 'T') + 'Z');
         if (isNaN(d.getTime())) return dateStr;
         return d.toLocaleDateString();
