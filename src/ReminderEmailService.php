@@ -24,16 +24,25 @@ class ReminderEmailService {
             $port = $security === 'ssl' ? 465 : 587;
         }
 
+        $host = trim((string)getGlobalSetting('smtp_host', ''));
+        $fromEmail = trim((string)getGlobalSetting('smtp_from_email', ''));
+        $configured = $host !== '' && filter_var($fromEmail, FILTER_VALIDATE_EMAIL);
+
+        $appUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+        if ($appUrl === '' && function_exists('_env')) {
+            $appUrl = rtrim(trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))), '/');
+        }
+
         return [
-            'enabled' => $this->isTruthy(getGlobalSetting('smtp_enabled', '0')),
-            'host' => trim((string)getGlobalSetting('smtp_host', '')),
+            'enabled' => $configured,
+            'host' => $host,
             'port' => $port,
             'security' => $security,
             'username' => (string)getGlobalSetting('smtp_username', ''),
             'password' => (string)getGlobalSetting('smtp_password', ''),
-            'from_email' => trim((string)getGlobalSetting('smtp_from_email', '')),
+            'from_email' => $fromEmail,
             'from_name' => trim((string)getGlobalSetting('smtp_from_name', 'Poznote')),
-            'app_url' => rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/'),
+            'app_url' => $appUrl,
             'reminder_cutoff_at' => trim((string)getGlobalSetting('smtp_reminder_cutoff_at', '')),
             'timeout' => 15,
         ];
@@ -197,6 +206,7 @@ class ReminderEmailService {
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             trigger_at DATETIME,
             dismissed INTEGER DEFAULT 0,
+            email_enabled INTEGER DEFAULT 1,
             email_sent_at DATETIME,
             email_attempts INTEGER DEFAULT 0,
             email_last_attempt_at DATETIME,
@@ -208,6 +218,7 @@ class ReminderEmailService {
         $existing = array_column($cols, 'name');
 
         $columns = [
+            'email_enabled' => 'INTEGER DEFAULT 1',
             'email_sent_at' => 'DATETIME',
             'email_attempts' => 'INTEGER DEFAULT 0',
             'email_last_attempt_at' => 'DATETIME',
@@ -235,6 +246,7 @@ class ReminderEmailService {
             WHERE n.dismissed = 0
               AND n.trigger_at <= ?
               AND n.trigger_at >= ?
+              AND COALESCE(n.email_enabled, 1) = 1
               AND n.email_sent_at IS NULL
               AND COALESCE(n.email_attempts, 0) < ?
               AND (n.email_last_attempt_at IS NULL OR n.email_last_attempt_at <= ?)
@@ -338,7 +350,8 @@ class ReminderEmailService {
 
         if ($noteUrl !== '') {
             $safeUrl = htmlspecialchars($noteUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $html .= '<p><a href="' . $safeUrl . '">' . htmlspecialchars(t('reminder.email.open_button', [], 'Open note', $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a></p>';
+            $html .= '<p><a href="' . $safeUrl . '">' . htmlspecialchars(t('reminder.email.open_button', [], 'Open note', $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a><br>'
+                . '<span style="font-size: 12px; color: #666;">' . $safeUrl . '</span></p>';
         }
 
         return [
@@ -420,9 +433,5 @@ class ReminderEmailService {
         }
         $scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
         return in_array($scheme, ['http', 'https'], true);
-    }
-
-    private function isTruthy($value): bool {
-        return in_array(strtolower(trim((string)$value)), ['1', 'true', 'yes', 'on'], true);
     }
 }

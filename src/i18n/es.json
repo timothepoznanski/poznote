@@ -2462,15 +2462,20 @@
     },
     "hints": {
       "enabled": "Cuando está activado, el worker interno envía correos para los recordatorios vencidos a la dirección de correo de cada usuario.",
+      "security_summary": "STARTTLS suele usar el puerto 587 y cambia a TLS después de conectar. SSL/TLS se cifra desde la conexión, normalmente en el puerto 465. Ninguno no usa cifrado.",
+      "security_tls": "STARTTLS: conexión estándar y luego cambio a TLS, normalmente puerto 587.",
+      "security_ssl": "SSL/TLS: cifrado desde la conexión, normalmente puerto 465.",
+      "security_none": "Ninguno: sin cifrado, solo para un relay local o una red de confianza.",
       "password_configured": "Hay una contraseña configurada. Deje en blanco para conservarla.",
       "password_empty": "No hay contraseña configurada.",
-      "app_url": "Se usa para incluir un enlace a la nota en los correos de recordatorio. Déjelo vacío para omitir los enlaces.",
+      "app_url": "Se usa para incluir un enlace directo a la nota en los correos de recordatorio. Este valor se detecta automáticamente; edítelo si su URL pública es diferente.",
       "test_recipient": "Use esto para verificar el proveedor antes de activar los correos de recordatorio."
     },
     "test": {
       "button": "Enviar correo de prueba",
-      "success": "Configuración SMTP guardada y correo de prueba enviado.",
+      "success": "Configuración SMTP guardada y correo de prueba enviado a la dirección de correo {{email}} configurada para su cuenta por el administrador.",
       "error": "Configuración SMTP guardada, pero el correo de prueba falló: {{error}}",
+      "no_account_email": "Su cuenta no tiene una dirección de correo configurada. Póngase en contacto con un administrador para que añada una a su perfil.",
       "subject": "Prueba SMTP de Poznote",
       "body_text": "Este es un correo de prueba de Poznote.\n\nSi lo recibió, su configuración SMTP funciona.",
       "body_html_intro": "Este es un correo de prueba de Poznote.",
@@ -2509,6 +2514,8 @@
       "tomorrow": "Mañana",
       "in_1week": "1 semana",
       "remove": "Eliminar recordatorio",
+      "email_toggle": "Enviarme un correo",
+      "email_hint": "A {{email}}",
       "select_date": "Seleccione una fecha y hora",
       "past_time": "Seleccione una fecha futura"
     }

@@ -2171,15 +2171,20 @@
     },
     "hints": {
       "enabled": "When enabled, the internal worker sends emails for due reminders to each user email address.",
+      "security_summary": "STARTTLS usually uses port 587 and upgrades to TLS after connecting. SSL/TLS is encrypted from the connection, usually on port 465. None uses no encryption.",
+      "security_tls": "STARTTLS: standard connection, then upgrade to TLS, usually port 587.",
+      "security_ssl": "SSL/TLS: encrypted from the connection, usually port 465.",
+      "security_none": "None: no encryption, only for a local relay or trusted network.",
       "password_configured": "A password is configured. Leave blank to keep it.",
       "password_empty": "No password configured.",
-      "app_url": "Used to include a note link in reminder emails. Leave empty to omit links.",
+      "app_url": "Used to include a direct note link in reminder emails. This value is detected automatically; edit it if your public URL is different.",
       "test_recipient": "Use this to verify the provider before enabling reminder emails."
     },
     "test": {
       "button": "Send test email",
-      "success": "SMTP configuration saved and test email sent.",
+      "success": "SMTP configuration saved and test email sent to the email address {{email}} configured for your account by the administrator.",
       "error": "SMTP configuration saved, but the test email failed: {{error}}",
+      "no_account_email": "Your account does not have an email address configured. Contact an administrator to add one to your profile.",
       "subject": "Poznote SMTP test",
       "body_text": "This is a test email from Poznote.\n\nIf you received it, your SMTP configuration works.",
       "body_html_intro": "This is a test email from Poznote.",
@@ -2218,6 +2223,8 @@
       "tomorrow": "Tomorrow",
       "in_1week": "1 week",
       "remove": "Remove reminder",
+      "email_toggle": "Send me an email",
+      "email_hint": "To {{email}}",
       "select_date": "Please select a date and time",
       "past_time": "Please select a future time"
     }

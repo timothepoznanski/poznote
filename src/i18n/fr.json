@@ -2682,15 +2682,20 @@
     },
     "hints": {
       "enabled": "Une fois activé, le worker interne envoie les rappels arrivés à échéance à l’adresse email de chaque utilisateur.",
+      "security_summary": "STARTTLS utilise généralement le port 587 et active TLS après la connexion. SSL/TLS chiffre dès la connexion, généralement sur le port 465. Aucun n’utilise pas de chiffrement.",
+      "security_tls": "STARTTLS : connexion standard puis passage en TLS, généralement port 587.",
+      "security_ssl": "SSL/TLS : chiffrement dès la connexion, généralement port 465.",
+      "security_none": "Aucun : sans chiffrement, seulement pour un relais local ou un réseau de confiance.",
       "password_configured": "Un mot de passe est configuré. Laissez ce champ vide pour le conserver.",
       "password_empty": "Aucun mot de passe configuré.",
-      "app_url": "Utilisée pour inclure un lien vers la note dans les emails de rappel. Laissez vide pour ne pas ajouter de lien.",
+      "app_url": "Utilisée pour inclure un lien direct vers la note dans les emails de rappel. Cette valeur est détectée automatiquement ; modifiez-la si votre URL publique est différente.",
       "test_recipient": "Utilisez ce champ pour vérifier le fournisseur avant d’activer les emails de rappel."
     },
     "test": {
-      "button": "Envoyer un email de test",
-      "success": "Configuration SMTP enregistrée et email de test envoyé.",
+      "button": "Envoyer un mail de test",
+      "success": "Configuration SMTP enregistrée et email de test envoyé à l'adresse mail {{email}} configurée pour votre compte par l'administrateur.",
       "error": "Configuration SMTP enregistrée, mais l’email de test a échoué : {{error}}",
+      "no_account_email": "Votre compte n'a pas d'adresse mail configurée. Contactez un administrateur pour qu'il en ajoute une à votre profil.",
       "subject": "Test SMTP Poznote",
       "body_text": "Ceci est un email de test envoyé par Poznote.\n\nSi vous l’avez reçu, votre configuration SMTP fonctionne.",
       "body_html_intro": "Ceci est un email de test envoyé par Poznote.",
@@ -2729,6 +2734,8 @@
       "tomorrow": "Demain",
       "in_1week": "1 semaine",
       "remove": "Supprimer le rappel",
+      "email_toggle": "M’envoyer un email",
+      "email_hint": "À l’adresse {{email}}",
       "select_date": "Veuillez sélectionner une date et une heure",
       "past_time": "Veuillez sélectionner une date future"
     }

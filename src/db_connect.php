@@ -252,6 +252,7 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         trigger_at DATETIME,
         dismissed INTEGER DEFAULT 0,
+        email_enabled INTEGER DEFAULT 1,
         email_sent_at DATETIME,
         email_attempts INTEGER DEFAULT 0,
         email_last_attempt_at DATETIME,
@@ -471,6 +472,9 @@ try {
         $existingColumns = array_column($cols, 'name');
         if (!in_array('email_sent_at', $existingColumns)) {
             $con->exec("ALTER TABLE notifications ADD COLUMN email_sent_at DATETIME");
+        }
+        if (!in_array('email_enabled', $existingColumns)) {
+            $con->exec("ALTER TABLE notifications ADD COLUMN email_enabled INTEGER DEFAULT 1");
         }
         if (!in_array('email_attempts', $existingColumns)) {
             $con->exec("ALTER TABLE notifications ADD COLUMN email_attempts INTEGER DEFAULT 0");

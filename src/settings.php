@@ -105,9 +105,10 @@ if ($isAdmin) {
         require_once 'users/db_master.php';
         $users = listAllUserProfiles();
         $users_count = count($users);
-        $smtp_enabled = in_array(strtolower(trim((string)getGlobalSetting('smtp_enabled', '0'))), ['1', 'true', 'yes', 'on'], true);
+        $smtp_from_email = trim((string)getGlobalSetting('smtp_from_email', ''));
         $smtp_configured = trim((string)getGlobalSetting('smtp_host', '')) !== ''
-            && trim((string)getGlobalSetting('smtp_from_email', '')) !== '';
+            && filter_var($smtp_from_email, FILTER_VALIDATE_EMAIL);
+        $smtp_enabled = $smtp_configured;
     } catch (Exception $e) {
         $users_count = 0;
         $smtp_enabled = false;

@@ -2466,15 +2466,20 @@
     },
     "hints": {
       "enabled": "Quando ativado, o worker interno envia e-mails para lembretes vencidos para o endereço de e-mail de cada utilizador.",
+      "security_summary": "STARTTLS usa normalmente a porta 587 e muda para TLS após a ligação. SSL/TLS é encriptado desde a ligação, normalmente na porta 465. Nenhum não usa encriptação.",
+      "security_tls": "STARTTLS: ligação padrão e depois mudança para TLS, normalmente porta 587.",
+      "security_ssl": "SSL/TLS: encriptado desde a ligação, normalmente porta 465.",
+      "security_none": "Nenhum: sem encriptação, apenas para um relay local ou uma rede de confiança.",
       "password_configured": "Uma palavra-passe está configurada. Deixe em branco para a manter.",
       "password_empty": "Nenhuma palavra-passe configurada.",
-      "app_url": "Usado para incluir um link para a nota nos e-mails de lembrete. Deixe em branco para omitir os links.",
+      "app_url": "Usado para incluir um link direto para a nota nos e-mails de lembrete. Este valor é detetado automaticamente; edite-o se a sua URL pública for diferente.",
       "test_recipient": "Use este campo para verificar o fornecedor antes de ativar os e-mails de lembrete."
     },
     "test": {
       "button": "Enviar e-mail de teste",
-      "success": "Configuração SMTP guardada e e-mail de teste enviado.",
+      "success": "Configuração SMTP guardada e e-mail de teste enviado para o endereço de e-mail {{email}} configurado para a sua conta pelo administrador.",
       "error": "Configuração SMTP guardada, mas o e-mail de teste falhou: {{error}}",
+      "no_account_email": "A sua conta não tem um endereço de e-mail configurado. Contacte um administrador para adicionar um ao seu perfil.",
       "subject": "Teste SMTP do Poznote",
       "body_text": "Este é um e-mail de teste do Poznote.\n\nSe o recebeu, a sua configuração SMTP funciona.",
       "body_html_intro": "Este é um e-mail de teste do Poznote.",
@@ -2513,6 +2518,8 @@
       "tomorrow": "Amanhã",
       "in_1week": "1 semana",
       "remove": "Remover lembrete",
+      "email_toggle": "Enviar-me um e-mail",
+      "email_hint": "Para {{email}}",
       "select_date": "Selecione uma data e hora",
       "past_time": "Selecione uma data futura"
     }

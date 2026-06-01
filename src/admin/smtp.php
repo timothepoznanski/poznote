@@ -39,21 +39,59 @@ function smtp_setting(string $key, string $default = ''): string {
     return $value === null ? $default : (string)$value;
 }
 
-function smtp_setting_bool(string $key, bool $default = false): bool {
-    $value = getGlobalSetting($key, null);
-    if ($value === null) {
-        return $default;
+function smtp_detect_app_url(): string {
+    if (PHP_SAPI === 'cli') {
+        return '';
     }
-    return in_array(strtolower(trim((string)$value)), ['1', 'true', 'yes', 'on'], true);
+
+    $host = function_exists('getExternalHostWithPort')
+        ? getExternalHostWithPort()
+        : trim((string)($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '')));
+    if ($host === '') {
+        return '';
+    }
+
+    $protocol = function_exists('getProtocol') ? getProtocol() : 'http';
+    $scriptDir = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+    if ($scriptDir === '.' || $scriptDir === '/') {
+        $scriptDir = '';
+    }
+    if (basename($scriptDir) === 'admin') {
+        $scriptDir = rtrim(dirname($scriptDir), '/');
+        if ($scriptDir === '.' || $scriptDir === '/') {
+            $scriptDir = '';
+        }
+    }
+
+    return $protocol . '://' . $host . $scriptDir;
 }
+
+function smtp_current_account_profile(): array {
+    $currentUser = getCurrentUser();
+    $userId = (int)($currentUser['id'] ?? getCurrentUserId() ?? 0);
+
+    if ($userId > 0 && function_exists('getUserProfileById')) {
+        $profile = getUserProfileById($userId);
+        if (is_array($profile)) {
+            return $profile;
+        }
+    }
+
+    return is_array($currentUser) ? $currentUser : [];
+}
+
+$currentUser = smtp_current_account_profile();
+$currentAccountEmail = trim((string)($currentUser['email'] ?? ''));
+$currentAccountName = trim((string)($currentUser['username'] ?? ''));
+$detectedAppUrl = smtp_detect_app_url();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
     if (!isset($_SESSION['smtp_csrf_token']) || !hash_equals($_SESSION['smtp_csrf_token'], $token)) {
         $error = t('smtp_admin.error_csrf', [], 'Invalid form submission. Please try again.');
+    } elseif (($_POST['action'] ?? 'save') === 'test' && !filter_var($currentAccountEmail, FILTER_VALIDATE_EMAIL)) {
+        $error = t('smtp_admin.test.no_account_email', [], 'Your account does not have an email address configured. Contact an administrator to add one to your profile.');
     } else {
-        $previousEnabled = smtp_setting_bool('smtp_enabled', false);
-        $enabled = isset($_POST['smtp_enabled']);
         $security = strtolower(trim((string)($_POST['smtp_security'] ?? 'tls')));
         if (!in_array($security, ['none', 'tls', 'ssl'], true)) {
             $security = 'tls';
@@ -62,17 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $port = $postedPort === '' ? ($security === 'ssl' ? 465 : ($security === 'none' ? 25 : 587)) : (int)$postedPort;
         $port = max(1, min(65535, $port));
 
-        $existingPassword = smtp_setting('smtp_password', '');
-        $clearPassword = isset($_POST['smtp_clear_password']);
-        $postedPassword = (string)($_POST['smtp_password'] ?? '');
-        $password = $clearPassword ? '' : ($postedPassword !== '' ? $postedPassword : $existingPassword);
+        $password = array_key_exists('smtp_password', $_POST)
+            ? (string)$_POST['smtp_password']
+            : smtp_setting('smtp_password', '');
 
         $existingAppUrl = smtp_setting('smtp_app_url', '');
-        $appUrl = array_key_exists('smtp_app_url', $_POST)
-            ? rtrim(trim((string)$_POST['smtp_app_url']), '/')
-            : $existingAppUrl;
+        $appUrl = $detectedAppUrl !== '' ? $detectedAppUrl : $existingAppUrl;
         $settingsToSave = [
-            'smtp_enabled' => $enabled ? '1' : '0',
             'smtp_host' => trim((string)($_POST['smtp_host'] ?? '')),
             'smtp_port' => (string)$port,
             'smtp_security' => $security,
@@ -84,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         $configForValidation = [
-            'enabled' => $enabled,
+            'enabled' => true,
             'host' => $settingsToSave['smtp_host'],
             'port' => (int)$settingsToSave['smtp_port'],
             'security' => $security,
@@ -95,14 +129,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'app_url' => $appUrl,
         ];
 
-        $validationErrors = $enabled ? $service->validateSmtpConfig($configForValidation, true) : [];
-        if (($_POST['action'] ?? 'save') === 'test') {
-            $validationErrors = array_merge($validationErrors, $service->validateSmtpConfig($configForValidation, false));
-        }
-
+        $action = $_POST['action'] ?? 'save';
+        $hasProviderConfig = $settingsToSave['smtp_host'] !== ''
+            || $settingsToSave['smtp_from_email'] !== '';
+        $validationErrors = ($hasProviderConfig || $action === 'test')
+            ? $service->validateSmtpConfig($configForValidation, false)
+            : [];
         if (!empty($validationErrors)) {
             $error = implode(' ', $validationErrors);
         } else {
+            $enabled = $settingsToSave['smtp_host'] !== ''
+                && filter_var($settingsToSave['smtp_from_email'], FILTER_VALIDATE_EMAIL);
+            $settingsToSave = ['smtp_enabled' => $enabled ? '1' : '0'] + $settingsToSave;
             $allOk = true;
             foreach ($settingsToSave as $key => $value) {
                 if (!setGlobalSetting($key, $value)) {
@@ -110,17 +148,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            if ($enabled && (!$previousEnabled || smtp_setting('smtp_reminder_cutoff_at', '') === '')) {
+            if ($enabled && smtp_setting('smtp_reminder_cutoff_at', '') === '') {
                 setGlobalSetting('smtp_reminder_cutoff_at', gmdate('Y-m-d H:i:s'));
             }
 
             if (!$allOk) {
                 $error = t('smtp_admin.error_saving', [], 'Error saving SMTP configuration.');
-            } elseif (($_POST['action'] ?? 'save') === 'test') {
-                $recipient = trim((string)($_POST['smtp_test_recipient'] ?? ''));
-                $test = $service->sendTestEmail($recipient, '');
+            } elseif ($action === 'test') {
+                $recipient = $currentAccountEmail;
+                $test = $service->sendTestEmail($recipient, $currentAccountName);
                 if ($test['success']) {
-                    $success = t('smtp_admin.test.success', [], 'SMTP configuration saved and test email sent.');
+                    $success = t('smtp_admin.test.success', ['email' => $recipient], 'SMTP configuration saved and test email sent to {{email}}.');
                 } else {
                     $error = t('smtp_admin.test.error', ['error' => $test['error'] ?? 'Unknown error'], 'SMTP configuration saved, but the test email failed: {{error}}');
                 }
@@ -134,19 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $_SESSION['smtp_csrf_token'] = bin2hex(random_bytes(32));
 
 $settings = [
-    'smtp_enabled' => smtp_setting_bool('smtp_enabled', false),
     'smtp_host' => smtp_setting('smtp_host', ''),
     'smtp_port' => smtp_setting('smtp_port', '587'),
     'smtp_security' => smtp_setting('smtp_security', 'tls'),
     'smtp_username' => smtp_setting('smtp_username', ''),
-    'smtp_password_configured' => smtp_setting('smtp_password', '') !== '',
+    'smtp_password' => smtp_setting('smtp_password', ''),
     'smtp_from_email' => smtp_setting('smtp_from_email', ''),
     'smtp_from_name' => smtp_setting('smtp_from_name', 'Poznote'),
-    'smtp_app_url' => smtp_setting('smtp_app_url', ''),
 ];
-
-$currentUser = getCurrentUser();
-$defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo smtp_h($currentLang); ?>">
@@ -194,6 +227,78 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
             font-size: 0.92rem;
             margin-bottom: 4px;
         }
+        .smtp-label-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .smtp-label-row label {
+            margin-bottom: 0;
+        }
+        .smtp-help {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            color: var(--text-secondary, #777);
+            cursor: help;
+            flex: 0 0 auto;
+        }
+        .smtp-help .lucide {
+            width: 15px;
+            height: 15px;
+            opacity: 0.7;
+            transition: opacity 0.15s ease, color 0.15s ease;
+        }
+        .smtp-help:hover .lucide,
+        .smtp-help:focus .lucide,
+        .smtp-help:focus-visible .lucide {
+            opacity: 1;
+            color: var(--accent-color, #007cba);
+        }
+        .smtp-help:focus-visible {
+            outline: 2px solid var(--accent-color, #007cba);
+            outline-offset: 2px;
+            border-radius: 50%;
+        }
+        .smtp-help-tooltip {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: max-content;
+            min-width: 250px;
+            max-width: min(340px, calc(100vw - 32px));
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: rgba(20, 20, 20, 0.94);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1.45;
+            text-align: left;
+            white-space: normal;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.15s ease, visibility 0.15s ease;
+            z-index: 1000;
+        }
+        .smtp-help-line {
+            display: block;
+        }
+        .smtp-help-line + .smtp-help-line {
+            margin-top: 5px;
+        }
+        .smtp-help:hover .smtp-help-tooltip,
+        .smtp-help:focus .smtp-help-tooltip,
+        .smtp-help:focus-visible .smtp-help-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
         .smtp-hint {
             display: block;
             font-size: 0.82rem;
@@ -216,43 +321,42 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
             color: var(--text-primary, #333);
             box-sizing: border-box;
         }
-        .smtp-switch-row {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
+        .smtp-password-wrapper {
+            position: relative;
         }
-        .smtp-switch-copy {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1 1 auto;
+        .smtp-password-wrapper input[type="password"],
+        .smtp-password-wrapper input[type="text"] {
+            padding-right: 44px;
         }
-        .smtp-switch-title {
-            display: block;
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin: 0;
-        }
-        .smtp-switch-state {
-            display: inline-block;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--text-muted, #666);
-        }
-        .smtp-switch-state.is-enabled { color: #1f8f4e; }
-        .smtp-switch-state.is-disabled { color: #b54747; }
-        .smtp-field label.smtp-inline-check {
+        .smtp-password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
             color: var(--text-secondary, #666);
-            font-weight: 500;
-            margin-top: 8px;
-            margin-bottom: 0;
+            cursor: pointer;
+        }
+        .smtp-password-toggle:hover,
+        .smtp-password-toggle:focus-visible {
+            color: var(--accent-color, #007cba);
+            background: rgba(0, 124, 186, 0.08);
+        }
+        .smtp-password-toggle:focus-visible {
+            outline: 2px solid var(--accent-color, #007cba);
+            outline-offset: 1px;
+        }
+        .smtp-password-toggle .lucide {
+            width: 18px;
+            height: 18px;
         }
         .smtp-actions {
             display: flex;
@@ -261,16 +365,41 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
             margin-top: 24px;
             flex-wrap: wrap;
         }
+        .settings-container.smtp-page .workspaces-nav .smtp-test-button {
+            background: #007cba !important;
+            border-color: #007cba !important;
+            color: #fff !important;
+        }
+        .settings-container.smtp-page .workspaces-nav .smtp-test-button:hover,
+        .settings-container.smtp-page .workspaces-nav .smtp-test-button:focus-visible {
+            background: #005a8a !important;
+            border-color: #005a8a !important;
+            color: #fff !important;
+            opacity: 1;
+        }
         html[data-theme='dark'] .smtp-section h2,
         body.dark-mode .smtp-section h2 {
             color: var(--dm-text);
             border-bottom-color: var(--dm-accent);
         }
         html[data-theme='dark'] .smtp-hint,
-        body.dark-mode .smtp-hint,
-        html[data-theme='dark'] .smtp-inline-check,
-        body.dark-mode .smtp-inline-check {
+        body.dark-mode .smtp-hint {
             color: rgba(255, 255, 255, 0.62);
+        }
+        html[data-theme='dark'] .smtp-help,
+        body.dark-mode .smtp-help {
+            color: rgba(255, 255, 255, 0.72);
+        }
+        html[data-theme='dark'] .smtp-password-toggle,
+        body.dark-mode .smtp-password-toggle {
+            color: rgba(255, 255, 255, 0.72);
+        }
+        html[data-theme='dark'] .smtp-password-toggle:hover,
+        html[data-theme='dark'] .smtp-password-toggle:focus-visible,
+        body.dark-mode .smtp-password-toggle:hover,
+        body.dark-mode .smtp-password-toggle:focus-visible {
+            color: var(--dm-accent, #4da3ff);
+            background: rgba(77, 163, 255, 0.14);
         }
         html[data-theme='dark'] .smtp-field input,
         html[data-theme='dark'] .smtp-field select,
@@ -282,7 +411,6 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
         }
         @media (max-width: 800px) {
             .smtp-grid { grid-template-columns: 1fr; }
-            .smtp-switch-row { flex-direction: column; }
             .settings-container.smtp-page .smtp-actions,
             .settings-container.smtp-page .workspaces-nav {
                 display: grid !important;
@@ -319,6 +447,10 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
             <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
             <?php echo t_h('common.back_to_settings', [], 'Settings'); ?>
         </a>
+        <button type="submit" form="smtp-config-form" name="action" value="test" class="btn btn-primary smtp-test-button">
+            <i class="lucide lucide-mail" style="margin-right: 5px;"></i>
+            <?php echo t_h('smtp_admin.test.button', [], 'Send test email'); ?>
+        </button>
     </div>
 
     <?php if ($success || $error): ?>
@@ -327,32 +459,8 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="" autocomplete="off">
+    <form method="POST" action="" autocomplete="off" id="smtp-config-form">
         <input type="hidden" name="csrf_token" value="<?php echo smtp_h($_SESSION['smtp_csrf_token']); ?>">
-
-        <div class="settings-section smtp-section">
-            <h2><?php echo t_h('smtp_admin.section_delivery', [], 'Reminder email delivery'); ?></h2>
-            <div class="smtp-field">
-                <div class="smtp-switch-row">
-                    <div class="smtp-switch-copy">
-                        <label for="smtp_enabled" class="smtp-switch-title"><?php echo t_h('smtp_admin.fields.enabled', [], 'Enable reminder emails'); ?></label>
-                        <span class="smtp-hint"><?php echo t_h('smtp_admin.hints.enabled', [], 'When enabled, the internal worker sends emails for due reminders to each user email address.'); ?></span>
-                        <span
-                            class="smtp-switch-state <?php echo $settings['smtp_enabled'] ? 'is-enabled' : 'is-disabled'; ?>"
-                            id="smtp-enabled-state"
-                            data-enabled-label="<?php echo smtp_h(t('common.enabled', [], 'Enabled')); ?>"
-                            data-disabled-label="<?php echo smtp_h(t('common.disabled', [], 'Disabled')); ?>"
-                        >
-                            <?php echo $settings['smtp_enabled'] ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
-                        </span>
-                    </div>
-                    <label class="toggle-switch" for="smtp_enabled">
-                        <input type="checkbox" id="smtp_enabled" name="smtp_enabled" value="1" <?php echo $settings['smtp_enabled'] ? 'checked' : ''; ?>>
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
 
         <div class="settings-section smtp-section">
             <h2><?php echo t_h('smtp_admin.section_provider', [], 'SMTP provider'); ?></h2>
@@ -366,7 +474,17 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
                     <input type="number" id="smtp_port" name="smtp_port" min="1" max="65535" value="<?php echo smtp_h($settings['smtp_port']); ?>">
                 </div>
                 <div class="smtp-field">
-                    <label for="smtp_security"><?php echo t_h('smtp_admin.fields.security', [], 'Encryption'); ?></label>
+                    <div class="smtp-label-row">
+                        <label for="smtp_security"><?php echo t_h('smtp_admin.fields.security', [], 'Encryption'); ?></label>
+                        <span class="smtp-help" tabindex="0" role="img" aria-label="<?php echo t_h('smtp_admin.hints.security_summary', [], 'STARTTLS usually uses port 587 and upgrades to TLS after connecting. SSL/TLS is encrypted from the connection, usually on port 465. None uses no encryption.'); ?>">
+                            <i class="lucide lucide-help-circle"></i>
+                            <span class="smtp-help-tooltip" role="tooltip">
+                                <span class="smtp-help-line"><?php echo t_h('smtp_admin.hints.security_tls', [], 'STARTTLS: standard connection, then upgrade to TLS, usually port 587.'); ?></span>
+                                <span class="smtp-help-line"><?php echo t_h('smtp_admin.hints.security_ssl', [], 'SSL/TLS: encrypted from the connection, usually port 465.'); ?></span>
+                                <span class="smtp-help-line"><?php echo t_h('smtp_admin.hints.security_none', [], 'None: no encryption, only for a local relay or trusted network.'); ?></span>
+                            </span>
+                        </span>
+                    </div>
                     <select id="smtp_security" name="smtp_security">
                         <option value="tls" <?php echo $settings['smtp_security'] === 'tls' ? 'selected' : ''; ?>>STARTTLS</option>
                         <option value="ssl" <?php echo $settings['smtp_security'] === 'ssl' ? 'selected' : ''; ?>>SSL/TLS</option>
@@ -379,18 +497,20 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
                 </div>
                 <div class="smtp-field">
                     <label for="smtp_password"><?php echo t_h('smtp_admin.fields.password', [], 'Password'); ?></label>
-                    <span class="smtp-hint">
-                        <?php echo $settings['smtp_password_configured']
-                            ? t_h('smtp_admin.hints.password_configured', [], 'A password is configured. Leave blank to keep it.')
-                            : t_h('smtp_admin.hints.password_empty', [], 'No password configured.'); ?>
-                    </span>
-                    <input type="password" id="smtp_password" name="smtp_password" value="" autocomplete="new-password">
-                    <?php if ($settings['smtp_password_configured']): ?>
-                        <label class="smtp-inline-check" for="smtp_clear_password">
-                            <input type="checkbox" id="smtp_clear_password" name="smtp_clear_password" value="1">
-                            <?php echo t_h('smtp_admin.fields.clear_password', [], 'Clear stored password'); ?>
-                        </label>
-                    <?php endif; ?>
+                    <div class="smtp-password-wrapper">
+                        <input type="password" id="smtp_password" name="smtp_password" value="<?php echo smtp_h($settings['smtp_password']); ?>" autocomplete="new-password">
+                        <button
+                            type="button"
+                            class="smtp-password-toggle"
+                            id="smtp-password-toggle"
+                            title="<?php echo t_h('login.show_password', [], 'Show password'); ?>"
+                            aria-label="<?php echo t_h('login.show_password', [], 'Show password'); ?>"
+                            data-show-label="<?php echo t_h('login.show_password', [], 'Show password'); ?>"
+                            data-hide-label="<?php echo t_h('login.hide_password', [], 'Hide password'); ?>"
+                        >
+                            <i class="lucide lucide-eye"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="smtp-field">
                     <label for="smtp_from_email"><?php echo t_h('smtp_admin.fields.from_email', [], 'Sender email'); ?></label>
@@ -403,46 +523,41 @@ $defaultTestRecipient = trim((string)($currentUser['email'] ?? ''));
             </div>
         </div>
 
-        <div class="settings-section smtp-section">
-            <h2><?php echo t_h('smtp_admin.section_test', [], 'Test'); ?></h2>
-            <div class="smtp-field">
-                <label for="smtp_test_recipient"><?php echo t_h('smtp_admin.fields.test_recipient', [], 'Test recipient'); ?></label>
-                <span class="smtp-hint"><?php echo t_h('smtp_admin.hints.test_recipient', [], 'Use this to verify the provider before enabling reminder emails.'); ?></span>
-                <input type="email" id="smtp_test_recipient" name="smtp_test_recipient" value="<?php echo smtp_h($defaultTestRecipient); ?>" placeholder="you@example.com">
-            </div>
-        </div>
-
         <div class="smtp-actions">
             <a href="../settings.php" class="btn btn-danger"><?php echo t_h('common.cancel', [], 'Cancel'); ?></a>
-            <button type="submit" name="action" value="test" class="btn btn-secondary"><?php echo t_h('smtp_admin.test.button', [], 'Send test email'); ?></button>
             <button type="submit" name="action" value="save" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
         </div>
     </form>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var enabledCheckbox = document.getElementById('smtp_enabled');
-    var enabledState = document.getElementById('smtp-enabled-state');
     var securitySelect = document.getElementById('smtp_security');
     var portInput = document.getElementById('smtp_port');
-
-    if (enabledCheckbox && enabledState) {
-        var enabledLabel = enabledState.getAttribute('data-enabled-label') || 'Enabled';
-        var disabledLabel = enabledState.getAttribute('data-disabled-label') || 'Disabled';
-        function syncEnabledState() {
-            var isEnabled = enabledCheckbox.checked;
-            enabledState.textContent = isEnabled ? enabledLabel : disabledLabel;
-            enabledState.classList.toggle('is-enabled', isEnabled);
-            enabledState.classList.toggle('is-disabled', !isEnabled);
-        }
-        enabledCheckbox.addEventListener('change', syncEnabledState);
-        syncEnabledState();
-    }
+    var passwordInput = document.getElementById('smtp_password');
+    var passwordToggle = document.getElementById('smtp-password-toggle');
 
     if (securitySelect && portInput) {
         securitySelect.addEventListener('change', function () {
             if (!portInput.value || portInput.value === '465' || portInput.value === '587' || portInput.value === '25') {
                 portInput.value = securitySelect.value === 'ssl' ? '465' : (securitySelect.value === 'none' ? '25' : '587');
+            }
+        });
+    }
+
+    if (passwordInput && passwordToggle) {
+        passwordToggle.addEventListener('click', function () {
+            var isHidden = passwordInput.getAttribute('type') === 'password';
+            var nextType = isHidden ? 'text' : 'password';
+            var nextLabel = passwordToggle.getAttribute(isHidden ? 'data-hide-label' : 'data-show-label') || '';
+            var icon = passwordToggle.querySelector('i');
+
+            passwordInput.setAttribute('type', nextType);
+            passwordToggle.setAttribute('title', nextLabel);
+            passwordToggle.setAttribute('aria-label', nextLabel);
+
+            if (icon) {
+                icon.classList.toggle('lucide-eye', !isHidden);
+                icon.classList.toggle('lucide-eye-off', isHidden);
             }
         });
     }

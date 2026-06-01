@@ -11,6 +11,8 @@ let reminderNoteId = null;
 let reminderInitialInputValue = '';
 let reminderInitialDisplayText = '';
 let reminderHasInitialReminder = false;
+let reminderInitialEmailEnabled = false;
+let reminderEmailAvailable = false;
 const REMINDER_NOTIFICATION_POLL_INTERVAL = 45000;
 
 function parseReminderDate(value) {
@@ -54,6 +56,33 @@ function restoreInitialReminderPreview(currentInfo, currentDate) {
 
     currentDate.textContent = '';
     currentInfo.classList.add('initially-hidden');
+}
+
+function getReminderEmailControls() {
+    const modal = document.getElementById('reminderModal');
+    const option = document.getElementById('reminderEmailOption');
+    const input = document.getElementById('reminderEmailInput');
+    const available = modal && modal.dataset.reminderEmailAvailable === '1';
+    return { modal, option, input, available };
+}
+
+function setReminderEmailOption(enabled) {
+    const controls = getReminderEmailControls();
+    reminderEmailAvailable = !!controls.available;
+
+    if (controls.option) {
+        controls.option.classList.toggle('initially-hidden', !reminderEmailAvailable);
+    }
+
+    if (controls.input) {
+        controls.input.checked = reminderEmailAvailable && !!enabled;
+        controls.input.disabled = !reminderEmailAvailable;
+    }
+}
+
+function getReminderEmailEnabled() {
+    const controls = getReminderEmailControls();
+    return !!controls.available && !!controls.input && controls.input.checked;
 }
 
 function updateNotificationIndicators(count) {
@@ -112,11 +141,12 @@ function syncReminderPreviewFromInput() {
         return false;
     }
 
-    const hasChanged = dateInput.value !== reminderInitialInputValue;
-    const canSave = hasChanged && !!dateInput.value;
+    const hasDateChanged = dateInput.value !== reminderInitialInputValue;
+    const hasEmailChanged = reminderEmailAvailable && getReminderEmailEnabled() !== reminderInitialEmailEnabled;
+    const canSave = (hasDateChanged || hasEmailChanged) && !!dateInput.value;
     saveBtn.classList.toggle('initially-hidden', !canSave);
 
-    if (!hasChanged || !dateInput.value) {
+    if (!hasDateChanged || !dateInput.value) {
         restoreInitialReminderPreview(currentInfo, currentDate);
         return canSave;
     }
@@ -148,6 +178,9 @@ function openReminderModal(noteId, currentReminderAt) {
     reminderInitialInputValue = '';
     reminderInitialDisplayText = '';
     reminderHasInitialReminder = false;
+    reminderEmailAvailable = getReminderEmailControls().available;
+    reminderInitialEmailEnabled = reminderEmailAvailable;
+    setReminderEmailOption(reminderInitialEmailEnabled);
 
     // Set minimum date to now
     const now = new Date();
@@ -176,6 +209,24 @@ function openReminderModal(noteId, currentReminderAt) {
 
     syncReminderPreviewFromInput();
     modal.style.display = 'flex';
+
+    if (noteId && currentReminderAt) {
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/reminder', {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (!data.success || String(reminderNoteId) !== String(noteId)) {
+                return;
+            }
+
+            reminderInitialEmailEnabled = reminderEmailAvailable && !!data.email_enabled;
+            setReminderEmailOption(reminderInitialEmailEnabled);
+            syncReminderPreviewFromInput();
+        })
+        .catch(function() {});
+    }
 }
 
 /**
@@ -189,6 +240,8 @@ function closeReminderModal() {
     reminderInitialInputValue = '';
     reminderInitialDisplayText = '';
     reminderHasInitialReminder = false;
+    reminderInitialEmailEnabled = false;
+    reminderEmailAvailable = false;
 }
 
 /**
@@ -200,7 +253,9 @@ function saveReminder() {
     const noteId = reminderNoteId;
 
     const dateInput = document.getElementById('reminderDateInput');
-    if (!dateInput || dateInput.value === reminderInitialInputValue) {
+    const emailEnabled = getReminderEmailEnabled();
+    const emailChanged = reminderEmailAvailable && emailEnabled !== reminderInitialEmailEnabled;
+    if (!dateInput || (dateInput.value === reminderInitialInputValue && !emailChanged)) {
         return;
     }
 
@@ -231,7 +286,10 @@ function saveReminder() {
             'Accept': 'application/json'
         },
         credentials: 'same-origin',
-        body: JSON.stringify({ reminder_at: utcIso })
+        body: JSON.stringify({
+            reminder_at: utcIso,
+            email_enabled: emailEnabled
+        })
     })
     .then(r => r.json())
     .then(data => {
@@ -381,6 +439,13 @@ if (reminderDateInput) {
     reminderDateInput.addEventListener('change', function() {
         syncReminderPreviewFromInput();
         closeReminderPicker();
+    });
+}
+
+const reminderEmailInput = document.getElementById('reminderEmailInput');
+if (reminderEmailInput) {
+    reminderEmailInput.addEventListener('change', function() {
+        syncReminderPreviewFromInput();
     });
 }
 

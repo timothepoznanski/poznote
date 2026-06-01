@@ -2603,15 +2603,20 @@
     },
     "hints": {
       "enabled": "启用后，内部 Worker 会将到期提醒邮件发送至每位用户的邮箱。",
+      "security_summary": "STARTTLS 通常使用 587 端口，并在连接后升级到 TLS。SSL/TLS 从连接开始即加密，通常使用 465 端口。无表示不使用加密。",
+      "security_tls": "STARTTLS：标准连接后升级到 TLS，通常使用 587 端口。",
+      "security_ssl": "SSL/TLS：从连接开始即加密，通常使用 465 端口。",
+      "security_none": "无：不加密，仅适用于本地中继或可信网络。",
       "password_configured": "已配置密码，留空则保留现有密码。",
       "password_empty": "未配置密码。",
-      "app_url": "用于在提醒邮件中附上笔记链接，留空则不附加链接。",
+      "app_url": "用于在提醒邮件中附上直接打开笔记的链接。此值会自动检测；如果您的公网 URL 不同，请修改它。",
       "test_recipient": "在启用提醒邮件前，使用此项验证提供商。"
     },
     "test": {
       "button": "发送测试邮件",
-      "success": "SMTP 配置已保存，测试邮件已发送。",
+      "success": "SMTP 配置已保存，测试邮件已发送到管理员为您的账户配置的电子邮件地址 {{email}}。",
       "error": "SMTP 配置已保存，但测试邮件发送失败：{{error}}",
+      "no_account_email": "您的账户未配置电子邮件地址。请联系管理员为您的个人资料添加一个地址。",
       "subject": "Poznote SMTP 测试",
       "body_text": "这是来自 Poznote 的测试邮件。\n\n如果您收到了，说明您的 SMTP 配置正常。",
       "body_html_intro": "这是来自 Poznote 的测试邮件。",
@@ -2650,6 +2655,8 @@
       "tomorrow": "明天",
       "in_1week": "1 周",
       "remove": "移除提醒",
+      "email_toggle": "给我发送邮件",
+      "email_hint": "发送至 {{email}}",
       "select_date": "请选择日期和时间",
       "past_time": "请选择一个未来的时间"
     }

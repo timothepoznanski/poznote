@@ -2463,15 +2463,20 @@
     },
     "hints": {
       "enabled": "Wenn aktiviert, sendet der interne Worker E-Mails für fällige Erinnerungen an die E-Mail-Adresse jedes Benutzers.",
+      "security_summary": "STARTTLS verwendet normalerweise Port 587 und wechselt nach dem Verbindungsaufbau zu TLS. SSL/TLS ist ab der Verbindung verschlüsselt, normalerweise auf Port 465. Keine verwendet keine Verschlüsselung.",
+      "security_tls": "STARTTLS: Standardverbindung, danach Wechsel zu TLS, normalerweise Port 587.",
+      "security_ssl": "SSL/TLS: ab der Verbindung verschlüsselt, normalerweise Port 465.",
+      "security_none": "Keine: keine Verschlüsselung, nur für ein lokales Relay oder ein vertrauenswürdiges Netzwerk.",
       "password_configured": "Ein Passwort ist konfiguriert. Lassen Sie das Feld leer, um es beizubehalten.",
       "password_empty": "Kein Passwort konfiguriert.",
-      "app_url": "Wird verwendet, um einen Notizlink in Erinnerungs-E-Mails einzufügen. Leer lassen, um Links wegzulassen.",
+      "app_url": "Wird verwendet, um einen direkten Notizlink in Erinnerungs-E-Mails einzufügen. Dieser Wert wird automatisch erkannt; ändern Sie ihn, wenn Ihre öffentliche URL anders ist.",
       "test_recipient": "Verwenden Sie dies, um den Anbieter zu überprüfen, bevor Sie Erinnerungs-E-Mails aktivieren."
     },
     "test": {
       "button": "Test-E-Mail senden",
-      "success": "SMTP-Konfiguration gespeichert und Test-E-Mail gesendet.",
+      "success": "SMTP-Konfiguration gespeichert und Test-E-Mail an die von Ihrem Administrator für Ihr Konto konfigurierte E-Mail-Adresse {{email}} gesendet.",
       "error": "SMTP-Konfiguration gespeichert, aber die Test-E-Mail ist fehlgeschlagen: {{error}}",
+      "no_account_email": "Ihr Konto hat keine E-Mail-Adresse konfiguriert. Wenden Sie sich an einen Administrator, damit er Ihrem Profil eine hinzufügt.",
       "subject": "Poznote SMTP-Test",
       "body_text": "Dies ist eine Test-E-Mail von Poznote.\n\nWenn Sie sie erhalten haben, funktioniert Ihre SMTP-Konfiguration.",
       "body_html_intro": "Dies ist eine Test-E-Mail von Poznote.",
@@ -2510,6 +2515,8 @@
       "tomorrow": "Morgen",
       "in_1week": "1 Woche",
       "remove": "Erinnerung entfernen",
+      "email_toggle": "Mir eine E-Mail senden",
+      "email_hint": "An {{email}}",
       "select_date": "Bitte wählen Sie Datum und Uhrzeit",
       "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt"
     }

@@ -1,9 +1,32 @@
+<?php
+$reminderEmailAvailable = false;
+$reminderEmailAddress = '';
+try {
+    if (!function_exists('getGlobalSetting')) {
+        require_once __DIR__ . '/users/db_master.php';
+    }
+    $smtpHost = function_exists('getGlobalSetting') ? trim((string)getGlobalSetting('smtp_host', '')) : '';
+    $smtpFromEmail = function_exists('getGlobalSetting') ? trim((string)getGlobalSetting('smtp_from_email', '')) : '';
+    $currentReminderUser = function_exists('getCurrentUser') ? getCurrentUser() : [];
+    $reminderEmailAddress = trim((string)($currentReminderUser['email'] ?? ''));
+    $reminderEmailAvailable = $smtpHost !== ''
+        && filter_var($smtpFromEmail, FILTER_VALIDATE_EMAIL)
+        && filter_var($reminderEmailAddress, FILTER_VALIDATE_EMAIL);
+} catch (Throwable $e) {
+    $reminderEmailAvailable = false;
+    $reminderEmailAddress = '';
+}
+?>
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
 <div id="notificationPopup"></div>
 
 <!-- Reminder Modal -->
-<div id="reminderModal" class="modal">
+<div
+    id="reminderModal"
+    class="modal"
+    data-reminder-email-available="<?php echo $reminderEmailAvailable ? '1' : '0'; ?>"
+>
     <div class="modal-content">
         <h3><?php echo t_h('reminder.modal.title', [], 'Reminder'); ?></h3>
         <div class="reminder-form">
@@ -15,6 +38,23 @@
                 <button type="button" class="reminder-quick-btn" data-hours="1"><?php echo t_h('reminder.modal.in_1h', [], '1 hour'); ?></button>
                 <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
                 <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
+            </div>
+            <div class="reminder-email-option <?php echo $reminderEmailAvailable ? '' : 'initially-hidden'; ?>" id="reminderEmailOption">
+                <label class="reminder-email-label" for="reminderEmailInput">
+                    <span class="reminder-email-copy">
+                        <span class="reminder-email-title">
+                            <i class="lucide lucide-mail"></i>
+                            <?php echo t_h('reminder.modal.email_toggle', [], 'Send me an email'); ?>
+                        </span>
+                        <span class="reminder-email-hint">
+                            <?php echo t_h('reminder.modal.email_hint', ['email' => $reminderEmailAddress], 'To {{email}}'); ?>
+                        </span>
+                    </span>
+                    <span class="toggle-switch reminder-email-switch">
+                        <input type="checkbox" id="reminderEmailInput" <?php echo $reminderEmailAvailable ? 'checked' : ''; ?>>
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
             </div>
             <div class="reminder-current-info initially-hidden" id="reminderCurrentInfo">
                 <i class="lucide lucide-bell"></i>
