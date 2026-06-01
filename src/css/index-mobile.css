@@ -123,10 +123,68 @@ body::-webkit-scrollbar {
 
 #right_col {
     overflow-y: auto !important;
+    position: relative;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .resize-handle {
     display: none !important;
+}
+
+/* Keep the note toolbar above long note content while #right_col scrolls. */
+.note-header {
+    position: sticky;
+    top: 0;
+    z-index: 1200;
+    flex: 0 0 auto;
+    transform: translateZ(0);
+}
+
+body.has-internal-tabs .note-header {
+    top: 39px;
+}
+
+.notecard,
+.innernote {
+    overflow: visible !important;
+}
+
+.note-bottom-space {
+    height: max(88px, calc(env(safe-area-inset-bottom, 0px) + 64px));
+    flex: 0 0 auto;
+}
+
+body.mobile-formatting-toolbar-active #right_col .note-header,
+body.mobile-keyboard-open #right_col .note-header {
+    position: fixed;
+    top: calc(var(--mobile-visual-viewport-top, 0px) + env(safe-area-inset-top, 0px));
+    left: 0;
+    right: 0;
+    width: 100vw;
+    max-width: none !important;
+    margin: 0 !important;
+    z-index: 2147483000;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
+}
+
+body.mobile-formatting-toolbar-active.has-internal-tabs #right_col .note-header,
+body.mobile-keyboard-open.has-internal-tabs #right_col .note-header {
+    top: calc(var(--mobile-visual-viewport-top, 0px) + env(safe-area-inset-top, 0px) + 39px);
+}
+
+body.mobile-formatting-toolbar-active.has-background-image #right_col .note-header,
+body.mobile-keyboard-open.has-background-image #right_col .note-header {
+    background: rgba(255, 255, 255, 0.96);
+}
+
+body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 4px;
+    scroll-padding-left: 4px;
 }
 
 /* Hide scrollbar on mobile - comprehensive approach */

@@ -222,6 +222,78 @@ function initTextSelectionHandlers() {
         return false;
     }
 
+    function isMobileFormattingViewport() {
+        try {
+            return window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+        } catch (e) {
+            return window.innerWidth <= 800;
+        }
+    }
+
+    function setMobileFormattingToolbarActive(active) {
+        if (!document.body) return;
+
+        syncMobileViewportToolbarState();
+
+        var shouldActivate = !!active && isMobileFormattingViewport();
+        document.body.classList.toggle('mobile-formatting-toolbar-active', shouldActivate);
+    }
+
+    function getMobileViewportKeyboardInset() {
+        var visualViewport = window.visualViewport;
+        if (!visualViewport) return 0;
+
+        var layoutHeight = document.documentElement ? document.documentElement.clientHeight : window.innerHeight;
+        var currentHeight = Math.round(visualViewport.height || window.innerHeight || 0);
+        var viewportTop = Math.max(0, Math.round(visualViewport.offsetTop || 0));
+        var baselineHeight = window.__poznoteMobileViewportBaselineHeight || 0;
+
+        if (!baselineHeight || currentHeight > baselineHeight || layoutHeight > baselineHeight) {
+            baselineHeight = Math.max(currentHeight, layoutHeight);
+            window.__poznoteMobileViewportBaselineHeight = baselineHeight;
+        }
+
+        return Math.max(0, Math.round(baselineHeight - currentHeight - viewportTop));
+    }
+
+    function syncMobileViewportToolbarState() {
+        if (!document.documentElement || !document.body) return;
+
+        var visualViewport = window.visualViewport;
+        var viewportTop = 0;
+        var keyboardInset = 0;
+
+        if (visualViewport && isMobileFormattingViewport()) {
+            viewportTop = Math.max(0, Math.round(visualViewport.offsetTop || 0));
+            keyboardInset = getMobileViewportKeyboardInset();
+        }
+
+        document.documentElement.style.setProperty('--mobile-visual-viewport-top', viewportTop + 'px');
+        document.body.classList.toggle('mobile-keyboard-open', keyboardInset > 120);
+    }
+
+    function initializeMobileViewportToolbarState() {
+        if (window.__poznoteMobileViewportToolbarStateInitialized) return;
+        window.__poznoteMobileViewportToolbarStateInitialized = true;
+
+        syncMobileViewportToolbarState();
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', syncMobileViewportToolbarState);
+            window.visualViewport.addEventListener('scroll', syncMobileViewportToolbarState);
+        }
+
+        window.addEventListener('resize', syncMobileViewportToolbarState);
+        window.addEventListener('orientationchange', function () {
+            window.__poznoteMobileViewportBaselineHeight = 0;
+            setTimeout(syncMobileViewportToolbarState, 250);
+        });
+        document.addEventListener('focusin', syncMobileViewportToolbarState);
+        document.addEventListener('focusout', function () {
+            setTimeout(syncMobileViewportToolbarState, 120);
+        });
+    }
+
     function handleSelectionChange() {
         clearTimeout(selectionTimeout);
         selectionTimeout = setTimeout(function () {
@@ -232,7 +304,7 @@ function initTextSelectionHandlers() {
             var noteActionButtons = document.querySelectorAll('.note-action-btn');
 
             // Check if the selection contains text
-            if (selection && selection.toString().trim().length > 0) {
+            if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
                 var range = selection.getRangeAt(0);
                 var container = range.commonAncestorContainer;
 
@@ -313,6 +385,7 @@ function initTextSelectionHandlers() {
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.remove('hide-on-selection');
                     }
+                    setMobileFormattingToolbarActive(false);
                 } else if (editableElement) {
                     // Text selected in an editable area: show formatting buttons, hide actions
                     for (var i = 0; i < textFormatButtons.length; i++) {
@@ -325,6 +398,7 @@ function initTextSelectionHandlers() {
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.add('hide-on-selection');
                     }
+                    setMobileFormattingToolbarActive(true);
                 } else {
                     // Text selected but not in an editable area: hide everything
                     for (var i = 0; i < textFormatButtons.length; i++) {
@@ -333,6 +407,7 @@ function initTextSelectionHandlers() {
                     for (var i = 0; i < noteActionButtons.length; i++) {
                         noteActionButtons[i].classList.add('hide-on-selection');
                     }
+                    setMobileFormattingToolbarActive(false);
                 }
             } else {
                 // No text selection: show actions, hide formatting
@@ -342,6 +417,7 @@ function initTextSelectionHandlers() {
                 for (var i = 0; i < noteActionButtons.length; i++) {
                     noteActionButtons[i].classList.remove('hide-on-selection');
                 }
+                setMobileFormattingToolbarActive(false);
             }
 
         }, 50); // Short delay to avoid too frequent calls
@@ -355,6 +431,8 @@ function initTextSelectionHandlers() {
         // Wait a bit for the selection to be updated
         setTimeout(handleSelectionChange, 10);
     });
+
+    initializeMobileViewportToolbarState();
 }
 
 // Expose to global scope
