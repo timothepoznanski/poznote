@@ -258,7 +258,7 @@
     }
 
     function isLockHeldByDifferentUser(lock) {
-        return !!(lock && !lock.holder_is_current_user && !lock.holder_is_current_editor_session);
+        return !!(lock && !lock.holder_is_current_editor_session);
     }
 
     function showLockConflictNotification(message) {
