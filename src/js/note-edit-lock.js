@@ -488,6 +488,19 @@
         });
     }
 
+    function releaseCurrentLock() {
+        var noteId = normalizeNoteId(activeNoteId);
+        if (!noteId) {
+            return;
+        }
+
+        stopHeartbeat();
+        stopStatusChecks();
+        releaseLock(noteId);
+        activeNoteId = null;
+        delete noteStates[noteId];
+    }
+
     function handleLockConflict(noteId, lock, message, reason) {
         stopHeartbeat();
         setNoteLockedState(noteId, lock || null);
@@ -650,9 +663,7 @@
     function handleCurrentNoteLoaded(noteId) {
         noteId = normalizeNoteId(noteId || window.noteid || getCurrentDomNoteId());
         if (!noteId) {
-            stopHeartbeat();
-            stopStatusChecks();
-            activeNoteId = null;
+            releaseCurrentLock();
             return;
         }
 
@@ -668,6 +679,7 @@
     window.handleNoteEditLockConflict = function (noteId, lock, message, reason) {
         handleLockConflict(noteId, lock, message, reason || 'lost');
     };
+    window.releaseCurrentNoteEditLock = releaseCurrentLock;
     window.acquireNoteEditLockForCurrentNote = handleCurrentNoteLoaded;
 
     function initializeCurrentNoteLock() {
@@ -694,5 +706,11 @@
 
     window.addEventListener('focus', function () {
         checkLockStatus(activeNoteId);
+    });
+
+    window.addEventListener('pageshow', function (event) {
+        if (event && event.persisted) {
+            handleCurrentNoteLoaded();
+        }
     });
 })();

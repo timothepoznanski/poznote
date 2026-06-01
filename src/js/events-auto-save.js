@@ -161,6 +161,10 @@ function setupPageUnloadWarning() {
                 }
             }
         }
+
+        if (typeof window.releaseCurrentNoteEditLock === 'function') {
+            window.releaseCurrentNoteEditLock();
+        }
     });
 
     // Additional fallback for visibility changes (tab switching, app backgrounding)
