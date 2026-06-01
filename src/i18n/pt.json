@@ -2440,6 +2440,8 @@
   "smtp_admin": {
     "title": "Configuração SMTP",
     "saved": "Configuração SMTP guardada com sucesso.",
+    "enabled": "Envio SMTP ativado.",
+    "disabled": "Envio SMTP desativado.",
     "error_saving": "Erro ao guardar a configuração SMTP.",
     "error_csrf": "Envio de formulário inválido. Tente novamente.",
     "section_delivery": "Entrega de e-mails de lembrete",
@@ -2447,6 +2449,10 @@
     "section_links": "Links",
     "section_test": "Teste",
     "security_none": "Nenhum",
+    "actions": {
+      "enable": "Ativar SMTP",
+      "disable": "Desativar SMTP"
+    },
     "status": {
       "configured": "Configurado",
       "not_configured": "Não configurado"

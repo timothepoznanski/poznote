@@ -2109,6 +2109,8 @@
   "smtp_admin": {
     "title": "Настройка SMTP",
     "saved": "Настройки SMTP успешно сохранены.",
+    "enabled": "Отправка SMTP включена.",
+    "disabled": "Отправка SMTP отключена.",
     "error_saving": "Ошибка при сохранении настроек SMTP.",
     "error_csrf": "Некорректная отправка формы. Пожалуйста, попробуйте снова.",
     "section_delivery": "Доставка писем с напоминаниями",
@@ -2116,6 +2118,10 @@
     "section_links": "Ссылки",
     "section_test": "Тест",
     "security_none": "Нет",
+    "actions": {
+      "enable": "Включить SMTP",
+      "disable": "Отключить SMTP"
+    },
     "status": {
       "configured": "Настроено",
       "not_configured": "Не настроено"

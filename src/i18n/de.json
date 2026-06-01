@@ -2437,6 +2437,8 @@
   "smtp_admin": {
     "title": "SMTP-Konfiguration",
     "saved": "SMTP-Konfiguration erfolgreich gespeichert.",
+    "enabled": "SMTP-Zustellung aktiviert.",
+    "disabled": "SMTP-Zustellung deaktiviert.",
     "error_saving": "Fehler beim Speichern der SMTP-Konfiguration.",
     "error_csrf": "Ungültige Formularübermittlung. Bitte versuchen Sie es erneut.",
     "section_delivery": "Zustellung von Erinnerungs-E-Mails",
@@ -2444,6 +2446,10 @@
     "section_links": "Links",
     "section_test": "Test",
     "security_none": "Keine",
+    "actions": {
+      "enable": "SMTP aktivieren",
+      "disable": "SMTP deaktivieren"
+    },
     "status": {
       "configured": "Konfiguriert",
       "not_configured": "Nicht konfiguriert"

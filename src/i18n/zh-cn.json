@@ -2577,6 +2577,8 @@
   "smtp_admin": {
     "title": "SMTP 配置",
     "saved": "SMTP 配置已成功保存。",
+    "enabled": "SMTP 发送已启用。",
+    "disabled": "SMTP 发送已禁用。",
     "error_saving": "保存 SMTP 配置时出错。",
     "error_csrf": "表单提交无效，请重试。",
     "section_delivery": "提醒邮件发送",
@@ -2584,6 +2586,10 @@
     "section_links": "链接",
     "section_test": "测试",
     "security_none": "无",
+    "actions": {
+      "enable": "启用 SMTP",
+      "disable": "禁用 SMTP"
+    },
     "status": {
       "configured": "已配置",
       "not_configured": "未配置"

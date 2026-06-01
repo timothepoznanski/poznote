@@ -2145,6 +2145,8 @@
   "smtp_admin": {
     "title": "SMTP Configuration",
     "saved": "SMTP configuration saved successfully.",
+    "enabled": "SMTP delivery enabled.",
+    "disabled": "SMTP delivery disabled.",
     "error_saving": "Error saving SMTP configuration.",
     "error_csrf": "Invalid form submission. Please try again.",
     "section_delivery": "Reminder email delivery",
@@ -2152,6 +2154,10 @@
     "section_links": "Links",
     "section_test": "Test",
     "security_none": "None",
+    "actions": {
+      "enable": "Enable SMTP",
+      "disable": "Disable SMTP"
+    },
     "status": {
       "configured": "Configured",
       "not_configured": "Not configured"

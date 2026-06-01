@@ -2656,6 +2656,8 @@
   "smtp_admin": {
     "title": "Configuration SMTP",
     "saved": "Configuration SMTP enregistrée avec succès.",
+    "enabled": "Envoi SMTP activé.",
+    "disabled": "Envoi SMTP désactivé.",
     "error_saving": "Erreur lors de l’enregistrement de la configuration SMTP.",
     "error_csrf": "Soumission de formulaire invalide. Veuillez réessayer.",
     "section_delivery": "Envoi des emails de rappel",
@@ -2663,6 +2665,10 @@
     "section_links": "Liens",
     "section_test": "Test",
     "security_none": "Aucun",
+    "actions": {
+      "enable": "Activer SMTP",
+      "disable": "Désactiver SMTP"
+    },
     "status": {
       "configured": "Configuré",
       "not_configured": "Non configuré"
