@@ -1,9 +1,32 @@
+<?php
+$reminderEmailAvailable = false;
+$reminderEmailAddress = '';
+try {
+    if (!function_exists('getGlobalSetting')) {
+        require_once __DIR__ . '/users/db_master.php';
+    }
+    $smtpHost = function_exists('getGlobalSetting') ? trim((string)getGlobalSetting('smtp_host', '')) : '';
+    $smtpFromEmail = function_exists('getGlobalSetting') ? trim((string)getGlobalSetting('smtp_from_email', '')) : '';
+    $currentReminderUser = function_exists('getCurrentUser') ? getCurrentUser() : [];
+    $reminderEmailAddress = trim((string)($currentReminderUser['email'] ?? ''));
+    $reminderEmailAvailable = $smtpHost !== ''
+        && filter_var($smtpFromEmail, FILTER_VALIDATE_EMAIL)
+        && filter_var($reminderEmailAddress, FILTER_VALIDATE_EMAIL);
+} catch (Throwable $e) {
+    $reminderEmailAvailable = false;
+    $reminderEmailAddress = '';
+}
+?>
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
 <div id="notificationPopup"></div>
 
 <!-- Reminder Modal -->
-<div id="reminderModal" class="modal">
+<div
+    id="reminderModal"
+    class="modal"
+    data-reminder-email-available="<?php echo $reminderEmailAvailable ? '1' : '0'; ?>"
+>
     <div class="modal-content">
         <h3><?php echo t_h('reminder.modal.title', [], 'Reminder'); ?></h3>
         <div class="reminder-form">
@@ -15,6 +38,23 @@
                 <button type="button" class="reminder-quick-btn" data-hours="1"><?php echo t_h('reminder.modal.in_1h', [], '1 hour'); ?></button>
                 <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
                 <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
+            </div>
+            <div class="reminder-email-option <?php echo $reminderEmailAvailable ? '' : 'initially-hidden'; ?>" id="reminderEmailOption">
+                <label class="reminder-email-label" for="reminderEmailInput">
+                    <span class="reminder-email-copy">
+                        <span class="reminder-email-title">
+                            <i class="lucide lucide-mail"></i>
+                            <?php echo t_h('reminder.modal.email_toggle', [], 'Send me an email'); ?>
+                        </span>
+                        <span class="reminder-email-hint">
+                            <?php echo t_h('reminder.modal.email_hint', ['email' => $reminderEmailAddress], 'To {{email}}'); ?>
+                        </span>
+                    </span>
+                    <span class="toggle-switch reminder-email-switch">
+                        <input type="checkbox" id="reminderEmailInput" <?php echo $reminderEmailAvailable ? 'checked' : ''; ?>>
+                        <span class="toggle-slider"></span>
+                    </span>
+                </label>
             </div>
             <div class="reminder-current-info initially-hidden" id="reminderCurrentInfo">
                 <i class="lucide lucide-bell"></i>
@@ -751,6 +791,29 @@
     </div>
 </div>
 
+<!-- Date and time format modal -->
+<div id="dateTimeFormatModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.date_time_format.title', [], 'Date & time format'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.date_time_format.description', [], 'Choose how dates and times are displayed:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="dateTimeFormat" value="default"> <?php echo t_h('modals.date_time_format.options.default', [], 'YYYY-MM-DD HH:mm'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="ymd_his"> <?php echo t_h('modals.date_time_format.options.ymd_his', [], 'YYYY-MM-DD HH:mm:ss'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="dmy_hi"> <?php echo t_h('modals.date_time_format.options.dmy_hi', [], 'DD/MM/YYYY HH:mm'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="mdy_hia"> <?php echo t_h('modals.date_time_format.options.mdy_hia', [], 'MM/DD/YYYY hh:mm AM/PM'); ?></label>
+                <label><input type="radio" name="dateTimeFormat" value="custom"> <?php echo t_h('modals.date_time_format.options.custom', [], 'Custom'); ?></label>
+                <input type="text" id="dateTimeFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.date_time_format.custom_placeholder', [], 'YYYY-MM-DD HH:mm:ss'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
+                <small style="display: block; margin: 4px 0 0 24px; color: #6b7280;"><?php echo t_h('modals.date_time_format.custom_hint', [], 'Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A'); ?></small>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="dateTimeFormatModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveDateTimeFormatModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note Reference Modal -->
 <div id="noteReferenceModal" class="modal">
     <div class="modal-content note-reference-modal-content">
@@ -1123,6 +1186,7 @@
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-sort-card" checked><span><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
@@ -1134,6 +1198,7 @@
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:smtp-config-card" checked><span><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>

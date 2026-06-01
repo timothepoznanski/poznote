@@ -364,10 +364,10 @@ $v = getAppVersion();
                         <th>
                             <span class="users-table-header-with-help">
                                 <?php echo t_h('multiuser.admin.email', [], 'Email'); ?>
-                                <span class="users-header-help" tabindex="0" role="img" aria-label="<?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication if configured. Poznote does not send any emails.'); ?>">
+                                <span class="users-header-help" tabindex="0" role="img" aria-label="<?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication and reminder emails when configured.'); ?>">
                                     <i class="lucide lucide-help-circle"></i>
                                     <span class="users-header-help-tooltip">
-                                        <?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication if configured. Poznote does not send any emails.'); ?>
+                                        <?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication and reminder emails when configured.'); ?>
                                     </span>
                                 </span>
                             </span>

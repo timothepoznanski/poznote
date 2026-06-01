@@ -42,32 +42,19 @@
                 });
             }
 
-            // Unified "Remember Me" handling for both standard and OIDC login
-            var rememberMeCheckbox = document.getElementById('remember_me');
-            
-            // Standard login form: sync checkbox with hidden input
-            var loginForm = document.querySelector('form[method="POST"]');
-            var rememberMeHidden = document.getElementById('remember_me_hidden');
-            
-            if (loginForm && rememberMeCheckbox && rememberMeHidden) {
-                loginForm.addEventListener('submit', function() {
-                    rememberMeHidden.value = rememberMeCheckbox.checked ? '1' : '0';
-                });
-            }
-            
-            // OIDC login: redirect with remember_me parameter
-            if (config.oidcEnabled && rememberMeCheckbox) {
+            // OIDC login: redirect without creating a Poznote remember-me cookie.
+            if (config.oidcEnabled) {
                 var oidcLoginBtn = document.getElementById('oidc-login-btn');
                 
                 if (oidcLoginBtn) {
                     oidcLoginBtn.addEventListener('click', function (e) {
                         e.preventDefault();
-                        var rememberMe = rememberMeCheckbox.checked ? '1' : '0';
-                        var params = new URLSearchParams({ remember_me: rememberMe });
+                        var params = new URLSearchParams();
                         if (config.redirectAfter) {
                             params.set('redirect', config.redirectAfter);
                         }
-                        window.location.href = 'oidc_login.php?' + params.toString();
+                        var query = params.toString();
+                        window.location.href = 'oidc_login.php' + (query ? '?' + query : '');
                     });
                 }
             }

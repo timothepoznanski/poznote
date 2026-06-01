@@ -23,6 +23,8 @@ class RemindersController {
      * List pending notifications (triggered reminders that are not dismissed)
      */
     public function index(): void {
+        $this->rememberDetectedAppUrl();
+
         try {
             $now = gmdate('Y-m-d H:i:s');
             
@@ -68,6 +70,8 @@ class RemindersController {
      * Get triggered notification counters (lightweight polling endpoint)
      */
     public function count(): void {
+        $this->rememberDetectedAppUrl();
+
         try {
             $now = gmdate('Y-m-d H:i:s');
                 $stmt = $this->con->prepare("
@@ -101,12 +105,15 @@ class RemindersController {
      * Body (JSON):
      *   - reminder_at: ISO datetime string (required)
      *   - message: Custom reminder message (optional)
+     *   - email_enabled: Whether to send an email for this reminder (optional)
      */
     public function setReminder(string $id): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid note ID');
             return;
         }
+
+        $this->rememberDetectedAppUrl();
         
         $noteId = (int)$id;
         $input = json_decode(file_get_contents('php://input'), true);
@@ -118,6 +125,7 @@ class RemindersController {
         
         $reminderAt = $input['reminder_at'] ?? null;
         $message = isset($input['message']) ? trim($input['message']) : '';
+        $emailEnabled = !empty($input['email_enabled']) && $this->isReminderEmailAvailable();
         
         if (empty($reminderAt)) {
             $this->sendError(400, 'reminder_at is required');
@@ -154,14 +162,15 @@ class RemindersController {
             // Create notification entry
             $notifMessage = $message ?: $note['heading'];
             $stmt = $this->con->prepare("
-                INSERT INTO notifications (note_id, type, message, trigger_at, created)
-                VALUES (?, 'reminder', ?, ?, datetime('now'))
+                INSERT INTO notifications (note_id, type, message, trigger_at, email_enabled, created)
+                VALUES (?, 'reminder', ?, ?, ?, datetime('now'))
             ");
-            $stmt->execute([$noteId, $notifMessage, $reminderAtUtc]);
+            $stmt->execute([$noteId, $notifMessage, $reminderAtUtc, $emailEnabled ? 1 : 0]);
             
             $this->sendSuccess([
                 'note_id' => $noteId,
-                'reminder_at' => $reminderAtUtc
+                'reminder_at' => $reminderAtUtc,
+                'email_enabled' => $emailEnabled
             ]);
         } catch (Exception $e) {
             error_log('RemindersController::setReminder error: ' . $e->getMessage());
@@ -205,11 +214,21 @@ class RemindersController {
             $this->sendError(400, 'Invalid note ID');
             return;
         }
+
+        $this->rememberDetectedAppUrl();
         
         $noteId = (int)$id;
         
         try {
-            $stmt = $this->con->prepare("SELECT reminder_at FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("
+                SELECT e.reminder_at,
+                       COALESCE(n.email_enabled, 1) AS email_enabled
+                FROM entries e
+                LEFT JOIN notifications n ON n.note_id = e.id AND n.dismissed = 0
+                WHERE e.id = ? AND e.trash = 0
+                ORDER BY n.id DESC
+                LIMIT 1
+            ");
             $stmt->execute([$noteId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -220,7 +239,8 @@ class RemindersController {
             
             $this->sendSuccess([
                 'note_id' => $noteId,
-                'reminder_at' => $row['reminder_at']
+                'reminder_at' => $row['reminder_at'],
+                'email_enabled' => !empty($row['email_enabled'])
             ]);
         } catch (Exception $e) {
             $this->sendError(500, 'Failed to get reminder');
@@ -300,6 +320,87 @@ class RemindersController {
         }
     }
     
+    private function isReminderEmailAvailable(): bool {
+        if (!function_exists('getGlobalSetting')) {
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        }
+
+        if (!function_exists('getGlobalSetting')) {
+            return false;
+        }
+
+        $host = trim((string)getGlobalSetting('smtp_host', ''));
+        $fromEmail = trim((string)getGlobalSetting('smtp_from_email', ''));
+        if ($host === '' || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+
+        if (function_exists('getCurrentUser')) {
+            $user = getCurrentUser();
+            $email = trim((string)($user['email'] ?? ''));
+            return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+        }
+
+        return true;
+    }
+
+    private function rememberDetectedAppUrl(): void {
+        if (!function_exists('setGlobalSetting') || !function_exists('getGlobalSetting')) {
+            require_once dirname(__DIR__, 3) . '/users/db_master.php';
+        }
+
+        if (!function_exists('setGlobalSetting') || !function_exists('getGlobalSetting')) {
+            return;
+        }
+
+        $detectedUrl = $this->detectAppUrl();
+        if ($detectedUrl === '') {
+            return;
+        }
+
+        $currentUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+        if ($currentUrl === $detectedUrl) {
+            return;
+        }
+
+        setGlobalSetting('smtp_app_url', $detectedUrl);
+    }
+
+    private function detectAppUrl(): string {
+        if (PHP_SAPI === 'cli') {
+            return '';
+        }
+
+        $host = function_exists('getExternalHostWithPort')
+            ? getExternalHostWithPort()
+            : trim((string)($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? '')));
+        if ($host === '') {
+            return '';
+        }
+
+        $protocol = function_exists('getProtocol') ? getProtocol() : 'http';
+        $scriptDir = rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
+        if ($scriptDir === '.' || $scriptDir === '/') {
+            $scriptDir = '';
+        }
+
+        foreach (['/api/v1', '/admin'] as $suffix) {
+            if ($scriptDir === $suffix || substr($scriptDir, -strlen($suffix)) === $suffix) {
+                $scriptDir = substr($scriptDir, 0, -strlen($suffix));
+                break;
+            }
+        }
+        $scriptDir = rtrim((string)$scriptDir, '/');
+
+        $url = $protocol . '://' . $host . $scriptDir;
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return '';
+        }
+
+        $scheme = strtolower((string)parse_url($url, PHP_URL_SCHEME));
+        return in_array($scheme, ['http', 'https'], true) ? $url : '';
+    }
+
     private function sendSuccess(array $data): void {
         echo json_encode(array_merge(['success' => true], $data));
     }

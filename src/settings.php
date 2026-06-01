@@ -98,13 +98,21 @@ try {
 
 // Count users (for admin)
 $users_count = 0;
+$smtp_enabled = false;
+$smtp_configured = false;
 if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
         $users = listAllUserProfiles();
         $users_count = count($users);
+        $smtp_from_email = trim((string)getGlobalSetting('smtp_from_email', ''));
+        $smtp_configured = trim((string)getGlobalSetting('smtp_host', '')) !== ''
+            && filter_var($smtp_from_email, FILTER_VALIDATE_EMAIL);
+        $smtp_enabled = $smtp_configured;
     } catch (Exception $e) {
         $users_count = 0;
+        $smtp_enabled = false;
+        $smtp_configured = false;
     }
 }
 
@@ -377,6 +385,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Date and Time Format -->
+            <div class="home-card" id="date-time-format-card">
+                <div class="home-card-icon"><i class="lucide lucide-calendar"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span>
+                    <span id="date-time-format-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Note Sort Order -->
             <div class="home-card" id="note-sort-card">
                 <div class="home-card-icon"><i class="lucide lucide-arrow-up-down-amount-down"></i></div>
@@ -494,6 +511,27 @@ if ($isAdmin) {
                     <span class="home-card-title"><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span>
                     <span class="setting-status <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? 'enabled' : 'disabled'; ?>">
                         <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- SMTP Configuration -->
+            <div class="home-card settings-card-clickable" id="smtp-config-card" data-href="admin/smtp.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-mail"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span>
+                    <span class="setting-status <?php echo ($smtp_enabled && $smtp_configured) ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($smtp_enabled && $smtp_configured) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif ($smtp_configured) {
+                            echo t_h('smtp_admin.status.configured', [], 'Configured');
+                        } else {
+                            echo t_h('smtp_admin.status.not_configured', [], 'Not configured');
+                        }
+                        ?>
                     </span>
                 </div>
             </div>

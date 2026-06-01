@@ -901,21 +901,6 @@ function oidc_finish_login($claims, $tokens) {
         $_SESSION['oidc_id_token'] = $tokens['id_token'];
     }
 
-    // Handle "Remember Me" functionality if requested
-    $rememberMe = isset($_SESSION['oidc_remember_me']) && $_SESSION['oidc_remember_me'] === true;
-    if ($rememberMe) {
-        // Use the same Remember Me mechanism as standard authentication
-        // This creates a persistent cookie that lasts 30 days
-        $timestamp = time();
-        $actualUsername = $user['username'];
-        $secretToUse = getRememberMeSecret($user);
-        
-        // Format: actual_username:user_id:timestamp:hash
-        $token = buildRememberMeToken($actualUsername, (int)$user['id'], $timestamp, $secretToUse);
-        
-        setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);
-    }
-
     // Clear transient values
     unset($_SESSION['oidc_state'], $_SESSION['oidc_nonce'], $_SESSION['oidc_code_verifier'], $_SESSION['oidc_remember_me']);
 }

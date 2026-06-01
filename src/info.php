@@ -48,16 +48,13 @@ $title = $note['heading'] ?: t('index.note.new_note', [], 'New note');
 // Format dates
 function formatDateString($dateStr) {
     if (empty($dateStr)) return t('common.not_available', [], 'Not available');
-    try {
-        // Dates are stored in UTC in the database
-        // Convert to the user's configured timezone for display
-        $timezone = getUserTimezone();
-        $date = new DateTime($dateStr, new DateTimeZone('UTC'));
-        $date->setTimezone(new DateTimeZone($timezone));
-        return $date->format('Y-m-d H:i');
-    } catch (Exception $e) {
-        return t('common.not_available', [], 'Not available');
+    $formatted = formatUtcDateTimeForDisplay($dateStr, 'Y-m-d H:i');
+    if ($formatted !== '') {
+        return $formatted;
     }
+
+    $fallback = convertUtcToUserTimezone($dateStr);
+    return $fallback !== '' ? $fallback : t('common.not_available', [], 'Not available');
 }
 
 function formatUserString($userId) {

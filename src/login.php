@@ -52,7 +52,7 @@ if ($redirectAfter !== null) {
 }
 
 // Detect language change from selector
-$allowedLangs = ['en', 'fr', 'es', 'de', 'pt', 'zh-cn'];
+$allowedLangs = ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn'];
 if (isset($_GET['lang'])) {
     $requestedLang = strtolower(trim((string)$_GET['lang']));
     if (in_array($requestedLang, $allowedLangs, true)) {
@@ -233,6 +233,7 @@ if (isset($_GET['oidc_error'])) {
                         'es' => 'Español',
                         'de' => 'Deutsch',
                         'pt' => 'Português',
+                        'ru' => 'Русский',
                         'zh-cn' => '简体中文'
                     ];
                     foreach ($langs as $code => $label): ?>
@@ -319,7 +320,12 @@ if (isset($_GET['oidc_error'])) {
                     <?php endif; ?>
                 </div>
 
-                <input type="hidden" name="remember_me" value="0" id="remember_me_hidden">
+                <div class="form-group remember-me-group remember-me-unified">
+                    <label class="remember-me-label">
+                        <input type="checkbox" name="remember_me" value="1" id="remember_me">
+                        <span><?php echo t_h('login.remember_me', [], 'Remember me for 30 days', $currentLang ?? 'en'); ?></span>
+                    </label>
+                </div>
                 <button type="submit" class="login-button"><?php echo t_h('login.button', [], 'Login', $currentLang ?? 'en'); ?></button>
             </form>
             <?php endif; ?>
@@ -334,15 +340,6 @@ if (isset($_GET['oidc_error'])) {
                 <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$showNormalLogin): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
             <?php endif; ?>
             
-            <?php if ($showNormalLogin || (function_exists('oidc_is_enabled') && oidc_is_enabled())): ?>
-            <div class="form-group remember-me-group remember-me-unified">
-                <label class="remember-me-label">
-                    <input type="checkbox" name="remember_me" value="1" id="remember_me">
-                    <span><?php echo t_h('login.remember_me', [], 'Remember me for 30 days', $currentLang ?? 'en'); ?></span>
-                </label>
-            </div>
-            <?php endif; ?>
-
             <?php if ($oidcError): ?>
                 <div class="error oidc-error"><?php echo htmlspecialchars($oidcError); ?></div>
             <?php endif; ?>
