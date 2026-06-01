@@ -416,7 +416,8 @@
       "change_password": "Changer le mot de passe",
       "import_limits": "Limites d'import",
       "git_sync_toggle": "Synchronisation Git",
-      "oidc_config": "OIDC / SSO"
+      "oidc_config": "OIDC / SSO",
+      "smtp_config": "SMTP / Email"
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -2247,7 +2248,7 @@
       "attachments_count": "Pièces jointes",
       "actions": "Actions",
       "not_defined": "non défini",
-      "email_usage_note": "Un utilisateur peut se connecter avec son adresse email plutôt qu'avec son nom d'utilisateur. Les adresses email sont aussi utilisées pour la connexion OIDC si elle est configurée. Poznote n'envoie aucun email.",
+      "email_usage_note": "Un utilisateur peut se connecter avec son adresse email plutôt qu'avec son nom d'utilisateur. Les adresses email sont aussi utilisées pour la connexion OIDC et les emails de rappel si ces options sont configurées.",
       "account_access": {
         "column": "Accès notes",
         "title": "Accès aux notes",
@@ -2652,6 +2653,50 @@
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
     }
   },
+  "smtp_admin": {
+    "title": "Configuration SMTP",
+    "saved": "Configuration SMTP enregistrée avec succès.",
+    "error_saving": "Erreur lors de l’enregistrement de la configuration SMTP.",
+    "error_csrf": "Soumission de formulaire invalide. Veuillez réessayer.",
+    "section_delivery": "Envoi des emails de rappel",
+    "section_provider": "Fournisseur SMTP",
+    "section_links": "Liens",
+    "section_test": "Test",
+    "security_none": "Aucun",
+    "status": {
+      "configured": "Configuré",
+      "not_configured": "Non configuré"
+    },
+    "fields": {
+      "enabled": "Activer les emails de rappel",
+      "host": "Hôte SMTP",
+      "port": "Port",
+      "security": "Chiffrement",
+      "username": "Nom d’utilisateur",
+      "password": "Mot de passe",
+      "clear_password": "Effacer le mot de passe enregistré",
+      "from_email": "Email expéditeur",
+      "from_name": "Nom expéditeur",
+      "app_url": "URL de l’application",
+      "test_recipient": "Destinataire de test"
+    },
+    "hints": {
+      "enabled": "Une fois activé, le worker interne envoie les rappels arrivés à échéance à l’adresse email de chaque utilisateur.",
+      "password_configured": "Un mot de passe est configuré. Laissez ce champ vide pour le conserver.",
+      "password_empty": "Aucun mot de passe configuré.",
+      "app_url": "Utilisée pour inclure un lien vers la note dans les emails de rappel. Laissez vide pour ne pas ajouter de lien.",
+      "test_recipient": "Utilisez ce champ pour vérifier le fournisseur avant d’activer les emails de rappel."
+    },
+    "test": {
+      "button": "Envoyer un email de test",
+      "success": "Configuration SMTP enregistrée et email de test envoyé.",
+      "error": "Configuration SMTP enregistrée, mais l’email de test a échoué : {{error}}",
+      "subject": "Test SMTP Poznote",
+      "body_text": "Ceci est un email de test envoyé par Poznote.\n\nSi vous l’avez reçu, votre configuration SMTP fonctionne.",
+      "body_html_intro": "Ceci est un email de test envoyé par Poznote.",
+      "body_html_success": "Si vous l’avez reçu, votre configuration SMTP fonctionne."
+    }
+  },
   "reminder": {
     "toolbar_button": "Définir un rappel",
     "notifications": "Notifications",
@@ -2663,6 +2708,18 @@
     "just_now": "À l'instant",
     "new_notifications": "Vous avez",
     "notification_s": "notification(s)",
+    "email": {
+      "subject": "Rappel : {{note}}",
+      "intro": "Un rappel est arrivé à échéance dans Poznote.",
+      "note": "Note : {{note}}",
+      "note_label": "Note",
+      "due_at": "Échéance : {{date}}",
+      "due_at_label": "Échéance",
+      "message": "Message : {{message}}",
+      "open_link": "Ouvrir la note : {{url}}",
+      "open_button": "Ouvrir la note",
+      "untitled_note": "Note sans titre"
+    },
     "modal": {
       "title": "Rappel",
       "date_label": "Date et heure",

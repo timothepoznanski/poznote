@@ -130,7 +130,8 @@
       "change_password": "Change Password",
       "import_limits": "Import Limits",
       "git_sync_toggle": "Git Sync",
-      "oidc_config": "OIDC / SSO"
+      "oidc_config": "OIDC / SSO",
+      "smtp_config": "SMTP / Email"
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -2027,7 +2028,7 @@
       "click_to_deactivate": "Click to deactivate",
       "toggle_admin": "Grant or revoke administrator privileges",
       "admin_id_1_locked": "Administrator role cannot be removed from user ID 1",
-      "email_usage_note": "Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication if configured. Poznote does not send any emails.",
+      "email_usage_note": "Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication and reminder emails when configured.",
       "admin_note": "Use the Admin checkbox to grant or revoke administrator privileges for another user.",
       "account_access": {
         "column": "Note access",
@@ -2141,6 +2142,50 @@
       "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
     }
   },
+  "smtp_admin": {
+    "title": "SMTP Configuration",
+    "saved": "SMTP configuration saved successfully.",
+    "error_saving": "Error saving SMTP configuration.",
+    "error_csrf": "Invalid form submission. Please try again.",
+    "section_delivery": "Reminder email delivery",
+    "section_provider": "SMTP provider",
+    "section_links": "Links",
+    "section_test": "Test",
+    "security_none": "None",
+    "status": {
+      "configured": "Configured",
+      "not_configured": "Not configured"
+    },
+    "fields": {
+      "enabled": "Enable reminder emails",
+      "host": "SMTP host",
+      "port": "Port",
+      "security": "Encryption",
+      "username": "Username",
+      "password": "Password",
+      "clear_password": "Clear stored password",
+      "from_email": "Sender email",
+      "from_name": "Sender name",
+      "app_url": "Application URL",
+      "test_recipient": "Test recipient"
+    },
+    "hints": {
+      "enabled": "When enabled, the internal worker sends emails for due reminders to each user email address.",
+      "password_configured": "A password is configured. Leave blank to keep it.",
+      "password_empty": "No password configured.",
+      "app_url": "Used to include a note link in reminder emails. Leave empty to omit links.",
+      "test_recipient": "Use this to verify the provider before enabling reminder emails."
+    },
+    "test": {
+      "button": "Send test email",
+      "success": "SMTP configuration saved and test email sent.",
+      "error": "SMTP configuration saved, but the test email failed: {{error}}",
+      "subject": "Poznote SMTP test",
+      "body_text": "This is a test email from Poznote.\n\nIf you received it, your SMTP configuration works.",
+      "body_html_intro": "This is a test email from Poznote.",
+      "body_html_success": "If you received it, your SMTP configuration works."
+    }
+  },
   "reminder": {
     "toolbar_button": "Set reminder",
     "notifications": "Notifications",
@@ -2152,6 +2197,18 @@
     "just_now": "Just now",
     "new_notifications": "You have",
     "notification_s": "notification(s)",
+    "email": {
+      "subject": "Reminder: {{note}}",
+      "intro": "A reminder is due in Poznote.",
+      "note": "Note: {{note}}",
+      "note_label": "Note",
+      "due_at": "Due at: {{date}}",
+      "due_at_label": "Due at",
+      "message": "Message: {{message}}",
+      "open_link": "Open note: {{url}}",
+      "open_button": "Open note",
+      "untitled_note": "Untitled note"
+    },
     "modal": {
       "title": "Reminder",
       "date_label": "Date and time",

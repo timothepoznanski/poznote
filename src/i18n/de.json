@@ -404,7 +404,8 @@
       "change_password": "Passwort ändern",
       "import_limits": "Importlimits",
       "git_sync_toggle": "Git-Synchronisierung",
-      "oidc_config": "OIDC / SSO"
+      "oidc_config": "OIDC / SSO",
+      "smtp_config": "SMTP / E-Mail"
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -2433,6 +2434,50 @@
       "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
     }
   },
+  "smtp_admin": {
+    "title": "SMTP-Konfiguration",
+    "saved": "SMTP-Konfiguration erfolgreich gespeichert.",
+    "error_saving": "Fehler beim Speichern der SMTP-Konfiguration.",
+    "error_csrf": "Ungültige Formularübermittlung. Bitte versuchen Sie es erneut.",
+    "section_delivery": "Zustellung von Erinnerungs-E-Mails",
+    "section_provider": "SMTP-Anbieter",
+    "section_links": "Links",
+    "section_test": "Test",
+    "security_none": "Keine",
+    "status": {
+      "configured": "Konfiguriert",
+      "not_configured": "Nicht konfiguriert"
+    },
+    "fields": {
+      "enabled": "Erinnerungs-E-Mails aktivieren",
+      "host": "SMTP-Host",
+      "port": "Port",
+      "security": "Verschlüsselung",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "clear_password": "Gespeichertes Passwort löschen",
+      "from_email": "Absender-E-Mail",
+      "from_name": "Absendername",
+      "app_url": "Anwendungs-URL",
+      "test_recipient": "Testempfänger"
+    },
+    "hints": {
+      "enabled": "Wenn aktiviert, sendet der interne Worker E-Mails für fällige Erinnerungen an die E-Mail-Adresse jedes Benutzers.",
+      "password_configured": "Ein Passwort ist konfiguriert. Lassen Sie das Feld leer, um es beizubehalten.",
+      "password_empty": "Kein Passwort konfiguriert.",
+      "app_url": "Wird verwendet, um einen Notizlink in Erinnerungs-E-Mails einzufügen. Leer lassen, um Links wegzulassen.",
+      "test_recipient": "Verwenden Sie dies, um den Anbieter zu überprüfen, bevor Sie Erinnerungs-E-Mails aktivieren."
+    },
+    "test": {
+      "button": "Test-E-Mail senden",
+      "success": "SMTP-Konfiguration gespeichert und Test-E-Mail gesendet.",
+      "error": "SMTP-Konfiguration gespeichert, aber die Test-E-Mail ist fehlgeschlagen: {{error}}",
+      "subject": "Poznote SMTP-Test",
+      "body_text": "Dies ist eine Test-E-Mail von Poznote.\n\nWenn Sie sie erhalten haben, funktioniert Ihre SMTP-Konfiguration.",
+      "body_html_intro": "Dies ist eine Test-E-Mail von Poznote.",
+      "body_html_success": "Wenn Sie sie erhalten haben, funktioniert Ihre SMTP-Konfiguration."
+    }
+  },
   "reminder": {
     "toolbar_button": "Erinnerung setzen",
     "notifications": "Benachrichtigungen",
@@ -2444,6 +2489,18 @@
     "just_now": "Gerade eben",
     "new_notifications": "Sie haben",
     "notification_s": "Benachrichtigung(en)",
+    "email": {
+      "subject": "Erinnerung: {{note}}",
+      "intro": "Eine Erinnerung ist in Poznote fällig.",
+      "note": "Notiz: {{note}}",
+      "note_label": "Notiz",
+      "due_at": "Fällig um: {{date}}",
+      "due_at_label": "Fällig um",
+      "message": "Nachricht: {{message}}",
+      "open_link": "Notiz öffnen: {{url}}",
+      "open_button": "Notiz öffnen",
+      "untitled_note": "Unbenannte Notiz"
+    },
     "modal": {
       "title": "Erinnerung",
       "date_label": "Datum und Uhrzeit",

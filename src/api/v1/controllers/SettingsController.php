@@ -11,7 +11,26 @@ class SettingsController {
     private $con;
     
     // Global settings that should be stored in master database
-    private $globalSettings = ['login_display_name', 'custom_css_path', 'git_sync_enabled', 'import_max_individual_files', 'import_max_zip_files', 'mcp_user_id', 'mcp_default_workspace', 'mcp_debug'];
+    private $globalSettings = [
+        'login_display_name',
+        'custom_css_path',
+        'git_sync_enabled',
+        'import_max_individual_files',
+        'import_max_zip_files',
+        'mcp_user_id',
+        'mcp_default_workspace',
+        'mcp_debug',
+        'smtp_enabled',
+        'smtp_host',
+        'smtp_port',
+        'smtp_security',
+        'smtp_username',
+        'smtp_password',
+        'smtp_from_email',
+        'smtp_from_name',
+        'smtp_app_url',
+        'smtp_reminder_cutoff_at',
+    ];
     
     public function __construct($con) {
         $this->con = $con;
@@ -113,6 +132,49 @@ class SettingsController {
             return substr(trim((string) $value), 0, 255);
         }
 
+        if ($key === 'smtp_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+        }
+
+        if ($key === 'smtp_port') {
+            $intVal = (int) $value;
+            if ($intVal < 1 || $intVal > 65535) {
+                throw new InvalidArgumentException('smtp_port must be between 1 and 65535', 400);
+            }
+            return (string) $intVal;
+        }
+
+        if ($key === 'smtp_security') {
+            $normalized = strtolower(trim((string) $value));
+            if (!in_array($normalized, ['none', 'tls', 'ssl'], true)) {
+                throw new InvalidArgumentException('invalid smtp_security', 400);
+            }
+            return $normalized;
+        }
+
+        if ($key === 'smtp_from_email') {
+            $email = trim((string) $value);
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new InvalidArgumentException('invalid smtp_from_email', 400);
+            }
+            return $email;
+        }
+
+        if ($key === 'smtp_app_url') {
+            $url = rtrim(trim((string) $value), '/');
+            if ($url !== '') {
+                $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+                if (!filter_var($url, FILTER_VALIDATE_URL) || !in_array($scheme, ['http', 'https'], true)) {
+                    throw new InvalidArgumentException('smtp_app_url must start with http:// or https://', 400);
+                }
+            }
+            return $url;
+        }
+
+        if (in_array($key, ['smtp_host', 'smtp_username', 'smtp_password', 'smtp_from_name', 'smtp_reminder_cutoff_at'], true)) {
+            return substr(trim((string) $value), 0, 1000);
+        }
+
         return is_string($value) ? $value : (string) $value;
     }
     
@@ -137,6 +199,9 @@ class SettingsController {
                 $this->requireGlobalSettingsAdmin();
                 require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 $value = getGlobalSetting($key, '');
+                if ($key === 'smtp_password' && $value !== '') {
+                    $value = '';
+                }
             } else {
                 // For user settings, use the user database
                 if (!$this->con) {

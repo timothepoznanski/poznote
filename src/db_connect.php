@@ -252,11 +252,15 @@ try {
         created DATETIME DEFAULT CURRENT_TIMESTAMP,
         trigger_at DATETIME,
         dismissed INTEGER DEFAULT 0,
+        email_sent_at DATETIME,
+        email_attempts INTEGER DEFAULT 0,
+        email_last_attempt_at DATETIME,
+        email_error TEXT,
         FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 13;
+    $CURRENT_SCHEMA_VERSION = 14;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -457,9 +461,30 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
 
         // === Update schema version ===
-        $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '11')");
+        $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '" . $CURRENT_SCHEMA_VERSION . "')");
     }
     // --- End schema versioning ---
+
+    // Always ensure reminder email delivery columns exist for databases created before SMTP reminders.
+    try {
+        $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
+        $existingColumns = array_column($cols, 'name');
+        if (!in_array('email_sent_at', $existingColumns)) {
+            $con->exec("ALTER TABLE notifications ADD COLUMN email_sent_at DATETIME");
+        }
+        if (!in_array('email_attempts', $existingColumns)) {
+            $con->exec("ALTER TABLE notifications ADD COLUMN email_attempts INTEGER DEFAULT 0");
+        }
+        if (!in_array('email_last_attempt_at', $existingColumns)) {
+            $con->exec("ALTER TABLE notifications ADD COLUMN email_last_attempt_at DATETIME");
+        }
+        if (!in_array('email_error', $existingColumns)) {
+            $con->exec("ALTER TABLE notifications ADD COLUMN email_error TEXT");
+        }
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
+    } catch (Exception $e) {
+        error_log('Could not ensure reminder email columns: ' . $e->getMessage());
+    }
 
     // Always ensure linked_note_id column exists (may have been removed and re-added)
     try {

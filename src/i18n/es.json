@@ -404,7 +404,8 @@
       "change_password": "Cambiar contraseña",
       "import_limits": "Límites de importación",
       "git_sync_toggle": "Sincronización Git",
-      "oidc_config": "OIDC / SSO"
+      "oidc_config": "OIDC / SSO",
+      "smtp_config": "SMTP / Correo"
     },
     "install_app": {
       "launching": "La instalación va a iniciarse. Por favor, espere...",
@@ -2432,6 +2433,50 @@
       "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
     }
   },
+  "smtp_admin": {
+    "title": "Configuración SMTP",
+    "saved": "Configuración SMTP guardada correctamente.",
+    "error_saving": "Error al guardar la configuración SMTP.",
+    "error_csrf": "Envío de formulario inválido. Inténtelo de nuevo.",
+    "section_delivery": "Envío de correos de recordatorio",
+    "section_provider": "Proveedor SMTP",
+    "section_links": "Enlaces",
+    "section_test": "Prueba",
+    "security_none": "Ninguno",
+    "status": {
+      "configured": "Configurado",
+      "not_configured": "No configurado"
+    },
+    "fields": {
+      "enabled": "Activar correos de recordatorio",
+      "host": "Host SMTP",
+      "port": "Puerto",
+      "security": "Cifrado",
+      "username": "Nombre de usuario",
+      "password": "Contraseña",
+      "clear_password": "Borrar contraseña guardada",
+      "from_email": "Correo del remitente",
+      "from_name": "Nombre del remitente",
+      "app_url": "URL de la aplicación",
+      "test_recipient": "Destinatario de prueba"
+    },
+    "hints": {
+      "enabled": "Cuando está activado, el worker interno envía correos para los recordatorios vencidos a la dirección de correo de cada usuario.",
+      "password_configured": "Hay una contraseña configurada. Deje en blanco para conservarla.",
+      "password_empty": "No hay contraseña configurada.",
+      "app_url": "Se usa para incluir un enlace a la nota en los correos de recordatorio. Déjelo vacío para omitir los enlaces.",
+      "test_recipient": "Use esto para verificar el proveedor antes de activar los correos de recordatorio."
+    },
+    "test": {
+      "button": "Enviar correo de prueba",
+      "success": "Configuración SMTP guardada y correo de prueba enviado.",
+      "error": "Configuración SMTP guardada, pero el correo de prueba falló: {{error}}",
+      "subject": "Prueba SMTP de Poznote",
+      "body_text": "Este es un correo de prueba de Poznote.\n\nSi lo recibió, su configuración SMTP funciona.",
+      "body_html_intro": "Este es un correo de prueba de Poznote.",
+      "body_html_success": "Si lo recibió, su configuración SMTP funciona."
+    }
+  },
   "reminder": {
     "toolbar_button": "Establecer recordatorio",
     "notifications": "Notificaciones",
@@ -2443,6 +2488,18 @@
     "just_now": "Ahora mismo",
     "new_notifications": "Tiene",
     "notification_s": "notificación(es)",
+    "email": {
+      "subject": "Recordatorio: {{note}}",
+      "intro": "Un recordatorio está pendiente en Poznote.",
+      "note": "Nota: {{note}}",
+      "note_label": "Nota",
+      "due_at": "Vence: {{date}}",
+      "due_at_label": "Vence",
+      "message": "Mensaje: {{message}}",
+      "open_link": "Abrir nota: {{url}}",
+      "open_button": "Abrir nota",
+      "untitled_note": "Nota sin título"
+    },
     "modal": {
       "title": "Recordatorio",
       "date_label": "Fecha y hora",

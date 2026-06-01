@@ -405,7 +405,8 @@
       "change_password": "修改密码",
       "import_limits": "导入限制",
       "git_sync_toggle": "Git 同步",
-      "oidc_config": "OIDC / SSO"
+      "oidc_config": "OIDC / SSO",
+      "smtp_config": "SMTP / 邮件"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -2573,6 +2574,50 @@
       "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
     }
   },
+  "smtp_admin": {
+    "title": "SMTP 配置",
+    "saved": "SMTP 配置已成功保存。",
+    "error_saving": "保存 SMTP 配置时出错。",
+    "error_csrf": "表单提交无效，请重试。",
+    "section_delivery": "提醒邮件发送",
+    "section_provider": "SMTP 提供商",
+    "section_links": "链接",
+    "section_test": "测试",
+    "security_none": "无",
+    "status": {
+      "configured": "已配置",
+      "not_configured": "未配置"
+    },
+    "fields": {
+      "enabled": "启用提醒邮件",
+      "host": "SMTP 主机",
+      "port": "端口",
+      "security": "加密方式",
+      "username": "用户名",
+      "password": "密码",
+      "clear_password": "清除已保存的密码",
+      "from_email": "发件人邮箱",
+      "from_name": "发件人名称",
+      "app_url": "应用 URL",
+      "test_recipient": "测试收件人"
+    },
+    "hints": {
+      "enabled": "启用后，内部 Worker 会将到期提醒邮件发送至每位用户的邮箱。",
+      "password_configured": "已配置密码，留空则保留现有密码。",
+      "password_empty": "未配置密码。",
+      "app_url": "用于在提醒邮件中附上笔记链接，留空则不附加链接。",
+      "test_recipient": "在启用提醒邮件前，使用此项验证提供商。"
+    },
+    "test": {
+      "button": "发送测试邮件",
+      "success": "SMTP 配置已保存，测试邮件已发送。",
+      "error": "SMTP 配置已保存，但测试邮件发送失败：{{error}}",
+      "subject": "Poznote SMTP 测试",
+      "body_text": "这是来自 Poznote 的测试邮件。\n\n如果您收到了，说明您的 SMTP 配置正常。",
+      "body_html_intro": "这是来自 Poznote 的测试邮件。",
+      "body_html_success": "如果您收到了，说明您的 SMTP 配置正常。"
+    }
+  },
   "reminder": {
     "toolbar_button": "设置提醒",
     "notifications": "通知",
@@ -2584,6 +2629,18 @@
     "just_now": "刚刚",
     "new_notifications": "您有",
     "notification_s": "条通知",
+    "email": {
+      "subject": "提醒：{{note}}",
+      "intro": "Poznote 中有一个提醒已到期。",
+      "note": "笔记：{{note}}",
+      "note_label": "笔记",
+      "due_at": "到期时间：{{date}}",
+      "due_at_label": "到期时间",
+      "message": "消息：{{message}}",
+      "open_link": "打开笔记：{{url}}",
+      "open_button": "打开笔记",
+      "untitled_note": "无标题笔记"
+    },
     "modal": {
       "title": "提醒",
       "date_label": "日期和时间",
