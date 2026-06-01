@@ -108,7 +108,9 @@ if ($isAdmin) {
         $smtp_from_email = trim((string)getGlobalSetting('smtp_from_email', ''));
         $smtp_configured = trim((string)getGlobalSetting('smtp_host', '')) !== ''
             && filter_var($smtp_from_email, FILTER_VALIDATE_EMAIL);
-        $smtp_enabled = $smtp_configured;
+        $smtp_enabled_setting = getGlobalSetting('smtp_enabled', null);
+        $smtp_enabled = $smtp_configured
+            && ($smtp_enabled_setting === null || $smtp_enabled_setting === '' || filter_var($smtp_enabled_setting, FILTER_VALIDATE_BOOLEAN));
     } catch (Exception $e) {
         $users_count = 0;
         $smtp_enabled = false;
@@ -527,7 +529,7 @@ if ($isAdmin) {
                         if ($smtp_enabled && $smtp_configured) {
                             echo t_h('common.enabled', [], 'Enabled');
                         } elseif ($smtp_configured) {
-                            echo t_h('smtp_admin.status.configured', [], 'Configured');
+                            echo t_h('common.disabled', [], 'Disabled');
                         } else {
                             echo t_h('smtp_admin.status.not_configured', [], 'Not configured');
                         }

@@ -27,6 +27,8 @@ class ReminderEmailService {
         $host = trim((string)getGlobalSetting('smtp_host', ''));
         $fromEmail = trim((string)getGlobalSetting('smtp_from_email', ''));
         $configured = $host !== '' && filter_var($fromEmail, FILTER_VALIDATE_EMAIL);
+        $enabledSetting = getGlobalSetting('smtp_enabled', null);
+        $enabled = $configured && ($enabledSetting === null || $enabledSetting === '' || filter_var($enabledSetting, FILTER_VALIDATE_BOOLEAN));
 
         $appUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
         if ($appUrl === '' && function_exists('_env')) {
@@ -34,7 +36,8 @@ class ReminderEmailService {
         }
 
         return [
-            'enabled' => $configured,
+            'enabled' => $enabled,
+            'configured' => $configured,
             'host' => $host,
             'port' => $port,
             'security' => $security,
@@ -52,7 +55,7 @@ class ReminderEmailService {
         $errors = [];
 
         if ($requireEnabled && empty($config['enabled'])) {
-            $errors[] = 'SMTP reminder emails are disabled';
+            $errors[] = 'SMTP configuration is disabled';
         }
         if (trim((string)($config['host'] ?? '')) === '') {
             $errors[] = 'SMTP host is required';

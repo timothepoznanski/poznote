@@ -2440,6 +2440,8 @@
   "smtp_admin": {
     "title": "Configuração SMTP",
     "saved": "Configuração SMTP guardada com sucesso.",
+    "enabled": "Configuração SMTP ativada.",
+    "disabled": "Configuração SMTP desativada.",
     "error_saving": "Erro ao guardar a configuração SMTP.",
     "error_csrf": "Envio de formulário inválido. Tente novamente.",
     "section_delivery": "Entrega de e-mails de lembrete",
@@ -2447,12 +2449,16 @@
     "section_links": "Links",
     "section_test": "Teste",
     "security_none": "Nenhum",
+    "actions": {
+      "enable": "Ativar SMTP",
+      "disable": "Desativar SMTP"
+    },
     "status": {
       "configured": "Configurado",
       "not_configured": "Não configurado"
     },
     "fields": {
-      "enabled": "Ativar e-mails de lembrete",
+      "enabled": "Ativar configuração SMTP",
       "host": "Servidor SMTP",
       "port": "Porta",
       "security": "Encriptação",
@@ -2465,7 +2471,7 @@
       "test_recipient": "Destinatário de teste"
     },
     "hints": {
-      "enabled": "Quando ativado, o worker interno envia e-mails para lembretes vencidos para o endereço de e-mail de cada utilizador.",
+      "enabled": "Quando ativada, o Poznote pode usar este fornecedor SMTP para enviar e-mails.",
       "security_summary": "STARTTLS usa normalmente a porta 587 e muda para TLS após a ligação. SSL/TLS é encriptado desde a ligação, normalmente na porta 465. Nenhum não usa encriptação.",
       "security_tls": "STARTTLS: ligação padrão e depois mudança para TLS, normalmente porta 587.",
       "security_ssl": "SSL/TLS: encriptado desde a ligação, normalmente porta 465.",
@@ -2473,7 +2479,7 @@
       "password_configured": "Uma palavra-passe está configurada. Deixe em branco para a manter.",
       "password_empty": "Nenhuma palavra-passe configurada.",
       "app_url": "Usado para incluir um link direto para a nota nos e-mails de lembrete. Este valor é detetado automaticamente; edite-o se a sua URL pública for diferente.",
-      "test_recipient": "Use este campo para verificar o fornecedor antes de ativar os e-mails de lembrete."
+      "test_recipient": "Use este campo para verificar o fornecedor antes de ativar a configuração SMTP."
     },
     "test": {
       "button": "Enviar e-mail de teste",

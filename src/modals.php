@@ -7,9 +7,12 @@ try {
     }
     $smtpHost = function_exists('getGlobalSetting') ? trim((string)getGlobalSetting('smtp_host', '')) : '';
     $smtpFromEmail = function_exists('getGlobalSetting') ? trim((string)getGlobalSetting('smtp_from_email', '')) : '';
+    $smtpEnabledSetting = function_exists('getGlobalSetting') ? getGlobalSetting('smtp_enabled', null) : null;
+    $smtpEnabled = $smtpEnabledSetting === null || $smtpEnabledSetting === '' || filter_var($smtpEnabledSetting, FILTER_VALIDATE_BOOLEAN);
     $currentReminderUser = function_exists('getCurrentUser') ? getCurrentUser() : [];
     $reminderEmailAddress = trim((string)($currentReminderUser['email'] ?? ''));
-    $reminderEmailAvailable = $smtpHost !== ''
+    $reminderEmailAvailable = $smtpEnabled
+        && $smtpHost !== ''
         && filter_var($smtpFromEmail, FILTER_VALIDATE_EMAIL)
         && filter_var($reminderEmailAddress, FILTER_VALIDATE_EMAIL);
 } catch (Throwable $e) {

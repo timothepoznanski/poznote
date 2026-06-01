@@ -331,6 +331,11 @@ class RemindersController {
 
         $host = trim((string)getGlobalSetting('smtp_host', ''));
         $fromEmail = trim((string)getGlobalSetting('smtp_from_email', ''));
+        $enabledSetting = getGlobalSetting('smtp_enabled', null);
+        if ($enabledSetting !== null && $enabledSetting !== '' && !filter_var($enabledSetting, FILTER_VALIDATE_BOOLEAN)) {
+            return false;
+        }
+
         if ($host === '' || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
             return false;
         }

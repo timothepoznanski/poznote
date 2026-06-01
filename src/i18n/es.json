@@ -2436,6 +2436,8 @@
   "smtp_admin": {
     "title": "Configuración SMTP",
     "saved": "Configuración SMTP guardada correctamente.",
+    "enabled": "Configuración SMTP activada.",
+    "disabled": "Configuración SMTP desactivada.",
     "error_saving": "Error al guardar la configuración SMTP.",
     "error_csrf": "Envío de formulario inválido. Inténtelo de nuevo.",
     "section_delivery": "Envío de correos de recordatorio",
@@ -2443,12 +2445,16 @@
     "section_links": "Enlaces",
     "section_test": "Prueba",
     "security_none": "Ninguno",
+    "actions": {
+      "enable": "Activar SMTP",
+      "disable": "Desactivar SMTP"
+    },
     "status": {
       "configured": "Configurado",
       "not_configured": "No configurado"
     },
     "fields": {
-      "enabled": "Activar correos de recordatorio",
+      "enabled": "Activar configuración SMTP",
       "host": "Host SMTP",
       "port": "Puerto",
       "security": "Cifrado",
@@ -2461,7 +2467,7 @@
       "test_recipient": "Destinatario de prueba"
     },
     "hints": {
-      "enabled": "Cuando está activado, el worker interno envía correos para los recordatorios vencidos a la dirección de correo de cada usuario.",
+      "enabled": "Cuando está activada, Poznote puede usar este proveedor SMTP para enviar correos.",
       "security_summary": "STARTTLS suele usar el puerto 587 y cambia a TLS después de conectar. SSL/TLS se cifra desde la conexión, normalmente en el puerto 465. Ninguno no usa cifrado.",
       "security_tls": "STARTTLS: conexión estándar y luego cambio a TLS, normalmente puerto 587.",
       "security_ssl": "SSL/TLS: cifrado desde la conexión, normalmente puerto 465.",
@@ -2469,7 +2475,7 @@
       "password_configured": "Hay una contraseña configurada. Deje en blanco para conservarla.",
       "password_empty": "No hay contraseña configurada.",
       "app_url": "Se usa para incluir un enlace directo a la nota en los correos de recordatorio. Este valor se detecta automáticamente; edítelo si su URL pública es diferente.",
-      "test_recipient": "Use esto para verificar el proveedor antes de activar los correos de recordatorio."
+      "test_recipient": "Use esto para verificar el proveedor antes de activar la configuración SMTP."
     },
     "test": {
       "button": "Enviar correo de prueba",

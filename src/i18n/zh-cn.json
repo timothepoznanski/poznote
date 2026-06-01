@@ -2577,6 +2577,8 @@
   "smtp_admin": {
     "title": "SMTP 配置",
     "saved": "SMTP 配置已成功保存。",
+    "enabled": "SMTP 配置已启用。",
+    "disabled": "SMTP 配置已禁用。",
     "error_saving": "保存 SMTP 配置时出错。",
     "error_csrf": "表单提交无效，请重试。",
     "section_delivery": "提醒邮件发送",
@@ -2584,12 +2586,16 @@
     "section_links": "链接",
     "section_test": "测试",
     "security_none": "无",
+    "actions": {
+      "enable": "启用 SMTP",
+      "disable": "禁用 SMTP"
+    },
     "status": {
       "configured": "已配置",
       "not_configured": "未配置"
     },
     "fields": {
-      "enabled": "启用提醒邮件",
+      "enabled": "启用 SMTP 配置",
       "host": "SMTP 主机",
       "port": "端口",
       "security": "加密方式",
@@ -2602,7 +2608,7 @@
       "test_recipient": "测试收件人"
     },
     "hints": {
-      "enabled": "启用后，内部 Worker 会将到期提醒邮件发送至每位用户的邮箱。",
+      "enabled": "启用后，Poznote 可以使用此 SMTP 提供商发送邮件。",
       "security_summary": "STARTTLS 通常使用 587 端口，并在连接后升级到 TLS。SSL/TLS 从连接开始即加密，通常使用 465 端口。无表示不使用加密。",
       "security_tls": "STARTTLS：标准连接后升级到 TLS，通常使用 587 端口。",
       "security_ssl": "SSL/TLS：从连接开始即加密，通常使用 465 端口。",
@@ -2610,7 +2616,7 @@
       "password_configured": "已配置密码，留空则保留现有密码。",
       "password_empty": "未配置密码。",
       "app_url": "用于在提醒邮件中附上直接打开笔记的链接。此值会自动检测；如果您的公网 URL 不同，请修改它。",
-      "test_recipient": "在启用提醒邮件前，使用此项验证提供商。"
+      "test_recipient": "在启用 SMTP 配置前，使用此项验证提供商。"
     },
     "test": {
       "button": "发送测试邮件",

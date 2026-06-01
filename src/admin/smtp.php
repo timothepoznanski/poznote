@@ -2,7 +2,7 @@
 /**
  * SMTP Configuration - Admin Tool
  *
- * Configure SMTP delivery for reminder emails.
+ * Configure SMTP delivery.
  */
 
 require_once __DIR__ . '/../auth.php';
@@ -37,6 +37,25 @@ function smtp_h($value): string {
 function smtp_setting(string $key, string $default = ''): string {
     $value = getGlobalSetting($key, null);
     return $value === null ? $default : (string)$value;
+}
+
+function smtp_bool_setting(string $key, ?bool $default = null): ?bool {
+    $value = getGlobalSetting($key, null);
+    if ($value === null || $value === '') {
+        return $default;
+    }
+
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+}
+
+function smtp_is_configured(array $settings): bool {
+    return trim((string)($settings['smtp_host'] ?? '')) !== ''
+        && filter_var((string)($settings['smtp_from_email'] ?? ''), FILTER_VALIDATE_EMAIL);
+}
+
+function smtp_is_enabled(bool $configured): bool {
+    $enabledSetting = smtp_bool_setting('smtp_enabled', null);
+    return $configured && ($enabledSetting ?? true);
 }
 
 function smtp_detect_app_url(): string {
@@ -89,81 +108,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
     if (!isset($_SESSION['smtp_csrf_token']) || !hash_equals($_SESSION['smtp_csrf_token'], $token)) {
         $error = t('smtp_admin.error_csrf', [], 'Invalid form submission. Please try again.');
-    } elseif (($_POST['action'] ?? 'save') === 'test' && !filter_var($currentAccountEmail, FILTER_VALIDATE_EMAIL)) {
-        $error = t('smtp_admin.test.no_account_email', [], 'Your account does not have an email address configured. Contact an administrator to add one to your profile.');
     } else {
-        $security = strtolower(trim((string)($_POST['smtp_security'] ?? 'tls')));
-        if (!in_array($security, ['none', 'tls', 'ssl'], true)) {
-            $security = 'tls';
-        }
-        $postedPort = trim((string)($_POST['smtp_port'] ?? ''));
-        $port = $postedPort === '' ? ($security === 'ssl' ? 465 : ($security === 'none' ? 25 : 587)) : (int)$postedPort;
-        $port = max(1, min(65535, $port));
-
-        $password = array_key_exists('smtp_password', $_POST)
-            ? (string)$_POST['smtp_password']
-            : smtp_setting('smtp_password', '');
-
-        $existingAppUrl = smtp_setting('smtp_app_url', '');
-        $appUrl = $detectedAppUrl !== '' ? $detectedAppUrl : $existingAppUrl;
-        $settingsToSave = [
-            'smtp_host' => trim((string)($_POST['smtp_host'] ?? '')),
-            'smtp_port' => (string)$port,
-            'smtp_security' => $security,
-            'smtp_username' => trim((string)($_POST['smtp_username'] ?? '')),
-            'smtp_password' => $password,
-            'smtp_from_email' => trim((string)($_POST['smtp_from_email'] ?? '')),
-            'smtp_from_name' => trim((string)($_POST['smtp_from_name'] ?? 'Poznote')),
-            'smtp_app_url' => $appUrl,
-        ];
-
-        $configForValidation = [
-            'enabled' => true,
-            'host' => $settingsToSave['smtp_host'],
-            'port' => (int)$settingsToSave['smtp_port'],
-            'security' => $security,
-            'username' => $settingsToSave['smtp_username'],
-            'password' => $password,
-            'from_email' => $settingsToSave['smtp_from_email'],
-            'from_name' => $settingsToSave['smtp_from_name'],
-            'app_url' => $appUrl,
-        ];
-
         $action = $_POST['action'] ?? 'save';
-        $hasProviderConfig = $settingsToSave['smtp_host'] !== ''
-            || $settingsToSave['smtp_from_email'] !== '';
-        $validationErrors = ($hasProviderConfig || $action === 'test')
-            ? $service->validateSmtpConfig($configForValidation, false)
-            : [];
-        if (!empty($validationErrors)) {
-            $error = implode(' ', $validationErrors);
-        } else {
-            $enabled = $settingsToSave['smtp_host'] !== ''
-                && filter_var($settingsToSave['smtp_from_email'], FILTER_VALIDATE_EMAIL);
-            $settingsToSave = ['smtp_enabled' => $enabled ? '1' : '0'] + $settingsToSave;
-            $allOk = true;
-            foreach ($settingsToSave as $key => $value) {
-                if (!setGlobalSetting($key, $value)) {
-                    $allOk = false;
-                }
-            }
+        if (!in_array($action, ['save', 'test', 'enable', 'disable'], true)) {
+            $action = 'save';
+        }
 
-            if ($enabled && smtp_setting('smtp_reminder_cutoff_at', '') === '') {
-                setGlobalSetting('smtp_reminder_cutoff_at', gmdate('Y-m-d H:i:s'));
-            }
-
-            if (!$allOk) {
-                $error = t('smtp_admin.error_saving', [], 'Error saving SMTP configuration.');
-            } elseif ($action === 'test') {
-                $recipient = $currentAccountEmail;
-                $test = $service->sendTestEmail($recipient, $currentAccountName);
-                if ($test['success']) {
-                    $success = t('smtp_admin.test.success', ['email' => $recipient], 'SMTP configuration saved and test email sent to {{email}}.');
-                } else {
-                    $error = t('smtp_admin.test.error', ['error' => $test['error'] ?? 'Unknown error'], 'SMTP configuration saved, but the test email failed: {{error}}');
-                }
+        if ($action === 'disable') {
+            if (setGlobalSetting('smtp_enabled', '0')) {
+                $success = t('smtp_admin.disabled', [], 'SMTP configuration disabled.');
             } else {
-                $success = t('smtp_admin.saved', [], 'SMTP configuration saved successfully.');
+                $error = t('smtp_admin.error_saving', [], 'Error saving SMTP configuration.');
+            }
+        } elseif ($action === 'test' && !filter_var($currentAccountEmail, FILTER_VALIDATE_EMAIL)) {
+            $error = t('smtp_admin.test.no_account_email', [], 'Your account does not have an email address configured. Contact an administrator to add one to your profile.');
+        } else {
+            $requestedEnabled = !empty($_POST['smtp_enabled']);
+            $security = strtolower(trim((string)($_POST['smtp_security'] ?? 'tls')));
+            if (!in_array($security, ['none', 'tls', 'ssl'], true)) {
+                $security = 'tls';
+            }
+            $postedPort = trim((string)($_POST['smtp_port'] ?? ''));
+            $port = $postedPort === '' ? ($security === 'ssl' ? 465 : ($security === 'none' ? 25 : 587)) : (int)$postedPort;
+            $port = max(1, min(65535, $port));
+
+            $password = array_key_exists('smtp_password', $_POST)
+                ? (string)$_POST['smtp_password']
+                : smtp_setting('smtp_password', '');
+
+            $existingAppUrl = smtp_setting('smtp_app_url', '');
+            $appUrl = $detectedAppUrl !== '' ? $detectedAppUrl : $existingAppUrl;
+            $settingsToSave = [
+                'smtp_host' => trim((string)($_POST['smtp_host'] ?? '')),
+                'smtp_port' => (string)$port,
+                'smtp_security' => $security,
+                'smtp_username' => trim((string)($_POST['smtp_username'] ?? '')),
+                'smtp_password' => $password,
+                'smtp_from_email' => trim((string)($_POST['smtp_from_email'] ?? '')),
+                'smtp_from_name' => trim((string)($_POST['smtp_from_name'] ?? 'Poznote')),
+                'smtp_app_url' => $appUrl,
+            ];
+
+            $configForValidation = [
+                'enabled' => true,
+                'host' => $settingsToSave['smtp_host'],
+                'port' => (int)$settingsToSave['smtp_port'],
+                'security' => $security,
+                'username' => $settingsToSave['smtp_username'],
+                'password' => $password,
+                'from_email' => $settingsToSave['smtp_from_email'],
+                'from_name' => $settingsToSave['smtp_from_name'],
+                'app_url' => $appUrl,
+            ];
+
+            $hasProviderConfig = $settingsToSave['smtp_host'] !== ''
+                || $settingsToSave['smtp_from_email'] !== '';
+            $validationErrors = ($hasProviderConfig || $requestedEnabled || $action === 'test' || $action === 'enable')
+                ? $service->validateSmtpConfig($configForValidation, false)
+                : [];
+            if (!empty($validationErrors)) {
+                $error = implode(' ', $validationErrors);
+            } else {
+                $configured = $settingsToSave['smtp_host'] !== ''
+                    && filter_var($settingsToSave['smtp_from_email'], FILTER_VALIDATE_EMAIL);
+                $enabled = $action === 'enable'
+                    ? $configured
+                    : ($configured && $requestedEnabled);
+                $settingsToSave = ['smtp_enabled' => $enabled ? '1' : '0'] + $settingsToSave;
+                $allOk = true;
+                foreach ($settingsToSave as $key => $value) {
+                    if (!setGlobalSetting($key, $value)) {
+                        $allOk = false;
+                    }
+                }
+
+                if ($enabled && smtp_setting('smtp_reminder_cutoff_at', '') === '') {
+                    setGlobalSetting('smtp_reminder_cutoff_at', gmdate('Y-m-d H:i:s'));
+                }
+
+                if (!$allOk) {
+                    $error = t('smtp_admin.error_saving', [], 'Error saving SMTP configuration.');
+                } elseif ($action === 'test') {
+                    $recipient = $currentAccountEmail;
+                    $test = $service->sendTestEmail($recipient, $currentAccountName);
+                    if ($test['success']) {
+                        $success = t('smtp_admin.test.success', ['email' => $recipient], 'SMTP configuration saved and test email sent to {{email}}.');
+                    } else {
+                        $error = t('smtp_admin.test.error', ['error' => $test['error'] ?? 'Unknown error'], 'SMTP configuration saved, but the test email failed: {{error}}');
+                    }
+                } elseif ($action === 'enable') {
+                    $success = t('smtp_admin.enabled', [], 'SMTP configuration enabled.');
+                } else {
+                    $success = t('smtp_admin.saved', [], 'SMTP configuration saved successfully.');
+                }
             }
         }
     }
@@ -180,6 +217,8 @@ $settings = [
     'smtp_from_email' => smtp_setting('smtp_from_email', ''),
     'smtp_from_name' => smtp_setting('smtp_from_name', 'Poznote'),
 ];
+$smtp_configured = smtp_is_configured($settings);
+$smtp_enabled = smtp_is_enabled($smtp_configured);
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo smtp_h($currentLang); ?>">
@@ -365,6 +404,41 @@ $settings = [
             margin-top: 24px;
             flex-wrap: wrap;
         }
+        .smtp-switch-field {
+            margin-bottom: 18px;
+        }
+        .smtp-switch-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        .smtp-switch-copy {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1 1 auto;
+        }
+        .smtp-switch-title {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        .smtp-switch-state {
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-muted, #666);
+        }
+        .smtp-switch-state.is-enabled {
+            color: #1f8f4e;
+        }
+        .smtp-switch-state.is-disabled {
+            color: #b54747;
+        }
         .settings-container.smtp-page .workspaces-nav .smtp-test-button {
             background: #007cba !important;
             border-color: #007cba !important;
@@ -394,6 +468,10 @@ $settings = [
         body.dark-mode .smtp-password-toggle {
             color: rgba(255, 255, 255, 0.72);
         }
+        html[data-theme='dark'] .smtp-switch-state,
+        body.dark-mode .smtp-switch-state {
+            color: var(--dm-text-muted);
+        }
         html[data-theme='dark'] .smtp-password-toggle:hover,
         html[data-theme='dark'] .smtp-password-toggle:focus-visible,
         body.dark-mode .smtp-password-toggle:hover,
@@ -411,6 +489,9 @@ $settings = [
         }
         @media (max-width: 800px) {
             .smtp-grid { grid-template-columns: 1fr; }
+            .smtp-switch-row {
+                flex-direction: column;
+            }
             .settings-container.smtp-page .smtp-actions,
             .settings-container.smtp-page .workspaces-nav {
                 display: grid !important;
@@ -464,6 +545,26 @@ $settings = [
 
         <div class="settings-section smtp-section">
             <h2><?php echo t_h('smtp_admin.section_provider', [], 'SMTP provider'); ?></h2>
+            <div class="smtp-field smtp-switch-field">
+                <input type="hidden" name="smtp_enabled" value="0">
+                <div class="smtp-switch-row">
+                    <div class="smtp-switch-copy">
+                        <label for="smtp_enabled" class="smtp-switch-title"><?php echo t_h('smtp_admin.fields.enabled', [], 'Enable SMTP configuration'); ?></label>
+                        <span
+                            class="smtp-switch-state <?php echo $smtp_enabled ? 'is-enabled' : 'is-disabled'; ?>"
+                            id="smtp-enabled-state"
+                            data-enabled-label="<?php echo smtp_h(t('common.enabled', [], 'Enabled')); ?>"
+                            data-disabled-label="<?php echo smtp_h(t('common.disabled', [], 'Disabled')); ?>"
+                        >
+                            <?php echo $smtp_enabled ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                        </span>
+                    </div>
+                    <label class="toggle-switch" for="smtp_enabled">
+                        <input type="checkbox" id="smtp_enabled" name="smtp_enabled" value="1" <?php echo $smtp_enabled ? 'checked' : ''; ?>>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
             <div class="smtp-grid">
                 <div class="smtp-field">
                     <label for="smtp_host"><?php echo t_h('smtp_admin.fields.host', [], 'SMTP host'); ?></label>
@@ -535,6 +636,17 @@ document.addEventListener('DOMContentLoaded', function () {
     var portInput = document.getElementById('smtp_port');
     var passwordInput = document.getElementById('smtp_password');
     var passwordToggle = document.getElementById('smtp-password-toggle');
+    var enabledInput = document.getElementById('smtp_enabled');
+    var enabledState = document.getElementById('smtp-enabled-state');
+
+    if (enabledInput && enabledState) {
+        enabledInput.addEventListener('change', function () {
+            var isEnabled = enabledInput.checked;
+            enabledState.textContent = enabledState.getAttribute(isEnabled ? 'data-enabled-label' : 'data-disabled-label') || '';
+            enabledState.classList.toggle('is-enabled', isEnabled);
+            enabledState.classList.toggle('is-disabled', !isEnabled);
+        });
+    }
 
     if (securitySelect && portInput) {
         securitySelect.addEventListener('change', function () {
