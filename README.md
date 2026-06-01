@@ -405,7 +405,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Editor:** Markdown syntax editor with real-time preview.
 *   **Storage:** Saved as `.md` files in the user data directory.
 *   **Exclusive Features:**
-    *   **Mermaid Diagrams:</strong> Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
+    *   **Mermaid Diagrams:** </strong> Native support for generating diagrams (flowcharts, sequence, etc.) via ` ```mermaid ` code blocks.
     *   **Math Equations:** Robust LaTeX support for mathematical formulas using `$ inline $` and `$$ block $$` syntax.
     *   **Portability:** Standard Markdown format compatible with any external editor or static site generator.
 </details>
