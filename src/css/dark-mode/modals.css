@@ -116,6 +116,36 @@ body.dark-mode #reminderModal .reminder-quick-btn:focus-visible {
     color: #f2f7ff;
 }
 
+html[data-theme='dark'] #reminderModal .reminder-email-option,
+body.dark-mode #reminderModal .reminder-email-option {
+    background: #2b2f35;
+    border-color: rgba(255, 255, 255, 0.08);
+    color: #edf2f7;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-email-option:hover,
+html[data-theme='dark'] #reminderModal .reminder-email-option:focus-within,
+body.dark-mode #reminderModal .reminder-email-option:hover,
+body.dark-mode #reminderModal .reminder-email-option:focus-within {
+    background: #31363d;
+    border-color: rgba(74, 158, 255, 0.24);
+}
+
+html[data-theme='dark'] #reminderModal .reminder-email-title,
+body.dark-mode #reminderModal .reminder-email-title {
+    color: #edf2f7;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-email-title i,
+body.dark-mode #reminderModal .reminder-email-title i {
+    color: #7ab8ff;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-email-hint,
+body.dark-mode #reminderModal .reminder-email-hint {
+    color: #b8c2cf;
+}
+
 html[data-theme='dark'] #reminderModal .reminder-current-info,
 body.dark-mode #reminderModal .reminder-current-info {
     background: rgba(74, 158, 255, 0.11);
