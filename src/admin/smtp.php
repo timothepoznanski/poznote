@@ -2,7 +2,7 @@
 /**
  * SMTP Configuration - Admin Tool
  *
- * Configure SMTP delivery for reminder emails.
+ * Configure SMTP delivery.
  */
 
 require_once __DIR__ . '/../auth.php';
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'disable') {
             if (setGlobalSetting('smtp_enabled', '0')) {
-                $success = t('smtp_admin.disabled', [], 'SMTP delivery disabled.');
+                $success = t('smtp_admin.disabled', [], 'SMTP configuration disabled.');
             } else {
                 $error = t('smtp_admin.error_saving', [], 'Error saving SMTP configuration.');
             }
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $error = t('smtp_admin.test.error', ['error' => $test['error'] ?? 'Unknown error'], 'SMTP configuration saved, but the test email failed: {{error}}');
                     }
                 } elseif ($action === 'enable') {
-                    $success = t('smtp_admin.enabled', [], 'SMTP delivery enabled.');
+                    $success = t('smtp_admin.enabled', [], 'SMTP configuration enabled.');
                 } else {
                     $success = t('smtp_admin.saved', [], 'SMTP configuration saved successfully.');
                 }
@@ -549,7 +549,7 @@ $smtp_enabled = smtp_is_enabled($smtp_configured);
                 <input type="hidden" name="smtp_enabled" value="0">
                 <div class="smtp-switch-row">
                     <div class="smtp-switch-copy">
-                        <label for="smtp_enabled" class="smtp-switch-title"><?php echo t_h('smtp_admin.fields.enabled', [], 'Enable reminder emails'); ?></label>
+                        <label for="smtp_enabled" class="smtp-switch-title"><?php echo t_h('smtp_admin.fields.enabled', [], 'Enable SMTP configuration'); ?></label>
                         <span
                             class="smtp-switch-state <?php echo $smtp_enabled ? 'is-enabled' : 'is-disabled'; ?>"
                             id="smtp-enabled-state"

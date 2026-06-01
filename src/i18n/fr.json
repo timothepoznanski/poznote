@@ -2656,8 +2656,8 @@
   "smtp_admin": {
     "title": "Configuration SMTP",
     "saved": "Configuration SMTP enregistrée avec succès.",
-    "enabled": "Envoi SMTP activé.",
-    "disabled": "Envoi SMTP désactivé.",
+    "enabled": "Configuration SMTP activée.",
+    "disabled": "Configuration SMTP désactivée.",
     "error_saving": "Erreur lors de l’enregistrement de la configuration SMTP.",
     "error_csrf": "Soumission de formulaire invalide. Veuillez réessayer.",
     "section_delivery": "Envoi des emails de rappel",
@@ -2674,7 +2674,7 @@
       "not_configured": "Non configuré"
     },
     "fields": {
-      "enabled": "Activer les emails de rappel",
+      "enabled": "Activer la configuration SMTP",
       "host": "Hôte SMTP",
       "port": "Port",
       "security": "Chiffrement",
@@ -2687,7 +2687,7 @@
       "test_recipient": "Destinataire de test"
     },
     "hints": {
-      "enabled": "Une fois activé, le worker interne envoie les rappels arrivés à échéance à l’adresse email de chaque utilisateur.",
+      "enabled": "Une fois activée, Poznote peut utiliser ce fournisseur SMTP pour envoyer des emails.",
       "security_summary": "STARTTLS utilise généralement le port 587 et active TLS après la connexion. SSL/TLS chiffre dès la connexion, généralement sur le port 465. Aucun n’utilise pas de chiffrement.",
       "security_tls": "STARTTLS : connexion standard puis passage en TLS, généralement port 587.",
       "security_ssl": "SSL/TLS : chiffrement dès la connexion, généralement port 465.",
@@ -2695,7 +2695,7 @@
       "password_configured": "Un mot de passe est configuré. Laissez ce champ vide pour le conserver.",
       "password_empty": "Aucun mot de passe configuré.",
       "app_url": "Utilisée pour inclure un lien direct vers la note dans les emails de rappel. Cette valeur est détectée automatiquement ; modifiez-la si votre URL publique est différente.",
-      "test_recipient": "Utilisez ce champ pour vérifier le fournisseur avant d’activer les emails de rappel."
+      "test_recipient": "Utilisez ce champ pour vérifier le fournisseur avant d’activer la configuration SMTP."
     },
     "test": {
       "button": "Envoyer un mail de test",

@@ -55,7 +55,7 @@ class ReminderEmailService {
         $errors = [];
 
         if ($requireEnabled && empty($config['enabled'])) {
-            $errors[] = 'SMTP reminder emails are disabled';
+            $errors[] = 'SMTP configuration is disabled';
         }
         if (trim((string)($config['host'] ?? '')) === '') {
             $errors[] = 'SMTP host is required';

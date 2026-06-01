@@ -2145,8 +2145,8 @@
   "smtp_admin": {
     "title": "SMTP Configuration",
     "saved": "SMTP configuration saved successfully.",
-    "enabled": "SMTP delivery enabled.",
-    "disabled": "SMTP delivery disabled.",
+    "enabled": "SMTP configuration enabled.",
+    "disabled": "SMTP configuration disabled.",
     "error_saving": "Error saving SMTP configuration.",
     "error_csrf": "Invalid form submission. Please try again.",
     "section_delivery": "Reminder email delivery",
@@ -2163,7 +2163,7 @@
       "not_configured": "Not configured"
     },
     "fields": {
-      "enabled": "Enable reminder emails",
+      "enabled": "Enable SMTP configuration",
       "host": "SMTP host",
       "port": "Port",
       "security": "Encryption",
@@ -2176,7 +2176,7 @@
       "test_recipient": "Test recipient"
     },
     "hints": {
-      "enabled": "When enabled, the internal worker sends emails for due reminders to each user email address.",
+      "enabled": "When enabled, Poznote can use this SMTP provider to send emails.",
       "security_summary": "STARTTLS usually uses port 587 and upgrades to TLS after connecting. SSL/TLS is encrypted from the connection, usually on port 465. None uses no encryption.",
       "security_tls": "STARTTLS: standard connection, then upgrade to TLS, usually port 587.",
       "security_ssl": "SSL/TLS: encrypted from the connection, usually port 465.",
@@ -2184,7 +2184,7 @@
       "password_configured": "A password is configured. Leave blank to keep it.",
       "password_empty": "No password configured.",
       "app_url": "Used to include a direct note link in reminder emails. This value is detected automatically; edit it if your public URL is different.",
-      "test_recipient": "Use this to verify the provider before enabling reminder emails."
+      "test_recipient": "Use this to verify the provider before enabling the SMTP configuration."
     },
     "test": {
       "button": "Send test email",

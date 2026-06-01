@@ -2437,8 +2437,8 @@
   "smtp_admin": {
     "title": "SMTP-Konfiguration",
     "saved": "SMTP-Konfiguration erfolgreich gespeichert.",
-    "enabled": "SMTP-Zustellung aktiviert.",
-    "disabled": "SMTP-Zustellung deaktiviert.",
+    "enabled": "SMTP-Konfiguration aktiviert.",
+    "disabled": "SMTP-Konfiguration deaktiviert.",
     "error_saving": "Fehler beim Speichern der SMTP-Konfiguration.",
     "error_csrf": "Ungültige Formularübermittlung. Bitte versuchen Sie es erneut.",
     "section_delivery": "Zustellung von Erinnerungs-E-Mails",
@@ -2455,7 +2455,7 @@
       "not_configured": "Nicht konfiguriert"
     },
     "fields": {
-      "enabled": "Erinnerungs-E-Mails aktivieren",
+      "enabled": "SMTP-Konfiguration aktivieren",
       "host": "SMTP-Host",
       "port": "Port",
       "security": "Verschlüsselung",
@@ -2468,7 +2468,7 @@
       "test_recipient": "Testempfänger"
     },
     "hints": {
-      "enabled": "Wenn aktiviert, sendet der interne Worker E-Mails für fällige Erinnerungen an die E-Mail-Adresse jedes Benutzers.",
+      "enabled": "Wenn aktiviert, kann Poznote diesen SMTP-Anbieter zum Senden von E-Mails verwenden.",
       "security_summary": "STARTTLS verwendet normalerweise Port 587 und wechselt nach dem Verbindungsaufbau zu TLS. SSL/TLS ist ab der Verbindung verschlüsselt, normalerweise auf Port 465. Keine verwendet keine Verschlüsselung.",
       "security_tls": "STARTTLS: Standardverbindung, danach Wechsel zu TLS, normalerweise Port 587.",
       "security_ssl": "SSL/TLS: ab der Verbindung verschlüsselt, normalerweise Port 465.",
@@ -2476,7 +2476,7 @@
       "password_configured": "Ein Passwort ist konfiguriert. Lassen Sie das Feld leer, um es beizubehalten.",
       "password_empty": "Kein Passwort konfiguriert.",
       "app_url": "Wird verwendet, um einen direkten Notizlink in Erinnerungs-E-Mails einzufügen. Dieser Wert wird automatisch erkannt; ändern Sie ihn, wenn Ihre öffentliche URL anders ist.",
-      "test_recipient": "Verwenden Sie dies, um den Anbieter zu überprüfen, bevor Sie Erinnerungs-E-Mails aktivieren."
+      "test_recipient": "Verwenden Sie dies, um den Anbieter zu überprüfen, bevor Sie die SMTP-Konfiguration aktivieren."
     },
     "test": {
       "button": "Test-E-Mail senden",
