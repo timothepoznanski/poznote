@@ -599,6 +599,8 @@
     "placeholder_notes": "Buscar por uma ou mais palavras...",
     "placeholder_tags": "Buscar por uma ou mais etiquetas...",
     "placeholder_combined": "Buscar em notas e etiquetas...",
+    "search_in_notes": "Buscar em notas",
+    "search_in_tags": "Buscar em etiquetas",
     "toggle_options": "Mostrar/ocultar opções de busca",
     "toggle_date_filter": "Mostrar/ocultar filtro de data",
     "created_from": "Criada a partir de",

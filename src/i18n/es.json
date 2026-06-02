@@ -601,6 +601,8 @@
     "placeholder_notes": "Buscar una o más palabras...",
     "placeholder_tags": "Buscar una o más etiquetas...",
     "placeholder_combined": "Buscar en notas y etiquetas...",
+    "search_in_notes": "Buscar en notas",
+    "search_in_tags": "Buscar en etiquetas",
     "toggle_options": "Mostrar/ocultar opciones de búsqueda",
     "toggle_date_filter": "Mostrar/ocultar filtro de fecha",
     "created_from": "Creada desde",
