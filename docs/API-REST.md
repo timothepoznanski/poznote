@@ -160,6 +160,8 @@ List all notes for a user with optional filtering and sorting.
 | `folder_id` | integer | Filter by folder ID |
 | `tag` | string | Filter by tag |
 | `search` | string | Search in heading and content |
+| `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
+| `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
 | `favorite` | boolean | Filter favorites only |
 | `sort` | string | Sort order: `updated_desc`, `created_desc`, `heading_asc` |
 | `get_folders` | boolean | Include folder information |
@@ -173,6 +175,12 @@ Filter notes by workspace, folder, and tag:
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes?workspace=Personal&folder=Projects&tag=important"
+```
+
+Filter notes by creation date:
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes?created_from=2026-01-01&created_to=2026-01-31"
 ```
 
 ### List Notes with Attachments
@@ -234,10 +242,12 @@ Search notes by heading or content.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `q` | string | Search query |
+| `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
+| `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
-  "http://YOUR_SERVER/api/v1/notes/search?q=docker"
+  "http://YOUR_SERVER/api/v1/notes/search?q=docker&created_from=2026-01-01&created_to=2026-01-31"
 ```
 
 ### Create Note

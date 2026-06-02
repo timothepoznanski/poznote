@@ -127,6 +127,8 @@ class PoznoteClient:
         query: str,
         limit: int = 10,
         workspace: str | None = None,
+        created_from: str | None = None,
+        created_to: str | None = None,
         user_id: str | int | None = None,
     ) -> list[dict]:
         """
@@ -136,6 +138,10 @@ class PoznoteClient:
         """
         params = {"q": query, "limit": limit}
         self._set_workspace(params, workspace)
+        if created_from:
+            params["created_from"] = created_from
+        if created_to:
+            params["created_to"] = created_to
         
         response = self.client.get("/notes/search", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()

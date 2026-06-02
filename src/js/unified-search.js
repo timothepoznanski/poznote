@@ -5,6 +5,7 @@ class SearchManager {
         this.isMobile = false;
         this.currentSearchType = 'notes';
         this.lastSearchTerm = '';
+        this.lastDateFilterKey = '';
         // When set, skip restore from recent user toggle (ms since epoch).
         this._suppressUntil = 0;
         // When set, skip restore from URL during initialization (used after AJAX)
@@ -48,6 +49,12 @@ class SearchManager {
                 tagsTerm: document.getElementById(`search-tags-hidden${suffix}`),
                 combinedMode: document.getElementById(`search-combined-mode${suffix}`)
             },
+            dateFilter: document.getElementById(`search-date-filter${suffix}`),
+            dateInputs: {
+                createdFrom: document.getElementById(`created-from${suffix}`),
+                createdTo: document.getElementById(`created-to${suffix}`)
+            },
+            dateToggle: document.getElementById(`search-date-toggle${suffix}`),
             optionsToggle: document.getElementById(`search-options-toggle${suffix}`),
             typeIconsContainer: document.getElementById(`searchbar-type-icons${suffix}`),
             container: document.querySelector(isMobile ? '.unified-search-container.mobile' : '.unified-search-container')
@@ -76,7 +83,7 @@ class SearchManager {
 
         // Check if there's an active search
         const urlParams = new URLSearchParams(window.location.search);
-        const hasActiveSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
+        const hasActiveSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search') || urlParams.get('created_from') || urlParams.get('created_to'));
 
         // Show or hide system folders container based on search state
         if (hasActiveSearch) {
@@ -97,6 +104,7 @@ class SearchManager {
         if (elements.searchInput && elements.searchInput.value) {
             this.lastSearchTerm = elements.searchInput.value.trim();
         }
+        this.lastDateFilterKey = this.getDateFilterKey(isMobile);
 
         this.updateInterface(isMobile);
     }
@@ -293,7 +301,7 @@ class SearchManager {
             // Only hide special folders when there is an actual search in progress
             const term = elements.searchInput?.value?.trim() || '';
             const urlParams = new URLSearchParams(window.location.search);
-            const hasUrlSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search'));
+            const hasUrlSearch = Boolean(urlParams.get('search') || urlParams.get('tags_search') || urlParams.get('created_from') || urlParams.get('created_to'));
             // Also consider hidden inputs which are used during AJAX submissions
             // Only term-bearing hidden inputs should count as an ongoing search.
             const hasHiddenNotesTerm = Boolean(elements.hiddenInputs.notesTerm?.value && elements.hiddenInputs.notesTerm.value.trim());
@@ -578,6 +586,10 @@ class SearchManager {
         this.setupInputListeners(true);
         this.setupOptionsToggleListeners(false);
         this.setupOptionsToggleListeners(true);
+        this.setupDateToggleListeners(false);
+        this.setupDateToggleListeners(true);
+        this.setupDateFilterListeners(false);
+        this.setupDateFilterListeners(true);
     }
 
     /**
@@ -601,6 +613,120 @@ class SearchManager {
 
         this.eventHandlers.set(handlerKey, handler);
         elements.optionsToggle.addEventListener('click', handler);
+    }
+
+    /**
+     * Setup date filter toggle listeners.
+     */
+    setupDateToggleListeners(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.dateToggle) return;
+
+        const handlerKey = `date-toggle-${isMobile ? 'mobile' : 'desktop'}`;
+        const existingHandler = this.eventHandlers.get(handlerKey);
+        if (existingHandler) {
+            elements.dateToggle.removeEventListener('click', existingHandler);
+        }
+
+        const handler = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleDateFilter(isMobile);
+        };
+
+        this.eventHandlers.set(handlerKey, handler);
+        elements.dateToggle.addEventListener('click', handler);
+    }
+
+    /**
+     * Keep desktop and mobile date fields aligned when both exist.
+     */
+    syncDateInputs(isMobile, createdFrom, createdTo) {
+        const otherElements = this.getElements(!isMobile);
+        if (otherElements.dateInputs.createdFrom) {
+            otherElements.dateInputs.createdFrom.value = createdFrom;
+        }
+        if (otherElements.dateInputs.createdTo) {
+            otherElements.dateInputs.createdTo.value = createdTo;
+        }
+        this.updateDateToggleState(!isMobile);
+    }
+
+    /**
+     * Reflect whether the date filter panel is open.
+     */
+    updateDateToggleState(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.dateToggle) return;
+
+        const isOpen = Boolean(elements.dateFilter && !elements.dateFilter.hidden);
+        elements.dateToggle.classList.toggle('active', isOpen);
+        elements.dateToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    }
+
+    /**
+     * Toggle the creation date filter panel.
+     */
+    toggleDateFilter(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (!elements.dateFilter || !elements.dateToggle) return;
+
+        const shouldShowDateFilter = elements.dateFilter.hidden;
+        elements.dateFilter.hidden = !shouldShowDateFilter;
+        if (!shouldShowDateFilter) {
+            this.clearDateInputs(isMobile);
+        }
+        this.updateDateToggleState(isMobile);
+
+        if (shouldShowDateFilter) {
+            const firstInput = elements.dateInputs.createdFrom || elements.dateInputs.createdTo;
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
+    }
+
+    /**
+     * Setup date filter listeners.
+     */
+    setupDateFilterListeners(isMobile) {
+        const elements = this.getElements(isMobile);
+
+        ['createdFrom', 'createdTo'].forEach(key => {
+            const input = elements.dateInputs[key];
+            if (!input) return;
+
+            const handlerKey = `date-${key}-${isMobile ? 'mobile' : 'desktop'}`;
+            const existingHandler = this.eventHandlers.get(handlerKey);
+            if (existingHandler) {
+                input.removeEventListener('input', existingHandler);
+                input.removeEventListener('change', existingHandler);
+            }
+
+            const keydownHandlerKey = `date-${key}-keydown-${isMobile ? 'mobile' : 'desktop'}`;
+            const existingKeydownHandler = this.eventHandlers.get(keydownHandlerKey);
+            if (existingKeydownHandler) {
+                input.removeEventListener('keydown', existingKeydownHandler);
+            }
+
+            const handler = () => {
+                this.hideValidationError(isMobile);
+                const createdFrom = elements.dateInputs.createdFrom?.value || '';
+                const createdTo = elements.dateInputs.createdTo?.value || '';
+                this.syncDateInputs(isMobile, createdFrom, createdTo);
+            };
+            const keydownHandler = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
+            };
+
+            this.eventHandlers.set(handlerKey, handler);
+            this.eventHandlers.set(keydownHandlerKey, keydownHandler);
+            input.addEventListener('input', handler);
+            input.addEventListener('change', handler);
+            input.addEventListener('keydown', keydownHandler);
+        });
     }
 
     /**
@@ -834,17 +960,20 @@ class SearchManager {
         const elements = this.getElements(isMobile);
         const searchValue = elements.searchInput?.value.trim() || '';
         const activeType = this.getActiveSearchType(isMobile);
+        const hasDateFilter = this.hasDateFilter(isMobile);
+        const dateFilterKey = this.getDateFilterKey(isMobile);
 
-        if (!searchValue) {
+        if (!searchValue && !hasDateFilter) {
             this.lastSearchTerm = '';
+            this.lastDateFilterKey = '';
             this.clearSearch();
             return;
         }
 
         // If the search term is the same as the last one, navigate through highlights 
-        // regardless of search type (notes, tags, or combined).
-        const isCombined = this.isCombinedModeActive(isMobile);
-        if (searchValue === this.lastSearchTerm) {
+        // regardless of search type (notes, tags, or combined), but only if
+        // the date filter is unchanged too.
+        if (searchValue && searchValue === this.lastSearchTerm && dateFilterKey === this.lastDateFilterKey) {
             if (e.shiftKey && typeof navigateToPreviousHighlight === 'function') {
                 navigateToPreviousHighlight();
                 return;
@@ -860,6 +989,7 @@ class SearchManager {
         }
 
         this.lastSearchTerm = searchValue;
+        this.lastDateFilterKey = dateFilterKey;
 
         // Validate that exactly one search type is active
         if (!this.validateSearchState(isMobile)) {
@@ -867,7 +997,11 @@ class SearchManager {
         }
 
         // Validate search terms length
-        if (!this.validateSearchTerms(searchValue, activeType, isMobile)) {
+        if (searchValue && !this.validateSearchTerms(searchValue, activeType, isMobile)) {
+            return;
+        }
+
+        if (!this.validateDateRange(isMobile)) {
             return;
         }
 
@@ -889,6 +1023,59 @@ class SearchManager {
 
 
         this.performAjaxSearch(elements.form, isMobile);
+    }
+
+    /**
+     * Check if a creation date filter is active.
+     */
+    hasDateFilter(isMobile) {
+        const elements = this.getElements(isMobile);
+        return Boolean(
+            elements.dateInputs.createdFrom?.value ||
+            elements.dateInputs.createdTo?.value
+        );
+    }
+
+    /**
+     * Return a compact representation of the active creation date filter.
+     */
+    getDateFilterKey(isMobile) {
+        const elements = this.getElements(isMobile);
+        const createdFrom = elements.dateInputs.createdFrom?.value || '';
+        const createdTo = elements.dateInputs.createdTo?.value || '';
+        return `${createdFrom}|${createdTo}`;
+    }
+
+    /**
+     * Validate the creation date interval.
+     */
+    validateDateRange(isMobile) {
+        const elements = this.getElements(isMobile);
+        const createdFrom = elements.dateInputs.createdFrom?.value || '';
+        const createdTo = elements.dateInputs.createdTo?.value || '';
+
+        if (createdFrom && createdTo && createdFrom > createdTo) {
+            this.showValidationError(
+                isMobile,
+                (window.t
+                    ? window.t('search.validation.invalid_date_range', null, 'The start date must be before or equal to the end date.')
+                    : 'The start date must be before or equal to the end date.')
+            );
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Clear the creation date fields without submitting a search.
+     */
+    clearDateInputs(isMobile) {
+        const elements = this.getElements(isMobile);
+        if (elements.dateInputs.createdFrom) elements.dateInputs.createdFrom.value = '';
+        if (elements.dateInputs.createdTo) elements.dateInputs.createdTo.value = '';
+        this.syncDateInputs(isMobile, '', '');
+        this.hideValidationError(isMobile);
     }
 
     /**
@@ -987,6 +1174,7 @@ class SearchManager {
 
             // Ensure lastSearchTerm is updated when search is initiated through any means
             this.lastSearchTerm = searchValue;
+            this.lastDateFilterKey = this.getDateFilterKey(isMobile);
 
             const formData = new FormData(form);
             const params = new URLSearchParams();
@@ -1106,7 +1294,9 @@ class SearchManager {
                     const unified = newParams.get('unified_search');
                     const search = newParams.get('search');
                     const tagsSearch = newParams.get('tags_search');
-                    window.isSearchMode = Boolean(unified || search || tagsSearch);
+                    const createdFrom = newParams.get('created_from');
+                    const createdTo = newParams.get('created_to');
+                    window.isSearchMode = Boolean(unified || search || tagsSearch || createdFrom || createdTo);
                 } catch (e) {
                     // ignore
                 }
@@ -1549,7 +1739,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Handle browser back button
     window.addEventListener('popstate', function (event) {
         const urlParams = new URLSearchParams(window.location.search);
-        const hasSearch = urlParams.get('search') || urlParams.get('tags_search');
+        const hasSearch = urlParams.get('search') || urlParams.get('tags_search') || urlParams.get('created_from') || urlParams.get('created_to');
         const preserveNotes = urlParams.get('preserve_notes');
         const preserveTags = urlParams.get('preserve_tags');
 

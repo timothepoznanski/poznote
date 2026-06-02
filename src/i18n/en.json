@@ -1609,9 +1609,13 @@
     "placeholder_tags": "Search for one or more tags...",
     "placeholder_combined": "Search in notes and tags...",
     "toggle_options": "Toggle search options",
+    "toggle_date_filter": "Toggle date filter",
+    "created_from": "Created from",
+    "created_to": "Created to",
     "validation": {
       "select_type": "Please select at least one search option (Notes or Tags)",
-      "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search."
+      "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search.",
+      "invalid_date_range": "The start date must be before or equal to the end date."
     }
   },
   "icon_names": {

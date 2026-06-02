@@ -600,9 +600,15 @@
     "clear": "Suche löschen",
     "placeholder_notes": "Nach einem oder mehreren Wörtern suchen...",
     "placeholder_tags": "Nach einem oder mehreren Tags suchen...",
+    "placeholder_combined": "In Notizen und Tags suchen...",
+    "toggle_options": "Suchoptionen ein-/ausblenden",
+    "toggle_date_filter": "Datumsfilter ein-/ausblenden",
+    "created_from": "Erstellt ab",
+    "created_to": "Erstellt bis",
     "validation": {
       "select_type": "Bitte wählen Sie mindestens eine Suchoption aus (Notizen oder Tags)",
-      "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche."
+      "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche.",
+      "invalid_date_range": "Das Startdatum muss vor oder am Enddatum liegen."
     }
   },
   "autosave": {

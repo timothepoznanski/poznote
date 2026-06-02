@@ -8,7 +8,7 @@ Transport:
 
 Tools:
   - get_note: Get a specific note by its ID with full content
-  - search_notes: Search notes by text query
+  - search_notes: Search notes by text query, with optional creation date range
   - create_note: Create a new note
   - update_note: Update an existing note
   - delete_note: Delete a note by its ID
@@ -313,13 +313,15 @@ def list_notes(workspace: Optional[str] = None, limit: int = 50, user_id: Option
 
 
 @mcp.tool()
-def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, user_id: Optional[int] = None) -> str:
+def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, created_from: Optional[str] = None, created_to: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Search notes by text query. Returns matching notes with excerpts.
     
     Args:
         query: Search query (text to find in notes)
         workspace: Workspace name (optional)
         limit: Maximum number of results (default: 10)
+        created_from: Filter notes created on or after this date (YYYY-MM-DD)
+        created_to: Filter notes created on or before this date (YYYY-MM-DD)
         user_id: User profile ID to access (optional, overrides default)
     """
     if not query:
@@ -329,7 +331,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, u
     if err:
         return err
     try:
-        results = client.search_notes(query, limit=limit, workspace=workspace, user_id=user_id)
+        results = client.search_notes(query, limit=limit, workspace=workspace, created_from=created_from, created_to=created_to, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
     
@@ -342,6 +344,8 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, u
             "excerpt": r.get("excerpt", r.get("content", "")[:200] + "..."),
             "tags": r.get("tags", ""),
             "folder": r.get("folder"),
+            "createdAt": r.get("created"),
+            "updatedAt": r.get("updated"),
         })
     
     return json.dumps({

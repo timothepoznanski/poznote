@@ -95,6 +95,42 @@ body.dark-mode .searchbar-icon {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .searchbar-date-toggle,
+body.dark-mode .searchbar-date-toggle {
+    color: #808080;
+}
+
+html[data-theme='dark'] .searchbar-date-toggle:hover,
+html[data-theme='dark'] .searchbar-date-toggle.active,
+body.dark-mode .searchbar-date-toggle:hover,
+body.dark-mode .searchbar-date-toggle.active {
+    background: transparent;
+    color: #5cb3e9;
+}
+
+html[data-theme='dark'] .search-date-filter,
+body.dark-mode .search-date-filter {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .search-date-field label,
+body.dark-mode .search-date-field label {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .search-date-field label i,
+body.dark-mode .search-date-field label i {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .search-date-input,
+body.dark-mode .search-date-input {
+    background: var(--dm-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
 /* Search options toggle button */
 html[data-theme='dark'] .searchbar-options-toggle,
 body.dark-mode .searchbar-options-toggle {

@@ -296,7 +296,7 @@ body.outline-collapsed .toggle-outline-btn i {
         position: fixed;
         right: 0;
         top: 0;
-        z-index: 1001;
+        z-index: 2147483003;
         width: 80% !important;
         max-width: 320px !important;
         transform: translateX(100%);
@@ -309,7 +309,7 @@ body.outline-collapsed .toggle-outline-btn i {
         position: fixed;
         right: 0;
         top: 0;
-        z-index: 1001;
+        z-index: 2147483003;
         box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
         width: 80% !important;
         max-width: 320px !important;
@@ -327,7 +327,7 @@ body.outline-collapsed .toggle-outline-btn i {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.4);
-    z-index: 1000;
+    z-index: 2147483002;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;

@@ -497,12 +497,16 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
  * @param bool $preserve_tags Whether to preserve tags state
  * @param int $note_id Note ID
  * @param bool $search_combined Whether to combine search
+ * @param string $created_from Creation date lower bound (YYYY-MM-DD)
+ * @param string $created_to Creation date upper bound (YYYY-MM-DD)
  * @return string URL for the note
  */
-function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_id, $search_combined = false) {
+function generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $note_id, $search_combined = false, $created_from = '', $created_to = '') {
     $params = [];
     if (!empty($search)) $params[] = 'search=' . urlencode($search);
     if (!empty($tags_search)) $params[] = 'tags_search=' . urlencode($tags_search);
+    if (!empty($created_from)) $params[] = 'created_from=' . urlencode($created_from);
+    if (!empty($created_to)) $params[] = 'created_to=' . urlencode($created_to);
     if (!empty($folder_filter)) $params[] = 'folder=' . urlencode($folder_filter);
     if (!empty($workspace_filter)) $params[] = 'workspace=' . urlencode($workspace_filter);
     if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) $params[] = 'public_workspace=1';

@@ -63,8 +63,10 @@ function parseSearchTerms($search) {
 
 /**
  * Build secure search conditions
+ *
+ * $created_from and $created_to are user-local dates in YYYY-MM-DD format.
  */
-function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $combined_mode = false) {
+function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $combined_mode = false, $created_from = '', $created_to = '') {
     $where_conditions = ["trash = 0"];
     $search_params = [];
     
@@ -165,8 +167,18 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
         $where_conditions[] = "workspace = ?";
         $search_params[] = $workspace_filter;
     }
-    
-    
+
+    $created_from_utc = dateOnlyFilterToUtcBoundary($created_from, false);
+    if ($created_from_utc !== null) {
+        $where_conditions[] = "created >= ?";
+        $search_params[] = $created_from_utc;
+    }
+
+    $created_to_utc = dateOnlyFilterToUtcBoundary($created_to, true);
+    if ($created_to_utc !== null) {
+        $where_conditions[] = "created <= ?";
+        $search_params[] = $created_to_utc;
+    }
     
     $where_clause = implode(" AND ", $where_conditions);
     

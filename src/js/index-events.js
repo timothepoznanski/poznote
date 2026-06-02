@@ -1202,7 +1202,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const hasScrollFlag = urlParams.has('scroll') && urlParams.get('scroll') === '1';
             const hasNoteId = urlParams.has('note') && urlParams.get('note');
-            const isSearch = urlParams.has('search') || urlParams.has('tags_search') || window.isSearchMode;
+            const isSearch = urlParams.has('search') || urlParams.has('tags_search') || urlParams.has('created_from') || urlParams.has('created_to') || window.isSearchMode;
 
             if (hasScrollFlag || (hasNoteId && !isSearch)) {
                 requestAnimationFrame(function () {

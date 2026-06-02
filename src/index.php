@@ -158,7 +158,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
 <head>
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, interactive-widget=resizes-content"/>
     <title><?php echo getPageTitle(); ?></title>
     <?php 
     // Cache version based on app version to force reload on updates
@@ -367,7 +367,7 @@ if ($isPublicWorkspaceReadonly) {
         
     <?php
     // Construction des conditions de recherche sécurisées
-    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined ?? false);
+    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined ?? false, $created_from ?? '', $created_to ?? '');
     $where_clause = $search_conditions['where_clause'];
     $search_params = $search_conditions['search_params'];
     appendNoteAgeFilter($where_clause, $search_params, getNoteAgeFilterDays($con));
@@ -412,7 +412,8 @@ if ($isPublicWorkspaceReadonly) {
         
     <?php
         // Determine which folders should be open
-        $is_search_mode = !empty($search) || !empty($tags_search);
+        $has_created_date_filter = !empty($created_from) || !empty($created_to);
+        $is_search_mode = !empty($search) || !empty($tags_search) || $has_created_date_filter;
         
         // Execute query for right column - only override if in search mode
         if ($is_search_mode) {
@@ -424,7 +425,7 @@ if ($isPublicWorkspaceReadonly) {
     <script type="application/json" id="page-config-data"><?php 
         $currentWorkspaceOpacityKey = 'background_opacity_' . (string)($workspace_filter ?? '');
         $config_data = [
-            'isSearchMode' => !empty($search) || !empty($tags_search),
+            'isSearchMode' => !empty($search) || !empty($tags_search) || $has_created_date_filter,
             'currentNoteFolder' => null, // Will be set below
             'selectedWorkspace' => $workspace_filter ?? '',
             'userId' => $_SESSION['user_id'] ?? null,
@@ -572,6 +573,12 @@ if ($isPublicWorkspaceReadonly) {
                     if (!empty($tags_search)) {
                         $home_params[] = 'tags_search=' . urlencode($tags_search);
                         $home_params[] = 'preserve_tags=1';
+                    }
+                    if (!empty($created_from)) {
+                        $home_params[] = 'created_from=' . urlencode($created_from);
+                    }
+                    if (!empty($created_to)) {
+                        $home_params[] = 'created_to=' . urlencode($created_to);
                     }
                     if (!empty($folder_filter)) {
                         $home_params[] = 'folder=' . urlencode($folder_filter);

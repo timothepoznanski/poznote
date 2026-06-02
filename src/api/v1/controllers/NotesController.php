@@ -284,6 +284,8 @@ class NotesController {
      *   - get_folders: If set, return folders instead of notes
     *   - favorite: Filter by favorite status (0 or 1)
      *   - search: Search query to filter notes by heading or content
+     *   - created_from: Filter notes created on or after this date (YYYY-MM-DD)
+     *   - created_to: Filter notes created on or before this date (YYYY-MM-DD)
      */
     public function index(): void {
         $workspace = $_GET['workspace'] ?? null;
@@ -293,8 +295,27 @@ class NotesController {
         $sort = $_GET['sort'] ?? null;
         $favorite = isset($_GET['favorite']) ? (int)$_GET['favorite'] : null;
         $search = $_GET['search'] ?? null;
+        $createdFromRaw = trim((string)($_GET['created_from'] ?? ''));
+        $createdToRaw = trim((string)($_GET['created_to'] ?? ''));
+        $createdFrom = normalizeDateOnlyFilter($createdFromRaw);
+        $createdTo = normalizeDateOnlyFilter($createdToRaw);
         
         try {
+            if ($createdFromRaw !== '' && $createdFrom === '') {
+                $this->sendError(400, 'created_from must use YYYY-MM-DD format');
+                return;
+            }
+
+            if ($createdToRaw !== '' && $createdTo === '') {
+                $this->sendError(400, 'created_to must use YYYY-MM-DD format');
+                return;
+            }
+
+            if ($createdFrom !== '' && $createdTo !== '' && $createdFrom > $createdTo) {
+                $this->sendError(400, 'created_from must be before or equal to created_to');
+                return;
+            }
+
             // Validate workspace if provided
             if ($workspace) {
                 $chk = $this->con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
@@ -341,6 +362,18 @@ class NotesController {
                          OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
                 $params[] = '%' . $search . '%';
                 $params[] = '%' . $search . '%';
+            }
+
+            $createdFromUtc = dateOnlyFilterToUtcBoundary($createdFrom, false);
+            if ($createdFromUtc !== null) {
+                $sql .= " AND created >= ?";
+                $params[] = $createdFromUtc;
+            }
+
+            $createdToUtc = dateOnlyFilterToUtcBoundary($createdTo, true);
+            if ($createdToUtc !== null) {
+                $sql .= " AND created <= ?";
+                $params[] = $createdToUtc;
             }
 
             $this->appendPublicWorkspaceAgeFilter($sql, $params);
@@ -2241,14 +2274,35 @@ class NotesController {
      *   - q: Search query (required)
      *   - limit: Maximum number of results (default: 10)
      *   - workspace: Filter by workspace
+     *   - created_from: Filter notes created on or after this date (YYYY-MM-DD)
+     *   - created_to: Filter notes created on or before this date (YYYY-MM-DD)
      */
     public function search(): void {
         $query = $_GET['q'] ?? '';
         $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 10;
         $workspace = $_GET['workspace'] ?? null;
+        $createdFromRaw = trim((string)($_GET['created_from'] ?? ''));
+        $createdToRaw = trim((string)($_GET['created_to'] ?? ''));
+        $createdFrom = normalizeDateOnlyFilter($createdFromRaw);
+        $createdTo = normalizeDateOnlyFilter($createdToRaw);
         
         if (empty($query)) {
             $this->sendError(400, 'Search query (q) is required');
+            return;
+        }
+
+        if ($createdFromRaw !== '' && $createdFrom === '') {
+            $this->sendError(400, 'created_from must use YYYY-MM-DD format');
+            return;
+        }
+
+        if ($createdToRaw !== '' && $createdTo === '') {
+            $this->sendError(400, 'created_to must use YYYY-MM-DD format');
+            return;
+        }
+
+        if ($createdFrom !== '' && $createdTo !== '' && $createdFrom > $createdTo) {
+            $this->sendError(400, 'created_from must be before or equal to created_to');
             return;
         }
         
@@ -2266,6 +2320,18 @@ class NotesController {
             if ($workspace) {
                 $sql .= " AND workspace = ?";
                 $params[] = $workspace;
+            }
+
+            $createdFromUtc = dateOnlyFilterToUtcBoundary($createdFrom, false);
+            if ($createdFromUtc !== null) {
+                $sql .= " AND created >= ?";
+                $params[] = $createdFromUtc;
+            }
+
+            $createdToUtc = dateOnlyFilterToUtcBoundary($createdTo, true);
+            if ($createdToUtc !== null) {
+                $sql .= " AND created <= ?";
+                $params[] = $createdToUtc;
             }
 
             $this->appendPublicWorkspaceAgeFilter($sql, $params);

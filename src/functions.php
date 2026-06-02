@@ -663,6 +663,41 @@ function t_h($key, $vars = [], $default = null, $lang = null) {
     return htmlspecialchars(t($key, $vars, $default, $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+function normalizeDateOnlyFilter($value) {
+    $date = trim((string)$value);
+    if ($date === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return '';
+    }
+
+    $dt = DateTime::createFromFormat('!Y-m-d', $date);
+    $errors = DateTime::getLastErrors();
+    if ($dt === false || ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
+        return '';
+    }
+
+    return $dt->format('Y-m-d') === $date ? $date : '';
+}
+
+function dateOnlyFilterToUtcBoundary($value, $endOfDay = false) {
+    $date = normalizeDateOnlyFilter($value);
+    if ($date === '') {
+        return null;
+    }
+
+    try {
+        $timezone = new DateTimeZone(getUserTimezone());
+        $time = $endOfDay ? '23:59:59' : '00:00:00';
+        $dt = DateTime::createFromFormat('!Y-m-d H:i:s', $date . ' ' . $time, $timezone);
+        if ($dt === false) {
+            return null;
+        }
+        $dt->setTimezone(new DateTimeZone('UTC'));
+        return $dt->format('Y-m-d H:i:s');
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
 /**
  * Get the page title for the application
  * Uses custom display name from settings if available, otherwise uses app name from i18n
