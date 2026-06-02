@@ -2100,9 +2100,9 @@ window.insertTable = insertTable;
     const menu = getMenu(toolbar);
     if (!menu) return;
 
-    // On desktop, use position:fixed to escape overflow clipping ancestors
+    // Use position: fixed to escape overflow clipping ancestors, including the single-line mobile toolbar.
     const anchor = toolbar.querySelector('.toolbar-menu-anchor');
-    if (anchor && window.innerWidth >= 800) {
+    if (anchor) {
       const rect = anchor.getBoundingClientRect();
       menu.style.position = 'fixed';
       menu.style.top = rect.bottom + 4 + 'px';

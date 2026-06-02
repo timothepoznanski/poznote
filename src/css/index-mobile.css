@@ -78,7 +78,16 @@
     touch-action: manipulation !important;
 }
 
+html {
+    overflow: hidden !important;
+    height: 100% !important;
+}
+
 body {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     -ms-overflow-style: none !important;
@@ -121,11 +130,17 @@ body::-webkit-scrollbar {
     height: 100vh !important;
 }
 
+/* While the mobile keyboard is open, shrink the pane to the visible (visual) viewport so the sticky toolbar can never be panned out of view. */
+body.mobile-keyboard-open #right_pane {
+    height: var(--mobile-visual-viewport-height, 100vh) !important;
+}
+
 #right_col {
     overflow-y: auto !important;
     position: relative;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
+    scroll-padding-top: calc(var(--mobile-note-header-height, 56px) + 12px);
 }
 
 .resize-handle {
@@ -157,20 +172,7 @@ body.has-internal-tabs .note-header {
 
 body.mobile-formatting-toolbar-active #right_col .note-header,
 body.mobile-keyboard-open #right_col .note-header {
-    position: fixed;
-    top: calc(var(--mobile-visual-viewport-top, 0px) + env(safe-area-inset-top, 0px));
-    left: 0;
-    right: 0;
-    width: 100vw;
-    max-width: none !important;
-    margin: 0 !important;
     z-index: 2147483000;
-    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
-}
-
-body.mobile-formatting-toolbar-active.has-internal-tabs #right_col .note-header,
-body.mobile-keyboard-open.has-internal-tabs #right_col .note-header {
-    top: calc(var(--mobile-visual-viewport-top, 0px) + env(safe-area-inset-top, 0px) + 39px);
 }
 
 body.mobile-formatting-toolbar-active.has-background-image #right_col .note-header,
@@ -178,13 +180,28 @@ body.mobile-keyboard-open.has-background-image #right_col .note-header {
     background: rgba(255, 255, 255, 0.96);
 }
 
-body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar {
+.save-indicator {
+    top: calc(var(--mobile-visual-viewport-top, 0px) + 10px);
+    z-index: 2147483001;
+}
+
+#right_col .note-edit-toolbar {
     flex-wrap: nowrap;
-    justify-content: flex-start;
+    justify-content: safe center;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
     padding: 0 4px;
     scroll-padding-left: 4px;
+}
+
+.css-title,
+.note-tags-row,
+.note-attachments-row,
+.note-subline,
+.noteentry,
+.markdown-editor,
+.markdown-editor-container {
+    scroll-margin-top: calc(var(--mobile-note-header-height, 56px) + 12px);
 }
 
 /* Hide scrollbar on mobile - comprehensive approach */
@@ -361,6 +378,10 @@ a.links_arbo_left::-webkit-scrollbar,
     display: flex !important;
 }
 
+body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home-btn {
+    display: none !important;
+}
+
 /* When text is selected inside a note, show formatting buttons on mobile too */
 .note-edit-toolbar .text-format-btn.show-on-selection {
     display: inline-flex !important;
@@ -370,7 +391,7 @@ a.links_arbo_left::-webkit-scrollbar,
 .note-edit-toolbar .mobile-toolbar-menu {
     right: 0;
     top: 100%;
-    z-index: 2000;
+    z-index: 2147483001;
 }
 
 .note-edit-toolbar .mobile-toolbar-menu[hidden] {

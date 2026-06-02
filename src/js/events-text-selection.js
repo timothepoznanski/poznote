@@ -6,6 +6,8 @@
 // Text selection management for formatting toolbar
 function initTextSelectionHandlers() {
     var selectionTimeout;
+    var wasMobileKeyboardOpen = false;
+    var pendingKeyboardCloseBlurTimer = null;
     var plainCodeBlockedButtonClasses = ['btn-link', 'btn-text-height', 'btn-inline-code', 'btn-code'];
 
     function getSelectionOffsetsWithinMarkdownEditor(editor, range) {
@@ -237,6 +239,7 @@ function initTextSelectionHandlers() {
 
         var shouldActivate = !!active && isMobileFormattingViewport();
         document.body.classList.toggle('mobile-formatting-toolbar-active', shouldActivate);
+        syncMobileNoteHeaderMetrics();
     }
 
     function getMobileViewportKeyboardInset() {
@@ -245,7 +248,6 @@ function initTextSelectionHandlers() {
 
         var layoutHeight = document.documentElement ? document.documentElement.clientHeight : window.innerHeight;
         var currentHeight = Math.round(visualViewport.height || window.innerHeight || 0);
-        var viewportTop = Math.max(0, Math.round(visualViewport.offsetTop || 0));
         var baselineHeight = window.__poznoteMobileViewportBaselineHeight || 0;
 
         if (!baselineHeight || currentHeight > baselineHeight || layoutHeight > baselineHeight) {
@@ -253,7 +255,83 @@ function initTextSelectionHandlers() {
             window.__poznoteMobileViewportBaselineHeight = baselineHeight;
         }
 
-        return Math.max(0, Math.round(baselineHeight - currentHeight - viewportTop));
+        // Only the height shrink indicates the keyboard. Do NOT subtract visualViewport.offsetTop:
+        // when the caret is low and the browser pans to reveal it, offsetTop grows and would make
+        // an open keyboard look closed, causing the toolbar to jump and the editor to blur.
+        return Math.max(0, Math.round(baselineHeight - currentHeight));
+    }
+
+    function getActiveMobileEditableElement() {
+        var activeElement = document.activeElement;
+        if (activeElement && activeElement !== document.body && activeElement !== document.documentElement) {
+            var activeEditable = getMobileEditableRoot(activeElement);
+            if (activeEditable) return activeEditable;
+        }
+
+        var selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || selection.rangeCount === 0) return null;
+
+        var node = selection.anchorNode;
+        var element = node && node.nodeType === 3 ? node.parentElement : node;
+        return getMobileEditableRoot(element);
+    }
+
+    function getMobileEditableRoot(element) {
+        if (!element || !element.closest) return null;
+
+        if (element.matches && element.matches('input, textarea, select, [contenteditable="true"]')) {
+            return element;
+        }
+
+        return element.closest('.noteentry, .markdown-editor, .css-title, .editable-tags-container, .tag-input');
+    }
+
+    function clearCollapsedSelectionInside(element) {
+        var selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || selection.rangeCount === 0 || !selection.isCollapsed) return;
+
+        var node = selection.anchorNode;
+        var anchorElement = node && node.nodeType === 3 ? node.parentElement : node;
+        if (anchorElement && element && (anchorElement === element || (element.contains && element.contains(anchorElement)))) {
+            selection.removeAllRanges();
+        }
+    }
+
+    function blurMobileEditorAfterKeyboardClose() {
+        var editableElement = getActiveMobileEditableElement();
+        if (!editableElement) return;
+
+        if (typeof editableElement.blur === 'function') {
+            editableElement.blur();
+        }
+
+        clearCollapsedSelectionInside(editableElement);
+        setMobileFormattingToolbarActive(false);
+    }
+
+    function hasActiveTextSelection() {
+        var selection = window.getSelection ? window.getSelection() : null;
+        return !!(selection && selection.rangeCount > 0 && !selection.isCollapsed
+            && selection.toString().trim().length > 0);
+    }
+
+    function scheduleMobileEditorBlurOnKeyboardClose() {
+        if (pendingKeyboardCloseBlurTimer) {
+            clearTimeout(pendingKeyboardCloseBlurTimer);
+        }
+
+        // The visual viewport jitters while the keyboard animates open, which can
+        // momentarily look like a close. Re-verify after the animation settles so we
+        // only blur on a genuine keyboard close (e.g. Android back button).
+        pendingKeyboardCloseBlurTimer = setTimeout(function () {
+            pendingKeyboardCloseBlurTimer = null;
+            if (!isMobileFormattingViewport()) return;
+            if (getMobileViewportKeyboardInset() > 120) return;
+            // Selecting text closes the keyboard on many mobile browsers; keep the
+            // formatting toolbar and selection intact instead of blurring it away.
+            if (hasActiveTextSelection()) return;
+            blurMobileEditorAfterKeyboardClose();
+        }, 400);
     }
 
     function syncMobileViewportToolbarState() {
@@ -262,14 +340,53 @@ function initTextSelectionHandlers() {
         var visualViewport = window.visualViewport;
         var viewportTop = 0;
         var keyboardInset = 0;
+        var viewportHeight = 0;
 
         if (visualViewport && isMobileFormattingViewport()) {
             viewportTop = Math.max(0, Math.round(visualViewport.offsetTop || 0));
             keyboardInset = getMobileViewportKeyboardInset();
+            viewportHeight = Math.max(0, Math.round(visualViewport.height || 0));
         }
 
+        var isKeyboardOpen = keyboardInset > 120;
         document.documentElement.style.setProperty('--mobile-visual-viewport-top', viewportTop + 'px');
-        document.body.classList.toggle('mobile-keyboard-open', keyboardInset > 120);
+        if (viewportHeight > 0) {
+            document.documentElement.style.setProperty('--mobile-visual-viewport-height', viewportHeight + 'px');
+        } else {
+            document.documentElement.style.removeProperty('--mobile-visual-viewport-height');
+        }
+        document.body.classList.toggle('mobile-keyboard-open', isKeyboardOpen);
+        syncMobileNoteHeaderMetrics();
+
+        if (isKeyboardOpen && pendingKeyboardCloseBlurTimer) {
+            clearTimeout(pendingKeyboardCloseBlurTimer);
+            pendingKeyboardCloseBlurTimer = null;
+        }
+
+        if (wasMobileKeyboardOpen && !isKeyboardOpen && isMobileFormattingViewport()) {
+            scheduleMobileEditorBlurOnKeyboardClose();
+        }
+        wasMobileKeyboardOpen = isKeyboardOpen;
+    }
+
+    function syncMobileNoteHeaderMetrics() {
+        if (!document.documentElement) return;
+
+        if (!isMobileFormattingViewport()) {
+            document.documentElement.style.removeProperty('--mobile-note-header-height');
+            return;
+        }
+
+        var noteHeader = document.querySelector('#right_col .note-header');
+        if (!noteHeader) {
+            document.documentElement.style.removeProperty('--mobile-note-header-height');
+            return;
+        }
+
+        var headerHeight = Math.ceil(noteHeader.getBoundingClientRect().height || 0);
+        if (headerHeight > 0) {
+            document.documentElement.style.setProperty('--mobile-note-header-height', headerHeight + 'px');
+        }
     }
 
     function initializeMobileViewportToolbarState() {
