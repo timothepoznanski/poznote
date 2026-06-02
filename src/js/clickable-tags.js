@@ -836,15 +836,26 @@ function redirectToTag(tag) {
         newTagsSearch = currentTags.join(' ');
     }
 
-    // Build URL with updated tags parameter
-    let finalUrl;
-    if (newTagsSearch.trim()) {
-        // If there are still tags, navigate with them
-        finalUrl = 'index.php?tags_search=' + encodeURIComponent(newTagsSearch) + '&workspace=' + encodeURIComponent(currentWorkspace);
-    } else {
-        // If no tags left, clear the search (like clicking the clear search button)
-        finalUrl = 'index.php?workspace=' + encodeURIComponent(currentWorkspace);
+    // Build URL with updated tags parameter while preserving date filters
+    const finalParams = new URLSearchParams();
+    if (currentWorkspace) {
+        finalParams.set('workspace', currentWorkspace);
     }
+
+    const createdFrom = urlParams.get('created_from');
+    const createdTo = urlParams.get('created_to');
+    if (createdFrom) {
+        finalParams.set('created_from', createdFrom);
+    }
+    if (createdTo) {
+        finalParams.set('created_to', createdTo);
+    }
+
+    if (newTagsSearch.trim()) {
+        finalParams.set('tags_search', newTagsSearch);
+    }
+
+    const finalUrl = 'index.php' + (finalParams.toString() ? '?' + finalParams.toString() : '');
 
     // Navigate to the URL
     window.location.href = finalUrl;

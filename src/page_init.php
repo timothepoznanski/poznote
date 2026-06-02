@@ -46,6 +46,8 @@ function initializeWorkspacesAndLabels($con) {
 function initializeSearchParams() {
     $search = $_POST['search'] ?? $_GET['search'] ?? '';
     $tags_search = $_POST['tags_search'] ?? $_GET['tags_search'] ?? '';
+    $created_from = normalizeDateOnlyFilter($_POST['created_from'] ?? $_GET['created_from'] ?? '');
+    $created_to = normalizeDateOnlyFilter($_POST['created_to'] ?? $_GET['created_to'] ?? '');
     $note = $_GET['note'] ?? '';
     if ($note === '' && isset($_GET['select_linked_note']) && $_GET['select_linked_note'] !== '') {
         $note = $_GET['select_linked_note'];
@@ -63,6 +65,8 @@ function initializeSearchParams() {
     return [
         'search' => $search,
         'tags_search' => $tags_search,
+        'created_from' => $created_from,
+        'created_to' => $created_to,
         'note' => $note,
         'folder_filter' => $folder_filter,
         'workspace_filter' => getWorkspaceFilter(),

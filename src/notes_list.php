@@ -26,6 +26,7 @@ try {
 }
 
 $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['select_linked_note']) : 0;
+$has_created_date_filter = !empty($created_from) || !empty($created_to);
 
 ?>
 
@@ -46,11 +47,30 @@ $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['se
                         <i class="lucide lucide-tag"></i>
                     </button>
                 </div>
-                <div class="searchbar-input-wrapper">
+                <div class="searchbar-input-wrapper searchbar-has-date-toggle<?php echo (!empty($search) || !empty($tags_search) || $has_created_date_filter) ? ' searchbar-has-clear' : ''; ?>">
                     <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>" value="<?php echo htmlspecialchars(($search ?: $tags_search) ?? '', ENT_QUOTES); ?>" />
-                    <?php if (!empty($search) || !empty($tags_search)): ?>
+                    <button type="button" id="search-date-toggle" class="searchbar-date-toggle<?php echo $has_created_date_filter ? ' active' : ''; ?>" data-action="toggle-date-filter" title="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-label="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-controls="search-date-filter" aria-expanded="<?php echo $has_created_date_filter ? 'true' : 'false'; ?>">
+                        <i class="lucide lucide-calendar"></i>
+                    </button>
+                    <?php if (!empty($search) || !empty($tags_search) || $has_created_date_filter): ?>
                         <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" data-action="clear-search"><span class="clear-icon">×</span></button>
                     <?php endif; ?>
+                </div>
+            </div>
+            <div class="search-date-filter<?php echo $has_created_date_filter ? ' active' : ''; ?>" id="search-date-filter"<?php echo $has_created_date_filter ? '' : ' hidden'; ?>>
+                <div class="search-date-field">
+                    <label for="created-from">
+                        <i class="lucide lucide-calendar"></i>
+                        <span><?php echo t_h('search.created_from', [], 'Created from'); ?></span>
+                    </label>
+                    <input id="created-from" class="search-date-input" type="date" name="created_from" value="<?php echo htmlspecialchars($created_from ?? '', ENT_QUOTES); ?>">
+                </div>
+                <div class="search-date-field">
+                    <label for="created-to">
+                        <i class="lucide lucide-calendar"></i>
+                        <span><?php echo t_h('search.created_to', [], 'Created to'); ?></span>
+                    </label>
+                    <input id="created-to" class="search-date-input" type="date" name="created_to" value="<?php echo htmlspecialchars($created_to ?? '', ENT_QUOTES); ?>">
                 </div>
             </div>
             <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
@@ -69,7 +89,7 @@ $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['se
 /**
  * Recursive function to display folders and their subfolders
  */
-function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true) {
+function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true, $created_from = '', $created_to = '') {
     global $selected_linked_note_id;
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
@@ -161,7 +181,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $isSelected = (($note == $row1["id"]) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
             
             // Generate note link
-            $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
+            $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
             
             $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
@@ -204,7 +224,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     // Recursively display subfolders
     if (isset($folderData['children']) && !empty($folderData['children'])) {
         foreach ($folderData['children'] as $childId => $childData) {
-            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst);
+            displayFolderRecursive($childId, $childData, $depth + 1, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
         }
     }
 
@@ -214,7 +234,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $isSelected = (($note == $row1["id"]) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
             
             // Generate note link
-            $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
+            $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
             
             $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
@@ -302,7 +322,7 @@ foreach($hierarchicalFolders as $folderId => $folderData) {
 // Display Favorites folder first
 if ($favoritesFolder && $favorites_count > 0) {
     foreach($favoritesFolder as $folderId => $folderData) {
-        displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst);
+        displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
     }
 }
 
@@ -334,7 +354,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $isSelected = ((isset($note) && $row1["id"] == $note) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
         
         // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
         
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
@@ -362,7 +382,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 
 // Display regular folders and notes hierarchically
 foreach($regularFolders as $folderId => $folderData) {
-    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst);
+    displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
 }
 
 // Display uncategorized notes (notes without folder) at the END if NOT sorting by date (i.e., alphabetical sort)
@@ -371,7 +391,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $isSelected = ((isset($note) && $row1["id"] == $note) || ($selected_linked_note_id > 0 && $selected_linked_note_id == $row1["id"])) ? 'selected-note' : '';
         
         // Generate note link
-        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined);
+        $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
         
         $noteClass = 'links_arbo_left note-without-folder';
         $noteDbId = isset($row1["id"]) ? $row1["id"] : '';

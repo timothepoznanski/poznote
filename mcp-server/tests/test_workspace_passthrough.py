@@ -37,6 +37,24 @@ def test_list_notes_includes_workspace_filter_when_provided(mock_client_cls):
 
 
 @patch("poznote_mcp.client.httpx.Client")
+def test_search_notes_includes_creation_date_filters(mock_client_cls):
+    http_client = MagicMock()
+    http_client.get.return_value = _mock_response({"success": True, "results": []})
+    mock_client_cls.return_value = http_client
+
+    client = PoznoteClient(base_url="http://example.test/api/v1", service_token="secret-token")
+    client.search_notes(query="docker", created_from="2026-01-01", created_to="2026-01-31")
+
+    _, kwargs = http_client.get.call_args
+    assert kwargs["params"] == {
+        "q": "docker",
+        "limit": 10,
+        "created_from": "2026-01-01",
+        "created_to": "2026-01-31",
+    }
+
+
+@patch("poznote_mcp.client.httpx.Client")
 def test_create_note_omits_workspace_field_when_absent(mock_client_cls):
     http_client = MagicMock()
     http_client.post.return_value = _mock_response({"success": True, "note": {"id": 1}})

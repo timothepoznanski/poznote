@@ -600,9 +600,15 @@
     "clear": "清除搜索",
     "placeholder_notes": "搜索一个或多个关键词...",
     "placeholder_tags": "搜索一个或多个标签...",
+    "placeholder_combined": "搜索笔记和标签...",
+    "toggle_options": "显示/隐藏搜索选项",
+    "toggle_date_filter": "显示/隐藏日期筛选",
+    "created_from": "创建日期从",
+    "created_to": "创建日期到",
     "validation": {
       "select_type": "请至少选择一个搜索选项（笔记或标签）",
-      "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。"
+      "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。",
+      "invalid_date_range": "开始日期必须早于或等于结束日期。"
     }
   },
   "autosave": {

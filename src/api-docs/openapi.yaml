@@ -242,6 +242,18 @@ paths:
           schema:
             type: string
           description: Search in note content
+        - name: created_from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter notes created on or after this date
+        - name: created_to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter notes created on or before this date
         - name: tag
           in: query
           schema:

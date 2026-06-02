@@ -221,7 +221,7 @@ The Poznote MCP server provides the following tools that VS Code Copilot can use
 ### Note Management
 - `get_note` - Get a specific note by ID
 - `list_notes` - List all notes
-- `search_notes` - Search notes by text query
+- `search_notes` - Search notes by text query, with optional creation date range
 - `create_note` - Create a new note
 - `update_note` - Update an existing note
 - `delete_note` - Delete a note

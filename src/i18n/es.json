@@ -600,9 +600,15 @@
     "clear": "Limpiar búsqueda",
     "placeholder_notes": "Buscar una o más palabras...",
     "placeholder_tags": "Buscar una o más etiquetas...",
+    "placeholder_combined": "Buscar en notas y etiquetas...",
+    "toggle_options": "Mostrar/ocultar opciones de búsqueda",
+    "toggle_date_filter": "Mostrar/ocultar filtro de fecha",
+    "created_from": "Creada desde",
+    "created_to": "Creada hasta",
     "validation": {
       "select_type": "Por favor selecciona al menos una opción de búsqueda (Notas o Etiquetas)",
-      "single_letter_warning": "Buscar con palabras de una sola letra puede devolver demasiados resultados. Intenta usar palabras más largas para una búsqueda más precisa."
+      "single_letter_warning": "Buscar con palabras de una sola letra puede devolver demasiados resultados. Intenta usar palabras más largas para una búsqueda más precisa.",
+      "invalid_date_range": "La fecha de inicio debe ser anterior o igual a la fecha de fin."
     }
   },
   "autosave": {

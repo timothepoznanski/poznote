@@ -38,6 +38,14 @@
     box-sizing: border-box;
 }
 
+.searchbar-has-date-toggle .searchbar-input {
+    padding-right: 48px;
+}
+
+.searchbar-has-date-toggle.searchbar-has-clear .searchbar-input {
+    padding-right: 88px;
+}
+
 .searchbar-input:disabled {
     background-color: #f5f5f5;
     color: #999;
@@ -230,7 +238,7 @@
 
 .searchbar-clear {
     position: absolute;
-    right: 15px;
+    right: 8px;
     top: 50%;
     transform: translateY(-50%);
     background: none !important;
@@ -248,11 +256,105 @@
     transition: background 0.2s, color 0.2s;
 }
 
+.searchbar-date-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #9aa3a8;
+    cursor: pointer;
+    z-index: 3;
+    transition: color 0.18s;
+}
+
+.searchbar-has-date-toggle .searchbar-clear {
+    right: 48px;
+}
+
+.searchbar-date-toggle:hover,
+.searchbar-date-toggle.active {
+    color: #007DB8;
+    background: transparent;
+}
+
+.searchbar-date-toggle i {
+    color: inherit;
+    font-size: 16px;
+}
+
 .searchbar-clear .clear-icon {
     color: #d32f2f;
     font-size: 16px;
     font-weight: bold;
     line-height: 1;
+}
+
+.search-date-filter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    align-items: end;
+    width: 100%;
+    margin: 0 0 8px 0;
+    padding: 8px;
+    border: 1px solid #d3d6db;
+    border-radius: 8px;
+    background: #f8fafc;
+    box-sizing: border-box;
+}
+
+.search-date-filter[hidden] {
+    display: none;
+}
+
+.search-date-field {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 4px;
+}
+
+.search-date-field label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 18px;
+    color: #6c7580;
+    font-size: 0.74em;
+    line-height: 1.2;
+}
+
+.search-date-field label i {
+    color: #9aa3a8;
+    font-size: 14px;
+    flex: 0 0 auto;
+}
+
+.search-date-input {
+    width: 100%;
+    min-width: 0;
+    height: 34px;
+    padding: 6px 8px;
+    border: 1px solid #d3d6db;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #4b5563;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.78em;
+    box-sizing: border-box;
+}
+
+.search-date-input:focus {
+    border-color: #b0b3b8;
+    outline: none;
 }
 
 .contains_forms_search {
@@ -326,4 +428,10 @@
     align-items: center;
     width: 100%;
     position: relative;
+}
+
+@media (max-width: 520px) {
+    .search-date-filter {
+        grid-template-columns: 1fr;
+    }
 }

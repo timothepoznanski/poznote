@@ -187,7 +187,9 @@
             var urlParams = new URLSearchParams(window.location.search || '');
             var urlSearch = (urlParams.get('search') || '').trim();
             var urlTags = (urlParams.get('tags_search') || '').trim();
-            if (urlSearch || urlTags) return true;
+            var createdFrom = (urlParams.get('created_from') || '').trim();
+            var createdTo = (urlParams.get('created_to') || '').trim();
+            if (urlSearch || urlTags || createdFrom || createdTo) return true;
         } catch (e) { /* ignore */ }
 
         var searchInputs = [
@@ -196,7 +198,11 @@
             document.getElementById('search-notes-hidden'),
             document.getElementById('search-notes-hidden-mobile'),
             document.getElementById('search-tags-hidden'),
-            document.getElementById('search-tags-hidden-mobile')
+            document.getElementById('search-tags-hidden-mobile'),
+            document.getElementById('created-from'),
+            document.getElementById('created-from-mobile'),
+            document.getElementById('created-to'),
+            document.getElementById('created-to-mobile')
         ];
 
         for (var i = 0; i < searchInputs.length; i++) {
