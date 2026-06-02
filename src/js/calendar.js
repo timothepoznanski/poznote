@@ -33,13 +33,72 @@ class MiniCalendar {
     }
 
     /**
+     * Get the active workspace for calendar API calls.
+     */
+    getCurrentWorkspace() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search || '');
+            const workspaceFromUrl = urlParams.get('workspace');
+            if (workspaceFromUrl) {
+                return workspaceFromUrl;
+            }
+        } catch (error) {
+            // Ignore URL parsing errors and continue with page state fallbacks.
+        }
+
+        if (typeof getSelectedWorkspace === 'function') {
+            const selected = getSelectedWorkspace();
+            if (selected) {
+                return selected;
+            }
+        }
+
+        if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+            return selectedWorkspace;
+        }
+
+        if (window.selectedWorkspace) {
+            return window.selectedWorkspace;
+        }
+
+        const configElement = document.getElementById('page-config-data');
+        if (configElement) {
+            try {
+                const config = JSON.parse(configElement.textContent || '{}');
+                if (config.selectedWorkspace) {
+                    return config.selectedWorkspace;
+                }
+            } catch (error) {
+                // Ignore malformed config and continue with DOM fallback.
+            }
+        }
+
+        return document.body ? document.body.getAttribute('data-workspace') || '' : '';
+    }
+
+    /**
+     * Build a calendar API URL scoped to the active workspace.
+     */
+    buildCalendarApiUrl(endpoint, params = {}) {
+        const searchParams = new URLSearchParams(params);
+        const workspace = this.getCurrentWorkspace();
+
+        if (workspace) {
+            searchParams.set('workspace', workspace);
+        }
+
+        const queryString = searchParams.toString();
+        return queryString ? `${endpoint}?${queryString}` : endpoint;
+    }
+
+    /**
      * Fetch notes data from the database
      * Groups notes by creation date
      */
     async fetchNotesData() {
         try {
             // Fetch notes data via AJAX
-            const response = await fetch('api/v1/calendar/notes-by-date.php');
+            const response = await fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-by-date.php'));
             if (response.ok) {
                 const data = await response.json();
                 this.notesData = data;
@@ -306,7 +365,7 @@ class MiniCalendar {
     async filterNotesByDate(dateStr) {
         try {
             // Fetch notes created on this date
-            const response = await fetch(`api/v1/calendar/notes-on-date.php?date=${dateStr}`);
+            const response = await fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-on-date.php', { date: dateStr }));
             if (!response.ok) {
                 console.error('Failed to fetch notes for date:', dateStr);
                 return;
