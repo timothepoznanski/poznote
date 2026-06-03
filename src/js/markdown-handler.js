@@ -435,6 +435,79 @@ function renderMarkdownEditorContent(editorDiv, content) {
     editorDiv.appendChild(fragment);
 }
 
+function isMarkdownEntryReadOnly(noteEntry) {
+    if (!noteEntry) {
+        return true;
+    }
+
+    if (document.body && document.body.classList.contains('public-workspace-readonly')) {
+        return true;
+    }
+
+    var noteId = noteEntry.getAttribute('data-note-id') || (noteEntry.id || '').replace('entry', '');
+    return !!(noteId && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId));
+}
+
+function applyMarkdownEditorEditableState(editorDiv, editable) {
+    if (!editorDiv) {
+        return;
+    }
+
+    var canEdit = !!editable;
+    editorDiv.setAttribute('contenteditable', canEdit ? 'true' : 'false');
+    editorDiv.setAttribute('aria-readonly', canEdit ? 'false' : 'true');
+    editorDiv.classList.toggle('markdown-editor-readonly', !canEdit);
+
+    if (!canEdit && document.activeElement === editorDiv) {
+        editorDiv.blur();
+    }
+}
+
+function isMarkdownEditorDisplayed(noteEntry, editorDiv) {
+    if (!noteEntry || !editorDiv) {
+        return false;
+    }
+
+    if (noteEntry.classList.contains('markdown-split-mode')) {
+        return true;
+    }
+
+    var editorContainer = editorDiv.closest ? editorDiv.closest('.markdown-editor-container') : null;
+    var elementToCheck = editorContainer || editorDiv;
+    try {
+        return window.getComputedStyle(elementToCheck).display !== 'none';
+    } catch (e) {
+        return elementToCheck.style.display !== 'none';
+    }
+}
+
+function setMarkdownEditorEditable(editorDiv, editable) {
+    var noteEntry = editorDiv && editorDiv.closest ? editorDiv.closest('.noteentry') : null;
+    applyMarkdownEditorEditableState(editorDiv, !!editable && !isMarkdownEntryReadOnly(noteEntry));
+}
+
+function syncMarkdownEditorEditableState(noteEntryOrId) {
+    var noteEntry = null;
+    if (typeof noteEntryOrId === 'string' || typeof noteEntryOrId === 'number') {
+        noteEntry = document.getElementById('entry' + noteEntryOrId);
+    } else {
+        noteEntry = noteEntryOrId;
+    }
+
+    if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown') {
+        return;
+    }
+
+    noteEntry.setAttribute('contenteditable', 'false');
+
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    if (!editorDiv) {
+        return;
+    }
+
+    setMarkdownEditorEditable(editorDiv, isMarkdownEditorDisplayed(noteEntry, editorDiv));
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -2801,7 +2874,6 @@ function initializeMarkdownNote(noteId) {
 
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
-    editorDiv.contentEditable = true;
     renderMarkdownEditorContent(editorDiv, markdownContent);
     var isMobileViewport = false;
     try {
@@ -2857,14 +2929,17 @@ function initializeMarkdownNote(noteId) {
         noteEntry.classList.add('markdown-split-mode');
         editorContainer.style.setProperty('display', 'flex', 'important');
         previewDiv.style.setProperty('display', 'block', 'important');
+        setMarkdownEditorEditable(editorDiv, true);
     } else if (startInEditMode) {
         // Edit mode: show editor, hide preview
         editorContainer.style.setProperty('display', 'flex', 'important');
         previewDiv.style.setProperty('display', 'none', 'important');
+        setMarkdownEditorEditable(editorDiv, true);
     } else {
         // Preview mode: show preview, hide editor
         editorContainer.style.setProperty('display', 'none', 'important');
         previewDiv.style.setProperty('display', 'block', 'important');
+        setMarkdownEditorEditable(editorDiv, false);
     }
 
     // Replace note content with preview and editor
@@ -2872,6 +2947,7 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(editorContainer);
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
+    syncMarkdownEditorEditableState(noteEntry);
 
     if (typeof window.highlightSearchTerms === 'function') {
         setTimeout(function () {
@@ -3032,6 +3108,8 @@ function switchToEditMode(noteId) {
     } else {
         editorDiv.style.setProperty('display', 'block', 'important');
     }
+    setMarkdownEditorEditable(editorDiv, true);
+    noteEntry.setAttribute('contenteditable', 'false');
 
     // Determine scroll ratio based on source mode
     // If preview was scrollable (Split Mode), use its internal scroll
@@ -3129,6 +3207,8 @@ function switchToPreviewMode(noteId) {
         editorDiv.style.setProperty('display', 'none', 'important');
     }
     previewDiv.style.setProperty('display', 'block', 'important');
+    setMarkdownEditorEditable(editorDiv, false);
+    noteEntry.setAttribute('contenteditable', 'false');
 
     // Determine scroll ratio based on source mode
     // If editor was scrollable (Split Mode), use its internal scroll
@@ -3227,7 +3307,7 @@ function getMarkdownContentForNote(noteId) {
 
     // Check if we're in edit mode or preview mode
     var editorDiv = noteEntry.querySelector('.markdown-editor');
-    if (editorDiv && editorDiv.style.display !== 'none') {
+    if (editorDiv && isMarkdownEditorDisplayed(noteEntry, editorDiv)) {
         // In edit mode, get content from editor
         // Use helper function to properly normalize content
         return normalizeContentEditableText(editorDiv);
@@ -3374,6 +3454,8 @@ function switchToSplitMode(noteId) {
         editorDiv.style.setProperty('display', 'block', 'important');
     }
     previewDiv.style.setProperty('display', 'block', 'important');
+    setMarkdownEditorEditable(editorDiv, true);
+    noteEntry.setAttribute('contenteditable', 'false');
 
     // Restore scroll position after layout changes
     // In split mode, the right_col becomes hidden overflow, and panels scroll internally.
@@ -4066,6 +4148,7 @@ window.getMarkdownContentForNote = getMarkdownContentForNote;
 window.parseMarkdown = parseMarkdown;
 window.renderMarkdownPreview = renderMarkdownPreview;
 window.renderMarkdownEditorContent = renderMarkdownEditorContent;
+window.syncMarkdownEditorEditableState = syncMarkdownEditorEditableState;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;
 window.setupSplitModePreviewUpdate = setupSplitModePreviewUpdate;
