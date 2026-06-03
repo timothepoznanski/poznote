@@ -3,13 +3,40 @@
 // ============================================================
 
 // Constants
-var DEFAULT_NOTE_TITLE_PATTERNS = [
-    /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
-    /^Nouvelle note( \(\d+\))?$/,   // French: "Nouvelle note" or "Nouvelle note (2)"
-    /^Neue Notiz( \(\d+\))?$/,      // German
-    /^Nueva nota( \(\d+\))?$/,      // Spanish
-    /^Nova nota( \(\d+\))?$/        // Portuguese
-];
+var DEFAULT_NOTE_TITLES = Array.isArray(window.DEFAULT_NOTE_TITLES) && window.DEFAULT_NOTE_TITLES.length
+    ? window.DEFAULT_NOTE_TITLES.slice()
+    : ['New note'];
+
+function _escapeDefaultTitleRegex(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function matchDefaultNoteTitleText(text) {
+    if (!text) return null;
+
+    var normalized = String(text).trim();
+    for (var i = 0; i < DEFAULT_NOTE_TITLES.length; i++) {
+        var title = DEFAULT_NOTE_TITLES[i];
+        var pattern = new RegExp('^' + _escapeDefaultTitleRegex(title) + '(?: \\((\\d+)\\))?$');
+        var match = pattern.exec(normalized);
+        if (match) {
+            return {
+                title: title,
+                number: match[1] || null
+            };
+        }
+    }
+
+    return null;
+}
+
+function isDefaultNoteTitleText(text) {
+    return matchDefaultNoteTitleText(text) !== null;
+}
+
+window.DEFAULT_NOTE_TITLES = DEFAULT_NOTE_TITLES.slice();
+window.matchDefaultNoteTitleText = matchDefaultNoteTitleText;
+window.isDefaultNoteTitleText = isDefaultNoteTitleText;
 
 // ============================================================
 // DOM UTILITIES
@@ -108,10 +135,7 @@ function createMarkdownNote() {
  * @private
  */
 function _isDefaultPlaceholder(placeholder) {
-    if (!placeholder) return false;
-    return DEFAULT_NOTE_TITLE_PATTERNS.some(function (pattern) {
-        return pattern.test(placeholder);
-    });
+    return isDefaultNoteTitleText(placeholder);
 }
 
 /**

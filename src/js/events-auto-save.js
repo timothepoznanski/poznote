@@ -460,22 +460,9 @@ function emergencySave(noteId) {
 
     let headi = titleInput.value || '';
 
-    // If title is empty, use placeholder if it matches default note title patterns
-    // supported by the note list renderer.
-    if (headi === '' && titleInput.placeholder) {
-        const placeholderPatterns = [
-            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
-            /^Nouvelle note( \(\d+\))?$/,   // French: "Nouvelle note" or "Nouvelle note (2)"
-            /^Neue Notiz( \(\d+\))?$/,      // German
-            /^Nueva nota( \(\d+\))?$/,      // Spanish
-            /^Nova nota( \(\d+\))?$/        // Portuguese
-        ];
-
-        const isDefaultPlaceholder = placeholderPatterns.some(pattern => pattern.test(titleInput.placeholder));
-
-        if (isDefaultPlaceholder) {
-            headi = titleInput.placeholder;
-        }
+    // If title is empty, use placeholder if it matches a default note title.
+    if (headi === '' && typeof window.isDefaultNoteTitleText === 'function' && window.isDefaultNoteTitleText(titleInput.placeholder)) {
+        headi = titleInput.placeholder;
     }
 
     // Get note type to determine how to extract content

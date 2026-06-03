@@ -167,7 +167,8 @@ $currentLang = getUserLanguage();
     <script src="js/template-selector.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/linked-note-selector.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/notes.js?v=<?php echo $cache_v; ?>"></script>
+    <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
+    <script src="js/notes.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
     <script src="js/folder-hierarchy.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
 

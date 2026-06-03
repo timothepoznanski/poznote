@@ -937,14 +937,13 @@ if ($isPublicWorkspaceReadonly) {
                     echo '<input type="hidden" id="folderId'.$row['id'].'" value="'.htmlspecialchars($row['folder_id'] ?: '', ENT_QUOTES).'"/>';
                     
                     // Title - disable for protected note
-                    // If the heading is "New note" or "Nouvelle note" (or numbered variants), treat it as a placeholder
+                    // If the heading is a localized default note title, treat it as a placeholder.
                     $heading = htmlspecialchars_decode($row['heading'] ?: 'New note');
-                    $defaultMatch = [];
-                    // Check for default titles in all supported languages
-                    $isDefaultTitle = preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)(?: \((\d+)\))?$/', $heading, $defaultMatch);
+                    $defaultMatch = matchDefaultNoteTitle($heading);
+                    $isDefaultTitle = $defaultMatch !== null;
                     $titleValue = $isDefaultTitle ? '' : htmlspecialchars($heading, ENT_QUOTES, 'UTF-8');
                     if ($isDefaultTitle) {
-                        $defaultNum = isset($defaultMatch[1]) && $defaultMatch[1] !== '' ? $defaultMatch[1] : null;
+                        $defaultNum = isset($defaultMatch['number']) && $defaultMatch['number'] !== '' ? $defaultMatch['number'] : null;
                         $titlePlaceholder = $defaultNum
                             ? t_h('index.note.new_note_numbered', ['number' => $defaultNum], 'New note ({{number}})')
                             : t_h('index.note.new_note', [], 'New note');
@@ -1077,7 +1076,8 @@ if ($isPublicWorkspaceReadonly) {
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js?v=<?php echo $v; ?>"></script>
 <script src="js/workspaces.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
-<script src="js/notes.js"></script>
+<script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
+<script src="js/notes.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
 <script src="js/ui.js"></script>
 <script src="js/note-edit-lock.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/note-edit-lock.js') ?: time(); ?>"></script>
 <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : $v; ?>"></script>

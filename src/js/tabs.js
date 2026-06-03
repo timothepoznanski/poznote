@@ -114,6 +114,26 @@
         return window.t ? window.t('notes_list.folder_actions.kanban_view', null, 'Kanban view') : 'Kanban view';
     }
 
+    function _matchDefaultNoteTitle(title) {
+        var normalizedTitle = String(title || '').trim();
+        if (!normalizedTitle) return null;
+
+        if (typeof window.matchDefaultNoteTitleText === 'function') {
+            var defaultMatch = window.matchDefaultNoteTitleText(normalizedTitle);
+            if (defaultMatch) return defaultMatch;
+        }
+
+        var legacyUntitledMatch = /^Untitled(?: \((\d+)\))?$/.exec(normalizedTitle);
+        if (legacyUntitledMatch) {
+            return {
+                title: 'Untitled',
+                number: legacyUntitledMatch[1] || null
+            };
+        }
+
+        return null;
+    }
+
     function _readFolderTitle(folderId, fallback) {
         folderId = String(folderId);
         var selectors = [
@@ -810,16 +830,14 @@
     document.addEventListener('poznote:i18n:loaded', function () {
         if (_areTabsEnabled() && tabs.length > 0) {
             // Update tabs that have default titles to use the translated version
-            // Pattern to detect default titles in all languages: "New note", "Nouvelle note (5)", etc.
-            var defaultTitlePattern = /^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota|Untitled)(?: \((\d+)\))?$/;
             var changed = false;
             var newDefaultTitle = _getDefaultTitle();
 
             tabs.forEach(function (tab) {
                 if (!_isNoteTab(tab)) return;
-                var match = defaultTitlePattern.exec(tab.title);
+                var match = _matchDefaultNoteTitle(tab.title);
                 if (match) {
-                    var number = match[1]; // Captured number, e.g., "10" from "New note (10)"
+                    var number = match.number; // Captured number, e.g., "10" from "New note (10)"
                     var freshTitle;
 
                     // For active tab or if note is in DOM, read from DOM (has the most accurate info)

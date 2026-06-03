@@ -1263,6 +1263,82 @@ function saveLastOpenedWorkspace($workspace) {
 }
 
 /**
+ * Default note titles as they may already be stored in existing databases,
+ * derived from src/i18n/* index.note.new_note values.
+ */
+function getDefaultNoteTitles(): array {
+    static $titles = null;
+
+    if ($titles === null) {
+        $titles = [];
+        foreach (glob(__DIR__ . '/i18n/*.json') ?: [] as $file) {
+            $lang = basename($file, '.json');
+            $dict = loadI18nDictionary($lang);
+            $title = i18nGet($dict, 'index.note.new_note');
+            if ($title !== null && trim($title) !== '') {
+                $titles[] = $title;
+            }
+        }
+
+        $titles = array_values(array_unique($titles));
+        if (empty($titles)) {
+            $titles = ['New note'];
+        }
+    }
+
+    return $titles;
+}
+
+/**
+ * Safe JSON payload for exposing default note titles to client scripts.
+ */
+function getDefaultNoteTitlesJson(): string {
+    return json_encode(
+        getDefaultNoteTitles(),
+        JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+    ) ?: '["New note"]';
+}
+
+/**
+ * Return metadata when a title is one of the localized default note titles,
+ * optionally with a numeric suffix like " (2)".
+ */
+function matchDefaultNoteTitle($title): ?array {
+    $normalizedTitle = trim((string)$title);
+    if ($normalizedTitle === '') {
+        return null;
+    }
+
+    foreach (getDefaultNoteTitles() as $defaultTitle) {
+        $pattern = '/^' . preg_quote($defaultTitle, '/') . '(?: \((\d+)\))?$/u';
+        if (preg_match($pattern, $normalizedTitle, $matches)) {
+            return [
+                'title' => $defaultTitle,
+                'number' => $matches[1] ?? null,
+            ];
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Translate stored default note titles to the current UI language.
+ */
+function translateDefaultNoteTitle($title): string {
+    $match = matchDefaultNoteTitle($title);
+    if ($match === null) {
+        return (string)$title;
+    }
+
+    if ($match['number'] !== null && $match['number'] !== '') {
+        return t('index.note.new_note_numbered', ['number' => $match['number']], 'New note (' . $match['number'] . ')');
+    }
+
+    return t('index.note.new_note', [], 'New note');
+}
+
+/**
  * Generate a unique note title to prevent duplicates
  * Default to "New note" when empty.
  * If a title already exists, add a numeric suffix like " (1)", " (2)", ...
