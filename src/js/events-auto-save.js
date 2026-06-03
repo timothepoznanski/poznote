@@ -365,9 +365,18 @@ function saveToServerDebounced() {
     const titleKey = 'poznote_title_' + noteid;
     const tagsKey = 'poznote_tags_' + noteid;
 
-    const currentDraft = localStorage.getItem(draftKey);
-    const currentTitle = localStorage.getItem(titleKey);
-    const currentTags = localStorage.getItem(tagsKey);
+    const storedDraft = localStorage.getItem(draftKey);
+    const storedTitle = localStorage.getItem(titleKey);
+    const storedTags = localStorage.getItem(tagsKey);
+
+    const currentDraft = storedDraft !== null
+        ? storedDraft
+        : ((typeof window.getComparableNoteContent === 'function')
+            ? window.getComparableNoteContent(entryElem, noteid)
+            : entryElem.innerHTML);
+    const currentTitle = storedTitle !== null ? storedTitle : titleInput.value;
+    const tagsElem = document.getElementById("tags" + noteid);
+    const currentTags = storedTags !== null ? storedTags : (tagsElem ? tagsElem.value : '');
 
     const contentChanged = currentDraft !== lastSavedContent;
     const titleChanged = currentTitle !== lastSavedTitle;
@@ -451,19 +460,9 @@ function emergencySave(noteId) {
 
     let headi = titleInput.value || '';
 
-    // If title is empty, use placeholder if it matches default note title patterns
-    // Support both English and French (and potentially other languages)
-    if (headi === '' && titleInput.placeholder) {
-        const placeholderPatterns = [
-            /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
-            /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
-        ];
-
-        const isDefaultPlaceholder = placeholderPatterns.some(pattern => pattern.test(titleInput.placeholder));
-
-        if (isDefaultPlaceholder) {
-            headi = titleInput.placeholder;
-        }
+    // If title is empty, use placeholder if it matches a default note title.
+    if (headi === '' && typeof window.isDefaultNoteTitleText === 'function' && window.isDefaultNoteTitleText(titleInput.placeholder)) {
+        headi = titleInput.placeholder;
     }
 
     // Get note type to determine how to extract content
@@ -530,7 +529,8 @@ function emergencySave(noteId) {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Editor-Session-ID': (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : ''
             },
             body: JSON.stringify(updates),
             keepalive: true

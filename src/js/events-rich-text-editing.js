@@ -1011,12 +1011,19 @@ function handleNoteEntryKeydown(e) {
 function handleNoteEditEvent(e) {
     var target = e.target;
 
+    if (target.classList.contains('css-title')) {
+        if (window.updateidhead) {
+            window.updateidhead(target);
+        }
+        triggerNoteSave();
+        return;
+    }
+
     // Skip non-note fields
     if (target.classList.contains('searchbar') ||
         target.id === 'search' ||
         target.classList.contains('searchtrash') ||
         target.classList.contains('one_note_title') ||
-        target.classList.contains('css-title') ||
         target.classList.contains('tags')) {
         return;
     }

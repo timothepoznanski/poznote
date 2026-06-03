@@ -175,6 +175,37 @@ body.mobile-keyboard-open #right_col .note-header {
     z-index: 2147483000;
 }
 
+body.mobile-formatting-toolbar-active .color-palette-popup {
+    z-index: 2147483002;
+}
+
+body.mobile-formatting-toolbar-active #linkModal.modal {
+    z-index: 2147483004 !important;
+}
+
+body.mobile-formatting-toolbar-active #linkModal .modal-content {
+    z-index: 2147483005 !important;
+}
+
+body.mobile-formatting-toolbar-active .color-palette-popup .color-grid {
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: 6px 8px;
+}
+
+body.mobile-formatting-toolbar-active .color-palette-popup .color-item {
+    align-items: center;
+    display: inline-flex;
+    height: 24px;
+    justify-content: center;
+    width: 26px;
+}
+
+body.mobile-formatting-toolbar-active .color-palette-popup .color-swatch {
+    height: 18px;
+    width: 18px;
+}
+
 body.mobile-formatting-toolbar-active.has-background-image #right_col .note-header,
 body.mobile-keyboard-open.has-background-image #right_col .note-header {
     background: rgba(255, 255, 255, 0.96);

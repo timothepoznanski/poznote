@@ -262,7 +262,7 @@
                 break;
             case 'toggle-red-color':
                 if (typeof toggleRedColor === 'function') {
-                    toggleRedColor();
+                    toggleRedColor(target);
                 }
                 break;
             case 'toggle-yellow-highlight':

@@ -601,6 +601,8 @@
     "placeholder_notes": "搜索一个或多个关键词...",
     "placeholder_tags": "搜索一个或多个标签...",
     "placeholder_combined": "搜索笔记和标签...",
+    "search_in_notes": "在笔记中搜索",
+    "search_in_tags": "在标签中搜索",
     "toggle_options": "显示/隐藏搜索选项",
     "toggle_date_filter": "显示/隐藏日期筛选",
     "created_from": "创建日期从",

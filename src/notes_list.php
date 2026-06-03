@@ -187,18 +187,9 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
             $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
             
-            // Translate default note titles (New note, Nouvelle note, etc.)
+            // Translate default note titles stored in any supported language.
             $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
-            
-            // Check if the title matches a default note pattern in any supported language
-            if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)( \(\d+\))?$/', $noteTitle)) {
-                // Default title - translate to current language
-                if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota) \((\d+)\)$/', $noteTitle, $matches)) {
-                    $noteTitle = t('index.note.new_note_numbered', ['number' => $matches[1]], 'New note (' . $matches[1] . ')');
-                } else {
-                    $noteTitle = t('index.note.new_note', [], 'New note');
-                }
-            }
+            $noteTitle = translateDefaultNoteTitle($noteTitle);
             
             // Add icon for linked notes
             $noteIcon = '';
@@ -240,18 +231,9 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
             $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
             
-            // Translate default note titles (New note, Nouvelle note, etc.)
+            // Translate default note titles stored in any supported language.
             $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
-            
-            // Check if the title matches a default note pattern in any supported language
-            if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota)( \(\d+\))?$/', $noteTitle)) {
-                // Default title - translate to current language
-                if (preg_match('/^(?:New note|Nouvelle note|Neue Notiz|Nueva nota|Nova nota) \((\d+)\)$/', $noteTitle, $matches)) {
-                    $noteTitle = t('index.note.new_note_numbered', ['number' => $matches[1]], 'New note (' . $matches[1] . ')');
-                } else {
-                    $noteTitle = t('index.note.new_note', [], 'New note');
-                }
-            }
+            $noteTitle = translateDefaultNoteTitle($noteTitle);
             
             // Add icon for linked notes
             $noteIcon = '';
@@ -370,10 +352,12 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
                 $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
             }
         }
+
+        $noteTitle = translateDefaultNoteTitle($row1["heading"] ?: t('index.note.new_note', [], 'New note'));
         
         echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
+        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "</div>";
         echo "<div id=pxbetweennotes></div>";
@@ -407,10 +391,12 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
                 $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
             }
         }
+
+        $noteTitle = translateDefaultNoteTitle($row1["heading"] ?: t('index.note.new_note', [], 'New note'));
         
         echo "<div class='note-list-item'>";
         echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars(($row1["heading"] ?: t('index.note.new_note', [], 'New note')), ENT_QUOTES) . "</span>";
+        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "</div>";
         echo "<div id=pxbetweennotes></div>";
