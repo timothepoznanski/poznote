@@ -1000,6 +1000,7 @@ if ($isPublicWorkspaceReadonly) {
                     
                     // Public workspace access keeps the standard UI but disables content editing.
                     $editable = $isPublicWorkspaceReadonly ? 'false' : 'true';
+                    $entry_editable = ($note_type === 'markdown') ? 'false' : $editable;
                     $excalidraw_attr = '';
 
                     $placeholder_desktop = t('index.editor.placeholder_desktop', [], 'Enter text, use / to open commands menu, paste images or drag-and-drop an image at the cursor.');
@@ -1014,7 +1015,7 @@ if ($isPublicWorkspaceReadonly) {
                     if (isset($row['linked_note_id']) && $row['linked_note_id']) {
                         $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
                     }
-                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';

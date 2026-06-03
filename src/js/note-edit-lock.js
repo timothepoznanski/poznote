@@ -178,6 +178,25 @@
         element.classList.add('note-lock-readonly');
     }
 
+    function isMarkdownEntry(entry) {
+        return !!(entry && entry.getAttribute && entry.getAttribute('data-note-type') === 'markdown');
+    }
+
+    function restoreEntryContentEditableState(entry) {
+        if (!entry) {
+            return;
+        }
+
+        setContentEditableState(entry, true);
+
+        if (isMarkdownEntry(entry)) {
+            entry.setAttribute('contenteditable', 'false');
+            if (typeof window.syncMarkdownEditorEditableState === 'function') {
+                window.syncMarkdownEditorEditableState(entry);
+            }
+        }
+    }
+
     function updateToolbarState(noteCard, locked) {
         if (!noteCard) {
             return;
@@ -437,10 +456,13 @@
         }
 
         if (entry) {
-            setContentEditableState(entry, true);
+            restoreEntryContentEditableState(entry);
             entry.querySelectorAll('[data-note-lock-prev-contenteditable]').forEach(function (element) {
                 setContentEditableState(element, true);
             });
+            if (isMarkdownEntry(entry) && typeof window.syncMarkdownEditorEditableState === 'function') {
+                window.syncMarkdownEditorEditableState(entry);
+            }
             entry.querySelectorAll('[data-note-lock-managed]').forEach(function (element) {
                 setTemporarilyDisabled(element, false);
             });
