@@ -179,6 +179,14 @@ body.mobile-formatting-toolbar-active .color-palette-popup {
     z-index: 2147483002;
 }
 
+body.mobile-formatting-toolbar-active #linkModal.modal {
+    z-index: 2147483004 !important;
+}
+
+body.mobile-formatting-toolbar-active #linkModal .modal-content {
+    z-index: 2147483005 !important;
+}
+
 body.mobile-formatting-toolbar-active .color-palette-popup .color-grid {
     flex-wrap: nowrap;
     gap: 6px;
