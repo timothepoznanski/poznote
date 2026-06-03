@@ -77,13 +77,15 @@ class NotesController {
         return (int) $stmt->fetchColumn() > 0;
     }
 
-    private function buildNoteEditLockPayload(?array $lock): ?array {
+    private function buildNoteEditLockPayload(?array $lock, ?string $editorSessionId = null): ?array {
         if (!$lock) {
             return null;
         }
 
         $currentHolderUserId = $this->getNoteLockHolderUserId();
-        $currentEditorSessionId = $this->getEditorSessionId();
+        $currentEditorSessionId = $editorSessionId !== null
+            ? trim($editorSessionId)
+            : $this->getEditorSessionId();
 
         return [
             'target_user_id' => (int) ($lock['target_user_id'] ?? 0),
@@ -99,12 +101,12 @@ class NotesController {
         ];
     }
 
-    private function sendLockConflict(string $message, ?array $lock = null): void {
+    private function sendLockConflict(string $message, ?array $lock = null, ?string $editorSessionId = null): void {
         http_response_code(423);
         echo json_encode([
             'success' => false,
             'error' => $message,
-            'lock' => $this->buildNoteEditLockPayload($lock),
+            'lock' => $this->buildNoteEditLockPayload($lock, $editorSessionId),
         ]);
     }
 
@@ -113,7 +115,7 @@ class NotesController {
         $holderUserId = $this->getNoteLockHolderUserId();
 
         if ($targetUserId <= 0 || $holderUserId <= 0) {
-            $this->sendLockConflict('Missing edit lock for this note', getNoteEditLock($targetUserId, $noteId));
+            $this->sendLockConflict('Missing edit lock for this note', getNoteEditLock($targetUserId, $noteId), $editorSessionId);
             return false;
         }
 
@@ -123,7 +125,7 @@ class NotesController {
                 return true;
             }
 
-            $this->sendLockConflict('This note is currently locked for editing', $lock);
+            $this->sendLockConflict('This note is currently locked for editing', $lock, $editorSessionId);
             return false;
         }
 
@@ -145,7 +147,7 @@ class NotesController {
             ? 'This note is currently locked for editing'
             : 'You no longer hold the edit lock for this note';
 
-        $this->sendLockConflict($message, $lock);
+        $this->sendLockConflict($message, $lock, $editorSessionId);
         return false;
     }
 
@@ -182,12 +184,12 @@ class NotesController {
 
         if (!empty($result['success'])) {
             $this->sendSuccess([
-                'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null),
+                'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null, $editorSessionId),
             ]);
             return;
         }
 
-        $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null);
+        $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null, $editorSessionId);
     }
 
     public function lockStatus(string $id): void {
@@ -235,12 +237,12 @@ class NotesController {
 
         if (!empty($result['success'])) {
             $this->sendSuccess([
-                'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null),
+                'lock' => $this->buildNoteEditLockPayload($result['lock'] ?? null, $editorSessionId),
             ]);
             return;
         }
 
-        $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null);
+        $this->sendLockConflict($result['error'] ?? 'This note is currently locked for editing', $result['lock'] ?? null, $editorSessionId);
     }
 
     public function releaseLock(string $id): void {

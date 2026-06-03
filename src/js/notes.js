@@ -5,7 +5,10 @@
 // Constants
 var DEFAULT_NOTE_TITLE_PATTERNS = [
     /^New note( \(\d+\))?$/,        // English: "New note" or "New note (2)"
-    /^Nouvelle note( \(\d+\))?$/    // French: "Nouvelle note" or "Nouvelle note (2)"
+    /^Nouvelle note( \(\d+\))?$/,   // French: "Nouvelle note" or "Nouvelle note (2)"
+    /^Neue Notiz( \(\d+\))?$/,      // German
+    /^Nueva nota( \(\d+\))?$/,      // Spanish
+    /^Nova nota( \(\d+\))?$/        // Portuguese
 ];
 
 // ============================================================
@@ -136,11 +139,52 @@ function _getNoteTitle(titleInput, defaultTitle) {
     return title;
 }
 
+function _getEditorSessionIdForSave() {
+    return (typeof window.getCurrentEditorSessionId === 'function')
+        ? window.getCurrentEditorSessionId()
+        : '';
+}
+
+function _canRecoverOwnEditLock(lock) {
+    return !!(lock && (lock.holder_is_current_editor_session || lock.holder_is_current_user));
+}
+
+function _recoverOwnEditLock(noteId, editorSessionId) {
+    if (!noteId || !editorSessionId) {
+        return Promise.resolve(false);
+    }
+
+    return fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-Editor-Session-ID': editorSessionId
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            editor_session_id: editorSessionId
+        })
+    })
+        .then(function (response) {
+            return response.json().catch(function () {
+                return {};
+            }).then(function (data) {
+                return !!(response.ok && data && data.success);
+            });
+        })
+        .catch(function () {
+            return false;
+        });
+}
+
 /**
  * Save the current note to server
  * This function is called by the auto-save mechanism
  */
-function saveNoteToServer() {
+function saveNoteToServer(options) {
+    options = options || {};
+
     // Check that noteid is valid
     if (!noteid || noteid === -1 || noteid === '' || noteid === null || noteid === undefined) {
         console.error('saveNoteToServer: invalid noteid', noteid);
@@ -169,6 +213,11 @@ function saveNoteToServer() {
     // If title is empty, don't save to avoid "heading is required" error
     if (headi === '' || headi.trim() === '') {
         return;
+    }
+
+    if (typeof saveTimeout !== 'undefined') {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
     }
 
     // Serialize checklist data before saving
@@ -211,13 +260,15 @@ function saveNoteToServer() {
         }
     }
 
+    var editorSessionId = _getEditorSessionIdForSave();
+
     var updates = {
         heading: headi,
         content: ent,
         tags: tags,
         folder_id: folderId,
         workspace: selectedWorkspace || getSelectedWorkspace(),
-        editor_session_id: (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : ''
+        editor_session_id: editorSessionId
     };
 
     // Use RESTful API: PATCH /api/v1/notes/{id}
@@ -225,8 +276,10 @@ function saveNoteToServer() {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json",
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-Editor-Session-ID': editorSessionId
         },
+        credentials: 'same-origin',
         body: JSON.stringify(updates)
     })
         .then(function (response) {
@@ -271,6 +324,25 @@ function saveNoteToServer() {
                     window.refreshKanbanView();
                 }
             } else {
+                if (!options.retriedEditLock && _canRecoverOwnEditLock(data.lock)) {
+                    _recoverOwnEditLock(noteid, editorSessionId).then(function (recovered) {
+                        if (recovered) {
+                            saveNoteToServer({ retriedEditLock: true });
+                            return;
+                        }
+
+                        if (data.lock && typeof window.handleNoteEditLockConflict === 'function') {
+                            window.handleNoteEditLockConflict(noteid, data.lock, data.error || 'This note is currently locked for editing.');
+                            return;
+                        }
+
+                        if (typeof showNotificationPopup === 'function') {
+                            showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
+                        }
+                    });
+                    return;
+                }
+
                 if (data.lock && typeof window.handleNoteEditLockConflict === 'function') {
                     window.handleNoteEditLockConflict(noteid, data.lock, data.error || 'This note is currently locked for editing.');
                     return;
