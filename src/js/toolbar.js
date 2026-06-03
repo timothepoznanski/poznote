@@ -205,31 +205,77 @@ window.savedRanges = {};
     return popup;
   }
 
+  function getViewportBounds() {
+    const viewport = window.visualViewport;
+    const left = viewport ? viewport.offsetLeft : 0;
+    const top = viewport ? viewport.offsetTop : 0;
+    const width = viewport ? viewport.width : window.innerWidth;
+    const height = viewport ? viewport.height : window.innerHeight;
+
+    return {
+      left,
+      top,
+      right: left + width,
+      bottom: top + height
+    };
+  }
+
+  function isMobileColorPaletteViewport() {
+    try {
+      return window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+    } catch (e) {
+      return window.innerWidth <= 800;
+    }
+  }
+
+  function positionColorPopup(popup, btn) {
+    const margin = 8;
+    const btnRect = btn ? btn.getBoundingClientRect() : { left: margin, right: margin + 30, bottom: 40, width: 30 };
+    const popupRect = popup.getBoundingClientRect();
+    const viewport = getViewportBounds();
+    const viewportWidth = viewport.right - viewport.left;
+    const preferredLeft = isMobileColorPaletteViewport()
+      ? viewport.left + ((viewportWidth - popupRect.width) / 2)
+      : btnRect.left + (btnRect.width / 2) - (popupRect.width / 2);
+    const maxLeft = Math.max(viewport.left + margin, viewport.right - popupRect.width - margin);
+    const left = Math.min(Math.max(preferredLeft, viewport.left + margin), maxLeft);
+    const top = Math.min(
+      Math.max(btnRect.bottom + 8, viewport.top + margin),
+      Math.max(viewport.top + margin, viewport.bottom - popupRect.height - margin)
+    );
+
+    popup.style.position = 'fixed';
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+
+    const caretX = (btnRect.left + (btnRect.width / 2)) - left;
+    popup.style.setProperty('--caret-x', Math.max(8, Math.min(caretX, popupRect.width - 8)) + 'px');
+  }
+
+  function getColorTriggerButton(triggerButton) {
+    if (triggerButton && triggerButton.classList && triggerButton.classList.contains('btn-color')) {
+      return triggerButton;
+    }
+
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement.classList && activeElement.classList.contains('btn-color')) {
+      return activeElement;
+    }
+
+    return document.querySelector('.btn-color');
+  }
+
   // Main entry: show popup centered under the palette button
-  function toggleRedColor() {
+  function toggleRedColor(triggerButton) {
     try {
       removeExistingPopup();
       saveSelection();
 
-      const btn = document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('btn-color')
-        ? document.activeElement
-        : document.querySelector('.btn-color');
-
+      const btn = getColorTriggerButton(triggerButton);
       const popup = buildPopup();
       document.body.appendChild(popup);
 
-      // Positioning: center under button
-      const btnRect = btn ? btn.getBoundingClientRect() : { left: 10, right: 40, bottom: 40, width: 30 };
-      const popupRect = popup.getBoundingClientRect();
-      const left = btnRect.left + (btnRect.width / 2) - (popupRect.width / 2) + window.scrollX;
-      const top = btnRect.bottom + 8 + window.scrollY;
-      popup.style.position = 'absolute';
-      popup.style.left = Math.max(8, left) + 'px';
-      popup.style.top = top + 'px';
-
-      // caret alignment variable for CSS if used
-      const caretX = (btnRect.left + (btnRect.width / 2)) - (left);
-      popup.style.setProperty('--caret-x', Math.max(8, caretX) + 'px');
+      positionColorPopup(popup, btn);
 
       // show class for CSS transitions
       setTimeout(() => popup.classList.add('show'), 10);
