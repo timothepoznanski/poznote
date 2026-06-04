@@ -60,6 +60,41 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + FILESIZE_UNITS[i];
     }
 
+    function getAttachmentFilename(attachment) {
+        return attachment.original_filename || attachment.filename || '';
+    }
+
+    function getAttachmentExtension(attachment) {
+        var filename = getAttachmentFilename(attachment);
+        var lastDotIndex = filename.lastIndexOf('.');
+        if (lastDotIndex > -1 && lastDotIndex < filename.length - 1) {
+            return filename.slice(lastDotIndex + 1).toLowerCase();
+        }
+        return '';
+    }
+
+    function isImageAttachment(attachment) {
+        var mimeType = String(attachment.file_type || attachment.mime_type || attachment.type || '').toLowerCase();
+        if (mimeType.indexOf('image/') === 0) return true;
+
+        return ['avif', 'bmp', 'gif', 'heic', 'heif', 'ico', 'jpg', 'jpeg', 'png', 'svg', 'webp'].indexOf(getAttachmentExtension(attachment)) !== -1;
+    }
+
+    function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function isEmbeddedImageAttachment(attachment, noteContent) {
+        if (!attachment || !attachment.id || !noteContent || !isImageAttachment(attachment)) return false;
+
+        var attachmentRefPattern = 'attachments\\/' + escapeRegExp(String(attachment.id)) + '(?:[?#][^\\s"\'<>)]*)?(?=$|[\\s"\'<>\\)])';
+        var htmlImagePattern = new RegExp('<img\\b[^>]*' + attachmentRefPattern, 'i');
+        var markdownImagePattern = new RegExp('!\\[[^\\]]*\\]\\([^)]*' + attachmentRefPattern + '[^)]*\\)', 'i');
+        var content = String(noteContent);
+
+        return htmlImagePattern.test(content) || markdownImagePattern.test(content);
+    }
+
     // Show notification
     function showNotification(message, type) {
         var notification = document.createElement('div');
@@ -258,15 +293,9 @@
     function displayAttachments(attachments, noteContent) {
         var container = document.getElementById('attachmentsList');
 
-        var showInlineEverything = document.getElementById('showInlineImagesToggle') ? document.getElementById('showInlineImagesToggle').checked : true;
-
-        // Filter out inline attachments if toggle is off
-        var visibleAttachments = attachments;
-        if (!showInlineEverything) {
-            visibleAttachments = attachments.filter(function (att) {
-                return !noteContent || !noteContent.includes('attachments/' + att.id);
-            });
-        }
+        var visibleAttachments = (attachments || []).filter(function (attachment) {
+            return !isEmbeddedImageAttachment(attachment, noteContent);
+        });
 
         if (visibleAttachments.length === 0) {
             container.innerHTML = '<div class="no-attachments">' + TXT.noAttachments + '</div>';
@@ -279,10 +308,10 @@
             var uploadDate = typeof window.poznoteFormatDateTime === 'function'
                 ? window.poznoteFormatDateTime(attachment.uploaded_at, { defaultDateOnly: true })
                 : new Date(attachment.uploaded_at).toLocaleDateString();
-            var fileName = attachment.original_filename;
+            var fileName = getAttachmentFilename(attachment);
             var shortName = fileName.length > 40 ? fileName.substring(0, 40) + '...' : fileName;
 
-            var isImage = attachment.file_type && attachment.file_type.startsWith('image/');
+            var isImage = isImageAttachment(attachment);
             var isPDF = attachment.file_type && attachment.file_type === 'application/pdf';
             var isVideo = attachment.file_type && attachment.file_type.startsWith('video/');
             if (!isVideo && attachment.original_filename) {
@@ -569,31 +598,6 @@
 
         // Update back link
         updateBackLink();
-
-        // Set up inline images toggle
-        var showInlineImagesToggle = document.getElementById('showInlineImagesToggle');
-        if (showInlineImagesToggle) {
-            showInlineImagesToggle.addEventListener('change', function () {
-                var isChecked = this.checked;
-                // Key: 'show_inline_attachments_in_list'. Logic: '1' SHOWS everything, '0' HIDES inline ones.
-                var valToSet = isChecked ? '1' : '0';
-
-                fetch('/api/v1/settings/show_inline_attachments_in_list', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ value: valToSet })
-                })
-                    .then(function (r) { return r.json(); })
-                    .then(function (result) {
-                        if (result && result.success) {
-                            // Reload to apply the change and filter
-                            loadAttachments();
-                        }
-                    })
-                    .catch(function (e) { console.error('Error saving setting:', e); });
-            });
-        }
 
         // Load attachments
         loadAttachments();

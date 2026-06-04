@@ -647,23 +647,7 @@ if ($isPublicWorkspaceReadonly) {
                         $attachments_data = json_decode($row['attachments'], true);
                         if (is_array($attachments_data)) {
                             $attachments_count = count($attachments_data);
-                            $note_content_for_count = $row['entry'] ?? '';
-                            foreach ($attachments_data as $att) {
-                                if (isset($att['id'])) {
-                                    $is_inline = false;
-                                    $mime = $att['mime_type'] ?? '';
-                                    $is_img = strpos($mime, 'image/') === 0;
-                                    if (!$is_img && isset($att['original_filename'])) {
-                                        $ext = strtolower(pathinfo($att['original_filename'], PATHINFO_EXTENSION));
-                                        $is_img = in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp']);
-                                    }
-                                    if ($is_img) {
-                                        $pattern = 'attachments/' . $att['id'];
-                                        $is_inline = (strpos($note_content_for_count, $pattern) !== false || strpos($note_content_for_count, urlencode($pattern)) !== false);
-                                    }
-                                    if (!$is_inline) $visible_attachments_count++;
-                                }
-                            }
+                            $visible_attachments_count = poznoteCountDisplayableAttachments($attachments_data, $row['entry'] ?? '');
                         }
                     }
                 
@@ -682,7 +666,7 @@ if ($isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-cloud"></i></button>';
                     }
                     
-                    $attachment_indicator_class = ($attachments_count > 0) ? ' has-attachments' : '';
+                    $attachment_indicator_class = ($visible_attachments_count > 0) ? ' has-attachments' : '';
                     echo '<button type="button" class="toolbar-btn btn-attachment note-action-btn'.$attachment_indicator_class.'" title="'.t_h('index.toolbar.attachments_with_count', ['count' => $visible_attachments_count], 'Attachments ({{count}})').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'"><i class="lucide lucide-paperclip"></i></button>';
                     
                     // Reminder button
@@ -878,8 +862,8 @@ if ($isPublicWorkspaceReadonly) {
                     .'</span>';
                     echo '</div>';
                 
-                    // Display attachments directly in the note if they exist
-                    if (!empty($row['attachments'])) {
+                    // Display attachment links only when full attachment previews are disabled.
+                    if (!$attachment_previews_in_note_setting && !empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
                         if (is_array($attachments_data) && !empty($attachments_data)) {
                             // Get note content to check for inline images

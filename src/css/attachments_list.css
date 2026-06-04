@@ -76,22 +76,27 @@ body.attachments-page {
     margin-bottom: 30px;
 }
 
+.attachments-inline-notice {
+    max-width: 900px;
+    margin: -8px auto 20px auto;
+    padding: 10px 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    box-sizing: border-box;
+}
+
 /* Filter Bar */
 .attachments-filter-bar {
     max-width: 900px;
-    margin: 0 auto 30px auto;
+    margin: 0 auto 10px auto;
     display: flex;
+    flex-direction: row;
     align-items: center;
-    gap: 15px;
-}
-
-.filter-options-bar {
-    max-width: 900px;
-    margin: -20px auto 20px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
+    gap: 12px;
 }
 
 .filter-input-wrapper {
@@ -121,6 +126,32 @@ body.attachments-page {
 
 .filter-input::placeholder {
     color: var(--text-muted, #999999);
+}
+
+.file-type-filter {
+    flex: 0 0 auto;
+    min-width: 130px;
+    max-width: 180px;
+    padding: 10px 34px 10px 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--text-color, #333333);
+    background-color: var(--input-bg, #ffffff);
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.file-type-filter:focus {
+    outline: none;
+    border-color: var(--primary-color, #007bff);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.thumbnails-toggle {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .clear-filter-btn {
@@ -386,6 +417,14 @@ body.attachments-page {
         margin: 15px 10px;
     }
 
+    .attachments-filter-bar {
+        flex-wrap: wrap;
+    }
+
+    .attachments-filter-bar .filter-input-wrapper {
+        min-width: 240px;
+    }
+
     .attachment-item {
         flex-wrap: wrap;
         gap: 8px;
@@ -436,7 +475,19 @@ body.attachments-page {
     background-color: #3a3a3a;
 }
 
+[data-theme="dark"] .attachments-inline-notice {
+    border-color: #1e3a8a;
+    background: #172554;
+    color: #bfdbfe;
+}
+
 [data-theme="dark"] .filter-input {
+    background-color: #333333;
+    border-color: #444444;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .file-type-filter {
     background-color: #333333;
     border-color: #444444;
     color: #e0e0e0;
@@ -556,6 +607,23 @@ body.attachments-page {
 }
 
 @media (max-width: 600px) {
+    .attachments-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .attachments-filter-bar .filter-input-wrapper,
+    .file-type-filter,
+    .thumbnails-toggle {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .attachments-filter-bar .filter-stats {
+        align-self: flex-start;
+    }
+
     .attachment-files-list {
         margin-left: 10px;
     }

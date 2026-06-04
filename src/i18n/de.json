@@ -317,7 +317,8 @@
       "loading_attachments": "Anhänge werden geladen...",
       "preview_alt": "Vorschau",
       "uploaded_prefix": "Hochgeladen: ",
-      "open_in_new_tab": "In neuem Tab öffnen"
+      "open_in_new_tab": "In neuem Tab öffnen",
+      "inline_images_hidden_notice": "Bilder, die direkt im Notizinhalt eingefügt wurden, bleiben als Anhänge gespeichert, werden hier aber ausgeblendet, um Mehrdeutigkeiten zu vermeiden."
     },
     "modals": {
       "delete": {
@@ -345,6 +346,8 @@
       "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
       "show_thumbnails": "Vorschaubilder in dieser Liste anzeigen",
       "show_inline_images": "Auch Bilder anzeigen, die bereits im Notizinhalt sichtbar sind",
+      "all_file_types": "Alle Typen",
+      "file_type_filter": "Nach Dateityp filtern",
       "download": "Herunterladen"
     }
   },

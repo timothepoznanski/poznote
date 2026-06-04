@@ -259,6 +259,18 @@
         return false;
     }
 
+    function _getRenderedNoteId() {
+        var noteEntry = document.querySelector('#right_col .noteentry[data-note-id]');
+        return noteEntry ? String(noteEntry.getAttribute('data-note-id')) : null;
+    }
+
+    function _shouldRestoreActiveTabContent(tab) {
+        if (!tab) return false;
+        if (_isKanbanTab(tab)) return true;
+        if (!_isNoteTab(tab)) return false;
+        return _getRenderedNoteId() !== String(tab.noteId);
+    }
+
     function _applySearchTabVisibility() {
         var bar = document.getElementById('app-tab-bar');
         if (!bar) return;
@@ -798,6 +810,15 @@
 
             _saveToStorage();
             render();
+
+            if (!currentNoteId && !currentKanbanFolderId && !_isSearchFilteringActive()) {
+                var activeTabToRestore = _findTabById(activeTabId);
+                if (_shouldRestoreActiveTabContent(activeTabToRestore)) {
+                    setTimeout(function () {
+                        _loadTabContent(activeTabToRestore);
+                    }, 0);
+                }
+            }
             return;
         }
 

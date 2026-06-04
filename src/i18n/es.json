@@ -318,7 +318,8 @@
       "loading_attachments": "Cargando adjuntos...",
       "preview_alt": "Vista previa",
       "uploaded_prefix": "Subido: ",
-      "open_in_new_tab": "Abrir en nueva pestaña"
+      "open_in_new_tab": "Abrir en nueva pestaña",
+      "inline_images_hidden_notice": "Las imágenes insertadas directamente en el contenido de la nota siguen almacenadas como adjuntos, pero se ocultan aquí para evitar ambigüedades."
     },
     "modals": {
       "delete": {
@@ -346,6 +347,8 @@
       "no_filter_results": "Ninguna note coincide con su búsqueda.",
       "show_thumbnails": "Mostrar miniaturas en esta lista",
       "show_inline_images": "Mostrar también las imágenes ya visibles en el contenido de la nota",
+      "all_file_types": "Todos los tipos",
+      "file_type_filter": "Filtrar por tipo de archivo",
       "download": "Descargar"
     }
   },

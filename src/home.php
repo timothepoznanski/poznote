@@ -12,6 +12,16 @@ require_once 'db_connect.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
+$backToNotesParams = [];
+if ($pageWorkspace !== '') {
+    $backToNotesParams['workspace'] = $pageWorkspace;
+}
+if (isset($_GET['note']) && ctype_digit((string) $_GET['note'])) {
+    $backToNotesParams['note'] = (string) $_GET['note'];
+} elseif (isset($_GET['kanban']) && ctype_digit((string) $_GET['kanban'])) {
+    $backToNotesParams['kanban'] = (string) $_GET['kanban'];
+}
+$backToNotesHref = 'index.php' . (!empty($backToNotesParams) ? '?' . http_build_query($backToNotesParams) : '');
 
 // GitHub Sync Logic
 require_once 'GitSync.php';
@@ -255,7 +265,7 @@ try {
 $attachments_count = 0;
 try {
     if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+        $query = "SELECT entry, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
         $params = [];
         if (!empty($pageWorkspace)) {
             $query .= " AND workspace = ?";
@@ -263,7 +273,9 @@ try {
         }
         $stmtAttachments = $con->prepare($query);
         $stmtAttachments->execute($params);
-        $attachments_count = (int)$stmtAttachments->fetchColumn();
+        while ($row = $stmtAttachments->fetch(PDO::FETCH_ASSOC)) {
+            $attachments_count += poznoteCountDisplayableAttachments($row['attachments'] ?? '', $row['entry'] ?? '');
+        }
     }
 } catch (Exception $e) {
     $attachments_count = 0;
@@ -418,7 +430,7 @@ try {
         <?php $currentUser = getCurrentUser(); ?>
 
         <div class="home-nav-actions" style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+            <a id="backToNotesLink" href="<?php echo htmlspecialchars($backToNotesHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="btn btn-secondary go-to-nav-btn">
                 <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </a>

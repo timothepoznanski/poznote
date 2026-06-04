@@ -319,7 +319,8 @@
       "preview_alt": "预览",
       "uploaded_prefix": "已上传: ",
       "open_in_new_tab": "在新标签页中打开",
-      "pdf_label": "PDF"
+      "pdf_label": "PDF",
+      "inline_images_hidden_notice": "直接插入笔记内容的图片仍会作为附件存储，但此处会隐藏它们，以避免混淆。"
     },
     "modals": {
       "delete": {
@@ -347,6 +348,8 @@
       "no_filter_results": "没有与您的搜索匹配的笔记。",
       "show_thumbnails": "在此列表显示缩略图",
       "show_inline_images": "同时显示笔记内容中已可见的图片",
+      "all_file_types": "所有类型",
+      "file_type_filter": "按文件类型筛选",
       "download": "下载"
     }
   },
