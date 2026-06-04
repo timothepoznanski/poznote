@@ -662,10 +662,12 @@
         link.textContent = title;
         link.title = `Go to: ${heading || title}`;
         
-        // Prevent event propagation so clicking links doesn't trigger 
-        // edit mode in task lists or other parent click handlers
+        // Handle navigation here because task-list references must stop
+        // propagation before the parent task text enters edit mode.
         link.addEventListener('click', function(e) {
+            e.preventDefault();
             e.stopPropagation();
+            navigateToNote(noteId);
         });
         
         return link;

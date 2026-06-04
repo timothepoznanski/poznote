@@ -72,6 +72,46 @@ function setupBrowserNavigationHandler() {
     }
 }
 
+function isInternalNoteNavigationLink(link) {
+    if (!link) return false;
+    if (link.matches('a[data-task-url="true"]')) return false;
+
+    if (link.matches('a.links_arbo_left, a[data-action="load-note"]')) {
+        return true;
+    }
+
+    var href = link.getAttribute('href');
+    if (!href) return false;
+
+    try {
+        var url = new URL(href, window.location.href);
+        if (url.origin !== window.location.origin) return false;
+        if (!url.searchParams.has('note')) return false;
+
+        var path = url.pathname.replace(/\/+$/, '');
+        return path === '' || path.endsWith('/index.php');
+    } catch (e) {
+        return false;
+    }
+}
+
+function getNavigationTargetNoteId(link) {
+    if (!link) return null;
+
+    var dataId = link.getAttribute('data-note-db-id') || link.getAttribute('data-note-id');
+    if (dataId && /^\d+$/.test(String(dataId))) {
+        return String(dataId);
+    }
+
+    try {
+        var url = new URL(link.getAttribute('href') || '', window.location.href);
+        var noteId = url.searchParams.get('note');
+        return noteId && /^\d+$/.test(String(noteId)) ? noteId : null;
+    } catch (e) {
+        return null;
+    }
+}
+
 /**
  * Intercept clicks on note links to check for unsaved changes
  * Prevents navigation if there are unsaved changes and initiates save
@@ -79,17 +119,15 @@ function setupBrowserNavigationHandler() {
 function setupNoteNavigationInterceptor() {
     document.addEventListener('click', function (e) {
         // Check if this is a note link
-        var link = e.target.closest('a.links_arbo_left, a[href*="note="]');
-        if (!link) return;
+        var link = e.target.closest('a');
+        if (!isInternalNoteNavigationLink(link)) return;
 
         // Extract target note ID from href
         var href = link.getAttribute('href');
         if (!href) return;
 
-        var noteMatch = href.match(/[?&]note=(\d+)/);
-        if (!noteMatch) return;
-
-        var targetNoteId = noteMatch[1];
+        var targetNoteId = getNavigationTargetNoteId(link);
+        if (!targetNoteId) return;
         var currentNoteId = window.noteid;
 
         // Check for unsaved changes BEFORE allowing navigation

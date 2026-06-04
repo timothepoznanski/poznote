@@ -180,6 +180,21 @@ function escapeAttribute(value) {
         .replace(/>/g, '&gt;');
 }
 
+function handleTaskLinkClick(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    const link = event && event.currentTarget ? event.currentTarget : null;
+    if (!link || !link.href) return false;
+
+    window.open(link.href, '_blank', 'noopener,noreferrer');
+    return false;
+}
+
+window.handleTaskLinkClick = handleTaskLinkClick;
+
 // Render the task list interface
 function renderTaskList(noteId, tasks) {
     const noteEntry = document.getElementById('entry' + noteId);
@@ -1004,7 +1019,7 @@ function linkifyHtml(text) {
         
         // Use double quotes around attributes and stop propagation on click to avoid editing
         // Add title attribute to show full URL on hover
-        return `<a href="${href}" target="_blank" rel="noopener noreferrer" title="${m}" onclick="event.stopPropagation();">${displayText}</a>`;
+        return `<a href="${href}" target="_blank" rel="noopener noreferrer" data-task-url="true" title="${m}" onclick="return handleTaskLinkClick(event);">${displayText}</a>`;
     });
 
     return replaced;
