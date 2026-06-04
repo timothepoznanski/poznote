@@ -575,6 +575,10 @@
     display: inline-flex;
 }
 
+#snapshotModal .snapshot-modal-actions .snapshot-markdown-preview-btn[hidden] {
+    display: none !important;
+}
+
 .snapshot-modal-actions button i.lucide {
     display: none;
 }
