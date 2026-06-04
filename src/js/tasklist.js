@@ -15,6 +15,25 @@ function isPublicWorkspaceReadOnly() {
     return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
 }
 
+function isTaskEditBlurSavePaused(input) {
+    return !!(input && input.dataset && input.dataset.taskEditBlurSavePaused === 'true');
+}
+
+function pauseTaskEditBlurSave(input) {
+    if (input && input.classList && input.classList.contains('task-edit-input')) {
+        input.dataset.taskEditBlurSavePaused = 'true';
+    }
+}
+
+function resumeTaskEditBlurSave(input) {
+    if (input && input.dataset) {
+        delete input.dataset.taskEditBlurSavePaused;
+    }
+}
+
+window.pauseTaskEditBlurSave = pauseTaskEditBlurSave;
+window.resumeTaskEditBlurSave = resumeTaskEditBlurSave;
+
 // Save tasks to data attribute and re-render the task list
 function saveAndRenderTasks(noteId, tasks) {
     const noteEntry = document.getElementById('entry' + noteId);
@@ -408,6 +427,8 @@ function editTask(taskId, noteId) {
     input.type = 'text';
     input.value = currentText;
     input.className = 'task-edit-input';
+    input.dataset.taskId = String(taskId);
+    input.dataset.noteId = String(noteId);
     // Allow up to 4000 characters for a task line
     input.maxLength = 4000;
     
@@ -430,6 +451,10 @@ function editTask(taskId, noteId) {
     });
 
     input.addEventListener('blur', function() {
+        if (isTaskEditBlurSavePaused(input)) {
+            return;
+        }
+
         if (!isSaving) {
             isSaving = true;
             saveTaskEdit(taskId, noteId, input.value.trim());

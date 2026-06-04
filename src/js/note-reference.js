@@ -170,6 +170,17 @@
         return false;
     }
 
+    function resumeTaskEditBlurSaveIfNeeded() {
+        if (
+            savedEditableElement &&
+            savedEditableElement.classList &&
+            savedEditableElement.classList.contains('task-edit-input') &&
+            typeof window.resumeTaskEditBlurSave === 'function'
+        ) {
+            window.resumeTaskEditBlurSave(savedEditableElement);
+        }
+    }
+
     // ============================================================================
     // MODAL MANAGEMENT
     // ============================================================================
@@ -185,7 +196,10 @@
         saveSelection();
         
         const modal = document.getElementById('noteReferenceModal');
-        if (!modal) return;
+        if (!modal) {
+            resumeTaskEditBlurSaveIfNeeded();
+            return;
+        }
         
         modal.style.display = 'flex';
         
@@ -210,6 +224,7 @@
         }
         // Restore selection to the note editor
         restoreSelection();
+        resumeTaskEditBlurSaveIfNeeded();
     };
 
     // ============================================================================
@@ -483,12 +498,8 @@
         try {
             input.setSelectionRange(caretPos, caretPos);
         } catch (e) { }
-        
-        // Force immediate save if it's a task input
-        if (input.classList.contains('task-edit-input')) {
-            // No direct action needed here as 'input' event is dispatched above,
-            // but for tasklist we might want to ensure the edit is saved if they don't blur.
-        }
+
+        resumeTaskEditBlurSaveIfNeeded();
     }
 
     /**
