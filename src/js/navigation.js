@@ -45,15 +45,81 @@ function buildUrl(baseUrl, params) {
     return baseUrl;
 }
 
+function getUrlNoteContext() {
+    try {
+        var params = new URLSearchParams(window.location.search || '');
+        var noteId = params.get('note');
+        if (noteId && /^\d+$/.test(noteId)) {
+            return { type: 'note', noteId: noteId };
+        }
+
+        var folderId = params.get('kanban');
+        if (folderId && /^\d+$/.test(folderId)) {
+            return { type: 'kanban', folderId: folderId };
+        }
+    } catch (e) {
+        // Ignore malformed URLs and fall back to stored tabs.
+    }
+
+    return null;
+}
+
+function getStoredActiveTabContext(workspace) {
+    try {
+        var storageWorkspace = workspace || 'default';
+        var raw = localStorage.getItem('poznote_tabs_' + storageWorkspace);
+        if (!raw) return null;
+
+        var data = JSON.parse(raw);
+        if (!data || !Array.isArray(data.tabs) || data.tabs.length === 0) return null;
+
+        var activeTab = null;
+        for (var i = 0; i < data.tabs.length; i++) {
+            if (data.tabs[i] && data.tabs[i].id === data.activeTabId) {
+                activeTab = data.tabs[i];
+                break;
+            }
+        }
+        if (!activeTab) activeTab = data.tabs[0];
+        if (!activeTab) return null;
+
+        if (activeTab.type === 'kanban' && activeTab.folderId) {
+            return { type: 'kanban', folderId: String(activeTab.folderId) };
+        }
+        if (activeTab.noteId) {
+            return { type: 'note', noteId: String(activeTab.noteId) };
+        }
+    } catch (e) {
+        // Storage may be unavailable in private mode.
+    }
+
+    return null;
+}
+
+function getBackToNotesUrl() {
+    var pageWorkspace = getPageWorkspace();
+    var workspace = getEffectiveWorkspace(pageWorkspace);
+    var params = {};
+    var context = getUrlNoteContext() || getStoredActiveTabContext(workspace);
+
+    if (workspace) {
+        params.workspace = workspace;
+    }
+    if (context && context.type === 'note' && context.noteId) {
+        params.note = context.noteId;
+    } else if (context && context.type === 'kanban' && context.folderId) {
+        params.kanban = context.folderId;
+    }
+
+    return buildUrl('index.php', params);
+}
+
 /**
  * Navigate back to the notes list (index.php)
  * Uses workspace from localStorage with fallback to page data-attribute
  */
 function goBackToNotes() {
-    var pageWorkspace = getPageWorkspace();
-    var workspace = getEffectiveWorkspace(pageWorkspace);
-    var url = buildUrl('index.php', { workspace: workspace });
-    window.location.href = url;
+    window.location.href = getBackToNotesUrl();
 }
 
 /**
@@ -102,7 +168,16 @@ function goBackToHome() {
 window.getPageWorkspace = getPageWorkspace;
 window.getEffectiveWorkspace = getEffectiveWorkspace;
 window.buildUrl = buildUrl;
+window.getStoredActiveTabContext = getStoredActiveTabContext;
+window.getBackToNotesUrl = getBackToNotesUrl;
 window.goBackToNotes = goBackToNotes;
 window.goBackToNote = goBackToNote;
 window.navigateToPage = navigateToPage;
 window.goBackToHome = goBackToHome;
+
+document.addEventListener('DOMContentLoaded', function () {
+    var backToNotesLink = document.getElementById('backToNotesLink');
+    if (backToNotesLink) {
+        backToNotesLink.href = getBackToNotesUrl();
+    }
+});

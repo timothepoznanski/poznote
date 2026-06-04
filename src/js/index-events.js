@@ -20,6 +20,48 @@
         return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
     }
 
+    function getStoredActiveTabForCurrentWorkspace() {
+        try {
+            var params = new URLSearchParams(window.location.search || '');
+            var workspace = window.selectedWorkspace || params.get('workspace') || 'default';
+            var raw = localStorage.getItem('poznote_tabs_' + workspace);
+            if (!raw) return null;
+
+            var data = JSON.parse(raw);
+            if (!data || !Array.isArray(data.tabs) || data.tabs.length === 0) return null;
+
+            var activeTab = null;
+            for (var i = 0; i < data.tabs.length; i++) {
+                if (data.tabs[i] && data.tabs[i].id === data.activeTabId) {
+                    activeTab = data.tabs[i];
+                    break;
+                }
+            }
+
+            return activeTab || data.tabs[0] || null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function shouldSkipInitialDefaultNoteTracking(noteId) {
+        if (window.innerWidth <= 800) return false;
+
+        try {
+            var params = new URLSearchParams(window.location.search || '');
+            if (params.get('note') || params.get('kanban')) return false;
+            if (params.get('search') || params.get('tags_search') || params.get('created_from') || params.get('created_to')) return false;
+        } catch (e) {
+            return false;
+        }
+
+        var activeTab = getStoredActiveTabForCurrentWorkspace();
+        if (!activeTab) return false;
+        if (activeTab.type === 'kanban') return true;
+
+        return !!activeTab.noteId && String(activeTab.noteId) !== String(noteId);
+    }
+
     /**
      * Handle focus events using event delegation for note editing tracking
      * @param {Event} e - Focus event
@@ -534,7 +576,7 @@
         if (noteEntry && typeof window.trackNoteOpened === 'function') {
             var noteId = noteEntry.getAttribute('data-note-id');
             var heading = noteEntry.getAttribute('data-note-heading');
-            if (noteId && heading) {
+            if (noteId && heading && !shouldSkipInitialDefaultNoteTracking(noteId)) {
                 window.trackNoteOpened(noteId, heading);
             }
         }
@@ -972,10 +1014,33 @@
 
         // Don't pass note parameter to profile.php
         if (page !== 'profile.php') {
-            var urlParams = new URLSearchParams(window.location.search);
-            var noteId = urlParams.get('note');
-            if (noteId) {
-                params.push('note=' + encodeURIComponent(noteId));
+            var activeContextAdded = false;
+            if (window.tabManager && typeof window.tabManager.getActiveTabType === 'function') {
+                var activeTabType = window.tabManager.getActiveTabType();
+                if (activeTabType === 'note' && typeof window.tabManager.getActiveNoteId === 'function') {
+                    var activeNoteId = window.tabManager.getActiveNoteId();
+                    if (activeNoteId) {
+                        params.push('note=' + encodeURIComponent(activeNoteId));
+                        activeContextAdded = true;
+                    }
+                } else if (activeTabType === 'kanban' && typeof window.tabManager.getActiveKanbanFolderId === 'function') {
+                    var activeFolderId = window.tabManager.getActiveKanbanFolderId();
+                    if (activeFolderId) {
+                        params.push('kanban=' + encodeURIComponent(activeFolderId));
+                        activeContextAdded = true;
+                    }
+                }
+            }
+
+            if (!activeContextAdded) {
+                var urlParams = new URLSearchParams(window.location.search);
+                var noteId = urlParams.get('note');
+                var kanbanFolderId = urlParams.get('kanban');
+                if (noteId) {
+                    params.push('note=' + encodeURIComponent(noteId));
+                } else if (kanbanFolderId) {
+                    params.push('kanban=' + encodeURIComponent(kanbanFolderId));
+                }
             }
         }
 
