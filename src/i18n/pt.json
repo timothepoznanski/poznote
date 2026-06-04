@@ -316,7 +316,8 @@
       "loading_attachments": "Carregando anexos...",
       "preview_alt": "Pré-visualização",
       "uploaded_prefix": "Enviado: ",
-      "open_in_new_tab": "Abrir em nova aba"
+      "open_in_new_tab": "Abrir em nova aba",
+      "inline_images_hidden_notice": "As imagens inseridas diretamente no conteúdo da nota continuam armazenadas como anexos, mas ficam ocultas aqui para evitar ambiguidade."
     },
     "modals": {
       "delete": {

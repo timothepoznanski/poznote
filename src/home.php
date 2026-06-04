@@ -274,9 +274,7 @@ try {
         $stmtAttachments = $con->prepare($query);
         $stmtAttachments->execute($params);
         while ($row = $stmtAttachments->fetch(PDO::FETCH_ASSOC)) {
-            if (poznoteCountDisplayableAttachments($row['attachments'] ?? '', $row['entry'] ?? '') > 0) {
-                $attachments_count++;
-            }
+            $attachments_count += poznoteCountDisplayableAttachments($row['attachments'] ?? '', $row['entry'] ?? '');
         }
     }
 } catch (Exception $e) {

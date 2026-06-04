@@ -76,23 +76,27 @@ body.attachments-page {
     margin-bottom: 30px;
 }
 
+.attachments-inline-notice {
+    max-width: 900px;
+    margin: -8px auto 20px auto;
+    padding: 10px 12px;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    box-sizing: border-box;
+}
+
 /* Filter Bar */
 .attachments-filter-bar {
     max-width: 900px;
-    margin: 0 auto 30px auto;
+    margin: 0 auto 10px auto;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 12px;
-}
-
-.filter-options-bar {
-    max-width: 900px;
-    margin: 0 auto 20px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
 }
 
 .filter-input-wrapper {
@@ -143,6 +147,11 @@ body.attachments-page {
     outline: none;
     border-color: var(--primary-color, #007bff);
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.thumbnails-toggle {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .clear-filter-btn {
@@ -466,6 +475,12 @@ body.attachments-page {
     background-color: #3a3a3a;
 }
 
+[data-theme="dark"] .attachments-inline-notice {
+    border-color: #1e3a8a;
+    background: #172554;
+    color: #bfdbfe;
+}
+
 [data-theme="dark"] .filter-input {
     background-color: #333333;
     border-color: #444444;
@@ -598,7 +613,8 @@ body.attachments-page {
     }
 
     .attachments-filter-bar .filter-input-wrapper,
-    .file-type-filter {
+    .file-type-filter,
+    .thumbnails-toggle {
         width: 100%;
         max-width: none;
         min-width: 0;

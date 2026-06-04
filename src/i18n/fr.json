@@ -329,7 +329,8 @@
       "preview_alt": "Aperçu",
       "uploaded_prefix": "Téléversé : ",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
-      "pdf_label": "PDF"
+      "pdf_label": "PDF",
+      "inline_images_hidden_notice": "Les images insérées directement dans le contenu de la note restent stockées comme pièces jointes, mais elles sont masquées ici pour éviter toute ambiguïté."
     },
     "modals": {
       "delete": {

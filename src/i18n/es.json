@@ -318,7 +318,8 @@
       "loading_attachments": "Cargando adjuntos...",
       "preview_alt": "Vista previa",
       "uploaded_prefix": "Subido: ",
-      "open_in_new_tab": "Abrir en nueva pestaña"
+      "open_in_new_tab": "Abrir en nueva pestaña",
+      "inline_images_hidden_notice": "Las imágenes insertadas directamente en el contenido de la nota siguen almacenadas como adjuntos, pero se ocultan aquí para evitar ambigüedades."
     },
     "modals": {
       "delete": {

@@ -259,7 +259,10 @@ function renderRows() {
             ? displayableAttachments.filter(att => att.extension === selectedFileType)
             : displayableAttachments;
 
-        const visibleAttachments = typeFilteredAttachments;
+        const noteNameMatchesFilter = filterText !== '' && row.noteName.toLowerCase().includes(filterText);
+        const visibleAttachments = filterText !== '' && !noteNameMatchesFilter
+            ? typeFilteredAttachments.filter(att => att.filename.toLowerCase().includes(filterText))
+            : typeFilteredAttachments;
 
         if (visibleAttachments.length === 0) return null;
 

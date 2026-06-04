@@ -52,6 +52,10 @@ $currentLang = getUserLanguage();
 				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
 			</button>
 		</div>
+
+		<div class="attachments-inline-notice">
+			<?php echo t_h('attachments.page.inline_images_hidden_notice', [], 'Images inserted directly in the note content are still stored as attachments, but they are hidden here to avoid ambiguity.'); ?>
+		</div>
 		
 		<div class="shared-filter-bar attachments-filter-bar">
 			<div class="filter-input-wrapper">
@@ -61,14 +65,11 @@ $currentLang = getUserLanguage();
 				</button>
 			</div>
 			<select id="fileTypeFilter" class="file-type-filter initially-hidden" aria-label="<?php echo t_h('attachments.list.file_type_filter', [], 'Filter by file type'); ?>" title="<?php echo t_h('attachments.list.file_type_filter', [], 'Filter by file type'); ?>"></select>
-			<div id="filterStats" class="filter-stats initially-hidden"></div>
-		</div>
-
-		<div class="filter-options-bar">
-			<label class="toggle-checkbox">
+			<label class="toggle-checkbox thumbnails-toggle">
 				<input type="checkbox" id="showThumbnailsToggle" checked>
 				<span class="toggle-label"><?php echo t_h('attachments.list.show_thumbnails', [], 'Show thumbnails in this list'); ?></span>
 			</label>
+			<div id="filterStats" class="filter-stats initially-hidden"></div>
 		</div>
 		
 		<div class="shared-content">

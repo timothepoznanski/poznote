@@ -38,20 +38,6 @@ if (!$note) {
     exit;
 }
 
-// Fetch the setting for inline images in list views
-$showInlineInList = true;
-try {
-    $stmt_setting = $con->prepare("SELECT value FROM settings WHERE key = 'show_inline_attachments_in_list' LIMIT 1");
-    $stmt_setting->execute();
-    $val = $stmt_setting->fetchColumn();
-    // Default is shown, so only '0' or 'false' means hidden
-    if ($val === '0' || $val === 'false') {
-        $showInlineInList = false;
-    }
-} catch (Exception $e) {
-    // Ignore error
-}
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -91,41 +77,6 @@ try {
     <link rel="stylesheet" href="css/dark-mode/icons.css">
     <script src="js/theme-manager.js"></script>
     <style>
-        .settings-banner-info {
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 0.9rem;
-            color: #475569;
-        }
-        [data-theme="dark"] .settings-banner-info {
-            background-color: #1e293b;
-            border-color: #334155;
-            color: #94a3b8;
-        }
-        
-        /* Toggle Checkbox Styles */
-        .toggle-checkbox {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            gap: 10px;
-            user-select: none;
-        }
-        .toggle-checkbox input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        .toggle-label {
-            font-weight: 500;
-        }
-
         .file-icon-placeholder {
             width: 60px;
             height: 60px;
@@ -154,12 +105,21 @@ try {
             border-color: #545b62 !important;
         }
 
-        @media (max-width: 600px) {
-            .settings-banner-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
+        .attachments-inline-notice {
+            margin: 18px 0 20px;
+            padding: 10px 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 6px;
+            background: #eff6ff;
+            color: #1e40af;
+            font-size: 0.88rem;
+            line-height: 1.45;
+        }
+
+        [data-theme="dark"] .attachments-inline-notice {
+            border-color: #1e3a8a;
+            background: #172554;
+            color: #bfdbfe;
         }
     </style>
 </head>
@@ -213,17 +173,12 @@ try {
             }
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
-    <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
+        <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
             <?php echo t_h('common.back_to_notes'); ?>
         </a>
 
-        <br><br>
-
-        <div class="settings-banner-info">
-            <label class="toggle-checkbox">
-                <input type="checkbox" id="showInlineImagesToggle" <?php echo $showInlineInList ? 'checked' : ''; ?>>
-                <span class="toggle-label"><?php echo t_h('attachments.list.show_inline_images', [], 'Also show images already visible in the note content'); ?></span>
-            </label>
+        <div class="attachments-inline-notice">
+            <?php echo t_h('attachments.page.inline_images_hidden_notice', [], 'Images inserted directly in the note content are still stored as attachments, but they are hidden here to avoid ambiguity.'); ?>
         </div>
 
         <!-- Upload Section -->

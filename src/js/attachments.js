@@ -421,31 +421,21 @@ function updateAttachmentCountInMenu(noteId) {
                 if (noteEntry) {
                     noteContent = noteEntry.innerHTML || '';
                 }
+                var effectiveNoteContent = noteContent || data.entry || '';
 
-                renderAttachmentPreviews(noteId, data.attachments, noteContent || data.entry || '');
+                renderAttachmentPreviews(noteId, data.attachments, effectiveNoteContent);
 
                 // Calculate visible attachments count (excluding inline images)
                 var visibleLinksCount = 0;
                 for (var j = 0; j < data.attachments.length; j++) {
                     var attachment = data.attachments[j];
                     if (attachment.id && attachment.original_filename) {
-                        var isActuallyInline = false;
-                        var mimeType = attachment.mime_type || attachment.file_type || '';
-                        var isImage = mimeType.startsWith('image/');
-                        if (!isImage && attachment.original_filename) {
-                            var ext = attachment.original_filename.split('.').pop().toLowerCase();
-                            isImage = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].indexOf(ext) !== -1;
-                        }
-                        if (isImage) {
-                            var pattern = 'attachments/' + attachment.id;
-                            isActuallyInline = noteContent.indexOf(pattern) !== -1 ||
-                                noteContent.indexOf(encodeURIComponent(pattern)) !== -1;
-                        }
+                        var isActuallyInline = isEmbeddedImageAttachment(attachment, effectiveNoteContent);
                         if (!isActuallyInline) visibleLinksCount++;
                     }
                 }
 
-                var hasAttachmentIndicator = count > 0;
+                var hasAttachmentIndicator = visibleLinksCount > 0;
 
                 // Update dropdown menu
                 var menu = document.getElementById('note-menu-' + noteId);
@@ -502,6 +492,13 @@ function updateAttachmentCountInMenu(noteId) {
                 if (noteElement) {
                     var existingAttachmentsRow = noteElement.querySelector('.note-attachments-row');
 
+                    if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.inlineAttachmentPreviews === true) {
+                        if (existingAttachmentsRow) {
+                            existingAttachmentsRow.parentNode.removeChild(existingAttachmentsRow);
+                        }
+                        return;
+                    }
+
                     if (count > 0 && data.attachments && data.attachments.length > 0) {
                         // Create or update the attachments row
                         if (!existingAttachmentsRow) {
@@ -532,24 +529,7 @@ function updateAttachmentCountInMenu(noteId) {
                         for (var k = 0; k < data.attachments.length; k++) {
                             var att = data.attachments[k];
                             if (att.id && att.original_filename) {
-                                // Check if this is an image that's displayed inline in the note content
-                                // Inline images (pasted) are hidden from the attachments list
-                                var isInline = false;
-                                var mime = att.mime_type || att.file_type || '';
-                                var isImg = mime.startsWith('image/');
-
-                                // Fallback to extension check
-                                if (!isImg && att.original_filename) {
-                                    var extCheck = att.original_filename.split('.').pop().toLowerCase();
-                                    isImg = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'].indexOf(extCheck) !== -1;
-                                }
-
-                                if (isImg) {
-                                    // Look for the attachment ID specifically in the content
-                                    var patternCheck = 'attachments/' + att.id;
-                                    isInline = noteContent.indexOf(patternCheck) !== -1 ||
-                                        noteContent.indexOf(encodeURIComponent(patternCheck)) !== -1;
-                                }
+                                var isInline = isEmbeddedImageAttachment(att, effectiveNoteContent);
 
                                 var safeFilename = att.original_filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
                                 var dlTitle = tr('attachments.actions.download', { filename: safeFilename }, 'Download {{filename}}');
@@ -650,6 +630,21 @@ function getAttachmentPreviewKind(attachment) {
     }
 
     return 'file';
+}
+
+function escapeAttachmentRegExp(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function isEmbeddedImageAttachment(attachment, content) {
+    if (!attachment || !attachment.id || !content || getAttachmentPreviewKind(attachment) !== 'image') return false;
+
+    var fragmentPattern = 'attachments\\/' + escapeAttachmentRegExp(attachment.id) + '(?:[?#][^\\s"\'<>)]*)?(?=$|[\\s"\'<>\\)])';
+    var htmlImagePattern = new RegExp('<img\\b[^>]*' + fragmentPattern, 'i');
+    var markdownImagePattern = new RegExp('!\\[[^\\]]*\\]\\([^)]*' + fragmentPattern + '[^)]*\\)', 'i');
+    var noteContent = String(content);
+
+    return htmlImagePattern.test(noteContent) || markdownImagePattern.test(noteContent);
 }
 
 function isAttachmentReferencedInContent(attachment, content) {
