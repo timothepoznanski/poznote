@@ -1113,6 +1113,7 @@ try {
             </div>
         </div>
         <div class="modal-buttons">
+            <button type="button" class="btn-primary" data-action="navigate-tags"><?php echo t_h('tags.list_all', [], 'List all tags'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-tags-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
@@ -1199,6 +1200,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachment-previews-card" checked><span><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:smtp-config-card" checked><span><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span></label>

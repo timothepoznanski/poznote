@@ -554,6 +554,7 @@
       "note_content_width": "笔记内容宽度",
       "markdown_split_card_view": "带边框的 Markdown",
       "code_block_word_wrap": "代码块自动换行",
+      "attachment_previews_in_note": "附件预览",
       "ui_customization": "元素可见性"
     },
     "badges": {

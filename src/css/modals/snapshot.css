@@ -155,6 +155,9 @@
     align-items: center;
     gap: 8px;
     min-width: 0;
+    position: relative;
+    align-self: flex-start;
+    max-width: 100%;
 }
 
 .snapshot-modal-header h3 {
@@ -166,7 +169,7 @@
 }
 
 .snapshot-help-btn {
-    position: relative;
+    position: static;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -205,7 +208,7 @@
 
 .snapshot-help-btn::before {
     content: '';
-    left: 8px;
+    left: calc(100% - 20px);
     top: calc(100% + 2px);
     border: 6px solid transparent;
     border-bottom-color: #111827;
@@ -222,7 +225,7 @@
     background: #111827;
     color: #ffffff;
     box-shadow: 0 10px 26px rgba(16, 24, 40, 0.22);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     line-height: 1.45;
     text-align: left;
@@ -570,6 +573,10 @@
 
 .snapshot-markdown-preview-btn:not([hidden]) {
     display: inline-flex;
+}
+
+#snapshotModal .snapshot-modal-actions .snapshot-markdown-preview-btn[hidden] {
+    display: none !important;
 }
 
 .snapshot-modal-actions button i.lucide {

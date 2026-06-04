@@ -567,6 +567,7 @@
       "note_content_width": "Largeur du contenu de la note",
       "markdown_split_card_view": "Markdown encadré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
+      "attachment_previews_in_note": "Aperçus des pièces jointes",
       "ui_customization": "Visibilité des éléments"
     },
     "badges": {

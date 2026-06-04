@@ -275,6 +275,7 @@ function loadAttachments(noteId) {
         .then(function (data) {
             if (data.success) {
                 displayAttachments(data.attachments);
+                renderAttachmentPreviews(noteId, data.attachments, data.entry || '');
             }
         })
         .catch(function () {
@@ -420,6 +421,8 @@ function updateAttachmentCountInMenu(noteId) {
                 if (noteEntry) {
                     noteContent = noteEntry.innerHTML || '';
                 }
+
+                renderAttachmentPreviews(noteId, data.attachments, noteContent || data.entry || '');
 
                 // Calculate visible attachments count (excluding inline images)
                 var visibleLinksCount = 0;
@@ -589,6 +592,270 @@ function formatFileSize(bytes) {
     var i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
+
+function escapeAttachmentPreviewHtml(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function getAttachmentPreviewMimeType(attachment) {
+    var mimeType = String(attachment.file_type || attachment.mime_type || attachment.type || '').toLowerCase();
+    if (mimeType) return mimeType;
+
+    var filename = attachment.original_filename || attachment.filename || '';
+    var extension = filename.split('.').pop().toLowerCase();
+    var extensionMap = {
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        gif: 'image/gif',
+        svg: 'image/svg+xml',
+        webp: 'image/webp',
+        bmp: 'image/bmp',
+        pdf: 'application/pdf',
+        mp4: 'video/mp4',
+        webm: 'video/webm',
+        mov: 'video/quicktime',
+        m4v: 'video/x-m4v',
+        mp3: 'audio/mpeg',
+        wav: 'audio/wav',
+        ogg: 'audio/ogg',
+        m4a: 'audio/mp4',
+        flac: 'audio/flac'
+    };
+
+    return extensionMap[extension] || '';
+}
+
+function getAttachmentPreviewKind(attachment) {
+    var mimeType = getAttachmentPreviewMimeType(attachment);
+    var filename = attachment.original_filename || attachment.filename || '';
+    var extension = filename.split('.').pop().toLowerCase();
+
+    if (mimeType.indexOf('image/') === 0 || ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp'].indexOf(extension) !== -1) {
+        return 'image';
+    }
+    if (mimeType === 'application/pdf' || extension === 'pdf') {
+        return 'pdf';
+    }
+    if (mimeType.indexOf('video/') === 0 || ['mp4', 'webm', 'mov', 'm4v'].indexOf(extension) !== -1) {
+        return 'video';
+    }
+    if (mimeType.indexOf('audio/') === 0 || ['mp3', 'wav', 'ogg', 'm4a', 'flac'].indexOf(extension) !== -1) {
+        return 'audio';
+    }
+
+    return 'file';
+}
+
+function isAttachmentReferencedInContent(attachment, content) {
+    if (!attachment || !attachment.id || !content) return false;
+
+    var fragment = 'attachments/' + attachment.id;
+    return content.indexOf(fragment) !== -1 ||
+        content.indexOf(encodeURIComponent(fragment)) !== -1;
+}
+
+function buildAttachmentPreviewUrl(noteId, attachmentId, forceDownload) {
+    var url = '/api/v1/notes/' + encodeURIComponent(noteId) + '/attachments/' + encodeURIComponent(attachmentId);
+    var params = [];
+    var workspace = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : (window.selectedWorkspace || selectedWorkspace || '');
+    if (workspace) {
+        params.push('workspace=' + encodeURIComponent(workspace));
+    }
+    if (forceDownload) {
+        params.push('download=1');
+    }
+    return params.length ? url + '?' + params.join('&') : url;
+}
+
+function buildAttachmentAudioPreviewUrl(noteId, attachmentId) {
+    var params = [
+        'note=' + encodeURIComponent(noteId),
+        'attachment=' + encodeURIComponent(attachmentId)
+    ];
+    var workspace = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() : (window.selectedWorkspace || selectedWorkspace || '');
+    if (workspace) {
+        params.push('workspace=' + encodeURIComponent(workspace));
+    }
+    return '/audio_player.php?' + params.join('&');
+}
+
+function buildAttachmentPreviewCard(noteId, attachment) {
+    var attachmentId = attachment.id;
+    var filename = attachment.original_filename || attachment.filename || attachmentId;
+    var kind = getAttachmentPreviewKind(attachment);
+    var fileUrl = buildAttachmentPreviewUrl(noteId, attachmentId, false);
+    var downloadUrl = buildAttachmentPreviewUrl(noteId, attachmentId, true);
+    var safeFilename = escapeAttachmentPreviewHtml(filename);
+    var safeFileUrl = escapeAttachmentPreviewHtml(fileUrl);
+    var safeDownloadUrl = escapeAttachmentPreviewHtml(downloadUrl);
+    var sizeLabel = attachment.file_size ? formatFileSize(attachment.file_size) : '';
+    var safeSize = escapeAttachmentPreviewHtml(sizeLabel);
+    var iconClass = 'lucide lucide-file-text';
+
+    if (kind === 'image') iconClass = 'lucide lucide-file-image';
+    else if (kind === 'video') iconClass = 'lucide lucide-file-video';
+    else if (kind === 'audio') iconClass = 'lucide lucide-music';
+
+    var mediaHtml = '';
+    if (kind === 'image') {
+        mediaHtml = '<a class="note-attachment-preview-media" href="' + safeFileUrl + '" target="_blank" rel="noopener noreferrer">' +
+            '<img src="' + safeFileUrl + '" alt="' + safeFilename + '" loading="lazy" decoding="async">' +
+            '</a>';
+    } else if (kind === 'pdf') {
+        mediaHtml = '<iframe class="note-attachment-preview-media note-attachment-preview-frame" src="' + safeFileUrl + '" title="' + safeFilename + '" loading="lazy"></iframe>';
+    } else if (kind === 'video') {
+        mediaHtml = '<div class="note-attachment-preview-media"><video controls preload="metadata" playsinline src="' + safeFileUrl + '"></video></div>';
+    } else if (kind === 'audio') {
+        var audioUrl = escapeAttachmentPreviewHtml(buildAttachmentAudioPreviewUrl(noteId, attachmentId));
+        mediaHtml = '<iframe class="note-attachment-preview-media note-attachment-preview-audio-frame" src="' + audioUrl + '" title="' + safeFilename + '" scrolling="no" frameborder="0" allow="autoplay" loading="lazy"></iframe>';
+    } else {
+        mediaHtml = '<a class="note-attachment-preview-file-card" href="' + safeDownloadUrl + '" title="' + escapeAttachmentPreviewHtml(tr('attachments.actions.download', { filename: filename }, 'Download ' + filename)) + '">' +
+            '<i class="' + iconClass + '"></i>' +
+            '<span class="note-attachment-preview-file-meta">' +
+            '<span class="note-attachment-preview-file-name">' + safeFilename + '</span>' +
+            (safeSize ? '<span class="note-attachment-preview-size">' + safeSize + '</span>' : '') +
+            '</span>' +
+            '</a>';
+    }
+
+    var captionHtml = '';
+    if (kind !== 'file') {
+        captionHtml = '<figcaption class="note-attachment-preview-caption">' +
+            '<i class="' + iconClass + '"></i>' +
+            '<a href="' + safeDownloadUrl + '" title="' + escapeAttachmentPreviewHtml(tr('attachments.actions.download', { filename: filename }, 'Download ' + filename)) + '">' + safeFilename + '</a>' +
+            (safeSize ? '<span class="note-attachment-preview-size">' + safeSize + '</span>' : '') +
+            '</figcaption>';
+    }
+
+    return '<figure class="note-attachment-preview note-attachment-preview-' + kind + '" data-attachment-id="' + escapeAttachmentPreviewHtml(attachmentId) + '" contenteditable="false">' +
+        mediaHtml +
+        captionHtml +
+        '</figure>';
+}
+
+function resolveAttachmentPreviewSetting(callback) {
+    if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.inlineAttachmentPreviews === true) {
+        callback(true);
+        return;
+    }
+
+    fetch('/api/v1/settings/attachment_previews_in_note', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
+        .then(function (response) {
+            if (!response.ok) throw new Error('Failed to load setting');
+            return response.json();
+        })
+        .then(function (data) {
+            var enabled = !!(data && data.success && (data.value === '1' || data.value === 'true'));
+            window.POZNOTE_CONFIG = window.POZNOTE_CONFIG || {};
+            window.POZNOTE_CONFIG.inlineAttachmentPreviews = enabled;
+            callback(enabled);
+        })
+        .catch(function () {
+            callback(false);
+        });
+}
+
+function renderAttachmentPreviewsNow(noteId, attachments, noteContent) {
+    var existing = document.getElementById('attachment-previews-' + noteId);
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    var content = noteContent || noteEntry.innerHTML || '';
+    var cards = [];
+    (attachments || []).forEach(function (attachment) {
+        if (!attachment || !attachment.id) return;
+        if (isAttachmentReferencedInContent(attachment, content)) return;
+        cards.push(buildAttachmentPreviewCard(noteId, attachment));
+    });
+
+    if (cards.length === 0) {
+        if (existing) existing.remove();
+        return;
+    }
+
+    var html = cards.join('');
+    var wrapper = existing;
+    if (existing) {
+        existing.innerHTML = html;
+    } else {
+        wrapper = document.createElement('div');
+        wrapper.id = 'attachment-previews-' + noteId;
+        wrapper.className = 'note-attachment-previews';
+        wrapper.setAttribute('data-note-id', noteId);
+        wrapper.setAttribute('contenteditable', 'false');
+        wrapper.innerHTML = html;
+    }
+
+    if (noteEntry.parentNode && wrapper.nextElementSibling !== noteEntry) {
+        noteEntry.parentNode.insertBefore(wrapper, noteEntry);
+    }
+}
+
+function renderAttachmentPreviews(noteId, attachments, noteContent) {
+    var existing = document.getElementById('attachment-previews-' + noteId);
+
+    resolveAttachmentPreviewSetting(function (enabled) {
+        if (!enabled) {
+            if (existing) existing.remove();
+            return;
+        }
+
+        renderAttachmentPreviewsNow(noteId, attachments, noteContent);
+    });
+}
+
+function refreshAttachmentPreviewsForNote(noteId) {
+    if (!noteId) return;
+
+    fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/attachments', {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
+        .then(function (response) {
+            if (!response.ok) throw new Error('Failed to load attachments');
+            return response.json();
+        })
+        .then(function (data) {
+            if (!data || !data.success) return;
+            var noteEntry = document.getElementById('entry' + noteId);
+            renderAttachmentPreviews(noteId, data.attachments || [], data.entry || (noteEntry ? noteEntry.innerHTML : ''));
+        })
+        .catch(function () {
+        });
+}
+
+function refreshAttachmentPreviewsForVisibleNotes() {
+    var entries = document.querySelectorAll('.noteentry[data-note-id]');
+    entries.forEach(function (entry) {
+        refreshAttachmentPreviewsForNote(entry.getAttribute('data-note-id'));
+    });
+}
+
+window.refreshAttachmentPreviewsForNote = refreshAttachmentPreviewsForNote;
+window.refreshAttachmentPreviewsForVisibleNotes = refreshAttachmentPreviewsForVisibleNotes;
+
+document.addEventListener('DOMContentLoaded', function () {
+    refreshAttachmentPreviewsForVisibleNotes();
+});
+
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        window.POZNOTE_CONFIG = window.POZNOTE_CONFIG || {};
+        delete window.POZNOTE_CONFIG.inlineAttachmentPreviews;
+        refreshAttachmentPreviewsForVisibleNotes();
+    }
+});
 
 function createUploadPlaceholderId(prefix) {
     return (prefix || 'upload') + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);

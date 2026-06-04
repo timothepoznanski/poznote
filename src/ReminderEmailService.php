@@ -324,9 +324,14 @@ class ReminderEmailService {
         $dueAt = $this->formatUserDateTime((string)($notification['trigger_at'] ?? ''), $settings);
         $noteUrl = $this->buildNoteUrl((int)($notification['note_id'] ?? 0), (string)($notification['workspace'] ?? ''), $config);
 
+        $intro = t('reminder.email.intro', [], 'A reminder is due in Poznote.', $lang);
+        $noteLabel = t('reminder.email.note_label', [], 'Note', $lang);
+        $dueAtLabel = t('reminder.email.due_at_label', [], 'Due at', $lang);
+        $openButton = t('reminder.email.open_button', [], 'Open note', $lang);
+
         $subject = t('reminder.email.subject', ['note' => $title], 'Reminder: {{note}}', $lang);
         $lines = [
-            t('reminder.email.intro', [], 'A reminder is due in Poznote.', $lang),
+            $intro,
             '',
             t('reminder.email.note', ['note' => $title], 'Note: {{note}}', $lang),
             t('reminder.email.due_at', ['date' => $dueAt], 'Due at: {{date}}', $lang),
@@ -341,27 +346,109 @@ class ReminderEmailService {
             $lines[] = t('reminder.email.open_link', ['url' => $noteUrl], 'Open note: {{url}}', $lang);
         }
 
-        $html = '<p>' . htmlspecialchars(t('reminder.email.intro', [], 'A reminder is due in Poznote.', $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>'
-            . '<p><strong>' . htmlspecialchars(t('reminder.email.note_label', [], 'Note', $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . ':</strong> '
-            . htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '<br>'
-            . '<strong>' . htmlspecialchars(t('reminder.email.due_at_label', [], 'Due at', $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . ':</strong> '
-            . htmlspecialchars($dueAt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</p>';
-
-        if ($message !== '' && $message !== $title) {
-            $html .= '<p>' . nl2br(htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')) . '</p>';
-        }
-
-        if ($noteUrl !== '') {
-            $safeUrl = htmlspecialchars($noteUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $html .= '<p><a href="' . $safeUrl . '">' . htmlspecialchars(t('reminder.email.open_button', [], 'Open note', $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</a><br>'
-                . '<span style="font-size: 12px; color: #666;">' . $safeUrl . '</span></p>';
-        }
+        $html = $this->buildReminderHtml(
+            $lang,
+            $intro,
+            t('reminder.modal.title', [], 'Reminder', $lang),
+            $noteLabel,
+            $dueAtLabel,
+            $openButton,
+            $title,
+            $dueAt,
+            ($message !== '' && $message !== $title) ? $message : '',
+            $noteUrl
+        );
 
         return [
             'subject' => $subject,
-            'text' => implode("\n", $lines),
-            'html' => $html,
+            'text' => trim(implode("\n", $lines)),
+            'html' => trim($html),
         ];
+    }
+
+    private function buildReminderHtml(
+        string $lang,
+        string $intro,
+        string $heading,
+        string $noteLabel,
+        string $dueAtLabel,
+        string $openButton,
+        string $title,
+        string $dueAt,
+        string $message,
+        string $noteUrl
+    ): string {
+        $safeLang = $this->htmlEscape($lang);
+        $safeIntro = $this->htmlEscape($intro);
+        $safeHeading = $this->htmlEscape($heading);
+        $safeNoteLabel = $this->htmlEscape($noteLabel);
+        $safeDueAtLabel = $this->htmlEscape($dueAtLabel);
+        $safeOpenButton = $this->htmlEscape($openButton);
+        $safeTitle = $this->htmlEscape($title);
+        $safeDueAt = $this->htmlEscape($dueAt);
+
+        $messageHtml = '';
+        if ($message !== '') {
+            $messageHtml = '<tr><td style="padding:18px 24px 0;">'
+                . '<div style="font-size:15px;line-height:23px;color:#374151;background-color:#f9fafb;border-left:4px solid #2563eb;padding:13px 16px;border-radius:8px;">'
+                . nl2br($this->htmlEscape($message), false)
+                . '</div>'
+                . '</td></tr>';
+        }
+
+        $actionHtml = '';
+        if ($noteUrl !== '') {
+            $safeUrl = $this->htmlEscape($noteUrl);
+            $actionHtml = '<tr><td style="padding:22px 24px 0;">'
+                . '<a href="' . $safeUrl . '" style="display:inline-block;background-color:#2563eb;border-radius:8px;color:#ffffff;font-size:15px;font-weight:700;line-height:20px;padding:12px 18px;text-decoration:none;">'
+                . $safeOpenButton
+                . '</a>'
+                . '</td></tr>';
+        }
+
+        return implode('', [
+            '<!doctype html>',
+            '<html lang="' . $safeLang . '">',
+            '<head>',
+            '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">',
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            '</head>',
+            '<body style="margin:0;padding:0;background-color:#f4f6fb;color:#111827;font-family:Arial,Helvetica,sans-serif;">',
+            '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">' . $safeIntro . '</div>',
+            '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f4f6fb;margin:0;padding:0;">',
+            '<tr>',
+            '<td align="center" style="padding:28px 16px;">',
+            '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0;max-width:560px;background-color:#ffffff;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;">',
+            '<tr><td style="padding:22px 24px 14px;border-bottom:1px solid #e5e7eb;background-color:#ffffff;">',
+            '<div style="font-size:13px;font-weight:700;line-height:18px;color:#2563eb;text-transform:uppercase;">Poznote</div>',
+            '<h1 style="margin:8px 0 0;color:#111827;font-size:22px;font-weight:700;line-height:29px;">' . $safeHeading . '</h1>',
+            '<p style="margin:8px 0 0;color:#4b5563;font-size:15px;line-height:22px;">' . $safeIntro . '</p>',
+            '</td></tr>',
+            '<tr><td style="padding:22px 24px 0;">',
+            '<div style="font-size:12px;font-weight:700;line-height:16px;color:#6b7280;text-transform:uppercase;">' . $safeNoteLabel . '</div>',
+            '<div style="margin-top:6px;color:#111827;font-size:20px;font-weight:700;line-height:27px;">' . $safeTitle . '</div>',
+            '</td></tr>',
+            '<tr><td style="padding:18px 24px 0;">',
+            '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background-color:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;">',
+            '<tr><td style="padding:14px 16px;">',
+            '<div style="color:#6b7280;font-size:12px;line-height:16px;">' . $safeDueAtLabel . '</div>',
+            '<div style="margin-top:4px;color:#111827;font-size:16px;font-weight:600;line-height:22px;">' . $safeDueAt . '</div>',
+            '</td></tr>',
+            '</table>',
+            '</td></tr>',
+            $messageHtml,
+            $actionHtml,
+            '<tr><td style="padding:18px 24px 22px;">',
+            '<div style="height:1px;background-color:#e5e7eb;font-size:1px;line-height:1px;">&nbsp;</div>',
+            '<p style="margin:14px 0 0;color:#6b7280;font-size:12px;line-height:18px;">Poznote</p>',
+            '</td></tr>',
+            '</table>',
+            '</td>',
+            '</tr>',
+            '</table>',
+            '</body>',
+            '</html>',
+        ]);
     }
 
     private function buildNoteUrl(int $noteId, string $workspace, array $config): string {
@@ -428,6 +515,10 @@ class ReminderEmailService {
     private function normalizeLanguage(string $lang): string {
         $lang = strtolower(trim($lang));
         return preg_match('/^[a-z]{2}(-[a-z]{2})?$/', $lang) ? $lang : 'en';
+    }
+
+    private function htmlEscape(string $value): string {
+        return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     private function isValidHttpUrl(string $url): bool {

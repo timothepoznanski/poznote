@@ -121,11 +121,12 @@ $settings = [
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
-    'markdown_split_card_view' => '1'
+    'markdown_split_card_view' => '1',
+    'attachment_previews_in_note' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -310,6 +311,7 @@ if ($settings['code_block_word_wrap'] === '0' || $settings['code_block_word_wrap
 if ($settings['markdown_split_card_view'] === '1' || $settings['markdown_split_card_view'] === 'true') {
     $extra_body_classes .= ' markdown-split-card-view';
 }
+$attachment_previews_in_note_setting = ($settings['attachment_previews_in_note'] === '1' || $settings['attachment_previews_in_note'] === 'true');
 // Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
 $pref = $settings['note_list_sort'];
@@ -346,7 +348,8 @@ if ($isPublicWorkspaceReadonly) {
     <script type="application/json" id="poznote-config"><?php
         echo json_encode([
             'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
-            'dateTimeFormat' => getUserDateTimeFormat()
+            'dateTimeFormat' => getUserDateTimeFormat(),
+            'inlineAttachmentPreviews' => $attachment_previews_in_note_setting
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
@@ -867,11 +870,7 @@ if ($isPublicWorkspaceReadonly) {
                     echo '</div>';
                     
                     echo '<div class="tag-actions-dropdown">';
-                    echo '<span class="lucide lucide-tag icon_tag cursor-pointer" data-action="toggle-tags-menu" data-note-id="'.$row['id'].'"></span>';
-                    echo '<div id="tags-menu-'.$row['id'].'" class="dropdown-menu tags-actions-menu" hidden>';
-                    echo '<button type="button" class="dropdown-item" data-action="navigate-tags"><i class="lucide lucide-tags"></i> ' . t_h('tags.list_all', [], 'List all tags') . '</button>';
-                    echo '<button type="button" class="dropdown-item" data-action="show-tag-edit-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-pencil"></i> ' . t_h('tags.manage_note_tags', [], 'Manage note tags') . '</button>';
-                    echo '</div>';
+                    echo '<span class="lucide lucide-tag icon_tag cursor-pointer" data-action="show-tag-edit-modal" data-note-id="'.$row['id'].'" title="'.t_h('tags.manage_note_tags', [], 'Manage note tags').'"></span>';
                     echo '</div>';
 
                     echo '<span class="name_tags">'
@@ -1015,6 +1014,9 @@ if ($isPublicWorkspaceReadonly) {
                     if (isset($row['linked_note_id']) && $row['linked_note_id']) {
                         $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
                     }
+                    if ($attachment_previews_in_note_setting) {
+                        echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
+                    }
                     echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
@@ -1082,7 +1084,7 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/ui.js"></script>
 <script src="js/note-edit-lock.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/note-edit-lock.js') ?: time(); ?>"></script>
 <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : $v; ?>"></script>
-<script src="js/attachments.js"></script>
+<script src="js/attachments.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/attachments.js') ?: time(); ?>"></script>
 <script src="js/tags-modal.js"></script>
 <!-- Event management modules -->
 <script src="js/events-utils.js?v=<?php echo $v; ?>"></script>

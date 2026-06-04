@@ -477,6 +477,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Attachment Previews in Notes -->
+            <div class="home-card" id="attachment-previews-card">
+                <div class="home-card-icon"><i class="lucide lucide-file-image"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
+                    <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
             <!-- UI Customization -->
             <div class="home-card" id="ui-customization-card">
                 <div class="home-card-icon"><i class="lucide lucide-eye-off"></i></div>

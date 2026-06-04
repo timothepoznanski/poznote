@@ -552,6 +552,7 @@
       "note_content_width": "Largura do conteúdo da nota",
       "markdown_split_card_view": "Markdown com moldura",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
+      "attachment_previews_in_note": "Pré-visualizações de anexos",
       "ui_customization": "Visibilidade dos elementos"
     },
     "badges": {

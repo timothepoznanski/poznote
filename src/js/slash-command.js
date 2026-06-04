@@ -1201,6 +1201,110 @@
         }, []);
     }
 
+    function isTaskInputElement(input) {
+        return !!(input && input.tagName === 'INPUT' && input.classList && (
+            input.classList.contains('task-input') ||
+            input.classList.contains('task-edit-input')
+        ));
+    }
+
+    function pauseTaskEditBlurSave(input) {
+        if (input && input.classList && input.classList.contains('task-edit-input') && typeof window.pauseTaskEditBlurSave === 'function') {
+            window.pauseTaskEditBlurSave(input);
+        }
+    }
+
+    function resumeTaskEditBlurSave(input) {
+        if (input && input.classList && input.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+            window.resumeTaskEditBlurSave(input);
+        }
+    }
+
+    function openEmojiForInput(input) {
+        if (!input || input.tagName !== 'INPUT') return;
+
+        input.focus();
+        window.savedActiveInput = input;
+        window.savedActiveInputSelection = {
+            start: input.selectionStart,
+            end: input.selectionEnd
+        };
+
+        pauseTaskEditBlurSave(input);
+
+        if (typeof window.toggleEmojiPicker === 'function') {
+            setTimeout(() => window.toggleEmojiPicker(), 0);
+        }
+    }
+
+    function openDateForInput(input) {
+        if (!input || input.tagName !== 'INPUT') return;
+
+        pauseTaskEditBlurSave(input);
+
+        const insertionStart = (typeof input.selectionStart === 'number') ? input.selectionStart : Math.max(0, slashOffset);
+        const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
+
+        const dateInput = document.createElement('input');
+        dateInput.type = 'date';
+        dateInput.style.position = 'fixed';
+        dateInput.style.top = '-1000px';
+        dateInput.style.left = '-1000px';
+        document.body.appendChild(dateInput);
+
+        let cleanedUp = false;
+        function cleanup() {
+            if (cleanedUp) return;
+            cleanedUp = true;
+            if (dateInput.parentNode) {
+                dateInput.parentNode.removeChild(dateInput);
+            }
+            resumeTaskEditBlurSave(input);
+        }
+
+        dateInput.addEventListener('change', function () {
+            const date = dateInput.value;
+            if (date) {
+                const formattedDate = new Date(date).toLocaleDateString() + ' ';
+                const text = input.value;
+
+                const safeStart = Math.max(0, Math.min(insertionStart, text.length));
+                const safeEnd = Math.max(safeStart, Math.min(insertionEnd, text.length));
+
+                if (typeof input.setRangeText === 'function') {
+                    input.setRangeText(formattedDate, safeStart, safeEnd, 'end');
+                } else {
+                    input.value = text.substring(0, safeStart) + formattedDate + text.substring(safeEnd);
+                }
+
+                const caretPos = safeStart + formattedDate.length;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.focus();
+                try {
+                    input.setSelectionRange(caretPos, caretPos);
+                } catch (e) { }
+                setTimeout(() => {
+                    try {
+                        input.setSelectionRange(caretPos, caretPos);
+                    } catch (e) { }
+                }, 0);
+            }
+            cleanup();
+        });
+
+        dateInput.addEventListener('blur', function () {
+            setTimeout(function () {
+                if (!dateInput.value) cleanup();
+            }, 200);
+        });
+
+        if (dateInput.showPicker) {
+            dateInput.showPicker();
+        } else {
+            dateInput.click();
+        }
+    }
+
     // Return title commands for the slash menu (specific to title field)
     function getTitleSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
@@ -1210,21 +1314,7 @@
                 icon: 'lucide-smile',
                 label: t('slash_menu.emoji', null, 'Emoji'),
                 action: function () {
-                    const input = savedEditableElement;
-                    if (!input || input.tagName !== 'INPUT') return;
-
-                    // Ensure input focus and preserve selection for emoji insertion
-                    input.focus();
-                    window.savedActiveInput = input;
-                    window.savedActiveInputSelection = {
-                        start: input.selectionStart,
-                        end: input.selectionEnd
-                    };
-
-                    // Open the emoji picker after focus is applied
-                    if (typeof window.toggleEmojiPicker === 'function') {
-                        setTimeout(() => window.toggleEmojiPicker(), 0);
-                    }
+                    openEmojiForInput(savedEditableElement);
                 }
             },
             {
@@ -1232,55 +1322,7 @@
                 icon: 'lucide-calendar-alt',
                 label: t('slash_menu.date', null, 'Date'),
                 action: function () {
-                    const input = savedEditableElement;
-                    if (!input || input.tagName !== 'INPUT') return;
-
-                    // Capture insertion position now (selection is already restored by deleteSlashText)
-                    const insertionStart = (typeof input.selectionStart === 'number') ? input.selectionStart : Math.max(0, slashOffset);
-                    const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
-
-                    const dateInput = document.createElement('input');
-                    dateInput.type = 'date';
-                    dateInput.style.position = 'fixed';
-                    dateInput.style.top = '-1000px';
-                    dateInput.style.left = '-1000px';
-                    document.body.appendChild(dateInput);
-
-                    dateInput.addEventListener('change', function () {
-                        const date = dateInput.value;
-                        if (date) {
-                            const formattedDate = new Date(date).toLocaleDateString() + ' ';
-                            const text = input.value;
-
-                            const safeStart = Math.max(0, Math.min(insertionStart, text.length));
-                            const safeEnd = Math.max(safeStart, Math.min(insertionEnd, text.length));
-
-                            if (typeof input.setRangeText === 'function') {
-                                input.setRangeText(formattedDate, safeStart, safeEnd, 'end');
-                            } else {
-                                input.value = text.substring(0, safeStart) + formattedDate + text.substring(safeEnd);
-                            }
-
-                            const caretPos = safeStart + formattedDate.length;
-                            input.dispatchEvent(new Event('input', { bubbles: true }));
-                            input.focus();
-                            try {
-                                input.setSelectionRange(caretPos, caretPos);
-                            } catch (e) { }
-                            setTimeout(() => {
-                                try {
-                                    input.setSelectionRange(caretPos, caretPos);
-                                } catch (e) { }
-                            }, 0);
-                        }
-                        document.body.removeChild(dateInput);
-                    });
-
-                    if (dateInput.showPicker) {
-                        dateInput.showPicker();
-                    } else {
-                        dateInput.click();
-                    }
+                    openDateForInput(savedEditableElement);
                 }
             }
         ]);
@@ -1291,6 +1333,22 @@
         const t = window.t || ((key, params, fallback) => fallback);
         const common = getCommonSlashCommands();
         return filterSlashCommands([
+            {
+                id: 'emoji',
+                icon: 'lucide-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                action: function () {
+                    openEmojiForInput(savedEditableElement);
+                }
+            },
+            {
+                id: 'date',
+                icon: 'lucide-calendar-alt',
+                label: t('slash_menu.date', null, 'Date'),
+                action: function () {
+                    openDateForInput(savedEditableElement);
+                }
+            },
             common.noteReference,
             common.cancel
         ]);
@@ -1329,8 +1387,11 @@
                 icon: 'lucide lucide-at',
                 label: t('slash_menu.link_to_note', null, 'Link to note'),
                 action: function () {
+                    pauseTaskEditBlurSave(savedEditableElement);
                     if (typeof window.openNoteReferenceModal === 'function') {
                         window.openNoteReferenceModal();
+                    } else {
+                        resumeTaskEditBlurSave(savedEditableElement);
                     }
                 }
             },
@@ -2296,7 +2357,7 @@
         // Mark slash position
         slashOffset = pos - 1;
 
-        const isTaskInput = input.classList.contains('task-input');
+        const isTaskInput = isTaskInputElement(input);
         const ctx = { noteType: isTaskInput ? 'tasklist' : 'title', noteEntry: savedNoteEntry, editableElement: input };
 
         activeCommands = isTaskInput ? getTaskSlashCommands() : getTitleSlashCommands();
@@ -3443,8 +3504,7 @@
 
             // Check if this is a title input field or a task list input
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
-            // Restrict to the "new task" input only, excluding existing task editing inputs
-            const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
+            const isTaskInput = isTaskInputElement(target);
             const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
 
             if (isTitleInput || isTaskInput) {
@@ -4176,4 +4236,3 @@
         init();
     }
 })();
-

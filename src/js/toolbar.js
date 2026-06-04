@@ -1314,6 +1314,9 @@ function toggleEmojiPicker() {
 
   if (existingPicker) {
     existingPicker.remove();
+    if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+      window.resumeTaskEditBlurSave(window.savedActiveInput);
+    }
     window.savedRanges.emoji = null;
     window.savedActiveInput = null;
     window.savedActiveInputSelection = null;
@@ -1441,7 +1444,12 @@ function toggleEmojiPicker() {
   });
 
   setupPopupDismiss(picker, '.btn-emoji', function () {
+    if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+      window.resumeTaskEditBlurSave(window.savedActiveInput);
+    }
     window.savedRanges.emoji = null;
+    window.savedActiveInput = null;
+    window.savedActiveInputSelection = null;
   });
 }
 
@@ -1472,7 +1480,7 @@ function insertEmoji(emoji) {
     }
   } catch (e) { }
 
-  // Handle title input insertion
+  // Handle input insertion (title and task fields)
   if (window.savedActiveInput) {
     const input = window.savedActiveInput;
     input.focus();
@@ -1493,6 +1501,9 @@ function insertEmoji(emoji) {
 
     input.setRangeText(emoji, start, end, 'end');
     input.dispatchEvent(new Event('input', { bubbles: true }));
+    if (input.classList && input.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+      window.resumeTaskEditBlurSave(input);
+    }
 
     window.savedRanges.emoji = null;
     window.savedActiveInput = null;

@@ -1165,7 +1165,16 @@ try {
                 credentials: 'same-origin'
             })
             .then(r => r.json())
-            .then(data => { if (data.success) loadNotifications(); })
+            .then(data => {
+                if (data.success) {
+                    closeNotificationsModal();
+                    if (typeof goBackToNotes === 'function') {
+                        goBackToNotes();
+                        return;
+                    }
+                    window.location.href = 'index.php';
+                }
+            })
             .catch(e => console.error('Dismiss all error:', e));
         }
 
