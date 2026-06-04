@@ -1170,6 +1170,10 @@ function handleImageClick(event) {
         return;
     }
 
+    if (img.closest('.note-attachment-previews')) {
+        return;
+    }
+
     // On public pages, if image is in a link, let the link work
     if (window.isPublicNotePage && img.closest('a')) {
         return;
@@ -1414,6 +1418,11 @@ function reinitializeNoteContent() {
 
     // Re-initialize image click handlers
     reinitializeImageClickHandlers();
+
+    // Refresh attachment previews after initial and AJAX note loads.
+    if (typeof window.refreshAttachmentPreviewsForVisibleNotes === 'function') {
+        window.refreshAttachmentPreviewsForVisibleNotes();
+    }
 
     // Update note history navigation buttons
     if (typeof NoteHistory !== 'undefined' && NoteHistory.updateButtons) {

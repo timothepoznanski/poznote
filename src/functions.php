@@ -102,6 +102,232 @@ function resolveAttachmentReferenceId($attachmentId, array $attachmentExtensions
     return $resolvedId ?? $attachmentId;
 }
 
+function poznoteAttachmentOriginalFilename(array $attachment) {
+    return (string)($attachment['original_filename'] ?? $attachment['filename'] ?? '');
+}
+
+function poznoteAttachmentExtension(array $attachment) {
+    $filename = poznoteAttachmentOriginalFilename($attachment);
+    return strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+}
+
+function poznoteAttachmentMimeType(array $attachment) {
+    $mimeType = strtolower(trim((string)($attachment['file_type'] ?? $attachment['mime_type'] ?? $attachment['type'] ?? '')));
+    if ($mimeType !== '') {
+        return $mimeType;
+    }
+
+    $extension = poznoteAttachmentExtension($attachment);
+    $extensionMimeMap = [
+        'png' => 'image/png',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'gif' => 'image/gif',
+        'svg' => 'image/svg+xml',
+        'webp' => 'image/webp',
+        'bmp' => 'image/bmp',
+        'pdf' => 'application/pdf',
+        'mp4' => 'video/mp4',
+        'webm' => 'video/webm',
+        'mov' => 'video/quicktime',
+        'm4v' => 'video/x-m4v',
+        'mp3' => 'audio/mpeg',
+        'wav' => 'audio/wav',
+        'ogg' => 'audio/ogg',
+        'm4a' => 'audio/mp4',
+        'flac' => 'audio/flac',
+    ];
+
+    return $extensionMimeMap[$extension] ?? '';
+}
+
+function poznoteAttachmentPreviewKind(array $attachment) {
+    $mimeType = poznoteAttachmentMimeType($attachment);
+    $extension = poznoteAttachmentExtension($attachment);
+
+    if (strpos($mimeType, 'image/') === 0 || in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp'], true)) {
+        return 'image';
+    }
+    if ($mimeType === 'application/pdf' || $extension === 'pdf') {
+        return 'pdf';
+    }
+    if (strpos($mimeType, 'video/') === 0 || in_array($extension, ['mp4', 'webm', 'mov', 'm4v'], true)) {
+        return 'video';
+    }
+    if (strpos($mimeType, 'audio/') === 0 || in_array($extension, ['mp3', 'wav', 'ogg', 'm4a', 'flac'], true)) {
+        return 'audio';
+    }
+
+    return 'file';
+}
+
+function poznoteAttachmentIsReferencedInContent(array $attachment, $content) {
+    $attachmentId = (string)($attachment['id'] ?? '');
+    if ($attachmentId === '') {
+        return false;
+    }
+
+    $content = (string)$content;
+    if ($content === '') {
+        return false;
+    }
+
+    $pathFragment = 'attachments/' . $attachmentId;
+    return strpos($content, $pathFragment) !== false
+        || strpos($content, urlencode($pathFragment)) !== false
+        || strpos($content, rawurlencode($pathFragment)) !== false;
+}
+
+function poznoteFormatAttachmentSize($bytes) {
+    $bytes = (int)$bytes;
+    if ($bytes <= 0) {
+        return '';
+    }
+
+    $units = ['B', 'KB', 'MB', 'GB'];
+    $index = 0;
+    $size = (float)$bytes;
+    while ($size >= 1024 && $index < count($units) - 1) {
+        $size /= 1024;
+        $index++;
+    }
+
+    $precision = $index === 0 ? 0 : 1;
+    return rtrim(rtrim(number_format($size, $precision, '.', ''), '0'), '.') . ' ' . $units[$index];
+}
+
+function poznoteBuildAttachmentUrl($noteId, $attachmentId, $workspace = '', $forceDownload = false) {
+    $query = [];
+    $workspace = trim((string)$workspace);
+    if ($workspace !== '') {
+        $query['workspace'] = $workspace;
+    }
+    if ($forceDownload) {
+        $query['download'] = '1';
+    }
+
+    $url = '/api/v1/notes/' . rawurlencode((string)$noteId) . '/attachments/' . rawurlencode((string)$attachmentId);
+    if (!empty($query)) {
+        $url .= '?' . http_build_query($query);
+    }
+
+    return $url;
+}
+
+function poznoteBuildAudioPlayerUrl($noteId, $attachmentId, $workspace = '') {
+    $query = [
+        'note' => (string)$noteId,
+        'attachment' => (string)$attachmentId,
+    ];
+    $workspace = trim((string)$workspace);
+    if ($workspace !== '') {
+        $query['workspace'] = $workspace;
+    }
+
+    return '/audio_player.php?' . http_build_query($query);
+}
+
+function poznoteRenderAttachmentPreviews($noteId, $attachments, $workspace = '', $content = '') {
+    if (is_string($attachments)) {
+        $decoded = json_decode($attachments, true);
+        $attachments = is_array($decoded) ? $decoded : [];
+    }
+    if (!is_array($attachments) || empty($attachments)) {
+        return '';
+    }
+
+    $cards = [];
+    foreach ($attachments as $attachment) {
+        if (!is_array($attachment) || empty($attachment['id'])) {
+            continue;
+        }
+        if (poznoteAttachmentIsReferencedInContent($attachment, $content)) {
+            continue;
+        }
+
+        $attachmentId = (string)$attachment['id'];
+        $filename = poznoteAttachmentOriginalFilename($attachment);
+        if ($filename === '') {
+            $filename = (string)($attachment['filename'] ?? $attachmentId);
+        }
+
+        $kind = poznoteAttachmentPreviewKind($attachment);
+        $safeKind = htmlspecialchars($kind, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeId = htmlspecialchars($attachmentId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeFilename = htmlspecialchars($filename, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $fileUrl = poznoteBuildAttachmentUrl($noteId, $attachmentId, $workspace, false);
+        $downloadUrl = poznoteBuildAttachmentUrl($noteId, $attachmentId, $workspace, true);
+        $safeFileUrl = htmlspecialchars($fileUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $safeDownloadUrl = htmlspecialchars($downloadUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $sizeLabel = poznoteFormatAttachmentSize($attachment['file_size'] ?? 0);
+        $safeSize = htmlspecialchars($sizeLabel, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        switch ($kind) {
+            case 'image':
+                $iconClass = 'lucide lucide-file-image';
+                break;
+            case 'video':
+                $iconClass = 'lucide lucide-file-video';
+                break;
+            case 'audio':
+                $iconClass = 'lucide lucide-music';
+                break;
+            default:
+                $iconClass = 'lucide lucide-file-text';
+                break;
+        }
+
+        $mediaHtml = '';
+        if ($kind === 'image') {
+            $mediaHtml = '<a class="note-attachment-preview-media" href="' . $safeFileUrl . '" target="_blank" rel="noopener noreferrer">'
+                . '<img src="' . $safeFileUrl . '" alt="' . $safeFilename . '" loading="lazy" decoding="async">'
+                . '</a>';
+        } elseif ($kind === 'pdf') {
+            $mediaHtml = '<iframe class="note-attachment-preview-media note-attachment-preview-frame" src="' . $safeFileUrl . '" title="' . $safeFilename . '" loading="lazy"></iframe>';
+        } elseif ($kind === 'video') {
+            $mediaHtml = '<div class="note-attachment-preview-media"><video controls preload="metadata" playsinline src="' . $safeFileUrl . '"></video></div>';
+        } elseif ($kind === 'audio') {
+            $audioPlayerUrl = htmlspecialchars(poznoteBuildAudioPlayerUrl($noteId, $attachmentId, $workspace), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $mediaHtml = '<iframe class="note-attachment-preview-media note-attachment-preview-audio-frame" src="' . $audioPlayerUrl . '" title="' . $safeFilename . '" scrolling="no" frameborder="0" allow="autoplay" loading="lazy"></iframe>';
+        } else {
+            $mediaHtml = '<a class="note-attachment-preview-file-card" href="' . $safeDownloadUrl . '" title="' . t_h('attachments.actions.download', ['filename' => $filename], 'Download {{filename}}') . '">'
+                . '<i class="' . $iconClass . '"></i>'
+                . '<span class="note-attachment-preview-file-meta">'
+                . '<span class="note-attachment-preview-file-name">' . $safeFilename . '</span>';
+            if ($safeSize !== '') {
+                $mediaHtml .= '<span class="note-attachment-preview-size">' . $safeSize . '</span>';
+            }
+            $mediaHtml .= '</span>'
+                . '</a>';
+        }
+
+        $caption = '';
+        if ($kind !== 'file') {
+            $caption = '<figcaption class="note-attachment-preview-caption">'
+                . '<i class="' . $iconClass . '"></i>'
+                . '<a href="' . $safeDownloadUrl . '" title="' . t_h('attachments.actions.download', ['filename' => $filename], 'Download {{filename}}') . '">' . $safeFilename . '</a>';
+            if ($safeSize !== '') {
+                $caption .= '<span class="note-attachment-preview-size">' . $safeSize . '</span>';
+            }
+            $caption .= '</figcaption>';
+        }
+
+        $cards[] = '<figure class="note-attachment-preview note-attachment-preview-' . $safeKind . '" data-attachment-id="' . $safeId . '" contenteditable="false">'
+            . $mediaHtml
+            . $caption
+            . '</figure>';
+    }
+
+    if (empty($cards)) {
+        return '';
+    }
+
+    $safeNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    return '<div id="attachment-previews-' . $safeNoteId . '" class="note-attachment-previews" data-note-id="' . $safeNoteId . '" contenteditable="false">'
+        . implode('', $cards)
+        . '</div>';
+}
+
 /**
  * Detect if the current request is using HTTPS
  * Supports reverse proxy headers (X-Forwarded-Proto, X-Forwarded-SSL)

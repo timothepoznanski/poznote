@@ -213,6 +213,59 @@ body.dark-mode .noteentry audio {
     background: var(--dm-surface);
 }
 
+html[data-theme='dark'] .note-attachment-preview,
+body.dark-mode .note-attachment-preview {
+    border-color: var(--dm-border);
+    background: var(--dm-surface);
+}
+
+html[data-theme='dark'] .note-attachment-preview-media,
+html[data-theme='dark'] .note-attachment-preview-file-card,
+body.dark-mode .note-attachment-preview-media,
+body.dark-mode .note-attachment-preview-file-card {
+    background: #2b2b2b;
+}
+
+html[data-theme='dark'] .note-attachment-preview-file-card,
+body.dark-mode .note-attachment-preview-file-card {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .note-attachment-preview-file-card:hover,
+html[data-theme='dark'] .note-attachment-preview-file-card:focus,
+body.dark-mode .note-attachment-preview-file-card:hover,
+body.dark-mode .note-attachment-preview-file-card:focus {
+    background: #303844;
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .note-attachment-preview-caption,
+body.dark-mode .note-attachment-preview-caption {
+    border-top-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .note-attachment-preview-caption a,
+body.dark-mode .note-attachment-preview-caption a {
+    color: var(--dm-text) !important;
+}
+
+html[data-theme='dark'] .note-attachment-preview-caption a:hover,
+html[data-theme='dark'] .note-attachment-preview-caption a:focus,
+body.dark-mode .note-attachment-preview-caption a:hover,
+body.dark-mode .note-attachment-preview-caption a:focus {
+    color: var(--dm-accent) !important;
+}
+
+html[data-theme='dark'] .note-attachment-preview-file-card i,
+html[data-theme='dark'] .note-attachment-preview-caption i,
+html[data-theme='dark'] .note-attachment-preview-size,
+body.dark-mode .note-attachment-preview-file-card i,
+body.dark-mode .note-attachment-preview-caption i,
+body.dark-mode .note-attachment-preview-size {
+    color: var(--dm-text-muted);
+}
+
 /* ============================================
    Text Selection & Highlighting
    ============================================ */

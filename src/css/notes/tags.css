@@ -50,19 +50,13 @@
     align-items: center;
 }
 
-/* Tag Actions Dropdown */
+/* Tag Action Wrapper */
 .tag-actions-dropdown {
     position: relative;
     display: inline-flex;
     margin-right: 8px;
     align-self: center;
     line-height: 1;
-}
-
-.tags-actions-menu {
-    left: 0 !important;
-    right: auto !important;
-    margin-top: 5px;
 }
 
 /* Tag Icon */

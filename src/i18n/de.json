@@ -554,6 +554,7 @@
       "note_content_width": "Breite des Notizinhalts",
       "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
+      "attachment_previews_in_note": "Anhangsvorschauen",
       "ui_customization": "Sichtbarkeit von Elementen"
     },
     "badges": {

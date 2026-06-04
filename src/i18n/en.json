@@ -216,6 +216,7 @@
       "note_content_width": "Note content width",
       "markdown_split_card_view": "Framed markdown",
       "code_block_word_wrap": "Code block word wrap",
+      "attachment_previews_in_note": "Attachment previews",
       "ui_customization": "Element visibility"
     },
     "badges": {

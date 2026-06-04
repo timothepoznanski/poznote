@@ -460,11 +460,18 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
 
         // === Update schema version ===
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '" . $CURRENT_SCHEMA_VERSION . "')");
     }
     // --- End schema versioning ---
+
+    try {
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
+    } catch (Exception $e) {
+        error_log('Could not ensure attachment preview setting: ' . $e->getMessage());
+    }
 
     // Always ensure reminder email delivery columns exist for databases created before SMTP reminders.
     try {
