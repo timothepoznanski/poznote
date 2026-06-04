@@ -347,6 +347,8 @@
       "no_filter_results": "没有与您的搜索匹配的笔记。",
       "show_thumbnails": "在此列表显示缩略图",
       "show_inline_images": "同时显示笔记内容中已可见的图片",
+      "all_file_types": "所有类型",
+      "file_type_filter": "按文件类型筛选",
       "download": "下载"
     }
   },

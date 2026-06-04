@@ -351,7 +351,9 @@
       "filter_placeholder": "Filter by note title or attachment name...",
       "no_filter_results": "No notes match your search.",
       "show_thumbnails": "Show thumbnails in this list",
-      "show_inline_images": "Also show images already visible in the note content"
+      "show_inline_images": "Also show images already visible in the note content",
+      "all_file_types": "All types",
+      "file_type_filter": "Filter by file type"
     }
   },
   "modals": {

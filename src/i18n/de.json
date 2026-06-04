@@ -345,6 +345,8 @@
       "no_filter_results": "Keine Notizen entsprechen Ihrer Suche.",
       "show_thumbnails": "Vorschaubilder in dieser Liste anzeigen",
       "show_inline_images": "Auch Bilder anzeigen, die bereits im Notizinhalt sichtbar sind",
+      "all_file_types": "Alle Typen",
+      "file_type_filter": "Nach Dateityp filtern",
       "download": "Herunterladen"
     }
   },

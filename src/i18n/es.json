@@ -346,6 +346,8 @@
       "no_filter_results": "Ninguna note coincide con su búsqueda.",
       "show_thumbnails": "Mostrar miniaturas en esta lista",
       "show_inline_images": "Mostrar también las imágenes ya visibles en el contenido de la nota",
+      "all_file_types": "Todos los tipos",
+      "file_type_filter": "Filtrar por tipo de archivo",
       "download": "Descargar"
     }
   },

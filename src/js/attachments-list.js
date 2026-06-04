@@ -4,10 +4,12 @@
 let allRows = [];
 let filteredRows = [];
 let filterText = '';
+let selectedFileType = '';
 
 document.addEventListener('DOMContentLoaded', function () {
     const filterInput = document.getElementById('filterInput');
     const clearFilterBtn = document.getElementById('clearFilterBtn');
+    const fileTypeFilter = document.getElementById('fileTypeFilter');
     const backToNotesBtn = document.getElementById('backToNotesBtn');
     const backToHomeBtn = document.getElementById('backToHomeBtn');
 
@@ -49,6 +51,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.style.display = 'none';
                 filterInput.focus();
             }
+        });
+    }
+
+    if (fileTypeFilter) {
+        fileTypeFilter.addEventListener('change', function () {
+            selectedFileType = this.value;
+            applyFilter();
         });
     }
 
@@ -95,10 +104,13 @@ async function loadAttachments() {
             noteContent: note.entry || '',
             attachments: (note.attachments || []).map(att => ({
                 id: att.id,
-                filename: att.original_filename || att.filename,
-                type: att.file_type || att.type
+                filename: att.original_filename || att.filename || '',
+                type: att.file_type || att.mime_type || att.type,
+                extension: getAttachmentExtension(att)
             }))
         }));
+
+        populateFileTypeFilter(allRows);
 
         if (allRows.length === 0) {
             if (emptyMessage) emptyMessage.style.display = 'block';
@@ -114,21 +126,102 @@ async function loadAttachments() {
     }
 }
 
+function getAttachmentExtension(attachment) {
+    const filename = String(attachment.original_filename || attachment.filename || '').trim();
+    const lastDotIndex = filename.lastIndexOf('.');
+
+    if (lastDotIndex > -1 && lastDotIndex < filename.length - 1) {
+        return filename.slice(lastDotIndex + 1).toLowerCase();
+    }
+
+    const mimeType = String(attachment.file_type || attachment.mime_type || attachment.type || '').toLowerCase();
+    if (!mimeType.includes('/')) return '';
+
+    const subtype = mimeType.split('/')[1].split(';')[0].trim();
+    const mimeExtensionMap = {
+        'jpeg': 'jpg',
+        'svg+xml': 'svg',
+        'x-zip-compressed': 'zip'
+    };
+
+    return mimeExtensionMap[subtype] || subtype;
+}
+
+function populateFileTypeFilter(rows) {
+    const fileTypeFilter = document.getElementById('fileTypeFilter');
+    if (!fileTypeFilter) return;
+
+    const extensionSet = new Set();
+    rows.forEach(row => {
+        getDisplayableAttachments(row).forEach(att => {
+            if (att.extension) extensionSet.add(att.extension);
+        });
+    });
+    const extensions = Array.from(extensionSet).sort((a, b) => a.localeCompare(b));
+
+    const allTypesText = document.body.getAttribute('data-txt-all-file-types') || 'All types';
+    fileTypeFilter.innerHTML = '<option value="">' + escapeHtml(allTypesText) + '</option>' +
+        extensions.map(extension => (
+            '<option value="' + escapeHtml(extension) + '">' + escapeHtml(extension.toUpperCase()) + '</option>'
+        )).join('');
+
+    if (selectedFileType && !extensions.includes(selectedFileType)) {
+        selectedFileType = '';
+    }
+
+    fileTypeFilter.value = selectedFileType;
+    fileTypeFilter.disabled = extensions.length === 0;
+    fileTypeFilter.style.display = extensions.length === 0 ? 'none' : 'block';
+}
+
+function getDisplayableAttachments(row) {
+    return row.attachments.filter(att => !isEmbeddedImageAttachment(row, att));
+}
+
+function isEmbeddedImageAttachment(row, attachment) {
+    if (!isImageAttachment(attachment) || !row.noteContent || !attachment.id) return false;
+
+    const attachmentRefPattern = 'attachments\\/' + escapeRegExp(String(attachment.id)) + '(?:[?#][^\\s"\'<>)]*)?(?=$|[\\s"\'<>\\)])';
+    const htmlImagePattern = new RegExp('<img\\b[^>]*' + attachmentRefPattern, 'i');
+    const markdownImagePattern = new RegExp('!\\[[^\\]]*\\]\\([^)]*' + attachmentRefPattern + '[^)]*\\)', 'i');
+    const noteContent = String(row.noteContent);
+
+    return htmlImagePattern.test(noteContent) || markdownImagePattern.test(noteContent);
+}
+
+function isImageAttachment(attachment) {
+    const mimeType = String(attachment.type || '').toLowerCase();
+    if (mimeType.startsWith('image/')) return true;
+
+    const imageExtensions = ['avif', 'bmp', 'gif', 'heic', 'heif', 'ico', 'jpg', 'jpeg', 'png', 'svg', 'webp'];
+    return imageExtensions.includes(attachment.extension);
+}
+
 function applyFilter() {
-    filteredRows = filterText
-        ? allRows.filter(r => {
-            const nameMatch = r.noteName.toLowerCase().includes(filterText);
-            const fileMatch = r.attachments.some(att => att.filename.toLowerCase().includes(filterText));
-            return nameMatch || fileMatch;
-        })
-        : [...allRows];
+    const hasTextFilter = filterText !== '';
+    const hasTypeFilter = selectedFileType !== '';
+
+    filteredRows = allRows.filter(row => {
+        const displayableAttachments = getDisplayableAttachments(row);
+        const matchingTypeAttachments = hasTypeFilter
+            ? displayableAttachments.filter(att => att.extension === selectedFileType)
+            : displayableAttachments;
+
+        if (matchingTypeAttachments.length === 0) return false;
+        if (!hasTextFilter) return true;
+
+        const nameMatch = row.noteName.toLowerCase().includes(filterText);
+        const fileMatch = matchingTypeAttachments.some(att => att.filename.toLowerCase().includes(filterText));
+        return nameMatch || fileMatch;
+    });
 
     renderRows();
 
     const statsDiv = document.getElementById('filterStats');
     if (statsDiv) {
-        if (filterText && filteredRows.length < allRows.length) {
-            statsDiv.textContent = filteredRows.length + ' / ' + allRows.length;
+        const displayableRowCount = allRows.filter(row => getDisplayableAttachments(row).length > 0).length;
+        if ((hasTextFilter || hasTypeFilter) && filteredRows.length < displayableRowCount) {
+            statsDiv.textContent = filteredRows.length + ' / ' + displayableRowCount;
             statsDiv.style.display = 'block';
         } else {
             statsDiv.style.display = 'none';
@@ -142,18 +235,17 @@ function renderRows() {
     const workspace = getPageWorkspace();
     const noResultsText = document.body.getAttribute('data-txt-no-results') || 'No results.';
     const showThumbnailsToggle = document.getElementById('showThumbnailsToggle');
-    const showImagesToggle = document.getElementById('showImagesToggle');
     const showThumbnails = showThumbnailsToggle ? showThumbnailsToggle.checked : true;
-    const showInlineEverything = showImagesToggle ? showImagesToggle.checked : true;
+    const hasActiveFilters = filterText !== '' || selectedFileType !== '';
 
     if (!container) return;
 
     if (filteredRows.length === 0) {
-        container.innerHTML = filterText
+        container.innerHTML = hasActiveFilters
             ? '<div class="empty-message"><p>' + escapeHtml(noResultsText) + '</p></div>'
             : '';
         if (emptyMessage) {
-            emptyMessage.style.display = filterText ? 'none' : 'block';
+            emptyMessage.style.display = hasActiveFilters ? 'none' : 'block';
         }
         return;
     }
@@ -162,15 +254,17 @@ function renderRows() {
 
     const rowsHtmlArray = filteredRows.map(row => {
         // Filter attachments based on visibility settings
-        const visibleAttachments = row.attachments.filter(att => {
-            const isInline = row.noteContent && row.noteContent.includes('attachments/' + att.id);
-            return showInlineEverything || !isInline;
-        });
+        const displayableAttachments = getDisplayableAttachments(row);
+        const typeFilteredAttachments = selectedFileType
+            ? displayableAttachments.filter(att => att.extension === selectedFileType)
+            : displayableAttachments;
+
+        const visibleAttachments = typeFilteredAttachments;
 
         if (visibleAttachments.length === 0) return null;
 
         const attachmentsList = visibleAttachments.map(att => {
-            const isImage = att.type && att.type.startsWith('image/');
+            const isImage = isImageAttachment(att);
             let preview = '';
 
             if (isImage && showThumbnails) {
@@ -274,6 +368,10 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function escapeRegExp(text) {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function downloadAttachment(attachmentId, noteId) {

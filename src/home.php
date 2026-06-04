@@ -265,7 +265,7 @@ try {
 $attachments_count = 0;
 try {
     if (isset($con)) {
-        $query = "SELECT COUNT(*) as cnt FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+        $query = "SELECT entry, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
         $params = [];
         if (!empty($pageWorkspace)) {
             $query .= " AND workspace = ?";
@@ -273,7 +273,11 @@ try {
         }
         $stmtAttachments = $con->prepare($query);
         $stmtAttachments->execute($params);
-        $attachments_count = (int)$stmtAttachments->fetchColumn();
+        while ($row = $stmtAttachments->fetch(PDO::FETCH_ASSOC)) {
+            if (poznoteCountDisplayableAttachments($row['attachments'] ?? '', $row['entry'] ?? '') > 0) {
+                $attachments_count++;
+            }
+        }
     }
 } catch (Exception $e) {
     $attachments_count = 0;

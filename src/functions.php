@@ -145,7 +145,7 @@ function poznoteAttachmentPreviewKind(array $attachment) {
     $mimeType = poznoteAttachmentMimeType($attachment);
     $extension = poznoteAttachmentExtension($attachment);
 
-    if (strpos($mimeType, 'image/') === 0 || in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp'], true)) {
+    if (poznoteAttachmentIsImage($attachment)) {
         return 'image';
     }
     if ($mimeType === 'application/pdf' || $extension === 'pdf') {
@@ -159,6 +159,15 @@ function poznoteAttachmentPreviewKind(array $attachment) {
     }
 
     return 'file';
+}
+
+function poznoteAttachmentIsImage(array $attachment) {
+    $mimeType = poznoteAttachmentMimeType($attachment);
+    if (strpos($mimeType, 'image/') === 0) {
+        return true;
+    }
+
+    return in_array(poznoteAttachmentExtension($attachment), ['avif', 'bmp', 'gif', 'heic', 'heif', 'ico', 'jpg', 'jpeg', 'png', 'svg', 'webp'], true);
 }
 
 function poznoteAttachmentIsReferencedInContent(array $attachment, $content) {
@@ -176,6 +185,57 @@ function poznoteAttachmentIsReferencedInContent(array $attachment, $content) {
     return strpos($content, $pathFragment) !== false
         || strpos($content, urlencode($pathFragment)) !== false
         || strpos($content, rawurlencode($pathFragment)) !== false;
+}
+
+function poznoteAttachmentIsEmbeddedImageInContent(array $attachment, $content) {
+    $attachmentId = (string)($attachment['id'] ?? '');
+    $content = (string)$content;
+
+    if ($attachmentId === '' || $content === '' || !poznoteAttachmentIsImage($attachment)) {
+        return false;
+    }
+
+    $references = [
+        'attachments/' . $attachmentId,
+        urlencode('attachments/' . $attachmentId),
+        rawurlencode('attachments/' . $attachmentId),
+    ];
+
+    foreach (array_unique($references) as $reference) {
+        $referencePattern = preg_quote($reference, '~') . '(?:[?#][^\s"\'<>)]*)?(?=$|[\s"\'<>\)])';
+        if (preg_match('~<img\b[^>]*' . $referencePattern . '~i', $content)) {
+            return true;
+        }
+        if (preg_match('~!\[[^\]]*\]\([^)]*' . $referencePattern . '[^)]*\)~i', $content)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function poznoteDecodeAttachments($attachments) {
+    if (is_string($attachments)) {
+        $decoded = json_decode($attachments, true);
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    return is_array($attachments) ? $attachments : [];
+}
+
+function poznoteCountDisplayableAttachments($attachments, $content = '') {
+    $count = 0;
+    foreach (poznoteDecodeAttachments($attachments) as $attachment) {
+        if (!is_array($attachment) || empty($attachment['id'])) {
+            continue;
+        }
+        if (poznoteAttachmentIsEmbeddedImageInContent($attachment, $content)) {
+            continue;
+        }
+        $count++;
+    }
+
+    return $count;
 }
 
 function poznoteFormatAttachmentSize($bytes) {
