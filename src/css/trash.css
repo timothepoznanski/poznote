@@ -511,17 +511,17 @@ body.trash-page {
 html[data-theme='dark'] body.trash-page,
 [data-theme='dark'] body.trash-page,
 body.dark-mode.trash-page {
-    background-color: #252526 !important;
-    background: #252526 !important;
-    color: #e0e0e0;
+    background-color: var(--dm-content-bg) !important;
+    background: var(--dm-content-bg) !important;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .trash-search-input,
 [data-theme='dark'] .trash-search-input,
 body.dark-mode .trash-search-input {
-    background-color: #333333 !important;
-    color: #e0e0e0 !important;
-    border-color: #404040 !important;
+    background-color: var(--dm-surface) !important;
+    color: var(--dm-text) !important;
+    border-color: var(--dm-border) !important;
 }
 
 [data-theme='dark'] .clear-filter-btn {
@@ -530,8 +530,8 @@ body.dark-mode .trash-search-input {
 
 html[data-theme='dark'] .trash-notecard,
 body.dark-mode .trash-notecard {
-    background-color: #333333 !important;
-    border-color: #333 !important;
+    background-color: var(--dm-surface) !important;
+    border-color: var(--dm-border) !important;
 }
 
 html[data-theme='dark'] .trash-innernote,

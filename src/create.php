@@ -25,7 +25,7 @@ $currentLang = getUserLanguage();
     <?php 
     $cache_v = @file_get_contents('version.txt');
     if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(trim($cache_v));
+    $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>

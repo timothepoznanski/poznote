@@ -8,7 +8,7 @@
 
 html[data-theme='dark'] .markdown-preview,
 body.dark-mode .markdown-preview {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 

@@ -176,7 +176,7 @@ foreach ($users as $listedUser) {
 ?>
 <?php
 // Cache busting: version based on app version to force reload on updates
-$v = getAppVersion();
+$v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">

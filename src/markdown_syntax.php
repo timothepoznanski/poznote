@@ -392,13 +392,13 @@ $examples = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t_h('markdown_syntax.page_title', [], 'Markdown syntax'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
+    <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/info.css">
     <link rel="stylesheet" href="css/markdown-syntax.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body>
     <div class="info-page markdown-syntax-page">

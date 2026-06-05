@@ -9,31 +9,31 @@
 /* Dark mode - base */
 html[data-theme='dark'] .home-page,
 body.dark-mode .home-page {
-    background: #252526;
+    background: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .home-header,
 body.dark-mode .home-header {
-    color: #e5e7eb;
-    border-bottom-color: #374151;
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .home-workspace-name,
 body.dark-mode .home-workspace-name {
-    color: #e5e7eb;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .home-notes-count,
 body.dark-mode .home-notes-count {
-    color: #9ca3af;
-    background: #374151;
+    color: var(--dm-text-muted);
+    background: var(--dm-surface);
 }
 
 /* Dark mode - cards */
 html[data-theme='dark'] .home-card,
 body.dark-mode .home-card {
-    background: #333333;
-    border-color: #374151;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .home-card:hover,
@@ -43,12 +43,12 @@ body.dark-mode .home-card:hover {
 
 html[data-theme='dark'] .home-card-title,
 body.dark-mode .home-card-title {
-    color: #e5e7eb;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .home-card-count,
 body.dark-mode .home-card-count {
-    color: #9ca3af;
+    color: var(--dm-text-muted);
 }
 
 html[data-theme='dark'] .home-card-icon,
@@ -75,17 +75,17 @@ body.dark-mode .home-card-icon-trash {
 /* Dark mode - debug info */
 html[data-theme='dark'] .debug-info,
 body.dark-mode .debug-info {
-    background: #252525 !important;
-    border-color: #374151 !important;
-    color: #e5e7eb;
+    background: var(--dm-sidebar-surface) !important;
+    border-color: var(--dm-border) !important;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .debug-info h4,
 body.dark-mode .debug-info h4 {
-    color: #e5e7eb;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .debug-info pre,
 body.dark-mode .debug-info pre {
-    color: #d1d5db;
+    color: var(--dm-text-muted);
 }

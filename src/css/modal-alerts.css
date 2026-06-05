@@ -152,14 +152,14 @@ html[data-theme='dark'] .alert-modal-body,
 
 html[data-theme='dark'] .alert-modal-button,
 .dark-mode .alert-modal-button {
-    background-color: #333333;
-    color: #e0e0e0;
-    border-color: #404040;
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .alert-modal-button:hover,
 .dark-mode .alert-modal-button:hover {
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .alert-modal-button.primary,

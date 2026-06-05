@@ -193,11 +193,11 @@ if (isset($_GET['oidc_error'])) {
     <meta name="color-scheme" content="dark light">
     <link rel="manifest" href="pwa/manifest.webmanifest">
     <link rel="apple-touch-icon" href="pwa/poznote.png">
-    <script src="js/theme-init.js"></script>
+    <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="pwa/pwa.js" defer></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/login.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
     <link rel="stylesheet" href="css/dark-mode/menus.css">
     <link rel="stylesheet" href="css/dark-mode/editor.css">
@@ -208,7 +208,7 @@ if (isset($_GET['oidc_error'])) {
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body>
     <div class="login-container">

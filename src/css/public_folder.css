@@ -120,20 +120,20 @@
 }
 
 [data-theme="dark"] .password-page-body {
-    --password-bg: #252526;
-    --password-card-bg: #1f1f1f;
-    --password-border: #333333;
-    --password-text: #e0e0e0;
-    --password-muted: #b0b0b0;
+    --password-bg: var(--dm-bg, #252526);
+    --password-card-bg: var(--dm-surface, #333333);
+    --password-border: var(--dm-border, #404040);
+    --password-text: var(--dm-text, #bebebe);
+    --password-muted: var(--dm-text-muted, #c5c5c5);
     --password-accent: #6db3f2;
     --password-accent-hover: #82bdf3;
     --password-shadow: none;
 }
 
 [data-theme="dark"] .password-container input[type="password"] {
-    background: #252526;
-    border-color: #444444;
-    color: #e0e0e0;
+    background: var(--dm-bg, #252526);
+    border-color: var(--dm-border, #404040);
+    color: var(--dm-text, #bebebe);
 }
 
 [data-theme="dark"] .password-container input[type="password"]::placeholder {
@@ -141,7 +141,7 @@
 }
 
 [data-theme="dark"] .password-container .info {
-    background: #252526;
+    background: var(--dm-bg, #252526);
 }
 
 [data-theme="dark"] .password-container .error {
@@ -296,11 +296,11 @@
 }
 
 [data-theme="dark"] .status-page-body {
-    --status-bg: #252526;
-    --status-card-bg: #1f1f1f;
-    --status-card-border: #333333;
-    --status-text: #e0e0e0;
-    --status-muted: #b0b0b0;
+    --status-bg: var(--dm-bg, #252526);
+    --status-card-bg: var(--dm-surface, #333333);
+    --status-card-border: var(--dm-border, #404040);
+    --status-text: var(--dm-text, #bebebe);
+    --status-muted: var(--dm-text-muted, #c5c5c5);
     --status-accent: #6db3f2;
     --status-accent-strong: #6db3f2;
     --status-shadow: none;
@@ -308,7 +308,7 @@
 
 [data-theme="dark"] .status-card-hint,
 [data-theme="dark"] .status-card-action.secondary {
-    background: #252526;
+    background: var(--dm-bg, #252526);
 }
 
 /* Main folder page */
@@ -328,13 +328,13 @@ body.view-kanban .public-folder-body {
 
 [data-theme="dark"] .public-folder-body,
 [data-theme="dark"].public-folder-html {
-    --bg-color: #252526;
-    --text-color: #e0e0e0;
+    --bg-color: var(--dm-bg, #252526);
+    --text-color: var(--dm-text, #bebebe);
     --link-color: #6db3f2;
-    --border-color: #333;
-    --sidebar-bg: #151515;
-    --panel-bg: #1f1f1f;
-    --muted-color: #b0b0b0;
+    --border-color: var(--dm-border, #404040);
+    --sidebar-bg: var(--dm-sidebar-bg, #252526);
+    --panel-bg: var(--dm-surface, #333333);
+    --muted-color: var(--dm-text-muted, #c5c5c5);
     --hover-bg: rgba(255, 255, 255, 0.06);
 }
 
@@ -864,15 +864,15 @@ body.view-kanban .public-folder-body {
 
 /* Dark mode support */
 [data-theme="dark"] {
-    --note-bg: #333333;
-    --text-color: #e0e0e0;
-    --text-muted: #999;
-    --border-color: #444;
+    --note-bg: var(--dm-surface, #333333);
+    --text-color: var(--dm-text, #bebebe);
+    --text-muted: var(--dm-text-muted, #c5c5c5);
+    --border-color: var(--dm-border, #404040);
     --primary-color: #4a9eff;
     --primary-hover: #3a8eef;
-    --button-bg: #3a3a3a;
-    --button-hover-bg: #4a4a4a;
-    --tag-bg: #3a3a3a;
+    --button-bg: var(--dm-surface, #333333);
+    --button-hover-bg: var(--dm-surface-hover, #3a3a3a);
+    --tag-bg: var(--dm-surface, #333333);
 }
 
 [data-theme="light"] {

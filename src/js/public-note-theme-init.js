@@ -11,11 +11,15 @@
         var configEl = document.getElementById('public-note-config');
         var config = configEl ? JSON.parse(configEl.textContent || '{}') : {};
         var theme = config.serverTheme || 'light';
+        var effectiveTheme = theme === 'black' ? 'dark' : theme;
+        var isDark = effectiveTheme === 'dark';
+        var background = theme === 'black' ? '#141821' : '#252526';
         
         var root = document.documentElement;
-        root.setAttribute('data-theme', theme);
-        root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-        root.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
+        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        root.style.backgroundColor = isDark ? background : '#ffffff';
+        root.classList.toggle('theme-black', theme === 'black');
     } catch (e) {
         // Fallback silently
     }

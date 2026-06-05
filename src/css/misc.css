@@ -256,14 +256,14 @@ div[contentEditable=true]:empty:before {
 /* Dark mode styles for create note modal */
 html[data-theme='dark'] .create-note-option,
 body.dark-mode .create-note-option {
-    background-color: #333333;
-    border-color: #444;
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .create-note-option:hover,
 body.dark-mode .create-note-option:hover {
     border-color: #007DB8;
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .create-note-option.selected,

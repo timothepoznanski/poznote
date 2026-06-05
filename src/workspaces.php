@@ -707,7 +707,7 @@ try {
     <?php 
     $cache_v = @file_get_contents('version.txt');
     if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(trim($cache_v));
+    $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
     ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
@@ -906,7 +906,7 @@ try {
     <div class="section-bottom-spacer"></div>
     </div>
 
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="js/modal-alerts.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces.js') ?: time(); ?>"></script>

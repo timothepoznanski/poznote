@@ -259,7 +259,7 @@ span.note-link-broken {
 
 /* Dark mode adjustments */
 [data-theme="dark"] .note-reference-modal-content {
-    background-color: var(--dark-card-bg, #1e1e1e);
+    background-color: var(--dm-content-bg, #252526);
 }
 
 [data-theme="dark"] .note-reference-modal-header h3 {
@@ -275,8 +275,8 @@ span.note-link-broken {
 }
 
 [data-theme="dark"] .note-reference-search-input {
-    background: var(--dark-input-bg, #333333);
-    border-color: var(--dark-border-color, #444);
+    background: var(--dm-surface, #333333);
+    border-color: var(--dm-border, #404040);
     color: var(--dark-text-color, #e0e0e0);
 }
 
@@ -286,8 +286,8 @@ span.note-link-broken {
 }
 
 [data-theme="dark"] .note-reference-search input {
-    background: var(--dark-input-bg, #333333);
-    border-color: var(--dark-border-color, #444);
+    background: var(--dm-surface, #333333);
+    border-color: var(--dm-border, #404040);
     color: var(--dark-text-color, #e0e0e0);
 }
 

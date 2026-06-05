@@ -1,15 +1,42 @@
 /**
  * Theme Manager for Poznote
- * Handles dark mode / light mode / system mode switching
+ * Handles light, dark, black, and system mode switching
  */
 
 (function () {
     'use strict';
 
-    function getForcedTheme() {
-        return window.__poznoteForcedTheme === 'dark' || window.__poznoteForcedTheme === 'light'
-            ? window.__poznoteForcedTheme
+    var palettes = {
+        dark: {
+            contentBg: '#252526',
+            sidebarBg: '#252526',
+            text: '#e0e0e0'
+        },
+        black: {
+            contentBg: '#141821',
+            sidebarBg: '#0b0d12',
+            text: '#d8dee8'
+        }
+    };
+
+    function normalizeThemeMode(theme) {
+        theme = String(theme || '').toLowerCase();
+        return theme === 'black' || theme === 'dark' || theme === 'light' || theme === 'system'
+            ? theme
             : null;
+    }
+
+    function getEffectiveTheme(theme) {
+        return theme === 'black' || theme === 'dark' ? 'dark' : 'light';
+    }
+
+    function getPalette(theme) {
+        return theme === 'black' ? palettes.black : palettes.dark;
+    }
+
+    function getForcedTheme() {
+        var forcedTheme = normalizeThemeMode(window.__poznoteForcedTheme);
+        return forcedTheme && forcedTheme !== 'system' ? forcedTheme : null;
     }
 
     // Initialize theme on page load
@@ -20,24 +47,21 @@
             return;
         }
 
-        var savedTheme = localStorage.getItem('poznote-theme');
-        var themeToApply = savedTheme;
+        var savedTheme = normalizeThemeMode(localStorage.getItem('poznote-theme')) || 'system';
 
-        if (!savedTheme || savedTheme === 'system') {
-            // Use system preference
-            themeToApply = getSystemTheme();
-
+        if (savedTheme === 'system') {
             // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
                 // Only re-apply if no manual preference is set
-                if (!localStorage.getItem('poznote-theme') || localStorage.getItem('poznote-theme') === 'system') {
+                var currentMode = normalizeThemeMode(localStorage.getItem('poznote-theme')) || 'system';
+                if (currentMode === 'system') {
                     applyTheme('system', false);
                 }
             });
         }
 
         // Apply theme
-        applyTheme(savedTheme || 'system', false);
+        applyTheme(savedTheme, false);
     }
 
     // Get system theme preference
@@ -50,7 +74,7 @@
     }
 
     // Apply theme to document
-    // theme: 'light', 'dark', or 'system'
+    // theme: 'light', 'dark', 'black', or 'system'
     // save: boolean, whether to save to localStorage
     function applyTheme(theme, save) {
         var root = document.documentElement;
@@ -60,10 +84,11 @@
             save = false;
         }
 
-        var themeToApply = theme;
+        theme = normalizeThemeMode(theme) || 'system';
+        var selectedTheme = theme;
 
         if (theme === 'system') {
-            themeToApply = getSystemTheme();
+            selectedTheme = getSystemTheme();
             if (save !== false) {
                 localStorage.removeItem('poznote-theme');
             }
@@ -71,21 +96,23 @@
             localStorage.setItem('poznote-theme', theme);
         }
 
-        var normalizedTheme = themeToApply === 'dark' ? 'dark' : 'light';
+        var effectiveTheme = getEffectiveTheme(selectedTheme);
+        var palette = getPalette(selectedTheme);
 
         // Set data-theme on <html> for early CSS
-        root.setAttribute('data-theme', normalizedTheme);
-        root.style.colorScheme = normalizedTheme;
-        root.style.backgroundColor = normalizedTheme === 'dark' ? '#252526' : '#ffffff';
+        root.setAttribute('data-theme', effectiveTheme);
+        root.style.colorScheme = effectiveTheme;
+        root.style.backgroundColor = effectiveTheme === 'dark' ? palette.contentBg : '#ffffff';
 
         // Update theme-dark/theme-light classes for consistency with theme-init.js
-        if (normalizedTheme === 'dark') {
+        if (effectiveTheme === 'dark') {
             root.classList.add('theme-dark');
             root.classList.remove('theme-light');
         } else {
             root.classList.add('theme-light');
             root.classList.remove('theme-dark');
         }
+        root.classList.toggle('theme-black', selectedTheme === 'black');
 
         // Remove critical CSS from theme-init.js if it exists, as it contains !important rules
         // that will interfere with dynamic theme switching
@@ -95,14 +122,17 @@
         }
 
         // Manage body class for compatibility
-        if (normalizedTheme === 'dark') {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
+        if (document.body) {
+            if (effectiveTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+            document.body.classList.toggle('black-mode', selectedTheme === 'black');
         }
 
         // Update toggle button/badge if it exists
-        // We pass the original theme (light, dark, or system) to update UI correctly
+        // We pass the selected mode (light, dark, black, or system) to update UI correctly
         updateThemeUI(theme);
     }
 
@@ -128,6 +158,7 @@
 
         var label = 'system';
         if (mode === 'dark') label = 'dark';
+        if (mode === 'black') label = 'black';
         if (mode === 'light') label = 'light';
 
         if (badge) {
@@ -139,7 +170,7 @@
 
         // Change icon: moon for dark mode, sun for light mode, desktop for system
         if (icon) {
-            if (mode === 'dark') {
+            if (mode === 'dark' || mode === 'black') {
                 icon.className = 'lucide lucide-moon';
             } else if (mode === 'light') {
                 icon.className = 'lucide lucide-sun';
@@ -150,8 +181,7 @@
 
         var publicWorkspaceToggle = document.getElementById('publicWorkspaceThemeToggle');
         if (publicWorkspaceToggle) {
-            var appliedTheme = mode === 'system' ? getSystemTheme() : mode;
-            appliedTheme = appliedTheme === 'dark' ? 'dark' : 'light';
+            var appliedTheme = mode === 'system' ? getSystemTheme() : getEffectiveTheme(mode);
             var publicIcon = publicWorkspaceToggle.querySelector('i');
             if (publicIcon) {
                 publicIcon.className = appliedTheme === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
@@ -164,19 +194,20 @@
         updateThemeUI(getCurrentThemeMode());
     });
 
-    // Get current theme mode (light, dark, or system)
+    // Get current theme mode (light, dark, black, or system)
     function getCurrentThemeMode() {
         var forcedTheme = getForcedTheme();
         if (forcedTheme) return forcedTheme;
 
-        return localStorage.getItem('poznote-theme') || 'system';
+        return normalizeThemeMode(localStorage.getItem('poznote-theme')) || 'system';
     }
 
     // Make functions globally available
     window.toggleTheme = toggleTheme;
     window.getCurrentTheme = function () {
         var mode = getCurrentThemeMode();
-        return mode === 'system' ? getSystemTheme() : mode;
+        var selectedTheme = mode === 'system' ? getSystemTheme() : mode;
+        return getEffectiveTheme(selectedTheme);
     };
     window.getCurrentThemeMode = getCurrentThemeMode;
     window.applyTheme = applyTheme;

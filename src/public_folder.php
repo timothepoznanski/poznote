@@ -101,6 +101,7 @@ try {
         
         if (!isset($_SESSION[$sessionKey]) || $_SESSION[$sessionKey] !== true) {
             $stylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
+            $variablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
             $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>
@@ -111,6 +112,7 @@ try {
                 <meta name="robots" content="noindex, nofollow">
                 <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
                 <script src="<?php echo htmlspecialchars($themeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+                <link rel="stylesheet" href="<?php echo htmlspecialchars($variablesStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
                 <link rel="stylesheet" href="<?php echo htmlspecialchars($stylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             </head>
             <body class="password-page-body">
@@ -268,11 +270,14 @@ try {
 
 // Determine theme
 $theme = 'light';
-if (!empty($row['theme']) && in_array($row['theme'], ['dark', 'light'])) {
+$allowedPublicThemes = ['dark', 'light', 'black'];
+if (!empty($row['theme']) && in_array($row['theme'], $allowedPublicThemes, true)) {
     $theme = $row['theme'];
-} elseif (isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light'])) {
+} elseif (isset($_GET['theme']) && in_array($_GET['theme'], $allowedPublicThemes, true)) {
     $theme = $_GET['theme'];
 }
+$effectiveTheme = $theme === 'black' ? 'dark' : $theme;
+$themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 
 // Build base URL for note links
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
@@ -284,7 +289,7 @@ $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
 $noteBaseUrl = $protocol . '://' . $host;
 ?>
 <!doctype html>
-<html data-theme="<?php echo htmlspecialchars($theme); ?>">
+<html data-theme="<?php echo htmlspecialchars($effectiveTheme); ?>"<?php echo $themeClass; ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -292,8 +297,8 @@ $noteBaseUrl = $protocol . '://' . $host;
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
     <title><?php echo htmlspecialchars($folder['name']); ?></title>
-    <link rel="stylesheet" href="/css/lucide.css">
-    <link rel="stylesheet" href="/css/dark-mode/variables.css">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/lucide.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/dark-mode/variables.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     <link rel="stylesheet" href="/css/dark-mode/layout.css">
     <link rel="stylesheet" href="/css/dark-mode/menus.css">
     <link rel="stylesheet" href="/css/dark-mode/editor.css">
@@ -303,7 +308,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <link rel="stylesheet" href="/css/dark-mode/markdown.css">
     <link rel="stylesheet" href="/css/dark-mode/kanban.css">
     <link rel="stylesheet" href="/css/dark-mode/icons.css">
-    <link rel="stylesheet" href="/css/public_folder.css">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/public_folder.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 </head>
 <body class="public-folder-body" 
       data-txt-no-results="<?php echo t_h('public_folder.no_filter_results', [], 'No results.'); ?>"

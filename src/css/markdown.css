@@ -477,7 +477,7 @@ body.slash-menu-cursor-hidden * {
 
 /* Dark mode adjustment for mermaid container */
 [data-theme='dark'] .mermaid {
-    background-color: #333333;
+    background-color: var(--dm-surface);
 }
 
 /* Math equations styling */
@@ -576,7 +576,7 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
 /* Dark mode border for split view */
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
-    background: var(--dm-bg) !important;
+    background: var(--dm-content-bg) !important;
 }
 
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
@@ -627,7 +627,7 @@ html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-
 body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
 body.dark-mode.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     border-color: var(--dm-border) !important;
-    background: var(--dm-bg) !important;
+    background: var(--dm-content-bg) !important;
 }
 
 /* Scrollbar styling for split view columns */

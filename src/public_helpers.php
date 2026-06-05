@@ -44,7 +44,7 @@ function escapePublicStatusText($text) {
 
 function normalizePublicForcedTheme($theme): ?string {
     $theme = strtolower(trim((string)$theme));
-    return in_array($theme, ['dark', 'light'], true) ? $theme : null;
+    return in_array($theme, ['dark', 'light', 'black'], true) ? $theme : null;
 }
 
 function renderPublicForcedThemeScript($theme): void {
@@ -135,6 +135,7 @@ function renderPublicStatusPage($currentLang, array $options = []) {
     http_response_code($options['status'] ?? 403);
 
     $statusStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
+    $statusVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
     $themeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
     $title = $options['title'] ?? t_h('common.error', [], 'Error', $currentLang);
     $message = $options['message'] ?? '';
@@ -151,6 +152,7 @@ function renderPublicStatusPage($currentLang, array $options = []) {
         <title><?php echo escapePublicStatusText($title); ?> - Poznote</title>
         <?php renderPublicForcedThemeScript($forcedTheme); ?>
         <script src="<?php echo htmlspecialchars($themeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+        <link rel="stylesheet" href="<?php echo htmlspecialchars($statusVariablesStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
         <link rel="stylesheet" href="<?php echo htmlspecialchars($statusStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     </head>
     <body class="status-page-body">

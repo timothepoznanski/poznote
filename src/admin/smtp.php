@@ -22,7 +22,7 @@ require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../ReminderEmailService.php';
 require_once __DIR__ . '/../version_helper.php';
 
-$v = getAppVersion();
+$v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());
 $service = new ReminderEmailService();

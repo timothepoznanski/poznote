@@ -10,7 +10,7 @@
 
 html[data-theme='dark'] .settings-container,
 body.dark-mode .settings-container {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
@@ -78,19 +78,19 @@ body.dark-mode .settings-section .btn:enabled {
 
 html[data-theme='dark'] .info-container,
 body.dark-mode .info-container {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .info-label,
 body.dark-mode .info-label {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .info-value,
 body.dark-mode .info-value {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
@@ -189,19 +189,19 @@ body.dark-mode .workspace-item:hover {
 
 html[data-theme='dark'] .trash-container,
 body.dark-mode .trash-container {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .trash-header,
 body.dark-mode .trash-header {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .trash-innernote,
 body.dark-mode .trash-innernote {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
@@ -257,7 +257,7 @@ body.dark-mode .attachment-link:hover {
 
 html[data-theme='dark'] .attachments-display,
 body.dark-mode .attachments-display {
-    background: var(--dm-bg);
+    background: var(--dm-content-bg);
     border-color: var(--dm-border);
 }
 
@@ -309,7 +309,7 @@ body.dark-mode .attachment-size {
 
 html[data-theme='dark'] .backup-container,
 body.dark-mode .backup-container {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
@@ -418,7 +418,7 @@ body.dark-mode .backup-section input[type="file"]::file-selector-button:hover {
 /* Card containers (backup/export) */
 html[data-theme='dark'] .card-container,
 body.dark-mode .card-container {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     border-color: var(--dm-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
@@ -462,7 +462,7 @@ body.dark-mode .card-header p {
 
 html[data-theme='dark'] .card-content,
 body.dark-mode .card-content {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .sub-card,

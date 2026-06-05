@@ -158,13 +158,13 @@
 
 /* Dark mode adjustments */
 [data-theme="dark"] .search-replace-bar {
-    background: var(--dark-background-secondary, #333333);
-    border-bottom-color: var(--dark-border-color, #444);
+    background: var(--dm-surface, #333333);
+    border-bottom-color: var(--dm-border, #404040);
 }
 
 [data-theme="dark"] .search-replace-input {
-    background: var(--dark-input-bg, #252526);
-    border-color: var(--dark-border-color, #444);
+    background: var(--dm-bg, #252526);
+    border-color: var(--dm-border, #404040);
     color: var(--dark-text-color, #e0e0e0);
 }
 
@@ -225,4 +225,3 @@
         font-size: 11px;
     }
 }
-

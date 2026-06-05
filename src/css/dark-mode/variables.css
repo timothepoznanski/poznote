@@ -7,16 +7,47 @@ body.dark-mode {
     --dm-text: #bebebe;
     --dm-text-muted: #c5c5c5;
     --dm-bg: #252526;
+    --dm-content-bg: #252526;
+    --dm-sidebar-bg: #252526;
+    --dm-sidebar-surface: #333333;
     --dm-surface: #333333;
+    --dm-surface-hover: #3a3a3a;
     --dm-border: #404040;
     --dm-border-light: #555555;
     --dm-accent: #4a9eff;
+    --dm-active: #1e3a5f;
+    --dm-code-bg: #262424;
+    --dm-tabbar-bg: #1e1e1e;
+    --dm-tab-bg: #252525;
+    --dm-tab-hover-bg: #2e2e2e;
+    --dm-tab-active-bg: #383838;
+}
+
+html.theme-black[data-theme='dark'],
+body.black-mode {
+    --dm-text: #c0c8d4;
+    --dm-text-muted: #9ba6b5;
+    --dm-bg: #0f1117;
+    --dm-content-bg: #141821;
+    --dm-sidebar-bg: #0b0d12;
+    --dm-sidebar-surface: #12151c;
+    --dm-surface: #171a21;
+    --dm-surface-hover: #202532;
+    --dm-border: #252b35;
+    --dm-border-light: #394150;
+    --dm-accent: #5f94f7;
+    --dm-active: #15243a;
+    --dm-code-bg: #090b10;
+    --dm-tabbar-bg: var(--dm-sidebar-bg);
+    --dm-tab-bg: var(--dm-sidebar-surface);
+    --dm-tab-hover-bg: var(--dm-surface);
+    --dm-tab-active-bg: var(--dm-content-bg);
 }
 
 /* Apply dark background as early as possible */
 html[data-theme='dark'],
 body.dark-mode {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 

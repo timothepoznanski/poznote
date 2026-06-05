@@ -181,8 +181,8 @@ div[onclick*="openExcalidrawNote"] {
 
 /* Dark mode styles */
 [data-theme="dark"] .excalidraw-toolbar {
-    background: var(--bg-primary, #252526);
-    border-bottom-color: var(--border-color, #333333);
+    background: var(--dm-bg, #252526);
+    border-bottom-color: var(--dm-border, #404040);
 }
 
 [data-theme="dark"] .excalidraw-toolbar h3 {
@@ -190,19 +190,19 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn {
-    background: var(--bg-secondary, #333333);
-    border-color: var(--border-color, #444444);
+    background: var(--dm-surface, #333333);
+    border-color: var(--dm-border, #404040);
     color: var(--text-primary, #e0e0e0);
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn:hover {
-    background: var(--bg-hover, #353535);
-    border-color: var(--border-hover, #555555);
+    background: var(--dm-surface-hover, #3a3a3a);
+    border-color: var(--dm-border-light, #555555);
 }
 
 [data-theme="dark"] .excalidraw-preview-container {
-    border-color: var(--border-color, #333333);
-    background: var(--bg-secondary, #333333);
+    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, #333333);
 }
 
 /* Mobile responsive */
@@ -276,8 +276,8 @@ div[onclick*="openExcalidrawNote"] {
     /* Dark mode adjustments for mobile */
     [data-theme="dark"] .excalidraw-toolbar,
     [data-theme="dark"] div[style*="justify-content: space-between"][style*="align-items: center"] {
-        background: #252526 !important;
-        border-bottom-color: #333333 !important;
+        background: var(--dm-bg, #252526) !important;
+        border-bottom-color: var(--dm-border, #404040) !important;
     }
 }
 
@@ -691,6 +691,4 @@ html[data-theme='dark'] #app * {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
 }
-
-
 

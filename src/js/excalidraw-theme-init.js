@@ -7,8 +7,14 @@
     
     try {
         var theme = localStorage.getItem('poznote-theme') || 'light';
-        document.documentElement.setAttribute('data-theme', theme);
-        document.documentElement.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
+        if (theme === 'system') {
+            theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        var effectiveTheme = theme === 'black' ? 'dark' : theme;
+        var background = theme === 'black' ? '#141821' : '#252526';
+        document.documentElement.setAttribute('data-theme', effectiveTheme === 'dark' ? 'dark' : 'light');
+        document.documentElement.classList.toggle('theme-black', theme === 'black');
+        document.documentElement.style.backgroundColor = effectiveTheme === 'dark' ? background : '#ffffff';
     } catch (e) {
         // Fallback silently
     }

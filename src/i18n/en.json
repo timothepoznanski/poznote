@@ -891,6 +891,7 @@
   },
   "theme": {
     "badge": {
+      "black": "black mode",
       "dark": "dark mode",
       "light": "light mode",
       "system": "system mode"

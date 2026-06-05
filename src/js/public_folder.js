@@ -5,6 +5,7 @@ function toggleTheme() {
     var current = html.getAttribute('data-theme');
     var next = current === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-theme', next);
+    html.classList.remove('theme-black');
     var icon = document.getElementById('themeIcon');
     if (icon) {
         icon.className = next === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';

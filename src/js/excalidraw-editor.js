@@ -154,7 +154,11 @@
 
     function getTheme() {
         try {
-            return localStorage.getItem('poznote-theme') || 'light';
+            var theme = localStorage.getItem('poznote-theme') || 'light';
+            if (theme === 'system') {
+                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+            }
+            return theme === 'black' ? 'dark' : theme;
         } catch (e) {
             return 'light';
         }

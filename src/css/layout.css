@@ -187,6 +187,12 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     box-sizing: border-box;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#right_col::-webkit-scrollbar {
+    display: none;
 }
 
 /* Toggle sidebar and collapsed state */

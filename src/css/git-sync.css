@@ -404,8 +404,8 @@ body.git-sync-page {
 
 /* Dark Mode */
 body.dark-mode .git-sync-section {
-    background: #252526;
-    border: 1px solid #333;
+    background: var(--dm-bg);
+    border: 1px solid var(--dm-border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -418,7 +418,7 @@ body.dark-mode .git-sync-description {
 }
 
 body.dark-mode .config-item {
-    border-color: #333;
+    border-color: var(--dm-border);
 }
 
 body.dark-mode .config-label {
@@ -439,20 +439,20 @@ body.dark-mode .git-field-label {
 }
 
 body.dark-mode .git-field-input {
-    background: #2a2a2e;
-    border-color: #3f3f46;
-    color: #e5e7eb;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 body.dark-mode .git-field-input:focus {
-    background: #1f1f23;
+    background: var(--dm-surface-hover);
     border-color: #007cba;
     box-shadow: none;
 }
 
 body.dark-mode .git-field-input[readonly]:focus {
-    background: #2a2a2e;
-    border-color: #3f3f46;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
     box-shadow: none;
 }
 
@@ -484,9 +484,9 @@ body.dark-mode .form-group label {
 }
 
 body.dark-mode .form-group select {
-    background: #333333;
-    border-color: #444;
-    color: #e0e0e0;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 body.dark-mode .form-group select:focus {
@@ -712,7 +712,7 @@ body.dark-mode .auto-sync-settings h4 {
 }
 
 body.dark-mode .form-check {
-    background: #1e1e1e;
+    background: var(--dm-surface);
 }
 
 .check-label {

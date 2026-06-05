@@ -162,8 +162,8 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, interactive-widget=resizes-content"/>
     <title><?php echo getPageTitle(); ?></title>
     <?php 
-    // Cache version based on app version to force reload on updates
-    $v = getAppVersion();
+    // Cache version based on app version plus theme assets to force reload on theme changes
+    $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     ?>
     <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">

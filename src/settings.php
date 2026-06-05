@@ -43,7 +43,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
     if (empty($_SESSION['settings_password_authenticated'])) {
         $spCacheV = @file_get_contents('version.txt');
         if ($spCacheV === false) { $spCacheV = time(); }
-        $spCacheV = urlencode(trim($spCacheV));
+        $spCacheV = urlencode(poznoteBuildAssetCacheVersion(trim($spCacheV)));
         ?>
         <!doctype html>
         <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -53,6 +53,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
             <title><?php echo t_h('settings_password.title', [], 'Settings Protected', $currentLang); ?></title>
             <meta name="color-scheme" content="dark light">
             <script src="js/theme-init.js?v=<?php echo $spCacheV; ?>"></script>
+            <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $spCacheV; ?>">
             <link rel="stylesheet" href="css/public_folder.css?v=<?php echo $spCacheV; ?>">
         </head>
         <body class="password-page-body">
@@ -79,7 +80,7 @@ $cache_v = @file_get_contents('version.txt');
 if ($cache_v === false) {
     $cache_v = time();
 }
-$cache_v = urlencode(trim($cache_v));
+$cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 
 $app_version_display = trim(@file_get_contents('version.txt') ?: 'Unknown');
 $app_version_display = htmlspecialchars($app_version_display, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -610,7 +611,7 @@ if ($isAdmin) {
 
     <?php include 'modals.php'; ?>
     <script src="js/modal-alerts.js"></script>
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js"></script>
     <script src="js/utils.js"></script>
