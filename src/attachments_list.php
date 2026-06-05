@@ -53,9 +53,6 @@ $currentLang = getUserLanguage();
 			</button>
 		</div>
 
-		<div class="attachments-inline-notice">
-			<?php echo t_h('attachments.page.inline_images_hidden_notice', [], 'Images inserted directly in the note content are still stored as attachments, but they are hidden here to avoid ambiguity.'); ?>
-		</div>
 		
 		<div class="shared-filter-bar attachments-filter-bar">
 			<div class="filter-input-wrapper">

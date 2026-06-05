@@ -148,6 +148,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/info.css?v=<?php echo filemtime(__DIR__ . '/css/info.css'); ?>">
+    <link rel="stylesheet" href="css/home/buttons.css">
     <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
@@ -165,8 +166,9 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     
     <div class="info-page">
         <div class="info-buttons-back-container">
-            <button id="backToNoteBtn" class="btn btn-secondary" title="<?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>">
-                <?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>
+            <button id="backToNoteBtn" class="btn btn-secondary go-to-nav-btn" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
+                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </button>
         </div>
         

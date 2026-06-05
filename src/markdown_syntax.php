@@ -395,6 +395,7 @@ $examples = [
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/info.css">
+    <link rel="stylesheet" href="css/home/buttons.css">
     <link rel="stylesheet" href="css/markdown-syntax.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/pages.css">
@@ -403,7 +404,8 @@ $examples = [
 <body>
     <div class="info-page markdown-syntax-page">
         <div class="info-buttons-back-container">
-            <a class="btn btn-secondary" href="<?php echo htmlspecialchars($backUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
+            <a class="btn btn-secondary go-to-nav-btn" href="<?php echo htmlspecialchars($backUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </a>
         </div>

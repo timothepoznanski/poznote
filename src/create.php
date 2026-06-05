@@ -62,8 +62,9 @@ $currentLang = getUserLanguage();
 <body class="home-page" 
     data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="home-container">
-        <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary btn-toolbar-size">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </a>
         </div>

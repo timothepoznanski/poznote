@@ -56,6 +56,7 @@ if (!$note) {
     <link rel="stylesheet" href="css/attachments/upload.css">
     <link rel="stylesheet" href="css/attachments/display.css">
     <link rel="stylesheet" href="css/attachments/buttons-alerts.css">
+    <link rel="stylesheet" href="css/home/buttons.css">
     <link rel="stylesheet" href="css/attachments/preview-modal.css">
     <link rel="stylesheet" href="css/attachments/responsive.css">
     <link rel="stylesheet" href="css/modals/base.css">
@@ -173,13 +174,14 @@ if (!$note) {
             }
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
-        <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_notes'); ?>
-        </a>
-
-        <div class="attachments-inline-notice">
-            <?php echo t_h('attachments.page.inline_images_hidden_notice', [], 'Images inserted directly in the note content are still stored as attachments, but they are hidden here to avoid ambiguity.'); ?>
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
+                <?php echo t_h('common.back_to_notes'); ?>
+            </a>
         </div>
+
+        <br>
 
         <!-- Upload Section -->
         <div class="settings-section">

@@ -4,6 +4,24 @@
  * Button styles, alert messages, warning boxes, and spin animation.
  */
 
+/* Go-to navigation button (matches settings.php style) */
+.go-to-nav-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    line-height: 1.4;
+    min-width: auto;
+    min-height: auto;
+}
+
 /* Button styles */
 .btn {
     padding: 12px 25px;
