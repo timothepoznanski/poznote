@@ -3,6 +3,7 @@
  * SettingsController - RESTful API controller for app settings
  * 
  * Endpoints:
+ *   GET  /api/v1/settings         - Get setting values, optionally filtered with ?keys=a,b
  *   GET  /api/v1/settings/{key}   - Get a setting value
  *   PUT  /api/v1/settings/{key}   - Set a setting value
  */
@@ -38,6 +39,32 @@ class SettingsController {
 
     private function isGlobalSetting(string $key): bool {
         return in_array($key, $this->globalSettings, true);
+    }
+
+    private function getRequestedKeys(): ?array {
+        if (!array_key_exists('keys', $_GET) || $_GET['keys'] === '') {
+            return null;
+        }
+
+        $rawKeys = $_GET['keys'];
+        if (!is_array($rawKeys)) {
+            $rawKeys = explode(',', (string) $rawKeys);
+        }
+
+        $keys = [];
+        foreach ($rawKeys as $rawKey) {
+            $key = trim(urldecode((string) $rawKey));
+            if ($key === '') {
+                continue;
+            }
+
+            $keys[$key] = true;
+            if (count($keys) > 200) {
+                throw new InvalidArgumentException('too many setting keys requested', 400);
+            }
+        }
+
+        return array_keys($keys);
     }
 
     private function requireGlobalSettingsAdmin(): void {
@@ -180,6 +207,126 @@ class SettingsController {
         }
 
         return is_string($value) ? $value : (string) $value;
+    }
+
+    private function loadUserSettings(?array $keys): array {
+        if (!$this->con) {
+            throw new Exception('Database connection not available');
+        }
+
+        $settings = [];
+
+        if ($keys === null) {
+            $stmt = $this->con->query('SELECT key, value FROM settings');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $settings[$row['key']] = $row['value'];
+            }
+            return $settings;
+        }
+
+        if (empty($keys)) {
+            return [];
+        }
+
+        foreach ($keys as $key) {
+            $settings[$key] = '';
+        }
+
+        $placeholders = implode(',', array_fill(0, count($keys), '?'));
+        $stmt = $this->con->prepare("SELECT key, value FROM settings WHERE key IN ($placeholders)");
+        $stmt->execute($keys);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $settings[$row['key']] = $row['value'];
+        }
+
+        return $settings;
+    }
+
+    private function loadGlobalSettings(?array $keys): array {
+        $this->requireGlobalSettingsAdmin();
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+
+        $settings = [];
+        $masterCon = getMasterConnection();
+
+        if ($keys === null) {
+            $keys = $this->globalSettings;
+        }
+
+        if (empty($keys)) {
+            return [];
+        }
+
+        foreach ($keys as $key) {
+            $settings[$key] = '';
+        }
+
+        $placeholders = implode(',', array_fill(0, count($keys), '?'));
+        $stmt = $masterCon->prepare("SELECT key, value FROM global_settings WHERE key IN ($placeholders)");
+        $stmt->execute($keys);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $value = $row['value'];
+            if ($row['key'] === 'smtp_password' && $value !== '') {
+                $value = '';
+            }
+            $settings[$row['key']] = $value;
+        }
+
+        return $settings;
+    }
+
+    /**
+     * GET /api/v1/settings
+     * Get setting values. Optional query: ?keys=key1,key2 or repeated keys[].
+     */
+    public function index() {
+        try {
+            $this->requireActiveAccountOwner();
+            $requestedKeys = $this->getRequestedKeys();
+
+            if ($requestedKeys === null) {
+                $settings = $this->loadUserSettings(null);
+                if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+                    $settings = array_merge($settings, $this->loadGlobalSettings(null));
+                }
+
+                echo json_encode(['success' => true, 'settings' => $settings]);
+                return;
+            }
+
+            $userKeys = [];
+            $globalKeys = [];
+            foreach ($requestedKeys as $key) {
+                if ($this->isGlobalSetting($key)) {
+                    $globalKeys[] = $key;
+                } else {
+                    $userKeys[] = $key;
+                }
+            }
+
+            $loaded = [];
+            if (!empty($userKeys)) {
+                $loaded = array_merge($loaded, $this->loadUserSettings($userKeys));
+            }
+            if (!empty($globalKeys)) {
+                $loaded = array_merge($loaded, $this->loadGlobalSettings($globalKeys));
+            }
+
+            $settings = [];
+            foreach ($requestedKeys as $key) {
+                $settings[$key] = $loaded[$key] ?? '';
+            }
+
+            echo json_encode(['success' => true, 'settings' => $settings]);
+        } catch (Exception $e) {
+            error_log('SettingsController::index error: ' . $e->getMessage());
+            $statusCode = (int) $e->getCode();
+            if ($statusCode < 400 || $statusCode > 599) {
+                $statusCode = 500;
+            }
+            http_response_code($statusCode);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
     
     /**

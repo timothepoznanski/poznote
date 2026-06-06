@@ -6,12 +6,46 @@
     'use strict';
 
     const tr = window.t || function (key, vars, fallback) { return fallback || key; };
+    var passwordStatusCache = null;
 
     // ========== Password Status Badge ==========
 
-    function refreshPasswordStatusBadge() {
+    function seedPasswordStatusFromPageConfig() {
+        if (passwordStatusCache !== null || typeof window.getPoznotePageConfig !== 'function') {
+            return passwordStatusCache !== null;
+        }
+
+        var config = window.getPoznotePageConfig();
+        if (config && config.passwordStatus && typeof config.passwordStatus === 'object') {
+            passwordStatusCache = config.passwordStatus;
+            return true;
+        }
+
+        return false;
+    }
+
+    function renderPasswordStatusBadge(data) {
         var badge = document.getElementById('password-status-badge');
         if (!badge) return;
+
+        if (data && data.has_custom_password) {
+            badge.textContent = tr('password.status.custom', {}, 'Custom password');
+            badge.className = 'setting-status enabled';
+        } else {
+            badge.textContent = tr('password.status.default', {}, 'Default');
+            badge.className = 'setting-status disabled';
+        }
+    }
+
+    function refreshPasswordStatusBadge(options) {
+        var forceFetch = options && options.forceFetch;
+        var badge = document.getElementById('password-status-badge');
+        if (!badge) return;
+
+        if (!forceFetch && seedPasswordStatusFromPageConfig()) {
+            renderPasswordStatusBadge(passwordStatusCache);
+            return;
+        }
 
         fetch('/api/v1/users/me/password-status', {
             method: 'GET',
@@ -20,13 +54,8 @@
         })
             .then(function (r) { return r.json(); })
             .then(function (data) {
-                if (data && data.has_custom_password) {
-                    badge.textContent = tr('password.status.custom', {}, 'Custom password');
-                    badge.className = 'setting-status enabled';
-                } else {
-                    badge.textContent = tr('password.status.default', {}, 'Default');
-                    badge.className = 'setting-status disabled';
-                }
+                passwordStatusCache = data || { has_custom_password: false };
+                renderPasswordStatusBadge(passwordStatusCache);
             })
             .catch(function () {
                 badge.textContent = '';
@@ -168,7 +197,7 @@
                 if (result.data.success) {
                     var modal = document.getElementById('changePasswordModal');
                     if (modal) modal.style.display = 'none';
-                    refreshPasswordStatusBadge();
+                    refreshPasswordStatusBadge({ forceFetch: true });
                 } else {
                     var msg = result.data.error || tr('common.error', {}, 'Error');
                     // Translate known error messages
