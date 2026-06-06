@@ -82,15 +82,20 @@
         if (!themeToggle) return;
         const icon = themeToggle.querySelector('i');
         if (icon) {
-            icon.className = theme === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
+            const effectiveTheme = theme === 'black' ? 'dark' : theme;
+            icon.className = effectiveTheme === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
         }
     }
 
     function setTheme(theme, options) {
         options = options || {};
-        root.setAttribute('data-theme', theme);
-        root.style.colorScheme = theme === 'dark' ? 'dark' : 'light';
-        root.style.backgroundColor = theme === 'dark' ? '#252526' : '#ffffff';
+        const effectiveTheme = theme === 'black' ? 'dark' : theme;
+        const isDark = effectiveTheme === 'dark';
+        const background = theme === 'black' ? '#141821' : '#252526';
+        root.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        root.style.colorScheme = isDark ? 'dark' : 'light';
+        root.style.backgroundColor = isDark ? background : '#ffffff';
+        root.classList.toggle('theme-black', theme === 'black');
 
         try {
             localStorage.setItem('poznote-public-theme', theme);
@@ -125,9 +130,11 @@
     // Check localStorage on page load (visitor preference overrides server theme)
     try {
         const savedTheme = localStorage.getItem('poznote-public-theme');
-        if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
+        if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light' || savedTheme === 'black')) {
             const serverTheme = root.getAttribute('data-theme');
-            if (savedTheme !== serverTheme) {
+            const savedEffectiveTheme = savedTheme === 'black' ? 'dark' : savedTheme;
+            const savedIsBlack = savedTheme === 'black';
+            if (savedEffectiveTheme !== serverTheme || savedIsBlack !== root.classList.contains('theme-black')) {
                 setTheme(savedTheme, { rerenderMermaid: false });
             } else {
                 updateThemeIcon(savedTheme);

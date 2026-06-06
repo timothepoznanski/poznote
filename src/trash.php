@@ -70,7 +70,7 @@ $currentLang = getUserLanguage();
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
+    <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link type="text/css" rel="stylesheet" href="css/lucide.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
@@ -86,7 +86,7 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
     <link type="text/css" rel="stylesheet" href="css/code-blocks.css"/>
     <link type="text/css" rel="stylesheet" href="css/syntax-highlight.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
@@ -96,7 +96,7 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">
     <div class="trash-container">

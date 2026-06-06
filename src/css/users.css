@@ -16,12 +16,12 @@
 
 html[data-theme='dark'],
 body.dark-mode {
-    --bg-color: #252526;
-    --bg-secondary: #333333;
-    --bg-hover: #333333;
-    --text-color: #e0e0e0;
-    --text-muted: #a0a0a0;
-    --border-color: #333;
+    --bg-color: var(--dm-bg);
+    --bg-secondary: var(--dm-surface);
+    --bg-hover: var(--dm-surface-hover);
+    --text-color: var(--dm-text);
+    --text-muted: var(--dm-text-muted);
+    --border-color: var(--dm-border);
 }
 
 .admin-container {

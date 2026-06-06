@@ -501,7 +501,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <title><?php echo getPageTitle(); ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
+    <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/backup_export.css">
     <link rel="stylesheet" href="css/modals/base.css">
@@ -511,7 +511,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <link rel="stylesheet" href="css/modals/share-modal.css">
     <link rel="stylesheet" href="css/modals/alerts-utilities.css">
     <link rel="stylesheet" href="css/modals/responsive.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
     <link rel="stylesheet" href="css/dark-mode/menus.css">
     <link rel="stylesheet" href="css/dark-mode/editor.css">
@@ -522,7 +522,7 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
     <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <div class="backup-container">

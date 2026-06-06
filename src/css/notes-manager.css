@@ -204,14 +204,14 @@ body.dark-mode .nm-bulk-select option {
 /* ── Dark Mode Overrides ────────────────────────────────────────────── */
 :root[data-theme='dark'],
 body.dark-mode {
-    --bg-color: var(--dm-bg, #1e1e1e);
+    --bg-color: var(--dm-bg, #252526);
     --text-color: var(--dm-text, #e3e3e3);
     --border-color: var(--dm-border, #404040);
-    --border-color-light: #333333;
-    --input-bg: #2d2d2d;
-    --folder-header-bg: #2d2d2d;
-    --folder-header-hover: #383838;
-    --row-hover-bg: #2a2a2a;
+    --border-color-light: var(--dm-border);
+    --input-bg: var(--dm-surface);
+    --folder-header-bg: var(--dm-surface);
+    --folder-header-hover: var(--dm-surface-hover);
+    --row-hover-bg: var(--dm-surface-hover);
     --row-selected-bg: rgba(148, 163, 184, 0.12);
     --bulk-bar-bg: #1f2937;
     --bulk-bar-border: #334155;
@@ -239,12 +239,12 @@ body.dark-mode .nm-note-link {
 }
 
 body.dark-mode .nm-tag-chip {
-    background: #3a3a3a;
-    color: #aaa;
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
 }
 
 body.dark-mode .nm-folder-option:hover {
-    background: #374151;
+    background: var(--dm-surface-hover);
 }
 
 body.dark-mode .nm-folder-option-selected {

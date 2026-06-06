@@ -386,7 +386,7 @@ try {
     <?php 
     $cache_v = @file_get_contents('version.txt');
     if ($cache_v === false) $cache_v = time();
-    $cache_v = urlencode(trim($cache_v));
+    $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
     ?>
     <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">

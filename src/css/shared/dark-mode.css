@@ -5,8 +5,8 @@
  */
 
 [data-theme="dark"] body.shared-page {
-    background-color: #252526;
-    color: #e0e0e0;
+    background-color: var(--dm-content-bg);
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .shared-info {
@@ -15,24 +15,24 @@
 }
 
 [data-theme="dark"] .shared-notes-table {
-    background-color: #333333;
+    background-color: var(--dm-surface);
 }
 
 [data-theme="dark"] .shared-notes-table thead {
-    background-color: #333333;
+    background-color: var(--dm-surface);
 }
 
 [data-theme="dark"] .shared-notes-table th {
-    color: #e0e0e0;
-    border-bottom-color: #444444;
+    color: var(--dm-text);
+    border-bottom-color: var(--dm-border);
 }
 
 [data-theme="dark"] .shared-notes-table td {
-    border-bottom-color: #444444;
+    border-bottom-color: var(--dm-border);
 }
 
 [data-theme="dark"] .shared-notes-table tbody tr:hover {
-    background-color: #333333;
+    background-color: var(--dm-surface-hover);
 }
 
 [data-theme="dark"] .note-link {
@@ -40,21 +40,21 @@
 }
 
 [data-theme="dark"] .url-input {
-    background-color: #333333;
-    border-color: #444444;
-    color: #e0e0e0;
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .modal-content {
-    background-color: #333333;
+    background-color: var(--dm-content-bg);
 }
 
 [data-theme="dark"] .modal-header {
-    border-bottom-color: #444444;
+    border-bottom-color: var(--dm-border);
 }
 
 [data-theme="dark"] .modal-footer {
-    border-top-color: #444444;
+    border-top-color: var(--dm-border);
 }
 
 [data-theme="dark"] .error-message {
@@ -64,7 +64,7 @@
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar {
-    background-color: #333333 !important;
+    background-color: var(--dm-surface) !important;
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb {
@@ -76,7 +76,7 @@
 }
 
 [data-theme="dark"] .indexable-toggle-label {
-    color: #e0e0e0;
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .shared-note-item {
@@ -204,9 +204,9 @@
 
 /* Type filter buttons - dark mode */
 [data-theme="dark"] .filter-type-btn {
-    background: #333333;
-    color: #b0b0b0;
-    border-color: #555555;
+    background: var(--dm-surface);
+    color: var(--dm-text-muted);
+    border-color: var(--dm-border);
 }
 
 [data-theme="dark"] .filter-type-btn:hover {

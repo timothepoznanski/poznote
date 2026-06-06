@@ -1,14 +1,49 @@
 // Public Folder Theme Toggle
 
+var PUBLIC_THEME_STORAGE_KEY = 'poznote-public-theme';
+
+function normalizePublicTheme(theme) {
+    theme = String(theme || '').toLowerCase();
+    return theme === 'dark' || theme === 'light' || theme === 'black' ? theme : null;
+}
+
+function applyPublicTheme(theme, save) {
+    theme = normalizePublicTheme(theme) || 'light';
+
+    var html = document.documentElement;
+    var effectiveTheme = theme === 'black' ? 'dark' : theme;
+    var isDark = effectiveTheme === 'dark';
+    var background = theme === 'black' ? '#141821' : '#252526';
+
+    html.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    html.style.colorScheme = isDark ? 'dark' : 'light';
+    html.style.backgroundColor = isDark ? background : '#ffffff';
+    html.classList.toggle('theme-black', theme === 'black');
+
+    if (save) {
+        try {
+            localStorage.setItem(PUBLIC_THEME_STORAGE_KEY, theme);
+        } catch (e) {
+            // localStorage not available
+        }
+    }
+
+    updateThemeIcon(theme);
+}
+
+function updateThemeIcon(theme) {
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+        var effectiveTheme = theme === 'black' ? 'dark' : theme;
+        icon.className = effectiveTheme === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
+    }
+}
+
 function toggleTheme() {
     var html = document.documentElement;
     var current = html.getAttribute('data-theme');
     var next = current === 'dark' ? 'light' : 'dark';
-    html.setAttribute('data-theme', next);
-    var icon = document.getElementById('themeIcon');
-    if (icon) {
-        icon.className = next === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
-    }
+    applyPublicTheme(next, true);
 }
 
 // Public Folder View Toggle
@@ -128,9 +163,18 @@ function applyFilter() {
 
 document.addEventListener('DOMContentLoaded', function() {
     var html = document.documentElement;
-    var icon = document.getElementById('themeIcon');
-    if (icon && html.getAttribute('data-theme') === 'dark') {
-        icon.className = 'lucide lucide-sun';
+    var savedTheme = null;
+
+    try {
+        savedTheme = normalizePublicTheme(localStorage.getItem(PUBLIC_THEME_STORAGE_KEY));
+    } catch (e) {
+        savedTheme = null;
+    }
+
+    if (savedTheme) {
+        applyPublicTheme(savedTheme, false);
+    } else {
+        updateThemeIcon(html.classList.contains('theme-black') ? 'black' : html.getAttribute('data-theme'));
     }
 
     var filterInput = document.getElementById('folderFilterInput');

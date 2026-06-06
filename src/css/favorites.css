@@ -230,8 +230,8 @@ body.favorites-page {
 
 /* Dark mode */
 [data-theme="dark"] body.favorites-page {
-    background-color: #252526;
-    color: #e0e0e0;
+    background-color: var(--dm-content-bg);
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .note-name {
@@ -239,14 +239,14 @@ body.favorites-page {
 }
 
 [data-theme="dark"] .folder-badge {
-    background-color: #333;
-    color: #aaa;
+    background-color: var(--dm-surface);
+    color: var(--dm-text-muted);
 }
 
 [data-theme="dark"] .filter-input {
-    background-color: #333333;
-    border-color: #444;
-    color: #e0e0e0;
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 [data-theme="dark"] .filter-stats {

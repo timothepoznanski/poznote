@@ -498,7 +498,7 @@ Create a public share link for a note.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `theme` | string | Display theme: `light` or `dark` |
+| `theme` | string | Display theme: `light`, `dark`, or `black` |
 | `indexable` | boolean | Allow search engine indexing |
 | `password` | string | Optional password protection |
 | `custom_token` | string | Custom URL token (slug) |
@@ -615,7 +615,7 @@ Share a folder. All notes in the folder will also be shared.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `theme` | string | Display theme: `light` or `dark` |
+| `theme` | string | Display theme: `light`, `dark`, or `black` |
 | `indexable` | integer | Allow indexing (`0` or `1`) |
 | `password` | string | Optional password protection |
 | `custom_token` | string | Custom URL slug |

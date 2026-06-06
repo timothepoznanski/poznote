@@ -1302,6 +1302,7 @@
   },
   "theme": {
     "badge": {
+      "black": "黑色模式",
       "dark": "深色模式",
       "light": "浅色模式",
       "system": "系统模式"

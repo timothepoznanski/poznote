@@ -473,25 +473,25 @@ input[type="password"]::placeholder {
    ============================================ */
 
 html[data-theme='dark'] body {
-    background-color: #252526;
-    color: #e0e0e0;
+    background-color: var(--dm-bg);
+    color: var(--dm-text);
     --text-muted: #a0aec0;
 }
 
 html[data-theme='dark'] .login-title {
-    color: #e0e0e0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] label,
 html[data-theme='dark'] .remember-me-label {
-    color: #e0e0e0;
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] input[type="text"],
 html[data-theme='dark'] input[type="password"] {
-    background-color: #333333;
-    border-color: #404040;
-    color: #e0e0e0;
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .password-toggle {
@@ -542,14 +542,14 @@ html[data-theme='dark'] .account-select-logout:hover {
 }
 
 html[data-theme='dark'] .account-option {
-    background: #333333;
-    border-color: #404040;
-    color: #e0e0e0;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .account-option:hover,
 html[data-theme='dark'] .account-option:focus {
-    background: #3a3a3a;
+    background: var(--dm-surface-hover);
     border-color: #4a9eff;
 }
 
@@ -559,8 +559,8 @@ html[data-theme='dark'] .account-option-badge {
 }
 
 html[data-theme='dark'] .language-select option {
-    background: #333333;
-    color: #e0e0e0;
+    background: var(--dm-surface);
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .oidc-divider::before,
@@ -570,7 +570,7 @@ html[data-theme='dark'] .oidc-divider::after {
 
 html[data-theme='dark'] .oidc-divider span {
     color: #a0aec0;
-    background: #252526;
+    background: var(--dm-bg);
 }
 
 /* Responsive Design */

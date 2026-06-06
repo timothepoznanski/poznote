@@ -1308,6 +1308,7 @@
   },
   "theme": {
     "badge": {
+      "black": "Schwarzmodus",
       "dark": "Dunkelmodus",
       "light": "Hellmodus",
       "system": "Systemmodus"

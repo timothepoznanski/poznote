@@ -248,11 +248,9 @@ textarea:focus {
 
 .note-attachment-previews {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 190px));
-    justify-content: flex-start;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     width: 100%;
-    max-width: 760px;
     margin: 8px 0 16px;
 }
 
@@ -416,7 +414,6 @@ textarea:focus {
     .note-attachment-previews {
         grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
         gap: 8px;
-        max-width: 100%;
         margin: 8px 0 14px;
     }
 }

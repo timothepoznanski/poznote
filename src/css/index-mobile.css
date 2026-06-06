@@ -179,11 +179,23 @@ body.mobile-formatting-toolbar-active .color-palette-popup {
     z-index: 2147483002;
 }
 
-body.mobile-formatting-toolbar-active #linkModal.modal {
+body.mobile-formatting-toolbar-active #linkModal.modal,
+body.mobile-formatting-toolbar-active #tagsModal.modal,
+body.mobile-keyboard-open #tagsModal.modal,
+body.mobile-formatting-toolbar-active #linkedNoteSelectorModal.modal,
+body.mobile-keyboard-open #linkedNoteSelectorModal.modal,
+body.mobile-formatting-toolbar-active #linkedNoteFolderSelectorModal.modal,
+body.mobile-keyboard-open #linkedNoteFolderSelectorModal.modal {
     z-index: 2147483004 !important;
 }
 
-body.mobile-formatting-toolbar-active #linkModal .modal-content {
+body.mobile-formatting-toolbar-active #linkModal .modal-content,
+body.mobile-formatting-toolbar-active #tagsModal .modal-content,
+body.mobile-keyboard-open #tagsModal .modal-content,
+body.mobile-formatting-toolbar-active #linkedNoteSelectorModal .modal-content,
+body.mobile-keyboard-open #linkedNoteSelectorModal .modal-content,
+body.mobile-formatting-toolbar-active #linkedNoteFolderSelectorModal .modal-content,
+body.mobile-keyboard-open #linkedNoteFolderSelectorModal .modal-content {
     z-index: 2147483005 !important;
 }
 

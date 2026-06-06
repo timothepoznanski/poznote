@@ -48,7 +48,7 @@ if (!$note) {
     <?php 
     $v = @file_get_contents('version.txt');
     if ($v === false) $v = time();
-    $v = urlencode(trim($v));
+    $v = urlencode(poznoteBuildAssetCacheVersion(trim($v)));
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="css/lucide.css">
@@ -56,6 +56,7 @@ if (!$note) {
     <link rel="stylesheet" href="css/attachments/upload.css">
     <link rel="stylesheet" href="css/attachments/display.css">
     <link rel="stylesheet" href="css/attachments/buttons-alerts.css">
+    <link rel="stylesheet" href="css/home/buttons.css">
     <link rel="stylesheet" href="css/attachments/preview-modal.css">
     <link rel="stylesheet" href="css/attachments/responsive.css">
     <link rel="stylesheet" href="css/modals/base.css">
@@ -65,7 +66,7 @@ if (!$note) {
     <link rel="stylesheet" href="css/modals/share-modal.css">
     <link rel="stylesheet" href="css/modals/alerts-utilities.css">
     <link rel="stylesheet" href="css/modals/responsive.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
     <link rel="stylesheet" href="css/dark-mode/menus.css">
     <link rel="stylesheet" href="css/dark-mode/editor.css">
@@ -75,7 +76,7 @@ if (!$note) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <style>
         .file-icon-placeholder {
             width: 60px;
@@ -173,13 +174,14 @@ if (!$note) {
             }
             $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
         ?>
-        <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary">
-            <?php echo t_h('common.back_to_notes'); ?>
-        </a>
-
-        <div class="attachments-inline-notice">
-            <?php echo t_h('attachments.page.inline_images_hidden_notice', [], 'Images inserted directly in the note content are still stored as attachments, but they are hidden here to avoid ambiguity.'); ?>
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
+                <?php echo t_h('common.back_to_notes'); ?>
+            </a>
         </div>
+
+        <br>
 
         <!-- Upload Section -->
         <div class="settings-section">

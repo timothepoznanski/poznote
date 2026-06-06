@@ -219,8 +219,8 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
 /* Dark mode for drop zone */
 html[data-theme='dark'] .root-drop-zone,
 body.dark-mode .root-drop-zone {
-    background-color: #333333;
-    border-color: #4a4a4a;
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .root-drop-zone.drag-over,

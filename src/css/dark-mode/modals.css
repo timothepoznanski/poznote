@@ -11,7 +11,7 @@ body.dark-mode .modal {
 /* Modal content base */
 html[data-theme='dark'] .modal-content,
 body.dark-mode .modal-content {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
     border-color: var(--dm-border);
 }
@@ -48,12 +48,12 @@ body.dark-mode .modal-buttons button {
 
 html[data-theme='dark'] .modal-buttons button:hover,
 body.dark-mode .modal-buttons button:hover {
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .modal-buttons button:first-child,
 body.dark-mode .modal-buttons button:first-child {
-    background-color: #1e3a5f;
+    background-color: var(--dm-active);
     color: white;
 }
 
@@ -282,7 +282,7 @@ body.dark-mode #notificationsModal .modal-buttons .btn-cancel:hover {
 html[data-theme='dark'] .move-task-list,
 body.dark-mode .move-task-list {
     border-color: var(--dm-border);
-    background-color: #1f1f1f;
+    background-color: var(--dm-sidebar-surface);
 }
 
 html[data-theme='dark'] .move-task-item,
@@ -292,12 +292,12 @@ body.dark-mode .move-task-item {
 
 html[data-theme='dark'] .move-task-item:hover,
 body.dark-mode .move-task-item:hover {
-    background: var(--dm-surface);
+    background: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .move-task-item.selected,
 body.dark-mode .move-task-item.selected {
-    background: #1e3a5f;
+    background: var(--dm-active);
 }
 
 html[data-theme='dark'] .move-task-item small,
@@ -352,12 +352,12 @@ body.dark-mode #moveFolderFilesModal .modal-buttons .btn-cancel {
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-cancel:hover,
 body.dark-mode #moveFolderFilesModal .modal-buttons .btn-cancel:hover {
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-buttons .btn-primary,
 body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary {
-    background-color: #1e3a5f;
+    background-color: var(--dm-active);
     color: #fff;
     border: none;
 }
@@ -569,7 +569,7 @@ body.dark-mode #fontSizeModal .font-size-preview {
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary,
 body.dark-mode #fontSizeModal .modal-footer .btn-primary {
-    background-color: #1e3a5f;
+    background-color: var(--dm-active);
     color: #fff;
 }
 
@@ -598,7 +598,7 @@ body.dark-mode #fontSizeModal .modal-buttons .btn-cancel {
 
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel:hover,
 body.dark-mode #fontSizeModal .modal-buttons .btn-cancel:hover {
-    background-color: #333333;
+    background-color: var(--dm-surface-hover);
     color: #e0e0e0;
 }
 
@@ -627,8 +627,8 @@ body.dark-mode #shareModal .share-custom-label .optional-text {
 
 html[data-theme='dark'] #shareModal .share-custom-input,
 body.dark-mode #shareModal .share-custom-input {
-    background: #252526;
-    border: 1px solid #404040;
+    background: var(--dm-surface);
+    border: 1px solid var(--dm-border);
     color: #e0e0e0;
 }
 
@@ -678,7 +678,7 @@ body.dark-mode input:checked+.toggle-slider {
 /* Folder Share Modal */
 html[data-theme='dark'] #folderShareModal .modal-content,
 body.dark-mode #folderShareModal .modal-content {
-    background-color: #333333;
+    background-color: var(--dm-content-bg);
     color: #e0e0e0;
 }
 
@@ -717,7 +717,7 @@ body.dark-mode .folder-option:hover {
 
 html[data-theme='dark'] .folder-option.selected,
 body.dark-mode .folder-option.selected {
-    background-color: #1e3a5f;
+    background-color: var(--dm-active);
     color: white;
 }
 
@@ -1004,16 +1004,44 @@ body.dark-mode #snapshotModal .snapshot-state-hint {
 /* Update Modal Specific */
 html[data-theme='dark'] #updateModal .version-info,
 body.dark-mode #updateModal .version-info {
-    background-color: #2a2d32;
-    border: 1px solid #40444b;
+    background-color: #2a2d32 !important;
+    border: 1px solid #40444b !important;
 }
 
 html[data-theme='dark'] #updateModal .version-info p,
 body.dark-mode #updateModal .version-info p {
-    color: #e0e0e0;
+    color: #e0e0e0 !important;
 }
 
 html[data-theme='dark'] #updateModal .modal-content p,
 body.dark-mode #updateModal .modal-content p {
-    color: #bebebe;
+    color: #bebebe !important;
+}
+
+html[data-theme='dark'] #updateModal .backup-warning,
+body.dark-mode #updateModal .backup-warning {
+    background-color: #2d2a1e !important;
+    border-color: #5a4e1a !important;
+}
+
+html[data-theme='dark'] #updateModal .backup-warning p,
+body.dark-mode #updateModal .backup-warning p {
+    color: var(--dm-text) !important;
+}
+
+/* Update Check Modal Specific */
+html[data-theme='dark'] #updateCheckModal .modal-content,
+body.dark-mode #updateCheckModal .modal-content {
+    background-color: var(--dm-content-bg) !important;
+    color: var(--dm-text) !important;
+}
+
+html[data-theme='dark'] #updateCheckModal .modal-content h3,
+body.dark-mode #updateCheckModal .modal-content h3 {
+    color: var(--dm-accent) !important;
+}
+
+html[data-theme='dark'] #updateCheckModal .modal-content p,
+body.dark-mode #updateCheckModal .modal-content p {
+    color: var(--dm-text) !important;
 }

@@ -422,6 +422,7 @@ try {
 
         if (!$allAuthenticated) {
             $passwordStylesheetHref = getVersionedPublicAppAssetHref('css/public_folder.css');
+            $passwordVariablesStylesheetHref = getVersionedPublicAppAssetHref('css/dark-mode/variables.css');
             $passwordThemeInitHref = getVersionedPublicAppAssetHref('js/theme-init.js');
             ?>
             <!doctype html>
@@ -432,6 +433,7 @@ try {
                 <meta name="robots" content="noindex, nofollow">
                 <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
                 <script src="<?php echo htmlspecialchars($passwordThemeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+                <link rel="stylesheet" href="<?php echo htmlspecialchars($passwordVariablesStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
                 <link rel="stylesheet" href="<?php echo htmlspecialchars($passwordStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             </head>
             <body class="password-page-body">
@@ -710,19 +712,22 @@ $content = preg_replace_callback('/\x00P(VIDEO|AUDIO|IFRAME)(\d+)\x00/', functio
 // Priority: 1) Stored theme 2) URL parameter 3) Default (light)
 
 $theme = 'light';
+$allowedPublicThemes = ['dark', 'light', 'black'];
 
-if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
+if (!empty($sharedTheme) && in_array($sharedTheme, $allowedPublicThemes, true)) {
     $theme = $sharedTheme;
-} elseif (isset($_GET['theme']) && in_array($_GET['theme'], ['dark', 'light'])) {
+} elseif (isset($_GET['theme']) && in_array($_GET['theme'], $allowedPublicThemes, true)) {
     $theme = $_GET['theme'];
 }
+$effectiveTheme = $theme === 'black' ? 'dark' : $theme;
+$themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 
 // ============================================================================
 // HTML OUTPUT
 // ============================================================================
 ?>
 <!doctype html>
-<html data-theme="<?php echo htmlspecialchars($theme); ?>">
+<html data-theme="<?php echo htmlspecialchars($effectiveTheme); ?>"<?php echo $themeClass; ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -768,7 +773,7 @@ if (!empty($sharedTheme) && in_array($sharedTheme, ['dark', 'light'])) {
             }
         })();
     </script>
-    <script src="js/public-note-theme-init.js"></script>
+    <script src="js/public-note-theme-init.js?v=<?php echo file_exists(__DIR__ . '/js/public-note-theme-init.js') ? filemtime(__DIR__ . '/js/public-note-theme-init.js') : '1'; ?>"></script>
     <script>
         (function () {
             try {

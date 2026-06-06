@@ -49,8 +49,8 @@ body.dark-mode .clickable-tag-wrapper {
 
 html[data-theme='dark'] .clickable-tag-wrapper:hover,
 body.dark-mode .clickable-tag-wrapper:hover {
-    background: #333;
-    border-color: #4a4a4a;
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .clickable-tag,
@@ -115,8 +115,8 @@ body.dark-mode .folder_name {
 
 html[data-theme='dark'] .folder_name:hover,
 body.dark-mode .folder_name:hover {
-    background: #333;
-    border-color: #4a4a4a;
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border-light);
 }
 
 /* Tag suggestions dropdown */
@@ -266,7 +266,7 @@ body.dark-mode .form-group input::placeholder {
 
 html[data-theme='dark'] .form-group input:focus,
 body.dark-mode .form-group input:focus {
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
     border-color: var(--dm-accent);
     outline: none;
 }
@@ -301,7 +301,7 @@ html[data-theme='dark'] .btn:hover,
 html[data-theme='dark'] .btn-secondary:hover,
 body.dark-mode .btn:hover,
 body.dark-mode .btn-secondary:hover {
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .btn-shared,
@@ -578,7 +578,7 @@ body.dark-mode .table-picker-cell:hover {
 
 html[data-theme='dark'] .table-picker-cell.highlighted,
 body.dark-mode .table-picker-cell.highlighted {
-    background-color: #1e3a5f;
+    background-color: var(--dm-active);
     border-color: #64B5F6;
 }
 

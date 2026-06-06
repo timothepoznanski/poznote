@@ -1164,8 +1164,11 @@ function handleInternalNoteLink(href) {
         var url = 'index.php?workspace=' + encodeURIComponent(targetWorkspace) + '&note=' + targetNoteId;
         window.location.href = url;
     } else {
-        // Same workspace - just load the note
-        if (typeof window.loadNoteById === 'function') {
+        // Same workspace - open in new tab on desktop, load directly on mobile
+        const isMobile = window.innerWidth <= 800;
+        if (!isMobile && window.tabManager && typeof window.tabManager.openInNewTab === 'function') {
+            window.tabManager.openInNewTab(targetNoteId, null, { insertAfterActive: true });
+        } else if (typeof window.loadNoteById === 'function') {
             window.loadNoteById(targetNoteId);
         }
     }

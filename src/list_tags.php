@@ -47,7 +47,7 @@ $count_tags = count($tags_list);
 sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
 
 $currentLang = getUserLanguage();
-$cache_v = getAppVersion();
+$cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="tags-page">

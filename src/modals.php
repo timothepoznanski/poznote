@@ -700,6 +700,7 @@ try {
             <div class="radio-options">
                 <label><input type="radio" name="themeChoice" value="light"> <?php echo t_h('theme.badge.light', [], 'Light'); ?></label>
                 <label><input type="radio" name="themeChoice" value="dark"> <?php echo t_h('theme.badge.dark', [], 'Dark'); ?></label>
+                <label><input type="radio" name="themeChoice" value="black"> <?php echo t_h('theme.badge.black', [], 'Black'); ?></label>
                 <label><input type="radio" name="themeChoice" value="system"> <?php echo t_h('theme.badge.system', [], 'System'); ?></label>
             </div>
         </div>

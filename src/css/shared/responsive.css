@@ -311,7 +311,7 @@
     }
 
     [data-theme="dark"] body.shared-page {
-        background: #252526 !important;
+        background: var(--dm-bg) !important;
     }
 
     [data-theme="dark"] .indexable-label-text {

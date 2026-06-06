@@ -13,6 +13,76 @@ function _env(string $key, $default = '') {
 }
 
 /**
+ * Return a cache version that changes when theme-critical assets change.
+ */
+function poznoteGetThemeAssetVersion() {
+    static $cachedVersion = null;
+
+    if ($cachedVersion !== null) {
+        return $cachedVersion;
+    }
+
+    $paths = [
+        'js/theme-init.js',
+        'js/theme-manager.js',
+        'js/public-note-theme-init.js',
+        'js/public-note.js',
+        'js/excalidraw-theme-init.js',
+        'css/dark-mode/variables.css',
+        'css/dark-mode/layout.css',
+        'css/dark-mode/menus.css',
+        'css/dark-mode/editor.css',
+        'css/dark-mode/modals.css',
+        'css/dark-mode/components.css',
+        'css/dark-mode/pages.css',
+        'css/dark-mode/markdown.css',
+        'css/dark-mode/kanban.css',
+        'css/dark-mode/icons.css',
+        'css/layout.css',
+        'css/outline.css',
+        'css/tabs.css',
+        'css/public_folder.css',
+        'css/public_note.css',
+        'css/excalidraw.css',
+        'css/excalidraw-unified.css',
+        'css/note-reference.css',
+        'css/search-replace.css',
+        'css/favorites.css',
+        'css/trash.css',
+        'css/attachments_list.css',
+        'css/home/dark-mode.css',
+        'css/shared/dark-mode.css',
+        'css/notes/sidebar.css',
+    ];
+
+    $version = 0;
+    foreach ($paths as $relativePath) {
+        $absolutePath = __DIR__ . '/' . $relativePath;
+        if (is_file($absolutePath)) {
+            $version = max($version, (int) filemtime($absolutePath));
+        }
+    }
+
+    $cachedVersion = $version > 0 ? (string) $version : '';
+    return $cachedVersion;
+}
+
+function poznoteBuildAssetCacheVersion($baseVersion = '') {
+    $baseVersion = trim((string) $baseVersion);
+    $themeAssetVersion = poznoteGetThemeAssetVersion();
+
+    if ($baseVersion === '') {
+        return $themeAssetVersion;
+    }
+
+    if ($themeAssetVersion === '') {
+        return $baseVersion;
+    }
+
+    return $baseVersion . '-' . $themeAssetVersion;
+}
+
+/**
  * Normalize a custom CSS filename stored under the css directory.
  * Returns an empty string when invalid.
  */

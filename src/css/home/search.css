@@ -50,9 +50,9 @@
 /* Dark mode - search */
 html[data-theme='dark'] .home-search-input,
 body.dark-mode .home-search-input {
-    background: #333333;
-    border-color: #374151;
-    color: #e5e7eb;
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
 }
 
 html[data-theme='dark'] .home-search-input:focus,
@@ -63,5 +63,5 @@ body.dark-mode .home-search-input:focus {
 
 html[data-theme='dark'] .home-info-line,
 body.dark-mode .home-info-line {
-    color: #e5e7eb;
+    color: var(--dm-text);
 }

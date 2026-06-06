@@ -14,6 +14,7 @@ $workspace = isset($_GET['workspace']) ? $_GET['workspace'] : getFirstWorkspaceN
 
 // Enable debug logging only when explicitly requested
 $excalidraw_debug = !empty($_GET['debug']) || (defined('EXCALIDRAW_DEBUG') && EXCALIDRAW_DEBUG);
+$themeAssetVersion = rawurlencode(poznoteGetThemeAssetVersion());
 
 // Determine if we're in embedded diagram mode
 $is_embedded_diagram = !empty($diagram_id);
@@ -145,11 +146,11 @@ if ($note_id > 0) {
     <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
     
     <!-- Theme initialization - CSP compliant -->
-    <script src="js/excalidraw-theme-init.js"></script>
+    <script src="js/excalidraw-theme-init.js?v=<?php echo $themeAssetVersion; ?>"></script>
     
     <link rel="stylesheet" href="css/modal-alerts.css">
-    <link rel="stylesheet" href="css/excalidraw.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/excalidraw.css?v=<?php echo $themeAssetVersion; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $themeAssetVersion; ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
     <link rel="stylesheet" href="css/dark-mode/menus.css">
     <link rel="stylesheet" href="css/dark-mode/editor.css">

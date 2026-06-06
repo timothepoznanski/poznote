@@ -923,7 +923,12 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
         ]);
     } else {
         $v = @file_get_contents(__DIR__ . '/version.txt') ?: time();
-        $v = urlencode(trim($v));
+        $themeAssetVersion = max(
+            (int) (@filemtime(__DIR__ . '/js/theme-init.js') ?: 0),
+            (int) (@filemtime(__DIR__ . '/css/dark-mode/variables.css') ?: 0),
+            (int) (@filemtime(__DIR__ . '/css/public_folder.css') ?: 0)
+        );
+        $v = urlencode(trim($v) . ($themeAssetVersion > 0 ? '-' . $themeAssetVersion : ''));
         $currentLang = (function_exists('getUserLanguage')) ? getUserLanguage() : 'en';
         $title = (function_exists('t')) ? t('common.access_denied', [], 'Access Denied') : 'Access Denied';
         $isSubdir = strpos($_SERVER['SCRIPT_NAME'] ?? '', '/admin/') !== false;
@@ -937,6 +942,7 @@ function denyPublicWorkspaceAccessResponse(string $message, int $code = 403): vo
             <title><?php echo htmlspecialchars($title); ?></title>
             <meta name="color-scheme" content="dark light">
             <script src="<?php echo $prefix; ?>js/theme-init.js?v=<?php echo $v; ?>"></script>
+            <link rel="stylesheet" href="<?php echo $prefix; ?>css/dark-mode/variables.css?v=<?php echo $v; ?>">
             <link rel="stylesheet" href="<?php echo $prefix; ?>css/public_folder.css?v=<?php echo $v; ?>">
             <link rel="stylesheet" href="<?php echo $prefix; ?>css/lucide.css?v=<?php echo $v; ?>">
             <style>

@@ -1308,6 +1308,7 @@
   },
   "theme": {
     "badge": {
+      "black": "modo negro",
       "dark": "modo oscuro",
       "light": "modo claro",
       "system": "modo sistema"

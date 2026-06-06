@@ -5,42 +5,42 @@
 /* Note card and inner note */
 html[data-theme='dark'] .notecard,
 body.dark-mode .notecard {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
 }
 
 html[data-theme='dark'] .innernote,
 body.dark-mode .innernote {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 /* Note header and toolbar - apply dark background immediately */
 html[data-theme='dark'] .note-header,
 body.dark-mode .note-header {
-    background-color: var(--dm-bg) !important;
+    background-color: var(--dm-content-bg) !important;
 }
 
 html[data-theme='dark'] .note-edit-toolbar,
 body.dark-mode .note-edit-toolbar {
-    background-color: var(--dm-bg) !important;
+    background-color: var(--dm-content-bg) !important;
 }
 
 html[data-theme='dark'] .note-header-spacer,
 body.dark-mode .note-header-spacer {
-    background-color: var(--dm-bg) !important;
+    background-color: var(--dm-content-bg) !important;
 }
 
 /* Note title */
 html[data-theme='dark'] .css-title,
 body.dark-mode .css-title {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text);
 }
 
 /* Note entry content */
 html[data-theme='dark'] .noteentry,
 body.dark-mode .noteentry {
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
     color: var(--dm-text) !important;
 }
 
@@ -67,7 +67,7 @@ html[data-theme='dark'] pre.code-block,
 body.dark-mode .noteentry pre,
 body.dark-mode .code-block,
 body.dark-mode pre.code-block {
-    background-color: #262424 !important;
+    background-color: var(--dm-code-bg) !important;
     border-color: var(--dm-border) !important;
     color: var(--dm-text-muted) !important;
 }
@@ -79,7 +79,7 @@ html[data-theme='dark'] .noteentry code *[style*="background"],
 body.dark-mode .noteentry code *[style*="background"],
 html[data-theme='dark'] .noteentry .code-block *[style*="background"],
 body.dark-mode .noteentry .code-block *[style*="background"] {
-    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), #262424 !important;
+    background: linear-gradient(rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.4)), var(--dm-code-bg) !important;
     color: var(--dm-text) !important;
 }
 
@@ -223,7 +223,7 @@ html[data-theme='dark'] .note-attachment-preview-media,
 html[data-theme='dark'] .note-attachment-preview-file-card,
 body.dark-mode .note-attachment-preview-media,
 body.dark-mode .note-attachment-preview-file-card {
-    background: #2b2b2b;
+    background: var(--dm-sidebar-surface);
 }
 
 html[data-theme='dark'] .note-attachment-preview-file-card,
@@ -235,7 +235,7 @@ html[data-theme='dark'] .note-attachment-preview-file-card:hover,
 html[data-theme='dark'] .note-attachment-preview-file-card:focus,
 body.dark-mode .note-attachment-preview-file-card:hover,
 body.dark-mode .note-attachment-preview-file-card:focus {
-    background: #303844;
+    background: var(--dm-surface-hover);
     color: var(--dm-accent);
 }
 
@@ -333,7 +333,7 @@ body.dark-mode .toolbar-btn {
 
 html[data-theme='dark'] .toolbar-btn:hover,
 body.dark-mode .toolbar-btn:hover {
-    background-color: #333;
+    background-color: var(--dm-surface-hover);
 }
 
 /* ============================================
@@ -362,7 +362,7 @@ body.dark-mode .toolbar-vertical-menu {
 /* Font size popup */
 html[data-theme='dark'] .font-size-popup,
 body.dark-mode .font-size-popup {
-    background-color: var(--dm-surface);
+    background-color: var(--dm-content-bg);
     border-color: var(--dm-border);
 }
 
@@ -380,7 +380,7 @@ html[data-theme='dark'] .font-size-popup .size-preview,
 body.dark-mode .font-size-popup .size-preview {
     border-color: var(--dm-border);
     color: var(--dm-text);
-    background-color: var(--dm-bg);
+    background-color: var(--dm-content-bg);
 }
 
 /* Image resize handle */

@@ -145,11 +145,12 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t_h('info.page_title', [], 'Note Information'); ?> - <?php echo htmlspecialchars($title); ?></title>
     <meta name="color-scheme" content="dark light">
-    <script src="js/theme-init.js"></script>
+    <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css">
     <link rel="stylesheet" href="css/info.css?v=<?php echo filemtime(__DIR__ . '/css/info.css'); ?>">
+    <link rel="stylesheet" href="css/home/buttons.css">
     <link rel="stylesheet" href="css/modal-alerts.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
     <link rel="stylesheet" href="css/dark-mode/menus.css">
     <link rel="stylesheet" href="css/dark-mode/editor.css">
@@ -159,14 +160,15 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <script src="js/theme-manager.js"></script>
+    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     
     <div class="info-page">
         <div class="info-buttons-back-container">
-            <button id="backToNoteBtn" class="btn btn-secondary" title="<?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>">
-                <?php echo t_h('info.actions.back_to_note', [], 'Back to note'); ?>
+            <button id="backToNoteBtn" class="btn btn-secondary go-to-nav-btn" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
+                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
+                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </button>
         </div>
         

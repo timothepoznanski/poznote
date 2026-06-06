@@ -18,7 +18,7 @@ $currentLang = getUserLanguage();
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
-	<script src="js/theme-init.js"></script>
+	<script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
@@ -28,7 +28,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/attachments_list.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
@@ -38,7 +38,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-	<script src="js/theme-manager.js"></script>
+	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="shared-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>" data-txt-no-results="<?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?>" data-txt-all-file-types="<?php echo t_h('attachments.list.all_file_types', [], 'All types'); ?>">
 	<div class="shared-container">
@@ -53,9 +53,6 @@ $currentLang = getUserLanguage();
 			</button>
 		</div>
 
-		<div class="attachments-inline-notice">
-			<?php echo t_h('attachments.page.inline_images_hidden_notice', [], 'Images inserted directly in the note content are still stored as attachments, but they are hidden here to avoid ambiguity.'); ?>
-		</div>
 		
 		<div class="shared-filter-bar attachments-filter-bar">
 			<div class="filter-input-wrapper">
