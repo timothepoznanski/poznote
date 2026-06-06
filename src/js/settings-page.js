@@ -23,6 +23,9 @@
         return fallback || key;
     };
 
+    var settingsCache = Object.create(null);
+    var settingsPreloadPromise = null;
+
     // Get language label from code
     function getLanguageLabel(code) {
         switch (code) {
@@ -39,8 +42,33 @@
 
     // ========== API Helpers ==========
 
-    // Generic function to get setting value from API
-    function getSetting(key, callback) {
+    function hasCachedSetting(key) {
+        return Object.prototype.hasOwnProperty.call(settingsCache, key);
+    }
+
+    function seedSettingFromPageConfig(key) {
+        if (hasCachedSetting(key) || typeof window.getPoznoteInitialSetting !== 'function') {
+            return hasCachedSetting(key);
+        }
+
+        var initialValue = window.getPoznoteInitialSetting(key);
+        if (initialValue !== null) {
+            settingsCache[key] = initialValue;
+            return true;
+        }
+
+        return false;
+    }
+
+    function cacheSettings(settings) {
+        if (!settings || typeof settings !== 'object') return;
+
+        Object.keys(settings).forEach(function (key) {
+            settingsCache[key] = settings[key];
+        });
+    }
+
+    function fetchSingleSetting(key, callback) {
         fetch('/api/v1/settings/' + encodeURIComponent(key), {
             method: 'GET',
             headers: { 'Accept': 'application/json' },
@@ -57,6 +85,111 @@
             .catch(function () { callback(null); });
     }
 
+    function getSettingsPreloadKeys() {
+        var keys = [
+            'language',
+            'show_note_created',
+            'hide_folder_counts',
+            'hide_folder_actions',
+            'notes_without_folders_after_folders',
+            'markdown_split_card_view',
+            'code_block_word_wrap',
+            'attachment_previews_in_note',
+            'center_note_content',
+            'note_list_sort',
+            'note_age_filter_days',
+            'tasklist_insert_order',
+            'toolbar_mode',
+            'timezone',
+            'date_time_format',
+            'hidden_ui_elements'
+        ];
+
+        if (document.getElementById('login-display-badge')) {
+            keys.push('login_display_name');
+        }
+        if (document.getElementById('custom-css-badge')) {
+            keys.push('custom_css_path');
+        }
+        if (document.getElementById('import-limits-card')) {
+            keys.push('import_max_individual_files', 'import_max_zip_files');
+        }
+        if (document.getElementById('git-sync-enabled-card')) {
+            keys.push('git_sync_enabled');
+        }
+
+        var unique = Object.create(null);
+        return keys.filter(function (key) {
+            if (unique[key]) return false;
+            unique[key] = true;
+            return true;
+        });
+    }
+
+    function preloadSettings(keys) {
+        var missingKeys = [];
+
+        keys.forEach(function (key) {
+            if (!seedSettingFromPageConfig(key)) {
+                missingKeys.push(key);
+            }
+        });
+
+        if (missingKeys.length === 0) {
+            settingsPreloadPromise = Promise.resolve();
+            return settingsPreloadPromise;
+        }
+
+        if (typeof window.canUsePoznoteSettingsApi === 'function' && !window.canUsePoznoteSettingsApi()) {
+            settingsPreloadPromise = Promise.resolve();
+            return settingsPreloadPromise;
+        }
+
+        var params = new URLSearchParams();
+        missingKeys.forEach(function (key) {
+            params.append('keys[]', key);
+        });
+
+        settingsPreloadPromise = fetch('/api/v1/settings?' + params.toString(), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function (r) { return r.json(); })
+            .then(function (j) {
+                if (j && j.success) {
+                    cacheSettings(j.settings);
+                }
+            })
+            .catch(function () {
+                // Badge refreshes will fall back to defaults if the batch request fails.
+            });
+
+        return settingsPreloadPromise;
+    }
+
+    // Generic function to get setting value from page config, cache, or API.
+    function getSetting(key, callback) {
+        if (seedSettingFromPageConfig(key)) {
+            callback(settingsCache[key]);
+            return;
+        }
+
+        if (settingsPreloadPromise) {
+            settingsPreloadPromise.then(function () {
+                if (hasCachedSetting(key)) {
+                    callback(settingsCache[key]);
+                    return;
+                }
+
+                fetchSingleSetting(key, callback);
+            });
+            return;
+        }
+
+        fetchSingleSetting(key, callback);
+    }
+
     // Generic function to set setting value via API
     function setSetting(key, value, callback) {
         fetch('/api/v1/settings/' + encodeURIComponent(key), {
@@ -67,6 +200,9 @@
         })
             .then(function (r) { return r.json(); })
             .then(function (result) {
+                if (result && result.success) {
+                    settingsCache[key] = Object.prototype.hasOwnProperty.call(result, 'value') ? result.value : value;
+                }
                 if (callback) callback(result && result.success, result);
             })
             .catch(function () {
@@ -185,16 +321,16 @@
 
     function refreshLoginDisplayBadge() {
         var txt = getTranslations();
+        var badge = document.getElementById('login-display-badge');
+        if (!badge) return;
+
         getSetting('login_display_name', function (value) {
-            var badge = document.getElementById('login-display-badge');
-            if (badge) {
-                if (value && value.trim()) {
-                    badge.textContent = value.trim();
-                    badge.className = 'setting-status enabled';
-                } else {
-                    badge.textContent = txt.notDefined;
-                    badge.className = 'setting-status disabled';
-                }
+            if (value && value.trim()) {
+                badge.textContent = value.trim();
+                badge.className = 'setting-status enabled';
+            } else {
+                badge.textContent = txt.notDefined;
+                badge.className = 'setting-status disabled';
             }
         });
     }
@@ -1277,23 +1413,24 @@
             });
         }
 
-        // Load all badges on page load
-        refreshLanguageBadge();
-        refreshLoginDisplayBadge();
-        refreshFontSizeBadge();
-        refreshNoteSortBadge();
-        refreshNoteAgeFilterBadge();
-        refreshTasklistInsertOrderBadge();
-        refreshToolbarModeBadge();
-        refreshTimezoneBadge();
-        refreshDateTimeFormatBadge();
-        refreshNoteWidthBadge();
-        refreshIndexIconScaleBadge();
-        refreshCustomCssBadge();
-        refreshImportLimitsBadges();
-        refreshGitSyncEnabledBadge();
-        refreshGitSyncCardBadge();
-        refreshUiCustomizationBadge();
+        // Load all badges on page load. Most values are already embedded in page-config-data.
+        preloadSettings(getSettingsPreloadKeys()).then(function () {
+            refreshLanguageBadge();
+            refreshLoginDisplayBadge();
+            refreshFontSizeBadge();
+            refreshNoteSortBadge();
+            refreshNoteAgeFilterBadge();
+            refreshTasklistInsertOrderBadge();
+            refreshToolbarModeBadge();
+            refreshTimezoneBadge();
+            refreshDateTimeFormatBadge();
+            refreshNoteWidthBadge();
+            refreshIndexIconScaleBadge();
+            refreshCustomCssBadge();
+            refreshImportLimitsBadges();
+            refreshGitSyncEnabledBadge();
+            refreshUiCustomizationBadge();
+        });
 
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');

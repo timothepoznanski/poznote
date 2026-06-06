@@ -662,6 +662,11 @@ $router->delete('/notes/{noteId}/attachments/{attachmentId}', function($params) 
 // Settings Routes
 // ======================
 
+// Get setting values
+$router->get('/settings', function($params) use ($settingsController) {
+    $settingsController->index();
+});
+
 // Get a setting value
 $router->get('/settings/{key}', function($params) use ($settingsController) {
     $settingsController->show($params['key']);

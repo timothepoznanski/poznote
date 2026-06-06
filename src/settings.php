@@ -85,6 +85,68 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 $app_version_display = trim(@file_get_contents('version.txt') ?: 'Unknown');
 $app_version_display = htmlspecialchars($app_version_display, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
+$settingsPageConfig = [
+    'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
+    'settings' => [],
+    'passwordStatus' => null,
+];
+
+$settingsPageUserKeys = [
+    'emoji_icons_enabled',
+    'language',
+    'show_note_created',
+    'hide_folder_counts',
+    'hide_folder_actions',
+    'notes_without_folders_after_folders',
+    'markdown_split_card_view',
+    'code_block_word_wrap',
+    'attachment_previews_in_note',
+    'center_note_content',
+    'note_list_sort',
+    'note_age_filter_days',
+    'tasklist_insert_order',
+    'toolbar_mode',
+    'timezone',
+    'date_time_format',
+    'hidden_ui_elements',
+];
+
+foreach ($settingsPageUserKeys as $settingsPageKey) {
+    $settingsPageConfig['settings'][$settingsPageKey] = getSetting($settingsPageKey, '');
+}
+
+try {
+    require_once 'users/db_master.php';
+    $settingsPageUserId = getCurrentUserId();
+    if ($settingsPageUserId && function_exists('hasCustomPassword')) {
+        $settingsPageUserProfile = function_exists('getUserProfileById') ? getUserProfileById((int)$settingsPageUserId) : null;
+        $settingsPageConfig['passwordStatus'] = [
+            'has_custom_password' => hasCustomPassword((int)$settingsPageUserId),
+            'password_changed_at' => is_array($settingsPageUserProfile) ? ($settingsPageUserProfile['password_changed_at'] ?? null) : null,
+        ];
+    }
+} catch (Exception $e) {
+    $settingsPageConfig['passwordStatus'] = null;
+}
+
+if ($isAdmin) {
+    try {
+        require_once 'users/db_master.php';
+        $settingsPageGlobalKeys = [
+            'login_display_name',
+            'custom_css_path',
+            'import_max_individual_files',
+            'import_max_zip_files',
+            'git_sync_enabled',
+        ];
+        foreach ($settingsPageGlobalKeys as $settingsPageKey) {
+            $settingsPageConfig['settings'][$settingsPageKey] = getGlobalSetting($settingsPageKey, '');
+        }
+    } catch (Exception $e) {
+        // Keep the page usable if the master database is temporarily unavailable.
+    }
+}
+
 // Count workspaces
 $workspaces_count = 0;
 try {
@@ -610,6 +672,9 @@ if ($isAdmin) {
     </div>
 
     <?php include 'modals.php'; ?>
+    <script type="application/json" id="page-config-data"><?php
+        echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    ?></script>
     <script src="js/modal-alerts.js"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
@@ -623,6 +688,6 @@ if ($isAdmin) {
     <script src="js/modals-events.js"></script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/change-password.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
 </body>
 </html>

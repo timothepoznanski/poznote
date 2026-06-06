@@ -1311,6 +1311,34 @@ paths:
   # ==================
   # Settings Endpoints
   # ==================
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get setting values
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: keys
+          in: query
+          required: false
+          description: Optional comma-separated list of setting keys to return
+          schema:
+            type: string
+            example: language,note_age_filter_days
+      responses:
+        '200':
+          description: Setting values
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  settings:
+                    type: object
+                    additionalProperties:
+                      type: string
+
   /settings/{key}:
     get:
       tags: [Settings]

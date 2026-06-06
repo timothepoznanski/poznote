@@ -1413,6 +1413,19 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 
 ## Settings
 
+### Get Settings
+
+```
+GET /settings
+```
+
+Get setting values in one request. Use `keys` to return only specific settings; omit it to return all user settings, plus global settings for admins.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/settings?keys=language,note_age_filter_days"
+```
+
 ### Get Setting
 
 ```
@@ -2082,6 +2095,7 @@ curl http://YOUR_SERVER/api_health.php
 ### Settings
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| `GET` | `/settings` | Get settings |
 | `GET` | `/settings/{key}` | Get setting |
 | `PUT` | `/settings/{key}` | Update setting |
 
