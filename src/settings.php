@@ -159,7 +159,7 @@ if ($isAdmin) {
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $cache_v; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/dark-mode/modals.css') ?: time(); ?>">
     <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">

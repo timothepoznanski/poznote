@@ -1004,16 +1004,44 @@ body.dark-mode #snapshotModal .snapshot-state-hint {
 /* Update Modal Specific */
 html[data-theme='dark'] #updateModal .version-info,
 body.dark-mode #updateModal .version-info {
-    background-color: #2a2d32;
-    border: 1px solid #40444b;
+    background-color: #2a2d32 !important;
+    border: 1px solid #40444b !important;
 }
 
 html[data-theme='dark'] #updateModal .version-info p,
 body.dark-mode #updateModal .version-info p {
-    color: #e0e0e0;
+    color: #e0e0e0 !important;
 }
 
 html[data-theme='dark'] #updateModal .modal-content p,
 body.dark-mode #updateModal .modal-content p {
-    color: #bebebe;
+    color: #bebebe !important;
+}
+
+html[data-theme='dark'] #updateModal .backup-warning,
+body.dark-mode #updateModal .backup-warning {
+    background-color: #2d2a1e !important;
+    border-color: #5a4e1a !important;
+}
+
+html[data-theme='dark'] #updateModal .backup-warning p,
+body.dark-mode #updateModal .backup-warning p {
+    color: var(--dm-text) !important;
+}
+
+/* Update Check Modal Specific */
+html[data-theme='dark'] #updateCheckModal .modal-content,
+body.dark-mode #updateCheckModal .modal-content {
+    background-color: var(--dm-content-bg) !important;
+    color: var(--dm-text) !important;
+}
+
+html[data-theme='dark'] #updateCheckModal .modal-content h3,
+body.dark-mode #updateCheckModal .modal-content h3 {
+    color: var(--dm-accent) !important;
+}
+
+html[data-theme='dark'] #updateCheckModal .modal-content p,
+body.dark-mode #updateCheckModal .modal-content p {
+    color: var(--dm-text) !important;
 }
