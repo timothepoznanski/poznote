@@ -297,6 +297,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
     <title><?php echo htmlspecialchars($folder['name']); ?></title>
+    <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/public-note-theme-init.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
     <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/lucide.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/dark-mode/variables.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     <link rel="stylesheet" href="/css/dark-mode/layout.css">
@@ -460,7 +461,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     }
     ?>
 
-    <script src="/js/pwa-helpers.js"></script>
-    <script src="/js/public_folder.js"></script>
+    <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/pwa-helpers.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+    <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/public_folder.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
 </body>
 </html>
