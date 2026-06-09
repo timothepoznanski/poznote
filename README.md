@@ -6,7 +6,7 @@
 <div align="center">
 
 <h3 align="center">
-Poznote is a personal note-taking and documentation platform.
+Poznote is a note-taking and documentation platform.
 </h3>
 
 <br>
