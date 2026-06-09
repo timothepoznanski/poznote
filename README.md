@@ -3,8 +3,6 @@
   <img src="images/poznote-logo-text.png" alt="Poznote Logo" width="400">
 </p>
 
-<div align="center">
-
 <h3 align="center">
 Poznote is a note-taking and documentation platform.
 </h3>
