@@ -551,7 +551,7 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
     overflow-x: hidden !important;
     border-right: 1px solid #e0e0e0 !important;
     box-sizing: border-box !important;
-    max-height: calc(100vh - 200px) !important;
+    max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
 }
 
 .noteentry.markdown-split-mode .markdown-editor-container {
@@ -570,7 +570,7 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
     overflow-x: hidden !important;
     padding: 10px 10px 44px 24px !important;
     box-sizing: border-box !important;
-    max-height: calc(100vh - 200px) !important;
+    max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
 }
 
 /* Dark mode border for split view */
@@ -585,6 +585,7 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode {
+    --markdown-split-pane-bottom-gap: 18px;
     gap: 16px !important;
     padding: 6px 2px 10px !important;
 }
@@ -594,7 +595,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     position: relative !important;
     min-height: 0 !important;
     box-sizing: border-box !important;
-    max-height: calc(100vh - 220px) !important;
+    max-height: var(--markdown-split-pane-height, calc(100vh - 240px)) !important;
     border: 1px solid #d9dee7 !important;
     border-radius: 16px !important;
     background: #ffffff !important;
@@ -611,7 +612,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
     min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding: 18px 18px 44px !important;
+    padding: 18px 18px 18px !important;
     border-right: none !important;
     box-sizing: border-box !important;
     max-height: none !important;
@@ -619,7 +620,7 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
 
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {
     min-height: 0 !important;
-    padding: 18px 18px 44px !important;
+    padding: 18px 18px 18px !important;
 }
 
 html[data-theme='dark'] body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor-container,
