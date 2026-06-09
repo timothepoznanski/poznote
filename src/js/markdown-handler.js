@@ -508,6 +508,136 @@ function syncMarkdownEditorEditableState(noteEntryOrId) {
     setMarkdownEditorEditable(editorDiv, isMarkdownEditorDisplayed(noteEntry, editorDiv));
 }
 
+var markdownSplitPaneHeightRaf = null;
+var markdownSplitPaneHeightListenersAttached = false;
+
+function getMarkdownSplitViewportHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || 0;
+}
+
+function getMarkdownSplitPaneBottomGap(noteEntry) {
+    var bottomGap = 18;
+
+    try {
+        var configuredGap = window.getComputedStyle(noteEntry).getPropertyValue('--markdown-split-pane-bottom-gap');
+        var parsedGap = parseFloat(configuredGap);
+        if (isFinite(parsedGap)) {
+            bottomGap = parsedGap;
+        }
+    } catch (e) {}
+
+    return bottomGap;
+}
+
+function clearMarkdownSplitPaneHeight(noteEntryOrId) {
+    var noteEntry = null;
+    if (typeof noteEntryOrId === 'string' || typeof noteEntryOrId === 'number') {
+        noteEntry = document.getElementById('entry' + noteEntryOrId);
+    } else {
+        noteEntry = noteEntryOrId;
+    }
+
+    if (noteEntry && noteEntry.style) {
+        noteEntry.style.removeProperty('--markdown-split-pane-height');
+    }
+}
+
+function updateMarkdownSplitPaneHeight(noteEntryOrId) {
+    var noteEntry = null;
+    if (typeof noteEntryOrId === 'string' || typeof noteEntryOrId === 'number') {
+        noteEntry = document.getElementById('entry' + noteEntryOrId);
+    } else {
+        noteEntry = noteEntryOrId;
+    }
+
+    if (!noteEntry) {
+        return;
+    }
+
+    if (!noteEntry.classList.contains('markdown-split-mode')) {
+        clearMarkdownSplitPaneHeight(noteEntry);
+        return;
+    }
+
+    ensureMarkdownSplitPaneHeightListeners();
+
+    var panes = [
+        noteEntry.querySelector('.markdown-editor-container'),
+        noteEntry.querySelector('.markdown-preview')
+    ];
+    var paneTop = null;
+
+    panes.forEach(function (pane) {
+        if (!pane) {
+            return;
+        }
+
+        try {
+            if (window.getComputedStyle(pane).display === 'none') {
+                return;
+            }
+        } catch (e) {}
+
+        var rect = pane.getBoundingClientRect();
+        if (rect.height > 0 || rect.top > 0) {
+            paneTop = paneTop === null ? rect.top : Math.min(paneTop, rect.top);
+        }
+    });
+
+    if (paneTop === null) {
+        paneTop = noteEntry.getBoundingClientRect().top;
+    }
+
+    var viewportHeight = getMarkdownSplitViewportHeight();
+    var bottomGap = getMarkdownSplitPaneBottomGap(noteEntry);
+    var availableHeight = Math.floor(viewportHeight - Math.max(0, paneTop) - bottomGap);
+
+    if (!isFinite(availableHeight) || availableHeight <= 0) {
+        return;
+    }
+
+    noteEntry.style.setProperty('--markdown-split-pane-height', Math.max(120, availableHeight) + 'px');
+}
+
+function updateAllMarkdownSplitPaneHeights() {
+    document.querySelectorAll('.noteentry.markdown-split-mode').forEach(function (noteEntry) {
+        updateMarkdownSplitPaneHeight(noteEntry);
+    });
+}
+
+function scheduleMarkdownSplitPaneHeightUpdate(noteEntryOrId) {
+    if (markdownSplitPaneHeightRaf !== null) {
+        window.cancelAnimationFrame(markdownSplitPaneHeightRaf);
+    }
+
+    markdownSplitPaneHeightRaf = window.requestAnimationFrame(function () {
+        markdownSplitPaneHeightRaf = null;
+
+        if (noteEntryOrId) {
+            updateMarkdownSplitPaneHeight(noteEntryOrId);
+        } else {
+            updateAllMarkdownSplitPaneHeights();
+        }
+    });
+}
+
+function ensureMarkdownSplitPaneHeightListeners() {
+    if (markdownSplitPaneHeightListenersAttached) {
+        return;
+    }
+
+    markdownSplitPaneHeightListenersAttached = true;
+    window.addEventListener('resize', function () {
+        scheduleMarkdownSplitPaneHeightUpdate();
+    });
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', function () {
+            scheduleMarkdownSplitPaneHeightUpdate();
+        });
+    }
+}
+
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
     // More robust content extraction that handles contentEditable quirks
@@ -3075,6 +3205,10 @@ function initializeMarkdownNote(noteId) {
     // Setup live preview update if starting in split mode
     if (startInSplitMode) {
         setupSplitModePreviewUpdate(noteId);
+        scheduleMarkdownSplitPaneHeightUpdate(noteEntry);
+        setTimeout(function () {
+            updateMarkdownSplitPaneHeight(noteEntry);
+        }, 100);
     }
 
     // Setup event listeners for the editor
@@ -3468,6 +3602,8 @@ function switchToSplitMode(noteId) {
                     scrollContainer.scrollTop = 0;
                 }
 
+                updateMarkdownSplitPaneHeight(noteEntry);
+
                 // Apply proportional scroll to editor and preview
                 if (scrollRatio > 0) {
                     // Scroll editor
@@ -3525,6 +3661,7 @@ function exitSplitMode(noteId) {
 
     // Remove split mode class
     noteEntry.classList.remove('markdown-split-mode');
+    clearMarkdownSplitPaneHeight(noteEntry);
 
     // Remove split mode input listener
     if (editorDiv && editorDiv._splitModeInputListener) {
@@ -4149,6 +4286,8 @@ window.parseMarkdown = parseMarkdown;
 window.renderMarkdownPreview = renderMarkdownPreview;
 window.renderMarkdownEditorContent = renderMarkdownEditorContent;
 window.syncMarkdownEditorEditableState = syncMarkdownEditorEditableState;
+window.updateMarkdownSplitPaneHeight = updateMarkdownSplitPaneHeight;
+window.scheduleMarkdownSplitPaneHeightUpdate = scheduleMarkdownSplitPaneHeightUpdate;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
 window.updateViewModeButton = updateViewModeButton;
 window.setupSplitModePreviewUpdate = setupSplitModePreviewUpdate;
