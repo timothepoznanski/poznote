@@ -106,6 +106,8 @@ function applyIndexIconScale(scale) {
         /* Sidebar: howto / home / settings / create */
         .sidebar-howto i,
         .sidebar-howto [class*="lucide-"],
+        .sidebar-folder-toggle i,
+        .sidebar-folder-toggle [class*="lucide-"],
         .sidebar-home i,
         .sidebar-home [class*="lucide-"],
         .sidebar-settings i,

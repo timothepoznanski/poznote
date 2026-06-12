@@ -601,6 +601,8 @@
     "home": "Tableau de bord",
     "settings": "Paramètres",
     "create": "Créer",
+    "expand_all_folders": "Tout déplier",
+    "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche"
   },
   "home": {

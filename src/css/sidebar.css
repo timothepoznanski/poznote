@@ -70,6 +70,7 @@
     position: relative;
 }
 
+.sidebar-folder-toggle,
 .sidebar-howto,
 .sidebar-home {
     background: transparent;
@@ -110,10 +111,12 @@
 .sidebar-howto:hover,
 .sidebar-home:hover,
 .sidebar-settings:hover,
+.sidebar-folder-toggle:hover,
 .sidebar-plus:hover {
     background: rgba(0, 125, 184, 0.1);
 }
 
+.sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-home:focus,
 .sidebar-settings:focus,
@@ -124,6 +127,7 @@
 
 /* Sidebar menu button (hamburger) */
 /* Sidebar action buttons (Home, Settings, Create) - visible on all screens */
+.sidebar-folder-toggle,
 .sidebar-howto,
 .sidebar-home,
 .sidebar-settings,
@@ -149,6 +153,7 @@
     font-size: 1.15rem;
 }
 
+.sidebar-folder-toggle:hover,
 .sidebar-howto:hover,
 .sidebar-home:hover,
 .sidebar-settings:hover,
@@ -156,6 +161,7 @@
     background: rgba(0, 125, 184, 0.1);
 }
 
+.sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-home:focus,
 .sidebar-settings:focus,
@@ -245,11 +251,18 @@
 /* Reduce the size of Lucide icons in the sidebar */
 .sidebar-title-actions i,
 .sidebar-title-actions [class*="lucide-"],
+.sidebar-folder-toggle i,
+.sidebar-folder-toggle [class*="lucide-"],
 .sidebar-home i,
 .sidebar-home [class*="lucide-"],
 .sidebar-settings i,
 .sidebar-settings [class*="lucide-"] {
     font-size: 0.875em !important;
+}
+
+.sidebar-folder-toggle i,
+.sidebar-folder-toggle [class*="lucide-"] {
+    font-size: 1.05em !important;
 }
 
 /* Icône plus-circle un peu plus grande */

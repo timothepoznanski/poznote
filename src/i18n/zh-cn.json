@@ -585,6 +585,8 @@
     "home": "仪表盘",
     "settings": "设置",
     "create": "创建",
+    "expand_all_folders": "展开所有文件夹",
+    "collapse_all_folders": "折叠所有文件夹",
     "toggle": "显示/隐藏左侧边栏"
   },
   "home": {

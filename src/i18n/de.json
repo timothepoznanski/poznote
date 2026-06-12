@@ -585,6 +585,8 @@
     "home": "Dashboard",
     "settings": "Einstellungen",
     "create": "Erstellen",
+    "expand_all_folders": "Alle Ordner aufklappen",
+    "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden"
   },
   "home": {

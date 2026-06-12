@@ -583,6 +583,8 @@
     "home": "Painel",
     "settings": "Configurações",
     "create": "Criar",
+    "expand_all_folders": "Expandir todas as pastas",
+    "collapse_all_folders": "Recolher todas as pastas",
     "toggle": "Mostrar/Ocultar a coluna esquerda"
   },
   "home": {

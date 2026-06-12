@@ -161,6 +161,16 @@
                     navigateToDisplayOrSettings('settings.php');
                 }
                 break;
+            case 'toggle-all-folders':
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                if (typeof window.toggleAllFolders === 'function') {
+                    window.toggleAllFolders();
+                }
+                if (typeof target.blur === 'function') {
+                    target.blur();
+                }
+                break;
             case 'open-password-settings':
                 if (typeof navigateToDisplayOrSettings === 'function') {
                     navigateToDisplayOrSettings('settings.php', {

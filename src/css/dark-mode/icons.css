@@ -24,3 +24,9 @@ html[data-theme='dark'] .sidebar-plus,
 body.dark-mode .sidebar-plus {
     filter: brightness(0) saturate(0%) invert(80%) !important;
 }
+
+html[data-theme='dark'] .sidebar-folder-toggle [class*="lucide-"],
+body.dark-mode .sidebar-folder-toggle [class*="lucide-"] {
+    color: inherit;
+    filter: none !important;
+}

@@ -391,6 +391,9 @@ if ($isPublicWorkspaceReadonly) {
             </div>
             <div class="sidebar-title-actions">
                 <?php if (!$isPublicWorkspaceReadonly): ?>
+                    <button class="sidebar-folder-toggle" data-action="toggle-all-folders" title="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>" aria-label="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>">
+                        <i class="lucide lucide-chevron-down"></i>
+                    </button>
                     <button class="sidebar-home<?php echo $notifications_count > 0 ? ' has-notifications-dot' : ''; ?>" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
                         <i class="lucide lucide-layout-dashboard"></i>
                         <span class="sidebar-notifications-dot" aria-hidden="true"></span>

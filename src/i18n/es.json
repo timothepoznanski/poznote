@@ -585,6 +585,8 @@
     "home": "Panel",
     "settings": "Configuración",
     "create": "Crear",
+    "expand_all_folders": "Expandir todas las carpetas",
+    "collapse_all_folders": "Contraer todas las carpetas",
     "toggle": "Mostrar/Ocultar la columna izquierda"
   },
   "home": {

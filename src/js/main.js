@@ -88,6 +88,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     } catch (e) {}
 
+    if (typeof window.updateToggleAllFoldersButton === 'function') {
+        window.updateToggleAllFoldersButton();
+    }
+
     // Restore checklist values from data attributes (after page reload)
     const noteentry = document.querySelector('.noteentry');
     if (noteentry) {
@@ -261,6 +265,8 @@ window.executeDeleteFolder = executeDeleteFolder;
 window.showDeleteFolderModal = showDeleteFolderModal;
 window.selectFolder = selectFolder;
 window.toggleFolder = toggleFolder;
+window.toggleAllFolders = toggleAllFolders;
+window.updateToggleAllFoldersButton = updateToggleAllFoldersButton;
 window.revealFolderInTree = revealFolderInTree;
 window.restoreFolderStates = restoreFolderStates;
 window.persistFolderStatesFromDOM = persistFolderStatesFromDOM;
