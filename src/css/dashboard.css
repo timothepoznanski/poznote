@@ -10,6 +10,27 @@ body.dashboard-page {
     padding-top: 0;
 }
 
+.dashboard-sidebar-sep {
+    width: 60%;
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 6px 0;
+    flex-shrink: 0;
+}
+
+.dashboard-sidebar-kofi .lucide-heart {
+    color: #e63946;
+}
+
+.dashboard-sidebar-kofi:hover .lucide-heart {
+    color: #e63946 !important;
+}
+
+:root[data-theme='dark'] .dashboard-sidebar-sep,
+body.dark-mode .dashboard-sidebar-sep {
+    border-color: var(--dm-border);
+}
+
 /* ---------- Left sidebar (tool buttons: home, search, git, settings) ---------- */
 
 .dashboard-sidebar {
@@ -59,6 +80,14 @@ body.dashboard-page {
     display: flex;
     align-items: center;
     width: 420px;
+    max-width: 90%;
+    margin: 20px auto 0;
+    animation: filterSlideIn 0.18s ease;
+}
+
+@keyframes filterSlideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 .dashboard-topbar-filter.is-collapsed {
@@ -120,7 +149,7 @@ body.dashboard-page {
 .dashboard-topbar-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 22px;
     flex-wrap: nowrap;
     justify-content: center;
     overflow-x: auto;
@@ -215,8 +244,8 @@ body.dashboard-page {
 }
 
 .dashboard-topbar-btn .lucide-search,
-.dashboard-topbar-btn .lucide-github,
-.dashboard-topbar-btn .lucide-git-branch {
+.dashboard-topbar-btn .lucide-upload,
+.dashboard-topbar-btn .lucide-download {
     color: #10b981;
 }
 
@@ -690,11 +719,11 @@ body.dark-mode .dashboard-topbar-btn .lucide-trash-2 {
 }
 
 :root[data-theme='dark'] .dashboard-topbar-btn .lucide-search,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-github,
-:root[data-theme='dark'] .dashboard-topbar-btn .lucide-git-branch,
+:root[data-theme='dark'] .dashboard-topbar-btn .lucide-upload,
+:root[data-theme='dark'] .dashboard-topbar-btn .lucide-download,
 body.dark-mode .dashboard-topbar-btn .lucide-search,
-body.dark-mode .dashboard-topbar-btn .lucide-github,
-body.dark-mode .dashboard-topbar-btn .lucide-git-branch {
+body.dark-mode .dashboard-topbar-btn .lucide-upload,
+body.dark-mode .dashboard-topbar-btn .lucide-download {
     color: #10b981;
 }
 
@@ -800,7 +829,7 @@ body.dark-mode .dashboard-empty {
 
 @media (max-width: 600px) {
     .dashboard-topbar {
-        gap: 10px;
+        gap: 6px;
     }
 
     .dashboard-topbar-filter {
@@ -812,19 +841,40 @@ body.dark-mode .dashboard-empty {
     }
 
     .dashboard-sidebar {
-        width: 40px;
-        padding: 12px 4px;
+        width: 36px;
+        padding: 10px 3px;
         gap: 2px;
     }
 
     .dashboard-sidebar .dashboard-topbar-btn {
-        width: 34px;
-        height: 34px;
+        width: 30px;
+        height: 30px;
     }
 
     .dashboard-sidebar .dashboard-topbar-btn .lucide {
-        width: 16px;
-        height: 16px;
+        width: 14px;
+        height: 14px;
+    }
+
+    .dashboard-topbar-actions {
+        gap: 4px;
+        padding: 0 2px;
+    }
+
+    .dashboard-topbar-btn {
+        width: 28px;
+        height: 32px;
+        padding: 0 0 10px;
+    }
+
+    .dashboard-topbar-btn .lucide {
+        width: 14px;
+        height: 14px;
+    }
+
+    .dashboard-topbar-count {
+        font-size: 9px;
+        bottom: 1px;
     }
 
     .dashboard-grid-container {
