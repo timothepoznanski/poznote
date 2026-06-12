@@ -99,7 +99,6 @@ $settingsPageUserKeys = [
     'hide_folder_actions',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
-    'dashboard_enabled',
     'code_block_word_wrap',
     'attachment_previews_in_note',
     'center_note_content',
@@ -529,15 +528,6 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
                     <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Notes Board (Dashboard) -->
-            <div class="home-card" id="dashboard-card">
-                <div class="home-card-icon"><i class="lucide lucide-sticky-note"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.notes_dashboard', [], 'Notes board'); ?></span>
-                    <span id="dashboard-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 
