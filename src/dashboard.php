@@ -445,15 +445,23 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 </head>
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+		<nav class="dashboard-sidebar">
+			<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_notes'); ?>">
+				<i class="lucide lucide-home"></i>
+			</a>
+			<button type="button" id="dashboardToggleFilter" class="dashboard-topbar-btn" title="<?php echo t_h('search.placeholder', [], 'Search'); ?>" aria-label="<?php echo t_h('search.placeholder', [], 'Search'); ?>" aria-controls="dashboardTopbarFilter" aria-expanded="false">
+				<i class="lucide lucide-search"></i>
+			</button>
+			<button type="button" id="dashboardGitBtn" class="dashboard-topbar-btn" title="<?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?>" aria-label="<?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?>" aria-controls="dashboardGitModal">
+				<i class="<?php echo htmlspecialchars($dashboardGitIcon, ENT_QUOTES, 'UTF-8'); ?>"></i>
+			</button>
+			<a href="settings.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
+				<i class="lucide lucide-settings"></i>
+			</a>
+		</nav>
 		<div class="favorites-container dashboard-container">
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
-					<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_notes'); ?>">
-						<i class="lucide lucide-home"></i>
-					</a>
-					<button type="button" id="dashboardToggleFilter" class="dashboard-topbar-btn" title="<?php echo t_h('search.placeholder', [], 'Search'); ?>" aria-label="<?php echo t_h('search.placeholder', [], 'Search'); ?>" aria-controls="dashboardTopbarFilter" aria-expanded="false">
-						<i class="lucide lucide-search"></i>
-					</button>
 					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
 						<i class="lucide lucide-sticky-note"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['notes'] ?? 0); ?></span>
@@ -485,12 +493,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
 						<i class="lucide lucide-trash-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['trash'] ?? 0); ?></span>
-					</a>
-					<button type="button" id="dashboardGitBtn" class="dashboard-topbar-btn" title="<?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?>" aria-label="<?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?>" aria-controls="dashboardGitModal">
-						<i class="<?php echo htmlspecialchars($dashboardGitIcon, ENT_QUOTES, 'UTF-8'); ?>"></i>
-					</button>
-					<a href="settings.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
-						<i class="lucide lucide-settings"></i>
 					</a>
 				</nav>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter is-collapsed">

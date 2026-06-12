@@ -3,15 +3,40 @@
    ============================================ */
 
 body.dashboard-page {
+    display: flex;
+    align-items: flex-start;
     background: #f8f9fa;
     min-height: 100vh;
-    padding-top: 20px;
+    padding-top: 0;
+}
+
+/* ---------- Left sidebar (tool buttons: home, search, git, settings) ---------- */
+
+.dashboard-sidebar {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 6px;
+    min-height: 100vh;
+    width: 52px;
+    flex-shrink: 0;
+}
+
+.dashboard-sidebar .dashboard-topbar-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
 }
 
 .dashboard-container {
+    flex: 1;
     max-width: 1150px;
     padding-top: 0;
     padding-bottom: 0;
+    min-width: 0;
 }
 
 /* ---------- Top bar ---------- */
@@ -19,10 +44,14 @@ body.dashboard-page {
 .dashboard-topbar {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    align-items: stretch;
+    gap: 0;
     margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-color, #f8f9fa);
+    padding: 12px 0 8px;
 }
 
 .dashboard-topbar-filter {
@@ -91,10 +120,17 @@ body.dashboard-page {
 .dashboard-topbar-actions {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 12px;
+    flex-wrap: nowrap;
     justify-content: center;
-    margin-bottom: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 0;
+    padding: 0 4px;
+}
+
+.dashboard-topbar-actions::-webkit-scrollbar {
+    display: none;
 }
 
 .dashboard-topbar-btn {
@@ -102,21 +138,29 @@ body.dashboard-page {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
+    box-sizing: border-box;
+    width: 36px;
     height: 40px;
-    padding: 0;
-    border: 1px solid #e5e7eb;
+    padding: 0 0 12px;
+    margin: 0;
+    border: none;
     border-radius: 8px;
     color: #6b7280;
-    background: #ffffff;
+    background: transparent;
     text-decoration: none;
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    font-family: inherit;
+    font-size: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
 .dashboard-topbar-btn:hover {
-    border-color: #007DB8;
     color: #007DB8;
+    background: rgba(0, 125, 184, 0.08);
+    border-radius: 8px;
+    transform: translateY(-2px);
 }
 
 .dashboard-topbar-btn.active .lucide {
@@ -133,21 +177,17 @@ body.dashboard-page {
 
 .dashboard-topbar-count {
     position: absolute;
-    right: 4px;
-    bottom: 3px;
-    min-width: 0;
-    height: auto;
+    bottom: 2px;
+    left: 0;
+    right: 0;
+    text-align: center;
     padding: 0;
     color: #007DB8;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 700;
     line-height: 1;
     font-variant-numeric: tabular-nums;
     pointer-events: none;
-    z-index: 2;
 }
 
 .dashboard-notifications-btn.has-notifications .dashboard-topbar-count {
@@ -155,8 +195,8 @@ body.dashboard-page {
 }
 
 .dashboard-topbar-btn .lucide {
-    width: 19px;
-    height: 19px;
+    width: 18px;
+    height: 18px;
 }
 
 /* Per-icon accent colours — matching home.php card palette */
@@ -571,6 +611,16 @@ body.dark-mode.dashboard-page {
     background: var(--dm-content-bg);
 }
 
+:root[data-theme='dark'] .dashboard-topbar,
+body.dark-mode .dashboard-topbar {
+    background: var(--dm-content-bg);
+}
+
+:root[data-theme='dark'] .dashboard-sidebar,
+body.dark-mode .dashboard-sidebar {
+    background: var(--dm-content-bg);
+}
+
 :root[data-theme='dark'] .dashboard-filter-input,
 body.dark-mode .dashboard-filter-input {
     background: var(--dm-surface);
@@ -585,15 +635,16 @@ body.dark-mode .dashboard-filter-clear:hover {
 
 :root[data-theme='dark'] .dashboard-topbar-btn,
 body.dark-mode .dashboard-topbar-btn {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
+    background: transparent;
+    border-color: transparent;
     color: var(--dm-text-muted);
 }
 
 :root[data-theme='dark'] .dashboard-topbar-btn:hover,
 body.dark-mode .dashboard-topbar-btn:hover {
-    border-color: #007DB8;
     color: #007DB8;
+    background: rgba(0, 125, 184, 0.12);
+    transform: translateY(-2px);
 }
 
 :root[data-theme='dark'] .dashboard-topbar-btn.active .lucide,
@@ -619,6 +670,16 @@ body.dark-mode .dashboard-topbar-btn .lucide-share-2,
 body.dark-mode .dashboard-topbar-btn .lucide-paperclip,
 body.dark-mode .dashboard-topbar-btn .lucide-bell {
     color: #007DB8;
+}
+
+:root[data-theme='dark'] .dashboard-notifications-btn.has-notifications .lucide-bell,
+body.dark-mode .dashboard-notifications-btn.has-notifications .lucide-bell {
+    color: #f59e0b;
+}
+
+:root[data-theme='dark'] .dashboard-notifications-btn.has-notifications .dashboard-topbar-count,
+body.dark-mode .dashboard-notifications-btn.has-notifications .dashboard-topbar-count {
+    color: #f59e0b;
 }
 
 :root[data-theme='dark'] .dashboard-topbar-btn .lucide-star,
@@ -750,11 +811,60 @@ body.dark-mode .dashboard-empty {
         grid-template-columns: 1fr;
     }
 
+    .dashboard-sidebar {
+        width: 40px;
+        padding: 12px 4px;
+        gap: 2px;
+    }
+
+    .dashboard-sidebar .dashboard-topbar-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .dashboard-sidebar .dashboard-topbar-btn .lucide {
+        width: 16px;
+        height: 16px;
+    }
+
     .dashboard-grid-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        grid-auto-rows: 100px;
-        gap: 10px;
-        margin-top: 10px;
+        grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: 90px;
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .dash-card-name {
+        font-size: 12px;
+    }
+
+    .dash-card-note-title {
+        font-size: 12px;
+        margin-bottom: 4px;
+    }
+
+    .board-card-excerpt {
+        -webkit-line-clamp: 2;
+        font-size: 11.5px;
+    }
+
+    .dash-card-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .dash-card-icon .lucide {
+        width: 16px;
+        height: 16px;
+    }
+
+    .dash-folder-card {
+        gap: 4px;
+        padding: 10px 8px;
+    }
+
+    .dash-note-card {
+        padding: 10px 12px;
     }
 
     .dash-card-unpin {
