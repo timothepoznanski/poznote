@@ -1,7 +1,6 @@
 <?php
 /**
  * Notes board - visual dashboard of notes grouped by folder.
- * Enabled via the "Notes board" card in settings.php (user setting: dashboard_enabled).
  */
 require 'auth.php';
 requireAuth();
@@ -14,11 +13,6 @@ require_once 'GitSync.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
-
-if (getSetting('dashboard_enabled', '0') !== '1') {
-    header('Location: index.php' . ($pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''));
-    exit;
-}
 
 /**
  * Build a short plain-text excerpt (or task preview) for a board card.

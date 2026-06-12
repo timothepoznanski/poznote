@@ -93,7 +93,6 @@
             'hide_folder_actions',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
-            'dashboard_enabled',
             'code_block_word_wrap',
             'attachment_previews_in_note',
             'center_note_content',
@@ -1038,7 +1037,6 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
-        setupToggleCard('dashboard-card', 'dashboard-status', 'dashboard_enabled', false, false);
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('attachment-previews-card', 'attachment-previews-status', 'attachment_previews_in_note', false, false);
 
