@@ -840,7 +840,7 @@
         window.location.href = 'index.php' + (cfg.workspace ? '?workspace=' + encodeURIComponent(cfg.workspace) : '');
     });
     document.getElementById('backToHomeBtn').addEventListener('click', function () {
-        window.location.href = 'home.php' + (cfg.workspace ? '?workspace=' + encodeURIComponent(cfg.workspace) : '');
+        window.location.href = 'dashboard.php' + (cfg.workspace ? '?workspace=' + encodeURIComponent(cfg.workspace) : '');
     });
 
     // ── Filter events ─────────────────────────────────────────────────────────

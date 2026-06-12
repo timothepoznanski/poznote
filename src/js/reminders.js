@@ -1,6 +1,6 @@
 /**
  * Reminders system for Poznote
- * Handles setting reminders on notes (notifications are displayed on home.php)
+ * Handles setting reminders on notes (notifications are displayed on dashboard.php)
  */
 
 // ============================================================================
@@ -392,7 +392,7 @@ function handleQuickReminder(e) {
 }
 
 // ============================================================================
-// EVENT HANDLERS (Reminder modal only - notifications are on home.php)
+// EVENT HANDLERS (Reminder modal only - notifications are on dashboard.php)
 // ============================================================================
 
 document.addEventListener('click', function(e) {

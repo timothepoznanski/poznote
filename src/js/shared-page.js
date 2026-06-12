@@ -2096,7 +2096,7 @@
                 if (typeof window.goBackToHome === 'function') {
                     window.goBackToHome();
                 } else {
-                    window.location.href = 'home.php';
+                    window.location.href = 'dashboard.php';
                 }
             });
         }

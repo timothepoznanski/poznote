@@ -1011,7 +1011,7 @@ function enforcePublicWorkspaceRequestAccess(): void {
 
     $scriptName = (string)($_SERVER['SCRIPT_NAME'] ?? '');
     $restrictedScripts = [
-        '/home.php',
+        '/dashboard.php',
         '/favorites.php',
         '/notes_manager.php',
         '/trash.php',

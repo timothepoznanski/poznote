@@ -1709,7 +1709,7 @@ function parseMarkdown(text) {
 
     function isPlainFormattingCodeBlockLanguage(language) {
         const normalizedLanguage = language ? language.trim().toLowerCase() : '';
-        return normalizedLanguage !== '' && (isPlainCodeBlockLanguage(normalizedLanguage) || !isSyntaxHighlightLanguage(normalizedLanguage));
+        return isPlainCodeBlockLanguage(normalizedLanguage) || !isSyntaxHighlightLanguage(normalizedLanguage);
     }
 
     function getPlainCodeBlockDisplayLanguage(language) {

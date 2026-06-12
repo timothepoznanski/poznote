@@ -571,7 +571,8 @@
       "markdown_split_card_view": "Markdown encadré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "attachment_previews_in_note": "Aperçus des pièces jointes",
-      "ui_customization": "Visibilité des éléments"
+      "ui_customization": "Visibilité des éléments",
+      "notes_dashboard": "Tableau de notes"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -2777,5 +2778,14 @@
     "popup_title": "Attention",
     "lost_to_other_tab": "Vous n'avez plus le verrou d'édition sur cette note. Elle est maintenant modifiée dans un autre onglet.",
     "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant."
+  },
+  "dashboard": {
+    "title": "Tableau de notes",
+    "empty": "Aucune note favorite pour le moment. Ajoutez des notes aux favoris pour les épingler sur ce tableau.",
+    "filter_placeholder": "Filtrer par titre, dossier ou étiquette...",
+    "unpin": "Retirer des favoris",
+    "no_folder": "Autres notes",
+    "toggle_all": "Afficher toutes les notes",
+    "toggle_favorites": "Afficher seulement les favoris"
   }
 }

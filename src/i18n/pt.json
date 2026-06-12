@@ -556,7 +556,8 @@
       "markdown_split_card_view": "Markdown com moldura",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
       "attachment_previews_in_note": "Pré-visualizações de anexos",
-      "ui_customization": "Visibilidade dos elementos"
+      "ui_customization": "Visibilidade dos elementos",
+      "notes_dashboard": "Quadro de notas"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -2563,5 +2564,14 @@
     "popup_title": "Atenção",
     "lost_to_other_tab": "Você não tem mais o bloqueio de edição desta nota. Ela agora está sendo editada em outra aba.",
     "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora."
+  },
+  "dashboard": {
+    "title": "Quadro de notas",
+    "empty": "Ainda não há notas favoritas. Marque notas como favoritas para fixá-las neste quadro.",
+    "filter_placeholder": "Filtrar por título, pasta ou etiqueta...",
+    "unpin": "Remover dos favoritos",
+    "no_folder": "Outras notas",
+    "toggle_all": "Mostrar todas as notas",
+    "toggle_favorites": "Mostrar apenas favoritos"
   }
 }

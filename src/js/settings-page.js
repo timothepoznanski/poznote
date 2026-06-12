@@ -93,6 +93,7 @@
             'hide_folder_actions',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
+            'dashboard_enabled',
             'code_block_word_wrap',
             'attachment_previews_in_note',
             'center_note_content',
@@ -951,11 +952,66 @@
         Object.keys(externalCards).forEach(function (cardId) {
             var card = document.getElementById(cardId);
             if (card) {
-                card.addEventListener('click', function () {
+                card.addEventListener('click', function (e) {
+                    e.preventDefault();
                     window.open(externalCards[cardId], '_blank');
                 });
             }
         });
+
+        var apiRestCard = document.getElementById('api-rest-card');
+        var apiRestModal = document.getElementById('apiRestModal');
+        var openGithubApiDocsBtn = document.getElementById('openGithubApiDocsBtn');
+        var openSwaggerApiBtn = document.getElementById('openSwaggerApiBtn');
+        var closeApiRestModalBtn = document.getElementById('closeApiRestModalBtn');
+        var githubApiDocsUrl = 'https://github.com/timothepoznanski/poznote/blob/main/docs/API-REST.md';
+        var swaggerApiUrl = 'api-docs/';
+
+        function openApiRestModal() {
+            if (!apiRestModal) return;
+            apiRestModal.style.display = 'flex';
+        }
+
+        function closeApiRestModal() {
+            if (!apiRestModal) return;
+            apiRestModal.style.display = 'none';
+        }
+
+        if (apiRestCard) {
+            apiRestCard.addEventListener('click', openApiRestModal);
+            apiRestCard.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openApiRestModal();
+                }
+            });
+        }
+
+        if (openGithubApiDocsBtn) {
+            openGithubApiDocsBtn.addEventListener('click', function () {
+                window.open(githubApiDocsUrl, '_blank');
+                closeApiRestModal();
+            });
+        }
+
+        if (openSwaggerApiBtn) {
+            openSwaggerApiBtn.addEventListener('click', function () {
+                closeApiRestModal();
+                window.location.href = swaggerApiUrl;
+            });
+        }
+
+        if (closeApiRestModalBtn) {
+            closeApiRestModalBtn.addEventListener('click', closeApiRestModal);
+        }
+
+        if (apiRestModal) {
+            apiRestModal.addEventListener('click', function (e) {
+                if (e.target === apiRestModal) {
+                    closeApiRestModal();
+                }
+            });
+        }
 
         var installAppCard = document.getElementById('install-app-card');
         if (installAppCard) {
@@ -982,6 +1038,7 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
+        setupToggleCard('dashboard-card', 'dashboard-status', 'dashboard_enabled', false, false);
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('attachment-previews-card', 'attachment-previews-status', 'attachment_previews_in_note', false, false);
 

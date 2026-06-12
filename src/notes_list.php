@@ -301,7 +301,7 @@ foreach($hierarchicalFolders as $folderId => $folderData) {
     }
 }
 
-// Display Favorites folder first
+// Display Favorites folder after Dashboard
 if ($favoritesFolder && $favorites_count > 0) {
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);

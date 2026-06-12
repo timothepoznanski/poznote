@@ -1189,8 +1189,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (confirmed) {
                         // Mark as handled for this session
                         sessionStorage.setItem('last_git_pull_' + ws, now);
-                        // Redirect to home.php with auto_pull parameter
-                        const homeUrl = new URL('home.php', window.location.href);
+                        // Redirect to dashboard.php with auto_pull parameter
+                        const homeUrl = new URL('dashboard.php', window.location.href);
                         homeUrl.searchParams.set('auto_pull', '1');
                         window.location.href = homeUrl.toString();
                     } else {

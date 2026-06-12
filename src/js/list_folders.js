@@ -59,7 +59,7 @@
     const backToHomeBtn = document.getElementById('backToHomeBtn');
     if (backToHomeBtn) {
         backToHomeBtn.addEventListener('click', function() {
-            window.location.href = 'home.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+            window.location.href = 'dashboard.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
         });
     }
 })();

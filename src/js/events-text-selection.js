@@ -82,7 +82,7 @@ function initTextSelectionHandlers() {
 
     function isPlainFormattingCodeBlockLanguage(language) {
         var normalizedLanguage = String(language || '').trim().toLowerCase();
-        return normalizedLanguage !== '' && (isPlainCodeBlockLanguage(normalizedLanguage) || !isSyntaxHighlightLanguage(normalizedLanguage));
+        return isPlainCodeBlockLanguage(normalizedLanguage) || !isSyntaxHighlightLanguage(normalizedLanguage);
     }
 
     function rangesOverlap(startA, endA, startB, endB) {
