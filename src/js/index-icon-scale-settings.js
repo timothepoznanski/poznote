@@ -67,7 +67,8 @@ function saveIndexIconScale() {
     const scaleInput = document.getElementById('indexIconScaleInput');
     if (!scaleInput) return;
 
-    const scale = scaleInput.value;
+    // Normalize to one decimal place so '1' becomes '1.0', etc.
+    const scale = parseFloat(scaleInput.value).toFixed(1);
 
     // Save to localStorage for immediate effect
     localStorage.setItem('index_icon_scale', scale);
@@ -87,7 +88,7 @@ function updateIndexIconScaleBadge(scale) {
 
 // Function to apply the scale (index.php only)
 function applyIndexIconScale(scale) {
-    if (!scale || scale === '1.0') {
+    if (!scale || parseFloat(scale) === 1.0) {
         const styleTag = document.getElementById('index-icon-scale-style');
         if (styleTag) styleTag.remove();
         return;
@@ -147,7 +148,7 @@ function applyIndexIconScale(scale) {
     // 3. Fallback to default 1.0
     let scale = localStorage.getItem('index_icon_scale') || '1.0';
 
-    if (scale !== '1.0') {
+    if (parseFloat(scale) !== 1.0) {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => applyIndexIconScale(scale));
         } else {
