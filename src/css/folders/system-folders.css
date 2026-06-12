@@ -95,7 +95,7 @@
 }
 
 .system-folder[data-folder="Favorites"] [class*="lucide-"].folder-icon {
-    font-size: 0.8em !important;
+    font-size: clamp(11px, 2vw, 14px) !important;
 }
 
 /* Afficher le compteur à droite de l'icône - toujours visible */

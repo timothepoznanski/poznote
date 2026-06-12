@@ -157,11 +157,11 @@ function navigateToPage(page) {
 }
 
 /**
- * Navigate back to Home (home.php)
+ * Navigate back to Home (dashboard.php)
  * Preserves workspace when available.
  */
 function goBackToHome() {
-    navigateToPage('home.php');
+    navigateToPage('dashboard.php');
 }
 
 // Expose functions globally

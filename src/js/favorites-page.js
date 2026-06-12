@@ -170,7 +170,7 @@
         var backHomeBtn = document.getElementById('backToHomeBtn');
         if (backHomeBtn) {
             backHomeBtn.addEventListener('click', function () {
-                window.location.href = 'home.php';
+                window.location.href = 'dashboard.php';
             });
         }
 

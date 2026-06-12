@@ -153,7 +153,7 @@
                 break;
             case 'navigate-to-home':
                 if (typeof navigateToDisplayOrSettings === 'function') {
-                    navigateToDisplayOrSettings('home.php');
+                    navigateToDisplayOrSettings('dashboard.php');
                 }
                 break;
             case 'navigate-to-settings':
@@ -1000,7 +1000,7 @@
 
     /**
      * Navigate to a different page while preserving workspace and note context
-     * @param {string} page - The target page (e.g., 'settings.php', 'home.php')
+     * @param {string} page - The target page (e.g., 'settings.php', 'dashboard.php')
      */
     window.navigateToDisplayOrSettings = function (page, options) {
         var url = page;

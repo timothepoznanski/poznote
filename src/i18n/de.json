@@ -558,7 +558,8 @@
       "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "attachment_previews_in_note": "Anhangsvorschauen",
-      "ui_customization": "Sichtbarkeit von Elementen"
+      "ui_customization": "Sichtbarkeit von Elementen",
+      "notes_dashboard": "Notiz-Board"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -2560,5 +2561,14 @@
     "popup_title": "Achtung",
     "lost_to_other_tab": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. Sie wird jetzt in einem anderen Tab bearbeitet.",
     "lost_to_user": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. {{user}} bearbeitet sie jetzt."
+  },
+  "dashboard": {
+    "title": "Notiz-Board",
+    "empty": "Noch keine favorisierten Notizen. Markieren Sie Notizen als Favoriten, um sie an dieses Board zu heften.",
+    "filter_placeholder": "Nach Titel, Ordner oder Tag filtern...",
+    "unpin": "Aus Favoriten entfernen",
+    "no_folder": "Andere Notizen",
+    "toggle_all": "Alle Notizen anzeigen",
+    "toggle_favorites": "Nur Favoriten anzeigen"
   }
 }

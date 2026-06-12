@@ -217,7 +217,8 @@
       "markdown_split_card_view": "Framed markdown",
       "code_block_word_wrap": "Code block word wrap",
       "attachment_previews_in_note": "Attachment previews",
-      "ui_customization": "Element visibility"
+      "ui_customization": "Element visibility",
+      "notes_dashboard": "Notes board"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -2266,5 +2267,14 @@
     "popup_title": "Attention",
     "lost_to_other_tab": "You no longer hold the edit lock for this note. It is now being edited in another tab.",
     "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it."
+  },
+  "dashboard": {
+    "title": "Notes board",
+    "empty": "No favorite notes yet. Mark notes as favorites to pin them to this board.",
+    "filter_placeholder": "Filter by title, folder or tag...",
+    "unpin": "Remove from favorites",
+    "no_folder": "Other notes",
+    "toggle_all": "Show all notes",
+    "toggle_favorites": "Show favorites only"
   }
 }

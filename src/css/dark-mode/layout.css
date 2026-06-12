@@ -297,9 +297,21 @@ body.dark-mode .links_arbo_left {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .sidebar-dashboard-link,
+body.dark-mode .sidebar-dashboard-link {
+    color: var(--dm-text);
+}
+
 html[data-theme='dark'] .links_arbo_left:hover,
 html[data-theme='dark'] .links_arbo_left.selected-note,
 body.dark-mode .links_arbo_left:hover {
+    background-color: var(--dm-sidebar-surface) !important;
+}
+
+html[data-theme='dark'] .sidebar-dashboard-link:hover,
+html[data-theme='dark'] .sidebar-dashboard-link:focus,
+body.dark-mode .sidebar-dashboard-link:hover,
+body.dark-mode .sidebar-dashboard-link:focus {
     background-color: var(--dm-sidebar-surface) !important;
 }
 
@@ -336,6 +348,11 @@ body.black-mode .note-title {
 
 html.theme-black[data-theme='dark'] .links_arbo_left,
 body.black-mode .links_arbo_left {
+    color: #66778f;
+}
+
+html.theme-black[data-theme='dark'] .sidebar-dashboard-link,
+body.black-mode .sidebar-dashboard-link {
     color: #66778f;
 }
 

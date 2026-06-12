@@ -99,6 +99,7 @@ $settingsPageUserKeys = [
     'hide_folder_actions',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
+    'dashboard_enabled',
     'code_block_word_wrap',
     'attachment_previews_in_note',
     'center_note_content',
@@ -252,7 +253,7 @@ if ($isAdmin) {
                 <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
-            <a id="backToHomeLink" href="home.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+            <a id="backToHomeLink" href="dashboard.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
     				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
             </a>
@@ -531,6 +532,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Notes Board (Dashboard) -->
+            <div class="home-card" id="dashboard-card">
+                <div class="home-card-icon"><i class="lucide lucide-sticky-note"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.notes_dashboard', [], 'Notes board'); ?></span>
+                    <span id="dashboard-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
             <!-- Code Block Word Wrap -->
             <div class="home-card" id="code-wrap-card">
                 <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
@@ -669,7 +679,69 @@ if ($isAdmin) {
         </div>
         <?php endif; ?>
 
+        <!-- DOCUMENTATION CATEGORY -->
+        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'Documentation'); ?></h2>
+        <div class="home-grid" id="settings-documentation-section-grid">
+
+            <!-- Version -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" rel="noopener noreferrer" class="home-card" id="version-card" title="<?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-info-circle"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span>
+                    <span class="home-card-count"><?php echo $app_version_display; ?></span>
+                </div>
+            </a>
+
+            <!-- GitHub documentation -->
+            <a href="https://github.com/timothepoznanski/poznote" target="_blank" rel="noopener noreferrer" class="home-card" id="github-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-github"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span>
+                </div>
+            </a>
+
+            <?php if ($isAdmin): ?>
+            <!-- API REST -->
+            <div class="home-card" id="api-rest-card" role="button" tabindex="0">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Poznote Website -->
+            <a href="https://poznote.com" target="_blank" rel="noopener noreferrer" class="home-card" id="website-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-globe"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
+                </div>
+            </a>
+
+        </div>
+
     </div>
+
+    <?php if ($isAdmin): ?>
+    <div id="apiRestModal" class="modal">
+        <div class="modal-content">
+            <h3><?php echo t_h('modals.api_rest.title', [], 'API REST'); ?></h3>
+            <div class="modal-buttons" style="flex-wrap: nowrap; justify-content: space-between;">
+                <button type="button" class="btn-primary" id="openGithubApiDocsBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.github_option', [], 'GitHub'); ?></button>
+                <button type="button" class="btn-primary" id="openSwaggerApiBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.swagger_option', [], 'Swagger'); ?></button>
+                <button type="button" class="btn-danger" id="closeApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <?php include 'modals.php'; ?>
     <script type="application/json" id="page-config-data"><?php
