@@ -1386,6 +1386,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Afficher dans la liste des dossiers"
+    },
     "errors": {
       "create_task_list": "Erreur lors de la création de la liste de tâches",
       "create_task_list_prefix": "Erreur lors de la création de la liste de tâches : ",

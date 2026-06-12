@@ -430,6 +430,11 @@
                     showSnapshotModal(noteId);
                 }
                 break;
+            case 'reveal-folder-in-tree':
+                if (typeof revealFolderInTree === 'function') {
+                    revealFolderInTree(target.dataset.folderId);
+                }
+                break;
             case 'show-move-folder-dialog':
                 if (isPublicWorkspaceReadOnly()) {
                     break;

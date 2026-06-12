@@ -261,6 +261,7 @@ window.executeDeleteFolder = executeDeleteFolder;
 window.showDeleteFolderModal = showDeleteFolderModal;
 window.selectFolder = selectFolder;
 window.toggleFolder = toggleFolder;
+window.revealFolderInTree = revealFolderInTree;
 window.restoreFolderStates = restoreFolderStates;
 window.persistFolderStatesFromDOM = persistFolderStatesFromDOM;
 window.showNewWorkspacePrompt = showNewWorkspacePrompt;

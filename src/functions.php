@@ -2174,6 +2174,50 @@ function getFolderPath($folder_id, $con) {
 }
 
 /**
+ * Get the complete folder path as individual segments (root first)
+ * @param int $folder_id The folder ID
+ * @param PDO $con Database connection
+ * @return array Array of ['id' => int, 'name' => string] from root folder down to the folder itself
+ */
+function getFolderPathSegments($folder_id, $con) {
+    static $folderData = null;
+
+    if ($folder_id === null || $folder_id === 0) {
+        return [];
+    }
+
+    // Pre-load ALL folders on first call to avoid N+1 queries
+    if ($folderData === null) {
+        $folderData = [];
+        try {
+            $stmt = $con->query("SELECT id, name, parent_id FROM folders");
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $folderData[(int)$row['id']] = [
+                    'name' => $row['name'],
+                    'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null
+                ];
+            }
+        } catch (Exception $e) {
+            $folderData = [];
+        }
+    }
+
+    $segments = [];
+    $currentId = (int)$folder_id;
+    $maxDepth = 50; // Prevent infinite loops
+    $depth = 0;
+
+    while ($currentId !== null && isset($folderData[$currentId]) && $depth < $maxDepth) {
+        $folder = $folderData[$currentId];
+        array_unshift($segments, ['id' => $currentId, 'name' => $folder['name']]);
+        $currentId = $folder['parent_id'];
+        $depth++;
+    }
+
+    return $segments;
+}
+
+/**
  * Fix database inconsistencies in notes:
  * 1. Populates folder_id from legacy folder (TEXT) column.
  * 2. Re-generates search snippets (entry column) from physical files if empty.

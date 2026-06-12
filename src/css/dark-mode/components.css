@@ -43,13 +43,11 @@ body.dark-mode .tag-name {
 /* Editable tags */
 html[data-theme='dark'] .clickable-tag-wrapper,
 body.dark-mode .clickable-tag-wrapper {
-    background: var(--dm-surface);
     border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .clickable-tag-wrapper:hover,
 body.dark-mode .clickable-tag-wrapper:hover {
-    background: var(--dm-surface-hover);
     border-color: var(--dm-border-light);
 }
 
@@ -108,15 +106,23 @@ body.dark-mode .tag-input::placeholder {
 /* Folder name badge */
 html[data-theme='dark'] .folder_name,
 body.dark-mode .folder_name {
-    background: var(--dm-surface);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder_name:hover,
 body.dark-mode .folder_name:hover {
-    background: var(--dm-surface-hover);
     border-color: var(--dm-border-light);
+}
+
+html[data-theme='dark'] .folder-path-segment:hover,
+body.dark-mode .folder-path-segment:hover {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .folder-path-separator,
+body.dark-mode .folder-path-separator {
+    color: #64748b;
 }
 
 /* Tag suggestions dropdown */

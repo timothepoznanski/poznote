@@ -852,7 +852,21 @@ if ($isPublicWorkspaceReadonly) {
                     echo '<div class="note-tags-row">';
                     echo '<div class="folder-wrapper">';
                     echo '<span class="lucide lucide-folder icon_folder cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
-                    echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                    $folder_path_segments = $folder_id ? getFolderPathSegments($folder_id, $con) : [];
+                    if (!empty($folder_path_segments)) {
+                        // Breadcrumb: each segment reveals (expands) its folder in the left folder list
+                        $reveal_title = t_h('index.folder_path.reveal_in_list', [], 'Show in folder list');
+                        echo '<span class="folder_name folder-breadcrumb">';
+                        foreach ($folder_path_segments as $segment_index => $segment) {
+                            if ($segment_index > 0) {
+                                echo '<span class="folder-path-separator">/</span>';
+                            }
+                            echo '<span class="folder-path-segment" data-action="reveal-folder-in-tree" data-folder-id="'.(int)$segment['id'].'" title="'.$reveal_title.'">'.htmlspecialchars($segment['name'], ENT_QUOTES).'</span>';
+                        }
+                        echo '</span>';
+                    } else {
+                        echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                    }
                     echo '</div>';
                     
                     echo '<div class="tag-actions-dropdown">';

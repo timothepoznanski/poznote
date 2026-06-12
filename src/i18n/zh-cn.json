@@ -1328,6 +1328,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "在文件夹列表中显示"
+    },
     "errors": {
       "create_task_list": "创建任务列表出错",
       "create_task_list_prefix": "创建任务列表出错: ",

@@ -1338,6 +1338,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Mostrar na lista de pastas"
+    },
     "errors": {
       "create_task_list": "Erro ao criar lista de tarefas",
       "create_task_list_prefix": "Erro ao criar lista de tarefas: ",

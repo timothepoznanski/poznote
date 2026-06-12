@@ -1334,6 +1334,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "In der Ordnerliste anzeigen"
+    },
     "errors": {
       "create_task_list": "Fehler beim Erstellen der Aufgabenliste",
       "create_task_list_prefix": "Fehler beim Erstellen der Aufgabenliste: ",

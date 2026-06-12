@@ -904,6 +904,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Показать в списке папок"
+    },
     "errors": {
       "create_task_list": "Ошибка при создании списка задач",
       "create_task_list_prefix": "Ошибка при создании списка задач: ",

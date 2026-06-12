@@ -1541,6 +1541,40 @@ function toggleFolder(folderId) {
 }
 
 /**
+ * Reveal a folder in the left folder list: expand it and all of its
+ * ancestor folders, then scroll to its header and highlight it briefly.
+ * Used by the folder breadcrumb segments in the note header.
+ * @param {string|number} folderId - The folder database ID
+ */
+function revealFolderInTree(folderId) {
+    var content = document.getElementById('folder-' + folderId);
+    var header = document.querySelector(".folder-header[data-folder-key='folder_" + folderId + "']");
+    // Folder may be absent from the list (search mode, folder filter)
+    if (!content || !header) return;
+
+    // Expand the folder itself and every ancestor folder
+    var node = content;
+    while (node) {
+        if (node.classList.contains('folder-content')) {
+            var isHidden = node.style.display === 'none' || window.getComputedStyle(node).display === 'none';
+            if (isHidden) toggleFolder(node.id);
+        }
+        node = node.parentElement ? node.parentElement.closest('.folder-content') : null;
+    }
+
+    // On mobile the note view hides the list: switch back to the left column first
+    if (window.innerWidth <= 800 && typeof window.scrollToLeftColumn === 'function') {
+        window.scrollToLeftColumn();
+    }
+
+    header.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    header.classList.add('folder-reveal-highlight');
+    setTimeout(function () {
+        header.classList.remove('folder-reveal-highlight');
+    }, 1600);
+}
+
+/**
  * Persist current folder open/closed states to localStorage
  * Useful before actions that reload the page (e.g., drag & drop moves)
  */
