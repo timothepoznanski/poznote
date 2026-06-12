@@ -73,7 +73,7 @@ function markdownUsesSyntaxHighlightLanguage($language) {
 
 function markdownUsesPlainFormattingCodeBlockLanguage($language) {
     $normalizedLanguage = is_string($language) ? strtolower(trim($language)) : '';
-    return $normalizedLanguage !== '' && (markdownUsesPlainCodeBlockLanguage($normalizedLanguage) || !markdownUsesSyntaxHighlightLanguage($normalizedLanguage));
+    return markdownUsesPlainCodeBlockLanguage($normalizedLanguage) || !markdownUsesSyntaxHighlightLanguage($normalizedLanguage);
 }
 
 function markdownGetPlainCodeBlockDisplayLanguage($language) {
