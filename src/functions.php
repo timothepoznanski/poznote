@@ -732,10 +732,7 @@ function getSetting($key, $default = null) {
 function poznoteGetNonHideableUiKeys() {
     return [
         'card:check-updates-card' => true,
-        'card:github-card' => true,
         'card:home-support-card' => true,
-        'card:version-card' => true,
-        'card:website-card' => true,
     ];
 }
 

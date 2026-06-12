@@ -7,10 +7,7 @@
 
     var NON_HIDEABLE_UI_KEYS = {
         'card:check-updates-card': true,
-        'card:github-card': true,
-        'card:home-support-card': true,
-        'card:version-card': true,
-        'card:website-card': true
+        'card:home-support-card': true
     };
 
     var CUSTOMIZABLE_TOOLBAR_BUTTONS = {
