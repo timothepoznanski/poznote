@@ -1139,27 +1139,6 @@ try {
             <div class="ui-custom-sections-scroll">
                 <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
 
-                <!-- Dashboard Cards Section -->
-                <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.home_cards', [], 'Dashboard Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
-                <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notes-card" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-tags-card" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-favorites-card" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-folders-card" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-shares-card" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-notifications-card" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-trash-card" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-attachments-card" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-git-push-card" checked><span><?php echo t_h('git_sync.actions.push.button', ['provider' => 'Git'], 'Git Push'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-git-pull-card" checked><span><?php echo t_h('git_sync.actions.pull.button', ['provider' => 'Git'], 'Git Pull'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:home-logout-card" checked><span><?php echo t_h('workspaces.menu.logout', [], 'Logout'); ?></span></label>
-                </div>
-                </div>
-
                 <!-- Create Cards Section -->
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.create_cards', [], 'Create Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
@@ -1202,6 +1181,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachment-previews-card" checked><span><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:smtp-config-card" checked><span><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span></label>
@@ -1210,6 +1190,9 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:version-card" checked><span><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
                 </div>
                 </div>
 

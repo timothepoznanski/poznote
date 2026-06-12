@@ -349,7 +349,7 @@
     function handleDashboardGitAction(actionBtn) {
         var action = actionBtn.getAttribute('data-dashboard-git-action');
         var titleEl = actionBtn.querySelector('.dashboard-git-action-title');
-        var title = titleEl ? titleEl.textContent : 'Sync';
+        var title = titleEl ? titleEl.textContent : (action === 'pull' ? 'Pull' : 'Push');
         var confirmMsg = action === 'pull' ? gitTxt.confirmPull : gitTxt.confirmPush;
 
         closeDashboardGitModal();
@@ -447,6 +447,32 @@
             gitBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 openDashboardGitModal();
+            });
+        }
+
+        // --- API REST modal ---
+        var apiRestBtn   = document.getElementById('dashboardApiRestBtn');
+        var apiRestModal = document.getElementById('dashboardApiRestModal');
+        if (apiRestBtn && apiRestModal) {
+            apiRestBtn.addEventListener('click', function () {
+                apiRestModal.style.display = 'flex';
+            });
+            apiRestModal.addEventListener('click', function (e) {
+                if (e.target === apiRestModal) apiRestModal.style.display = 'none';
+            });
+            var ghBtn = document.getElementById('dashboardOpenGithubApiDocsBtn');
+            if (ghBtn) ghBtn.addEventListener('click', function () {
+                window.open('https://github.com/timothepoznanski/poznote/blob/main/docs/API-REST.md', '_blank');
+                apiRestModal.style.display = 'none';
+            });
+            var swBtn = document.getElementById('dashboardOpenSwaggerApiBtn');
+            if (swBtn) swBtn.addEventListener('click', function () {
+                apiRestModal.style.display = 'none';
+                window.location.href = 'api-docs/';
+            });
+            var closeBtn = document.getElementById('dashboardCloseApiRestModalBtn');
+            if (closeBtn) closeBtn.addEventListener('click', function () {
+                apiRestModal.style.display = 'none';
             });
         }
 

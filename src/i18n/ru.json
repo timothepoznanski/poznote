@@ -904,6 +904,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Показать в списке папок"
+    },
     "errors": {
       "create_task_list": "Ошибка при создании списка задач",
       "create_task_list_prefix": "Ошибка при создании списка задач: ",
@@ -1568,6 +1571,8 @@
     "home": "Панель",
     "settings": "Настройки",
     "create": "Создать",
+    "expand_all_folders": "Развернуть все папки",
+    "collapse_all_folders": "Свернуть все папки",
     "toggle": "Скрыть/Показать левую колонку"
   },
   "home": {

@@ -583,6 +583,8 @@
     "home": "Painel",
     "settings": "Configurações",
     "create": "Criar",
+    "expand_all_folders": "Expandir todas as pastas",
+    "collapse_all_folders": "Recolher todas as pastas",
     "toggle": "Mostrar/Ocultar a coluna esquerda"
   },
   "home": {
@@ -1338,6 +1340,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Mostrar na lista de pastas"
+    },
     "errors": {
       "create_task_list": "Erro ao criar lista de tarefas",
       "create_task_list_prefix": "Erro ao criar lista de tarefas: ",

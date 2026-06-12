@@ -52,6 +52,21 @@
     }
 }
 
+/* Highlight flash when a folder is revealed from the note header breadcrumb */
+.folder-header.folder-reveal-highlight > .folder-toggle {
+    animation: folderRevealFlash 1.6s ease-out;
+    border-radius: 6px;
+}
+
+@keyframes folderRevealFlash {
+    0%, 50% {
+        background-color: rgba(0, 125, 184, 0.18);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
 /* Smooth transition for note selection */
 .links_arbo_left {
     transition: background-color 0.2s ease, border-left 0.2s ease;

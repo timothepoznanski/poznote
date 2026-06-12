@@ -585,6 +585,8 @@
     "home": "Dashboard",
     "settings": "Einstellungen",
     "create": "Erstellen",
+    "expand_all_folders": "Alle Ordner aufklappen",
+    "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden"
   },
   "home": {
@@ -1334,6 +1336,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "In der Ordnerliste anzeigen"
+    },
     "errors": {
       "create_task_list": "Fehler beim Erstellen der Aufgabenliste",
       "create_task_list_prefix": "Fehler beim Erstellen der Aufgabenliste: ",

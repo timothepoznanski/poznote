@@ -601,6 +601,8 @@
     "home": "Tableau de bord",
     "settings": "Paramètres",
     "create": "Créer",
+    "expand_all_folders": "Tout déplier",
+    "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche"
   },
   "home": {
@@ -1386,6 +1388,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Afficher dans la liste des dossiers"
+    },
     "errors": {
       "create_task_list": "Erreur lors de la création de la liste de tâches",
       "create_task_list_prefix": "Erreur lors de la création de la liste de tâches : ",

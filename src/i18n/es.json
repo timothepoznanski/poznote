@@ -585,6 +585,8 @@
     "home": "Panel",
     "settings": "Configuración",
     "create": "Crear",
+    "expand_all_folders": "Expandir todas las carpetas",
+    "collapse_all_folders": "Contraer todas las carpetas",
     "toggle": "Mostrar/Ocultar la columna izquierda"
   },
   "home": {
@@ -1334,6 +1336,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Mostrar en la lista de carpetas"
+    },
     "errors": {
       "create_task_list": "Error al crear lista de tareas",
       "create_task_list_prefix": "Error al crear lista de tareas: ",

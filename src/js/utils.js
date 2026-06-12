@@ -1506,9 +1506,23 @@ function saveFolderName() {
         });
 }
 
-// Folder management function (open/closed folder icon)
-function toggleFolder(folderId) {
+function getFolderContentElements() {
+    return Array.prototype.slice.call(document.querySelectorAll('#left_col .folder-content[id]')).filter(function (content) {
+        var folderHeader = content.closest('.folder-header');
+        return !folderHeader || folderHeader.getAttribute('data-folder') !== 'Favorites';
+    });
+}
+
+function isFolderContentOpen(content) {
+    if (!content) return false;
+    var display = content.style.display || window.getComputedStyle(content).display;
+    return display !== 'none';
+}
+
+function setFolderOpenState(folderId, isOpen) {
     var content = document.getElementById(folderId);
+    if (!content) return;
+
     // Find the corresponding folder header/icon by folder DOM id (e.g. "folder-123")
     var folderNameEl = document.querySelector('.folder-name[data-folder-dom-id="' + folderId + '"]');
     var folderToggle = folderNameEl ? folderNameEl.closest('.folder-toggle') : null;
@@ -1521,7 +1535,7 @@ function toggleFolder(folderId) {
     // Check if icon is custom (don't toggle if custom)
     var isCustomIcon = icon && icon.getAttribute('data-custom-icon') === 'true';
 
-    if (content.style.display === 'none') {
+    if (isOpen) {
         content.style.display = 'block';
         // show open folder icon (only if not custom and not favorites)
         if (icon && !isFavoritesFolder && !isCustomIcon) {
@@ -1538,6 +1552,92 @@ function toggleFolder(folderId) {
         }
         localStorage.setItem('folder_' + folderId, 'closed');
     }
+}
+
+function getShouldExpandAllFolders() {
+    var folderContents = getFolderContentElements();
+    if (folderContents.length === 0) return false;
+
+    return folderContents.some(function (content) {
+        return !isFolderContentOpen(content);
+    });
+}
+
+function updateToggleAllFoldersButton() {
+    var button = document.querySelector('[data-action="toggle-all-folders"]');
+    if (!button) return;
+
+    var folderContents = getFolderContentElements();
+    var hasFolders = folderContents.length > 0;
+    var shouldExpand = !hasFolders || getShouldExpandAllFolders();
+    var icon = button.querySelector('.lucide');
+    var title = shouldExpand
+        ? (window.t ? window.t('sidebar.expand_all_folders', null, 'Expand all folders') : 'Expand all folders')
+        : (window.t ? window.t('sidebar.collapse_all_folders', null, 'Collapse all folders') : 'Collapse all folders');
+
+    button.disabled = !hasFolders;
+    button.title = title;
+    button.setAttribute('aria-label', title);
+    button.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
+
+    if (icon) {
+        icon.classList.toggle('lucide-chevron-down', shouldExpand);
+        icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+    }
+}
+
+function toggleAllFolders() {
+    var folderContents = getFolderContentElements();
+    if (folderContents.length === 0) return;
+
+    var shouldOpen = getShouldExpandAllFolders();
+    folderContents.forEach(function (content) {
+        setFolderOpenState(content.id, shouldOpen);
+    });
+    updateToggleAllFoldersButton();
+}
+
+// Folder management function (open/closed folder icon)
+function toggleFolder(folderId) {
+    var content = document.getElementById(folderId);
+    if (!content) return;
+
+    setFolderOpenState(folderId, !isFolderContentOpen(content));
+    updateToggleAllFoldersButton();
+}
+
+/**
+ * Reveal a folder in the left folder list: expand it and all of its
+ * ancestor folders, then scroll to its header and highlight it briefly.
+ * Used by the folder breadcrumb segments in the note header.
+ * @param {string|number} folderId - The folder database ID
+ */
+function revealFolderInTree(folderId) {
+    var content = document.getElementById('folder-' + folderId);
+    var header = document.querySelector(".folder-header[data-folder-key='folder_" + folderId + "']");
+    // Folder may be absent from the list (search mode, folder filter)
+    if (!content || !header) return;
+
+    // Expand the folder itself and every ancestor folder
+    var node = content;
+    while (node) {
+        if (node.classList.contains('folder-content')) {
+            var isHidden = node.style.display === 'none' || window.getComputedStyle(node).display === 'none';
+            if (isHidden) toggleFolder(node.id);
+        }
+        node = node.parentElement ? node.parentElement.closest('.folder-content') : null;
+    }
+
+    // On mobile the note view hides the list: switch back to the left column first
+    if (window.innerWidth <= 800 && typeof window.scrollToLeftColumn === 'function') {
+        window.scrollToLeftColumn();
+    }
+
+    header.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+    header.classList.add('folder-reveal-highlight');
+    setTimeout(function () {
+        header.classList.remove('folder-reveal-highlight');
+    }, 1600);
 }
 
 /**
@@ -1622,6 +1722,8 @@ function restoreFolderStates() {
         favoritesHeader.classList.remove('favorites-collapsed');
         localStorage.removeItem('favorites_collapsed');
     }
+
+    updateToggleAllFoldersButton();
 }
 
 function emptyFolder(folderId, folderName) {

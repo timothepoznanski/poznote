@@ -31,7 +31,6 @@
     color: #37352F;
     flex-shrink: 0;
     margin-right: 20px;
-    background: #f0f4f8;
     padding: 4px 8px;
     border-radius: 12px;
     border: 1px solid #e2e8f0;
@@ -41,8 +40,26 @@
 }
 
 .folder_name:hover {
-    background: #e2e8f0;
     border-color: #cbd5e1;
+}
+
+/* Folder breadcrumb (segmented path inside the folder badge) */
+.folder_name.folder-breadcrumb {
+    white-space: nowrap;
+}
+
+.folder-path-segment {
+    cursor: pointer;
+}
+
+.folder-path-segment:hover {
+    color: #007DB8;
+    text-decoration: underline;
+}
+
+.folder-path-separator {
+    margin: 0 4px;
+    color: #94a3b8;
 }
 
 .folder-wrapper {
@@ -125,7 +142,6 @@
 .clickable-tag-wrapper {
     display: inline-flex;
     align-items: center;
-    background: #f0f4f8;
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     transition: all 0.2s ease;
@@ -133,7 +149,6 @@
 }
 
 .clickable-tag-wrapper:hover {
-    background: #e2e8f0;
     border-color: #cbd5e1;
 }
 

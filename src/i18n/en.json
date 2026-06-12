@@ -917,6 +917,9 @@
     }
   },
   "index": {
+    "folder_path": {
+      "reveal_in_list": "Show in folder list"
+    },
     "errors": {
       "create_task_list": "Error creating task list",
       "create_task_list_prefix": "Error creating task list: ",
@@ -1591,6 +1594,8 @@
     "home": "Dashboard",
     "settings": "Settings",
     "create": "Create",
+    "expand_all_folders": "Expand all folders",
+    "collapse_all_folders": "Collapse all folders",
     "toggle": "Hide/Show left column"
   },
   "home": {
