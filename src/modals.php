@@ -718,6 +718,7 @@ try {
         <div class="modal-body">
             <p><?php echo t_h('modals.timezone.description', [], 'Select your timezone:'); ?></p>
             <select id="timezoneSelect" class="timezone-select">
+                <option value="UTC">UTC</option>
                 <optgroup label="<?php echo t_h('modals.timezone.groups.europe', [], 'Europe'); ?>">
                     <option value="Europe/Paris">Europe/Paris (France, CET/CEST)</option>
                     <option value="Europe/London">Europe/London (UK, GMT/BST)</option>
@@ -737,19 +738,41 @@ try {
                     <option value="Europe/Moscow">Europe/Moscow (Russia, MSK)</option>
                     <option value="Europe/Lisbon">Europe/Lisbon (Portugal, WET/WEST)</option>
                     <option value="Europe/Dublin">Europe/Dublin (Ireland, GMT/IST)</option>
+                    <option value="Atlantic/Reykjavik">Atlantic/Reykjavik (Iceland, GMT)</option>
+                    <option value="Europe/Prague">Europe/Prague (Czech Republic, CET/CEST)</option>
+                    <option value="Europe/Budapest">Europe/Budapest (Hungary, CET/CEST)</option>
+                    <option value="Europe/Belgrade">Europe/Belgrade (Serbia, CET/CEST)</option>
+                    <option value="Europe/Bucharest">Europe/Bucharest (Romania, EET/EEST)</option>
+                    <option value="Europe/Sofia">Europe/Sofia (Bulgaria, EET/EEST)</option>
+                    <option value="Europe/Kyiv">Europe/Kyiv (Ukraine, EET/EEST)</option>
+                    <option value="Europe/Istanbul">Europe/Istanbul (Turkey, TRT)</option>
                 </optgroup>
                 <optgroup label="<?php echo t_h('modals.timezone.groups.america', [], 'America'); ?>">
                     <option value="America/New_York">America/New_York (US Eastern)</option>
                     <option value="America/Chicago">America/Chicago (US Central)</option>
                     <option value="America/Denver">America/Denver (US Mountain)</option>
                     <option value="America/Los_Angeles">America/Los_Angeles (US Pacific)</option>
+                    <option value="America/Phoenix">America/Phoenix (US Arizona)</option>
                     <option value="America/Anchorage">America/Anchorage (US Alaska)</option>
-                    <option value="America/Honolulu">America/Honolulu (US Hawaii)</option>
+                    <option value="Pacific/Honolulu">Pacific/Honolulu (US Hawaii)</option>
+                    <option value="America/St_Johns">America/St_Johns (Newfoundland, NST/NDT)</option>
+                    <option value="America/Halifax">America/Halifax (Canada Atlantic, AST/ADT)</option>
                     <option value="America/Toronto">America/Toronto (Canada Eastern)</option>
+                    <option value="America/Winnipeg">America/Winnipeg (Canada Central, CST/CDT)</option>
+                    <option value="America/Regina">America/Regina (Canada Saskatchewan, CST)</option>
+                    <option value="America/Edmonton">America/Edmonton (Canada Mountain, MST/MDT)</option>
                     <option value="America/Vancouver">America/Vancouver (Canada Pacific)</option>
+                    <option value="America/Whitehorse">America/Whitehorse (Canada Yukon, MST)</option>
                     <option value="America/Mexico_City">America/Mexico_City (Mexico)</option>
+                    <option value="America/Havana">America/Havana (Cuba)</option>
+                    <option value="America/Puerto_Rico">America/Puerto_Rico (Puerto Rico, AST)</option>
+                    <option value="America/Jamaica">America/Jamaica (Jamaica, EST)</option>
+                    <option value="America/Guatemala">America/Guatemala (Guatemala)</option>
+                    <option value="America/Panama">America/Panama (Panama)</option>
+                    <option value="America/Caracas">America/Caracas (Venezuela)</option>
                     <option value="America/Sao_Paulo">America/Sao_Paulo (Brazil)</option>
                     <option value="America/Buenos_Aires">America/Buenos_Aires (Argentina)</option>
+                    <option value="America/Montevideo">America/Montevideo (Uruguay)</option>
                     <option value="America/Santiago">America/Santiago (Chile)</option>
                     <option value="America/Bogota">America/Bogota (Colombia)</option>
                     <option value="America/Lima">America/Lima (Peru)</option>
@@ -766,17 +789,36 @@ try {
                     <option value="Asia/Jakarta">Asia/Jakarta (Indonesia)</option>
                     <option value="Asia/Manila">Asia/Manila (Philippines)</option>
                     <option value="Asia/Taipei">Asia/Taipei (Taiwan)</option>
+                    <option value="Asia/Ho_Chi_Minh">Asia/Ho_Chi_Minh (Vietnam)</option>
+                    <option value="Asia/Kuala_Lumpur">Asia/Kuala_Lumpur (Malaysia)</option>
+                    <option value="Asia/Colombo">Asia/Colombo (Sri Lanka)</option>
+                    <option value="Asia/Dhaka">Asia/Dhaka (Bangladesh)</option>
+                    <option value="Asia/Yangon">Asia/Yangon (Myanmar)</option>
+                    <option value="Asia/Kathmandu">Asia/Kathmandu (Nepal)</option>
                     <option value="Asia/Karachi">Asia/Karachi (Pakistan)</option>
                     <option value="Asia/Tehran">Asia/Tehran (Iran)</option>
                     <option value="Asia/Jerusalem">Asia/Jerusalem (Israel)</option>
                     <option value="Asia/Riyadh">Asia/Riyadh (Saudi Arabia)</option>
+                    <option value="Asia/Tbilisi">Asia/Tbilisi (Georgia)</option>
+                    <option value="Asia/Yerevan">Asia/Yerevan (Armenia)</option>
+                    <option value="Asia/Baku">Asia/Baku (Azerbaijan)</option>
+                    <option value="Asia/Almaty">Asia/Almaty (Kazakhstan)</option>
+                    <option value="Asia/Tashkent">Asia/Tashkent (Uzbekistan)</option>
                 </optgroup>
                 <optgroup label="<?php echo t_h('modals.timezone.groups.pacific', [], 'Pacific'); ?>">
                     <option value="Pacific/Auckland">Pacific/Auckland (New Zealand)</option>
                     <option value="Australia/Sydney">Australia/Sydney</option>
                     <option value="Australia/Melbourne">Australia/Melbourne</option>
+                    <option value="Australia/Hobart">Australia/Hobart (Tasmania)</option>
+                    <option value="Australia/Adelaide">Australia/Adelaide (Australia Central)</option>
                     <option value="Australia/Brisbane">Australia/Brisbane</option>
+                    <option value="Australia/Darwin">Australia/Darwin (Northern Territory)</option>
                     <option value="Australia/Perth">Australia/Perth</option>
+                    <option value="Pacific/Chatham">Pacific/Chatham (Chatham Islands)</option>
+                    <option value="Pacific/Guam">Pacific/Guam</option>
+                    <option value="Pacific/Port_Moresby">Pacific/Port_Moresby (Papua New Guinea)</option>
+                    <option value="Pacific/Apia">Pacific/Apia (Samoa)</option>
+                    <option value="Pacific/Tongatapu">Pacific/Tongatapu (Tonga)</option>
                     <option value="Pacific/Fiji">Pacific/Fiji</option>
                 </optgroup>
                 <optgroup label="<?php echo t_h('modals.timezone.groups.africa', [], 'Africa'); ?>">
@@ -785,6 +827,12 @@ try {
                     <option value="Africa/Lagos">Africa/Lagos (Nigeria)</option>
                     <option value="Africa/Nairobi">Africa/Nairobi (Kenya)</option>
                     <option value="Africa/Casablanca">Africa/Casablanca (Morocco)</option>
+                    <option value="Africa/Algiers">Africa/Algiers (Algeria)</option>
+                    <option value="Africa/Tunis">Africa/Tunis (Tunisia)</option>
+                    <option value="Africa/Accra">Africa/Accra (Ghana)</option>
+                    <option value="Africa/Abidjan">Africa/Abidjan (Cote d'Ivoire)</option>
+                    <option value="Africa/Maputo">Africa/Maputo (Mozambique)</option>
+                    <option value="Africa/Harare">Africa/Harare (Zimbabwe)</option>
                 </optgroup>
             </select>
         </div>
