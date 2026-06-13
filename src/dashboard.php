@@ -151,7 +151,6 @@ function dashboardBuildContextItems(string $pageWorkspace): array {
             'icon'  => 'lucide-layers',
             'label' => 'Workspace',
             'value' => $pageWorkspace,
-            'href'  => dashboardBuildPageUrl('workspaces.php', $pageWorkspace),
         ];
     }
 
@@ -161,7 +160,6 @@ function dashboardBuildContextItems(string $pageWorkspace): array {
             'icon'  => 'lucide-user',
             'label' => 'User',
             'value' => $username,
-            'href'  => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin() ? dashboardBuildPageUrl('admin/users.php', $pageWorkspace) : '',
         ];
     }
 
@@ -501,19 +499,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 					<?php foreach ($dashboardContextItems as $item): ?>
 						<?php
 							$contextTitle = $item['label'] . ': ' . $item['value'];
-							$contextHref = trim((string)($item['href'] ?? ''));
 						?>
-						<?php if ($contextHref !== ''): ?>
-						<a href="<?php echo htmlspecialchars($contextHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="dashboard-sidebar-context-item dashboard-sidebar-context-link" title="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-							<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
-							<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-						</a>
-						<?php else: ?>
 						<div class="dashboard-sidebar-context-item" title="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 							<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
 							<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
 						</div>
-						<?php endif; ?>
 					<?php endforeach; ?>
 				</div>
 			<?php endif; ?>
@@ -548,7 +538,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 				<i class="lucide lucide-globe"></i>
 			</a>
 			<hr class="dashboard-sidebar-sep">
-			<a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn dashboard-sidebar-kofi" title="Support on Ko-fi">
+			<a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn dashboard-sidebar-kofi" title="<?php echo t_h('settings.cards.buy_me_a_coffee', [], 'Buy me a coffee'); ?>">
 				<i class="lucide lucide-heart"></i>
 			</a>
 		</nav>
