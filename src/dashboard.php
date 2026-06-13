@@ -16,37 +16,40 @@ $currentLang = getUserLanguage();
 
 /**
  * Build a short plain-text excerpt (or task preview) for a board card.
- * @return array{text: string, tasks: ?array}
+ * @return array{text: string, tasks: ?array, search: string}
  */
 function dashboardBuildNotePreview($noteId, $type) {
     $file = getEntryFilename($noteId, $type);
     if (!is_readable($file)) {
-        return ['text' => '', 'tasks' => null];
+        return ['text' => '', 'tasks' => null, 'search' => ''];
     }
 
-    $raw = @file_get_contents($file, false, null, 0, 32768);
+    $raw = @file_get_contents($file);
     if ($raw === false || $raw === '') {
-        return ['text' => '', 'tasks' => null];
+        return ['text' => '', 'tasks' => null, 'search' => ''];
     }
 
     if ($type === 'tasklist') {
         $json = normalizeTasklistJsonContent($raw);
         $items = json_decode($json !== '' ? $json : $raw, true);
         $tasks = [];
+        $taskSearch = [];
         if (is_array($items)) {
             foreach ($items as $item) {
                 if (!is_array($item)) continue;
                 $label = trim((string)($item['text'] ?? ''));
                 if ($label === '') continue;
-                $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
-                if (count($tasks) >= 4) break;
+                $taskSearch[] = $label;
+                if (count($tasks) < 4) {
+                    $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
+                }
             }
         }
-        return ['text' => '', 'tasks' => $tasks];
+        return ['text' => '', 'tasks' => $tasks, 'search' => implode(' ', $taskSearch)];
     }
 
     if ($type === 'markdown') {
-        $text = preg_replace('/```[\s\S]*?```/', ' ', $raw);
+        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $raw);
         $text = preg_replace('/^#{1,6}\s+/m', '', $text);
         $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
         $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
@@ -59,11 +62,12 @@ function dashboardBuildNotePreview($noteId, $type) {
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $text = preg_replace('/\s+/u', ' ', $text);
     $text = trim((string)$text);
-    if ($text !== '' && mb_strlen($text, 'UTF-8') > 220) {
-        $text = rtrim(mb_substr($text, 0, 220, 'UTF-8')) . '…';
+    $previewText = $text;
+    if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > 220) {
+        $previewText = rtrim(mb_substr($previewText, 0, 220, 'UTF-8')) . '…';
     }
 
-    return ['text' => $text, 'tasks' => null];
+    return ['text' => $previewText, 'tasks' => null, 'search' => $text];
 }
 
 function dashboardFolderHasNotes(int $id, array &$folders): bool {
@@ -87,6 +91,7 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'text'    => $preview['text'],
         'tasks'   => $preview['tasks'],
         'tags'    => $tags,
+        'search'  => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
         'updated' => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
     ];
 }
@@ -523,7 +528,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 						type="text"
 						id="filterInput"
 						class="dashboard-filter-input"
-						placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, folder or tag...'); ?>"
+						placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'); ?>"
 						autocomplete="off"
 					/>
 					<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">

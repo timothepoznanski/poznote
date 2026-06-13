@@ -2710,7 +2710,7 @@
   "dashboard": {
     "title": "笔记看板",
     "empty": "还没有收藏的笔记。将笔记标记为收藏即可固定到此便签板。",
-    "filter_placeholder": "按标题、文件夹或标签筛选...",
+    "filter_placeholder": "按标题、内容或标签筛选...",
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",

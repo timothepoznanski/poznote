@@ -2570,7 +2570,7 @@
   "dashboard": {
     "title": "Notiz-Board",
     "empty": "Noch keine favorisierten Notizen. Markieren Sie Notizen als Favoriten, um sie an dieses Board zu heften.",
-    "filter_placeholder": "Nach Titel, Ordner oder Tag filtern...",
+    "filter_placeholder": "Nach Titel, Inhalt oder Tag filtern...",
     "unpin": "Aus Favoriten entfernen",
     "no_folder": "Andere Notizen",
     "toggle_all": "Alle Notizen anzeigen",

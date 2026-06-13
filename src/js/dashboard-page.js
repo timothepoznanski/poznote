@@ -30,6 +30,8 @@
     // Navigation stack: array of folder objects navigated into.
     // Empty = at root level.
     var navStack = [];
+    var activeFilterTerm = '';
+    var allNotesCache = null;
 
     function currentLevel() {
         return navStack.length === 0 ? rootData : navStack[navStack.length - 1];
@@ -63,6 +65,51 @@
         return baseKey + ':' + encodeURIComponent(workspace) + ':' + favoritesMode;
     }
 
+    function normalizeSearchText(value) {
+        var text = String(value || '').toLowerCase();
+        if (typeof text.normalize === 'function') {
+            text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        }
+        return text;
+    }
+
+    function getNoteSearchValue(note) {
+        var tags = note.tags || [];
+        var taskText = '';
+        if (Array.isArray(note.tasks)) {
+            taskText = note.tasks.map(function (task) { return task.text || ''; }).join(' ');
+        }
+        return normalizeSearchText(note.search || (note.heading + ' ' + tags.join(' ') + ' ' + (note.text || '') + ' ' + taskText));
+    }
+
+    function collectNotes(level, notes) {
+        (level.notes || []).forEach(function (note) { notes.push(note); });
+        (level.folders || []).forEach(function (folder) { collectNotes(folder, notes); });
+    }
+
+    function getAllNotes() {
+        if (!allNotesCache) {
+            allNotesCache = [];
+            collectNotes(rootData, allNotesCache);
+        }
+        return allNotesCache;
+    }
+
+    function noteMatchesSearch(note, term) {
+        var haystack = getNoteSearchValue(note);
+        var tokens = term.split(/\s+/).filter(Boolean);
+        return tokens.every(function (token) {
+            return haystack.indexOf(token) !== -1;
+        });
+    }
+
+    function setNoResultsVisible(visible) {
+        var noResults = document.getElementById('dashboardNoResults');
+        if (noResults) {
+            noResults.style.display = visible ? 'block' : 'none';
+        }
+    }
+
     // --- Card builders ---
 
     function buildFolderCard(folder, index) {
@@ -78,7 +125,7 @@
 
     function buildNoteCard(note) {
         var tags      = note.tags || [];
-        var searchVal = (note.heading + ' ' + tags.join(' ')).toLowerCase();
+        var searchVal = getNoteSearchValue(note);
 
         var content = '';
         if (note.tasks !== null && note.tasks !== undefined && note.tasks.length > 0) {
@@ -121,21 +168,25 @@
         if (!grid) return;
 
         var html = '';
-        level.folders.forEach(function (folder, i) { html += buildFolderCard(folder, i); });
-        level.notes.forEach(function (note)         { html += buildNoteCard(note); });
-        grid.innerHTML = html;
-
-        var filterInput = document.getElementById('filterInput');
-        if (filterInput && filterInput.value.trim()) {
-            applyFilter(filterInput.value.trim().toLowerCase());
+        if (activeFilterTerm) {
+            var matchingNotes = getAllNotes().filter(function (note) {
+                return noteMatchesSearch(note, activeFilterTerm);
+            });
+            matchingNotes.forEach(function (note) { html += buildNoteCard(note); });
+            setNoResultsVisible(matchingNotes.length === 0);
+        } else {
+            level.folders.forEach(function (folder, i) { html += buildFolderCard(folder, i); });
+            level.notes.forEach(function (note)         { html += buildNoteCard(note); });
+            setNoResultsVisible(false);
         }
+        grid.innerHTML = html;
     }
 
     function renderBreadcrumb() {
         var bc = document.getElementById('dashboardBreadcrumb');
         if (!bc) return;
 
-        if (navStack.length === 0) {
+        if (activeFilterTerm || navStack.length === 0) {
             bc.style.display = 'none';
             bc.innerHTML = '';
             return;
@@ -225,20 +276,8 @@
     // --- Filter ---
 
     function applyFilter(term) {
-        var cards = document.querySelectorAll('.dash-card');
-        var visibleTotal = 0;
-
-        cards.forEach(function (card) {
-            var haystack = card.getAttribute('data-search') || '';
-            var match = !term || haystack.indexOf(term) !== -1;
-            card.style.display = match ? '' : 'none';
-            if (match) visibleTotal++;
-        });
-
-        var noResults = document.getElementById('dashboardNoResults');
-        if (noResults) {
-            noResults.style.display = (visibleTotal === 0 && cards.length > 0) ? 'block' : 'none';
-        }
+        activeFilterTerm = normalizeSearchText(term.trim());
+        renderAll();
     }
 
     // --- Git sync ---
@@ -450,7 +489,7 @@
                 setFilterOpen(true, false);
             }
             if (initialTerm) {
-                applyFilter(initialTerm.toLowerCase());
+                applyFilter(initialTerm);
                 if (clearFilterBtn) clearFilterBtn.style.display = 'flex';
             }
         }
@@ -469,7 +508,7 @@
 
         if (filterInput) {
             filterInput.addEventListener('input', function () {
-                var term = this.value.trim().toLowerCase();
+                var term = this.value.trim();
                 try {
                     localStorage.setItem(FILTER_VALUE_KEY, this.value);
                 } catch (err) { /* ignore */ }

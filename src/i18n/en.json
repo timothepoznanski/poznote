@@ -2276,7 +2276,7 @@
   "dashboard": {
     "title": "Notes board",
     "empty": "No favorite notes yet. Mark notes as favorites to pin them to this board.",
-    "filter_placeholder": "Filter by title, folder or tag...",
+    "filter_placeholder": "Filter by title, content or tag...",
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",

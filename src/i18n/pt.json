@@ -2573,7 +2573,7 @@
   "dashboard": {
     "title": "Quadro de notas",
     "empty": "Ainda não há notas favoritas. Marque notas como favoritas para fixá-las neste quadro.",
-    "filter_placeholder": "Filtrar por título, pasta ou etiqueta...",
+    "filter_placeholder": "Filtrar por título, conteúdo ou etiqueta...",
     "unpin": "Remover dos favoritos",
     "no_folder": "Outras notas",
     "toggle_all": "Mostrar todas as notas",
