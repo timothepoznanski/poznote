@@ -464,6 +464,49 @@ $dashboardGitEnabled = GitSync::isEnabled() && $dashboardGitSync->isConfigured()
 $dashboardGitIcon = ($dashboardGitProviderRaw === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 $dashboardGitConfigUrl = dashboardBuildPageUrl('git_sync.php', $pageWorkspace);
 
+// Result of the last Git sync (stored in session by GitSyncController after a push/pull).
+// The page is reloaded by the sync JS once it completes, so we surface the outcome banner
+// and the detailed action log (with copy button) here.
+$dashboardSyncMessage = '';
+$dashboardSyncWarning = '';
+$dashboardSyncError = '';
+$dashboardSyncResult = null;
+if (isset($_SESSION['last_sync_result'])) {
+    $lastSync = $_SESSION['last_sync_result'];
+    $syncAction = $lastSync['action'] ?? '';
+    $dashboardSyncResult = $lastSync['result'] ?? null;
+    unset($_SESSION['last_sync_result']);
+
+    if (is_array($dashboardSyncResult)) {
+        $syncErrorCount = count($dashboardSyncResult['errors'] ?? []);
+        if (!empty($dashboardSyncResult['success'])) {
+            if ($syncAction === 'push') {
+                $dashboardSyncMessage = t('git_sync.messages.push_success', array_merge($dashboardGitProviderParams, [
+                    'count' => $dashboardSyncResult['pushed'] ?? 0,
+                    'attachments' => $dashboardSyncResult['attachments_pushed'] ?? 0,
+                    'deleted' => $dashboardSyncResult['deleted'] ?? 0,
+                    'errors' => $syncErrorCount,
+                ]));
+            } else {
+                $dashboardSyncMessage = t('git_sync.messages.pull_success', array_merge($dashboardGitProviderParams, [
+                    'pulled' => $dashboardSyncResult['pulled'] ?? 0,
+                    'updated' => $dashboardSyncResult['updated'] ?? 0,
+                    'deleted' => $dashboardSyncResult['deleted'] ?? 0,
+                    'errors' => $syncErrorCount,
+                ]));
+            }
+            if ($syncErrorCount > 0) {
+                $dashboardSyncWarning = $dashboardSyncMessage;
+                $dashboardSyncMessage = '';
+            }
+        } else {
+            $dashboardSyncError = t('git_sync.messages.' . $syncAction . '_error', array_merge($dashboardGitProviderParams, [
+                'error' => $dashboardSyncResult['errors'][0]['error'] ?? 'Unknown error',
+            ]));
+        }
+    }
+}
+
 $cache_v = @file_get_contents('version.txt');
 if ($cache_v === false) $cache_v = time();
 $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
@@ -482,6 +525,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 	<link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/favorites.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dashboard.css?v=<?php echo file_exists(__DIR__ . '/css/dashboard.css') ? filemtime(__DIR__ . '/css/dashboard.css') : $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
@@ -592,6 +636,74 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 					</button>
 				</div>
 			</header>
+
+		<?php if ($dashboardSyncMessage || $dashboardSyncWarning || $dashboardSyncError || ($dashboardSyncResult && !empty($dashboardSyncResult['debug']))): ?>
+		<div class="dashboard-sync-feedback" style="display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px;">
+			<?php if ($dashboardSyncMessage): ?>
+			<div class="alert alert-success">
+				<i class="lucide lucide-check-circle"></i> <?php echo htmlspecialchars($dashboardSyncMessage); ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($dashboardSyncWarning): ?>
+			<div class="alert alert-warning">
+				<i class="lucide lucide-alert-triangle"></i> <?php echo htmlspecialchars($dashboardSyncWarning); ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($dashboardSyncError): ?>
+			<div class="alert alert-error">
+				<i class="lucide lucide-alert-circle"></i> <?php echo htmlspecialchars($dashboardSyncError); ?>
+			</div>
+			<?php endif; ?>
+
+			<?php if ($dashboardSyncResult && !empty($dashboardSyncResult['debug'])): ?>
+			<div class="dashboard-sync-debug" style="margin-top: 10px;">
+				<div style="display: flex; gap: 10px; margin-bottom: 10px;">
+					<button type="button" id="dashboardDebugToggleBtn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+						<i class="lucide lucide-bug"></i> <span id="dashboardDebugToggleText"><?php echo t_h('git_sync.debug.show'); ?></span>
+					</button>
+					<button type="button" id="dashboardDebugCopyBtn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: none;">
+						<i class="lucide lucide-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
+					</button>
+				</div>
+				<div id="dashboardDebugInfo" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; max-height: 250px; overflow-y: auto;">
+					<h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600;"><?php echo t_h('git_sync.debug.title', [], 'Debug Info'); ?></h4>
+					<pre style="margin: 0; font-size: 11px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; text-align: left;"><?php echo htmlspecialchars(implode("\n", $dashboardSyncResult['debug'])); ?></pre>
+				</div>
+				<script>
+				(function() {
+					const debugContent = <?php echo json_encode(implode("\n", $dashboardSyncResult['debug'])); ?>;
+					const toggleBtn = document.getElementById('dashboardDebugToggleBtn');
+					const debugDiv = document.getElementById('dashboardDebugInfo');
+					const toggleText = document.getElementById('dashboardDebugToggleText');
+					const copyBtn = document.getElementById('dashboardDebugCopyBtn');
+
+					toggleBtn?.addEventListener('click', function() {
+						if (debugDiv.style.display === 'none') {
+							debugDiv.style.display = 'block';
+							copyBtn.style.display = 'inline-block';
+							toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.hide')); ?>;
+						} else {
+							debugDiv.style.display = 'none';
+							copyBtn.style.display = 'none';
+							toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.show')); ?>;
+						}
+					});
+
+					copyBtn?.addEventListener('click', function() {
+						navigator.clipboard.writeText(debugContent).then(function() {
+							const originalHTML = copyBtn.innerHTML;
+							copyBtn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(t_h('git_sync.debug.copied')); ?>;
+							setTimeout(function() {
+								copyBtn.innerHTML = originalHTML;
+							}, 2000);
+						});
+					});
+				})();
+				</script>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php endif; ?>
 
 		<?php if ($isEmpty): ?>
 			<div class="dashboard-empty">
