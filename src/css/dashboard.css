@@ -185,6 +185,13 @@ body.dark-mode .dashboard-sidebar-sep {
     transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
 }
 
+.dashboard-topbar-actions .dashboard-topbar-btn {
+    border: 1px solid #d1d5db;
+    width: 50px;
+    height: 50px;
+    padding: 4px 4px 14px;
+}
+
 .dashboard-topbar-btn:hover {
     color: #007DB8;
     background: rgba(0, 125, 184, 0.08);
@@ -206,13 +213,13 @@ body.dark-mode .dashboard-sidebar-sep {
 
 .dashboard-topbar-count {
     position: absolute;
-    bottom: 2px;
+    bottom: 4px;
     left: 0;
     right: 0;
     text-align: center;
     padding: 0;
     color: #007DB8;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -224,8 +231,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-topbar-btn .lucide {
-    width: 25px;
-    height: 25px;
+    width: 21px;
+    height: 21px;
 }
 
 /* Per-icon accent colours — matching home.php card palette */
@@ -712,6 +719,11 @@ body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn .lucide {
     color: var(--dm-text-muted);
 }
 
+:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn,
+body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn {
+    border-color: var(--dm-border);
+}
+
 :root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
 body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
     color: #ffc107;
@@ -842,25 +854,29 @@ body.dark-mode .dashboard-empty {
     }
 
     .dashboard-topbar-actions {
-        gap: 4px;
-        justify-content: flex-start;
+        display: grid;
+        grid-template-columns: repeat(4, 50px);
+        justify-content: center;
+        align-items: center;
+        gap: 10px 16px;
+        overflow-x: visible;
         padding: 0 2px;
     }
 
-    .dashboard-topbar-btn {
-        width: 38px;
-        height: 44px;
-        padding: 0 0 12px;
+    .dashboard-topbar-actions .dashboard-topbar-btn {
+        width: 50px;
+        height: 50px;
+        padding: 4px 4px 14px;
     }
 
     .dashboard-topbar-btn .lucide {
-        width: 22px;
-        height: 22px;
+        width: 21px;
+        height: 21px;
     }
 
     .dashboard-topbar-count {
-        font-size: 10px;
-        bottom: 1px;
+        font-size: 12px;
+        bottom: 4px;
     }
 
     .dashboard-grid-container {
