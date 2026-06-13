@@ -16,37 +16,40 @@ $currentLang = getUserLanguage();
 
 /**
  * Build a short plain-text excerpt (or task preview) for a board card.
- * @return array{text: string, tasks: ?array}
+ * @return array{text: string, tasks: ?array, search: string}
  */
 function dashboardBuildNotePreview($noteId, $type) {
     $file = getEntryFilename($noteId, $type);
     if (!is_readable($file)) {
-        return ['text' => '', 'tasks' => null];
+        return ['text' => '', 'tasks' => null, 'search' => ''];
     }
 
-    $raw = @file_get_contents($file, false, null, 0, 32768);
+    $raw = @file_get_contents($file);
     if ($raw === false || $raw === '') {
-        return ['text' => '', 'tasks' => null];
+        return ['text' => '', 'tasks' => null, 'search' => ''];
     }
 
     if ($type === 'tasklist') {
         $json = normalizeTasklistJsonContent($raw);
         $items = json_decode($json !== '' ? $json : $raw, true);
         $tasks = [];
+        $taskSearch = [];
         if (is_array($items)) {
             foreach ($items as $item) {
                 if (!is_array($item)) continue;
                 $label = trim((string)($item['text'] ?? ''));
                 if ($label === '') continue;
-                $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
-                if (count($tasks) >= 4) break;
+                $taskSearch[] = $label;
+                if (count($tasks) < 4) {
+                    $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
+                }
             }
         }
-        return ['text' => '', 'tasks' => $tasks];
+        return ['text' => '', 'tasks' => $tasks, 'search' => implode(' ', $taskSearch)];
     }
 
     if ($type === 'markdown') {
-        $text = preg_replace('/```[\s\S]*?```/', ' ', $raw);
+        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $raw);
         $text = preg_replace('/^#{1,6}\s+/m', '', $text);
         $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
         $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
@@ -59,11 +62,12 @@ function dashboardBuildNotePreview($noteId, $type) {
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $text = preg_replace('/\s+/u', ' ', $text);
     $text = trim((string)$text);
-    if ($text !== '' && mb_strlen($text, 'UTF-8') > 220) {
-        $text = rtrim(mb_substr($text, 0, 220, 'UTF-8')) . '…';
+    $previewText = $text;
+    if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > 220) {
+        $previewText = rtrim(mb_substr($previewText, 0, 220, 'UTF-8')) . '…';
     }
 
-    return ['text' => $text, 'tasks' => null];
+    return ['text' => $previewText, 'tasks' => null, 'search' => $text];
 }
 
 function dashboardFolderHasNotes(int $id, array &$folders): bool {
@@ -87,6 +91,7 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'text'    => $preview['text'],
         'tasks'   => $preview['tasks'],
         'tags'    => $tags,
+        'search'  => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
         'updated' => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
     ];
 }
@@ -117,6 +122,48 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
 
 function dashboardBuildPageUrl(string $page, string $pageWorkspace): string {
     return $page . ($pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : '');
+}
+
+function dashboardGetCurrentUsername(): string {
+    $sessionUser = $_SESSION['user'] ?? null;
+    if (is_array($sessionUser) && trim((string)($sessionUser['username'] ?? '')) !== '') {
+        return trim((string)$sessionUser['username']);
+    }
+
+    $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+    if ($userId > 0) {
+        try {
+            require_once __DIR__ . '/users/db_master.php';
+            $profile = getUserProfileById($userId);
+            if (is_array($profile) && trim((string)($profile['username'] ?? '')) !== '') {
+                return trim((string)$profile['username']);
+            }
+        } catch (Exception $e) {}
+    }
+
+    return '';
+}
+
+function dashboardBuildContextItems(string $pageWorkspace): array {
+    $items = [];
+    if ($pageWorkspace !== '') {
+        $items[] = [
+            'icon'  => 'lucide-layers',
+            'label' => 'Workspace',
+            'value' => $pageWorkspace,
+        ];
+    }
+
+    $username = dashboardGetCurrentUsername();
+    if ($username !== '') {
+        $items[] = [
+            'icon'  => 'lucide-user',
+            'label' => 'User',
+            'value' => $username,
+        ];
+    }
+
+    return $items;
 }
 
 function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
@@ -417,6 +464,49 @@ $dashboardGitEnabled = GitSync::isEnabled() && $dashboardGitSync->isConfigured()
 $dashboardGitIcon = ($dashboardGitProviderRaw === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 $dashboardGitConfigUrl = dashboardBuildPageUrl('git_sync.php', $pageWorkspace);
 
+// Result of the last Git sync (stored in session by GitSyncController after a push/pull).
+// The page is reloaded by the sync JS once it completes, so we surface the outcome banner
+// and the detailed action log (with copy button) here.
+$dashboardSyncMessage = '';
+$dashboardSyncWarning = '';
+$dashboardSyncError = '';
+$dashboardSyncResult = null;
+if (isset($_SESSION['last_sync_result'])) {
+    $lastSync = $_SESSION['last_sync_result'];
+    $syncAction = $lastSync['action'] ?? '';
+    $dashboardSyncResult = $lastSync['result'] ?? null;
+    unset($_SESSION['last_sync_result']);
+
+    if (is_array($dashboardSyncResult)) {
+        $syncErrorCount = count($dashboardSyncResult['errors'] ?? []);
+        if (!empty($dashboardSyncResult['success'])) {
+            if ($syncAction === 'push') {
+                $dashboardSyncMessage = t('git_sync.messages.push_success', array_merge($dashboardGitProviderParams, [
+                    'count' => $dashboardSyncResult['pushed'] ?? 0,
+                    'attachments' => $dashboardSyncResult['attachments_pushed'] ?? 0,
+                    'deleted' => $dashboardSyncResult['deleted'] ?? 0,
+                    'errors' => $syncErrorCount,
+                ]));
+            } else {
+                $dashboardSyncMessage = t('git_sync.messages.pull_success', array_merge($dashboardGitProviderParams, [
+                    'pulled' => $dashboardSyncResult['pulled'] ?? 0,
+                    'updated' => $dashboardSyncResult['updated'] ?? 0,
+                    'deleted' => $dashboardSyncResult['deleted'] ?? 0,
+                    'errors' => $syncErrorCount,
+                ]));
+            }
+            if ($syncErrorCount > 0) {
+                $dashboardSyncWarning = $dashboardSyncMessage;
+                $dashboardSyncMessage = '';
+            }
+        } else {
+            $dashboardSyncError = t('git_sync.messages.' . $syncAction . '_error', array_merge($dashboardGitProviderParams, [
+                'error' => $dashboardSyncResult['errors'][0]['error'] ?? 'Unknown error',
+            ]));
+        }
+    }
+}
+
 $cache_v = @file_get_contents('version.txt');
 if ($cache_v === false) $cache_v = time();
 $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
@@ -435,6 +525,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 	<link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/favorites.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dashboard.css?v=<?php echo file_exists(__DIR__ . '/css/dashboard.css') ? filemtime(__DIR__ . '/css/dashboard.css') : $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
@@ -446,6 +537,20 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 		<nav class="dashboard-sidebar">
+			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
+			<?php if (!empty($dashboardContextItems)): ?>
+				<div class="dashboard-sidebar-context">
+					<?php foreach ($dashboardContextItems as $item): ?>
+						<?php
+							$contextTitle = $item['label'] . ': ' . $item['value'];
+						?>
+						<div class="dashboard-sidebar-context-item" title="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+							<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
+							<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+						</div>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 			<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<i class="lucide lucide-home"></i>
 			</a>
@@ -477,7 +582,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 				<i class="lucide lucide-globe"></i>
 			</a>
 			<hr class="dashboard-sidebar-sep">
-			<a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn dashboard-sidebar-kofi" title="Support on Ko-fi">
+			<a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn dashboard-sidebar-kofi" title="<?php echo t_h('settings.cards.buy_me_a_coffee', [], 'Buy me a coffee'); ?>">
 				<i class="lucide lucide-heart"></i>
 			</a>
 		</nav>
@@ -523,7 +628,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 						type="text"
 						id="filterInput"
 						class="dashboard-filter-input"
-						placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, folder or tag...'); ?>"
+						placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'); ?>"
 						autocomplete="off"
 					/>
 					<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
@@ -531,6 +636,74 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 					</button>
 				</div>
 			</header>
+
+		<?php if ($dashboardSyncMessage || $dashboardSyncWarning || $dashboardSyncError || ($dashboardSyncResult && !empty($dashboardSyncResult['debug']))): ?>
+		<div class="dashboard-sync-feedback" style="display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px;">
+			<?php if ($dashboardSyncMessage): ?>
+			<div class="alert alert-success">
+				<i class="lucide lucide-check-circle"></i> <?php echo htmlspecialchars($dashboardSyncMessage); ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($dashboardSyncWarning): ?>
+			<div class="alert alert-warning">
+				<i class="lucide lucide-alert-triangle"></i> <?php echo htmlspecialchars($dashboardSyncWarning); ?>
+			</div>
+			<?php endif; ?>
+			<?php if ($dashboardSyncError): ?>
+			<div class="alert alert-error">
+				<i class="lucide lucide-alert-circle"></i> <?php echo htmlspecialchars($dashboardSyncError); ?>
+			</div>
+			<?php endif; ?>
+
+			<?php if ($dashboardSyncResult && !empty($dashboardSyncResult['debug'])): ?>
+			<div class="dashboard-sync-debug" style="margin-top: 10px;">
+				<div style="display: flex; gap: 10px; margin-bottom: 10px;">
+					<button type="button" id="dashboardDebugToggleBtn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+						<i class="lucide lucide-bug"></i> <span id="dashboardDebugToggleText"><?php echo t_h('git_sync.debug.show'); ?></span>
+					</button>
+					<button type="button" id="dashboardDebugCopyBtn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: none;">
+						<i class="lucide lucide-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
+					</button>
+				</div>
+				<div id="dashboardDebugInfo" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; max-height: 250px; overflow-y: auto;">
+					<h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600;"><?php echo t_h('git_sync.debug.title', [], 'Debug Info'); ?></h4>
+					<pre style="margin: 0; font-size: 11px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; text-align: left;"><?php echo htmlspecialchars(implode("\n", $dashboardSyncResult['debug'])); ?></pre>
+				</div>
+				<script>
+				(function() {
+					const debugContent = <?php echo json_encode(implode("\n", $dashboardSyncResult['debug'])); ?>;
+					const toggleBtn = document.getElementById('dashboardDebugToggleBtn');
+					const debugDiv = document.getElementById('dashboardDebugInfo');
+					const toggleText = document.getElementById('dashboardDebugToggleText');
+					const copyBtn = document.getElementById('dashboardDebugCopyBtn');
+
+					toggleBtn?.addEventListener('click', function() {
+						if (debugDiv.style.display === 'none') {
+							debugDiv.style.display = 'block';
+							copyBtn.style.display = 'inline-block';
+							toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.hide')); ?>;
+						} else {
+							debugDiv.style.display = 'none';
+							copyBtn.style.display = 'none';
+							toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.show')); ?>;
+						}
+					});
+
+					copyBtn?.addEventListener('click', function() {
+						navigator.clipboard.writeText(debugContent).then(function() {
+							const originalHTML = copyBtn.innerHTML;
+							copyBtn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(t_h('git_sync.debug.copied')); ?>;
+							setTimeout(function() {
+								copyBtn.innerHTML = originalHTML;
+							}, 2000);
+						});
+					});
+				})();
+				</script>
+			</div>
+			<?php endif; ?>
+		</div>
+		<?php endif; ?>
 
 		<?php if ($isEmpty): ?>
 			<div class="dashboard-empty">
@@ -620,12 +793,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 
 		<script>
 		window.DASHBOARD_DATA      = <?php echo json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
-		window.DASHBOARD_WORKSPACE = <?php echo json_encode($pageWorkspace); ?>;
-		window.DASHBOARD_TXT = {
-			unpin:     <?php echo json_encode(t('dashboard.unpin', [], 'Remove from favorites')); ?>,
-			error:     <?php echo json_encode(t('common.error', [], 'Error')); ?>,
-			noResults: <?php echo json_encode(t('public.no_filter_results', [], 'No notes match your search.')); ?>
-		};
 		window.NOTIFICATIONS_TXT = {
 			dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,
 			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>

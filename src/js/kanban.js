@@ -589,6 +589,50 @@
         preview.scrollTop = previousScrollTop;
     }
 
+    function getKanbanEditorSessionId() {
+        return (typeof window.getCurrentEditorSessionId === 'function')
+            ? window.getCurrentEditorSessionId()
+            : '';
+    }
+
+    async function parseKanbanJsonResponse(response) {
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = {};
+        }
+
+        return {
+            ok: response.ok,
+            status: response.status,
+            data: data || {}
+        };
+    }
+
+    async function patchKanbanTasklistContent(taskNoteId, tasks, editorSessionId) {
+        const headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+        const payload = { content: JSON.stringify(tasks) };
+
+        if (editorSessionId) {
+            headers['X-Editor-Session-ID'] = editorSessionId;
+            payload.editor_session_id = editorSessionId;
+        }
+
+        const response = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
+            method: 'PATCH',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        });
+
+        return parseKanbanJsonResponse(response);
+    }
+
     async function toggleKanbanTaskFromCard(checkbox) {
         if (isPublicWorkspaceReadOnly()) {
             checkbox.checked = !checkbox.checked;
@@ -638,20 +682,19 @@
             toggledTask.completed = completed;
             tasks = reorderKanbanTasksAfterToggle(tasks, toggledTask);
 
-            const updateResponse = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify({ content: JSON.stringify(tasks) })
-            });
+            let updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, '');
+            if (updateResult.status === 423) {
+                const editorSessionId = getKanbanEditorSessionId();
+                if (editorSessionId) {
+                    updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, editorSessionId);
+                }
+            }
 
-            if (!updateResponse.ok) throw new Error('HTTP error: ' + updateResponse.status);
+            const updateData = updateResult.data || {};
+            if (!updateResult.ok) {
+                throw new Error(updateData.error || ('HTTP error: ' + updateResult.status));
+            }
 
-            const updateData = await updateResponse.json();
             if (!updateData || !updateData.success) {
                 throw new Error(updateData?.error || 'Unable to update task');
             }
@@ -667,7 +710,7 @@
             checkbox.checked = !completed;
             checkbox.disabled = false;
             if (preview) preview.classList.remove('is-saving');
-            showError('Unable to update task');
+            showError(error?.message || 'Unable to update task');
         }
     }
 

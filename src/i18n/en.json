@@ -122,6 +122,7 @@
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
       "support": "Support Poznote",
+      "buy_me_a_coffee": "Buy me a coffee",
       "install_extension": "Install extension",
       "install_app": "Install application",
       "custom_css": "Custom CSS path",
@@ -2276,7 +2277,7 @@
   "dashboard": {
     "title": "Notes board",
     "empty": "No favorite notes yet. Mark notes as favorites to pin them to this board.",
-    "filter_placeholder": "Filter by title, folder or tag...",
+    "filter_placeholder": "Filter by title, content or tag...",
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",

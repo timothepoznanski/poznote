@@ -20,10 +20,37 @@ body.dashboard-page {
 
 .dashboard-sidebar-kofi .lucide-heart {
     color: #e63946;
+    animation: dashboardHeartBlink 2.4s ease-in-out infinite;
+    transform-origin: center;
 }
 
 .dashboard-sidebar-kofi:hover .lucide-heart {
     color: #e63946 !important;
+}
+
+@keyframes dashboardHeartBlink {
+    0%, 100% {
+        opacity: 0.82;
+        transform: scale(1);
+    }
+
+    45% {
+        opacity: 1;
+        transform: scale(1.07);
+    }
+
+    70% {
+        opacity: 0.68;
+        transform: scale(0.97);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-sidebar-kofi .lucide-heart {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
 }
 
 :root[data-theme='dark'] .dashboard-sidebar-sep,
@@ -42,14 +69,62 @@ body.dark-mode .dashboard-sidebar-sep {
     gap: 4px;
     padding: 16px 6px;
     min-height: 100vh;
-    width: 52px;
+    width: 58px;
     flex-shrink: 0;
 }
 
 .dashboard-sidebar .dashboard-topbar-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     padding: 0;
+}
+
+.dashboard-sidebar-context {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.dashboard-sidebar-context-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 48px;
+    min-height: 42px;
+    color: #4b5563;
+    text-align: center;
+}
+
+.dashboard-sidebar-context-link {
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-sidebar-context-link:hover,
+.dashboard-sidebar-context-link:focus-visible {
+    color: #007DB8;
+    transform: translateY(-1px);
+}
+
+.dashboard-sidebar-context-item .lucide {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.dashboard-sidebar-context-item span {
+    max-width: 46px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.1;
 }
 
 .dashboard-container {
@@ -67,7 +142,7 @@ body.dark-mode .dashboard-sidebar-sep {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     position: sticky;
     top: 0;
     z-index: 100;
@@ -97,15 +172,15 @@ body.dark-mode .dashboard-sidebar-sep {
 .dashboard-filter-icon {
     position: absolute;
     left: 10px;
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     color: #9ca3af;
     pointer-events: none;
 }
 
 .dashboard-filter-input {
     width: 100%;
-    padding: 7px 32px 7px 32px;
+    padding: 7px 38px 7px 40px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 13px;
@@ -127,8 +202,8 @@ body.dark-mode .dashboard-sidebar-sep {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     border: none;
     border-radius: 50%;
@@ -142,8 +217,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-filter-clear .lucide {
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
 }
 
 .dashboard-topbar-actions {
@@ -168,9 +243,9 @@ body.dark-mode .dashboard-sidebar-sep {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    width: 36px;
-    height: 40px;
-    padding: 0 0 12px;
+    width: 46px;
+    height: 50px;
+    padding: 0 0 14px;
     margin: 0;
     border: none;
     border-radius: 8px;
@@ -183,6 +258,12 @@ body.dark-mode .dashboard-sidebar-sep {
     appearance: none;
     -webkit-appearance: none;
     transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-topbar-actions .dashboard-topbar-btn {
+    width: 50px;
+    height: 50px;
+    padding: 4px 4px 14px;
 }
 
 .dashboard-topbar-btn:hover {
@@ -206,13 +287,13 @@ body.dark-mode .dashboard-sidebar-sep {
 
 .dashboard-topbar-count {
     position: absolute;
-    bottom: 2px;
+    bottom: 4px;
     left: 0;
     right: 0;
     text-align: center;
     padding: 0;
     color: #007DB8;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -224,8 +305,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-topbar-btn .lucide {
-    width: 18px;
-    height: 18px;
+    width: 21px;
+    height: 21px;
 }
 
 /* Per-icon accent colours — matching home.php card palette */
@@ -249,6 +330,18 @@ body.dark-mode .dashboard-sidebar-sep {
     color: #10b981;
 }
 
+.dashboard-topbar-actions .dashboard-topbar-btn .lucide {
+    color: #6b7280;
+}
+
+.dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+    color: #ffc107;
+}
+
+.dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell {
+    color: #f59e0b;
+}
+
 /* ---------- Git modal ---------- */
 
 .dashboard-git-actions {
@@ -262,7 +355,7 @@ body.dark-mode .dashboard-sidebar-sep {
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: 58px;
+    min-height: 72px;
     padding: 10px 12px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -286,17 +379,17 @@ body.dark-mode .dashboard-sidebar-sep {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 34px;
-    width: 34px;
-    height: 34px;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
     background: rgba(0, 125, 184, 0.1);
     color: #007DB8;
 }
 
 .dashboard-git-action-icon .lucide {
-    width: 18px;
-    height: 18px;
+    width: 28px;
+    height: 28px;
 }
 
 .dashboard-git-action-body {
@@ -347,14 +440,14 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .bc-home .lucide {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
 }
 
 .bc-sep {
     color: #d1d5db;
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
@@ -386,7 +479,7 @@ body.dark-mode .dashboard-sidebar-sep {
 .dashboard-grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    grid-auto-rows: 120px;
+    grid-auto-rows: 132px;
     gap: 14px;
     margin-top: 14px;
 }
@@ -425,8 +518,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dash-card-icon {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -436,8 +529,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dash-card-icon .lucide {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     color: #007DB8;
 }
 
@@ -490,7 +583,6 @@ body.dark-mode .dashboard-sidebar-sep {
     font-size: 14px;
     line-height: 1.35;
     margin-bottom: 7px;
-    padding-right: 20px;
     color: #1f2937;
     word-break: break-word;
 }
@@ -530,8 +622,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .board-card-tasks li .lucide {
-    width: 13px;
-    height: 13px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     margin-top: 2px;
     opacity: 0.7;
@@ -576,42 +668,6 @@ body.dark-mode .dashboard-sidebar-sep {
     white-space: nowrap;
 }
 
-/* ---------- Unpin button (note cards only) ---------- */
-
-.dash-card-unpin {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
-    color: #6b7280;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.12s ease, background 0.12s ease;
-}
-
-.dash-note-card:hover .dash-card-unpin,
-.dash-card-unpin:focus {
-    opacity: 0.7;
-}
-
-.dash-card-unpin:hover {
-    opacity: 1 !important;
-    background: #f3f4f6;
-}
-
-.dash-card-unpin .lucide {
-    width: 13px;
-    height: 13px;
-}
-
 /* ---------- Empty state ---------- */
 
 .dashboard-empty {
@@ -621,10 +677,15 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-empty .lucide {
-    width: 26px;
-    height: 26px;
+    width: 42px;
+    height: 42px;
     opacity: 0.5;
     margin-bottom: 10px;
+}
+
+body.dashboard-page .notifications-empty i {
+    width: 54px;
+    height: 54px;
 }
 
 .dashboard-empty p {
@@ -648,6 +709,11 @@ body.dark-mode .dashboard-topbar {
 :root[data-theme='dark'] .dashboard-sidebar,
 body.dark-mode .dashboard-sidebar {
     background: var(--dm-content-bg);
+}
+
+:root[data-theme='dark'] .dashboard-sidebar-context-item,
+body.dark-mode .dashboard-sidebar-context-item {
+    color: var(--dm-text-muted);
 }
 
 :root[data-theme='dark'] .dashboard-filter-input,
@@ -725,6 +791,21 @@ body.dark-mode .dashboard-topbar-btn .lucide-search,
 body.dark-mode .dashboard-topbar-btn .lucide-upload,
 body.dark-mode .dashboard-topbar-btn .lucide-download {
     color: #10b981;
+}
+
+:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn .lucide,
+body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn .lucide {
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
+body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+    color: #ffc107;
+}
+
+:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell,
+body.dark-mode .dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell {
+    color: #f59e0b;
 }
 
 :root[data-theme='dark'] .dashboard-git-action,
@@ -810,16 +891,6 @@ body.dark-mode .board-card-date {
     opacity: 0.7;
 }
 
-:root[data-theme='dark'] .dash-card-unpin,
-body.dark-mode .dash-card-unpin {
-    color: var(--dm-text-muted);
-}
-
-:root[data-theme='dark'] .dash-card-unpin:hover,
-body.dark-mode .dash-card-unpin:hover {
-    background: var(--dm-surface-hover);
-}
-
 :root[data-theme='dark'] .dashboard-empty,
 body.dark-mode .dashboard-empty {
     color: var(--dm-text-muted);
@@ -841,45 +912,71 @@ body.dark-mode .dashboard-empty {
     }
 
     .dashboard-sidebar {
-        width: 36px;
+        width: 50px;
         padding: 10px 3px;
         gap: 2px;
     }
 
     .dashboard-sidebar .dashboard-topbar-btn {
-        width: 30px;
-        height: 30px;
+        width: 44px;
+        height: 44px;
+    }
+
+    .dashboard-sidebar-context-item {
+        width: 44px;
+        min-height: 38px;
+    }
+
+    .dashboard-sidebar-context-item .lucide {
+        width: 14px;
+        height: 14px;
+    }
+
+    .dashboard-sidebar-context-item span {
+        max-width: 42px;
+        font-size: 11px;
     }
 
     .dashboard-sidebar .dashboard-topbar-btn .lucide {
-        width: 14px;
-        height: 14px;
+        width: 20px;
+        height: 20px;
     }
 
     .dashboard-topbar-actions {
-        gap: 4px;
+        display: grid;
+        grid-template-columns: repeat(4, 50px);
+        justify-content: center;
+        align-items: center;
+        gap: 10px 16px;
+        overflow-x: visible;
         padding: 0 2px;
     }
 
-    .dashboard-topbar-btn {
-        width: 28px;
-        height: 32px;
-        padding: 0 0 10px;
+    .dashboard-topbar-actions .dashboard-topbar-btn {
+        border: 1px solid #d1d5db;
+        width: 50px;
+        height: 50px;
+        padding: 4px 4px 14px;
+    }
+
+    :root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn,
+    body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn {
+        border-color: var(--dm-border);
     }
 
     .dashboard-topbar-btn .lucide {
-        width: 14px;
-        height: 14px;
+        width: 21px;
+        height: 21px;
     }
 
     .dashboard-topbar-count {
-        font-size: 9px;
-        bottom: 1px;
+        font-size: 12px;
+        bottom: 4px;
     }
 
     .dashboard-grid-container {
         grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 90px;
+        grid-auto-rows: 116px;
         gap: 8px;
         margin-top: 8px;
     }
@@ -899,13 +996,13 @@ body.dark-mode .dashboard-empty {
     }
 
     .dash-card-icon {
-        width: 32px;
-        height: 32px;
+        width: 48px;
+        height: 48px;
     }
 
     .dash-card-icon .lucide {
-        width: 16px;
-        height: 16px;
+        width: 28px;
+        height: 28px;
     }
 
     .dash-folder-card {
@@ -915,9 +1012,5 @@ body.dark-mode .dashboard-empty {
 
     .dash-note-card {
         padding: 10px 12px;
-    }
-
-    .dash-card-unpin {
-        opacity: 0.5;
     }
 }

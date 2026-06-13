@@ -402,6 +402,7 @@
       "guestbook": "Poznote 留言板",
       "custom_css": "自定义 CSS 文件",
       "support": "支持 Poznote",
+      "buy_me_a_coffee": "请我喝杯咖啡",
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "orphan_scanner": "孤立附件扫描器",
@@ -2710,7 +2711,7 @@
   "dashboard": {
     "title": "笔记看板",
     "empty": "还没有收藏的笔记。将笔记标记为收藏即可固定到此便签板。",
-    "filter_placeholder": "按标题、文件夹或标签筛选...",
+    "filter_placeholder": "按标题、内容或标签筛选...",
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",

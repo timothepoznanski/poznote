@@ -411,6 +411,7 @@
       "github_star": "Mettre une étoile sur GitHub",
       "guestbook": "Livre d'or Poznote",
       "support": "Soutenir Poznote",
+      "buy_me_a_coffee": "Offrez-moi un café",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
       "custom_css": "Chemin CSS personnalisé",
@@ -2787,7 +2788,7 @@
   "dashboard": {
     "title": "Tableau de notes",
     "empty": "Aucune note favorite pour le moment. Ajoutez des notes aux favoris pour les épingler sur ce tableau.",
-    "filter_placeholder": "Filtrer par titre, dossier ou étiquette...",
+    "filter_placeholder": "Filtrer par titre, contenu ou étiquette...",
     "unpin": "Retirer des favoris",
     "no_folder": "Autres notes",
     "toggle_all": "Afficher toutes les notes",
