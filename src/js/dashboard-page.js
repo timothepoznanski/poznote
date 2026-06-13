@@ -123,9 +123,18 @@
         '</button>';
     }
 
+    function buildNoteTooltip(note, tags) {
+        var lines = [note.heading || ''];
+        if (tags.length > 0) {
+            lines.push('Tags: ' + tags.join(', '));
+        }
+        return lines.join('\n');
+    }
+
     function buildNoteCard(note) {
         var tags      = note.tags || [];
         var searchVal = getNoteSearchValue(note);
+        var tooltip   = buildNoteTooltip(note, tags);
 
         var content = '';
         if (note.tasks !== null && note.tasks !== undefined && note.tasks.length > 0) {
@@ -152,7 +161,7 @@
             footer += '</div>';
         }
 
-        return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '">' +
+        return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '">' +
             '<a class="dash-card-link" href="' + esc(note.url) + '">' +
                 '<div class="dash-card-note-title">' + esc(note.heading) + '</div>' +
                 content +
