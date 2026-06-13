@@ -496,7 +496,7 @@ if ($isAdmin) {
             </div>
 
             <!-- Show Folder Counts -->
-            <div class="home-card" id="folder-counts-card">
+            <div class="home-card desktop-only" id="folder-counts-card">
                 <div class="home-card-icon"><i class="lucide lucide-hash"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?></span>
