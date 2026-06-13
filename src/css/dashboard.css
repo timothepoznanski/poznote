@@ -20,10 +20,37 @@ body.dashboard-page {
 
 .dashboard-sidebar-kofi .lucide-heart {
     color: #e63946;
+    animation: dashboardHeartBlink 2.4s ease-in-out infinite;
+    transform-origin: center;
 }
 
 .dashboard-sidebar-kofi:hover .lucide-heart {
     color: #e63946 !important;
+}
+
+@keyframes dashboardHeartBlink {
+    0%, 100% {
+        opacity: 0.82;
+        transform: scale(1);
+    }
+
+    45% {
+        opacity: 1;
+        transform: scale(1.07);
+    }
+
+    70% {
+        opacity: 0.68;
+        transform: scale(0.97);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-sidebar-kofi .lucide-heart {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
 }
 
 :root[data-theme='dark'] .dashboard-sidebar-sep,
@@ -50,6 +77,54 @@ body.dark-mode .dashboard-sidebar-sep {
     width: 48px;
     height: 48px;
     padding: 0;
+}
+
+.dashboard-sidebar-context {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.dashboard-sidebar-context-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    width: 48px;
+    min-height: 42px;
+    color: #4b5563;
+    text-align: center;
+}
+
+.dashboard-sidebar-context-link {
+    text-decoration: none;
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-sidebar-context-link:hover,
+.dashboard-sidebar-context-link:focus-visible {
+    color: #007DB8;
+    transform: translateY(-1px);
+}
+
+.dashboard-sidebar-context-item .lucide {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.dashboard-sidebar-context-item span {
+    max-width: 46px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.1;
 }
 
 .dashboard-container {
@@ -186,7 +261,6 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-topbar-actions .dashboard-topbar-btn {
-    border: 1px solid #d1d5db;
     width: 50px;
     height: 50px;
     padding: 4px 4px 14px;
@@ -637,6 +711,11 @@ body.dark-mode .dashboard-sidebar {
     background: var(--dm-content-bg);
 }
 
+:root[data-theme='dark'] .dashboard-sidebar-context-item,
+body.dark-mode .dashboard-sidebar-context-item {
+    color: var(--dm-text-muted);
+}
+
 :root[data-theme='dark'] .dashboard-filter-input,
 body.dark-mode .dashboard-filter-input {
     background: var(--dm-surface);
@@ -717,11 +796,6 @@ body.dark-mode .dashboard-topbar-btn .lucide-download {
 :root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn .lucide,
 body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn .lucide {
     color: var(--dm-text-muted);
-}
-
-:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn,
-body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn {
-    border-color: var(--dm-border);
 }
 
 :root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
@@ -848,9 +922,24 @@ body.dark-mode .dashboard-empty {
         height: 44px;
     }
 
+    .dashboard-sidebar-context-item {
+        width: 44px;
+        min-height: 38px;
+    }
+
+    .dashboard-sidebar-context-item .lucide {
+        width: 14px;
+        height: 14px;
+    }
+
+    .dashboard-sidebar-context-item span {
+        max-width: 42px;
+        font-size: 11px;
+    }
+
     .dashboard-sidebar .dashboard-topbar-btn .lucide {
-        width: 24px;
-        height: 24px;
+        width: 20px;
+        height: 20px;
     }
 
     .dashboard-topbar-actions {
@@ -864,9 +953,15 @@ body.dark-mode .dashboard-empty {
     }
 
     .dashboard-topbar-actions .dashboard-topbar-btn {
+        border: 1px solid #d1d5db;
         width: 50px;
         height: 50px;
         padding: 4px 4px 14px;
+    }
+
+    :root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn,
+    body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn {
+        border-color: var(--dm-border);
     }
 
     .dashboard-topbar-btn .lucide {

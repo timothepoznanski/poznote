@@ -124,6 +124,50 @@ function dashboardBuildPageUrl(string $page, string $pageWorkspace): string {
     return $page . ($pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : '');
 }
 
+function dashboardGetCurrentUsername(): string {
+    $sessionUser = $_SESSION['user'] ?? null;
+    if (is_array($sessionUser) && trim((string)($sessionUser['username'] ?? '')) !== '') {
+        return trim((string)$sessionUser['username']);
+    }
+
+    $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+    if ($userId > 0) {
+        try {
+            require_once __DIR__ . '/users/db_master.php';
+            $profile = getUserProfileById($userId);
+            if (is_array($profile) && trim((string)($profile['username'] ?? '')) !== '') {
+                return trim((string)$profile['username']);
+            }
+        } catch (Exception $e) {}
+    }
+
+    return '';
+}
+
+function dashboardBuildContextItems(string $pageWorkspace): array {
+    $items = [];
+    if ($pageWorkspace !== '') {
+        $items[] = [
+            'icon'  => 'lucide-layers',
+            'label' => 'Workspace',
+            'value' => $pageWorkspace,
+            'href'  => dashboardBuildPageUrl('workspaces.php', $pageWorkspace),
+        ];
+    }
+
+    $username = dashboardGetCurrentUsername();
+    if ($username !== '') {
+        $items[] = [
+            'icon'  => 'lucide-user',
+            'label' => 'User',
+            'value' => $username,
+            'href'  => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin() ? dashboardBuildPageUrl('admin/users.php', $pageWorkspace) : '',
+        ];
+    }
+
+    return $items;
+}
+
 function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
     $counts = [
         'notes' => 0,
@@ -451,6 +495,28 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 		<nav class="dashboard-sidebar">
+			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
+			<?php if (!empty($dashboardContextItems)): ?>
+				<div class="dashboard-sidebar-context">
+					<?php foreach ($dashboardContextItems as $item): ?>
+						<?php
+							$contextTitle = $item['label'] . ': ' . $item['value'];
+							$contextHref = trim((string)($item['href'] ?? ''));
+						?>
+						<?php if ($contextHref !== ''): ?>
+						<a href="<?php echo htmlspecialchars($contextHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" class="dashboard-sidebar-context-item dashboard-sidebar-context-link" title="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-label="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+							<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
+							<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+						</a>
+						<?php else: ?>
+						<div class="dashboard-sidebar-context-item" title="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+							<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
+							<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+						</div>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 			<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<i class="lucide lucide-home"></i>
 			</a>

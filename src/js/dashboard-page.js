@@ -481,6 +481,16 @@
             }
         }
 
+        function clearFilterValue() {
+            if (!filterInput) return;
+            filterInput.value = '';
+            try {
+                localStorage.removeItem(FILTER_VALUE_KEY);
+            } catch (err) { /* ignore */ }
+            applyFilter('');
+            if (clearFilterBtn) clearFilterBtn.style.display = 'none';
+        }
+
         if (filterInput) {
             var storedFilterValue = '';
             var storedFilterOpen = false;
@@ -506,9 +516,11 @@
         if (toggleFilterBtn && filterWrap) {
             toggleFilterBtn.addEventListener('click', function (e) {
                 e.preventDefault();
+                toggleFilterBtn.blur();
                 var isOpen = !filterWrap.classList.contains('is-collapsed');
                 if (isOpen && filterInput && filterInput.value.trim()) {
-                    filterInput.focus();
+                    clearFilterValue();
+                    setFilterOpen(false, false);
                     return;
                 }
                 setFilterOpen(!isOpen);
@@ -528,14 +540,8 @@
 
         if (clearFilterBtn) {
             clearFilterBtn.addEventListener('click', function () {
-                if (!filterInput) return;
-                filterInput.value = '';
-                try {
-                    localStorage.removeItem(FILTER_VALUE_KEY);
-                } catch (err) { /* ignore */ }
-                applyFilter('');
-                clearFilterBtn.style.display = 'none';
-                filterInput.focus();
+                clearFilterValue();
+                if (filterInput) filterInput.focus();
             });
         }
 
