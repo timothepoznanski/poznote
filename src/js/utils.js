@@ -2788,6 +2788,13 @@ function loadKanbanViewInline(folderId, folderName, options) {
         return;
     }
 
+    if (typeof window.releaseCurrentNoteEditLock === 'function') {
+        window.releaseCurrentNoteEditLock();
+    }
+    if (typeof window.noteid !== 'undefined') {
+        window.noteid = -1;
+    }
+
     // Store original content for restoration
     if (!options.fromTabManager && !window._originalRightColContent) {
         window._originalRightColContent = rightCol.innerHTML;
@@ -2822,10 +2829,6 @@ function loadKanbanViewInline(folderId, folderName, options) {
             }
 
             activateKanbanViewState(folderId);
-
-            if (typeof window.noteid !== 'undefined') {
-                window.noteid = -1;
-            }
 
             // Remove selection from any notes in the sidebar
             document.querySelectorAll('.links_arbo_left.selected-note').forEach(function (el) {
