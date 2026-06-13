@@ -30,7 +30,6 @@ https://poznote.com/index.html#press
 ## Table of content
 
 - [Install](#install)
-  - [Cloud](#cloud)
 - [Access](#access)
 - [Change Settings](#change-settings)
 - [Update application](#update-application)
