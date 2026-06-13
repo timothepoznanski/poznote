@@ -42,13 +42,13 @@ body.dark-mode .dashboard-sidebar-sep {
     gap: 4px;
     padding: 16px 6px;
     min-height: 100vh;
-    width: 52px;
+    width: 58px;
     flex-shrink: 0;
 }
 
 .dashboard-sidebar .dashboard-topbar-btn {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     padding: 0;
 }
 
@@ -67,7 +67,7 @@ body.dark-mode .dashboard-sidebar-sep {
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     position: sticky;
     top: 0;
     z-index: 100;
@@ -97,15 +97,15 @@ body.dark-mode .dashboard-sidebar-sep {
 .dashboard-filter-icon {
     position: absolute;
     left: 10px;
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     color: #9ca3af;
     pointer-events: none;
 }
 
 .dashboard-filter-input {
     width: 100%;
-    padding: 7px 32px 7px 32px;
+    padding: 7px 38px 7px 40px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 13px;
@@ -127,8 +127,8 @@ body.dark-mode .dashboard-sidebar-sep {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     border: none;
     border-radius: 50%;
@@ -142,8 +142,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-filter-clear .lucide {
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
 }
 
 .dashboard-topbar-actions {
@@ -168,9 +168,9 @@ body.dark-mode .dashboard-sidebar-sep {
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    width: 36px;
-    height: 40px;
-    padding: 0 0 12px;
+    width: 46px;
+    height: 50px;
+    padding: 0 0 14px;
     margin: 0;
     border: none;
     border-radius: 8px;
@@ -212,7 +212,7 @@ body.dark-mode .dashboard-sidebar-sep {
     text-align: center;
     padding: 0;
     color: #007DB8;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -224,8 +224,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-topbar-btn .lucide {
-    width: 18px;
-    height: 18px;
+    width: 25px;
+    height: 25px;
 }
 
 /* Per-icon accent colours — matching home.php card palette */
@@ -249,6 +249,18 @@ body.dark-mode .dashboard-sidebar-sep {
     color: #10b981;
 }
 
+.dashboard-topbar-actions .dashboard-topbar-btn .lucide {
+    color: #6b7280;
+}
+
+.dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+    color: #ffc107;
+}
+
+.dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell {
+    color: #f59e0b;
+}
+
 /* ---------- Git modal ---------- */
 
 .dashboard-git-actions {
@@ -262,7 +274,7 @@ body.dark-mode .dashboard-sidebar-sep {
     display: flex;
     align-items: center;
     gap: 12px;
-    min-height: 58px;
+    min-height: 72px;
     padding: 10px 12px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
@@ -286,17 +298,17 @@ body.dark-mode .dashboard-sidebar-sep {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex: 0 0 34px;
-    width: 34px;
-    height: 34px;
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
     background: rgba(0, 125, 184, 0.1);
     color: #007DB8;
 }
 
 .dashboard-git-action-icon .lucide {
-    width: 18px;
-    height: 18px;
+    width: 28px;
+    height: 28px;
 }
 
 .dashboard-git-action-body {
@@ -347,14 +359,14 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .bc-home .lucide {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
 }
 
 .bc-sep {
     color: #d1d5db;
-    width: 14px;
-    height: 14px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
 }
 
@@ -386,7 +398,7 @@ body.dark-mode .dashboard-sidebar-sep {
 .dashboard-grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    grid-auto-rows: 120px;
+    grid-auto-rows: 132px;
     gap: 14px;
     margin-top: 14px;
 }
@@ -425,8 +437,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dash-card-icon {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -436,8 +448,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dash-card-icon .lucide {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 32px;
     color: #007DB8;
 }
 
@@ -490,7 +502,6 @@ body.dark-mode .dashboard-sidebar-sep {
     font-size: 14px;
     line-height: 1.35;
     margin-bottom: 7px;
-    padding-right: 20px;
     color: #1f2937;
     word-break: break-word;
 }
@@ -530,8 +541,8 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .board-card-tasks li .lucide {
-    width: 13px;
-    height: 13px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     margin-top: 2px;
     opacity: 0.7;
@@ -576,42 +587,6 @@ body.dark-mode .dashboard-sidebar-sep {
     white-space: nowrap;
 }
 
-/* ---------- Unpin button (note cards only) ---------- */
-
-.dash-card-unpin {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
-    color: #6b7280;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.12s ease, background 0.12s ease;
-}
-
-.dash-note-card:hover .dash-card-unpin,
-.dash-card-unpin:focus {
-    opacity: 0.7;
-}
-
-.dash-card-unpin:hover {
-    opacity: 1 !important;
-    background: #f3f4f6;
-}
-
-.dash-card-unpin .lucide {
-    width: 13px;
-    height: 13px;
-}
-
 /* ---------- Empty state ---------- */
 
 .dashboard-empty {
@@ -621,10 +596,15 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-empty .lucide {
-    width: 26px;
-    height: 26px;
+    width: 42px;
+    height: 42px;
     opacity: 0.5;
     margin-bottom: 10px;
+}
+
+body.dashboard-page .notifications-empty i {
+    width: 54px;
+    height: 54px;
 }
 
 .dashboard-empty p {
@@ -727,6 +707,21 @@ body.dark-mode .dashboard-topbar-btn .lucide-download {
     color: #10b981;
 }
 
+:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn .lucide,
+body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn .lucide {
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star,
+body.dark-mode .dashboard-topbar-actions #dashboardToggleFavorites.active .lucide-star {
+    color: #ffc107;
+}
+
+:root[data-theme='dark'] .dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell,
+body.dark-mode .dashboard-topbar-actions .dashboard-notifications-btn.has-notifications .lucide-bell {
+    color: #f59e0b;
+}
+
 :root[data-theme='dark'] .dashboard-git-action,
 body.dark-mode .dashboard-git-action {
     background: var(--dm-surface);
@@ -810,16 +805,6 @@ body.dark-mode .board-card-date {
     opacity: 0.7;
 }
 
-:root[data-theme='dark'] .dash-card-unpin,
-body.dark-mode .dash-card-unpin {
-    color: var(--dm-text-muted);
-}
-
-:root[data-theme='dark'] .dash-card-unpin:hover,
-body.dark-mode .dash-card-unpin:hover {
-    background: var(--dm-surface-hover);
-}
-
 :root[data-theme='dark'] .dashboard-empty,
 body.dark-mode .dashboard-empty {
     color: var(--dm-text-muted);
@@ -841,45 +826,46 @@ body.dark-mode .dashboard-empty {
     }
 
     .dashboard-sidebar {
-        width: 36px;
+        width: 50px;
         padding: 10px 3px;
         gap: 2px;
     }
 
     .dashboard-sidebar .dashboard-topbar-btn {
-        width: 30px;
-        height: 30px;
+        width: 44px;
+        height: 44px;
     }
 
     .dashboard-sidebar .dashboard-topbar-btn .lucide {
-        width: 14px;
-        height: 14px;
+        width: 24px;
+        height: 24px;
     }
 
     .dashboard-topbar-actions {
         gap: 4px;
+        justify-content: flex-start;
         padding: 0 2px;
     }
 
     .dashboard-topbar-btn {
-        width: 28px;
-        height: 32px;
-        padding: 0 0 10px;
+        width: 38px;
+        height: 44px;
+        padding: 0 0 12px;
     }
 
     .dashboard-topbar-btn .lucide {
-        width: 14px;
-        height: 14px;
+        width: 22px;
+        height: 22px;
     }
 
     .dashboard-topbar-count {
-        font-size: 9px;
+        font-size: 10px;
         bottom: 1px;
     }
 
     .dashboard-grid-container {
         grid-template-columns: repeat(2, 1fr);
-        grid-auto-rows: 90px;
+        grid-auto-rows: 116px;
         gap: 8px;
         margin-top: 8px;
     }
@@ -899,13 +885,13 @@ body.dark-mode .dashboard-empty {
     }
 
     .dash-card-icon {
-        width: 32px;
-        height: 32px;
+        width: 48px;
+        height: 48px;
     }
 
     .dash-card-icon .lucide {
-        width: 16px;
-        height: 16px;
+        width: 28px;
+        height: 28px;
     }
 
     .dash-folder-card {
@@ -915,9 +901,5 @@ body.dark-mode .dashboard-empty {
 
     .dash-note-card {
         padding: 10px 12px;
-    }
-
-    .dash-card-unpin {
-        opacity: 0.5;
     }
 }

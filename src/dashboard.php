@@ -620,12 +620,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 
 		<script>
 		window.DASHBOARD_DATA      = <?php echo json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
-		window.DASHBOARD_WORKSPACE = <?php echo json_encode($pageWorkspace); ?>;
-		window.DASHBOARD_TXT = {
-			unpin:     <?php echo json_encode(t('dashboard.unpin', [], 'Remove from favorites')); ?>,
-			error:     <?php echo json_encode(t('common.error', [], 'Error')); ?>,
-			noResults: <?php echo json_encode(t('public.no_filter_results', [], 'No notes match your search.')); ?>
-		};
 		window.NOTIFICATIONS_TXT = {
 			dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,
 			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>

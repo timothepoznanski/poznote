@@ -4,6 +4,9 @@
     // Sync favorites preference (localStorage → URL) before the page renders.
     // Only redirects if localStorage has an explicit saved value that differs from the URL.
     var FAVORITES_KEY = 'dashboard_favorites';
+    var FILTER_OPEN_KEY = 'dashboard_filter_open';
+    var FILTER_VALUE_KEY = 'dashboard_filter_value';
+    var NAV_PATH_KEY = 'dashboard_nav_path';
     (function syncFavoritesFromStorage() {
         try {
             var stored = localStorage.getItem(FAVORITES_KEY);
@@ -22,8 +25,6 @@
     })();
 
     var rootData  = window.DASHBOARD_DATA || { folders: [], notes: [] };
-    var workspace = window.DASHBOARD_WORKSPACE || '';
-    var txt       = window.DASHBOARD_TXT || {};
     var gitTxt    = window.DASHBOARD_GIT || {};
 
     // Navigation stack: array of folder objects navigated into.
@@ -50,6 +51,18 @@
         return total;
     }
 
+    function dashboardStorageKey(baseKey) {
+        var workspace = '';
+        var favoritesMode = 'all';
+
+        try {
+            workspace = document.body && document.body.dataset ? (document.body.dataset.workspace || '') : '';
+            favoritesMode = new URL(window.location.href).searchParams.get('favorites') === '1' ? 'favorites' : 'all';
+        } catch (err) { /* ignore */ }
+
+        return baseKey + ':' + encodeURIComponent(workspace) + ':' + favoritesMode;
+    }
+
     // --- Card builders ---
 
     function buildFolderCard(folder, index) {
@@ -66,10 +79,6 @@
     function buildNoteCard(note) {
         var tags      = note.tags || [];
         var searchVal = (note.heading + ' ' + tags.join(' ')).toLowerCase();
-
-        var unpin = '<button type="button" class="dash-card-unpin" data-note-id="' + note.id + '"' +
-            ' title="' + esc(txt.unpin || '') + '" aria-label="' + esc(txt.unpin || '') + '">' +
-            '<i class="lucide lucide-x"></i></button>';
 
         var content = '';
         if (note.tasks !== null && note.tasks !== undefined && note.tasks.length > 0) {
@@ -97,7 +106,6 @@
         }
 
         return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '">' +
-            unpin +
             '<a class="dash-card-link" href="' + esc(note.url) + '">' +
                 '<div class="dash-card-note-title">' + esc(note.heading) + '</div>' +
                 content +
@@ -153,10 +161,56 @@
 
     // --- Navigation ---
 
+    function findFolderAtLevel(level, folderId) {
+        var id = String(folderId);
+        var folders = level && Array.isArray(level.folders) ? level.folders : [];
+        for (var i = 0; i < folders.length; i++) {
+            if (String(folders[i].id) === id) {
+                return folders[i];
+            }
+        }
+        return null;
+    }
+
+    function saveNavigationPath() {
+        try {
+            var path = navStack.map(function (folder) { return folder.id; });
+            localStorage.setItem(dashboardStorageKey(NAV_PATH_KEY), JSON.stringify(path));
+        } catch (err) { /* ignore */ }
+    }
+
+    function restoreNavigationPath() {
+        var storedPath;
+        try {
+            storedPath = JSON.parse(localStorage.getItem(dashboardStorageKey(NAV_PATH_KEY)) || '[]');
+        } catch (err) {
+            storedPath = [];
+        }
+
+        if (!Array.isArray(storedPath)) {
+            storedPath = [];
+        }
+
+        var level = rootData;
+        var restoredStack = [];
+        for (var i = 0; i < storedPath.length; i++) {
+            var folder = findFolderAtLevel(level, storedPath[i]);
+            if (!folder) break;
+            restoredStack.push(folder);
+            level = folder;
+        }
+
+        navStack = restoredStack;
+        if (restoredStack.length !== storedPath.length) {
+            saveNavigationPath();
+        }
+    }
+
     function navigateInto(folderIndex) {
         var level = currentLevel();
         if (folderIndex >= 0 && folderIndex < level.folders.length) {
             navStack.push(level.folders[folderIndex]);
+            saveNavigationPath();
             renderAll();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -164,6 +218,7 @@
 
     function navigateTo(depth) {
         navStack = navStack.slice(0, depth);
+        saveNavigationPath();
         renderAll();
     }
 
@@ -184,40 +239,6 @@
         if (noResults) {
             noResults.style.display = (visibleTotal === 0 && cards.length > 0) ? 'block' : 'none';
         }
-    }
-
-    // --- Unpin ---
-
-    function removeNoteFromData(level, noteId) {
-        level.notes = level.notes.filter(function (n) { return n.id !== noteId; });
-        level.folders.forEach(function (f) { removeNoteFromData(f, noteId); });
-    }
-
-    function unpinNote(noteId) {
-        fetch('api/v1/notes/' + encodeURIComponent(noteId) + '/favorite', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ workspace: workspace })
-        })
-            .then(function (r) { return r.json(); })
-            .then(function (data) {
-                if (data.success) {
-                    var card = document.querySelector('.dash-note-card[data-note-id="' + noteId + '"]');
-                    if (card) card.remove();
-                    removeNoteFromData(rootData, noteId);
-
-                    var remaining = document.querySelectorAll('.dash-card');
-                    if (remaining.length === 0) window.location.reload();
-                } else {
-                    throw new Error(data.error || 'Request failed');
-                }
-            })
-            .catch(function (err) {
-                if (window.modalAlert) {
-                    window.modalAlert.alert((txt.error || 'Error') + ': ' + err.message, 'error');
-                }
-            });
     }
 
     // --- Git sync ---
@@ -369,7 +390,9 @@
     // --- Init ---
 
     document.addEventListener('DOMContentLoaded', function () {
+        restoreNavigationPath();
         renderAll();
+        window.addEventListener('pagehide', saveNavigationPath);
 
         var toggleFavoritesBtn = document.getElementById('dashboardToggleFavorites');
         if (toggleFavoritesBtn) {
@@ -394,15 +417,41 @@
         var toggleFilterBtn = document.getElementById('dashboardToggleFilter');
         var filterWrap      = document.getElementById('dashboardTopbarFilter');
 
-        function setFilterOpen(open) {
+        function setFilterOpen(open, focusInput) {
             if (!filterWrap) return;
+            if (focusInput === undefined) focusInput = true;
             filterWrap.classList.toggle('is-collapsed', !open);
             if (toggleFilterBtn) {
                 toggleFilterBtn.classList.toggle('active', open);
                 toggleFilterBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
             }
-            if (open && filterInput) {
+            try {
+                localStorage.setItem(FILTER_OPEN_KEY, open ? '1' : '0');
+            } catch (err) { /* ignore */ }
+            if (open && focusInput && filterInput) {
                 window.setTimeout(function () { filterInput.focus(); }, 0);
+            }
+        }
+
+        if (filterInput) {
+            var storedFilterValue = '';
+            var storedFilterOpen = false;
+            try {
+                storedFilterValue = localStorage.getItem(FILTER_VALUE_KEY) || '';
+                storedFilterOpen = localStorage.getItem(FILTER_OPEN_KEY) === '1';
+            } catch (err) { /* ignore */ }
+
+            if (storedFilterValue) {
+                filterInput.value = storedFilterValue;
+            }
+
+            var initialTerm = filterInput.value.trim();
+            if (initialTerm || storedFilterOpen) {
+                setFilterOpen(true, false);
+            }
+            if (initialTerm) {
+                applyFilter(initialTerm.toLowerCase());
+                if (clearFilterBtn) clearFilterBtn.style.display = 'flex';
             }
         }
 
@@ -419,13 +468,11 @@
         }
 
         if (filterInput) {
-            if (filterInput.value.trim()) {
-                setFilterOpen(true);
-                if (clearFilterBtn) clearFilterBtn.style.display = 'flex';
-            }
-
             filterInput.addEventListener('input', function () {
                 var term = this.value.trim().toLowerCase();
+                try {
+                    localStorage.setItem(FILTER_VALUE_KEY, this.value);
+                } catch (err) { /* ignore */ }
                 applyFilter(term);
                 if (clearFilterBtn) clearFilterBtn.style.display = term ? 'flex' : 'none';
             });
@@ -435,6 +482,9 @@
             clearFilterBtn.addEventListener('click', function () {
                 if (!filterInput) return;
                 filterInput.value = '';
+                try {
+                    localStorage.removeItem(FILTER_VALUE_KEY);
+                } catch (err) { /* ignore */ }
                 applyFilter('');
                 clearFilterBtn.style.display = 'none';
                 filterInput.focus();
@@ -505,14 +555,6 @@
                 var idx = parseInt(folderCard.getAttribute('data-folder-index') || '0', 10);
                 navigateInto(idx);
                 return;
-            }
-
-            var unpinBtn = e.target.closest('.dash-card-unpin');
-            if (unpinBtn) {
-                e.preventDefault();
-                e.stopPropagation();
-                var noteId = parseInt(unpinBtn.getAttribute('data-note-id') || '0', 10);
-                if (noteId) unpinNote(noteId);
             }
         });
     });
