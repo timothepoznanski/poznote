@@ -30,7 +30,6 @@ https://poznote.com/index.html#press
 ## Table of content
 
 - [Install](#install)
-  - [Cloud](#cloud)
 - [Access](#access)
 - [Change Settings](#change-settings)
 - [Update application](#update-application)
@@ -204,6 +203,7 @@ docker compose up -d
 <a id="cloud"></a>
 <details>
 <summary><strong>☁️ Cloud</strong></summary>
+<br>
 
 Use [Poznote Cloud](https://poznote.com/index.html#cloud) or deploy your own instance on platforms like Railway, Render, Fly.io, Koyeb, Northflank, DigitalOcean App Platform, or Heroku.
 

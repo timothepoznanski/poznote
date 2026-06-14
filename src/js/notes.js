@@ -603,6 +603,19 @@ function stripSearchHighlights(element) {
     if (!element) return null;
 
     var clonedElement = element.cloneNode(true);
+
+    normalizeCodeBlocksForStorage(clonedElement);
+
+    var codeBlockButtons = clonedElement.querySelectorAll('.code-block-copy-btn, .code-block-delete-btn');
+    for (var b = 0; b < codeBlockButtons.length; b++) {
+        codeBlockButtons[b].remove();
+    }
+
+    var codeBlockHosts = clonedElement.querySelectorAll('.code-block-actions-host');
+    for (var c = 0; c < codeBlockHosts.length; c++) {
+        unwrapCodeBlockActionHost(codeBlockHosts[c]);
+    }
+
     var headingAnchors = clonedElement.querySelectorAll('.heading-anchor, [data-heading-anchor="true"]');
 
     for (var h = 0; h < headingAnchors.length; h++) {
@@ -619,6 +632,96 @@ function stripSearchHighlights(element) {
     }
 
     return clonedElement;
+}
+
+function isCodeLineBlockElement(node) {
+    if (!node || node.nodeType !== 1) return false;
+
+    return ['DIV', 'P', 'LI'].indexOf(node.tagName) !== -1;
+}
+
+function getTextWithCodeLineBreaks(node) {
+    if (!node) return '';
+
+    if (node.nodeType === Node.TEXT_NODE) {
+        return node.nodeValue || '';
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+        return '';
+    }
+
+    if (node.classList && (
+        node.classList.contains('code-block-copy-btn') ||
+        node.classList.contains('code-block-delete-btn')
+    )) {
+        return '';
+    }
+
+    if (node.tagName === 'BR') {
+        return '\n';
+    }
+
+    var text = '';
+    for (var i = 0; i < node.childNodes.length; i++) {
+        text += getTextWithCodeLineBreaks(node.childNodes[i]);
+    }
+
+    if (isCodeLineBlockElement(node) && !text.endsWith('\n')) {
+        text += '\n';
+    }
+
+    return text;
+}
+
+function getCodeBlockSourceText(codeElement) {
+    if (!codeElement) return '';
+
+    var text = '';
+    for (var i = 0; i < codeElement.childNodes.length; i++) {
+        text += getTextWithCodeLineBreaks(codeElement.childNodes[i]);
+    }
+
+    var lastChild = codeElement.lastChild;
+    if (lastChild && isCodeLineBlockElement(lastChild) && text.endsWith('\n')) {
+        text = text.slice(0, -1);
+    }
+
+    return text.replace(/\u00A0/g, ' ');
+}
+
+window.getCodeBlockSourceText = window.getCodeBlockSourceText || getCodeBlockSourceText;
+
+function normalizeCodeBlocksForStorage(root) {
+    if (!root || !root.querySelectorAll) return;
+
+    var codeBlocks = root.querySelectorAll('pre code');
+    for (var i = 0; i < codeBlocks.length; i++) {
+        var codeBlock = codeBlocks[i];
+        var languageMatch = codeBlock.className && codeBlock.className.match(/(?:^|\s)language-([a-zA-Z0-9_+-]+)/);
+        if (!languageMatch) {
+            continue;
+        }
+
+        var sourceText = getCodeBlockSourceText(codeBlock);
+        var languageClass = languageMatch ? 'language-' + languageMatch[1] : '';
+
+        codeBlock.textContent = sourceText;
+        codeBlock.removeAttribute('data-highlighted');
+        codeBlock.className = languageClass;
+    }
+}
+
+function unwrapCodeBlockActionHost(host) {
+    if (!host || !host.parentNode || !host.classList || !host.classList.contains('code-block-actions-host')) {
+        return;
+    }
+
+    var parent = host.parentNode;
+    while (host.firstChild) {
+        parent.insertBefore(host.firstChild, host);
+    }
+    parent.removeChild(host);
 }
 
 /**

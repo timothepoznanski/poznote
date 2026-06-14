@@ -138,8 +138,13 @@
             delBtn.remove();
         }
         
-        // Get text content and normalize spaces
-        var text = clone.textContent || clone.innerText || '';
+        // Get text content and preserve visual line breaks from editable code blocks.
+        var codeElement = clone.tagName && clone.tagName.toLowerCase() === 'code'
+            ? clone
+            : clone.querySelector('code');
+        var text = (typeof window.getCodeBlockSourceText === 'function' && codeElement)
+            ? window.getCodeBlockSourceText(codeElement)
+            : (clone.textContent || clone.innerText || '');
         
         // Replace non-breaking spaces with regular spaces
         text = text.replace(/\u00A0/g, ' ');
