@@ -34,6 +34,62 @@
         return !!(normalizedLanguage && typeof hljs !== 'undefined' && hljs && typeof hljs.getLanguage === 'function' && hljs.getLanguage(normalizedLanguage));
     }
 
+    function isCodeLineBlockElement(node) {
+        if (!node || node.nodeType !== 1) return false;
+
+        return ['DIV', 'P', 'LI'].indexOf(node.tagName) !== -1;
+    }
+
+    function getTextWithCodeLineBreaks(node) {
+        if (!node) return '';
+
+        if (node.nodeType === Node.TEXT_NODE) {
+            return node.nodeValue || '';
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            return '';
+        }
+
+        if (node.classList && (
+            node.classList.contains('code-block-copy-btn') ||
+            node.classList.contains('code-block-delete-btn')
+        )) {
+            return '';
+        }
+
+        if (node.tagName === 'BR') {
+            return '\n';
+        }
+
+        var text = '';
+        for (var i = 0; i < node.childNodes.length; i++) {
+            text += getTextWithCodeLineBreaks(node.childNodes[i]);
+        }
+
+        if (isCodeLineBlockElement(node) && !text.endsWith('\n')) {
+            text += '\n';
+        }
+
+        return text;
+    }
+
+    function getCodeBlockSourceText(codeElement) {
+        if (!codeElement) return '';
+
+        var text = '';
+        for (var i = 0; i < codeElement.childNodes.length; i++) {
+            text += getTextWithCodeLineBreaks(codeElement.childNodes[i]);
+        }
+
+        var lastChild = codeElement.lastChild;
+        if (lastChild && isCodeLineBlockElement(lastChild) && text.endsWith('\n')) {
+            text = text.slice(0, -1);
+        }
+
+        return text.replace(/\u00A0/g, ' ');
+    }
+
     /**
      * Apply syntax highlighting to all code blocks in a container
      * @param {HTMLElement} container - The container to search for code blocks (optional, defaults to document)
@@ -58,7 +114,7 @@
             }
 
             // Skip if the code block is empty or only has zero-width space
-            var text = codeBlock.textContent || '';
+            var text = getCodeBlockSourceText(codeBlock);
             if (!text.trim() || text === '\u200B') {
                 return;
             }
@@ -83,6 +139,7 @@
             codeBlock.classList.remove('hljs');
             // Remove highlighted dataset to prevent the warning
             delete codeBlock.dataset.highlighted;
+            codeBlock.textContent = text;
 
             try {
                 hljs.highlightElement(codeBlock);
@@ -123,7 +180,7 @@
         
         codeBlocks.forEach(function(codeBlock) {
             // Skip if the code block is empty or only has zero-width space
-            var text = codeBlock.textContent || '';
+            var text = getCodeBlockSourceText(codeBlock);
             if (!text.trim() || text === '\u200B') {
                 return;
             }
@@ -137,6 +194,7 @@
                 // Auto-detect language
                 var result = hljs.highlightAuto(text);
                 if (result.language && result.relevance > 5) {
+                    codeBlock.textContent = text;
                     codeBlock.innerHTML = result.value;
                     codeBlock.classList.add('hljs');
                     codeBlock.classList.add('language-' + result.language);
@@ -179,6 +237,7 @@
     }
 
     // Export functions globally
+    window.getCodeBlockSourceText = window.getCodeBlockSourceText || getCodeBlockSourceText;
     window.applySyntaxHighlighting = applySyntaxHighlighting;
     window.applyAutoHighlighting = applyAutoHighlighting;
     window.refreshSyntaxHighlighting = refreshSyntaxHighlighting;
