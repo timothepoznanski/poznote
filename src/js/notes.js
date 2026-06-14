@@ -698,8 +698,12 @@ function normalizeCodeBlocksForStorage(root) {
     var codeBlocks = root.querySelectorAll('pre code');
     for (var i = 0; i < codeBlocks.length; i++) {
         var codeBlock = codeBlocks[i];
-        var sourceText = getCodeBlockSourceText(codeBlock);
         var languageMatch = codeBlock.className && codeBlock.className.match(/(?:^|\s)language-([a-zA-Z0-9_+-]+)/);
+        if (!languageMatch) {
+            continue;
+        }
+
+        var sourceText = getCodeBlockSourceText(codeBlock);
         var languageClass = languageMatch ? 'language-' + languageMatch[1] : '';
 
         codeBlock.textContent = sourceText;

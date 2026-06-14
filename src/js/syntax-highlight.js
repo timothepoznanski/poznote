@@ -90,6 +90,16 @@
         return text.replace(/\u00A0/g, ' ');
     }
 
+    function isExplicitPlainCodeBlock(codeBlock) {
+        if (!codeBlock) return false;
+
+        var preElement = codeBlock.closest ? codeBlock.closest('pre') : null;
+        var dataLanguage = (codeBlock.getAttribute && codeBlock.getAttribute('data-language')) ||
+            (preElement && preElement.getAttribute ? preElement.getAttribute('data-language') : '');
+
+        return String(dataLanguage || '').trim().toLowerCase() === 'code';
+    }
+
     /**
      * Apply syntax highlighting to all code blocks in a container
      * @param {HTMLElement} container - The container to search for code blocks (optional, defaults to document)
@@ -179,6 +189,10 @@
         var highlightedAnyBlock = false;
         
         codeBlocks.forEach(function(codeBlock) {
+            if (isExplicitPlainCodeBlock(codeBlock)) {
+                return;
+            }
+
             // Skip if the code block is empty or only has zero-width space
             var text = getCodeBlockSourceText(codeBlock);
             if (!text.trim() || text === '\u200B') {
