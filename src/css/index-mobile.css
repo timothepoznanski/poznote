@@ -105,6 +105,7 @@ body::-webkit-scrollbar {
 }
 
 #left_col {
+    --mobile-sidebar-bottom-space: max(48px, calc(env(safe-area-inset-bottom, 0px) + 28px));
     width: 100% !important;
     max-width: 100% !important;
     min-width: 100% !important;
@@ -116,6 +117,17 @@ body::-webkit-scrollbar {
     overflow: -moz-scrollbars-none !important;
     /* Firefox legacy */
     overflow-y: auto !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    scroll-padding-bottom: var(--mobile-sidebar-bottom-space);
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.notes-list-scrollable-content {
+    padding-bottom: var(--mobile-sidebar-bottom-space);
+    scroll-padding-bottom: var(--mobile-sidebar-bottom-space);
+    box-sizing: border-box;
 }
 
 #right_pane,
