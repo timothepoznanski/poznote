@@ -918,8 +918,10 @@ function parseMarkdown($text) {
             continue;
         }
         
+        $taskListLinePattern = '/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/';
+
         // Helper: Parse nested lists (supports task lists, ordered, and unordered)
-        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList) {
+        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList, $taskListLinePattern) {
             $listItems = [];
             $currentIndex = $startIndex;
             $baseIndent = null;
@@ -945,9 +947,14 @@ function parseMarkdown($text) {
                         
                         // Check if this is a list item that continues our list
                         if ($isTaskList) {
-                            $lookMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $lookAheadLine, $lookMatches);
+                            $lookMatch = preg_match($taskListLinePattern, $lookAheadLine, $lookMatches);
                             $lookMarkerType = null;
                         } else {
+                            $lookTaskMatch = preg_match($taskListLinePattern, $lookAheadLine, $lookTaskMatches);
+                            if ($lookTaskMatch && $baseIndent !== null && strlen($lookTaskMatches[1]) === $baseIndent) {
+                                break;
+                            }
+
                             $lookMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $lookAheadLine, $lookMatches);
                             if ($lookMatch) {
                                 $lookMarker = $lookMatches[2];
@@ -976,10 +983,15 @@ function parseMarkdown($text) {
                 
                 // Parse list item (task list or regular list)
                 if ($isTaskList) {
-                    $listMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $currentLine, $matches);
+                    $listMatch = preg_match($taskListLinePattern, $currentLine, $matches);
                     $marker = null;
                     $markerType = null;
                 } else {
+                    $taskLineMatch = preg_match($taskListLinePattern, $currentLine, $taskMatches);
+                    if ($taskLineMatch && $baseIndent !== null && strlen($taskMatches[1]) <= $baseIndent) {
+                        break;
+                    }
+
                     $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $currentLine, $matches);
                     $marker = isset($matches[2]) ? $matches[2] : null;
                     $markerType = ($marker && preg_match('/\d+(?:\.\d+)*\./', $marker)) ? 'number' : 'bullet';
@@ -1053,18 +1065,24 @@ function parseMarkdown($text) {
                     $nextIndex = $currentIndex + 1;
                     if ($nextIndex < count($lines)) {
                         $nextLine = $lines[$nextIndex];
+                        $nextIsTaskList = false;
                         if ($isTaskList) {
-                            $nextMatch = preg_match('/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $nextLine, $nextMatches);
+                            $nextMatch = preg_match($taskListLinePattern, $nextLine, $nextMatches);
                         } else {
-                            $nextMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $nextLine, $nextMatches);
+                            $nextIsTaskList = preg_match($taskListLinePattern, $nextLine, $nextMatches) === 1;
+                            if ($nextIsTaskList) {
+                                $nextMatch = 1;
+                            } else {
+                                $nextMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $nextLine, $nextMatches);
+                            }
                         }
                         
                         if ($nextMatch && strlen($nextMatches[1]) > $indent) {
                             // Parse nested list recursively
-                            $nestedResult = $parseNestedList($nextIndex, $isTaskList);
-                            $isOrderedNested = !$isTaskList && preg_match('/\d+(?:\.\d+)*\./', $nextMatches[2]);
+                            $nestedResult = $parseNestedList($nextIndex, $isTaskList || $nextIsTaskList);
+                            $isOrderedNested = !$isTaskList && !$nextIsTaskList && preg_match('/\d+(?:\.\d+)*\./', $nextMatches[2]);
                             $listTag = $isOrderedNested ? 'ol' : 'ul';
-                            $listClass = $isTaskList ? ' class="task-list"' : '';
+                            $listClass = ($isTaskList || $nextIsTaskList) ? ' class="task-list"' : '';
                             $itemHtml .= '<' . $listTag . $listClass . '>' . implode('', $nestedResult['items']) . '</' . $listTag . '>';
                             $currentIndex = $nestedResult['endIndex'];
                         }
@@ -1090,7 +1108,7 @@ function parseMarkdown($text) {
         };
         
         // Task lists (checkboxes) - must be checked before unordered lists
-        if (preg_match('/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/', $line)) {
+        if (preg_match($taskListLinePattern, $line)) {
             $flushParagraph();
             $listResult = $parseNestedList($i, true);
             $result[] = '<ul class="task-list">' . implode('', $listResult['items']) . '</ul>';
