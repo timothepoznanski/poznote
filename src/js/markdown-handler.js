@@ -2511,6 +2511,8 @@ function parseMarkdown(text) {
             continue;
         }
 
+        const taskListLineRegex = /^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/;
+
         // Helper function to parse nested lists
         function parseNestedList(startIndex, isTaskList = false) {
             let listItems = [];
@@ -2542,8 +2544,13 @@ function parseMarkdown(text) {
                         let lookMarkerType = null;
 
                         if (isTaskList) {
-                            lookMatch = lookAheadLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
+                            lookMatch = lookAheadLine.match(taskListLineRegex);
                         } else {
+                            let lookTaskMatch = lookAheadLine.match(taskListLineRegex);
+                            if (lookTaskMatch && baseIndent !== null && lookTaskMatch[1].length === baseIndent) {
+                                break;
+                            }
+
                             lookMatch = lookAheadLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
                             if (lookMatch) {
                                 let lookMarker = lookMatch[2];
@@ -2577,8 +2584,13 @@ function parseMarkdown(text) {
                 let markerType = null;
 
                 if (isTaskList) {
-                    listMatch = currentLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
+                    listMatch = currentLine.match(taskListLineRegex);
                 } else {
+                    let taskLineMatch = currentLine.match(taskListLineRegex);
+                    if (taskLineMatch && baseIndent !== null && taskLineMatch[1].length <= baseIndent) {
+                        break;
+                    }
+
                     listMatch = currentLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
                     if (listMatch) {
                         marker = listMatch[2];
@@ -2658,18 +2670,23 @@ function parseMarkdown(text) {
                     if (nextIndex < lines.length) {
                         let nextLine = lines[nextIndex];
                         let nextMatch;
+                        let nextIsTaskList = false;
                         if (isTaskList) {
-                            nextMatch = nextLine.match(/^(\s*)[\*\-\+]\s+\[([ xX])\]\s+(.+)$/);
+                            nextMatch = nextLine.match(taskListLineRegex);
                         } else {
-                            nextMatch = nextLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
+                            nextMatch = nextLine.match(taskListLineRegex);
+                            nextIsTaskList = !!nextMatch;
+                            if (!nextMatch) {
+                                nextMatch = nextLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
+                            }
                         }
 
                         if (nextMatch && nextMatch[1].length > indent) {
                             // Parse nested list
-                            let nestedResult = parseNestedList(nextIndex, isTaskList);
-                            let isOrderedNested = !isTaskList && nextMatch[2].match(/\d+(?:\.\d+)*\./);
+                            let nestedResult = parseNestedList(nextIndex, isTaskList || nextIsTaskList);
+                            let isOrderedNested = !isTaskList && !nextIsTaskList && nextMatch[2].match(/\d+(?:\.\d+)*\./);
                             let listTag = isOrderedNested ? 'ol' : 'ul';
-                            let listClass = isTaskList ? ' class="task-list"' : '';
+                            let listClass = (isTaskList || nextIsTaskList) ? ' class="task-list"' : '';
                             itemHtml += '<' + listTag + listClass + '>' + nestedResult.items.join('') + '</' + listTag + '>';
                             currentIndex = nestedResult.endIndex;
                         }
@@ -2695,7 +2712,7 @@ function parseMarkdown(text) {
         }
 
         // Task lists (checkboxes) - must be checked before unordered lists
-        if (line.match(/^\s*[\*\-\+]\s+\[([ xX])\]\s+(.+)$/)) {
+        if (line.match(taskListLineRegex)) {
             flushParagraph();
             let listResult = parseNestedList(i, true);
             result.push('<ul class="task-list">' + listResult.items.join('') + '</ul>');
