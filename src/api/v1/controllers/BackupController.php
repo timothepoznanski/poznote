@@ -20,6 +20,10 @@ class BackupController {
     }
 
     private function requireActiveAccountOwner() {
+        if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+            return null;
+        }
+
         if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
             http_response_code(403);
             $message = function_exists('getActiveAccountOwnerRequiredMessage')
