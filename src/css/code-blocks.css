@@ -65,7 +65,7 @@ pre.code-block .code-block-copy-btn,
 pre.code-block .code-block-delete-btn,
 .noteentry pre .code-block-delete-btn {
     position: absolute;
-    top: 8px;
+    top: 2px;
     width: 28px;
     height: 28px;
     background: transparent;
@@ -160,6 +160,19 @@ pre.code-block .code-block-delete-btn,
 .code-block-actions-host > .code-block-delete-btn svg {
     width: 14px;
     height: 14px;
+}
+
+@media (max-width: 800px) {
+    .code-block-copy-btn,
+    pre.code-block .code-block-copy-btn,
+    .noteentry pre .code-block-copy-btn,
+    .code-block-delete-btn,
+    pre.code-block .code-block-delete-btn,
+    .noteentry pre .code-block-delete-btn,
+    .code-block-actions-host > .code-block-copy-btn,
+    .code-block-actions-host > .code-block-delete-btn {
+        top: 2px;
+    }
 }
 
 /* Additional specific rule to ensure padding is applied */
