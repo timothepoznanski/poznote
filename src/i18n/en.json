@@ -41,6 +41,8 @@
     "at": "at",
     "scroll_left": "Scroll left",
     "scroll_right": "Scroll right",
+    "scroll_top": "Scroll to top",
+    "scroll_bottom": "Scroll to bottom",
     "outline": {
       "title": "Outline",
       "no_headings": "No headings in this note"
@@ -218,6 +220,7 @@
       "markdown_split_card_view": "Framed markdown",
       "code_block_word_wrap": "Code block word wrap",
       "attachment_previews_in_note": "Attachment previews",
+      "default_image_border_no_padding": "Default image border",
       "ui_customization": "Element visibility",
       "notes_dashboard": "Notes board"
     },
@@ -470,6 +473,7 @@
       "title": "Move Note to Folder",
       "workspace_destination": "Select Workspace destination:",
       "target_folder": "Select target folder:",
+      "recent_folders": "Recent folders",
       "enter_folder_name": "Please enter a folder name"
     },
     "move_folder_files": {

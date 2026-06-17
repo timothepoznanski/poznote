@@ -167,9 +167,9 @@ if ($note_id > 0) {
         window.EXCALIDRAW_ASSET_PATH = window.EXCALIDRAW_ASSET_PATH || 'js/excalidraw-dist/';
     </script>
     <!-- Excalidraw Bundle (compiled with Vite) -->
-    <script src="js/excalidraw-dist/excalidraw-bundle.iife.js"></script>
+    <script src="js/excalidraw-dist/excalidraw-bundle.iife.js?v=<?php echo $themeAssetVersion; ?>"></script>
 </head>
-<body>
+<body class="excalidraw-editor-page">
     <div class="excalidraw-page-wrapper">
         <!-- Clean toolbar -->
         <div class="poznote-toolbar">
@@ -231,6 +231,6 @@ if ($note_id > 0) {
         ];
         echo json_encode($excalidrawConfig);
     ?></script>
-    <script src="js/excalidraw-editor.js"></script>
+    <script src="js/excalidraw-editor.js?v=<?php echo $themeAssetVersion; ?>"></script>
 </body>
 </html>

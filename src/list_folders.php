@@ -56,6 +56,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
@@ -86,6 +87,24 @@ $currentLang = getUserLanguage();
 		.shared-folder-icon i {
 			transition: color 0.15s ease;
 		}
+		.folder-list-actions {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			flex: 0 0 auto;
+		}
+		.folder-delete-btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			padding: 0 !important;
+		}
+		.folder-delete-btn i {
+			font-size: 14px;
+			line-height: 1;
+		}
 		
 		/* Mobile simplification: list style instead of cards */
 		@media (max-width: 768px) {
@@ -113,8 +132,8 @@ $currentLang = getUserLanguage();
 			.folder-name-text {
 				font-size: 14px !important;
 			}
-			.note-actions {
-				display: none !important;
+			.folder-list-actions {
+				margin-left: auto;
 			}
 		}
 	</style>
@@ -169,13 +188,18 @@ $currentLang = getUserLanguage();
 				echo '<div class="shared-note-item folder-item" onclick="window.location.href=\'' . $kanban_url . '\'" data-folder-name="' . $folder_name . '" style="cursor: pointer; padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
 				
 				echo '<div class="note-name-container" style="display: flex; align-items: center; gap: 12px; flex: 1;">';
-				$icon_style = $icon_color ? 'style="color: ' . $icon_color . ' !important;"' : '';
+				$icon_style = 'style="' . ($icon_color ? 'color: ' . $icon_color . ' !important; ' : '') . 'filter: none !important;"';
 				echo '<div class="shared-folder-icon" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: transparent !important; border-radius: 8px;">';
 				echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
 				echo '</div>';
 				echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px; color: var(--text-color, var(--dm-text, #333333));">' . $folder_name . ' <span style="font-size: 14px; color: var(--text-muted, var(--dm-text-muted, #6c757d)); font-weight: 400;">(' . $note_count . ')</span></span>';
 				echo '</div>';
 				
+				echo '<div class="folder-list-actions">';
+				echo '<button type="button" class="btn btn-sm btn-danger folder-delete-btn" data-action="delete-folder" data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '" title="' . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . '" aria-label="' . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . '">';
+				echo '<i class="lucide lucide-trash-2"></i>';
+				echo '</button>';
+				echo '</div>';
 
 				echo '</div>';
 				}
@@ -184,9 +208,29 @@ $currentLang = getUserLanguage();
 			</div>
 		</div>
 	</div>
+
+	<div id="deleteFolderModal" class="modal">
+		<div class="modal-content">
+			<h3><?php echo t_h('modals.folder.delete_title'); ?></h3>
+			<div id="deleteFolderMessage" class="delete-folder-message">
+				<p id="deleteFolderMainMessage" class="delete-folder-main-message"></p>
+				<ul id="deleteFolderDetails" class="delete-folder-details">
+				</ul>
+				<p id="deleteFolderNote" class="delete-folder-note"></p>
+			</div>
+			<div class="modal-buttons">
+				<button type="button" class="btn-cancel" data-action="close-modal" data-modal="deleteFolderModal"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-danger" data-action="execute-delete-folder"><?php echo t_h('modals.folder.delete_folder'); ?></button>
+			</div>
+		</div>
+	</div>
 	
 	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/navigation.js"></script>
-	<script src="js/list_folders.js"></script>
+	<script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
+	<script src="js/ui.js?v=<?php echo getAppVersion(); ?>"></script>
+	<script src="js/utils.js?v=<?php echo file_exists(__DIR__ . '/js/utils.js') ? filemtime(__DIR__ . '/js/utils.js') : getAppVersion(); ?>"></script>
+	<script src="js/modals-events.js?v=<?php echo getAppVersion(); ?>"></script>
+	<script src="js/list_folders.js?v=<?php echo file_exists(__DIR__ . '/js/list_folders.js') ? filemtime(__DIR__ . '/js/list_folders.js') : getAppVersion(); ?>"></script>
 </body>
 </html>

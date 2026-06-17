@@ -64,6 +64,8 @@
     "apply": "应用",
     "at": "于",
     "kanban": "看板",
+    "scroll_top": "转到笔记顶部",
+    "scroll_bottom": "转到笔记底部",
     "outline": {
       "title": "大纲",
       "no_headings": "此笔记中没有标题"
@@ -559,6 +561,7 @@
       "markdown_split_card_view": "带边框的 Markdown",
       "code_block_word_wrap": "代码块自动换行",
       "attachment_previews_in_note": "附件预览",
+      "default_image_border_no_padding": "默认图片边框",
       "ui_customization": "元素可见性",
       "notes_dashboard": "笔记看板"
     },
@@ -935,6 +938,7 @@
       "title": "将笔记移动到文件夹",
       "workspace_destination": "选择目标工作区:",
       "target_folder": "选择目标文件夹:",
+      "recent_folders": "最近的文件夹",
       "enter_folder_name": "请输入文件夹名称"
     },
     "move_folder_files": {

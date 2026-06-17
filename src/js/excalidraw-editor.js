@@ -30,6 +30,23 @@
     var TXT_INIT_ERROR_TEMPLATE = config.txt.initErrorTemplate || 'Error initializing Excalidraw: {{error}}';
     var TXT_ERROR_TEMPLATE = config.txt.errorTemplate || 'Error: {{error}}';
     var TXT_SAVE_FAILED = config.txt.saveFailed || 'Save failed';
+    var EXCALIDRAW_THEME_COLORS = {
+        light: {
+            noteBackground: '#ffffff',
+            canvasBackground: '#ffffff',
+            itemStroke: '#1e1e1e'
+        },
+        dark: {
+            noteBackground: '#252526',
+            canvasBackground: '#e9e9ea',
+            itemStroke: '#1e1e1e'
+        },
+        black: {
+            noteBackground: '#141821',
+            canvasBackground: '#f2f7ff',
+            itemStroke: '#1e1e1e'
+        }
+    };
 
     function tpl(template, vars) {
         return String(template).replace(/\{\{(\w+)\}\}/g, function(match, key) {
@@ -68,6 +85,9 @@
         
         // Validate and clean the data structure for Excalidraw
         if (existingData) {
+            var initialPoznoteTheme = getPoznoteTheme();
+            var initialTheme = normalizeTheme(initialPoznoteTheme);
+
             // Ensure we have proper structure
             if (!existingData.elements) {
                 existingData.elements = [];
@@ -91,10 +111,15 @@
             existingData = {
                 elements: existingData.elements,
                 appState: {
-                    viewBackgroundColor: existingData.appState.viewBackgroundColor || "#ffffff",
+                    viewBackgroundColor: getCanvasBackground(initialPoznoteTheme),
                     zoom: existingData.appState.zoom || { value: 1 },
                     scrollX: existingData.appState.scrollX || 0,
-                    scrollY: existingData.appState.scrollY || 0
+                    scrollY: existingData.appState.scrollY || 0,
+                    theme: initialTheme,
+                    currentItemStrokeColor: getCurrentItemStrokeColor(initialPoznoteTheme),
+                    currentItemBackgroundColor: 'transparent',
+                    exportBackground: true,
+                    exportWithDarkMode: initialTheme === 'dark'
                 },
                 files: existingData.files || {},
                 libraryItems: existingData.libraryItems || []
@@ -109,6 +134,7 @@
     var excalidrawAPI = null;
     var hasChanges = false;
     var initialElements = null;
+    var initialAppState = null;
 
     // Function to enable/disable save buttons based on changes
     function updateSaveButtonsState() {
@@ -126,11 +152,13 @@
 
     // Function to check if there are changes
     function checkForChanges() {
-        if (!excalidrawAPI || !initialElements) {
+        if (!excalidrawAPI || !initialElements || !initialAppState) {
             return;
         }
         
         var currentElements = excalidrawAPI.getSceneElements();
+        var currentAppState = getTrackedAppState(excalidrawAPI.getAppState());
+        applyEditorShellTheme();
         
         // Check if elements count changed
         if (currentElements.length !== initialElements.length) {
@@ -142,8 +170,10 @@
         // Check if any element has changed
         var currentJSON = JSON.stringify(currentElements);
         var initialJSON = JSON.stringify(initialElements);
+        var currentAppStateJSON = JSON.stringify(currentAppState);
+        var initialAppStateJSON = JSON.stringify(initialAppState);
         
-        if (currentJSON !== initialJSON) {
+        if (currentJSON !== initialJSON || currentAppStateJSON !== initialAppStateJSON) {
             hasChanges = true;
         } else {
             hasChanges = false;
@@ -153,23 +183,110 @@
     }
 
     function getTheme() {
+        return normalizeTheme(getPoznoteTheme());
+    }
+
+    function getPoznoteTheme() {
         try {
-            var theme = localStorage.getItem('poznote-theme') || 'light';
+            var theme = normalizePoznoteTheme(window.__poznoteForcedTheme)
+                || normalizePoznoteTheme(localStorage.getItem('poznote-theme'))
+                || 'system';
             if (theme === 'system') {
                 theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
             }
-            return theme === 'black' ? 'dark' : theme;
+            return theme === 'black' ? 'black' : normalizeTheme(theme);
         } catch (e) {
             return 'light';
         }
     }
 
+    function normalizePoznoteTheme(theme) {
+        theme = String(theme || '').toLowerCase();
+        return theme === 'black' || theme === 'dark' || theme === 'light' || theme === 'system'
+            ? theme
+            : null;
+    }
+
+    function normalizeTheme(theme) {
+        return theme === 'dark' || theme === 'black' ? 'dark' : 'light';
+    }
+
+    function applyEditorShellTheme() {
+        if (!document.body) {
+            return;
+        }
+
+        var poznoteTheme = getPoznoteTheme();
+        var normalizedTheme = normalizeTheme(poznoteTheme);
+        document.body.classList.toggle('excalidraw-shell-dark', normalizedTheme === 'dark');
+        document.body.classList.toggle('excalidraw-shell-light', normalizedTheme !== 'dark');
+        document.body.style.setProperty('--excalidraw-note-background', getNoteBackground(poznoteTheme));
+        document.body.style.setProperty('--excalidraw-canvas-background', getCanvasBackground(poznoteTheme));
+        applyExcalidrawDomTheme(normalizedTheme);
+    }
+
+    function getNoteBackground(theme) {
+        return getThemeColors(theme).noteBackground;
+    }
+
+    function getCanvasBackground(theme) {
+        return getThemeColors(theme).canvasBackground;
+    }
+
+    function getCurrentItemStrokeColor(theme) {
+        return getThemeColors(theme).itemStroke;
+    }
+
+    function getThemeColors(theme) {
+        var poznoteTheme = theme === 'black' ? 'black' : normalizeTheme(theme);
+        return EXCALIDRAW_THEME_COLORS[poznoteTheme] || EXCALIDRAW_THEME_COLORS.light;
+    }
+
+    function applyExcalidrawDomTheme(theme) {
+        var roots = document.querySelectorAll('.excalidraw');
+        for (var i = 0; i < roots.length; i++) {
+            roots[i].classList.toggle('theme--dark', theme === 'dark');
+        }
+    }
+
+    function getExportAppState(appState) {
+        var poznoteTheme = getPoznoteTheme();
+        var theme = normalizeTheme(poznoteTheme);
+        return Object.assign({}, appState || {}, {
+            theme: theme,
+            viewBackgroundColor: getCanvasBackground(poznoteTheme),
+            currentItemStrokeColor: getCurrentItemStrokeColor(poznoteTheme),
+            currentItemBackgroundColor: 'transparent',
+            exportBackground: true,
+            exportWithDarkMode: theme === 'dark'
+        });
+    }
+
+    function getTrackedAppState(appState) {
+        var exportAppState = getExportAppState(appState);
+        return {
+            theme: exportAppState.theme,
+            exportWithDarkMode: exportAppState.exportWithDarkMode,
+            viewBackgroundColor: exportAppState.viewBackgroundColor || '#ffffff'
+        };
+    }
+
+    function syncExcalidrawTheme() {
+        applyEditorShellTheme();
+
+        if (excalidrawAPI && typeof excalidrawAPI.syncTheme === 'function') {
+            excalidrawAPI.syncTheme();
+        }
+    }
+
     // Save embedded diagram
     async function saveEmbeddedDiagram(data, elements, appState, files) {
-        // Generate preview canvas with padding for white margin around drawing
+        var previewAppState = getExportAppState(appState);
+
+        // Generate preview canvas with padding around drawing
         var canvas = await excalidrawAPI.exportToCanvas({
             elements: elements,
-            appState: appState,
+            appState: previewAppState,
             files: files,
             exportPadding: 10,
             exportBackground: true
@@ -205,10 +322,12 @@
     
     // Save full note
     async function saveFullNote(data, elements, appState, files) {
-        // Generate PNG preview with padding for white margin around drawing
+        var previewAppState = getExportAppState(appState);
+
+        // Generate PNG preview with padding around drawing
         var canvas = await excalidrawAPI.exportToCanvas({
             elements: elements,
-            appState: appState,
+            appState: previewAppState,
             files: files,
             exportPadding: 10,
             exportBackground: true
@@ -276,8 +395,9 @@
             // Adjust app container for mobile
             var app = document.getElementById('app');
             if (app) {
-                app.style.marginTop = '50px';
-                app.style.height = 'calc(100vh - 50px)';
+                app.style.marginTop = 'var(--excalidraw-toolbar-height)';
+                app.style.paddingTop = '0';
+                app.style.height = 'calc(var(--excalidraw-viewport-height) - var(--excalidraw-toolbar-height) - env(safe-area-inset-bottom, 0px))';
             }
         }
         
@@ -292,17 +412,40 @@
             
             try {
                 // Initialize Excalidraw with safe fallback
-                var safeInitialData = existingData || { elements: [], appState: {}, files: {} };
+                var currentPoznoteTheme = getPoznoteTheme();
+                var currentTheme = normalizeTheme(currentPoznoteTheme);
+                applyEditorShellTheme();
+                var safeInitialData = existingData || {
+                    elements: [],
+                    appState: {
+                        theme: currentTheme,
+                        viewBackgroundColor: getCanvasBackground(currentPoznoteTheme),
+                        currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),
+                        currentItemBackgroundColor: 'transparent',
+                        exportBackground: true,
+                        exportWithDarkMode: currentTheme === 'dark'
+                    },
+                    files: {}
+                };
                 
                 excalidrawAPI = window.PoznoteExcalidraw.init('app', {
                     initialData: safeInitialData,
-                    theme: getTheme()
+                    theme: currentTheme,
+                    canvasBackgroundColor: getCanvasBackground(currentPoznoteTheme),
+                    currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),
+                    currentItemBackgroundColor: 'transparent'
                 });
+
+                setTimeout(syncExcalidrawTheme, 0);
+                setTimeout(syncExcalidrawTheme, 100);
+                setTimeout(syncExcalidrawTheme, 300);
                 
                 // Store initial elements for change detection
                 setTimeout(function() {
                     if (excalidrawAPI) {
                         initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
+                        initialAppState = getTrackedAppState(excalidrawAPI.getAppState());
+                        syncExcalidrawTheme();
                         
                         // Set up change detection interval
                         setInterval(checkForChanges, 500);
@@ -346,7 +489,7 @@
                 
                 try {
                     var elements = excalidrawAPI.getSceneElements();
-                    var appState = excalidrawAPI.getAppState();
+                    var appState = getExportAppState(excalidrawAPI.getAppState());
                     var files = excalidrawAPI.getFiles();
                     var libraryItems = excalidrawAPI.getLibraryItems ? excalidrawAPI.getLibraryItems() : [];
                     
@@ -386,6 +529,7 @@
                     
                     // Reset change tracking after save
                     initialElements = JSON.parse(JSON.stringify(excalidrawAPI.getSceneElements()));
+                    initialAppState = getTrackedAppState(excalidrawAPI.getAppState());
                     hasChanges = false;
                     updateSaveButtonsState();
                     
@@ -414,7 +558,7 @@
                 
                 try {
                     var elements = excalidrawAPI.getSceneElements();
-                    var appState = excalidrawAPI.getAppState();
+                    var appState = getExportAppState(excalidrawAPI.getAppState());
                     var files = excalidrawAPI.getFiles();
                     var libraryItems = excalidrawAPI.getLibraryItems ? excalidrawAPI.getLibraryItems() : [];
                     

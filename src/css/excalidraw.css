@@ -82,7 +82,7 @@
 .excalidraw-editor {
     flex: 1;
     width: 100%;
-    height: calc(100vh - 60px);
+    height: calc(var(--excalidraw-viewport-height, 100vh) - var(--excalidraw-toolbar-height, 48px) - env(safe-area-inset-bottom, 0px));
     position: relative;
 }
 
@@ -244,9 +244,9 @@ div[onclick*="openExcalidrawNote"] {
     
     .excalidraw-editor,
     #app {
-        height: calc(100vh - 50px) !important;
-        padding-top: 50px !important; /* Changed from margin-top to padding-top */
-        margin-top: 0 !important;
+        height: calc(var(--excalidraw-viewport-height) - var(--excalidraw-toolbar-height) - env(safe-area-inset-bottom, 0px)) !important;
+        padding-top: 0 !important;
+        margin-top: var(--excalidraw-toolbar-height) !important;
         width: 100% !important;
         overflow: hidden !important; /* Changed from auto to hidden */
         -webkit-overflow-scrolling: touch !important;
@@ -255,7 +255,7 @@ div[onclick*="openExcalidrawNote"] {
     
     /* Adjust position of Excalidraw elements on mobile */
     .excalidraw .layer-ui__wrapper {
-        top: 50px !important; /* Offset below mobile banner */
+        top: 0 !important;
     }
     
     /* Force the Excalidraw canvas to be responsive */
@@ -268,7 +268,7 @@ div[onclick*="openExcalidrawNote"] {
     
     /* Ensure the main container is mobile friendly */
     div[style*="height: 100vh"] {
-        height: 100vh !important;
+        height: var(--excalidraw-viewport-height) !important;
         width: 100vw !important;
         overflow: hidden !important;
     }
@@ -303,9 +303,9 @@ div[onclick*="openExcalidrawNote"] {
     
     .excalidraw-editor,
     #app {
-        height: calc(100vh - 45px) !important;
-        padding-top: 45px !important; /* Changed from margin-top to padding-top */
-        margin-top: 0 !important;
+        height: calc(var(--excalidraw-viewport-height) - var(--excalidraw-toolbar-height) - env(safe-area-inset-bottom, 0px)) !important;
+        padding-top: 0 !important;
+        margin-top: var(--excalidraw-toolbar-height) !important;
         box-sizing: border-box !important;
     }
 }
@@ -324,13 +324,14 @@ div[onclick*="openExcalidrawNote"] {
     background: var(--bg-primary, #ffffff) !important;
     border-bottom: 1px solid var(--border-color, #e0e0e0) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-    height: 40px !important; /* Reduced height from 60px to 40px */
+    box-sizing: border-box !important;
+    height: var(--excalidraw-toolbar-height) !important;
     padding: 8px 20px !important; /* Reduced padding to fit new height */
 }
 
 /* Position Excalidraw interface elements below the toolbar */
 .excalidraw .layer-ui__wrapper {
-    top: 45px !important; /* Offset Excalidraw toolbar just below the banner */
+    top: 0 !important;
     z-index: 1000 !important; /* Lower z-index than Poznote banner */
 }
 
@@ -345,10 +346,11 @@ div[onclick*="openExcalidrawNote"] {
 /* FIX: Ensure the main app container uses proper positioning */
 #app {
     position: relative !important;
-    margin-top: 0 !important;
-    padding-top: 45px !important; /* Space for toolbar */
-    height: 100vh !important;
+    margin-top: var(--excalidraw-toolbar-height) !important;
+    padding-top: 0 !important;
+    height: calc(var(--excalidraw-viewport-height) - var(--excalidraw-toolbar-height) - env(safe-area-inset-bottom, 0px)) !important;
     box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 /* Adjust the position of the main Excalidraw toolbar */
@@ -361,7 +363,7 @@ div[onclick*="openExcalidrawNote"] {
 .excalidraw,
 .excalidraw .excalidraw__canvas,
 .excalidraw-canvas-wrapper {
-    height: calc(100vh - 45px) !important;
+    height: 100% !important;
     width: 100% !important;
 }
 
@@ -404,9 +406,9 @@ body {
     
     .excalidraw-editor,
     #app {
-        height: calc(100vh - 45px) !important;
-        padding-top: 45px !important; /* Changed from margin-top to padding-top */
-        margin-top: 0 !important;
+        height: calc(var(--excalidraw-viewport-height) - var(--excalidraw-toolbar-height) - env(safe-area-inset-bottom, 0px)) !important;
+        padding-top: 0 !important;
+        margin-top: var(--excalidraw-toolbar-height) !important;
         box-sizing: border-box !important;
     }
 }
@@ -436,27 +438,84 @@ body {
 }
 
 /* ------------------------------------------------------------------
-   Force light theme for Excalidraw editor even in dark mode
+   Excalidraw editor shell theme
    ------------------------------------------------------------------ */
 
-/* Force light theme on Excalidraw editor container */
-.excalidraw-editor,
-.excalidraw-container,
-#app,
-.excalidraw {
-    color-scheme: light !important;
-    background-color: #ffffff !important;
-    color: #000000 !important;
+body.excalidraw-editor-page {
+    --excalidraw-toolbar-height: 48px;
+    --excalidraw-viewport-height: 100vh;
+    --excalidraw-note-background: #ffffff;
+    --excalidraw-canvas-background: #ffffff;
+    margin: 0;
+    background: #ffffff;
+    color: #24292f;
+    overflow: hidden;
 }
 
-/* Force light theme on all Excalidraw editor elements */
-body.dark-mode .excalidraw-editor *,
-body.dark-mode .excalidraw-container *,
-body.dark-mode #app *,
-html[data-theme='dark'] .excalidraw-editor *,
-html[data-theme='dark'] .excalidraw-container *,
-html[data-theme='dark'] #app * {
-    color-scheme: light !important;
+@supports (height: 100dvh) {
+    body.excalidraw-editor-page {
+        --excalidraw-viewport-height: 100dvh;
+    }
+}
+
+body.excalidraw-editor-page #app,
+body.excalidraw-editor-page .excalidraw {
+    background: var(--excalidraw-note-background, #ffffff) !important;
+    color-scheme: light;
+}
+
+body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw {
+    --theme-filter: invert(93%) hue-rotate(180deg);
+}
+
+body.excalidraw-editor-page .excalidraw .excalidraw-canvas-container,
+body.excalidraw-editor-page .excalidraw .excalidraw-canvas-wrapper,
+body.excalidraw-editor-page .excalidraw .excalidraw__canvas-wrapper {
+    background: var(--excalidraw-note-background, #ffffff) !important;
+}
+
+body.excalidraw-editor-page .excalidraw canvas[data-excalidraw-canvas],
+body.excalidraw-editor-page .excalidraw canvas.static {
+    background: var(--excalidraw-canvas-background, #ffffff) !important;
+}
+
+body.excalidraw-editor-page .excalidraw canvas.interactive {
+    background: transparent !important;
+}
+
+body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw canvas {
+    filter: var(--theme-filter, invert(93%) hue-rotate(180deg)) !important;
+}
+
+body.excalidraw-editor-page.excalidraw-shell-light .excalidraw canvas {
+    filter: none !important;
+}
+
+body.excalidraw-editor-page .excalidraw .layer-ui__wrapper {
+    background: transparent !important;
+}
+
+html[data-theme='dark'] body.excalidraw-editor-page,
+body.excalidraw-editor-page.excalidraw-shell-dark {
+    background: var(--dm-content-bg, #252526);
+    color: var(--dm-text, #bebebe);
+}
+
+html[data-theme='dark'] body.excalidraw-editor-page #app,
+html[data-theme='dark'] body.excalidraw-editor-page .excalidraw,
+body.excalidraw-editor-page.excalidraw-shell-dark #app,
+body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw {
+    color-scheme: dark;
+}
+
+html body.excalidraw-editor-page.excalidraw-shell-light {
+    background: #ffffff;
+    color: #24292f;
+}
+
+html body.excalidraw-editor-page.excalidraw-shell-light #app,
+html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
+    color-scheme: light;
 }
 
 /* ------------------------------------------------------------------
@@ -493,7 +552,8 @@ html[data-theme='dark'] #app * {
 .excalidraw-page-wrapper {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: var(--excalidraw-viewport-height);
+    overflow: hidden;
 }
 
 /* Poznote toolbar at the top of excalidraw editor */
@@ -509,6 +569,19 @@ html[data-theme='dark'] #app * {
     z-index: 5000;
 }
 
+html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar,
+body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
+    background: var(--dm-surface, #333333) !important;
+    border-bottom-color: var(--dm-border, #404040) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
+}
+
+html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
+    background: #ffffff !important;
+    border-bottom-color: #e1e4e8 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
 .poznote-toolbar-buttons {
     display: flex;
     gap: 8px;
@@ -521,6 +594,15 @@ html[data-theme='dark'] #app * {
     font-weight: 400;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
+}
+
+html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar-title,
+body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar-title {
+    color: var(--dm-text, #bebebe);
+}
+
+html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
+    color: #24292f;
 }
 
 .poznote-toolbar-spacer {
@@ -582,6 +664,15 @@ html[data-theme='dark'] #app * {
     background: #fff;
 }
 
+html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-app-container,
+body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-app-container {
+    background: var(--dm-content-bg, #252526);
+}
+
+html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-app-container {
+    background: #ffffff;
+}
+
 /* Loading state */
 .excalidraw-loading {
     display: flex;
@@ -590,6 +681,15 @@ html[data-theme='dark'] #app * {
     height: 100%;
     font-size: 18px;
     font-family: 'Inter', sans-serif;
+}
+
+html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-loading,
+body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-loading {
+    color: var(--dm-text, #bebebe);
+}
+
+html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
+    color: #24292f;
 }
 
 /* Library warning modal */
@@ -691,4 +791,3 @@ html[data-theme='dark'] #app * {
     font-family: 'Inter';
     src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
 }
-

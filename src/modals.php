@@ -302,6 +302,13 @@ try {
         
         <div class="form-group">
             <label for="moveNoteTargetSelect"><?php echo t_h('modals.move_note_folder.target_folder'); ?></label>
+            <div id="moveNoteRecentFolders" class="move-note-recent-folders initially-hidden">
+                <div class="move-note-recent-label">
+                    <i class="lucide lucide-history"></i>
+                    <?php echo t_h('modals.move_note_folder.recent_folders', [], 'Recent folders'); ?>
+                </div>
+                <div id="moveNoteRecentFoldersList" class="move-note-recent-list"></div>
+            </div>
             <select id="moveNoteTargetSelect" class="workspace-select">
                 <!-- Options will be populated dynamically -->
             </select>
@@ -1229,6 +1236,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachment-previews-card" checked><span><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-image-border-card" checked><span><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>

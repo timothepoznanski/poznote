@@ -54,6 +54,68 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+.note-scroll-edge-controls {
+    display: none;
+}
+
+@media (min-width: 801px) {
+    .note-scroll-edge-controls {
+        position: fixed;
+        right: 10px;
+        bottom: 10px;
+        z-index: 30;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        pointer-events: none;
+    }
+
+    html:not(.outline-collapsed) .note-scroll-edge-controls {
+        right: calc(var(--outline-width, 280px) + 10px);
+    }
+
+    .note-scroll-edge-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 7px;
+        background: rgba(255, 255, 255, 0.96);
+        color: #007DB8;
+        box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.82;
+        pointer-events: auto;
+        transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .note-scroll-edge-btn[hidden] {
+        display: none !important;
+    }
+
+    .note-scroll-edge-btn:hover,
+    .note-scroll-edge-btn:focus {
+        opacity: 1;
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(15, 23, 42, 0.18);
+        outline: none;
+    }
+
+    .note-scroll-edge-btn:focus-visible {
+        outline: 2px solid #007DB8;
+        outline-offset: 2px;
+    }
+
+    .note-scroll-edge-btn i,
+    .note-scroll-edge-btn [class*="lucide-"] {
+        font-size: 15px;
+    }
 }
 
 /* Textarea */

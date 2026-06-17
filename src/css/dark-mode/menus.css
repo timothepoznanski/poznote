@@ -213,8 +213,15 @@ body.dark-mode .folder-actions-toggle {
 
 html[data-theme='dark'] .folder-actions-toggle:hover,
 body.dark-mode .folder-actions-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.12);
     color: var(--dm-text);
+}
+
+html[data-theme='dark'] .folder-actions-toggle:hover i,
+html[data-theme='dark'] .folder-actions-toggle:hover [class*="lucide-"],
+body.dark-mode .folder-actions-toggle:hover i,
+body.dark-mode .folder-actions-toggle:hover [class*="lucide-"] {
+    color: #38bdf8;
 }
 
 html[data-theme='dark'] .folder-actions-menu,

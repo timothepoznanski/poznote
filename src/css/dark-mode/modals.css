@@ -419,6 +419,27 @@ body.dark-mode #moveNoteFolderModal .modal-content label {
     color: #c8c8c8;
 }
 
+html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-label,
+body.dark-mode #moveNoteFolderModal .move-note-recent-label {
+    color: #c8c8c8;
+}
+
+html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder,
+body.dark-mode #moveNoteFolderModal .move-note-recent-folder {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder:hover,
+html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder.is-selected,
+body.dark-mode #moveNoteFolderModal .move-note-recent-folder:hover,
+body.dark-mode #moveNoteFolderModal .move-note-recent-folder.is-selected {
+    background: rgba(74, 158, 255, 0.16);
+    border-color: var(--dm-accent);
+    color: #dcecff;
+}
+
 /* ============================================
    Rename Modal
    ============================================ */

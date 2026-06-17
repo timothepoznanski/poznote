@@ -122,11 +122,12 @@ $settings = [
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
     'markdown_split_card_view' => '1',
-    'attachment_previews_in_note' => '0'
+    'attachment_previews_in_note' => '0',
+    'default_image_border_no_padding' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -349,7 +350,8 @@ if ($isPublicWorkspaceReadonly) {
         echo json_encode([
             'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
             'dateTimeFormat' => getUserDateTimeFormat(),
-            'inlineAttachmentPreviews' => $attachment_previews_in_note_setting
+            'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
+            'defaultImageBorderNoPadding' => ($settings['default_image_border_no_padding'] === '1' || $settings['default_image_border_no_padding'] === 'true')
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
@@ -1021,6 +1023,10 @@ if ($isPublicWorkspaceReadonly) {
                         echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
                     }
                     echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    echo '<div class="note-scroll-edge-controls">';
+                    echo '<button type="button" class="note-scroll-edge-btn note-scroll-top-btn" data-action="scroll-note-top" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_top', [], 'Scroll to top').'" aria-label="'.t_h('common.scroll_top', [], 'Scroll to top').'" hidden><i class="lucide lucide-arrow-up"></i></button>';
+                    echo '<button type="button" class="note-scroll-edge-btn note-scroll-bottom-btn" data-action="scroll-note-bottom" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" aria-label="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" hidden><i class="lucide lucide-arrow-down"></i></button>';
+                    echo '</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';

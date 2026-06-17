@@ -1150,6 +1150,10 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     selectId = selectId || 'moveFolderFilesTargetSelect';
     var select = document.getElementById(selectId);
     if (!select) return;
+    var workspace = isMoveNoteTargetSelect(selectId) ? getMoveModalWorkspace() : getMoveFallbackWorkspace();
+    if (isMoveNoteTargetSelect(selectId)) {
+        clearMoveNoteRecentFolders();
+    }
     select.innerHTML = '';
     var defaultOption = document.createElement('option');
     defaultOption.value = '';
@@ -1157,7 +1161,7 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
     select.appendChild(defaultOption);
 
     // Get all folders using RESTful API
-    fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(selectedWorkspace))
+    fetch('/api/v1/notes?get_folders=1&workspace=' + encodeURIComponent(workspace))
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success && data.folders) {
@@ -1175,9 +1179,13 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
                     }
                 }
                 // Don't auto-select any folder - leave "No folder" selected by default
+                loadMoveNoteRecentFolders(excludeFolderId, selectId, workspace);
             }
         })
         .catch(function (error) {
+            if (isMoveNoteTargetSelect(selectId)) {
+                clearMoveNoteRecentFolders();
+            }
             showNotificationPopup(
                 (window.t ? window.t('folders.errors.load_prefix', { error: String(error) }, 'Error loading folders: {{error}}') : ('Error loading folders: ' + error)),
                 'error'
@@ -1186,17 +1194,155 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
 
     // If this dropdown is used for the 'move note' modal, wire change handler to enable the Move button
     try {
-        select.addEventListener('change', function () {
+        select.onchange = function () {
             // Always treat selection as exact match (including "No folder" with empty value)
             // The user explicitly selected an option, so enable Move button
             updateMoveButton(this.value || 'no-folder', true);
-        });
+            if (isMoveNoteTargetSelect(selectId)) {
+                syncMoveNoteRecentSelection(this.value);
+            }
+        };
 
         // Initialize button state - "No folder" is pre-selected
         updateMoveButton(select.value || 'no-folder', true);
     } catch (e) {
         // ignore if updateMoveButton is not available in this context
     }
+}
+
+function isMoveNoteTargetSelect(selectId) {
+    return selectId === 'moveNoteTargetSelect';
+}
+
+function getMoveModalWorkspace() {
+    var workspaceSelect = document.getElementById('workspaceSelect');
+    if (workspaceSelect && workspaceSelect.value !== undefined) {
+        return workspaceSelect.value || '';
+    }
+
+    return getMoveFallbackWorkspace();
+}
+
+function getMoveFallbackWorkspace() {
+    try {
+        if (typeof getSelectedWorkspace === 'function') {
+            return getSelectedWorkspace() || '';
+        }
+    } catch (e) { }
+
+    return (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ? selectedWorkspace : '';
+}
+
+function clearMoveNoteRecentFolders() {
+    var container = document.getElementById('moveNoteRecentFolders');
+    var list = document.getElementById('moveNoteRecentFoldersList');
+    if (list) {
+        list.innerHTML = '';
+    }
+    if (container) {
+        container.classList.add('initially-hidden');
+    }
+}
+
+function findSelectOptionByValue(select, value) {
+    if (!select) return null;
+    value = String(value);
+    for (var i = 0; i < select.options.length; i += 1) {
+        if (String(select.options[i].value) === value) {
+            return select.options[i];
+        }
+    }
+    return null;
+}
+
+function syncMoveNoteRecentSelection(selectedValue) {
+    var list = document.getElementById('moveNoteRecentFoldersList');
+    if (!list) return;
+    selectedValue = String(selectedValue || '');
+    list.querySelectorAll('.move-note-recent-folder').forEach(function (button) {
+        var isSelected = selectedValue !== '' && button.dataset.folderId === selectedValue;
+        button.classList.toggle('is-selected', isSelected);
+        button.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+    });
+}
+
+function loadMoveNoteRecentFolders(excludeFolderId, selectId, workspace) {
+    if (!isMoveNoteTargetSelect(selectId)) {
+        return;
+    }
+
+    var url = '/api/v1/folders/suggested';
+    if (workspace) {
+        url += '?workspace=' + encodeURIComponent(workspace);
+    }
+
+    fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        credentials: 'same-origin'
+    })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (!data || !data.success || !Array.isArray(data.folders)) {
+                clearMoveNoteRecentFolders();
+                return;
+            }
+            renderMoveNoteRecentFolders(data.folders, excludeFolderId);
+        })
+        .catch(function (error) {
+            console.warn('Error loading recent folders:', error);
+            clearMoveNoteRecentFolders();
+        });
+}
+
+function renderMoveNoteRecentFolders(folders, excludeFolderId) {
+    var container = document.getElementById('moveNoteRecentFolders');
+    var list = document.getElementById('moveNoteRecentFoldersList');
+    var select = document.getElementById('moveNoteTargetSelect');
+    if (!container || !list || !select) return;
+
+    list.innerHTML = '';
+    var excluded = excludeFolderId == null ? '' : String(excludeFolderId);
+    var seen = {};
+
+    folders.forEach(function (folder) {
+        var folderId = folder && (folder.id !== undefined ? folder.id : folder.folder_id);
+        if (folderId === undefined || folderId === null) return;
+
+        folderId = String(folderId);
+        if (!folderId || folderId === excluded || seen[folderId]) return;
+
+        var matchingOption = findSelectOptionByValue(select, folderId);
+        if (!matchingOption) return;
+
+        seen[folderId] = true;
+
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'move-note-recent-folder';
+        button.dataset.folderId = folderId;
+        button.title = matchingOption.textContent || folder.name || '';
+        button.setAttribute('aria-pressed', 'false');
+
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-folder';
+
+        var text = document.createElement('span');
+        text.textContent = matchingOption.textContent || folder.path || folder.name || '';
+
+        button.appendChild(icon);
+        button.appendChild(text);
+        button.addEventListener('click', function () {
+            select.value = folderId;
+            updateMoveButton(folderId, true);
+            syncMoveNoteRecentSelection(folderId);
+        });
+
+        list.appendChild(button);
+    });
+
+    container.classList.toggle('initially-hidden', list.children.length === 0);
+    syncMoveNoteRecentSelection(select.value);
 }
 
 function executeMoveAllFiles() {
@@ -1959,6 +2105,7 @@ function onWorkspaceChange() {
                 // Update the target folder dropdown with folders from the new workspace
                 var select = document.getElementById('moveNoteTargetSelect');
                 if (select) {
+                    clearMoveNoteRecentFolders();
                     select.innerHTML = '<option value="">' + (window.t ? window.t('modals.folder.no_folder', null, 'No folder') : 'No folder') + '</option>';
 
                     // Populate with folders from the new workspace
@@ -1977,6 +2124,7 @@ function onWorkspaceChange() {
                     // Leave "No folder" selected by default (index 0)
                     // Update button state to enable Move button with "No folder" selected
                     updateMoveButton('no-folder', true);
+                    loadMoveNoteRecentFolders(null, 'moveNoteTargetSelect', newWorkspace || '');
                 }
             }
         })

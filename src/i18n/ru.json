@@ -41,6 +41,8 @@
     "at": "в",
     "scroll_left": "Прокрутить влево",
     "scroll_right": "Прокрутить вправо",
+    "scroll_top": "Перейти к началу заметки",
+    "scroll_bottom": "Перейти к концу заметки",
     "outline": {
       "title": "Оглавление",
       "no_headings": "В этой заметке нет заголовков"
@@ -218,6 +220,7 @@
       "markdown_split_card_view": "Markdown с рамкой",
       "code_block_word_wrap": "Перенос строк в блоке кода",
       "attachment_previews_in_note": "Предпросмотр вложений",
+      "default_image_border_no_padding": "Рамка изображения по умолчанию",
       "ui_customization": "Видимость элементов",
       "notes_dashboard": "Доска заметок"
     },
@@ -464,6 +467,7 @@
       "title": "Переместить заметку в папку",
       "workspace_destination": "Выберите рабочее пространство:",
       "target_folder": "Выберите целевую папку:",
+      "recent_folders": "Недавние папки",
       "enter_folder_name": "Пожалуйста, введите название папки"
     },
     "move_folder_files": {

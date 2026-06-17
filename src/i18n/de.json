@@ -63,6 +63,8 @@
     "apply": "Anwenden",
     "at": "um",
     "kanban": "Kanban",
+    "scroll_top": "Zum Anfang der Notiz scrollen",
+    "scroll_bottom": "Zum Ende der Notiz scrollen",
     "outline": {
       "title": "Gliederung",
       "no_headings": "Keine Überschriften in dieser Notiz"
@@ -559,6 +561,7 @@
       "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "attachment_previews_in_note": "Anhangsvorschauen",
+      "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board"
     },
@@ -936,6 +939,7 @@
       "title": "Notiz in Ordner verschieben",
       "workspace_destination": "Arbeitsbereich-Ziel auswählen:",
       "target_folder": "Zielordner auswählen:",
+      "recent_folders": "Zuletzt verwendete Ordner",
       "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
     },
     "move_folder_files": {

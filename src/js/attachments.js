@@ -910,7 +910,8 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
         .then(function (data) {
             if (data.success) {
                 // Remplacer le texte de chargement par la syntaxe markdown finale
-                var imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
+                var borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
+                var imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')' + borderSuffix;
                 replaceLoadingText(loadingText, imageMarkdown, dropTarget, loadingTextNode);
 
                 // Marquer la note comme modifiée
@@ -1161,6 +1162,9 @@ function handleHTMLImageInsert(file, dropTarget) {
                     placeholderImg.style.border = '';
                     placeholderImg.setAttribute('loading', 'lazy');
                     placeholderImg.setAttribute('decoding', 'async');
+                    if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding) {
+                        placeholderImg.classList.add('img-with-border-no-padding');
+                    }
                 }
 
                 // Update the global noteid to the target note for proper saving

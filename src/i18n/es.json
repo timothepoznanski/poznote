@@ -64,6 +64,8 @@
     "apply": "Aplicar",
     "at": "a las",
     "kanban": "Kanban",
+    "scroll_top": "Ir al inicio de la nota",
+    "scroll_bottom": "Ir al final de la nota",
     "outline": {
       "title": "Esquema",
       "no_headings": "Sin encabezados en esta nota"
@@ -559,6 +561,7 @@
       "markdown_split_card_view": "Markdown con marco",
       "code_block_word_wrap": "Ajuste de línea en bloques de código",
       "attachment_previews_in_note": "Vistas previas de adjuntos",
+      "default_image_border_no_padding": "Borde de imagen por defecto",
       "ui_customization": "Visibilidad de los elementos",
       "notes_dashboard": "Tablero de notas"
     },
@@ -936,6 +939,7 @@
       "title": "Mover nota a carpeta",
       "workspace_destination": "Seleccionar destino del espacio de trabajo:",
       "target_folder": "Seleccionar carpeta de destino:",
+      "recent_folders": "Carpetas recientes",
       "enter_folder_name": "Por favor ingresa un nombre de carpeta"
     },
     "move_folder_files": {

@@ -132,6 +132,174 @@
         }
     }
 
+    var noteScrollButtonsUpdateQueued = false;
+    var noteScrollLockEdge = null;
+    var noteScrollLockId = 0;
+
+    function getNoteScrollTargets(triggerEl) {
+        var noteCard = triggerEl && triggerEl.closest ? triggerEl.closest('.notecard') : null;
+        var noteEntry = noteCard ? noteCard.querySelector('.noteentry') : document.querySelector('#right_col .noteentry');
+
+        if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
+            return [
+                noteEntry.querySelector('.markdown-editor'),
+                noteEntry.querySelector('.markdown-preview')
+            ].filter(Boolean);
+        }
+
+        return [document.getElementById('right_col')].filter(Boolean);
+    }
+
+    function scrollElementToEdge(element, edge) {
+        if (!element) return;
+
+        var top = edge === 'top' ? 0 : Math.max(0, element.scrollHeight - element.clientHeight);
+        var behavior = isReducedMotionPreferred() ? 'auto' : 'smooth';
+
+        if (typeof element.scrollTo === 'function') {
+            element.scrollTo({
+                top: top,
+                behavior: behavior
+            });
+        } else {
+            element.scrollTop = top;
+        }
+    }
+
+    function scrollNoteToEdge(triggerEl, edge) {
+        var targets = getNoteScrollTargets(triggerEl);
+        var lockId = ++noteScrollLockId;
+
+        noteScrollLockEdge = edge;
+        scheduleUpdateNoteScrollButtons();
+
+        targets.forEach(function (target) {
+            scrollElementToEdge(target, edge);
+        });
+        waitForNoteScrollEdge(targets, edge, lockId, performance.now());
+    }
+
+    function areNoteScrollTargetsAtEdge(targets, edge) {
+        var threshold = 2;
+
+        return targets.every(function (target) {
+            if (!target) return true;
+
+            var maxTop = Math.max(0, target.scrollHeight - target.clientHeight);
+            if (maxTop <= threshold) return true;
+
+            if (edge === 'top') {
+                return target.scrollTop <= threshold;
+            }
+
+            return target.scrollTop >= maxTop - threshold;
+        });
+    }
+
+    function waitForNoteScrollEdge(targets, edge, lockId, startedAt) {
+        if (lockId !== noteScrollLockId) return;
+
+        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > 1600) {
+            noteScrollLockEdge = null;
+            scheduleUpdateNoteScrollButtons();
+            return;
+        }
+
+        requestAnimationFrame(function () {
+            waitForNoteScrollEdge(targets, edge, lockId, startedAt);
+        });
+    }
+
+    function getNoteScrollState(targets) {
+        var threshold = 2;
+        var canScrollUp = false;
+        var canScrollDown = false;
+
+        targets.forEach(function (target) {
+            if (!target) return;
+
+            var maxTop = Math.max(0, target.scrollHeight - target.clientHeight);
+            if (maxTop <= threshold) return;
+
+            canScrollUp = canScrollUp || target.scrollTop > threshold;
+            canScrollDown = canScrollDown || target.scrollTop < maxTop - threshold;
+        });
+
+        return {
+            canScrollUp: canScrollUp,
+            canScrollDown: canScrollDown
+        };
+    }
+
+    function updateNoteScrollButtons() {
+        document.querySelectorAll('#right_col .note-scroll-edge-controls').forEach(function (controls) {
+            var topButton = controls.querySelector('.note-scroll-top-btn');
+            var bottomButton = controls.querySelector('.note-scroll-bottom-btn');
+            var state = getNoteScrollState(getNoteScrollTargets(controls));
+
+            if (noteScrollLockEdge === 'bottom') {
+                state.canScrollUp = false;
+            } else if (noteScrollLockEdge === 'top') {
+                state.canScrollDown = false;
+            }
+
+            if (topButton) topButton.hidden = !state.canScrollUp;
+            if (bottomButton) bottomButton.hidden = !state.canScrollDown;
+        });
+    }
+
+    function scheduleUpdateNoteScrollButtons() {
+        if (noteScrollButtonsUpdateQueued) return;
+
+        noteScrollButtonsUpdateQueued = true;
+        requestAnimationFrame(function () {
+            noteScrollButtonsUpdateQueued = false;
+            updateNoteScrollButtons();
+        });
+    }
+
+    function initNoteScrollButtons() {
+        var rightCol = document.getElementById('right_col');
+
+        scheduleUpdateNoteScrollButtons();
+
+        document.addEventListener('scroll', function (event) {
+            var target = event.target;
+            if (
+                target === rightCol ||
+                (target && target.id === 'right_col') ||
+                (target && target.classList && (
+                    target.classList.contains('markdown-editor') ||
+                    target.classList.contains('markdown-preview')
+                ))
+            ) {
+                scheduleUpdateNoteScrollButtons();
+            }
+        }, true);
+
+        document.addEventListener('input', function (event) {
+            var target = event.target;
+            if (target && target.closest && target.closest('#right_col .noteentry, #right_col .markdown-editor')) {
+                scheduleUpdateNoteScrollButtons();
+            }
+        });
+
+        document.addEventListener('load', function (event) {
+            var target = event.target;
+            if (target && target.closest && target.closest('#right_col')) {
+                scheduleUpdateNoteScrollButtons();
+            }
+        }, true);
+
+        window.addEventListener('resize', scheduleUpdateNoteScrollButtons);
+
+        if (rightCol && typeof MutationObserver !== 'undefined') {
+            new MutationObserver(scheduleUpdateNoteScrollButtons).observe(rightCol, {
+                childList: true
+            });
+        }
+    }
+
     /**
      * Handle click events using event delegation
      * @param {Event} e - Click event
@@ -200,6 +368,16 @@
                 if (typeof scrollToLeftColumn === 'function') {
                     scrollToLeftColumn();
                 }
+                break;
+            case 'scroll-note-bottom':
+                e.preventDefault();
+                e.stopPropagation();
+                scrollNoteToEdge(target, 'bottom');
+                break;
+            case 'scroll-note-top':
+                e.preventDefault();
+                e.stopPropagation();
+                scrollNoteToEdge(target, 'top');
                 break;
 
             // Text formatting commands
@@ -793,6 +971,7 @@
         // Initialize page configuration first
         initializePageConfig();
         restoreFolderStates();
+        initNoteScrollButtons();
 
         // Check for kanban parameter in URL to restore Kanban view
         const urlParams = new URLSearchParams(window.location.search);
