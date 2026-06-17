@@ -11,6 +11,7 @@
     display: inline-flex;
     align-items: center;
     margin-left: auto;
+    margin-right: -6px;
     flex: 0 0 auto;
     opacity: 1;
     transition: opacity 0.2s;
@@ -42,7 +43,9 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Three-dot toggle button */
 .folder-actions-toggle {
-    padding: 4px 8px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
     cursor: pointer;
     color: #6b7280;
     border-radius: 4px;
@@ -53,18 +56,24 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-toggle:hover {
-    background: transparent;
+    background: rgba(107, 114, 128, 0.12);
     color: #374151;
 }
 
 .folder-actions-toggle i {
     font-size: 0.8em;
+    transition: color 0.15s ease;
 }
 
 /* Reduce Lucide icon size in folder-actions-toggle */
 .folder-actions-toggle i[class*="lucide-"],
 .folder-actions-toggle [class*="lucide-"] {
     font-size: 0.85em !important;
+}
+
+.folder-actions-toggle:hover i,
+.folder-actions-toggle:hover [class*="lucide-"] {
+    color: #007DB8;
 }
 
 /* Kanban icon style */
