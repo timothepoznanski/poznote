@@ -400,6 +400,8 @@ function cleanupDraggingNotes() {
 
 // Handle end of note drag operation and cleanup
 function handleNoteDragEnd(e) {
+    clearFolderDragExpandTimer();
+
     // Clean up the dragged note styles
     var noteLink = e.target.closest('.links_arbo_left');
     if (noteLink) {
@@ -620,6 +622,8 @@ function handleFolderDragStart(e) {
 
 // Handle folder drag end
 function handleFolderDragEnd(e) {
+    clearFolderDragExpandTimer();
+
     var folderToggle = e.target.closest('.folder-toggle');
     var folderHeader = e.target.closest('.folder-header');
 
@@ -665,6 +669,10 @@ function handleFolderDragEnd(e) {
     }, 100);
 }
 
+var folderDragExpandTimer = null;
+var folderDragExpandTarget = null;
+var FOLDER_DRAG_EXPAND_DELAY = 550;
+
 function getFolderToggleElement(folderHeader) {
     if (!folderHeader || !folderHeader.children) return null;
     for (var i = 0; i < folderHeader.children.length; i++) {
@@ -673,6 +681,104 @@ function getFolderToggleElement(folderHeader) {
         }
     }
     return folderHeader.querySelector ? folderHeader.querySelector('.folder-toggle') : null;
+}
+
+function getDirectFolderContentElement(folderHeader) {
+    if (!folderHeader || !folderHeader.children) return null;
+    for (var i = 0; i < folderHeader.children.length; i++) {
+        if (folderHeader.children[i].classList && folderHeader.children[i].classList.contains('folder-content')) {
+            return folderHeader.children[i];
+        }
+    }
+    return null;
+}
+
+function clearFolderDragExpandTimer(folderHeader) {
+    if (folderHeader && folderDragExpandTarget !== folderHeader) return;
+
+    if (folderDragExpandTimer) {
+        clearTimeout(folderDragExpandTimer);
+    }
+
+    folderDragExpandTimer = null;
+    folderDragExpandTarget = null;
+}
+
+function isFolderContentOpenForDrag(content) {
+    if (!content) return false;
+    if (typeof isFolderContentOpen === 'function') {
+        return isFolderContentOpen(content);
+    }
+
+    var display = content.style.display || window.getComputedStyle(content).display;
+    return display !== 'none';
+}
+
+function openFolderHeaderForDrag(folderHeader) {
+    var content = getDirectFolderContentElement(folderHeader);
+    if (!content || isFolderContentOpenForDrag(content)) return;
+
+    if (typeof setFolderOpenState === 'function') {
+        setFolderOpenState(content.id, true);
+    } else {
+        content.style.display = 'block';
+        try {
+            localStorage.setItem('folder_' + content.id, 'open');
+        } catch (err) { }
+    }
+
+    if (typeof updateToggleAllFoldersButton === 'function') {
+        updateToggleAllFoldersButton();
+    }
+}
+
+function scheduleFolderDragExpand(folderHeader, dragData, dropPosition) {
+    if (!folderHeader || !dragData) {
+        clearFolderDragExpandTimer();
+        return;
+    }
+
+    var targetFolder = folderHeader.getAttribute('data-folder');
+    if (targetFolder === 'Tags' || targetFolder === 'Public' || targetFolder === 'Trash') {
+        clearFolderDragExpandTimer(folderHeader);
+        return;
+    }
+
+    if (dragData.type === 'folder' && dropPosition && dropPosition !== 'inside') {
+        clearFolderDragExpandTimer(folderHeader);
+        return;
+    }
+
+    var content = getDirectFolderContentElement(folderHeader);
+    if (!content || isFolderContentOpenForDrag(content)) {
+        clearFolderDragExpandTimer(folderHeader);
+        return;
+    }
+
+    if (folderDragExpandTimer && folderDragExpandTarget === folderHeader) {
+        return;
+    }
+
+    clearFolderDragExpandTimer();
+    folderDragExpandTarget = folderHeader;
+    folderDragExpandTimer = setTimeout(function () {
+        var targetHeader = folderDragExpandTarget;
+        folderDragExpandTimer = null;
+        folderDragExpandTarget = null;
+
+        if (!targetHeader || !document.body.contains(targetHeader) || !window.currentDragData) {
+            return;
+        }
+
+        if (window.currentDragData.type === 'folder') {
+            var currentDropPosition = targetHeader.dataset ? (targetHeader.dataset.folderDropPosition || 'inside') : 'inside';
+            if (currentDropPosition !== 'inside') {
+                return;
+            }
+        }
+
+        openFolderHeaderForDrag(targetHeader);
+    }, FOLDER_DRAG_EXPAND_DELAY);
 }
 
 function clearFolderDropIndicator(folderHeader) {
@@ -685,6 +791,7 @@ function clearFolderDropIndicator(folderHeader) {
     if (folderHeader.dataset && folderHeader.dataset.folderDropPosition) {
         delete folderHeader.dataset.folderDropPosition;
     }
+    clearFolderDragExpandTimer(folderHeader);
 }
 
 function clearOtherFolderDropIndicators(activeHeader) {
@@ -794,7 +901,9 @@ function handleFolderDragEnterEnhanced(e) {
         if (!canDropFolderOnHeader(dragData, folderHeader, targetFolderId)) {
             return;
         }
-        applyFolderDropIndicator(folderHeader, getFolderDropPosition(e, folderHeader));
+        var folderDropPosition = getFolderDropPosition(e, folderHeader);
+        applyFolderDropIndicator(folderHeader, folderDropPosition);
+        scheduleFolderDragExpand(folderHeader, dragData, folderDropPosition);
         return;
     }
 
@@ -803,6 +912,7 @@ function handleFolderDragEnterEnhanced(e) {
     }
 
     folderHeader.classList.add('drag-over');
+    scheduleFolderDragExpand(folderHeader, dragData, 'inside');
 }
 
 // Enhanced folder drag over handler that supports both notes and folders
@@ -827,7 +937,9 @@ function handleFolderDragOverEnhanced(e) {
         }
 
         e.dataTransfer.dropEffect = 'move';
-        applyFolderDropIndicator(folderHeader, getFolderDropPosition(e, folderHeader));
+        var folderDropPosition = getFolderDropPosition(e, folderHeader);
+        applyFolderDropIndicator(folderHeader, folderDropPosition);
+        scheduleFolderDragExpand(folderHeader, dragData, folderDropPosition);
         return;
     }
 
@@ -841,6 +953,7 @@ function handleFolderDragOverEnhanced(e) {
     // Allow drag-over for all other folders including Favorites
     e.dataTransfer.dropEffect = 'move';
     folderHeader.classList.add('drag-over');
+    scheduleFolderDragExpand(folderHeader, dragData, 'inside');
 }
 
 // Enhanced folder drag leave handler
@@ -877,6 +990,7 @@ function handleFolderDropEnhanced(e) {
     folderHeader.classList.remove('folder-drop-before');
     folderHeader.classList.remove('folder-drop-after');
     folderHeader.classList.remove('folder-drop-inside');
+    clearFolderDragExpandTimer(folderHeader);
     if (folderHeader.dataset && folderHeader.dataset.dragEnterCount) {
         delete folderHeader.dataset.dragEnterCount;
     }
