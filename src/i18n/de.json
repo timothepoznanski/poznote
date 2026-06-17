@@ -561,6 +561,7 @@
       "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "attachment_previews_in_note": "Anhangsvorschauen",
+      "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board"
     },

@@ -574,6 +574,7 @@
       "markdown_split_card_view": "Markdown encadré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "attachment_previews_in_note": "Aperçus des pièces jointes",
+      "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
       "notes_dashboard": "Tableau de notes"
     },

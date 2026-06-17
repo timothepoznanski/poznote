@@ -220,6 +220,7 @@
       "markdown_split_card_view": "Markdown с рамкой",
       "code_block_word_wrap": "Перенос строк в блоке кода",
       "attachment_previews_in_note": "Предпросмотр вложений",
+      "default_image_border_no_padding": "Рамка изображения по умолчанию",
       "ui_customization": "Видимость элементов",
       "notes_dashboard": "Доска заметок"
     },

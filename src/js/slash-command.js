@@ -837,7 +837,8 @@
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
-                                    const imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')';
+                                    const borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
+                                    const imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')' + borderSuffix;
 
                                     // Replace loading text
                                     const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);

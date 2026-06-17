@@ -122,11 +122,12 @@ $settings = [
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
     'markdown_split_card_view' => '1',
-    'attachment_previews_in_note' => '0'
+    'attachment_previews_in_note' => '0',
+    'default_image_border_no_padding' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -349,7 +350,8 @@ if ($isPublicWorkspaceReadonly) {
         echo json_encode([
             'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
             'dateTimeFormat' => getUserDateTimeFormat(),
-            'inlineAttachmentPreviews' => $attachment_previews_in_note_setting
+            'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
+            'defaultImageBorderNoPadding' => ($settings['default_image_border_no_padding'] === '1' || $settings['default_image_border_no_padding'] === 'true')
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>

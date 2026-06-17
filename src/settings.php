@@ -101,6 +101,7 @@ $settingsPageUserKeys = [
     'markdown_split_card_view',
     'code_block_word_wrap',
     'attachment_previews_in_note',
+    'default_image_border_no_padding',
     'center_note_content',
     'note_list_sort',
     'note_age_filter_days',
@@ -546,6 +547,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
                     <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Default Image Border (No Padding) -->
+            <div class="home-card" id="default-image-border-card">
+                <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
+                    <span id="default-image-border-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 
