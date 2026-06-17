@@ -53,7 +53,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-toggle:hover {
-    background: rgba(107, 114, 128, 0.1);
+    background: transparent;
     color: #374151;
 }
 

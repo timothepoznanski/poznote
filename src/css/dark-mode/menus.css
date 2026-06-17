@@ -213,7 +213,7 @@ body.dark-mode .folder-actions-toggle {
 
 html[data-theme='dark'] .folder-actions-toggle:hover,
 body.dark-mode .folder-actions-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     color: var(--dm-text);
 }
 
