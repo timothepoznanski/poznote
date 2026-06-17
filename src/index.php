@@ -1021,6 +1021,10 @@ if ($isPublicWorkspaceReadonly) {
                         echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
                     }
                     echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    echo '<div class="note-scroll-edge-controls">';
+                    echo '<button type="button" class="note-scroll-edge-btn note-scroll-top-btn" data-action="scroll-note-top" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_top', [], 'Scroll to top').'" aria-label="'.t_h('common.scroll_top', [], 'Scroll to top').'" hidden><i class="lucide lucide-arrow-up"></i></button>';
+                    echo '<button type="button" class="note-scroll-edge-btn note-scroll-bottom-btn" data-action="scroll-note-bottom" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" aria-label="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" hidden><i class="lucide lucide-arrow-down"></i></button>';
+                    echo '</div>';
                     echo '<div class="note-bottom-space"></div>';
                     echo '</div>';
                     echo '</div>';

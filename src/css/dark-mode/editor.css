@@ -44,6 +44,21 @@ body.dark-mode .noteentry {
     color: var(--dm-text) !important;
 }
 
+html[data-theme='dark'] .note-scroll-edge-btn,
+body.dark-mode .note-scroll-edge-btn {
+    background: rgba(51, 51, 51, 0.96);
+    border-color: var(--dm-border);
+    color: var(--dm-accent);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.26);
+}
+
+html[data-theme='dark'] .note-scroll-edge-btn:hover,
+html[data-theme='dark'] .note-scroll-edge-btn:focus,
+body.dark-mode .note-scroll-edge-btn:hover,
+body.dark-mode .note-scroll-edge-btn:focus {
+    background: var(--dm-surface-hover);
+}
+
 /* Readable text colors: preserve inline color styles, links, and syntax highlighting */
 html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]),
 body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]) {

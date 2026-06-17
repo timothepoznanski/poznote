@@ -64,6 +64,8 @@
     "apply": "Aplicar",
     "at": "a las",
     "kanban": "Kanban",
+    "scroll_top": "Ir al inicio de la nota",
+    "scroll_bottom": "Ir al final de la nota",
     "outline": {
       "title": "Esquema",
       "no_headings": "Sin encabezados en esta nota"

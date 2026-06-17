@@ -63,6 +63,8 @@
     "apply": "Anwenden",
     "at": "um",
     "kanban": "Kanban",
+    "scroll_top": "Zum Anfang der Notiz scrollen",
+    "scroll_bottom": "Zum Ende der Notiz scrollen",
     "outline": {
       "title": "Gliederung",
       "no_headings": "Keine Überschriften in dieser Notiz"

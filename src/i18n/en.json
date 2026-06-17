@@ -41,6 +41,8 @@
     "at": "at",
     "scroll_left": "Scroll left",
     "scroll_right": "Scroll right",
+    "scroll_top": "Scroll to top",
+    "scroll_bottom": "Scroll to bottom",
     "outline": {
       "title": "Outline",
       "no_headings": "No headings in this note"

@@ -66,6 +66,8 @@
     "at": "à",
     "kanban": "Kanban",
     "scroll_right": "Faire défiler à droite",
+    "scroll_top": "Aller en haut de la note",
+    "scroll_bottom": "Aller en bas de la note",
     "outline": {
       "title": "Sommaire",
       "no_headings": "Aucun titre dans cette note"

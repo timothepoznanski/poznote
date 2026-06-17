@@ -62,6 +62,8 @@
     "apply": "Aplicar",
     "at": "às",
     "kanban": "Kanban",
+    "scroll_top": "Ir para o topo da nota",
+    "scroll_bottom": "Ir para o fim da nota",
     "outline": {
       "title": "Sumário",
       "no_headings": "Sem títulos nesta nota"

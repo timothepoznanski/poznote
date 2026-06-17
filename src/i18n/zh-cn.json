@@ -64,6 +64,8 @@
     "apply": "应用",
     "at": "于",
     "kanban": "看板",
+    "scroll_top": "转到笔记顶部",
+    "scroll_bottom": "转到笔记底部",
     "outline": {
       "title": "大纲",
       "no_headings": "此笔记中没有标题"
