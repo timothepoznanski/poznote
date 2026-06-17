@@ -296,6 +296,60 @@
     color: #333;
 }
 
+#moveNoteFolderModal .move-note-recent-folders {
+    margin: 4px 0 10px;
+}
+
+#moveNoteFolderModal .move-note-recent-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    color: #555;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#moveNoteFolderModal .move-note-recent-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#moveNoteFolderModal .move-note-recent-folder {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid #d7dde3;
+    border-radius: 8px;
+    background: #f7f9fb;
+    color: #263238;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1.2;
+}
+
+#moveNoteFolderModal .move-note-recent-folder:hover,
+#moveNoteFolderModal .move-note-recent-folder.is-selected {
+    border-color: #007DB8;
+    background: #e8f4fa;
+    color: #005f8c;
+}
+
+#moveNoteFolderModal .move-note-recent-folder span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#moveNoteFolderModal .move-note-recent-folder i {
+    flex: 0 0 auto;
+}
+
 /* Move Task Modal */
 #moveTaskModal .modal-buttons {
     margin-top: 12px;

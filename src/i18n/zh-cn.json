@@ -937,6 +937,7 @@
       "title": "将笔记移动到文件夹",
       "workspace_destination": "选择目标工作区:",
       "target_folder": "选择目标文件夹:",
+      "recent_folders": "最近的文件夹",
       "enter_folder_name": "请输入文件夹名称"
     },
     "move_folder_files": {

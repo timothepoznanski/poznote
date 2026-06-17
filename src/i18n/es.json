@@ -938,6 +938,7 @@
       "title": "Mover nota a carpeta",
       "workspace_destination": "Seleccionar destino del espacio de trabajo:",
       "target_folder": "Seleccionar carpeta de destino:",
+      "recent_folders": "Carpetas recientes",
       "enter_folder_name": "Por favor ingresa un nombre de carpeta"
     },
     "move_folder_files": {

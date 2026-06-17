@@ -472,6 +472,7 @@
       "title": "Move Note to Folder",
       "workspace_destination": "Select Workspace destination:",
       "target_folder": "Select target folder:",
+      "recent_folders": "Recent folders",
       "enter_folder_name": "Please enter a folder name"
     },
     "move_folder_files": {

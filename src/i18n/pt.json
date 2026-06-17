@@ -937,6 +937,7 @@
       "title": "Mover Nota para Pasta",
       "workspace_destination": "Selecione o espaço de trabalho de destino:",
       "target_folder": "Selecione a pasta de destino:",
+      "recent_folders": "Pastas recentes",
       "enter_folder_name": "Por favor, insira um nome de pasta"
     },
     "move_folder_files": {

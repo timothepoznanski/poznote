@@ -466,6 +466,7 @@
       "title": "Переместить заметку в папку",
       "workspace_destination": "Выберите рабочее пространство:",
       "target_folder": "Выберите целевую папку:",
+      "recent_folders": "Недавние папки",
       "enter_folder_name": "Пожалуйста, введите название папки"
     },
     "move_folder_files": {

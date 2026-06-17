@@ -48,6 +48,21 @@
         });
     }
 
+    const deleteButtons = document.querySelectorAll('[data-action="delete-folder"]');
+    deleteButtons.forEach(function(deleteButton) {
+        deleteButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const folderId = deleteButton.getAttribute('data-folder-id');
+            const folderName = deleteButton.getAttribute('data-folder-name') || '';
+
+            if (folderId && typeof window.deleteFolder === 'function') {
+                window.deleteFolder(folderId, folderName);
+            }
+        });
+    });
+
     // Back buttons
     const backToNotesBtn = document.getElementById('backToNotesBtn');
     if (backToNotesBtn) {

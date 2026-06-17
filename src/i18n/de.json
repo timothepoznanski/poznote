@@ -938,6 +938,7 @@
       "title": "Notiz in Ordner verschieben",
       "workspace_destination": "Arbeitsbereich-Ziel auswählen:",
       "target_folder": "Zielordner auswählen:",
+      "recent_folders": "Zuletzt verwendete Ordner",
       "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
     },
     "move_folder_files": {

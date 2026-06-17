@@ -964,6 +964,7 @@
       "title": "Déplacer la note vers un dossier",
       "workspace_destination": "Sélectionnez l’espace de travail de destination :",
       "target_folder": "Sélectionnez le dossier cible :",
+      "recent_folders": "Dossiers récents",
       "enter_folder_name": "Veuillez saisir un nom de dossier"
     },
     "git_sync": {

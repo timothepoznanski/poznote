@@ -302,6 +302,13 @@ try {
         
         <div class="form-group">
             <label for="moveNoteTargetSelect"><?php echo t_h('modals.move_note_folder.target_folder'); ?></label>
+            <div id="moveNoteRecentFolders" class="move-note-recent-folders initially-hidden">
+                <div class="move-note-recent-label">
+                    <i class="lucide lucide-history"></i>
+                    <?php echo t_h('modals.move_note_folder.recent_folders', [], 'Recent folders'); ?>
+                </div>
+                <div id="moveNoteRecentFoldersList" class="move-note-recent-list"></div>
+            </div>
             <select id="moveNoteTargetSelect" class="workspace-select">
                 <!-- Options will be populated dynamically -->
             </select>
