@@ -28,6 +28,8 @@ function poznoteGetThemeAssetVersion() {
         'js/public-note-theme-init.js',
         'js/public-note.js',
         'js/excalidraw-theme-init.js',
+        'js/excalidraw-editor.js',
+        'js/excalidraw-dist/excalidraw-bundle.iife.js',
         'css/dark-mode/variables.css',
         'css/dark-mode/layout.css',
         'css/dark-mode/menus.css',
