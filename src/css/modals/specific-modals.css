@@ -296,6 +296,10 @@
     color: #333;
 }
 
+#moveNoteFolderModal label[for="moveNoteTargetSelect"] {
+    margin-bottom: 22px;
+}
+
 #moveNoteFolderModal .move-note-recent-folders {
     margin: 4px 0 10px;
 }
