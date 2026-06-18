@@ -179,12 +179,7 @@ class AttachmentsController {
         $original_name = $file['name'];
         $file_size = $file['size'];
         $file_type = $file['type'];
-        
-        // Generate unique filename
-        $file_extension = pathinfo($original_name, PATHINFO_EXTENSION);
-        $unique_filename = uniqid() . '_' . time() . '.' . $file_extension;
-        $file_path = $this->attachmentsDir . '/' . $unique_filename;
-        
+
         // Check if source file exists and is readable
         if (!is_uploaded_file($file['tmp_name'])) {
             http_response_code(400);
@@ -198,6 +193,20 @@ class AttachmentsController {
             echo json_encode(['success' => false, 'message' => 'File too large (max 200MB)']);
             return;
         }
+
+        $validation = poznoteValidateAttachmentFile($original_name, $file['tmp_name']);
+        if (!$validation['success']) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => $validation['error']]);
+            return;
+        }
+
+        $file_type = $validation['mime_type'];
+
+        // Generate unique filename
+        $file_extension = strtolower(pathinfo($validation['filename'], PATHINFO_EXTENSION));
+        $unique_filename = uniqid() . '_' . time() . ($file_extension !== '' ? '.' . $file_extension : '');
+        $file_path = $this->attachmentsDir . '/' . $unique_filename;
         
         // Check if destination directory is writable
         if (!is_writable($this->attachmentsDir)) {

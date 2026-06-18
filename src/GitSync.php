@@ -1094,6 +1094,14 @@ class GitSync {
             foreach ($attachmentFiles as $path) {
                 $currentStep++;
                 $filename  = basename($path);
+                $filenameValidation = poznoteValidateAttachmentFilename($filename);
+                if (!$filenameValidation['success']) {
+                    $results['errors'][] = ['attachment' => $filename, 'error' => $filenameValidation['error']];
+                    $results['debug'][]  = "  Attachment SKIPPED {$filename}: " . $filenameValidation['error'];
+                    continue;
+                }
+
+                $filename = $filenameValidation['filename'];
                 $localFile = $attachmentsPath . '/' . $filename;
                 if (file_exists($localFile)) {
                     $remoteSha = $remoteShaMap[$path] ?? null;
@@ -1112,6 +1120,14 @@ class GitSync {
                     $results['debug'][]  = "  Attachment ERROR {$filename}: " . $raw['error'];
                     continue;
                 }
+
+                $attachmentValidation = poznoteValidateAttachmentFile($filename, null, $raw['content']);
+                if (!$attachmentValidation['success']) {
+                    $results['errors'][] = ['attachment' => $filename, 'error' => $attachmentValidation['error']];
+                    $results['debug'][]  = "  Attachment SKIPPED {$filename}: " . $attachmentValidation['error'];
+                    continue;
+                }
+
                 file_put_contents($localFile, $raw['content']);
                 $results['debug'][] = "  Attachment saved: {$filename}";
             }

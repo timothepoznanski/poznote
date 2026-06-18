@@ -161,12 +161,7 @@ function handleUpload() {
     $original_name = $file['name'];
     $file_size = $file['size'];
     $file_type = $file['type'];
-    
-    // Generate unique filename
-    $file_extension = pathinfo($original_name, PATHINFO_EXTENSION);
-    $unique_filename = uniqid() . '_' . time() . '.' . $file_extension;
-    $file_path = $attachments_dir . '/' . $unique_filename;
-    
+
     // Check if source file exists and is readable
     if (!is_uploaded_file($file['tmp_name'])) {
         error_log("Upload failed: Invalid uploaded file: " . $file['tmp_name']);
@@ -180,6 +175,20 @@ function handleUpload() {
         echo json_encode(['success' => false, 'message' => 'File too large (max 200MB)']);
         return;
     }
+
+    $validation = poznoteValidateAttachmentFile($original_name, $file['tmp_name']);
+    if (!$validation['success']) {
+        error_log("Upload failed: " . $validation['error'] . ": " . $original_name);
+        echo json_encode(['success' => false, 'message' => $validation['error']]);
+        return;
+    }
+
+    $file_type = $validation['mime_type'];
+
+    // Generate unique filename
+    $file_extension = strtolower(pathinfo($validation['filename'], PATHINFO_EXTENSION));
+    $unique_filename = uniqid() . '_' . time() . ($file_extension !== '' ? '.' . $file_extension : '');
+    $file_path = $attachments_dir . '/' . $unique_filename;
     
     // Re-check if destination directory is writable
     if (!is_writable($attachments_dir)) {

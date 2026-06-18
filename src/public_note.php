@@ -19,8 +19,12 @@ foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
     $frameSrcDomains .= " https://{$domain}";
 }
 
+// Per-request nonce so the page's own inline <script> blocks can run while
+// 'unsafe-inline' stays out of script-src (prevents injected inline scripts).
+$cspNonce = base64_encode(random_bytes(16));
+
 // Set security headers for public notes
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$cspNonce}' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
 header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: SAMEORIGIN");
 
@@ -432,7 +436,7 @@ try {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <meta name="robots" content="noindex, nofollow">
                 <title><?php echo t_h('public.protection.title', [], 'Password Protected', $currentLang); ?></title>
-                <script src="<?php echo htmlspecialchars($passwordThemeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+                <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" src="<?php echo htmlspecialchars($passwordThemeInitHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
                 <link rel="stylesheet" href="<?php echo htmlspecialchars($passwordVariablesStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
                 <link rel="stylesheet" href="<?php echo htmlspecialchars($passwordStylesheetHref, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
             </head>
@@ -661,50 +665,11 @@ if (is_array($attachmentsData)) {
 // ============================================================================
 // XSS SANITIZATION
 // ============================================================================
-// Protect media elements, sanitize scripts, then restore protected elements
+// Defense-in-depth: strip scripts/handlers, drop untrusted iframes (and any
+// srcdoc), and clean media tags before the content is echoed. Centralized in
+// public_helpers.php so it can be unit tested.
 
-$protectedElements = [];
-$protectedIndex = 0;
-
-// Protect video tags
-$content = preg_replace_callback('/<video\s+([^>]*)>\s*<\/video>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
-    $placeholder = "\x00PVIDEO" . $protectedIndex . "\x00";
-    $protectedElements[$protectedIndex] = $matches[0];
-    $protectedIndex++;
-    return $placeholder;
-}, $content);
-
-// Protect audio tags
-$content = preg_replace_callback('/<audio\s+([^>]*)>\s*<\/audio>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
-    $placeholder = "\x00PAUDIO" . $protectedIndex . "\x00";
-    $protectedElements[$protectedIndex] = $matches[0];
-    $protectedIndex++;
-    return $placeholder;
-}, $content);
-
-// Protect iframe tags
-$content = preg_replace_callback('/<iframe\s+([^>]+)>\s*<\/iframe>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
-    $placeholder = "\x00PIFRAME" . $protectedIndex . "\x00";
-    $protectedElements[$protectedIndex] = $matches[0];
-    $protectedIndex++;
-    return $placeholder;
-}, $content);
-
-// Remove script tags and inline event handlers
-$content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
-$content = preg_replace_callback('#<([a-zA-Z0-9]+)([^>]*)>#', function($m) {
-    $tag = $m[1];
-    $attrs = $m[2];
-    // Remove any on* attributes
-    $cleanAttrs = preg_replace('/\s+on[a-zA-Z]+=(["\"][^"\\]*["\\"]|[^\s>]*)/i', '', $attrs);
-    return '<' . $tag . $cleanAttrs . '>';
-}, $content);
-
-// Restore protected elements
-$content = preg_replace_callback('/\x00P(VIDEO|AUDIO|IFRAME)(\d+)\x00/', function($matches) use ($protectedElements) {
-    $index = (int)$matches[2];
-    return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
-}, $content);
+$content = sanitizePublicNoteHtml($content);
 
 // ============================================================================
 // THEME DETERMINATION
@@ -735,7 +700,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <meta name="robots" content="noindex, nofollow">
     <?php endif; ?>
     <title><?php echo htmlspecialchars($note['heading'] ?: t('untitled', [], 'Untitled', $currentLang)); ?></title>
-    <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
+    <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <!-- CSP-compliant theme initialization -->
     <script type="application/json" id="public-note-config"><?php 
         $apiBaseUrl = $scriptDir . '/api/v1';
@@ -755,7 +720,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
             ]
         ]); 
     ?></script>
-    <script>
+    <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
         // Simple window.t for modal-alerts.js compatibility (used by window.confirm)
         (function() {
             try {
@@ -774,7 +739,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
         })();
     </script>
     <script src="js/public-note-theme-init.js?v=<?php echo file_exists(__DIR__ . '/js/public-note-theme-init.js') ? filemtime(__DIR__ . '/js/public-note-theme-init.js') : '1'; ?>"></script>
-    <script>
+    <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
         (function () {
             try {
                 var isDesktop = window.innerWidth > 800;

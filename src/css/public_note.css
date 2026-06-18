@@ -93,6 +93,25 @@ body.public-note-page {
 .public-note img {
     max-width: 100%;
     height: auto;
+    cursor: default !important;
+}
+
+.public-note .content .excalidraw-container {
+    display: block;
+    max-width: 100%;
+    margin: 5px 0;
+    text-align: left !important;
+    cursor: default !important;
+}
+
+.public-note .content .excalidraw-container img,
+.public-note .content img[data-is-excalidraw="true"] {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    cursor: default !important;
 }
 
 .public-note img.img-with-border {

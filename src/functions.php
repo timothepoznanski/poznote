@@ -1217,6 +1217,171 @@ function getEntriesPath() { return getDataPath('entries'); }
 function getAttachmentsPath() { return getDataPath('attachments'); }
 function getBackupsPath() { return getDataPath('backups'); }
 
+function poznoteBlockedAttachmentExtensions(): array {
+    return [
+        'asp' => true,
+        'aspx' => true,
+        'bat' => true,
+        'bash' => true,
+        'cgi' => true,
+        'cmd' => true,
+        'com' => true,
+        'dll' => true,
+        'dylib' => true,
+        'exe' => true,
+        'fcgi' => true,
+        'fish' => true,
+        'jar' => true,
+        'jsp' => true,
+        'jspx' => true,
+        'ksh' => true,
+        'pht' => true,
+        'phtml' => true,
+        'phar' => true,
+        'pl' => true,
+        'ps1' => true,
+        'psm1' => true,
+        'py' => true,
+        'rb' => true,
+        'shtml' => true,
+        'sh' => true,
+        'so' => true,
+        'zsh' => true,
+    ];
+}
+
+function poznoteAttachmentExtensionIsBlocked(string $extension): bool {
+    $extension = strtolower(ltrim($extension, '.'));
+    if ($extension === '') {
+        return false;
+    }
+
+    if (preg_match('/^php[0-9]*$/', $extension)) {
+        return true;
+    }
+
+    $blockedExtensions = poznoteBlockedAttachmentExtensions();
+    return isset($blockedExtensions[$extension]);
+}
+
+function poznoteBlockedAttachmentMimeTypes(): array {
+    return [
+        'application/java-archive' => true,
+        'application/php' => true,
+        'application/vnd.microsoft.portable-executable' => true,
+        'application/x-cgi' => true,
+        'application/x-dosexec' => true,
+        'application/x-executable' => true,
+        'application/x-httpd-cgi' => true,
+        'application/x-httpd-php' => true,
+        'application/x-java-archive' => true,
+        'application/x-mach-binary' => true,
+        'application/x-ms-dos-executable' => true,
+        'application/x-msdownload' => true,
+        'application/x-perl' => true,
+        'application/x-php' => true,
+        'application/x-python' => true,
+        'application/x-python-code' => true,
+        'application/x-ruby' => true,
+        'application/x-sh' => true,
+        'application/x-sharedlib' => true,
+        'application/x-shellscript' => true,
+        'text/x-cgi' => true,
+        'text/x-perl' => true,
+        'text/x-php' => true,
+        'text/x-python' => true,
+        'text/x-ruby' => true,
+        'text/x-script.python' => true,
+        'text/x-sh' => true,
+        'text/x-shellscript' => true,
+    ];
+}
+
+function poznoteAttachmentMimeTypeIsBlocked(?string $mimeType): bool {
+    if (!is_string($mimeType) || trim($mimeType) === '') {
+        return false;
+    }
+
+    $mimeType = strtolower(trim(explode(';', $mimeType, 2)[0]));
+    $blockedMimeTypes = poznoteBlockedAttachmentMimeTypes();
+
+    return isset($blockedMimeTypes[$mimeType]);
+}
+
+function poznoteNormalizeAttachmentFilename(string $filename): string {
+    return trim(basename(str_replace('\\', '/', $filename)));
+}
+
+function poznoteValidateAttachmentFilename(string $filename): array {
+    $baseFilename = poznoteNormalizeAttachmentFilename($filename);
+
+    if ($baseFilename === '' || $baseFilename === '.' || $baseFilename === '..') {
+        return ['success' => false, 'error' => 'Invalid attachment filename'];
+    }
+
+    if ($baseFilename[0] === '.') {
+        return ['success' => false, 'error' => 'Hidden attachment filenames are not allowed'];
+    }
+
+    if (preg_match('/[\x00-\x1F\x7F]/', $baseFilename)) {
+        return ['success' => false, 'error' => 'Attachment filename contains invalid characters'];
+    }
+
+    if (strlen($baseFilename) > 255) {
+        return ['success' => false, 'error' => 'Attachment filename is too long'];
+    }
+
+    $segments = explode('.', $baseFilename);
+    foreach (array_slice($segments, 1) as $extensionSegment) {
+        if (poznoteAttachmentExtensionIsBlocked($extensionSegment)) {
+            return ['success' => false, 'error' => 'Attachment file type is not allowed'];
+        }
+    }
+
+    return ['success' => true, 'filename' => $baseFilename];
+}
+
+function poznoteDetectAttachmentMimeType(?string $filePath = null, ?string $content = null): ?string {
+    if (!class_exists('finfo') || !defined('FILEINFO_MIME_TYPE')) {
+        return null;
+    }
+
+    try {
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        if ($content !== null) {
+            $mimeType = $finfo->buffer($content);
+            return is_string($mimeType) && $mimeType !== '' ? $mimeType : null;
+        }
+
+        if ($filePath !== null && is_file($filePath)) {
+            $mimeType = $finfo->file($filePath);
+            return is_string($mimeType) && $mimeType !== '' ? $mimeType : null;
+        }
+    } catch (Throwable $e) {
+        error_log('Attachment MIME detection failed: ' . $e->getMessage());
+    }
+
+    return null;
+}
+
+function poznoteValidateAttachmentFile(string $filename, ?string $filePath = null, ?string $content = null): array {
+    $filenameValidation = poznoteValidateAttachmentFilename($filename);
+    if (!$filenameValidation['success']) {
+        return $filenameValidation;
+    }
+
+    $mimeType = poznoteDetectAttachmentMimeType($filePath, $content);
+    if (poznoteAttachmentMimeTypeIsBlocked($mimeType)) {
+        return ['success' => false, 'error' => 'Attachment MIME type is not allowed'];
+    }
+
+    return [
+        'success' => true,
+        'filename' => $filenameValidation['filename'],
+        'mime_type' => $mimeType ?: 'application/octet-stream',
+    ];
+}
+
 function deleteNoteSnapshots($noteId) {
     $noteId = (int) $noteId;
     if ($noteId <= 0) {
@@ -1840,7 +2005,15 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $attachmentsDir = $tempExtractDir . '/attachments';
         if (is_dir($attachmentsDir)) {
             $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
-            $results[] = 'Attachments: ' . ($attachmentsResult['success'] ? 'Restored ' . $attachmentsResult['count'] . ' files' : 'Failed - ' . $attachmentsResult['error']);
+            if ($attachmentsResult['success']) {
+                $attachmentsMessage = 'Restored ' . $attachmentsResult['count'] . ' files';
+                if (!empty($attachmentsResult['skipped'])) {
+                    $attachmentsMessage .= ', skipped ' . $attachmentsResult['skipped'] . ' blocked files';
+                }
+                $results[] = 'Attachments: ' . $attachmentsMessage;
+            } else {
+                $results[] = 'Attachments: Failed - ' . $attachmentsResult['error'];
+            }
             if (!$attachmentsResult['success']) $hasErrors = true;
         } else {
             $results[] = 'Attachments: No attachments directory found in backup (attachments directory cleared)';
@@ -2025,6 +2198,7 @@ function restoreAttachmentsFromDir($sourceDir) {
     );
     
     $importedCount = 0;
+    $skippedCount = 0;
     
     foreach ($files as $name => $file) {
         if (!$file->isDir()) {
@@ -2049,7 +2223,14 @@ function restoreAttachmentsFromDir($sourceDir) {
                 $targetFilename = $basename;
             }
             
-            $targetFile = $attachmentsPath . '/' . $targetFilename;
+            $validation = poznoteValidateAttachmentFile($targetFilename, $filePath);
+            if (!$validation['success']) {
+                $skippedCount++;
+                error_log('Skipped blocked attachment during restore: ' . $targetFilename . ' - ' . $validation['error']);
+                continue;
+            }
+
+            $targetFile = $attachmentsPath . '/' . $validation['filename'];
             if (copy($filePath, $targetFile)) {
                 chmod($targetFile, 0644);
                 $importedCount++;
@@ -2057,7 +2238,7 @@ function restoreAttachmentsFromDir($sourceDir) {
         }
     }
     
-    return ['success' => true, 'count' => $importedCount];
+    return ['success' => true, 'count' => $importedCount, 'skipped' => $skippedCount];
 }
 
 /**
