@@ -131,6 +131,222 @@ function replacePublicAudioEmbedIframes(string $content): string {
     return preg_replace_callback('/&lt;iframe\b([\s\S]*?)&gt;\s*&lt;\/iframe&gt;/i', $replaceCallback, $content);
 }
 
+/**
+ * Decide whether an iframe `src` points at a trusted origin.
+ *
+ * Uses parse_url() with EXACT host matching (plus subdomains of an allowed
+ * domain) so look-alike hosts such as `www.youtube.com.evil.test` are rejected.
+ * Only http(s) and same-origin relative paths are accepted; protocol-relative,
+ * javascript:, data: and other schemes are refused.
+ */
+function publicNoteIframeSrcIsTrusted(string $src): bool {
+    $src = trim($src);
+    if ($src === '') {
+        return false;
+    }
+
+    // Reject any explicit scheme that is not http/https (javascript:, data:, ...).
+    if (preg_match('#^([a-z][a-z0-9+.\-]*):#i', $src, $schemeMatch)) {
+        if (!in_array(strtolower($schemeMatch[1]), ['http', 'https'], true)) {
+            return false;
+        }
+    }
+
+    $host = parse_url($src, PHP_URL_HOST);
+    if ($host === null || $host === false || $host === '') {
+        // No host -> relative/local path only. A leading "//" with no resolvable
+        // host is treated as untrusted.
+        if (strpos($src, '//') === 0) {
+            return false;
+        }
+        return $src[0] === '/'
+            || strpos($src, './') === 0
+            || preg_match('~^audio_player\.php(?:[?#]|$)~i', $src) === 1;
+    }
+
+    $host = strtolower($host);
+    foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
+        $domain = strtolower(trim((string) $domain));
+        if ($domain === '') {
+            continue;
+        }
+        if ($host === $domain || str_ends_with($host, '.' . $domain)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Sanitize rendered HTML before it is echoed on a public (unauthenticated) page.
+ *
+ * This performs a real DOM parse + tag/attribute allowlist (not a regex pass),
+ * so an attribute value that contains ">" — e.g.
+ * `<video src=x title=">" onerror=alert(1)>` — cannot be used to smuggle an
+ * event handler or `srcdoc` past the filter. The rules are:
+ *   - Only allowlisted tags survive; unknown tags are unwrapped (text kept).
+ *   - script/style/object/embed/form/... are dropped together with their content.
+ *   - Only allowlisted attributes (plus any data-* / aria-*) are kept; every on*
+ *     handler is removed regardless of casing.
+ *   - href/src/poster/srcset values using javascript:/vbscript:/data: are
+ *     dropped (data: is allowed only for <img> image payloads).
+ *   - <iframe> is dropped unless its `src` is a trusted origin; `srcdoc` is
+ *     never allowlisted, so it is always stripped.
+ *
+ * Server-generated markup (e.g. tasklist `data-index`/`data-text`) is preserved
+ * because data-* / aria-* / title / class are kept.
+ */
+function sanitizePublicNoteHtml(string $content): string {
+    if (trim($content) === '') {
+        return $content;
+    }
+
+    static $allowedTags = [
+        'p', 'br', 'div', 'span', 'a', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'del', 'ins',
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        'ul', 'ol', 'li', 'dl', 'dt', 'dd',
+        'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td', 'caption', 'colgroup', 'col',
+        'blockquote', 'pre', 'code', 'hr', 'kbd', 'samp', 'var',
+        'img', 'figure', 'figcaption',
+        'details', 'summary',
+        'mark', 'small', 'sub', 'sup', 'abbr', 'cite', 'q', 'time', 'label',
+        'input', 'button',
+        'iframe', 'video', 'audio', 'source',
+        'aside',
+        'svg', 'path', 'rect', 'polyline', 'polygon', 'circle', 'ellipse', 'line', 'g',
+    ];
+
+    // Removed together with their subtree (never just unwrapped).
+    static $forbiddenTags = [
+        'script', 'style', 'object', 'embed', 'applet', 'form',
+        'link', 'meta', 'base', 'noscript', 'template', 'frame', 'frameset',
+    ];
+
+    static $tagAttrs = [
+        'a' => ['href', 'target', 'rel', 'name', 'download'],
+        'img' => ['src', 'alt', 'width', 'height', 'loading', 'decoding'],
+        'source' => ['src', 'srcset', 'type', 'media'],
+        'td' => ['colspan', 'rowspan'],
+        'th' => ['colspan', 'rowspan', 'scope'],
+        'col' => ['span'],
+        'colgroup' => ['span'],
+        'input' => ['type', 'checked', 'disabled', 'readonly', 'value', 'placeholder'],
+        'time' => ['datetime'],
+        'blockquote' => ['cite'],
+        'q' => ['cite'],
+        'button' => ['type'],
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'allowtransparency', 'sandbox', 'loading', 'referrerpolicy', 'scrolling'],
+        'video' => ['src', 'width', 'height', 'preload', 'poster', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'],
+        'audio' => ['src', 'preload', 'controls', 'muted', 'loop', 'autoplay'],
+        'svg' => ['viewbox', 'width', 'height', 'fill', 'xmlns', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'aria-hidden'],
+        'path' => ['d', 'fill', 'fill-rule', 'clip-rule', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        'rect' => ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
+        'circle' => ['cx', 'cy', 'r', 'fill', 'stroke', 'stroke-width'],
+        'ellipse' => ['cx', 'cy', 'rx', 'ry', 'fill', 'stroke', 'stroke-width'],
+        'line' => ['x1', 'y1', 'x2', 'y2', 'stroke', 'stroke-width', 'stroke-linecap'],
+        'polyline' => ['points', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'],
+        'polygon' => ['points', 'fill', 'stroke', 'stroke-width'],
+        'g' => ['fill', 'stroke', 'stroke-width', 'opacity'],
+    ];
+
+    static $globalAttrs = [
+        'id', 'class', 'style', 'title', 'dir', 'lang', 'role', 'tabindex', 'datetime', 'contenteditable',
+    ];
+
+    $isSafeUrl = static function (string $value, bool $allowDataImage = false): bool {
+        $probe = strtolower((string) preg_replace('/[\s\x00-\x1F]+/', '', $value));
+        if ($probe === '') {
+            return true;
+        }
+        if (strncmp($probe, 'javascript:', 11) === 0 || strncmp($probe, 'vbscript:', 9) === 0) {
+            return false;
+        }
+        if (strncmp($probe, 'data:', 5) === 0) {
+            return $allowDataImage
+                && preg_match('#^data:image/(?:png|jpe?g|gif|webp|svg\+xml|bmp)[;,]#', $probe) === 1;
+        }
+        return true;
+    };
+
+    libxml_use_internal_errors(true);
+    $dom = new DOMDocument();
+    $dom->encoding = 'UTF-8';
+    $dom->loadHTML(
+        '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $content . '</body></html>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+    libxml_clear_errors();
+
+    // Drop dangerous elements together with their subtree first.
+    foreach ($forbiddenTags as $tag) {
+        foreach (iterator_to_array($dom->getElementsByTagName($tag)) as $node) {
+            if ($node->parentNode !== null) {
+                $node->parentNode->removeChild($node);
+            }
+        }
+    }
+
+    $xpath = new DOMXPath($dom);
+    foreach (iterator_to_array($xpath->query('//body//*')) as $el) {
+        if (!($el instanceof DOMElement) || $el->parentNode === null) {
+            continue; // detached by an earlier removal/unwrap
+        }
+        $tag = strtolower($el->nodeName);
+
+        if (!in_array($tag, $allowedTags, true)) {
+            // Unwrap unknown element, keeping its (still-to-be-sanitized) children.
+            while ($el->firstChild !== null) {
+                $el->parentNode->insertBefore($el->firstChild, $el);
+            }
+            $el->parentNode->removeChild($el);
+            continue;
+        }
+
+        $allowed = $tagAttrs[$tag] ?? [];
+        foreach (iterator_to_array($el->attributes) as $attr) {
+            $name = strtolower($attr->name);
+            if (strncmp($name, 'on', 2) === 0) {
+                $el->removeAttribute($attr->name);
+                continue;
+            }
+            $keep = strncmp($name, 'data-', 5) === 0
+                || strncmp($name, 'aria-', 5) === 0
+                || in_array($name, $globalAttrs, true)
+                || in_array($name, $allowed, true);
+            if (!$keep) {
+                $el->removeAttribute($attr->name);
+                continue;
+            }
+            if ($name === 'href' || $name === 'src' || $name === 'poster' || $name === 'srcset') {
+                if (!$isSafeUrl($attr->value, $tag === 'img')) {
+                    $el->removeAttribute($attr->name);
+                }
+            } elseif ($name === 'style') {
+                if (preg_match('/expression\s*\(|javascript\s*:|vbscript\s*:/i', $attr->value)) {
+                    $el->removeAttribute($attr->name);
+                }
+            }
+        }
+
+        if ($tag === 'iframe' && !publicNoteIframeSrcIsTrusted($el->getAttribute('src'))) {
+            $el->parentNode->removeChild($el);
+        }
+    }
+
+    $body = $dom->getElementsByTagName('body')->item(0);
+    if ($body === null) {
+        return '';
+    }
+
+    $out = '';
+    foreach ($body->childNodes as $child) {
+        $out .= $dom->saveHTML($child);
+    }
+
+    return trim($out);
+}
+
 function renderPublicStatusPage($currentLang, array $options = []) {
     http_response_code($options['status'] ?? 403);
 

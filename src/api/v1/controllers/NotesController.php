@@ -745,19 +745,21 @@ class NotesController {
                 createDirectoryWithPermissions($entriesDir);
                 
                 if (!empty($entry)) {
-                    // Sanitize HTML content to prevent XSS attacks
-                    $contentToSave = $entry;
-                    
-                    // For HTML notes (type='note'), sanitize the content
-                    if ($type === 'note') {
-                        $contentToSave = sanitizeHtml($entry);
-                    }
-                    
-                    // For markdown notes, use markdown-specific sanitizer to preserve syntax
+                    // Sanitize content to prevent stored XSS. Fail closed: only
+                    // markdown and a *valid* JSON tasklist payload (rendered with
+                    // htmlspecialchars) skip HTML sanitization. Everything else —
+                    // including excalidraw, an unknown type, or a tasklist whose
+                    // content is not valid JSON — is sanitized as HTML, because a
+                    // syntactically valid JSON string can still embed markup.
                     if ($type === 'markdown') {
                         $contentToSave = sanitizeMarkdownContent($entry);
+                    } elseif ($type === 'tasklist'
+                        && $this->isStructuredJsonPayload($entry)) {
+                        $contentToSave = $entry;
+                    } else {
+                        $contentToSave = sanitizeHtml($entry);
                     }
-                    
+
                     $write_result = file_put_contents($filename, $contentToSave);
                     
                     // Update the entry content in database with sanitized version
@@ -947,6 +949,20 @@ class NotesController {
                     $contentToSave = sanitizeMarkdownContent($contentToSave);
                 }
                 
+                // Fail closed: only markdown and a *valid* JSON tasklist payload
+                // skip HTML sanitization. Every other note type — including
+                // excalidraw, an unknown type, or a tasklist whose stored content
+                // is not valid JSON — must be sanitized as HTML to prevent stored
+                // XSS (a valid JSON string can still embed markup, and
+                // non-markdown/tasklist notes are rendered as raw HTML elsewhere).
+                if (!empty($entry) && $noteType !== 'note' && $noteType !== 'markdown') {
+                    $isStructuredJson = $noteType === 'tasklist'
+                        && $this->isStructuredJsonPayload($entry);
+                    if (!$isStructuredJson) {
+                        $contentToSave = sanitizeHtml($entry);
+                    }
+                }
+
                 $write_result = file_put_contents($filename, $contentToSave);
                 if ($write_result === false) {
                     $this->sendError(500, 'Failed to write file');
@@ -2380,6 +2396,27 @@ class NotesController {
         }
     }
     
+    /**
+     * Determine whether a structured-note payload (tasklist/excalidraw) is
+     * actually valid JSON. Used to fail closed: a structured note whose stored
+     * content is not valid JSON is treated as untrusted HTML and sanitized.
+     *
+     * @param string $content Raw note content to validate.
+     * @return bool True only when $content decodes to a JSON array/object.
+     */
+    private function isStructuredJsonPayload(string $content): bool {
+        $trimmed = trim($content);
+        if ($trimmed === '') {
+            return false;
+        }
+        // Structured payloads are JSON arrays or objects, never bare scalars.
+        if ($trimmed[0] !== '[' && $trimmed[0] !== '{') {
+            return false;
+        }
+        $decoded = json_decode($trimmed, true);
+        return json_last_error() === JSON_ERROR_NONE && is_array($decoded);
+    }
+
     /**
      * Sanitize and normalize a tags value (string or array) into a clean comma-separated string.
      */
