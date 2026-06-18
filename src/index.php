@@ -116,7 +116,7 @@ $settings = [
     'sidebar_font_size' => '13',
     'center_note_content' => '0',
     'show_note_created' => false,
-    'show_note_icons' => '0',
+    'show_note_icons' => '1',
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
@@ -957,7 +957,13 @@ if ($isPublicWorkspaceReadonly) {
                         $titlePlaceholder = t_h('index.note.title_placeholder', [], 'Title ?');
                     }
                     $titleReadonlyAttr = $isPublicWorkspaceReadonly ? ' readonly' : '';
-                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
+                    $titleNoteIcon = '';
+                    if (!empty($show_note_icons_setting)) {
+                        $noteIconRaw = !empty($row['icon']) ? $row['icon'] : '';
+                        $noteIconColor = !empty($row['icon_color']) ? (string)$row['icon_color'] : '';
+                        $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon');
+                    }
+                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
                     if (!empty($created_clean)) {

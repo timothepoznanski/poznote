@@ -86,32 +86,6 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
 <div class="notes-list-scrollable-content">
 
 <?php
-/**
- * Recursive function to display folders and their subfolders
- */
-function buildSidebarNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
-    $converted = !empty($iconClass) ? convertFontAwesomeToLucide($iconClass) : $defaultIcon;
-    $converted = trim((string)($converted ?: $defaultIcon));
-    $classes = preg_split('/\s+/', $converted);
-    $hasLucideBase = in_array('lucide', $classes, true);
-    $hasLucideIcon = false;
-
-    foreach ($classes as $class) {
-        if (strpos($class, 'lucide-') === 0) {
-            $hasLucideIcon = true;
-            break;
-        }
-    }
-
-    if (!$hasLucideBase) {
-        array_unshift($classes, 'lucide');
-    }
-    if (!$hasLucideIcon) {
-        $classes[] = $defaultIcon;
-    }
-
-    return implode(' ', array_unique(array_filter($classes)));
-}
 
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
     global $show_note_icons_setting;
@@ -122,14 +96,9 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
 
     $noteIcon = '';
     if (!empty($show_note_icons_setting)) {
-        $noteIconRaw = !empty($row1['icon']) ? $row1['icon'] : 'lucide-file-text';
-        $hasCustomNoteIcon = !empty($row1['icon']);
-        $noteIconClass = buildSidebarNoteIconClass($noteIconRaw);
+        $noteIconRaw = !empty($row1['icon']) ? $row1['icon'] : '';
         $noteIconColor = !empty($row1['icon_color']) ? (string)$row1['icon_color'] : '';
-        $iconStyle = $noteIconColor ? " style='color: " . htmlspecialchars($noteIconColor, ENT_QUOTES) . " !important;'" : "";
-        $iconColorAttr = $noteIconColor ? " data-icon-color='" . htmlspecialchars($noteIconColor, ENT_QUOTES) . "'" : "";
-        $changeIconTitle = t_h('notes_list.folder_actions.change_note_icon', [], 'Change note icon');
-        $noteIcon = "<i class='" . htmlspecialchars($noteIconClass, ENT_QUOTES) . " note-icon note-list-click-action' data-custom-icon='" . ($hasCustomNoteIcon ? 'true' : 'false') . "' data-action='open-note-icon-picker' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-title='" . htmlspecialchars($noteTitle, ENT_QUOTES) . "'$iconColorAttr title='" . $changeIconTitle . "'$iconStyle></i> ";
+        $noteIcon = renderEditableNoteIcon($noteDbId, $noteTitle, $noteIconRaw, $noteIconColor, 'note-list-click-action') . ' ';
     }
 
     $noteTypeIcon = '';

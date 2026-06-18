@@ -45,7 +45,8 @@
     "scroll_bottom": "Scroll to bottom",
     "outline": {
       "title": "Outline",
-      "no_headings": "No headings in this note"
+      "no_headings": "No headings in this note",
+      "unavailable_tasklist": "Outline is not available for task lists"
     },
     "link_copied": "Link copied"
   },
@@ -241,7 +242,11 @@
     "insert_order_top": "Top",
     "insert_order_bottom": "Bottom",
     "clear_completed": "Clear completed tasks",
-    "no_completed_tasks": "No completed tasks to clear."
+    "no_completed_tasks": "No completed tasks to clear.",
+    "edit_task": "Edit task",
+    "edit_text_label": "Task text",
+    "edit_hint": "Enter adds a new line. Ctrl+Enter saves.",
+    "edit_empty_error": "Task text cannot be empty."
   },
   "tags": {
     "add_single": "Add tag...",

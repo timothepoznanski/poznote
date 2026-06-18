@@ -712,10 +712,14 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
             'apiBaseUrl' => $apiBaseUrl,
             'i18n' => [
                 'addTask' => t('tasklist.input_placeholder', [], 'Add a task...'),
-                'editTask' => t('image_menu.edit', [], 'Edit') . ' :',
+                'editTask' => t('tasklist.edit_task', [], 'Edit task'),
+                'taskTextLabel' => t('tasklist.edit_text_label', [], 'Task text'),
+                'taskEditHint' => t('tasklist.edit_hint', [], 'Enter adds a new line. Ctrl+Enter saves.'),
+                'taskEditEmptyError' => t('tasklist.edit_empty_error', [], 'Task text cannot be empty.'),
                 'deleteTask' => t('common.delete', [], 'Delete') . ' ?',
                 'confirm' => t('common.confirm', [], 'Confirm'),
                 'cancel' => t('common.cancel', [], 'Cancel'),
+                'save' => t('common.save', [], 'Save'),
                 'ok' => t('common.ok', [], 'OK')
             ]
         ]); 

@@ -464,7 +464,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '0')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
@@ -478,7 +478,7 @@ try {
 
     try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '0')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
     } catch (Exception $e) {
         error_log('Could not ensure display settings: ' . $e->getMessage());
     }

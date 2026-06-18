@@ -425,70 +425,150 @@
         }
     });
 
+    let publicTaskEditState = {
+        idOrIndex: null,
+        isMarkdown: false,
+        originalText: '',
+        lastFocusedElement: null
+    };
+
+    function getPublicTaskEditText(key, fallback) {
+        const config = getPublicConfig();
+        return (config && config.i18n && config.i18n[key]) ? config.i18n[key] : fallback;
+    }
+
+    function setPublicTaskEditError(message) {
+        const errorEl = document.getElementById('publicTaskEditError');
+        if (!errorEl) return;
+
+        errorEl.textContent = message || '';
+        errorEl.style.display = message ? 'block' : 'none';
+    }
+
+    function closePublicTaskEditModal() {
+        const overlay = document.getElementById('publicTaskEditOverlay');
+        if (overlay) overlay.classList.remove('show');
+
+        const lastFocusedElement = publicTaskEditState.lastFocusedElement;
+        publicTaskEditState = {
+            idOrIndex: null,
+            isMarkdown: false,
+            originalText: '',
+            lastFocusedElement: null
+        };
+        setPublicTaskEditError('');
+
+        if (lastFocusedElement && document.contains(lastFocusedElement)) {
+            lastFocusedElement.focus({ preventScroll: true });
+        }
+    }
+
+    function savePublicTaskEditModal() {
+        const textarea = document.getElementById('publicTaskEditTextarea');
+        if (!textarea || publicTaskEditState.idOrIndex === null) return;
+
+        const newText = textarea.value.trim();
+        if (!newText) {
+            setPublicTaskEditError(getPublicTaskEditText('taskEditEmptyError', 'Task text cannot be empty.'));
+            textarea.focus();
+            return;
+        }
+
+        if (newText !== publicTaskEditState.originalText) {
+            updateTaskText(publicTaskEditState.idOrIndex, newText, publicTaskEditState.isMarkdown);
+        } else {
+            closePublicTaskEditModal();
+        }
+    }
+
+    function ensurePublicTaskEditModal() {
+        let overlay = document.getElementById('publicTaskEditOverlay');
+        if (overlay) return overlay;
+
+        overlay = document.createElement('div');
+        overlay.id = 'publicTaskEditOverlay';
+        overlay.className = 'alert-modal-overlay public-task-edit-overlay';
+        overlay.innerHTML = `
+            <div class="alert-modal public-task-edit-modal" role="dialog" aria-modal="true" aria-labelledby="publicTaskEditTitle">
+                <div class="alert-modal-body public-task-edit-body">
+                    <h3 id="publicTaskEditTitle" class="public-task-edit-title">${escapeHtml(getPublicTaskEditText('editTask', 'Edit task'))}</h3>
+                    <label for="publicTaskEditTextarea" class="task-edit-label">${escapeHtml(getPublicTaskEditText('taskTextLabel', 'Task text'))}</label>
+                    <textarea id="publicTaskEditTextarea" class="task-edit-textarea public-task-edit-textarea" maxlength="4000" aria-describedby="publicTaskEditHint publicTaskEditError"></textarea>
+                    <p id="publicTaskEditHint" class="task-edit-hint">${escapeHtml(getPublicTaskEditText('taskEditHint', 'Enter adds a new line. Ctrl+Enter saves.'))}</p>
+                    <p id="publicTaskEditError" class="task-edit-error" role="alert"></p>
+                </div>
+                <div class="alert-modal-footer public-task-edit-footer">
+                    <button type="button" class="alert-modal-button public-task-edit-cancel" id="publicTaskEditCancelBtn">${escapeHtml(getPublicTaskEditText('cancel', 'Cancel'))}</button>
+                    <button type="button" class="alert-modal-button primary" id="publicTaskEditSaveBtn">${escapeHtml(getPublicTaskEditText('save', 'Save'))}</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const textarea = document.getElementById('publicTaskEditTextarea');
+        const saveBtn = document.getElementById('publicTaskEditSaveBtn');
+        const cancelBtn = document.getElementById('publicTaskEditCancelBtn');
+
+        if (textarea) {
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    savePublicTaskEditModal();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closePublicTaskEditModal();
+                }
+            });
+
+            textarea.addEventListener('input', function() {
+                setPublicTaskEditError('');
+            });
+        }
+
+        if (saveBtn) saveBtn.addEventListener('click', savePublicTaskEditModal);
+        if (cancelBtn) cancelBtn.addEventListener('click', closePublicTaskEditModal);
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                closePublicTaskEditModal();
+            }
+        });
+
+        return overlay;
+    }
+
     /**
-     * Enable inline editing for a task
+     * Open the task edit modal
      * @param {HTMLElement} textElement - The text element to edit
      * @param {string|number} idOrIndex - The task ID or index
      * @param {boolean} isMarkdown - Whether this is a markdown task
      */
     function enableInlineEdit(textElement, idOrIndex, isMarkdown) {
         const originalText = textElement.getAttribute('data-text') || textElement.textContent;
-        const width = textElement.offsetWidth;
+        const overlay = ensurePublicTaskEditModal();
+        const textarea = document.getElementById('publicTaskEditTextarea');
+        if (!overlay || !textarea) return;
 
-        // Create input
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = originalText;
-        input.className = 'public-task-edit-input';
-
-        // Style to look like text
-        input.style.width = '100%';
-        input.style.minWidth = Math.max(width, 200) + 'px';
-        input.style.font = 'inherit';
-        input.style.color = 'inherit';
-        input.style.background = 'transparent';
-        // Use css variable if available, else fallback
-        input.style.border = '1px solid var(--primary-color, #3b82f6)';
-        input.style.borderRadius = '4px';
-        input.style.padding = '2px 4px';
-        input.style.boxSizing = 'border-box';
-
-        let isSaving = false;
-
-        const save = () => {
-            if (isSaving) return;
-            isSaving = true;
-
-            const newText = input.value.trim();
-            if (newText !== null && newText !== originalText) {
-                updateTaskText(idOrIndex, newText, isMarkdown);
-            } else {
-                cancel();
-            }
+        publicTaskEditState = {
+            idOrIndex: idOrIndex,
+            isMarkdown: isMarkdown,
+            originalText: originalText,
+            lastFocusedElement: textElement
         };
 
-        const cancel = () => {
-            // If we're cancelling, we just put back the element
-            // If save was called and triggered a reload, this might race, but usually reload wins
-            if (input.parentNode) {
-                input.replaceWith(textElement);
-            }
-        };
+        setPublicTaskEditError('');
+        textarea.value = originalText;
+        overlay.classList.add('show');
 
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                input.blur();
-            } else if (e.key === 'Escape') {
-                e.preventDefault();
-                cancel();
+        requestAnimationFrame(function() {
+            textarea.focus();
+            const end = textarea.value.length;
+            try {
+                textarea.setSelectionRange(end, end);
+            } catch (e) {
+                // Some browsers do not support selection APIs on inactive controls.
             }
         });
-
-        input.addEventListener('blur', save);
-
-        textElement.replaceWith(input);
-        input.focus();
     }
 
     // Task interaction handlers (edit and delete)

@@ -419,6 +419,140 @@ function toggleTask(taskId, noteId) {
     markTaskListAsModified(noteId);
 }
 
+let taskEditState = {
+    taskId: null,
+    noteId: null,
+    originalText: '',
+    lastFocusedElement: null
+};
+
+function getTaskEditEmptyError() {
+    return window.t
+        ? window.t('tasklist.edit_empty_error', null, 'Task text cannot be empty.')
+        : 'Task text cannot be empty.';
+}
+
+function setTaskEditError(message) {
+    const errorEl = document.getElementById('taskEditError');
+    if (!errorEl) return;
+
+    errorEl.textContent = message || '';
+    errorEl.style.display = message ? 'block' : 'none';
+}
+
+function closeTaskEditModal() {
+    if (typeof closeModal === 'function') {
+        closeModal('taskEditModal');
+    } else {
+        const modal = document.getElementById('taskEditModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    const lastFocusedElement = taskEditState.lastFocusedElement;
+    taskEditState = {
+        taskId: null,
+        noteId: null,
+        originalText: '',
+        lastFocusedElement: null
+    };
+    setTaskEditError('');
+
+    if (lastFocusedElement && document.contains(lastFocusedElement)) {
+        lastFocusedElement.focus({ preventScroll: true });
+    }
+}
+
+function saveTaskEditFromModal() {
+    const textarea = document.getElementById('taskEditTextarea');
+    if (!textarea || taskEditState.taskId === null || taskEditState.noteId === null) return;
+
+    const newText = textarea.value.trim();
+    if (!newText) {
+        setTaskEditError(getTaskEditEmptyError());
+        textarea.focus();
+        return;
+    }
+
+    if (newText !== taskEditState.originalText) {
+        saveTaskEdit(taskEditState.taskId, taskEditState.noteId, newText);
+    }
+
+    closeTaskEditModal();
+}
+
+function attachTaskEditModalHandlers(modal) {
+    if (!modal || modal.dataset.handlersAttached === 'true') return;
+
+    const textarea = document.getElementById('taskEditTextarea');
+    const saveBtn = document.getElementById('saveTaskEditBtn');
+    const cancelBtn = document.getElementById('cancelTaskEditBtn');
+
+    if (textarea) {
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                saveTaskEditFromModal();
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                closeTaskEditModal();
+            }
+        });
+
+        textarea.addEventListener('input', function() {
+            setTaskEditError('');
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', saveTaskEditFromModal);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeTaskEditModal);
+    }
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeTaskEditModal();
+        }
+    });
+
+    modal.dataset.handlersAttached = 'true';
+}
+
+function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement) {
+    const modal = document.getElementById('taskEditModal');
+    const textarea = document.getElementById('taskEditTextarea');
+    const saveBtn = document.getElementById('saveTaskEditBtn');
+    if (!modal || !textarea || !saveBtn) return false;
+
+    attachTaskEditModalHandlers(modal);
+
+    taskEditState = {
+        taskId: taskId,
+        noteId: noteId,
+        originalText: currentText,
+        lastFocusedElement: lastFocusedElement || document.activeElement
+    };
+
+    setTaskEditError('');
+    textarea.value = currentText;
+    textarea.maxLength = 4000;
+    modal.style.display = 'flex';
+
+    requestAnimationFrame(function() {
+        textarea.focus();
+        const end = textarea.value.length;
+        try {
+            textarea.setSelectionRange(end, end);
+        } catch (e) {
+            // Some browsers do not support selection APIs on inactive controls.
+        }
+    });
+
+    return true;
+}
+
 // Edit task text
 function editTask(taskId, noteId) {
     if (isPublicWorkspaceReadOnly()) return;
@@ -437,6 +571,10 @@ function editTask(taskId, noteId) {
 
     const task = tasks.find(t => t.id === taskId);
     const currentText = task ? task.text : taskText.textContent;
+
+    if (openTaskEditModal(taskId, noteId, currentText, taskText)) {
+        return;
+    }
 
     const input = document.createElement('input');
     input.type = 'text';

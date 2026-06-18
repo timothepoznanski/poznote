@@ -178,6 +178,18 @@ body.dark-mode .task-edit-input {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .task-edit-textarea,
+body.dark-mode .task-edit-textarea {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .task-edit-hint,
+body.dark-mode .task-edit-hint {
+    color: #a8a8a8;
+}
+
 html[data-theme='dark'] .task-item:hover,
 body.dark-mode .task-item:hover {
     background-color: var(--dm-surface);

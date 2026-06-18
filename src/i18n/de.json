@@ -67,7 +67,8 @@
     "scroll_bottom": "Zum Ende der Notiz scrollen",
     "outline": {
       "title": "Gliederung",
-      "no_headings": "Keine Überschriften in dieser Notiz"
+      "no_headings": "Keine Überschriften in dieser Notiz",
+      "unavailable_tasklist": "Gliederung ist für Aufgabenlisten nicht verfügbar"
     },
     "link_copied": "Link kopiert"
   },
@@ -649,7 +650,11 @@
     "actions": "Aufgabenlisten-Aktionen",
     "uncheck_all": "Alle Aufgaben abwählen",
     "no_checked_tasks": "Keine ausgewählten Aufgaben zum Abwählen.",
-    "confirm_uncheck_all": "{{count}} Aufgabe(n) abwählen?"
+    "confirm_uncheck_all": "{{count}} Aufgabe(n) abwählen?",
+    "edit_task": "Aufgabe bearbeiten",
+    "edit_text_label": "Aufgabentext",
+    "edit_hint": "Enter fügt eine neue Zeile hinzu. Strg+Enter speichert.",
+    "edit_empty_error": "Der Aufgabentext darf nicht leer sein."
   },
   "tags": {
     "add_single": "Tag hinzufügen...",

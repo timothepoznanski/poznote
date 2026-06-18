@@ -68,7 +68,8 @@
     "scroll_bottom": "转到笔记底部",
     "outline": {
       "title": "大纲",
-      "no_headings": "此笔记中没有标题"
+      "no_headings": "此笔记中没有标题",
+      "unavailable_tasklist": "任务列表不支持大纲"
     },
     "link_copied": "链接已复制"
   },
@@ -646,7 +647,11 @@
     "actions": "任务列表操作",
     "uncheck_all": "取消勾选所有任务",
     "no_checked_tasks": "没有已勾选的任务可以取消勾选。",
-    "confirm_uncheck_all": "取消勾选 {{count}} 个任务？"
+    "confirm_uncheck_all": "取消勾选 {{count}} 个任务？",
+    "edit_task": "编辑任务",
+    "edit_text_label": "任务文本",
+    "edit_hint": "Enter 添加新行。Ctrl+Enter 保存。",
+    "edit_empty_error": "任务文本不能为空。"
   },
   "tags": {
     "add_single": "添加标签...",

@@ -231,6 +231,25 @@ body:not(.outline-collapsed) .toggle-outline-btn {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.toggle-outline-btn:disabled,
+.toggle-outline-btn[aria-disabled="true"],
+html.outline-collapsed .toggle-outline-btn:disabled,
+body.outline-collapsed .toggle-outline-btn:disabled {
+    background: #f1f3f5;
+    color: #adb5bd;
+    border-color: #dee2e6;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.toggle-outline-btn:disabled:hover,
+.toggle-outline-btn[aria-disabled="true"]:hover {
+    background: #f1f3f5;
+    color: #adb5bd;
+    box-shadow: none;
+}
+
 .toggle-outline-btn i {
     transition: transform 0.3s ease;
     width: 12px;
@@ -410,6 +429,23 @@ body.dark-mode .toggle-outline-btn:hover,
 html[data-theme='dark'] .toggle-outline-btn:hover {
     background: var(--dm-surface-hover);
     color: #4db8ff;
+}
+
+body.dark-mode .toggle-outline-btn:disabled,
+body.dark-mode .toggle-outline-btn[aria-disabled="true"],
+html[data-theme='dark'] .toggle-outline-btn:disabled,
+html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"] {
+    background: var(--dm-sidebar-surface);
+    border-color: var(--dm-border);
+    color: #666;
+}
+
+body.dark-mode .toggle-outline-btn:disabled:hover,
+body.dark-mode .toggle-outline-btn[aria-disabled="true"]:hover,
+html[data-theme='dark'] .toggle-outline-btn:disabled:hover,
+html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
+    background: var(--dm-sidebar-surface);
+    color: #666;
 }
 
 .heading-anchor--floating {

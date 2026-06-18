@@ -480,6 +480,38 @@ body.public-note-page {
     cursor: default;
 }
 
+.public-task-edit-modal {
+    width: min(92vw, 720px);
+    max-width: 720px;
+}
+
+.alert-modal-body.public-task-edit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 24px !important;
+}
+
+.public-task-edit-title {
+    margin: 0 0 8px 0;
+    color: var(--text-color, #333);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.public-task-edit-footer {
+    padding: 0 24px 24px 24px;
+}
+
+.public-task-edit-cancel {
+    background: #6c757d;
+    color: #fff;
+}
+
+.public-task-edit-cancel:hover {
+    background: #5a6268;
+}
+
 /* Important task styling for public view */
 .public-note .content .task-item.important {
     border-color: #ffcccc;
@@ -800,6 +832,19 @@ html[data-theme='dark'] .public-note .content .task-item.important {
 html[data-theme='dark'] .public-note .content .task-item.important .task-text {
     color: #ff6b6b;
     font-weight: 600;
+}
+
+html[data-theme='dark'] .public-task-edit-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .public-task-edit-cancel {
+    background: #4c5057;
+    color: #f4f6f8;
+}
+
+html[data-theme='dark'] .public-task-edit-cancel:hover {
+    background: #595e67;
 }
 
 /* Dark mode styles for tables */

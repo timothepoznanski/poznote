@@ -618,6 +618,23 @@ try {
     </div>
 </div>
 
+<!-- Edit Task Modal -->
+<div id="taskEditModal" class="modal">
+    <div class="modal-content task-edit-modal-content">
+        <h3><?php echo t_h('tasklist.edit_task', [], 'Edit task'); ?></h3>
+        <div class="modal-body task-edit-modal-body">
+            <label for="taskEditTextarea" class="task-edit-label"><?php echo t_h('tasklist.edit_text_label', [], 'Task text'); ?></label>
+            <textarea id="taskEditTextarea" class="task-edit-textarea" maxlength="4000" aria-describedby="taskEditHint taskEditError"></textarea>
+            <p id="taskEditHint" class="task-edit-hint"><?php echo t_h('tasklist.edit_hint', [], 'Enter adds a new line. Ctrl+Enter saves.'); ?></p>
+            <p id="taskEditError" class="task-edit-error" role="alert"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="cancelTaskEditBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveTaskEditBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Move Task Modal -->
 <div id="moveTaskModal" class="modal">
     <div class="modal-content">

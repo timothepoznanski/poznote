@@ -70,7 +70,8 @@
     "scroll_bottom": "Aller en bas de la note",
     "outline": {
       "title": "Sommaire",
-      "no_headings": "Aucun titre dans cette note"
+      "no_headings": "Aucun titre dans cette note",
+      "unavailable_tasklist": "Le sommaire n'est pas disponible pour les listes de tâches"
     },
     "link_copied": "Lien copié"
   },
@@ -668,7 +669,11 @@
     "actions": "Actions de liste de tâches",
     "uncheck_all": "Décocher toutes les tâches",
     "no_checked_tasks": "Aucune tâche cochée à décocher.",
-    "confirm_uncheck_all": "Décocher {{count}} tâche(s) ?"
+    "confirm_uncheck_all": "Décocher {{count}} tâche(s) ?",
+    "edit_task": "Modifier la tâche",
+    "edit_text_label": "Texte de la tâche",
+    "edit_hint": "Entrée ajoute une ligne. Ctrl+Entrée enregistre.",
+    "edit_empty_error": "Le texte de la tâche ne peut pas être vide."
   },
   "tags": {
     "add_single": "Ajouter un tag...",

@@ -703,6 +703,42 @@ function convertFontAwesomeToLucide($iconClass) {
     return $iconClass;
 }
 
+function buildNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
+    $converted = !empty($iconClass) ? convertFontAwesomeToLucide($iconClass) : $defaultIcon;
+    $converted = trim((string)($converted ?: $defaultIcon));
+    $classes = preg_split('/\s+/', $converted);
+    $hasLucideBase = in_array('lucide', $classes, true);
+    $hasLucideIcon = false;
+
+    foreach ($classes as $class) {
+        if (strpos($class, 'lucide-') === 0) {
+            $hasLucideIcon = true;
+            break;
+        }
+    }
+
+    if (!$hasLucideBase) {
+        array_unshift($classes, 'lucide');
+    }
+    if (!$hasLucideIcon) {
+        $classes[] = $defaultIcon;
+    }
+
+    return implode(' ', array_unique(array_filter($classes)));
+}
+
+function renderEditableNoteIcon($noteId, $noteTitle, $iconClass = '', $iconColor = '', $extraClasses = '') {
+    $hasCustomNoteIcon = !empty($iconClass);
+    $noteIconClass = buildNoteIconClass($hasCustomNoteIcon ? $iconClass : 'lucide-file-text');
+    $noteIconColor = !empty($iconColor) ? (string)$iconColor : '';
+    $classes = trim($noteIconClass . ' note-icon ' . (string)$extraClasses);
+    $iconStyle = $noteIconColor ? " style='color: " . htmlspecialchars($noteIconColor, ENT_QUOTES) . " !important;'" : "";
+    $iconColorAttr = $noteIconColor ? " data-icon-color='" . htmlspecialchars($noteIconColor, ENT_QUOTES) . "'" : "";
+    $changeIconTitle = t_h('notes_list.folder_actions.change_note_icon', [], 'Change note icon');
+
+    return "<i class='" . htmlspecialchars($classes, ENT_QUOTES) . "' data-custom-icon='" . ($hasCustomNoteIcon ? 'true' : 'false') . "' data-action='open-note-icon-picker' data-note-id='" . htmlspecialchars((string)$noteId, ENT_QUOTES) . "' data-note-title='" . htmlspecialchars((string)$noteTitle, ENT_QUOTES) . "'$iconColorAttr title='" . $changeIconTitle . "' aria-label='" . $changeIconTitle . "'$iconStyle></i>";
+}
+
 /**
  * Global settings cache - loads all settings in one query and caches them
  * This dramatically reduces database queries when settings are accessed multiple times

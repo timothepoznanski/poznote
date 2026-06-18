@@ -30,6 +30,61 @@ function getCurrentOutlineNoteElement() {
     return document.querySelector('.notecard:not([style*="display: none"]) .noteentry');
 }
 
+function getPublicOutlineNoteType() {
+    const configElement = document.getElementById('public-note-config');
+    if (!configElement) return '';
+
+    try {
+        const config = JSON.parse(configElement.textContent || '{}');
+        return String(config.noteType || '').toLowerCase();
+    } catch (_error) {
+        return '';
+    }
+}
+
+function getOutlineNoteType(noteElement) {
+    if (noteElement && noteElement.getAttribute) {
+        const noteType = noteElement.getAttribute('data-note-type');
+        if (noteType) return String(noteType).toLowerCase();
+    }
+
+    return isPublicOutlinePage() ? getPublicOutlineNoteType() : '';
+}
+
+function isOutlineDisabledForNote(noteElement) {
+    return getOutlineNoteType(noteElement) === 'tasklist';
+}
+
+function closeOutlineForDisabledNote() {
+    document.body.classList.remove('outline-mobile-open');
+    setDesktopOutlineCollapsedState(true);
+}
+
+function updateOutlineToggleAvailability(noteElement) {
+    const isDisabled = isOutlineDisabledForNote(noteElement);
+    const toggleBtn = document.getElementById('toggleOutlineBtn');
+
+    document.body.classList.toggle('outline-disabled', isDisabled);
+
+    if (toggleBtn) {
+        const enabledTitle = 'Toggle outline panel';
+        const disabledTitle = typeof window.t === 'function'
+            ? window.t('common.outline.unavailable_tasklist', null, 'Outline is not available for task lists')
+            : 'Outline is not available for task lists';
+
+        toggleBtn.disabled = isDisabled;
+        toggleBtn.setAttribute('aria-disabled', isDisabled ? 'true' : 'false');
+        toggleBtn.title = isDisabled ? disabledTitle : enabledTitle;
+        toggleBtn.setAttribute('aria-label', isDisabled ? disabledTitle : enabledTitle);
+    }
+
+    if (isDisabled) {
+        closeOutlineForDisabledNote();
+    }
+
+    return isDisabled;
+}
+
 function getOutlineScrollContainer() {
     if (isPublicOutlinePage()) {
         return document.getElementById('publicNoteMain');
@@ -389,6 +444,12 @@ function initToggleOutline() {
 function toggleOutline() {
     // Prevent opening outline in Kanban view
     if (window._isKanbanViewActive) {
+        return;
+    }
+
+    if (isOutlineDisabledForNote(getCurrentOutlineNoteElement())) {
+        closeOutlineForDisabledNote();
+        updateOutlineToggleAvailability(getCurrentOutlineNoteElement());
         return;
     }
 
@@ -1046,12 +1107,14 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     const visibleNote = getCurrentOutlineNoteElement();
 
     if (!visibleNote) {
+        updateOutlineToggleAvailability(null);
         renderOutline([]);
         return;
     }
 
     // Extract note ID from the element
     const noteId = isPublicOutlinePage() ? 'public-note' : visibleNote.id.replace('entry', '');
+    const isDisabled = updateOutlineToggleAvailability(visibleNote);
 
     // Only update if note has changed, unless forced
     if (!forceUpdate && currentNoteId === noteId) {
@@ -1059,6 +1122,11 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     }
 
     currentNoteId = noteId;
+
+    if (isDisabled) {
+        renderOutline([]);
+        return;
+    }
 
     // Extract headings
     const headings = extractHeadings(visibleNote);
@@ -1114,7 +1182,9 @@ function observeNoteChanges() {
     observer.observe(observationRoot, {
         childList: true,
         subtree: true,
-        characterData: true
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['style', 'class', 'data-note-type']
     });
 
     // Handle input events for real-time updates while typing
