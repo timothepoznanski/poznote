@@ -1076,6 +1076,8 @@ function importAttachmentsZip($uploadedFile) {
     }
     
     $importedCount = 0;
+    $skippedCount = 0;
+    $errors = [];
     
     // Extract each file
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -1087,24 +1089,50 @@ function importAttachmentsZip($uploadedFile) {
             continue;
         }
         
-        // Get the base filename without path
-        $baseFilename = basename($filename);
-        
         // Extract file content
         $content = $zip->getFromIndex($i);
-        if ($content !== false) {
-            $targetFile = $attachmentsPath . '/' . $baseFilename;
-            if (file_put_contents($targetFile, $content) !== false) {
-                chmod($targetFile, 0644);
-                $importedCount++;
-            }
+        if ($content === false) {
+            continue;
+        }
+
+        $validation = poznoteValidateAttachmentFile($filename, null, $content);
+        if (!$validation['success']) {
+            $skippedCount++;
+            $errors[] = poznoteNormalizeAttachmentFilename($filename) . ': ' . $validation['error'];
+            continue;
+        }
+
+        $targetFile = $attachmentsPath . '/' . $validation['filename'];
+        if (file_put_contents($targetFile, $content) !== false) {
+            chmod($targetFile, 0644);
+            $importedCount++;
         }
     }
     
     $zip->close();
     unlink($tempFile);
-    
-    return ['success' => true, 'message' => t('restore_import.import_attachments.summary', ['count' => $importedCount])];
+
+    if ($importedCount === 0 && $skippedCount > 0) {
+        return [
+            'success' => false,
+            'error' => t(
+                'restore_import.import_attachments.errors.no_allowed_files',
+                ['details' => implode('; ', array_slice($errors, 0, 5))],
+                'No attachments were imported because the ZIP only contained blocked file types. {{details}}'
+            )
+        ];
+    }
+
+    $message = t('restore_import.import_attachments.summary', ['count' => $importedCount]);
+    if ($skippedCount > 0) {
+        $message .= ' ' . t(
+            'restore_import.import_attachments.skipped_blocked',
+            ['count' => $skippedCount],
+            '{{count}} file(s) skipped because their type is not allowed.'
+        );
+    }
+
+    return ['success' => true, 'message' => $message];
 }
 
 function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null) {
