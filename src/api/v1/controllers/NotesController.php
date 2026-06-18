@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../../users/db_master.php';
 
 class NotesController {
     private PDO $con;
+    private const DEFAULT_NOTE_ICON = 'lucide-file-text';
     
     public function __construct(PDO $con) {
         $this->con = $con;
@@ -69,6 +70,23 @@ class NotesController {
         }
 
         return $input;
+    }
+
+    private function normalizeNoteIcon(?string $icon): ?string {
+        if (!is_string($icon)) {
+            return null;
+        }
+
+        $icon = trim($icon);
+        if ($icon === '') {
+            return null;
+        }
+
+        if (function_exists('convertFontAwesomeToLucide')) {
+            return convertFontAwesomeToLucide($icon);
+        }
+
+        return $icon;
     }
 
     private function noteExistsForEditing(int $noteId): bool {
@@ -335,7 +353,7 @@ class NotesController {
             }
             
             // Build query for notes
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite FROM entries WHERE trash = 0";
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color FROM entries WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
@@ -425,6 +443,8 @@ class NotesController {
             
             $notes = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $row['icon'] = $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON;
+                $row['icon_color'] = $row['icon_color'] ?? null;
                 $notes[] = $row;
             }
             
@@ -515,13 +535,13 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
@@ -539,13 +559,13 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
@@ -602,6 +622,8 @@ class NotesController {
                     'folder' => $row['folder'] ?? null,
                     'folder_id' => $row['folder_id'] ? (int)$row['folder_id'] : null,
                     'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
+                    'icon' => $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON,
+                    'icon_color' => $row['icon_color'] ?? null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
                     'reminder_at' => $row['reminder_at'] ?? null,
@@ -1056,6 +1078,55 @@ class NotesController {
                 $this->sendError(500, 'Database error while updating note');
             }
             
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
+    /**
+     * PUT /api/v1/notes/{id}/icon - Update note icon metadata
+     */
+    public function updateIcon(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input)) {
+            $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        $icon = isset($input['icon']) ? trim((string)$input['icon']) : '';
+        $iconColor = isset($input['icon_color']) ? trim((string)$input['icon_color']) : '';
+        $iconValue = $this->normalizeNoteIcon($icon);
+        $iconColorValue = $iconColor === '' ? null : $iconColor;
+
+        try {
+            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt->execute([$noteId]);
+            if (!$existsStmt->fetchColumn()) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $stmt = $this->con->prepare('UPDATE entries SET icon = ?, icon_color = ? WHERE id = ?');
+            $success = $stmt->execute([$iconValue, $iconColorValue, $noteId]);
+
+            if (!$success) {
+                $this->sendError(500, 'Database error while updating note icon');
+                return;
+            }
+
+            $this->sendSuccess([
+                'message' => 'Note icon updated successfully',
+                'icon' => $iconValue ?? self::DEFAULT_NOTE_ICON,
+                'icon_color' => $iconColorValue
+            ]);
+
+            $this->triggerGitSync($noteId, 'push');
         } catch (Exception $e) {
             $this->sendError(500, 'Database error occurred');
         }
@@ -1553,7 +1624,7 @@ class NotesController {
         $extraResponse  = $options['extraResponse'] ?? [];
 
         try {
-            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$id]);
             $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1623,7 +1694,7 @@ class NotesController {
 
             // Insert new note
             $actorUserId = $this->getActorUserId();
-            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
+            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
             $insertStmt->execute([
                 $newHeading,
                 $originalNote['tags'],
@@ -1632,6 +1703,8 @@ class NotesController {
                 $workspace,
                 $originalNote['type'],
                 $newAttachments,
+                $originalNote['icon'],
+                $originalNote['icon_color'],
                 $actorUserId,
                 $actorUserId
             ]);

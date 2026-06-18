@@ -116,6 +116,7 @@ $settings = [
     'sidebar_font_size' => '13',
     'center_note_content' => '0',
     'show_note_created' => false,
+    'show_note_icons' => '1',
     'hide_folder_actions' => null,
     'hide_folder_counts' => null,
     'note_list_sort' => 'updated_desc',
@@ -127,7 +128,7 @@ $settings = [
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -294,6 +295,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
 // Build body classes from previously loaded settings
 $extra_body_classes = '';
 $show_note_created_setting = ($settings['show_note_created'] === '1' || $settings['show_note_created'] === 'true');
+$show_note_icons_setting = ($settings['show_note_icons'] === '1' || $settings['show_note_icons'] === 'true');
 if ($show_note_created_setting) {
     $extra_body_classes .= ' show-note-created';
 }
@@ -378,7 +380,7 @@ if ($isPublicWorkspaceReadonly) {
     appendNoteAgeFilter($where_clause, $search_params, getNoteAgeFilterDays($con));
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, icon, icon_color FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 
@@ -955,7 +957,13 @@ if ($isPublicWorkspaceReadonly) {
                         $titlePlaceholder = t_h('index.note.title_placeholder', [], 'Title ?');
                     }
                     $titleReadonlyAttr = $isPublicWorkspaceReadonly ? ' readonly' : '';
-                    echo '<h4><input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
+                    $titleNoteIcon = '';
+                    if (!empty($show_note_icons_setting)) {
+                        $noteIconRaw = !empty($row['icon']) ? $row['icon'] : '';
+                        $noteIconColor = !empty($row['icon_color']) ? (string)$row['icon_color'] : '';
+                        $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon');
+                    }
+                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)
                     $created_display = '';
                     if (!empty($created_clean)) {

@@ -317,6 +317,12 @@ a.links_arbo_left.dragging,
     -webkit-user-drag: none;
 }
 
+/* Keep note icons clickable even though the title text is ignored for drag handling. */
+.links_arbo_left[draggable="true"] .note-title .note-icon {
+    pointer-events: auto;
+    -webkit-user-drag: none;
+}
+
 /* Re-enable pointer events for the link itself */
 .links_arbo_left[draggable="true"] {
     pointer-events: auto;

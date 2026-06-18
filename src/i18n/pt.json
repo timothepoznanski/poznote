@@ -66,7 +66,8 @@
     "scroll_bottom": "Ir para o fim da nota",
     "outline": {
       "title": "Sumário",
-      "no_headings": "Sem títulos nesta nota"
+      "no_headings": "Sem títulos nesta nota",
+      "unavailable_tasklist": "O sumário não está disponível para listas de tarefas"
     },
     "link_copied": "Link copiado"
   },
@@ -647,7 +648,11 @@
     "actions": "Ações da lista de tarefas",
     "uncheck_all": "Desmarcar todas as tarefas",
     "no_checked_tasks": "Nenhuma tarefa marcada para desmarcar.",
-    "confirm_uncheck_all": "Desmarcar {{count}} tarefa(s)?"
+    "confirm_uncheck_all": "Desmarcar {{count}} tarefa(s)?",
+    "edit_task": "Editar tarefa",
+    "edit_text_label": "Texto da tarefa",
+    "edit_hint": "Enter adiciona uma nova linha. Ctrl+Enter salva.",
+    "edit_empty_error": "O texto da tarefa não pode ficar vazio."
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",
@@ -1014,8 +1019,11 @@
     },
     "folder_icon": {
       "title": "Alterar ícone da pasta",
+      "default_icon": "Definir ícone padrão",
       "reset": "Restaurar comportamento padrão",
-      "search_placeholder": "Pesquisar ícones..."
+      "search_placeholder": "Pesquisar ícones...",
+      "gray": "Cinza",
+      "black": "Preto"
     },
     "linked_selector": {
       "title": "Criar um atalho a partir de uma nota",

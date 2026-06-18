@@ -577,6 +577,16 @@
                 }
                 break;
 
+            case 'open-note-icon-picker':
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                var noteIdForIcon = actionElement.getAttribute('data-note-id');
+                var noteTitleForIcon = actionElement.getAttribute('data-note-title') || '';
+                if (noteIdForIcon && typeof window.showChangeNoteIconModal === 'function') {
+                    window.showChangeNoteIconModal(noteIdForIcon, noteTitleForIcon);
+                }
+                break;
+
             case 'load-note':
                 event.preventDefault(); // Always prevent default navigation
                 

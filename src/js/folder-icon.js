@@ -48,6 +48,63 @@ const FOLDER_ICONS = [
     'lucide-clipboard',
     'lucide-file-text',
     'lucide-copy',
+    'lucide-file',
+    'lucide-file-alt',
+    'lucide-file-image',
+    'lucide-file-video',
+    'lucide-file-plus',
+    'lucide-file-minus',
+    'lucide-sticky-note',
+    'lucide-newspaper',
+    'lucide-paperclip',
+    'lucide-table',
+    'lucide-grid',
+    'lucide-layout-dashboard',
+    'lucide-layout-list',
+    'lucide-heading',
+    'lucide-pilcrow',
+    'lucide-quote',
+    'lucide-type',
+    'lucide-folder-closed',
+    'lucide-folder-open',
+    'lucide-folder-plus',
+    'lucide-folder-minus',
+    'lucide-folder-output',
+    'lucide-app-window',
+    'lucide-smartphone',
+    'lucide-chrome',
+    'lucide-github',
+    'lucide-git-fork',
+    'lucide-git-merge',
+    'lucide-git-pull-request',
+    'lucide-laptop-code',
+    'lucide-code-branch',
+    'lucide-message-square',
+    'lucide-alert-circle',
+    'lucide-alert-triangle',
+    'lucide-ban',
+    'lucide-info',
+    'lucide-check-circle',
+    'lucide-circle-dot',
+    'lucide-target',
+    'lucide-crosshair',
+    'lucide-scan',
+    'lucide-qr-code',
+    'lucide-barcode',
+    'lucide-ribbon',
+    'lucide-diamond',
+    'lucide-triangle',
+    'lucide-square',
+    'lucide-circle',
+    'lucide-battery',
+    'lucide-volume-1',
+    'lucide-volume-2',
+    'lucide-volume-x',
+    'lucide-lock-open',
+    'lucide-unlock',
+    'lucide-history',
+    'lucide-share-2',
+    'lucide-save-all',
     'lucide-gamepad-2',
     'lucide-trophy',
     'lucide-gift',
@@ -188,6 +245,9 @@ const FOLDER_ICONS = [
     'lucide-columns'
 ];
 
+const DEFAULT_NOTE_ICON = 'lucide-file-text';
+
+let currentIconTargetType = 'folder';
 let currentFolderIdForIcon = null;
 let currentFolderNameForIcon = null;
 let selectedIconClass = null;
@@ -304,8 +364,20 @@ function getIconTranslation(iconClass) {
  * Show the folder icon selection modal
  */
 function showChangeFolderIconModal(folderId, folderName) {
-    currentFolderIdForIcon = folderId;
-    currentFolderNameForIcon = folderName;
+    showChangeIconModal('folder', folderId, folderName);
+}
+
+/**
+ * Show the note icon selection modal using the same modal as folders.
+ */
+function showChangeNoteIconModal(noteId, noteTitle) {
+    showChangeIconModal('note', noteId, noteTitle);
+}
+
+function showChangeIconModal(targetType, targetId, targetName) {
+    currentIconTargetType = targetType === 'note' ? 'note' : 'folder';
+    currentFolderIdForIcon = targetId;
+    currentFolderNameForIcon = targetName;
     // '' means: use default folder icon (toggle open/closed). null means: not initialized.
     selectedIconClass = null;
     selectedIconColor = '';
@@ -321,14 +393,19 @@ function showChangeFolderIconModal(folderId, folderName) {
     iconGrid.innerHTML = '';
 
     // Get the current folder icon and color (if any)
-    const folderElement = document.querySelector(`[data-folder-id="${folderId}"] .folder-icon`);
+    const folderElement = currentIconTargetType === 'note'
+        ? document.querySelector(`.note-icon[data-note-id="${targetId}"]`)
+        : document.querySelector(`[data-folder-id="${targetId}"] .folder-icon`);
     let currentIcon = null;
     let currentColor = '';
     if (folderElement) {
-        for (let iconClass of FOLDER_ICONS) {
-            if (folderElement.classList.contains(iconClass)) {
-                currentIcon = iconClass;
-                break;
+        const usesDefaultIcon = folderElement.getAttribute('data-custom-icon') === 'false';
+        if (!usesDefaultIcon) {
+            for (let iconClass of FOLDER_ICONS) {
+                if (folderElement.classList.contains(iconClass)) {
+                    currentIcon = iconClass;
+                    break;
+                }
             }
         }
         // Get current color from data attribute or inline style
@@ -354,7 +431,7 @@ function showChangeFolderIconModal(folderId, folderName) {
 
     const defaultIcon = document.createElement('i');
     // Use the same base class style as existing UI (no need to add "fas")
-    defaultIcon.className = 'lucide-folder';
+    defaultIcon.className = currentIconTargetType === 'note' ? DEFAULT_NOTE_ICON : 'lucide-folder';
     defaultIconItem.appendChild(defaultIcon);
 
     defaultIconItem.addEventListener('click', function () {
@@ -508,6 +585,7 @@ function closeFolderIconModal() {
     if (modal) {
         modal.style.display = 'none';
     }
+    currentIconTargetType = 'folder';
     currentFolderIdForIcon = null;
     currentFolderNameForIcon = null;
     selectedIconClass = null;
@@ -521,8 +599,13 @@ function saveFolderIcon() {
     // selectedIconClass can be '' to keep the default toggle icon
     if (!currentFolderIdForIcon || selectedIconClass === null) return;
 
+    const isNoteIcon = currentIconTargetType === 'note';
+    const endpoint = isNoteIcon
+        ? '/api/v1/notes/' + currentFolderIdForIcon + '/icon'
+        : '/api/v1/folders/' + currentFolderIdForIcon + '/icon';
+
     // Send request to API
-    fetch('/api/v1/folders/' + currentFolderIdForIcon + '/icon', {
+    fetch(endpoint, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -537,24 +620,32 @@ function saveFolderIcon() {
         .then(data => {
             if (data.success) {
                 // Update the icon in the UI
-                updateFolderIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);
+                if (isNoteIcon) {
+                    updateNoteIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);
+                } else {
+                    updateFolderIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);
+                }
 
                 // Close modal
                 closeFolderIconModal();
 
                 // Show success notification
                 if (typeof window.showNotification === 'function') {
-                    window.showNotification(window.i18n?.t('notifications.folder_icon_updated') || 'Folder icon updated successfully', 'success');
+                    const fallbackMessage = isNoteIcon ? 'Note icon updated successfully' : 'Folder icon updated successfully';
+                    const message = window.t
+                        ? window.t(isNoteIcon ? 'notifications.note_icon_updated' : 'notifications.folder_icon_updated', null, fallbackMessage)
+                        : fallbackMessage;
+                    window.showNotification(message, 'success');
                 }
             } else {
-                console.error('Failed to update folder icon:', data.message);
+                console.error('Failed to update icon:', data.message);
                 if (typeof window.showNotification === 'function') {
                     window.showNotification(data.message || (window.i18n?.t('notifications.error') || 'An error occurred'), 'error');
                 }
             }
         })
         .catch(error => {
-            console.error('Error updating folder icon:', error);
+            console.error('Error updating icon:', error);
             if (typeof window.showNotification === 'function') {
                 window.showNotification(window.i18n?.t('notifications.error') || 'An error occurred', 'error');
             }
@@ -567,8 +658,13 @@ function saveFolderIcon() {
 function resetFolderIcon() {
     if (!currentFolderIdForIcon) return;
 
+    const isNoteIcon = currentIconTargetType === 'note';
+    const endpoint = isNoteIcon
+        ? '/api/v1/notes/' + currentFolderIdForIcon + '/icon'
+        : '/api/v1/folders/' + currentFolderIdForIcon + '/icon';
+
     // Send request to API to clear icon
-    fetch('/api/v1/folders/' + currentFolderIdForIcon + '/icon', {
+    fetch(endpoint, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -583,17 +679,21 @@ function resetFolderIcon() {
         .then(data => {
             if (data.success) {
                 // Update the icon in the UI (default toggle + default color)
-                updateFolderIconInUI(currentFolderIdForIcon, '', '');
+                if (isNoteIcon) {
+                    updateNoteIconInUI(currentFolderIdForIcon, '', '');
+                } else {
+                    updateFolderIconInUI(currentFolderIdForIcon, '', '');
+                }
                 closeFolderIconModal();
             } else {
-                console.error('Failed to reset folder icon:', data.message);
+                console.error('Failed to reset icon:', data.message);
                 if (typeof window.showNotification === 'function') {
                     window.showNotification(data.message || (window.i18n?.t('notifications.error') || 'An error occurred'), 'error');
                 }
             }
         })
         .catch(error => {
-            console.error('Error resetting folder icon:', error);
+            console.error('Error resetting icon:', error);
             if (typeof window.showNotification === 'function') {
                 window.showNotification(window.i18n?.t('notifications.error') || 'An error occurred', 'error');
             }
@@ -665,8 +765,37 @@ function updateFolderIconInUI(folderId, iconClass, iconColor) {
     });
 }
 
+/**
+ * Update note icon in the sidebar UI.
+ */
+function updateNoteIconInUI(noteId, iconClass, iconColor) {
+    const noteIcons = document.querySelectorAll(`.note-icon[data-note-id="${noteId}"]`);
+    if (noteIcons.length === 0) {
+        return;
+    }
+
+    noteIcons.forEach(noteIconElement => {
+        const allIconsToRemove = [...FOLDER_ICONS, DEFAULT_NOTE_ICON, 'lucide-file-text'];
+        allIconsToRemove.forEach(icon => {
+            noteIconElement.classList.remove(icon);
+        });
+
+        noteIconElement.classList.add(iconClass || DEFAULT_NOTE_ICON);
+        noteIconElement.setAttribute('data-custom-icon', iconClass ? 'true' : 'false');
+
+        if (iconColor) {
+            noteIconElement.style.setProperty('color', iconColor, 'important');
+            noteIconElement.setAttribute('data-icon-color', iconColor);
+        } else {
+            noteIconElement.style.removeProperty('color');
+            noteIconElement.removeAttribute('data-icon-color');
+        }
+    });
+}
+
 // Export functions to window
 window.showChangeFolderIconModal = showChangeFolderIconModal;
+window.showChangeNoteIconModal = showChangeNoteIconModal;
 window.closeFolderIconModal = closeFolderIconModal;
 window.resetFolderIcon = resetFolderIcon;
 
@@ -677,6 +806,11 @@ document.addEventListener('DOMContentLoaded', function () {
     closeButtons.forEach(button => {
         button.addEventListener('click', closeFolderIconModal);
     });
+
+    const resetButton = document.getElementById('resetFolderIconBtn');
+    if (resetButton) {
+        resetButton.addEventListener('click', resetFolderIcon);
+    }
 
     // Close modal when clicking outside
     const modal = document.getElementById('folderIconModal');

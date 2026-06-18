@@ -38,7 +38,25 @@ body:not(.show-note-created) .note-sub-sep {
     margin: 0 0 8px 0;
 }
 
+.innernote .note-title-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .innernote h4 .css-title {
     width: 100%;
     box-sizing: border-box;
+}
+
+.innernote .note-title-heading .css-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+}
+
+.innernote .note-title-heading .note-title-icon {
+    flex: 0 0 auto;
+    font-size: 20px;
+    margin: 15px 0 20px 0;
 }

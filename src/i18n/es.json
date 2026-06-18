@@ -68,7 +68,8 @@
     "scroll_bottom": "Ir al final de la nota",
     "outline": {
       "title": "Esquema",
-      "no_headings": "Sin encabezados en esta nota"
+      "no_headings": "Sin encabezados en esta nota",
+      "unavailable_tasklist": "El esquema no está disponible para listas de tareas"
     },
     "link_copied": "Enlace copiado"
   },
@@ -649,7 +650,11 @@
     "actions": "Acciones de lista de tareas",
     "uncheck_all": "Desmarcar todas las tareas",
     "no_checked_tasks": "No hay tareas marcadas para desmarcar.",
-    "confirm_uncheck_all": "¿Desmarcar {{count}} tarea(s)?"
+    "confirm_uncheck_all": "¿Desmarcar {{count}} tarea(s)?",
+    "edit_task": "Editar tarea",
+    "edit_text_label": "Texto de la tarea",
+    "edit_hint": "Enter añade una nueva línea. Ctrl+Enter guarda.",
+    "edit_empty_error": "El texto de la tarea no puede estar vacío."
   },
   "tags": {
     "add_single": "Agregar etiqueta...",
@@ -1015,8 +1020,11 @@
     },
     "folder_icon": {
       "title": "Cambiar icono de carpeta",
+      "default_icon": "Establecer icono predeterminado",
       "reset": "Restaurar el comportamiento predeterminado",
-      "search_placeholder": "Buscar iconos..."
+      "search_placeholder": "Buscar iconos...",
+      "gray": "Gris",
+      "black": "Negro"
     },
     "linked_selector": {
       "title": "Crear un atajo de una nota",

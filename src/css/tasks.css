@@ -148,6 +148,7 @@
     font-size: var(--note-font-size, 15px);
     line-height: 1.4;
     cursor: text;
+    white-space: pre-wrap;
     /* Ensure very long words/URLs wrap to next line to avoid overflowing the container */
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -187,6 +188,70 @@
     white-space: pre-wrap;
     /* preserve user line breaks but allow wrapping */
     overflow-wrap: anywhere;
+}
+
+.task-edit-modal-content {
+    width: min(92vw, 720px);
+    max-width: 720px;
+}
+
+.task-edit-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.task-edit-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: inherit;
+}
+
+.task-edit-textarea {
+    width: 100%;
+    min-height: 240px;
+    max-height: 60vh;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: var(--note-font-size, 15px);
+    font-family: inherit;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.task-edit-textarea:focus {
+    border-color: #007DB8;
+    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.1);
+}
+
+.task-edit-hint {
+    margin: 0;
+    color: #6c757d;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.task-edit-error {
+    display: none;
+    margin: 0;
+    color: #d32f2f;
+    font-size: 13px;
+    line-height: 1.35;
+}
+
+@media (max-width: 600px) {
+    .task-edit-modal-content {
+        width: 94vw;
+        padding: 20px;
+    }
+
+    .task-edit-textarea {
+        min-height: 45vh;
+    }
 }
 
 .task-delete-btn {

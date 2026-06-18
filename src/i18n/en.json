@@ -45,7 +45,8 @@
     "scroll_bottom": "Scroll to bottom",
     "outline": {
       "title": "Outline",
-      "no_headings": "No headings in this note"
+      "no_headings": "No headings in this note",
+      "unavailable_tasklist": "Outline is not available for task lists"
     },
     "link_copied": "Link copied"
   },
@@ -211,6 +212,7 @@
       "timezone": "Timezone",
       "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",
+      "show_note_icons": "Show note icons",
       "show_folder_counts": "Show folder note counts",
       "notes_without_folders_after": "Show notes after folders",
       "show_folder_actions": "Show folder actions",
@@ -240,7 +242,11 @@
     "insert_order_top": "Top",
     "insert_order_bottom": "Bottom",
     "clear_completed": "Clear completed tasks",
-    "no_completed_tasks": "No completed tasks to clear."
+    "no_completed_tasks": "No completed tasks to clear.",
+    "edit_task": "Edit task",
+    "edit_text_label": "Task text",
+    "edit_hint": "Enter adds a new line. Ctrl+Enter saves.",
+    "edit_empty_error": "Task text cannot be empty."
   },
   "tags": {
     "add_single": "Add tag...",
@@ -596,8 +602,11 @@
     },
     "folder_icon": {
       "title": "Change Folder Icon",
+      "default_icon": "Set default icon",
       "reset": "Restore default behavior",
-      "search_placeholder": "Search icons..."
+      "search_placeholder": "Search icons...",
+      "gray": "Gray",
+      "black": "Black"
     },
     "linked_selector": {
       "title": "Create a Shortcut from a Note",
@@ -754,6 +763,7 @@
       "delete_folder": "Delete folder",
       "move_folder": "Move folder",
       "change_icon": "Change icon",
+      "change_note_icon": "Change note icon",
       "download_folder": "Download",
       "is_public": "Is shared",
       "share_folder": "Share",

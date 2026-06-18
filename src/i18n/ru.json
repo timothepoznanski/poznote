@@ -45,7 +45,8 @@
     "scroll_bottom": "Перейти к концу заметки",
     "outline": {
       "title": "Оглавление",
-      "no_headings": "В этой заметке нет заголовков"
+      "no_headings": "В этой заметке нет заголовков",
+      "unavailable_tasklist": "Оглавление недоступно для списков задач"
     },
     "link_copied": "Ссылка скопирована"
   },
@@ -240,7 +241,11 @@
     "insert_order_top": "В начало",
     "insert_order_bottom": "В конец",
     "clear_completed": "Очистить выполненные задачи",
-    "no_completed_tasks": "Нет выполненных задач для удаления."
+    "no_completed_tasks": "Нет выполненных задач для удаления.",
+    "edit_task": "Редактировать задачу",
+    "edit_text_label": "Текст задачи",
+    "edit_hint": "Enter добавляет новую строку. Ctrl+Enter сохраняет.",
+    "edit_empty_error": "Текст задачи не может быть пустым."
   },
   "tags": {
     "add_single": "Добавить тег...",
@@ -589,8 +594,11 @@
     },
     "folder_icon": {
       "title": "Изменить иконку папки",
+      "default_icon": "Установить иконку по умолчанию",
       "reset": "Восстановить поведение по умолчанию",
-      "search_placeholder": "Поиск иконок..."
+      "search_placeholder": "Поиск иконок...",
+      "gray": "Серый",
+      "black": "Черный"
     },
     "linked_selector": {
       "title": "Создать ярлык из заметки",

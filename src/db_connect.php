@@ -169,6 +169,8 @@ try {
         favorite INTEGER DEFAULT 0,
         attachments TEXT,
         type TEXT DEFAULT "note",
+        icon TEXT,
+        icon_color TEXT,
         created_by_user_id INTEGER,
         updated_by_user_id INTEGER
     )');
@@ -261,7 +263,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 14;
+    $CURRENT_SCHEMA_VERSION = 15;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -285,6 +287,12 @@ try {
             }
             if (!in_array('type', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN type TEXT DEFAULT 'note'");
+            }
+            if (!in_array('icon', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN icon TEXT");
+            }
+            if (!in_array('icon_color', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN icon_color TEXT");
             }
             if (!in_array('created_by_user_id', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN created_by_user_id INTEGER");
@@ -456,6 +464,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
@@ -469,8 +478,9 @@ try {
 
     try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
     } catch (Exception $e) {
-        error_log('Could not ensure attachment preview setting: ' . $e->getMessage());
+        error_log('Could not ensure display settings: ' . $e->getMessage());
     }
 
     // Always ensure reminder email delivery columns exist for databases created before SMTP reminders.

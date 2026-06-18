@@ -618,6 +618,23 @@ try {
     </div>
 </div>
 
+<!-- Edit Task Modal -->
+<div id="taskEditModal" class="modal">
+    <div class="modal-content task-edit-modal-content">
+        <h3><?php echo t_h('tasklist.edit_task', [], 'Edit task'); ?></h3>
+        <div class="modal-body task-edit-modal-body">
+            <label for="taskEditTextarea" class="task-edit-label"><?php echo t_h('tasklist.edit_text_label', [], 'Task text'); ?></label>
+            <textarea id="taskEditTextarea" class="task-edit-textarea" maxlength="4000" aria-describedby="taskEditHint taskEditError"></textarea>
+            <p id="taskEditHint" class="task-edit-hint"><?php echo t_h('tasklist.edit_hint', [], 'Enter adds a new line. Ctrl+Enter saves.'); ?></p>
+            <p id="taskEditError" class="task-edit-error" role="alert"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="cancelTaskEditBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveTaskEditBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Move Task Modal -->
 <div id="moveTaskModal" class="modal">
     <div class="modal-content">
@@ -957,12 +974,19 @@ try {
                 <div class="folder-color-option" data-color="#64748b" title="<?php echo t_h('modals.folder_icon.slate', [], 'Slate'); ?>">
                     <div class="folder-color-swatch" style="background-color: #64748b;"></div>
                 </div>
+                <div class="folder-color-option" data-color="#6b7280" title="<?php echo t_h('modals.folder_icon.gray', [], 'Gray'); ?>">
+                    <div class="folder-color-swatch" style="background-color: #6b7280;"></div>
+                </div>
                 <div class="folder-color-option" data-color="#78716c" title="<?php echo t_h('modals.folder_icon.stone', [], 'Stone'); ?>">
                     <div class="folder-color-swatch" style="background-color: #78716c;"></div>
+                </div>
+                <div class="folder-color-option" data-color="#111827" title="<?php echo t_h('modals.folder_icon.black', [], 'Black'); ?>">
+                    <div class="folder-color-swatch" style="background-color: #111827;"></div>
                 </div>
             </div>
         </div>
         <div class="modal-buttons">
+            <button type="button" class="btn-secondary" id="resetFolderIconBtn"><?php echo t_h('modals.folder_icon.default_icon', [], 'Set default icon'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-folder-icon-modal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="applyFolderIconBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
         </div>
@@ -1230,6 +1254,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:show-created-card" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-icons-card" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-counts-card" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>

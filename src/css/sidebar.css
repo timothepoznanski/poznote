@@ -459,6 +459,18 @@
     opacity: 0.8;
 }
 
+.note-icon {
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-right: 5px;
+    vertical-align: -0.08em;
+}
+
+.note-icon:hover {
+    transform: scale(1.15);
+    color: #007DB8 !important;
+}
+
 /* Notes without folder - indent to align with folder items */
 .links_arbo_left.note-without-folder {
     margin-left: 0px !important;

@@ -830,13 +830,24 @@ function updateNoteTitleInLeftColumn() {
 function updateTitleInElement(linkElement, newTitle) {
     var titleSpan = linkElement.querySelector('.note-title');
     if (titleSpan) {
-        // Check if there's an icon (for linked notes) and preserve it
-        var icon = titleSpan.querySelector('.note-type-icon-inline');
-        if (icon) {
-            // Clear content but keep the icon
+        // Preserve inline icons (note icon and linked-note marker) when replacing the title text.
+        var icons = titleSpan.querySelectorAll('.note-icon, .note-type-icon-inline');
+        if (icons.length > 0) {
+            var iconClones = [];
+            icons.forEach(function (icon) {
+                var clone = icon.cloneNode(true);
+                if (clone.classList && clone.classList.contains('note-icon')) {
+                    clone.setAttribute('data-note-title', newTitle);
+                }
+                iconClones.push(clone);
+            });
+
             titleSpan.textContent = '';
-            titleSpan.appendChild(icon.cloneNode(true));
-            titleSpan.appendChild(document.createTextNode(' ' + newTitle));
+            iconClones.forEach(function (iconClone) {
+                titleSpan.appendChild(iconClone);
+                titleSpan.appendChild(document.createTextNode(' '));
+            });
+            titleSpan.appendChild(document.createTextNode(newTitle));
         } else {
             titleSpan.textContent = newTitle;
         }

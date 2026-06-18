@@ -89,6 +89,7 @@
         var keys = [
             'language',
             'show_note_created',
+            'show_note_icons',
             'hide_folder_counts',
             'hide_folder_actions',
             'notes_without_folders_after_folders',
@@ -1034,6 +1035,7 @@
 
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
+        setupToggleCard('note-icons-card', 'note-icons-status', 'show_note_icons', false, false);
         setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
