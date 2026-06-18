@@ -1025,8 +1025,11 @@
     },
     "folder_icon": {
       "title": "更改文件夹图标",
+      "default_icon": "设置默认图标",
       "reset": "恢复默认行为",
-      "search_placeholder": "搜索图标..."
+      "search_placeholder": "搜索图标...",
+      "gray": "灰色",
+      "black": "黑色"
     },
     "linked_selector": {
       "title": "从笔记创建快捷方式",

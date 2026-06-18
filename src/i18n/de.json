@@ -1015,8 +1015,11 @@
     },
     "folder_icon": {
       "title": "Ordnersymbol ändern",
+      "default_icon": "Standardsymbol festlegen",
       "reset": "Standardverhalten wiederherstellen",
-      "search_placeholder": "Symbole suchen..."
+      "search_placeholder": "Symbole suchen...",
+      "gray": "Grau",
+      "black": "Schwarz"
     },
     "linked_selector": {
       "title": "Verknüpfung aus einer Notiz erstellen",

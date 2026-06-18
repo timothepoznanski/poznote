@@ -565,6 +565,7 @@
       "timezone": "Fuseau horaire",
       "date_time_format": "Format date et heure",
       "show_note_created": "Afficher la date de création",
+      "show_note_icons": "Afficher les icônes des notes",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
       "show_folder_actions": "Afficher les actions de dossier",
@@ -1046,8 +1047,11 @@
     },
     "folder_icon": {
       "title": "Changer l'icône du dossier",
+      "default_icon": "Définir l'icône par défaut",
       "reset": "Reset",
       "search_placeholder": "Rechercher des icônes...",
+      "gray": "Gris",
+      "black": "Noir",
       "default": "Par défaut"
     },
     "linked_selector": {
@@ -1217,6 +1221,7 @@
       "delete_folder": "Supprimer le dossier",
       "download_folder": "Télécharger",
       "change_icon": "Changer l'icône",
+      "change_note_icon": "Changer l'icône de la note",
       "is_public": "Est partagé",
       "share_folder": "Partager",
       "tabs_not_available": "Les onglets ne sont pas disponibles sur les appareils mobiles",

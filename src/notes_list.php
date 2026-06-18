@@ -89,6 +89,73 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
 /**
  * Recursive function to display folders and their subfolders
  */
+function buildSidebarNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
+    $converted = !empty($iconClass) ? convertFontAwesomeToLucide($iconClass) : $defaultIcon;
+    $converted = trim((string)($converted ?: $defaultIcon));
+    $classes = preg_split('/\s+/', $converted);
+    $hasLucideBase = in_array('lucide', $classes, true);
+    $hasLucideIcon = false;
+
+    foreach ($classes as $class) {
+        if (strpos($class, 'lucide-') === 0) {
+            $hasLucideIcon = true;
+            break;
+        }
+    }
+
+    if (!$hasLucideBase) {
+        array_unshift($classes, 'lucide');
+    }
+    if (!$hasLucideIcon) {
+        $classes[] = $defaultIcon;
+    }
+
+    return implode(' ', array_unique(array_filter($classes)));
+}
+
+function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
+    global $show_note_icons_setting;
+
+    $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
+    $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
+    $noteTitle = translateDefaultNoteTitle($noteTitle);
+
+    $noteIcon = '';
+    if (!empty($show_note_icons_setting)) {
+        $noteIconRaw = !empty($row1['icon']) ? $row1['icon'] : 'lucide-file-text';
+        $hasCustomNoteIcon = !empty($row1['icon']);
+        $noteIconClass = buildSidebarNoteIconClass($noteIconRaw);
+        $noteIconColor = !empty($row1['icon_color']) ? (string)$row1['icon_color'] : '';
+        $iconStyle = $noteIconColor ? " style='color: " . htmlspecialchars($noteIconColor, ENT_QUOTES) . " !important;'" : "";
+        $iconColorAttr = $noteIconColor ? " data-icon-color='" . htmlspecialchars($noteIconColor, ENT_QUOTES) . "'" : "";
+        $changeIconTitle = t_h('notes_list.folder_actions.change_note_icon', [], 'Change note icon');
+        $noteIcon = "<i class='" . htmlspecialchars($noteIconClass, ENT_QUOTES) . " note-icon note-list-click-action' data-custom-icon='" . ($hasCustomNoteIcon ? 'true' : 'false') . "' data-action='open-note-icon-picker' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-title='" . htmlspecialchars($noteTitle, ENT_QUOTES) . "'$iconColorAttr title='" . $changeIconTitle . "'$iconStyle></i> ";
+    }
+
+    $noteTypeIcon = '';
+    $noteType = $row1['type'] ?? 'note';
+    $linkedNoteIdAttr = '';
+    if ($noteType === 'linked') {
+        $noteTypeIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
+        if (!empty($row1['linked_note_id'])) {
+            $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
+        }
+    }
+
+    $htmlFolderId = htmlspecialchars((string)$folderId, ENT_QUOTES);
+    $htmlFolderName = htmlspecialchars((string)$folderName, ENT_QUOTES);
+    $htmlNoteType = htmlspecialchars($noteType, ENT_QUOTES);
+    $htmlCreated = htmlspecialchars($row1['created'] ?? '', ENT_QUOTES);
+    $htmlUpdated = htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES);
+
+    echo "<div class='note-list-item'>";
+    echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
+    echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
+    echo "</a>";
+    echo "</div>";
+    echo "<div id=pxbetweennotes></div>";
+}
+
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true, $created_from = '', $created_to = '') {
     global $selected_linked_note_id;
     $folderName = $folderData['name'];
@@ -185,30 +252,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             
             $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
-            $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
-            
-            // Translate default note titles stored in any supported language.
-            $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
-            $noteTitle = translateDefaultNoteTitle($noteTitle);
-            
-            // Add icon for linked notes
-            $noteIcon = '';
-            $noteType = $row1['type'] ?? 'note';
-            $linkedNoteIdAttr = '';
-            if ($noteType === 'linked') {
-                $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
-                // Add the linked_note_id attribute if available
-                if (!empty($row1['linked_note_id'])) {
-                    $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
-                }
-            }
-            
-            echo "<div class='note-list-item'>";
-            echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-            echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
-            echo "</a>";
-            echo "</div>";
-            echo "<div id=pxbetweennotes></div>";
+            renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName);
         }
     }
     
@@ -229,30 +273,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             
             $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
-            $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
-            
-            // Translate default note titles stored in any supported language.
-            $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
-            $noteTitle = translateDefaultNoteTitle($noteTitle);
-            
-            // Add icon for linked notes
-            $noteIcon = '';
-            $noteType = $row1['type'] ?? 'note';
-            $linkedNoteIdAttr = '';
-            if ($noteType === 'linked') {
-                $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
-                // Add the linked_note_id attribute if available
-                if (!empty($row1['linked_note_id'])) {
-                    $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
-                }
-            }
-            
-            echo "<div class='note-list-item'>";
-            echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='$folderId' data-folder='$folderName' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-            echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
-            echo "</a>";
-            echo "</div>";
-            echo "<div id=pxbetweennotes></div>";
+            renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName);
         }
     }
     
@@ -339,28 +360,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
         
         $noteClass = 'links_arbo_left note-without-folder';
-        $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
-        
-        // Add icon for linked notes
-        $noteIcon = '';
-        $noteType = $row1['type'] ?? 'note';
-        $linkedNoteIdAttr = '';
-        if ($noteType === 'linked') {
-            $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
-            // Add the linked_note_id attribute if available
-            if (!empty($row1['linked_note_id'])) {
-                $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
-            }
-        }
-
-        $noteTitle = translateDefaultNoteTitle($row1["heading"] ?: t('index.note.new_note', [], 'New note'));
-        
-        echo "<div class='note-list-item'>";
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
-        echo "</a>";
-        echo "</div>";
-        echo "<div id=pxbetweennotes></div>";
+        renderNoteListItem($row1, $noteClass, $isSelected, $link, '', '');
     }
 }
 
@@ -378,28 +378,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
         
         $noteClass = 'links_arbo_left note-without-folder';
-        $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
-        
-        // Add icon for linked notes
-        $noteIcon = '';
-        $noteType = $row1['type'] ?? 'note';
-        $linkedNoteIdAttr = '';
-        if ($noteType === 'linked') {
-            $noteIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
-            // Add the linked_note_id attribute if available
-            if (!empty($row1['linked_note_id'])) {
-                $linkedNoteIdAttr = " data-linked-note-id='" . intval($row1['linked_note_id']) . "'";
-            }
-        }
-
-        $noteTitle = translateDefaultNoteTitle($row1["heading"] ?: t('index.note.new_note', [], 'New note'));
-        
-        echo "<div class='note-list-item'>";
-        echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . $noteDbId . "' data-note-db-id='" . $noteDbId . "' data-note-type='" . htmlspecialchars($noteType, ENT_QUOTES) . "'" . $linkedNoteIdAttr . " data-folder-id='' data-folder='' data-created='" . htmlspecialchars($row1['created'] ?? '', ENT_QUOTES) . "' data-updated='" . htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES) . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-        echo "<span class='note-title'>" . $noteIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
-        echo "</a>";
-        echo "</div>";
-        echo "<div id=pxbetweennotes></div>";
+        renderNoteListItem($row1, $noteClass, $isSelected, $link, '', '');
     }
 }
 ?>

@@ -48,6 +48,11 @@ body.public-workspace-readonly .kanban-inline-view .folder-icon[data-action="ope
     pointer-events: none !important;
 }
 
+body.public-workspace-readonly .note-icon[data-action="open-note-icon-picker"] {
+    cursor: default !important;
+    pointer-events: none !important;
+}
+
 body.public-workspace-readonly .code-block-copy-btn {
     right: 8px !important;
 }

@@ -95,6 +95,7 @@ $settingsPageUserKeys = [
     'emoji_icons_enabled',
     'language',
     'show_note_created',
+    'show_note_icons',
     'hide_folder_counts',
     'hide_folder_actions',
     'notes_without_folders_after_folders',
@@ -493,6 +494,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span>
                     <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Show Note Icons -->
+            <div class="home-card" id="note-icons-card">
+                <div class="home-card-icon"><i class="lucide lucide-file-text"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span>
+                    <span id="note-icons-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

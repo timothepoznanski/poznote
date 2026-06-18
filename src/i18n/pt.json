@@ -1014,8 +1014,11 @@
     },
     "folder_icon": {
       "title": "Alterar ícone da pasta",
+      "default_icon": "Definir ícone padrão",
       "reset": "Restaurar comportamento padrão",
-      "search_placeholder": "Pesquisar ícones..."
+      "search_placeholder": "Pesquisar ícones...",
+      "gray": "Cinza",
+      "black": "Preto"
     },
     "linked_selector": {
       "title": "Criar um atalho a partir de uma nota",

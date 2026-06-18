@@ -365,6 +365,11 @@ $router->put('/notes/{id}/tags', function($params) use ($notesController) {
     $notesController->updateTags($params['id']);
 });
 
+// Update note icon
+$router->put('/notes/{id}/icon', function($params) use ($notesController) {
+    $notesController->updateIcon($params['id']);
+});
+
 // Toggle favorite status for a note
 $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);

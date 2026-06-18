@@ -1004,6 +1004,8 @@ class GitSync {
                         if (isset($meta['attachments'])) { $setClauses[] = 'attachments = ?'; $params[] = $meta['attachments']; }
                         if (isset($meta['favorite']))    { $setClauses[] = 'favorite = ?';    $params[] = (int) $meta['favorite']; }
                         if (isset($meta['created']))     { $setClauses[] = 'created = ?';     $params[] = $meta['created']; }
+                        if (array_key_exists('icon', $meta))       { $setClauses[] = 'icon = ?';       $params[] = $meta['icon']; }
+                        if (array_key_exists('icon_color', $meta)) { $setClauses[] = 'icon_color = ?'; $params[] = $meta['icon_color']; }
                     };
 
                     foreach ($downloadedNotes as $note) {
@@ -1036,9 +1038,11 @@ class GitSync {
                             $favorite    = (int) ($meta['favorite'] ?? 0);
                             $created     = $meta['created']     ?? gmdate('Y-m-d H:i:s');
                             $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
+                            $icon        = $meta['icon']        ?? null;
+                            $iconColor   = $meta['icon_color']  ?? null;
                             $this->con->prepare(
-                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated]);
+                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated, $icon, $iconColor]);
                             $results['pulled']++;
                             $results['debug'][] = "  {$filename} → created (heading: {$heading})";
                         }
@@ -1073,9 +1077,11 @@ class GitSync {
                             $favorite    = (int) ($meta['favorite'] ?? 0);
                             $created     = $meta['created']     ?? gmdate('Y-m-d H:i:s');
                             $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
+                            $icon        = $meta['icon']        ?? null;
+                            $iconColor   = $meta['icon_color']  ?? null;
                             $this->con->prepare(
-                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated]);
+                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated, $icon, $iconColor]);
                             $results['pulled']++;
                         }
                     }
@@ -1458,7 +1464,7 @@ class GitSync {
 
         // Notes
         $stmt  = $this->con->query(
-            'SELECT id, heading, tags, folder_id, folder, workspace, type, attachments, favorite, created, updated FROM entries WHERE trash = 0'
+            'SELECT id, heading, tags, folder_id, folder, workspace, type, attachments, favorite, created, updated, icon, icon_color FROM entries WHERE trash = 0'
         );
         $notes = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -1473,6 +1479,8 @@ class GitSync {
                 'favorite'    => (int) ($row['favorite'] ?? 0),
                 'created'     => $row['created']      ?? null,
                 'updated'     => $row['updated']      ?? null,
+                'icon'        => $row['icon']         ?? null,
+                'icon_color'  => $row['icon_color']   ?? null,
             ];
         }
 
