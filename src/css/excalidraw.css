@@ -373,6 +373,18 @@ div[onclick*="openExcalidrawNote"] {
     overflow: hidden !important;
 }
 
+/* Excalidraw mounts dialogs in a body-level portal that also carries the
+   .excalidraw class. Keep the canvas sizing rules above from clipping it. */
+body.excalidraw-editor-page .excalidraw.excalidraw-modal-container {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: var(--excalidraw-viewport-height, 100vh) !important;
+    overflow: visible !important;
+    background: transparent !important;
+    z-index: 10050 !important;
+}
+
 /* Ensure the Excalidraw container handles touch */
 .excalidraw,
 .excalidraw .excalidraw-canvas-container,
