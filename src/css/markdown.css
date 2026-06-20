@@ -810,6 +810,10 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
     max-height: none !important;
 }
 
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host {
+    padding: 0 !important;
+}
+
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-editor,
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller {
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px));
