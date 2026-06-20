@@ -231,7 +231,7 @@ function markdownCompletionSource(context) {
   const isAtLineStart = linePrefix.trim() === ''
   const isSlashCommand = token.text.startsWith('/')
 
-  if (!context.explicit && !isSlashCommand) {
+  if (!context.explicit) {
     return null
   }
 
