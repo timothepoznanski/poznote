@@ -449,12 +449,12 @@ function replaceRange(host, start, end, replacement) {
   return true
 }
 
-function getCoordsAtPos(host, position) {
+function getCoordsAtPos(host, position, side = 1) {
   const instance = getInstance(host)
   if (!instance) return null
   const docLength = instance.view.state.doc.length
   const pos = Math.max(0, Math.min(position, docLength))
-  return instance.view.coordsAtPos(pos)
+  return instance.view.coordsAtPos(pos, side)
 }
 
 function scrollToPos(host, position, y = 'nearest') {
@@ -564,6 +564,18 @@ function createEditor(host, options = {}) {
   host.classList.add('markdown-codemirror-host')
 
   const updateListener = EditorView.updateListener.of(update => {
+    if (update.selectionSet) {
+      try {
+        host.dispatchEvent(new CustomEvent('markdown-selection-change', { bubbles: true }))
+      } catch (error) {
+        try {
+          host.dispatchEvent(new Event('markdown-selection-change', { bubbles: true }))
+        } catch (eventError) {
+          // Ignore synthetic event failures in older browsers.
+        }
+      }
+    }
+
     if (!update.docChanged) return
 
     const value = update.state.doc.toString()
