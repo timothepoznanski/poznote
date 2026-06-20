@@ -186,7 +186,8 @@ function handleTaskLinkClick(event) {
         event.stopPropagation();
     }
 
-    const link = event && event.currentTarget ? event.currentTarget : null;
+    // event.currentTarget is null for inline onclick attributes; use event.target.closest instead.
+    const link = event && event.target ? event.target.closest('a') : null;
     if (!link || !link.href) return false;
 
     window.open(link.href, '_blank', 'noopener,noreferrer');
@@ -473,11 +474,19 @@ function saveTaskEditFromModal() {
         return;
     }
 
+    const savedTaskId = taskEditState.taskId;
     if (newText !== taskEditState.originalText) {
         saveTaskEdit(taskEditState.taskId, taskEditState.noteId, newText);
     }
 
     closeTaskEditModal();
+
+    // Restore focus to the re-rendered task text span (saveTaskEdit replaced the old span).
+    const newTaskItem = savedTaskId !== null ? document.querySelector('[data-task-id="' + savedTaskId + '"]') : null;
+    const newTaskText = newTaskItem ? newTaskItem.querySelector('.task-text') : null;
+    if (newTaskText) {
+        newTaskText.focus({ preventScroll: true });
+    }
 }
 
 function attachTaskEditModalHandlers(modal) {

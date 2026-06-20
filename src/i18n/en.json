@@ -1110,6 +1110,11 @@
       "save": "Save"
     }
   },
+  "excalidraw": {
+    "messages": {
+      "use_desktop_mode_on_phone": "For a better user experience, Excalidraw editing is disabled on screens smaller than 800px. However, it should work if you switch your phone browser to Desktop mode."
+    }
+  },
   "image_menu": {
     "view_large": "Open",
     "download": "Download",

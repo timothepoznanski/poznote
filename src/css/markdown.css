@@ -68,9 +68,178 @@
     pointer-events: none;
 }
 
+.markdown-codemirror-host .markdown-excalidraw-placeholder {
+    width: 100%;
+    box-sizing: border-box;
+    vertical-align: top;
+}
+
 html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before,
 body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
     color: #b9c4cf;
+}
+
+.markdown-codemirror-host {
+    padding: 0;
+    white-space: normal;
+    --poznote-cm-keyword: #d73a49;
+    --poznote-cm-atom: #005cc5;
+    --poznote-cm-string: #032f62;
+    --poznote-cm-number: #005cc5;
+    --poznote-cm-comment: #6a737d;
+    --poznote-cm-function: #6f42c1;
+    --poznote-cm-variable: #24292e;
+    --poznote-cm-type: #22863a;
+    --poznote-cm-punctuation: #24292e;
+    --poznote-cm-meta: #005cc5;
+    --poznote-cm-heading: #005cc5;
+    --poznote-cm-link: #0366d6;
+    --poznote-cm-monospace: #6f42c1;
+    --poznote-cm-invalid: #b31d28;
+    --poznote-cm-invalid-bg: transparent;
+}
+
+.markdown-codemirror-host .cm-editor {
+    min-height: 100px;
+    height: auto;
+    background: transparent;
+    color: inherit;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: inherit;
+    line-height: inherit;
+    outline: none;
+}
+
+.markdown-codemirror-host .cm-editor.cm-focused {
+    outline: none;
+}
+
+.markdown-codemirror-host .cm-scroller {
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    font-family: inherit;
+}
+
+.markdown-codemirror-host .cm-scroller::-webkit-scrollbar {
+    display: none;
+}
+
+.markdown-codemirror-host .cm-content {
+    min-height: 100px;
+    padding: 10px 10px 24px;
+    caret-color: currentColor;
+}
+
+.markdown-codemirror-host .cm-line {
+    padding: 0;
+}
+
+.markdown-codemirror-host .cm-gutters {
+    display: none;
+}
+
+.markdown-codemirror-host .cm-activeLine {
+    background: rgba(0, 125, 184, 0.05);
+}
+
+.markdown-codemirror-host .cm-selectionBackground,
+.markdown-codemirror-host .cm-focused .cm-selectionBackground {
+    background: rgba(0, 125, 184, 0.22);
+}
+
+.markdown-codemirror-host .cm-placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+.markdown-codemirror-host .poznote-cm-keyword {
+    color: var(--poznote-cm-keyword) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-atom {
+    color: var(--poznote-cm-atom) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-string {
+    color: var(--poznote-cm-string) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-number {
+    color: var(--poznote-cm-number) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-comment {
+    color: var(--poznote-cm-comment) !important;
+    font-style: italic !important;
+}
+
+.markdown-codemirror-host .poznote-cm-function {
+    color: var(--poznote-cm-function) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-variable {
+    color: var(--poznote-cm-variable) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-type {
+    color: var(--poznote-cm-type) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-punctuation {
+    color: var(--poznote-cm-punctuation) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-meta {
+    color: var(--poznote-cm-meta) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-heading {
+    color: var(--poznote-cm-heading) !important;
+    font-weight: 700 !important;
+}
+
+.markdown-codemirror-host .poznote-cm-link {
+    color: var(--poznote-cm-link) !important;
+    text-decoration: underline !important;
+}
+
+.markdown-codemirror-host .poznote-cm-emphasis {
+    font-style: italic !important;
+}
+
+.markdown-codemirror-host .poznote-cm-strong {
+    font-weight: 700 !important;
+}
+
+.markdown-codemirror-host .poznote-cm-monospace {
+    color: var(--poznote-cm-monospace) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-strikethrough {
+    text-decoration: line-through !important;
+}
+
+.markdown-codemirror-host .poznote-cm-invalid {
+    background-color: var(--poznote-cm-invalid-bg) !important;
+    color: var(--poznote-cm-invalid) !important;
+}
+
+.cm-tooltip {
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+    overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.cm-tooltip-autocomplete ul {
+    max-height: 260px;
+}
+
+.cm-tooltip-autocomplete ul li[aria-selected] {
+    background: #007db8;
+    color: #fff;
 }
 
 body.slash-menu-cursor-hidden,
@@ -250,7 +419,7 @@ body.slash-menu-cursor-hidden * {
     max-width: 100%;
     height: auto;
     border-radius: 4px;
-    margin: 1em 0;
+    margin: 0;
 }
 
 .markdown-preview iframe {
@@ -562,6 +731,29 @@ body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-head
     padding: 10px 20px 44px 10px !important;
 }
 
+.noteentry.markdown-split-mode .markdown-codemirror-host {
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.noteentry.markdown-split-mode .markdown-codemirror-host .cm-editor {
+    height: 100%;
+    min-height: 0;
+    max-height: var(--markdown-split-pane-height, calc(100vh - 200px));
+}
+
+.noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller {
+    max-height: var(--markdown-split-pane-height, calc(100vh - 200px));
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {
+    min-height: var(--markdown-split-pane-height, calc(100vh - 200px));
+    padding: 10px 20px 44px 10px;
+    box-sizing: border-box;
+}
+
 .noteentry.markdown-split-mode .markdown-preview {
     flex: 1 1 50% !important;
     width: 50% !important;
@@ -616,6 +808,20 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor {
     border-right: none !important;
     box-sizing: border-box !important;
     max-height: none !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host {
+    padding: 0 !important;
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-editor,
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller {
+    max-height: var(--markdown-split-pane-height, calc(100vh - 240px));
+}
+
+body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {
+    min-height: var(--markdown-split-pane-height, calc(100vh - 240px));
+    padding: 18px;
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview {

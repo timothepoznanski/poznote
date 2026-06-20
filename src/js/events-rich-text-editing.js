@@ -808,6 +808,7 @@ function handleNoteEntryKeydown(e) {
     var target = e.target;
 
     if (!target.closest || !target.closest('.noteentry')) return;
+    if (target.closest('.markdown-codemirror-host')) return;
 
     // Delegate to checklist handler if in checklist
     if (target.closest('li.checklist-item')) {

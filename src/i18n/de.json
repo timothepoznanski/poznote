@@ -248,7 +248,8 @@
     "messages": {
       "disabled_small_screens": "Excalidraw-Bearbeitung ist auf kleinen Bildschirmen für eine bessere Benutzererfahrung deaktiviert.",
       "disabled_mobile": "Excalidraw-Bearbeitung ist auf mobilen Geräten deaktiviert.",
-      "disabled_under_800": "Excalidraw-Bearbeitung ist auf Bildschirmen kleiner als 800px deaktiviert."
+      "disabled_under_800": "Excalidraw-Bearbeitung ist auf Bildschirmen kleiner als 800px deaktiviert.",
+      "use_desktop_mode_on_phone": "Für eine bessere Benutzererfahrung ist die Excalidraw-Bearbeitung auf Bildschirmen kleiner als 800px deaktiviert. Es sollte jedoch funktionieren, wenn Sie den Browser Ihres Telefons in den Desktop-Modus wechseln."
     },
     "spinner": {
       "saving_note": "Notiz wird gespeichert...",

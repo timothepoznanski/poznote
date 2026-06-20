@@ -154,3 +154,80 @@
 .table-picker-insert-btn:active {
     transform: scale(0.98);
 }
+
+/* ── Table context menu (HTML notes + Markdown preview) ─────────────────── */
+
+.table-context-menu {
+    position: fixed;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 4px 0;
+    z-index: 10000;
+    display: none;
+    min-width: 180px;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+}
+
+.table-context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #374151;
+    transition: background 0.15s;
+}
+
+.table-context-menu-item:hover {
+    background: #f3f4f6;
+}
+
+.table-context-menu-item.danger {
+    color: #dc2626;
+}
+
+.table-context-menu-item.danger:hover {
+    background: #fee2e2;
+}
+
+.table-context-menu-separator {
+    height: 1px;
+    background: #eee;
+    margin: 4px 0;
+}
+
+/* Dark mode */
+html[data-theme='dark'] .table-context-menu,
+body.dark-mode .table-context-menu {
+    background: #1f2937;
+    border-color: #374151;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+html[data-theme='dark'] .table-context-menu-item,
+body.dark-mode .table-context-menu-item {
+    color: #e5e7eb;
+}
+
+html[data-theme='dark'] .table-context-menu-item:hover,
+body.dark-mode .table-context-menu-item:hover {
+    background: #374151;
+}
+
+html[data-theme='dark'] .table-context-menu-item.danger,
+body.dark-mode .table-context-menu-item.danger {
+    color: #f87171;
+}
+
+html[data-theme='dark'] .table-context-menu-item.danger:hover,
+body.dark-mode .table-context-menu-item.danger:hover {
+    background: #3b1919;
+}
+
+html[data-theme='dark'] .table-context-menu-separator,
+body.dark-mode .table-context-menu-separator {
+    background: #374151;
+}

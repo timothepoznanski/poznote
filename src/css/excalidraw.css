@@ -425,14 +425,8 @@ body {
     }
 }
 
-/* Disable Excalidraw editing interactions on mobile (< 800px) */
+/* Keep Excalidraw editing disabled on mobile while preserving menu affordances */
 @media (max-width: 800px) {
-    /* Hide edit buttons for Excalidraw on mobile */
-    .image-menu-item[data-action="edit-excalidraw"],
-    .image-menu-item[data-action="edit-embedded-excalidraw"] {
-        display: none !important;
-    }
-    
     /* Visual feedback that Excalidraw images are not editable on mobile */
     .excalidraw-preview-container,
     img[data-is-excalidraw="true"],

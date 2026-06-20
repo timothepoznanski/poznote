@@ -21,19 +21,6 @@
 
         contextMenu = document.createElement('div');
         contextMenu.className = 'table-context-menu';
-        contextMenu.style.cssText = `
-            position: fixed;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            padding: 4px 0;
-            z-index: 10000;
-            display: none;
-            min-width: 180px;
-            font-family: Inter, sans-serif;
-            font-size: 14px;
-        `;
 
         const menuItems = [
             { label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' },
@@ -51,37 +38,12 @@
         menuItems.forEach(item => {
             if (item.separator) {
                 const separator = document.createElement('div');
-                separator.style.cssText = `
-                    height: 1px;
-                    background: #eee;
-                    margin: 4px 0;
-                `;
+                separator.className = 'table-context-menu-separator';
                 contextMenu.appendChild(separator);
             } else {
                 const menuItem = document.createElement('div');
-                menuItem.className = 'table-context-menu-item';
-                menuItem.style.cssText = `
-                    padding: 8px 16px;
-                    cursor: pointer;
-                    transition: background 0.15s;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    color: ${item.danger ? '#dc2626' : '#374151'};
-                `;
-                
-                menuItem.innerHTML = `
-                    <span style="width: 20px; text-align: center;">${item.icon}</span>
-                    <span>${item.label}</span>
-                `;
-
-                menuItem.addEventListener('mouseenter', () => {
-                    menuItem.style.background = item.danger ? '#fee2e2' : '#f3f4f6';
-                });
-
-                menuItem.addEventListener('mouseleave', () => {
-                    menuItem.style.background = 'transparent';
-                });
+                menuItem.className = 'table-context-menu-item' + (item.danger ? ' danger' : '');
+                menuItem.innerHTML = `<span style="width:20px;text-align:center">${item.icon}</span><span>${item.label}</span>`;
 
                 menuItem.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -302,15 +264,353 @@
             if (contextMenu && !contextMenu.contains(e.target)) {
                 hideTableContextMenu();
             }
+            if (mdContextMenu && !mdContextMenu.contains(e.target)) {
+                hideMdTableContextMenu();
+            }
         });
 
         // Close the context menu with Escape
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && contextMenu && contextMenu.style.display !== 'none') {
-                hideTableContextMenu();
+            if (e.key === 'Escape') {
+                if (contextMenu && contextMenu.style.display !== 'none') {
+                    hideTableContextMenu();
+                }
+                if (mdContextMenu && mdContextMenu.style.display !== 'none') {
+                    hideMdTableContextMenu();
+                }
             }
         });
     }
+
+    // ─── Markdown preview table context menu ─────────────────────────────────
+
+    let mdContextMenu = null;
+    let mdActiveTable = null;
+    let mdActiveCell = null;
+    let mdActiveNoteEntry = null;
+
+    function createMdTableContextMenu() {
+        if (mdContextMenu) return mdContextMenu;
+
+        mdContextMenu = document.createElement('div');
+        mdContextMenu.className = 'table-context-menu md-table-context-menu';
+
+        const menuItems = [
+            { label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' },
+            { label: tr('table.context_menu.insert_row_below', 'Insert row below'), action: 'insertRowBelow', icon: '↓' },
+            { separator: true },
+            { label: tr('table.context_menu.insert_column_left', 'Insert column left'), action: 'insertColLeft', icon: '←' },
+            { label: tr('table.context_menu.insert_column_right', 'Insert column right'), action: 'insertColRight', icon: '→' },
+            { separator: true },
+            { label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true },
+            { label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true },
+        ];
+
+        menuItems.forEach(item => {
+            if (item.separator) {
+                const sep = document.createElement('div');
+                sep.className = 'table-context-menu-separator';
+                mdContextMenu.appendChild(sep);
+            } else {
+                const el = document.createElement('div');
+                el.className = 'table-context-menu-item' + (item.danger ? ' danger' : '');
+                el.innerHTML = `<span style="width:20px;text-align:center">${item.icon}</span><span>${item.label}</span>`;
+                el.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    executeMdTableAction(item.action);
+                    hideMdTableContextMenu();
+                });
+                mdContextMenu.appendChild(el);
+            }
+        });
+
+        document.body.appendChild(mdContextMenu);
+        return mdContextMenu;
+    }
+
+    function showMdTableContextMenu(x, y, table, cell, noteEntry) {
+        mdActiveTable = table;
+        mdActiveCell = cell;
+        mdActiveNoteEntry = noteEntry;
+
+        const menu = createMdTableContextMenu();
+        menu.style.display = 'block';
+
+        let left = x, top = y;
+        const rect = menu.getBoundingClientRect();
+        if (left + rect.width > window.innerWidth) left = window.innerWidth - rect.width - 10;
+        if (top + rect.height > window.innerHeight) top = window.innerHeight - rect.height - 10;
+        menu.style.left = left + 'px';
+        menu.style.top = top + 'px';
+    }
+
+    function hideMdTableContextMenu() {
+        if (mdContextMenu) mdContextMenu.style.display = 'none';
+        mdActiveTable = null;
+        mdActiveCell = null;
+        mdActiveNoteEntry = null;
+    }
+
+    function getMdCellIndex(cell) {
+        const row = cell.parentElement;
+        const cellIndex = Array.from(row.children).indexOf(cell);
+        const allRows = Array.from(mdActiveTable.querySelectorAll('tr'));
+        const rowIndex = allRows.indexOf(row);
+        return { rowIndex, cellIndex };
+    }
+
+    function addMdScrollSnapshot(snapshots, target) {
+        if (!target || snapshots.some(snapshot => snapshot.target === target)) {
+            return;
+        }
+
+        snapshots.push({
+            target: target,
+            top: target.scrollTop || 0,
+            left: target.scrollLeft || 0,
+            overflowAnchor: target.style ? target.style.overflowAnchor : null
+        });
+    }
+
+    function isMdScrollableElement(element) {
+        return !!(element &&
+            (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth));
+    }
+
+    function captureMdTableScrollState(previewDiv, editorScrollTarget) {
+        const snapshots = [];
+        const rightCol = document.getElementById('right_col');
+        const scrollingElement = document.scrollingElement || document.documentElement;
+
+        addMdScrollSnapshot(snapshots, previewDiv);
+        addMdScrollSnapshot(snapshots, editorScrollTarget);
+        addMdScrollSnapshot(snapshots, rightCol);
+
+        let parent = previewDiv ? previewDiv.parentElement : null;
+        while (parent && parent !== document.body && parent !== document.documentElement) {
+            if (isMdScrollableElement(parent)) {
+                addMdScrollSnapshot(snapshots, parent);
+            }
+            parent = parent.parentElement;
+        }
+
+        addMdScrollSnapshot(snapshots, scrollingElement);
+
+        return {
+            snapshots: snapshots,
+            windowX: window.pageXOffset || scrollingElement.scrollLeft || 0,
+            windowY: window.pageYOffset || scrollingElement.scrollTop || 0
+        };
+    }
+
+    function setMdTableScrollAnchoring(scrollState, disabled) {
+        scrollState.snapshots.forEach(snapshot => {
+            if (!snapshot.target.style) return;
+            snapshot.target.style.overflowAnchor = disabled ? 'none' : (snapshot.overflowAnchor || '');
+        });
+    }
+
+    function restoreMdTableScrollState(scrollState) {
+        scrollState.snapshots.forEach(snapshot => {
+            snapshot.target.scrollTop = snapshot.top;
+            snapshot.target.scrollLeft = snapshot.left;
+        });
+
+        if (typeof window.scrollTo === 'function') {
+            window.scrollTo(scrollState.windowX, scrollState.windowY);
+        }
+    }
+
+    function restoreMdTableScrollStateAfterLayout(scrollState) {
+        restoreMdTableScrollState(scrollState);
+
+        requestAnimationFrame(() => {
+            restoreMdTableScrollState(scrollState);
+            requestAnimationFrame(() => {
+                restoreMdTableScrollState(scrollState);
+                setTimeout(() => {
+                    restoreMdTableScrollState(scrollState);
+                    setMdTableScrollAnchoring(scrollState, false);
+                }, 100);
+            });
+        });
+    }
+
+    function markMdTableActionAsModified(noteId) {
+        if (typeof noteid !== 'undefined') {
+            noteid = noteId;
+        }
+        window.noteid = noteId;
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+    }
+
+    function executeMdTableAction(action) {
+        if (!mdActiveTable || !mdActiveCell || !mdActiveNoteEntry) return;
+
+        const startLine = parseInt(mdActiveTable.getAttribute('data-start-line'), 10);
+        if (isNaN(startLine)) return;
+
+        const noteId = mdActiveNoteEntry.getAttribute('data-note-id') ||
+            (mdActiveNoteEntry.id || '').replace('entry', '');
+        const rawContent = mdActiveNoteEntry.getAttribute('data-markdown-content') || '';
+        const lines = rawContent.split('\n');
+
+        // Identify all lines belonging to this table
+        let tableStart = startLine;
+        let tableEnd = startLine;
+        while (tableEnd + 1 < lines.length && isMarkdownTableLine(lines[tableEnd + 1])) {
+            tableEnd++;
+        }
+
+        const tableLines = lines.slice(tableStart, tableEnd + 1);
+
+        // Separate header, separator, and data rows (by line index within tableLines)
+        const separatorIdx = tableLines.findIndex(l => isMarkdownTableSeparatorLine(l));
+        if (separatorIdx < 0) return;
+
+        const { rowIndex, cellIndex } = getMdCellIndex(mdActiveCell);
+        const numCols = getMarkdownTableCells(tableLines[0]).length;
+
+        function makeEmptyRow(cols) {
+            return '| ' + Array(cols).fill('   ').join(' | ') + ' |';
+        }
+
+        function makeEmptySeparatorCell(colIndex) {
+            // Preserve alignment from separator
+            const sep = tableLines[separatorIdx];
+            const cells = getMarkdownTableCells(sep);
+            if (colIndex < cells.length) {
+                const c = cells[colIndex].trim();
+                const left = c.startsWith(':');
+                const right = c.endsWith(':');
+                if (left && right) return ':---:';
+                if (right) return '---:';
+                if (left) return ':---';
+            }
+            return '---';
+        }
+
+        // rowIndex in the <table> counts all tr including header; map to tableLines index
+        // header row → tableLines[0], body rows start after separator
+        // In the rendered table: row 0 = header, row 1+ = body rows
+        // In tableLines: index 0 = header, index separatorIdx = separator, index separatorIdx+1.. = body rows
+        const tableLineIndex = rowIndex === 0
+            ? 0
+            : separatorIdx + rowIndex; // body row: rowIndex 1 → tableLines[separatorIdx+1]
+
+        switch (action) {
+            case 'insertRowAbove': {
+                if (rowIndex === 0) break; // can't insert above the header row
+                const newRow = makeEmptyRow(numCols);
+                lines.splice(tableStart + tableLineIndex, 0, newRow);
+                break;
+            }
+            case 'insertRowBelow': {
+                const newRow = makeEmptyRow(numCols);
+                // Clicking header → insert first data row after separator
+                const insertAt = rowIndex === 0 ? tableStart + separatorIdx + 1 : tableStart + tableLineIndex + 1;
+                lines.splice(insertAt, 0, newRow);
+                break;
+            }
+            case 'insertColLeft':
+            case 'insertColRight': {
+                const after = action === 'insertColRight';
+                const insertColIdx = after ? cellIndex + 1 : cellIndex;
+                for (let li = tableStart; li <= tableEnd; li++) {
+                    const isSep = isMarkdownTableSeparatorLine(lines[li]);
+                    const cells = getMarkdownTableCells(lines[li]);
+                    const newCell = isSep ? makeEmptySeparatorCell(cellIndex) : '   ';
+                    cells.splice(insertColIdx, 0, newCell);
+                    lines[li] = '| ' + cells.join(' | ') + ' |';
+                }
+                break;
+            }
+            case 'deleteRow': {
+                const allDataRows = tableLines.length - separatorIdx - 1;
+                if (allDataRows <= 1 && rowIndex !== 0) {
+                    alert(tr('table.context_menu.errors.cannot_delete_last_row', 'Cannot delete the last row of the table.'));
+                    return;
+                }
+                if (rowIndex === 0) return; // don't delete header
+                lines.splice(tableStart + tableLineIndex, 1);
+                break;
+            }
+            case 'deleteCol': {
+                if (numCols <= 1) {
+                    alert(tr('table.context_menu.errors.cannot_delete_last_column', 'Cannot delete the last column of the table.'));
+                    return;
+                }
+                for (let li = tableStart; li <= tableEnd; li++) {
+                    const cells = getMarkdownTableCells(lines[li]);
+                    cells.splice(cellIndex, 1);
+                    lines[li] = '| ' + cells.join(' | ') + ' |';
+                }
+                break;
+            }
+        }
+
+        const newContent = lines.join('\n');
+        mdActiveNoteEntry.setAttribute('data-markdown-content', newContent);
+
+        const previewDiv = mdActiveNoteEntry.querySelector('.markdown-preview');
+        const editorDiv = mdActiveNoteEntry.querySelector('.markdown-editor');
+        const cmScroller = editorDiv && editorDiv.querySelector('.cm-scroller');
+        const editorScrollTarget = cmScroller || editorDiv;
+
+        const scrollState = captureMdTableScrollState(previewDiv, editorScrollTarget);
+        setMdTableScrollAnchoring(scrollState, true);
+
+        // Re-render preview (postProcess:false skips the 100ms setTimeout)
+        if (previewDiv && typeof window.renderMarkdownPreview === 'function') {
+            window.renderMarkdownPreview(previewDiv, newContent, noteId, { postProcess: false });
+            if (typeof window.setupPreviewInteractivity === 'function') {
+                window.setupPreviewInteractivity(noteId);
+            }
+        }
+
+        // Update editor source
+        if (editorDiv && typeof renderMarkdownEditorContent === 'function') {
+            const previousSuppressInput = editorDiv._suppressMarkdownTableContextInput;
+            editorDiv._suppressMarkdownTableContextInput = true;
+            try {
+                renderMarkdownEditorContent(editorDiv, newContent);
+            } finally {
+                editorDiv._suppressMarkdownTableContextInput = previousSuppressInput;
+            }
+        }
+
+        markMdTableActionAsModified(noteId);
+        restoreMdTableScrollStateAfterLayout(scrollState);
+    }
+
+    function isMarkdownTableLine(line) {
+        return typeof isMarkdownTableRowLine === 'function'
+            ? isMarkdownTableRowLine(line)
+            : /\|/.test(line);
+    }
+
+    function isMarkdownTableSeparatorLine(line) {
+        var trimmed = String(line || '').trim();
+        if (!trimmed || trimmed.indexOf('|') === -1) return false;
+        var cells = getMarkdownTableCells(trimmed);
+        return cells.length > 0 && cells.every(c => /^:?-+:?$/.test(c.trim()));
+    }
+
+    function getMarkdownTableCells(line) {
+        var trimmed = String(line || '').trim();
+        if (!trimmed || trimmed.indexOf('|') === -1) return [];
+        if (trimmed.charAt(0) === '|') trimmed = trimmed.slice(1);
+        if (trimmed.charAt(trimmed.length - 1) === '|') trimmed = trimmed.slice(0, -1);
+        return trimmed.split('|').map(c => c.trim());
+    }
+
+    // Exposed so setupPreviewInteractivity (markdown-handler.js) can call it
+    window.showMdTableContextMenu = showMdTableContextMenu;
+    window.hideMdTableContextMenu = hideMdTableContextMenu;
 
     // Initialize on page load
     if (document.readyState === 'loading') {

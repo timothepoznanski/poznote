@@ -141,8 +141,10 @@
         var noteEntry = noteCard ? noteCard.querySelector('.noteentry') : document.querySelector('#right_col .noteentry');
 
         if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
+            var editorEl = noteEntry.querySelector('.markdown-editor');
+            var cmScroller = editorEl && editorEl.querySelector('.cm-scroller');
             return [
-                noteEntry.querySelector('.markdown-editor'),
+                cmScroller || editorEl,
                 noteEntry.querySelector('.markdown-preview')
             ].filter(Boolean);
         }
@@ -483,7 +485,7 @@
                 break;
             case 'toggle-table-picker':
                 if (typeof toggleTablePicker === 'function') {
-                    toggleTablePicker();
+                    toggleTablePicker(target);
                 }
                 break;
             case 'insert-checklist':

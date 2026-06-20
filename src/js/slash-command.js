@@ -62,6 +62,9 @@
     let savedNoteEntry = null;
     let savedEditableElement = null;
     let activeCommands = null;
+    let codeMirrorSlashEditor = null;
+    let codeMirrorSlashFrom = -1;
+    let codeMirrorSlashTo = -1;
     const SLASH_CURSOR_HIDDEN_CLASS = 'slash-menu-cursor-hidden';
 
     // Touch tracking for distinguishing tap from scroll
@@ -107,8 +110,213 @@
         document.addEventListener('mousemove', handleSlashCursorReveal, true);
     }
 
+    function getMarkdownCodeMirrorApi() {
+        return window.PoznoteMarkdownCodeMirror || null;
+    }
+
+    function isMarkdownCodeMirrorEditor(editor) {
+        const api = getMarkdownCodeMirrorApi();
+        return !!(api && editor && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor));
+    }
+
+    function escapeMarkdownLabel(text, fallback) {
+        const normalized = String(text || '')
+            .replace(/[\r\n\t]+/g, ' ')
+            .trim();
+        const value = normalized || fallback || '';
+        return value
+            .replace(/\\/g, '\\\\')
+            .replace(/\[/g, '\\[')
+            .replace(/\]/g, '\\]');
+    }
+
+    function normalizeMarkdownDestination(url) {
+        const value = String(url || '').replace(/[\r\n]+/g, '').trim();
+        if (!value) return '';
+        if (/^(?:javascript|vbscript|data):/i.test(value)) return '';
+        return value.replace(/[()\s<>]/g, function (match) {
+            return encodeURIComponent(match);
+        });
+    }
+
+    function escapeHtmlAttributeValue(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function getCodeMirrorEditorFromTarget(target) {
+        if (!target || !target.closest) return null;
+        const editor = target.closest('.markdown-editor');
+        return isMarkdownCodeMirrorEditor(editor) ? editor : null;
+    }
+
+    function focusEditableElement(element) {
+        if (!element) return;
+
+        const api = getMarkdownCodeMirrorApi();
+        if (isMarkdownCodeMirrorEditor(element) && api && typeof api.focus === 'function') {
+            api.focus(element);
+            return;
+        }
+
+        try {
+            element.focus({ preventScroll: true });
+        } catch (e) {
+            try { element.focus(); } catch (e2) { }
+        }
+    }
+
+    function closeMobileKeyboardForSlashMenu(element) {
+        const isMobile = window.innerWidth < 768;
+        if (!isMobile) return;
+
+        const active = document.activeElement;
+        if (active && typeof active.blur === 'function') {
+            try {
+                active.blur();
+                return;
+            } catch (e) { }
+        }
+
+        if (isMarkdownCodeMirrorEditor(element) && element.querySelector) {
+            const codeMirrorContent = element.querySelector('.cm-content[contenteditable="true"]');
+            if (codeMirrorContent && typeof codeMirrorContent.blur === 'function') {
+                try {
+                    codeMirrorContent.blur();
+                    return;
+                } catch (e) { }
+            }
+        }
+
+        if (element && typeof element.blur === 'function') {
+            try { element.blur(); } catch (e) { }
+        }
+    }
+
+    function resetCodeMirrorSlashState() {
+        codeMirrorSlashEditor = null;
+        codeMirrorSlashFrom = -1;
+        codeMirrorSlashTo = -1;
+    }
+
+    function getCodeMirrorSelectionSnapshot(editor) {
+        const api = getMarkdownCodeMirrorApi();
+        if (!editor || !api || !isMarkdownCodeMirrorEditor(editor) || typeof api.getSelectionOffsets !== 'function') {
+            return null;
+        }
+
+        const offsets = api.getSelectionOffsets(editor);
+        const docLength = typeof api.getValue === 'function' ? api.getValue(editor).length : 0;
+        const start = offsets ? Math.max(0, Math.min(offsets.start, docLength)) : docLength;
+        const end = offsets ? Math.max(start, Math.min(offsets.end, docLength)) : start;
+
+        return {
+            editor,
+            start,
+            end
+        };
+    }
+
+    function getSavedDomRange() {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            try {
+                return selection.getRangeAt(0).cloneRange();
+            } catch (e) { }
+        }
+        if (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function') {
+            try {
+                return window._slashCommandSavedRange.cloneRange();
+            } catch (e) { }
+        }
+        return null;
+    }
+
+    function captureEditorInsertionContext() {
+        const context = getEditorContext() || {};
+        const noteEntry = savedNoteEntry || context.noteEntry || null;
+        let editableElement = savedEditableElement || context.editableElement || null;
+
+        if (!editableElement && noteEntry && noteEntry.querySelector) {
+            editableElement = noteEntry.querySelector('.markdown-editor') || noteEntry.querySelector('[contenteditable="true"]');
+        }
+
+        return {
+            noteEntry,
+            editableElement,
+            codeMirrorSelection: getCodeMirrorSelectionSnapshot(editableElement),
+            savedRange: getSavedDomRange()
+        };
+    }
+
+    function insertMarkdownAtContext(context, markdown, caretDeltaFromInsertEnd) {
+        const api = getMarkdownCodeMirrorApi();
+        const snapshot = context && context.codeMirrorSelection;
+        const insertText = String(markdown || '');
+        const caretDelta = typeof caretDeltaFromInsertEnd === 'number' ? caretDeltaFromInsertEnd : 0;
+
+        if (snapshot && api && isMarkdownCodeMirrorEditor(snapshot.editor) && typeof api.replaceRange === 'function') {
+            const caretOffsetWithinInsert = Math.max(0, Math.min(insertText.length, insertText.length + caretDelta));
+            const from = Math.min(snapshot.start, snapshot.end);
+            const to = Math.max(snapshot.start, snapshot.end);
+            const caretPos = from + caretOffsetWithinInsert;
+
+            api.replaceRange(snapshot.editor, from, to, insertText);
+            if (typeof api.setSelection === 'function') {
+                api.setSelection(snapshot.editor, caretPos, caretPos);
+            }
+            return true;
+        }
+
+        const editableElement = context && context.editableElement;
+        if (editableElement) {
+            focusEditableElement(editableElement);
+        }
+
+        if (context && context.savedRange) {
+            try {
+                const selection = window.getSelection();
+                if (selection) {
+                    selection.removeAllRanges();
+                    selection.addRange(context.savedRange);
+                }
+            } catch (e) { }
+        }
+
+        insertMarkdownAtCursor(insertText, caretDelta);
+        return false;
+    }
+
+    function getSelectedMarkdownTextFromContext(context) {
+        const snapshot = context && context.codeMirrorSelection;
+        const api = getMarkdownCodeMirrorApi();
+
+        if (snapshot && api && typeof api.getValue === 'function') {
+            return api.getValue(snapshot.editor).slice(snapshot.start, snapshot.end);
+        }
+
+        if (context && context.savedRange) {
+            return context.savedRange.toString();
+        }
+
+        const selection = window.getSelection();
+        return selection && selection.rangeCount > 0 ? selection.toString() : '';
+    }
+
     // Get the Markdown editor from the current selection
     function getCurrentMarkdownEditorFromSelection() {
+        if (isMarkdownCodeMirrorEditor(savedEditableElement)) {
+            return savedEditableElement;
+        }
+
+        const activeEditor = getCodeMirrorEditorFromTarget(document.activeElement);
+        if (activeEditor) {
+            return activeEditor;
+        }
+
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return null;
 
@@ -240,6 +448,22 @@
     function replaceMarkdownRange(rootEl, start, end, replacement, selectStartAfter, selectEndAfter) {
         if (!rootEl) return;
 
+        const api = getMarkdownCodeMirrorApi();
+        if (isMarkdownCodeMirrorEditor(rootEl) && api && typeof api.replaceRange === 'function') {
+            const fullText = typeof api.getValue === 'function' ? api.getValue(rootEl) : '';
+            const safeStart = Math.max(0, Math.min(start, fullText.length));
+            const safeEnd = Math.max(safeStart, Math.min(end, fullText.length));
+            const insertText = String(replacement || '');
+            api.replaceRange(rootEl, safeStart, safeEnd, insertText);
+
+            if (typeof api.setSelection === 'function') {
+                const newSelStart = typeof selectStartAfter === 'number' ? selectStartAfter : (safeStart + insertText.length);
+                const newSelEnd = typeof selectEndAfter === 'number' ? selectEndAfter : newSelStart;
+                api.setSelection(rootEl, newSelStart, newSelEnd);
+            }
+            return;
+        }
+
         const fullText = getMarkdownEditorText(rootEl);
         const safeStart = Math.max(0, Math.min(start, fullText.length));
         const safeEnd = Math.max(safeStart, Math.min(end, fullText.length));
@@ -266,6 +490,25 @@
         // Prefer DOM-range insertion to avoid line/offset mismatches in contentEditable.
         const editor = getCurrentMarkdownEditorFromSelection();
         if (!editor) {
+            return;
+        }
+
+        const api = getMarkdownCodeMirrorApi();
+        if (isMarkdownCodeMirrorEditor(editor) && api && typeof api.getSelectionOffsets === 'function' && typeof api.replaceRange === 'function') {
+            const selectionOffsets = api.getSelectionOffsets(editor);
+            if (!selectionOffsets) return;
+
+            const insertText = String(text || '');
+            const caretDelta = typeof caretDeltaFromInsertEnd === 'number' ? caretDeltaFromInsertEnd : 0;
+            const caretOffsetWithinInsert = Math.max(0, Math.min(insertText.length, insertText.length + caretDelta));
+            const from = Math.min(selectionOffsets.start, selectionOffsets.end);
+            const to = Math.max(selectionOffsets.start, selectionOffsets.end);
+            const caretPos = from + caretOffsetWithinInsert;
+
+            api.replaceRange(editor, from, to, insertText);
+            if (typeof api.setSelection === 'function') {
+                api.setSelection(editor, caretPos, caretPos);
+            }
             return;
         }
 
@@ -301,6 +544,34 @@
     function wrapMarkdownSelection(prefix, suffix, emptyInnerCaretOffset) {
         const editor = getCurrentMarkdownEditorFromSelection();
         if (!editor) return;
+
+        const api = getMarkdownCodeMirrorApi();
+        if (isMarkdownCodeMirrorEditor(editor) && api && typeof api.getSelectionOffsets === 'function' && typeof api.replaceRange === 'function') {
+            const selectionOffsets = api.getSelectionOffsets(editor);
+            if (!selectionOffsets) return;
+
+            const fullText = typeof api.getValue === 'function' ? api.getValue(editor) : '';
+            const from = Math.min(selectionOffsets.start, selectionOffsets.end);
+            const to = Math.max(selectionOffsets.start, selectionOffsets.end);
+            const selectedText = fullText.slice(from, to);
+
+            if (!selectedText) {
+                const replacement = prefix + suffix;
+                const caretInside = typeof emptyInnerCaretOffset === 'number' ? emptyInnerCaretOffset : prefix.length;
+                const caretPos = from + Math.max(0, Math.min(replacement.length, caretInside));
+                api.replaceRange(editor, from, to, replacement);
+                if (typeof api.setSelection === 'function') {
+                    api.setSelection(editor, caretPos, caretPos);
+                }
+            } else {
+                const replacement = prefix + selectedText + suffix;
+                api.replaceRange(editor, from, to, replacement);
+                if (typeof api.setSelection === 'function') {
+                    api.setSelection(editor, from + prefix.length, from + prefix.length + selectedText.length);
+                }
+            }
+            return;
+        }
 
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount) return;
@@ -779,6 +1050,8 @@
 
     // Insert an image (opens file picker)
     function insertImage() {
+        const insertionContext = captureEditorInsertionContext();
+
         // Create a temporary file input for images
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
@@ -791,36 +1064,51 @@
 
                 // Check if we're in a markdown note
                 const selection = window.getSelection();
-                if (!selection.rangeCount) return;
+                let range = insertionContext.savedRange || null;
 
-                const range = selection.getRangeAt(0);
-                let container = range.commonAncestorContainer;
-                if (container.nodeType === 3) container = container.parentNode;
+                if (!range && selection && selection.rangeCount > 0) {
+                    range = selection.getRangeAt(0);
+                }
 
-                const noteEntry = container.closest('.noteentry');
+                let container = range ? range.commonAncestorContainer : null;
+                if (container && container.nodeType === 3) container = container.parentNode;
+
+                const noteEntry = insertionContext.noteEntry || (container && container.closest ? container.closest('.noteentry') : null);
                 const isMarkdown = noteEntry && noteEntry.hasAttribute('data-note-type') &&
                     noteEntry.getAttribute('data-note-type') === 'markdown';
 
                 if (isMarkdown) {
                     // Handle markdown image insertion
                     const noteId = noteEntry.id.replace('entry', '');
-                    const loadingText = '![Uploading ' + file.name + '...]()';
-
-                    // Insert loading text
+                    const safeImageName = escapeMarkdownLabel(file.name, 'image');
+                    const loadingText = '![Uploading ' + safeImageName + '...]()';
                     const editor = noteEntry.querySelector('.markdown-editor');
-                    if (editor) {
-                        range.deleteContents();
-                        const textNode = document.createTextNode(loadingText);
-                        range.insertNode(textNode);
+                    if (!editor) return;
 
-                        // Collapse range to end of inserted node to avoid selection
-                        range.setStartAfter(textNode);
-                        range.collapse(true);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
+                    const cmApi = getMarkdownCodeMirrorApi();
+                    const isCmEditor = isMarkdownCodeMirrorEditor(editor);
 
-                        // Trigger input event
-                        editor.dispatchEvent(new Event('input', { bubbles: true }));
+                    // Insert loading placeholder
+                    if (isCmEditor && cmApi && typeof cmApi.getSelectionOffsets === 'function' && typeof cmApi.replaceRange === 'function') {
+                        const offsets = insertionContext.codeMirrorSelection && insertionContext.codeMirrorSelection.editor === editor
+                            ? insertionContext.codeMirrorSelection
+                            : cmApi.getSelectionOffsets(editor);
+                        const insertPos = offsets ? offsets.end : 0;
+                        cmApi.replaceRange(editor, insertPos, insertPos, loadingText);
+
+                        // Use a unique placeholder token so we can find-and-replace it after
+                        // the async upload, even if the user typed during the upload (which
+                        // would shift any captured integer offsets).
+                        const placeholderToken = '![Uploading ' + safeImageName + '_' + Date.now() + '...]()';
+                        cmApi.replaceRange(editor, insertPos, insertPos + loadingText.length, placeholderToken);
+
+                        function replacePlaceholder(replacement) {
+                            if (typeof cmApi.getValue !== 'function' || typeof cmApi.findMatches !== 'function') return;
+                            const current = cmApi.getValue(editor);
+                            const idx = current.indexOf(placeholderToken);
+                            if (idx === -1) return;
+                            cmApi.replaceRange(editor, idx, idx + placeholderToken.length, replacement);
+                        }
 
                         // Upload the file
                         const formData = new FormData();
@@ -838,108 +1126,83 @@
                             .then(data => {
                                 if (data.success) {
                                     const borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
-                                    const imageMarkdown = '![' + file.name + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')' + borderSuffix;
-
-                                    // Replace loading text
-                                    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
-                                    let textNodes = [];
-                                    let node;
-                                    while (node = walker.nextNode()) {
-                                        textNodes.push(node);
-                                    }
-
-                                    for (let i = 0; i < textNodes.length; i++) {
-                                        const textNode = textNodes[i];
-                                        const text = textNode.textContent;
-                                        const index = text.indexOf(loadingText);
-                                        if (index !== -1) {
-                                            textNode.textContent = text.replace(loadingText, imageMarkdown);
-
-                                            // Move cursor after the inserted markdown
-                                            try {
-                                                const sel = window.getSelection();
-                                                const newRange = document.createRange();
-                                                newRange.setStart(textNode, index + imageMarkdown.length);
-                                                newRange.collapse(true);
-                                                sel.removeAllRanges();
-                                                sel.addRange(newRange);
-                                            } catch (e) { }
-
-                                            break;
-                                        }
-                                    }
-
-                                    editor.dispatchEvent(new Event('input', { bubbles: true }));
-
-                                    // Mark note as modified
-                                    if (typeof window.markNoteAsModified === 'function') {
-                                        window.markNoteAsModified();
-                                    }
-
-                                    // Re-initialize image click handlers
-                                    if (typeof reinitializeImageClickHandlers === 'function') {
-                                        setTimeout(() => reinitializeImageClickHandlers(), 200);
-                                    }
-
-                                    // Save after upload
-                                    setTimeout(() => {
-                                        if (typeof window.saveNoteImmediately === 'function') {
-                                            window.saveNoteImmediately();
-                                        }
-                                    }, 500);
+                                    const imageMarkdown = '![' + safeImageName + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')' + borderSuffix;
+                                    replacePlaceholder(imageMarkdown);
+                                    if (typeof window.markNoteAsModified === 'function') window.markNoteAsModified();
+                                    if (typeof reinitializeImageClickHandlers === 'function') setTimeout(() => reinitializeImageClickHandlers(), 200);
+                                    setTimeout(() => { if (typeof window.saveNoteImmediately === 'function') window.saveNoteImmediately(); }, 500);
                                 } else {
-                                    // Remove loading text on error
-                                    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
-                                    let textNodes = [];
-                                    let node;
-                                    while (node = walker.nextNode()) {
-                                        textNodes.push(node);
-                                    }
-
-                                    for (let i = 0; i < textNodes.length; i++) {
-                                        const textNode = textNodes[i];
-                                        const text = textNode.textContent;
-                                        if (text.indexOf(loadingText) !== -1) {
-                                            textNode.textContent = text.replace(loadingText, '');
-                                            break;
-                                        }
-                                    }
-
-                                    editor.dispatchEvent(new Event('input', { bubbles: true }));
-
-                                    if (typeof showNotificationPopup === 'function') {
-                                        showNotificationPopup('Upload failed: ' + data.message, 'error');
-                                    }
+                                    replacePlaceholder('');
+                                    if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + data.message, 'error');
                                 }
                             })
                             .catch(error => {
-                                // Remove loading text on error
-                                const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
-                                let textNodes = [];
-                                let node;
-                                while (node = walker.nextNode()) {
-                                    textNodes.push(node);
-                                }
+                                replacePlaceholder('');
+                                if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + error.message, 'error');
+                            });
+                    } else {
+                        // contenteditable path
+                        if (!range) {
+                            range = document.createRange();
+                            range.selectNodeContents(editor);
+                            range.collapse(false);
+                        }
+                        range.deleteContents();
+                        const textNode = document.createTextNode(loadingText);
+                        range.insertNode(textNode);
+                        range.setStartAfter(textNode);
+                        range.collapse(true);
+                        if (selection) {
+                            selection.removeAllRanges();
+                            selection.addRange(range);
+                        }
+                        editor.dispatchEvent(new Event('input', { bubbles: true }));
 
-                                for (let i = 0; i < textNodes.length; i++) {
-                                    const textNode = textNodes[i];
-                                    const text = textNode.textContent;
-                                    if (text.indexOf(loadingText) !== -1) {
-                                        textNode.textContent = text.replace(loadingText, '');
-                                        break;
-                                    }
-                                }
+                        const formData = new FormData();
+                        formData.append('note_id', noteId);
+                        formData.append('file', file);
+                        if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+                            formData.append('workspace', selectedWorkspace);
+                        }
 
-                                editor.dispatchEvent(new Event('input', { bubbles: true }));
-
-                                if (typeof showNotificationPopup === 'function') {
-                                    showNotificationPopup('Upload failed: ' + error.message, 'error');
+                        const replaceInDom = (replacement) => {
+                            const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null);
+                            let node;
+                            while (node = walker.nextNode()) {
+                                const idx = node.textContent.indexOf(loadingText);
+                                if (idx !== -1) {
+                                    node.textContent = node.textContent.replace(loadingText, replacement);
+                                    break;
                                 }
+                            }
+                            editor.dispatchEvent(new Event('input', { bubbles: true }));
+                        };
+
+                        fetch('/api/v1/notes/' + noteId + '/attachments', {
+                            method: 'POST',
+                            body: formData
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    const borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
+                                    const imageMarkdown = '![' + safeImageName + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')' + borderSuffix;
+                                    replaceInDom(imageMarkdown);
+                                    if (typeof window.markNoteAsModified === 'function') window.markNoteAsModified();
+                                    if (typeof reinitializeImageClickHandlers === 'function') setTimeout(() => reinitializeImageClickHandlers(), 200);
+                                    setTimeout(() => { if (typeof window.saveNoteImmediately === 'function') window.saveNoteImmediately(); }, 500);
+                                } else {
+                                    replaceInDom('');
+                                    if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                }
+                            })
+                            .catch(error => {
+                                replaceInDom('');
+                                if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + error.message, 'error');
                             });
                     }
                 } else {
                     // Handle HTML image insertion via attachment upload
-                    const noteEntry = container.closest('.noteentry');
                     if (!noteEntry) {
                         if (typeof showNotificationPopup === 'function') {
                             showNotificationPopup('Cannot upload image: note not found', 'error');
@@ -958,6 +1221,10 @@
                     // Insert a placeholder while uploading
                     const placeholderId = 'image-upload-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
                     const placeholderHtml = '<img src="" alt="Uploading..." class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+                    if (range && selection) {
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
                     const inserted = insertHTMLAtSelection(placeholderHtml);
                     let placeholderImg = noteEntry.querySelector('[data-upload-placeholder-id="' + placeholderId + '"]');
 
@@ -1089,7 +1356,7 @@
             const date = dateInput.value;
             if (date) {
                 // Focus the editor back before inserting
-                context.editableElement.focus();
+                focusEditableElement(context.editableElement);
 
                 // Format the date based on user's locale
                 const formattedDate = new Date(date).toLocaleDateString();
@@ -1161,7 +1428,7 @@
             const date = dateInput.value;
             if (date) {
                 // Focus the editor back before inserting
-                context.editableElement.focus();
+                focusEditableElement(context.editableElement);
 
                 const formattedDate = new Date(date).toLocaleDateString();
                 insertMarkdownAtCursor(formattedDate, 0);
@@ -1235,6 +1502,9 @@
 
         if (typeof window.toggleEmojiPicker === 'function') {
             setTimeout(() => window.toggleEmojiPicker(), 0);
+        } else {
+            // Emoji picker unavailable — release the blur-save lock immediately.
+            resumeTaskEditBlurSave(input);
         }
     }
 
@@ -1873,38 +2143,26 @@
                         label: t('slash_menu.link', null, 'Link'),
                         action: function () {
                             if (typeof window.showLinkModal === 'function') {
-                                // Find the editor before opening the modal.
-                                let editor = savedEditableElement;
-                                if (!editor || !editor.classList.contains('markdown-editor')) {
-                                    editor = getCurrentMarkdownEditorFromSelection();
-                                }
-
-                                // Get current selection if any
-                                const sel = window.getSelection();
-                                const hasSelection = sel && sel.rangeCount > 0 && !sel.getRangeAt(0).collapsed;
-                                let selectedText = hasSelection ? sel.toString() : '';
-
-                                // Save the current range/position, with fallback to the
-                                // range saved by executeCommand (in case hideSlashMenu lost it)
-                                let savedRange = null;
-                                if (sel && sel.rangeCount > 0) {
-                                    savedRange = sel.getRangeAt(0).cloneRange();
-                                }
-                                if (!savedRange && window._slashCommandSavedRange) {
-                                    savedRange = window._slashCommandSavedRange.cloneRange();
-                                }
+                                const insertionContext = captureEditorInsertionContext();
+                                let editor = insertionContext.editableElement;
+                                let selectedText = getSelectedMarkdownTextFromContext(insertionContext);
 
                                 // Save editor-relative offsets too. They survive modal focus changes
                                 // more reliably than a live Range in contentEditable.
-                                let savedOffsets = null;
-                                if (editor) {
+                                let savedOffsets = insertionContext.codeMirrorSelection
+                                    ? {
+                                        start: insertionContext.codeMirrorSelection.start,
+                                        end: insertionContext.codeMirrorSelection.end
+                                    }
+                                    : null;
+                                if (editor && !savedOffsets) {
                                     savedOffsets = getSelectionOffsetsWithin(editor);
 
-                                    if (!savedOffsets && savedRange) {
+                                    if (!savedOffsets && insertionContext.savedRange) {
                                         try {
                                             const selection = window.getSelection();
                                             selection.removeAllRanges();
-                                            selection.addRange(savedRange);
+                                            selection.addRange(insertionContext.savedRange);
                                             savedOffsets = getSelectionOffsetsWithin(editor);
                                         } catch (e) { }
                                     }
@@ -1917,12 +2175,21 @@
                                 window.showLinkModal('https://', selectedText, function (url, linkText) {
                                     if (!url) return;
 
-                                    const linkMarkdown = '[' + (linkText || url || 'link') + '](' + url + ')';
+                                    const safeDestination = normalizeMarkdownDestination(url);
+                                    if (!safeDestination) {
+                                        if (typeof showNotificationPopup === 'function') {
+                                            showNotificationPopup(t('slash_menu.invalid_url', null, 'Invalid URL'), 'error');
+                                        }
+                                        return;
+                                    }
+
+                                    const safeLinkText = escapeMarkdownLabel(linkText || url || 'link', 'link');
+                                    const linkMarkdown = '[' + safeLinkText + '](' + safeDestination + ')';
                                     let dispatchedInput = false;
 
                                     // Focus the editor first
                                     if (editor) {
-                                        try { editor.focus({ preventScroll: true }); } catch (e) { editor.focus(); }
+                                        focusEditableElement(editor);
                                     }
 
                                     // Restore selection and insert link using DOM insertion (more robust than execCommand)
@@ -1930,10 +2197,10 @@
                                         if (editor && savedOffsets) {
                                             replaceMarkdownRange(editor, savedOffsets.start, savedOffsets.end, linkMarkdown);
                                             dispatchedInput = true;
-                                        } else if (savedRange) {
+                                        } else if (insertionContext.savedRange) {
                                             const selection = window.getSelection();
                                             selection.removeAllRanges();
-                                            selection.addRange(savedRange);
+                                            selection.addRange(insertionContext.savedRange);
 
                                             // Use the same approach as insertMarkdownAtCursor for robustness
                                             const range = selection.getRangeAt(0);
@@ -2040,6 +2307,21 @@
 
     // Get current editor context (note type, DOM elements)
     function getEditorContext() {
+        if (isMarkdownCodeMirrorEditor(savedEditableElement)) {
+            const noteEntry = savedEditableElement.closest && savedEditableElement.closest('.noteentry');
+            if (noteEntry) {
+                return { noteType: 'markdown', noteEntry, editableElement: savedEditableElement };
+            }
+        }
+
+        const activeCodeMirrorEditor = getCodeMirrorEditorFromTarget(document.activeElement);
+        if (activeCodeMirrorEditor) {
+            const noteEntry = activeCodeMirrorEditor.closest && activeCodeMirrorEditor.closest('.noteentry');
+            if (noteEntry) {
+                return { noteType: 'markdown', noteEntry, editableElement: activeCodeMirrorEditor };
+            }
+        }
+
         const selection = window.getSelection();
         if (!selection.rangeCount) return false;
 
@@ -2245,6 +2527,12 @@
         if (!slashMenuElement) return;
 
         const rect = range.getBoundingClientRect();
+        positionMenuAtRect(rect);
+    }
+
+    function positionMenuAtRect(rect) {
+        if (!slashMenuElement || !rect) return;
+
         const menuRect = slashMenuElement.getBoundingClientRect();
         const isMobile = window.innerWidth < 768;
 
@@ -2323,7 +2611,10 @@
     function hideSlashMenu() {
         clearSlashCursorHide();
 
-        if (!slashMenuElement) return;
+        if (!slashMenuElement) {
+            resetCodeMirrorSlashState();
+            return;
+        }
 
         hideSubmenu();
 
@@ -2345,6 +2636,7 @@
         slashTextNode = null;
         slashOffset = -1;
         filterText = '';
+        resetCodeMirrorSlashState();
     }
 
     // Show slash menu for an input field (title or task)
@@ -2427,6 +2719,8 @@
         slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        closeMobileKeyboardForSlashMenu(input);
     }
 
     // Update the .selected class on main menu items without rebuilding DOM
@@ -2582,6 +2876,23 @@
     // Delete slash text and search
     function deleteSlashText() {
         try {
+            const api = getMarkdownCodeMirrorApi();
+            if (codeMirrorSlashEditor && api && typeof api.replaceRange === 'function') {
+                const value = typeof api.getValue === 'function' ? api.getValue(codeMirrorSlashEditor) : '';
+                const selectionOffsets = typeof api.getSelectionOffsets === 'function'
+                    ? api.getSelectionOffsets(codeMirrorSlashEditor)
+                    : null;
+                const currentEnd = selectionOffsets ? selectionOffsets.end : codeMirrorSlashTo;
+                const safeStart = Math.max(0, Math.min(codeMirrorSlashFrom, value.length));
+                const safeEnd = Math.max(safeStart + 1, Math.min(currentEnd, value.length));
+
+                api.replaceRange(codeMirrorSlashEditor, safeStart, safeEnd, '');
+                if (typeof api.setSelection === 'function') {
+                    api.setSelection(codeMirrorSlashEditor, safeStart, safeStart);
+                }
+                return;
+            }
+
             // Handle input fields (title inputs)
             if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
                 const input = savedEditableElement;
@@ -2740,7 +3051,7 @@
         // that the selection is properly taken into account if possible by deleteSlashText.
         const isMobile = window.innerWidth < 768;
         if (isMobile && savedEditableElement) {
-            try { savedEditableElement.focus({ preventScroll: true }); } catch (e) { savedEditableElement.focus(); }
+            focusEditableElement(savedEditableElement);
         }
 
         // Delete the slash and filter text (unless keepSlash is true)
@@ -2783,7 +3094,7 @@
             // Restore cursor for contenteditable
             try {
                 if (savedEditableElement) {
-                    savedEditableElement.focus();
+                    focusEditableElement(savedEditableElement);
                 }
                 const sel = window.getSelection();
                 sel.removeAllRanges();
@@ -2806,9 +3117,7 @@
                 // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
                 if (!shouldKeepSlash) {
                     if (savedEditableElement) {
-                        try {
-                            savedEditableElement.focus();
-                        } catch (e) { }
+                        focusEditableElement(savedEditableElement);
                     } else if (savedNoteEntry) {
                         try {
                             savedNoteEntry.focus();
@@ -3011,6 +3320,8 @@
     function scheduleFilterUpdate() {
         if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
             setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
+        } else if (codeMirrorSlashEditor) {
+            setTimeout(updateFilterFromCodeMirror, 0);
         } else {
             setTimeout(updateFilterFromEditor, 0);
         }
@@ -3239,6 +3550,101 @@
         updateMenuContent();
     }
 
+    function updateFilterFromCodeMirror() {
+        const api = getMarkdownCodeMirrorApi();
+        if (!slashMenuElement || !codeMirrorSlashEditor || !api || typeof api.getValue !== 'function') return;
+
+        const selectionOffsets = typeof api.getSelectionOffsets === 'function'
+            ? api.getSelectionOffsets(codeMirrorSlashEditor)
+            : null;
+        const value = api.getValue(codeMirrorSlashEditor);
+        const cursorPos = selectionOffsets ? selectionOffsets.end : codeMirrorSlashTo;
+        const safeStart = Math.max(0, Math.min(codeMirrorSlashFrom + 1, value.length));
+        const safeEnd = Math.max(safeStart, Math.min(cursorPos, value.length));
+        const textAfterSlash = value.slice(safeStart, safeEnd);
+        const spaceIndex = textAfterSlash.search(/[\s\n]/);
+
+        filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
+        codeMirrorSlashTo = safeStart + filterText.length;
+        updateMenuContent();
+    }
+
+    function showSlashMenuForCodeMirror(editor, slashFrom, slashTo) {
+        const api = getMarkdownCodeMirrorApi();
+        if (!editor || !api) return;
+
+        hideSlashMenu();
+
+        codeMirrorSlashEditor = editor;
+        codeMirrorSlashFrom = Math.max(0, slashFrom);
+        codeMirrorSlashTo = Math.max(codeMirrorSlashFrom + 1, slashTo);
+        savedEditableElement = editor;
+        savedNoteEntry = editor.closest && editor.closest('.noteentry');
+
+        activeCommands = getMarkdownSlashCommands();
+        filterText = '';
+        selectedIndex = 0;
+        filteredCommands = getFilteredCommands('');
+
+        slashMenuElement = document.createElement('div');
+        slashMenuElement.className = 'slash-command-menu';
+        slashMenuElement.innerHTML = buildMenuHTML();
+
+        document.body.appendChild(slashMenuElement);
+
+        const coords = typeof api.getCoordsAtPos === 'function'
+            ? api.getCoordsAtPos(editor, codeMirrorSlashTo)
+            : null;
+        const fallbackRect = editor.getBoundingClientRect();
+        positionMenuAtRect(coords || fallbackRect);
+
+        requestAnimationFrame(() => {
+            if (slashMenuElement) slashMenuElement.classList.add('show');
+        });
+
+        slashMenuElement.addEventListener('mousedown', handleMenuMouseDown);
+        slashMenuElement.addEventListener('click', handleMenuClick);
+        slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
+
+        closeMobileKeyboardForSlashMenu(editor);
+        hideCursorForSlashMenu();
+    }
+
+    function handleCodeMirrorInput(e, editor) {
+        const api = getMarkdownCodeMirrorApi();
+        if (!api || !editor || typeof api.getValue !== 'function' || typeof api.getSelectionOffsets !== 'function') return;
+
+        const selectionOffsets = api.getSelectionOffsets(editor);
+        if (!selectionOffsets || selectionOffsets.start !== selectionOffsets.end) return;
+
+        const value = api.getValue(editor);
+        const cursorPos = Math.max(0, Math.min(selectionOffsets.end, value.length));
+        // e.inputType is undefined on plain Event('input') dispatched by CM's updateListener.
+        // Fall back to comparing doc length with the previously seen value length.
+        // Sentinel -1 means "never seen" — on the first call we can't know if content was
+        // deleted, so we rely solely on inputType (which is absent for CM), meaning the
+        // first event is treated as non-delete. This is acceptable: the first input on a
+        // fresh editor is virtually never a delete-that-reveals-a-slash.
+        const prevLength = editor._cmPrevLength !== undefined ? editor._cmPrevLength : -1;
+        const isDeleting = (e.inputType && e.inputType.startsWith('delete')) || (prevLength !== -1 && value.length < prevLength);
+        editor._cmPrevLength = value.length;
+        const lastChar = cursorPos > 0 ? value.charAt(cursorPos - 1) : '';
+
+        if (lastChar === '/' && !isDeleting) {
+            const textBeforeSlash = value.slice(0, cursorPos - 1);
+            const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
+
+            if (!isUrl) {
+                showSlashMenuForCodeMirror(editor, cursorPos - 1, cursorPos);
+            }
+            return;
+        }
+
+        if (slashMenuElement && codeMirrorSlashEditor === editor) {
+            updateFilterFromCodeMirror();
+        }
+    }
+
     // Show slash menu
     function showSlashMenu() {
         hideSlashMenu();
@@ -3290,11 +3696,7 @@
         slashMenuElement.addEventListener('click', handleMenuClick);
         slashMenuElement.addEventListener('mouseover', handleMenuMouseOver);
 
-        // On mobile, close keyboard when menu opens
-        const isMobile = window.innerWidth < 768;
-        if (isMobile && savedEditableElement) {
-            savedEditableElement.blur();
-        }
+        closeMobileKeyboardForSlashMenu(savedEditableElement);
 
         hideCursorForSlashMenu();
     }
@@ -3303,6 +3705,12 @@
     function handleInput(e) {
         const target = e.target;
         if (!target) return;
+
+        const codeMirrorEditor = getCodeMirrorEditorFromTarget(target);
+        if (codeMirrorEditor) {
+            handleCodeMirrorInput(e, codeMirrorEditor);
+            return;
+        }
 
         const noteEntry = target.closest && target.closest('.noteentry');
         if (!noteEntry) return;
@@ -3504,8 +3912,10 @@
             const target = e.target;
 
             // Check if this is a title input field or a task list input
+            // Only the new-task input (task-input) gets the slash menu; task-edit-input is excluded
+            // to avoid intercepting literal '/' characters (e.g. file paths) during task editing.
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
-            const isTaskInput = isTaskInputElement(target);
+            const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
             const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
 
             if (isTitleInput || isTaskInput) {
@@ -3543,14 +3953,15 @@
     }
 
     // Process a Bilibili URL and insert the corresponding iframe
-    function processStreamingVideoUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
+    function processStreamingVideoUrl(url, isMarkdown, editableElement, savedRange, noteEntry, savedCodeMirrorSelection) {
         const t = window.t || ((key, params, fallback) => fallback);
 
         if (!url) return;
 
         // Validate URL format
+        let parsedUrl;
         try {
-            new URL(url);
+            parsedUrl = new URL(url);
         } catch (e) {
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(t('slash_menu.invalid_url', null, 'Invalid URL'), 'error');
@@ -3561,7 +3972,9 @@
         }
 
         // Validate that it's a Bilibili URL
-        if (!url.includes('bilibili.com')) {
+        const host = parsedUrl.hostname.toLowerCase();
+        const isBilibiliHost = host === 'bilibili.com' || host.endsWith('.bilibili.com');
+        if (!isBilibiliHost) {
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(t('slash_menu.bilibili_invalid_url', null, 'Please enter a valid Bilibili URL'), 'error');
             } else {
@@ -3576,7 +3989,7 @@
         if (bvMatch) {
             // Convert page URL to embed URL
             embedUrl = 'https://player.bilibili.com/player.html?bvid=' + bvMatch[1];
-        } else if (!url.includes('player.bilibili.com')) {
+        } else if (host !== 'player.bilibili.com') {
             // Not a recognized Bilibili URL format
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(t('slash_menu.bilibili_invalid_format', null, 'Invalid Bilibili URL format. Use a video page URL (bilibili.com/video/BV...)'), 'error');
@@ -3588,24 +4001,16 @@
 
         if (isMarkdown) {
             // For markdown, insert iframe HTML directly
-            const iframeMarkdown = '<iframe width="560" height="315" src="' + embedUrl + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allowfullscreen></iframe>\n\n';
-
-            // Focus the editable element first
-            if (editableElement) {
-                editableElement.focus();
-            }
-
-            // Restore selection if saved
-            if (savedRange) {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(savedRange);
-            }
-
-            insertMarkdownAtCursor(iframeMarkdown, 0);
+            const iframeMarkdown = '<iframe width="560" height="315" src="' + escapeHtmlAttributeValue(embedUrl) + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allowfullscreen></iframe>\n\n';
+            insertMarkdownAtContext({
+                noteEntry,
+                editableElement,
+                savedRange,
+                codeMirrorSelection: savedCodeMirrorSelection
+            }, iframeMarkdown, 0);
         } else {
             // For HTML notes
-            const iframeHtml = '<iframe width="560" height="315" src="' + embedUrl + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allowfullscreen></iframe>';
+            const iframeHtml = '<iframe width="560" height="315" src="' + escapeHtmlAttributeValue(embedUrl) + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allowfullscreen></iframe>';
 
             // Focus the editable element first
             if (editableElement) {
@@ -3667,7 +4072,7 @@
         }
     }
 
-    function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry) {
+    function processYouTubeUrl(url, isMarkdown, editableElement, savedRange, noteEntry, savedCodeMirrorSelection) {
         const t = window.t || ((key, params, fallback) => fallback);
 
         if (!url) return;
@@ -3699,20 +4104,12 @@
         if (isMarkdown) {
             // For markdown, insert iframe HTML directly
             const iframeMarkdown = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-top-navigation-by-user-activation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>\n\n';
-
-            // Focus the editable element first
-            if (editableElement) {
-                editableElement.focus();
-            }
-
-            // Restore selection if saved
-            if (savedRange) {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(savedRange);
-            }
-
-            insertMarkdownAtCursor(iframeMarkdown, 0);
+            insertMarkdownAtContext({
+                noteEntry,
+                editableElement,
+                savedRange,
+                codeMirrorSelection: savedCodeMirrorSelection
+            }, iframeMarkdown, 0);
         } else {
             // For HTML notes
             // Create iframe HTML
@@ -3818,7 +4215,7 @@
     }
 
     // Generic media upload: handles both MP4 video and audio uploads. mediaType: 'video' | 'audio'
-    function insertUploadedMedia(mediaType, isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
+    function insertUploadedMedia(mediaType, isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange, savedCodeMirrorSelection) {
         var isVideo = (mediaType === 'video');
         var logPrefix = isVideo ? '[MP4]' : '[AUDIO]';
         var acceptType = isVideo ? 'video/mp4' : 'audio/*';
@@ -3932,7 +4329,12 @@
                         }
 
                         if (isMarkdown) {
-                            insertMarkdownAtCursor(mediaHtml + '\n\n', 0);
+                            insertMarkdownAtContext({
+                                noteEntry,
+                                editableElement,
+                                savedRange,
+                                codeMirrorSelection: savedCodeMirrorSelection
+                            }, mediaHtml + '\n\n', 0);
                             if (editableElement) {
                                 editableElement.dispatchEvent(new Event('input', { bubbles: true }));
                             }
@@ -4030,13 +4432,13 @@
     }
 
     // Backward-compatible wrapper for MP4 video uploads
-    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        insertUploadedMedia('video', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
+    function insertUploadedMp4(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange, savedCodeMirrorSelection) {
+        insertUploadedMedia('video', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange, savedCodeMirrorSelection);
     }
 
     // Backward-compatible wrapper for audio uploads
-    function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange) {
-        insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange);
+    function insertUploadedAudio(isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange, savedCodeMirrorSelection) {
+        insertUploadedMedia('audio', isMarkdown, preferredNoteEntry, preferredEditableElement, savedRange, savedCodeMirrorSelection);
     }
 
     // ============================================================================
@@ -4067,7 +4469,8 @@
             }
         }
 
-        insertUploadedAudio(isMarkdown, noteEntry, editableElement, savedRange);
+        const savedCodeMirrorSelection = options.codeMirrorSelection || getCodeMirrorSelectionSnapshot(editableElement);
+        insertUploadedAudio(isMarkdown, noteEntry, editableElement, savedRange, savedCodeMirrorSelection);
     };
 
     // Insert YouTube video into HTML note (exposed globally)
@@ -4100,27 +4503,23 @@
     // Insert YouTube video into Markdown note (exposed globally)
     window.insertYouTubeVideoMarkdown = function () {
         const t = window.t || ((key, params, fallback) => fallback);
+        const insertionContext = captureEditorInsertionContext();
 
         if (typeof window.showYouTubeModal !== 'function') {
             // Fallback to prompt if modal not available
             const url = prompt(t('slash_menu.youtube_url_prompt', null, 'Enter YouTube video URL or ID:'), 'https://www.youtube.com/watch?v=');
-            if (url) processYouTubeUrl(url, true, null, null, null);
+            if (url) processYouTubeUrl(url, true, insertionContext.editableElement, insertionContext.savedRange, insertionContext.noteEntry, insertionContext.codeMirrorSelection);
             return;
         }
 
         // Save the note entry and editable element before they get cleared
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-
-        // Save the current range/position
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
+        const noteEntry = insertionContext.noteEntry;
+        const editableElement = insertionContext.editableElement;
+        const savedRange = insertionContext.savedRange;
+        const savedCodeMirrorSelection = insertionContext.codeMirrorSelection;
 
         window.showYouTubeModal(function (url) {
-            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry);
+            processYouTubeUrl(url, true, editableElement, savedRange, noteEntry, savedCodeMirrorSelection);
         });
     };
 
@@ -4154,27 +4553,23 @@
     // Insert streaming video into Markdown note (exposed globally)
     window.insertStreamingVideoMarkdown = function () {
         const t = window.t || ((key, params, fallback) => fallback);
+        const insertionContext = captureEditorInsertionContext();
 
         if (typeof window.showStreamingVideoModal !== 'function') {
             // Fallback to prompt if modal not available
             const url = prompt(t('slash_menu.streaming_video_url_prompt', null, 'Enter streaming video URL (YouTube, Vimeo, etc.):'), 'https://www.youtube.com/embed/');
-            if (url) processStreamingVideoUrl(url, true, null, null, null);
+            if (url) processStreamingVideoUrl(url, true, insertionContext.editableElement, insertionContext.savedRange, insertionContext.noteEntry, insertionContext.codeMirrorSelection);
             return;
         }
 
         // Save the note entry and editable element before they get cleared
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-
-        // Save the current range/position
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
+        const noteEntry = insertionContext.noteEntry;
+        const editableElement = insertionContext.editableElement;
+        const savedRange = insertionContext.savedRange;
+        const savedCodeMirrorSelection = insertionContext.codeMirrorSelection;
 
         window.showStreamingVideoModal(function (url) {
-            processStreamingVideoUrl(url, true, editableElement, savedRange, noteEntry);
+            processStreamingVideoUrl(url, true, editableElement, savedRange, noteEntry, savedCodeMirrorSelection);
         });
     };
 
@@ -4204,26 +4599,26 @@
 
     // Insert MP4 video into Markdown note (exposed globally)
     window.insertMp4VideoMarkdown = function () {
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-        insertUploadedMp4(true, noteEntry, editableElement, savedRange);
+        const insertionContext = captureEditorInsertionContext();
+        insertUploadedMp4(
+            true,
+            insertionContext.noteEntry,
+            insertionContext.editableElement,
+            insertionContext.savedRange,
+            insertionContext.codeMirrorSelection
+        );
     };
 
     // Insert audio file into Markdown note (exposed globally)
     window.insertAudioFileMarkdown = function () {
-        const noteEntry = savedNoteEntry;
-        const editableElement = savedEditableElement;
-        let savedRange = null;
-        const sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            savedRange = sel.getRangeAt(0).cloneRange();
-        }
-        insertUploadedAudio(true, noteEntry, editableElement, savedRange);
+        const insertionContext = captureEditorInsertionContext();
+        insertUploadedAudio(
+            true,
+            insertionContext.noteEntry,
+            insertionContext.editableElement,
+            insertionContext.savedRange,
+            insertionContext.codeMirrorSelection
+        );
     };
 
     // ============================================================================

@@ -7,6 +7,7 @@
 
 let isResizingOutline = false;
 let currentNoteId = null;
+let currentOutlineSignature = null;
 let hasInitializedOutlinePanel = false;
 let hasInitializedHeadingAnchorHandlers = false;
 let floatingHeadingAnchor = null;
@@ -112,15 +113,12 @@ function getOutlineInteractionRoot(target) {
 function getMarkdownEditorContent(markdownEditor) {
     if (!markdownEditor) return '';
 
-    if (typeof markdownEditor.value === 'string' && markdownEditor.value !== '') {
-        return markdownEditor.value;
+    const cmApi = window.PoznoteMarkdownCodeMirror;
+    if (cmApi && typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(markdownEditor)) {
+        return typeof cmApi.getValue === 'function' ? cmApi.getValue(markdownEditor) : '';
     }
 
-    if (typeof window.normalizeContentEditableText === 'function') {
-        return window.normalizeContentEditableText(markdownEditor);
-    }
-
-    return markdownEditor.textContent || '';
+    return markdownEditor.getAttribute('data-codemirror-value') || markdownEditor.textContent || '';
 }
 
 function isMarkdownFence(line) {
@@ -217,6 +215,13 @@ function findMarkdownEditorDomPositionForSourceOffset(editor, sourceOffset) {
 }
 
 function getMarkdownEditorSourceOffsetRect(editor, sourceOffset) {
+    if (window.PoznoteMarkdownCodeMirror &&
+        typeof window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor === 'function' &&
+        window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor(editor) &&
+        typeof window.PoznoteMarkdownCodeMirror.getCoordsAtPos === 'function') {
+        return window.PoznoteMarkdownCodeMirror.getCoordsAtPos(editor, sourceOffset);
+    }
+
     const startPosition = findMarkdownEditorDomPositionForSourceOffset(editor, sourceOffset);
     if (!startPosition) return null;
 
@@ -1007,7 +1012,11 @@ function scrollToHeading(heading) {
         if (heading.isSplitMode) {
             // Scroll editor to line
             if (markdownEditor && markdownEditor.offsetParent !== null) {
-                scrollMarkdownEditorLineToTop(markdownEditor, heading.lineNumber, markdownEditor, OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET);
+                const cmApi = window.PoznoteMarkdownCodeMirror;
+                const editorScrollContainer = (cmApi && typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(markdownEditor))
+                    ? (markdownEditor.querySelector('.cm-scroller') || markdownEditor)
+                    : markdownEditor;
+                scrollMarkdownEditorLineToTop(markdownEditor, heading.lineNumber, editorScrollContainer, OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET);
             }
 
             // Scroll preview to heading element
@@ -1102,19 +1111,27 @@ function scrollToElement(element) {
 /**
  * Update outline for currently active note
  */
+function headingsSignature(headings) {
+    if (!headings || headings.length === 0) return '';
+    return headings.map(h => h.level + ':' + h.text + (h.lineNumber !== undefined ? ':' + h.lineNumber : '')).join('|');
+}
+
 function updateOutlineForCurrentNote(forceUpdate = false) {
     // Find the currently visible note
     const visibleNote = getCurrentOutlineNoteElement();
 
     if (!visibleNote) {
         updateOutlineToggleAvailability(null);
-        renderOutline([]);
+        currentNoteId = null;
+        if (currentOutlineSignature !== null) {
+            currentOutlineSignature = null;
+            renderOutline([]);
+        }
         return;
     }
 
     // Extract note ID from the element
     const noteId = isPublicOutlinePage() ? 'public-note' : visibleNote.id.replace('entry', '');
-    const isDisabled = updateOutlineToggleAvailability(visibleNote);
 
     // Only update if note has changed, unless forced
     if (!forceUpdate && currentNoteId === noteId) {
@@ -1122,16 +1139,24 @@ function updateOutlineForCurrentNote(forceUpdate = false) {
     }
 
     currentNoteId = noteId;
+    const isDisabled = updateOutlineToggleAvailability(visibleNote);
 
     if (isDisabled) {
-        renderOutline([]);
+        if (currentOutlineSignature !== null) {
+            currentOutlineSignature = null;
+            renderOutline([]);
+        }
         return;
     }
 
     // Extract headings
     const headings = extractHeadings(visibleNote);
 
-    // Render outline
+    // Skip re-render if headings haven't changed
+    const sig = headingsSignature(headings);
+    if (sig === currentOutlineSignature) return;
+    currentOutlineSignature = sig;
+
     renderOutline(headings);
 }
 
@@ -1152,8 +1177,16 @@ function observeNoteChanges() {
         // nodes around them.  Re-rendering the outline during this window can
         // interfere with the smooth-scroll animation that positions the active
         // search result in the viewport.
-        var onlySearch = mutations.every(function (m) {
+        var onlyNoise = mutations.every(function (m) {
+            var t = m.target;
+            // Ignore all mutations from the outline panel itself
+            if (t && t.closest && t.closest('#outline-panel')) return true;
+            // Ignore all mutations from inside the CM editor (content, cursor, layers, etc.)
+            if (t && t.closest && t.closest('.cm-editor')) return true;
             if (m.type === 'characterData') return true; // text-node splits
+            // Ignore attribute mutations — class/data-note-type changes on toolbar,
+            // syntax highlights, copy-code buttons etc. don't change heading content.
+            if (m.type === 'attributes') return true;
             if (m.type !== 'childList') return false;
             var nodes = [];
             for (var i = 0; i < m.addedNodes.length; i++) nodes.push(m.addedNodes[i]);
@@ -1164,12 +1197,14 @@ function observeNoteChanges() {
                     var cl = n.classList;
                     return cl && (cl.contains('search-highlight') ||
                                   cl.contains('tag-highlight') ||
-                                  cl.contains('input-highlight-overlay'));
+                                  cl.contains('input-highlight-overlay') ||
+                                  cl.contains('heading-anchor') ||
+                                  n.getAttribute('data-heading-anchor') === 'true');
                 }
                 return false;
             });
         });
-        if (onlySearch) return;
+        if (onlyNoise) return;
 
         // Debounce the update
         clearTimeout(window.outlineUpdateTimeout);
@@ -1182,9 +1217,7 @@ function observeNoteChanges() {
     observer.observe(observationRoot, {
         childList: true,
         subtree: true,
-        characterData: true,
-        attributes: true,
-        attributeFilter: ['style', 'class', 'data-note-type']
+        characterData: true
     });
 
     // Handle input events for real-time updates while typing
@@ -1206,10 +1239,6 @@ function observeNoteChanges() {
             updateOutlineForCurrentNote();
         });
 
-        // Listen for note visibility changes
-        document.addEventListener('noteVisibilityChanged', function() {
-            updateOutlineForCurrentNote();
-        });
     }
 
     // Add touch/swipe support for mobile
@@ -1230,7 +1259,8 @@ function observeNoteChanges() {
  * Manually trigger outline update (can be called from other scripts)
  */
 function refreshOutline() {
-    currentNoteId = null; // Force refresh
+    currentNoteId = null;
+    currentOutlineSignature = null;
     updateOutlineForCurrentNote();
 }
 

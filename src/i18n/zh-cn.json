@@ -249,7 +249,8 @@
     "messages": {
       "disabled_small_screens": "为了获得更好的用户体验，Excalidraw 编辑在小屏幕上已禁用。",
       "disabled_mobile": "Excalidraw 编辑在移动设备上已禁用。",
-      "disabled_under_800": "Excalidraw 编辑在小于 800 像素的屏幕上已禁用。"
+      "disabled_under_800": "Excalidraw 编辑在小于 800 像素的屏幕上已禁用。",
+      "use_desktop_mode_on_phone": "为了获得更好的用户体验，Excalidraw 编辑在小于 800 像素的屏幕上已禁用。不过，如果将手机浏览器切换到 Desktop 模式，它应该可以工作。"
     },
     "spinner": {
       "saving_note": "正在保存笔记...",

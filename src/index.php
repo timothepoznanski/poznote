@@ -280,6 +280,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
+    <script src="js/codemirror-dist/markdown-codemirror.iife.js?v=<?php echo file_exists(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') ? filemtime(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') : $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
     <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>

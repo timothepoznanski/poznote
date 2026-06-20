@@ -415,13 +415,25 @@ function updateAttachmentCountInMenu(noteId) {
             if (data.success) {
                 var count = data.attachments.length;
 
-                // Get the note content to check for inline images
+                // Get the note content to check for inline images.
+                // HTML innerHTML covers preview/split rendering (contains <img> tags).
+                // For CodeMirror editors the raw markdown is the ground truth;
+                // we read it directly so newly-uploaded inline images are
+                // recognised even before the next auto-save.
                 var noteContent = '';
                 var noteEntry = document.getElementById('entry' + noteId);
                 if (noteEntry) {
                     noteContent = noteEntry.innerHTML || '';
                 }
-                var effectiveNoteContent = noteContent || data.entry || '';
+                var cmContent = '';
+                if (noteEntry) {
+                    var editorDiv = noteEntry.querySelector('.markdown-editor');
+                    var cmApi = _getCmApi();
+                    if (editorDiv && cmApi && _isCmEditor(editorDiv) && typeof cmApi.getValue === 'function') {
+                        cmContent = cmApi.getValue(editorDiv) || '';
+                    }
+                }
+                var effectiveNoteContent = noteContent || cmContent || data.entry || '';
 
                 renderAttachmentPreviews(noteId, data.attachments, effectiveNoteContent);
 
@@ -879,9 +891,122 @@ function handleSingleImageFile(file, dropTarget) {
     }
 }
 
+function _getCmApi() {
+    return window.PoznoteMarkdownCodeMirror || null;
+}
+
+function _isCmEditor(editor) {
+    var api = _getCmApi();
+    return !!(api && editor && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor));
+}
+
 function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     var noteId = noteEntry.id.replace('entry', '');
 
+    var editor = dropTarget ? dropTarget.querySelector('.markdown-editor') : null;
+    var cmApi = _getCmApi();
+    var isCm = editor && _isCmEditor(editor);
+
+    // ── CodeMirror path ──────────────────────────────────────────────
+    if (isCm && cmApi && typeof cmApi.replaceRange === 'function' && typeof cmApi.getSelectionOffsets === 'function') {
+        var safeName = String(file.name || 'image').replace(/[\r\n\t]+/g, ' ').trim().replace(/[\\\[\]]/g, '\\$&') || 'image';
+        var offsets = cmApi.getSelectionOffsets(editor);
+        var insertPos = offsets ? offsets.end : 0;
+        var loadingText = '![Uploading ' + safeName + '...]()';
+        var uniqueToken = '![Uploading_' + safeName + '_' + Date.now() + '...]()';
+
+        // Insert placeholder, then overwrite with unique token for safe find-replace
+        cmApi.replaceRange(editor, insertPos, insertPos, loadingText);
+        cmApi.replaceRange(editor, insertPos, insertPos + loadingText.length, uniqueToken);
+
+        // Trigger initial save marker
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+
+        var formData = new FormData();
+        formData.append('note_id', noteId);
+        formData.append('file', file);
+        if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+            formData.append('workspace', selectedWorkspace);
+        }
+
+        fetch('/api/v1/notes/' + noteId + '/attachments', {
+            method: 'POST',
+            body: formData
+        })
+            .then(function (response) {
+                if (!response.ok) throw new Error('Failed to upload attachment');
+                return response.json();
+            })
+            .then(function (data) {
+                if (data.success) {
+                    var borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
+                    var imageMarkdown = '![' + safeName + '](/api/v1/notes/' + noteId + '/attachments/' + data.attachment_id + ')' + borderSuffix;
+
+                    // Replace unique token with final markdown
+                    if (typeof cmApi.getValue === 'function') {
+                        var current = cmApi.getValue(editor);
+                        var idx = current.indexOf(uniqueToken);
+                        if (idx !== -1) {
+                            cmApi.replaceRange(editor, idx, idx + uniqueToken.length, imageMarkdown);
+                        }
+                    }
+
+                    if (typeof window.markNoteAsModified === 'function') {
+                        window.markNoteAsModified();
+                    }
+
+                    if (typeof reinitializeImageClickHandlers === 'function') {
+                        setTimeout(function () { reinitializeImageClickHandlers(); }, 200);
+                    }
+
+                    updateAttachmentCountInMenu(noteId);
+
+                    if (typeof currentNoteIdForAttachments !== 'undefined' && currentNoteIdForAttachments == noteId) {
+                        loadAttachments(noteId);
+                    }
+
+                    if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                        window.setNeedsAutoPush(true);
+                    }
+
+                    setTimeout(function () {
+                        if (typeof window.saveNoteImmediately === 'function') {
+                            window.saveNoteImmediately();
+                        }
+                    }, 500);
+                } else {
+                    // Remove placeholder on error
+                    if (typeof cmApi.getValue === 'function') {
+                        var cur = cmApi.getValue(editor);
+                        var i = cur.indexOf(uniqueToken);
+                        if (i !== -1) {
+                            cmApi.replaceRange(editor, i, i + uniqueToken.length, '');
+                        }
+                    }
+                    if (typeof showNotificationPopup === 'function') {
+                        showNotificationPopup('Upload failed: ' + data.message, 'error');
+                    }
+                }
+            })
+            .catch(function (error) {
+                if (typeof cmApi.getValue === 'function') {
+                    var cur = cmApi.getValue(editor);
+                    var i = cur.indexOf(uniqueToken);
+                    if (i !== -1) {
+                        cmApi.replaceRange(editor, i, i + uniqueToken.length, '');
+                    }
+                }
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup('Upload failed: ' + error.message, 'error');
+                }
+            });
+
+        return;
+    }
+
+    // ── Legacy contenteditable path ───────────────────────────────────
     // Show loading indicator
     var loadingText = '![Uploading ' + file.name + '...]()';
     var loadingTextNode = insertMarkdownAtCursor(loadingText, dropTarget);
@@ -934,7 +1059,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
                     loadAttachments(noteId);
                 }
 
-                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                     window.setNeedsAutoPush(true);
                 }
 

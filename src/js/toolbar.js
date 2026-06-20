@@ -397,7 +397,13 @@ function getEditorFromRange(range) {
 
   if (!node || !node.closest) return null;
 
-  return node.closest('.noteentry, .markdown-editor, [contenteditable="true"]');
+  var markdownEditor = node.closest('.markdown-editor');
+  if (markdownEditor) return markdownEditor;
+
+  var editable = node.closest('[contenteditable="true"]');
+  if (editable) return editable;
+
+  return node.closest('.noteentry');
 }
 
 function captureScrollState(editor) {
@@ -435,12 +441,54 @@ function restoreScrollState(scrollState) {
 function focusEditorWithoutScroll(editor, scrollState) {
   if (!editor) return;
 
+  if (window.PoznoteMarkdownCodeMirror &&
+    typeof window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor === 'function' &&
+    window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor(editor) &&
+    typeof window.PoznoteMarkdownCodeMirror.focus === 'function') {
+    window.PoznoteMarkdownCodeMirror.focus(editor);
+    restoreScrollState(scrollState);
+    return;
+  }
+
   try {
     editor.focus({ preventScroll: true });
   } catch (e) {
     editor.focus();
     restoreScrollState(scrollState);
   }
+}
+
+function escapeMarkdownLinkLabel(text, fallback) {
+  const normalized = String(text || '')
+    .replace(/[\r\n\t]+/g, ' ')
+    .trim();
+  const value = normalized || fallback || '';
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]');
+}
+
+function normalizeMarkdownLinkDestination(url) {
+  const value = String(url || '').trim();
+  if (!value) return '';
+  if (/[\u0000-\u001F\u007F]/.test(value)) return '';
+  const schemeMatch = value.match(/^([a-z][a-z0-9+.-]*):/i);
+  if (schemeMatch) {
+    const scheme = schemeMatch[1].toLowerCase();
+    if (scheme !== 'http' && scheme !== 'https' && scheme !== 'mailto' && scheme !== 'tel') {
+      return '';
+    }
+  }
+  return value.replace(/[()\s<>]/g, function (match) {
+    return encodeURIComponent(match);
+  });
+}
+
+function buildSafeMarkdownLink(label, url) {
+  const destination = normalizeMarkdownLinkDestination(url);
+  if (!destination) return '';
+  return '[' + escapeMarkdownLinkLabel(label || url || 'link', 'link') + '](' + destination + ')';
 }
 
 function changeFontSize() {
@@ -777,6 +825,13 @@ function getMarkdownEditorFromRange(range) {
 function getRangeOffsetsWithinEditor(editor, range) {
   if (!editor || !range) return null;
 
+  if (window.PoznoteMarkdownCodeMirror &&
+    typeof window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor === 'function' &&
+    window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor(editor) &&
+    typeof window.PoznoteMarkdownCodeMirror.getSelectionOffsets === 'function') {
+    return window.PoznoteMarkdownCodeMirror.getSelectionOffsets(editor);
+  }
+
   try {
     if (!editor.contains(range.startContainer) || !editor.contains(range.endContainer)) {
       return null;
@@ -1008,6 +1063,14 @@ function findTextNodeAtOffset(rootEl, offset) {
 function setSelectionByEditorOffsets(editor, startOffset, endOffset) {
   if (!editor) return;
 
+  if (window.PoznoteMarkdownCodeMirror &&
+    typeof window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor === 'function' &&
+    window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor(editor) &&
+    typeof window.PoznoteMarkdownCodeMirror.setSelection === 'function') {
+    window.PoznoteMarkdownCodeMirror.setSelection(editor, startOffset, endOffset);
+    return;
+  }
+
   var selection = window.getSelection();
   if (!selection) return;
 
@@ -1029,6 +1092,13 @@ function setSelectionByEditorOffsets(editor, startOffset, endOffset) {
 
 function replaceMarkdownRangeByOffsets(editor, start, end, replacement) {
   if (!editor) return false;
+
+  if (window.PoznoteMarkdownCodeMirror &&
+    typeof window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor === 'function' &&
+    window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor(editor) &&
+    typeof window.PoznoteMarkdownCodeMirror.replaceRange === 'function') {
+    return window.PoznoteMarkdownCodeMirror.replaceRange(editor, start, end, replacement);
+  }
 
   var fullText = getMarkdownEditorText(editor);
   var safeStart = Math.max(0, Math.min(start, fullText.length));
@@ -1600,7 +1670,14 @@ function addLinkToNote() {
           try { markdownEditor.focus({ preventScroll: true }); } catch (e) { markdownEditor.focus(); }
         }
 
-        const linkMarkdown = '[' + (text || url || existingText || 'link') + '](' + url + ')';
+        const linkMarkdown = buildSafeMarkdownLink(text || existingText || url || 'link', url);
+        if (!linkMarkdown) {
+          if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup((window.t || function (key, params, fallback) { return fallback; })('slash_menu.invalid_url', null, 'Invalid URL'), 'error');
+          }
+          window.savedRanges.link = null;
+          return;
+        }
 
         // Apply markdown link syntax
         if (markdownEditor && markdownOffsets) {
@@ -1735,19 +1812,111 @@ function addLinkToNote() {
   }
 }
 
-function toggleTablePicker() {
+function getNodeNoteEntry(node) {
+  if (!node) return null;
+  if (node.nodeType === 3) node = node.parentNode;
+  return node && node.closest ? node.closest('.noteentry') : null;
+}
+
+function getSelectionNoteEntry() {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return null;
+  return getNodeNoteEntry(selection.getRangeAt(0).commonAncestorContainer);
+}
+
+function getCodeMirrorEditorForNoteEntry(noteEntry, cmApi) {
+  if (!noteEntry || !noteEntry.querySelector || !cmApi || typeof cmApi.isCodeMirrorEditor !== 'function') {
+    return null;
+  }
+
+  const candidate = noteEntry.querySelector('.markdown-editor');
+  return candidate && cmApi.isCodeMirrorEditor(candidate) ? candidate : null;
+}
+
+function getCurrentTableCodeMirrorContext(triggerElement) {
+  const cmApi = window.PoznoteMarkdownCodeMirror;
+  if (!cmApi || typeof cmApi.isCodeMirrorEditor !== 'function') return null;
+
+  let editor = null;
+
+  const selectionNoteEntry = getSelectionNoteEntry();
+  if (selectionNoteEntry) {
+    editor = getCodeMirrorEditorForNoteEntry(selectionNoteEntry, cmApi);
+    if (!editor) {
+      return null;
+    }
+  }
+
+  if (!editor && triggerElement && triggerElement.closest) {
+    const triggerNoteCard = triggerElement.closest('.notecard');
+    const triggerNoteEntry = triggerNoteCard ? triggerNoteCard.querySelector('.noteentry') : triggerElement.closest('.noteentry');
+    if (triggerNoteEntry) {
+      editor = getCodeMirrorEditorForNoteEntry(triggerNoteEntry, cmApi);
+      if (!editor) {
+        return null;
+      }
+    }
+  }
+
+  const active = document.activeElement;
+  const activeNoteCard = active && active.closest ? active.closest('.notecard') : null;
+
+  if (!editor && activeNoteCard && activeNoteCard.querySelector) {
+    const activeNoteEntry = activeNoteCard.querySelector('.noteentry');
+    editor = getCodeMirrorEditorForNoteEntry(activeNoteEntry, cmApi);
+    if (!editor) return null;
+  }
+
+  if (!editor && active && active.closest) {
+    const candidate = active.closest('.markdown-editor');
+    if (candidate && cmApi.isCodeMirrorEditor(candidate)) {
+      editor = candidate;
+    }
+  }
+
+  if (!editor && typeof cmApi.getLastActiveEditor === 'function') {
+    const candidate = cmApi.getLastActiveEditor();
+    if (candidate && cmApi.isCodeMirrorEditor(candidate)) {
+      editor = candidate;
+    }
+  }
+
+  if (!editor) return null;
+
+  const offsets = typeof cmApi.getSelectionOffsets === 'function' ? cmApi.getSelectionOffsets(editor) : null;
+  const docLength = typeof cmApi.getValue === 'function' ? cmApi.getValue(editor).length : 0;
+  const start = offsets ? Math.max(0, Math.min(offsets.start, docLength)) : docLength;
+  const end = offsets ? Math.max(start, Math.min(offsets.end, docLength)) : start;
+
+  return { editor, start, end };
+}
+
+function buildMarkdownTable(rows, cols) {
+  const header = Array.from({ length: cols }, (_, i) => `Column ${i + 1}`).join(' | ');
+  const separator = Array.from({ length: cols }, () => '---').join(' | ');
+  const row = Array.from({ length: cols }, () => ' ').join(' | ');
+  return `\n| ${header} |\n| ${separator} |\n${Array.from({ length: rows - 1 }, () => `| ${row} |`).join('\n')}\n`;
+}
+
+function toggleTablePicker(triggerElement) {
   const existingPicker = document.querySelector('.table-picker-popup');
 
   if (existingPicker) {
     existingPicker.remove();
+    window.savedCodeMirrorTable = null;
+    window.savedRanges.table = null;
     return;
   }
 
+  const codeMirrorTableContext = getCurrentTableCodeMirrorContext(triggerElement);
+
   // Check if cursor is in editable note BEFORE opening picker
-  if (!isCursorInEditableNote()) {
+  if (!codeMirrorTableContext && !isCursorInEditableNote()) {
     window.showCursorWarning();
     return;
   }
+
+  window.savedCodeMirrorTable = codeMirrorTableContext;
 
   // Save current selection/cursor position
   const sel = window.getSelection();
@@ -1938,10 +2107,30 @@ function toggleTablePicker() {
   rowsInput.addEventListener('keydown', handleInputEnter);
   colsInput.addEventListener('keydown', handleInputEnter);
 
-  setupPopupDismiss(picker, '.btn-table');
+  setupPopupDismiss(picker, '.btn-table', function () {
+    window.savedCodeMirrorTable = null;
+    window.savedRanges.table = null;
+  });
 }
 
 function insertTable(rows, cols) {
+  // CodeMirror markdown editor: insert markdown table syntax
+  const cmApi = window.PoznoteMarkdownCodeMirror;
+  const cmContext = window.savedCodeMirrorTable || getCurrentTableCodeMirrorContext();
+  if (cmContext && cmApi && typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(cmContext.editor) && typeof cmApi.replaceRange === 'function') {
+    const tableMarkdown = buildMarkdownTable(rows, cols);
+    cmApi.replaceRange(cmContext.editor, cmContext.start, cmContext.end, tableMarkdown);
+    if (typeof cmApi.setSelection === 'function') {
+      const caretPos = cmContext.start + tableMarkdown.length;
+      cmApi.setSelection(cmContext.editor, caretPos, caretPos);
+    }
+    window.savedCodeMirrorTable = null;
+    window.savedRanges.table = null;
+    return;
+  }
+
+  window.savedCodeMirrorTable = null;
+
   // Use saved range if available, otherwise check current cursor position
   if (window.savedRanges.table) {
     // Restore the saved selection
