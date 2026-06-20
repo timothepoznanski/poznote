@@ -115,8 +115,14 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 }
 
 .markdown-codemirror-host .cm-scroller {
-    overflow: visible;
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     font-family: inherit;
+}
+
+.markdown-codemirror-host .cm-scroller::-webkit-scrollbar {
+    display: none;
 }
 
 .markdown-codemirror-host .cm-content {
