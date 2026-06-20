@@ -2859,6 +2859,7 @@ function parseMarkdown(text) {
         if (isMarkdownTableStart(line, lines[i + 1] || '')) {
             flushParagraph();
 
+            let tableStartLine = i;
             let tableRows = [];
             let tableAlignments = [];
             let isFirstRow = true;
@@ -2912,7 +2913,7 @@ function parseMarkdown(text) {
 
             // Generate HTML table
             if (tableRows.length > 0) {
-                let tableHTML = '<table>';
+                let tableHTML = '<table data-start-line="' + tableStartLine + '">';
 
                 // Process rows
                 for (let r = 0; r < tableRows.length; r++) {
@@ -4379,6 +4380,23 @@ function setupPreviewInteractivity(noteId) {
         }
     }
 
+    // Left-click context menu on tables in preview
+    var previewTables = previewDiv.querySelectorAll('table[data-start-line]');
+    previewTables.forEach(function(table) {
+        table.removeEventListener('click', table._mdTableClickHandler);
+        table._mdTableClickHandler = function(e) {
+            const cell = e.target.closest('td, th');
+            if (!cell) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof window.showMdTableContextMenu === 'function') {
+                window.showMdTableContextMenu(e.clientX, e.clientY, table, cell, noteEntry);
+            }
+        };
+        table.addEventListener('click', table._mdTableClickHandler);
+        table.style.cursor = 'default';
+    });
+
     var isInSplitMode = noteEntry.classList.contains('markdown-split-mode');
 
     // Setup checkbox click handlers
@@ -4443,6 +4461,7 @@ window.syncMarkdownEditorEditableState = syncMarkdownEditorEditableState;
 window.updateMarkdownSplitPaneHeight = updateMarkdownSplitPaneHeight;
 window.scheduleMarkdownSplitPaneHeightUpdate = scheduleMarkdownSplitPaneHeightUpdate;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
+window.handleMarkdownTableEnter = handleMarkdownTableEnter;
 window.updateViewModeButton = updateViewModeButton;
 window.setupSplitModePreviewUpdate = setupSplitModePreviewUpdate;
 window.toggleMarkdownExcalidrawImageBorder = toggleMarkdownExcalidrawImageBorder;

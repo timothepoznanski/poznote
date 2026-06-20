@@ -269,6 +269,30 @@ function EditorSelectionRange(anchor, head) {
   return EditorSelection.range(anchor, head)
 }
 
+function runMarkdownTableEnter(host) {
+  return function run() {
+    if (!host || typeof window.handleMarkdownTableEnter !== 'function') {
+      return false
+    }
+
+    const noteEntry = host.closest ? host.closest('.noteentry') : null
+    const noteId = noteEntry && noteEntry.id ? noteEntry.id.replace(/^entry/, '') : null
+    if (!noteEntry || !noteId) {
+      return false
+    }
+
+    return !!window.handleMarkdownTableEnter({
+      key: 'Enter',
+      shiftKey: false,
+      ctrlKey: false,
+      metaKey: false,
+      altKey: false,
+      preventDefault() {},
+      stopPropagation() {}
+    }, host, noteEntry, noteId)
+  }
+}
+
 function createReadOnlyExtensions(readOnly) {
   return [
     EditorState.readOnly.of(!!readOnly),
@@ -608,6 +632,7 @@ function createEditor(host, options = {}) {
       updateListener,
       domHandlers,
       keymap.of([
+        { key: 'Enter', run: runMarkdownTableEnter(host) },
         { key: 'Enter', run: insertNewlineContinueMarkup },
         { key: 'Mod-Space', run: startCompletion },
         { key: 'Ctrl-Space', run: startCompletion },
