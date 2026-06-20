@@ -415,13 +415,25 @@ function updateAttachmentCountInMenu(noteId) {
             if (data.success) {
                 var count = data.attachments.length;
 
-                // Get the note content to check for inline images
+                // Get the note content to check for inline images.
+                // HTML innerHTML covers preview/split rendering (contains <img> tags).
+                // For CodeMirror editors the raw markdown is the ground truth;
+                // we read it directly so newly-uploaded inline images are
+                // recognised even before the next auto-save.
                 var noteContent = '';
                 var noteEntry = document.getElementById('entry' + noteId);
                 if (noteEntry) {
                     noteContent = noteEntry.innerHTML || '';
                 }
-                var effectiveNoteContent = noteContent || data.entry || '';
+                var cmContent = '';
+                if (noteEntry) {
+                    var editorDiv = noteEntry.querySelector('.markdown-editor');
+                    var cmApi = _getCmApi();
+                    if (editorDiv && cmApi && _isCmEditor(editorDiv) && typeof cmApi.getValue === 'function') {
+                        cmContent = cmApi.getValue(editorDiv) || '';
+                    }
+                }
+                var effectiveNoteContent = noteContent || cmContent || data.entry || '';
 
                 renderAttachmentPreviews(noteId, data.attachments, effectiveNoteContent);
 
