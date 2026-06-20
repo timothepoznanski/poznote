@@ -893,6 +893,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **AJAX** - Asynchronous data loading
 
 ### Libraries
+- **CodeMirror 6** - Extensible code and text editor for the Markdown editing experience
 - **Excalidraw** - Virtual whiteboard for sketching diagrams and drawings
 - **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
 - **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
