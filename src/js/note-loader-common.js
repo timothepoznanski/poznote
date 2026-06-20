@@ -861,9 +861,6 @@ function buildImageMenuHTML(img) {
     const isEmbeddedExcalidraw = excalidrawContainer !== null;
     const diagramId = excalidrawContainer ? excalidrawContainer.id : null;
 
-    // Check if we're on mobile (width < 800px)
-    const isMobile = window.innerWidth < 800;
-
     // Check if this is a markdown note (to exclude certain options for markdown)
     const isMarkdownNote = img.closest('.markdown-preview') !== null ||
         img.closest('.markdown-editor') !== null ||
@@ -895,8 +892,8 @@ function buildImageMenuHTML(img) {
     `;
     }
 
-    // Add Edit option for Excalidraw images (standalone notes) - hide on mobile
-    if (isExcalidraw && excalidrawNoteId && !isMobile) {
+    // Add Edit option for Excalidraw images (standalone notes)
+    if (isExcalidraw && excalidrawNoteId) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-excalidraw" data-note-id="${excalidrawNoteId}">
                 <i class="lucide lucide-pencil"></i>
@@ -905,8 +902,8 @@ function buildImageMenuHTML(img) {
         ` + menuHTML;
     }
 
-    // Add Edit option for embedded Excalidraw diagrams - hide on mobile
-    if (isEmbeddedExcalidraw && diagramId && !isMobile) {
+    // Add Edit option for embedded Excalidraw diagrams
+    if (isEmbeddedExcalidraw && diagramId) {
         menuHTML = `
             <div class="image-menu-item" data-action="edit-embedded-excalidraw" data-diagram-id="${diagramId}">
                 <i class="lucide lucide-pencil"></i>

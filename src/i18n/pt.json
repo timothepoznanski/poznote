@@ -247,7 +247,8 @@
     "messages": {
       "disabled_small_screens": "A edição do Excalidraw está desabilitada em telas pequenas para uma melhor experiência do usuário.",
       "disabled_mobile": "A edição do Excalidraw está desabilitada em dispositivos móveis.",
-      "disabled_under_800": "A edição do Excalidraw está desabilitada em telas menores que 800px."
+      "disabled_under_800": "A edição do Excalidraw está desabilitada em telas menores que 800px.",
+      "use_desktop_mode_on_phone": "Para uma melhor experiência do usuário, a edição do Excalidraw está desabilitada em telas menores que 800px. No entanto, deve funcionar se você mudar o navegador do telefone para o modo Desktop."
     },
     "spinner": {
       "saving_note": "Salvando nota...",

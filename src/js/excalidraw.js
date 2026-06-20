@@ -18,18 +18,37 @@ function excaTr(key, vars, fallback) {
     return text;
 }
 
+function getMobileExcalidrawDesktopModeMessage() {
+    return excaTr('excalidraw.messages.use_desktop_mode_on_phone', {}, 'Pour une meilleure expérience utilisateur, l’édition Excalidraw est désactivée sur les écrans de moins de 800px. Cependant, cela devrait fonctionner si vous passez votre téléphone en mode Desktop.');
+}
+
+function isExcalidrawMobileViewport() {
+    if (typeof isMobileDevice === 'function') {
+        return isMobileDevice();
+    }
+    if (window.matchMedia) {
+        return window.matchMedia('(max-width: 800px)').matches;
+    }
+    return window.innerWidth <= 800;
+}
+
+function showMobileExcalidrawEditUnavailable() {
+    const message = getMobileExcalidrawDesktopModeMessage();
+    if (typeof window.showError === 'function') {
+        window.showError(
+            message,
+            excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
+        );
+    } else {
+        alert(message);
+    }
+}
+
 // Open existing Excalidraw note for editing
 function openExcalidrawNote(noteId) {
-    // Disable Excalidraw editing on mobile devices (< 800px)
-    if (window.innerWidth < 800) {
-        if (typeof window.showError === 'function') {
-            window.showError(
-                excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
-                excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
-            );
-        } else {
-            alert(excaTr('excalidraw.messages.disabled_mobile', {}, 'Excalidraw editing is disabled on mobile devices.'));
-        }
+    // Disable Excalidraw editing on mobile devices (max-width: 800px)
+    if (isExcalidrawMobileViewport()) {
+        showMobileExcalidrawEditUnavailable();
         return false;
     }
 
@@ -205,8 +224,8 @@ function insertExcalidrawDiagram() {
         }
     }
 
-    // Disable Excalidraw insertion on mobile devices (< 800px)
-    if (window.innerWidth < 800) {
+    // Disable Excalidraw insertion on mobile devices (max-width: 800px)
+    if (isExcalidrawMobileViewport()) {
         if (typeof window.showError === 'function') {
             window.showError(
                 excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
@@ -397,16 +416,9 @@ function saveNoteAndWaitForCompletion() {
 
 // Open Excalidraw editor for a specific diagram
 function openExcalidrawEditor(diagramId, cursorPosition = null) {
-    // Disable Excalidraw editing on mobile devices (< 800px)
-    if (window.innerWidth < 800) {
-        if (typeof window.showError === 'function') {
-            window.showError(
-                excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
-                excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
-            );
-        } else {
-            alert(excaTr('excalidraw.messages.disabled_mobile', {}, 'Excalidraw editing is disabled on mobile devices.'));
-        }
+    // Disable Excalidraw editing on mobile devices (max-width: 800px)
+    if (isExcalidrawMobileViewport()) {
+        showMobileExcalidrawEditUnavailable();
         return false;
     }
 
@@ -590,14 +602,7 @@ function downloadImageFromUrl(imageSrc, filename) {
 
 // Function to show alert when trying to edit Excalidraw on mobile
 function showMobileExcalidrawAlert() {
-    if (typeof window.showError === 'function') {
-        window.showError(
-            excaTr('excalidraw.messages.disabled_small_screens', {}, 'Excalidraw editing is disabled on small screens for a better user experience.'),
-            excaTr('excalidraw.titles.editing_not_available', {}, 'Editing not available')
-        );
-    } else {
-        alert(excaTr('excalidraw.messages.disabled_under_800', {}, 'Excalidraw editing is disabled on screens smaller than 800px.'));
-    }
+    showMobileExcalidrawEditUnavailable();
 }
 
 // Make functions globally available
