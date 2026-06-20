@@ -4914,6 +4914,7 @@ window.syncMarkdownEditorEditableState = syncMarkdownEditorEditableState;
 window.updateMarkdownSplitPaneHeight = updateMarkdownSplitPaneHeight;
 window.scheduleMarkdownSplitPaneHeightUpdate = scheduleMarkdownSplitPaneHeightUpdate;
 window.setupMarkdownEditorListeners = setupMarkdownEditorListeners;
+window.handleMarkdownOrderedListTab = handleMarkdownOrderedListTab;
 window.handleMarkdownTableEnter = handleMarkdownTableEnter;
 window.updateViewModeButton = updateViewModeButton;
 window.setupSplitModePreviewUpdate = setupSplitModePreviewUpdate;

@@ -1,5 +1,5 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, snippetCompletion, startCompletion } from '@codemirror/autocomplete'
-import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
+import { defaultKeymap, history, historyKeymap, indentLess, indentMore } from '@codemirror/commands'
 import { markdown, markdownLanguage, insertNewlineContinueMarkup } from '@codemirror/lang-markdown'
 import { bracketMatching, HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { languages } from '@codemirror/language-data'
@@ -290,6 +290,29 @@ function runMarkdownTableEnter(host) {
       preventDefault() {},
       stopPropagation() {}
     }, host, noteEntry, noteId)
+  }
+}
+
+function runMarkdownOrderedListTab(host, shiftKey = false) {
+  return function run(view) {
+    if (host && typeof window.handleMarkdownOrderedListTab === 'function') {
+      const noteEntry = host.closest ? host.closest('.noteentry') : null
+      const noteId = noteEntry && noteEntry.id ? noteEntry.id.replace(/^entry/, '') : null
+
+      if (noteEntry && noteId && window.handleMarkdownOrderedListTab({
+        key: 'Tab',
+        shiftKey: !!shiftKey,
+        ctrlKey: false,
+        metaKey: false,
+        altKey: false,
+        preventDefault() {},
+        stopPropagation() {}
+      }, host, noteEntry, noteId)) {
+        return true
+      }
+    }
+
+    return shiftKey ? indentLess(view) : indentMore(view)
   }
 }
 
@@ -652,7 +675,11 @@ function createEditor(host, options = {}) {
         ...closeBracketsKeymap,
         ...completionKeymap,
         { key: 'Mod-i', run: wrapSelection('*', '*') },
-        indentWithTab,
+        {
+          key: 'Tab',
+          run: runMarkdownOrderedListTab(host),
+          shift: runMarkdownOrderedListTab(host, true)
+        },
         ...searchKeymap,
         ...historyKeymap,
         ...defaultKeymap
