@@ -1217,7 +1217,7 @@ function scrollMarkdownCaretIntoView(editorDiv) {
 }
 
 function scheduleMarkdownCaretScrollIntoView(editorDiv) {
-    if (!editorDiv) {
+    if (!editorDiv || editorDiv._suppressMarkdownTableContextInput) {
         return;
     }
 
@@ -1233,7 +1233,7 @@ function scheduleMarkdownCaretScrollIntoView(editorDiv) {
 }
 
 function scheduleMarkdownMobileCaretScrollIntoView(editorDiv) {
-    if (!editorDiv || !isMarkdownMobileViewport()) {
+    if (!editorDiv || editorDiv._suppressMarkdownTableContextInput || !isMarkdownMobileViewport()) {
         return;
     }
 
@@ -3884,6 +3884,10 @@ function setupMarkdownEditorListeners(noteId) {
         }
         window.noteid = noteId;
 
+        if (editorDiv._suppressMarkdownTableContextInput) {
+            return;
+        }
+
         // Mark as edited
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
@@ -4258,6 +4262,9 @@ function setupMarkdownPreviewScrollSync(noteEntry, editorDiv) {
     teardownMarkdownPreviewScrollSync(editorDiv);
 
     var schedule = function () {
+        if (editorDiv._suppressMarkdownTableContextInput) {
+            return;
+        }
         scheduleMarkdownPreviewScrollToEditorCaret(noteEntry);
     };
     var listeners = [
@@ -4297,6 +4304,11 @@ function setupSplitModePreviewUpdate(noteId) {
     // Create debounced update function
     var updateTimeout;
     editorDiv._splitModeInputListener = function () {
+        if (editorDiv._suppressMarkdownTableContextInput) {
+            clearTimeout(updateTimeout);
+            return;
+        }
+
         clearTimeout(updateTimeout);
         updateTimeout = setTimeout(function () {
             var content = normalizeContentEditableText(editorDiv);

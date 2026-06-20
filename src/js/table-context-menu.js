@@ -360,6 +360,94 @@
         return { rowIndex, cellIndex };
     }
 
+    function addMdScrollSnapshot(snapshots, target) {
+        if (!target || snapshots.some(snapshot => snapshot.target === target)) {
+            return;
+        }
+
+        snapshots.push({
+            target: target,
+            top: target.scrollTop || 0,
+            left: target.scrollLeft || 0,
+            overflowAnchor: target.style ? target.style.overflowAnchor : null
+        });
+    }
+
+    function isMdScrollableElement(element) {
+        return !!(element &&
+            (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth));
+    }
+
+    function captureMdTableScrollState(previewDiv, editorScrollTarget) {
+        const snapshots = [];
+        const rightCol = document.getElementById('right_col');
+        const scrollingElement = document.scrollingElement || document.documentElement;
+
+        addMdScrollSnapshot(snapshots, previewDiv);
+        addMdScrollSnapshot(snapshots, editorScrollTarget);
+        addMdScrollSnapshot(snapshots, rightCol);
+
+        let parent = previewDiv ? previewDiv.parentElement : null;
+        while (parent && parent !== document.body && parent !== document.documentElement) {
+            if (isMdScrollableElement(parent)) {
+                addMdScrollSnapshot(snapshots, parent);
+            }
+            parent = parent.parentElement;
+        }
+
+        addMdScrollSnapshot(snapshots, scrollingElement);
+
+        return {
+            snapshots: snapshots,
+            windowX: window.pageXOffset || scrollingElement.scrollLeft || 0,
+            windowY: window.pageYOffset || scrollingElement.scrollTop || 0
+        };
+    }
+
+    function setMdTableScrollAnchoring(scrollState, disabled) {
+        scrollState.snapshots.forEach(snapshot => {
+            if (!snapshot.target.style) return;
+            snapshot.target.style.overflowAnchor = disabled ? 'none' : (snapshot.overflowAnchor || '');
+        });
+    }
+
+    function restoreMdTableScrollState(scrollState) {
+        scrollState.snapshots.forEach(snapshot => {
+            snapshot.target.scrollTop = snapshot.top;
+            snapshot.target.scrollLeft = snapshot.left;
+        });
+
+        if (typeof window.scrollTo === 'function') {
+            window.scrollTo(scrollState.windowX, scrollState.windowY);
+        }
+    }
+
+    function restoreMdTableScrollStateAfterLayout(scrollState) {
+        restoreMdTableScrollState(scrollState);
+
+        requestAnimationFrame(() => {
+            restoreMdTableScrollState(scrollState);
+            requestAnimationFrame(() => {
+                restoreMdTableScrollState(scrollState);
+                setTimeout(() => {
+                    restoreMdTableScrollState(scrollState);
+                    setMdTableScrollAnchoring(scrollState, false);
+                }, 100);
+            });
+        });
+    }
+
+    function markMdTableActionAsModified(noteId) {
+        if (typeof noteid !== 'undefined') {
+            noteid = noteId;
+        }
+        window.noteid = noteId;
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+    }
+
     function executeMdTableAction(action) {
         if (!mdActiveTable || !mdActiveCell || !mdActiveNoteEntry) return;
 
@@ -468,31 +556,35 @@
         const newContent = lines.join('\n');
         mdActiveNoteEntry.setAttribute('data-markdown-content', newContent);
 
-        // Re-render preview, preserving scroll position
         const previewDiv = mdActiveNoteEntry.querySelector('.markdown-preview');
-        if (previewDiv && typeof renderMarkdownPreview === 'function') {
-            const previewScroll = previewDiv.scrollTop;
-            renderMarkdownPreview(previewDiv, newContent, noteId);
-            previewDiv.scrollTop = previewScroll;
-        }
-
-        // Persist via the editor div if present, preserving scroll position
         const editorDiv = mdActiveNoteEntry.querySelector('.markdown-editor');
-        if (editorDiv) {
-            // For CodeMirror, scroll lives in the .cm-scroller child
-            const cmScroller = editorDiv.querySelector('.cm-scroller');
-            const scrollTarget = cmScroller || editorDiv;
-            const savedScroll = scrollTarget.scrollTop;
+        const cmScroller = editorDiv && editorDiv.querySelector('.cm-scroller');
+        const editorScrollTarget = cmScroller || editorDiv;
 
-            if (typeof renderMarkdownEditorContent === 'function') {
-                renderMarkdownEditorContent(editorDiv, newContent);
+        const scrollState = captureMdTableScrollState(previewDiv, editorScrollTarget);
+        setMdTableScrollAnchoring(scrollState, true);
+
+        // Re-render preview (postProcess:false skips the 100ms setTimeout)
+        if (previewDiv && typeof window.renderMarkdownPreview === 'function') {
+            window.renderMarkdownPreview(previewDiv, newContent, noteId, { postProcess: false });
+            if (typeof window.setupPreviewInteractivity === 'function') {
+                window.setupPreviewInteractivity(noteId);
             }
-
-            // Restore after CodeMirror finishes layout
-            requestAnimationFrame(() => { scrollTarget.scrollTop = savedScroll; });
-
-            editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
         }
+
+        // Update editor source
+        if (editorDiv && typeof renderMarkdownEditorContent === 'function') {
+            const previousSuppressInput = editorDiv._suppressMarkdownTableContextInput;
+            editorDiv._suppressMarkdownTableContextInput = true;
+            try {
+                renderMarkdownEditorContent(editorDiv, newContent);
+            } finally {
+                editorDiv._suppressMarkdownTableContextInput = previousSuppressInput;
+            }
+        }
+
+        markMdTableActionAsModified(noteId);
+        restoreMdTableScrollStateAfterLayout(scrollState);
     }
 
     function isMarkdownTableLine(line) {
