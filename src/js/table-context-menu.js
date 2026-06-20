@@ -468,18 +468,29 @@
         const newContent = lines.join('\n');
         mdActiveNoteEntry.setAttribute('data-markdown-content', newContent);
 
-        // Re-render preview
+        // Re-render preview, preserving scroll position
         const previewDiv = mdActiveNoteEntry.querySelector('.markdown-preview');
         if (previewDiv && typeof renderMarkdownPreview === 'function') {
+            const previewScroll = previewDiv.scrollTop;
             renderMarkdownPreview(previewDiv, newContent, noteId);
+            previewDiv.scrollTop = previewScroll;
         }
 
-        // Persist via the editor div if present
+        // Persist via the editor div if present, preserving scroll position
         const editorDiv = mdActiveNoteEntry.querySelector('.markdown-editor');
         if (editorDiv) {
+            // For CodeMirror, scroll lives in the .cm-scroller child
+            const cmScroller = editorDiv.querySelector('.cm-scroller');
+            const scrollTarget = cmScroller || editorDiv;
+            const savedScroll = scrollTarget.scrollTop;
+
             if (typeof renderMarkdownEditorContent === 'function') {
                 renderMarkdownEditorContent(editorDiv, newContent);
             }
+
+            // Restore after CodeMirror finishes layout
+            requestAnimationFrame(() => { scrollTarget.scrollTop = savedScroll; });
+
             editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
         }
     }
