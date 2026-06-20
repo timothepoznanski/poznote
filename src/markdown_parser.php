@@ -218,6 +218,30 @@ function isDangerousMarkdownExcalidrawAttributeValue($value) {
     return preg_match('#javascript:|vbscript:|data:(?!image/)#i', (string)$value) === 1;
 }
 
+function normalizeMarkdownUrlForAttribute($url, $context = 'link') {
+    $value = trim((string)$url);
+    if ($value === '') {
+        return '';
+    }
+
+    $decodedValue = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+    if (preg_match('/[\x00-\x1F\x7F]/', $decodedValue)) {
+        return '';
+    }
+
+    if (preg_match('#^([a-z][a-z0-9+.-]*):#i', $decodedValue, $matches)) {
+        $scheme = strtolower($matches[1]);
+        if ($context === 'image' && $scheme === 'data') {
+            return preg_match('#^data:image/(png|jpeg|jpg|gif|webp);base64,#i', $decodedValue) === 1 ? $value : '';
+        }
+
+        $allowedSchemes = ($context === 'image') ? ['http', 'https'] : ['http', 'https', 'mailto', 'tel'];
+        return in_array($scheme, $allowedSchemes, true) ? $value : '';
+    }
+
+    return $value;
+}
+
 function buildMarkdownExcalidrawAttributes(DOMElement $element, array $allowedAttrs) {
     $attrs = [];
 
@@ -312,8 +336,13 @@ function getMarkdownImageWidthFromAttrBlock($attrs) {
 }
 
 function buildMarkdownImageTag($alt, $url, $title = '', $attrBlock = '') {
+    $safeUrl = normalizeMarkdownUrlForAttribute($url, 'image');
+    if ($safeUrl === '') {
+        return '';
+    }
+
     $attributes = [
-        'src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '"',
+        'src="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '"',
         'alt="' . htmlspecialchars($alt, ENT_QUOTES, 'UTF-8') . '"'
     ];
 
@@ -424,6 +453,9 @@ function parseMarkdown($text) {
         $attrBlock = isset($matches[4]) ? $matches[4] : '';
         $placeholder = "\x00PIMG" . $protectedIndex . "\x00";
         $imgTag = buildMarkdownImageTag($alt, $url, $title, $attrBlock);
+        if ($imgTag === '') {
+            return $matches[0];
+        }
         $protectedElements[$protectedIndex] = $imgTag;
         $protectedIndex++;
         return $placeholder;
@@ -434,11 +466,15 @@ function parseMarkdown($text) {
         $linkText = $matches[1];
         $url = $matches[2];
         $title = isset($matches[3]) ? $matches[3] : '';
+        $safeUrl = normalizeMarkdownUrlForAttribute($url, 'link');
+        if ($safeUrl === '') {
+            return $matches[0];
+        }
         $placeholder = "\x00PLNK" . $protectedIndex . "\x00";
         if ($title) {
-            $linkTag = '<a href="' . htmlspecialchars($url) . '" title="' . htmlspecialchars($title) . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText) . '</a>';
+            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8') . '</a>';
         } else {
-            $linkTag = '<a href="' . htmlspecialchars($url) . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText) . '</a>';
+            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8') . '</a>';
         }
         $protectedElements[$protectedIndex] = $linkTag;
         $protectedIndex++;

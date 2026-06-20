@@ -400,8 +400,67 @@ function _mdCreateExcalidrawEditorPlaceholder(rawHtml) {
     return placeholder;
 }
 
+function getMarkdownCodeMirrorApi() {
+    return window.PoznoteMarkdownCodeMirror || null;
+}
+
+function isCodeMirrorMarkdownEditor(editorDiv) {
+    var api = getMarkdownCodeMirrorApi();
+    return !!(api && editorDiv && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editorDiv));
+}
+
+function getCodeMirrorMarkdownContent(editorDiv) {
+    var api = getMarkdownCodeMirrorApi();
+    if (!api || !editorDiv || typeof api.getValue !== 'function') {
+        return null;
+    }
+
+    return api.getValue(editorDiv);
+}
+
+function setCodeMirrorMarkdownContent(editorDiv, content, options) {
+    var api = getMarkdownCodeMirrorApi();
+    if (!api || !editorDiv || typeof api.setValue !== 'function' || !isCodeMirrorMarkdownEditor(editorDiv)) {
+        return false;
+    }
+
+    return api.setValue(editorDiv, String(content || ''), options || {});
+}
+
+function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly) {
+    var api = getMarkdownCodeMirrorApi();
+    if (!api || !editorDiv || typeof api.createEditor !== 'function') {
+        return false;
+    }
+
+    try {
+        api.createEditor(editorDiv, {
+            value: String(markdownContent || ''),
+            placeholder: editorDiv.getAttribute('data-ph') || '',
+            readOnly: !!readOnly
+        });
+    } catch (error) {
+        console.error('Error initializing CodeMirror Markdown editor:', error);
+        try {
+            if (typeof api.destroyEditor === 'function') {
+                api.destroyEditor(editorDiv);
+            }
+        } catch (destroyError) { }
+        editorDiv.removeAttribute('data-codemirror-enabled');
+        editorDiv.classList.remove('markdown-codemirror-host');
+        renderMarkdownEditorContent(editorDiv, markdownContent);
+        return false;
+    }
+
+    return isCodeMirrorMarkdownEditor(editorDiv);
+}
+
 function renderMarkdownEditorContent(editorDiv, content) {
     if (!editorDiv) {
+        return;
+    }
+
+    if (setCodeMirrorMarkdownContent(editorDiv, content)) {
         return;
     }
 
@@ -454,7 +513,12 @@ function applyMarkdownEditorEditableState(editorDiv, editable) {
     }
 
     var canEdit = !!editable;
-    editorDiv.setAttribute('contenteditable', canEdit ? 'true' : 'false');
+    var api = getMarkdownCodeMirrorApi();
+    var isCodeMirrorEditor = isCodeMirrorMarkdownEditor(editorDiv);
+    if (isCodeMirrorEditor && api && typeof api.setReadOnly === 'function') {
+        api.setReadOnly(editorDiv, !canEdit);
+    }
+    editorDiv.setAttribute('contenteditable', isCodeMirrorEditor ? 'false' : (canEdit ? 'true' : 'false'));
     editorDiv.setAttribute('aria-readonly', canEdit ? 'false' : 'true');
     editorDiv.classList.toggle('markdown-editor-readonly', !canEdit);
 
@@ -640,6 +704,11 @@ function ensureMarkdownSplitPaneHeightListeners() {
 
 // Helper function to normalize content from contentEditable
 function normalizeContentEditableText(element) {
+    if (isCodeMirrorMarkdownEditor(element)) {
+        var codeMirrorContent = getCodeMirrorMarkdownContent(element);
+        return codeMirrorContent === null ? '' : codeMirrorContent;
+    }
+
     // More robust content extraction that handles contentEditable quirks
     var content = '';
 
@@ -711,6 +780,13 @@ function normalizeContentEditableText(element) {
 }
 
 function getSelectionOffsetsInTextElement(element) {
+    if (isCodeMirrorMarkdownEditor(element)) {
+        var api = getMarkdownCodeMirrorApi();
+        if (api && typeof api.getSelectionOffsets === 'function') {
+            return api.getSelectionOffsets(element);
+        }
+    }
+
     var selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
         return null;
@@ -738,6 +814,13 @@ function getSelectionOffsetsInTextElement(element) {
 function setSelectionOffsetsInTextElement(element, startOffset, endOffset) {
     if (!element) {
         return;
+    }
+
+    if (isCodeMirrorMarkdownEditor(element)) {
+        var api = getMarkdownCodeMirrorApi();
+        if (api && typeof api.setSelection === 'function' && api.setSelection(element, startOffset, endOffset)) {
+            return;
+        }
     }
 
     var textLength = (element.textContent || '').length;
@@ -840,6 +923,13 @@ function getMarkdownEditorScrollContainer(editorDiv) {
         return null;
     }
 
+    if (isCodeMirrorMarkdownEditor(editorDiv)) {
+        var codeMirrorScroller = editorDiv.querySelector ? editorDiv.querySelector('.cm-scroller') : null;
+        if (isElementVerticallyScrollable(codeMirrorScroller)) {
+            return codeMirrorScroller;
+        }
+    }
+
     if (isElementVerticallyScrollable(editorDiv)) {
         return editorDiv;
     }
@@ -858,6 +948,16 @@ function getMarkdownEditorScrollContainer(editorDiv) {
 }
 
 function getMarkdownCaretClientRect(editorDiv) {
+    if (isCodeMirrorMarkdownEditor(editorDiv)) {
+        var cmApi = getMarkdownCodeMirrorApi();
+        var cmSelection = cmApi && typeof cmApi.getSelectionOffsets === 'function'
+            ? cmApi.getSelectionOffsets(editorDiv)
+            : null;
+        if (cmApi && cmSelection && typeof cmApi.getCoordsAtPos === 'function') {
+            return cmApi.getCoordsAtPos(editorDiv, cmSelection.end);
+        }
+    }
+
     var selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) {
         return null;
@@ -907,6 +1007,21 @@ function getMarkdownCaretClientRect(editorDiv) {
 }
 
 function scrollMarkdownCaretIntoView(editorDiv) {
+    if (isCodeMirrorMarkdownEditor(editorDiv)) {
+        var cmApi = getMarkdownCodeMirrorApi();
+        if (!cmApi || typeof cmApi.hasFocus !== 'function' || !cmApi.hasFocus(editorDiv)) {
+            return;
+        }
+
+        var cmSelection = typeof cmApi.getSelectionOffsets === 'function'
+            ? cmApi.getSelectionOffsets(editorDiv)
+            : null;
+        if (cmSelection && typeof cmApi.scrollToPos === 'function') {
+            cmApi.scrollToPos(editorDiv, cmSelection.end, 'nearest');
+        }
+        return;
+    }
+
     if (!editorDiv || document.activeElement !== editorDiv) {
         return;
     }
@@ -983,7 +1098,9 @@ function updateMarkdownEditorContent(editorDiv, noteEntry, noteId, content, sele
     }
     window.noteid = noteId;
 
-    editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
+    if (!isCodeMirrorMarkdownEditor(editorDiv)) {
+        editorDiv.dispatchEvent(new Event('input', { bubbles: true }));
+    }
     setSelectionOffsetsInTextElement(editorDiv, selectionStart, selectionEnd);
     scheduleMarkdownCaretScrollIntoView(editorDiv);
 }
@@ -1709,7 +1826,7 @@ function parseMarkdown(text) {
 
     function isPlainFormattingCodeBlockLanguage(language) {
         const normalizedLanguage = language ? language.trim().toLowerCase() : '';
-        return isPlainCodeBlockLanguage(normalizedLanguage) || !isSyntaxHighlightLanguage(normalizedLanguage);
+        return normalizedLanguage !== '' && (isPlainCodeBlockLanguage(normalizedLanguage) || !isSyntaxHighlightLanguage(normalizedLanguage));
     }
 
     function getPlainCodeBlockDisplayLanguage(language) {
@@ -3059,8 +3176,12 @@ function initializeMarkdownNote(noteId) {
     // Ensure proper line break handling in contentEditable
     editorDiv.style.whiteSpace = 'pre-wrap';
 
-    // Handle paste to ensure plain text only
+    // Handle paste to ensure plain text only for the legacy contenteditable editor.
     editorDiv.addEventListener('paste', function (e) {
+        if (isCodeMirrorMarkdownEditor(editorDiv)) {
+            return;
+        }
+
         e.preventDefault();
         var text = (e.clipboardData || window.clipboardData).getData('text/plain');
 
@@ -3094,7 +3215,16 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(editorContainer);
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
-    syncMarkdownEditorEditableState(noteEntry);
+
+    initializeCodeMirrorMarkdownEditor(
+        editorDiv,
+        markdownContent,
+        !(startInSplitMode || startInEditMode) || isMarkdownEntryReadOnly(noteEntry)
+    );
+
+    // Re-apply editable state after CM init, using the known mode rather than
+    // getComputedStyle (which is unreliable on a not-yet-live-DOM element).
+    setMarkdownEditorEditable(editorDiv, (startInSplitMode || startInEditMode) && !isMarkdownEntryReadOnly(noteEntry));
 
     if (typeof window.highlightSearchTerms === 'function') {
         setTimeout(function () {
@@ -3487,6 +3617,8 @@ function setupMarkdownEditorListeners(noteId) {
     });
 
     editorDiv.addEventListener('keydown', function (e) {
+        if (isCodeMirrorMarkdownEditor(editorDiv)) { return; }
+
         if (handleMarkdownOrderedListTab(e, editorDiv, noteEntry, noteId)) {
             return;
         }
@@ -4127,6 +4259,11 @@ function _mdFindEditorPositionForSourceOffset(editorDiv, sourceOffset) {
 
 function _mdSetSelectionToSourceOffset(editorDiv, sourceOffset) {
     if (!editorDiv) return false;
+
+    if (isCodeMirrorMarkdownEditor(editorDiv)) {
+        var api = getMarkdownCodeMirrorApi();
+        return !!(api && typeof api.setSelection === 'function' && api.setSelection(editorDiv, sourceOffset, sourceOffset));
+    }
 
     if (editorDiv.childNodes.length === 0) {
         editorDiv.appendChild(document.createTextNode(''));

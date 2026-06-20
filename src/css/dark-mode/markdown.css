@@ -143,6 +143,61 @@ body.dark-mode .noteentry.markdown-split-mode .markdown-editor {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .markdown-codemirror-host,
+body.dark-mode .markdown-codemirror-host {
+    --poznote-cm-keyword: #ff7b72;
+    --poznote-cm-atom: #79c0ff;
+    --poznote-cm-string: #a5d6ff;
+    --poznote-cm-number: #79c0ff;
+    --poznote-cm-comment: #8b949e;
+    --poznote-cm-function: #d2a8ff;
+    --poznote-cm-variable: #c9d1d9;
+    --poznote-cm-type: #7ee787;
+    --poznote-cm-punctuation: #c9d1d9;
+    --poznote-cm-meta: #79c0ff;
+    --poznote-cm-heading: #79c0ff;
+    --poznote-cm-link: #58a6ff;
+    --poznote-cm-monospace: #d2a8ff;
+    --poznote-cm-invalid: #ffdcd7;
+    --poznote-cm-invalid-bg: #67060c;
+}
+
+html[data-theme='dark'] .markdown-codemirror-host .cm-editor,
+body.dark-mode .markdown-codemirror-host .cm-editor {
+    background-color: transparent;
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .markdown-codemirror-host .cm-activeLine,
+body.dark-mode .markdown-codemirror-host .cm-activeLine {
+    background: rgba(74, 158, 255, 0.12);
+}
+
+html[data-theme='dark'] .markdown-codemirror-host .cm-selectionBackground,
+html[data-theme='dark'] .markdown-codemirror-host .cm-focused .cm-selectionBackground,
+body.dark-mode .markdown-codemirror-host .cm-selectionBackground,
+body.dark-mode .markdown-codemirror-host .cm-focused .cm-selectionBackground {
+    background: rgba(74, 158, 255, 0.28);
+}
+
+html[data-theme='dark'] .markdown-codemirror-host .cm-placeholder,
+body.dark-mode .markdown-codemirror-host .cm-placeholder {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .cm-tooltip,
+body.dark-mode .cm-tooltip {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .cm-tooltip-autocomplete ul li[aria-selected],
+body.dark-mode .cm-tooltip-autocomplete ul li[aria-selected] {
+    background: var(--dm-accent);
+    color: #fff;
+}
+
 /* Checked task item text */
 html[data-theme='dark'] .markdown-preview li.task-list-item input[type="checkbox"]:checked+span,
 body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checked+span {

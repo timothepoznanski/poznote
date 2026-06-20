@@ -60,8 +60,8 @@ body.dark-mode .note-scroll-edge-btn:focus {
 }
 
 /* Readable text colors: preserve inline color styles, links, and syntax highlighting */
-html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]),
-body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]) {
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *),
+body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *) {
     color: var(--dm-text) !important;
 }
 

@@ -1,0 +1,24 @@
+{
+  "name": "poznote-markdown-editor",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "@codemirror/autocomplete": "^6.20.2",
+    "@codemirror/commands": "^6.10.0",
+    "@codemirror/lang-markdown": "^6.4.0",
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/language-data": "^6.5.1",
+    "@codemirror/search": "^6.7.0",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.41.1",
+    "@lezer/highlight": "^1.2.3"
+  },
+  "devDependencies": {
+    "rollup": "^4.60.1",
+    "vite": "^8.0.16"
+  }
+}

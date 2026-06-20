@@ -115,6 +115,60 @@ function getTextCursorPosition(rootEl, range) {
     return preCaretRange.toString().length;
 }
 
+function getCodeMirrorMarkdownEditorForNote(noteEntry) {
+    const api = window.PoznoteMarkdownCodeMirror;
+    if (!noteEntry || !api || typeof api.isCodeMirrorEditor !== 'function') {
+        return null;
+    }
+
+    const savedEditor = window._slashCommandSavedEditableElement;
+    if (savedEditor && noteEntry.contains(savedEditor) && api.isCodeMirrorEditor(savedEditor)) {
+        return savedEditor;
+    }
+
+    const activeEditor = document.activeElement && document.activeElement.closest
+        ? document.activeElement.closest('.markdown-editor')
+        : null;
+    if (activeEditor && noteEntry.contains(activeEditor) && api.isCodeMirrorEditor(activeEditor)) {
+        return activeEditor;
+    }
+
+    const lastActiveEditor = typeof api.getLastActiveEditor === 'function'
+        ? api.getLastActiveEditor()
+        : null;
+    if (lastActiveEditor && noteEntry.contains(lastActiveEditor) && api.isCodeMirrorEditor(lastActiveEditor)) {
+        return lastActiveEditor;
+    }
+
+    return null;
+}
+
+function getCodeMirrorMarkdownCursorPosition(noteEntry) {
+    const api = window.PoznoteMarkdownCodeMirror;
+    const editor = getCodeMirrorMarkdownEditorForNote(noteEntry);
+    if (!api || !editor || typeof api.getSelectionOffsets !== 'function') {
+        return null;
+    }
+
+    const offsets = api.getSelectionOffsets(editor);
+    if (!offsets) return null;
+
+    return Math.max(offsets.start, offsets.end);
+}
+
+function getMarkdownCursorPosition(noteEntry, markdownEditor, range) {
+    const codeMirrorPosition = getCodeMirrorMarkdownCursorPosition(noteEntry);
+    if (codeMirrorPosition !== null) {
+        return codeMirrorPosition;
+    }
+
+    if (markdownEditor && range && markdownEditor.contains(range.commonAncestorContainer)) {
+        return getTextCursorPosition(markdownEditor, range);
+    }
+
+    return null;
+}
+
 
 // Insert Excalidraw diagram at cursor position in a note
 function insertExcalidrawDiagram() {
@@ -130,6 +184,10 @@ function insertExcalidrawDiagram() {
             const isMarkdownNoteForPosition = noteEntryForPosition.getAttribute('data-note-type') === 'markdown';
             const markdownEditorForPosition = noteEntryForPosition.querySelector('.markdown-editor');
             
+            if (isMarkdownNoteForPosition) {
+                capturedCursorPosition = getMarkdownCursorPosition(noteEntryForPosition, markdownEditorForPosition, null);
+            }
+
             // Try to get from slash command saved range first (most reliable for slash menu)
             if (window._slashCommandSavedRange && noteEntryForPosition.contains(window._slashCommandSavedRange.commonAncestorContainer)) {
                 range = window._slashCommandSavedRange;
@@ -137,9 +195,9 @@ function insertExcalidrawDiagram() {
                 range = selection.getRangeAt(0);
             }
 
-            if (range && noteEntryForPosition.contains(range.commonAncestorContainer)) {
+            if (capturedCursorPosition === null && range && noteEntryForPosition.contains(range.commonAncestorContainer)) {
                 if (isMarkdownNoteForPosition && markdownEditorForPosition && markdownEditorForPosition.contains(range.commonAncestorContainer)) {
-                    capturedCursorPosition = getTextCursorPosition(markdownEditorForPosition, range);
+                    capturedCursorPosition = getMarkdownCursorPosition(noteEntryForPosition, markdownEditorForPosition, range);
                 } else {
                     capturedCursorPosition = getNormalizedCursorPosition(noteEntryForPosition, range);
                 }
@@ -367,14 +425,18 @@ function openExcalidrawEditor(diagramId, cursorPosition = null) {
 
     // If cursorPosition wasn't passed, try to get it from current selection
     if (cursorPosition === null && noteEntry) {
+        const isMarkdownNote = noteEntry.getAttribute('data-note-type') === 'markdown';
+        const markdownEditor = noteEntry.querySelector('.markdown-editor');
+        if (isMarkdownNote) {
+            cursorPosition = getMarkdownCursorPosition(noteEntry, markdownEditor, null);
+        }
+
         const selection = window.getSelection();
-        if (selection.rangeCount > 0) {
+        if (cursorPosition === null && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
             if (noteEntry.contains(range.commonAncestorContainer)) {
-                const isMarkdownNote = noteEntry.getAttribute('data-note-type') === 'markdown';
-                const markdownEditor = noteEntry.querySelector('.markdown-editor');
                 if (isMarkdownNote && markdownEditor && markdownEditor.contains(range.commonAncestorContainer)) {
-                    cursorPosition = getTextCursorPosition(markdownEditor, range);
+                    cursorPosition = getMarkdownCursorPosition(noteEntry, markdownEditor, range);
                 } else {
                     cursorPosition = getNormalizedCursorPosition(noteEntry, range);
                 }

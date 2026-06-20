@@ -494,6 +494,6 @@ textarea:focus {
 .noteentry u:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']):not(.hljs):not(.hljs *),
 .noteentry s:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']):not(.hljs):not(.hljs *),
 .noteentry a:not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']):not(.hljs):not(.hljs *),
-.noteentry span:not(.code-block span):not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']):not(.hljs):not(.hljs *) {
+.noteentry span:not(.code-block span):not([class*='poznote-cm-']):not([style*='Consolas']):not([style*='Monaco']):not([style*='Courier']):not([style*='monospace']):not([style*='Segoe UI Mono']):not(.hljs):not(.hljs *) {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji' !important;
 }

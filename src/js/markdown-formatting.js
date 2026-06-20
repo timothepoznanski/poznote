@@ -9,20 +9,21 @@
      */
     function isInMarkdownEditor() {
         var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return false;
-        
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-        var element = container.nodeType === 3 ? container.parentElement : container;
-        
-        // Traverse up to find if we're in a markdown editor
-        while (element && element !== document.body) {
-            if (element.classList && element.classList.contains('markdown-editor')) {
-                return true;
+        if (sel && sel.rangeCount > 0) {
+            var range = sel.getRangeAt(0);
+            var container = range.commonAncestorContainer;
+            var element = container.nodeType === 3 ? container.parentElement : container;
+
+            // Traverse up to find if we're in a markdown editor
+            while (element && element !== document.body) {
+                if (element.classList && element.classList.contains('markdown-editor')) {
+                    return true;
+                }
+                element = element.parentElement;
             }
-            element = element.parentElement;
         }
-        return false;
+
+        return !!getFallbackCodeMirrorEditor(false);
     }
 
     function getMarkdownEditorElement(range) {
@@ -46,6 +47,105 @@
         }
 
         return editor.innerText || editor.textContent || '';
+    }
+
+    function getMarkdownCodeMirrorApi() {
+        return window.PoznoteMarkdownCodeMirror || null;
+    }
+
+    function escapeMarkdownLinkLabel(text, fallback) {
+        var normalized = String(text || '')
+            .replace(/[\r\n\t]+/g, ' ')
+            .trim();
+        var value = normalized || fallback || '';
+        return value
+            .replace(/\\/g, '\\\\')
+            .replace(/\[/g, '\\[')
+            .replace(/\]/g, '\\]');
+    }
+
+    function normalizeMarkdownLinkDestination(url) {
+        var value = String(url || '').trim();
+        if (!value) return '';
+        if (/[\u0000-\u001F\u007F]/.test(value)) return '';
+        var schemeMatch = value.match(/^([a-z][a-z0-9+.-]*):/i);
+        if (schemeMatch) {
+            var scheme = schemeMatch[1].toLowerCase();
+            if (scheme !== 'http' && scheme !== 'https' && scheme !== 'mailto' && scheme !== 'tel') {
+                return '';
+            }
+        }
+        return value.replace(/[()\s<>]/g, function (match) {
+            return encodeURIComponent(match);
+        });
+    }
+
+    function buildSafeMarkdownLink(label, url) {
+        var destination = normalizeMarkdownLinkDestination(url);
+        if (!destination) return '';
+        return '[' + escapeMarkdownLinkLabel(label || url || 'link', 'link') + '](' + destination + ')';
+    }
+
+    function isMarkdownCodeMirrorEditor(editor) {
+        var api = getMarkdownCodeMirrorApi();
+        return !!(api && editor && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor));
+    }
+
+    function getCodeMirrorSelectionOffsets(editor) {
+        var api = getMarkdownCodeMirrorApi();
+        if (!api || !editor || typeof api.getSelectionOffsets !== 'function' || !isMarkdownCodeMirrorEditor(editor)) {
+            return null;
+        }
+
+        return api.getSelectionOffsets(editor);
+    }
+
+    function getFallbackCodeMirrorEditor(includeLastActive) {
+        var active = document.activeElement;
+        var toolbar = active && active.closest ? active.closest('.note-edit-toolbar') : null;
+        var noteCard = toolbar && toolbar.closest ? toolbar.closest('.notecard') : null;
+        var editor = noteCard && noteCard.querySelector ? noteCard.querySelector('.markdown-editor') : null;
+
+        if (isMarkdownCodeMirrorEditor(editor)) {
+            return editor;
+        }
+
+        if (includeLastActive === false) {
+            return null;
+        }
+
+        var api = getMarkdownCodeMirrorApi();
+        if (api && typeof api.getLastActiveEditor === 'function') {
+            editor = api.getLastActiveEditor();
+            if (isMarkdownCodeMirrorEditor(editor)) {
+                return editor;
+            }
+        }
+
+        return null;
+    }
+
+    function getCurrentMarkdownEditContext() {
+        var sel = window.getSelection();
+        var range = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+        var editor = range ? getMarkdownEditorElement(range) : null;
+        var offsets = editor && range ? getSelectionOffsetsInMarkdownEditor(editor, range) : null;
+
+        if (!editor || !offsets) {
+            var fallbackEditor = getFallbackCodeMirrorEditor(true);
+            if (fallbackEditor) {
+                editor = fallbackEditor;
+                offsets = getCodeMirrorSelectionOffsets(editor);
+                range = null;
+            }
+        }
+
+        return {
+            selection: sel,
+            range: range,
+            editor: editor,
+            offsets: offsets
+        };
     }
 
     function getSelectionOffsetsInMarkdownEditor(editor, range) {
@@ -177,11 +277,62 @@
      * Wrap selected text with markdown syntax
      */
     function wrapSelectionWithMarkdown(prefix, suffix) {
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
+        var context = getCurrentMarkdownEditContext();
+        var sel = context.selection;
+        var range = context.range;
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
 
-        var range = sel.getRangeAt(0);
-        var selectedText = sel.toString();
+        var selectedText = offsets && editor
+            ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
+            : (sel ? sel.toString() : '');
+
+        if (editor && offsets) {
+            var fullText = getMarkdownEditorValue(editor);
+            selectedText = fullText.slice(offsets.start, offsets.end);
+
+            if (!selectedText) {
+                var marker = prefix + suffix;
+                replaceMarkdownRangeAndSelect(
+                    editor,
+                    offsets.start,
+                    offsets.end,
+                    marker,
+                    offsets.start + prefix.length,
+                    offsets.start + prefix.length
+                );
+                return;
+            }
+
+            var beforeText = fullText.slice(Math.max(0, offsets.start - prefix.length), offsets.start);
+            var afterText = fullText.slice(offsets.end, offsets.end + suffix.length);
+
+            if (beforeText === prefix && afterText === suffix) {
+                replaceMarkdownRangeAndSelect(
+                    editor,
+                    offsets.start - prefix.length,
+                    offsets.end + suffix.length,
+                    selectedText,
+                    offsets.start - prefix.length,
+                    offsets.start - prefix.length + selectedText.length
+                );
+                return;
+            }
+
+            var wrappedText = prefix + selectedText + suffix;
+            replaceMarkdownRangeAndSelect(
+                editor,
+                offsets.start,
+                offsets.end,
+                wrappedText,
+                offsets.start + prefix.length,
+                offsets.start + prefix.length + selectedText.length
+            );
+            return;
+        }
+
+        if (!range) return;
         
         // If no text selected, insert markers and place cursor between them
         if (!selectedText) {
@@ -230,44 +381,47 @@
      * Toggle list formatting (bullet or numbered)
      */
     function toggleMarkdownList(listType) {
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
+        var context = getCurrentMarkdownEditContext();
+        var range = context.range;
+        var editor = context.editor;
 
-        var range = sel.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-        var element = container.nodeType === 3 ? container.parentElement : container;
-        
-        // Find the markdown editor
-        var editor = element.closest('.markdown-editor');
+        if (!editor && range) {
+            var container = range.commonAncestorContainer;
+            var element = container.nodeType === 3 ? container.parentElement : container;
+            editor = element.closest('.markdown-editor');
+        }
+
         if (!editor) return;
 
         // Get all text content
-        var textContent = editor.textContent || editor.innerText;
+        var textContent = getMarkdownEditorValue(editor);
         var lines = textContent.split('\n');
         
         // Find which line(s) are selected
-        var startOffset = 0;
-        var endOffset = 0;
-        
-        // Calculate offset from start of editor to selection
-        var walker = document.createTreeWalker(
-            editor,
-            NodeFilter.SHOW_TEXT,
-            null,
-            false
-        );
-        
-        var currentOffset = 0;
-        var node;
-        while (node = walker.nextNode()) {
-            if (node === range.startContainer) {
-                startOffset = currentOffset + range.startOffset;
+        var startOffset = context.offsets ? context.offsets.start : 0;
+        var endOffset = context.offsets ? context.offsets.end : 0;
+
+        if (!context.offsets && range) {
+            // Calculate offset from start of editor to selection
+            var walker = document.createTreeWalker(
+                editor,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            var currentOffset = 0;
+            var node;
+            while (node = walker.nextNode()) {
+                if (node === range.startContainer) {
+                    startOffset = currentOffset + range.startOffset;
+                }
+                if (node === range.endContainer) {
+                    endOffset = currentOffset + range.endOffset;
+                    break;
+                }
+                currentOffset += node.textContent.length;
             }
-            if (node === range.endContainer) {
-                endOffset = currentOffset + range.endOffset;
-                break;
-            }
-            currentOffset += node.textContent.length;
         }
 
         // Find affected line numbers
@@ -313,7 +467,7 @@
 
         if (modified) {
             // Replace editor content
-            editor.textContent = lines.join('\n');
+            replaceMarkdownRangeByOffsets(editor, 0, textContent.length, lines.join('\n'));
         }
     }
 
@@ -356,12 +510,9 @@
      * Apply markdown code block formatting
      */
     function applyMarkdownCodeBlock() {
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
-
-        var range = sel.getRangeAt(0);
-        var editor = getMarkdownEditorElement(range);
-        var offsets = getSelectionOffsetsInMarkdownEditor(editor, range);
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var offsets = context.offsets;
         var prefix = '\n```\n';
         var suffix = '\n```\n';
 
@@ -415,18 +566,44 @@
         }
         
         // Ensure editor has focus to avoid scroll jump
-        const noteentry = document.querySelector('.noteentry');
-        if (noteentry) {
-            try { noteentry.focus({ preventScroll: true }); } catch (e) { noteentry.focus(); }
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var offsets = context.offsets;
+
+        if (editor) {
+            focusMarkdownEditor(editor);
+        } else {
+            const noteentry = document.querySelector('.noteentry');
+            if (noteentry) {
+                try { noteentry.focus({ preventScroll: true }); } catch (e) { noteentry.focus(); }
+            }
         }
         
-        if (!sel || sel.rangeCount === 0) return;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
 
-        var selectedText = sel.toString();
+        var selectedText = offsets ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end) : (sel ? sel.toString() : '');
         var linkText = text || url || selectedText || 'link';
         var linkUrl = url || 'https://';
-        
-        var markdownLink = '[' + linkText + '](' + linkUrl + ')';
+
+        var markdownLink = buildSafeMarkdownLink(linkText, linkUrl);
+        if (!markdownLink) {
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup((window.t || function (key, params, fallback) { return fallback; })('slash_menu.invalid_url', null, 'Invalid URL'), 'error');
+            }
+            return;
+        }
+
+        if (editor && offsets) {
+            replaceMarkdownRangeAndSelect(
+                editor,
+                offsets.start,
+                offsets.end,
+                markdownLink,
+                offsets.start,
+                offsets.start + markdownLink.length
+            );
+            return;
+        }
         document.execCommand('insertText', false, markdownLink);
     }
 
@@ -437,10 +614,37 @@
         level = Math.max(1, Math.min(6, level || 1));
         var prefix = '#'.repeat(level) + ' ';
         
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
+        var context = getCurrentMarkdownEditContext();
+        var sel = context.selection;
+        var range = context.range;
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
 
-        var range = sel.getRangeAt(0);
+        if (editor && offsets) {
+            var fullText = getMarkdownEditorValue(editor);
+            var lineStart = fullText.lastIndexOf('\n', Math.max(0, offsets.start - 1)) + 1;
+            var lineEnd = fullText.indexOf('\n', offsets.start);
+            if (lineEnd === -1) lineEnd = fullText.length;
+
+            var sourceLine = fullText.slice(lineStart, lineEnd);
+            var nextLine = sourceLine.match(/^#{1,6}\s+/)
+                ? sourceLine.replace(/^#{1,6}\s+/, '')
+                : prefix + sourceLine;
+
+            replaceMarkdownRangeAndSelect(
+                editor,
+                lineStart,
+                lineEnd,
+                nextLine,
+                lineStart + nextLine.length,
+                lineStart + nextLine.length
+            );
+            return;
+        }
+
+        if (!range) return;
+
         var container = range.commonAncestorContainer;
         
         // Find the line start
@@ -483,11 +687,37 @@
      * @param {string|number} style - 'normal' to remove heading, or '1', '2', '3' for heading level
      */
     function applyMarkdownHeadingLevel(style) {
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
-        
-        var selectedText = sel.toString();
+        var context = getCurrentMarkdownEditContext();
+        var sel = context.selection;
+        var range = context.range;
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
+
+        var selectedText = offsets && editor
+            ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
+            : (sel ? sel.toString() : '');
         if (!selectedText) return;
+
+        if (editor && offsets) {
+            var fullText = getMarkdownEditorValue(editor);
+            selectedText = fullText.slice(offsets.start, offsets.end);
+
+            if (style === 'normal') {
+                var cleanText = selectedText.replace(/^#{1,6}\s+/, '');
+                replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, cleanText, offsets.start, offsets.start + cleanText.length);
+                return;
+            }
+
+            var level = parseInt(style, 10);
+            if (!level || level < 1 || level > 6) return;
+
+            var replacement = '#'.repeat(level) + ' ' + selectedText;
+            replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, replacement, offsets.start + replacement.length, offsets.start + replacement.length);
+            return;
+        }
+
+        if (!range) return;
         
         if (style === 'normal') {
             // For normal text, just remove any heading markers at the start
@@ -557,13 +787,24 @@
     function applyMarkdownColor(color) {
         if (!color) return;
         
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
+        var context = getCurrentMarkdownEditContext();
+        var sel = context.selection;
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
 
-        var selectedText = sel.toString();
+        var selectedText = offsets && editor
+            ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
+            : (sel ? sel.toString() : '');
         
         // If no selection, do nothing
         if (!selectedText) return;
+        if (editor && offsets) {
+            selectedText = getMarkdownEditorValue(editor).slice(offsets.start, offsets.end);
+            var coloredText = '<span style="color:' + color + '">' + selectedText + '</span>';
+            replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, coloredText, offsets.start, offsets.start + coloredText.length);
+            return;
+        }
 
         // Wrap with HTML color span as plain text in the markdown editor
         var coloredText = '<span style="color:' + color + '">' + selectedText + '</span>';
@@ -583,13 +824,24 @@
     function applyMarkdownFontSize(fontSize) {
         if (!fontSize) return;
         
-        var sel = window.getSelection();
-        if (!sel || sel.rangeCount === 0) return;
+        var context = getCurrentMarkdownEditContext();
+        var sel = context.selection;
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
 
-        var selectedText = sel.toString();
+        var selectedText = offsets && editor
+            ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
+            : (sel ? sel.toString() : '');
         
         // If no selection, do nothing
         if (!selectedText) return;
+        if (editor && offsets) {
+            selectedText = getMarkdownEditorValue(editor).slice(offsets.start, offsets.end);
+            var styledText = '<span style="font-size: ' + fontSize + '">' + selectedText + '</span>';
+            replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, styledText, offsets.start, offsets.start + styledText.length);
+            return;
+        }
 
         // Wrap with HTML span with font size
         var styledText = '<span style="font-size: ' + fontSize + '">' + selectedText + '</span>';

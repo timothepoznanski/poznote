@@ -32,6 +32,53 @@
         return document.getElementById('entry' + noteId);
     }
 
+    function getMarkdownEditorElement(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown') return null;
+
+        return noteEntry.querySelector('.markdown-editor');
+    }
+
+    function getMarkdownCodeMirrorEditor(noteId) {
+        const editor = getMarkdownEditorElement(noteId);
+        const api = window.PoznoteMarkdownCodeMirror;
+        if (!editor || !api) {
+            return null;
+        }
+
+        // Primary check: WeakMap instance registry
+        if (typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor)) {
+            return editor;
+        }
+
+        // Fallback: DOM attribute set by createEditor — handles cases where the WeakMap
+        // reference is stale (e.g. after a DOM rebuild) but CM still owns this host element
+        if (editor.hasAttribute('data-codemirror-enabled')) {
+            return editor;
+        }
+
+        return null;
+    }
+
+    function isMarkdownEditorVisible(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        const editor = getMarkdownEditorElement(noteId);
+        if (!noteEntry || !editor) return false;
+
+        if (noteEntry.classList.contains('markdown-split-mode')) return true;
+
+        const editorContainer = editor.closest('.markdown-editor-container') || editor;
+        try {
+            return window.getComputedStyle(editorContainer).display !== 'none';
+        } catch (e) {
+            return editorContainer.style.display !== 'none';
+        }
+    }
+
+    function getSearchContentRoot(noteId) {
+        return getMarkdownEditorElement(noteId) || getNoteEntry(noteId);
+    }
+
     /**
      * Get the search bar element
      */
@@ -54,6 +101,10 @@
 
         // Make sure listeners are initialized
         initNoteListeners(noteId);
+
+        if (getMarkdownEditorElement(noteId) && !isMarkdownEditorVisible(noteId) && typeof window.switchToEditMode === 'function') {
+            window.switchToEditMode(noteId);
+        }
 
         // Clear previous state
         clearHighlights(noteId);
@@ -145,6 +196,14 @@
         const noteEntry = getNoteEntry(noteId);
         if (!noteEntry) return false;
 
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        if (cmEditor && window.PoznoteMarkdownCodeMirror && typeof window.PoznoteMarkdownCodeMirror.clearSearch === 'function') {
+            const cmApi = window.PoznoteMarkdownCodeMirror;
+            const hadCmHighlights = (getNoteState(noteId).matches || []).length > 0;
+            cmApi.clearSearch(cmEditor);
+            return hadCmHighlights;
+        }
+
         const highlights = noteEntry.querySelectorAll('.search-replace-highlight');
         const hadHighlights = highlights.length > 0;
         
@@ -181,18 +240,75 @@
         }
 
         const noteEntry = getNoteEntry(noteId);
-        if (!noteEntry) return;
+        const searchRoot = getSearchContentRoot(noteId);
+        if (!noteEntry || !searchRoot) return;
 
         clearHighlights(noteId);
         state.matches = [];
         state.currentIndex = preserveIndex ? previousIndex : -1;
+
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi && typeof cmApi.findMatches === 'function') {
+            let cmMatches = cmApi.findMatches(cmEditor, searchText).map(match => ({
+                from: match.from,
+                to: match.to,
+                isCodeMirrorMatch: true
+            }));
+
+            // Fallback: if WeakMap instance is gone but the editor is still a CM host,
+            // search the stored text value directly so we don't fall through to DOM search
+            if (cmMatches.length === 0 && cmEditor.hasAttribute('data-codemirror-enabled')) {
+                const storedText = cmEditor.getAttribute('data-codemirror-value') || '';
+                if (storedText) {
+                    const needle = searchText.toLowerCase();
+                    const haystack = storedText.toLowerCase();
+                    let idx = 0;
+                    const fallbackMatches = [];
+                    while ((idx = haystack.indexOf(needle, idx)) !== -1) {
+                        fallbackMatches.push({ from: idx, to: idx + needle.length, isCodeMirrorMatch: true });
+                        idx += Math.max(needle.length, 1);
+                    }
+                    cmMatches = fallbackMatches;
+                }
+            }
+
+            state.matches = cmMatches;
+
+            const countEl = document.getElementById('searchCount' + noteId);
+            const count = state.matches.length;
+            if (countEl) {
+                if (count > 0) {
+                    if (preserveIndex) {
+                        let nextIndex = previousIndex;
+                        if (nextIndex >= count) nextIndex = count - 1;
+                        if (nextIndex < -1) nextIndex = -1;
+                        state.currentIndex = nextIndex;
+                    } else {
+                        state.currentIndex = 0;
+                    }
+                    countEl.textContent = `${count} ${count > 1 ? tr('search_replace.results', {}, 'results') : tr('search_replace.result', {}, 'result')}`;
+                    if (typeof cmApi.setSearchMatches === 'function') {
+                        cmApi.setSearchMatches(cmEditor, state.matches, state.currentIndex);
+                    }
+                    if (!skipScroll && state.currentIndex >= 0) {
+                        scrollToMatch(noteId, state.currentIndex);
+                    }
+                } else {
+                    state.currentIndex = -1;
+                    countEl.textContent = tr('search_replace.no_matches', {}, 'No results');
+                }
+            }
+
+            return;
+        }
 
         // Build regex pattern - escape special chars
         let pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(pattern, 'gi'); // Case insensitive for now
 
         // Search in the note
-        highlightMatches(noteEntry, regex, noteId);
+        highlightMatches(searchRoot, regex, noteId);
 
         // Update count
         const countEl = document.getElementById('searchCount' + noteId);
@@ -265,12 +381,28 @@
                 return;
             }
 
+            // Skip markdown preview pane (rendered HTML) — searching happens in the editor source only
+            if (node.classList && node.classList.contains('markdown-preview')) {
+                return;
+            }
+
+            // Skip CodeMirror host — the CM path handles search in CM editors
+            if (node.hasAttribute('data-codemirror-enabled')) {
+                return;
+            }
+
             // Skip hidden containers (e.g. markdown editor while preview is visible)
             try {
-                if (window.getComputedStyle(node).display === 'none') {
+                const style = window.getComputedStyle(node);
+                if (style.display === 'none' || style.visibility === 'hidden') {
                     return;
                 }
             } catch (e) { /* ignore */ }
+
+            // Skip elements explicitly hidden via the hidden attribute
+            if (node.hidden) {
+                return;
+            }
 
             // Process child nodes
             const children = Array.from(node.childNodes);
@@ -316,6 +448,19 @@
         const state = getNoteState(noteId);
         if (index < 0 || index >= state.matches.length) return;
 
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        const cmMatch = state.matches[index];
+        if (cmMatch && cmMatch.isCodeMirrorMatch && cmEditor && cmApi) {
+            if (typeof cmApi.setSearchMatches === 'function') {
+                cmApi.setSearchMatches(cmEditor, state.matches, index);
+            }
+            if (typeof cmApi.revealPos === 'function') {
+                cmApi.revealPos(cmEditor, cmMatch.from, 'center');
+            }
+            return;
+        }
+
         // Remove active class from all
         state.matches.forEach(m => m.classList.remove('active'));
 
@@ -354,7 +499,10 @@
             }
         }
 
-        // Normal mode: keep match below sticky tab bar + note header/search bar
+        // Normal mode: scroll manually so the match stays below the sticky tab bar + note header/search bar.
+        // scrollIntoView with block:'start' moves the match to the top of the scroll container,
+        // which can push the note-header/search bar off screen. We instead compute the target
+        // scroll position ourselves and only scroll if the match is not already visible.
         let stickyOffset = 0;
         const tabBar = document.getElementById('app-tab-bar');
         if (tabBar) {
@@ -368,8 +516,26 @@
             }
         }
 
-        match.style.scrollMarginTop = (stickyOffset + 12) + 'px';
-        match.scrollIntoView({ behavior, block: 'start', inline: 'nearest' });
+        const scrollContainer = document.getElementById('right_col') || document.documentElement;
+        const containerRect = scrollContainer.getBoundingClientRect
+            ? scrollContainer.getBoundingClientRect()
+            : { top: 0, bottom: window.innerHeight };
+        const matchRect = match.getBoundingClientRect();
+        const visibleTop = containerRect.top + stickyOffset;
+        const visibleBottom = containerRect.bottom - 12;
+
+        // Only scroll if the match is outside the visible area
+        if (matchRect.top < visibleTop || matchRect.bottom > visibleBottom) {
+            const currentScroll = scrollContainer.scrollTop !== undefined
+                ? scrollContainer.scrollTop
+                : window.scrollY;
+            const targetScroll = currentScroll + (matchRect.top - visibleTop) - 12;
+            if (scrollContainer.scrollTop !== undefined) {
+                scrollContainer.scrollTo({ top: Math.max(0, targetScroll), behavior });
+            } else {
+                window.scrollTo({ top: Math.max(0, targetScroll), behavior });
+            }
+        }
     }
 
     /**
@@ -386,7 +552,27 @@
         const currentMatch = state.matches[state.currentIndex];
         const noteEntry = getNoteEntry(noteId);
 
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (currentMatch && currentMatch.isCodeMirrorMatch && cmEditor && cmApi && typeof cmApi.replaceRange === 'function') {
+            state.suppressClearOnInput = true;
+            cmApi.replaceRange(cmEditor, currentMatch.from, currentMatch.to, replaceText);
+            state.suppressClearOnInput = false;
+
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+
+            findMatches(noteId, { preserveIndex: true, skipScroll: true });
+            if (state.matches.length > 0 && state.currentIndex >= 0) {
+                scrollToMatch(noteId, state.currentIndex);
+            }
+            return;
+        }
+
         if (currentMatch && currentMatch.parentNode && noteEntry) {
+            const editableTarget = currentMatch.closest && currentMatch.closest('.markdown-editor');
+
             // Replace the highlight span with a text node first
             const matchText = currentMatch.textContent;
             const textNode = document.createTextNode(matchText);
@@ -404,7 +590,7 @@
 
             // Use execCommand to make the replacement undoable
             state.suppressClearOnInput = true;
-            noteEntry.focus();
+            (editableTarget || noteEntry).focus();
             document.execCommand('insertText', false, replaceText);
             state.suppressClearOnInput = false;
             parent.normalize();
@@ -463,8 +649,51 @@
 
         if (!noteEntry) return;
 
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi && state.matches[0] && state.matches[0].isCodeMirrorMatch && typeof cmApi.getValue === 'function' && typeof cmApi.setValue === 'function') {
+            const searchInput = document.getElementById('searchInput' + noteId);
+            const searchText = searchInput ? searchInput.value : '';
+            if (!searchText) return;
+
+            const originalContent = cmApi.getValue(cmEditor);
+            const cmMatches = state.matches
+                .filter(match => match && match.isCodeMirrorMatch && Number.isFinite(match.from) && Number.isFinite(match.to))
+                .sort((a, b) => b.from - a.from);
+            let actualCount = 0;
+            let nextContent = originalContent;
+
+            cmMatches.forEach(match => {
+                if (match.from < 0 || match.to > originalContent.length || match.to <= match.from) return;
+                nextContent = nextContent.slice(0, match.from) + replaceText + nextContent.slice(match.to);
+                actualCount++;
+            });
+
+            state.suppressClearOnInput = true;
+            cmApi.setValue(cmEditor, nextContent, { preserveSelection: false });
+            if (typeof cmApi.clearSearch === 'function') {
+                cmApi.clearSearch(cmEditor);
+            }
+            state.suppressClearOnInput = false;
+
+            state.matches = [];
+            state.currentIndex = -1;
+
+            const countEl = document.getElementById('searchCount' + noteId);
+            if (countEl) {
+                countEl.textContent = tr('search_replace.replaced_all', { count: actualCount },
+                    `Replaced ${actualCount} match${actualCount > 1 ? 'es' : ''}`);
+            }
+
+            if (typeof window.markNoteAsModified === 'function') {
+                window.markNoteAsModified();
+            }
+            return;
+        }
+
         // Focus the note to enable execCommand
-        noteEntry.focus();
+        const searchRoot = getSearchContentRoot(noteId);
+        (searchRoot || noteEntry).focus();
         state.suppressClearOnInput = true;
 
         // Replace all matches in reverse order to maintain correct positions

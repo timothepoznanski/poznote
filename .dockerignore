@@ -11,6 +11,7 @@ venv
 node_modules
 **/node_modules
 excalidraw-build
+markdown-editor-build
 
 data
 **/data/database
