@@ -188,6 +188,10 @@ class GitSyncController {
             return;
         }
 
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -299,7 +303,8 @@ class GitSyncController {
             'success' => true,
             'started' => true,
             'action' => $action,
-            'id' => $jobId
+            'id' => $jobId,
+            'startedAt' => $running['started']
         ]);
         fastcgi_finish_request();
 

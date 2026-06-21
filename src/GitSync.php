@@ -62,10 +62,8 @@ class GitSync {
         $userApiBase = $userSettings['git_api_base'] ?? null;
         $this->apiBase = !empty($userApiBase) ? trim($userApiBase) : $this->getDefaultApiBase();
 
-        // Initialize progress only if it doesn't exist to avoid resetting on mid-sync requests
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
+        // Progress writes open the session only when needed. Keeping the constructor
+        // session-free prevents async sync jobs from blocking progress polling.
     }
     
     /**

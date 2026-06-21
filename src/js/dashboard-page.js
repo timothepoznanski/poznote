@@ -335,6 +335,52 @@
         }
     }
 
+    function buildDashboardGitApiUrl(path) {
+        var url = path;
+        try {
+            var apiUrl = new URL(path, window.location.href);
+            apiUrl.searchParams.set('_', String(Date.now()));
+            url = apiUrl.toString();
+        } catch (e) {
+            url += (url.indexOf('?') === -1 ? '?' : '&') + '_=' + encodeURIComponent(String(Date.now()));
+        }
+        return url;
+    }
+
+    function isCurrentGitSyncResult(asyncResult, action, syncJobId, syncStartTime, startResponseReceived) {
+        if (!asyncResult || !asyncResult.result || asyncResult.action !== action) {
+            return false;
+        }
+
+        if (asyncResult.finished && asyncResult.finished < syncStartTime) {
+            return false;
+        }
+
+        if (syncJobId) {
+            return asyncResult.id === syncJobId;
+        }
+
+        return !!startResponseReceived;
+    }
+
+    function parseGitSyncTimestampSeconds(value) {
+        if (!value) return 0;
+        var parsed = Date.parse(value);
+        return Number.isNaN(parsed) ? 0 : Math.floor(parsed / 1000);
+    }
+
+    function fetchDashboardGitJson(path, options) {
+        var fetchOptions = options || {};
+        fetchOptions.credentials = 'same-origin';
+        fetchOptions.cache = 'no-store';
+        fetchOptions.headers = Object.assign({
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+        }, fetchOptions.headers || {});
+
+        return fetch(buildDashboardGitApiUrl(path), fetchOptions).then(readJsonResponse);
+    }
+
     function executeDashboardGitSync(action, title) {
         if (!action) return;
         if (!window.modalAlert || typeof window.modalAlert.showProgressBar !== 'function') {
@@ -346,33 +392,86 @@
         var syncJobId = null;
         var progressBar = window.modalAlert.showProgressBar(title, gitTxt.starting || 'Syncing...');
         var syncCompleted = false;
+        var startResponseReceived = false;
+        var syncStartServerTime = 0;
+        var initialLastSyncTimestamp = gitTxt.lastSyncTimestamp || '';
+        var statusInterval = null;
+
+        progressBar.update(0, gitTxt.starting || 'Syncing...');
+
+        function completeFromResult(asyncResult) {
+            if (syncCompleted) return;
+            syncCompleted = true;
+            window.clearInterval(progressInterval);
+            if (statusInterval !== null) {
+                window.clearInterval(statusInterval);
+            }
+            if (asyncResult.result.success) {
+                progressBar.update(100, gitTxt.completed || 'Completed!');
+            }
+            window.setTimeout(function () {
+                progressBar.close();
+                window.location.reload();
+            }, 500);
+        }
+
+        function completeFromStatus(lastSync) {
+            completeFromResult({
+                action: action,
+                result: { success: true }
+            });
+        }
+
+        function lastSyncMatchesCurrentAction(lastSync) {
+            if (!lastSync || lastSync.action !== action) {
+                return false;
+            }
+
+            if (lastSync.timestamp && initialLastSyncTimestamp) {
+                return lastSync.timestamp !== initialLastSyncTimestamp;
+            }
+
+            var lastSyncTime = parseGitSyncTimestampSeconds(lastSync.timestamp);
+            if (syncStartServerTime > 0 && lastSyncTime >= syncStartServerTime) {
+                return true;
+            }
+
+            return false;
+        }
+
+        function pollGitSyncStatus() {
+            if (syncCompleted) return;
+
+            fetchDashboardGitJson('api/v1/git-sync/status')
+                .then(function (data) {
+                    if (syncCompleted || !data.success) return;
+                    if (lastSyncMatchesCurrentAction(data.lastSync)) {
+                        completeFromStatus(data.lastSync);
+                    }
+                })
+                .catch(function () {
+                    // Progress polling remains the primary path; status is a fallback.
+                });
+        }
 
         var progressInterval = window.setInterval(function () {
-            fetch('api/v1/git-sync/progress', { credentials: 'same-origin' })
-                .then(readJsonResponse)
+            fetchDashboardGitJson('api/v1/git-sync/progress')
                 .then(function (data) {
                     if (data.success && data.progress) {
                         progressBar.update(data.progress.percentage, data.progress.message);
                     }
 
                     var asyncResult = data.result;
-                    var resultIsCurrent = asyncResult &&
-                        syncJobId &&
-                        asyncResult.id === syncJobId &&
-                        asyncResult.result &&
-                        asyncResult.action === action &&
-                        (!asyncResult.finished || asyncResult.finished >= syncStartTime);
+                    var resultIsCurrent = isCurrentGitSyncResult(
+                        asyncResult,
+                        action,
+                        syncJobId,
+                        syncStartTime,
+                        startResponseReceived
+                    );
 
                     if (data.success && resultIsCurrent) {
-                        syncCompleted = true;
-                        window.clearInterval(progressInterval);
-                        if (asyncResult.result.success) {
-                            progressBar.update(100, gitTxt.completed || 'Completed!');
-                        }
-                        window.setTimeout(function () {
-                            progressBar.close();
-                            window.location.reload();
-                        }, 500);
+                        completeFromResult(asyncResult);
                     }
                 })
                 .catch(function () {
@@ -380,21 +479,25 @@
                 });
         }, 500);
 
-        fetch('api/v1/git-sync/' + action, {
+        fetchDashboardGitJson('api/v1/git-sync/' + action, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
             body: JSON.stringify({ workspace: gitTxt.workspace || '', async: true })
         })
-            .then(readJsonResponse)
             .then(function (data) {
+                startResponseReceived = true;
                 if (data.started) {
                     syncJobId = data.id || null;
+                    syncStartServerTime = data.startedAt || 0;
+                    statusInterval = window.setInterval(pollGitSyncStatus, 1500);
                     return;
                 }
 
                 syncCompleted = true;
                 window.clearInterval(progressInterval);
+                if (statusInterval !== null) {
+                    window.clearInterval(statusInterval);
+                }
 
                 if (data.success) {
                     progressBar.update(100, gitTxt.completed || 'Completed!');

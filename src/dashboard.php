@@ -463,6 +463,7 @@ $dashboardGitProviderParams = ['provider' => $dashboardGitProviderName];
 $dashboardGitEnabled = GitSync::isEnabled() && $dashboardGitSync->isConfigured();
 $dashboardGitIcon = ($dashboardGitProviderRaw === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 $dashboardGitConfigUrl = dashboardBuildPageUrl('git_sync.php', $pageWorkspace);
+$dashboardLastSyncInfo = $dashboardGitSync->getLastSyncInfo();
 
 // Result of the last Git sync (stored in session by GitSyncController after a push/pull).
 // The page is reloaded by the sync JS once it completes, so we surface the outcome banner
@@ -805,12 +806,13 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 			confirmPull: <?php echo json_encode(t('git_sync.confirm_pull', $dashboardGitProviderParams, 'Pull all notes from Git? This may overwrite local changes.')); ?>,
 			starting: <?php echo json_encode(t('git_sync.starting', [], 'Syncing...')); ?>,
 			completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>,
-			connectionError: <?php echo json_encode(t('git_sync.messages.connection_error', ['error' => ''], 'Connection error: ')); ?>
+			connectionError: <?php echo json_encode(t('git_sync.messages.connection_error', ['error' => ''], 'Connection error: ')); ?>,
+			lastSyncTimestamp: <?php echo json_encode(is_array($dashboardLastSyncInfo) ? ($dashboardLastSyncInfo['timestamp'] ?? '') : ''); ?>
 		};
 		</script>
 		<script src="js/navigation.js"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/notifications-modal.js?v=<?php echo file_exists(__DIR__ . '/js/notifications-modal.js') ? filemtime(__DIR__ . '/js/notifications-modal.js') : $cache_v; ?>"></script>
-		<script src="js/dashboard-page.js?v=<?php echo $cache_v; ?>"></script>
+		<script src="js/dashboard-page.js?v=<?php echo file_exists(__DIR__ . '/js/dashboard-page.js') ? filemtime(__DIR__ . '/js/dashboard-page.js') : $cache_v; ?>"></script>
 </body>
 </html>
