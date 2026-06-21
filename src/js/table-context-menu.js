@@ -288,23 +288,33 @@
     let mdActiveTable = null;
     let mdActiveCell = null;
     let mdActiveNoteEntry = null;
+    let mdContextMenuIsHeader = null; // track whether the cached menu was built for a header row
 
-    function createMdTableContextMenu() {
+    function createMdTableContextMenu(isHeader) {
+        // Rebuild if the header status changed (menu items differ)
+        if (mdContextMenu && mdContextMenuIsHeader !== isHeader) {
+            if (mdContextMenu.parentNode) mdContextMenu.parentNode.removeChild(mdContextMenu);
+            mdContextMenu = null;
+        }
         if (mdContextMenu) return mdContextMenu;
 
+        mdContextMenuIsHeader = isHeader;
         mdContextMenu = document.createElement('div');
         mdContextMenu.className = 'table-context-menu md-table-context-menu';
 
-        const menuItems = [
-            { label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' },
-            { label: tr('table.context_menu.insert_row_below', 'Insert row below'), action: 'insertRowBelow', icon: '↓' },
-            { separator: true },
-            { label: tr('table.context_menu.insert_column_left', 'Insert column left'), action: 'insertColLeft', icon: '←' },
-            { label: tr('table.context_menu.insert_column_right', 'Insert column right'), action: 'insertColRight', icon: '→' },
-            { separator: true },
-            { label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true },
-            { label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true },
-        ];
+        var menuItems = [];
+        if (!isHeader) {
+            menuItems.push({ label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' });
+        }
+        menuItems.push({ label: tr('table.context_menu.insert_row_below', 'Insert row below'), action: 'insertRowBelow', icon: '↓' });
+        menuItems.push({ separator: true });
+        menuItems.push({ label: tr('table.context_menu.insert_column_left', 'Insert column left'), action: 'insertColLeft', icon: '←' });
+        menuItems.push({ label: tr('table.context_menu.insert_column_right', 'Insert column right'), action: 'insertColRight', icon: '→' });
+        menuItems.push({ separator: true });
+        if (!isHeader) {
+            menuItems.push({ label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true });
+        }
+        menuItems.push({ label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true });
 
         menuItems.forEach(item => {
             if (item.separator) {
@@ -334,7 +344,10 @@
         mdActiveCell = cell;
         mdActiveNoteEntry = noteEntry;
 
-        const menu = createMdTableContextMenu();
+        const { rowIndex } = getMdCellIndex(cell);
+        const isHeader = rowIndex === 0;
+
+        const menu = createMdTableContextMenu(isHeader);
         menu.style.display = 'block';
 
         let left = x, top = y;

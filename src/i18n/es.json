@@ -1559,6 +1559,22 @@
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importadas {{count}} nota(s) del ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
     },
+    "skipped_attachments": {
+      "header": "Archivos adjuntos bloqueados omitidos:",
+      "unknown_path": "ruta desconocida",
+      "default_reason": "bloqueado por la política de seguridad de adjuntos",
+      "original_filename": "original",
+      "note": "nota",
+      "recovery_hint": "Estos archivos quedaron en el ZIP de origen y no se restauraron como adjuntos activos por motivos de seguridad. Puedes recuperarlos manualmente desde el ZIP. Una reimportación directa seguirá bloqueada mientras el archivo conserve un tipo prohibido; guárdalo dentro de un archivo permitido como .zip, o conviértelo/renómbralo a un tipo permitido solo si confías en el archivo.",
+      "reasons": {
+        "invalid_filename": "Nombre de archivo adjunto inválido",
+        "hidden_filename": "No se permiten nombres de archivos adjuntos ocultos",
+        "invalid_characters": "El nombre del archivo adjunto contiene caracteres inválidos",
+        "filename_too_long": "El nombre del archivo adjunto es demasiado largo",
+        "blocked_extension": "El tipo de archivo adjunto no está permitido",
+        "blocked_mime": "El tipo MIME del archivo adjunto no está permitido"
+      }
+    },
     "errors": {
       "complete_restore_form_not_found": "Formulario de restauración completa no encontrado. Por favor intenta de nuevo.",
       "form_not_found": "Formulario no encontrado. Por favor intenta de nuevo.",
@@ -1615,6 +1631,13 @@
       },
       "summary_with_location": "Esto importará {{fileText}} en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\".",
       "summary_zip_with_location": "Esto extraerá e importará todos los archivos del archivo ZIP en espacio de trabajo \"{{workspace}}\", carpeta \"{{folder}}\"."
+    },
+    "import_attachments": {
+      "summary": "Importado(s) {{count}} archivo(s) adjunto(s).",
+      "skipped_blocked": "{{count}} archivo(s) omitido(s) porque su tipo no está permitido.",
+      "errors": {
+        "no_allowed_files": "No se importaron adjuntos porque el ZIP solo contenía tipos de archivo bloqueados.\n{{details}}"
+      }
     },
     "sections": {
       "restore_from_backup": {

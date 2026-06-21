@@ -501,8 +501,10 @@ function showChangeIconModal(targetType, targetId, targetName) {
             filterIcons(e.target.value);
         });
 
-        // Focus on search input
-        setTimeout(() => newSearchInput.focus(), 100);
+        // Focus on search input only on non-touch devices to avoid opening keyboard on mobile
+        if (!('ontouchstart' in window)) {
+            setTimeout(() => newSearchInput.focus(), 100);
+        }
     }
 
     // Setup Apply button

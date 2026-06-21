@@ -1559,6 +1559,22 @@
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "{{count}} Notiz(en) aus ZIP in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importiert."
     },
+    "skipped_attachments": {
+      "header": "Übersprungene blockierte Anhangsdateien:",
+      "unknown_path": "unbekannter Pfad",
+      "default_reason": "durch die Sicherheitsrichtlinie für Anhänge blockiert",
+      "original_filename": "Original",
+      "note": "Notiz",
+      "recovery_hint": "Diese Dateien sind im Quell-ZIP geblieben und wurden aus Sicherheitsgründen nicht als aktive Anhänge wiederhergestellt. Sie können sie manuell aus dem ZIP wiederherstellen. Ein direkter Re-Import wird weiterhin blockiert, solange die Datei einen verbotenen Typ behält; speichern Sie sie in einem erlaubten Archiv wie .zip oder konvertieren/benennen Sie sie nur in einen erlaubten Typ um, wenn Sie der Datei vertrauen.",
+      "reasons": {
+        "invalid_filename": "Ungültiger Anhangsdateiname",
+        "hidden_filename": "Versteckte Anhangsdateinamen sind nicht erlaubt",
+        "invalid_characters": "Der Anhangsdateiname enthält ungültige Zeichen",
+        "filename_too_long": "Der Anhangsdateiname ist zu lang",
+        "blocked_extension": "Der Dateityp des Anhangs ist nicht erlaubt",
+        "blocked_mime": "Der MIME-Typ des Anhangs ist nicht erlaubt"
+      }
+    },
     "errors": {
       "complete_restore_form_not_found": "Vollständiges Wiederherstellungsformular nicht gefunden. Bitte versuchen Sie es erneut.",
       "form_not_found": "Formular nicht gefunden. Bitte versuchen Sie es erneut.",
@@ -1615,6 +1631,13 @@
       },
       "summary_with_location": "Dies wird {{fileText}} in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" importieren.",
       "summary_zip_with_location": "Dies wird alle Dateien aus dem ZIP-Archiv in Arbeitsbereich \"{{workspace}}\", Ordner \"{{folder}}\" extrahieren und importieren."
+    },
+    "import_attachments": {
+      "summary": "{{count}} Anhangsdatei(en) importiert.",
+      "skipped_blocked": "{{count}} Datei(en) übersprungen, weil ihr Typ nicht erlaubt ist.",
+      "errors": {
+        "no_allowed_files": "Es wurden keine Anhänge importiert, weil die ZIP-Datei nur blockierte Dateitypen enthielt.\n{{details}}"
+      }
     },
     "sections": {
       "restore_from_backup": {

@@ -1563,6 +1563,22 @@
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importadas {{count}} nota(s) do ZIP para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\"."
     },
+    "skipped_attachments": {
+      "header": "Arquivos de anexos bloqueados ignorados:",
+      "unknown_path": "caminho desconhecido",
+      "default_reason": "bloqueado pela política de segurança de anexos",
+      "original_filename": "original",
+      "note": "nota",
+      "recovery_hint": "Esses arquivos permaneceram no ZIP de origem e não foram restaurados como anexos ativos por motivos de segurança. Você pode recuperá-los manualmente a partir do ZIP. Uma reimportação direta continuará bloqueada enquanto o arquivo mantiver um tipo proibido; coloque-o dentro de um arquivo permitido, como .zip, ou converta/renomeie-o para um tipo permitido somente se confiar no arquivo.",
+      "reasons": {
+        "invalid_filename": "Nome de anexo inválido",
+        "hidden_filename": "Nomes de anexos ocultos não são permitidos",
+        "invalid_characters": "O nome do anexo contém caracteres inválidos",
+        "filename_too_long": "O nome do anexo é muito longo",
+        "blocked_extension": "O tipo de arquivo do anexo não é permitido",
+        "blocked_mime": "O tipo MIME do anexo não é permitido"
+      }
+    },
     "errors": {
       "complete_restore_form_not_found": "Formulário de restauração completa não encontrado. Por favor, tente novamente.",
       "form_not_found": "Formulário não encontrado. Por favor, tente novamente.",
@@ -1619,6 +1635,13 @@
       },
       "summary_with_location": "Isto importará {{fileText}} para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\".",
       "summary_zip_with_location": "Isto extrairá e importará todos os arquivos do arquivo ZIP para espaço de trabalho \"{{workspace}}\", pasta \"{{folder}}\"."
+    },
+    "import_attachments": {
+      "summary": "{{count}} arquivo(s) de anexo importado(s).",
+      "skipped_blocked": "{{count}} arquivo(s) ignorado(s) porque seu tipo não é permitido.",
+      "errors": {
+        "no_allowed_files": "Nenhum anexo foi importado porque o ZIP continha apenas tipos de arquivo bloqueados.\n{{details}}"
+      }
     },
     "sections": {
       "restore_from_backup": {
