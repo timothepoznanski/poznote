@@ -694,6 +694,40 @@
     overflow: hidden;
 }
 
+@media (min-width: 801px) {
+    body.kanban-active #right_col {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    body.kanban-active .kanban-inline-view {
+        flex: 1;
+        height: auto;
+        min-height: 0;
+    }
+
+    body.kanban-active .kanban-board-wrapper,
+    body.kanban-active .kanban-inline-view .kanban-board {
+        min-height: 0;
+    }
+
+    body.kanban-active .kanban-board-wrapper {
+        overflow: visible;
+    }
+
+    body.kanban-active .kanban-inline-view .kanban-board {
+        box-sizing: border-box;
+        scrollbar-width: auto;
+        -ms-overflow-style: auto;
+    }
+
+    body.kanban-active .kanban-inline-view .kanban-board::-webkit-scrollbar {
+        display: block;
+        height: 10px;
+    }
+}
+
 .kanban-scroll-btn {
     display: none;
 }
