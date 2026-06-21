@@ -238,6 +238,76 @@ function poznoteCountDisplayableAttachments($attachments, $content = '') {
     return $count;
 }
 
+function poznoteCountDisplayableAttachmentsFromDatabase($databaseConnection, $existingFilenames = null) {
+    if (!$databaseConnection instanceof PDO) {
+        return null;
+    }
+
+    $filenameSet = null;
+    if (is_array($existingFilenames)) {
+        $filenameSet = [];
+        foreach ($existingFilenames as $filename) {
+            $normalizedFilename = poznoteNormalizeAttachmentFilename((string)$filename);
+            if ($normalizedFilename !== '') {
+                $filenameSet[$normalizedFilename] = true;
+            }
+        }
+    }
+
+    $query = "SELECT entry, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+    $stmt = $databaseConnection->query($query);
+    $count = 0;
+
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $attachments = poznoteDecodeAttachments($row['attachments'] ?? '');
+        if ($filenameSet !== null) {
+            $attachments = array_values(array_filter($attachments, function($attachment) use ($filenameSet) {
+                if (!is_array($attachment) || empty($attachment['filename'])) {
+                    return false;
+                }
+
+                return isset($filenameSet[poznoteNormalizeAttachmentFilename((string)$attachment['filename'])]);
+            }));
+        }
+
+        $count += poznoteCountDisplayableAttachments($attachments, $row['entry'] ?? '');
+    }
+
+    return $count;
+}
+
+function poznoteGetActiveDatabasePath() {
+    global $dbPath;
+
+    if (!empty($dbPath)) {
+        return $dbPath;
+    }
+
+    if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+        require_once __DIR__ . '/users/UserDataManager.php';
+        $dataManager = new UserDataManager((int)$_SESSION['user_id']);
+        return $dataManager->getUserDatabasePath();
+    }
+
+    return defined('SQLITE_DATABASE') ? SQLITE_DATABASE : '';
+}
+
+function poznoteCountDisplayableAttachmentsInActiveDatabase($existingFilenames = null) {
+    $activeDbPath = poznoteGetActiveDatabasePath();
+    if ($activeDbPath === '' || !is_file($activeDbPath)) {
+        return null;
+    }
+
+    try {
+        $databaseConnection = new PDO('sqlite:' . $activeDbPath);
+        $databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return poznoteCountDisplayableAttachmentsFromDatabase($databaseConnection, $existingFilenames);
+    } catch (Throwable $e) {
+        error_log('Failed to count restored displayable attachments: ' . $e->getMessage());
+        return null;
+    }
+}
+
 function poznoteFormatAttachmentSize($bytes) {
     $bytes = (int)$bytes;
     if ($bytes <= 0) {
@@ -2004,6 +2074,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         $results = [];
         $hasErrors = false;
+        $databaseRestored = false;
         
         // Restore database if SQL file exists
         $sqlFile = $tempExtractDir . '/database/poznote_backup.sql';
@@ -2011,6 +2082,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $dbResult = restoreDatabaseFromFile($sqlFile);
             $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
             if (!$dbResult['success']) $hasErrors = true;
+            $databaseRestored = $dbResult['success'];
             
             // Fix orphaned folders and missing entries immediately after DB restore
             if ($dbResult['success']) {
@@ -2042,7 +2114,12 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         if (is_dir($attachmentsDir)) {
             $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
             if ($attachmentsResult['success']) {
-                $attachmentsMessage = 'Restored ' . $attachmentsResult['count'] . ' files';
+                $displayableAttachmentsCount = $databaseRestored
+                    ? poznoteCountDisplayableAttachmentsInActiveDatabase($attachmentsResult['filenames'] ?? [])
+                    : null;
+                $attachmentsMessage = $displayableAttachmentsCount !== null
+                    ? 'Restored ' . $displayableAttachmentsCount . ' file attachments'
+                    : 'Restored ' . $attachmentsResult['count'] . ' files';
                 if (!empty($attachmentsResult['skipped'])) {
                     $attachmentsMessage .= ', skipped ' . $attachmentsResult['skipped'] . ' blocked files';
                 }
@@ -2235,6 +2312,7 @@ function restoreAttachmentsFromDir($sourceDir) {
     
     $importedCount = 0;
     $skippedCount = 0;
+    $restoredFilenames = [];
     
     foreach ($files as $name => $file) {
         if (!$file->isDir()) {
@@ -2270,11 +2348,12 @@ function restoreAttachmentsFromDir($sourceDir) {
             if (copy($filePath, $targetFile)) {
                 chmod($targetFile, 0644);
                 $importedCount++;
+                $restoredFilenames[] = $validation['filename'];
             }
         }
     }
     
-    return ['success' => true, 'count' => $importedCount, 'skipped' => $skippedCount];
+    return ['success' => true, 'count' => $importedCount, 'skipped' => $skippedCount, 'filenames' => $restoredFilenames];
 }
 
 /**
