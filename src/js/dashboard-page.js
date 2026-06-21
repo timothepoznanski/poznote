@@ -7,6 +7,7 @@
     var FILTER_OPEN_KEY = 'dashboard_filter_open';
     var FILTER_VALUE_KEY = 'dashboard_filter_value';
     var NAV_PATH_KEY = 'dashboard_nav_path';
+    var SYNC_RESULT_SCROLL_KEY = 'dashboard_git_sync_result_scroll_top';
     (function syncFavoritesFromStorage() {
         try {
             var stored = localStorage.getItem(FAVORITES_KEY);
@@ -381,6 +382,46 @@
         return fetch(buildDashboardGitApiUrl(path), fetchOptions).then(readJsonResponse);
     }
 
+    function markDashboardGitSyncResultReload() {
+        try {
+            sessionStorage.setItem(SYNC_RESULT_SCROLL_KEY, '1');
+        } catch (e) { /* ignore */ }
+
+        try {
+            if ('scrollRestoration' in window.history) {
+                window.history.scrollRestoration = 'manual';
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    function restoreDashboardGitSyncResultPosition() {
+        var shouldScroll = false;
+        try {
+            shouldScroll = sessionStorage.getItem(SYNC_RESULT_SCROLL_KEY) === '1';
+            if (shouldScroll) {
+                sessionStorage.removeItem(SYNC_RESULT_SCROLL_KEY);
+            }
+        } catch (e) { /* ignore */ }
+
+        if (!shouldScroll) return;
+
+        try {
+            if ('scrollRestoration' in window.history) {
+                window.history.scrollRestoration = 'manual';
+            }
+        } catch (e) { /* ignore */ }
+
+        function scrollTop() {
+            window.scrollTo(0, 0);
+            if (document.documentElement) document.documentElement.scrollTop = 0;
+            if (document.body) document.body.scrollTop = 0;
+        }
+
+        scrollTop();
+        window.requestAnimationFrame(scrollTop);
+        window.setTimeout(scrollTop, 120);
+    }
+
     function executeDashboardGitSync(action, title) {
         if (!action) return;
         if (!window.modalAlert || typeof window.modalAlert.showProgressBar !== 'function') {
@@ -411,6 +452,7 @@
             }
             window.setTimeout(function () {
                 progressBar.close();
+                markDashboardGitSyncResultReload();
                 window.location.reload();
             }, 500);
         }
@@ -503,6 +545,7 @@
                     progressBar.update(100, gitTxt.completed || 'Completed!');
                     window.setTimeout(function () {
                         progressBar.close();
+                        markDashboardGitSyncResultReload();
                         window.location.reload();
                     }, 500);
                 } else {
@@ -543,6 +586,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         restoreNavigationPath();
         renderAll();
+        restoreDashboardGitSyncResultPosition();
         window.addEventListener('pagehide', saveNavigationPath);
 
         var toggleFavoritesBtn = document.getElementById('dashboardToggleFavorites');
