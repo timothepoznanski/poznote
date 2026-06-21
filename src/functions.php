@@ -1488,6 +1488,66 @@ function poznoteValidateAttachmentFile(string $filename, ?string $filePath = nul
     ];
 }
 
+function poznoteAttachmentValidationErrorForDisplay(string $error): string {
+    $translationMap = [
+        'Invalid attachment filename' => 'restore_import.skipped_attachments.reasons.invalid_filename',
+        'Hidden attachment filenames are not allowed' => 'restore_import.skipped_attachments.reasons.hidden_filename',
+        'Attachment filename contains invalid characters' => 'restore_import.skipped_attachments.reasons.invalid_characters',
+        'Attachment filename is too long' => 'restore_import.skipped_attachments.reasons.filename_too_long',
+        'Attachment file type is not allowed' => 'restore_import.skipped_attachments.reasons.blocked_extension',
+        'Attachment MIME type is not allowed' => 'restore_import.skipped_attachments.reasons.blocked_mime',
+    ];
+
+    if (isset($translationMap[$error])) {
+        return t($translationMap[$error], [], $error);
+    }
+
+    return $error;
+}
+
+function poznoteFormatSkippedAttachmentDetails(array $skippedFiles): string {
+    if (empty($skippedFiles)) {
+        return '';
+    }
+
+    $lines = [t('restore_import.skipped_attachments.header', [], 'Skipped blocked attachment files:')];
+
+    foreach ($skippedFiles as $skippedFile) {
+        $sourcePath = (string)($skippedFile['source_path'] ?? t('restore_import.skipped_attachments.unknown_path', [], 'unknown path'));
+        $targetFilename = (string)($skippedFile['target_filename'] ?? '');
+        $originalFilename = (string)($skippedFile['original_filename'] ?? '');
+        $noteId = (string)($skippedFile['note_id'] ?? '');
+        $noteHeading = (string)($skippedFile['note_heading'] ?? '');
+        $reason = poznoteAttachmentValidationErrorForDisplay((string)($skippedFile['reason'] ?? t('restore_import.skipped_attachments.default_reason', [], 'blocked by attachment security policy')));
+
+        $line = '- ' . $sourcePath;
+        if ($targetFilename !== '' && basename($sourcePath) !== $targetFilename) {
+            $line .= ' -> ' . $targetFilename;
+        }
+        if ($originalFilename !== '' && $originalFilename !== $targetFilename) {
+            $line .= ' (' . t('restore_import.skipped_attachments.original_filename', [], 'original') . ': ' . $originalFilename . ')';
+        }
+        if ($noteId !== '' || $noteHeading !== '') {
+            $noteParts = [];
+            if ($noteId !== '') {
+                $noteParts[] = '#' . $noteId;
+            }
+            if ($noteHeading !== '') {
+                $noteParts[] = '"' . $noteHeading . '"';
+            }
+            $noteLabel = implode(' ', $noteParts);
+            $line .= ' [' . t('restore_import.skipped_attachments.note', [], 'note') . ': ' . $noteLabel . ']';
+        }
+        $line .= ': ' . $reason;
+
+        $lines[] = $line;
+    }
+
+    $lines[] = t('restore_import.skipped_attachments.recovery_hint', [], 'These files were left in the source ZIP and were not restored as active attachments for security reasons. You can recover them manually from the ZIP. A direct re-import will still be blocked while the file keeps a forbidden type; store it inside an allowed archive such as .zip, or convert/rename it to an allowed type only if you trust the file.');
+
+    return implode("\n", $lines);
+}
+
 function deleteNoteSnapshots($noteId) {
     $noteId = (int) $noteId;
     if ($noteId <= 0) {
@@ -2075,6 +2135,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $results = [];
         $hasErrors = false;
         $databaseRestored = false;
+        $skippedAttachments = [];
         
         // Restore database if SQL file exists
         $sqlFile = $tempExtractDir . '/database/poznote_backup.sql';
@@ -2114,6 +2175,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         if (is_dir($attachmentsDir)) {
             $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
             if ($attachmentsResult['success']) {
+                $skippedAttachments = $attachmentsResult['skipped_files'] ?? [];
                 $displayableAttachmentsCount = $databaseRestored
                     ? poznoteCountDisplayableAttachmentsInActiveDatabase($attachmentsResult['filenames'] ?? [])
                     : null;
@@ -2122,6 +2184,10 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                     : 'Restored ' . $attachmentsResult['count'] . ' files';
                 if (!empty($attachmentsResult['skipped'])) {
                     $attachmentsMessage .= ', skipped ' . $attachmentsResult['skipped'] . ' blocked files';
+                    $skippedDetailsMessage = poznoteFormatSkippedAttachmentDetails($skippedAttachments);
+                    if ($skippedDetailsMessage !== '') {
+                        $attachmentsMessage .= "\n" . $skippedDetailsMessage;
+                    }
                 }
                 $results[] = 'Attachments: ' . $attachmentsMessage;
             } else {
@@ -2142,7 +2208,8 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         return [
             'success' => !$hasErrors,
             'message' => implode("\n", $results),
-            'error' => $hasErrors ? 'Some components failed to restore' : ''
+            'error' => $hasErrors ? 'Some components failed to restore' : '',
+            'skipped_attachments' => $skippedAttachments
         ];
         
     } catch (Exception $e) {
@@ -2290,7 +2357,7 @@ function restoreAttachmentsFromDir($sourceDir) {
     
     // Read metadata file to get original filenames
     $metadataFile = $sourceDir . '/poznote_attachments_metadata.json';
-    $idToFilenameMap = [];
+    $idToAttachmentMap = [];
     
     if (file_exists($metadataFile)) {
         $metadataContent = file_get_contents($metadataFile);
@@ -2299,7 +2366,12 @@ function restoreAttachmentsFromDir($sourceDir) {
         if (is_array($metadata)) {
             foreach ($metadata as $item) {
                 if (isset($item['attachment_data']['id']) && isset($item['attachment_data']['filename'])) {
-                    $idToFilenameMap[$item['attachment_data']['id']] = $item['attachment_data']['filename'];
+                    $idToAttachmentMap[$item['attachment_data']['id']] = [
+                        'filename' => $item['attachment_data']['filename'],
+                        'original_filename' => $item['attachment_data']['original_filename'] ?? '',
+                        'note_id' => $item['note_id'] ?? '',
+                        'note_heading' => $item['note_heading'] ?? ''
+                    ];
                 }
             }
         }
@@ -2313,6 +2385,7 @@ function restoreAttachmentsFromDir($sourceDir) {
     $importedCount = 0;
     $skippedCount = 0;
     $restoredFilenames = [];
+    $skippedFiles = [];
     
     foreach ($files as $name => $file) {
         if (!$file->isDir()) {
@@ -2330,8 +2403,9 @@ function restoreAttachmentsFromDir($sourceDir) {
             $filenameWithoutExt = pathinfo($basename, PATHINFO_FILENAME);
             
             // If we have a mapping for this ID, use the real filename
-            if (isset($idToFilenameMap[$filenameWithoutExt])) {
-                $targetFilename = $idToFilenameMap[$filenameWithoutExt];
+            $attachmentMetadata = $idToAttachmentMap[$filenameWithoutExt] ?? [];
+            if (!empty($attachmentMetadata['filename'])) {
+                $targetFilename = $attachmentMetadata['filename'];
             } else {
                 // Otherwise, use the original basename (for backwards compatibility)
                 $targetFilename = $basename;
@@ -2340,7 +2414,16 @@ function restoreAttachmentsFromDir($sourceDir) {
             $validation = poznoteValidateAttachmentFile($targetFilename, $filePath);
             if (!$validation['success']) {
                 $skippedCount++;
-                error_log('Skipped blocked attachment during restore: ' . $targetFilename . ' - ' . $validation['error']);
+                $sourcePath = 'attachments/' . str_replace('\\', '/', $relativePath);
+                $skippedFiles[] = [
+                    'source_path' => $sourcePath,
+                    'target_filename' => $targetFilename,
+                    'original_filename' => $attachmentMetadata['original_filename'] ?? '',
+                    'note_id' => $attachmentMetadata['note_id'] ?? '',
+                    'note_heading' => $attachmentMetadata['note_heading'] ?? '',
+                    'reason' => $validation['error']
+                ];
+                error_log('Skipped blocked attachment during restore: ' . $sourcePath . ' -> ' . $targetFilename . ' - ' . $validation['error']);
                 continue;
             }
 
@@ -2353,7 +2436,13 @@ function restoreAttachmentsFromDir($sourceDir) {
         }
     }
     
-    return ['success' => true, 'count' => $importedCount, 'skipped' => $skippedCount, 'filenames' => $restoredFilenames];
+    return [
+        'success' => true,
+        'count' => $importedCount,
+        'skipped' => $skippedCount,
+        'filenames' => $restoredFilenames,
+        'skipped_files' => $skippedFiles
+    ];
 }
 
 /**

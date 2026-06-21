@@ -1617,6 +1617,22 @@
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Importé {{count}} note(s) depuis le ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\"."
     },
+    "skipped_attachments": {
+      "header": "Fichiers de pièces jointes bloqués ignorés :",
+      "unknown_path": "chemin inconnu",
+      "default_reason": "bloqué par la politique de sécurité des pièces jointes",
+      "original_filename": "original",
+      "note": "note",
+      "recovery_hint": "Ces fichiers sont restés dans le ZIP source et n'ont pas été restaurés comme pièces jointes actives pour des raisons de sécurité. Vous pouvez les récupérer manuellement depuis le ZIP. Un réimport direct restera bloqué tant que le fichier garde un type interdit ; placez-le dans une archive autorisée comme .zip, ou convertissez/renommez-le vers un type autorisé uniquement si vous faites confiance au fichier.",
+      "reasons": {
+        "invalid_filename": "Nom de pièce jointe invalide",
+        "hidden_filename": "Les noms de pièces jointes masqués ne sont pas autorisés",
+        "invalid_characters": "Le nom de la pièce jointe contient des caractères invalides",
+        "filename_too_long": "Le nom de la pièce jointe est trop long",
+        "blocked_extension": "Le type de fichier de la pièce jointe n'est pas autorisé",
+        "blocked_mime": "Le type MIME de la pièce jointe n'est pas autorisé"
+      }
+    },
     "errors": {
       "complete_restore_form_not_found": "Formulaire de restauration complète introuvable. Veuillez réessayer.",
       "form_not_found": "Formulaire introuvable. Veuillez réessayer.",
@@ -1673,6 +1689,13 @@
       },
       "summary_with_location": "Cela importera {{fileText}} dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\".",
       "summary_zip_with_location": "Cela extraira et importera tous les fichiers depuis l'archive ZIP dans l'espace de travail \"{{workspace}}\", dossier \"{{folder}}\"."
+    },
+    "import_attachments": {
+      "summary": "{{count}} fichier(s) de pièces jointes importé(s).",
+      "skipped_blocked": "{{count}} fichier(s) ignoré(s), car leur type n'est pas autorisé.",
+      "errors": {
+        "no_allowed_files": "Aucune pièce jointe n'a été importée, car le ZIP ne contenait que des types de fichiers bloqués.\n{{details}}"
+      }
     },
     "sections": {
       "restore_from_backup": {

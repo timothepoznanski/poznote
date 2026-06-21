@@ -1239,6 +1239,22 @@
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "Imported {{count}} note(s) from ZIP into workspace \"{{workspace}}\", folder \"{{folder}}\"."
     },
+    "skipped_attachments": {
+      "header": "Skipped blocked attachment files:",
+      "unknown_path": "unknown path",
+      "default_reason": "blocked by attachment security policy",
+      "original_filename": "original",
+      "note": "note",
+      "recovery_hint": "These files were left in the source ZIP and were not restored as active attachments for security reasons. You can recover them manually from the ZIP. A direct re-import will still be blocked while the file keeps a forbidden type; store it inside an allowed archive such as .zip, or convert/rename it to an allowed type only if you trust the file.",
+      "reasons": {
+        "invalid_filename": "Invalid attachment filename",
+        "hidden_filename": "Hidden attachment filenames are not allowed",
+        "invalid_characters": "Attachment filename contains invalid characters",
+        "filename_too_long": "Attachment filename is too long",
+        "blocked_extension": "Attachment file type is not allowed",
+        "blocked_mime": "Attachment MIME type is not allowed"
+      }
+    },
     "errors": {
       "complete_restore_form_not_found": "Complete restore form not found. Please try again.",
       "form_not_found": "Form not found. Please try again.",
@@ -1295,6 +1311,13 @@
       },
       "summary_with_location": "This will import {{fileText}} into workspace \"{{workspace}}\", folder \"{{folder}}\".",
       "summary_zip_with_location": "This will extract and import all files from ZIP archive into workspace \"{{workspace}}\", folder \"{{folder}}\"."
+    },
+    "import_attachments": {
+      "summary": "Imported {{count}} attachment file(s).",
+      "skipped_blocked": "{{count}} file(s) skipped because their type is not allowed.",
+      "errors": {
+        "no_allowed_files": "No attachments were imported because the ZIP only contained blocked file types.\n{{details}}"
+      }
     },
     "sections": {
       "restore_from_backup": {

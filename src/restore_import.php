@@ -1078,6 +1078,7 @@ function importAttachmentsZip($uploadedFile) {
     $importedCount = 0;
     $skippedCount = 0;
     $errors = [];
+    $skippedFiles = [];
     
     // Extract each file
     for ($i = 0; $i < $zip->numFiles; $i++) {
@@ -1098,7 +1099,14 @@ function importAttachmentsZip($uploadedFile) {
         $validation = poznoteValidateAttachmentFile($filename, null, $content);
         if (!$validation['success']) {
             $skippedCount++;
-            $errors[] = poznoteNormalizeAttachmentFilename($filename) . ': ' . $validation['error'];
+            $sourcePath = str_replace('\\', '/', $filename);
+            $targetFilename = poznoteNormalizeAttachmentFilename($filename);
+            $skippedFiles[] = [
+                'source_path' => $sourcePath,
+                'target_filename' => $targetFilename,
+                'reason' => $validation['error']
+            ];
+            $errors[] = $sourcePath . ': ' . $validation['error'];
             continue;
         }
 
@@ -1113,13 +1121,15 @@ function importAttachmentsZip($uploadedFile) {
     unlink($tempFile);
 
     if ($importedCount === 0 && $skippedCount > 0) {
+        $skippedDetailsMessage = poznoteFormatSkippedAttachmentDetails($skippedFiles);
         return [
             'success' => false,
             'error' => t(
                 'restore_import.import_attachments.errors.no_allowed_files',
-                ['details' => implode('; ', array_slice($errors, 0, 5))],
+                ['details' => $skippedDetailsMessage !== '' ? $skippedDetailsMessage : implode('; ', array_slice($errors, 0, 5))],
                 'No attachments were imported because the ZIP only contained blocked file types. {{details}}'
-            )
+            ),
+            'skipped_attachments' => $skippedFiles
         ];
     }
 
@@ -1130,9 +1140,13 @@ function importAttachmentsZip($uploadedFile) {
             ['count' => $skippedCount],
             '{{count}} file(s) skipped because their type is not allowed.'
         );
+        $skippedDetailsMessage = poznoteFormatSkippedAttachmentDetails($skippedFiles);
+        if ($skippedDetailsMessage !== '') {
+            $message .= "\n" . $skippedDetailsMessage;
+        }
     }
 
-    return ['success' => true, 'message' => $message];
+    return ['success' => true, 'message' => $message, 'skipped_attachments' => $skippedFiles];
 }
 
 function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null) {

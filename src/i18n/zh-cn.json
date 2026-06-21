@@ -1558,6 +1558,22 @@
       "attachments_imported": "{{message}}",
       "notes_imported_zip": "已从 ZIP 导入 {{count}} 篇笔记到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。"
     },
+    "skipped_attachments": {
+      "header": "已跳过的被阻止附件文件：",
+      "unknown_path": "未知路径",
+      "default_reason": "被附件安全策略阻止",
+      "original_filename": "原始文件名",
+      "note": "笔记",
+      "recovery_hint": "这些文件仍保留在源 ZIP 中，出于安全原因未作为活动附件还原。您可以从 ZIP 中手动恢复它们。只要文件仍保持被禁止的类型，直接重新导入仍会被阻止；请将其放入允许的归档文件（如 .zip）中，或仅在信任该文件时将其转换/重命名为允许的类型。",
+      "reasons": {
+        "invalid_filename": "附件文件名无效",
+        "hidden_filename": "不允许隐藏的附件文件名",
+        "invalid_characters": "附件文件名包含无效字符",
+        "filename_too_long": "附件文件名过长",
+        "blocked_extension": "不允许该附件文件类型",
+        "blocked_mime": "不允许该附件 MIME 类型"
+      }
+    },
     "errors": {
       "complete_restore_form_not_found": "未找到完整还原表单。请稍后再试。",
       "form_not_found": "未找到表单。请稍后再试。",
@@ -1614,6 +1630,13 @@
       },
       "summary_with_location": "这将导入 {{fileText}} 到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。",
       "summary_zip_with_location": "这将解压并把 ZIP 归档中的所有文件导入到工作区 \"{{workspace}}\" 的文件夹 \"{{folder}}\" 中。"
+    },
+    "import_attachments": {
+      "summary": "已导入 {{count}} 个附件文件。",
+      "skipped_blocked": "已跳过 {{count}} 个文件，因为其类型不被允许。",
+      "errors": {
+        "no_allowed_files": "未导入任何附件，因为 ZIP 只包含被阻止的文件类型。\n{{details}}"
+      }
     },
     "sections": {
       "restore_from_backup": {
