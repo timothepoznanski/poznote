@@ -150,6 +150,11 @@ body.dark-mode .dashboard-sidebar-sep {
     padding: 12px 0 8px;
 }
 
+.dashboard-sync-feedback {
+    position: relative;
+    z-index: 101;
+}
+
 .dashboard-topbar-filter {
     position: relative;
     display: flex;
