@@ -66,7 +66,7 @@
 
 /* Ellipsis icon */
 .system-folder .lucide-more-vertical.folder-icon {
-    font-size: clamp(11px, 2vw, 14px) !important;
+    font-size: 1em !important;
     margin-right: 0 !important;
     color: #007DB8;
 }
@@ -89,13 +89,13 @@
 
 /* System folder icons */
 .system-folder:not([data-folder="Favorites"]) [class*="lucide-"].folder-icon {
-    font-size: clamp(11px, 2vw, 14px) !important;
+    font-size: 1em !important;
     margin-right: 0 !important;
     color: #007DB8;
 }
 
 .system-folder[data-folder="Favorites"] [class*="lucide-"].folder-icon {
-    font-size: clamp(11px, 2vw, 14px) !important;
+    font-size: 1em !important;
 }
 
 /* Afficher le compteur à droite de l'icône - toujours visible */

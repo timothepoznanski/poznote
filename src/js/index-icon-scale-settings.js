@@ -119,8 +119,8 @@ function applyIndexIconScale(scale) {
         }
 
         /* Folder icon */
-        .folder-icon {
-            font-size: ${1.1 * s}rem !important;
+        #left_col .folder-toggle .folder-icon {
+            font-size: ${1.0 * s}em !important;
         }
 
         /* Note editor toolbar icons */

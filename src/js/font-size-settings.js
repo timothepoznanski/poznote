@@ -147,7 +147,7 @@ function saveFontSize() {
 
         // Direct application as fallback for existing elements
         document.querySelectorAll('.noteentry').forEach(el => el.style.fontSize = noteSize);
-        document.querySelectorAll('.links_arbo_left .note-title, .folder-name').forEach(el => el.style.fontSize = sidebarSize);
+        document.querySelectorAll('.links_arbo_left .note-title, .folder-toggle, .folder-name').forEach(el => el.style.fontSize = sidebarSize);
 
         if (typeof window.refreshFontSizeBadge === 'function') {
             window.refreshFontSizeBadge();
