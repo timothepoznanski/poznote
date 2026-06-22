@@ -609,7 +609,9 @@ body.dark-mode .dashboard-debug-info pre {
     flex-shrink: 0;
 }
 
-.dash-card-icon .lucide {
+.dash-card-icon .lucide,
+.dash-card-icon [class^="lucide-"],
+.dash-card-icon [class*=" lucide-"] {
     width: 32px;
     height: 32px;
     color: #007DB8;
@@ -1081,7 +1083,9 @@ body.dark-mode .dashboard-empty {
         height: 48px;
     }
 
-    .dash-card-icon .lucide {
+    .dash-card-icon .lucide,
+    .dash-card-icon [class^="lucide-"],
+    .dash-card-icon [class*=" lucide-"] {
         width: 28px;
         height: 28px;
     }
