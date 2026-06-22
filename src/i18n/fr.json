@@ -1985,7 +1985,7 @@
     }
   },
   "public_folder": {
-    "filter_placeholder": "Filtrer sur les titres",
+    "filter_placeholder": "Filtrer les notes par titre",
     "no_filter_results": "Aucun résultat.",
     "view_notes": "Affichage par liste",
     "view_kanban": "Affichage Kanban"

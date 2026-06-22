@@ -181,6 +181,24 @@ try {
     $allRelevantFolderIds = array_merge([$folder_id], $allSubfolderIds);
     $placeholders = implode(',', array_fill(0, count($allRelevantFolderIds), '?'));
 
+    $subfoldersByParent = [];
+    foreach ($allSubfolderIds as $subfolderId) {
+        if (!isset($allFoldersPool[$subfolderId])) {
+            continue;
+        }
+
+        $parentId = $allFoldersPool[$subfolderId]['parent_id'];
+        if ($parentId === null) {
+            continue;
+        }
+
+        $parentKey = (int)$parentId;
+        if (!isset($subfoldersByParent[$parentKey])) {
+            $subfoldersByParent[$parentKey] = [];
+        }
+        $subfoldersByParent[$parentKey][] = $allFoldersPool[$subfolderId];
+    }
+
     // Get direct subfolders for Kanban mapping
     $directSubfolders = [];
     $directSubfolderIds = [];
@@ -256,13 +274,6 @@ try {
         }
     }
 
-    // Sort subfolder groups by name for the list view
-    uksort($notesByFolder, function($a, $b) use ($folderNames, $folder_id) {
-        if ($a == $folder_id) return -1;
-        if ($b == $folder_id) return 1;
-        return strcasecmp($folderNames[$a] ?? '', $folderNames[$b] ?? '');
-    });
-
 } catch (Exception $e) {
     http_response_code(500);
     echo t_h('public.errors.server_error', [], 'Server error', $currentLang);
@@ -313,9 +324,14 @@ $noteBaseUrl = $protocol . '://' . $host;
     <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/public_folder.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 </head>
 <body class="public-folder-body" 
+      data-share-token="<?php echo htmlspecialchars($token, ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-no-results="<?php echo t_h('public_folder.no_filter_results', [], 'No results.'); ?>"
       data-txt-view-notes="<?php echo t_h('public_folder.view_notes', [], 'View as list'); ?>"
-      data-txt-view-kanban="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
+      data-txt-view-kanban="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>"
+      data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"
+      data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>"
+      data-txt-expand-all="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>"
+      data-txt-collapse-all="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
     <div class="header-controls">
         <button id="viewToggle" class="view-toggle" onclick="toggleView()" title="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
             <i class="lucide lucide-columns-2" id="viewIcon"></i>
@@ -330,23 +346,16 @@ $noteBaseUrl = $protocol . '://' . $host;
     <?php if (!empty($sharedNotes)): ?>
         <div class="public-folder-filter">
             <div class="filter-input-wrapper">
-                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Filter notes'); ?>" autocomplete="off" />
+                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Filter notes by title'); ?>" autocomplete="off" />
                 <button id="clearFilterBtn" class="clear-filter-btn" type="button" aria-label="Clear search" style="display: none;">
                     <i class="lucide lucide-x"></i>
                 </button>
             </div>
             <div id="folderFilterStats" class="filter-stats" style="display: none;"></div>
-        </div>
-    <?php endif; ?>
-
-    <?php if ($isWorkspaceShared && !empty($directSubfolders)): ?>
-        <div class="public-workspace-subfolders">
-            <?php foreach ($directSubfolders as $subfolder): ?>
-                <a href="<?php echo htmlspecialchars(buildPublicAppHref('public_folder.php?token=' . rawurlencode($token) . '&folder_id=' . rawurlencode((string)$subfolder['id'])), ENT_QUOTES, 'UTF-8'); ?>" class="public-workspace-subfolder-link">
-                    <i class="lucide lucide-folder"></i>
-                    <span><?php echo htmlspecialchars($subfolder['name']); ?></span>
-                </a>
-            <?php endforeach; ?>
+            <button id="publicFolderToggleAll" class="public-folder-toggle-all" type="button">
+                <i class="lucide lucide-folder-minus"></i>
+                <span><?php echo t_h('public.collapse_all', [], 'Collapse all'); ?></span>
+            </button>
         </div>
     <?php endif; ?>
 
@@ -358,7 +367,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     <?php else: ?>
         <div id="listView">
             <?php 
-            // Separate direct notes and subfolder notes
+            // Render root notes first, then descendant folders recursively.
             $directNotes = $notesByFolder[$folder_id] ?? [];
             unset($notesByFolder[$folder_id]);
             ?>
@@ -371,17 +380,8 @@ $noteBaseUrl = $protocol . '://' . $host;
                 </ul>
             <?php endif; ?>
 
-            <?php foreach ($notesByFolder as $fid => $fNotes): ?>
-                <?php if (!empty($fNotes)): ?>
-                    <div class="public-folder-group">
-                        <h2 class="public-folder-group-title"><i class="lucide lucide-folder"></i> <?php echo htmlspecialchars($folderNames[$fid] ?? 'Subfolder'); ?></h2>
-                        <ul class="notes-list">
-                            <?php foreach ($fNotes as $note): ?>
-                                <?php renderPublicNoteItem($note, $noteBaseUrl, $token); ?>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                <?php endif; ?>
+            <?php foreach ($subfoldersByParent[(int)$folder_id] ?? [] as $subfolder): ?>
+                <?php renderPublicFolderBranch((int)$subfolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $noteBaseUrl, $token, 0); ?>
             <?php endforeach; ?>
         </div>
 
@@ -458,6 +458,51 @@ $noteBaseUrl = $protocol . '://' . $host;
                 <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
             </a>
         </li>
+        <?php
+    }
+
+    function publicFolderBranchHasNotes($folderId, $subfoldersByParent, $notesByFolder) {
+        if (!empty($notesByFolder[$folderId])) {
+            return true;
+        }
+
+        foreach ($subfoldersByParent[$folderId] ?? [] as $childFolder) {
+            if (publicFolderBranchHasNotes((int)$childFolder['id'], $subfoldersByParent, $notesByFolder)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function renderPublicFolderBranch($folderId, $subfoldersByParent, $notesByFolder, $folderNames, $noteBaseUrl, $folderToken, $depth = 0) {
+        if (!publicFolderBranchHasNotes($folderId, $subfoldersByParent, $notesByFolder)) {
+            return;
+        }
+
+        $folderNotes = $notesByFolder[$folderId] ?? [];
+        ?>
+        <div class="public-folder-group" data-folder-id="<?php echo (int)$folderId; ?>" style="--public-folder-depth: <?php echo (int)$depth; ?>">
+            <h2 class="public-folder-group-title">
+                <button type="button" class="public-folder-toggle" aria-expanded="true">
+                    <i class="lucide lucide-chevron-down"></i>
+                </button>
+                <i class="lucide lucide-folder"></i>
+                <?php echo htmlspecialchars($folderNames[$folderId] ?? 'Subfolder'); ?>
+            </h2>
+
+            <?php if (!empty($folderNotes)): ?>
+                <ul class="notes-list">
+                    <?php foreach ($folderNotes as $note): ?>
+                        <?php renderPublicNoteItem($note, $noteBaseUrl, $folderToken); ?>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+
+            <?php foreach ($subfoldersByParent[$folderId] ?? [] as $childFolder): ?>
+                <?php renderPublicFolderBranch((int)$childFolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $noteBaseUrl, $folderToken, $depth + 1); ?>
+            <?php endforeach; ?>
+        </div>
         <?php
     }
     ?>

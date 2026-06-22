@@ -1868,6 +1868,10 @@
     "shared_with_me": "与我共享",
     "shared_by": "共享者",
     "no_shared_with_me": "暂时没有人与您共享内容。",
+    "expand_all": "全部展开",
+    "collapse_all": "全部折叠",
+    "expand_folder": "展开文件夹",
+    "collapse_folder": "折叠文件夹",
     "login_required_title": "需要登录",
     "login_required_message": "此内容仅限特定用户访问。请登录以访问。",
     "access_denied_title": "拒绝访问",
@@ -1919,7 +1923,7 @@
     }
   },
   "public_folder": {
-    "filter_placeholder": "按标题筛选",
+    "filter_placeholder": "按笔记标题筛选",
     "no_filter_results": "无结果。"
   },
   "icon_names": {
