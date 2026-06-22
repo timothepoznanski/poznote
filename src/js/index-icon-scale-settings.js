@@ -119,8 +119,19 @@ function applyIndexIconScale(scale) {
         }
 
         /* Folder icon */
-        .folder-icon {
-            font-size: ${1.1 * s}rem !important;
+        #left_col .folder-toggle .folder-icon {
+            font-size: ${1.0 * s}em !important;
+        }
+
+        /* Note icons */
+        #left_col .note-title .note-icon {
+            font-size: ${0.85 * s}em !important;
+        }
+        #left_col .note-title .note-type-icon-inline {
+            font-size: ${0.85 * s}em !important;
+        }
+        .innernote .note-title-heading .note-title-icon {
+            font-size: ${20 * s}px !important;
         }
 
         /* Note editor toolbar icons */

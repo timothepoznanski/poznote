@@ -2328,7 +2328,10 @@
       "show": "Mostrar informações de depuração",
       "hide": "Ocultar informações de depuração",
       "copy": "Copiar debug",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "show_changes": "Apenas alterações",
+      "show_all": "Mostrar tudo",
+      "no_changes": "Nenhuma alteração encontrada no debug."
     },
     "limitations": {
       "title": "Limitações de sincronização",

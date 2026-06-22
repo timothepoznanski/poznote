@@ -412,6 +412,87 @@ body.dark-mode .dashboard-sidebar-sep {
     line-height: 1.2;
 }
 
+/* ---------- Git sync feedback/debug ---------- */
+
+.dashboard-sync-debug {
+    margin-top: 10px;
+}
+
+.dashboard-debug-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.dashboard-debug-controls [hidden],
+.dashboard-debug-info[hidden] {
+    display: none !important;
+}
+
+.dashboard-debug-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.dashboard-debug-btn[aria-pressed="true"] {
+    background: #007cba;
+    color: #fff;
+}
+
+.dashboard-debug-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.dashboard-debug-info h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.dashboard-debug-info pre {
+    margin: 0;
+    font-size: 11px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    text-align: left;
+}
+
+:root[data-theme='dark'] .dashboard-debug-btn[aria-pressed="true"],
+body.dark-mode .dashboard-debug-btn[aria-pressed="true"] {
+    background: #007cba;
+    color: #fff;
+}
+
+:root[data-theme='dark'] .dashboard-debug-info,
+body.dark-mode .dashboard-debug-info {
+    background: var(--dm-surface, #252526);
+    border-color: var(--dm-border, #3a3a3a);
+    color: var(--dm-text, #e0e0e0);
+}
+
+:root.theme-black[data-theme='dark'] .dashboard-debug-info {
+    background: #141821;
+    border-color: #2a3140;
+    color: #d8dee8;
+}
+
+:root[data-theme='dark'] .dashboard-debug-info h4,
+body.dark-mode .dashboard-debug-info h4 {
+    color: var(--dm-text, #e0e0e0);
+}
+
+:root[data-theme='dark'] .dashboard-debug-info pre,
+body.dark-mode .dashboard-debug-info pre {
+    color: inherit;
+}
+
 /* ---------- Breadcrumb ---------- */
 
 .dashboard-breadcrumb {
@@ -528,7 +609,9 @@ body.dark-mode .dashboard-sidebar-sep {
     flex-shrink: 0;
 }
 
-.dash-card-icon .lucide {
+.dash-card-icon .lucide,
+.dash-card-icon [class^="lucide-"],
+.dash-card-icon [class*=" lucide-"] {
     width: 32px;
     height: 32px;
     color: #007DB8;
@@ -1000,7 +1083,9 @@ body.dark-mode .dashboard-empty {
         height: 48px;
     }
 
-    .dash-card-icon .lucide {
+    .dash-card-icon .lucide,
+    .dash-card-icon [class^="lucide-"],
+    .dash-card-icon [class*=" lucide-"] {
         width: 28px;
         height: 28px;
     }

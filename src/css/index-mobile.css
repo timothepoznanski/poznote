@@ -567,5 +567,5 @@ div[contentEditable=true][data-ph-mobile]:empty:before {
 
 /* System folder icons sizing */
 .system-folder [class*="lucide-"].folder-icon {
-    font-size: 14px !important;
+    font-size: 1em !important;
 }

@@ -37,6 +37,21 @@ function getVersionedPublicAppAssetHref($relativePath) {
     return $href;
 }
 
+function redirectPublicPostToGet(string $fallbackPath): void {
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();
+    }
+
+    $target = (string)($_SERVER['REQUEST_URI'] ?? '');
+    $target = str_replace(["\r", "\n"], '', $target);
+    if ($target === '' || $target[0] !== '/') {
+        $target = buildPublicAppHref($fallbackPath);
+    }
+
+    header('Location: ' . $target, true, 303);
+    exit;
+}
+
 function escapePublicStatusText($text) {
     $decoded = html_entity_decode((string)$text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     return htmlspecialchars($decoded, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');

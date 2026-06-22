@@ -16,6 +16,7 @@
     gap: 2px;
     cursor: pointer;
     box-sizing: border-box;
+    font-size: var(--sidebar-font-size, 13px);
 }
 
 .folder-name {
@@ -64,7 +65,7 @@
     cursor: pointer;
 }
 
-/* Réduire les icônes dans les autres dossiers (non-système) */
+/* Keep folder icons tied to the sidebar text size. */
 .folder-icon:not(.system-folder .folder-icon) {
-    font-size: 0.8em !important;
+    font-size: 1em !important;
 }

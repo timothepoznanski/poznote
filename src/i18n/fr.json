@@ -2544,7 +2544,10 @@
       "show": "Afficher les infos de debug",
       "hide": "Masquer les infos de debug",
       "copy": "Copier le debug",
-      "copied": "Copié !"
+      "copied": "Copié !",
+      "show_changes": "N'afficher que les changements",
+      "show_all": "Tout afficher",
+      "no_changes": "Aucun changement trouvé dans le debug."
     },
     "limitations": {
       "title": "Limitations de la synchronisation",

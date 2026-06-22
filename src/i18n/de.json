@@ -2325,7 +2325,10 @@
       "show": "Debug-Informationen anzeigen",
       "hide": "Debug-Informationen ausblenden",
       "copy": "Debug kopieren",
-      "copied": "Kopiert!"
+      "copied": "Kopiert!",
+      "show_changes": "Nur Änderungen",
+      "show_all": "Alle anzeigen",
+      "no_changes": "Keine Änderungen im Debug gefunden."
     },
     "limitations": {
       "title": "Synchronisierungsbeschränkungen",

@@ -94,6 +94,7 @@ try {
             $submittedPassword = $_POST['folder_password'];
             if (password_verify($submittedPassword, $storedPassword)) {
                 $_SESSION[$sessionKey] = true;
+                redirectPublicPostToGet('public_folder.php?token=' . rawurlencode($token));
             } else {
                 $passwordError = true;
             }

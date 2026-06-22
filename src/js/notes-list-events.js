@@ -15,6 +15,7 @@
     var clickTimer = null;
     var lastClickedElement = null;
     var DOUBLE_CLICK_DELAY = 200; // milliseconds
+    var suppressNextEditorTitleIconClick = false;
 
     // =====================================================
     // HELPER FUNCTIONS
@@ -72,6 +73,46 @@
             typeof window.PoznoteUiCustomization.usesFolderIconKanban === 'function' &&
             !window.PoznoteUiCustomization.usesFolderIconKanban()
         );
+    }
+
+    function getNoteIconActionElement(target) {
+        if (!target || !target.closest) return null;
+        return target.closest('.note-icon[data-action="open-note-icon-picker"]');
+    }
+
+    function isEditorTitleNoteIcon(element) {
+        return !!(
+            element &&
+            element.classList &&
+            element.classList.contains('note-title-icon') &&
+            element.closest('.note-title-heading')
+        );
+    }
+
+    function blurActiveNoteTitle() {
+        if (
+            document.activeElement &&
+            document.activeElement.classList &&
+            document.activeElement.classList.contains('css-title') &&
+            typeof document.activeElement.blur === 'function'
+        ) {
+            document.activeElement.blur();
+        }
+    }
+
+    function openNoteIconPicker(event, actionElement) {
+        if (event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        }
+
+        blurActiveNoteTitle();
+
+        var noteIdForIcon = actionElement.getAttribute('data-note-id');
+        var noteTitleForIcon = actionElement.getAttribute('data-note-title') || '';
+        if (noteIdForIcon && typeof window.showChangeNoteIconModal === 'function') {
+            window.showChangeNoteIconModal(noteIdForIcon, noteTitleForIcon);
+        }
     }
 
     /**
@@ -578,13 +619,13 @@
                 break;
 
             case 'open-note-icon-picker':
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                var noteIdForIcon = actionElement.getAttribute('data-note-id');
-                var noteTitleForIcon = actionElement.getAttribute('data-note-title') || '';
-                if (noteIdForIcon && typeof window.showChangeNoteIconModal === 'function') {
-                    window.showChangeNoteIconModal(noteIdForIcon, noteTitleForIcon);
+                if (suppressNextEditorTitleIconClick && isEditorTitleNoteIcon(actionElement)) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    suppressNextEditorTitleIconClick = false;
+                    break;
                 }
+                openNoteIconPicker(event, actionElement);
                 break;
 
             case 'load-note':
@@ -668,6 +709,27 @@
         }
     }
 
+    function preventEditorTitleIconFocus(event) {
+        var actionElement = getNoteIconActionElement(event.target);
+        if (!isEditorTitleNoteIcon(actionElement)) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        blurActiveNoteTitle();
+    }
+
+    function handleEditorTitleIconTouchEnd(event) {
+        var actionElement = getNoteIconActionElement(event.target);
+        if (!isEditorTitleNoteIcon(actionElement)) return;
+
+        suppressNextEditorTitleIconClick = true;
+        setTimeout(function () {
+            suppressNextEditorTitleIconClick = false;
+        }, 350);
+
+        openNoteIconPicker(event, actionElement);
+    }
+
     // =====================================================
     // INITIALIZATION
     // =====================================================
@@ -731,6 +793,12 @@
      * Attach all event listeners
      */
     function attachEventListeners() {
+        // Prevent mobile browsers from focusing the adjacent note title input
+        // before the icon click opens the picker.
+        document.addEventListener('touchstart', preventEditorTitleIconFocus, { capture: true, passive: false });
+        document.addEventListener('touchend', handleEditorTitleIconTouchEnd, { capture: true, passive: false });
+        document.addEventListener('mousedown', preventEditorTitleIconFocus, true);
+
         // Main click event delegation
         document.addEventListener('click', handleNotesListClick);
 

@@ -88,10 +88,37 @@ function updateOutlineToggleAvailability(noteElement) {
 
 function getOutlineScrollContainer() {
     if (isPublicOutlinePage()) {
-        return document.getElementById('publicNoteMain');
+        const publicMain = document.getElementById('publicNoteMain');
+
+        if (isScrollableOutlineContainer(publicMain)) {
+            return publicMain;
+        }
+
+        return getDocumentScrollContainer();
     }
 
     return document.getElementById('right_col');
+}
+
+function getDocumentScrollContainer() {
+    return document.scrollingElement || document.documentElement || document.body;
+}
+
+function isDocumentScrollContainer(scrollContainer) {
+    const documentScrollContainer = getDocumentScrollContainer();
+    return scrollContainer === documentScrollContainer ||
+        scrollContainer === document.documentElement ||
+        scrollContainer === document.body;
+}
+
+function isScrollableOutlineContainer(element) {
+    if (!element) return false;
+
+    const style = window.getComputedStyle(element);
+    const overflowY = style.overflowY;
+    const allowsVerticalScroll = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+
+    return allowsVerticalScroll && element.scrollHeight > element.clientHeight + 1;
 }
 
 function getOutlineObservationRoot() {
@@ -1080,11 +1107,20 @@ function scrollToHeading(heading) {
 function scrollToElement(element) {
     if (!element) return;
 
-    // Find the scroll container (right_col)
+    // Find the scroll container (right_col, public note panel, or document on public mobile)
     const scrollContainer = getOutlineScrollContainer();
     if (!scrollContainer) {
         // Fallback to element scroll
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
+
+    if (isDocumentScrollContainer(scrollContainer)) {
+        window.scrollTo({
+            top: Math.max(0, window.scrollY + element.getBoundingClientRect().top - OUTLINE_PAGE_SCROLL_TOP_OFFSET),
+            behavior: 'smooth'
+        });
+        highlightOutlineTarget(element);
         return;
     }
 
@@ -1100,6 +1136,10 @@ function scrollToElement(element) {
         behavior: 'smooth'
     });
 
+    highlightOutlineTarget(element);
+}
+
+function highlightOutlineTarget(element) {
     // Briefly highlight the element
     element.style.transition = 'background-color 0.3s ease';
     element.style.backgroundColor = 'rgba(0, 125, 184, 0.1)';
