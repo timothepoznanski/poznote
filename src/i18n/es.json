@@ -1869,6 +1869,10 @@
     "shared_with_me": "Compartido conmigo",
     "shared_by": "Compartido por",
     "no_shared_with_me": "Aún no se ha compartido nada contigo.",
+    "expand_all": "Expandir todo",
+    "collapse_all": "Contraer todo",
+    "expand_folder": "Expandir carpeta",
+    "collapse_folder": "Contraer carpeta",
     "login_required_title": "Inicio de sesión requerido",
     "login_required_message": "Este contenido está restringido a usuarios específicos. Inicie sesión para acceder.",
     "access_denied_title": "Acceso denegado",
@@ -1920,7 +1924,7 @@
     }
   },
   "public_folder": {
-    "filter_placeholder": "Filtrar por títulos",
+    "filter_placeholder": "Filtrar notas por título",
     "no_filter_results": "Sin resultados."
   },
   "icon_names": {

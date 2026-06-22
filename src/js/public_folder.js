@@ -1,6 +1,8 @@
 // Public Folder Theme Toggle
 
 var PUBLIC_THEME_STORAGE_KEY = 'poznote-public-theme';
+var PUBLIC_FOLDER_COLLAPSED_STORAGE_PREFIX = 'poznote-public-folder-collapsed:';
+var publicFolderCollapsedStateLoaded = false;
 
 function normalizePublicTheme(theme) {
     theme = String(theme || '').toLowerCase();
@@ -92,6 +94,172 @@ function applyFilterToKanban() {
     });
 }
 
+function getPublicFolderCollapsedStorageKey() {
+    var token = document.body ? document.body.getAttribute('data-share-token') : '';
+    return PUBLIC_FOLDER_COLLAPSED_STORAGE_PREFIX + (token || window.location.pathname);
+}
+
+function loadPublicFolderCollapsedState() {
+    if (publicFolderCollapsedStateLoaded) {
+        return;
+    }
+    publicFolderCollapsedStateLoaded = true;
+
+    try {
+        var stored = localStorage.getItem(getPublicFolderCollapsedStorageKey());
+        var collapsedFolderIds = stored ? JSON.parse(stored) : [];
+        if (!Array.isArray(collapsedFolderIds)) {
+            return;
+        }
+
+        var collapsedLookup = {};
+        collapsedFolderIds.forEach(function(folderId) {
+            collapsedLookup[String(folderId)] = true;
+        });
+
+        getPublicFolderGroups().forEach(function(group) {
+            var folderId = group.getAttribute('data-folder-id');
+            group.classList.toggle('is-collapsed', !!collapsedLookup[String(folderId)]);
+        });
+    } catch (e) {
+        // localStorage not available
+    }
+}
+
+function savePublicFolderCollapsedState() {
+    try {
+        var collapsedFolderIds = getPublicFolderGroups()
+            .filter(function(group) {
+                return group.classList.contains('is-collapsed');
+            })
+            .map(function(group) {
+                return group.getAttribute('data-folder-id');
+            })
+            .filter(Boolean);
+
+        localStorage.setItem(getPublicFolderCollapsedStorageKey(), JSON.stringify(collapsedFolderIds));
+    } catch (e) {
+        // localStorage not available
+    }
+}
+
+function updatePublicFolderToggle(group) {
+    var button = group.querySelector('.public-folder-group-title .public-folder-toggle');
+    if (!button) return;
+
+    var body = document.body;
+    var isCollapsed = group.classList.contains('is-collapsed');
+    var isFilterActive = body.classList.contains('public-folder-filter-active');
+    var label = isCollapsed
+        ? (body.getAttribute('data-txt-expand-folder') || 'Expand folder')
+        : (body.getAttribute('data-txt-collapse-folder') || 'Collapse folder');
+
+    button.setAttribute('aria-expanded', isCollapsed && !isFilterActive ? 'false' : 'true');
+    button.setAttribute('aria-label', label);
+    button.title = label;
+    button.disabled = isFilterActive;
+    button.classList.toggle('is-disabled', isFilterActive);
+
+    var icon = button.querySelector('.lucide');
+    if (icon) {
+        icon.className = isCollapsed && !isFilterActive
+            ? 'lucide lucide-chevron-right'
+            : 'lucide lucide-chevron-down';
+    }
+}
+
+function updatePublicFolderToggles() {
+    document.querySelectorAll('.public-folder-group').forEach(updatePublicFolderToggle);
+    updatePublicFolderToggleAll();
+}
+
+function getPublicFolderGroups() {
+    return Array.prototype.slice.call(document.querySelectorAll('.public-folder-group'));
+}
+
+function updatePublicFolderToggleAll() {
+    var button = document.getElementById('publicFolderToggleAll');
+    if (!button) return;
+
+    var groups = getPublicFolderGroups();
+    var body = document.body;
+    var isFilterActive = body.classList.contains('public-folder-filter-active');
+
+    if (groups.length === 0) {
+        button.style.display = 'none';
+        return;
+    }
+
+    var hasExpandedFolder = groups.some(function(group) {
+        return !group.classList.contains('is-collapsed');
+    });
+    var shouldCollapse = hasExpandedFolder;
+    var label = shouldCollapse
+        ? (body.getAttribute('data-txt-collapse-all') || 'Collapse all')
+        : (body.getAttribute('data-txt-expand-all') || 'Expand all');
+
+    button.style.display = '';
+    button.disabled = isFilterActive;
+    button.dataset.action = shouldCollapse ? 'collapse' : 'expand';
+    button.classList.toggle('is-disabled', isFilterActive);
+    button.setAttribute('aria-label', label);
+    button.title = label;
+
+    var icon = button.querySelector('.lucide');
+    if (icon) {
+        icon.className = shouldCollapse
+            ? 'lucide lucide-folder-minus'
+            : 'lucide lucide-folder-open';
+    }
+
+    var labelEl = button.querySelector('span');
+    if (labelEl) {
+        labelEl.textContent = label;
+    }
+}
+
+function bindPublicFolderToggles() {
+    document.querySelectorAll('.public-folder-toggle').forEach(function(button) {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (button.disabled) {
+                return;
+            }
+
+            var group = button.closest('.public-folder-group');
+            if (!group) return;
+
+            group.classList.toggle('is-collapsed');
+            savePublicFolderCollapsedState();
+            updatePublicFolderToggles();
+        });
+    });
+
+    var toggleAllButton = document.getElementById('publicFolderToggleAll');
+    if (toggleAllButton) {
+        toggleAllButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (toggleAllButton.disabled) {
+                return;
+            }
+
+            var shouldCollapse = toggleAllButton.dataset.action !== 'expand';
+            getPublicFolderGroups().forEach(function(group) {
+                group.classList.toggle('is-collapsed', shouldCollapse);
+            });
+            savePublicFolderCollapsedState();
+            updatePublicFolderToggles();
+        });
+    }
+
+    loadPublicFolderCollapsedState();
+    updatePublicFolderToggles();
+}
+
 function applyFilter() {
     var filterInput = document.getElementById('folderFilterInput');
     var clearFilterBtn = document.getElementById('clearFilterBtn');
@@ -104,6 +272,7 @@ function applyFilter() {
 
     var filterText = filterInput.value.trim().toLowerCase();
     var visibleCount = 0;
+    document.body.classList.toggle('public-folder-filter-active', !!filterText);
 
     listItems.forEach(function(item) {
         var title = item.getAttribute('data-title') || '';
@@ -159,6 +328,8 @@ function applyFilter() {
             emptyMessage.classList.remove('is-hidden');
         }
     }
+
+    updatePublicFolderToggles();
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -176,6 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         updateThemeIcon(html.classList.contains('theme-black') ? 'black' : html.getAttribute('data-theme'));
     }
+
+    bindPublicFolderToggles();
 
     var filterInput = document.getElementById('folderFilterInput');
     var clearFilterBtn = document.getElementById('clearFilterBtn');

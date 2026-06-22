@@ -1607,7 +1607,7 @@
     }
   },
   "public_folder": {
-    "filter_placeholder": "Filter by titles",
+    "filter_placeholder": "Filter notes by title",
     "no_filter_results": "No results.",
     "view_notes": "View as list",
     "view_kanban": "View as Kanban"

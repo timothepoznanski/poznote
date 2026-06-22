@@ -415,6 +415,7 @@ body.view-kanban .public-folder-body {
     position: relative;
     display: flex;
     align-items: center;
+    flex: 1 1 260px;
 }
 
 .filter-input {
@@ -470,6 +471,36 @@ body.view-kanban .public-folder-body {
     font-weight: 500;
 }
 
+.public-folder-toggle-all {
+    min-height: 38px;
+    padding: 0 12px;
+    margin-left: auto;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    background: var(--panel-bg, #ffffff);
+    color: var(--text-color, #333333);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.public-folder-toggle-all:hover {
+    background: var(--hover-bg, #f0f0f0);
+}
+
+.public-folder-toggle-all.is-disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.public-folder-toggle-all.is-disabled:hover {
+    background: var(--panel-bg, #ffffff);
+}
+
 .public-folder-list {
     flex: 1;
     overflow-y: auto;
@@ -507,7 +538,7 @@ body.view-kanban .public-folder-body {
 }
 
 .notes-list li {
-    padding: 15px 0;
+    padding: 8px 0;
 }
 
 .notes-list li:last-child {
@@ -553,20 +584,62 @@ body.view-kanban .public-folder-body {
 }
 
 .public-folder-group {
-    margin-top: 30px;
+    margin-top: 16px;
 }
 
 .public-folder-group-title {
     font-size: 1.1rem;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     color: var(--text-color);
     opacity: 0.8;
     display: flex;
     align-items: center;
     gap: 10px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
+    padding-bottom: 4px;
+    margin-left: calc(var(--public-folder-depth, 0) * 22px);
+}
+
+.public-folder-toggle {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+.public-folder-toggle:hover {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.public-folder-toggle.is-disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
+.public-folder-toggle.is-disabled:hover {
+    background: transparent;
+    color: var(--muted-color);
+}
+
+.public-folder-group > .notes-list {
+    margin-left: calc((var(--public-folder-depth, 0) * 22px) + 38px);
+}
+
+.public-folder-group .public-folder-group {
+    margin-top: 10px;
+}
+
+body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.is-collapsed > .notes-list,
+body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.is-collapsed > .public-folder-group {
+    display: none;
 }
 
 .header-controls {
@@ -919,6 +992,15 @@ body.view-kanban .public-folder-body {
         padding: 15px;
     }
 
+    .public-folder-filter {
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .public-folder-toggle-all {
+        margin-left: 0;
+    }
+
     .public-folder-header {
         flex-direction: column;
         align-items: flex-start;
@@ -940,5 +1022,14 @@ body.view-kanban .public-folder-body {
     .note-meta {
         flex-direction: column;
         gap: 8px;
+    }
+
+    .public-folder-group-title,
+    .public-folder-group > .notes-list {
+        margin-left: calc(var(--public-folder-depth, 0) * 14px);
+    }
+
+    .public-folder-group > .notes-list {
+        margin-left: calc((var(--public-folder-depth, 0) * 14px) + 32px);
     }
 }
