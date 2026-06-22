@@ -403,6 +403,8 @@ try {
 
             if (!$matchedAny) {
                 $passwordError = true;
+            } else {
+                redirectPublicPostToGet('public_note.php?token=' . rawurlencode($token));
             }
         }
         
