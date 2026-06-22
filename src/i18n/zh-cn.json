@@ -2468,7 +2468,10 @@
       "show": "显示调试信息",
       "hide": "隐藏调试信息",
       "copy": "复制调试信息",
-      "copied": "已复制！"
+      "copied": "已复制！",
+      "show_changes": "仅显示更改",
+      "show_all": "显示全部",
+      "no_changes": "调试信息中未找到更改。"
     },
     "limitations": {
       "title": "同步限制",

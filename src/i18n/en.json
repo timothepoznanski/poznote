@@ -1965,7 +1965,10 @@
       "show": "Show Debug Info",
       "hide": "Hide Debug Info",
       "copy": "Copy Debug",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "show_changes": "Only changes",
+      "show_all": "Show all",
+      "no_changes": "No changes found in debug."
     },
     "limitations": {
       "title": "Synchronization Limitations",

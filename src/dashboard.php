@@ -657,43 +657,82 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 			<?php endif; ?>
 
 			<?php if ($dashboardSyncResult && !empty($dashboardSyncResult['debug'])): ?>
-			<div class="dashboard-sync-debug" style="margin-top: 10px;">
-				<div style="display: flex; gap: 10px; margin-bottom: 10px;">
-					<button type="button" id="dashboardDebugToggleBtn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+			<div class="dashboard-sync-debug">
+				<div class="dashboard-debug-controls">
+					<button type="button" id="dashboardDebugToggleBtn" class="btn btn-secondary dashboard-debug-btn">
 						<i class="lucide lucide-bug"></i> <span id="dashboardDebugToggleText"><?php echo t_h('git_sync.debug.show'); ?></span>
 					</button>
-					<button type="button" id="dashboardDebugCopyBtn" class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px; display: none;">
+					<button type="button" id="dashboardDebugChangesBtn" class="btn btn-secondary dashboard-debug-btn" aria-pressed="false" hidden>
+						<i class="lucide lucide-filter"></i> <span id="dashboardDebugChangesText"><?php echo t_h('git_sync.debug.show_changes', [], 'Only changes'); ?></span>
+					</button>
+					<button type="button" id="dashboardDebugCopyBtn" class="btn btn-secondary dashboard-debug-btn" hidden>
 						<i class="lucide lucide-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
 					</button>
 				</div>
-				<div id="dashboardDebugInfo" class="debug-info" style="display: none; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 15px; max-height: 250px; overflow-y: auto;">
-					<h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 600;"><?php echo t_h('git_sync.debug.title', [], 'Debug Info'); ?></h4>
-					<pre style="margin: 0; font-size: 11px; white-space: pre-wrap; word-wrap: break-word; font-family: monospace; text-align: left;"><?php echo htmlspecialchars(implode("\n", $dashboardSyncResult['debug'])); ?></pre>
+				<div id="dashboardDebugInfo" class="debug-info dashboard-debug-info" hidden>
+					<h4><?php echo t_h('git_sync.debug.title', [], 'Debug Info'); ?></h4>
+					<pre id="dashboardDebugOutput"><?php echo htmlspecialchars(implode("\n", $dashboardSyncResult['debug'])); ?></pre>
 				</div>
 				<script>
 				(function() {
-					const debugContent = <?php echo json_encode(implode("\n", $dashboardSyncResult['debug'])); ?>;
+					const debugLines = <?php echo json_encode($dashboardSyncResult['debug'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+					const debugContent = debugLines.join("\n");
+					const debugChangesContent = debugLines.filter(function(line) {
+						const normalized = line.trim();
+						if (!normalized) return false;
+						if (/→\s*unchanged\b|->\s*unchanged\b/i.test(normalized)) return false;
+						if (/^Attachment unchanged:/i.test(normalized)) return false;
+						if (/^Loaded metadata\.json/i.test(normalized)) return false;
+						if (/^Skipped /i.test(normalized)) return false;
+						return /→|->|Attachment saved:|Trashed local note|ERROR|WARNING|failed/i.test(normalized);
+					}).join("\n");
+					const debugNoChangesText = <?php echo json_encode(t('git_sync.debug.no_changes', [], 'No changes found in debug.'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 					const toggleBtn = document.getElementById('dashboardDebugToggleBtn');
 					const debugDiv = document.getElementById('dashboardDebugInfo');
+					const debugOutput = document.getElementById('dashboardDebugOutput');
 					const toggleText = document.getElementById('dashboardDebugToggleText');
 					const copyBtn = document.getElementById('dashboardDebugCopyBtn');
+					const changesBtn = document.getElementById('dashboardDebugChangesBtn');
+					const changesText = document.getElementById('dashboardDebugChangesText');
+					let debugChangesOnly = false;
+
+					function updateDebugOutput() {
+						if (!debugOutput) return;
+						debugOutput.textContent = debugChangesOnly
+							? (debugChangesContent || debugNoChangesText)
+							: debugContent;
+						if (changesBtn) changesBtn.setAttribute('aria-pressed', debugChangesOnly ? 'true' : 'false');
+						if (changesText) {
+							changesText.textContent = debugChangesOnly
+								? <?php echo json_encode(t('git_sync.debug.show_all', [], 'Show all'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>
+								: <?php echo json_encode(t('git_sync.debug.show_changes', [], 'Only changes'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+						}
+					}
 
 					toggleBtn?.addEventListener('click', function() {
-						if (debugDiv.style.display === 'none') {
-							debugDiv.style.display = 'block';
-							copyBtn.style.display = 'inline-block';
-							toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.hide')); ?>;
+						if (debugDiv.hidden) {
+							debugDiv.hidden = false;
+							if (changesBtn) changesBtn.hidden = false;
+							if (copyBtn) copyBtn.hidden = false;
+							updateDebugOutput();
+							toggleText.textContent = <?php echo json_encode(t('git_sync.debug.hide'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 						} else {
-							debugDiv.style.display = 'none';
-							copyBtn.style.display = 'none';
-							toggleText.textContent = <?php echo json_encode(t_h('git_sync.debug.show')); ?>;
+							debugDiv.hidden = true;
+							if (changesBtn) changesBtn.hidden = true;
+							if (copyBtn) copyBtn.hidden = true;
+							toggleText.textContent = <?php echo json_encode(t('git_sync.debug.show'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 						}
 					});
 
+					changesBtn?.addEventListener('click', function() {
+						debugChangesOnly = !debugChangesOnly;
+						updateDebugOutput();
+					});
+
 					copyBtn?.addEventListener('click', function() {
-						navigator.clipboard.writeText(debugContent).then(function() {
+						navigator.clipboard.writeText(debugOutput ? debugOutput.textContent : debugContent).then(function() {
 							const originalHTML = copyBtn.innerHTML;
-							copyBtn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(t_h('git_sync.debug.copied')); ?>;
+							copyBtn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(t('git_sync.debug.copied'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 							setTimeout(function() {
 								copyBtn.innerHTML = originalHTML;
 							}, 2000);
