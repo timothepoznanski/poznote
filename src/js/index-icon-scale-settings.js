@@ -123,6 +123,17 @@ function applyIndexIconScale(scale) {
             font-size: ${1.0 * s}em !important;
         }
 
+        /* Note icons */
+        #left_col .note-title .note-icon {
+            font-size: ${0.85 * s}em !important;
+        }
+        #left_col .note-title .note-type-icon-inline {
+            font-size: ${0.85 * s}em !important;
+        }
+        .innernote .note-title-heading .note-title-icon {
+            font-size: ${20 * s}px !important;
+        }
+
         /* Note editor toolbar icons */
         .toolbar-btn {
             min-width: ${38 * s}px !important;
