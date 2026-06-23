@@ -99,23 +99,10 @@
 /* ── Pinned tab ── */
 
 .app-tab.pinned {
-    background: #eef4fb;
-    border-color: #c3d9f0;
     min-width: 60px;
 }
 
-.app-tab.pinned:hover {
-    background: #ddeaf7;
-}
-
-.app-tab.pinned.active {
-    background: #fff;
-    border-top-color: #007DB8;
-}
-
 .app-tab-pin-icon {
-    font-size: 0.7rem;
-    line-height: 1;
     flex-shrink: 0;
     opacity: 0.7;
 }
@@ -221,19 +208,6 @@
 [data-theme="dark"] .app-tab-close:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #e5e7eb;
-}
-
-[data-theme="dark"] .app-tab.pinned {
-    background: #1e2d3d;
-    border-color: #2a4a6b;
-}
-
-[data-theme="dark"] .app-tab.pinned:hover {
-    background: #25374d;
-}
-
-[data-theme="dark"] .app-tab.pinned.active {
-    background: var(--dm-tab-active-bg);
 }
 
 [data-theme="dark"] .app-tab-context-menu {

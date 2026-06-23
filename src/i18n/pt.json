@@ -1206,8 +1206,8 @@
     "context_menu": {
       "pin": "Fixar aba",
       "unpin": "Desafixar aba",
-      "close": "Fechar aba",
-      "close_all": "Fechar todas as abas"
+      "close": "Fechar",
+      "close_all": "Fechar todas"
     }
   },
   "notes_manager": {

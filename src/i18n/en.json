@@ -778,8 +778,8 @@
     "context_menu": {
       "pin": "Pin tab",
       "unpin": "Unpin tab",
-      "close": "Close tab",
-      "close_all": "Close all tabs"
+      "close": "Close",
+      "close_all": "Close all"
     }
   },
   "notes_manager": {

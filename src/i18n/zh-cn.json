@@ -1196,8 +1196,8 @@
     "context_menu": {
       "pin": "固定标签页",
       "unpin": "取消固定标签页",
-      "close": "关闭标签页",
-      "close_all": "关闭所有标签页"
+      "close": "关闭",
+      "close_all": "关闭所有"
     }
   },
   "notes_manager": {

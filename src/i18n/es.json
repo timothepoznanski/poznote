@@ -1207,8 +1207,8 @@
     "context_menu": {
       "pin": "Fijar pestaña",
       "unpin": "Desfijar pestaña",
-      "close": "Cerrar pestaña",
-      "close_all": "Cerrar todas las pestañas"
+      "close": "Cerrar",
+      "close_all": "Cerrar todas"
     }
   },
   "notes_manager": {

@@ -1241,8 +1241,8 @@
     "context_menu": {
       "pin": "Épingler l'onglet",
       "unpin": "Désépingler l'onglet",
-      "close": "Fermer l'onglet",
-      "close_all": "Fermer tous les onglets"
+      "close": "Fermer",
+      "close_all": "Fermer tout"
     }
   },
   "notes_manager": {

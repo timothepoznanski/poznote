@@ -1207,8 +1207,8 @@
     "context_menu": {
       "pin": "Tab anheften",
       "unpin": "Tab lösen",
-      "close": "Tab schließen",
-      "close_all": "Alle Tabs schließen"
+      "close": "Schließen",
+      "close_all": "Alle schließen"
     }
   },
   "notes_manager": {

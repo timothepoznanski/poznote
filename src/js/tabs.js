@@ -522,10 +522,22 @@
     }
 
     function closeAllTabs() {
-        // Force-close all tabs (including pinned ones)
-        tabs = [];
-        activeTabId = null;
-        _pendingTabSwitch = null;
+        var hasPinned = tabs.some(function (t) { return _isPinnedTab(t); });
+
+        // Keep pinned tabs; also keep the active tab if no pinned tabs exist
+        tabs = tabs.filter(function (t) {
+            if (_isPinnedTab(t)) return true;
+            if (!hasPinned && t.id === activeTabId) return true;
+            return false;
+        });
+
+        if (tabs.length === 0) {
+            activeTabId = null;
+            _pendingTabSwitch = null;
+        } else if (hasPinned && !_findTabById(activeTabId)) {
+            // Active tab was closed — switch to first pinned tab
+            activeTabId = tabs[0].id;
+        }
         _saveToStorage();
         render();
     }
@@ -563,30 +575,34 @@
         });
         menu.appendChild(pinItem);
 
-        var separator = document.createElement('div');
-        separator.className = 'app-tab-context-separator';
-        menu.appendChild(separator);
+        if (tabs.length > 1) {
+            var separator = document.createElement('div');
+            separator.className = 'app-tab-context-separator';
+            menu.appendChild(separator);
+        }
 
-        // Only show close option for non-pinned tabs (pinned tabs require unpinning first)
-        if (!isPinned && tabs.length > 1) {
+        // Show close option for all tabs (including pinned)
+        if (tabs.length > 1) {
             var closeItem = document.createElement('div');
             closeItem.className = 'app-tab-context-item app-tab-context-item-danger';
-            closeItem.innerHTML = '<span class="app-tab-context-icon">×</span>' + _t('tabs.context_menu.close', 'Close tab');
+            closeItem.innerHTML = _t('tabs.context_menu.close', 'Close tab');
             closeItem.addEventListener('click', function () {
                 _removeContextMenu();
-                closeTab(tabId);
+                closeTab(tabId, true);
             });
             menu.appendChild(closeItem);
         }
 
-        var closeAllItem = document.createElement('div');
-        closeAllItem.className = 'app-tab-context-item app-tab-context-item-danger';
-        closeAllItem.innerHTML = '<span class="app-tab-context-icon">⊗</span>' + _t('tabs.context_menu.close_all', 'Close all tabs');
-        closeAllItem.addEventListener('click', function () {
-            _removeContextMenu();
-            closeAllTabs();
-        });
-        menu.appendChild(closeAllItem);
+        if (tabs.length > 1) {
+            var closeAllItem = document.createElement('div');
+            closeAllItem.className = 'app-tab-context-item app-tab-context-item-danger';
+            closeAllItem.innerHTML = _t('tabs.context_menu.close_all', 'Close all tabs');
+            closeAllItem.addEventListener('click', function () {
+                _removeContextMenu();
+                closeAllTabs();
+            });
+            menu.appendChild(closeAllItem);
+        }
 
         document.body.appendChild(menu);
 
@@ -814,9 +830,14 @@
             activeTabId = existingTabWithNote.id;
             existingTabWithNote.title = title; // Update title just in case
         } else if (activeTabId !== null) {
-            // Update the active tab to the new note
             var tab = _findTabById(activeTabId);
-            if (tab) {
+            if (tab && _isPinnedTab(tab)) {
+                // Don't replace a pinned tab — create a new tab instead
+                var newTab = { id: _generateId(), type: 'note', noteId: noteId, title: title };
+                tabs.push(newTab);
+                activeTabId = newTab.id;
+            } else if (tab) {
+                // Update the active tab to the new note
                 tab.type = 'note';
                 tab.noteId = noteId;
                 delete tab.folderId;
