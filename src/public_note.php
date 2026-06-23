@@ -808,9 +808,12 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                 <?php endif; ?>
                 <div class="public-note-header">
                     <?php
-                    $pnIconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : null;
-                    $pnIconColor = !empty($note['icon_color']) ? $note['icon_color'] : null;
+                    $pnShowIcons = getSetting('show_note_icons', '1') === '1';
+                    $pnIconRaw = ($pnShowIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
+                    $pnIconColor = ($pnShowIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
                     $pnIsEmoji = $pnIconRaw && !str_contains($pnIconRaw, 'lucide');
+                    $pnIconClasses = null;
+                    $pnIconStyle = '';
                     if (!$pnIsEmoji && $pnIconRaw) {
                         $pnIconClasses = str_contains($pnIconRaw, 'lucide ') ? $pnIconRaw : 'lucide ' . $pnIconRaw;
                         $pnIconStyle = $pnIconColor ? ' style="color: ' . htmlspecialchars($pnIconColor, ENT_QUOTES) . ' !important;"' : '';
@@ -819,7 +822,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                     <h1>
                         <?php if ($pnIsEmoji): ?>
                             <span class="public-note-title-icon"><?php echo htmlspecialchars($pnIconRaw); ?></span>
-                        <?php elseif (!empty($pnIconClasses)): ?>
+                        <?php elseif ($pnIconClasses): ?>
                             <i class="<?php echo htmlspecialchars($pnIconClasses); ?>"<?php echo $pnIconStyle; ?>></i>
                         <?php endif; ?>
                         <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>

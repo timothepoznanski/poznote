@@ -471,10 +471,12 @@ $noteBaseUrl = $protocol . '://' . $host;
 
         $noteUrl = !empty($note['token']) ? ($noteBaseUrl . '/' . $note['token'] . '?folder_token=' . $folderToken) : ($noteBaseUrl . '/public_note.php?id=' . $note['id'] . '&folder_token=' . $folderToken);
 
-        $noteIconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : null;
-        $noteIconColor = !empty($note['icon_color']) ? $note['icon_color'] : null;
+        $showNoteIcons = getSetting('show_note_icons', '1') === '1';
+        $noteIconRaw = ($showNoteIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
+        $noteIconColor = ($showNoteIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
         $noteIconStyle = $noteIconColor ? ' style="color: ' . htmlspecialchars($noteIconColor, ENT_QUOTES) . ' !important;"' : '';
         $noteIsEmoji = $noteIconRaw && !str_contains($noteIconRaw, 'lucide');
+        $noteIconClasses = null;
         if (!$noteIsEmoji && $noteIconRaw) {
             $noteIconClasses = str_contains($noteIconRaw, 'lucide ') ? $noteIconRaw : 'lucide ' . $noteIconRaw;
         }
@@ -483,9 +485,9 @@ $noteBaseUrl = $protocol . '://' . $host;
             <a class="public-note-link" href="<?php echo htmlspecialchars($noteUrl); ?>" target="_blank" rel="noopener">
                 <?php if ($noteIsEmoji): ?>
                     <span class="note-icon-emoji"><?php echo htmlspecialchars($noteIconRaw); ?></span>
-                <?php elseif (!empty($noteIconClasses)): ?>
+                <?php elseif ($noteIconClasses): ?>
                     <i class="<?php echo htmlspecialchars($noteIconClasses); ?>"<?php echo $noteIconStyle; ?>></i>
-                <?php else: ?>
+                <?php elseif ($showNoteIcons): ?>
                     <i class="lucide lucide-file-alt"></i>
                 <?php endif; ?>
                 <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
