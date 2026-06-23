@@ -728,6 +728,19 @@ body.public-note-page {
 
 .public-note-header h1 {
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.public-note-header h1 i {
+    flex: 0 0 auto;
+}
+
+.public-note-header h1 .public-note-title-icon {
+    flex: 0 0 auto;
+    font-style: normal;
+    line-height: 1;
 }
 
 .theme-toggle-btn {

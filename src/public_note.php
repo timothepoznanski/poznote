@@ -467,7 +467,7 @@ try {
     // DATABASE: FETCH NOTE CONTENT
     // ============================================================================
     
-    $stmt = $con->prepare('SELECT heading, entry, created, updated, type, attachments FROM entries WHERE id = ?');
+    $stmt = $con->prepare('SELECT heading, entry, created, updated, type, attachments, icon, icon_color FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -807,7 +807,23 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                     </div>
                 <?php endif; ?>
                 <div class="public-note-header">
-                    <h1><?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?></h1>
+                    <?php
+                    $pnIconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : null;
+                    $pnIconColor = !empty($note['icon_color']) ? $note['icon_color'] : null;
+                    $pnIsEmoji = $pnIconRaw && !str_contains($pnIconRaw, 'lucide');
+                    if (!$pnIsEmoji && $pnIconRaw) {
+                        $pnIconClasses = str_contains($pnIconRaw, 'lucide ') ? $pnIconRaw : 'lucide ' . $pnIconRaw;
+                        $pnIconStyle = $pnIconColor ? ' style="color: ' . htmlspecialchars($pnIconColor, ENT_QUOTES) . ' !important;"' : '';
+                    }
+                    ?>
+                    <h1>
+                        <?php if ($pnIsEmoji): ?>
+                            <span class="public-note-title-icon"><?php echo htmlspecialchars($pnIconRaw); ?></span>
+                        <?php elseif (!empty($pnIconClasses)): ?>
+                            <i class="<?php echo htmlspecialchars($pnIconClasses); ?>"<?php echo $pnIconStyle; ?>></i>
+                        <?php endif; ?>
+                        <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>
+                    </h1>
                     <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
                         <i class="lucide lucide-moon"></i>
                     </button>
