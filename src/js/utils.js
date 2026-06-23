@@ -152,7 +152,7 @@ function openCreatedNoteWithInternalTabs(noteId, noteTitle, folderId) {
     ).catch(function (error) {
         console.error('Error refreshing notes list before opening created note:', error);
     }).then(function () {
-        window.tabManager.openInNewTab(noteId, finalTitle);
+        window.tabManager.openInNewTab(noteId, finalTitle, { isNewNote: true });
         return true;
     });
 }

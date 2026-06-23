@@ -629,6 +629,21 @@
 
     // ── Public API ─────────────────────────────────────────────────────────
 
+    function _showNewNoteLoadingPlaceholder() {
+        var tabBar = document.getElementById('app-tab-bar');
+        if (!tabBar) return;
+
+        // Remove all siblings after the tab bar (the current note content)
+        while (tabBar.nextSibling) {
+            tabBar.parentNode.removeChild(tabBar.nextSibling);
+        }
+
+        // Insert a blank placeholder that fades in, matching the note area styling
+        var placeholder = document.createElement('div');
+        placeholder.id = 'new-note-loading-placeholder';
+        tabBar.parentNode.appendChild(placeholder);
+    }
+
     /**
      * Called when "open in new tab" is clicked (from note toolbar or sidebar menu).
      * Creates a new tab for the given note and makes it active.
@@ -674,6 +689,9 @@
         var isLoaded = !!document.getElementById('inp' + noteId);
         if (!isLoaded) {
             _pendingTabSwitch = newTab.id;
+            if (options.isNewNote) {
+                _showNewNoteLoadingPlaceholder();
+            }
             var url = _buildUrl(noteId);
             if (typeof window.loadNoteDirectly === 'function') {
                 window.loadNoteDirectly(url, noteId, null, null);
