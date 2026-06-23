@@ -403,6 +403,17 @@ body.view-kanban .public-folder-body {
     color: var(--link-color);
 }
 
+.public-folder-body h1 .folder-h1-emoji {
+    font-style: normal;
+    line-height: 1;
+}
+
+.public-note-link .note-icon-emoji {
+    font-style: normal;
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
 .public-folder-filter {
     max-width: 900px;
     margin: 0 auto 30px auto;
@@ -627,6 +638,10 @@ body.view-kanban .public-folder-body {
 .public-folder-toggle.is-disabled:hover {
     background: transparent;
     color: var(--muted-color);
+}
+
+#listView > .notes-list {
+    margin-left: 7px;
 }
 
 .public-folder-group > .notes-list {
@@ -988,17 +1003,28 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
 
 /* Responsive design */
 @media (max-width: 768px) {
+    .public-folder-body h1 {
+        font-size: 1.3rem;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+    }
+
+    .public-folder-body h1 i {
+        font-size: 1.1rem;
+    }
+
     .public-folder {
         padding: 15px;
     }
 
     .public-folder-filter {
-        flex-wrap: wrap;
-        align-items: stretch;
+        flex-wrap: nowrap;
+        align-items: center;
     }
 
     .public-folder-toggle-all {
-        margin-left: 0;
+        margin-left: auto;
     }
 
     .public-folder-header {
@@ -1029,7 +1055,11 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
         margin-left: calc(var(--public-folder-depth, 0) * 14px);
     }
 
+    #listView > .notes-list {
+        margin-left: 7px;
+    }
+
     .public-folder-group > .notes-list {
-        margin-left: calc((var(--public-folder-depth, 0) * 14px) + 32px);
+        margin-left: calc((var(--public-folder-depth, 0) * 14px) + 40px);
     }
 }
