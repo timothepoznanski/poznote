@@ -774,6 +774,14 @@
       "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
     }
   },
+  "tabs": {
+    "context_menu": {
+      "pin": "Pin tab",
+      "unpin": "Unpin tab",
+      "close": "Close tab",
+      "close_all": "Close all tabs"
+    }
+  },
   "notes_manager": {
     "actions": "Bulk actions",
     "all_types": "All types",

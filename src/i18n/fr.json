@@ -1237,6 +1237,14 @@
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
     }
   },
+  "tabs": {
+    "context_menu": {
+      "pin": "Épingler l'onglet",
+      "unpin": "Désépingler l'onglet",
+      "close": "Fermer l'onglet",
+      "close_all": "Fermer tous les onglets"
+    }
+  },
   "notes_manager": {
     "actions": "Actions groupées",
     "all_types": "Tous les types",

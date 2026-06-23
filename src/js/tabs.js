@@ -22,7 +22,7 @@
 
     // ── State ──────────────────────────────────────────────────────────────
 
-    /** @type {Array<{id: string, type?: string, noteId?: string, folderId?: string, title: string}>} */
+    /** @type {Array<{id: string, type?: string, noteId?: string, folderId?: string, title: string, pinned?: boolean}>} */
     var tabs = [];
 
     /** ID of the currently active tab, or null when no tabs exist. */
@@ -112,6 +112,21 @@
 
     function _getDefaultKanbanTitle() {
         return window.t ? window.t('notes_list.folder_actions.kanban_view', null, 'Kanban view') : 'Kanban view';
+    }
+
+    function _isPinnedTab(tab) {
+        return tab && tab.pinned === true;
+    }
+
+    /** Re-sort tabs so pinned ones always appear first (preserving relative order within each group). */
+    function _sortPinnedFirst() {
+        var pinned = tabs.filter(function (t) { return _isPinnedTab(t); });
+        var unpinned = tabs.filter(function (t) { return !_isPinnedTab(t); });
+        tabs = pinned.concat(unpinned);
+    }
+
+    function _t(key, fallback) {
+        return window.t ? window.t(key, null, fallback) : fallback;
     }
 
     function _matchDefaultNoteTitle(title) {
@@ -389,6 +404,14 @@
                 if (tabEl) switchToTab(tabEl.getAttribute('data-tab-id'));
             });
 
+            // Context menu (right-click) on the bar
+            bar.addEventListener('contextmenu', function (e) {
+                var tabEl = e.target.closest('.app-tab');
+                if (!tabEl) return;
+                e.preventDefault();
+                _showTabContextMenu(tabEl.getAttribute('data-tab-id'), e.clientX, e.clientY);
+            });
+
             // Prepend to right_pane so it sits above #right_col
             rightPane.insertBefore(bar, rightPane.firstChild);
         }
@@ -400,9 +423,19 @@
             var el = document.createElement('div');
             var tabType = _getTabType(tab);
             var fallbackTitle = tabType === 'kanban' ? _getDefaultKanbanTitle() : _getDefaultTitle();
-            el.className = 'app-tab app-tab-' + tabType + (tab.id === activeTabId ? ' active' : '');
+            el.className = 'app-tab app-tab-' + tabType +
+                (tab.id === activeTabId ? ' active' : '') +
+                (_isPinnedTab(tab) ? ' pinned' : '');
             el.setAttribute('data-tab-id', tab.id);
             el.setAttribute('data-tab-type', tabType);
+
+            if (_isPinnedTab(tab)) {
+                var pinIcon = document.createElement('span');
+                pinIcon.className = 'app-tab-pin-icon';
+                pinIcon.setAttribute('aria-hidden', 'true');
+                pinIcon.textContent = '📌';
+                el.appendChild(pinIcon);
+            }
 
             var titleSpan = document.createElement('span');
             titleSpan.className = 'app-tab-title';
@@ -411,7 +444,7 @@
 
             el.appendChild(titleSpan);
 
-            if (tabs.length > 1) {
+            if (tabs.length > 1 && !_isPinnedTab(tab)) {
                 var closeBtn = document.createElement('button');
                 closeBtn.className = 'app-tab-close';
                 closeBtn.setAttribute('aria-label', 'Close tab');
@@ -466,6 +499,116 @@
             return;
         }
         _loadNoteTab(tab);
+    }
+
+    // ── Pin / Unpin ────────────────────────────────────────────────────────
+
+    function pinTab(tabId) {
+        var tab = _findTabById(tabId);
+        if (!tab || _isPinnedTab(tab)) return;
+        tab.pinned = true;
+        _sortPinnedFirst();
+        _saveToStorage();
+        render();
+    }
+
+    function unpinTab(tabId) {
+        var tab = _findTabById(tabId);
+        if (!tab || !_isPinnedTab(tab)) return;
+        tab.pinned = false;
+        _sortPinnedFirst();
+        _saveToStorage();
+        render();
+    }
+
+    function closeAllTabs() {
+        // Force-close all tabs (including pinned ones)
+        tabs = [];
+        activeTabId = null;
+        _pendingTabSwitch = null;
+        _saveToStorage();
+        render();
+    }
+
+    // ── Tab context menu ───────────────────────────────────────────────────
+
+    function _removeContextMenu() {
+        var existing = document.getElementById('app-tab-context-menu');
+        if (existing) existing.remove();
+    }
+
+    function _showTabContextMenu(tabId, x, y) {
+        _removeContextMenu();
+
+        var tab = _findTabById(tabId);
+        if (!tab) return;
+
+        var menu = document.createElement('div');
+        menu.id = 'app-tab-context-menu';
+        menu.className = 'app-tab-context-menu';
+
+        var isPinned = _isPinnedTab(tab);
+        var pinLabel = isPinned
+            ? _t('tabs.context_menu.unpin', 'Unpin tab')
+            : _t('tabs.context_menu.pin', 'Pin tab');
+        var pinIcon = isPinned ? '📌' : '📌';
+
+        var pinItem = document.createElement('div');
+        pinItem.className = 'app-tab-context-item';
+        pinItem.innerHTML = '<span class="app-tab-context-icon">' + pinIcon + '</span>' + pinLabel;
+        pinItem.addEventListener('click', function () {
+            _removeContextMenu();
+            if (isPinned) unpinTab(tabId);
+            else pinTab(tabId);
+        });
+        menu.appendChild(pinItem);
+
+        var separator = document.createElement('div');
+        separator.className = 'app-tab-context-separator';
+        menu.appendChild(separator);
+
+        // Only show close option for non-pinned tabs (pinned tabs require unpinning first)
+        if (!isPinned && tabs.length > 1) {
+            var closeItem = document.createElement('div');
+            closeItem.className = 'app-tab-context-item app-tab-context-item-danger';
+            closeItem.innerHTML = '<span class="app-tab-context-icon">×</span>' + _t('tabs.context_menu.close', 'Close tab');
+            closeItem.addEventListener('click', function () {
+                _removeContextMenu();
+                closeTab(tabId);
+            });
+            menu.appendChild(closeItem);
+        }
+
+        var closeAllItem = document.createElement('div');
+        closeAllItem.className = 'app-tab-context-item app-tab-context-item-danger';
+        closeAllItem.innerHTML = '<span class="app-tab-context-icon">⊗</span>' + _t('tabs.context_menu.close_all', 'Close all tabs');
+        closeAllItem.addEventListener('click', function () {
+            _removeContextMenu();
+            closeAllTabs();
+        });
+        menu.appendChild(closeAllItem);
+
+        document.body.appendChild(menu);
+
+        // Position the menu
+        var menuRect;
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+        menuRect = menu.getBoundingClientRect();
+        if (menuRect.right > window.innerWidth) {
+            menu.style.left = (x - menuRect.width) + 'px';
+        }
+        if (menuRect.bottom > window.innerHeight) {
+            menu.style.top = (y - menuRect.height) + 'px';
+        }
+
+        // Close on outside click or scroll
+        setTimeout(function () {
+            document.addEventListener('click', _removeContextMenu, { once: true });
+            document.addEventListener('keydown', function onKey(e) {
+                if (e.key === 'Escape') { _removeContextMenu(); document.removeEventListener('keydown', onKey); }
+            });
+        }, 0);
     }
 
     // ── Public API ─────────────────────────────────────────────────────────
@@ -576,6 +719,8 @@
      * The last remaining tab cannot be closed unless force is true.
      */
     function closeTab(tabId, force) {
+        var tabToClose = _findTabById(tabId);
+        if (!force && tabToClose && _isPinnedTab(tabToClose)) return false; // cannot close pinned tab without unpinning
         if (!force && tabs.length <= 1) return false; // cannot close the last tab via UI
         var idx = _indexById(tabId);
         if (idx === -1) return false;
@@ -756,6 +901,7 @@
                 return;
             }
 
+            _sortPinnedFirst();
             activeTabId = stored.activeTabId || null;
 
             // Validate activeTabId is still in the list
@@ -939,6 +1085,7 @@
                 tab.title = tab.title || _getDefaultTitle();
                 return true;
             });
+            _sortPinnedFirst();
             activeTabId = stored.activeTabId || null;
 
             // Validate activeTabId
@@ -1068,6 +1215,9 @@
         closeTab: closeTab,
         closeActiveTab: closeActiveTab,
         closeTabByNoteId: closeTabByNoteId,
+        pinTab: pinTab,
+        unpinTab: unpinTab,
+        closeAllTabs: closeAllTabs,
         isNoteOpen: isNoteOpen,
         isKanbanOpen: isKanbanOpen,
         getActiveNoteId: getActiveNoteId,

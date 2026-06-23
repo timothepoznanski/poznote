@@ -1192,6 +1192,14 @@
       "too_many_notes": "此文件夹包含 {{count}} 条笔记。为避免浏览器负担过重，仅打开前 {{max}} 条。"
     }
   },
+  "tabs": {
+    "context_menu": {
+      "pin": "固定标签页",
+      "unpin": "取消固定标签页",
+      "close": "关闭标签页",
+      "close_all": "关闭所有标签页"
+    }
+  },
   "notes_manager": {
     "actions": "批量操作",
     "choose_action": "选择操作...",

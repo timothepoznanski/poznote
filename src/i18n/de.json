@@ -1203,6 +1203,14 @@
       "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
     }
   },
+  "tabs": {
+    "context_menu": {
+      "pin": "Tab anheften",
+      "unpin": "Tab lösen",
+      "close": "Tab schließen",
+      "close_all": "Alle Tabs schließen"
+    }
+  },
   "notes_manager": {
     "actions": "Stapelaktionen",
     "choose_action": "Aktion auswählen...",

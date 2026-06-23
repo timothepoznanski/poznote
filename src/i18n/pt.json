@@ -1202,6 +1202,14 @@
       "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador."
     }
   },
+  "tabs": {
+    "context_menu": {
+      "pin": "Fixar aba",
+      "unpin": "Desafixar aba",
+      "close": "Fechar aba",
+      "close_all": "Fechar todas as abas"
+    }
+  },
   "notes_manager": {
     "actions": "Ações em massa",
     "choose_action": "Escolher uma ação...",

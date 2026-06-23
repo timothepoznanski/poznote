@@ -1203,6 +1203,14 @@
       "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
     }
   },
+  "tabs": {
+    "context_menu": {
+      "pin": "Fijar pestaña",
+      "unpin": "Desfijar pestaña",
+      "close": "Cerrar pestaña",
+      "close_all": "Cerrar todas las pestañas"
+    }
+  },
   "notes_manager": {
     "actions": "Acciones masivas",
     "choose_action": "Elegir una acción...",
