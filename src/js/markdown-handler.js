@@ -2293,9 +2293,14 @@ function parseMarkdown(text) {
 
     // Protect Poznote-generated Excalidraw containers as safe block HTML.
     var markdownExcalidrawIndex = 0;
-    text = text.replace(/<div\b(?=[^>]*\bclass\s*=\s*(["'])[^"']*\bexcalidraw-container\b[^"']*\1)[^>]*>[\s\S]*?<\/div>/gi, function (match) {
+    // Maps protectedIndex → { sourceLine, lineCount } for scroll sync data-line correction
+    var excalidrawSourceLines = {};
+    text = text.replace(/<div\b(?=[^>]*\bclass\s*=\s*(["'])[^"']*\bexcalidraw-container\b[^"']*\1)[^>]*>[\s\S]*?<\/div>/gi, function (match, _p1, offset) {
         let placeholder = '\x00PEXCALIDRAW' + protectedIndex + '\x00';
         protectedElements[protectedIndex] = sanitizeExcalidrawContainerHtml(match, markdownExcalidrawIndex);
+        var sourceLine = (text.slice(0, offset).match(/\n/g) || []).length;
+        var matchLineCount = (match.match(/\n/g) || []).length;
+        excalidrawSourceLines[protectedIndex] = { sourceLine: sourceLine, lineCount: matchLineCount };
         protectedIndex++;
         markdownExcalidrawIndex++;
         return '\n' + placeholder + '\n';
@@ -2618,6 +2623,9 @@ function parseMarkdown(text) {
     let codeBlockLang = '';
     let codeBlockContent = [];
     let codeBlockStartLine = -1;
+    // Tracks how many source lines have been collapsed into placeholders so far,
+    // so that data-line values reflect positions in the original markdown source.
+    let sourceLineOffset = 0;
 
     function flushParagraph() {
         if (currentParagraph.length > 0) {
@@ -2658,7 +2666,7 @@ function parseMarkdown(text) {
                 inCodeBlock = true;
                 codeBlockLang = line.replace(/^\s*```/, '').trim();
                 codeBlockContent = [];
-                codeBlockStartLine = i;
+                codeBlockStartLine = i + sourceLineOffset;
             } else {
                 inCodeBlock = false;
                 let codeContent = codeBlockContent.join('\n');
@@ -2702,7 +2710,15 @@ function parseMarkdown(text) {
         if (excalidrawMatch) {
             flushParagraph();
             let index = parseInt(excalidrawMatch[1], 10);
-            result.push(protectedElements[index] || line);
+            let excalidrawHtml = protectedElements[index] || line;
+            let excalidrawInfo = excalidrawSourceLines[index];
+            let sourceLine = excalidrawInfo ? excalidrawInfo.sourceLine : (i + sourceLineOffset);
+            excalidrawHtml = excalidrawHtml.replace(/^(<div\b)/, '$1 data-line="' + sourceLine + '"');
+            result.push(excalidrawHtml);
+            // Account for the lines that were collapsed into this placeholder
+            if (excalidrawInfo) {
+                sourceLineOffset += excalidrawInfo.lineCount;
+            }
             continue;
         }
 
@@ -2788,7 +2804,7 @@ function parseMarkdown(text) {
             flushParagraph();
             var level = headingMatch[1].length;
             var content = headingMatch[2];
-            result.push('<h' + level + ' data-line="' + i + '">' + applyInlineStyles(content) + '</h' + level + '>');
+            result.push('<h' + level + ' data-line="' + (i + sourceLineOffset) + '">' + applyInlineStyles(content) + '</h' + level + '>');
             continue;
         }
 
@@ -3014,10 +3030,10 @@ function parseMarkdown(text) {
                     if (isTaskList) {
                         let isChecked = listMatch[2].toLowerCase() === 'x';
                         // Add data-line attribute for interactive checkbox toggling
-                        let checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' + currentIndex + '" ' + (isChecked ? 'checked ' : '') + '>';
-                        itemHtml = '<li class="task-list-item" data-line="' + currentIndex + '">' + checkbox + ' <span>' + applyInlineStyles(content) + '</span>';
+                        let checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' + (currentIndex + sourceLineOffset) + '" ' + (isChecked ? 'checked ' : '') + '>';
+                        itemHtml = '<li class="task-list-item" data-line="' + (currentIndex + sourceLineOffset) + '">' + checkbox + ' <span>' + applyInlineStyles(content) + '</span>';
                     } else {
-                        itemHtml = '<li data-line="' + currentIndex + '">' + applyInlineStyles(content);
+                        itemHtml = '<li data-line="' + (currentIndex + sourceLineOffset) + '">' + applyInlineStyles(content);
                     }
 
                     // Check if next items are more indented (nested)
@@ -3097,7 +3113,7 @@ function parseMarkdown(text) {
         if (isMarkdownTableStart(line, lines[i + 1] || '')) {
             flushParagraph();
 
-            let tableStartLine = i;
+            let tableStartLine = i + sourceLineOffset;
             let tableRows = [];
             let tableAlignments = [];
             let isFirstRow = true;
@@ -3177,7 +3193,7 @@ function parseMarkdown(text) {
 
         // Regular text - add to current paragraph
         if (paragraphStartLine === -1) {
-            paragraphStartLine = i;
+            paragraphStartLine = i + sourceLineOffset;
         }
         currentParagraph.push(line);
     }
