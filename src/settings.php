@@ -111,6 +111,7 @@ $settingsPageUserKeys = [
     'timezone',
     'date_time_format',
     'hidden_ui_elements',
+    'spellcheck_html_notes',
 ];
 
 foreach ($settingsPageUserKeys as $settingsPageKey) {
@@ -566,6 +567,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
                     <span id="default-image-border-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Spellcheck in HTML notes -->
+            <div class="home-card" id="spellcheck-html-notes-card">
+                <div class="home-card-icon"><i class="lucide lucide-list-check"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span>
+                    <span id="spellcheck-html-notes-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

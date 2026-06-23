@@ -104,7 +104,8 @@
             'toolbar_mode',
             'timezone',
             'date_time_format',
-            'hidden_ui_elements'
+            'hidden_ui_elements',
+            'spellcheck_html_notes'
         ];
 
         if (document.getElementById('login-display-badge')) {
@@ -1043,6 +1044,7 @@
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('attachment-previews-card', 'attachment-previews-status', 'attachment_previews_in_note', false, false);
         setupToggleCard('default-image-border-card', 'default-image-border-status', 'default_image_border_no_padding', false, false);
+        setupToggleCard('spellcheck-html-notes-card', 'spellcheck-html-notes-status', 'spellcheck_html_notes', false, false);
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');

@@ -565,7 +565,8 @@
       "attachment_previews_in_note": "Anhangsvorschauen",
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
-      "notes_dashboard": "Notiz-Board"
+      "notes_dashboard": "Notiz-Board",
+      "spellcheck_html_notes": "Rechtschreibprüfung"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",

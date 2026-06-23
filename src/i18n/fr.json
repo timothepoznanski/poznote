@@ -579,7 +579,8 @@
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
-      "notes_dashboard": "Tableau de notes"
+      "notes_dashboard": "Tableau de notes",
+      "spellcheck_html_notes": "Vérification orthographique"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",

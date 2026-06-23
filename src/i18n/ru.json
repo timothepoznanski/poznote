@@ -223,7 +223,8 @@
       "attachment_previews_in_note": "Предпросмотр вложений",
       "default_image_border_no_padding": "Рамка изображения по умолчанию",
       "ui_customization": "Видимость элементов",
-      "notes_dashboard": "Доска заметок"
+      "notes_dashboard": "Доска заметок",
+      "spellcheck_html_notes": "Проверка орфографии"
     },
     "badges": {
       "font_size_default": "по умолчанию ({{size}}px)",

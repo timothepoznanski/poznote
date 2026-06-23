@@ -565,7 +565,8 @@
       "attachment_previews_in_note": "附件预览",
       "default_image_border_no_padding": "默认图片边框",
       "ui_customization": "元素可见性",
-      "notes_dashboard": "笔记看板"
+      "notes_dashboard": "笔记看板",
+      "spellcheck_html_notes": "拼写检查"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",

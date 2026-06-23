@@ -563,7 +563,8 @@
       "attachment_previews_in_note": "Pré-visualizações de anexos",
       "default_image_border_no_padding": "Borda padrão de imagem",
       "ui_customization": "Visibilidade dos elementos",
-      "notes_dashboard": "Quadro de notas"
+      "notes_dashboard": "Quadro de notas",
+      "spellcheck_html_notes": "Verificação ortográfica"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
