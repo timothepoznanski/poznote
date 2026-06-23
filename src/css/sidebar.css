@@ -461,9 +461,9 @@
 
 .note-icon {
     cursor: pointer;
-    font-size: 0.85em;
+    font-size: 1em;
     margin-right: 5px;
-    vertical-align: -0.08em;
+    vertical-align: -0.1em;
 }
 
 .note-icon:hover {
