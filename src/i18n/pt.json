@@ -75,7 +75,7 @@
     "menu_item": "Instantâneos",
     "modal": {
       "title": "Instantâneos",
-      "description": "Os instantâneos são criados automaticamente na primeira vez que você abre esta nota em cada dia.\nUse «Criar instantâneo agora» para adicionar um instantâneo extra sem substituir os que já existem hoje.\nApenas os 7 instantâneos mais recentes são mantidos, incluindo os criados manualmente.",
+      "description": "Apenas o conteúdo de texto da nota é guardado (não os anexos nem as imagens). Se um anexo ou imagem foi eliminado, não poderá ser recuperado a partir de um instantâneo.\nCriados automaticamente na primeira abertura de cada dia. \"Criar instantâneo agora\" adiciona um extra sem substituir os de hoje. Máx. 7.",
       "loading": "Carregando instantâneo...",
       "history": "Histórico",
       "markdown_preview": "Pré-visualização",

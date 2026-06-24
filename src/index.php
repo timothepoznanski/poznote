@@ -509,7 +509,8 @@ if ($isPublicWorkspaceReadonly) {
 
 
 
-    <!-- RIGHT COLUMN -->	
+    <!-- RIGHT COLUMN -->
+    <div id="right_pane">
     <div id="right_col">
             
         <?php        
@@ -1055,6 +1056,7 @@ if ($isPublicWorkspaceReadonly) {
             }
         ?>
     </div>
+    </div><!-- #right_pane -->
 
     <!-- OUTLINE MOBILE BACKDROP -->
     <div class="outline-mobile-backdrop" id="outlineMobileBackdrop"></div>

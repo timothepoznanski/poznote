@@ -79,7 +79,7 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Les snapshots sont créés automatiquement à la première ouverture de cette note chaque jour.\nUtilisez « Prendre un snapshot maintenant » pour ajouter un snapshot supplémentaire sans remplacer ceux déjà pris aujourd'hui.\nSeuls les 7 snapshots les plus récents sont conservés, y compris ceux créés manuellement.",
+      "description": "Seul le contenu texte de la note est sauvegardé (pas les pièces jointes ni les images). Si une pièce jointe ou une image a été supprimée, elle ne pourra pas être récupérée via un snapshot.\nCréés automatiquement à la première ouverture chaque jour. « Prendre un snapshot maintenant » ajoute un snapshot sans remplacer ceux du jour. 7 maximum.",
       "loading": "Chargement du snapshot...",
       "history": "Historique",
       "markdown_preview": "Aperçu",

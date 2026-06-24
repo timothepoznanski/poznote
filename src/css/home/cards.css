@@ -67,6 +67,29 @@ body.dark-mode .home-card-red .home-card-icon {
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 
+/* Support card heart animation */
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); color: #f87171; }
+    15% { transform: scale(1.15); color: #ef4444; }
+    30% { transform: scale(1); color: #f87171; }
+    45% { transform: scale(1.12); color: #ef4444; }
+    60% { transform: scale(1); color: #f87171; }
+}
+
+#support-card .home-card-icon {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+#support-card .home-card-icon i {
+    color: #f87171;
+    animation: heartbeat 3.5s ease-in-out infinite;
+}
+
+html[data-theme='dark'] #support-card .home-card-icon,
+body.dark-mode #support-card .home-card-icon {
+    background: rgba(239, 68, 68, 0.22);
+}
+
 /* Orange cards (Settings) */
 .home-card-orange .home-card-icon {
     background: rgba(245, 158, 11, 0.12);

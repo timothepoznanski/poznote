@@ -258,10 +258,7 @@
     gap: 8px;
 }
 
-body.has-internal-tabs .note-header {
-    top: 39px;
-    /* Push down to make room for sticky tab bar */
-}
+/* Tab bar now lives outside #right_col in #right_pane — no offset needed */
 
 /* Only apply header background if no workspace background image is set */
 body:not(.has-background-image) .note-header {

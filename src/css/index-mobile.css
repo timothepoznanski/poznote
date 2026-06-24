@@ -168,9 +168,7 @@ body.mobile-keyboard-open #right_pane {
     transform: translateZ(0);
 }
 
-body.has-internal-tabs .note-header {
-    top: 39px;
-}
+/* Tab bar now lives outside #right_col — no offset needed */
 
 .notecard,
 .innernote {

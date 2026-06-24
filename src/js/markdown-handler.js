@@ -3620,6 +3620,11 @@ function initializeMarkdownNote(noteId) {
     // Set the global noteid
     noteid = noteId;
     window.noteid = noteId;
+
+    // Restore scroll position for this tab now that markdown DOM is ready
+    if (window.tabManager && typeof window.tabManager._restoreScrollForNote === 'function') {
+        window.tabManager._restoreScrollForNote(String(noteId));
+    }
 }
 
 function switchToEditMode(noteId) {

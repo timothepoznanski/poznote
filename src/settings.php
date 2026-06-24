@@ -746,6 +746,16 @@ if ($isAdmin) {
                 </div>
             </a>
 
+            <!-- Support -->
+            <a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="home-card" id="support-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-heart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.support', [], 'Support Poznote'); ?></span>
+                </div>
+            </a>
+
         </div>
 
     </div>

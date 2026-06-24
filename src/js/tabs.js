@@ -38,6 +38,9 @@
      */
     var _pendingTabSwitch = null;
 
+    /** Scroll positions keyed by tab ID — kept in memory only, not persisted. */
+    var _scrollPositions = {};
+
     // ── Helpers ────────────────────────────────────────────────────────────
 
     /** Get translated default title for new/untitled notes */
@@ -456,11 +459,17 @@
 
         _applySearchTabVisibility();
 
-        // Ensure active tab is visible if bar overflowed
+        // Ensure active tab is visible if bar overflowed — scroll only the bar horizontally
         if (activeTabId) {
             var activeEl = bar.querySelector('.app-tab.active');
-            if (activeEl && typeof activeEl.scrollIntoView === 'function') {
-                activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+            if (activeEl) {
+                var tabLeft = activeEl.offsetLeft;
+                var tabRight = tabLeft + activeEl.offsetWidth;
+                if (tabLeft < bar.scrollLeft) {
+                    bar.scrollLeft = tabLeft;
+                } else if (tabRight > bar.scrollLeft + bar.offsetWidth) {
+                    bar.scrollLeft = tabRight - bar.offsetWidth;
+                }
             }
         }
 
@@ -469,10 +478,21 @@
 
     function _loadNoteTab(tab) {
         if (!tab || !tab.noteId) return;
+
+        // If the note is already rendered, just activate the tab without reloading
+        if (_getRenderedNoteId() === String(tab.noteId)) {
+            activeTabId = tab.id;
+            _pendingTabSwitch = null;
+            _saveToStorage();
+            render();
+            _restoreScrollPosition(tab);
+            return;
+        }
+
         _pendingTabSwitch = tab.id;
         var url = _buildUrl(tab.noteId);
         if (typeof window.loadNoteDirectly === 'function') {
-            window.loadNoteDirectly(url, tab.noteId, null, null);
+            window.loadNoteDirectly(url, tab.noteId, null, null, { skipLoadingAnimation: true });
         } else {
             window.location.href = url;
         }
@@ -739,11 +759,76 @@
      * Sets _pendingTabSwitch so _onNoteLoaded knows not to update tab state,
      * then loads the tab's note.
      */
+    function _restoreScrollForNote(noteId) {
+        if (!activeTabId) return;
+        var tab = _findTabById(activeTabId);
+        if (!tab || !_isNoteTab(tab) || String(tab.noteId) !== String(noteId)) return;
+        _restoreScrollPosition(tab);
+    }
+
+    function _saveScrollPosition() {
+        if (!activeTabId) return;
+        var currentTab = _findTabById(activeTabId);
+        if (!currentTab || !_isNoteTab(currentTab)) return;
+        var rightCol = document.getElementById('right_col');
+        if (!rightCol) return;
+        var positions = { main: rightCol.scrollTop };
+        var cmScroller = rightCol.querySelector('.cm-scroller');
+        if (cmScroller) positions.cmScroller = cmScroller.scrollTop;
+        var mdPreview = rightCol.querySelector('.markdown-preview');
+        if (mdPreview) positions.mdPreview = mdPreview.scrollTop;
+        _scrollPositions[activeTabId] = positions;
+    }
+
+    function _restoreScrollPosition(tab) {
+        if (!tab) return;
+        var saved = _scrollPositions[tab.id];
+        if (!saved) return;
+
+        function applyScroll() {
+            var rightCol = document.getElementById('right_col');
+            if (!rightCol) return;
+            if (typeof saved.main === 'number') rightCol.scrollTop = saved.main;
+            if (typeof saved.cmScroller === 'number') {
+                var cmScroller = rightCol.querySelector('.cm-scroller');
+                if (cmScroller) cmScroller.scrollTop = saved.cmScroller;
+            }
+            if (typeof saved.mdPreview === 'number') {
+                var mdPreview = rightCol.querySelector('.markdown-preview');
+                if (mdPreview) mdPreview.scrollTop = saved.mdPreview;
+            }
+        }
+
+        applyScroll();
+
+        // Watch for layout shifts caused by images loading and re-apply scroll each time.
+        // Stop watching after 3 seconds to avoid interfering with user scrolling.
+        var rightCol = document.getElementById('right_col');
+        if (!rightCol || typeof ResizeObserver === 'undefined') return;
+
+        var deadline = Date.now() + 3000;
+        var observer = new ResizeObserver(function () {
+            if (Date.now() > deadline) {
+                observer.disconnect();
+                return;
+            }
+            applyScroll();
+        });
+        // Observe the note content area so any height change (image load) triggers re-apply
+        var noteContent = rightCol.querySelector('.notecard, .noteentry, .markdown-preview');
+        if (noteContent) {
+            observer.observe(noteContent);
+            // Disconnect after deadline regardless
+            setTimeout(function () { observer.disconnect(); }, 3000);
+        }
+    }
+
     function switchToTab(tabId) {
         var tab = _findTabById(tabId);
         if (!tab) return;
         if (tab.id === activeTabId) return; // already active
 
+        _saveScrollPosition();
         _loadTabContent(tab);
     }
 
@@ -761,6 +846,7 @@
 
         var wasActive = (tabId === activeTabId);
         tabs.splice(idx, 1);
+        delete _scrollPositions[tabId];
 
         if (tabs.length === 0) {
             // Last tab closed
@@ -824,6 +910,13 @@
                 var sidebarTitleForSwitch = _readSidebarTitle(noteId);
                 var freshTitle = _readTitle(noteId, sidebarTitleForSwitch || switchedTab.title || _getDefaultTitle());
                 switchedTab.title = freshTitle;
+                // For non-markdown notes, restore scroll now. Markdown notes restore via
+                // _restoreScrollForNote() called at the end of initializeMarkdownNote(),
+                // once the markdown DOM (cm-scroller, markdown-preview) is actually ready.
+                var isMarkdown = !!document.querySelector('#right_col .noteentry[data-note-type="markdown"]');
+                if (!isMarkdown) {
+                    _restoreScrollPosition(switchedTab);
+                }
             }
             _saveToStorage();
             return;
@@ -1266,6 +1359,8 @@
         render: render,
         updateUI: updateOpenInNewTabButtons, // Expose for external calls
         _onNoteLoaded: _onNoteLoaded,
+        _saveScrollPosition: _saveScrollPosition,
+        _restoreScrollForNote: _restoreScrollForNote,
         switchWorkspace: switchWorkspace
     };
 
