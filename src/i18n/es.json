@@ -565,7 +565,8 @@
       "attachment_previews_in_note": "Vistas previas de adjuntos",
       "default_image_border_no_padding": "Borde de imagen por defecto",
       "ui_customization": "Visibilidad de los elementos",
-      "notes_dashboard": "Tablero de notas"
+      "notes_dashboard": "Tablero de notas",
+      "spellcheck_html_notes": "Corrector ortográfico"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
@@ -1200,6 +1201,14 @@
       "no_notes_title": "Sin notas",
       "no_notes_in_folder": "Esta carpeta no contiene notas",
       "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
+    }
+  },
+  "tabs": {
+    "context_menu": {
+      "pin": "Fijar pestaña",
+      "unpin": "Desfijar pestaña",
+      "close": "Cerrar",
+      "close_all": "Cerrar todas"
     }
   },
   "notes_manager": {

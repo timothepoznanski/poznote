@@ -135,7 +135,7 @@ try {
     }
 
     // Get folder information
-    $stmt = $con->prepare('SELECT id, name, workspace FROM folders WHERE id = ?');
+    $stmt = $con->prepare('SELECT id, name, workspace, icon, icon_color FROM folders WHERE id = ?');
     $stmt->execute([$folder_id]);
     $folder = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$folder) {
@@ -158,7 +158,7 @@ try {
 
     // Faster approach: fetch all folders to build hierarchy in memory
     $allFoldersPool = [];
-    $stmt = $con->prepare('SELECT id, name, parent_id, display_order FROM folders WHERE workspace = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE');
+    $stmt = $con->prepare('SELECT id, name, parent_id, display_order, icon, icon_color FROM folders WHERE workspace = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE');
     $stmt->execute([$folder['workspace']]);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $allFoldersPool[$row['id']] = $row;
@@ -231,8 +231,8 @@ try {
     }
 
     $stmt = $con->prepare("
-        SELECT e.id, e.heading, e.created, e.type, e.folder_id, sn.token 
-        FROM entries e 
+        SELECT e.id, e.heading, e.created, e.type, e.folder_id, e.icon, e.icon_color, sn.token
+        FROM entries e
         LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
         WHERE $notesWhereClause
         ORDER BY e.created DESC
@@ -264,13 +264,16 @@ try {
         }
     }
 
-    // Prepare folder names for titles and sort groups
+    // Prepare folder names and icons for titles and sort groups
     $folderNames = [];
+    $folderIcons = [];
     foreach ($allRelevantFolderIds as $fid) {
         if ($fid == $folder_id) {
             $folderNames[$fid] = $folder['name'];
+            $folderIcons[$fid] = ['icon' => $folder['icon'] ?? null, 'icon_color' => $folder['icon_color'] ?? null];
         } else {
             $folderNames[$fid] = $allFoldersPool[$fid]['name'] ?? 'Subfolder';
+            $folderIcons[$fid] = ['icon' => $allFoldersPool[$fid]['icon'] ?? null, 'icon_color' => $allFoldersPool[$fid]['icon_color'] ?? null];
         }
     }
 
@@ -341,7 +344,24 @@ $noteBaseUrl = $protocol . '://' . $host;
         </button>
     </div>
 
-    <h1><i class="lucide lucide-folder-open"></i> <?php echo htmlspecialchars($folder['name']); ?></h1>
+    <?php
+    $folderCustomIcon = !empty($folder['icon']) ? convertFontAwesomeToLucide($folder['icon']) : null;
+    $folderCustomIconColor = !empty($folder['icon_color']) ? $folder['icon_color'] : null;
+    $folderIconStyle = $folderCustomIconColor ? ' style="color: ' . htmlspecialchars($folderCustomIconColor, ENT_QUOTES) . ' !important;"' : '';
+    $folderIconColorAttr = $folderCustomIconColor ? ' data-icon-color="' . htmlspecialchars($folderCustomIconColor, ENT_QUOTES) . '"' : '';
+    $isEmojiIcon = $folderCustomIcon && !str_contains($folderCustomIcon, 'lucide');
+    ?>
+    <h1>
+        <?php if ($isEmojiIcon): ?>
+            <span class="folder-h1-emoji"><?php echo htmlspecialchars($folderCustomIcon); ?></span>
+        <?php elseif ($folderCustomIcon): ?>
+            <?php $iconClasses = str_contains($folderCustomIcon, 'lucide') ? $folderCustomIcon : 'lucide lucide-folder-open'; if (!str_contains($iconClasses, 'lucide ')) $iconClasses = 'lucide ' . $iconClasses; ?>
+            <i class="<?php echo htmlspecialchars($iconClasses); ?>"<?php echo $folderIconStyle . $folderIconColorAttr; ?>></i>
+        <?php else: ?>
+            <i class="lucide lucide-folder-open"></i>
+        <?php endif; ?>
+        <?php echo htmlspecialchars($folder['name']); ?>
+    </h1>
 
     <?php if (!empty($sharedNotes)): ?>
         <div class="public-folder-filter">
@@ -381,7 +401,7 @@ $noteBaseUrl = $protocol . '://' . $host;
             <?php endif; ?>
 
             <?php foreach ($subfoldersByParent[(int)$folder_id] ?? [] as $subfolder): ?>
-                <?php renderPublicFolderBranch((int)$subfolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $noteBaseUrl, $token, 0); ?>
+                <?php renderPublicFolderBranch((int)$subfolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $token, 0); ?>
             <?php endforeach; ?>
         </div>
 
@@ -451,10 +471,27 @@ $noteBaseUrl = $protocol . '://' . $host;
         }
 
         $noteUrl = !empty($note['token']) ? ($noteBaseUrl . '/' . $note['token'] . '?folder_token=' . $folderToken) : ($noteBaseUrl . '/public_note.php?id=' . $note['id'] . '&folder_token=' . $folderToken);
+
+        $showNoteIcons = getSetting('show_note_icons', '1') === '1';
+        $noteIconRaw = ($showNoteIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
+        $noteIconColor = ($showNoteIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
+        $noteIconStyle = $noteIconColor ? ' style="color: ' . htmlspecialchars($noteIconColor, ENT_QUOTES) . ' !important;"' : '';
+        $noteIconColorAttr = $noteIconColor ? ' data-icon-color="' . htmlspecialchars($noteIconColor, ENT_QUOTES) . '"' : '';
+        $noteIsEmoji = $noteIconRaw && !str_contains($noteIconRaw, 'lucide');
+        $noteIconClasses = null;
+        if (!$noteIsEmoji && $noteIconRaw) {
+            $noteIconClasses = str_contains($noteIconRaw, 'lucide ') ? $noteIconRaw : 'lucide ' . $noteIconRaw;
+        }
         ?>
         <li class="public-note-item" data-title="<?php echo htmlspecialchars($noteTitleLower, ENT_QUOTES, 'UTF-8'); ?>">
             <a class="public-note-link" href="<?php echo htmlspecialchars($noteUrl); ?>" target="_blank" rel="noopener">
-                <i class="lucide lucide-file-alt"></i>
+                <?php if ($noteIsEmoji): ?>
+                    <span class="note-icon-emoji"><?php echo htmlspecialchars($noteIconRaw); ?></span>
+                <?php elseif ($noteIconClasses): ?>
+                    <i class="<?php echo htmlspecialchars($noteIconClasses); ?>"<?php echo $noteIconStyle . $noteIconColorAttr; ?>></i>
+                <?php elseif ($showNoteIcons): ?>
+                    <i class="lucide lucide-file-alt"></i>
+                <?php endif; ?>
                 <span class="public-note-title"><?php echo htmlspecialchars($noteTitle); ?></span>
             </a>
         </li>
@@ -475,19 +512,36 @@ $noteBaseUrl = $protocol . '://' . $host;
         return false;
     }
 
-    function renderPublicFolderBranch($folderId, $subfoldersByParent, $notesByFolder, $folderNames, $noteBaseUrl, $folderToken, $depth = 0) {
+    function renderPublicFolderBranch($folderId, $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $folderToken, $depth = 0) {
         if (!publicFolderBranchHasNotes($folderId, $subfoldersByParent, $notesByFolder)) {
             return;
         }
 
         $folderNotes = $notesByFolder[$folderId] ?? [];
+
+        $subIconRaw = !empty($folderIcons[$folderId]['icon']) ? convertFontAwesomeToLucide($folderIcons[$folderId]['icon']) : null;
+        $subIconColor = !empty($folderIcons[$folderId]['icon_color']) ? $folderIcons[$folderId]['icon_color'] : null;
+        $subIconStyle = $subIconColor ? ' style="color: ' . htmlspecialchars($subIconColor, ENT_QUOTES) . ' !important;"' : '';
+        $subIconColorAttr = $subIconColor ? ' data-icon-color="' . htmlspecialchars($subIconColor, ENT_QUOTES) . '"' : '';
+        $subIsEmoji = $subIconRaw && !str_contains($subIconRaw, 'lucide');
+        if (!$subIsEmoji && $subIconRaw) {
+            $subIconClasses = str_contains($subIconRaw, 'lucide ') ? $subIconRaw : 'lucide ' . $subIconRaw;
+        } else {
+            $subIconClasses = null;
+        }
         ?>
         <div class="public-folder-group" data-folder-id="<?php echo (int)$folderId; ?>" style="--public-folder-depth: <?php echo (int)$depth; ?>">
             <h2 class="public-folder-group-title">
                 <button type="button" class="public-folder-toggle" aria-expanded="true">
                     <i class="lucide lucide-chevron-down"></i>
                 </button>
-                <i class="lucide lucide-folder"></i>
+                <?php if ($subIsEmoji): ?>
+                    <span class="folder-h1-emoji"><?php echo htmlspecialchars($subIconRaw); ?></span>
+                <?php elseif ($subIconClasses): ?>
+                    <i class="<?php echo htmlspecialchars($subIconClasses); ?>"<?php echo $subIconStyle . $subIconColorAttr; ?>></i>
+                <?php else: ?>
+                    <i class="lucide lucide-folder"></i>
+                <?php endif; ?>
                 <?php echo htmlspecialchars($folderNames[$folderId] ?? 'Subfolder'); ?>
             </h2>
 
@@ -500,7 +554,7 @@ $noteBaseUrl = $protocol . '://' . $host;
             <?php endif; ?>
 
             <?php foreach ($subfoldersByParent[$folderId] ?? [] as $childFolder): ?>
-                <?php renderPublicFolderBranch((int)$childFolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $noteBaseUrl, $folderToken, $depth + 1); ?>
+                <?php renderPublicFolderBranch((int)$childFolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $folderToken, $depth + 1); ?>
             <?php endforeach; ?>
         </div>
         <?php

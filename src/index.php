@@ -124,11 +124,12 @@ $settings = [
     'code_block_word_wrap' => '1',
     'markdown_split_card_view' => '1',
     'attachment_previews_in_note' => '0',
-    'default_image_border_no_padding' => '0'
+    'default_image_border_no_padding' => '0',
+    'spellcheck_html_notes' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding', 'spellcheck_html_notes')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -156,7 +157,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>">
 
 <head>
     <meta charset="utf-8"/>
@@ -1031,7 +1032,10 @@ if ($isPublicWorkspaceReadonly) {
                     if ($attachment_previews_in_note_setting) {
                         echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
                     }
-                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="false" id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    $spellcheck_enabled = ($settings['spellcheck_html_notes'] === '1' || $settings['spellcheck_html_notes'] === 'true');
+                    $spellcheck_attr = ($note_type === 'note' && $spellcheck_enabled) ? 'true' : 'false';
+                    $lang_attr = ($note_type === 'note' && $spellcheck_enabled) ? ' lang="'.htmlspecialchars(getUserLanguage(), ENT_QUOTES).'"' : '';
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="'.$spellcheck_attr.'"'.$lang_attr.' id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     echo '<div class="note-scroll-edge-controls">';
                     echo '<button type="button" class="note-scroll-edge-btn note-scroll-top-btn" data-action="scroll-note-top" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_top', [], 'Scroll to top').'" aria-label="'.t_h('common.scroll_top', [], 'Scroll to top').'" hidden><i class="lucide lucide-arrow-up"></i></button>';
                     echo '<button type="button" class="note-scroll-edge-btn note-scroll-bottom-btn" data-action="scroll-note-bottom" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" aria-label="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" hidden><i class="lucide lucide-arrow-down"></i></button>';

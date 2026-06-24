@@ -1768,7 +1768,12 @@
         nameContainer.className = 'note-name-container';
 
         var typeIcon = document.createElement('i');
-        typeIcon.className = 'lucide lucide-sticky-note shared-type-icon';
+        var noteIconClass = (note.icon && note.icon !== 'lucide-sticky-note') ? note.icon : 'lucide-sticky-note';
+        typeIcon.className = 'lucide ' + noteIconClass + ' note-icon shared-type-icon';
+        if (note.icon_color) {
+            typeIcon.style.setProperty('color', note.icon_color, 'important');
+            typeIcon.setAttribute('data-icon-color', note.icon_color);
+        }
         nameContainer.appendChild(typeIcon);
 
         var noteLink = document.createElement('a');
@@ -1922,7 +1927,12 @@
         nameContainer.appendChild(toggleButton);
 
         var typeIcon = document.createElement('i');
-        typeIcon.className = 'lucide lucide-folder shared-type-icon';
+        var folderIconClass = (folder.icon && folder.icon !== 'lucide-folder') ? folder.icon : 'lucide-folder';
+        typeIcon.className = 'lucide ' + folderIconClass + ' folder-icon shared-type-icon';
+        if (folder.icon_color) {
+            typeIcon.style.setProperty('color', folder.icon_color, 'important');
+            typeIcon.setAttribute('data-icon-color', folder.icon_color);
+        }
         nameContainer.appendChild(typeIcon);
 
         var folderLink = document.createElement('a');
@@ -2039,7 +2049,13 @@
         nameContainer.className = 'note-name-container';
 
         var typeIcon = document.createElement('i');
-        typeIcon.className = 'lucide ' + (isFolder ? 'lucide-folder' : 'lucide-sticky-note') + ' shared-type-icon';
+        var defaultIconClass = isFolder ? 'lucide-folder' : 'lucide-sticky-note';
+        var customIconClass = sharedItem.icon || defaultIconClass;
+        typeIcon.className = 'lucide ' + customIconClass + ' ' + (isFolder ? 'folder-icon' : 'note-icon') + ' shared-type-icon';
+        if (sharedItem.icon_color) {
+            typeIcon.style.setProperty('color', sharedItem.icon_color, 'important');
+            typeIcon.setAttribute('data-icon-color', sharedItem.icon_color);
+        }
         nameContainer.appendChild(typeIcon);
 
         var nameEl = document.createElement('a');

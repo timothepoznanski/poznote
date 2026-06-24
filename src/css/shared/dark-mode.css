@@ -221,7 +221,7 @@
     border-color: #007DB8;
 }
 
-[data-theme="dark"] .shared-type-icon {
+[data-theme="dark"] .shared-type-icon:not([data-icon-color]) {
     color: #888888;
 }
 

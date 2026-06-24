@@ -224,7 +224,8 @@
       "attachment_previews_in_note": "Attachment previews",
       "default_image_border_no_padding": "Default image border",
       "ui_customization": "Element visibility",
-      "notes_dashboard": "Notes board"
+      "notes_dashboard": "Notes board",
+      "spellcheck_html_notes": "Spell check"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -771,6 +772,14 @@
       "no_notes_title": "No notes",
       "no_notes_in_folder": "This folder contains no notes",
       "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
+    }
+  },
+  "tabs": {
+    "context_menu": {
+      "pin": "Pin tab",
+      "unpin": "Unpin tab",
+      "close": "Close",
+      "close_all": "Close all"
     }
   },
   "notes_manager": {

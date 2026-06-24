@@ -472,9 +472,33 @@
         const rawContent = mdActiveNoteEntry.getAttribute('data-markdown-content') || '';
         const lines = rawContent.split('\n');
 
-        // Identify all lines belonging to this table
-        let tableStart = startLine;
-        let tableEnd = startLine;
+        // data-start-line is computed from the pre-processed text (where Excalidraw blocks
+        // are collapsed to a single placeholder line), so it may be smaller than the real
+        // line index in rawContent when Excalidraw blocks appear before the table.
+        // Find the actual table start by searching forward from startLine for the first
+        // line that belongs to a markdown table with the same column count as the rendered table.
+        const expectedCols = mdActiveTable.querySelectorAll('tr')[0]
+            ? mdActiveTable.querySelectorAll('tr')[0].children.length
+            : 0;
+
+        let tableStart = -1;
+        for (let li = startLine; li < lines.length; li++) {
+            if (isMarkdownTableLine(lines[li])) {
+                const cols = expectedCols > 0 ? getMarkdownTableCells(lines[li]).length : 0;
+                if (expectedCols === 0 || cols === expectedCols) {
+                    // Walk back to the actual start of this table block
+                    let blockStart = li;
+                    while (blockStart > 0 && isMarkdownTableLine(lines[blockStart - 1])) {
+                        blockStart--;
+                    }
+                    tableStart = blockStart;
+                    break;
+                }
+            }
+        }
+        if (tableStart < 0) return;
+
+        let tableEnd = tableStart;
         while (tableEnd + 1 < lines.length && isMarkdownTableLine(lines[tableEnd + 1])) {
             tableEnd++;
         }

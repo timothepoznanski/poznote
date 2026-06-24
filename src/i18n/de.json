@@ -565,7 +565,8 @@
       "attachment_previews_in_note": "Anhangsvorschauen",
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
-      "notes_dashboard": "Notiz-Board"
+      "notes_dashboard": "Notiz-Board",
+      "spellcheck_html_notes": "Rechtschreibprüfung"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -1200,6 +1201,14 @@
       "no_notes_title": "Keine Notizen",
       "no_notes_in_folder": "Dieser Ordner enthält keine Notizen",
       "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
+    }
+  },
+  "tabs": {
+    "context_menu": {
+      "pin": "Tab anheften",
+      "unpin": "Tab lösen",
+      "close": "Schließen",
+      "close_all": "Alle schließen"
     }
   },
   "notes_manager": {

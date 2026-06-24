@@ -579,7 +579,8 @@
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
-      "notes_dashboard": "Tableau de notes"
+      "notes_dashboard": "Tableau de notes",
+      "spellcheck_html_notes": "Vérification orthographique"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -1234,6 +1235,14 @@
       "no_notes_title": "Aucune note",
       "no_notes_in_folder": "Ce dossier ne contient aucune note",
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
+    }
+  },
+  "tabs": {
+    "context_menu": {
+      "pin": "Épingler l'onglet",
+      "unpin": "Désépingler l'onglet",
+      "close": "Fermer",
+      "close_all": "Fermer tout"
     }
   },
   "notes_manager": {

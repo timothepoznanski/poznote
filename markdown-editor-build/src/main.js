@@ -4,6 +4,9 @@ import { markdown, markdownLanguage, insertNewlineContinueMarkup } from '@codemi
 import { bracketMatching, HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { languages } from '@codemirror/language-data'
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
+// searchKeymap includes Mod-f (Ctrl+F) which would intercept the browser's native find.
+// We filter it out so Ctrl+F opens the browser find dialog instead of CodeMirror's panel.
+const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod-f')
 import { Compartment, EditorSelection, EditorState, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
@@ -680,7 +683,7 @@ function createEditor(host, options = {}) {
           run: runMarkdownOrderedListTab(host),
           shift: runMarkdownOrderedListTab(host, true)
         },
-        ...searchKeymap,
+        ...filteredSearchKeymap,
         ...historyKeymap,
         ...defaultKeymap
       ])
