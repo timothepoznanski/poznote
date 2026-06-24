@@ -814,16 +814,18 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                     $pnIsEmoji = $pnIconRaw && !str_contains($pnIconRaw, 'lucide');
                     $pnIconClasses = null;
                     $pnIconStyle = '';
+                    $pnIconColorAttr = '';
                     if (!$pnIsEmoji && $pnIconRaw) {
                         $pnIconClasses = str_contains($pnIconRaw, 'lucide ') ? $pnIconRaw : 'lucide ' . $pnIconRaw;
                         $pnIconStyle = $pnIconColor ? ' style="color: ' . htmlspecialchars($pnIconColor, ENT_QUOTES) . ' !important;"' : '';
+                        $pnIconColorAttr = $pnIconColor ? ' data-icon-color="' . htmlspecialchars($pnIconColor, ENT_QUOTES) . '"' : '';
                     }
                     ?>
                     <h1>
                         <?php if ($pnIsEmoji): ?>
                             <span class="public-note-title-icon"><?php echo htmlspecialchars($pnIconRaw); ?></span>
                         <?php elseif ($pnIconClasses): ?>
-                            <i class="<?php echo htmlspecialchars($pnIconClasses); ?>"<?php echo $pnIconStyle; ?>></i>
+                            <i class="<?php echo htmlspecialchars($pnIconClasses); ?>"<?php echo $pnIconStyle . $pnIconColorAttr; ?>></i>
                         <?php endif; ?>
                         <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>
                     </h1>

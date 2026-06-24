@@ -348,6 +348,7 @@ $noteBaseUrl = $protocol . '://' . $host;
     $folderCustomIcon = !empty($folder['icon']) ? convertFontAwesomeToLucide($folder['icon']) : null;
     $folderCustomIconColor = !empty($folder['icon_color']) ? $folder['icon_color'] : null;
     $folderIconStyle = $folderCustomIconColor ? ' style="color: ' . htmlspecialchars($folderCustomIconColor, ENT_QUOTES) . ' !important;"' : '';
+    $folderIconColorAttr = $folderCustomIconColor ? ' data-icon-color="' . htmlspecialchars($folderCustomIconColor, ENT_QUOTES) . '"' : '';
     $isEmojiIcon = $folderCustomIcon && !str_contains($folderCustomIcon, 'lucide');
     ?>
     <h1>
@@ -355,7 +356,7 @@ $noteBaseUrl = $protocol . '://' . $host;
             <span class="folder-h1-emoji"><?php echo htmlspecialchars($folderCustomIcon); ?></span>
         <?php elseif ($folderCustomIcon): ?>
             <?php $iconClasses = str_contains($folderCustomIcon, 'lucide') ? $folderCustomIcon : 'lucide lucide-folder-open'; if (!str_contains($iconClasses, 'lucide ')) $iconClasses = 'lucide ' . $iconClasses; ?>
-            <i class="<?php echo htmlspecialchars($iconClasses); ?>"<?php echo $folderIconStyle; ?>></i>
+            <i class="<?php echo htmlspecialchars($iconClasses); ?>"<?php echo $folderIconStyle . $folderIconColorAttr; ?>></i>
         <?php else: ?>
             <i class="lucide lucide-folder-open"></i>
         <?php endif; ?>
@@ -475,6 +476,7 @@ $noteBaseUrl = $protocol . '://' . $host;
         $noteIconRaw = ($showNoteIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
         $noteIconColor = ($showNoteIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
         $noteIconStyle = $noteIconColor ? ' style="color: ' . htmlspecialchars($noteIconColor, ENT_QUOTES) . ' !important;"' : '';
+        $noteIconColorAttr = $noteIconColor ? ' data-icon-color="' . htmlspecialchars($noteIconColor, ENT_QUOTES) . '"' : '';
         $noteIsEmoji = $noteIconRaw && !str_contains($noteIconRaw, 'lucide');
         $noteIconClasses = null;
         if (!$noteIsEmoji && $noteIconRaw) {
@@ -486,7 +488,7 @@ $noteBaseUrl = $protocol . '://' . $host;
                 <?php if ($noteIsEmoji): ?>
                     <span class="note-icon-emoji"><?php echo htmlspecialchars($noteIconRaw); ?></span>
                 <?php elseif ($noteIconClasses): ?>
-                    <i class="<?php echo htmlspecialchars($noteIconClasses); ?>"<?php echo $noteIconStyle; ?>></i>
+                    <i class="<?php echo htmlspecialchars($noteIconClasses); ?>"<?php echo $noteIconStyle . $noteIconColorAttr; ?>></i>
                 <?php elseif ($showNoteIcons): ?>
                     <i class="lucide lucide-file-alt"></i>
                 <?php endif; ?>
@@ -520,6 +522,7 @@ $noteBaseUrl = $protocol . '://' . $host;
         $subIconRaw = !empty($folderIcons[$folderId]['icon']) ? convertFontAwesomeToLucide($folderIcons[$folderId]['icon']) : null;
         $subIconColor = !empty($folderIcons[$folderId]['icon_color']) ? $folderIcons[$folderId]['icon_color'] : null;
         $subIconStyle = $subIconColor ? ' style="color: ' . htmlspecialchars($subIconColor, ENT_QUOTES) . ' !important;"' : '';
+        $subIconColorAttr = $subIconColor ? ' data-icon-color="' . htmlspecialchars($subIconColor, ENT_QUOTES) . '"' : '';
         $subIsEmoji = $subIconRaw && !str_contains($subIconRaw, 'lucide');
         if (!$subIsEmoji && $subIconRaw) {
             $subIconClasses = str_contains($subIconRaw, 'lucide ') ? $subIconRaw : 'lucide ' . $subIconRaw;
@@ -535,7 +538,7 @@ $noteBaseUrl = $protocol . '://' . $host;
                 <?php if ($subIsEmoji): ?>
                     <span class="folder-h1-emoji"><?php echo htmlspecialchars($subIconRaw); ?></span>
                 <?php elseif ($subIconClasses): ?>
-                    <i class="<?php echo htmlspecialchars($subIconClasses); ?>"<?php echo $subIconStyle; ?>></i>
+                    <i class="<?php echo htmlspecialchars($subIconClasses); ?>"<?php echo $subIconStyle . $subIconColorAttr; ?>></i>
                 <?php else: ?>
                     <i class="lucide lucide-folder"></i>
                 <?php endif; ?>

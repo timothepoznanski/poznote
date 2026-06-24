@@ -184,7 +184,7 @@ class SystemController {
             }
 
             // 2. Get all folders to build hierarchy and identifies descendant shares
-            $folderQuery = "SELECT id, name, parent_id, workspace FROM folders";
+            $folderQuery = "SELECT id, name, parent_id, workspace, icon, icon_color FROM folders";
             $fParams = [];
             if ($workspace) {
                 $folderQuery .= " WHERE workspace = ?";
@@ -219,7 +219,7 @@ class SystemController {
             $allSharedFolderIds = array_unique($allSharedFolderIds);
 
             // 3. Get notes that are explicitly shared
-            $explicitQuery = "SELECT 
+            $explicitQuery = "SELECT
                 sn.id as share_id,
                 sn.note_id,
                 sn.token,
@@ -235,7 +235,9 @@ class SystemController {
                 e.folder_id,
                 e.type,
                 e.workspace,
-                e.updated
+                e.updated,
+                e.icon,
+                e.icon_color
                         FROM shared_notes sn
             INNER JOIN entries e ON sn.note_id = e.id
                         WHERE e.trash = 0
@@ -255,7 +257,7 @@ class SystemController {
             $folderNotes = [];
             if (!empty($allSharedFolderIds)) {
                 $placeholders = implode(',', array_fill(0, count($allSharedFolderIds), '?'));
-                $folderNoteQuery = "SELECT 
+                $folderNoteQuery = "SELECT
                     NULL as share_id,
                     e.id as note_id,
                     sn.token as token,
@@ -270,7 +272,9 @@ class SystemController {
                     e.folder_id,
                     e.type,
                     e.workspace,
-                    e.updated
+                    e.updated,
+                    e.icon,
+                    e.icon_color
                 FROM entries e
                 LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
                 WHERE e.folder_id IN ($placeholders) AND e.trash = 0";
@@ -404,7 +408,9 @@ class SystemController {
                     'note_count' => (int)$countStmt->fetchColumn(),
                     'is_direct' => (bool)$directEntry,
                     'folder_path' => getFolderPath($fid, $this->con),
-                    'public_url' => $base . '/folder/' . rawurlencode($entry['token'])
+                    'public_url' => $base . '/folder/' . rawurlencode($entry['token']),
+                    'icon' => $folder['icon'] ?? null,
+                    'icon_color' => $folder['icon_color'] ?? null
                 ];
             }
 
@@ -466,7 +472,7 @@ class SystemController {
                 // Check shared_notes
                 $stmt = $ownerCon->prepare(
                     "SELECT sn.note_id, sn.token, sn.indexable, sn.allowed_users,
-                            e.heading, e.folder_id, e.type, e.workspace
+                            e.heading, e.folder_id, e.type, e.workspace, e.icon, e.icon_color
                      FROM shared_notes sn
                      INNER JOIN entries e ON sn.note_id = e.id
                      WHERE e.trash = 0
@@ -489,13 +495,15 @@ class SystemController {
                         'owner_id'     => $ownerId,
                         'owner_name'   => $user['username'],
                         'url'          => $base . '/' . rawurlencode($row['token']),
+                        'icon'         => $row['icon'] ?? null,
+                        'icon_color'   => $row['icon_color'] ?? null,
                     ];
                 }
 
                 // Check shared_folders
                 $stmt2 = $ownerCon->prepare(
                     "SELECT sf.folder_id, sf.token, sf.indexable, sf.allowed_users,
-                            f.name as folder_name, f.workspace
+                            f.name as folder_name, f.workspace, f.icon, f.icon_color
                      FROM shared_folders sf
                      INNER JOIN folders f ON sf.folder_id = f.id
                      WHERE sf.allowed_users IS NOT NULL AND sf.allowed_users != ''"
@@ -515,6 +523,8 @@ class SystemController {
                         'owner_id'     => $ownerId,
                         'owner_name'   => $user['username'],
                         'url'          => $base . '/folder/' . rawurlencode($row['token']),
+                        'icon'         => $row['icon'] ?? null,
+                        'icon_color'   => $row['icon_color'] ?? null,
                     ];
                 }
             } catch (Exception $e) {
