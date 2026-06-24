@@ -833,6 +833,11 @@ body.dark-mode #snapshotModal .snapshot-modal-header h3 {
     color: #f2f5f8;
 }
 
+html[data-theme='dark'] #snapshotModal .snapshot-modal-description,
+body.dark-mode #snapshotModal .snapshot-modal-description {
+    color: rgba(218, 226, 237, 0.82);
+}
+
 html[data-theme='dark'] #snapshotModal .snapshot-help-btn,
 body.dark-mode #snapshotModal .snapshot-help-btn {
     color: var(--dm-text-muted, #b5beca);

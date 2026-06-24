@@ -76,7 +76,7 @@
     "menu_item": "Schnappschüsse",
     "modal": {
       "title": "Schnappschüsse",
-      "description": "Schnappschüsse werden automatisch erstellt, wenn du diese Notiz an einem Tag zum ersten Mal öffnest.\nMit „Jetzt Schnappschuss erstellen“ fügst du einen zusätzlichen Schnappschuss hinzu, ohne die heutigen vorhandenen zu ersetzen.\nEs werden nur die 7 neuesten Schnappschüsse behalten, einschließlich der manuell erstellten.",
+      "description": "Nur der Textinhalt der Notiz wird gespeichert (keine Anhänge oder Bilder). Wurde ein Anhang oder Bild gelöscht, kann es nicht aus einem Schnappschuss wiederhergestellt werden.\nAutomatisch beim ersten Öffnen jeden Tag erstellt. „Jetzt Schnappschuss erstellen" fügt einen zusätzlichen hinzu, ohne die heutigen zu ersetzen. Max. 7.",
       "loading": "Schnappschuss wird geladen...",
       "history": "Verlauf",
       "markdown_preview": "Vorschau",

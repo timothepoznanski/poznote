@@ -160,6 +160,14 @@
     max-width: 100%;
 }
 
+.snapshot-modal-description {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #667085;
+    white-space: pre-line;
+}
+
 .snapshot-modal-header h3 {
     margin: 0 !important;
     display: flex;
@@ -459,6 +467,10 @@
 
 #snapshotModal.snapshot-modal-dark .snapshot-modal-header h3 {
     color: #f2f5f8 !important;
+}
+
+#snapshotModal.snapshot-modal-dark .snapshot-modal-description {
+    color: rgba(218, 226, 237, 0.82);
 }
 
 #snapshotModal.snapshot-modal-dark .snapshot-date-list-header,

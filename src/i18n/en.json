@@ -54,7 +54,7 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.\nOnly the 7 most recent snapshots are kept, including those created manually.",
+      "description": "Only the note's text content is saved (not attachments or images). If an attachment or image was deleted, it cannot be recovered from a snapshot.\nCreated automatically on first open each day. \"Take snapshot now\" adds an extra snapshot without replacing today's. Up to 7 kept.",
       "loading": "Loading snapshot...",
       "history": "History",
       "markdown_preview": "Preview",

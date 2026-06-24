@@ -77,7 +77,7 @@
     "menu_item": "Instantáneas",
     "modal": {
       "title": "Instantáneas",
-      "description": "Las instantáneas se crean automáticamente la primera vez que abres esta nota cada día.\nUsa «Tomar instantánea ahora» para añadir una instantánea extra sin reemplazar las que ya existen hoy.\nSolo se conservan las 7 instantáneas más recientes, incluidas las creadas manualmente.",
+      "description": "Solo se guarda el contenido de texto de la nota (no los archivos adjuntos ni las imágenes). Si se eliminó un archivo adjunto o una imagen, no se podrá recuperar desde una instantánea.\nCreadas automáticamente al abrir por primera vez cada día. «Tomar instantánea ahora» añade una extra sin reemplazar las de hoy. Máx. 7.",
       "loading": "Cargando instantánea...",
       "history": "Historial",
       "markdown_preview": "Vista previa",

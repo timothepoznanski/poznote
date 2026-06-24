@@ -1386,13 +1386,10 @@ try {
     <div class="modal-content snapshot-modal-content">
         <div class="snapshot-modal-header">
             <div class="snapshot-modal-header-copy">
-                <?php $snapshotDescription = t('snapshot.modal.description', [], "Snapshots are created automatically the first time you open this note each day.\nUse \"Take snapshot now\" to add an extra snapshot without replacing today's existing ones.\nOnly the 7 most recent snapshots are kept, including those created manually."); ?>
                 <div class="snapshot-modal-title-row">
                     <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
-                    <button type="button" class="snapshot-help-btn" aria-label="<?php echo htmlspecialchars($snapshotDescription, ENT_QUOTES); ?>" data-tooltip="<?php echo htmlspecialchars($snapshotDescription, ENT_QUOTES); ?>">
-                        <i class="lucide lucide-help-circle"></i>
-                    </button>
                 </div>
+                <p class="snapshot-modal-description"><?php echo t_h('snapshot.modal.description', [], "Only the note's text content is saved (not attachments or images). If an attachment or image was deleted, it cannot be recovered from a snapshot.\nCreated automatically on first open each day. \"Take snapshot now\" adds an extra snapshot without replacing today's. Up to 7 kept."); ?></p>
             </div>
         </div>
 
