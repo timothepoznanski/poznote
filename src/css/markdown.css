@@ -705,11 +705,7 @@ body.slash-menu-cursor-hidden * {
     overflow: hidden !important;
 }
 
-/* Fix for toolbar space in split view with tabs */
-body.has-internal-tabs .innernote:has(.noteentry.markdown-split-mode) .note-header {
-    top: 0 !important;
-    position: relative !important;
-}
+/* Tab bar now lives outside #right_col — split-mode header needs no override */
 
 .noteentry.markdown-split-mode .markdown-editor-container,
 .noteentry.markdown-split-mode .markdown-editor {

@@ -2838,22 +2838,6 @@ function setRightColumnContentPreservingTabs(html) {
         console.error('right_col element not found');
         return;
     }
-
-    var tabBar = document.getElementById('app-tab-bar');
-    if (tabBar && tabBar.parentNode === rightCol) {
-        while (rightCol.firstChild && rightCol.firstChild !== tabBar) {
-            rightCol.removeChild(rightCol.firstChild);
-        }
-        while (tabBar.nextSibling) {
-            rightCol.removeChild(tabBar.nextSibling);
-        }
-
-        var template = document.createElement('template');
-        template.innerHTML = html;
-        rightCol.appendChild(template.content);
-        return;
-    }
-
     rightCol.innerHTML = html;
 }
 

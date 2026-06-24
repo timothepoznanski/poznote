@@ -242,8 +242,10 @@ function findNoteLinkById(noteId) {
 function loadNoteCommon(url, noteId, options) {
     options = options || {};
 
-    // Show loading state
-    showNoteLoadingState();
+    // Show loading state (skip fade-out animation for tab switches to avoid flash)
+    if (!options.skipLoadingAnimation) {
+        showNoteLoadingState();
+    }
     if (options.updateSelectionBeforeLoad && options.clickedLink) {
         updateSelectedNote(options.clickedLink);
     }
@@ -297,33 +299,8 @@ function loadNoteCommon(url, noteId, options) {
                                     try { clearSearchHighlights(); } catch (e) { /* ignore */ }
                                 }
 
-                                // Preserve the tab bar if it exists, only replace content below it
-                                var existingTabBar = document.getElementById('app-tab-bar');
-                                if (existingTabBar) {
-                                    // Build new content in a fragment (avoids reflows per node)
-                                    var frag = document.createDocumentFragment();
-                                    var srcNodes = rightColumn.childNodes;
-                                    for (var i = 0; i < srcNodes.length; i++) {
-                                        var imported = document.importNode(srcNodes[i], true);
-                                        if (imported.id !== 'app-tab-bar') {
-                                            // Insert hidden so it doesn't flash before hideNoteLoadingState runs
-                                            if (imported.nodeType === 1) imported.classList.add('note-fade-out');
-                                            frag.appendChild(imported);
-                                        }
-                                    }
-                                    // Remove everything after the tab bar in one go
-                                    while (existingTabBar.nextSibling) {
-                                        currentRightColumn.removeChild(existingTabBar.nextSibling);
-                                    }
-                                    // Remove everything before the tab bar too (shouldn't exist, but be safe)
-                                    while (currentRightColumn.firstChild && currentRightColumn.firstChild !== existingTabBar) {
-                                        currentRightColumn.removeChild(currentRightColumn.firstChild);
-                                    }
-                                    // Append all new content at once
-                                    currentRightColumn.appendChild(frag);
-                                } else {
-                                    currentRightColumn.innerHTML = rightColumn.innerHTML;
-                                }
+                                // Replace right_col content (tab bar lives in #right_pane, not here)
+                                currentRightColumn.innerHTML = rightColumn.innerHTML;
 
                                 // Update tab state and re-render tab bar
                                 if (window.tabManager) {
@@ -367,14 +344,22 @@ function loadNoteCommon(url, noteId, options) {
                                     try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
                                 }
 
-                                // Small delay to ensure the loading animation is visible
-                                setTimeout(function () {
-                                    hideNoteLoadingState();
-                                    // Update selection after load if not done before
+                                if (options.skipLoadingAnimation) {
+                                    // No animation — just ensure fade-out class is cleared
+                                    var rightColEl = document.getElementById('right_col');
+                                    if (rightColEl) rightColEl.classList.remove('note-fade-out');
                                     if (!options.updateSelectionBeforeLoad && options.clickedLink) {
                                         updateSelectedNote(options.clickedLink);
                                     }
-                                }, 80);
+                                } else {
+                                    // Small delay to ensure the loading animation is visible
+                                    setTimeout(function () {
+                                        hideNoteLoadingState();
+                                        if (!options.updateSelectionBeforeLoad && options.clickedLink) {
+                                            updateSelectedNote(options.clickedLink);
+                                        }
+                                    }, 80);
+                                }
 
                                 // Reinitialize note click handlers if requested
                                 if (options.reinitClickHandlers && typeof window.initializeNoteClickHandlers === 'function') {
@@ -439,7 +424,7 @@ function loadNoteCommon(url, noteId, options) {
  * @param {Event} event - The click event
  * @param {HTMLElement} clickedElement - The actual clicked link element (optional)
  */
-window.loadNoteDirectly = function (url, noteId, event, clickedElement) {
+window.loadNoteDirectly = function (url, noteId, event, clickedElement, extraOptions) {
     try {
         // Check for unsaved changes in current note before proceeding
         var currentNoteId = window.noteid;
@@ -491,10 +476,15 @@ window.loadNoteDirectly = function (url, noteId, event, clickedElement) {
         }
         window.isLoadingNote = true;
 
+        // Save scroll position of the current tab before navigating away
+        if (window.tabManager && typeof window.tabManager._saveScrollPosition === 'function') {
+            window.tabManager._saveScrollPosition();
+        }
+
         // Find the clicked link to update selection
         const clickedLink = clickedElement || findNoteLinkById(noteId);
 
-        loadNoteCommon(url, noteId, {
+        loadNoteCommon(url, noteId, Object.assign({
             clickedLink: clickedLink,
             fromHistory: false,
             needsRefresh: needsRefresh,
@@ -532,7 +522,7 @@ window.loadNoteDirectly = function (url, noteId, event, clickedElement) {
                     }
                 }
             }
-        });
+        }, extraOptions || {}));
 
         return false;
     } catch (error) {
@@ -596,18 +586,7 @@ function loadNoteFromUrl(url, fromHistory) {
 function showNoteLoadingState() {
     const rightColumn = document.getElementById('right_col');
     if (!rightColumn) return;
-
-    const tabBar = document.getElementById('app-tab-bar');
-    if (tabBar) {
-        // Fade only siblings after the tab bar
-        var node = tabBar.nextSibling;
-        while (node) {
-            if (node.nodeType === 1) node.classList.add('note-fade-out');
-            node = node.nextSibling;
-        }
-    } else {
-        rightColumn.classList.add('note-fade-out');
-    }
+    rightColumn.classList.add('note-fade-out');
 }
 
 /**
@@ -617,32 +596,11 @@ function showNoteLoadingState() {
 function hideNoteLoadingState() {
     const rightColumn = document.getElementById('right_col');
     if (!rightColumn) return;
-
-    // Always remove from the main container first, in case it was added there 
-    // by showNoteLoadingState (e.g. if the tab bar was missing at that time).
     rightColumn.classList.remove('note-fade-out');
-
-    const tabBar = document.getElementById('app-tab-bar');
-    if (tabBar) {
-        // Animate only siblings after the tab bar
-        var node = tabBar.nextSibling;
-        while (node) {
-            if (node.nodeType === 1) {
-                node.classList.remove('note-fade-out');
-                node.classList.add('note-loading-state');
-                (function (el) {
-                    setTimeout(function () { el.classList.remove('note-loading-state'); }, 150);
-                })(node);
-            }
-            node = node.nextSibling;
-        }
-    } else {
-        rightColumn.classList.remove('note-fade-out');
-        rightColumn.classList.add('note-loading-state');
-        setTimeout(() => {
-            rightColumn.classList.remove('note-loading-state');
-        }, 150);
-    }
+    rightColumn.classList.add('note-loading-state');
+    setTimeout(function () {
+        rightColumn.classList.remove('note-loading-state');
+    }, 150);
 }
 
 /**
