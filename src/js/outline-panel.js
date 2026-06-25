@@ -1366,14 +1366,11 @@ function initTouchSupport() {
             return titleScroller;
         }
 
-        // Any touch that starts inside a code block should never trigger the
-        // outline/sommaire swipe gesture, regardless of whether the block is
-        // currently overflowing. Without a language label the inner <code>
-        // element has no overflow-x set, so the browser does not take over the
-        // gesture as a native scroll, and the swipe would incorrectly open the
-        // outline. Returning the closest code block keeps that safeguard.
+        // Only block the swipe gesture on code blocks when word wrap is disabled
+        // (body has .code-block-no-wrap), because that's when blocks can scroll
+        // horizontally and the swipe should be reserved for native scroll.
         const codeBlock = target.closest('pre, .code-block');
-        if (codeBlock) {
+        if (codeBlock && document.body.classList.contains('code-block-no-wrap')) {
             return codeBlock;
         }
 
