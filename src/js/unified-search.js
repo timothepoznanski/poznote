@@ -1223,31 +1223,7 @@ class SearchManager {
             if (newRight) {
                 const currentRightColumn = document.getElementById('right_col');
                 if (currentRightColumn) {
-                    // Preserve the tab bar if it exists, only replace content below it
-                    var existingTabBar = document.getElementById('app-tab-bar');
-                    if (existingTabBar) {
-                        // Build new content in a fragment (avoids reflows per node)
-                        var frag = document.createDocumentFragment();
-                        var srcNodes = newRight.childNodes;
-                        for (var i = 0; i < srcNodes.length; i++) {
-                            var imported = document.importNode(srcNodes[i], true);
-                            if (imported.id !== 'app-tab-bar') {
-                                frag.appendChild(imported);
-                            }
-                        }
-                        // Remove everything after the tab bar
-                        while (existingTabBar.nextSibling) {
-                            currentRightColumn.removeChild(existingTabBar.nextSibling);
-                        }
-                        // Remove everything before the tab bar too
-                        while (currentRightColumn.firstChild && currentRightColumn.firstChild !== existingTabBar) {
-                            currentRightColumn.removeChild(currentRightColumn.firstChild);
-                        }
-                        // Append all new content at once
-                        currentRightColumn.appendChild(frag);
-                    } else {
-                        currentRightColumn.innerHTML = newRight.innerHTML;
-                    }
+                    currentRightColumn.innerHTML = newRight.innerHTML;
                 }
             }
 
