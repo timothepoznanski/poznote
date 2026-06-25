@@ -28,23 +28,23 @@ if (!empty($workspace)) {
 $stmt = $con->prepare($select_query);
 $stmt->execute($search_params);
 
-$tags_list = [];
+$tags_list = []; // tag => note count
 
-while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {   
+while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	$words = explode(',', $row['tags']);
 	foreach($words as $word) {
-		$word = trim($word); // Clean spaces
-		if (!empty($word)) { // Verify that tag is not empty
-			if (!in_array($word, $tags_list)) {
-				$tags_list[] = $word;
-			}
-		}		
+		$word = trim($word);
+		if (!empty($word)) {
+			$tags_list[$word] = ($tags_list[$word] ?? 0) + 1;
+		}
 	}
 }
 
 $count_tags = count($tags_list);
 
-sort($tags_list, SORT_NATURAL | SORT_FLAG_CASE);
+uksort($tags_list, function($a, $b) {
+	return strnatcasecmp($a, $b);
+});
 
 $currentLang = getUserLanguage();
 $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
@@ -73,6 +73,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
@@ -129,10 +130,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		if (empty($tags_list)) {
 			echo '<div class="no-tags">' . t_h('tags.empty', [], 'No tags found.') . '</div>';
 		} else {
-			foreach($tags_list as $tag) {
+			foreach($tags_list as $tag => $count) {
 				if (!empty(trim($tag))) {
-					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag, ENT_QUOTES) . '">
-						<div class="tag-name">'.htmlspecialchars($tag).'</div>
+					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag, ENT_QUOTES) . '" data-count="' . $count . '">
+						<div class="tag-name">'.htmlspecialchars($tag).'<span class="tag-note-count">('.$count.')</span></div>
 					</div>';
 				}
 			}
@@ -143,6 +144,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	
 	<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/list_tags.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/clickable-tags.js?v=<?php echo $cache_v; ?>"></script>
 </body>

@@ -639,6 +639,16 @@ $router->get('/tags', function($params) use ($tagsController) {
     $tagsController->index();
 });
 
+// Rename a tag across all notes
+$router->patch('/tags/{tag}', function($params) use ($tagsController) {
+    $tagsController->rename($params['tag']);
+});
+
+// Delete a tag from all notes
+$router->delete('/tags/{tag}', function($params) use ($tagsController) {
+    $tagsController->delete($params['tag']);
+});
+
 // ======================
 // Attachments Routes
 // ======================
