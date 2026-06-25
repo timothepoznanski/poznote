@@ -467,10 +467,10 @@ try {
     // DATABASE: FETCH NOTE CONTENT
     // ============================================================================
     
-    $stmt = $con->prepare('SELECT heading, entry, created, updated, type, attachments, icon, icon_color FROM entries WHERE id = ?');
+    $stmt = $con->prepare('SELECT heading, entry, created, updated, type, attachments, icon, icon_color, linked_note_id FROM entries WHERE id = ?');
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$note) {
         $noteMsg = t_h('public.errors.shared_note_not_found_or_denied', [], "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
         [, $noteDetail] = array_pad(explode("\n\n", $noteMsg, 2), 2, '');
@@ -509,8 +509,23 @@ try {
 // CONTENT LOADING
 // ============================================================================
 // Load content from file if available, otherwise from database
+// For shortcuts (linked_note_id set), load content from the original note.
 
-$htmlFile = getEntryFilename($note_id, $note['type'] ?? 'note');
+$contentSourceId = $note_id;
+if (!empty($note['linked_note_id'])) {
+    $stmtOrig = $con->prepare('SELECT entry, type, attachments FROM entries WHERE id = ? AND trash = 0');
+    $stmtOrig->execute([$note['linked_note_id']]);
+    $originalNote = $stmtOrig->fetch(PDO::FETCH_ASSOC);
+    if ($originalNote) {
+        $contentSourceId = (int)$note['linked_note_id'];
+        $note['entry'] = $originalNote['entry'];
+        $note['attachments'] = $originalNote['attachments'];
+        // type must match original so rendering logic is consistent
+        $note['type'] = $originalNote['type'];
+    }
+}
+
+$htmlFile = getEntryFilename($contentSourceId, $note['type'] ?? 'note');
 $content = '';
 
 if (is_readable($htmlFile)) {
