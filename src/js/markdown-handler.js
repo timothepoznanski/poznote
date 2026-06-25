@@ -575,7 +575,6 @@ function syncMarkdownEditorEditableState(noteEntryOrId) {
 
 var markdownSplitPaneHeightRaf = null;
 var markdownSplitPaneHeightListenersAttached = false;
-var markdownMobileCaretViewportListenersAttached = false;
 
 function getMarkdownSplitViewportHeight() {
     return window.innerHeight || document.documentElement.clientHeight || 0;
@@ -926,9 +925,9 @@ function getMarkdownEditorScrollContainer(editorDiv) {
     }
 
     if (isCodeMirrorMarkdownEditor(editorDiv)) {
-        var codeMirrorScroller = editorDiv.querySelector ? editorDiv.querySelector('.cm-scroller') : null;
-        if (isElementVerticallyScrollable(codeMirrorScroller)) {
-            return codeMirrorScroller;
+        var cmScroller = editorDiv.querySelector('.cm-scroller');
+        if (isElementVerticallyScrollable(cmScroller)) {
+            return cmScroller;
         }
     }
 
@@ -949,175 +948,20 @@ function getMarkdownEditorScrollContainer(editorDiv) {
     return scrollContainer || editorContainer || editorDiv;
 }
 
-function isMarkdownEditorFocused(editorDiv) {
-    if (!editorDiv) {
-        return false;
-    }
-
-    if (isCodeMirrorMarkdownEditor(editorDiv)) {
-        var api = getMarkdownCodeMirrorApi();
-        if (api && typeof api.hasFocus === 'function') {
-            return api.hasFocus(editorDiv);
-        }
-    }
-
-    return document.activeElement === editorDiv || editorDiv.contains(document.activeElement);
-}
-
-function getActiveMarkdownEditorForCaretScroll() {
-    var activeElement = document.activeElement;
-    if (activeElement && activeElement.closest) {
-        var activeEditor = activeElement.closest('.markdown-editor');
-        if (activeEditor && isMarkdownEditorFocused(activeEditor)) {
-            return activeEditor;
-        }
-    }
-
-    var api = getMarkdownCodeMirrorApi();
-    if (api && typeof api.getLastActiveEditor === 'function') {
-        var lastActiveEditor = api.getLastActiveEditor();
-        if (lastActiveEditor && isMarkdownEditorFocused(lastActiveEditor)) {
-            return lastActiveEditor;
-        }
-    }
-
-    return null;
-}
-
-function isMarkdownMobileViewport() {
-    try {
-        return !!(window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
-    } catch (e) {
-        return false;
-    }
-}
-
-function getMarkdownVisibleViewportBounds() {
-    var viewportTop = 0;
-    var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-
-    if (window.visualViewport && typeof window.visualViewport.height === 'number') {
-        viewportTop = typeof window.visualViewport.offsetTop === 'number'
-            ? window.visualViewport.offsetTop
-            : 0;
-        viewportHeight = window.visualViewport.height;
-    }
-
-    return {
-        top: viewportTop,
-        bottom: viewportTop + viewportHeight
-    };
-}
-
-function scrollMarkdownContainerBy(scrollContainer, scrollDelta) {
-    if (!scrollContainer || !scrollDelta) {
-        return;
-    }
-
-    var previousScrollTop = scrollContainer.scrollTop || 0;
-    scrollContainer.scrollTop = previousScrollTop + scrollDelta;
-
-    if (Math.abs((scrollContainer.scrollTop || 0) - previousScrollTop) < 1 && typeof window.scrollBy === 'function') {
-        window.scrollBy(0, scrollDelta);
-    }
-}
-
-function isMarkdownCaretRectUsable(rect) {
-    return !!(rect &&
-        isFinite(rect.top) &&
-        isFinite(rect.bottom) &&
-        (rect.height > 0 || rect.bottom > rect.top));
-}
-
-function isMarkdownLineRectUsable(rect) {
-    // Empty lines have height 0 but still have valid top/bottom coords
-    return !!(rect && isFinite(rect.top) && isFinite(rect.bottom));
-}
-
-function getMarkdownCodeMirrorCaretRect(editorDiv, cmSelection) {
-    var cmApi = getMarkdownCodeMirrorApi();
-    if (!cmApi || !cmSelection || typeof cmApi.getCoordsAtPos !== 'function') {
-        return null;
-    }
-
-    var positions = [
-        cmSelection.end,
-        cmSelection.end - 1,
-        cmSelection.end + 1,
-        cmSelection.start
-    ];
-    var sides = [1, -1];
-    var tried = {};
-
-    for (var i = 0; i < positions.length; i++) {
-        var position = positions[i];
-        if (position < 0) {
-            continue;
-        }
-
-        for (var s = 0; s < sides.length; s++) {
-            var key = position + ':' + sides[s];
-            if (tried[key]) {
-                continue;
-            }
-            tried[key] = true;
-
-            var rect = cmApi.getCoordsAtPos(editorDiv, position, sides[s]);
-            if (isMarkdownCaretRectUsable(rect)) {
-                return rect;
-            }
-        }
-    }
-
-    return null;
-}
-
-function getMarkdownCodeMirrorActiveLineRect(editorDiv) {
-    if (!editorDiv || !editorDiv.querySelector) {
-        return null;
-    }
-
-    var selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-        var anchorNode = selection.getRangeAt(0).startContainer;
-        var anchorElement = anchorNode && anchorNode.nodeType === Node.ELEMENT_NODE
-            ? anchorNode
-            : (anchorNode ? anchorNode.parentElement : null);
-        var selectedLine = anchorElement && anchorElement.closest
-            ? anchorElement.closest('.cm-line')
-            : null;
-        if (selectedLine && editorDiv.contains(selectedLine)) {
-            var selectedLineRect = selectedLine.getBoundingClientRect();
-            if (isMarkdownLineRectUsable(selectedLineRect)) {
-                return selectedLineRect;
-            }
-        }
-    }
-
-    var activeLine = editorDiv.querySelector('.cm-activeLine');
-    if (!activeLine) {
-        return null;
-    }
-
-    var activeLineRect = activeLine.getBoundingClientRect();
-    return isMarkdownLineRectUsable(activeLineRect) ? activeLineRect : null;
-}
-
 function getMarkdownCaretClientRect(editorDiv) {
     if (isCodeMirrorMarkdownEditor(editorDiv)) {
         var cmApi = getMarkdownCodeMirrorApi();
         var cmSelection = cmApi && typeof cmApi.getSelectionOffsets === 'function'
             ? cmApi.getSelectionOffsets(editorDiv)
             : null;
-        var cmRect = getMarkdownCodeMirrorCaretRect(editorDiv, cmSelection);
-        if (cmRect) {
-            return cmRect;
+        if (cmSelection && typeof cmApi.getCoordsAtPos === 'function') {
+            var rect = cmApi.getCoordsAtPos(editorDiv, cmSelection.end, 1)
+                || cmApi.getCoordsAtPos(editorDiv, cmSelection.end, -1);
+            if (rect && isFinite(rect.top)) return rect;
         }
-
-        cmRect = getMarkdownCodeMirrorActiveLineRect(editorDiv);
-        if (cmRect) {
-            return cmRect;
-        }
+        var activeLine = editorDiv.querySelector && editorDiv.querySelector('.cm-activeLine');
+        if (activeLine) return activeLine.getBoundingClientRect();
+        return null;
     }
 
     var selection = window.getSelection();
@@ -1131,22 +975,21 @@ function getMarkdownCaretClientRect(editorDiv) {
     }
 
     var clientRects = range.getClientRects();
-    if (clientRects && clientRects.length > 0 && isMarkdownCaretRectUsable(clientRects[clientRects.length - 1])) {
+    if (clientRects && clientRects.length > 0) {
         return clientRects[clientRects.length - 1];
     }
 
     var boundingRect = range.getBoundingClientRect();
-    if (isMarkdownCaretRectUsable(boundingRect)) {
+    if (boundingRect && (boundingRect.top || boundingRect.bottom || boundingRect.height)) {
         return boundingRect;
     }
 
     var marker = document.createElement('span');
-    marker.setAttribute('data-markdown-caret-scroll-marker', 'true');
     marker.style.display = 'inline-block';
-    marker.style.width = '1px';
+    marker.style.width = '0';
     marker.style.height = '1em';
     marker.style.overflow = 'hidden';
-    marker.textContent = '\u200b';
+    marker.textContent = '​';
 
     var markerRange = range.cloneRange();
     markerRange.insertNode(marker);
@@ -1165,24 +1008,21 @@ function getMarkdownCaretClientRect(editorDiv) {
         selection.addRange(restoreRange);
     }
 
-    return isMarkdownCaretRectUsable(markerRect) ? markerRect : null;
+    return markerRect;
 }
 
 function scrollMarkdownCaretIntoView(editorDiv) {
-    if (!editorDiv || !isMarkdownEditorFocused(editorDiv)) {
+    if (!editorDiv) {
         return;
     }
 
     if (isCodeMirrorMarkdownEditor(editorDiv)) {
         var cmApi = getMarkdownCodeMirrorApi();
-        var cmSelection = typeof cmApi.getSelectionOffsets === 'function'
-            ? cmApi.getSelectionOffsets(editorDiv)
-            : null;
-        if (cmSelection && typeof cmApi.revealPos === 'function') {
-            cmApi.revealPos(editorDiv, cmSelection.end, 'nearest');
-        } else if (cmSelection && typeof cmApi.scrollToPos === 'function') {
-            cmApi.scrollToPos(editorDiv, cmSelection.end, 'nearest');
+        if (!cmApi || typeof cmApi.hasFocus !== 'function' || !cmApi.hasFocus(editorDiv)) {
+            return;
         }
+    } else if (document.activeElement !== editorDiv) {
+        return;
     }
 
     var scrollContainer = getMarkdownEditorScrollContainer(editorDiv);
@@ -1192,111 +1032,35 @@ function scrollMarkdownCaretIntoView(editorDiv) {
     }
 
     var containerRect = scrollContainer.getBoundingClientRect();
-    var visibleBounds = getMarkdownVisibleViewportBounds();
-    var mobileViewport = isMarkdownMobileViewport();
-    var visibleTop = mobileViewport ? Math.max(containerRect.top, visibleBounds.top) : containerRect.top;
-    var visibleBottom = mobileViewport ? Math.min(containerRect.bottom, visibleBounds.bottom) : containerRect.bottom;
-    var bottomPadding = mobileViewport ? 96 : 48;
-    var topPadding = mobileViewport ? 32 : 24;
+    var bottomPadding = 48;
+    var topPadding = 24;
     var scrollDelta = 0;
 
-    if (visibleBottom <= visibleTop) {
-        visibleTop = containerRect.top;
-        visibleBottom = containerRect.bottom;
-    }
-
-    if (caretRect.bottom > visibleBottom - bottomPadding) {
-        scrollDelta = caretRect.bottom - visibleBottom + bottomPadding;
-    } else if (caretRect.top < visibleTop + topPadding) {
-        scrollDelta = caretRect.top - visibleTop - topPadding;
+    if (caretRect.bottom > containerRect.bottom - bottomPadding) {
+        scrollDelta = caretRect.bottom - containerRect.bottom + bottomPadding;
+    } else if (caretRect.top < containerRect.top + topPadding) {
+        scrollDelta = caretRect.top - containerRect.top - topPadding;
     }
 
     if (scrollDelta !== 0) {
-        scrollMarkdownContainerBy(scrollContainer, scrollDelta);
+        scrollContainer.scrollTop += scrollDelta;
     }
 }
 
 function scheduleMarkdownCaretScrollIntoView(editorDiv) {
-    if (!editorDiv || editorDiv._suppressMarkdownTableContextInput) {
+    if (!editorDiv) {
         return;
     }
-
-    var runScroll = function () {
-        scrollMarkdownCaretIntoView(editorDiv);
-    };
 
     if (typeof window.requestAnimationFrame === 'function') {
-        window.requestAnimationFrame(runScroll);
-    } else {
-        setTimeout(runScroll, 0);
-    }
-}
-
-function scheduleMarkdownMobileCaretScrollIntoView(editorDiv) {
-    if (!editorDiv || editorDiv._suppressMarkdownTableContextInput || !isMarkdownMobileViewport()) {
-        return;
-    }
-
-    if (editorDiv._markdownMobileCaretScrollTimeouts) {
-        editorDiv._markdownMobileCaretScrollTimeouts.forEach(function (timeoutId) {
-            clearTimeout(timeoutId);
+        window.requestAnimationFrame(function () {
+            scrollMarkdownCaretIntoView(editorDiv);
         });
+    } else {
+        setTimeout(function () {
+            scrollMarkdownCaretIntoView(editorDiv);
+        }, 0);
     }
-
-    editorDiv._markdownMobileCaretScrollTimeouts = [];
-
-    var run = function () {
-        if (isMarkdownEditorFocused(editorDiv)) {
-            scheduleMarkdownCaretScrollIntoView(editorDiv);
-        }
-    };
-
-    run();
-    [120, 320, 650, 1000].forEach(function (delay) {
-        editorDiv._markdownMobileCaretScrollTimeouts.push(setTimeout(run, delay));
-    });
-}
-
-function ensureMarkdownMobileCaretViewportListeners() {
-    if (markdownMobileCaretViewportListenersAttached) {
-        return;
-    }
-
-    markdownMobileCaretViewportListenersAttached = true;
-
-    var scheduleActiveEditor = function () {
-        var activeEditor = getActiveMarkdownEditorForCaretScroll();
-        if (activeEditor) {
-            scheduleMarkdownMobileCaretScrollIntoView(activeEditor);
-        }
-    };
-
-    window.addEventListener('resize', scheduleActiveEditor);
-
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', scheduleActiveEditor);
-        window.visualViewport.addEventListener('scroll', scheduleActiveEditor);
-    }
-}
-
-function setupMarkdownMobileCaretVisibilityListeners(editorDiv) {
-    if (!editorDiv || editorDiv._markdownMobileCaretVisibilityListenersAttached) {
-        return;
-    }
-
-    editorDiv._markdownMobileCaretVisibilityListenersAttached = true;
-    ensureMarkdownMobileCaretViewportListeners();
-
-    var schedule = function () {
-        scheduleMarkdownMobileCaretScrollIntoView(editorDiv);
-    };
-
-    editorDiv.addEventListener('focus', schedule);
-    editorDiv.addEventListener('click', schedule);
-    editorDiv.addEventListener('mouseup', schedule);
-    editorDiv.addEventListener('touchend', schedule);
-    editorDiv.addEventListener('keyup', schedule);
-    editorDiv.addEventListener('markdown-selection-change', schedule);
 }
 
 function getMarkdownLineStartOffsets(text) {
@@ -3868,8 +3632,6 @@ function setupMarkdownEditorListeners(noteId) {
     var previewDiv = noteEntry.querySelector('.markdown-preview');
     if (!editorDiv) return;
 
-    setupMarkdownMobileCaretVisibilityListeners(editorDiv);
-
     // Set noteid on focus (like normal notes)
     editorDiv.addEventListener('focus', function () {
         if (typeof noteid !== 'undefined') {
@@ -3913,8 +3675,6 @@ function setupMarkdownEditorListeners(noteId) {
         if (typeof window.markNoteAsModified === 'function') {
             window.markNoteAsModified();
         }
-
-        scheduleMarkdownCaretScrollIntoView(editorDiv);
     });
 }
 
@@ -4774,6 +4534,30 @@ function _mdSetSelectionToSourceOffset(editorDiv, sourceOffset) {
     selection.addRange(range);
 
     return true;
+}
+
+function getMarkdownCaretClientRect(editorDiv) {
+    if (isCodeMirrorMarkdownEditor(editorDiv)) {
+        var cmApi = getMarkdownCodeMirrorApi();
+        var cmSelection = cmApi && typeof cmApi.getSelectionOffsets === 'function'
+            ? cmApi.getSelectionOffsets(editorDiv)
+            : null;
+        if (cmSelection && typeof cmApi.getCoordsAtPos === 'function') {
+            var rect = cmApi.getCoordsAtPos(editorDiv, cmSelection.end, 1)
+                || cmApi.getCoordsAtPos(editorDiv, cmSelection.end, -1);
+            if (rect && isFinite(rect.top)) return rect;
+        }
+        var activeLine = editorDiv.querySelector && editorDiv.querySelector('.cm-activeLine');
+        if (activeLine) return activeLine.getBoundingClientRect();
+        return null;
+    }
+
+    var sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return null;
+    var range = sel.getRangeAt(0);
+    if (!editorDiv.contains(range.startContainer)) return null;
+    var r = range.getBoundingClientRect();
+    return (r && isFinite(r.top)) ? r : null;
 }
 
 function _mdGetEditorNavigationTopOffset(editorDiv, scrollContainer) {

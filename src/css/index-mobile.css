@@ -152,7 +152,6 @@ body.mobile-keyboard-open #right_pane {
     position: relative;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
-    scroll-padding-top: calc(var(--mobile-note-header-height, 56px) + 12px);
 }
 
 .resize-handle {
@@ -251,9 +250,7 @@ body.mobile-keyboard-open.has-background-image #right_col .note-header {
 .note-tags-row,
 .note-attachments-row,
 .note-subline,
-.noteentry,
-.markdown-editor,
-.markdown-editor-container {
+.noteentry {
     scroll-margin-top: calc(var(--mobile-note-header-height, 56px) + 12px);
 }
 
