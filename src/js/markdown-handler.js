@@ -3102,11 +3102,14 @@ function initializeMarkdownNote(noteId) {
     var startInEditMode;
     var startInSplitMode = false;
     var forceSplitForNewMarkdown = false;
+    var isSearchContext = false;
 
     try {
         var params = new URLSearchParams(window.location.search || '');
         forceSplitForNewMarkdown = params.get('md_split') === '1';
-        
+        isSearchContext = (params.get('search') && params.get('search').trim() !== '') ||
+                         (params.get('tags_search') && params.get('tags_search').trim() !== '');
+
         // Clean up the URL parameter after reading it
         if (forceSplitForNewMarkdown) {
             params.delete('md_split');
@@ -3129,7 +3132,12 @@ function initializeMarkdownNote(noteId) {
     // - Desktop: split mode (edit + preview side by side)
     // - Mobile: edit mode only
     // IMPORTANT: Never use split mode on mobile
-    if (isEmpty && !isMobileViewportCheck) {
+    // IMPORTANT: Never use split mode when displaying search results (preview only)
+    if (isSearchContext) {
+        // In search context: always show preview only, never split
+        startInSplitMode = false;
+        startInEditMode = false;
+    } else if (isEmpty && !isMobileViewportCheck) {
         // New notes on desktop: start in split mode
         startInSplitMode = true;
         startInEditMode = false;

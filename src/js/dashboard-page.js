@@ -162,9 +162,19 @@
             footer += '</div>';
         }
 
+        var iconHtml = '';
+        if (note.icon) {
+            if (note.icon.indexOf('lucide') !== -1) {
+                var iconStyle = note.iconColor ? ' style="color:' + esc(note.iconColor) + ' !important"' : '';
+                iconHtml = '<i class="' + esc(note.icon) + ' dash-note-icon"' + iconStyle + '></i>';
+            } else {
+                iconHtml = '<span class="dash-note-icon dash-note-icon-emoji">' + esc(note.icon) + '</span>';
+            }
+        }
+
         return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '">' +
             '<a class="dash-card-link" href="' + esc(note.url) + '">' +
-                '<div class="dash-card-note-title">' + esc(note.heading) + '</div>' +
+                '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
             '</a>' +
             footer +
@@ -698,32 +708,6 @@
             gitBtn.addEventListener('click', function (e) {
                 e.preventDefault();
                 openDashboardGitModal();
-            });
-        }
-
-        // --- API REST modal ---
-        var apiRestBtn   = document.getElementById('dashboardApiRestBtn');
-        var apiRestModal = document.getElementById('dashboardApiRestModal');
-        if (apiRestBtn && apiRestModal) {
-            apiRestBtn.addEventListener('click', function () {
-                apiRestModal.style.display = 'flex';
-            });
-            apiRestModal.addEventListener('click', function (e) {
-                if (e.target === apiRestModal) apiRestModal.style.display = 'none';
-            });
-            var ghBtn = document.getElementById('dashboardOpenGithubApiDocsBtn');
-            if (ghBtn) ghBtn.addEventListener('click', function () {
-                window.open('https://github.com/timothepoznanski/poznote/blob/main/docs/API-REST.md', '_blank');
-                apiRestModal.style.display = 'none';
-            });
-            var swBtn = document.getElementById('dashboardOpenSwaggerApiBtn');
-            if (swBtn) swBtn.addEventListener('click', function () {
-                apiRestModal.style.display = 'none';
-                window.location.href = 'api-docs/';
-            });
-            var closeBtn = document.getElementById('dashboardCloseApiRestModalBtn');
-            if (closeBtn) closeBtn.addEventListener('click', function () {
-                apiRestModal.style.display = 'none';
             });
         }
 

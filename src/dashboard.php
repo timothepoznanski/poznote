@@ -84,15 +84,19 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
     $heading = trim((string)($note['heading'] ?? ''));
     if ($heading === '') $heading = t('common.untitled', [], 'Untitled');
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
+    $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
+    $iconColor = !empty($note['icon_color']) ? (string)$note['icon_color'] : '';
     return [
-        'id'      => $noteId,
-        'heading' => $heading,
-        'url'     => 'index.php?note=' . $noteId . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
-        'text'    => $preview['text'],
-        'tasks'   => $preview['tasks'],
-        'tags'    => $tags,
-        'search'  => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
-        'updated' => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
+        'id'        => $noteId,
+        'heading'   => $heading,
+        'url'       => 'index.php?note=' . $noteId . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
+        'text'      => $preview['text'],
+        'tasks'     => $preview['tasks'],
+        'tags'      => $tags,
+        'search'    => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
+        'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
+        'icon'      => $iconRaw,
+        'iconColor' => $iconColor,
     ];
 }
 
@@ -410,7 +414,7 @@ try {
         }
         unset($fd);
 
-        $query = "SELECT id, heading, type, tags, folder_id, folder, updated FROM entries WHERE trash = 0";
+        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color FROM entries WHERE trash = 0";
         $params = [];
         if ($favoritesOnly) {
             $query .= " AND favorite = 1";
@@ -508,9 +512,10 @@ if (isset($_SESSION['last_sync_result'])) {
     }
 }
 
-$cache_v = @file_get_contents('version.txt');
-if ($cache_v === false) $cache_v = time();
-$cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
+$rawVersion = @file_get_contents('version.txt');
+if ($rawVersion === false) $rawVersion = '0.0.0';
+$rawVersion = trim($rawVersion);
+$cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -538,20 +543,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 		<nav class="dashboard-sidebar">
-			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
-			<?php if (!empty($dashboardContextItems)): ?>
-				<div class="dashboard-sidebar-context">
-					<?php foreach ($dashboardContextItems as $item): ?>
-						<?php
-							$contextTitle = $item['label'] . ': ' . $item['value'];
-						?>
-						<div class="dashboard-sidebar-context-item" title="<?php echo htmlspecialchars($contextTitle, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-							<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
-							<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-						</div>
-					<?php endforeach; ?>
-				</div>
-			<?php endif; ?>
 			<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_notes'); ?>">
 				<i class="lucide lucide-home"></i>
 			</a>
@@ -567,27 +558,21 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 			<a href="settings.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
 				<i class="lucide lucide-settings"></i>
 			</a>
-			<hr class="dashboard-sidebar-sep">
-			<a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn" title="<?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?>">
-				<i class="lucide lucide-info"></i>
-			</a>
-			<a href="https://github.com/timothepoznanski/poznote" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn" title="<?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?>">
-				<i class="lucide lucide-github"></i>
-			</a>
-			<?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-			<button type="button" id="dashboardApiRestBtn" class="dashboard-topbar-btn" title="<?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?>">
-				<i class="lucide lucide-code"></i>
-			</button>
-			<?php endif; ?>
-			<a href="https://poznote.com" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn" title="<?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?>">
-				<i class="lucide lucide-globe"></i>
-			</a>
-			<hr class="dashboard-sidebar-sep">
-			<a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="dashboard-topbar-btn dashboard-sidebar-kofi" title="<?php echo t_h('settings.cards.buy_me_a_coffee', [], 'Buy me a coffee'); ?>">
-				<i class="lucide lucide-heart"></i>
-			</a>
+
 		</nav>
 		<div class="favorites-container dashboard-container">
+			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
+			<div class="dashboard-top-info">
+				<?php foreach ($dashboardContextItems as $item): ?>
+					<div class="dashboard-top-info-item" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
+						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+					</div>
+				<?php endforeach; ?>
+			</div>
+			<div class="dashboard-version-badge" title="Version">
+				<span>v<?php echo htmlspecialchars($rawVersion, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+			</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
 					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
@@ -758,19 +743,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($cache_v)));
 			<div id="dashboardGrid" class="dashboard-grid-container"></div>
 		<?php endif; ?>
 	</div>
-
-		<?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-		<div id="dashboardApiRestModal" class="modal">
-			<div class="modal-content">
-				<h3><?php echo t_h('modals.api_rest.title', [], 'API REST'); ?></h3>
-				<div class="modal-buttons" style="flex-wrap: nowrap; justify-content: space-between;">
-					<button type="button" class="btn-primary" id="dashboardOpenGithubApiDocsBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.github_option', [], 'GitHub'); ?></button>
-					<button type="button" class="btn-primary" id="dashboardOpenSwaggerApiBtn" style="flex: 1 1 0;"><?php echo t_h('modals.api_rest.swagger_option', [], 'Swagger'); ?></button>
-					<button type="button" class="btn-danger" id="dashboardCloseApiRestModalBtn" style="flex: 1 1 0;"><?php echo t_h('common.cancel'); ?></button>
-				</div>
-			</div>
-		</div>
-		<?php endif; ?>
 
 		<div id="notificationsModal" class="modal">
 			<div class="modal-content">

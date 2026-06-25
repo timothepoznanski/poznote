@@ -650,18 +650,14 @@
     // ── Public API ─────────────────────────────────────────────────────────
 
     function _showNewNoteLoadingPlaceholder() {
-        var tabBar = document.getElementById('app-tab-bar');
-        if (!tabBar) return;
+        var rightCol = document.getElementById('right_col');
+        if (!rightCol) return;
 
-        // Remove all siblings after the tab bar (the current note content)
-        while (tabBar.nextSibling) {
-            tabBar.parentNode.removeChild(tabBar.nextSibling);
-        }
-
-        // Insert a blank placeholder that fades in, matching the note area styling
+        // Replace right_col content with a blank placeholder without removing right_col itself
         var placeholder = document.createElement('div');
         placeholder.id = 'new-note-loading-placeholder';
-        tabBar.parentNode.appendChild(placeholder);
+        rightCol.innerHTML = '';
+        rightCol.appendChild(placeholder);
     }
 
     /**
