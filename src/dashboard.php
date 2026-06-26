@@ -542,36 +542,32 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 </head>
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
-		<nav class="dashboard-sidebar">
-			<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<i class="lucide lucide-home"></i>
-			</a>
-			<button type="button" id="dashboardToggleFilter" class="dashboard-topbar-btn" title="<?php echo t_h('search.placeholder', [], 'Search'); ?>" aria-label="<?php echo t_h('search.placeholder', [], 'Search'); ?>" aria-controls="dashboardTopbarFilter" aria-expanded="false">
-				<i class="lucide lucide-search"></i>
-			</button>
-		<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="push" title="Push" aria-label="Push">
-			<i class="lucide lucide-upload"></i>
-		</button>
-		<button type="button" id="dashboardGitPullBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="pull" title="Pull" aria-label="Pull">
-			<i class="lucide lucide-download"></i>
-			</button>
-			<a href="settings.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
-				<i class="lucide lucide-settings"></i>
-			</a>
 
-		</nav>
 		<div class="favorites-container dashboard-container">
 			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
 			<div class="dashboard-top-info">
+				<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-top-info-item dashboard-mobile-back" title="<?php echo t_h('common.back_to_notes'); ?>">
+					<i class="lucide lucide-home"></i>
+					<span><?php echo t_h('common.back_to_notes'); ?></span>
+				</a>
 				<?php foreach ($dashboardContextItems as $item): ?>
+					<?php if ($item['icon'] === 'lucide-layers'): ?>
+					<button type="button" class="dashboard-top-info-item dashboard-workspace-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-workspace-switcher-modal">
+						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
+						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+					</button>
+					<?php elseif ($item['icon'] === 'lucide-user'): ?>
+					<button type="button" class="dashboard-top-info-item dashboard-user-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-user-info-modal">
+						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
+						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+					</button>
+					<?php else: ?>
 					<div class="dashboard-top-info-item" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
 						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
 					</div>
+					<?php endif; ?>
 				<?php endforeach; ?>
-			</div>
-			<div class="dashboard-version-badge" title="Version">
-				<span>v<?php echo htmlspecialchars($rawVersion, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
 			</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
@@ -607,8 +603,16 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-trash-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['trash'] ?? 0); ?></span>
 					</a>
+					<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="push" title="Push" aria-label="Push">
+						<i class="lucide lucide-upload"></i>
+						<span class="dashboard-topbar-count">Push</span>
+					</button>
+					<button type="button" id="dashboardGitPullBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="pull" title="Pull" aria-label="Pull">
+						<i class="lucide lucide-download"></i>
+						<span class="dashboard-topbar-count">Pull</span>
+					</button>
 				</nav>
-				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter is-collapsed">
+				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
 					<input
 						type="text"
@@ -803,8 +807,34 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			</div>
 		</div>
 
+		<div id="workspaceSwitcherModal" class="modal">
+			<div class="modal-content">
+				<h3><?php echo t_h('workspaces.switcher_title', [], 'Switch workspace'); ?></h3>
+				<div id="workspaceSwitcherList" class="workspace-switcher-list">
+					<div class="workspace-switcher-loading"><?php echo t_h('common.loading', [], 'Loading...'); ?></div>
+				</div>
+				<div class="modal-buttons">
+					<button type="button" class="btn-cancel" data-action="close-workspace-switcher-modal"><?php echo t_h('common.close'); ?></button>
+				</div>
+			</div>
+		</div>
+
+		<div id="dashboardUserInfoModal" class="modal">
+			<div class="modal-content">
+				<h3><?php echo t_h('modals.user_settings_info.title', [], 'Account Settings'); ?></h3>
+				<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo t_h('modals.user_settings_info.message', [], 'You can change your password from Settings. To edit your email, username, or OIDC Subject (UUID), please contact the administrator of this Poznote instance.'); ?></p>
+				<div class="modal-buttons">
+					<button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=change-password#change-password-card'"><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
+					<button type="button" data-action="close-dashboard-user-info-modal"><?php echo t_h('common.close'); ?></button>
+				</div>
+			</div>
+		</div>
+
 		<script>
 		window.DASHBOARD_DATA      = <?php echo json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+		window.DASHBOARD_USER = {
+			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>
+		};
 		window.NOTIFICATIONS_TXT = {
 			dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,
 			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>

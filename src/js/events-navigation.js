@@ -139,7 +139,11 @@ function setupNoteNavigationInterceptor() {
             // Show notification and save, then navigate
             showSaveInProgressNotification(function () {
                 // Callback when save is complete - proceed with navigation
-                window.location.href = href;
+                if (typeof window.navigateToNote === 'function') {
+                    window.navigateToNote(targetNoteId);
+                } else {
+                    window.location.href = href;
+                }
             });
 
             return false;

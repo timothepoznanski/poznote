@@ -436,7 +436,7 @@
                 var pinIcon = document.createElement('span');
                 pinIcon.className = 'app-tab-pin-icon';
                 pinIcon.setAttribute('aria-hidden', 'true');
-                pinIcon.textContent = '📌';
+                pinIcon.innerHTML = '<i class="lucide lucide-pin"></i>';
                 el.appendChild(pinIcon);
             }
 
@@ -583,7 +583,7 @@
         var pinLabel = isPinned
             ? _t('tabs.context_menu.unpin', 'Unpin tab')
             : _t('tabs.context_menu.pin', 'Pin tab');
-        var pinIcon = isPinned ? '📌' : '📌';
+        var pinIcon = '<i class="lucide lucide-pin"></i>';
 
         var pinItem = document.createElement('div');
         pinItem.className = 'app-tab-context-item';

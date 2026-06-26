@@ -414,7 +414,10 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                     <?php if (empty($accessNames)): ?>
                                         <?php echo t_h('multiuser.admin.account_access.own_only', [], 'Own account only'); ?>
                                     <?php else: ?>
-                                        <?php echo htmlspecialchars(implode(', ', $accessNames), ENT_QUOTES, 'UTF-8'); ?>
+                                        <?php
+                                            array_unshift($accessNames, t('multiuser.admin.account_access.own_account', [], 'Own account'));
+                                            echo htmlspecialchars(implode(', ', $accessNames), ENT_QUOTES, 'UTF-8');
+                                        ?>
                                     <?php endif; ?>
                                 </div>
                             </td>

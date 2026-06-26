@@ -4,7 +4,6 @@
     // Sync favorites preference (localStorage → URL) before the page renders.
     // Only redirects if localStorage has an explicit saved value that differs from the URL.
     var FAVORITES_KEY = 'dashboard_favorites';
-    var FILTER_OPEN_KEY = 'dashboard_filter_open';
     var FILTER_VALUE_KEY = 'dashboard_filter_value';
     var NAV_PATH_KEY = 'dashboard_nav_path';
     var SYNC_RESULT_SCROLL_KEY = 'dashboard_git_sync_result_scroll_top';
@@ -338,6 +337,65 @@
         if (modal) modal.style.display = 'none';
     }
 
+    function openWorkspaceSwitcher() {
+        var modal = document.getElementById('workspaceSwitcherModal');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        loadWorkspaces();
+    }
+
+    function closeWorkspaceSwitcher() {
+        var modal = document.getElementById('workspaceSwitcherModal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function loadWorkspaces() {
+        var list = document.getElementById('workspaceSwitcherList');
+        if (!list) return;
+        list.innerHTML = '<div class="workspace-switcher-loading">Loading...</div>';
+
+        var currentWs = document.body.getAttribute('data-workspace') || '';
+
+        fetch('api/v1/workspaces', { credentials: 'same-origin' })
+            .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                if (!data.success || !Array.isArray(data.workspaces)) {
+                    list.innerHTML = '<div class="workspace-switcher-loading">No workspaces found</div>';
+                    return;
+                }
+                var html = '';
+                data.workspaces.forEach(function (ws) {
+                    var isCurrent = ws.name === currentWs;
+                    html += '<button type="button" class="workspace-switcher-item' + (isCurrent ? ' is-current' : '') + '"'
+                        + ' data-workspace="' + ws.name.replace(/"/g, '&quot;') + '"'
+                        + (isCurrent ? ' disabled' : '')
+                        + '>'
+                        + '<i class="lucide ' + (isCurrent ? 'lucide-check' : 'lucide-layers') + '"></i>'
+                        + ws.name
+                        + '</button>';
+                });
+                if (!data.workspaces.length) {
+                    html = '<div class="workspace-switcher-loading">No workspaces available</div>';
+                }
+                list.innerHTML = html;
+
+                Array.prototype.forEach.call(list.querySelectorAll('.workspace-switcher-item:not(.is-current)'), function (btn) {
+                    btn.addEventListener('click', function () {
+                        var ws = btn.getAttribute('data-workspace');
+                        if (ws) {
+                            window.location.href = 'dashboard.php?workspace=' + encodeURIComponent(ws);
+                        }
+                    });
+                });
+            })
+            .catch(function () {
+                list.innerHTML = '<div class="workspace-switcher-loading">Failed to load workspaces</div>';
+            });
+    }
+
     function showGitError(message, title) {
         if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
             window.modalAlert.alert(message, 'error', title);
@@ -619,24 +677,6 @@
 
         var filterInput     = document.getElementById('filterInput');
         var clearFilterBtn  = document.getElementById('clearFilterBtn');
-        var toggleFilterBtn = document.getElementById('dashboardToggleFilter');
-        var filterWrap      = document.getElementById('dashboardTopbarFilter');
-
-        function setFilterOpen(open, focusInput) {
-            if (!filterWrap) return;
-            if (focusInput === undefined) focusInput = true;
-            filterWrap.classList.toggle('is-collapsed', !open);
-            if (toggleFilterBtn) {
-                toggleFilterBtn.classList.toggle('active', open);
-                toggleFilterBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-            }
-            try {
-                localStorage.setItem(FILTER_OPEN_KEY, open ? '1' : '0');
-            } catch (err) { /* ignore */ }
-            if (open && focusInput && filterInput) {
-                window.setTimeout(function () { filterInput.focus(); }, 0);
-            }
-        }
 
         function clearFilterValue() {
             if (!filterInput) return;
@@ -650,10 +690,8 @@
 
         if (filterInput) {
             var storedFilterValue = '';
-            var storedFilterOpen = false;
             try {
                 storedFilterValue = localStorage.getItem(FILTER_VALUE_KEY) || '';
-                storedFilterOpen = localStorage.getItem(FILTER_OPEN_KEY) === '1';
             } catch (err) { /* ignore */ }
 
             if (storedFilterValue) {
@@ -661,27 +699,10 @@
             }
 
             var initialTerm = filterInput.value.trim();
-            if (initialTerm || storedFilterOpen) {
-                setFilterOpen(true, false);
-            }
             if (initialTerm) {
                 applyFilter(initialTerm);
                 if (clearFilterBtn) clearFilterBtn.style.display = 'flex';
             }
-        }
-
-        if (toggleFilterBtn && filterWrap) {
-            toggleFilterBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                toggleFilterBtn.blur();
-                var isOpen = !filterWrap.classList.contains('is-collapsed');
-                if (isOpen && filterInput && filterInput.value.trim()) {
-                    clearFilterValue();
-                    setFilterOpen(false, false);
-                    return;
-                }
-                setFilterOpen(!isOpen);
-            });
         }
 
         if (filterInput) {
@@ -724,6 +745,46 @@
         if (gitModal) {
             gitModal.addEventListener('click', function (e) {
                 if (e.target === gitModal) closeDashboardGitModal();
+            });
+        }
+
+        var wsModal = document.getElementById('workspaceSwitcherModal');
+        Array.prototype.forEach.call(document.querySelectorAll('[data-action="open-workspace-switcher-modal"]'), function (trigger) {
+            trigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                openWorkspaceSwitcher();
+            });
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-action="close-workspace-switcher-modal"]'), function (closeBtn) {
+            closeBtn.addEventListener('click', closeWorkspaceSwitcher);
+        });
+        if (wsModal) {
+            wsModal.addEventListener('click', function (e) {
+                if (e.target === wsModal) closeWorkspaceSwitcher();
+            });
+        }
+
+        var userInfoTrigger = document.querySelector('[data-action="open-user-info-modal"]');
+        var userInfoModal = document.getElementById('dashboardUserInfoModal');
+        if (userInfoTrigger) {
+            userInfoTrigger.addEventListener('click', function (e) {
+                e.preventDefault();
+                var isAdmin = window.DASHBOARD_USER && window.DASHBOARD_USER.isAdmin;
+                if (isAdmin) {
+                    window.location.href = 'admin/users.php';
+                } else if (userInfoModal) {
+                    userInfoModal.style.display = 'flex';
+                }
+            });
+        }
+        Array.prototype.forEach.call(document.querySelectorAll('[data-action="close-dashboard-user-info-modal"]'), function (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                if (userInfoModal) userInfoModal.style.display = 'none';
+            });
+        });
+        if (userInfoModal) {
+            userInfoModal.addEventListener('click', function (e) {
+                if (e.target === userInfoModal) userInfoModal.style.display = 'none';
             });
         }
 

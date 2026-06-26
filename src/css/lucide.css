@@ -967,6 +967,17 @@
   background-image: none;
 }
 
+.lucide-pin {
+  -webkit-mask-image: url("data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-pin%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%20%3Cpath%20d%3D%27M12%2017v5%27%20%2F%3E%20%3Cpath%20d%3D%27M9%2010.76a2%202%200%200%201-1.11%201.79l-1.78.9A2%202%200%200%200%205%2015.24V16a1%201%200%200%200%201%201h12a1%201%200%200%200%201-1v-.76a2%202%200%200%200-1.11-1.79l-1.78-.9A2%202%200%200%201%2015%2010.76V7a1%201%200%200%201%201-1%202%202%200%200%200%200-4H8a2%202%200%200%200%200%204%201%201%200%200%201%201%201z%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-pin%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%20%3Cpath%20d%3D%27M12%2017v5%27%20%2F%3E%20%3Cpath%20d%3D%27M9%2010.76a2%202%200%200%201-1.11%201.79l-1.78.9A2%202%200%200%200%205%2015.24V16a1%201%200%200%200%201%201h12a1%201%200%200%200%201-1v-.76a2%202%200%200%200-1.11-1.79l-1.78-.9A2%202%200%200%201%2015%2010.76V7a1%201%200%200%201%201-1%202%202%200%200%200%200-4H8a2%202%200%200%200%200%204%201%201%200%200%201%201%201z%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+
 .lucide-hash {
   -webkit-mask-image: url("data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-hash%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cline%20x1%3D%274%27%20x2%3D%2720%27%20y1%3D%279%27%20y2%3D%279%27%20%2F%3E%20%3Cline%20x1%3D%274%27%20x2%3D%2720%27%20y1%3D%2715%27%20y2%3D%2715%27%20%2F%3E%20%3Cline%20x1%3D%2710%27%20x2%3D%278%27%20y1%3D%273%27%20y2%3D%2721%27%20%2F%3E%20%3Cline%20x1%3D%2716%27%20x2%3D%2714%27%20y1%3D%273%27%20y2%3D%2721%27%20%2F%3E%20%3C%2Fsvg%3E");
   mask-image: url("data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-hash%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cline%20x1%3D%274%27%20x2%3D%2720%27%20y1%3D%279%27%20y2%3D%279%27%20%2F%3E%20%3Cline%20x1%3D%274%27%20x2%3D%2720%27%20y1%3D%2715%27%20y2%3D%2715%27%20%2F%3E%20%3Cline%20x1%3D%2710%27%20x2%3D%278%27%20y1%3D%273%27%20y2%3D%2721%27%20%2F%3E%20%3Cline%20x1%3D%2716%27%20x2%3D%2714%27%20y1%3D%273%27%20y2%3D%2721%27%20%2F%3E%20%3C%2Fsvg%3E");
