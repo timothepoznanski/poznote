@@ -548,7 +548,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			<div class="dashboard-top-info">
 				<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-top-info-item dashboard-mobile-back" title="<?php echo t_h('common.back_to_notes'); ?>">
 					<i class="lucide lucide-home"></i>
-					<span>retour</span>
+					<span><?php echo t_h('common.back_to_notes'); ?></span>
 				</a>
 				<?php foreach ($dashboardContextItems as $item): ?>
 					<?php if ($item['icon'] === 'lucide-layers'): ?>
