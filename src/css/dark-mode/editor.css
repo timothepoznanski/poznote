@@ -416,3 +416,32 @@ body.dark-mode .noteentry blockquote {
     border-left-color: var(--dm-border);
     color: #b0b0b0;
 }
+
+/* Note footer panel */
+html[data-theme="dark"] .note-footer-panel,
+body.dark-mode .note-footer-panel {
+    background-color: var(--dm-content-bg);
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme="dark"] .note-footer-toggle,
+body.dark-mode .note-footer-toggle {
+    color: #888;
+}
+
+html[data-theme="dark"] .note-footer-toggle:hover,
+body.dark-mode .note-footer-toggle:hover {
+    color: #4db8e8;
+}
+
+html[data-theme="dark"] .note-footer-section + .note-footer-section,
+body.dark-mode .note-footer-section + .note-footer-section {
+    border-top-color: var(--dm-border);
+}
+
+/* Note top panel */
+html[data-theme="dark"] .note-top-panel,
+body.dark-mode .note-top-panel {
+    background-color: var(--dm-content-bg);
+    border-bottom-color: var(--dm-border);
+}

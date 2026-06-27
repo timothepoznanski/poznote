@@ -290,7 +290,8 @@
       "view": "Anzeigen",
       "delete": "Löschen",
       "open_attachments": "Anhänge öffnen",
-      "download": "Herunterladen {{filename}}"
+      "download": "Herunterladen {{filename}}",
+      "copy_link": "Link kopieren"
     },
     "errors": {
       "select_file": "Bitte wählen Sie eine Datei zum Hochladen aus.",
@@ -304,11 +305,13 @@
       "loading_failed": "Anhänge konnten nicht geladen werden",
       "loading_error": "Fehler beim Laden der Anhänge",
       "upload_failed_generic": "Hochladen fehlgeschlagen. Bitte versuchen Sie es erneut.",
-      "upload_failed_connection": "Hochladen fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung."
+      "upload_failed_connection": "Hochladen fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung.",
+      "link_copy_failed": "Link konnte nicht kopiert werden"
     },
     "messages": {
       "upload_success": "Datei erfolgreich hochgeladen!",
-      "deleted_success": "Anhang erfolgreich gelöscht"
+      "deleted_success": "Anhang erfolgreich gelöscht",
+      "link_copied": "Link kopiert!"
     },
     "page": {
       "title": "Anhänge verwalten",
@@ -563,6 +566,8 @@
       "markdown_split_card_view": "Markdown mit Rahmen",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "attachment_previews_in_note": "Anhangsvorschauen",
+      "attachments_at_bottom": "Anhänge unten in der Notiz",
+      "backlinks_at_bottom": "Rückverweise unten in der Notiz",
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board",
@@ -1270,6 +1275,7 @@
     "table": "Tabelle",
     "separator": "Trennlinie",
     "link_to_note": "Link zur Notiz",
+    "link_to_attachment": "Link zum Anhang",
     "link": "Link",
     "cancel": "Abbrechen",
     "back": "Zurück",

@@ -891,6 +891,17 @@ try {
 </div>
 
 <!-- Note Reference Modal -->
+<div id="attachmentPickerModal" class="modal">
+    <div class="modal-content note-reference-modal-content">
+        <h3><i class="lucide lucide-paperclip"></i> <?php echo t_h('slash_menu.link_to_attachment', [], 'Link to attachment'); ?></h3>
+        <div id="attachmentPickerList" class="note-reference-list">
+            <!-- Attachments will be populated here -->
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-attachment-picker-modal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
 <div id="noteReferenceModal" class="modal">
     <div class="modal-content note-reference-modal-content">
         <h3><i class="lucide lucide-link"></i> <?php echo t_h('editor.toolbar.insert_note_reference', [], 'Insert note reference'); ?></h3>
@@ -1264,6 +1275,8 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachment-previews-card" checked><span><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachments-at-bottom-card" checked><span><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom of note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backlinks-at-bottom-card" checked><span><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom of note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-image-border-card" checked><span><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>

@@ -102,6 +102,8 @@ $settingsPageUserKeys = [
     'markdown_split_card_view',
     'code_block_word_wrap',
     'attachment_previews_in_note',
+    'attachments_at_bottom',
+    'backlinks_at_bottom',
     'default_image_border_no_padding',
     'center_note_content',
     'note_list_sort',
@@ -558,6 +560,24 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
                     <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Attachments at Bottom -->
+            <div class="home-card" id="attachments-at-bottom-card">
+                <div class="home-card-icon"><i class="lucide lucide-paperclip"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom of note'); ?></span>
+                    <span id="attachments-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Backlinks at Bottom -->
+            <div class="home-card" id="backlinks-at-bottom-card">
+                <div class="home-card-icon"><i class="lucide lucide-link"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom of note'); ?></span>
+                    <span id="backlinks-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

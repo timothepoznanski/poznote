@@ -289,7 +289,8 @@
       "view": "Visualizar",
       "delete": "Excluir",
       "open_attachments": "Abrir anexos",
-      "download": "Baixar {{filename}}"
+      "download": "Baixar {{filename}}",
+      "copy_link": "Copiar link"
     },
     "errors": {
       "select_file": "Por favor, selecione um arquivo para enviar.",
@@ -303,11 +304,13 @@
       "loading_failed": "Falha ao carregar anexos",
       "loading_error": "Erro ao carregar anexos",
       "upload_failed_generic": "Falha no envio. Por favor, tente novamente.",
-      "upload_failed_connection": "Falha no envio. Por favor, verifique sua conexão."
+      "upload_failed_connection": "Falha no envio. Por favor, verifique sua conexão.",
+      "link_copy_failed": "Falha ao copiar o link"
     },
     "messages": {
       "upload_success": "Arquivo enviado com sucesso!",
-      "deleted_success": "Anexo excluído com sucesso"
+      "deleted_success": "Anexo excluído com sucesso",
+      "link_copied": "Link copiado!"
     },
     "page": {
       "title": "Gerenciar Anexos",
@@ -561,6 +564,8 @@
       "markdown_split_card_view": "Markdown com moldura",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
       "attachment_previews_in_note": "Pré-visualizações de anexos",
+      "attachments_at_bottom": "Anexos no final da nota",
+      "backlinks_at_bottom": "Backlinks no final da nota",
       "default_image_border_no_padding": "Borda padrão de imagem",
       "ui_customization": "Visibilidade dos elementos",
       "notes_dashboard": "Quadro de notas",
@@ -1268,6 +1273,7 @@
     "table": "Tabela",
     "separator": "Separador",
     "link_to_note": "Link para nota",
+    "link_to_attachment": "Link para anexo",
     "link": "Link",
     "cancel": "Cancelar",
     "back": "Voltar",

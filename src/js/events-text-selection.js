@@ -477,6 +477,11 @@ function initTextSelectionHandlers() {
                         isTitleOrTagField = true;
                         break;
                     }
+                    // If selection is inside an indented pre block, hide formatting toolbar
+                    if (currentElement.tagName === 'PRE' && currentElement.classList && currentElement.classList.contains('indented-pre')) {
+                        isTitleOrTagField = true;
+                        break;
+                    }
                     if (currentElement.classList && currentElement.classList.contains('noteentry')) {
                         editableElement = currentElement;
                         var htmlCodeBlockType = getSelectionHtmlCodeBlockType(currentElement, range);

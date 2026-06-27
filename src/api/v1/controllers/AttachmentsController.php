@@ -753,14 +753,18 @@ class AttachmentsController {
                     
                     if (!empty($entry)) {
                         // Remove HTML <img> tags referencing this attachment
-                        $html_pattern = '/<img[^>]*src=[\'"][^\'"]*' . preg_quote($attachmentId, '/') . '[^\'"]*[\'"][^>]*>/i';
-                        $new_entry = preg_replace($html_pattern, '', $entry, -1, $count1);
-                        
-                        // Remove Markdown references: ![alt](...attachmentId...) or [...](...attachmentId...)
-                        $md_pattern = '/!?(?:\[[^\]]*\])?\([^)]*' . preg_quote($attachmentId, '/') . '[^)]*\)/i';
+                        $img_pattern = '/<img[^>]*src=[\'"][^\'"]*' . preg_quote($attachmentId, '/') . '[^\'"]*[\'"][^>]*>/i';
+                        $new_entry = preg_replace($img_pattern, '', $entry, -1, $count1);
+
+                        // Remove HTML <a href="..."> links referencing this attachment
+                        $a_pattern = '/<a[^>]*href=[\'"][^\'"]*' . preg_quote($attachmentId, '/') . '[^\'"]*[\'"][^>]*>.*?<\/a>/is';
+                        $new_entry = preg_replace($a_pattern, '', $new_entry, -1, $count_a);
+
+                        // Remove Markdown references: ![alt](...attachmentId...) or [text](...attachmentId...)
+                        $md_pattern = '/!?\[[^\]]*\]\([^)]*' . preg_quote($attachmentId, '/') . '[^)]*\)/i';
                         $new_entry = preg_replace($md_pattern, '', $new_entry, -1, $count2);
-                        
-                        if ($count1 > 0 || $count2 > 0) {
+
+                        if ($count1 > 0 || $count_a > 0 || $count2 > 0) {
                             $entry = $new_entry;
                             $content_changed = true;
                             

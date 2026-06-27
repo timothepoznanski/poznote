@@ -22,9 +22,9 @@ if (!$note_id) {
 }
 
 // Get note details
-$query = "SELECT heading FROM entries WHERE id = ?";
+$query = "SELECT heading, type FROM entries WHERE id = ?";
 if ($workspace) {
-    $query = "SELECT heading FROM entries WHERE id = ? AND workspace = ?";
+    $query = "SELECT heading, type FROM entries WHERE id = ? AND workspace = ?";
     $stmt = $con->prepare($query);
     $stmt->execute([$note_id, $workspace]);
 } else {
@@ -124,7 +124,8 @@ if (!$note) {
         }
     </style>
 </head>
-<body data-note-id="<?php echo $note_id; ?>" 
+<body data-note-id="<?php echo $note_id; ?>"
+      data-note-type="<?php echo htmlspecialchars($note['type'] ?? 'note', ENT_QUOTES); ?>"
       data-workspace="<?php echo $workspace ? htmlspecialchars($workspace, ENT_QUOTES) : ''; ?>"
       data-txt-uploading="<?php echo t_h('attachments.upload.button_uploading', [], 'Uploading...'); ?>"
       data-txt-select-file="<?php echo t_h('attachments.errors.select_file', [], 'Please select a file to upload.'); ?>"

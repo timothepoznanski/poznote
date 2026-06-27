@@ -518,15 +518,26 @@ function updateAttachmentCountInMenu(noteId) {
                             existingAttachmentsRow = document.createElement('div');
                             existingAttachmentsRow.className = 'note-attachments-row';
 
-                            // Insert after tags-display div
-                            var tagsDisplay = noteElement.querySelector('.tags-display');
-                            if (tagsDisplay && tagsDisplay.nextSibling) {
-                                tagsDisplay.parentNode.insertBefore(existingAttachmentsRow, tagsDisplay.nextSibling);
+                            var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.attachmentsAtBottom);
+                            if (atBottom) {
+                                // Insert before scroll-edge-controls (after noteentry)
+                                var scrollEdge = noteElement.querySelector('.note-scroll-edge-controls');
+                                if (scrollEdge) {
+                                    scrollEdge.parentNode.insertBefore(existingAttachmentsRow, scrollEdge);
+                                } else {
+                                    noteElement.appendChild(existingAttachmentsRow);
+                                }
                             } else {
-                                // Fallback: insert before the title
-                                var titleElement = noteElement.querySelector('h4');
-                                if (titleElement) {
-                                    titleElement.parentNode.insertBefore(existingAttachmentsRow, titleElement);
+                                // Insert after tags-display div
+                                var tagsDisplay = noteElement.querySelector('.tags-display');
+                                if (tagsDisplay && tagsDisplay.nextSibling) {
+                                    tagsDisplay.parentNode.insertBefore(existingAttachmentsRow, tagsDisplay.nextSibling);
+                                } else {
+                                    // Fallback: insert before the title
+                                    var titleElement = noteElement.querySelector('h4');
+                                    if (titleElement) {
+                                        titleElement.parentNode.insertBefore(existingAttachmentsRow, titleElement);
+                                    }
                                 }
                             }
                         }
@@ -803,8 +814,18 @@ function renderAttachmentPreviewsNow(noteId, attachments, noteContent) {
         wrapper.innerHTML = html;
     }
 
-    if (noteEntry.parentNode && wrapper.nextElementSibling !== noteEntry) {
-        noteEntry.parentNode.insertBefore(wrapper, noteEntry);
+    var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.attachmentsAtBottom);
+    if (atBottom) {
+        var scrollEdge = noteEntry.nextElementSibling;
+        if (noteEntry.parentNode && wrapper !== scrollEdge) {
+            noteEntry.parentNode.insertBefore(wrapper, scrollEdge);
+        }
+    } else {
+        var titleHeading = noteEntry.parentNode && noteEntry.parentNode.querySelector('.note-title-heading');
+        var insertBefore = titleHeading || noteEntry;
+        if (insertBefore.parentNode && wrapper.nextElementSibling !== insertBefore) {
+            insertBefore.parentNode.insertBefore(wrapper, insertBefore);
+        }
     }
 }
 
@@ -1403,3 +1424,174 @@ function insertHTMLAtSelection(html) {
         return false;
     }
 }
+
+// Attachment picker modal for slash command menu
+(function () {
+    var _savedRange = null;
+    var _savedEditableElement = null;
+    var _isMarkdown = false;
+
+    window.openAttachmentPickerModal = function () {
+        var noteEntry = document.querySelector('.noteentry');
+        if (!noteEntry) return;
+
+        var noteId = noteEntry.getAttribute('data-note-id');
+        if (!noteId) return;
+
+        // Save current selection before the modal steals focus
+        _savedEditableElement = null;
+        _savedRange = null;
+        try {
+            var sel = window.getSelection();
+            if (sel && sel.rangeCount > 0) {
+                _savedRange = sel.getRangeAt(0).cloneRange();
+                var container = _savedRange.startContainer;
+                if (container.nodeType === 3) container = container.parentNode;
+                _savedEditableElement = container.closest ? container.closest('[contenteditable="true"]') : null;
+            }
+        } catch (e) {}
+
+        _isMarkdown = !!(noteEntry.closest && noteEntry.closest('.innernote[data-markdown-note="true"]')) ||
+                      !!(noteEntry.getAttribute('data-note-type') === 'markdown');
+
+        var modal = document.getElementById('attachmentPickerModal');
+        if (!modal) return;
+
+        var list = document.getElementById('attachmentPickerList');
+        if (list) {
+            list.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted,#999)">' +
+                (window.t ? window.t('attachments.page.loading_attachments', null, 'Loading attachments...') : 'Loading attachments...') +
+                '</div>';
+        }
+
+        modal.style.display = 'flex';
+
+        var workspace = (typeof getSelectedWorkspace === 'function') ? getSelectedWorkspace() :
+            (window.selectedWorkspace || '');
+        var url = '/api/v1/notes/' + noteId + '/attachments';
+        if (workspace) url += '?workspace=' + encodeURIComponent(workspace);
+
+        fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' }, credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data.success || !data.attachments || data.attachments.length === 0) {
+                    if (list) list.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted,#999)">' +
+                        (window.t ? window.t('attachments.empty', null, 'No attachments.') : 'No attachments.') +
+                        '</div>';
+                    return;
+                }
+                var noteContent = data.entry || '';
+                var html = '';
+                data.attachments.forEach(function (att) {
+                    if (isAttachmentReferencedInContent(att, noteContent) && isEmbeddedImageAttachment(att, noteContent)) return;
+                    var filename = att.original_filename || att.filename || att.id;
+                    var safe = filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                    html += '<div class="note-reference-item" style="cursor:pointer;padding:8px 12px;" ' +
+                        'data-attachment-id="' + att.id + '" data-filename="' + safe + '" data-note-id="' + noteId + '">' +
+                        '<i class="lucide lucide-paperclip" style="margin-right:6px;opacity:0.6"></i>' + safe +
+                        '</div>';
+                });
+                if (!html) {
+                    if (list) list.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-muted,#999)">' +
+                        (window.t ? window.t('attachments.empty', null, 'No attachments.') : 'No attachments.') +
+                        '</div>';
+                    return;
+                }
+                if (list) {
+                    list.innerHTML = html;
+                    list.querySelectorAll('.note-reference-item').forEach(function (item) {
+                        item.addEventListener('click', function () {
+                            var attachmentId = item.getAttribute('data-attachment-id');
+                            var fname = item.getAttribute('data-filename');
+                            var nId = item.getAttribute('data-note-id');
+                            window.closeAttachmentPickerModal();
+                            insertAttachmentLink(nId, attachmentId, fname);
+                        });
+                    });
+                }
+            })
+            .catch(function () {
+                if (list) list.innerHTML = '<div style="padding:12px;color:var(--error,#c0392b)">' +
+                    (window.t ? window.t('attachments.errors.loading_error', null, 'Error loading attachments') : 'Error loading attachments') +
+                    '</div>';
+            });
+    };
+
+    window.closeAttachmentPickerModal = function () {
+        var modal = document.getElementById('attachmentPickerModal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    function insertAttachmentLink(noteId, attachmentId, filename) {
+        var url = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId;
+
+        // Restore cursor position
+        if (_savedEditableElement) {
+            try { _savedEditableElement.focus({ preventScroll: true }); } catch (e) { _savedEditableElement.focus(); }
+        }
+        if (_savedRange) {
+            try {
+                var sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(_savedRange);
+            } catch (e) {}
+        }
+
+        if (_isMarkdown) {
+            var text = '[' + filename + '](' + url + ')';
+            try {
+                var sel = window.getSelection();
+                if (sel && sel.rangeCount > 0) {
+                    var range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    var node = document.createTextNode(text);
+                    range.insertNode(node);
+                    var newRange = document.createRange();
+                    newRange.setStart(node, text.length);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                } else {
+                    document.execCommand('insertText', false, text);
+                }
+            } catch (e) {
+                document.execCommand('insertText', false, text);
+            }
+        } else {
+            var a = document.createElement('a');
+            a.href = url;
+            a.textContent = filename;
+            try {
+                var sel = window.getSelection();
+                if (sel && sel.rangeCount > 0) {
+                    var range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(a);
+                    var newRange = document.createRange();
+                    newRange.setStartAfter(a);
+                    newRange.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(newRange);
+                    document.execCommand('insertText', false, ' ');
+                } else if (_savedEditableElement) {
+                    _savedEditableElement.appendChild(a);
+                }
+            } catch (e) {
+                if (_savedEditableElement) _savedEditableElement.appendChild(a);
+            }
+        }
+
+        // Trigger autosave
+        var noteEntry = document.querySelector('.noteentry');
+        if (noteEntry) noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+        if (typeof window.saveNoteImmediately === 'function') window.saveNoteImmediately();
+    }
+
+    // Close modal on backdrop click
+    document.addEventListener('click', function (e) {
+        var modal = document.getElementById('attachmentPickerModal');
+        if (modal && e.target === modal) {
+            window.closeAttachmentPickerModal();
+        }
+    });
+})();

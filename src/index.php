@@ -124,12 +124,14 @@ $settings = [
     'code_block_word_wrap' => '1',
     'markdown_split_card_view' => '1',
     'attachment_previews_in_note' => '0',
+    'attachments_at_bottom' => '0',
+    'backlinks_at_bottom' => '0',
     'default_image_border_no_padding' => '0',
     'spellcheck_html_notes' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'default_image_border_no_padding', 'spellcheck_html_notes')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -317,6 +319,8 @@ if ($settings['markdown_split_card_view'] === '1' || $settings['markdown_split_c
     $extra_body_classes .= ' markdown-split-card-view';
 }
 $attachment_previews_in_note_setting = ($settings['attachment_previews_in_note'] === '1' || $settings['attachment_previews_in_note'] === 'true');
+$attachments_at_bottom_setting = ($settings['attachments_at_bottom'] === '1' || $settings['attachments_at_bottom'] === 'true');
+$backlinks_at_bottom_setting = ($settings['backlinks_at_bottom'] === '1' || $settings['backlinks_at_bottom'] === 'true');
 // Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
 $pref = $settings['note_list_sort'];
@@ -355,6 +359,8 @@ if ($isPublicWorkspaceReadonly) {
             'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
             'dateTimeFormat' => getUserDateTimeFormat(),
             'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
+            'attachmentsAtBottom' => $attachments_at_bottom_setting,
+            'backlinksAtBottom' => $backlinks_at_bottom_setting,
             'defaultImageBorderNoPadding' => ($settings['default_image_border_no_padding'] === '1' || $settings['default_image_border_no_padding'] === 'true')
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
@@ -888,20 +894,21 @@ if ($isPublicWorkspaceReadonly) {
                     .'</span>';
                     echo '</div>';
                 
-                    // Display attachment links only when full attachment previews are disabled.
+                    // Build attachment links row HTML (shown only when full attachment previews are disabled).
+                    $attachment_links_html = '';
                     if (!$attachment_previews_in_note_setting && !empty($row['attachments'])) {
                         $attachments_data = json_decode($row['attachments'], true);
                         if (is_array($attachments_data) && !empty($attachments_data)) {
                             // Get note content to check for inline images
                             $note_content = $row['entry'] ?? '';
-                            
+
                             $attachment_links = [];
                             $visible_links_count = 0;
                             foreach ($attachments_data as $attachment) {
                                 if (isset($attachment['id']) && isset($attachment['original_filename'])) {
                                     $original_filename = (string)$attachment['original_filename'];
                                     $safe_filename = htmlspecialchars($original_filename, ENT_QUOTES);
-                                    
+
                                     // Check if this is an image attachment that's displayed inline in the note content
                                     // Inline images (pasted) should be hidden from the attachments list
                                     $is_inline_image = false;
@@ -917,13 +924,13 @@ if ($isPublicWorkspaceReadonly) {
                                         $attachment_id_pattern = 'attachments/' . $attachment['id'];
                                         // Check in raw content
                                         $is_inline_image = (strpos($note_content, $attachment_id_pattern) !== false);
-                                        
+
                                         // If not found, try with escaped version just in case (e.g. for some specific editors)
                                         if (!$is_inline_image) {
                                             $is_inline_image = (strpos($note_content, urlencode($attachment_id_pattern)) !== false);
                                         }
                                     }
-                                    
+
                                     $link_style = $is_inline_image ? ' style="display: none;"' : '';
                                     $link_attr = $is_inline_image ? ' data-is-inline-image="true"' : '';
                                     $attachment_links[] = '<a href="#" class="attachment-link"' . $link_attr . $link_style . ' data-action="download-attachment" data-attachment-id="'.$attachment['id'].'" data-note-id="'.$row['id'].'" title="'.t_h('attachments.actions.download', ['filename' => $original_filename], 'Download {{filename}}').'">'.$safe_filename.'</a>';
@@ -931,14 +938,16 @@ if ($isPublicWorkspaceReadonly) {
                                 }
                             }
                             $row_style = ($visible_links_count === 0) ? ' style="display: none;"' : '';
-                            echo '<div class="note-attachments-row"' . $row_style . '>';
-                            // Make paperclip clickable to open attachments for this note (preserve workspace behavior via JS)
-                            echo '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="lucide lucide-paperclip icon_attachment"></span></button>';
-                            echo '<span class="note-attachments-list">';
-                            echo implode(' ', $attachment_links);
-                            echo '</span>';
-                            echo '</div>';
+                            $attachment_links_html = '<div class="note-attachments-row"' . $row_style . '>'
+                                . '<button type="button" class="icon-attachment-btn" title="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'" data-action="show-attachment-dialog" data-note-id="'.$row['id'].'" aria-label="'.t_h('attachments.actions.open_attachments', [], 'Open attachments').'"><span class="lucide lucide-paperclip icon_attachment"></span></button>'
+                                . '<span class="note-attachments-list">'
+                                . implode(' ', $attachment_links)
+                                . '</span>'
+                                . '</div>';
                         }
+                    }
+                    if (!$attachments_at_bottom_setting) {
+                        echo $attachment_links_html;
                     }
                     
                     // Hidden folder value for the note
@@ -1030,13 +1039,20 @@ if ($isPublicWorkspaceReadonly) {
                     if (isset($row['linked_note_id']) && $row['linked_note_id']) {
                         $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
                     }
-                    if ($attachment_previews_in_note_setting) {
+                    if ($attachment_previews_in_note_setting && !$attachments_at_bottom_setting) {
                         echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
                     }
                     $spellcheck_enabled = ($settings['spellcheck_html_notes'] === '1' || $settings['spellcheck_html_notes'] === 'true');
                     $spellcheck_attr = ($note_type === 'note' && $spellcheck_enabled) ? 'true' : 'false';
                     $lang_attr = ($note_type === 'note' && $spellcheck_enabled) ? ' lang="'.htmlspecialchars(getUserLanguage(), ENT_QUOTES).'"' : '';
                     echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="'.$spellcheck_attr.'"'.$lang_attr.' id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    if ($attachments_at_bottom_setting) {
+                        if ($attachment_previews_in_note_setting) {
+                            echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
+                        } else {
+                            echo $attachment_links_html;
+                        }
+                    }
                     echo '<div class="note-scroll-edge-controls">';
                     echo '<button type="button" class="note-scroll-edge-btn note-scroll-top-btn" data-action="scroll-note-top" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_top', [], 'Scroll to top').'" aria-label="'.t_h('common.scroll_top', [], 'Scroll to top').'" hidden><i class="lucide lucide-arrow-up"></i></button>';
                     echo '<button type="button" class="note-scroll-edge-btn note-scroll-bottom-btn" data-action="scroll-note-bottom" data-note-id="'.$row['id'].'" title="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" aria-label="'.t_h('common.scroll_bottom', [], 'Scroll to bottom').'" hidden><i class="lucide lucide-arrow-down"></i></button>';

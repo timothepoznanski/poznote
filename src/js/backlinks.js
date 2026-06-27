@@ -97,15 +97,10 @@
             return;
         }
 
-        // Preferred anchor: right after the attachments row
-        var attachRow = document.querySelector('.note-attachments-row');
-        // Fallback anchor: before the note title
-        var titleEl = attachRow ? null : document.querySelector('.notecard h4');
-        var anchor = attachRow || titleEl;
+        var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.backlinksAtBottom);
 
-        if (!anchor) {
-            return;
-        }
+        var noteEntry = document.querySelector('.noteentry');
+        if (!noteEntry) return;
 
         /* ── Icon button (mirrors .icon-attachment-btn) ───────────────────── */
         var iconBtn = document.createElement('span');
@@ -149,11 +144,14 @@
         row.appendChild(iconBtn);
         row.appendChild(list);
 
-        // Insert after the attachments row, or before the title as fallback
-        if (attachRow) {
-            attachRow.parentNode.insertBefore(row, attachRow.nextSibling);
+        // Mirror the exact same positioning logic as attachment previews
+        if (atBottom) {
+            var scrollEdge = noteEntry.nextElementSibling;
+            noteEntry.parentNode.insertBefore(row, scrollEdge);
         } else {
-            titleEl.parentNode.insertBefore(row, titleEl);
+            var titleHeading = noteEntry.parentNode && noteEntry.parentNode.querySelector('.note-title-heading');
+            var insertBefore = titleHeading || noteEntry;
+            insertBefore.parentNode.insertBefore(row, insertBefore);
         }
     }
 

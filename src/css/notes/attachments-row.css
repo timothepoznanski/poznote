@@ -13,6 +13,16 @@
     margin-top: 8px;
 }
 
+/* Separator when attachments/backlinks are placed below the note content */
+.noteentry ~ .note-attachments-row,
+.noteentry ~ .note-attachment-previews,
+.noteentry ~ .backlinks-row {
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    margin-top: 12px;
+    padding-top: 22px;
+    margin-bottom: 10px;
+}
+
 .lucide-paperclip.icon_attachment {
     font-size: 14px;
     margin-right: 14px;

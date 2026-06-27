@@ -370,6 +370,33 @@ body.slash-menu-cursor-hidden * {
     margin: 1em 0 !important;
 }
 
+.noteentry pre.indented-pre,
+.markdown-preview pre.indented-pre {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 0 1em 0 !important;
+    font-family: monospace !important;
+    font-size: inherit !important;
+    color: inherit !important;
+    white-space: pre-wrap !important;
+    width: auto !important;
+    box-sizing: border-box !important;
+    position: static !important;
+}
+
+html[data-theme='dark'] .noteentry pre.indented-pre,
+html[data-theme='dark'] .markdown-preview pre.indented-pre,
+body.dark-mode .noteentry pre.indented-pre,
+body.dark-mode .markdown-preview pre.indented-pre {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    color: inherit !important;
+}
+
 .markdown-preview pre code {
     background-color: transparent;
     padding: 0;
