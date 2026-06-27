@@ -567,7 +567,7 @@ if ($isAdmin) {
             <div class="home-card" id="attachments-at-bottom-card">
                 <div class="home-card-icon"><i class="lucide lucide-paperclip"></i></div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom of note'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span>
                     <span id="attachments-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
@@ -576,7 +576,7 @@ if ($isAdmin) {
             <div class="home-card" id="backlinks-at-bottom-card">
                 <div class="home-card-icon"><i class="lucide lucide-link"></i></div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom of note'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span>
                     <span id="backlinks-at-bottom-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
