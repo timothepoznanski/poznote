@@ -46,7 +46,6 @@ https://poznote.com/index.html#press
 - [Chrome Extension](#chrome-extension)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
-- [About](#about)
 
 ## Install
 
@@ -904,6 +903,3 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Python 3.12 (Alpine)** - MCP server runtime with httpx, uvicorn, fastmcp, and mcp libraries for AI assistant integration
 </details>
 
-## About
-
-Learn more about the project and its background on <a href="https://poznote.com/about.html"> the Poznote About page</a>.
