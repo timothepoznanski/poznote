@@ -16,9 +16,7 @@
 /* Separator when attachments/backlinks are placed below the note content */
 .noteentry ~ .note-attachments-row,
 .noteentry ~ .note-attachment-previews,
-.noteentry ~ .backlinks-row,
-.note-attachment-previews ~ .backlinks-row,
-.note-attachments-row ~ .backlinks-row {
+.noteentry ~ .backlinks-row {
     border-top: 1px solid var(--border-color, #e0e0e0);
     margin-top: 12px;
     padding-top: 22px;

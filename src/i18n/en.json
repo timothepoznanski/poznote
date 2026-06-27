@@ -223,6 +223,7 @@
       "code_block_word_wrap": "Code block word wrap",
       "attachment_previews_in_note": "Attachment previews",
       "attachments_at_bottom": "Attachments at bottom of note",
+      "backlinks_at_bottom": "Backlinks at bottom of note",
       "default_image_border_no_padding": "Default image border",
       "ui_customization": "Element visibility",
       "notes_dashboard": "Notes board",
@@ -305,7 +306,8 @@
       "view": "View",
       "delete": "Delete",
       "open_attachments": "Open attachments",
-      "download": "Download {{filename}}"
+      "download": "Download {{filename}}",
+      "copy_link": "Copy link"
     },
     "errors": {
       "select_file": "Please select a file to upload.",
@@ -319,11 +321,13 @@
       "loading_failed": "Failed to load attachments",
       "loading_error": "Error loading attachments",
       "upload_failed_generic": "Upload failed. Please try again.",
-      "upload_failed_connection": "Upload failed. Please check your connection."
+      "upload_failed_connection": "Upload failed. Please check your connection.",
+      "link_copy_failed": "Failed to copy link"
     },
     "messages": {
       "upload_success": "File uploaded successfully!",
-      "deleted_success": "Attachment deleted successfully"
+      "deleted_success": "Attachment deleted successfully",
+      "link_copied": "Link copied!"
     },
     "page": {
       "title": "Manage attachments",
@@ -848,6 +852,7 @@
     "table": "Table",
     "separator": "Separator",
     "link_to_note": "Link to note",
+    "link_to_attachment": "Link to attachment",
     "link": "Link",
     "cancel": "Cancel",
     "back": "Back",

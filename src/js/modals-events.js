@@ -163,6 +163,13 @@
                 }
                 break;
 
+            // Attachment picker modal
+            case 'close-attachment-picker-modal':
+                if (typeof window.closeAttachmentPickerModal === 'function') {
+                    window.closeAttachmentPickerModal();
+                }
+                break;
+
             // Note reference modal
             case 'close-note-reference-modal':
                 if (typeof closeNoteReferenceModal === 'function') {

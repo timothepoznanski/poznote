@@ -125,12 +125,13 @@ $settings = [
     'markdown_split_card_view' => '1',
     'attachment_previews_in_note' => '0',
     'attachments_at_bottom' => '0',
+    'backlinks_at_bottom' => '0',
     'default_image_border_no_padding' => '0',
     'spellcheck_html_notes' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'attachments_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -319,6 +320,7 @@ if ($settings['markdown_split_card_view'] === '1' || $settings['markdown_split_c
 }
 $attachment_previews_in_note_setting = ($settings['attachment_previews_in_note'] === '1' || $settings['attachment_previews_in_note'] === 'true');
 $attachments_at_bottom_setting = ($settings['attachments_at_bottom'] === '1' || $settings['attachments_at_bottom'] === 'true');
+$backlinks_at_bottom_setting = ($settings['backlinks_at_bottom'] === '1' || $settings['backlinks_at_bottom'] === 'true');
 // Load note list sort preference using previously loaded settings
 $note_list_sort_type = 'updated_desc'; // default
 $pref = $settings['note_list_sort'];
@@ -358,6 +360,7 @@ if ($isPublicWorkspaceReadonly) {
             'dateTimeFormat' => getUserDateTimeFormat(),
             'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
             'attachmentsAtBottom' => $attachments_at_bottom_setting,
+            'backlinksAtBottom' => $backlinks_at_bottom_setting,
             'defaultImageBorderNoPadding' => ($settings['default_image_border_no_padding'] === '1' || $settings['default_image_border_no_padding'] === 'true')
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>

@@ -222,6 +222,7 @@
       "code_block_word_wrap": "Перенос строк в блоке кода",
       "attachment_previews_in_note": "Предпросмотр вложений",
       "attachments_at_bottom": "Вложения внизу заметки",
+      "backlinks_at_bottom": "Обратные ссылки внизу заметки",
       "default_image_border_no_padding": "Рамка изображения по умолчанию",
       "ui_customization": "Видимость элементов",
       "notes_dashboard": "Доска заметок",
@@ -298,7 +299,8 @@
       "view": "Просмотр",
       "delete": "Удалить",
       "open_attachments": "Открыть вложения",
-      "download": "Скачать {{filename}}"
+      "download": "Скачать {{filename}}",
+      "copy_link": "Копировать ссылку"
     },
     "errors": {
       "select_file": "Пожалуйста, выберите файл для загрузки.",
@@ -312,11 +314,13 @@
       "loading_failed": "Не удалось загрузить вложения",
       "loading_error": "Ошибка загрузки вложений",
       "upload_failed_generic": "Не удалось загрузить. Пожалуйста, попробуйте снова.",
-      "upload_failed_connection": "Не удалось загрузить. Проверьте подключение."
+      "upload_failed_connection": "Не удалось загрузить. Проверьте подключение.",
+      "link_copy_failed": "Не удалось скопировать ссылку"
     },
     "messages": {
       "upload_success": "Файл успешно загружен!",
-      "deleted_success": "Вложение успешно удалено"
+      "deleted_success": "Вложение успешно удалено",
+      "link_copied": "Ссылка скопирована!"
     },
     "page": {
       "title": "Управление вложениями",
@@ -833,6 +837,7 @@
     "table": "Таблица",
     "separator": "Разделитель",
     "link_to_note": "Ссылка на заметку",
+    "link_to_attachment": "Ссылка на вложение",
     "link": "Ссылка",
     "cancel": "Отмена",
     "back": "Назад",

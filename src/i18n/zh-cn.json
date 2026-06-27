@@ -291,7 +291,8 @@
       "view": "查看",
       "delete": "删除",
       "open_attachments": "打开附件",
-      "download": "下载 {{filename}}"
+      "download": "下载 {{filename}}",
+      "copy_link": "复制链接"
     },
     "errors": {
       "select_file": "请选择要上传的文件。",
@@ -305,11 +306,13 @@
       "loading_failed": "加载附件失败",
       "loading_error": "加载附件时出错",
       "upload_failed_generic": "上传失败。请稍后重试。",
-      "upload_failed_connection": "上传失败。请检查您的网络连接。"
+      "upload_failed_connection": "上传失败。请检查您的网络连接。",
+      "link_copy_failed": "复制链接失败"
     },
     "messages": {
       "upload_success": "文件上传成功！",
-      "deleted_success": "附件删除成功"
+      "deleted_success": "附件删除成功",
+      "link_copied": "链接已复制！"
     },
     "page": {
       "title": "管理附件",
@@ -565,6 +568,7 @@
       "code_block_word_wrap": "代码块自动换行",
       "attachment_previews_in_note": "附件预览",
       "attachments_at_bottom": "附件显示在笔记底部",
+      "backlinks_at_bottom": "反向链接显示在笔记底部",
       "default_image_border_no_padding": "默认图片边框",
       "ui_customization": "元素可见性",
       "notes_dashboard": "笔记看板",
@@ -1260,6 +1264,7 @@
     "table": "表格",
     "separator": "分隔符",
     "link_to_note": "链接到笔记",
+    "link_to_attachment": "链接到附件",
     "link": "链接",
     "cancel": "取消",
     "back": "返回",

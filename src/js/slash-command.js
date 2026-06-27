@@ -1937,7 +1937,17 @@
                             }
                         }
                     },
-                    common.noteReference
+                    common.noteReference,
+                    {
+                        id: 'link-to-attachment',
+                        icon: 'lucide lucide-paperclip',
+                        label: t('slash_menu.link_to_attachment', null, 'Link to attachment'),
+                        action: function () {
+                            if (typeof window.openAttachmentPickerModal === 'function') {
+                                window.openAttachmentPickerModal();
+                            }
+                        }
+                    }
                 ]
             },
             {
@@ -2243,7 +2253,17 @@
                             }
                         }
                     },
-                    common.noteReference
+                    common.noteReference,
+                    {
+                        id: 'link-to-attachment',
+                        icon: 'lucide lucide-paperclip',
+                        label: t('slash_menu.link_to_attachment', null, 'Link to attachment'),
+                        action: function () {
+                            if (typeof window.openAttachmentPickerModal === 'function') {
+                                window.openAttachmentPickerModal();
+                            }
+                        }
+                    }
                 ]
             },
             {

@@ -291,7 +291,8 @@
       "view": "Ver",
       "delete": "Eliminar",
       "open_attachments": "Abrir adjuntos",
-      "download": "Descargar {{filename}}"
+      "download": "Descargar {{filename}}",
+      "copy_link": "Copiar enlace"
     },
     "errors": {
       "select_file": "Por favor selecciona un archivo para subir.",
@@ -305,11 +306,13 @@
       "loading_failed": "Falló al cargar adjuntos",
       "loading_error": "Error al cargar adjuntos",
       "upload_failed_generic": "Subida fallida. Por favor intenta de nuevo.",
-      "upload_failed_connection": "Subida fallida. Por favor verifica tu conexión."
+      "upload_failed_connection": "Subida fallida. Por favor verifica tu conexión.",
+      "link_copy_failed": "Error al copiar el enlace"
     },
     "messages": {
       "upload_success": "¡Archivo subido exitosamente!",
-      "deleted_success": "Adjunto eliminado exitosamente"
+      "deleted_success": "Adjunto eliminado exitosamente",
+      "link_copied": "¡Enlace copiado!"
     },
     "page": {
       "title": "Administrar adjuntos",
@@ -565,6 +568,7 @@
       "code_block_word_wrap": "Ajuste de línea en bloques de código",
       "attachment_previews_in_note": "Vistas previas de adjuntos",
       "attachments_at_bottom": "Adjuntos al final de la nota",
+      "backlinks_at_bottom": "Backlinks al final de la nota",
       "default_image_border_no_padding": "Borde de imagen por defecto",
       "ui_customization": "Visibilidad de los elementos",
       "notes_dashboard": "Tablero de notas",
@@ -1271,6 +1275,7 @@
     "table": "Tabla",
     "separator": "Separador",
     "link_to_note": "Enlace a nota",
+    "link_to_attachment": "Enlace a adjunto",
     "link": "Enlace",
     "cancel": "Cancelar",
     "back": "Volver",

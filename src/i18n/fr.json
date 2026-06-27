@@ -301,7 +301,8 @@
       "view": "Voir",
       "delete": "Supprimer",
       "open_attachments": "Ouvrir les pièces jointes",
-      "download": "Télécharger {{filename}}"
+      "download": "Télécharger {{filename}}",
+      "copy_link": "Copier le lien"
     },
     "errors": {
       "select_file": "Veuillez sélectionner un fichier à télécharger.",
@@ -315,11 +316,13 @@
       "loading_failed": "Impossible de charger les pièces jointes",
       "loading_error": "Erreur lors du chargement des pièces jointes",
       "upload_failed_generic": "Échec du téléchargement. Veuillez réessayer.",
-      "upload_failed_connection": "Échec du téléchargement. Veuillez vérifier votre connexion."
+      "upload_failed_connection": "Échec du téléchargement. Veuillez vérifier votre connexion.",
+      "link_copy_failed": "Impossible de copier le lien"
     },
     "messages": {
       "upload_success": "Fichier téléchargé avec succès !",
-      "deleted_success": "Pièce jointe supprimée avec succès"
+      "deleted_success": "Pièce jointe supprimée avec succès",
+      "link_copied": "Lien copié !"
     },
     "page": {
       "title": "Gérer les pièces jointes",
@@ -578,6 +581,7 @@
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "attachments_at_bottom": "Pièces jointes en bas de la note",
+      "backlinks_at_bottom": "Liens retour en bas de la note",
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
       "notes_dashboard": "Tableau de notes",
@@ -1311,6 +1315,7 @@
     "table": "Tableau",
     "separator": "Séparateur",
     "link_to_note": "Lien vers une note",
+    "link_to_attachment": "Lien vers une pièce jointe",
     "link": "Lien",
     "cancel": "Annuler",
     "back": "Retour",
