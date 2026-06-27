@@ -2470,6 +2470,24 @@ function parseMarkdown(text) {
             continue;
         }
 
+        // Indented code blocks: lines starting with 4 spaces or a tab
+        if (line.match(/^(    |\t)/)) {
+            flushParagraph();
+            let indentedBlockStartLine = i + sourceLineOffset;
+            let indentedLines = [];
+            while (i < lines.length && (lines[i].match(/^(    |\t)/) || lines[i].trim() === '')) {
+                indentedLines.push(lines[i].replace(/^(    |\t)/, ''));
+                i++;
+            }
+            // Remove trailing blank lines
+            while (indentedLines.length > 0 && indentedLines[indentedLines.length - 1].trim() === '') {
+                indentedLines.pop();
+            }
+            i--; // The for loop will increment
+            result.push('<pre class="indented-pre" data-line="' + indentedBlockStartLine + '">' + escapeHtml(indentedLines.join('\n')) + '</pre>');
+            continue;
+        }
+
         let excalidrawMatch = line.match(/^\s*\x00PEXCALIDRAW(\d+)\x00\s*$/);
         if (excalidrawMatch) {
             flushParagraph();
@@ -2540,6 +2558,7 @@ function parseMarkdown(text) {
                 let nextLine = lines[nextNonEmptyIndex];
                 isNextBlockElement = (
                     /^\s*```/.test(nextLine) ||                      // Code block fence
+                    /^(    |\t)/.test(nextLine) ||                   // Indented code block
                     /^\s*\x00PEXCALIDRAW\d+\x00\s*$/.test(nextLine) || // Excalidraw block placeholder
                     /\x00MATHBLOCK\d+\x00/.test(nextLine) ||        // Math block placeholder
                     /^\x00PTAG\d+\x00/.test(nextLine) ||            // Protected HTML tags

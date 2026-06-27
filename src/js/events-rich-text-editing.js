@@ -932,21 +932,6 @@ function handleNoteEntryKeydown(e) {
             return;
         }
 
-        if (e.shiftKey && e.key.toLowerCase() === 'b' && noteEditor) {
-            e.preventDefault();
-            if (typeof window.toggleCodeBlock === 'function') {
-                window.toggleCodeBlock();
-            } else if (typeof toggleCodeBlock === 'function') {
-                toggleCodeBlock();
-            } else if (inMarkdownEditor) {
-                if (typeof window.applyMarkdownCodeBlock === 'function') {
-                    window.applyMarkdownCodeBlock();
-                } else if (typeof applyMarkdownCodeBlock === 'function') {
-                    applyMarkdownCodeBlock();
-                }
-            }
-            return;
-        }
 
         if (e.key.toLowerCase() === 'u' && noteEditor) {
             e.preventDefault();
@@ -962,7 +947,7 @@ function handleNoteEntryKeydown(e) {
             return;
         }
 
-        if (e.key.toLowerCase() === 'b' && noteEditor) {
+        if (e.key.toLowerCase() === 'b' && !e.shiftKey && noteEditor) {
             e.preventDefault();
             if (inMarkdownEditor) {
                 if (typeof window.applyMarkdownBold === 'function') {
