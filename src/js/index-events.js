@@ -198,17 +198,28 @@
         });
     }
 
-    function waitForNoteScrollEdge(targets, edge, lockId, startedAt) {
+    function waitForNoteScrollEdge(targets, edge, lockId, startedAt, lastScrollTop) {
         if (lockId !== noteScrollLockId) return;
 
-        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > 1600) {
+        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > 5000) {
             noteScrollLockEdge = null;
             scheduleUpdateNoteScrollButtons();
             return;
         }
 
+        // If scroll position hasn't changed for ~300ms, the smooth scroll may have stalled — nudge it
+        var currentScrollTops = targets.map(function (t) { return t ? t.scrollTop : 0; });
+        if (lastScrollTop !== undefined && performance.now() - startedAt > 300) {
+            var stalled = targets.every(function (t, i) {
+                return !t || Math.abs(t.scrollTop - lastScrollTop[i]) < 1;
+            });
+            if (stalled && !areNoteScrollTargetsAtEdge(targets, edge)) {
+                targets.forEach(function (target) { scrollElementToEdge(target, edge); });
+            }
+        }
+
         requestAnimationFrame(function () {
-            waitForNoteScrollEdge(targets, edge, lockId, startedAt);
+            waitForNoteScrollEdge(targets, edge, lockId, startedAt, currentScrollTops);
         });
     }
 

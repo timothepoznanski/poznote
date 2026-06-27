@@ -470,6 +470,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
 
         // === Update schema version ===
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '" . $CURRENT_SCHEMA_VERSION . "')");
@@ -478,6 +479,7 @@ try {
 
     try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
     } catch (Exception $e) {
         error_log('Could not ensure display settings: ' . $e->getMessage());

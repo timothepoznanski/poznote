@@ -518,15 +518,26 @@ function updateAttachmentCountInMenu(noteId) {
                             existingAttachmentsRow = document.createElement('div');
                             existingAttachmentsRow.className = 'note-attachments-row';
 
-                            // Insert after tags-display div
-                            var tagsDisplay = noteElement.querySelector('.tags-display');
-                            if (tagsDisplay && tagsDisplay.nextSibling) {
-                                tagsDisplay.parentNode.insertBefore(existingAttachmentsRow, tagsDisplay.nextSibling);
+                            var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.attachmentsAtBottom);
+                            if (atBottom) {
+                                // Insert before scroll-edge-controls (after noteentry)
+                                var scrollEdge = noteElement.querySelector('.note-scroll-edge-controls');
+                                if (scrollEdge) {
+                                    scrollEdge.parentNode.insertBefore(existingAttachmentsRow, scrollEdge);
+                                } else {
+                                    noteElement.appendChild(existingAttachmentsRow);
+                                }
                             } else {
-                                // Fallback: insert before the title
-                                var titleElement = noteElement.querySelector('h4');
-                                if (titleElement) {
-                                    titleElement.parentNode.insertBefore(existingAttachmentsRow, titleElement);
+                                // Insert after tags-display div
+                                var tagsDisplay = noteElement.querySelector('.tags-display');
+                                if (tagsDisplay && tagsDisplay.nextSibling) {
+                                    tagsDisplay.parentNode.insertBefore(existingAttachmentsRow, tagsDisplay.nextSibling);
+                                } else {
+                                    // Fallback: insert before the title
+                                    var titleElement = noteElement.querySelector('h4');
+                                    if (titleElement) {
+                                        titleElement.parentNode.insertBefore(existingAttachmentsRow, titleElement);
+                                    }
                                 }
                             }
                         }
@@ -803,8 +814,16 @@ function renderAttachmentPreviewsNow(noteId, attachments, noteContent) {
         wrapper.innerHTML = html;
     }
 
-    if (noteEntry.parentNode && wrapper.nextElementSibling !== noteEntry) {
-        noteEntry.parentNode.insertBefore(wrapper, noteEntry);
+    var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.attachmentsAtBottom);
+    if (atBottom) {
+        var scrollEdge = noteEntry.nextElementSibling;
+        if (noteEntry.parentNode && wrapper !== scrollEdge) {
+            noteEntry.parentNode.insertBefore(wrapper, scrollEdge);
+        }
+    } else {
+        if (noteEntry.parentNode && wrapper.nextElementSibling !== noteEntry) {
+            noteEntry.parentNode.insertBefore(wrapper, noteEntry);
+        }
     }
 }
 

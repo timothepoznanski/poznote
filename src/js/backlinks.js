@@ -97,9 +97,12 @@
             return;
         }
 
-        // Preferred anchor: right after the attachments row
-        var attachRow = document.querySelector('.note-attachments-row');
-        // Fallback anchor: before the note title
+        var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.attachmentsAtBottom);
+        // When attachments are at the bottom, anchor after the attachments row or previews wrapper.
+        // Otherwise anchor before the note title.
+        var attachRow = atBottom
+            ? (document.querySelector('.note-attachments-row') || document.querySelector('.note-attachment-previews'))
+            : document.querySelector('.note-attachments-row');
         var titleEl = attachRow ? null : document.querySelector('.notecard h4');
         var anchor = attachRow || titleEl;
 
