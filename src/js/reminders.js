@@ -97,7 +97,9 @@ function pollNotificationIndicators() {
         return;
     }
 
-    fetch('/api/v1/reminders/count', {
+    var workspace = document.body ? document.body.getAttribute('data-workspace') || '' : '';
+    var url = '/api/v1/reminders/count' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+    fetch(url, {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })

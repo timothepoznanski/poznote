@@ -99,8 +99,19 @@ $res_right = $note_load_result['res_right'] ?? null;
 $notifications_count = 0;
 try {
     if (isset($con)) {
-        $stmtNotif = $con->prepare("SELECT COUNT(*) as cnt FROM notifications WHERE is_read = 0 AND dismissed = 0 AND trigger_at <= datetime('now')");
-        $stmtNotif->execute();
+        if (!empty($workspace_filter)) {
+            $stmtNotif = $con->prepare("
+                SELECT COUNT(*) as cnt
+                FROM notifications n
+                LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
+                WHERE n.is_read = 0 AND n.dismissed = 0 AND n.trigger_at <= datetime('now')
+                  AND e.workspace = ?
+            ");
+            $stmtNotif->execute([$workspace_filter]);
+        } else {
+            $stmtNotif = $con->prepare("SELECT COUNT(*) as cnt FROM notifications WHERE is_read = 0 AND dismissed = 0 AND trigger_at <= datetime('now')");
+            $stmtNotif->execute();
+        }
         $notifications_count = (int)$stmtNotif->fetchColumn();
     }
 } catch (Exception $e) {
@@ -348,7 +359,7 @@ if ($isPublicWorkspaceReadonly) {
 }
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?>>
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
     <div id="save-indicator" class="save-indicator" style="display: none;">
         <i class="lucide lucide-save"></i>
     </div>
