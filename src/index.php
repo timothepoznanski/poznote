@@ -248,7 +248,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/tabs.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
-    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/modal-alerts.css') ?: time(); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>"/>
@@ -360,6 +360,49 @@ if ($isPublicWorkspaceReadonly) {
 ?>
 
 <body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+    <script>
+    (function () {
+        try {
+            if (!window.sessionStorage || sessionStorage.getItem('poznote_create_page_loading') !== '1') {
+                return;
+            }
+
+            document.body.classList.add('note-creation-is-loading');
+
+            if (document.getElementById('note-creation-loading-modal')) {
+                return;
+            }
+
+            var modal = document.createElement('div');
+            modal.id = 'note-creation-loading-modal';
+            modal.className = 'note-creation-loading-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-label', <?php echo json_encode(t('common.loading', [], 'Loading...'), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);
+
+            var dialog = document.createElement('div');
+            dialog.className = 'note-creation-loading-dialog';
+
+            var content = document.createElement('div');
+            content.className = 'note-creation-loading-content';
+            content.setAttribute('role', 'status');
+            content.setAttribute('aria-live', 'polite');
+
+            var icon = document.createElement('i');
+            icon.className = 'lucide lucide-loader-2 lucide-spin';
+            icon.setAttribute('aria-hidden', 'true');
+
+            var label = document.createElement('span');
+            label.textContent = <?php echo json_encode(t('common.loading', [], 'Loading...'), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;
+
+            content.appendChild(icon);
+            content.appendChild(label);
+            dialog.appendChild(content);
+            modal.appendChild(dialog);
+            document.body.appendChild(modal);
+        } catch (error) {}
+    })();
+    </script>
     <div id="save-indicator" class="save-indicator" style="display: none;">
         <i class="lucide lucide-save"></i>
     </div>

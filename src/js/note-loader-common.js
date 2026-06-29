@@ -302,6 +302,10 @@ function loadNoteCommon(url, noteId, options) {
                                 // Replace right_col content (tab bar lives in #right_pane, not here)
                                 currentRightColumn.innerHTML = rightColumn.innerHTML;
 
+                                if (typeof window.hideNoteCreationLoading === 'function') {
+                                    window.hideNoteCreationLoading();
+                                }
+
                                 // Update tab state and re-render tab bar
                                 if (window.tabManager) {
                                     window.tabManager._onNoteLoaded(noteId);

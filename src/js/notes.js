@@ -73,6 +73,10 @@ function _createNoteOfType(noteType) {
         type: noteType
     };
 
+    if (typeof window.showNoteCreationLoading === 'function') {
+        window.showNoteCreationLoading();
+    }
+
     // Use RESTful API: POST /api/v1/notes
     fetch("/api/v1/notes", {
         method: "POST",
@@ -95,10 +99,16 @@ function _createNoteOfType(noteType) {
                     window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
                 }
             } else {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
             }
         })
         .catch(function (error) {
+            if (typeof window.hideNoteCreationLoading === 'function') {
+                window.hideNoteCreationLoading();
+            }
             showNotificationPopup('Network error: ' + error.message, 'error');
         });
 }

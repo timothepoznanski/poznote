@@ -1145,6 +1145,10 @@
             type: 'tasklist'
         };
 
+        if (typeof window.showNoteCreationLoading === 'function') {
+            window.showNoteCreationLoading();
+        }
+
         // Use RESTful API: POST /api/v1/notes
         fetch("/api/v1/notes", {
             method: "POST",
@@ -1167,10 +1171,16 @@
                         window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
                     }
                 } else {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
                 }
             })
             .catch(function (error) {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
             });
     };
@@ -1186,6 +1196,10 @@
             type: 'markdown'
         };
 
+        if (typeof window.showNoteCreationLoading === 'function') {
+            window.showNoteCreationLoading();
+        }
+
         // Use RESTful API: POST /api/v1/notes
         fetch("/api/v1/notes", {
             method: "POST",
@@ -1208,10 +1222,16 @@
                         window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
                     }
                 } else {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
                 }
             })
             .catch(function (error) {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
             });
     };
