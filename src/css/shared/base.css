@@ -203,6 +203,26 @@ body.shared-page {
     outline-offset: 2px;
 }
 
+.shared-filter-tree-actions .btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .shared-filter-tree-actions .btn {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .shared-filter-tree-actions .btn:not(:disabled):hover,
+    .shared-filter-tree-actions .btn:not(:disabled):active,
+    .shared-filter-tree-actions .btn:not(:disabled):focus {
+        border-color: rgba(148, 163, 184, 0.34);
+        background: rgba(255, 255, 255, 0.76);
+        color: var(--text-muted, #5f6b76);
+        box-shadow: none;
+        outline: none;
+    }
+}
+
 .shared-filter-tree-actions .btn:disabled {
     border-color: rgba(148, 163, 184, 0.2);
     background: rgba(248, 250, 252, 0.72);

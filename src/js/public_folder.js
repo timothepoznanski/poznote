@@ -4,6 +4,18 @@ var PUBLIC_THEME_STORAGE_KEY = 'poznote-public-theme';
 var PUBLIC_FOLDER_COLLAPSED_STORAGE_PREFIX = 'poznote-public-folder-collapsed:';
 var publicFolderCollapsedStateLoaded = false;
 
+function blurAfterPointerActivation(element, event) {
+    if (!element || typeof element.blur !== 'function') return;
+    if (event && event.detail === 0) return;
+
+    element.blur();
+    window.setTimeout(function() {
+        if (document.activeElement === element) {
+            element.blur();
+        }
+    }, 0);
+}
+
 function normalizePublicTheme(theme) {
     theme = String(theme || '').toLowerCase();
     return theme === 'dark' || theme === 'light' || theme === 'black' ? theme : null;
@@ -253,6 +265,7 @@ function bindPublicFolderToggles() {
             });
             savePublicFolderCollapsedState();
             updatePublicFolderToggles();
+            blurAfterPointerActivation(toggleAllButton, event);
         });
     }
 

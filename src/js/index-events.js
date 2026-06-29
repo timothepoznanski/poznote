@@ -20,6 +20,18 @@
         return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
     }
 
+    function blurAfterPointerActivation(element, event) {
+        if (!element || typeof element.blur !== 'function') return;
+        if (event && event.detail === 0) return;
+
+        element.blur();
+        window.setTimeout(function () {
+            if (document.activeElement === element) {
+                element.blur();
+            }
+        }, 0);
+    }
+
     function getStoredActiveTabForCurrentWorkspace() {
         try {
             var params = new URLSearchParams(window.location.search || '');
@@ -348,9 +360,7 @@
                 if (typeof window.toggleAllFolders === 'function') {
                     window.toggleAllFolders();
                 }
-                if (typeof target.blur === 'function') {
-                    target.blur();
-                }
+                blurAfterPointerActivation(target, e);
                 break;
             case 'open-password-settings':
                 if (typeof navigateToDisplayOrSettings === 'function') {

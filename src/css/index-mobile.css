@@ -19,6 +19,20 @@
     display: none !important;
 }
 
+/* Mobile browsers can keep :hover after a tap. Keep the folder expand button neutral. */
+.sidebar-folder-toggle {
+    -webkit-tap-highlight-color: transparent !important;
+    touch-action: manipulation !important;
+}
+
+.sidebar-folder-toggle:hover,
+.sidebar-folder-toggle:active,
+.sidebar-folder-toggle:focus {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
 /* Force folder actions to be visible on mobile regardless of hide_folder_actions setting */
 
 .folder-toggle .folder-actions i {
