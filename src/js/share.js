@@ -92,7 +92,9 @@ function positionMenuNearButton(menu, button) {
 /**
  * Refresh notes list after folder action (share/revoke)
  */
-function refreshNotesListAfterFolderAction(folderIdToOpen) {
+function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
+    options = options || {};
+
     if (typeof persistFolderStatesFromDOM === 'function') {
         persistFolderStatesFromDOM();
     }
@@ -145,7 +147,7 @@ function refreshNotesListAfterFolderAction(folderIdToOpen) {
                         window.reinitializeFavoritesToggle();
                     }
 
-                    if (typeof window.refreshKanbanView === 'function') {
+                    if (!options.skipKanbanViewRefresh && typeof window.refreshKanbanView === 'function') {
                         window.refreshKanbanView();
                     }
                 } catch (error) {

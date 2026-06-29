@@ -221,9 +221,9 @@
                         window.setNeedsAutoPush(true);
                     }
                     
-                    // Success: refresh the sidebar to stay in sync with the new note location
+                    // Success: refresh the sidebar without rebuilding the already-updated Kanban view.
                     if (typeof window.refreshNotesListAfterFolderAction === 'function') {
-                        window.refreshNotesListAfterFolderAction();
+                        window.refreshNotesListAfterFolderAction(null, { skipKanbanViewRefresh: true });
                     }
                 }
             } catch (error) {
