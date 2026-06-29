@@ -147,6 +147,7 @@
     var noteScrollButtonsUpdateQueued = false;
     var noteScrollLockEdge = null;
     var noteScrollLockId = 0;
+    var NOTE_SCROLL_EDGE_TIMEOUT_MS = 12000;
 
     function getNoteScrollTargets(triggerEl) {
         var noteCard = triggerEl && triggerEl.closest ? triggerEl.closest('.notecard') : null;
@@ -213,7 +214,7 @@
     function waitForNoteScrollEdge(targets, edge, lockId, startedAt, lastScrollTop) {
         if (lockId !== noteScrollLockId) return;
 
-        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > 5000) {
+        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > NOTE_SCROLL_EDGE_TIMEOUT_MS) {
             noteScrollLockEdge = null;
             scheduleUpdateNoteScrollButtons();
             return;
