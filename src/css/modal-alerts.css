@@ -1,4 +1,61 @@
 /* Modal Alert System */
+.note-creation-loading-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(17, 24, 39, 0.34);
+    backdrop-filter: blur(2px);
+}
+
+.note-creation-loading-dialog {
+    width: min(260px, 100%);
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(229, 231, 235, 0.85);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+}
+
+.note-creation-loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: #4b5563;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.note-creation-loading-content i {
+    color: #007DB8;
+    font-size: 34px;
+    line-height: 1;
+}
+
+html[data-theme='dark'] .note-creation-loading-modal,
+body.dark-mode .note-creation-loading-modal {
+    background: rgba(0, 0, 0, 0.46);
+}
+
+html[data-theme='dark'] .note-creation-loading-dialog,
+body.dark-mode .note-creation-loading-dialog {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.42);
+}
+
+html[data-theme='dark'] .note-creation-loading-content,
+body.dark-mode .note-creation-loading-content {
+    color: var(--dm-text-muted);
+}
+
 .alert-modal-overlay {
     position: fixed;
     top: 0;

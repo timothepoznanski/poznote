@@ -7,14 +7,15 @@
 
 /* Folder dragging styles - target folder-toggle instead of folder-header */
 .folder-header:not(.system-folder)>.folder-toggle[draggable="true"] {
-    cursor: grab;
+    cursor: pointer;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-.folder-header:not(.system-folder)>.folder-toggle[draggable="true"]:active {
+.folder-header:not(.system-folder)>.folder-toggle[draggable="true"]:active,
+.folder-header:not(.system-folder)>.folder-toggle.folder-dragging {
     cursor: grabbing;
 }
 

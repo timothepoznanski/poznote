@@ -27,7 +27,12 @@ class RemindersController {
 
         try {
             $now = gmdate('Y-m-d H:i:s');
-            
+            $workspace = $_GET['workspace'] ?? null;
+            $hasWorkspace = $workspace !== null && $workspace !== '';
+
+            $workspaceClause = $hasWorkspace ? 'AND e.workspace = ?' : '';
+            $params = $hasWorkspace ? [$now, $workspace] : [$now];
+
             $stmt = $this->con->prepare("
                 SELECT n.id, n.note_id, n.type, n.message, n.is_read, n.created, n.trigger_at,
                        e.heading AS note_heading
@@ -35,24 +40,28 @@ class RemindersController {
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
                 WHERE n.dismissed = 0
                   AND n.trigger_at <= ?
+                  $workspaceClause
                 ORDER BY n.trigger_at DESC
                 LIMIT 50
             ");
-            $stmt->execute([$now]);
+            $stmt->execute($params);
             $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             // Also count triggered notifications (read or unread) and triggered unread notifications
-                $countStmt = $this->con->prepare("
-                    SELECT
-                        COUNT(*) as total_count,
-                        COALESCE(SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END), 0) as unread_count
-                    FROM notifications
-                    WHERE dismissed = 0 AND trigger_at <= ?
-                ");
-                $countStmt->execute([$now]);
-                $counts = $countStmt->fetch(PDO::FETCH_ASSOC) ?: [];
-                $unreadCount = (int)($counts['unread_count'] ?? 0);
-                $totalCount = (int)($counts['total_count'] ?? 0);
+            $countParams = $hasWorkspace ? [$now, $workspace] : [$now];
+            $countStmt = $this->con->prepare("
+                SELECT
+                    COUNT(*) as total_count,
+                    COALESCE(SUM(CASE WHEN n.is_read = 0 THEN 1 ELSE 0 END), 0) as unread_count
+                FROM notifications n
+                LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
+                WHERE n.dismissed = 0 AND n.trigger_at <= ?
+                  $workspaceClause
+            ");
+            $countStmt->execute($countParams);
+            $counts = $countStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+            $unreadCount = (int)($counts['unread_count'] ?? 0);
+            $totalCount = (int)($counts['total_count'] ?? 0);
             
             $this->sendSuccess([
                 'notifications' => $notifications,
@@ -74,14 +83,21 @@ class RemindersController {
 
         try {
             $now = gmdate('Y-m-d H:i:s');
-                $stmt = $this->con->prepare("
-                    SELECT
-                        COUNT(*) as total_count,
-                        COALESCE(SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END), 0) as unread_count
-                    FROM notifications
-                    WHERE dismissed = 0 AND trigger_at <= ?
-                ");
-                $stmt->execute([$now]);
+            $workspace = $_GET['workspace'] ?? null;
+            $hasWorkspace = $workspace !== null && $workspace !== '';
+            $workspaceClause = $hasWorkspace ? 'AND e.workspace = ?' : '';
+            $params = $hasWorkspace ? [$now, $workspace] : [$now];
+
+            $stmt = $this->con->prepare("
+                SELECT
+                    COUNT(*) as total_count,
+                    COALESCE(SUM(CASE WHEN n.is_read = 0 THEN 1 ELSE 0 END), 0) as unread_count
+                FROM notifications n
+                LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
+                WHERE n.dismissed = 0 AND n.trigger_at <= ?
+                  $workspaceClause
+            ");
+            $stmt->execute($params);
                 $counts = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
                 $unreadCount = (int)($counts['unread_count'] ?? 0);
                 $totalCount = (int)($counts['total_count'] ?? 0);

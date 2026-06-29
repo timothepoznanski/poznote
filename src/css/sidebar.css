@@ -170,6 +170,24 @@
     outline-offset: 2px;
 }
 
+.sidebar-folder-toggle:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .sidebar-folder-toggle {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .sidebar-folder-toggle:hover,
+    .sidebar-folder-toggle:active,
+    .sidebar-folder-toggle:focus {
+        background: transparent;
+        box-shadow: none;
+        outline: none;
+    }
+}
+
 /* Hide mobile burger menu completely */
 .sidebar-menu-btn {
     display: none !important;

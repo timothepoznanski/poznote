@@ -179,6 +179,10 @@
         try {
             // Close the modal
             closeTemplateNoteSelectorModal();
+
+            if (typeof window.showNoteCreationLoading === 'function') {
+                window.showNoteCreationLoading();
+            }
             
             // Call the backend to create template
             const response = await fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/create-template', {
@@ -206,6 +210,9 @@
                 window.location.href = url;
             } else {
                 // Error
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 const errorMsg = data.error || tr('template.error', {}, 'Error creating template');
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(errorMsg, 'error');
@@ -213,6 +220,9 @@
             }
         } catch (error) {
             console.error('Error creating template:', error);
+            if (typeof window.hideNoteCreationLoading === 'function') {
+                window.hideNoteCreationLoading();
+            }
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(tr('ui.alerts.network_error', {}, 'Network error'), 'error');
             }

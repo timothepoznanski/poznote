@@ -185,6 +185,193 @@ function navigateToCreatedNoteInInternalTab(noteId, noteTitle, workspaceName, fo
 
 window.navigateToCreatedNoteInInternalTab = navigateToCreatedNoteInInternalTab;
 
+var NOTE_CREATION_PENDING_KEY = 'poznote_create_page_loading';
+
+function getNoteCreationLoadingText() {
+    return window.t ? window.t('common.loading', null, 'Loading...') : 'Loading...';
+}
+
+function isCreatePageLoadingContext() {
+    var path = (window.location && window.location.pathname) ? window.location.pathname : '';
+    return /(?:^|\/)create\.php$/.test(path);
+}
+
+function hasPendingNoteCreationLoading() {
+    try {
+        return window.sessionStorage && sessionStorage.getItem(NOTE_CREATION_PENDING_KEY) === '1';
+    } catch (error) {
+        return false;
+    }
+}
+
+function setPendingNoteCreationLoading() {
+    try {
+        if (window.sessionStorage) {
+            sessionStorage.setItem(NOTE_CREATION_PENDING_KEY, '1');
+        }
+    } catch (error) {
+        // Ignore storage errors; the modal still works until the current page unloads.
+    }
+}
+
+function clearPendingNoteCreationLoading() {
+    try {
+        if (window.sessionStorage) {
+            sessionStorage.removeItem(NOTE_CREATION_PENDING_KEY);
+        }
+    } catch (error) {
+        // Ignore storage errors.
+    }
+}
+
+function createNoteCreationLoadingElement() {
+    var content = document.createElement('div');
+    content.className = 'note-creation-loading-content';
+    content.setAttribute('role', 'status');
+    content.setAttribute('aria-live', 'polite');
+
+    var icon = document.createElement('i');
+    icon.className = 'lucide lucide-loader-2 lucide-spin';
+    icon.setAttribute('aria-hidden', 'true');
+
+    var label = document.createElement('span');
+    label.textContent = getNoteCreationLoadingText();
+
+    content.appendChild(icon);
+    content.appendChild(label);
+
+    return content;
+}
+
+function setNoteCreationTriggerLoading(triggerElement) {
+    if (window.noteCreationLoadingTrigger && window.noteCreationLoadingTrigger !== triggerElement) {
+        clearNoteCreationTriggerLoading();
+    }
+
+    if (!triggerElement || !triggerElement.classList) return;
+
+    window.noteCreationLoadingTrigger = triggerElement;
+    triggerElement.classList.add('is-creating');
+    triggerElement.setAttribute('aria-busy', 'true');
+    triggerElement.setAttribute('aria-disabled', 'true');
+}
+
+function clearNoteCreationTriggerLoading() {
+    var triggerElement = window.noteCreationLoadingTrigger;
+    if (triggerElement && triggerElement.classList) {
+        triggerElement.classList.remove('is-creating');
+        triggerElement.removeAttribute('aria-busy');
+        triggerElement.removeAttribute('aria-disabled');
+    }
+    window.noteCreationLoadingTrigger = null;
+}
+
+function showNoteCreationLoadingModal() {
+    if (!document.body || document.getElementById('note-creation-loading-modal')) {
+        return;
+    }
+
+    var modal = document.createElement('div');
+    modal.id = 'note-creation-loading-modal';
+    modal.className = 'note-creation-loading-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
+    modal.setAttribute('aria-label', getNoteCreationLoadingText());
+
+    var dialog = document.createElement('div');
+    dialog.className = 'note-creation-loading-dialog';
+    dialog.appendChild(createNoteCreationLoadingElement());
+
+    modal.appendChild(dialog);
+    document.body.appendChild(modal);
+}
+
+function showNoteCreationLoading(triggerElement) {
+    var isCreatePage = isCreatePageLoadingContext();
+    if (!isCreatePage && !hasPendingNoteCreationLoading()) {
+        return;
+    }
+
+    if (isCreatePage) {
+        setPendingNoteCreationLoading();
+    }
+
+    var trigger = triggerElement || window.noteCreationTriggerElement || window.noteCreationLoadingTrigger || null;
+    window.isNoteCreationLoading = true;
+
+    if (document.body) {
+        document.body.classList.add('note-creation-is-loading');
+    }
+
+    setNoteCreationTriggerLoading(trigger);
+    showNoteCreationLoadingModal();
+
+    var rightCol = document.getElementById('right_col');
+    if (rightCol) {
+        rightCol.scrollTop = 0;
+    }
+}
+
+function hideNoteCreationLoading() {
+    window.isNoteCreationLoading = false;
+    clearPendingNoteCreationLoading();
+
+    if (document.body) {
+        document.body.classList.remove('note-creation-is-loading');
+    }
+
+    var modal = document.getElementById('note-creation-loading-modal');
+    if (modal && modal.parentNode) {
+        modal.parentNode.removeChild(modal);
+    }
+
+    var overlay = document.getElementById('note-creation-loading-overlay');
+    if (overlay && overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+    }
+
+    var rightCol = document.getElementById('right_col');
+    if (rightCol) {
+        rightCol.classList.remove('is-note-creation-loading');
+    }
+
+    clearNoteCreationTriggerLoading();
+}
+
+window.createNoteCreationLoadingElement = createNoteCreationLoadingElement;
+window.showNoteCreationLoading = showNoteCreationLoading;
+window.hideNoteCreationLoading = hideNoteCreationLoading;
+
+(function initializePendingNoteCreationLoading() {
+    if (!hasPendingNoteCreationLoading()) {
+        return;
+    }
+
+    function showPendingModal() {
+        if (!hasPendingNoteCreationLoading()) {
+            return;
+        }
+
+        window.isNoteCreationLoading = true;
+        if (document.body) {
+            document.body.classList.add('note-creation-is-loading');
+        }
+        showNoteCreationLoadingModal();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', showPendingModal, { once: true });
+    } else {
+        showPendingModal();
+    }
+
+    window.addEventListener('load', function () {
+        if (hasPendingNoteCreationLoading()) {
+            window.setTimeout(hideNoteCreationLoading, 120);
+        }
+    }, { once: true });
+})();
+
 function consumePendingCreatedNoteOpenOnLoad(retryCount) {
     if (window.innerWidth <= 800) {
         return;
@@ -333,6 +520,10 @@ function newFolder() {
                 workspace: selectedWorkspace || getSelectedWorkspace()
             };
 
+            if (typeof window.showNoteCreationLoading === 'function') {
+                window.showNoteCreationLoading();
+            }
+
             fetch('/api/v1/folders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -365,6 +556,9 @@ function newFolder() {
                             window.location.reload();
                         }
                     } else {
+                        if (typeof window.hideNoteCreationLoading === 'function') {
+                            window.hideNoteCreationLoading();
+                        }
                         // Use modal alert instead of notification popup
                         if (typeof window.showError === 'function') {
                             window.showError(
@@ -382,6 +576,9 @@ function newFolder() {
                     }
                 })
                 .catch(function (error) {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
                     // Use modal alert instead of notification popup
                     if (typeof window.showError === 'function') {
                         window.showError(
@@ -2473,6 +2670,10 @@ function executeCreateAction() {
  * @param {string[]} globalFnNames - Ordered list of global function names to try before falling back to the API.
  */
 function createNoteOfType(noteType, globalFnNames) {
+    if (typeof window.showNoteCreationLoading === 'function') {
+        window.showNoteCreationLoading();
+    }
+
     if (isCreatingInFolder && targetFolderId) {
         // Mark folder as open in localStorage to keep it open after page reload
         var folderDomId = 'folder-' + targetFolderId;
@@ -2513,7 +2714,17 @@ function createNoteOfType(noteType, globalFnNames) {
                     } else {
                         window.location.href = 'index.php?note=' + data.note.id;
                     }
+                } else {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
+                    showNotificationPopup(data.error || data.message || 'Error creating note', 'error');
                 }
+            }).catch(function (error) {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
+                showNotificationPopup('Network error: ' + error.message, 'error');
             });
         }
 
@@ -2551,7 +2762,17 @@ function createNoteOfType(noteType, globalFnNames) {
                     } else {
                         window.location.href = 'index.php?note=' + data.note.id;
                     }
+                } else {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
+                    showNotificationPopup(data.error || data.message || 'Error creating note', 'error');
                 }
+            }).catch(function (error) {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
+                showNotificationPopup('Network error: ' + error.message, 'error');
             });
         }
     }
@@ -2570,6 +2791,10 @@ function createMarkdownNoteInUtils() {
 }
 
 function createWorkspace() {
+    if (typeof window.showNoteCreationLoading === 'function') {
+        window.showNoteCreationLoading();
+    }
+
     // Navigate to the workspaces management page
     window.location = 'workspaces.php';
 }
@@ -3099,6 +3324,10 @@ function createKanbanStructure() {
     // Close modal
     closeModal('kanbanStructureModal');
 
+    if (typeof window.showNoteCreationLoading === 'function') {
+        window.showNoteCreationLoading();
+    }
+
     // Create the structure via API
     var data = {
         folder_name: folderName,
@@ -3143,6 +3372,9 @@ function createKanbanStructure() {
                     }, 300);
                 }
             } else {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 showNotificationPopup(
                     data.error || (window.t ? window.t('modals.kanban_structure.error_create', null, 'Failed to create Kanban structure') : 'Failed to create Kanban structure'),
                     'error'
@@ -3150,6 +3382,9 @@ function createKanbanStructure() {
             }
         })
         .catch(function (error) {
+            if (typeof window.hideNoteCreationLoading === 'function') {
+                window.hideNoteCreationLoading();
+            }
             showNotificationPopup(
                 window.t ? window.t('modals.kanban_structure.error_create_prefix', { error: error.message }, 'Error creating Kanban structure: {{error}}') : ('Error creating Kanban structure: ' + error.message),
                 'error'

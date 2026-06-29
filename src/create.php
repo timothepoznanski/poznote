@@ -39,12 +39,12 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/home/cards.css') ?: time(); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/modal-alerts.css') ?: time(); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
@@ -164,9 +164,9 @@ $currentLang = getUserLanguage();
     <script src="js/navigation.js"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/utils.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/template-selector.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/linked-note-selector.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/utils.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/utils.js') ?: time(); ?>"></script>
+    <script src="js/template-selector.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/template-selector.js') ?: time(); ?>"></script>
+    <script src="js/linked-note-selector.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/linked-note-selector.js') ?: time(); ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
     <script src="js/notes.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
@@ -183,6 +183,7 @@ $currentLang = getUserLanguage();
                 const createType = this.dataset.createType;
                 
                 // Set global variables
+                window.noteCreationTriggerElement = this;
                 window.selectedCreateType = createType;
                 window.targetFolderId = null;
                 window.targetFolderName = null;
@@ -191,6 +192,13 @@ $currentLang = getUserLanguage();
                 
                 // Execute create action
                 if (typeof executeCreateAction === 'function') {
+                    const immediateExitTypes = ['html', 'markdown', 'list', 'workspace'];
+                    if (immediateExitTypes.includes(createType) && typeof showNoteCreationLoading === 'function') {
+                        showNoteCreationLoading(this);
+                        window.setTimeout(executeCreateAction, 80);
+                        return;
+                    }
+
                     executeCreateAction();
                 } else {
                     console.error('executeCreateAction not found');

@@ -503,6 +503,24 @@ body.view-kanban .public-folder-body {
     background: var(--hover-bg, #f0f0f0);
 }
 
+.public-folder-toggle-all:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .public-folder-toggle-all {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .public-folder-toggle-all:not(.is-disabled):hover,
+    .public-folder-toggle-all:not(.is-disabled):active,
+    .public-folder-toggle-all:not(.is-disabled):focus {
+        background: var(--panel-bg, #ffffff);
+        box-shadow: none;
+        outline: none;
+    }
+}
+
 .public-folder-toggle-all.is-disabled {
     cursor: default;
     opacity: 0.6;

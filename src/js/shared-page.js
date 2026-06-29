@@ -68,6 +68,18 @@
 
     var config = getConfig();
 
+    function blurAfterPointerActivation(element, event) {
+        if (!element || typeof element.blur !== 'function') return;
+        if (event && event.detail === 0) return;
+
+        element.blur();
+        window.setTimeout(function() {
+            if (document.activeElement === element) {
+                element.blur();
+            }
+        }, 0);
+    }
+
     // ========== State ==========
 
     var sharedNotes = [];
@@ -2124,12 +2136,18 @@
 
         var expandAllFoldersBtn = document.getElementById('expandAllFoldersBtn');
         if (expandAllFoldersBtn) {
-            expandAllFoldersBtn.addEventListener('click', expandAllFolders);
+            expandAllFoldersBtn.addEventListener('click', function(event) {
+                expandAllFolders();
+                blurAfterPointerActivation(expandAllFoldersBtn, event);
+            });
         }
 
         var collapseAllFoldersBtn = document.getElementById('collapseAllFoldersBtn');
         if (collapseAllFoldersBtn) {
-            collapseAllFoldersBtn.addEventListener('click', collapseAllFolders);
+            collapseAllFoldersBtn.addEventListener('click', function(event) {
+                collapseAllFolders();
+                blurAfterPointerActivation(collapseAllFoldersBtn, event);
+            });
         }
 
         // Type filter buttons

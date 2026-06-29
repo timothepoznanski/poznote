@@ -353,6 +353,10 @@
      */
     async function createLinkedNote(noteId, noteHeading, folderId = null) {
         try {
+            if (typeof window.showNoteCreationLoading === 'function') {
+                window.showNoteCreationLoading();
+            }
+
             // Get current workspace
             const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
             
@@ -401,6 +405,9 @@
                 window.location.href = url;
             } else {
                 // Error
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating shortcut');
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(errorMsg, 'error');
@@ -408,6 +415,9 @@
             }
         } catch (error) {
             console.error('Error creating linked note:', error);
+            if (typeof window.hideNoteCreationLoading === 'function') {
+                window.hideNoteCreationLoading();
+            }
             if (typeof showNotificationPopup === 'function') {
                 showNotificationPopup(tr('ui.alerts.network_error', {}, 'Network error'), 'error');
             }

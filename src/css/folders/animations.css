@@ -11,10 +11,18 @@
 /* Smooth fade out for outgoing content - no transition */
 .note-fade-out {}
 
-/* Blank placeholder shown while a newly-created note loads, preventing the previous note from flashing */
 #new-note-loading-placeholder {
     flex: 1;
     min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4b5563;
+}
+
+html[data-theme='dark'] #new-note-loading-placeholder,
+body.dark-mode #new-note-loading-placeholder {
+    color: var(--dm-text-muted);
 }
 
 /* Spin animation */

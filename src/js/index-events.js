@@ -20,6 +20,18 @@
         return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
     }
 
+    function blurAfterPointerActivation(element, event) {
+        if (!element || typeof element.blur !== 'function') return;
+        if (event && event.detail === 0) return;
+
+        element.blur();
+        window.setTimeout(function () {
+            if (document.activeElement === element) {
+                element.blur();
+            }
+        }, 0);
+    }
+
     function getStoredActiveTabForCurrentWorkspace() {
         try {
             var params = new URLSearchParams(window.location.search || '');
@@ -135,6 +147,7 @@
     var noteScrollButtonsUpdateQueued = false;
     var noteScrollLockEdge = null;
     var noteScrollLockId = 0;
+    var NOTE_SCROLL_EDGE_TIMEOUT_MS = 12000;
 
     function getNoteScrollTargets(triggerEl) {
         var noteCard = triggerEl && triggerEl.closest ? triggerEl.closest('.notecard') : null;
@@ -201,7 +214,7 @@
     function waitForNoteScrollEdge(targets, edge, lockId, startedAt, lastScrollTop) {
         if (lockId !== noteScrollLockId) return;
 
-        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > 5000) {
+        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > NOTE_SCROLL_EDGE_TIMEOUT_MS) {
             noteScrollLockEdge = null;
             scheduleUpdateNoteScrollButtons();
             return;
@@ -348,9 +361,7 @@
                 if (typeof window.toggleAllFolders === 'function') {
                     window.toggleAllFolders();
                 }
-                if (typeof target.blur === 'function') {
-                    target.blur();
-                }
+                blurAfterPointerActivation(target, e);
                 break;
             case 'open-password-settings':
                 if (typeof navigateToDisplayOrSettings === 'function') {
@@ -1134,6 +1145,10 @@
             type: 'tasklist'
         };
 
+        if (typeof window.showNoteCreationLoading === 'function') {
+            window.showNoteCreationLoading();
+        }
+
         // Use RESTful API: POST /api/v1/notes
         fetch("/api/v1/notes", {
             method: "POST",
@@ -1156,10 +1171,16 @@
                         window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
                     }
                 } else {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
                 }
             })
             .catch(function (error) {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
             });
     };
@@ -1175,6 +1196,10 @@
             type: 'markdown'
         };
 
+        if (typeof window.showNoteCreationLoading === 'function') {
+            window.showNoteCreationLoading();
+        }
+
         // Use RESTful API: POST /api/v1/notes
         fetch("/api/v1/notes", {
             method: "POST",
@@ -1197,10 +1222,16 @@
                         window.location.href = "index.php?workspace=" + ws + "&note=" + data.note.id + "&scroll=1";
                     }
                 } else {
+                    if (typeof window.hideNoteCreationLoading === 'function') {
+                        window.hideNoteCreationLoading();
+                    }
                     showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
                 }
             })
             .catch(function (error) {
+                if (typeof window.hideNoteCreationLoading === 'function') {
+                    window.hideNoteCreationLoading();
+                }
                 showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
             });
     };

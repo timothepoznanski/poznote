@@ -12,6 +12,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    position: relative;
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
@@ -27,6 +28,33 @@
     border-color: #007DB8;
     box-shadow: 0 4px 12px rgba(0, 125, 184, 0.15);
     transform: translateY(-2px);
+}
+
+.home-card.is-creating {
+    cursor: wait;
+    pointer-events: none;
+    opacity: 0.82;
+    transform: none;
+}
+
+.home-card.is-creating .home-card-icon i {
+    opacity: 0;
+}
+
+.home-card.is-creating .home-card-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin-top: -9px;
+    margin-left: -9px;
+    border: 2px solid rgba(0, 125, 184, 0.22);
+    border-top-color: #007DB8;
+    border-radius: 999px;
+    animation: lucide-spin 0.8s linear infinite;
 }
 
 /* Card icon (blue default) */

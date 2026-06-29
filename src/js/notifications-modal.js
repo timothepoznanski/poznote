@@ -21,8 +21,14 @@
         return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
     }
 
+    function getWorkspace() {
+        return document.body ? document.body.getAttribute('data-workspace') || '' : '';
+    }
+
     function loadNotifications() {
-        fetch('/api/v1/reminders', {
+        var workspace = getWorkspace();
+        var url = '/api/v1/reminders' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+        fetch(url, {
             headers: { 'Accept': 'application/json' },
             credentials: 'same-origin'
         })
@@ -110,10 +116,15 @@
             var shouldHighlight = trigger.id === 'dashboardNotificationsBtn' ? totalCount > 0 : unreadCount > 0;
             trigger.classList.toggle('has-notifications', shouldHighlight);
         });
+
+        var homeBtn = document.querySelector('[data-action="navigate-to-home"]');
+        if (homeBtn) homeBtn.classList.toggle('has-notifications-dot', totalCount > 0);
     }
 
     function pollCount() {
-        fetch('/api/v1/reminders/count', {
+        var workspace = getWorkspace();
+        var url = '/api/v1/reminders/count' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+        fetch(url, {
             headers: { 'Accept': 'application/json' },
             credentials: 'same-origin'
         })
