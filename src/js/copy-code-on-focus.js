@@ -313,7 +313,7 @@
         var editorDiv = noteEntry.querySelector('.markdown-editor');
         if (!editorDiv) return false;
 
-        var allPres = Array.from(markdownPreview.querySelectorAll('pre'));
+        var allPres = Array.from(markdownPreview.querySelectorAll('pre:not(.indented-pre)'));
         var preIndex = allPres.indexOf(targetPre);
         if (preIndex === -1) return false;
 
@@ -330,7 +330,11 @@
 
         lines.splice(range.start, range.end - range.start + 1);
         var newContent = lines.join('\n');
-        editorDiv.textContent = newContent;
+        if (typeof window.renderMarkdownEditorContent === 'function') {
+            window.renderMarkdownEditorContent(editorDiv, newContent);
+        } else {
+            editorDiv.textContent = newContent;
+        }
         noteEntry.setAttribute('data-markdown-content', newContent);
 
         if (typeof window.markNoteAsModified === 'function') {
