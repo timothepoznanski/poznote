@@ -179,7 +179,7 @@
         var blocks = [];
         var root = container || document;
 
-        root.querySelectorAll('pre, .code-block').forEach(function(candidate) {
+        root.querySelectorAll('pre:not(.indented-pre), .code-block').forEach(function(candidate) {
             var block = getCodeBlockElement(candidate);
             if (block && blocks.indexOf(block) === -1) {
                 blocks.push(block);
