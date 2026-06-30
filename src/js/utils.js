@@ -1064,70 +1064,23 @@ window.restoreUpdateBadge = restoreUpdateBadge;
 function showUpdateInstructions(hasUpdate = false) {
     var modal = document.getElementById('updateModal');
     if (modal) {
-        // Apply/reset inline styles based on current theme
-        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        var modalContent = modal.querySelector('.modal-content');
-        var versionInfo = modal.querySelector('.version-info');
-        var backupWarn = modal.querySelector('.backup-warning');
-        if (isDark) {
-            var dmContentBg = getComputedStyle(document.documentElement).getPropertyValue('--dm-content-bg').trim() || '#252526';
-            var dmSurface = getComputedStyle(document.documentElement).getPropertyValue('--dm-surface').trim() || '#333333';
-            var dmBorder = getComputedStyle(document.documentElement).getPropertyValue('--dm-border').trim() || '#404040';
-            var dmText = getComputedStyle(document.documentElement).getPropertyValue('--dm-text').trim() || '#bebebe';
-            if (modalContent) {
-                modalContent.style.backgroundColor = dmContentBg;
-                modalContent.style.color = dmText;
-            }
-            if (versionInfo) {
-                versionInfo.style.backgroundColor = dmSurface;
-                versionInfo.style.border = '1px solid ' + dmBorder;
-                versionInfo.querySelectorAll('p').forEach(function(p) { p.style.color = dmText; });
-                versionInfo.querySelectorAll('strong').forEach(function(s) { s.style.color = '#4a9eff'; });
-            }
-            if (backupWarn) {
-                backupWarn.style.backgroundColor = '#2d2a1e';
-                backupWarn.style.borderColor = '#5a4e1a';
-            }
-        } else {
-            // Reset all inline styles so light-mode CSS takes over
-            if (modalContent) { modalContent.style.backgroundColor = ''; modalContent.style.color = ''; }
-            if (versionInfo) {
-                versionInfo.style.backgroundColor = '';
-                versionInfo.style.border = '';
-                versionInfo.querySelectorAll('p').forEach(function(p) { p.style.color = ''; });
-                versionInfo.querySelectorAll('strong').forEach(function(s) { s.style.color = ''; });
-            }
-            if (backupWarn) { backupWarn.style.backgroundColor = ''; backupWarn.style.borderColor = ''; }
-        }
-
-        // Update modal title and content based on whether there's an update
         var titleEl = modal.querySelector('h3');
         var messageEl = modal.querySelector('#updateMessage');
-        var updateButtonsContainer = modal.querySelector('.update-instructions-buttons');
+        var releaseNotesLink = document.getElementById('releaseNotesLink');
         var backupWarning = document.getElementById('updateBackupWarning');
+        var howToUpdate = document.getElementById('updateHowToUpdate');
+
+        if (releaseNotesLink) releaseNotesLink.style.display = 'block';
 
         if (hasUpdate) {
-            if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, '🎉 New Update Available!') : '🎉 New Update Available!';
-            if (messageEl) messageEl.textContent = window.t ? window.t('update.new_version_available', null, 'A new version of Poznote is available.') : 'A new version of Poznote is available.';
-            if (backupWarning) {
-                backupWarning.style.display = 'block';
-            }
-            // Show release notes link
-            var releaseNotesLink = document.getElementById('releaseNotesLink');
-            if (releaseNotesLink) {
-                releaseNotesLink.style.display = 'block';
+            if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, 'New update available') : 'New update available';
+            if (messageEl) {
+                messageEl.innerHTML = window.t ? window.t('update.new_version_available', null, 'To update, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a>.') : 'To update, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a>.';
+                messageEl.style.display = '';
             }
         } else {
-            if (titleEl) titleEl.textContent = window.t ? window.t('update.up_to_date', null, '✅ Poznote is Up to date') : '✅ Poznote is Up to date';
-            if (messageEl) messageEl.textContent = '';
-            if (backupWarning) {
-                backupWarning.style.display = 'none';
-            }
-            // Show release notes link for up-to-date status as well
-            var releaseNotesLink = document.getElementById('releaseNotesLink');
-            if (releaseNotesLink) {
-                releaseNotesLink.style.display = 'block';
-            }
+            if (titleEl) titleEl.textContent = window.t ? window.t('update.up_to_date', null, 'Poznote is up to date') : 'Poznote is up to date';
+            if (messageEl) messageEl.style.display = 'none';
         }
 
         // Fill version information
@@ -1183,7 +1136,7 @@ function closeUpdateModal() {
 }
 
 function goToSelfHostedUpdateInstructions() {
-    window.open('https://github.com/timothepoznanski/poznote/blob/main/README.md#update-to-the-latest-version', '_blank');
+    window.open('https://github.com/timothepoznanski/poznote#update-application', '_blank');
 }
 
 function goToCloudUpdateInstructions() {
@@ -1243,6 +1196,9 @@ function showUpdateCheckResult(title, message, type) {
     }
     if (statusElement) {
         statusElement.textContent = message;
+        if (type === 'error' && message.indexOf('Invalid response from update server') !== -1) {
+            statusElement.textContent += ' This may also be caused by GitHub rate limiting/quota.';
+        }
     }
 
     // Update colors based on type

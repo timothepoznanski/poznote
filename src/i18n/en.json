@@ -381,7 +381,7 @@
       "backup_hint": "<strong>Settings > Backup</strong>",
       "current_version": "Current version:",
       "latest_available": "Latest available:",
-      "view_release_notes": "View release notes",
+      "view_release_notes": "View release notes <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">here</a>",
       "self_hosted": "Self-Hosted Instructions",
       "cloud": "Cloud Instructions"
     },
@@ -822,6 +822,7 @@
   },
   "update": {
     "new_available": "🎉 New update available!",
+    "new_version_available": "To update, follow the instructions on GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">here</a>",
     "description": "Your data will be preserved during the update.",
     "up_to_date": "✅ Poznote is up to date",
     "error_loading_version": "Error loading version"

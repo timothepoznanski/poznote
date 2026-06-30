@@ -849,7 +849,7 @@
       "backup_hint": "<strong>设置 > 备份</strong>",
       "current_version": "当前版本:",
       "latest_available": "最新可用版本:",
-      "view_release_notes": "查看发布日志",
+      "view_release_notes": "查看发布日志 <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">此处</a>",
       "self_hosted": "自托管说明",
       "cloud": "云端说明"
     },
@@ -1235,6 +1235,7 @@
   },
   "update": {
     "new_available": "🎉 有新版本可用！",
+    "new_version_available": "如需更新，请查看 GitHub 上的说明 <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">此处</a>",
     "description": "您的数据在更新过程中将被保留。",
     "up_to_date": "✅ Poznote 已是最新版本",
     "error_loading_version": "加载版本信息出错"

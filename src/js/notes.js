@@ -564,6 +564,10 @@ function deleteNote(noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                if (typeof window.invalidateNoteDomCache === 'function') {
+                    window.invalidateNoteDomCache(noteId);
+                }
+
                 // Mark note for auto-push since we deleted a note (if auto-push enabled)
                 if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                     window.setNeedsAutoPush(true);
@@ -1055,6 +1059,10 @@ function deleteLinkedNoteOnly(linkedNoteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                if (typeof window.invalidateNoteDomCache === 'function') {
+                    window.invalidateNoteDomCache(linkedNoteId);
+                }
+
                 closeModal('deleteLinkedNoteModal');
                 redirectToWorkspace();
                 return;
@@ -1093,6 +1101,11 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                if (typeof window.invalidateNoteDomCache === 'function') {
+                    window.invalidateNoteDomCache(targetNoteId);
+                    window.invalidateNoteDomCache(linkedNoteId);
+                }
+
                 if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
                     window.tabManager.closeTabByNoteId(targetNoteId);
                 }

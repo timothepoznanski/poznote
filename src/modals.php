@@ -76,15 +76,15 @@ try {
 <div id="updateModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.update.title'); ?></h3>
+        <div class="version-info">
+            <p><strong><?php echo t_h('modals.update.current_version'); ?></strong> <span id="currentVersion"><?php echo t_h('common.loading'); ?></span></p>
+            <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
+        </div>
+        <p id="releaseNotesLink" class="initially-hidden"><?php echo t('modals.update.view_release_notes'); ?></p>
         <p id="updateMessage"></p>
         <div class="backup-warning initially-hidden" id="updateBackupWarning">
             <p><strong>⚠️ </strong> <span class="backup-warning-text"><?php echo t_h('modals.update.backup_warning'); ?></span></p>
             <p class="text-small-muted"><?php echo t('modals.update.backup_hint'); ?></p>
-        </div>
-        <div class="version-info">
-            <p><strong><?php echo t_h('modals.update.current_version'); ?></strong> <span id="currentVersion"><?php echo t_h('common.loading'); ?></span></p>
-            <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
-            <p id="releaseNotesLink" class="initially-hidden"><a href="#" id="releaseNotesHref" target="_blank"><?php echo t_h('modals.update.view_release_notes'); ?></a></p>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>

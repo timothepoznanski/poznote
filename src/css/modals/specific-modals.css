@@ -503,7 +503,7 @@
     justify-content: center;
     border-top: none;
     padding-top: 0;
-    margin-top: 0;
+    margin-top: 20px;
 }
 
 #updateModal .btn-cancel {
