@@ -374,7 +374,7 @@
       "backup_hint": "<strong>Настройки > Резервное копирование</strong>",
       "current_version": "Текущая версия:",
       "latest_available": "Доступная версия:",
-      "view_release_notes": "Посмотреть примечания к выпуску",
+      "view_release_notes": "Посмотреть примечания к выпуску <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">здесь</a>",
       "self_hosted": "Инструкции для самостоятельного хостинга",
       "cloud": "Инструкции для облачной версии"
     },
@@ -807,6 +807,7 @@
   },
   "update": {
     "new_available": "🎉 Доступно новое обновление!",
+    "new_version_available": "Для обновления следуйте инструкциям на GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">здесь</a>",
     "description": "Ваши данные будут сохранены во время обновления.",
     "up_to_date": "✅ Poznote обновлен",
     "error_loading_version": "Ошибка загрузки версии"
