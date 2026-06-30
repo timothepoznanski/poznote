@@ -7,6 +7,215 @@
 var currentLoadingNoteId = null;
 var isNoteLoading = false;
 var imageClickHandlerInitialized = false;
+var NOTE_DOM_CACHE_LIMIT = 8;
+var noteDomCache = new Map();
+
+function getNoteDomCacheWorkspace(url) {
+    try {
+        var target = new URL(url, window.location.origin);
+        var urlWorkspace = target.searchParams.get('workspace');
+        if (urlWorkspace) return urlWorkspace;
+    } catch (e) { /* ignore */ }
+
+    if (typeof getSelectedWorkspace === 'function') {
+        var selected = getSelectedWorkspace();
+        if (selected) return selected;
+    }
+
+    return window.selectedWorkspace || (typeof selectedWorkspace !== 'undefined' ? selectedWorkspace : '') || '';
+}
+
+function getNoteDomCacheKey(noteId, url) {
+    var publicFlag = (typeof window.isPublicWorkspaceNavigationActive === 'function' && window.isPublicWorkspaceNavigationActive()) ? 'public' : 'private';
+    return publicFlag + '|' + getNoteDomCacheWorkspace(url) + '|' + String(noteId);
+}
+
+function urlHasSearchContext(url) {
+    var searchKeys = ['search', 'tags_search', 'unified_search', 'created_from', 'created_to', 'search_combined'];
+    try {
+        var target = new URL(url, window.location.origin);
+        for (var i = 0; i < searchKeys.length; i++) {
+            if ((target.searchParams.get(searchKeys[i]) || '').trim() !== '') {
+                return true;
+            }
+        }
+    } catch (e) { /* ignore */ }
+
+    return false;
+}
+
+function isNoteDomCacheAllowed(url, noteId, options) {
+    options = options || {};
+    if (!noteId || noteId === -1 || noteId === 'search') return false;
+    if (options.needsRefresh || options.disableDomCache) return false;
+    if (urlHasSearchContext(url) || urlHasSearchContext(window.location.href)) return false;
+    if (typeof window.isSearchMode !== 'undefined' && window.isSearchMode) return false;
+    return true;
+}
+
+function trimNoteDomCache(exceptKey) {
+    while (noteDomCache.size > NOTE_DOM_CACHE_LIMIT) {
+        var oldestKey = null;
+        noteDomCache.forEach(function (_entry, key) {
+            if (oldestKey === null && key !== exceptKey) oldestKey = key;
+        });
+        if (oldestKey === null) break;
+        noteDomCache.delete(oldestKey);
+    }
+}
+
+function invalidateNoteDomCache(noteId) {
+    if (!noteId) return;
+    noteId = String(noteId);
+    var keysToDelete = [];
+    noteDomCache.forEach(function (entry, key) {
+        if (entry && String(entry.noteId) === noteId) {
+            keysToDelete.push(key);
+        }
+    });
+    keysToDelete.forEach(function (key) {
+        noteDomCache.delete(key);
+    });
+}
+
+function storeCurrentNoteDomInCache(nextNoteId, targetUrl, options) {
+    options = options || {};
+    var currentRightColumn = document.getElementById('right_col');
+    if (!currentRightColumn) return;
+
+    var currentEntry = currentRightColumn.querySelector('.noteentry[data-note-id]');
+    if (!currentEntry) return;
+
+    var currentNoteId = currentEntry.getAttribute('data-note-id');
+    if (!currentNoteId || String(currentNoteId) === String(nextNoteId)) return;
+    if (!isNoteDomCacheAllowed(window.location.href, currentNoteId, options)) return;
+
+    if (typeof notesNeedingRefresh !== 'undefined' && notesNeedingRefresh.has(String(currentNoteId))) {
+        invalidateNoteDomCache(currentNoteId);
+        return;
+    }
+
+    if (typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(currentNoteId)) {
+        invalidateNoteDomCache(currentNoteId);
+        return;
+    }
+
+    var key = getNoteDomCacheKey(currentNoteId, window.location.href || targetUrl || '');
+    var fragment = document.createDocumentFragment();
+    while (currentRightColumn.firstChild) {
+        fragment.appendChild(currentRightColumn.firstChild);
+    }
+
+    noteDomCache.delete(key);
+    noteDomCache.set(key, {
+        noteId: String(currentNoteId),
+        fragment: fragment,
+        cachedAt: Date.now()
+    });
+    trimNoteDomCache(key);
+}
+
+function clearKanbanStateForNoteLoad(options) {
+    if (!options || !options.clearKanbanFlags) return;
+    if (typeof window.resetKanbanViewState === 'function') {
+        window.resetKanbanViewState();
+    } else {
+        window._isKanbanViewActive = false;
+        window._kanbanFolderId = null;
+        window._originalRightColContent = null;
+    }
+}
+
+function finishNoteLoadVisualState(options) {
+    options = options || {};
+    if (options.skipLoadingAnimation) {
+        var rightColEl = document.getElementById('right_col');
+        if (rightColEl) rightColEl.classList.remove('note-fade-out');
+        if (!options.updateSelectionBeforeLoad && options.clickedLink) {
+            updateSelectedNote(options.clickedLink);
+        }
+        return;
+    }
+
+    setTimeout(function () {
+        hideNoteLoadingState();
+        if (!options.updateSelectionBeforeLoad && options.clickedLink) {
+            updateSelectedNote(options.clickedLink);
+        }
+    }, 40);
+}
+
+function restoreNoteDomFromCache(url, noteId, options) {
+    options = options || {};
+    if (!isNoteDomCacheAllowed(url, noteId, options)) return false;
+
+    var key = getNoteDomCacheKey(noteId, url);
+    var cached = noteDomCache.get(key);
+    if (!cached || !cached.fragment) return false;
+
+    var currentRightColumn = document.getElementById('right_col');
+    if (!currentRightColumn) return false;
+
+    if (typeof clearSearchHighlights === 'function') {
+        try { clearSearchHighlights(); } catch (e) { /* ignore */ }
+    }
+
+    storeCurrentNoteDomInCache(noteId, url, options);
+    noteDomCache.delete(key);
+
+    while (currentRightColumn.firstChild) {
+        currentRightColumn.removeChild(currentRightColumn.firstChild);
+    }
+    currentRightColumn.appendChild(cached.fragment);
+    requestAnimationFrame(function () {
+        try {
+            window.dispatchEvent(new Event('resize'));
+        } catch (e) { /* ignore */ }
+    });
+
+    if (typeof window.hideNoteCreationLoading === 'function') {
+        window.hideNoteCreationLoading();
+    }
+
+    if (window.tabManager) {
+        window.tabManager._onNoteLoaded(noteId);
+        window.tabManager.render();
+    }
+
+    clearKanbanStateForNoteLoad(options);
+
+    if (!options.fromHistory) {
+        updateBrowserUrl(url, noteId);
+    }
+
+    reinitializeNoteContent({
+        skipStructuralInit: true,
+        preserveRuntimeState: true
+    });
+
+    const isPublicWorkspaceReadonlyFromCache =
+        (typeof window.isPublicWorkspaceNavigationActive === 'function' && window.isPublicWorkspaceNavigationActive()) ||
+        (document.body && document.body.classList.contains('public-workspace-readonly'));
+
+    if (typeof window.createNoteSnapshot === 'function' && !isPublicWorkspaceReadonlyFromCache) {
+        window.createNoteSnapshot(noteId);
+    }
+
+    if (typeof options.onLoadingComplete === 'function') {
+        options.onLoadingComplete();
+    }
+
+    if (typeof options.onContentLoaded === 'function') {
+        options.onContentLoaded(noteId, url);
+    }
+
+    if (typeof applyHighlightsWithRetries === 'function') {
+        try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
+    }
+
+    finishNoteLoadVisualState(options);
+    return true;
+}
 
 /**
  * Ensure the currently active search highlight is visible in the viewport.
@@ -242,10 +451,6 @@ function findNoteLinkById(noteId) {
 function loadNoteCommon(url, noteId, options) {
     options = options || {};
 
-    // Show loading state (skip fade-out animation for tab switches to avoid flash)
-    if (!options.skipLoadingAnimation) {
-        showNoteLoadingState();
-    }
     if (options.updateSelectionBeforeLoad && options.clickedLink) {
         updateSelectedNote(options.clickedLink);
     }
@@ -253,6 +458,15 @@ function loadNoteCommon(url, noteId, options) {
     // On mobile, add note-open class
     if (isMobileDevice()) {
         document.body.classList.add('note-open');
+    }
+
+    if (restoreNoteDomFromCache(url, noteId, options)) {
+        return;
+    }
+
+    // Show loading state (skip fade-out animation for tab switches to avoid flash)
+    if (!options.skipLoadingAnimation) {
+        showNoteLoadingState();
     }
 
     // Build final URL with cache-busting if needed
@@ -299,6 +513,8 @@ function loadNoteCommon(url, noteId, options) {
                                     try { clearSearchHighlights(); } catch (e) { /* ignore */ }
                                 }
 
+                                storeCurrentNoteDomInCache(noteId, url, options);
+
                                 // Replace right_col content (tab bar lives in #right_pane, not here)
                                 currentRightColumn.innerHTML = rightColumn.innerHTML;
 
@@ -312,16 +528,7 @@ function loadNoteCommon(url, noteId, options) {
                                     window.tabManager.render();
                                 }
 
-                                // Clear Kanban view flags if requested
-                                if (options.clearKanbanFlags) {
-                                    if (typeof window.resetKanbanViewState === 'function') {
-                                        window.resetKanbanViewState();
-                                    } else {
-                                        window._isKanbanViewActive = false;
-                                        window._kanbanFolderId = null;
-                                        window._originalRightColContent = null;
-                                    }
-                                }
+                                clearKanbanStateForNoteLoad(options);
 
                                 // Update URL (skip if coming from popstate)
                                 if (!options.fromHistory) {
@@ -348,22 +555,7 @@ function loadNoteCommon(url, noteId, options) {
                                     try { applyHighlightsWithRetries(); } catch (e) { /* ignore */ }
                                 }
 
-                                if (options.skipLoadingAnimation) {
-                                    // No animation — just ensure fade-out class is cleared
-                                    var rightColEl = document.getElementById('right_col');
-                                    if (rightColEl) rightColEl.classList.remove('note-fade-out');
-                                    if (!options.updateSelectionBeforeLoad && options.clickedLink) {
-                                        updateSelectedNote(options.clickedLink);
-                                    }
-                                } else {
-                                    // Small delay to ensure the loading animation is visible
-                                    setTimeout(function () {
-                                        hideNoteLoadingState();
-                                        if (!options.updateSelectionBeforeLoad && options.clickedLink) {
-                                            updateSelectedNote(options.clickedLink);
-                                        }
-                                    }, 80);
-                                }
+                                finishNoteLoadVisualState(options);
 
                                 // Reinitialize note click handlers if requested
                                 if (options.reinitClickHandlers && typeof window.initializeNoteClickHandlers === 'function') {
@@ -1318,7 +1510,11 @@ function translateCalloutTitles() {
 /**
  * Re-initialize note content after AJAX load
  */
-function reinitializeNoteContent() {
+function reinitializeNoteContent(options) {
+    options = options || {};
+    var skipStructuralInit = options.skipStructuralInit === true;
+    var preserveRuntimeState = options.preserveRuntimeState === true || skipStructuralInit;
+
     // Re-initialize any JavaScript components that might be in the loaded content
 
     // Re-initialize auto-save state for the current note
@@ -1329,14 +1525,16 @@ function reinitializeNoteContent() {
     // Convert base64 images in HTML notes to attachments (migration)
     try {
         var noteEntries = document.querySelectorAll('.noteentry[data-note-type="note"], .noteentry:not([data-note-type])');
-        noteEntries.forEach(function (entry) {
-            if (typeof window.convertBase64ImagesToAttachments === 'function') {
-                // Small delay to ensure DOM is stable
-                setTimeout(function () {
-                    window.convertBase64ImagesToAttachments(entry);
-                }, 100);
-            }
-        });
+        if (!skipStructuralInit) {
+            noteEntries.forEach(function (entry) {
+                if (typeof window.convertBase64ImagesToAttachments === 'function') {
+                    // Small delay to ensure DOM is stable
+                    setTimeout(function () {
+                        window.convertBase64ImagesToAttachments(entry);
+                    }, 100);
+                }
+            });
+        }
     } catch (e) {
         // Silently continue if error
     }
@@ -1379,7 +1577,7 @@ function reinitializeNoteContent() {
     reinitializeImageClickHandlers();
 
     // Refresh attachment previews after initial and AJAX note loads.
-    if (typeof window.refreshAttachmentPreviewsForVisibleNotes === 'function') {
+    if (!preserveRuntimeState && typeof window.refreshAttachmentPreviewsForVisibleNotes === 'function') {
         window.refreshAttachmentPreviewsForVisibleNotes();
     }
 
@@ -1408,22 +1606,24 @@ function reinitializeNoteContent() {
     // If the loaded note(s) include any tasklist entries, initialize them so the JSON content
     // is replaced with the interactive task list UI when notes are loaded via AJAX.
     try {
-        const taskEntries = document.querySelectorAll('[data-note-type="tasklist"]');
-        taskEntries.forEach(function (entry) {
-            const idAttr = entry.id || '';
-            if (!idAttr) return;
-            const noteId = idAttr.replace('entry', '');
-            if (typeof initializeTaskList === 'function') {
-                // Call initializeTaskList after a short delay to ensure the DOM is stable
-                setTimeout(function () {
-                    try {
-                        initializeTaskList(noteId, 'tasklist');
-                    } catch (e) {
-                        console.error('Error initializing tasklist for noteId', noteId, e);
-                    }
-                }, 50);
-            }
-        });
+        if (!skipStructuralInit) {
+            const taskEntries = document.querySelectorAll('[data-note-type="tasklist"]');
+            taskEntries.forEach(function (entry) {
+                const idAttr = entry.id || '';
+                if (!idAttr) return;
+                const noteId = idAttr.replace('entry', '');
+                if (typeof initializeTaskList === 'function') {
+                    // Call initializeTaskList after a short delay to ensure the DOM is stable
+                    setTimeout(function () {
+                        try {
+                            initializeTaskList(noteId, 'tasklist');
+                        } catch (e) {
+                            console.error('Error initializing tasklist for noteId', noteId, e);
+                        }
+                    }, 50);
+                }
+            });
+        }
     } catch (e) {
         console.error('Error while initializing tasklist entries after AJAX load:', e);
     }
@@ -1431,22 +1631,24 @@ function reinitializeNoteContent() {
     // If the loaded note(s) include any markdown entries, initialize them so the markdown content
     // is replaced with the interactive markdown editor/preview UI when notes are loaded via AJAX.
     try {
-        const markdownEntries = document.querySelectorAll('[data-note-type="markdown"]');
-        markdownEntries.forEach(function (entry) {
-            const idAttr = entry.id || '';
-            if (!idAttr) return;
-            const noteId = idAttr.replace('entry', '');
-            if (typeof initializeMarkdownNote === 'function') {
-                // Call initializeMarkdownNote after a short delay to ensure the DOM is stable
-                setTimeout(function () {
-                    try {
-                        initializeMarkdownNote(noteId);
-                    } catch (e) {
-                        console.error('Error initializing markdown note for noteId', noteId, e);
-                    }
-                }, 50);
-            }
-        });
+        if (!skipStructuralInit) {
+            const markdownEntries = document.querySelectorAll('[data-note-type="markdown"]');
+            markdownEntries.forEach(function (entry) {
+                const idAttr = entry.id || '';
+                if (!idAttr) return;
+                const noteId = idAttr.replace('entry', '');
+                if (typeof initializeMarkdownNote === 'function') {
+                    // Call initializeMarkdownNote after a short delay to ensure the DOM is stable
+                    setTimeout(function () {
+                        try {
+                            initializeMarkdownNote(noteId);
+                        } catch (e) {
+                            console.error('Error initializing markdown note for noteId', noteId, e);
+                        }
+                    }, 50);
+                }
+            });
+        }
     } catch (e) {
         console.error('Error while initializing markdown entries after AJAX load:', e);
     }
@@ -1477,9 +1679,11 @@ function reinitializeNoteContent() {
     // Close all toggle blocks on page load (toggles should always start closed)
     try {
         const toggleBlocks = document.querySelectorAll('details.toggle-block');
-        toggleBlocks.forEach(function (toggle) {
-            toggle.removeAttribute('open');
-        });
+        if (!preserveRuntimeState) {
+            toggleBlocks.forEach(function (toggle) {
+                toggle.removeAttribute('open');
+            });
+        }
     } catch (e) {
         console.error('Error closing toggle blocks:', e);
     }
@@ -2314,3 +2518,5 @@ function hideImageLinkToast(toast) {
         reinitializeImageClickHandlers();
     }
 })();
+
+window.invalidateNoteDomCache = invalidateNoteDomCache;

@@ -3017,6 +3017,7 @@ function renderMarkdownPreview(previewDiv, markdownContent, noteId, options) {
         previewDiv.classList.add('empty');
     } else {
         previewDiv.innerHTML = parseMarkdown(markdownContent);
+        prioritizeInitialMarkdownPreviewImages(previewDiv);
         previewDiv.classList.remove('empty');
         if (postProcess && noteId) {
             setTimeout(function () {
@@ -3029,6 +3030,25 @@ function renderMarkdownPreview(previewDiv, markdownContent, noteId, options) {
                 }
                 setupPreviewInteractivity(noteId);
             }, delay);
+        }
+    }
+}
+
+function prioritizeInitialMarkdownPreviewImages(previewDiv) {
+    if (!previewDiv || !previewDiv.querySelectorAll) return;
+
+    var images = previewDiv.querySelectorAll('img');
+    for (var i = 0; i < images.length; i++) {
+        var img = images[i];
+        img.setAttribute('decoding', 'async');
+
+        if (i < 3) {
+            img.setAttribute('loading', 'eager');
+            if (i === 0) {
+                img.setAttribute('fetchpriority', 'high');
+            }
+        } else if (!img.hasAttribute('loading')) {
+            img.setAttribute('loading', 'lazy');
         }
     }
 }

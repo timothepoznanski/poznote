@@ -97,6 +97,69 @@ function decodeAttachmentList($attachmentsJson) {
     return is_array($attachments) ? $attachments : [];
 }
 
+function buildLegacyAttachmentEtag($filePath, $attachment) {
+    $mtime = @filemtime($filePath) ?: 0;
+    $size = @filesize($filePath) ?: 0;
+    $userId = $_SESSION['user_id'] ?? ($_SERVER['HTTP_X_USER_ID'] ?? '');
+    $identity = implode('|', [
+        (string)$userId,
+        (string)($attachment['id'] ?? ''),
+        (string)($attachment['filename'] ?? basename($filePath)),
+        (string)$size,
+        (string)$mtime,
+    ]);
+
+    return '"' . hash('sha256', $identity) . '"';
+}
+
+function legacyClientHasFreshAttachment($etag, $lastModified) {
+    $ifNoneMatch = trim((string)($_SERVER['HTTP_IF_NONE_MATCH'] ?? ''));
+    if ($ifNoneMatch !== '') {
+        if ($ifNoneMatch === '*') {
+            return true;
+        }
+
+        $clientEtags = array_map('trim', explode(',', $ifNoneMatch));
+        foreach ($clientEtags as $clientEtag) {
+            if ($clientEtag === $etag || preg_replace('/^W\//', '', $clientEtag) === $etag) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    $ifModifiedSince = trim((string)($_SERVER['HTTP_IF_MODIFIED_SINCE'] ?? ''));
+    if ($ifModifiedSince === '') {
+        return false;
+    }
+
+    $clientModifiedTime = strtotime($ifModifiedSince);
+    return $clientModifiedTime !== false && $clientModifiedTime >= $lastModified;
+}
+
+function sendLegacyAttachmentCacheHeaders($filePath, $attachment, $forceDownload = false) {
+    $lastModified = @filemtime($filePath) ?: time();
+    $etag = buildLegacyAttachmentEtag($filePath, $attachment);
+    $cacheSeconds = $forceDownload ? 0 : 3600;
+
+    header_remove('Pragma');
+    header('ETag: ' . $etag);
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
+    header('Vary: Cookie, Authorization, X-User-ID');
+    header('Cache-Control: private, max-age=' . $cacheSeconds . ', must-revalidate');
+    header($cacheSeconds > 0
+        ? 'Expires: ' . gmdate('D, d M Y H:i:s', time() + $cacheSeconds) . ' GMT'
+        : 'Expires: 0'
+    );
+
+    if (!$forceDownload && legacyClientHasFreshAttachment($etag, $lastModified)) {
+        header_remove('Content-Type');
+        http_response_code(304);
+        exit;
+    }
+}
+
 function handleUpload() {
     global $con, $attachments_dir;
     
@@ -343,9 +406,11 @@ function handleDownload() {
                     
                     // Sanitize filename for Content-Disposition header
                     $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
-                    
+                    $isInlineView = strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false;
+                    sendLegacyAttachmentCacheHeaders($file_path, $attachment, !$isInlineView);
+
                     // For PDFs and images, allow inline viewing
-                    if (strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false) {
+                    if ($isInlineView) {
                         header('Content-Type: ' . $file_type);
                         header('Content-Disposition: inline; filename="' . $safeFilename . '"');
                     } else {
@@ -353,11 +418,8 @@ function handleDownload() {
                         header('Content-Type: application/octet-stream');
                         header('Content-Disposition: attachment; filename="' . $safeFilename . '"');
                     }
-                    
+
                     header('Content-Description: File Transfer');
-                    header('Expires: 0');
-                    header('Cache-Control: must-revalidate');
-                    header('Pragma: public');
                     header('Content-Length: ' . filesize($file_path));
                     
                     // Output file
