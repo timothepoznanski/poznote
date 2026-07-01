@@ -199,6 +199,38 @@ docker compose up -d
 
 </details>
 
+<a id="kubernetes"></a>
+<details>
+<summary><strong>Kubernetes with Helm</strong></summary>
+
+#### Step 1: Prerequisite
+
+Install [Helm](https://helm.sh/docs/intro/install/) and make sure your Kubernetes context points to the cluster where you want to deploy Poznote.
+
+#### Step 2: Deploy Poznote
+
+Add the HelmForge chart repository:
+
+```bash
+helm repo add helmforge https://repo.helmforge.dev
+```
+
+Update your local chart index:
+
+```bash
+helm repo update
+```
+
+Install Poznote:
+
+```bash
+helm install poznote helmforge/poznote --namespace poznote --create-namespace
+```
+
+The Poznote Helm chart is maintained by the HelmForge community as a Kubernetes-native installation option. See the [HelmForge Poznote chart documentation](https://helmforge.dev/docs/charts/poznote) for values, persistence, service exposure, probes, security contexts, and other production-oriented settings.
+
+</details>
+
 > If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
 ## Access
