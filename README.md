@@ -201,7 +201,7 @@ docker compose up -d
 
 <a id="kubernetes"></a>
 <details>
-<summary><strong>Kubernetes with Helm</strong></summary>
+<summary><strong>☸️ Kubernetes with Helm</strong></summary>
 
 #### Step 1: Prerequisite
 
