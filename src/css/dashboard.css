@@ -1003,6 +1003,43 @@ body.dark-mode .dashboard-empty {
     color: #007DB8;
 }
 
+.dashboard-mobile-back:hover .lucide {
+    color: #007DB8;
+}
+
+:root[data-theme='dark'] .dashboard-mobile-back:hover,
+body.dark-mode .dashboard-mobile-back:hover {
+    color: var(--dm-accent, #60a5fa);
+}
+
+:root[data-theme='dark'] .dashboard-mobile-back:hover .lucide,
+body.dark-mode .dashboard-mobile-back:hover .lucide {
+    color: var(--dm-accent, #60a5fa);
+}
+
+/* ---------- Desktop settings link (hidden on mobile) ---------- */
+.dashboard-desktop-settings {
+    text-decoration: none;
+}
+
+.dashboard-desktop-settings:hover {
+    color: #007DB8;
+}
+
+.dashboard-desktop-settings:hover .lucide {
+    color: #007DB8;
+}
+
+:root[data-theme='dark'] .dashboard-desktop-settings:hover,
+body.dark-mode .dashboard-desktop-settings:hover {
+    color: var(--dm-accent, #60a5fa);
+}
+
+:root[data-theme='dark'] .dashboard-desktop-settings:hover .lucide,
+body.dark-mode .dashboard-desktop-settings:hover .lucide {
+    color: var(--dm-accent, #60a5fa);
+}
+
 
 
 /* ---------- Git sync labels ---------- */
@@ -1017,6 +1054,10 @@ body.dark-mode .dashboard-empty {
 @media (max-width: 800px) {
     .dashboard-mobile-back {
         display: flex;
+    }
+
+    .dashboard-top-info .dashboard-desktop-settings {
+        display: none;
     }
 
     .dashboard-topbar {
