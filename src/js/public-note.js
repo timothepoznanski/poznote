@@ -420,9 +420,23 @@
     document.addEventListener('keydown', function (e) {
         if (e.target.matches('.public-task-add-input, .public-markdown-task-add-input')) {
             if (e.key === 'Enter') {
+                // preventDefault also suppresses the implicit form submission,
+                // so handleAddTask is not called twice when keydown does fire.
+                e.preventDefault();
                 handleAddTask(e.target);
             }
         }
+    });
+
+    // Implicit form submission is the only Enter mechanism that mobile virtual
+    // keyboards trigger reliably (their keydown events often come through IME
+    // composition with key 'Unidentified' instead of 'Enter').
+    document.addEventListener('submit', function (e) {
+        const form = e.target;
+        if (!form.classList || !form.classList.contains('task-input-form')) return;
+        e.preventDefault();
+        const input = form.querySelector('.public-task-add-input, .public-markdown-task-add-input');
+        if (input) handleAddTask(input);
     });
 
     let publicTaskEditState = {

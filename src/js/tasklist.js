@@ -206,8 +206,11 @@ function renderTaskList(noteId, tasks) {
     const taskListHtml = `
         <div class="task-list-container" id="tasklist-${noteId}">
             <div class="task-input-container">
-          <input type="text" class="task-input" id="task-input-${noteId}"
-              placeholder="${escapeAttribute(inputPlaceholder)}" maxlength="4000">
+          <form class="task-input-form" id="task-input-form-${noteId}" action="javascript:void(0);">
+              <input type="text" class="task-input" id="task-input-${noteId}"
+                  placeholder="${escapeAttribute(inputPlaceholder)}" maxlength="4000"
+                  autocomplete="off" enterkeyhint="go">
+          </form>
             </div>
             <div class="tasks-list" id="tasks-list-${noteId}">
                 ${renderTasks(tasks, noteId)}
@@ -220,9 +223,23 @@ function renderTaskList(noteId, tasks) {
 
     // Add event listeners
     const input = document.getElementById(`task-input-${noteId}`);
+    const form = document.getElementById(`task-input-form-${noteId}`);
+    if (form) {
+        // Implicit form submission is the only Enter mechanism that mobile
+        // virtual keyboards trigger reliably (their keydown events often come
+        // through IME composition with key 'Unidentified' instead of 'Enter',
+        // so a keydown-only handler randomly misses the Enter key and the
+        // browser moves focus to the next focusable element instead).
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            addTask(noteId);
+        });
+    }
     if (input) {
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
+                // preventDefault also suppresses the implicit form submission,
+                // so addTask is not called twice when keydown does fire.
                 e.preventDefault();
                 e.stopPropagation(); // Standardize event handling
                 addTask(noteId);

@@ -553,7 +553,9 @@ $noteType = $note['type'] ?? 'note';
 // Markdown with tasklist: add task input
 if ($noteType === 'markdown' && strpos($content, 'class="task-list"') !== false) {
     $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
-    $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
+    $addTaskHtml .= '<form class="task-input-form" action="javascript:void(0);">';
+    $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" autocomplete="off" enterkeyhint="go" />';
+    $addTaskHtml .= '</form>';
     $addTaskHtml .= '</div>';
     $content .= $addTaskHtml;
 }
@@ -572,7 +574,9 @@ if ($noteType === 'tasklist') {
         $tasksHtml = '<div class="task-list-container">';
         if ($taskAccessMode === 'full') {
             $tasksHtml .= '<div class="task-input-container">';
-            $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" />';
+            $tasksHtml .= '<form class="task-input-form" action="javascript:void(0);">';
+            $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" autocomplete="off" enterkeyhint="go" />';
+            $tasksHtml .= '</form>';
             $tasksHtml .= '</div>';
         }
 

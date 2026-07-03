@@ -25,6 +25,15 @@
     align-items: center;
 }
 
+/* The form only exists so mobile keyboards submit on Enter; keep it layout-neutral */
+.task-input-form {
+    width: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .task-input {
     width: 95%;
     padding: 8px 12px;
