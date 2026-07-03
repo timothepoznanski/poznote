@@ -69,6 +69,22 @@ class TestUpdateNote:
         assert kwargs["content"] == html
 
     @patch("poznote_mcp.server._get_client_or_error")
+    def test_client_wrapped_string_is_unwrapped(self, mock_gcoe):
+        """A client that wraps a plain string in an array must not produce
+        a note body containing literal bracket syntax (regression for the
+        6.29.0 MCP bug)."""
+        from poznote_mcp.server import update_note
+
+        client = _fake_client()
+        mock_gcoe.return_value = (client, None)
+
+        update_note(id=100, content=["# My Note\n\nSome text"])
+
+        _, kwargs = client.update_note.call_args
+        assert kwargs["content"] == "# My Note\n\nSome text"
+        assert not kwargs["content"].startswith("[")
+
+    @patch("poznote_mcp.server._get_client_or_error")
     def test_none_content_passes_through(self, mock_gcoe):
         from poznote_mcp.server import update_note
 
@@ -117,6 +133,25 @@ class TestCreateNote:
 
         _, kwargs = client.create_note.call_args
         assert kwargs["content"] == md
+
+    @patch("poznote_mcp.server._get_client_or_error")
+    def test_client_wrapped_markdown_is_unwrapped(self, mock_gcoe):
+        """Regression: markdown note whose string content was wrapped in an
+        array by the MCP client must be stored as a plain string."""
+        from poznote_mcp.server import create_note
+
+        client = _fake_client()
+        mock_gcoe.return_value = (client, None)
+
+        create_note(
+            title="MD Note",
+            content=["# My Note Content\n\nSome text"],
+            note_type="markdown",
+        )
+
+        _, kwargs = client.create_note.call_args
+        assert kwargs["content"] == "# My Note Content\n\nSome text"
+        assert not kwargs["content"].startswith("[")
 
     @patch("poznote_mcp.server._get_client_or_error")
     def test_json_string_content_not_double_encoded(self, mock_gcoe):

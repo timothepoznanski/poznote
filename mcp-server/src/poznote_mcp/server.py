@@ -355,6 +355,36 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, c
     }, indent=2, ensure_ascii=False)
 
 
+def _normalize_content(content, note_type=None):
+    """Normalize note content into the string the backend API expects.
+
+    Some MCP clients don't handle the ``anyOf`` schema for the ``content``
+    field well and wrap a plain string in a single-element array to satisfy
+    validation (e.g. ``["# My Note"]``). Task-list notes, on the other hand,
+    genuinely carry a JSON array of task objects. We must serialize the real
+    task-list array but *unwrap* the accidental string wrapping, otherwise the
+    literal ``["..."]`` ends up written into the note body.
+
+    Discriminator:
+      * A real task-list array is a list of dicts (task items).
+      * An accidentally-wrapped standard/markdown note is a list of strings.
+    """
+    if not isinstance(content, list):
+        return content
+
+    # Genuine task-list content: list of task-item objects. Serialize as-is.
+    if note_type == "tasklist" or (content and all(isinstance(el, dict) for el in content)):
+        return json.dumps(content, ensure_ascii=False)
+
+    # Non-tasklist content the client wrapped in an array. Unwrap it back to a
+    # plain string so the note body doesn't contain literal bracket syntax.
+    if all(isinstance(el, str) for el in content):
+        return "".join(content)
+
+    # Fallback: serialize whatever we got rather than crash.
+    return json.dumps(content, ensure_ascii=False)
+
+
 @mcp.tool()
 def create_note(
     title: str,
@@ -366,20 +396,17 @@ def create_note(
     user_id: Optional[int] = None,
 ) -> str:
     """Create a new note in Poznote
-    
+
     Args:
         title: Title of the new note
-        content: Content of the note (HTML, Markdown, or JSON array for task lists)
+        content: Content of the note. Always a plain string (HTML or Markdown).
+            For task lists, pass the JSON array serialized as a string.
         workspace: Workspace name (optional)
         tags: Comma-separated tags (e.g., 'ai, docs, important')
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
         user_id: User profile ID to access (optional, overrides default)
     """
-    # Task list notes use a JSON array as content; if the MCP framework
-    # parsed it into a Python list, convert it back to a JSON string.
-    if isinstance(content, list):
-        content = json.dumps(content, ensure_ascii=False)
     client, err = _get_client_or_error()
     if err:
         return err
@@ -400,6 +427,8 @@ def create_note(
                 },
                 ensure_ascii=False,
             )
+
+    content = _normalize_content(content, note_type)
 
     try:
         result = client.create_note(
@@ -438,15 +467,14 @@ def update_note(
     Args:
         id: ID of the note to update
         workspace: Workspace name (optional)
-        content: New content for the note (string, or JSON array for task lists)
+        content: New content for the note. A plain string (HTML or Markdown).
+            For task lists, pass the JSON array serialized as a string.
         title: New title for the note
         tags: New tags (comma-separated)
         user_id: User profile ID to access (optional, overrides default)
     """
-    # Task list notes use a JSON array as content; if the MCP framework
-    # parsed it into a Python list, convert it back to a JSON string.
-    if isinstance(content, list):
-        content = json.dumps(content, ensure_ascii=False)
+    if content is not None:
+        content = _normalize_content(content)
     client, err = _get_client_or_error()
     if err:
         return err
