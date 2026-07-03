@@ -23,9 +23,14 @@ You should see the MCP server running. Note the port number in the output (defau
 
 ### 2. Configure VS Code
 
-Add the Poznote MCP server to your `mcp.json` file:
+Add the Poznote MCP server to your `mcp.json` file. The location depends on your operating system :
 
-**Local installation:**
+- **Windows:** `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
+- **Linux:** `~/.config/Code/User/mcp.json`
+- **macOS:** `~/Library/Application Support/Code/User/mcp.json`
+
+If the file doesn't exist, create it with the following configuration :
+
 ```json
 {
   "servers": {
@@ -39,17 +44,7 @@ Add the Poznote MCP server to your `mcp.json` file:
 
 > **Note:** Replace `8045` with your actual MCP server port if you've customized it in your `docker-compose.yml`.
 
-### 3. Locate mcp.json
-
-The `mcp.json` file location depends on your operating system:
-
-- **Windows:** `C:\Users\YOUR-USERNAME\AppData\Roaming\Code\User\mcp.json`
-- **Linux:** `~/.config/Code/User/mcp.json`
-- **macOS:** `~/Library/Application Support/Code/User/mcp.json`
-
-If the file doesn't exist, create it with the JSON configuration above.
-
-### 4. Reload VS Code
+### 3. Reload VS Code
 
 After updating `mcp.json`, reload VS Code for the changes to take effect:
 - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
