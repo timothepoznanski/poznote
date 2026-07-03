@@ -568,6 +568,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
+				<a href="settings.php" class="dashboard-top-info-item dashboard-desktop-settings" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
+					<i class="lucide lucide-settings"></i>
+					<span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
+				</a>
 			</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">

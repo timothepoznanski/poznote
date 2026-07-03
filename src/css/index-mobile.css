@@ -208,7 +208,9 @@ body.mobile-keyboard-open #tagsModal.modal,
 body.mobile-formatting-toolbar-active #linkedNoteSelectorModal.modal,
 body.mobile-keyboard-open #linkedNoteSelectorModal.modal,
 body.mobile-formatting-toolbar-active #linkedNoteFolderSelectorModal.modal,
-body.mobile-keyboard-open #linkedNoteFolderSelectorModal.modal {
+body.mobile-keyboard-open #linkedNoteFolderSelectorModal.modal,
+body.mobile-formatting-toolbar-active #taskEditModal.modal,
+body.mobile-keyboard-open #taskEditModal.modal {
     z-index: 2147483004 !important;
 }
 
@@ -218,7 +220,9 @@ body.mobile-keyboard-open #tagsModal .modal-content,
 body.mobile-formatting-toolbar-active #linkedNoteSelectorModal .modal-content,
 body.mobile-keyboard-open #linkedNoteSelectorModal .modal-content,
 body.mobile-formatting-toolbar-active #linkedNoteFolderSelectorModal .modal-content,
-body.mobile-keyboard-open #linkedNoteFolderSelectorModal .modal-content {
+body.mobile-keyboard-open #linkedNoteFolderSelectorModal .modal-content,
+body.mobile-formatting-toolbar-active #taskEditModal .modal-content,
+body.mobile-keyboard-open #taskEditModal .modal-content {
     z-index: 2147483005 !important;
 }
 

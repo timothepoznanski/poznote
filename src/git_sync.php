@@ -481,7 +481,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
         <div class="alert alert-warning" style="justify-content: center; text-align: center; margin-top: 20px;">
-            <i class="lucide lucide-info-circle"></i>
             <span>
                 <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from Dashboard.', $currentLang); ?></strong>
                 <a href="dashboard.php" style="margin-left: 8px; font-weight: 600; text-decoration: underline; color: inherit;">

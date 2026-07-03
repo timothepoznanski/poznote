@@ -780,10 +780,10 @@
   },
   "notes_manager": {
     "actions": "Массовые действия",
-    "choose_action": "Выберите действие...",
+    "choose_action": "Выберите действие",
     "select_folder": "Выберите целевую папку",
-    "add_tag": "Добавить тег",
-    "remove_tag": "Удалить тег",
+    "add_tag": "Добавить теги",
+    "remove_tag": "Удалить теги",
     "add_favorite": "Добавить в избранное",
     "remove_favorite": "Убрать из избранного",
     "move_to_trash": "Переместить в корзину",

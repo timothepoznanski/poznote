@@ -135,7 +135,7 @@ $currentLang = getUserLanguage();
 		<!-- Bulk action bar (hidden by default) -->
 		<div id="nmBulkBar" class="nm-bulk-bar nm-bulk-bar-hidden">
 			<div class="nm-bulk-count-wrap">
-				<span id="nmSelectedCount" class="nm-selected-count"></span>
+				<span id="nmSelectedCount" class="nm-selected-count">0 <?php echo t_h('notes_manager.selected', [], 'selected'); ?></span>
 			</div>
 			<div class="nm-bulk-actions">
 				<button id="nmSelectAllBtn" class="btn btn-sm btn-secondary nm-bulk-btn">
@@ -150,7 +150,7 @@ $currentLang = getUserLanguage();
 					disabled
 					aria-label="<?php echo t_h('notes_manager.actions', [], 'Bulk actions'); ?>"
 				>
-					<option value=""><?php echo t_h('notes_manager.choose_action', [], 'Choose an action...'); ?></option>
+					<option value=""><?php echo t_h('notes_manager.choose_action', [], 'Choose an action'); ?></option>
 					<option value="move"><?php echo t_h('notes_manager.move_to', [], 'Move to...'); ?></option>
 					<option value="add-tag"><?php echo t_h('notes_manager.add_tag', [], 'Add tag'); ?></option>
 					<option value="remove-tag"><?php echo t_h('notes_manager.remove_tag', [], 'Remove tag'); ?></option>

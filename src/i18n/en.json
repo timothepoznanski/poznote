@@ -790,10 +790,10 @@
   "notes_manager": {
     "actions": "Bulk actions",
     "all_types": "All types",
-    "choose_action": "Choose an action...",
+    "choose_action": "Choose an action",
     "select_folder": "Select a target folder",
-    "add_tag": "Add tag",
-    "remove_tag": "Remove tag",
+    "add_tag": "Add tags",
+    "remove_tag": "Remove tags",
     "add_favorite": "Add to favorites",
     "remove_favorite": "Remove from favorites",
     "move_to_trash": "Move to trash",

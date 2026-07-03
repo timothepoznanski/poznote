@@ -1253,10 +1253,10 @@
   "notes_manager": {
     "actions": "Actions groupées",
     "all_types": "Tous les types",
-    "choose_action": "Choisir une action...",
+    "choose_action": "Choisir une action",
     "select_folder": "Sélectionnez un dossier de destination",
-    "add_tag": "Ajouter un tag",
-    "remove_tag": "Supprimer un tag",
+    "add_tag": "Ajouter des tags",
+    "remove_tag": "Supprimer des tags",
     "add_favorite": "Ajouter aux favoris",
     "remove_favorite": "Retirer des favoris",
     "move_to_trash": "Mettre à la corbeille",

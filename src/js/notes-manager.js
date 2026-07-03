@@ -514,13 +514,13 @@
         var count = selectedIds.size;
         if (count > 0) {
             nmBulkBar.classList.remove('nm-bulk-bar-hidden');
-            nmSelectedCount.textContent = count + ' ' + cfg.txtSelected;
             nmBulkActionSelect.disabled = false;
         } else {
             nmBulkBar.classList.add('nm-bulk-bar-hidden');
             nmBulkActionSelect.disabled = true;
             nmBulkActionSelect.value = '';
         }
+        nmSelectedCount.textContent = count + ' ' + cfg.txtSelected;
     }
 
     nmSelectAllBtn.addEventListener('click', function () {

@@ -165,7 +165,7 @@ body.trash-page {
 .trash-buttons-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 10px;
     margin-top: 20px;
     margin-bottom: 30px;
 }
@@ -444,10 +444,19 @@ body.trash-page {
     }
 
     .trash-buttons-container {
+        display: flex;
+        flex-wrap: nowrap;
         justify-content: center;
-        margin: 15px 10px;
-        gap: 30px;
+        align-items: center;
+        margin: 15px 5px;
+        gap: 8px;
         padding-left: 0;
+    }
+
+    .trash-buttons-container .btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        white-space: nowrap;
     }
 
 
