@@ -1217,10 +1217,10 @@
   },
   "notes_manager": {
     "actions": "Ações em massa",
-    "choose_action": "Escolher uma ação...",
+    "choose_action": "Escolher uma ação",
     "select_folder": "Selecione uma pasta de destino",
-    "add_tag": "Adicionar etiqueta",
-    "remove_tag": "Remover etiqueta",
+    "add_tag": "Adicionar etiquetas",
+    "remove_tag": "Remover etiquetas",
     "add_favorite": "Adicionar aos favoritos",
     "remove_favorite": "Remover dos favoritos",
     "move_to_trash": "Mover para a lixeira",

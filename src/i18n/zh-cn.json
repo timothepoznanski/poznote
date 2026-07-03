@@ -1208,7 +1208,7 @@
   },
   "notes_manager": {
     "actions": "批量操作",
-    "choose_action": "选择操作...",
+    "choose_action": "选择操作"
     "select_folder": "选择目标文件夹",
     "add_tag": "添加标签",
     "remove_tag": "移除标签",

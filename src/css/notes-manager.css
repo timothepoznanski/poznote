@@ -117,6 +117,13 @@ body.notes-manager-page {
     display: none;
 }
 
+/* Desktop: always show the bulk action bar */
+@media (min-width: 641px) {
+    .nm-bulk-bar-hidden {
+        display: flex !important;
+    }
+}
+
 .nm-bulk-count-wrap {
     display: flex;
     align-items: center;
@@ -139,6 +146,15 @@ body.notes-manager-page {
     font-size: 13px;
     padding: 8px 14px;
     font-weight: 500;
+    background: transparent;
+    color: #64748b;
+    border: 1px solid #d1d5db;
+}
+
+#nmBulkBar .nm-bulk-btn:hover {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #94a3b8;
 }
 
 .nm-bulk-select {
@@ -586,6 +602,20 @@ body.dark-mode .nm-note-row:has(.nm-note-checkbox:checked) {
 body.dark-mode .nm-bulk-bar {
     background: var(--bulk-bar-bg, #1f2937);
     border-color: var(--bulk-bar-border, #334155);
+}
+
+:root[data-theme='dark'] #nmBulkBar .nm-bulk-btn,
+body.dark-mode #nmBulkBar .nm-bulk-btn {
+    background: transparent;
+    color: #94a3b8;
+    border-color: #475569;
+}
+
+:root[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover,
+body.dark-mode #nmBulkBar .nm-bulk-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1;
+    border-color: #64748b;
 }
 
 :root[data-theme='dark'] .nm-bulk-select,
