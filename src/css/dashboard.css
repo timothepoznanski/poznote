@@ -590,11 +590,15 @@ body.dark-mode .dashboard-debug-info pre {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 14px 12px;
+    gap: 4px;
+    padding: 6px 12px 14px;
     text-align: center;
     width: 100%;
     box-sizing: border-box;
+}
+
+.dash-folder-card .dash-card-count {
+    margin-top: 2px;
 }
 
 .dash-card-icon {
