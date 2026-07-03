@@ -298,6 +298,30 @@ function renderTasks(tasks, noteId) {
     }).join('');
 }
 
+// Cached tasklist insert order preference (global setting, rarely changes).
+// Avoids a network round-trip on every task addition, which caused tasks to be
+// added late or lost on mobile (slow network + race condition when adding
+// several tasks quickly while a fetch was still in flight).
+let cachedTasklistInsertOrder = null;
+
+function refreshCachedTasklistInsertOrder() {
+    fetch('/api/v1/settings/tasklist_insert_order', {
+        method: 'GET',
+        credentials: 'same-origin'
+    })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success && (data.value === 'top' || data.value === 'bottom')) {
+                cachedTasklistInsertOrder = data.value;
+            } else if (cachedTasklistInsertOrder === null) {
+                cachedTasklistInsertOrder = 'bottom';
+            }
+        })
+        .catch(() => {
+            if (cachedTasklistInsertOrder === null) cachedTasklistInsertOrder = 'bottom';
+        });
+}
+
 // Add a new task
 function addTask(noteId) {
     const input = document.getElementById(`task-input-${noteId}`);
@@ -315,47 +339,40 @@ function addTask(noteId) {
         id: Date.now() + Math.random(),
         text: taskText,
         completed: false,
-        noteId: noteId
+        noteId: noteId,
+        important: false
     };
 
-    // default important flag
-    newTask.important = false;
+    // Insert synchronously using the cached preference (default: bottom).
+    // No network call here so the task always appears immediately, even on
+    // slow/unstable mobile connections, and rapid successive additions can't
+    // race and overwrite each other.
+    const insertOrder = (cachedTasklistInsertOrder === 'top') ? 'top' : 'bottom';
 
-    // Get task insert order preference from database (default: bottom)
-    fetch('/api/v1/settings/tasklist_insert_order', {
-        method: 'GET',
-        credentials: 'same-origin'
-    })
-        .then(r => r.json())
-        .then(data => {
-            const insertOrder = (data && data.success && data.value) ? data.value : 'bottom';
-            
-            const groups = groupTasksByStatus(tasks);
+    const groups = groupTasksByStatus(tasks);
+    if (insertOrder === 'top') {
+        groups.normal.splice(0, 0, newTask);
+    } else {
+        groups.normal.push(newTask);
+    }
 
-            if (insertOrder === 'top') {
-                groups.normal.splice(0, 0, newTask);
-            } else {
-                groups.normal.push(newTask);
-            }
+    tasks = [].concat(groups.important, groups.normal, groups.completed);
 
-            tasks = [].concat(groups.important, groups.normal, groups.completed);
+    saveAndRenderTasks(noteId, tasks);
 
-            saveAndRenderTasks(noteId, tasks);
+    // Clear input
+    input.value = '';
 
-            // Clear input
-            input.value = '';
+    // Refocus so the user can keep typing the next task (important on mobile).
+    input.focus();
 
-            // Mark as modified
-            markTaskListAsModified(noteId);
-        })
-        .catch(err => {
-            console.error('Error getting task order preference:', err);
-            // Fallback to bottom insertion on error
-            tasks.push(newTask);
-            saveAndRenderTasks(noteId, tasks);
-            input.value = '';
-            markTaskListAsModified(noteId);
-        });
+    // Mark as modified
+    markTaskListAsModified(noteId);
+
+    // Refresh the cached preference in the background (does not block the add).
+    if (cachedTasklistInsertOrder === null) {
+        refreshCachedTasklistInsertOrder();
+    }
 }
 
 // Toggle task completion
@@ -1205,6 +1222,9 @@ function toggleTaskInsertOrder() {
             })
                 .then(r => r.json())
                 .then(() => {
+                    // Keep the cached preference used by addTask() in sync
+                    cachedTasklistInsertOrder = newOrder;
+
                     // Update button appearance
                     updateTaskInsertOrderButton(newOrder);
                     
@@ -1586,9 +1606,15 @@ document.addEventListener('poznote:i18n:loaded', function() {
     
     // Update task insert order button
     updateTaskInsertOrderButton();
+
+    // Prime the cached insert-order preference used by addTask()
+    refreshCachedTasklistInsertOrder();
 });
 
 // Initialize task insert order button on page load
 document.addEventListener('DOMContentLoaded', function() {
     updateTaskInsertOrderButton();
+
+    // Prime the cached insert-order preference used by addTask()
+    refreshCachedTasklistInsertOrder();
 });
