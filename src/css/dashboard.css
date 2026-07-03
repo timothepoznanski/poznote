@@ -597,8 +597,12 @@ body.dark-mode .dashboard-debug-info pre {
     box-sizing: border-box;
 }
 
+.dash-folder-card .dash-card-name {
+    margin-top: -2px;
+}
+
 .dash-folder-card .dash-card-count {
-    margin-top: 2px;
+    margin-top: 6px;
 }
 
 .dash-card-icon {
