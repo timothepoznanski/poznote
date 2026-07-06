@@ -172,7 +172,9 @@
         }
 
         return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '">' +
-            '<a class="dash-card-link" href="' + esc(note.url) + '">' +
+            // Named target: reuses the same Poznote notes tab if already open
+            // (instead of spawning a new tab per click or replacing the dashboard).
+            '<a class="dash-card-link" href="' + esc(note.url) + '" target="poznote-notes">' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
             '</a>' +
@@ -325,16 +327,6 @@
         var plainText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
         var detail = plainText ? plainText.substring(0, 180) : 'HTTP ' + response.status;
         throw new Error(detail || 'Unexpected server response.');
-    }
-
-    function openDashboardGitModal() {
-        var modal = document.getElementById('dashboardGitModal');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeDashboardGitModal() {
-        var modal = document.getElementById('dashboardGitModal');
-        if (modal) modal.style.display = 'none';
     }
 
     function openWorkspaceSwitcher() {
@@ -631,11 +623,8 @@
 
     function handleDashboardGitAction(actionBtn) {
         var action = actionBtn.getAttribute('data-dashboard-git-action');
-        var titleEl = actionBtn.querySelector('.dashboard-git-action-title');
-        var title = titleEl ? titleEl.textContent : (action === 'pull' ? 'Pull' : 'Push');
+        var title = action === 'pull' ? 'Pull' : 'Push';
         var confirmMsg = action === 'pull' ? gitTxt.confirmPull : gitTxt.confirmPush;
-
-        closeDashboardGitModal();
 
         if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
             window.modalAlert.confirm(confirmMsg).then(function (confirmed) {
@@ -723,30 +712,11 @@
             });
         }
 
-        var gitBtn = document.getElementById('dashboardGitBtn');
-        var gitModal = document.getElementById('dashboardGitModal');
-        if (gitBtn) {
-            gitBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                openDashboardGitModal();
-            });
-        }
-
         Array.prototype.forEach.call(document.querySelectorAll('[data-dashboard-git-action]'), function (actionBtn) {
             actionBtn.addEventListener('click', function () {
                 handleDashboardGitAction(actionBtn);
             });
         });
-
-        Array.prototype.forEach.call(document.querySelectorAll('[data-action="close-dashboard-git-modal"]'), function (closeBtn) {
-            closeBtn.addEventListener('click', closeDashboardGitModal);
-        });
-
-        if (gitModal) {
-            gitModal.addEventListener('click', function (e) {
-                if (e.target === gitModal) closeDashboardGitModal();
-            });
-        }
 
         var wsModal = document.getElementById('workspaceSwitcherModal');
         Array.prototype.forEach.call(document.querySelectorAll('[data-action="open-workspace-switcher-modal"]'), function (trigger) {

@@ -89,7 +89,9 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
     return [
         'id'        => $noteId,
         'heading'   => $heading,
-        'url'       => 'index.php?note=' . $noteId . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
+        // newtab=1 tells tabs.js to open the note as a new internal tab
+        // instead of replacing the active one (see _init in js/tabs.js).
+        'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
         'text'      => $preview['text'],
         'tasks'     => $preview['tasks'],
         'tags'      => $tags,
@@ -465,7 +467,6 @@ $dashboardGitProviderRaw = $dashboardGitSync->getProvider();
 $dashboardGitProviderName = getGitProviderName($dashboardGitProviderRaw);
 $dashboardGitProviderParams = ['provider' => $dashboardGitProviderName];
 $dashboardGitEnabled = GitSync::isEnabled() && $dashboardGitSync->isConfigured();
-$dashboardGitIcon = ($dashboardGitProviderRaw === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github';
 $dashboardGitConfigUrl = dashboardBuildPageUrl('git_sync.php', $pageWorkspace);
 $dashboardLastSyncInfo = $dashboardGitSync->getLastSyncInfo();
 
@@ -765,48 +766,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				<div class="modal-buttons">
 					<button type="button" class="btn-danger initially-hidden" id="dismissAllBtn" data-action="dismiss-all-notifications"><?php echo t_h('reminder.dismiss_all', [], 'Delete all'); ?></button>
 					<button type="button" class="btn-cancel" data-action="close-notifications-modal"><?php echo t_h('common.close'); ?></button>
-				</div>
-			</div>
-		</div>
-
-		<div id="dashboardGitModal" class="modal dashboard-git-modal">
-			<div class="modal-content">
-				<h3><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></h3>
-				<div class="dashboard-git-actions">
-					<?php if ($dashboardGitEnabled): ?>
-						<button type="button" class="dashboard-git-action" data-dashboard-git-action="push">
-							<span class="dashboard-git-action-icon"><i class="lucide lucide-upload"></i></span>
-							<span class="dashboard-git-action-body">
-								<span class="dashboard-git-action-title">Push</span>
-								<span class="dashboard-git-action-status"><?php echo htmlspecialchars($dashboardGitProviderName, ENT_QUOTES, 'UTF-8'); ?></span>
-							</span>
-						</button>
-						<button type="button" class="dashboard-git-action" data-dashboard-git-action="pull">
-							<span class="dashboard-git-action-icon"><i class="lucide lucide-download"></i></span>
-							<span class="dashboard-git-action-body">
-								<span class="dashboard-git-action-title">Pull</span>
-								<span class="dashboard-git-action-status"><?php echo htmlspecialchars($dashboardGitProviderName, ENT_QUOTES, 'UTF-8'); ?></span>
-							</span>
-						</button>
-					<?php else: ?>
-						<a href="<?php echo htmlspecialchars($dashboardGitConfigUrl, ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-git-action">
-							<span class="dashboard-git-action-icon"><i class="lucide lucide-upload"></i></span>
-							<span class="dashboard-git-action-body">
-								<span class="dashboard-git-action-title">Push</span>
-								<span class="dashboard-git-action-status"><?php echo t_h('git_sync.config.not_configured_yet', $dashboardGitProviderParams, 'To configure'); ?></span>
-							</span>
-						</a>
-						<a href="<?php echo htmlspecialchars($dashboardGitConfigUrl, ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-git-action">
-							<span class="dashboard-git-action-icon"><i class="lucide lucide-download"></i></span>
-							<span class="dashboard-git-action-body">
-								<span class="dashboard-git-action-title">Pull</span>
-								<span class="dashboard-git-action-status"><?php echo t_h('git_sync.config.not_configured_yet', $dashboardGitProviderParams, 'To configure'); ?></span>
-							</span>
-						</a>
-					<?php endif; ?>
-				</div>
-				<div class="modal-buttons">
-					<button type="button" class="btn-cancel" data-action="close-dashboard-git-modal"><?php echo t_h('common.close'); ?></button>
 				</div>
 			</div>
 		</div>

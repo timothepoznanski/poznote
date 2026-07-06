@@ -992,6 +992,7 @@
         // Read current note from page config
         var currentNoteId = null;
         var currentKanbanFolderId = null;
+        var openAsNewTab = false;
         try {
             var configEl = document.getElementById('current-note-data');
             if (configEl) {
@@ -1000,6 +1001,9 @@
             }
             var params = new URLSearchParams(window.location.search || '');
             currentKanbanFolderId = params.get('kanban') ? String(params.get('kanban')) : null;
+            // Set by external pages (e.g. the dashboard) to open the note as an
+            // additional tab instead of replacing the active one.
+            openAsNewTab = params.get('newtab') === '1';
         } catch (e) { }
 
         // Try to restore from localStorage
@@ -1053,6 +1057,12 @@
                 if (matchingTab) {
                     // Make the matching tab active
                     activeTabId = matchingTab.id;
+                } else if (openAsNewTab) {
+                    // Requested via newtab=1 (e.g. from the dashboard) — add a tab
+                    // for this note instead of replacing the active one
+                    var requestedTab = { id: _generateId(), type: 'note', noteId: currentNoteId, title: _readTitle(currentNoteId, _getDefaultTitle()) };
+                    tabs.push(requestedTab);
+                    activeTabId = requestedTab.id;
                 } else if (activeTabId) {
                     // Active tab's note doesn't match URL — update it
                     var activeTab = _findTabById(activeTabId);
