@@ -38,6 +38,7 @@
       }
     },
     "download": "下载",
+    "print": "打印",
     "convert": "转换",
     "create": "创建",
     "delete": "删除",
@@ -1107,10 +1108,6 @@
       "json": {
         "title": "下载为 JSON",
         "description": "以 JSON 文件形式下载原始任务列表数据"
-      },
-      "print": {
-        "title": "打印为 PDF (浏览器)",
-        "description": "使用浏览器原生打印对话框保存为 PDF"
       }
     },
     "note_sort": {
@@ -1208,7 +1205,7 @@
   },
   "notes_manager": {
     "actions": "批量操作",
-    "choose_action": "选择操作"
+    "choose_action": "选择操作",
     "select_folder": "选择目标文件夹",
     "add_tag": "添加标签",
     "remove_tag": "移除标签",
@@ -1318,9 +1315,9 @@
       "duplicate_title_in_folder": "该文件夹中已存在同名笔记。",
       "note_id_required": "需要 note_id",
       "note_not_found": "未找到笔记",
-      "invalid_custom_token": "无效的自定义 Token。\n\n允许使用：\n\n字母、数字、-、_、. (4-128 个字符)",
-      "token_already_in_use": "Token 已被使用",
-      "no_token_generated": "未生成 Token",
+      "invalid_custom_token": "无效的自定义链接。\n\n允许使用：\n\n字母、数字、-、_、. (4-128 个字符)",
+      "token_already_in_use": "自定义链接已被使用",
+      "no_token_generated": "未生成链接",
       "server_error": "服务器错误: {{error}}"
     }
   },
@@ -1384,8 +1381,8 @@
     },
     "share_modal": {
       "description": "共享 URL 会为这条笔记创建一个公开链接。创建后，你还可以使用更多选项，例如为笔记设置密码，或自定义共享 URL。",
-      "custom_token": "自定义 Token (可选)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "自定义链接 (可选)",
+      "custom_token_placeholder": "my-custom-link-1",
       "custom_token_example": "例如，这将得到：",
       "password": "密码 (可选)",
       "password_placeholder": "输入密码",
@@ -1404,12 +1401,12 @@
       "copy": "复制",
       "revoke": "撤销",
       "renew": "更新",
-      "renew_token": "更新 Token",
+      "renew_token": "更新链接",
       "manage": "编辑",
       "create_url": "创建 URL",
       "no_link_yet": "尚未创建公开链接",
-      "custom_token": "自定义 Token (可选)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "自定义链接 (可选)",
+      "custom_token_placeholder": "my-custom-link-1",
       "indexable": "允许搜索引擎索引",
       "indexable_mobile": "允许索引",
       "tasklist_access": "任务列表公开访问权限",
@@ -1899,7 +1896,7 @@
       "path": "路径",
       "url": "共享 URL",
       "folder": "文件夹",
-      "token": "Token",
+      "token": "链接",
       "actions": "操作"
     },
     "actions": {
@@ -1913,7 +1910,7 @@
     "shared_folder_title": "共享文件夹",
     "note_shared_through_folder": "笔记通过文件夹共享",
     "folder_shared_through_parent": "文件夹通过父文件夹共享",
-    "token_help": "Token 是你在公开链接中选择的唯一部分。例如，使用 project-2026 时，笔记链接可以是 https://your-domain.example/project-2026，文件夹链接可以是 https://your-domain.example/folder/project-2026。",
+    "token_help": "自定义链接是你在公开 URL 中选择的唯一部分。例如，使用 project-2026 时，笔记链接可以是 https://your-domain.example/project-2026，文件夹链接可以是 https://your-domain.example/folder/project-2026。",
     "indexable": "可被索引",
     "password_protected": "受密码保护",
     "add_password_title": "添加密码保护",
@@ -1930,8 +1927,8 @@
       "unlock": "解锁"
     },
     "errors": {
-      "token_missing": "缺少令牌",
-      "token_or_folder_auth_missing": "缺少令牌或文件夹授权",
+      "token_missing": "缺少链接",
+      "token_or_folder_auth_missing": "缺少链接或文件夹授权",
       "shared_folder_not_found": "未找到共享文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "folder_not_found": "未找到文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",

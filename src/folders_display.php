@@ -434,11 +434,11 @@ function renderFolderActionsMenu() {
     // Share folder action: two variants, the client shows the one matching
     // the folder's shared state (data-shared on the toggle)
     $menu .= "<div class='folder-actions-menu-item shared share-state-shared' data-action='share-folder'>";
-    $menu .= "<i class='lucide lucide-cloud'></i>";
+    $menu .= "<i class='lucide lucide-share-2'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
     $menu .= "</div>";
     $menu .= "<div class='folder-actions-menu-item share-state-not-shared' data-action='share-folder'>";
-    $menu .= "<i class='lucide lucide-cloud'></i>";
+    $menu .= "<i class='lucide lucide-share-2'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
     $menu .= "</div>";
 

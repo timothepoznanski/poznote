@@ -2403,29 +2403,25 @@ function showExportModal(noteId, filename, title, noteType) {
         var htmlOption = modal.querySelector('.export-option-html');
         var htmlEmbeddedOption = modal.querySelector('.export-option-html-embedded');
         var jsonOption = modal.querySelector('.export-option-json');
-        var printOption = modal.querySelector('.export-option-print');
 
         if (noteType === 'markdown') {
-            // For markdown notes: allow MD export, HTML export and print
+            // For markdown notes: allow MD export and HTML export
             if (markdownOption) markdownOption.style.display = 'flex';
             if (htmlOption) htmlOption.style.display = 'flex';
             if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
-            if (printOption) printOption.style.display = 'flex';
         } else if (noteType === 'tasklist') {
-            // For tasklist notes: allow MD export (checkbox format), HTML export, JSON export and print
+            // For tasklist notes: allow MD export (checkbox format), HTML export and JSON export
             if (markdownOption) markdownOption.style.display = 'flex';
             if (htmlOption) htmlOption.style.display = 'flex';
             if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'flex';
-            if (printOption) printOption.style.display = 'flex';
         } else {
-            // For other notes: show HTML and print options, hide MD and JSON options
+            // For other notes: show HTML options, hide MD and JSON options
             if (markdownOption) markdownOption.style.display = 'none';
             if (htmlOption) htmlOption.style.display = 'flex';
             if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
-            if (printOption) printOption.style.display = 'flex';
         }
 
         modal.style.display = 'flex';
@@ -2436,11 +2432,7 @@ function showExportModal(noteId, filename, title, noteType) {
 function selectExportType(type) {
     closeModal('exportModal');
 
-    if (type === 'print') {
-        exportNoteToPrint(currentExportNoteId, currentExportNoteType);
-    } else {
-        exportNoteAsFormat(currentExportNoteId, type, currentExportNoteType);
-    }
+    exportNoteAsFormat(currentExportNoteId, type, currentExportNoteType);
 }
 
 // Unified export function for HTML, Markdown, JSON formats

@@ -230,6 +230,7 @@
         noteCard.querySelectorAll('.mobile-toolbar-menu [data-action]').forEach(function (element) {
             var selector = element.getAttribute('data-selector') || '';
             var keepEnabled = element.getAttribute('data-action') === 'open-markdown-syntax'
+                || element.getAttribute('data-action') === 'print-note'
                 || selector === '.btn-download'
                 || selector === '.btn-info'
                 || selector === '.markdown-view-mode-btn'

@@ -587,13 +587,6 @@ try {
                     </div>
                 </div>
 
-                <div class="export-option export-option-print" data-action="select-export-type" data-type="print">
-                    <i class="lucide lucide-printer"></i>
-                    <div>
-                        <span><?php echo t_h('modals.export.print.title', [], 'Print to PDF (Browser)'); ?></span>
-                        <p><?php echo t_h('modals.export.print.description', [], 'Use browser\'s native print dialog to save as PDF'); ?></p>
-                    </div>
-                </div>
             </div>
         </div>
         <div class="modal-buttons">

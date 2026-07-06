@@ -182,7 +182,7 @@
                     }
 
                     if (!$isPublicWorkspaceReadonly) {
-                        echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-cloud"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-share-2"></i></button>';
                     }
                     
                     $attachment_indicator_class = ($visible_attachments_count > 0) ? ' has-attachments' : '';
@@ -319,6 +319,7 @@
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="lucide lucide-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="lucide lucide-folder-output"></i> '.t_h('common.move', [], 'Move').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="lucide lucide-download"></i> '.t_h('common.download', [], 'Download').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type.'"><i class="lucide lucide-printer"></i> '.t_h('common.print', [], 'Print').'</button>';
 
                     // Convert button (only for markdown and note types, with appropriate icon)
                     if ($note_type === 'markdown') {

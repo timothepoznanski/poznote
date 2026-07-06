@@ -37,6 +37,7 @@
       }
     },
     "download": "Télécharger",
+    "print": "Imprimer",
     "convert": "Convertir",
     "create": "Créer",
     "delete": "Supprimer",
@@ -1115,10 +1116,6 @@
       "json": {
         "title": "Télécharger en JSON",
         "description": "Télécharger les données brutes de la liste de tâches au format JSON"
-      },
-      "print": {
-        "title": "Imprimer en PDF (Navigateur)",
-        "description": "Utiliser la boîte de dialogue d'impression native du navigateur pour enregistrer en PDF"
       }
     },
     "task_move": {
@@ -1377,9 +1374,9 @@
       "duplicate_title_in_folder": "Une autre note avec le même titre existe déjà dans ce dossier.",
       "note_id_required": "Paramètre note_id requis",
       "note_not_found": "Note introuvable",
-      "invalid_custom_token": "Jeton personnalisé invalide.\n\nCaractères autorisés :\n\nlettres, chiffres, -, _, . (4-128 caractères)",
-      "token_already_in_use": "Jeton déjà utilisé",
-      "no_token_generated": "Aucun jeton généré",
+      "invalid_custom_token": "Lien personnalisé invalide.\n\nCaractères autorisés :\n\nlettres, chiffres, -, _, . (4-128 caractères)",
+      "token_already_in_use": "Lien personnalisé déjà utilisé",
+      "no_token_generated": "Aucun lien généré",
       "server_error": "Erreur serveur : {{error}}"
     }
   },
@@ -1443,8 +1440,8 @@
     },
     "share_modal": {
       "description": "Une URL de partage crée un lien public vers cette note. Une fois l'URL créée, d'autres options seront proposées, comme protéger la note par mot de passe ou personnaliser l'URL de partage.",
-      "custom_token": "Jeton personnalisé (optionnel)",
-      "custom_token_placeholder": "mon_jeton_personnalise-1",
+      "custom_token": "Lien personnalisé (optionnel)",
+      "custom_token_placeholder": "mon-lien-personnalise-1",
       "custom_token_example": "Ce qui donnera par exemple :",
       "password": "Mot de passe (optionnel)",
       "password_placeholder": "Saisir un mot de passe",
@@ -1467,12 +1464,12 @@
       "copy": "Copier",
       "revoke": "Révoquer",
       "renew": "Renouveler",
-      "renew_token": "Renouveler le token",
+      "renew_token": "Renouveler le lien",
       "manage": "Modifier",
       "create_url": "Créer l'url",
       "no_link_yet": "Aucun lien public pour le moment",
-      "custom_token": "Token personnalisé (optionnel)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "Lien personnalisé (optionnel)",
+      "custom_token_placeholder": "mon-lien-personnalise-1",
       "indexable": "Autoriser l'indexation par les moteurs de recherche",
       "indexable_mobile": "Autoriser l'indexation",
       "password": "Mot de passe (optionnel)",
@@ -1959,7 +1956,7 @@
       "path": "Chemin / Dossier",
       "url": "URL partagée",
       "folder": "Dossier",
-      "token": "Jeton",
+      "token": "Lien",
       "actions": "Actions"
     },
     "actions": {
@@ -1973,7 +1970,7 @@
     "shared_folder_title": "Dossier partagé",
     "note_shared_through_folder": "Note partagée via le dossier",
     "folder_shared_through_parent": "Dossier partagé via le dossier parent",
-    "token_help": "Le jeton est la partie unique que vous choisissez dans le lien public. Par exemple, avec projet-2026, l'URL d'une note peut devenir https://votre-domaine.exemple/projet-2026, et celle d'un dossier https://votre-domaine.exemple/folder/projet-2026.",
+    "token_help": "Le lien personnalisé est la partie unique que vous choisissez dans l'URL publique. Par exemple, avec projet-2026, l'URL d'une note peut devenir https://votre-domaine.exemple/projet-2026, et celle d'un dossier https://votre-domaine.exemple/folder/projet-2026.",
     "indexable": "Indexable",
     "password_protected": "Protégé par mot de passe",
     "add_password_title": "Ajouter une protection par mot de passe",
@@ -1991,8 +1988,8 @@
       "unlock": "Déverrouiller"
     },
     "errors": {
-      "token_missing": "Token manquant",
-      "token_or_folder_auth_missing": "Jeton ou autorisation du dossier manquant",
+      "token_missing": "Lien manquant",
+      "token_or_folder_auth_missing": "Lien ou autorisation du dossier manquant",
       "shared_folder_not_found": "Dossier partagé introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "folder_not_found": "Dossier introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",

@@ -665,6 +665,17 @@
                     showExportModal(noteId, filename, title, noteType);
                 }
                 break;
+            case 'print-note':
+                if (noteId && typeof exportNoteToPrint === 'function') {
+                    // Close the toolbar menu
+                    var toolbarElForPrint = target.closest('.note-edit-toolbar');
+                    if (toolbarElForPrint) {
+                        var menuElForPrint = toolbarElForPrint.querySelector('.mobile-toolbar-menu');
+                        if (menuElForPrint) menuElForPrint.hidden = true;
+                    }
+                    exportNoteToPrint(noteId, target.dataset.noteType);
+                }
+                break;
             case 'show-convert-modal':
                 if (noteId && typeof showConvertNoteModal === 'function') {
                     const convertTo = target.dataset.convertTo;

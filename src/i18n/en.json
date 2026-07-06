@@ -48,7 +48,8 @@
       "no_headings": "No headings in this note",
       "unavailable_tasklist": "Outline is not available for task lists"
     },
-    "link_copied": "Link copied"
+    "link_copied": "Link copied",
+    "print": "Print"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -677,10 +678,6 @@
       "json": {
         "title": "Download as JSON",
         "description": "Download the raw tasklist data as a JSON file"
-      },
-      "print": {
-        "title": "Print to PDF (Browser)",
-        "description": "Use browser's native print dialog to save as PDF"
       }
     },
     "task_move": {
@@ -905,9 +902,9 @@
       "duplicate_title_in_folder": "Another note with the same title exists in this folder.",
       "note_id_required": "note_id required",
       "note_not_found": "Note not found",
-      "invalid_custom_token": "Invalid custom token.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
-      "token_already_in_use": "Token already in use",
-      "no_token_generated": "No token generated",
+      "invalid_custom_token": "Invalid custom link.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
+      "token_already_in_use": "Custom link already in use",
+      "no_token_generated": "No link generated",
       "server_error": "Server error: {{error}}"
     }
   },
@@ -970,8 +967,8 @@
     },
     "share_modal": {
       "description": "A shared URL creates a public link to this note. Once the URL is created, you will be able to add more options, such as protecting the note with a password or customizing the share URL.",
-      "custom_token": "Custom token (optional)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "Custom link (optional)",
+      "custom_token_placeholder": "my-custom-link-1",
       "custom_token_example": "This would give for example:",
       "password": "Password (optional)",
       "password_placeholder": "Enter a password",
@@ -994,12 +991,12 @@
       "copy": "Copy",
       "revoke": "Revoke",
       "renew": "Renew",
-      "renew_token": "Renew token",
+      "renew_token": "Renew link",
       "manage": "Edit",
       "create_url": "Create url",
       "no_link_yet": "No public link yet",
-      "custom_token": "Custom token (optional)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "Custom link (optional)",
+      "custom_token_placeholder": "my-custom-link-1",
       "indexable": "Allow indexing by search engines",
       "indexable_mobile": "Allow indexing",
       "password": "Password (optional)",
@@ -1546,7 +1543,7 @@
       "no_public_notes": "No shared notes yet.",
       "public_hint": "Share a note by clicking the cloud button in note toolbar."
     },
-    "filter_placeholder": "Filter by name or token...",
+    "filter_placeholder": "Filter by name or link...",
     "no_filter_results": "No items match your search.",
     "filter_all": "All",
     "filter_notes": "Notes",
@@ -1581,7 +1578,7 @@
       "path": "Path / Folder",
       "url": "Shared URL",
       "folder": "Folder",
-      "token": "Token",
+      "token": "Link",
       "actions": "Actions"
     },
     "actions": {
@@ -1595,7 +1592,7 @@
     "shared_folder_title": "Shared Folder",
     "note_shared_through_folder": "Note shared through folder",
     "folder_shared_through_parent": "Folder shared through parent folder",
-    "token_help": "The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.",
+    "token_help": "The custom link is the unique part you choose in the public URL. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.",
     "indexable": "Indexable",
     "password_protected": "Password protected",
     "add_password_title": "Add password protection",
@@ -1613,8 +1610,8 @@
       "unlock": "Unlock"
     },
     "errors": {
-      "token_missing": "Token missing",
-      "token_or_folder_auth_missing": "Token or folder authorization missing",
+      "token_missing": "Link missing",
+      "token_or_folder_auth_missing": "Link or folder authorization missing",
       "shared_folder_not_found": "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",

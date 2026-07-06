@@ -16,8 +16,8 @@
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
 .toolbar-btn.btn-favorite.is-favorite i.lucide-star,
 .toolbar-btn.btn-favorite.is-favorite .lucide-star,
-.toolbar-btn.btn-share.is-shared i.lucide-cloud,
-.toolbar-btn.btn-share.is-shared .lucide-cloud,
+.toolbar-btn.btn-share.is-shared i.lucide-share-2,
+.toolbar-btn.btn-share.is-shared .lucide-share-2,
 .toolbar-btn.btn-attachment.has-attachments i,
 .toolbar-btn.btn-reminder.has-reminder i {
     color: #007DB8 !important;
@@ -126,7 +126,7 @@
 
 /* Exception: Remove filter for favorite/share/attachment (to show blue color) */
 .toolbar-btn.is-favorite .lucide-star,
-.toolbar-btn.is-shared .lucide-cloud,
+.toolbar-btn.is-shared .lucide-share-2,
 .toolbar-btn.has-attachments .lucide-paperclip {
     filter: none !important;
 }
