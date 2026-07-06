@@ -656,6 +656,9 @@
         // Replace right_col content with a blank placeholder without removing right_col itself
         var placeholder = document.createElement('div');
         placeholder.id = 'new-note-loading-placeholder';
+        if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+            window.destroyMarkdownCodeMirrorEditorsWithin(rightCol);
+        }
         rightCol.innerHTML = '';
         rightCol.appendChild(placeholder);
     }

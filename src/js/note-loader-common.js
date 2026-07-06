@@ -53,6 +53,16 @@ function isNoteDomCacheAllowed(url, noteId, options) {
     return true;
 }
 
+// Drop a cache entry, destroying any CodeMirror editors still living in its
+// detached fragment so their instances (and theme observers) don't leak.
+function dropNoteDomCacheEntry(key) {
+    var entry = noteDomCache.get(key);
+    if (entry && entry.fragment && typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+        window.destroyMarkdownCodeMirrorEditorsWithin(entry.fragment);
+    }
+    noteDomCache.delete(key);
+}
+
 function trimNoteDomCache(exceptKey) {
     while (noteDomCache.size > NOTE_DOM_CACHE_LIMIT) {
         var oldestKey = null;
@@ -60,7 +70,7 @@ function trimNoteDomCache(exceptKey) {
             if (oldestKey === null && key !== exceptKey) oldestKey = key;
         });
         if (oldestKey === null) break;
-        noteDomCache.delete(oldestKey);
+        dropNoteDomCacheEntry(oldestKey);
     }
 }
 
@@ -74,7 +84,7 @@ function invalidateNoteDomCache(noteId) {
         }
     });
     keysToDelete.forEach(function (key) {
-        noteDomCache.delete(key);
+        dropNoteDomCacheEntry(key);
     });
 }
 
@@ -106,7 +116,7 @@ function storeCurrentNoteDomInCache(nextNoteId, targetUrl, options) {
         fragment.appendChild(currentRightColumn.firstChild);
     }
 
-    noteDomCache.delete(key);
+    dropNoteDomCacheEntry(key);
     noteDomCache.set(key, {
         noteId: String(currentNoteId),
         fragment: fragment,
@@ -161,8 +171,15 @@ function restoreNoteDomFromCache(url, noteId, options) {
     }
 
     storeCurrentNoteDomInCache(noteId, url, options);
+    // Plain delete here (not dropNoteDomCacheEntry): this fragment is about to
+    // be re-attached, its editors must stay alive.
     noteDomCache.delete(key);
 
+    // Whatever is still in right_col was not moved into the cache above, so
+    // its editors are about to be discarded - destroy them first.
+    if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+        window.destroyMarkdownCodeMirrorEditorsWithin(currentRightColumn);
+    }
     while (currentRightColumn.firstChild) {
         currentRightColumn.removeChild(currentRightColumn.firstChild);
     }
@@ -514,6 +531,12 @@ function loadNoteCommon(url, noteId, options) {
                                 }
 
                                 storeCurrentNoteDomInCache(noteId, url, options);
+
+                                // Destroy editors that were not moved into the
+                                // DOM cache before their DOM is discarded
+                                if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+                                    window.destroyMarkdownCodeMirrorEditorsWithin(currentRightColumn);
+                                }
 
                                 // Replace right_col content (tab bar lives in #right_pane, not here)
                                 currentRightColumn.innerHTML = rightColumn.innerHTML;

@@ -3019,6 +3019,9 @@ function setRightColumnContentPreservingTabs(html) {
         console.error('right_col element not found');
         return;
     }
+    if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+        window.destroyMarkdownCodeMirrorEditorsWithin(rightCol);
+    }
     rightCol.innerHTML = html;
 }
 

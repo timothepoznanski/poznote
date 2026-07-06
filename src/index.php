@@ -236,7 +236,6 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/folders/search.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/animations.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/toolbar-icons.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo file_exists(__DIR__ . '/css/lucide.css') ? filemtime(__DIR__ . '/css/lucide.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo file_exists(__DIR__ . '/css/folders/system-folders.css') ? filemtime(__DIR__ . '/css/folders/system-folders.css') : $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
@@ -269,17 +268,8 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/kanban.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/public-workspace-readonly.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/dark-mode/modals.css') ?: time(); ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/calendar.css?v=<?php echo $v; ?>"/>
+    <!-- Dark-mode stylesheets are served concatenated (same order as the css/dark-mode/ sources) -->
+    <link type="text/css" rel="stylesheet" href="dark_mode_css.php?v=<?php echo $v; ?>&m=<?php echo @max(array_map(function ($f) { return @filemtime(__DIR__ . '/css/dark-mode/' . $f) ?: 0; }, ['variables.css','layout.css','menus.css','editor.css','modals.css','components.css','pages.css','markdown.css','kanban.css','icons.css','calendar.css'])); ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
@@ -294,15 +284,15 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
-    <script src="js/codemirror-dist/markdown-codemirror.iife.js?v=<?php echo file_exists(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') ? filemtime(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') : $v; ?>"></script>
+    <script defer src="js/codemirror-dist/markdown-codemirror.iife.js?v=<?php echo file_exists(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') ? filemtime(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') : $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
-    <script src="js/mermaid/mermaid.min.js?v=<?php echo $v; ?>"></script>
-    <script src="js/katex/katex.min.js?v=<?php echo $v; ?>"></script>
-    <script src="js/katex/auto-render.min.js?v=<?php echo $v; ?>"></script>
+    <!-- Mermaid (2.7 MB) and KaTeX are loaded on demand by js/lazy-libs.js, only
+         when a note actually contains a diagram or a math element -->
+    <script defer src="js/lazy-libs.js?v=<?php echo $v; ?>"></script>
     <link type="text/css" rel="stylesheet" href="css/syntax-highlight.css?v=<?php echo $v; ?>"/>
-    <script src="js/highlight/highlight.min.js?v=<?php echo $v; ?>"></script>
-    <script src="js/highlight/powershell.min.js?v=<?php echo $v; ?>"></script>
-    <script src="js/syntax-highlight.js?v=<?php echo $v; ?>"></script>
+    <script defer src="js/highlight/highlight.min.js?v=<?php echo $v; ?>"></script>
+    <script defer src="js/highlight/powershell.min.js?v=<?php echo $v; ?>"></script>
+    <script defer src="js/syntax-highlight.js?v=<?php echo $v; ?>"></script>
 
 </head>
 

@@ -431,6 +431,7 @@ function setCodeMirrorMarkdownContent(editorDiv, content, options) {
 function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly) {
     var api = getMarkdownCodeMirrorApi();
     if (!api || !editorDiv || typeof api.createEditor !== 'function') {
+        renderMarkdownEditorContent(editorDiv, markdownContent);
         return false;
     }
 
@@ -453,8 +454,31 @@ function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly
         return false;
     }
 
-    return isCodeMirrorMarkdownEditor(editorDiv);
+    if (!isCodeMirrorMarkdownEditor(editorDiv)) {
+        renderMarkdownEditorContent(editorDiv, markdownContent);
+        return false;
+    }
+
+    return true;
 }
+
+// Destroy every CodeMirror editor hosted inside root (element or fragment).
+// Must be called before discarding note DOM (innerHTML replacement, cache
+// eviction...), otherwise the editor instances and their theme observers on
+// <html>/<body> stay alive and accumulate as notes are switched.
+function destroyMarkdownCodeMirrorEditorsWithin(root) {
+    var api = getMarkdownCodeMirrorApi();
+    if (!api || !root || typeof api.destroyEditorsWithin !== 'function') {
+        return;
+    }
+
+    try {
+        api.destroyEditorsWithin(root);
+    } catch (e) {
+        console.error('Error destroying CodeMirror editors:', e);
+    }
+}
+window.destroyMarkdownCodeMirrorEditorsWithin = destroyMarkdownCodeMirrorEditorsWithin;
 
 function renderMarkdownEditorContent(editorDiv, content) {
     if (!editorDiv) {
@@ -1552,7 +1576,28 @@ function handleMarkdownOrderedListEnter(event, editorDiv, noteEntry, noteId) {
 function initMermaid(retryCount) {
     retryCount = retryCount || 0;
     if (typeof mermaid === 'undefined') {
-        // Mermaid may be loaded async; retry a few times without delaying normal rendering.
+        // Nothing to render on this page: skip entirely, so the 2.7 MB Mermaid
+        // library is never fetched for notes without diagrams.
+        if (!document.querySelector('.mermaid, code.language-mermaid, code.lang-mermaid, code.mermaid')) {
+            return;
+        }
+
+        // Load the library on demand (deduped by lazy-libs.js), then render.
+        if (typeof window.poznoteEnsureMermaid === 'function') {
+            if (!initMermaid._loading) {
+                initMermaid._loading = true;
+                window.poznoteEnsureMermaid().then(function () {
+                    initMermaid._loading = false;
+                    initMermaid();
+                }, function (error) {
+                    initMermaid._loading = false;
+                    console.error('Could not load Mermaid:', error);
+                });
+            }
+            return;
+        }
+
+        // Fallback for pages that include Mermaid statically (async/defer tag).
         if (retryCount < 10) {
             setTimeout(function () {
                 initMermaid(retryCount + 1);
@@ -3100,6 +3145,7 @@ function initializeMarkdownNote(noteId) {
         }
 
         // Clear the corrupted HTML and restore clean content
+        destroyMarkdownCodeMirrorEditorsWithin(noteEntry);
         noteEntry.innerHTML = '';
         noteEntry.textContent = markdownContent;
 
@@ -3115,7 +3161,9 @@ function initializeMarkdownNote(noteId) {
         // Store in data attribute
         noteEntry.setAttribute('data-markdown-content', markdownContent);
 
-        // Clear existing elements to re-initialize cleanly
+        // Clear existing elements to re-initialize cleanly (content was
+        // extracted above, so the live editor can be destroyed now)
+        destroyMarkdownCodeMirrorEditorsWithin(noteEntry);
         noteEntry.innerHTML = '';
         noteEntry.textContent = markdownContent;
     } else {
@@ -3196,8 +3244,12 @@ function initializeMarkdownNote(noteId) {
     // Create preview and editor containers
     var previewDiv = document.createElement('div');
     previewDiv.className = 'markdown-preview';
-    // Set preview content or placeholder if empty
-    renderMarkdownPreview(previewDiv, markdownContent, noteId, { postProcess: false });
+    // Render the preview now only if it will be visible. In edit-only mode it
+    // stays hidden and switchToPreviewMode/switchToSplitMode re-render it from
+    // the live editor content when the user switches view.
+    if (!startInEditMode || startInSplitMode) {
+        renderMarkdownPreview(previewDiv, markdownContent, noteId, { postProcess: false });
+    }
 
     // Create container for editor
     var editorContainer = document.createElement('div');
@@ -3205,7 +3257,9 @@ function initializeMarkdownNote(noteId) {
 
     var editorDiv = document.createElement('div');
     editorDiv.className = 'markdown-editor';
-    renderMarkdownEditorContent(editorDiv, markdownContent);
+    // No content is rendered here: initializeCodeMirrorMarkdownEditor below
+    // creates the CodeMirror document directly (and falls back to
+    // renderMarkdownEditorContent itself if CodeMirror is unavailable).
     var isMobileViewport = false;
     try {
         isMobileViewport = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
@@ -3278,6 +3332,7 @@ function initializeMarkdownNote(noteId) {
     }
 
     // Replace note content with preview and editor
+    destroyMarkdownCodeMirrorEditorsWithin(noteEntry);
     noteEntry.innerHTML = '';
     noteEntry.appendChild(editorContainer);
     noteEntry.appendChild(previewDiv);
@@ -3702,11 +3757,24 @@ function setupMarkdownEditorListeners(noteId) {
         handleMarkdownOrderedListEnter(e, editorDiv, noteEntry, noteId);
     });
 
+    // Mirroring the whole document into data-markdown-content on every
+    // keystroke is expensive on long notes (full serialization + huge DOM
+    // attribute write), so the mirror is refreshed on a short debounce and
+    // flushed when the editor loses focus.
+    var contentSyncTimer = null;
+    function syncMarkdownContentAttribute() {
+        if (contentSyncTimer !== null) {
+            clearTimeout(contentSyncTimer);
+            contentSyncTimer = null;
+        }
+        noteEntry.setAttribute('data-markdown-content', normalizeContentEditableText(editorDiv));
+    }
+
     editorDiv.addEventListener('input', function () {
-        // Update the data attribute with current content
-        // Use helper function to properly normalize content
-        var content = normalizeContentEditableText(editorDiv);
-        noteEntry.setAttribute('data-markdown-content', content);
+        if (contentSyncTimer !== null) {
+            clearTimeout(contentSyncTimer);
+        }
+        contentSyncTimer = setTimeout(syncMarkdownContentAttribute, 300);
 
         // Make sure noteid is set
         if (typeof noteid !== 'undefined') {
@@ -3723,6 +3791,8 @@ function setupMarkdownEditorListeners(noteId) {
             window.markNoteAsModified();
         }
     });
+
+    editorDiv.addEventListener('focusout', syncMarkdownContentAttribute);
 }
 
 // Save markdown content when updating note

@@ -1,8 +1,24 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, snippetCompletion, startCompletion } from '@codemirror/autocomplete'
 import { defaultKeymap, history, historyKeymap, indentLess, indentMore } from '@codemirror/commands'
 import { markdown, markdownLanguage, insertNewlineContinueMarkup } from '@codemirror/lang-markdown'
-import { bracketMatching, HighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import { languages } from '@codemirror/language-data'
+import { bracketMatching, HighlightStyle, LanguageDescription, LanguageSupport, StreamLanguage, syntaxHighlighting } from '@codemirror/language'
+import { cpp } from '@codemirror/lang-cpp'
+import { css } from '@codemirror/lang-css'
+import { go } from '@codemirror/lang-go'
+import { html } from '@codemirror/lang-html'
+import { java } from '@codemirror/lang-java'
+import { javascript } from '@codemirror/lang-javascript'
+import { json } from '@codemirror/lang-json'
+import { php } from '@codemirror/lang-php'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { sql } from '@codemirror/lang-sql'
+import { xml } from '@codemirror/lang-xml'
+import { yaml } from '@codemirror/lang-yaml'
+import { csharp } from '@codemirror/legacy-modes/mode/clike'
+import { powerShell } from '@codemirror/legacy-modes/mode/powershell'
+import { ruby } from '@codemirror/legacy-modes/mode/ruby'
+import { shell } from '@codemirror/legacy-modes/mode/shell'
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 // searchKeymap includes Mod-f (Ctrl+F) which would intercept the browser's native find.
 // We filter it out so Ctrl+F opens the browser find dialog instead of CodeMirror's panel.
@@ -110,12 +126,42 @@ function buildExcalidrawDecorations(doc) {
   return Decoration.set(decorations, true)
 }
 
+// Rebuilding the placeholders means stringifying and regex-scanning the whole
+// document, so on doc changes we only rebuild when the edit could actually
+// affect an Excalidraw block: text near the change containing the block marker,
+// or a change overlapping an existing placeholder.
+function changesMayAffectExcalidrawBlocks(value, transaction) {
+  const newDoc = transaction.newDoc
+  let affected = false
+
+  transaction.changes.iterChanges((fromA, toA, fromB, toB) => {
+    if (affected) return
+
+    const start = Math.max(0, fromB - 64)
+    const end = Math.min(newDoc.length, toB + 64)
+    if (/excalidraw-container/i.test(newDoc.sliceString(start, end))) {
+      affected = true
+      return
+    }
+
+    value.between(Math.max(0, fromA - 1), toA + 1, () => {
+      affected = true
+      return false
+    })
+  })
+
+  return affected
+}
+
 const excalidrawPlaceholderField = StateField.define({
   create(state) {
     return buildExcalidrawDecorations(state.doc)
   },
   update(value, transaction) {
     if (transaction.docChanged) {
+      if (!changesMayAffectExcalidrawBlocks(value, transaction)) {
+        return value.map(transaction.changes)
+      }
       return buildExcalidrawDecorations(transaction.state.doc)
     }
 
@@ -123,6 +169,35 @@ const excalidrawPlaceholderField = StateField.define({
   },
   provide: field => EditorView.decorations.from(field)
 })
+
+// Curated fenced-code-block languages matching CODE_BLOCK_LANGUAGES below.
+// @codemirror/language-data would inline every language grammar into the
+// bundle (~1 MB extra), so we only ship the ones Poznote actually offers.
+function legacyLanguage(parser) {
+  return new LanguageSupport(StreamLanguage.define(parser))
+}
+
+const codeLanguages = [
+  LanguageDescription.of({ name: 'JavaScript', alias: ['js', 'jsx', 'node'], extensions: ['js', 'jsx', 'mjs', 'cjs'], load: () => Promise.resolve(javascript({ jsx: true })) }),
+  LanguageDescription.of({ name: 'TypeScript', alias: ['ts', 'tsx'], extensions: ['ts', 'tsx'], load: () => Promise.resolve(javascript({ jsx: true, typescript: true })) }),
+  LanguageDescription.of({ name: 'Python', alias: ['py'], extensions: ['py'], load: () => Promise.resolve(python()) }),
+  LanguageDescription.of({ name: 'HTML', alias: ['htm'], extensions: ['html', 'htm'], load: () => Promise.resolve(html()) }),
+  LanguageDescription.of({ name: 'CSS', alias: ['scss', 'less'], extensions: ['css'], load: () => Promise.resolve(css()) }),
+  LanguageDescription.of({ name: 'JSON', alias: ['json5'], extensions: ['json'], load: () => Promise.resolve(json()) }),
+  LanguageDescription.of({ name: 'Shell', alias: ['bash', 'sh', 'zsh', 'shell', 'console'], extensions: ['sh', 'bash'], load: () => Promise.resolve(legacyLanguage(shell)) }),
+  LanguageDescription.of({ name: 'PowerShell', alias: ['ps1', 'psm1', 'pwsh'], extensions: ['ps1'], load: () => Promise.resolve(legacyLanguage(powerShell)) }),
+  LanguageDescription.of({ name: 'SQL', alias: ['mysql', 'postgresql', 'sqlite'], extensions: ['sql'], load: () => Promise.resolve(sql()) }),
+  LanguageDescription.of({ name: 'PHP', extensions: ['php'], load: () => Promise.resolve(php()) }),
+  LanguageDescription.of({ name: 'Java', extensions: ['java'], load: () => Promise.resolve(java()) }),
+  LanguageDescription.of({ name: 'C#', alias: ['csharp', 'cs'], extensions: ['cs'], load: () => Promise.resolve(legacyLanguage(csharp)) }),
+  LanguageDescription.of({ name: 'C++', alias: ['cpp', 'c', 'cc', 'cxx'], extensions: ['cpp', 'c', 'h', 'hpp'], load: () => Promise.resolve(cpp()) }),
+  LanguageDescription.of({ name: 'Go', alias: ['golang'], extensions: ['go'], load: () => Promise.resolve(go()) }),
+  LanguageDescription.of({ name: 'Rust', alias: ['rs'], extensions: ['rs'], load: () => Promise.resolve(rust()) }),
+  LanguageDescription.of({ name: 'Ruby', alias: ['rb'], extensions: ['rb'], load: () => Promise.resolve(legacyLanguage(ruby)) }),
+  LanguageDescription.of({ name: 'YAML', alias: ['yml'], extensions: ['yaml', 'yml'], load: () => Promise.resolve(yaml()) }),
+  LanguageDescription.of({ name: 'XML', alias: ['xsl', 'svg', 'rss'], extensions: ['xml'], load: () => Promise.resolve(xml()) }),
+  LanguageDescription.of({ name: 'Markdown', alias: ['md'], extensions: ['md'], load: () => Promise.resolve(markdown({ base: markdownLanguage })) })
+]
 
 const CODE_BLOCK_LANGUAGES = [
   'javascript', 'typescript', 'python', 'html', 'css', 'json', 'bash', 'powershell',
@@ -604,9 +679,6 @@ function createEditor(host, options = {}) {
 
     if (!update.docChanged) return
 
-    const value = update.state.doc.toString()
-    host.setAttribute('data-codemirror-value', value)
-
     try {
       host.dispatchEvent(new Event('input', { bubbles: true }))
     } catch (error) {
@@ -649,7 +721,7 @@ function createEditor(host, options = {}) {
       }),
       markdown({
         base: markdownLanguage,
-        codeLanguages: languages,
+        codeLanguages,
         addKeymap: false
       }),
       markdownLanguage.data.of({
@@ -722,13 +794,29 @@ function destroyEditor(host) {
     lastActiveHost = null
   }
   host.removeAttribute('data-codemirror-enabled')
+  host.removeAttribute('data-codemirror-value')
   host.classList.remove('markdown-codemirror-host')
   return true
+}
+
+// Destroy every editor hosted inside root (an element or a document fragment,
+// e.g. the DOM cache fragments), releasing their theme observers and views.
+function destroyEditorsWithin(root) {
+  if (!root || typeof root.querySelectorAll !== 'function') return 0
+
+  let destroyed = 0
+  root.querySelectorAll('.markdown-codemirror-host').forEach(host => {
+    if (destroyEditor(host)) destroyed++
+  })
+  if (root.nodeType === Node.ELEMENT_NODE && destroyEditor(root)) destroyed++
+
+  return destroyed
 }
 
 window.PoznoteMarkdownCodeMirror = {
   createEditor,
   destroyEditor,
+  destroyEditorsWithin,
   getValue,
   getLastActiveEditor,
   setValue,
