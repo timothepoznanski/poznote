@@ -208,14 +208,14 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <script src="pwa/pwa.js?v=<?php echo $v; ?>" defer></script>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
-    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo file_exists(__DIR__ . '/css/lucide.css') ? filemtime(__DIR__ . '/css/lucide.css') : $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>"/>
     <!-- Modular CSS - Imported directly (previously via index.css) -->
     <link type="text/css" rel="stylesheet" href="css/variables.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/base.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/utilities.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo file_exists(__DIR__ . '/css/layout.css') ? filemtime(__DIR__ . '/css/layout.css') : $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/layout.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/sidebar.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo file_exists(__DIR__ . '/css/outline.css') ? filemtime(__DIR__ . '/css/outline.css') : $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/outline.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/toolbar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/menus.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/searchbars.css?v=<?php echo $v; ?>"/>
@@ -237,7 +237,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/folders/animations.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/toolbar-icons.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/folders/table-picker.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo file_exists(__DIR__ . '/css/folders/system-folders.css') ? filemtime(__DIR__ . '/css/folders/system-folders.css') : $v; ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/folders/system-folders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/emoji-picker.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/calendar.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/table-picker.css?v=<?php echo $v; ?>"/>
@@ -247,14 +247,14 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/tabs.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/misc.css?v=<?php echo $v; ?>"/>
     <link rel="stylesheet" href="css/index-mobile.css?v=<?php echo $v; ?>" media="(max-width: 800px)">
-    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/modal-alerts.css') ?: time(); ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/snapshot.css?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/modals/snapshot.css') ?: time(); ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/modals/snapshot.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/tasks.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/markdown.css?v=<?php echo $v; ?>"/>
@@ -268,7 +268,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="css/background-image.css?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/public-workspace-readonly.css?v=<?php echo $v; ?>"/>
     <!-- Dark-mode stylesheets are served concatenated (same order as the css/dark-mode/ sources) -->
-    <link type="text/css" rel="stylesheet" href="dark_mode_css.php?v=<?php echo $v; ?>&m=<?php echo @max(array_map(function ($f) { return @filemtime(__DIR__ . '/css/dark-mode/' . $f) ?: 0; }, ['variables.css','layout.css','menus.css','editor.css','modals.css','components.css','pages.css','markdown.css','kanban.css','icons.css','calendar.css'])); ?>"/>
+    <link type="text/css" rel="stylesheet" href="dark_mode_css.php?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
@@ -283,7 +283,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
     <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
-    <script defer src="js/codemirror-dist/markdown-codemirror.iife.js?v=<?php echo file_exists(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') ? filemtime(__DIR__ . '/js/codemirror-dist/markdown-codemirror.iife.js') : $v; ?>"></script>
+    <script defer src="js/codemirror-dist/markdown-codemirror.iife.js?v=<?php echo $v; ?>"></script>
     <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <!-- Mermaid (2.7 MB) and KaTeX are loaded on demand by js/lazy-libs.js, only
          when a note actually contains a diagram or a math element -->
@@ -710,7 +710,7 @@ if ($isPublicWorkspaceReadonly) {
                         }
                     }
                 
-                    $is_favorite = $row['favorite'] ?? 0;
+                    $is_favorite = intval($row['favorite'] ?? 0);
                     $favorite_class = $is_favorite ? ' is-favorite' : '';
                     $favorite_title = $is_favorite
                         ? t_h('index.toolbar.favorite_remove', [], 'Remove from favorites')
@@ -719,8 +719,7 @@ if ($isPublicWorkspaceReadonly) {
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-favorite note-action-btn'.$favorite_class.'" title="'.$favorite_title.'" data-action="toggle-favorite" data-note-id="'.$row['id'].'"><i class="lucide lucide-star"></i></button>';
                     }
-                    $share_class = $is_shared ? ' is-shared' : '';
-                    
+
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-cloud"></i></button>';
                     }
@@ -779,7 +778,6 @@ if ($isPublicWorkspaceReadonly) {
                     // Get the complete folder path including parents
                     $folder_id = $row['folder_id'] ?? null;
                     $folder_path = $folder_id ? getFolderPath($folder_id, $con) : $folder_name;
-                    $is_favorite = intval($row['favorite'] ?? 0);
                     $tags_data = $row['tags'] ?? '';
                     
                     // Encode additional data safely for JavaScript
@@ -1038,7 +1036,6 @@ if ($isPublicWorkspaceReadonly) {
                     }
                     
                     // Note content with font size style
-                    $note_type = $row['type'] ?? 'note';
                     $data_attr = '';
                     
                     if ($note_type === 'tasklist') {
@@ -1161,13 +1158,13 @@ if ($isPublicWorkspaceReadonly) {
 </body>
 <!-- Modules refactorisés de script.js -->
 <script src="js/globals.js?v=<?php echo $v; ?>"></script>
-<script src="js/workspaces.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
+<script src="js/workspaces.js?v=<?php echo $v; ?>"></script>
 <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
-<script src="js/notes.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
+<script src="js/notes.js?v=<?php echo $v; ?>"></script>
 <script src="js/ui.js"></script>
-<script src="js/note-edit-lock.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/note-edit-lock.js') ?: time(); ?>"></script>
-<script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : $v; ?>"></script>
-<script src="js/attachments.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/attachments.js') ?: time(); ?>"></script>
+<script src="js/note-edit-lock.js?v=<?php echo $v; ?>"></script>
+<script src="js/date-time-format.js?v=<?php echo $v; ?>"></script>
+<script src="js/attachments.js?v=<?php echo $v; ?>"></script>
 <script src="js/tags-modal.js"></script>
 <!-- Event management modules -->
 <script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
@@ -1177,7 +1174,7 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
 <script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>
-<script src="js/utils.js?v=<?php echo file_exists(__DIR__ . '/js/utils.js') ? filemtime(__DIR__ . '/js/utils.js') : $v; ?>"></script>
+<script src="js/utils.js?v=<?php echo $v; ?>"></script>
 <script src="js/search-highlight.js?v=<?php echo $v; ?>"></script>
 <script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
 <script src="js/pwa-helpers.js?v=<?php echo $v; ?>"></script>
@@ -1189,18 +1186,18 @@ if ($isPublicWorkspaceReadonly) {
 <script src="js/index-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/main.js?v=<?php echo $v; ?>"></script>
 <script src="js/resize-column.js?v=<?php echo $v; ?>"></script>
-<script src="js/outline-panel.js?v=<?php echo file_exists(__DIR__ . '/js/outline-panel.js') ? filemtime(__DIR__ . '/js/outline-panel.js') : $v; ?>"></script>
+<script src="js/outline-panel.js?v=<?php echo $v; ?>"></script>
 <script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
 <script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
 <script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
-<script src="js/index-icon-scale-settings.js?v=<?php echo $v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
+<script src="js/index-icon-scale-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
 <script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
 <script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
 <script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
 <script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
 <script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
-<script src="js/notes-list-events.js?v=<?php echo file_exists(__DIR__ . '/js/notes-list-events.js') ? filemtime(__DIR__ . '/js/notes-list-events.js') : $v; ?>"></script>
+<script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
 <script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
 <script src="js/kanban.js?v=<?php echo $v; ?>"></script>
 <script src="js/tabs.js?v=<?php echo $v; ?>"></script>
@@ -1244,8 +1241,8 @@ window.calendarTranslations = {
 };
 </script>
 <script src="js/calendar.js?v=<?php echo $v; ?>"></script>
-<script src="js/backlinks.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/backlinks.js') ?: time(); ?>"></script>
-<script src="js/snapshots.js?v=<?php echo $v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/snapshots.js') ?: time(); ?>"></script>
+<script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
+<script src="js/snapshots.js?v=<?php echo $v; ?>"></script>
 <script src="js/ui-customization.js?v=<?php echo $v; ?>"></script>
 
 <?php if (!$isPublicWorkspaceReadonly && $note && is_numeric($note)): ?>
