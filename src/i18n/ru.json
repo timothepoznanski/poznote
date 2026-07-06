@@ -480,6 +480,11 @@
       "workspace_destination": "Выберите рабочее пространство:",
       "target_folder": "Выберите целевую папку:",
       "recent_folders": "Недавние папки",
+      "new_folder": "Новая папка",
+      "new_workspace": "Новое рабочее пространство",
+      "folder_name_placeholder": "Имя папки (используйте / для вложенных папок)",
+      "workspace_name_placeholder": "Название рабочего пространства",
+      "enter_workspace_name": "Пожалуйста, введите название рабочего пространства",
       "enter_folder_name": "Пожалуйста, введите название папки"
     },
     "move_folder_files": {

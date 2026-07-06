@@ -487,6 +487,11 @@
       "workspace_destination": "Select Workspace destination:",
       "target_folder": "Select target folder:",
       "recent_folders": "Recent folders",
+      "new_folder": "New folder",
+      "new_workspace": "New workspace",
+      "folder_name_placeholder": "Folder name (use / for subfolders)",
+      "workspace_name_placeholder": "Workspace name",
+      "enter_workspace_name": "Please enter a workspace name",
       "enter_folder_name": "Please enter a folder name"
     },
     "move_folder_files": {

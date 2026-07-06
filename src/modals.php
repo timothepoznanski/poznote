@@ -294,14 +294,29 @@ try {
         
         <!-- Workspace selection -->
         <div class="form-group">
-            <label for="workspaceSelect"><?php echo t_h('modals.move_note_folder.workspace_destination'); ?></label>
+            <div class="move-note-label-row">
+                <label for="workspaceSelect"><?php echo t_h('modals.move_note_folder.workspace_destination'); ?></label>
+                <button type="button" class="move-note-inline-create-toggle" data-action="toggle-move-create-workspace">
+                    <i class="lucide lucide-plus"></i><?php echo t_h('modals.move_note_folder.new_workspace', [], 'New workspace'); ?>
+                </button>
+            </div>
             <select id="workspaceSelect" class="workspace-select" data-action="on-workspace-change">
                 <!-- Workspaces will be loaded here -->
             </select>
+            <div id="moveCreateWorkspaceRow" class="move-note-inline-create initially-hidden">
+                <input type="text" id="moveCreateWorkspaceName" maxlength="255" placeholder="<?php echo t_h('modals.move_note_folder.workspace_name_placeholder', [], 'Workspace name'); ?>" data-enter-action="create-move-modal-workspace">
+                <button type="button" class="btn-primary" data-action="create-move-modal-workspace"><?php echo t_h('common.create'); ?></button>
+                <button type="button" class="btn-cancel" data-action="toggle-move-create-workspace"><?php echo t_h('common.cancel'); ?></button>
+            </div>
         </div>
-        
+
         <div class="form-group">
-            <label for="moveNoteTargetSelect"><?php echo t_h('modals.move_note_folder.target_folder'); ?></label>
+            <div class="move-note-label-row">
+                <label for="moveNoteTargetSelect"><?php echo t_h('modals.move_note_folder.target_folder'); ?></label>
+                <button type="button" class="move-note-inline-create-toggle" data-action="toggle-move-create-folder">
+                    <i class="lucide lucide-plus"></i><?php echo t_h('modals.move_note_folder.new_folder', [], 'New folder'); ?>
+                </button>
+            </div>
             <div id="moveNoteRecentFolders" class="move-note-recent-folders initially-hidden">
                 <div class="move-note-recent-label">
                     <i class="lucide lucide-history"></i>
@@ -312,6 +327,11 @@ try {
             <select id="moveNoteTargetSelect" class="workspace-select">
                 <!-- Options will be populated dynamically -->
             </select>
+            <div id="moveCreateFolderRow" class="move-note-inline-create initially-hidden">
+                <input type="text" id="moveCreateFolderName" maxlength="255" placeholder="<?php echo t_h('modals.move_note_folder.folder_name_placeholder', [], 'Folder name (use / for subfolders)'); ?>" data-enter-action="create-move-modal-folder">
+                <button type="button" class="btn-primary" data-action="create-move-modal-folder"><?php echo t_h('common.create'); ?></button>
+                <button type="button" class="btn-cancel" data-action="toggle-move-create-folder"><?php echo t_h('common.cancel'); ?></button>
+            </div>
         </div>
         
         <!-- Action buttons -->

@@ -980,6 +980,11 @@
       "workspace_destination": "Sélectionnez l’espace de travail de destination :",
       "target_folder": "Sélectionnez le dossier cible :",
       "recent_folders": "Dossiers récents",
+      "new_folder": "Nouveau dossier",
+      "new_workspace": "Nouvel espace de travail",
+      "folder_name_placeholder": "Nom du dossier (utilisez / pour les sous-dossiers)",
+      "workspace_name_placeholder": "Nom de l'espace de travail",
+      "enter_workspace_name": "Veuillez saisir un nom d'espace de travail",
       "enter_folder_name": "Veuillez saisir un nom de dossier"
     },
     "git_sync": {

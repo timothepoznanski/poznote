@@ -953,6 +953,11 @@
       "workspace_destination": "选择目标工作区:",
       "target_folder": "选择目标文件夹:",
       "recent_folders": "最近的文件夹",
+      "new_folder": "新建文件夹",
+      "new_workspace": "新建工作区",
+      "folder_name_placeholder": "文件夹名称（使用 / 创建子文件夹）",
+      "workspace_name_placeholder": "工作区名称",
+      "enter_workspace_name": "请输入工作区名称",
       "enter_folder_name": "请输入文件夹名称"
     },
     "move_folder_files": {

@@ -300,6 +300,76 @@
     margin-bottom: 22px;
 }
 
+#moveNoteFolderModal .move-note-label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#moveNoteFolderModal .move-note-inline-create-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px;
+    border: none;
+    background: none;
+    color: #007DB8;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#moveNoteFolderModal .move-note-inline-create-toggle:hover {
+    color: #005f8c;
+    text-decoration: underline;
+}
+
+#moveNoteFolderModal .move-note-inline-create {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+#moveNoteFolderModal .move-note-inline-create.initially-hidden {
+    display: none;
+}
+
+#moveNoteFolderModal .move-note-inline-create input {
+    flex: 1;
+    min-width: 0;
+}
+
+#moveNoteFolderModal .move-note-inline-create button {
+    flex: 0 0 auto;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#moveNoteFolderModal .move-note-inline-create button.btn-primary {
+    background-color: #007DB8;
+    color: white;
+}
+
+#moveNoteFolderModal .move-note-inline-create button.btn-primary:hover {
+    background-color: #005a8a;
+}
+
+#moveNoteFolderModal .move-note-inline-create button.btn-cancel {
+    background-color: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+#moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
+    background-color: #e9ecef;
+}
+
 #moveNoteFolderModal .move-note-recent-folders {
     margin: 4px 0 10px;
 }

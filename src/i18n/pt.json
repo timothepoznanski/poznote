@@ -952,6 +952,11 @@
       "workspace_destination": "Selecione o espaço de trabalho de destino:",
       "target_folder": "Selecione a pasta de destino:",
       "recent_folders": "Pastas recentes",
+      "new_folder": "Nova pasta",
+      "new_workspace": "Novo espaço de trabalho",
+      "folder_name_placeholder": "Nome da pasta (use / para subpastas)",
+      "workspace_name_placeholder": "Nome do espaço de trabalho",
+      "enter_workspace_name": "Por favor, insira um nome de espaço de trabalho",
       "enter_folder_name": "Por favor, insira um nome de pasta"
     },
     "move_folder_files": {

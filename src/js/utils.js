@@ -1298,8 +1298,9 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
     document.getElementById('moveFolderFilesModal').style.display = 'block';
 }
 
-function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, selectId) {
+function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, selectId, preselectFolderId) {
     // selectId allows populating different modals' select elements
+    // preselectFolderId (optional) selects that folder once options are loaded (e.g. a freshly created folder)
     selectId = selectId || 'moveFolderFilesTargetSelect';
     var select = document.getElementById(selectId);
     if (!select) return;
@@ -1332,6 +1333,12 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
                     }
                 }
                 // Don't auto-select any folder - leave "No folder" selected by default
+                if (preselectFolderId != null && findSelectOptionByValue(select, preselectFolderId)) {
+                    select.value = String(preselectFolderId);
+                    try {
+                        updateMoveButton(select.value, true);
+                    } catch (e) { }
+                }
                 loadMoveNoteRecentFolders(excludeFolderId, selectId, workspace);
             }
         })
@@ -2116,6 +2123,13 @@ function showMoveFolderDialog(noteId, forcedFolderId, forcedFolderName) {
         currentFolder = folderEl ? folderEl.value : '';
     }
 
+    // Remember the note's current folder so the dropdown can be rebuilt later
+    // (e.g. after creating a folder from within the modal) with the same exclusion
+    if (modal) {
+        modal.dataset.currentFolderId = (currentFolderId === undefined || currentFolderId === null) ? '' : String(currentFolderId);
+        modal.dataset.currentFolderName = currentFolder || '';
+    }
+
     // Load workspaces first
     loadWorkspacesForMoveModal(function () {
         // Load folders after workspaces are loaded
@@ -2197,9 +2211,10 @@ function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
 
 
 
-                // Reset the interface: clear move button state and errors
+                // Reset the interface: clear move button state, errors and inline create rows
                 updateMoveButton('');
                 hideMoveFolderError();
+                resetMoveModalCreateRows();
 
                 // Populate and show the modal; focus the select if present
                 document.getElementById('moveNoteFolderModal').style.display = 'flex';
@@ -2379,6 +2394,136 @@ function hideMoveFolderError() {
     if (errorElement) {
         errorElement.style.display = 'none';
     }
+}
+
+// --- Inline creation of folders/workspaces from the move note modal ---
+
+function toggleMoveModalCreateRow(rowId, forceShow) {
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    var show = forceShow !== undefined ? forceShow : row.classList.contains('initially-hidden');
+    row.classList.toggle('initially-hidden', !show);
+    var input = row.querySelector('input');
+    if (input) {
+        input.value = '';
+        if (show) {
+            setTimeout(function () { input.focus(); }, 50);
+        }
+    }
+    if (show) hideMoveFolderError();
+}
+
+function resetMoveModalCreateRows() {
+    toggleMoveModalCreateRow('moveCreateWorkspaceRow', false);
+    toggleMoveModalCreateRow('moveCreateFolderRow', false);
+}
+
+function toggleMoveCreateWorkspace() {
+    toggleMoveModalCreateRow('moveCreateWorkspaceRow');
+}
+
+function toggleMoveCreateFolder() {
+    toggleMoveModalCreateRow('moveCreateFolderRow');
+}
+
+function selectMoveModalWorkspace(name) {
+    var workspaceSelect = document.getElementById('workspaceSelect');
+    if (!workspaceSelect) return;
+    if (!findSelectOptionByValue(workspaceSelect, name)) {
+        var option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        workspaceSelect.appendChild(option);
+    }
+    workspaceSelect.value = name;
+    // Reload the folder list for the newly selected workspace
+    onWorkspaceChange();
+}
+
+function createWorkspaceFromMoveModal() {
+    var input = document.getElementById('moveCreateWorkspaceName');
+    var name = input ? input.value.trim() : '';
+    if (!name) {
+        showMoveFolderError(
+            window.t ? window.t('modals.move_note_folder.enter_workspace_name', null, 'Please enter a workspace name') : 'Please enter a workspace name'
+        );
+        return;
+    }
+
+    fetch('/api/v1/workspaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ name: name })
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data };
+            });
+        })
+        .then(function (result) {
+            var data = result.data || {};
+            if (data.success || result.status === 409) {
+                // Created — or it already exists, in which case just switch to it
+                hideMoveFolderError();
+                toggleMoveModalCreateRow('moveCreateWorkspaceRow', false);
+                selectMoveModalWorkspace(data.name || name);
+            } else {
+                showMoveFolderError(data.message || data.error || 'Error creating workspace');
+            }
+        })
+        .catch(function (error) {
+            showMoveFolderError(
+                window.t ? window.t('folders.errors.generic_prefix', { error: String(error) }, 'Error: {{error}}') : ('Error: ' + String(error))
+            );
+        });
+}
+
+function createFolderFromMoveModal() {
+    var input = document.getElementById('moveCreateFolderName');
+    var path = input ? input.value.trim().replace(/^\/+|\/+$/g, '') : '';
+    if (!path) {
+        showMoveFolderError(
+            window.t ? window.t('modals.move_note_folder.enter_folder_name', null, 'Please enter a folder name') : 'Please enter a folder name'
+        );
+        return;
+    }
+
+    var workspace = getMoveModalWorkspace();
+    var modal = document.getElementById('moveNoteFolderModal');
+    var currentFolderId = modal ? (modal.dataset.currentFolderId || '') : '';
+    var currentFolderName = modal ? (modal.dataset.currentFolderName || '') : '';
+
+    fetch('/api/v1/folders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ workspace: workspace, folder_path: path, create_parents: true })
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data };
+            });
+        })
+        .then(function (result) {
+            var data = result.data || {};
+            var folderId = data.folder_id || (data.folder && data.folder.id);
+            if (data.success || (result.status === 409 && folderId)) {
+                // Created — or it already exists, in which case just select it
+                hideMoveFolderError();
+                toggleMoveModalCreateRow('moveCreateFolderRow', false);
+                // Rebuild the dropdown so the new folder (and any created parents)
+                // appear with their full path, then preselect it
+                populateTargetFolderDropdown(currentFolderId, currentFolderName, 'moveNoteTargetSelect', folderId);
+            } else {
+                showMoveFolderError(data.error || data.message || 'Error creating folder');
+            }
+        })
+        .catch(function (error) {
+            showMoveFolderError(
+                window.t ? window.t('folders.errors.generic_prefix', { error: String(error) }, 'Error: {{error}}') : ('Error: ' + String(error))
+            );
+        });
 }
 
 // executeFolderAction removed

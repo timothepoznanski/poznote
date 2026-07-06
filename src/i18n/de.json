@@ -953,6 +953,11 @@
       "workspace_destination": "Arbeitsbereich-Ziel auswählen:",
       "target_folder": "Zielordner auswählen:",
       "recent_folders": "Zuletzt verwendete Ordner",
+      "new_folder": "Neuer Ordner",
+      "new_workspace": "Neuer Arbeitsbereich",
+      "folder_name_placeholder": "Ordnername (verwenden Sie / für Unterordner)",
+      "workspace_name_placeholder": "Name des Arbeitsbereichs",
+      "enter_workspace_name": "Bitte geben Sie einen Namen für den Arbeitsbereich ein",
       "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
     },
     "move_folder_files": {
