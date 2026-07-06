@@ -202,6 +202,11 @@ function startAuthenticatedUserSession(array $authUser, ?string $authMethod = nu
         return false;
     }
 
+    // Prevent session fixation: never keep the pre-authentication session ID.
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+
     setAuthenticatedIdentity($authUser, $authMethod);
 
     require_once __DIR__ . '/users/db_master.php';
@@ -1039,11 +1044,165 @@ function enforcePublicWorkspaceRequestAccess(): void {
     }
 }
 
+// --- Brute-force protection for password logins (form + API Basic Auth) ---
+//
+// Strategy: progressive delay, not a hard lockout. Each consecutive failure
+// makes the next attempt slower (0s -> 1s -> 2s -> 4s ... capped), so a
+// legitimate user fumbling a few passwords is never locked out, while a
+// brute-forcer is throttled to a handful of guesses per minute. A very high
+// hard cap stays as a last-resort safety net against sustained attacks.
+define('LOGIN_DELAY_FREE_ATTEMPTS', 2);     // first N failures incur no delay
+define('LOGIN_DELAY_MAX_SECONDS', 10);      // per-attempt delay cap
+define('LOGIN_HARD_BLOCK_ATTEMPTS', 50);    // safety-net hard block threshold
+define('LOGIN_ATTEMPT_WINDOW_SECONDS', 15 * 60); // failures older than this are forgotten
+
+function getLoginRateLimitConnection(): ?PDO {
+    static $initialized = false;
+
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        $con = getMasterConnection();
+        if (!$initialized) {
+            $con->exec('CREATE TABLE IF NOT EXISTS login_attempts (
+                key TEXT PRIMARY KEY,
+                attempts INTEGER NOT NULL DEFAULT 0,
+                first_attempt_at INTEGER NOT NULL
+            )');
+            $initialized = true;
+        }
+        return $con;
+    } catch (Throwable $e) {
+        error_log('Poznote login rate limit storage unavailable: ' . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Rate limit keys: per-account (primary) and per-source-IP (backstop).
+ * REMOTE_ADDR is used on purpose — X-Forwarded-For is client-controlled.
+ */
+function getLoginRateLimitKeys(string $identifier): array {
+    $keys = [];
+    $identifier = strtolower(trim($identifier));
+    if ($identifier !== '') {
+        $keys[] = 'user:' . $identifier;
+    }
+    $remoteAddr = trim((string)($_SERVER['REMOTE_ADDR'] ?? ''));
+    if ($remoteAddr !== '') {
+        $keys[] = 'ip:' . $remoteAddr;
+    }
+    return $keys;
+}
+
+/**
+ * Highest active failure count across this request's keys (account + IP),
+ * ignoring failures older than the forget window.
+ */
+function getRecentFailedLoginCount(string $identifier): int {
+    $con = getLoginRateLimitConnection();
+    if ($con === null) {
+        return 0;
+    }
+
+    $maxAttempts = 0;
+    try {
+        $windowStart = time() - LOGIN_ATTEMPT_WINDOW_SECONDS;
+        foreach (getLoginRateLimitKeys($identifier) as $key) {
+            $stmt = $con->prepare('SELECT attempts FROM login_attempts WHERE key = ? AND first_attempt_at >= ?');
+            $stmt->execute([$key, $windowStart]);
+            $attempts = $stmt->fetchColumn();
+            if ($attempts !== false) {
+                $maxAttempts = max($maxAttempts, (int)$attempts);
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('Poznote login rate limit check failed: ' . $e->getMessage());
+    }
+
+    return $maxAttempts;
+}
+
+/**
+ * Delay (in seconds) to apply before processing an attempt, based on how many
+ * recent failures precede it: 0 while under the free allowance, then doubling
+ * (1, 2, 4, 8, ...) up to the cap.
+ */
+function computeLoginDelaySeconds(int $recentFailures): int {
+    $over = $recentFailures - LOGIN_DELAY_FREE_ATTEMPTS;
+    if ($over <= 0) {
+        return 0;
+    }
+
+    $delay = 1 << ($over - 1); // 1, 2, 4, 8, ...
+    return (int)min($delay, LOGIN_DELAY_MAX_SECONDS);
+}
+
+/**
+ * Throttle the current login attempt. Sleeps a progressively longer time as
+ * recent failures accumulate. Returns true when the hard safety-net block is
+ * in effect and the caller should reject the attempt outright.
+ */
+function throttleLoginAttempt(string $identifier): bool {
+    $recentFailures = getRecentFailedLoginCount($identifier);
+
+    if ($recentFailures >= LOGIN_HARD_BLOCK_ATTEMPTS) {
+        error_log("Poznote Auth: Login hard-blocked after $recentFailures failures for '$identifier'");
+        return true;
+    }
+
+    $delay = computeLoginDelaySeconds($recentFailures);
+    if ($delay > 0) {
+        sleep($delay);
+    }
+
+    return false;
+}
+
+function recordFailedLoginAttempt(string $identifier): void {
+    $con = getLoginRateLimitConnection();
+    if ($con === null) {
+        return;
+    }
+
+    try {
+        $now = time();
+        $windowStart = $now - LOGIN_ATTEMPT_WINDOW_SECONDS;
+        // Opportunistically drop forgotten windows so the table stays small.
+        $con->prepare('DELETE FROM login_attempts WHERE first_attempt_at < ?')->execute([$windowStart]);
+        foreach (getLoginRateLimitKeys($identifier) as $key) {
+            $con->prepare('INSERT INTO login_attempts (key, attempts, first_attempt_at) VALUES (?, 1, ?)
+                ON CONFLICT(key) DO UPDATE SET attempts = attempts + 1')->execute([$key, $now]);
+        }
+    } catch (Throwable $e) {
+        error_log('Poznote login rate limit record failed: ' . $e->getMessage());
+    }
+}
+
+function clearLoginRateLimit(string $identifier): void {
+    $con = getLoginRateLimitConnection();
+    if ($con === null) {
+        return;
+    }
+
+    try {
+        foreach (getLoginRateLimitKeys($identifier) as $key) {
+            $con->prepare('DELETE FROM login_attempts WHERE key = ?')->execute([$key]);
+        }
+    } catch (Throwable $e) {
+        error_log('Poznote login rate limit clear failed: ' . $e->getMessage());
+    }
+}
+
 /**
  * Authenticate with username/password
  */
 function authenticate($username, $password, $rememberMe = false) {
     require_once __DIR__ . '/users/db_master.php';
+
+    // Progressive delay before processing; hard block only as a safety net.
+    if (throttleLoginAttempt((string)$username)) {
+        return false;
+    }
 
     // 1. Find user profile by their own username or email
     $user = getUserProfileByUsername($username);
@@ -1055,6 +1214,7 @@ function authenticate($username, $password, $rememberMe = false) {
     
     if (!$user || !$user['active']) {
         error_log("Poznote Auth: Login failed - User/Email '$username' not found or inactive");
+        recordFailedLoginAttempt((string)$username);
         return false;
     }
 
@@ -1066,9 +1226,11 @@ function authenticate($username, $password, $rememberMe = false) {
     if (!$authenticated) {
         $role = $isProfileAdmin ? 'Admin' : 'User';
         error_log("Poznote Auth: $role password mismatch for user '$username'");
+        recordFailedLoginAttempt((string)$username);
     }
 
     if ($authenticated) {
+        clearLoginRateLimit((string)$username);
         startAuthenticatedUserSession($user);
         updateUserLastLogin($userId);
 
@@ -1408,11 +1570,29 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     
     require_once __DIR__ . '/users/db_master.php';
     $loginIdentifier = $basicCredentials['username'];
+
+    // Progressive delay before processing; hard block only as a safety net.
+    if (throttleLoginAttempt((string)$loginIdentifier)) {
+        $msg = api_t('auth.api.too_many_attempts', [], 'Too many failed authentication attempts. Try again later.');
+        header('HTTP/1.1 429 Too Many Requests');
+        header('Retry-After: ' . LOGIN_ATTEMPT_WINDOW_SECONDS);
+        header('Content-Type: application/json');
+        echo json_encode(['error' => $msg]);
+        exit;
+    }
+
     $authUser = ctype_digit($loginIdentifier)
         ? getUserProfileById((int)$loginIdentifier)
         : getUserProfileByUsername($loginIdentifier);
-    
-    if (!$authUser || !$authUser['active'] || ($requireAdmin && !(bool)$authUser['is_admin']) || !verifyUserPassword((int)$authUser['id'], $basicCredentials['password'])) {
+
+    $credentialsValid = $authUser && $authUser['active'] && verifyUserPassword((int)($authUser['id'] ?? 0), $basicCredentials['password']);
+
+    // Same response for bad credentials and insufficient role (no role disclosure),
+    // but only genuine credential failures count towards the rate limit.
+    if (!$credentialsValid || ($requireAdmin && !(bool)$authUser['is_admin'])) {
+        if (!$credentialsValid) {
+            recordFailedLoginAttempt((string)$loginIdentifier);
+        }
         $msg = api_t('auth.api.invalid_credentials', [], 'Invalid credentials');
         header('HTTP/1.1 401 Unauthorized');
         header('Content-Type: application/json');
@@ -1421,7 +1601,8 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
     }
 
     $authUser['_api_auth_method'] = 'basic';
-    
+    clearLoginRateLimit((string)$loginIdentifier);
+
     return $authUser;
 }
 
@@ -1612,6 +1793,14 @@ function requireApiAuthAdmin() {
     if (isAuthenticated()) {
         if (isPublicWorkspaceAccessActive()) {
             denyPublicWorkspaceAccessResponse('This endpoint is not available in public workspace mode', 403);
+        }
+        // Session users must hold the admin role; controllers may re-check,
+        // but the gate itself must not let non-admins through.
+        if (!isCurrentUserAdmin()) {
+            header('HTTP/1.1 403 Forbidden');
+            header('Content-Type: application/json');
+            echo json_encode(['error' => api_t('auth.api.admin_required', [], 'Admin access required')]);
+            exit;
         }
         return;
     }

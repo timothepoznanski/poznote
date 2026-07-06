@@ -506,6 +506,11 @@
                     
                     // For markdown notes, store the markdown content in a data attribute
                     if ($note_type === 'markdown') {
+                        if ($isPublicWorkspaceReadonly) {
+                            // Public workspace visitors must never receive raw scripts
+                            // embedded in markdown (stored XSS against other users).
+                            $entryfinal = sanitizeMarkdownContent($entryfinal);
+                        }
                         $markdown_content = htmlspecialchars($entryfinal, ENT_QUOTES);
                         $data_attr .= ' data-markdown-content="'.$markdown_content.'"';
                         // Start with the raw markdown displayed
@@ -513,10 +518,21 @@
                     } else {
                         // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
-                        
+
                         // Unescape media tags if they were HTML-escaped in the content
                         // This allows iframes, audio, and video to render properly
                         $display_content = unescapeMediaInHtml($display_content);
+
+                        if ($isPublicWorkspaceReadonly) {
+                            // Public workspace visitors must never receive raw note HTML
+                            // (stored XSS against other users of the instance). Applied
+                            // after unescapeMediaInHtml so re-enabled media tags are
+                            // sanitized too, matching the public_note.php policy.
+                            if (!function_exists('sanitizePublicNoteHtml')) {
+                                require_once __DIR__ . '/public_helpers.php';
+                            }
+                            $display_content = sanitizePublicNoteHtml($display_content);
+                        }
                     }
                     
                     // Public workspace access keeps the standard UI but disables content editing.
