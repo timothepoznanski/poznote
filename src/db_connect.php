@@ -30,13 +30,20 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
 } else {
     // Check if this is a public shared link access
     $publicToken = $_GET['token'] ?? null;
-    
-    // Also check pretty URLs (tokens are usually alphanumeric/hex)
-    if (!$publicToken && !empty($_SERVER['REQUEST_URI'])) {
-        $uri = trim($_SERVER['REQUEST_URI'], '/');
-        $parts = explode('/', $uri);
+
+    // Also check pretty URLs (tokens are usually alphanumeric/hex), but only for
+    // public entry points that accept URI tokens. Other unauthenticated pages
+    // (login.php, index.php, ...) would otherwise trigger a useless
+    // shared_links lookup on every request.
+    $publicTokenScripts = ['public_note.php', 'public_folder.php'];
+    $scriptBasename = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    $isApiRequest = strpos((string)($_SERVER['REQUEST_URI'] ?? ''), '/api/v1/') !== false;
+    if (!$publicToken && !empty($_SERVER['REQUEST_URI'])
+        && (in_array($scriptBasename, $publicTokenScripts, true) || $isApiRequest)) {
+        $uriPath = (string)(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '');
+        $parts = explode('/', trim($uriPath, '/'));
         $lastPart = end($parts);
-        if ($lastPart && preg_match('/^[a-f0-9]{32}$|^[a-zA-Z0-9\-_.]{4,128}$/', $lastPart)) {
+        if ($lastPart && $lastPart !== $scriptBasename && preg_match('/^[a-zA-Z0-9\-_.]{4,128}$/', $lastPart)) {
             $publicToken = $lastPart;
         }
     }
@@ -263,7 +270,7 @@ try {
     )');
 
     // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 15;
+    $CURRENT_SCHEMA_VERSION = 16;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -275,7 +282,12 @@ try {
         // settings table might not exist yet for very old databases
     }
 
-    if ($currentVersion < $CURRENT_SCHEMA_VERSION) {
+    // Run migrations whenever the stored version differs from the code's version.
+    // A mismatch in EITHER direction matters: a database restored from an old backup
+    // (lower version) needs the migrations, and a database that ran under a newer or
+    // different code version (higher version) may be missing columns this version
+    // expects. All migrations below are idempotent, so re-running them is safe.
+    if ($currentVersion !== $CURRENT_SCHEMA_VERSION) {
         // === COLUMN MIGRATIONS ===
 
         // Add missing columns to entries if they don't exist (migration for old backups)
@@ -473,55 +485,47 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");
 
+        // Ensure reminder email delivery columns exist for databases created before SMTP reminders.
+        try {
+            $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('email_sent_at', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_sent_at DATETIME");
+            }
+            if (!in_array('email_enabled', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_enabled INTEGER DEFAULT 1");
+            }
+            if (!in_array('email_attempts', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_attempts INTEGER DEFAULT 0");
+            }
+            if (!in_array('email_last_attempt_at', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_last_attempt_at DATETIME");
+            }
+            if (!in_array('email_error', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_error TEXT");
+            }
+            $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
+        } catch (Exception $e) {
+            error_log('Could not ensure reminder email columns: ' . $e->getMessage());
+        }
+
+        // Ensure linked_note_id column exists (may be missing from restored backups)
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('linked_note_id', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add linked_note_id column: ' . $e->getMessage());
+        }
+
         // === Update schema version ===
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '" . $CURRENT_SCHEMA_VERSION . "')");
     }
     // --- End schema versioning ---
 
-    try {
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
-    } catch (Exception $e) {
-        error_log('Could not ensure display settings: ' . $e->getMessage());
-    }
 
-    // Always ensure reminder email delivery columns exist for databases created before SMTP reminders.
-    try {
-        $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        if (!in_array('email_sent_at', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_sent_at DATETIME");
-        }
-        if (!in_array('email_enabled', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_enabled INTEGER DEFAULT 1");
-        }
-        if (!in_array('email_attempts', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_attempts INTEGER DEFAULT 0");
-        }
-        if (!in_array('email_last_attempt_at', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_last_attempt_at DATETIME");
-        }
-        if (!in_array('email_error', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_error TEXT");
-        }
-        $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
-    } catch (Exception $e) {
-        error_log('Could not ensure reminder email columns: ' . $e->getMessage());
-    }
-
-    // Always ensure linked_note_id column exists (may have been removed and re-added)
-    try {
-        $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        if (!in_array('linked_note_id', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
-        }
-    } catch (Exception $e) {
-        error_log('Could not add linked_note_id column: ' . $e->getMessage());
-    }
-    
     // Ensure required data directories exist
     // $dbDir points to data/users/{id}/database, so we go up one level to get data/users/{id}/
     $dataDir = dirname($dbDir);
@@ -580,7 +584,9 @@ try {
     }
 
 } catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    error_log("Poznote: database connection failed: " . $e->getMessage());
+    http_response_code(503);
+    die("Database connection failed. Please contact the administrator or check the server logs.");
 }
 
 ?>
