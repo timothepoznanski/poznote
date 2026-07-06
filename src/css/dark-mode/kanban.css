@@ -2,34 +2,9 @@
    Dark Mode - Kanban View
    ============================================ */
 
-html[data-theme='dark'] .kanban-page,
-body.dark-mode .kanban-page {
-    background: transparent;
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .kanban-header,
-body.dark-mode .kanban-header {
-    background: var(--dm-bg);
-    border-bottom-color: var(--dm-border);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-
 html[data-theme='dark'] .kanban-title,
 body.dark-mode .kanban-title {
     color: var(--dm-text);
-}
-
-html[data-theme='dark'] .kanban-back-btn,
-body.dark-mode .kanban-back-btn {
-    background: var(--dm-surface);
-    color: var(--dm-text-muted);
-}
-
-html[data-theme='dark'] .kanban-back-btn:hover,
-body.dark-mode .kanban-back-btn:hover {
-    background: var(--dm-border);
-    color: #ffffff;
 }
 
 html[data-theme='dark'] .kanban-column,
@@ -117,9 +92,7 @@ body.dark-mode .kanban-task-preview-item {
 }
 
 html[data-theme='dark'] .kanban-task-preview-item.completed .kanban-task-preview-text,
-body.dark-mode .kanban-task-preview-item.completed .kanban-task-preview-text,
-html[data-theme='dark'] .kanban-task-preview-more,
-body.dark-mode .kanban-task-preview-more {
+body.dark-mode .kanban-task-preview-item.completed .kanban-task-preview-text {
     color: #808080;
 }
 

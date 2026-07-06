@@ -23,7 +23,6 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
 	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>

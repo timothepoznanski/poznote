@@ -23,7 +23,6 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>

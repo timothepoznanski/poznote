@@ -245,59 +245,6 @@ class UserDataManager {
     }
     
     /**
-     * List available backups
-     * @return array
-     */
-    public function listBackups() {
-        $backupsPath = $this->getUserBackupsPath();
-        $backups = [];
-        
-        if (!is_dir($backupsPath)) {
-            return $backups;
-        }
-        
-        $files = scandir($backupsPath);
-        foreach ($files as $file) {
-            if (preg_match('/^backup_.*\.zip$/', $file)) {
-                $fullPath = $backupsPath . '/' . $file;
-                $backups[] = [
-                    'name' => $file,
-                    'path' => $fullPath,
-                    'size' => filesize($fullPath),
-                    'created' => filemtime($fullPath)
-                ];
-            }
-        }
-        
-        // Sort by creation time, newest first
-        usort($backups, function($a, $b) {
-            return $b['created'] - $a['created'];
-        });
-        
-        return $backups;
-    }
-    
-    /**
-     * Delete a specific backup
-     * @param string $backupName
-     * @return bool
-     */
-    public function deleteBackup($backupName) {
-        // Sanitize filename to prevent directory traversal
-        $backupName = basename($backupName);
-        if (!preg_match('/^backup_.*\.zip$/', $backupName)) {
-            return false;
-        }
-        
-        $backupPath = $this->getUserBackupsPath() . '/' . $backupName;
-        
-        if (file_exists($backupPath)) {
-            return unlink($backupPath);
-        }
-        
-        return false;
-    }
-    /**
      * Sync username to user's local settings table for redundancy (disaster recovery)
      * @param string $username
      * @param PDO|null $con Optional existing database connection to use

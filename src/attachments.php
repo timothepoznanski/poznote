@@ -62,7 +62,6 @@ if (!$note) {
     <link rel="stylesheet" href="css/modals/base.css">
     <link rel="stylesheet" href="css/modals/specific-modals.css">
     <link rel="stylesheet" href="css/modals/attachments.css">
-    <link rel="stylesheet" href="css/modals/link-modal.css">
     <link rel="stylesheet" href="css/modals/share-modal.css">
     <link rel="stylesheet" href="css/modals/alerts-utilities.css">
     <link rel="stylesheet" href="css/modals/responsive.css">

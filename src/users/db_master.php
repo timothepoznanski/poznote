@@ -189,31 +189,6 @@ function getAllUserProfiles(): array {
 }
 
 /**
- * Return explicit target account IDs a user may access, excluding their own implicit account.
- */
-function getUserAccountAccessTargetIds(int $accessorUserId): array {
-    if ($accessorUserId <= 0) {
-        return [];
-    }
-
-    try {
-        $con = getMasterConnection();
-        $stmt = $con->prepare("
-            SELECT target_user_id
-            FROM user_account_access
-            WHERE accessor_user_id = ?
-            ORDER BY target_user_id
-        ");
-        $stmt->execute([$accessorUserId]);
-
-        return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
-    } catch (Exception $e) {
-        error_log("Error getting account access grants: " . $e->getMessage());
-        return [];
-    }
-}
-
-/**
  * Return all active account IDs a user can open. Their own account is always included.
  */
 function getUserAccessibleAccountIds(int $accessorUserId): array {

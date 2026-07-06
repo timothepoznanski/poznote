@@ -135,28 +135,11 @@
 
 /* MENU LEFT */
 
-.newbutton[style],
 .list_tags[style] {
     text-align: center;
 }
 
-.newbutton[style] {
-    cursor: pointer;
-    margin-left: 8px;
-}
-
-.newbutton[style] .lucide-times-circle {
-    color: #d32f2f;
-    font-size: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.newbutton,
-.newfolderbutton,
-.list_tags,
-.settingsbutton {
+.list_tags {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -170,10 +153,7 @@
     transition: background-color 0.2s, color 0.2s;
 }
 
-.newbutton:hover,
-.newfolderbutton:hover,
-.list_tags:hover,
-.settingsbutton:hover {
+.list_tags:hover {
     background-color: rgba(0, 125, 184, 0.1);
     color: #005a8a;
 }
@@ -184,20 +164,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.settingsbutton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    margin: 4px;
-    color: #007DB8;
-    font-size: 16px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
 }
 
 .settings-menu {
@@ -386,35 +352,3 @@
     color: #007DB8;
 }
 
-.trashnotebutton {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    margin: 4px;
-    color: #007DB8;
-    font-size: 16px;
-    border-radius: 4px;
-    transition: background-color 0.2s, color 0.2s;
-}
-
-.trashnotebutton:hover {
-    background-color: rgba(0, 125, 184, 0.1);
-    color: #005a8a;
-}
-
-.logoutbutton {
-    display: inline-block;
-    width: 30px;
-    cursor: pointer;
-    height: 20px;
-    margin: 5px;
-    color: #dc3545;
-    font-size: 15px;
-}
-
-.logoutbutton:hover {
-    color: #c82333;
-}
