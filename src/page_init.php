@@ -6,6 +6,17 @@
 require_once 'functions.php';
 
 /**
+ * Interpret a boolean-ish setting value ('1'/'true'/'0'/'false').
+ * Empty, null or missing values fall back to $default.
+ */
+function poznoteSettingEnabled($value, bool $default = false): bool {
+    if ($value === null || $value === false || $value === '') {
+        return $default;
+    }
+    return $value !== '0' && $value !== 'false';
+}
+
+/**
  * Initialise les workspaces et labels
  */
 function initializeWorkspacesAndLabels($con) {

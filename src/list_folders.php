@@ -48,14 +48,12 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/link-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/folders-grid.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>

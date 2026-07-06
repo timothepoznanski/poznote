@@ -341,76 +341,6 @@ body.dark-mode .dashboard-sidebar-sep {
     color: #f59e0b;
 }
 
-/* ---------- Git modal ---------- */
-
-.dashboard-git-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin: 16px 0;
-}
-
-.dashboard-git-action {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-height: 72px;
-    padding: 10px 12px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #ffffff;
-    color: #1f2937;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.dashboard-git-action:hover,
-.dashboard-git-action:focus {
-    border-color: #007DB8;
-    background: #f8fbfd;
-    color: #007DB8;
-    outline: none;
-}
-
-.dashboard-git-action-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 48px;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
-}
-
-.dashboard-git-action-icon .lucide {
-    width: 28px;
-    height: 28px;
-}
-
-.dashboard-git-action-body {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-.dashboard-git-action-title {
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.dashboard-git-action-status {
-    margin-top: 3px;
-    color: #6b7280;
-    font-size: 11px;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
 /* ---------- Git sync feedback/debug ---------- */
 
 .dashboard-sync-debug {
@@ -915,27 +845,6 @@ body.dark-mode .dashboard-topbar-actions .dashboard-notifications-btn.has-notifi
     color: #f59e0b;
 }
 
-:root[data-theme='dark'] .dashboard-git-action,
-body.dark-mode .dashboard-git-action {
-    background: var(--dm-surface);
-    border-color: var(--dm-border);
-    color: var(--dm-text);
-}
-
-:root[data-theme='dark'] .dashboard-git-action:hover,
-:root[data-theme='dark'] .dashboard-git-action:focus,
-body.dark-mode .dashboard-git-action:hover,
-body.dark-mode .dashboard-git-action:focus {
-    background: var(--dm-surface-hover);
-    border-color: #007DB8;
-    color: #007DB8;
-}
-
-:root[data-theme='dark'] .dashboard-git-action-status,
-body.dark-mode .dashboard-git-action-status {
-    color: var(--dm-text-muted);
-}
-
 :root[data-theme='dark'] .bc-current,
 body.dark-mode .bc-current {
     color: var(--dm-text);
@@ -1074,10 +983,6 @@ body.dark-mode .dashboard-desktop-settings:hover .lucide {
 
     .dashboard-topbar-filter {
         width: 100%;
-    }
-
-    .dashboard-git-actions {
-        grid-template-columns: 1fr;
     }
 
     .dashboard-sidebar {

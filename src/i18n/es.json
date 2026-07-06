@@ -38,6 +38,7 @@
       }
     },
     "download": "Descargar",
+    "print": "Imprimir",
     "convert": "Convertir",
     "create": "Crear",
     "delete": "Eliminar",
@@ -953,6 +954,11 @@
       "workspace_destination": "Seleccionar destino del espacio de trabajo:",
       "target_folder": "Seleccionar carpeta de destino:",
       "recent_folders": "Carpetas recientes",
+      "new_folder": "Nueva carpeta",
+      "new_workspace": "Nuevo espacio de trabajo",
+      "folder_name_placeholder": "Nombre de la carpeta (usa / para subcarpetas)",
+      "workspace_name_placeholder": "Nombre del espacio de trabajo",
+      "enter_workspace_name": "Por favor ingresa un nombre de espacio de trabajo",
       "enter_folder_name": "Por favor ingresa un nombre de carpeta"
     },
     "move_folder_files": {
@@ -1097,10 +1103,6 @@
       "json": {
         "title": "Descargar como JSON",
         "description": "Descargar los datos sin procesar de la lista de tareas como archivo JSON"
-      },
-      "print": {
-        "title": "Imprimir a PDF (Navegador)",
-        "description": "Usar el diálogo de impresión nativo del navegador para guardar como PDF"
       }
     },
     "task_move": {
@@ -1327,7 +1329,7 @@
       "invalid_action": "Acción inválida",
       "internal_server_error": "Error interno del servidor",
       "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
-      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)"
+      "invalid_custom_token": "Enlace personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)"
     }
   },
   "ui": {
@@ -1389,8 +1391,8 @@
     },
     "share_modal": {
       "description": "Una URL compartida crea un enlace público a esta nota. Una vez creada la URL, se ofrecerán otras opciones, como proteger la nota con contraseña o personalizar la URL compartida.",
-      "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "mi_token_personalizado-1",
+      "custom_token": "Enlace personalizado (opcional)",
+      "custom_token_placeholder": "mi-enlace-personalizado-1",
       "custom_token_example": "Lo que dará por ejemplo:",
       "password": "Contraseña (opcional)",
       "password_placeholder": "Ingrese una contraseña",
@@ -1409,12 +1411,12 @@
       "copy": "Copiar",
       "revoke": "Revocar",
       "renew": "Renovar",
-      "renew_token": "Renovar token",
+      "renew_token": "Renovar enlace",
       "manage": "Editar",
       "create_url": "Crear url",
       "no_link_yet": "Aún no hay enlace público",
-      "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "Enlace personalizado (opcional)",
+      "custom_token_placeholder": "mi-enlace-personalizado-1",
       "indexable": "Permitir indexación por motores de búsqueda",
       "indexable_mobile": "Permitir indexación",
       "tasklist_access": "Acceso público a la lista de tareas",
@@ -1900,7 +1902,7 @@
       "path": "Ruta",
       "url": "URL Compartida",
       "folder": "Carpeta",
-      "token": "Token",
+      "token": "Enlace",
       "actions": "Acciones"
     },
     "actions": {
@@ -1914,7 +1916,7 @@
     "shared_folder_title": "Carpeta compartida",
     "note_shared_through_folder": "Nota compartida mediante carpeta",
     "folder_shared_through_parent": "Carpeta compartida mediante carpeta padre",
-    "token_help": "El token es la parte única que eliges en el enlace público. Por ejemplo, si usas proyecto-2026, la URL de una nota puede ser https://tu-dominio.ejemplo/proyecto-2026 y la de una carpeta https://tu-dominio.ejemplo/folder/proyecto-2026.",
+    "token_help": "El enlace personalizado es la parte única que eliges en la URL pública. Por ejemplo, si usas proyecto-2026, la URL de una nota puede ser https://tu-dominio.ejemplo/proyecto-2026 y la de una carpeta https://tu-dominio.ejemplo/folder/proyecto-2026.",
     "indexable": "Indexable",
     "password_protected": "Protegido con contraseña",
     "add_password_title": "Agregar protección con contraseña",
@@ -1931,8 +1933,8 @@
       "unlock": "Desbloquear"
     },
     "errors": {
-      "token_missing": "Falta el token",
-      "token_or_folder_auth_missing": "Falta el token o la autorización de carpeta",
+      "token_missing": "Falta el enlace",
+      "token_or_folder_auth_missing": "Falta el enlace o la autorización de carpeta",
       "shared_folder_not_found": "Carpeta compartida no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "folder_not_found": "Carpeta no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",

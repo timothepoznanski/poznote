@@ -108,6 +108,27 @@
                 }
                 break;
 
+            case 'toggle-move-create-workspace':
+                if (typeof toggleMoveCreateWorkspace === 'function') {
+                    toggleMoveCreateWorkspace();
+                }
+                break;
+            case 'toggle-move-create-folder':
+                if (typeof toggleMoveCreateFolder === 'function') {
+                    toggleMoveCreateFolder();
+                }
+                break;
+            case 'create-move-modal-workspace':
+                if (typeof createWorkspaceFromMoveModal === 'function') {
+                    createWorkspaceFromMoveModal();
+                }
+                break;
+            case 'create-move-modal-folder':
+                if (typeof createFolderFromMoveModal === 'function') {
+                    createFolderFromMoveModal();
+                }
+                break;
+
             // Note actions
             case 'move-note-to-folder':
                 if (typeof moveNoteToFolder === 'function') {
@@ -228,6 +249,16 @@
                 case 'create-folder':
                     if (typeof createFolder === 'function') {
                         createFolder();
+                    }
+                    break;
+                case 'create-move-modal-workspace':
+                    if (typeof createWorkspaceFromMoveModal === 'function') {
+                        createWorkspaceFromMoveModal();
+                    }
+                    break;
+                case 'create-move-modal-folder':
+                    if (typeof createFolderFromMoveModal === 'function') {
+                        createFolderFromMoveModal();
                     }
                     break;
             }

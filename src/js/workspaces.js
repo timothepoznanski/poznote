@@ -433,6 +433,9 @@ function refreshLeftColumnForWorkspace(workspaceName) {
 function clearRightColumn() {
     var rightCol = document.getElementById('right_col');
     if (rightCol) {
+        if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+            window.destroyMarkdownCodeMirrorEditorsWithin(rightCol);
+        }
         rightCol.innerHTML = '';
     }
 

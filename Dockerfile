@@ -16,7 +16,7 @@ RUN apk add --no-cache \
     libzip-dev \
     curl-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_sqlite zip curl \
+    && docker-php-ext-install pdo pdo_sqlite zip curl opcache \
     && docker-php-source delete \
     && apk del --no-cache .build-deps
 

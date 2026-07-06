@@ -257,8 +257,12 @@
             }));
 
             // Fallback: if WeakMap instance is gone but the editor is still a CM host,
-            // search the stored text value directly so we don't fall through to DOM search
-            if (cmMatches.length === 0 && cmEditor.hasAttribute('data-codemirror-enabled')) {
+            // search the stored text value directly so we don't fall through to DOM search.
+            // Only when the instance is really gone: on a live editor findMatches() is
+            // authoritative and data-codemirror-value may be stale (set at creation only).
+            if (cmMatches.length === 0 &&
+                cmEditor.hasAttribute('data-codemirror-enabled') &&
+                !(typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(cmEditor))) {
                 const storedText = cmEditor.getAttribute('data-codemirror-value') || '';
                 if (storedText) {
                     const needle = searchText.toLowerCase();

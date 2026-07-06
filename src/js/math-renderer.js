@@ -9,14 +9,41 @@
     var _mathRetryCount = 0;
     var MAX_MATH_RETRIES = 50; // 5 seconds max
 
+    var _katexLoading = false;
+
     // Function to render all math elements on the page
     window.renderMathInElement = function(element) {
         if (!element) {
             element = document.body;
         }
 
+        // Locate math elements first: when there are none (the vast majority
+        // of calls, including every MutationObserver tick), exit before any
+        // KaTeX loading/availability logic runs.
+        const mathBlocks = element.querySelectorAll('.math-block');
+        const mathInline = element.querySelectorAll('.math-inline');
+        if (mathBlocks.length === 0 && mathInline.length === 0) {
+            return;
+        }
+
         // Check if KaTeX is available
         if (typeof katex === 'undefined') {
+            // Load it on demand (deduped by lazy-libs.js), then re-run.
+            if (typeof window.poznoteEnsureKatex === 'function') {
+                if (!_katexLoading) {
+                    _katexLoading = true;
+                    window.poznoteEnsureKatex().then(function() {
+                        _katexLoading = false;
+                        window.renderMathInElement(element);
+                    }, function(error) {
+                        _katexLoading = false;
+                        console.error('Could not load KaTeX:', error);
+                    });
+                }
+                return;
+            }
+
+            // Fallback for pages that include KaTeX statically (async/defer tag).
             if (_mathRetryCount < MAX_MATH_RETRIES) {
                 _mathRetryCount++;
                 setTimeout(function() {
@@ -28,7 +55,6 @@
         _mathRetryCount = 0;
 
         // Render math blocks (display mode)
-        const mathBlocks = element.querySelectorAll('.math-block');
         mathBlocks.forEach(function(block) {
             const mathContent = block.getAttribute('data-math');
             if (mathContent) {
@@ -49,7 +75,6 @@
         });
 
         // Render inline math
-        const mathInline = element.querySelectorAll('.math-inline');
         mathInline.forEach(function(inline) {
             const mathContent = inline.getAttribute('data-math');
             if (mathContent) {

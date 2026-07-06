@@ -424,6 +424,28 @@ body.dark-mode #moveNoteFolderModal .move-note-recent-label {
     color: #c8c8c8;
 }
 
+html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create-toggle,
+body.dark-mode #moveNoteFolderModal .move-note-inline-create-toggle {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create-toggle:hover,
+body.dark-mode #moveNoteFolderModal .move-note-inline-create-toggle:hover {
+    color: #dcecff;
+}
+
+html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel,
+body.dark-mode #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
+    background-color: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover,
+body.dark-mode #moveNoteFolderModal .move-note-inline-create button.btn-cancel:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
 html[data-theme='dark'] #moveNoteFolderModal .move-note-recent-folder,
 body.dark-mode #moveNoteFolderModal .move-note-recent-folder {
     background: var(--dm-surface);

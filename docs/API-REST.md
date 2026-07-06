@@ -11,6 +11,9 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [HTTP Status Codes](#http-status-codes)
 - [Interactive Documentation (Swagger)](#interactive-documentation-swagger)
 - [Notes](#notes)
+- [Note Locks](#note-locks)
+- [Snapshots](#snapshots)
+- [Reminders](#reminders)
 - [Note Sharing](#note-sharing)
 - [Folder Sharing](#folder-sharing)
 - [Backlinks](#backlinks)
@@ -158,7 +161,6 @@ List all notes for a user with optional filtering and sorting.
 | `workspace` | string | Filter by workspace name |
 | `folder` | string | Filter by folder name |
 | `folder_id` | integer | Filter by folder ID |
-| `tag` | string | Filter by tag |
 | `search` | string | Search in heading and content |
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
@@ -171,10 +173,10 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes
 ```
 
-Filter notes by workspace, folder, and tag:
+Filter notes by workspace and folder:
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
-  "http://YOUR_SERVER/api/v1/notes?workspace=Personal&folder=Projects&tag=important"
+  "http://YOUR_SERVER/api/v1/notes?workspace=Personal&folder=Projects"
 ```
 
 Filter notes by creation date:
@@ -241,7 +243,9 @@ Search notes by heading or content.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `q` | string | Search query |
+| `q` | string | Search query (required) |
+| `workspace` | string | Restrict search to a workspace |
+| `limit` | integer | Max results (1–100, default `10`) |
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
 
@@ -388,8 +392,16 @@ POST /notes/{id}/convert
 
 Convert a note between Markdown and HTML formats.
 
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `target` | string | Yes | Target format: `html` or `markdown` |
+
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"target": "markdown"}' \
   http://YOUR_SERVER/api/v1/notes/123/convert
 ```
 
@@ -412,6 +424,28 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"tags": "work,urgent,meeting"}' \
   http://YOUR_SERVER/api/v1/notes/123/tags
+```
+
+### Update Note Icon
+
+```
+PUT /notes/{id}/icon
+```
+
+Set a custom icon and color for a note. Send an empty `icon` to reset to the default.
+
+**Request Body (JSON):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `icon` | string | Icon class name (e.g. `lucide-file-text`) |
+| `icon_color` | string | Icon color (e.g. `#ff9800`), empty to reset |
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"icon": "lucide-file-text", "icon_color": "#ff9800"}' \
+  http://YOUR_SERVER/api/v1/notes/123/icon
 ```
 
 ### Toggle Favorite
@@ -471,6 +505,298 @@ Emergency save via `sendBeacon` API. Accepts FormData instead of JSON. Used inte
 
 ---
 
+## Note Locks
+
+Exclusive edit locks prevent two editors from modifying the same note simultaneously. All lock endpoints identify the editor with an `editor_session_id`, sent either in the JSON body, as an `editor_session_id` form field, or via the `X-Editor-Session-ID` header. When the note is already locked by another session, lock endpoints respond with `409 Conflict` and the current lock details.
+
+### Acquire Lock
+
+```
+POST /notes/{id}/lock
+```
+
+Acquire an exclusive edit lock for a note.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `editor_session_id` | string | Yes | Unique ID of the editing session |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"editor_session_id": "session-abc123"}' \
+  http://YOUR_SERVER/api/v1/notes/123/lock
+```
+
+### Get Lock Status
+
+```
+GET /notes/{id}/lock
+```
+
+Get the current edit lock status for a note.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/lock
+```
+
+### Refresh Lock (Heartbeat)
+
+```
+POST /notes/{id}/lock/heartbeat
+```
+
+Refresh an existing edit lock to keep it alive.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `editor_session_id` | string | Yes | Editing session that holds the lock |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"editor_session_id": "session-abc123"}' \
+  http://YOUR_SERVER/api/v1/notes/123/lock/heartbeat
+```
+
+### Release Lock
+
+```
+POST /notes/{id}/lock/release
+```
+
+Release a note edit lock.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `editor_session_id` | string | Yes | Editing session that holds the lock |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"editor_session_id": "session-abc123"}' \
+  http://YOUR_SERVER/api/v1/notes/123/lock/release
+```
+
+---
+
+## Snapshots
+
+Snapshots preserve daily versions of a note's content. One automatic snapshot is kept per day; manual snapshots can be added on demand.
+
+### Create Snapshot
+
+```
+POST /notes/{id}/snapshot
+```
+
+Create a snapshot for a note. Without parameters, creates/updates today's automatic snapshot.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `manual` | boolean | If `1`, create an additional manual snapshot (alias: `force`) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/123/snapshot?manual=1"
+```
+
+### List Snapshots
+
+```
+GET /notes/{id}/snapshots
+```
+
+List available snapshots for a note.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/snapshots
+```
+
+### Get Snapshot
+
+```
+GET /notes/{id}/snapshot
+```
+
+Get a snapshot's content.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `snapshot_key` | string | Snapshot key from the list endpoint |
+| `date` | date | Snapshot date (`YYYY-MM-DD`, defaults to today) |
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/123/snapshot?date=2026-07-01"
+```
+
+### Restore Snapshot
+
+```
+POST /notes/{id}/snapshot/restore
+```
+
+Restore a note to a snapshot state.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `snapshot_key` | string | Snapshot key from the list endpoint |
+| `date` | date | Snapshot date (`YYYY-MM-DD`, defaults to today) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/123/snapshot/restore?date=2026-07-01"
+```
+
+---
+
+## Reminders
+
+Reminders schedule notifications for notes. Triggered reminders appear as notifications that can be read or dismissed.
+
+### Get Note Reminder
+
+```
+GET /notes/{id}/reminder
+```
+
+Get the reminder set on a note.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/reminder
+```
+
+### Set Note Reminder
+
+```
+POST /notes/{id}/reminder
+```
+
+Set (or replace) a reminder on a note.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `reminder_at` | datetime | Yes | When to trigger the reminder (ISO 8601) |
+| `message` | string | No | Optional reminder message |
+| `email_enabled` | boolean | No | Also send an email (if email is configured) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"reminder_at": "2026-07-10T09:00:00Z", "message": "Review this note"}' \
+  http://YOUR_SERVER/api/v1/notes/123/reminder
+```
+
+### Remove Note Reminder
+
+```
+DELETE /notes/{id}/reminder
+```
+
+Remove the reminder from a note.
+
+```bash
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/reminder
+```
+
+### List Notifications
+
+```
+GET /reminders
+```
+
+List triggered notifications (most recent first, max 50).
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Filter by workspace |
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/reminders
+```
+
+### Get Notification Count
+
+```
+GET /reminders/count
+```
+
+Get unread notification counters (lightweight polling endpoint).
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Filter by workspace |
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/reminders/count
+```
+
+### Mark Notification as Read
+
+```
+POST /reminders/{id}/read
+```
+
+Mark a notification as read.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/reminders/45/read
+```
+
+### Dismiss Notification
+
+```
+POST /reminders/{id}/dismiss
+```
+
+Dismiss a notification.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/reminders/45/dismiss
+```
+
+### Dismiss All Notifications
+
+```
+POST /reminders/dismiss-all
+```
+
+Dismiss all triggered notifications.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/reminders/dismiss-all
+```
+
+---
+
 ## Note Sharing
 
 ### Get Share Status
@@ -502,7 +828,7 @@ Create a public share link for a note.
 | `indexable` | boolean | Allow search engine indexing |
 | `password` | string | Optional password protection |
 | `custom_token` | string | Custom URL token (slug) |
-| `access_mode` | string | Access mode for the share |
+| `access_mode` | string | Access mode: `read_only`, `check_only`, `full` (tasklists only) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -527,17 +853,16 @@ Update share settings on an existing share.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `theme` | string | Display theme |
 | `indexable` | boolean | Allow indexing |
-| `password` | string | Password protection |
+| `password` | string | Password protection (empty to remove) |
 | `custom_token` | string | Custom URL token |
-| `access_mode` | string | Access mode |
+| `access_mode` | string | Access mode: `read_only`, `check_only`, `full` (tasklists only) |
 | `allowed_users` | array | User IDs with access |
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
-  -d '{"theme": "dark", "indexable": true}' \
+  -d '{"indexable": true, "password": "new-password"}' \
   http://YOUR_SERVER/api/v1/notes/123/share
 ```
 
@@ -912,18 +1237,52 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/move-files
 ```
 
+### Reorder Folders
+
+```
+POST /folders/reorder
+```
+
+Reorder a folder before or after a sibling folder (same workspace).
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `folder_id` | integer | Yes | Folder to move |
+| `target_folder_id` | integer | Yes | Sibling folder used as anchor |
+| `position` | string | Yes | `before` or `after` the target folder |
+| `workspace` | string | No | Workspace check (must match target folder) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"folder_id": 10, "target_folder_id": 20, "position": "after"}' \
+  http://YOUR_SERVER/api/v1/folders/reorder
+```
+
 ### Create Kanban Structure
 
 ```
 POST /folders/kanban-structure
 ```
 
-Create a Kanban board folder structure.
+Create a Kanban board folder structure (a parent folder with column subfolders).
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `folder_name` | string | Yes | Name of the Kanban board folder |
+| `columns` | integer | Yes | Number of columns (1–9) |
+| `workspace` | string | No | Target workspace |
+| `parent_folder_id` | integer | No | Create inside this parent folder |
+| `language` | string | No | Language for default column names (default `en`) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
-  -d '{"workspace": "Personal", "name": "Project Board"}' \
+  -d '{"workspace": "Personal", "folder_name": "Project Board", "columns": 3}' \
   http://YOUR_SERVER/api/v1/folders/kanban-structure
 ```
 
@@ -1131,6 +1490,47 @@ Filter by workspace:
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/tags?workspace=Personal"
+```
+
+### Rename Tag
+
+```
+PATCH /tags/{tag}
+```
+
+Rename a tag across all notes.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `new_name` | string | Yes | New tag name |
+| `workspace` | string | No | Only rename within this workspace |
+
+```bash
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"new_name": "projects"}' \
+  http://YOUR_SERVER/api/v1/tags/work
+```
+
+### Delete Tag
+
+```
+DELETE /tags/{tag}
+```
+
+Remove a tag from all notes.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Only delete within this workspace |
+
+```bash
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/tags/obsolete-tag
 ```
 
 ---
@@ -1565,6 +1965,7 @@ Push notes to the configured Git repository.
 | Field | Type | Description |
 |-------|------|-------------|
 | `workspace` | string | Workspace to push (optional, pushes all if omitted) |
+| `async` | boolean | Run the push in the background (poll `/git-sync/progress`) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -1592,6 +1993,7 @@ Pull notes from the configured Git repository.
 | Field | Type | Description |
 |-------|------|-------------|
 | `workspace` | string | Workspace to pull (optional, pulls all if omitted) |
+| `async` | boolean | Run the pull in the background (poll `/git-sync/progress`) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -1686,13 +2088,14 @@ Change the current user's password.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `old_password` | string | Yes | Current password |
-| `new_password` | string | Yes | New password |
+| `current_password` | string | Yes | Current password |
+| `new_password` | string | Yes | New password (min. 4 characters) |
+| `confirm_password` | string | Yes | New password confirmation |
 
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"old_password": "current", "new_password": "newpass"}' \
+  -d '{"current_password": "current", "new_password": "newpass", "confirm_password": "newpass"}' \
   http://YOUR_SERVER/api/v1/users/me/password
 ```
 
@@ -1822,12 +2225,28 @@ curl -X DELETE -u 'username:password' \
 POST /admin/users/{id}/reset-password
 ```
 
-Reset or set a custom password for a user.
+Reset a user's password to the default or set a custom one.
 
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `action` | string | No | `reset_to_default` (default) or `set_password` |
+| `new_password` | string | If `set_password` | New password (min. 4 characters) |
+
+Reset to default:
 ```bash
 curl -X POST -u 'username:password' \
   -H "Content-Type: application/json" \
-  -d '{"password": "new-password"}' \
+  -d '{"action": "reset_to_default"}' \
+  http://YOUR_SERVER/api/v1/admin/users/2/reset-password
+```
+
+Set a custom password:
+```bash
+curl -X POST -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"action": "set_password", "new_password": "new-password"}' \
   http://YOUR_SERVER/api/v1/admin/users/2/reset-password
 ```
 
@@ -1965,8 +2384,6 @@ curl -X DELETE \
 
 ---
 
----
-
 ## Health Check
 
 ```
@@ -2009,9 +2426,38 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/convert` | Convert type |
 | `POST` | `/notes/{id}/beacon` | Emergency save |
 | `PUT` | `/notes/{id}/tags` | Update tags |
+| `PUT` | `/notes/{id}/icon` | Update note icon |
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
+
+### Note Locks
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/notes/{id}/lock` | Acquire edit lock |
+| `GET` | `/notes/{id}/lock` | Lock status |
+| `POST` | `/notes/{id}/lock/heartbeat` | Refresh lock |
+| `POST` | `/notes/{id}/lock/release` | Release lock |
+
+### Snapshots
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/notes/{id}/snapshot` | Create snapshot |
+| `GET` | `/notes/{id}/snapshots` | List snapshots |
+| `GET` | `/notes/{id}/snapshot` | Get snapshot |
+| `POST` | `/notes/{id}/snapshot/restore` | Restore snapshot |
+
+### Reminders
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/notes/{id}/reminder` | Get note reminder |
+| `POST` | `/notes/{id}/reminder` | Set note reminder |
+| `DELETE` | `/notes/{id}/reminder` | Remove note reminder |
+| `GET` | `/reminders` | List notifications |
+| `GET` | `/reminders/count` | Notification count |
+| `POST` | `/reminders/{id}/read` | Mark as read |
+| `POST` | `/reminders/{id}/dismiss` | Dismiss notification |
+| `POST` | `/reminders/dismiss-all` | Dismiss all |
 
 ### Note Sharing
 | Method | Endpoint | Description |
@@ -2044,6 +2490,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/folders/{id}/empty` | Empty folder |
 | `PUT` | `/folders/{id}/icon` | Update icon |
 | `POST` | `/folders/move-files` | Move files |
+| `POST` | `/folders/reorder` | Reorder folders |
 | `POST` | `/folders/kanban-structure` | Create Kanban |
 
 ### Folder Sharing
@@ -2073,6 +2520,8 @@ curl http://YOUR_SERVER/api_health.php
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/tags` | List tags |
+| `PATCH` | `/tags/{tag}` | Rename tag |
+| `DELETE` | `/tags/{tag}` | Delete tag |
 
 ### Attachments
 | Method | Endpoint | Description |

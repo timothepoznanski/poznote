@@ -35,7 +35,6 @@ body.notes-manager-page {
     position: relative;
     flex: 1 1 180px;
     min-width: 150px;
-    max-width: 360px;
     display: flex;
     align-items: center;
 }
@@ -115,13 +114,6 @@ body.notes-manager-page {
 
 .nm-bulk-bar-hidden {
     display: none;
-}
-
-/* Desktop: always show the bulk action bar */
-@media (min-width: 641px) {
-    .nm-bulk-bar-hidden {
-        display: flex !important;
-    }
 }
 
 .nm-bulk-count-wrap {

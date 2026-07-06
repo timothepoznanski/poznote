@@ -259,21 +259,9 @@ $folders = enrichFoldersWithParentId($folders, $con, $workspace_filter);
 $hierarchicalFolders = buildFolderHierarchy($folders);
 
 // Determine if we should display uncategorized notes first (after Favorites, before other folders)
-// Check the user setting
-$displayUncategorizedFirst = true; // default: notes without folders BEFORE folders
-try {
-    $stmtSetting = $con->prepare('SELECT value FROM settings WHERE key = ?');
-    $stmtSetting->execute(['notes_without_folders_after_folders']);
-    $settingValue = $stmtSetting->fetchColumn();
-    // Enable if setting is not set or not '0' (defaultFolders first)
-    if ($settingValue === '0' || $settingValue === 'false' || $settingValue === false) {
-        $displayUncategorizedFirst = true; // notes without folders BEFORE folders
-    } else {
-        $displayUncategorizedFirst = false; // notes without folders AFTER folders
-    }
-} catch (Exception $e) {
-    // ignore, keep default
-}
+// Reuses the setting already loaded by index.php (also used there for the SQL
+// ORDER BY) instead of re-querying the settings table.
+$displayUncategorizedFirst = !(isset($notes_without_folders_after) ? $notes_without_folders_after : true);
 
 // If sorting alphabetically, always display uncategorized notes at the end
 if (isset($note_list_sort_type) && $note_list_sort_type === 'heading_asc') {
@@ -352,6 +340,13 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 }
 ?>
 </div><!-- End of notes-list-scrollable-content -->
+
+<?php
+// Single shared dropdown for the per-folder three-dot toggles (position:fixed,
+// populated and placed by toggleFolderActionsMenu in js/utils.js). Kept
+// outside the scrollable container so no ancestor can clip or transform it.
+echo renderFolderActionsMenu();
+?>
 
 <!-- Mini Calendar Component -->
 <div class="mini-calendar-container">

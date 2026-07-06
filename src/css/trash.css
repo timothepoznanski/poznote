@@ -266,17 +266,6 @@ body.trash-page {
     color: #007DB8;
 }
 
-.backbutton,
-.emptytrash {
-    display: inline-block;
-    width: 30px;
-    cursor: pointer;
-    height: 20px;
-    margin: 5px;
-    color: #007DB8;
-    font-size: 17px;
-}
-
 .searchtrash::-webkit-input-placeholder {
     color: white;
 }

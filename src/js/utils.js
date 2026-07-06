@@ -1298,8 +1298,9 @@ function showMoveFolderFilesDialog(sourceFolderId, sourceFolderName) {
     document.getElementById('moveFolderFilesModal').style.display = 'block';
 }
 
-function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, selectId) {
+function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, selectId, preselectFolderId) {
     // selectId allows populating different modals' select elements
+    // preselectFolderId (optional) selects that folder once options are loaded (e.g. a freshly created folder)
     selectId = selectId || 'moveFolderFilesTargetSelect';
     var select = document.getElementById(selectId);
     if (!select) return;
@@ -1332,6 +1333,12 @@ function populateTargetFolderDropdown(excludeFolderId, excludeFolderName, select
                     }
                 }
                 // Don't auto-select any folder - leave "No folder" selected by default
+                if (preselectFolderId != null && findSelectOptionByValue(select, preselectFolderId)) {
+                    select.value = String(preselectFolderId);
+                    try {
+                        updateMoveButton(select.value, true);
+                    } catch (e) { }
+                }
                 loadMoveNoteRecentFolders(excludeFolderId, selectId, workspace);
             }
         })
@@ -2116,6 +2123,13 @@ function showMoveFolderDialog(noteId, forcedFolderId, forcedFolderName) {
         currentFolder = folderEl ? folderEl.value : '';
     }
 
+    // Remember the note's current folder so the dropdown can be rebuilt later
+    // (e.g. after creating a folder from within the modal) with the same exclusion
+    if (modal) {
+        modal.dataset.currentFolderId = (currentFolderId === undefined || currentFolderId === null) ? '' : String(currentFolderId);
+        modal.dataset.currentFolderName = currentFolder || '';
+    }
+
     // Load workspaces first
     loadWorkspacesForMoveModal(function () {
         // Load folders after workspaces are loaded
@@ -2197,9 +2211,10 @@ function loadFoldersForMoveModal(currentFolderId, currentFolderName) {
 
 
 
-                // Reset the interface: clear move button state and errors
+                // Reset the interface: clear move button state, errors and inline create rows
                 updateMoveButton('');
                 hideMoveFolderError();
+                resetMoveModalCreateRows();
 
                 // Populate and show the modal; focus the select if present
                 document.getElementById('moveNoteFolderModal').style.display = 'flex';
@@ -2381,6 +2396,136 @@ function hideMoveFolderError() {
     }
 }
 
+// --- Inline creation of folders/workspaces from the move note modal ---
+
+function toggleMoveModalCreateRow(rowId, forceShow) {
+    var row = document.getElementById(rowId);
+    if (!row) return;
+    var show = forceShow !== undefined ? forceShow : row.classList.contains('initially-hidden');
+    row.classList.toggle('initially-hidden', !show);
+    var input = row.querySelector('input');
+    if (input) {
+        input.value = '';
+        if (show) {
+            setTimeout(function () { input.focus(); }, 50);
+        }
+    }
+    if (show) hideMoveFolderError();
+}
+
+function resetMoveModalCreateRows() {
+    toggleMoveModalCreateRow('moveCreateWorkspaceRow', false);
+    toggleMoveModalCreateRow('moveCreateFolderRow', false);
+}
+
+function toggleMoveCreateWorkspace() {
+    toggleMoveModalCreateRow('moveCreateWorkspaceRow');
+}
+
+function toggleMoveCreateFolder() {
+    toggleMoveModalCreateRow('moveCreateFolderRow');
+}
+
+function selectMoveModalWorkspace(name) {
+    var workspaceSelect = document.getElementById('workspaceSelect');
+    if (!workspaceSelect) return;
+    if (!findSelectOptionByValue(workspaceSelect, name)) {
+        var option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        workspaceSelect.appendChild(option);
+    }
+    workspaceSelect.value = name;
+    // Reload the folder list for the newly selected workspace
+    onWorkspaceChange();
+}
+
+function createWorkspaceFromMoveModal() {
+    var input = document.getElementById('moveCreateWorkspaceName');
+    var name = input ? input.value.trim() : '';
+    if (!name) {
+        showMoveFolderError(
+            window.t ? window.t('modals.move_note_folder.enter_workspace_name', null, 'Please enter a workspace name') : 'Please enter a workspace name'
+        );
+        return;
+    }
+
+    fetch('/api/v1/workspaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ name: name })
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data };
+            });
+        })
+        .then(function (result) {
+            var data = result.data || {};
+            if (data.success || result.status === 409) {
+                // Created — or it already exists, in which case just switch to it
+                hideMoveFolderError();
+                toggleMoveModalCreateRow('moveCreateWorkspaceRow', false);
+                selectMoveModalWorkspace(data.name || name);
+            } else {
+                showMoveFolderError(data.message || data.error || 'Error creating workspace');
+            }
+        })
+        .catch(function (error) {
+            showMoveFolderError(
+                window.t ? window.t('folders.errors.generic_prefix', { error: String(error) }, 'Error: {{error}}') : ('Error: ' + String(error))
+            );
+        });
+}
+
+function createFolderFromMoveModal() {
+    var input = document.getElementById('moveCreateFolderName');
+    var path = input ? input.value.trim().replace(/^\/+|\/+$/g, '') : '';
+    if (!path) {
+        showMoveFolderError(
+            window.t ? window.t('modals.move_note_folder.enter_folder_name', null, 'Please enter a folder name') : 'Please enter a folder name'
+        );
+        return;
+    }
+
+    var workspace = getMoveModalWorkspace();
+    var modal = document.getElementById('moveNoteFolderModal');
+    var currentFolderId = modal ? (modal.dataset.currentFolderId || '') : '';
+    var currentFolderName = modal ? (modal.dataset.currentFolderName || '') : '';
+
+    fetch('/api/v1/folders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ workspace: workspace, folder_path: path, create_parents: true })
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data };
+            });
+        })
+        .then(function (result) {
+            var data = result.data || {};
+            var folderId = data.folder_id || (data.folder && data.folder.id);
+            if (data.success || (result.status === 409 && folderId)) {
+                // Created — or it already exists, in which case just select it
+                hideMoveFolderError();
+                toggleMoveModalCreateRow('moveCreateFolderRow', false);
+                // Rebuild the dropdown so the new folder (and any created parents)
+                // appear with their full path, then preselect it
+                populateTargetFolderDropdown(currentFolderId, currentFolderName, 'moveNoteTargetSelect', folderId);
+            } else {
+                showMoveFolderError(data.error || data.message || 'Error creating folder');
+            }
+        })
+        .catch(function (error) {
+            showMoveFolderError(
+                window.t ? window.t('folders.errors.generic_prefix', { error: String(error) }, 'Error: {{error}}') : ('Error: ' + String(error))
+            );
+        });
+}
+
 // executeFolderAction removed
 
 
@@ -2403,29 +2548,25 @@ function showExportModal(noteId, filename, title, noteType) {
         var htmlOption = modal.querySelector('.export-option-html');
         var htmlEmbeddedOption = modal.querySelector('.export-option-html-embedded');
         var jsonOption = modal.querySelector('.export-option-json');
-        var printOption = modal.querySelector('.export-option-print');
 
         if (noteType === 'markdown') {
-            // For markdown notes: allow MD export, HTML export and print
+            // For markdown notes: allow MD export and HTML export
             if (markdownOption) markdownOption.style.display = 'flex';
             if (htmlOption) htmlOption.style.display = 'flex';
             if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
-            if (printOption) printOption.style.display = 'flex';
         } else if (noteType === 'tasklist') {
-            // For tasklist notes: allow MD export (checkbox format), HTML export, JSON export and print
+            // For tasklist notes: allow MD export (checkbox format), HTML export and JSON export
             if (markdownOption) markdownOption.style.display = 'flex';
             if (htmlOption) htmlOption.style.display = 'flex';
             if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'flex';
-            if (printOption) printOption.style.display = 'flex';
         } else {
-            // For other notes: show HTML and print options, hide MD and JSON options
+            // For other notes: show HTML options, hide MD and JSON options
             if (markdownOption) markdownOption.style.display = 'none';
             if (htmlOption) htmlOption.style.display = 'flex';
             if (htmlEmbeddedOption) htmlEmbeddedOption.style.display = 'flex';
             if (jsonOption) jsonOption.style.display = 'none';
-            if (printOption) printOption.style.display = 'flex';
         }
 
         modal.style.display = 'flex';
@@ -2436,11 +2577,7 @@ function showExportModal(noteId, filename, title, noteType) {
 function selectExportType(type) {
     closeModal('exportModal');
 
-    if (type === 'print') {
-        exportNoteToPrint(currentExportNoteId, currentExportNoteType);
-    } else {
-        exportNoteAsFormat(currentExportNoteId, type, currentExportNoteType);
-    }
+    exportNoteAsFormat(currentExportNoteId, type, currentExportNoteType);
 }
 
 // Unified export function for HTML, Markdown, JSON formats
@@ -2761,37 +2898,87 @@ function createNoteInFolder() {
 }
 
 // Folder actions menu toggle functions
-function toggleFolderActionsMenu(folderId) {
-    // Close all other folder menus first
-    document.querySelectorAll('.folder-actions-menu.show').forEach(function (menu) {
-        if (menu.id !== 'folder-actions-menu-' + folderId) {
-            menu.classList.remove('show');
-        }
+//
+// A single shared dropdown (#folder-actions-menu, rendered once by
+// folders_display.php) serves every folder's three-dot toggle. On open it is
+// populated from the toggle's data attributes (folder id/name, note count,
+// shared state, current sort) and positioned next to the toggle.
+
+function populateFolderActionsMenu(menu, toggle) {
+    var folderId = toggle.getAttribute('data-folder-id') || '';
+    var folderName = toggle.getAttribute('data-folder-name') || '';
+    var noteCount = parseInt(toggle.getAttribute('data-note-count'), 10) || 0;
+    var isShared = toggle.getAttribute('data-shared') === '1';
+    var currentSort = toggle.getAttribute('data-current-sort') || '';
+
+    menu.setAttribute('data-folder-id', folderId);
+
+    // Copy folder identity onto every action item (handlers read it there)
+    menu.querySelectorAll('[data-action]').forEach(function (item) {
+        item.setAttribute('data-folder-id', folderId);
+        item.setAttribute('data-folder-name', folderName);
     });
 
-    // Toggle the current menu
-    var menu = document.getElementById('folder-actions-menu-' + folderId);
-    if (menu) {
-        var isShowing = menu.classList.toggle('show');
+    // Items only relevant when the folder contains notes
+    menu.querySelectorAll('.requires-notes').forEach(function (item) {
+        item.style.display = noteCount > 0 ? '' : 'none';
+    });
 
-        // If closing, unexpand sort submenus
-        if (!isShowing) {
-            menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
-                submenu.style.display = 'none';
-            });
-            menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
-                chevron.style.transform = 'rotate(0deg)';
-            });
-        }
+    // Share item: show the variant matching the folder's shared state
+    menu.querySelectorAll('.share-state-shared').forEach(function (item) {
+        item.style.display = isShared ? '' : 'none';
+    });
+    menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
+        item.style.display = isShared ? 'none' : '';
+    });
 
-        // If showing, check if menu would overflow viewport and adjust position
-        if (isShowing) {
-            adjustMenuPosition(menu);
+    // Sort options: highlight the active one and reflect it in the header label
+    var activeLabel = null;
+    menu.querySelectorAll('[data-action="sort-folder"]').forEach(function (item) {
+        var isActive = currentSort && item.getAttribute('data-sort-type') === currentSort;
+        item.classList.toggle('active', !!isActive);
+        if (isActive) {
+            var optionLabel = item.querySelector('.sort-option-label');
+            if (optionLabel) activeLabel = optionLabel.textContent;
         }
+    });
+    var headerLabel = menu.querySelector('.sort-header-label');
+    if (headerLabel) {
+        headerLabel.textContent = activeLabel || headerLabel.getAttribute('data-default-label') || headerLabel.textContent;
     }
+
+    // Start with the sort submenu collapsed
+    menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
+        submenu.style.display = 'none';
+    });
+    menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
+        chevron.style.transform = 'rotate(0deg)';
+    });
 }
 
-function adjustMenuPosition(menu) {
+function toggleFolderActionsMenu(folderId) {
+    var menu = document.getElementById('folder-actions-menu');
+    if (!menu) return;
+
+    var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+    if (!toggle) return;
+
+    // Clicking the toggle of the folder whose menu is already open closes it;
+    // any other toggle re-populates and moves the menu
+    var isOpenForFolder = menu.classList.contains('show') &&
+        menu.getAttribute('data-folder-id') === String(folderId);
+
+    if (isOpenForFolder) {
+        closeFolderActionsMenu(folderId);
+        return;
+    }
+
+    populateFolderActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    adjustMenuPosition(menu, toggle);
+}
+
+function adjustMenuPosition(menu, toggleButton) {
     // Reset any previous adjustments
     menu.style.bottom = '';
     menu.style.top = '';
@@ -2802,8 +2989,9 @@ function adjustMenuPosition(menu) {
     menu.style.maxHeight = '';
     menu.style.overflowY = '';
 
-    // Get the parent toggle button to position relative to it
-    var toggleButton = menu.previousElementSibling;
+    // Position relative to the toggle button (passed for the shared folder
+    // menu; falls back to the previous sibling for legacy inline menus)
+    toggleButton = toggleButton || menu.previousElementSibling;
     if (!toggleButton) {
         return;
     }
@@ -2864,7 +3052,9 @@ function adjustMenuPosition(menu) {
 }
 
 function closeFolderActionsMenu(folderId) {
-    var menu = document.getElementById('folder-actions-menu-' + folderId);
+    // Single shared menu: folderId is accepted for backwards compatibility
+    // but closing is unconditional
+    var menu = document.getElementById('folder-actions-menu');
     if (menu) {
         menu.classList.remove('show');
         // Unexpand sort submenus
@@ -2879,8 +3069,9 @@ function closeFolderActionsMenu(folderId) {
 
 // Close folder menus when clicking outside
 document.addEventListener('click', function (event) {
-    // If click is not inside a folder-actions element, close all menus
-    if (!event.target.closest('.folder-actions')) {
+    // If click is neither on a folder-actions toggle nor inside the shared
+    // dropdown (which lives outside .folder-actions), close all menus
+    if (!event.target.closest('.folder-actions') && !event.target.closest('.folder-actions-menu')) {
         document.querySelectorAll('.folder-actions-menu.show').forEach(function (menu) {
             menu.classList.remove('show');
             // Unexpand sort submenus
@@ -3018,6 +3209,9 @@ function setRightColumnContentPreservingTabs(html) {
     if (!rightCol) {
         console.error('right_col element not found');
         return;
+    }
+    if (typeof window.destroyMarkdownCodeMirrorEditorsWithin === 'function') {
+        window.destroyMarkdownCodeMirrorEditorsWithin(rightCol);
     }
     rightCol.innerHTML = html;
 }

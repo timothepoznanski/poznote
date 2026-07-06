@@ -9,7 +9,11 @@ servers:
 
 tags:
   - name: Notes
-    description: Notes CRUD operations
+    description: Notes CRUD operations, locks and utilities
+  - name: Snapshots
+    description: Note snapshots (daily versions)
+  - name: Reminders
+    description: Note reminders and notifications
   - name: Folders
     description: Folders management
   - name: Trash
@@ -28,8 +32,12 @@ tags:
     description: Backup and restore
   - name: System
     description: System information and utilities
+  - name: Git Sync
+    description: Git synchronization (GitHub / Forgejo)
   - name: Users
     description: User profiles management
+  - name: Public Tasks
+    description: Tasks on publicly shared notes (token-based)
   - name: Export
     description: Export operations (legacy endpoints)
 
@@ -189,15 +197,19 @@ components:
           nullable: true
         theme:
           type: string
-          enum: [light, dark, auto]
+          enum: [light, dark, black]
         indexable:
           type: boolean
         has_password:
           type: boolean
-        expires:
+        access_mode:
           type: string
-          format: date-time
+          enum: [read_only, check_only, full]
+        allowed_users:
+          type: array
           nullable: true
+          items:
+            type: integer
 
     Error:
       type: object
@@ -237,6 +249,11 @@ paths:
           schema:
             type: string
           description: Filter by folder name
+        - name: folder_id
+          in: query
+          schema:
+            type: integer
+          description: Filter by folder ID
         - name: search
           in: query
           schema:
@@ -254,23 +271,23 @@ paths:
             type: string
             format: date
           description: Filter notes created on or before this date
-        - name: tag
-          in: query
-          schema:
-            type: string
-          description: Filter by tag
         - name: favorite
           in: query
           schema:
             type: integer
             enum: [0, 1]
           description: Filter favorites only
-        - name: type
+        - name: sort
           in: query
           schema:
             type: string
-            enum: [note, markdown, tasklist, excalidraw]
-          description: Filter by note type
+            enum: [updated_desc, created_desc, heading_asc]
+          description: Sort order
+        - name: get_folders
+          in: query
+          schema:
+            type: boolean
+          description: Include folder information
       responses:
         '200':
           description: List of notes
@@ -303,6 +320,9 @@ paths:
                 content:
                   type: string
                   example: "Note content here"
+                entry:
+                  type: string
+                  description: Alternative field for content
                 workspace:
                   type: string
                   example: "Personal"
@@ -311,6 +331,9 @@ paths:
                   nullable: true
                   description: ID of the folder (optional)
                   example: 12
+                folder:
+                  type: string
+                  description: Target folder name (alternative to folder_id)
                 type:
                   type: string
                   enum: [note, markdown, tasklist]
@@ -365,11 +388,65 @@ paths:
                   note:
                     $ref: '#/components/schemas/Note'
 
+  /notes/search:
+    get:
+      tags: [Notes]
+      summary: Search notes
+      description: Search notes by heading or content
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - name: workspace
+          in: query
+          schema:
+            type: string
+          description: Restrict search to a workspace
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Maximum number of results
+        - name: created_from
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter notes created on or after this date
+        - name: created_to
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Filter notes created on or before this date
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  notes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Note'
+
   /notes/with-attachments:
     get:
       tags: [Notes]
       summary: List notes with attachments
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -559,7 +636,12 @@ paths:
               properties:
                 folder_id:
                   type: integer
-                folder_name:
+                  nullable: true
+                  description: Target folder ID (0 or null moves to root)
+                folder:
+                  type: string
+                  description: Target folder name (alternative to folder_id)
+                workspace:
                   type: string
       responses:
         '200':
@@ -606,6 +688,411 @@ paths:
         '200':
           description: Note saved
 
+  /notes/{id}/backlinks:
+    get:
+      tags: [Notes]
+      summary: Get backlinks for a note
+      description: List all notes that link to this note (HTML links, URL parameters, and wiki-link syntax `[[Note Title]]`)
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of backlinks
+
+  /notes/{id}/icon:
+    put:
+      tags: [Notes]
+      summary: Update note icon
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                icon:
+                  type: string
+                  example: "lucide-file-text"
+                  description: Icon class name (empty string resets to default)
+                icon_color:
+                  type: string
+                  example: "#ff9800"
+                  description: Icon color (empty string resets)
+      responses:
+        '200':
+          description: Icon updated
+
+  /notes/{id}/create-template:
+    post:
+      tags: [Notes]
+      summary: Create a template from a note
+      description: Copies the note into the "Templates" folder of its workspace (created if missing)
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Template created
+
+  /notes/{id}/convert:
+    post:
+      tags: [Notes]
+      summary: Convert note type (Markdown <-> HTML)
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target]
+              properties:
+                target:
+                  type: string
+                  enum: [html, markdown]
+                  description: Target format
+      responses:
+        '200':
+          description: Note converted
+        '400':
+          description: Invalid or unsupported conversion
+
+  /notes/{id}/lock:
+    get:
+      tags: [Notes]
+      summary: Get note edit lock status
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Current lock status
+    post:
+      tags: [Notes]
+      summary: Acquire an exclusive edit lock
+      description: The editor session can also be sent via the X-Editor-Session-ID header
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [editor_session_id]
+              properties:
+                editor_session_id:
+                  type: string
+                  description: Unique ID of the editing session
+      responses:
+        '200':
+          description: Lock acquired
+        '409':
+          description: Note is locked by another session
+
+  /notes/{id}/lock/heartbeat:
+    post:
+      tags: [Notes]
+      summary: Refresh an existing note edit lock
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [editor_session_id]
+              properties:
+                editor_session_id:
+                  type: string
+      responses:
+        '200':
+          description: Lock refreshed
+        '409':
+          description: Note is locked by another session
+
+  /notes/{id}/lock/release:
+    post:
+      tags: [Notes]
+      summary: Release a note edit lock
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [editor_session_id]
+              properties:
+                editor_session_id:
+                  type: string
+      responses:
+        '200':
+          description: Lock released (or was not held)
+
+  # ==================
+  # Snapshots Endpoints
+  # ==================
+  /notes/{id}/snapshot:
+    post:
+      tags: [Snapshots]
+      summary: Create a snapshot for a note
+      description: Without parameters, creates/updates today's automatic snapshot (one per day)
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: manual
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+          description: If 1, create an additional manual snapshot (alias `force`)
+      responses:
+        '200':
+          description: Snapshot created
+    get:
+      tags: [Snapshots]
+      summary: Get a snapshot for a note
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: snapshot_key
+          in: query
+          schema:
+            type: string
+          description: Snapshot key from the list endpoint
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Snapshot date (defaults to today)
+      responses:
+        '200':
+          description: Snapshot content
+        '404':
+          description: Snapshot not found
+
+  /notes/{id}/snapshots:
+    get:
+      tags: [Snapshots]
+      summary: List available snapshots for a note
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of snapshots
+
+  /notes/{id}/snapshot/restore:
+    post:
+      tags: [Snapshots]
+      summary: Restore a note to a snapshot state
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: snapshot_key
+          in: query
+          schema:
+            type: string
+          description: Snapshot key from the list endpoint
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Snapshot date (defaults to today)
+      responses:
+        '200':
+          description: Note restored to snapshot state
+        '404':
+          description: Snapshot not found
+
+  # ==================
+  # Reminders Endpoints
+  # ==================
+  /notes/{id}/reminder:
+    get:
+      tags: [Reminders]
+      summary: Get reminder for a note
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reminder details
+    post:
+      tags: [Reminders]
+      summary: Set a reminder on a note
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reminder_at]
+              properties:
+                reminder_at:
+                  type: string
+                  format: date-time
+                  description: When to trigger the reminder (ISO 8601)
+                message:
+                  type: string
+                  description: Optional reminder message
+                email_enabled:
+                  type: boolean
+                  description: Also send an email (if email is configured)
+      responses:
+        '200':
+          description: Reminder set
+    delete:
+      tags: [Reminders]
+      summary: Remove a reminder from a note
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reminder removed
+
+  /reminders:
+    get:
+      tags: [Reminders]
+      summary: List triggered notifications
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notifications with unread/total counts
+
+  /reminders/count:
+    get:
+      tags: [Reminders]
+      summary: Get unread notification count (lightweight polling)
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification counters
+
+  /reminders/dismiss-all:
+    post:
+      tags: [Reminders]
+      summary: Dismiss all notifications
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      responses:
+        '200':
+          description: All notifications dismissed
+
+  /reminders/{id}/read:
+    post:
+      tags: [Reminders]
+      summary: Mark a notification as read
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification marked as read
+
+  /reminders/{id}/dismiss:
+    post:
+      tags: [Reminders]
+      summary: Dismiss a notification
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Notification dismissed
+
   # ==================
   # Share Endpoints
   # ==================
@@ -650,13 +1137,18 @@ paths:
               properties:
                 theme:
                   type: string
-                  enum: [light, dark, auto]
+                  enum: [light, dark, black]
                 indexable:
                   type: boolean
                 password:
                   type: string
-                expires_days:
-                  type: integer
+                custom_token:
+                  type: string
+                  description: Custom URL token (slug)
+                access_mode:
+                  type: string
+                  enum: [read_only, check_only, full]
+                  description: Access mode (tasklist notes only)
       responses:
         '200':
           description: Share link created
@@ -676,13 +1168,24 @@ paths:
             schema:
               type: object
               properties:
-                theme:
-                  type: string
                 indexable:
                   type: boolean
                 password:
                   type: string
                   nullable: true
+                  description: New password (empty to remove)
+                custom_token:
+                  type: string
+                access_mode:
+                  type: string
+                  enum: [read_only, check_only, full]
+                  description: Access mode (tasklist notes only)
+                allowed_users:
+                  type: array
+                  nullable: true
+                  items:
+                    type: integer
+                  description: User IDs with access
       responses:
         '200':
           description: Share settings updated
@@ -703,9 +1206,9 @@ paths:
   /shared:
     get:
       tags: [Share]
-      summary: List all shared notes
+      summary: List all shared notes and folders
+      description: Does not require the X-User-ID header
       parameters:
-        - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
           schema:
@@ -714,11 +1217,21 @@ paths:
         '200':
           description: List of shared notes
 
+  /shared/with-me:
+    get:
+      tags: [Share]
+      summary: List items shared with the current user by others
+      description: Does not require the X-User-ID header
+      responses:
+        '200':
+          description: Notes and folders shared with the current user
+
   /folders/{folderId}/share:
     get:
       tags: [Share]
       summary: Get folder share status
       parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
         - name: folderId
           in: path
           required: true
@@ -762,7 +1275,7 @@ paths:
                   type: string
                 theme:
                   type: string
-                  enum: [light, dark]
+                  enum: [light, dark, black]
                 indexable:
                   type: integer
                 password:
@@ -792,6 +1305,12 @@ paths:
                   type: string
                 custom_token:
                   type: string
+                allowed_users:
+                  type: array
+                  nullable: true
+                  items:
+                    type: integer
+                  description: User IDs with access
       responses:
         '200':
           description: Folder share settings updated
@@ -978,24 +1497,99 @@ paths:
   /folders/move-files:
     post:
       tags: [Folders]
-      summary: Move files between folders
+      summary: Move all files from one folder to another
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
+              required: [source_folder_id, target_folder_id]
               properties:
-                note_ids:
-                  type: array
-                  items:
-                    type: integer
+                source_folder_id:
+                  type: integer
+                  description: Source folder ID
                 target_folder_id:
                   type: integer
+                  description: Target folder ID (0 moves notes to root)
+                workspace:
+                  type: string
+                  description: Workspace context
       responses:
         '200':
           description: Files moved
+
+  /folders/reorder:
+    post:
+      tags: [Folders]
+      summary: Reorder a folder before/after a sibling
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [folder_id, target_folder_id, position]
+              properties:
+                folder_id:
+                  type: integer
+                  description: Folder to move
+                target_folder_id:
+                  type: integer
+                  description: Sibling folder used as anchor
+                position:
+                  type: string
+                  enum: [before, after]
+                workspace:
+                  type: string
+                  description: Workspace check (must match target folder)
+      responses:
+        '200':
+          description: Folder reordered
+        '400':
+          description: Invalid parameters or folders in different workspaces
+        '409':
+          description: Move would create a cycle
+
+  /folders/kanban-structure:
+    post:
+      tags: [Folders]
+      summary: Create a Kanban board folder structure
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [folder_name, columns]
+              properties:
+                folder_name:
+                  type: string
+                  description: Name of the Kanban board folder
+                columns:
+                  type: integer
+                  minimum: 1
+                  maximum: 9
+                  description: Number of columns
+                workspace:
+                  type: string
+                parent_folder_id:
+                  type: integer
+                  nullable: true
+                  description: Create inside this parent folder
+                language:
+                  type: string
+                  default: en
+                  description: Language for default column names
+      responses:
+        '201':
+          description: Kanban structure created
 
   /folders/{id}:
     get:
@@ -1171,6 +1765,11 @@ paths:
           in: query
           schema:
             type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search in trashed notes
       responses:
         '200':
           description: List of trashed notes
@@ -1308,6 +1907,52 @@ paths:
                     items:
                       type: string
 
+  /tags/{tag}:
+    patch:
+      tags: [Tags]
+      summary: Rename a tag across all notes
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [new_name]
+              properties:
+                new_name:
+                  type: string
+                workspace:
+                  type: string
+                  description: Only rename within this workspace
+      responses:
+        '200':
+          description: Tag renamed
+    delete:
+      tags: [Tags]
+      summary: Delete a tag from all notes
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: tag
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: workspace
+          in: query
+          schema:
+            type: string
+          description: Only delete within this workspace
+      responses:
+        '200':
+          description: Tag deleted
+
   # ==================
   # Settings Endpoints
   # ==================
@@ -1350,7 +1995,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [language, theme, editor_font_size, sidebar_width, last_workspace]
+          description: Setting key (user-level or global)
       responses:
         '200':
           description: Setting value
@@ -1635,6 +2280,13 @@ paths:
     get:
       tags: [System]
       summary: Get translations
+      parameters:
+        - name: lang
+          in: query
+          schema:
+            type: string
+            example: fr
+          description: Language code (defaults to the configured language)
       responses:
         '200':
           description: Translation strings
@@ -1654,9 +2306,133 @@ paths:
                       type: string
 
   # ==================
+  # Git Sync Endpoints
+  # ==================
+  # The legacy /github-sync/* prefix is an alias of /git-sync/* (status, test, push, pull)
+  /git-sync/status:
+    get:
+      tags: [Git Sync]
+      summary: Get Git sync configuration and status
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      responses:
+        '200':
+          description: Sync status
+
+  /git-sync/test:
+    post:
+      tags: [Git Sync]
+      summary: Test the Git connection and credentials
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      responses:
+        '200':
+          description: Connection test result
+
+  /git-sync/push:
+    post:
+      tags: [Git Sync]
+      summary: Push notes to the configured Git repository
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workspace:
+                  type: string
+                  description: Workspace to push (pushes all if omitted)
+                async:
+                  type: boolean
+                  description: Run in background (poll /git-sync/progress)
+      responses:
+        '200':
+          description: Push result
+        '403':
+          description: Git sync is not enabled
+
+  /git-sync/pull:
+    post:
+      tags: [Git Sync]
+      summary: Pull notes from the configured Git repository
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workspace:
+                  type: string
+                  description: Workspace to pull (pulls all if omitted)
+                async:
+                  type: boolean
+                  description: Run in background (poll /git-sync/progress)
+      responses:
+        '200':
+          description: Pull result
+        '403':
+          description: Git sync is not enabled
+
+  /git-sync/progress:
+    get:
+      tags: [Git Sync]
+      summary: Get the current sync progress
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      responses:
+        '200':
+          description: Sync progress
+
+  /git-sync/config:
+    put:
+      tags: [Git Sync]
+      summary: Save per-user Git sync configuration
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                provider:
+                  type: string
+                  enum: [github, forgejo]
+                repo:
+                  type: string
+                  example: "username/my-notes"
+                token:
+                  type: string
+                  description: Access token (PAT)
+                branch:
+                  type: string
+                  default: main
+                api_base:
+                  type: string
+                  description: API base URL (Forgejo only)
+                author_name:
+                  type: string
+                author_email:
+                  type: string
+      responses:
+        '200':
+          description: Configuration saved
+        '403':
+          description: Git sync is not enabled
+
+  # ==================
   # Export Endpoints (Legacy - File Downloads)
   # ==================
+  # These legacy endpoints live at the application root, not under /api/v1
+  # (hence the per-path "servers" override below).
   /api_export_note.php:
+    servers:
+      - url: /
     get:
       tags: [Export]
       summary: Export a note
@@ -1679,6 +2455,8 @@ paths:
           description: File download
 
   /api_export_folder.php:
+    servers:
+      - url: /
     get:
       tags: [Export]
       summary: Export a folder as ZIP
@@ -1694,6 +2472,8 @@ paths:
           description: ZIP file download
 
   /api_export_entries.php:
+    servers:
+      - url: /
     get:
       tags: [Export]
       summary: Export all entries as ZIP
@@ -1708,6 +2488,8 @@ paths:
           description: ZIP file download
 
   /api_export_structured.php:
+    servers:
+      - url: /
     get:
       tags: [Export]
       summary: Export structured data
@@ -1722,6 +2504,8 @@ paths:
           description: Structured export download
 
   /api_export_attachments.php:
+    servers:
+      - url: /
     get:
       tags: [Export]
       summary: Export all attachments as ZIP
@@ -1732,6 +2516,8 @@ paths:
           description: ZIP file download
 
   /api_download_note.php:
+    servers:
+      - url: /
     get:
       tags: [Export]
       summary: Download note file
@@ -1752,6 +2538,8 @@ paths:
           description: File download
 
   /api_save_excalidraw.php:
+    servers:
+      - url: /
     post:
       tags: [Export]
       summary: Save Excalidraw diagram
@@ -1807,6 +2595,65 @@ paths:
                     username:
                       type: string
                       example: "admin"
+
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Get current authenticated user's profile
+      description: Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+                  is_admin:
+                    type: boolean
+
+  /users/me/password:
+    post:
+      tags: [Users]
+      summary: Change current user's password
+      description: Does NOT require X-User-ID header.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, new_password, confirm_password]
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+                  minLength: 4
+                confirm_password:
+                  type: string
+      responses:
+        '200':
+          description: Password changed
+        '400':
+          description: Missing fields or passwords do not match
+        '401':
+          description: Current password is incorrect
+
+  /users/me/password-status:
+    get:
+      tags: [Users]
+      summary: Get current user's password status
+      description: |
+        Indicates whether the current user has a custom password or is using the .env fallback.
+        Does NOT require X-User-ID header.
+      responses:
+        '200':
+          description: Password status
 
   /users/lookup/{username}:
     get:
@@ -2047,6 +2894,64 @@ paths:
         '404':
           description: User not found
 
+  /admin/users/{id}/reset-password:
+    post:
+      tags: [Users]
+      summary: Reset or set a user's password (admin only)
+      description: |
+        Reset a user's password to the default or set a custom one.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [reset_to_default, set_password]
+                  default: reset_to_default
+                new_password:
+                  type: string
+                  minLength: 4
+                  description: Required when action is set_password
+      responses:
+        '200':
+          description: Password reset or updated
+        '400':
+          description: Invalid action or password too short
+        '403':
+          description: Admin access required
+        '404':
+          description: User not found
+
+  /admin/users/{id}/password-status:
+    get:
+      tags: [Users]
+      summary: Get a user's password status (admin only)
+      description: |
+        Indicates whether the user has a custom password or is using the .env fallback.
+        Requires admin privileges. Does NOT require X-User-ID header.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Password status
+        '403':
+          description: Admin access required
+        '404':
+          description: User not found
+
   /admin/stats:
     get:
       tags: [Users]
@@ -2114,3 +3019,94 @@ paths:
                           type: string
         '403':
           description: Admin access required
+
+  # ==================
+  # Public Tasks Endpoints (token-based, no Basic Auth)
+  # ==================
+  /public/tasks:
+    post:
+      tags: [Public Tasks]
+      summary: Add a task to a shared task list
+      description: Authenticated with the public share token instead of credentials
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Public share token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  description: Task text
+      responses:
+        '200':
+          description: Task added
+        '403':
+          description: Invalid token or share not writable
+
+  /public/tasks/{id}:
+    patch:
+      tags: [Public Tasks]
+      summary: Update a task on a shared note
+      description: Authenticated with the public share token instead of credentials
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Task index in the list
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Public share token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                completed:
+                  type: boolean
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Task updated
+        '403':
+          description: Invalid token or share not writable
+    delete:
+      tags: [Public Tasks]
+      summary: Delete a task from a shared task list
+      description: Authenticated with the public share token instead of credentials
+      security: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Task index in the list
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Public share token
+      responses:
+        '200':
+          description: Task deleted
+        '403':
+          description: Invalid token or share not writable

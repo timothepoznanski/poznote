@@ -337,8 +337,7 @@ pre code.hljs,
 
 /* Allow name parts to scroll horizontally, but NOT push everything to the right if short */
 .folder-name,
-.note-title,
-.shared-folder-name {
+.note-title {
     flex: 0 1 auto !important;
     min-width: 0 !important;
     overflow-x: auto !important;

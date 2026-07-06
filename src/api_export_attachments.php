@@ -40,7 +40,6 @@ if (!$hasAttachments) {
         <link href="css/modals/base.css" rel="stylesheet">
         <link href="css/modals/specific-modals.css" rel="stylesheet">
         <link href="css/modals/attachments.css" rel="stylesheet">
-        <link href="css/modals/link-modal.css" rel="stylesheet">
         <link href="css/modals/share-modal.css" rel="stylesheet">
         <link href="css/modals/alerts-utilities.css" rel="stylesheet">
         <link href="css/modals/responsive.css" rel="stylesheet">

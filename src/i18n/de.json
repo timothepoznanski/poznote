@@ -38,6 +38,7 @@
       }
     },
     "download": "Herunterladen",
+    "print": "Drucken",
     "create": "Erstellen",
     "delete": "Löschen",
     "duplicate": "Duplizieren",
@@ -76,7 +77,7 @@
     "menu_item": "Schnappschüsse",
     "modal": {
       "title": "Schnappschüsse",
-      "description": "Nur der Textinhalt der Notiz wird gespeichert (keine Anhänge oder Bilder). Wurde ein Anhang oder Bild gelöscht, kann es nicht aus einem Schnappschuss wiederhergestellt werden.\nAutomatisch beim ersten Öffnen jeden Tag erstellt. „Jetzt Schnappschuss erstellen" fügt einen zusätzlichen hinzu, ohne die heutigen zu ersetzen. Max. 7.",
+      "description": "Nur der Textinhalt der Notiz wird gespeichert (keine Anhänge oder Bilder). Wurde ein Anhang oder Bild gelöscht, kann es nicht aus einem Schnappschuss wiederhergestellt werden.\nAutomatisch beim ersten Öffnen jeden Tag erstellt. „Jetzt Schnappschuss erstellen“ fügt einen zusätzlichen hinzu, ohne die heutigen zu ersetzen. Max. 7.",
       "loading": "Schnappschuss wird geladen...",
       "history": "Verlauf",
       "markdown_preview": "Vorschau",
@@ -952,6 +953,11 @@
       "workspace_destination": "Arbeitsbereich-Ziel auswählen:",
       "target_folder": "Zielordner auswählen:",
       "recent_folders": "Zuletzt verwendete Ordner",
+      "new_folder": "Neuer Ordner",
+      "new_workspace": "Neuer Arbeitsbereich",
+      "folder_name_placeholder": "Ordnername (verwenden Sie / für Unterordner)",
+      "workspace_name_placeholder": "Name des Arbeitsbereichs",
+      "enter_workspace_name": "Bitte geben Sie einen Namen für den Arbeitsbereich ein",
       "enter_folder_name": "Bitte geben Sie einen Ordnernamen ein"
     },
     "move_folder_files": {
@@ -1096,10 +1102,6 @@
       "json": {
         "title": "Als JSON herunterladen",
         "description": "Die Rohdaten der Aufgabenliste als JSON-Datei herunterladen"
-      },
-      "print": {
-        "title": "Als PDF drucken (Browser)",
-        "description": "Verwenden Sie den nativen Druckdialog des Browsers, um als PDF zu speichern"
       }
     },
     "task_move": {
@@ -1326,7 +1328,7 @@
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
-      "invalid_custom_token": "Ungültiges benutzerdefiniertes Token.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)"
+      "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)"
     }
   },
   "ui": {
@@ -1388,8 +1390,8 @@
     },
     "share_modal": {
       "description": "Eine geteilte URL erstellt einen öffentlichen Link zu dieser Notiz. Sobald die URL erstellt wurde, stehen weitere Optionen zur Verfügung, zum Beispiel ein Passwortschutz für die Notiz oder eine Anpassung der Freigabe-URL.",
-      "custom_token": "Benutzerdefiniertes Token (optional)",
-      "custom_token_placeholder": "mein_benutzerdefiniertes_token-1",
+      "custom_token": "Benutzerdefinierter Link (optional)",
+      "custom_token_placeholder": "mein-benutzerdefinierter-link-1",
       "custom_token_example": "Das ergibt zum Beispiel:",
       "password": "Passwort (optional)",
       "password_placeholder": "Geben Sie ein Passwort ein",
@@ -1408,12 +1410,12 @@
       "copy": "Kopieren",
       "revoke": "Widerrufen",
       "renew": "Erneuern",
-      "renew_token": "Token erneuern",
+      "renew_token": "Link erneuern",
       "manage": "Bearbeiten",
       "create_url": "URL erstellen",
       "no_link_yet": "Noch kein öffentlicher Link",
-      "custom_token": "Benutzerdefiniertes Token (optional)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "Benutzerdefinierter Link (optional)",
+      "custom_token_placeholder": "mein-benutzerdefinierter-link-1",
       "indexable": "Suchmaschinenindizierung zulassen",
       "indexable_mobile": "Indizierung zulassen",
       "tasklist_access": "Zugriff auf öffentliche Aufgabenliste",
@@ -1899,7 +1901,7 @@
       "path": "Pfad",
       "url": "Geteilte URL",
       "folder": "Ordner",
-      "token": "Token",
+      "token": "Link",
       "actions": "Aktionen"
     },
     "actions": {
@@ -1913,7 +1915,7 @@
     "shared_folder_title": "Geteilter Ordner",
     "note_shared_through_folder": "Notiz über Ordner geteilt",
     "folder_shared_through_parent": "Ordner über übergeordneten Ordner geteilt",
-    "token_help": "Das Token ist der eindeutige Teil, den Sie im öffentlichen Link wählen. Wenn Sie zum Beispiel projekt-2026 verwenden, wird daraus für eine Notiz https://ihre-domain.beispiel/projekt-2026 und für einen Ordner https://ihre-domain.beispiel/folder/projekt-2026.",
+    "token_help": "Der benutzerdefinierte Link ist der eindeutige Teil, den Sie in der öffentlichen URL wählen. Wenn Sie zum Beispiel projekt-2026 verwenden, wird daraus für eine Notiz https://ihre-domain.beispiel/projekt-2026 und für einen Ordner https://ihre-domain.beispiel/folder/projekt-2026.",
     "indexable": "Indexierbar",
     "password_protected": "Passwortgeschützt",
     "add_password_title": "Passwortschutz hinzufügen",
@@ -1930,8 +1932,8 @@
       "unlock": "Entsperren"
     },
     "errors": {
-      "token_missing": "Token fehlt",
-      "token_or_folder_auth_missing": "Token oder Ordnerberechtigung fehlt",
+      "token_missing": "Link fehlt",
+      "token_or_folder_auth_missing": "Link oder Ordnerberechtigung fehlt",
       "shared_folder_not_found": "Geteilter Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "folder_not_found": "Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",

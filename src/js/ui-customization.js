@@ -219,32 +219,28 @@
     }
 
     function syncFolderActionToggles() {
-        var menus = document.querySelectorAll('.folder-actions-menu');
+        // Single shared dropdown serves every folder's toggle: when UI
+        // customization hides all of its items, hide every toggle
+        var menu = document.getElementById('folder-actions-menu');
+        if (!menu) return;
 
-        menus.forEach(function (menu) {
-            var toggle = menu.previousElementSibling;
-            if (!toggle || !toggle.classList.contains('folder-actions-toggle')) return;
+        var visibleItems = Array.prototype.some.call(
+            Array.prototype.filter.call(menu.children, function (child) {
+                return child.classList && child.classList.contains('folder-actions-menu-item');
+            }),
+            isVisibleElement
+        );
 
+        if (!visibleItems) {
+            menu.classList.remove('show');
+        }
+
+        document.querySelectorAll('.folder-actions-toggle').forEach(function (toggle) {
             var actionsContainer = toggle.parentElement;
 
-            var visibleItems = Array.prototype.some.call(
-                Array.prototype.filter.call(menu.children, function (child) {
-                    return child.classList && child.classList.contains('folder-actions-menu-item');
-                }),
-                isVisibleElement
-            );
-
-            if (!visibleItems) {
-                toggle.style.display = 'none';
-                menu.classList.remove('show');
-                if (actionsContainer && actionsContainer.classList.contains('folder-actions')) {
-                    actionsContainer.style.display = 'none';
-                }
-            } else {
-                toggle.style.display = '';
-                if (actionsContainer && actionsContainer.classList.contains('folder-actions')) {
-                    actionsContainer.style.display = '';
-                }
+            toggle.style.display = visibleItems ? '' : 'none';
+            if (actionsContainer && actionsContainer.classList.contains('folder-actions')) {
+                actionsContainer.style.display = visibleItems ? '' : 'none';
             }
         });
     }

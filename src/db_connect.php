@@ -30,13 +30,20 @@ if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
 } else {
     // Check if this is a public shared link access
     $publicToken = $_GET['token'] ?? null;
-    
-    // Also check pretty URLs (tokens are usually alphanumeric/hex)
-    if (!$publicToken && !empty($_SERVER['REQUEST_URI'])) {
-        $uri = trim($_SERVER['REQUEST_URI'], '/');
-        $parts = explode('/', $uri);
+
+    // Also check pretty URLs (tokens are usually alphanumeric/hex), but only for
+    // public entry points that accept URI tokens. Other unauthenticated pages
+    // (login.php, index.php, ...) would otherwise trigger a useless
+    // shared_links lookup on every request.
+    $publicTokenScripts = ['public_note.php', 'public_folder.php'];
+    $scriptBasename = basename((string)($_SERVER['SCRIPT_NAME'] ?? ''));
+    $isApiRequest = strpos((string)($_SERVER['REQUEST_URI'] ?? ''), '/api/v1/') !== false;
+    if (!$publicToken && !empty($_SERVER['REQUEST_URI'])
+        && (in_array($scriptBasename, $publicTokenScripts, true) || $isApiRequest)) {
+        $uriPath = (string)(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '');
+        $parts = explode('/', trim($uriPath, '/'));
         $lastPart = end($parts);
-        if ($lastPart && preg_match('/^[a-f0-9]{32}$|^[a-zA-Z0-9\-_.]{4,128}$/', $lastPart)) {
+        if ($lastPart && $lastPart !== $scriptBasename && preg_match('/^[a-zA-Z0-9\-_.]{4,128}$/', $lastPart)) {
             $publicToken = $lastPart;
         }
     }
@@ -154,116 +161,11 @@ try {
         return $text;
     }, 2);
     
-    // Create entries table
-    $con->exec('CREATE TABLE IF NOT EXISTS entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        trash INTEGER DEFAULT 0,
-        heading TEXT,
-        entry TEXT,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated DATETIME,
-        tags TEXT,
-        folder TEXT DEFAULT "Default",
-        folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL,
-        workspace TEXT DEFAULT "Poznote",
-        favorite INTEGER DEFAULT 0,
-        attachments TEXT,
-        type TEXT DEFAULT "note",
-        icon TEXT,
-        icon_color TEXT,
-        created_by_user_id INTEGER,
-        updated_by_user_id INTEGER
-    )');
-
-    // Create folders table for empty folders (scoped by workspace)
-    $con->exec('CREATE TABLE IF NOT EXISTS folders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        workspace TEXT DEFAULT "Poznote",
-        parent_id INTEGER DEFAULT NULL,
-        display_order INTEGER DEFAULT 0,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
-    )');
-
-    // Create workspaces table
-    $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP
-    )');
-
-    // Insert default workspace only if no workspaces exist
-    $wsCount = $con->query("SELECT COUNT(*) FROM workspaces")->fetchColumn();
-    if ((int)$wsCount === 0) {
-        $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
-    }
-
-    // Create settings table for configuration
-    $con->exec('CREATE TABLE IF NOT EXISTS settings (
-        key TEXT PRIMARY KEY,
-        value TEXT
-    )');
-
-    // Table for public shared notes (token based)
-    $con->exec('CREATE TABLE IF NOT EXISTS shared_notes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        note_id INTEGER NOT NULL,
-        token TEXT UNIQUE NOT NULL,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        expires DATETIME,
-        access_mode TEXT DEFAULT "full",
-        password_encrypted TEXT,
-        FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
-    )');
-
-    // Table for public shared folders (token based)
-    $con->exec('CREATE TABLE IF NOT EXISTS shared_folders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        folder_id INTEGER NOT NULL,
-        token TEXT UNIQUE NOT NULL,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        expires DATETIME,
-        theme TEXT,
-        indexable INTEGER DEFAULT 0,
-        password TEXT,
-        password_encrypted TEXT,
-        FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
-    )');
-
-    // Table for public shared workspaces (read-only)
-    $con->exec('CREATE TABLE IF NOT EXISTS shared_workspaces (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        workspace_name TEXT UNIQUE NOT NULL,
-        token TEXT UNIQUE NOT NULL,
-        theme TEXT,
-        password TEXT,
-        password_encrypted TEXT,
-        login_required INTEGER DEFAULT 0,
-        allowed_users TEXT,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP
-    )');
-
-    // Notifications table for in-app reminders
-    $con->exec('CREATE TABLE IF NOT EXISTS notifications (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        note_id INTEGER,
-        type TEXT NOT NULL DEFAULT "reminder",
-        message TEXT,
-        is_read INTEGER DEFAULT 0,
-        created DATETIME DEFAULT CURRENT_TIMESTAMP,
-        trigger_at DATETIME,
-        dismissed INTEGER DEFAULT 0,
-        email_enabled INTEGER DEFAULT 1,
-        email_sent_at DATETIME,
-        email_attempts INTEGER DEFAULT 0,
-        email_last_attempt_at DATETIME,
-        email_error TEXT,
-        FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
-    )');
-
-    // --- Schema versioning: skip migrations & indexes if already up to date ---
-    $CURRENT_SCHEMA_VERSION = 15;
+    // --- Schema versioning: the entire bootstrap below (table creation,
+    // migrations, indexes, default settings, welcome note, legacy repair)
+    // is skipped when the database is already at the current version, leaving
+    // a single SELECT on the settings table per request.
+    $CURRENT_SCHEMA_VERSION = 16;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -272,10 +174,126 @@ try {
             $currentVersion = (int)$svResult;
         }
     } catch (Exception $e) {
-        // settings table might not exist yet for very old databases
+        // settings table doesn't exist yet (fresh or very old database)
     }
 
-    if ($currentVersion < $CURRENT_SCHEMA_VERSION) {
+    // Run the bootstrap whenever the stored version differs from the code's
+    // version. A mismatch in EITHER direction matters: a database restored from
+    // an old backup (lower version) needs the migrations, and a database that
+    // ran under a newer or different code version (higher version) may be
+    // missing columns this version expects. Everything below is idempotent,
+    // so re-running it is safe.
+    if ($currentVersion !== $CURRENT_SCHEMA_VERSION) {
+        // === TABLE CREATION ===
+
+        // Create entries table
+        $con->exec('CREATE TABLE IF NOT EXISTS entries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            trash INTEGER DEFAULT 0,
+            heading TEXT,
+            entry TEXT,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated DATETIME,
+            tags TEXT,
+            folder TEXT DEFAULT "Default",
+            folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL,
+            workspace TEXT DEFAULT "Poznote",
+            favorite INTEGER DEFAULT 0,
+            attachments TEXT,
+            type TEXT DEFAULT "note",
+            icon TEXT,
+            icon_color TEXT,
+            created_by_user_id INTEGER,
+            updated_by_user_id INTEGER
+        )');
+
+        // Create folders table for empty folders (scoped by workspace)
+        $con->exec('CREATE TABLE IF NOT EXISTS folders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            workspace TEXT DEFAULT "Poznote",
+            parent_id INTEGER DEFAULT NULL,
+            display_order INTEGER DEFAULT 0,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
+        )');
+
+        // Create workspaces table
+        $con->exec('CREATE TABLE IF NOT EXISTS workspaces (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE NOT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP
+        )');
+
+        // Insert default workspace only if no workspaces exist
+        $wsCount = $con->query("SELECT COUNT(*) FROM workspaces")->fetchColumn();
+        if ((int)$wsCount === 0) {
+            $con->exec("INSERT OR IGNORE INTO workspaces (name) VALUES ('Poznote')");
+        }
+
+        // Create settings table for configuration
+        $con->exec('CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )');
+
+        // Table for public shared notes (token based)
+        $con->exec('CREATE TABLE IF NOT EXISTS shared_notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            note_id INTEGER NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires DATETIME,
+            access_mode TEXT DEFAULT "full",
+            password_encrypted TEXT,
+            FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
+        )');
+
+        // Table for public shared folders (token based)
+        $con->exec('CREATE TABLE IF NOT EXISTS shared_folders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            folder_id INTEGER NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            expires DATETIME,
+            theme TEXT,
+            indexable INTEGER DEFAULT 0,
+            password TEXT,
+            password_encrypted TEXT,
+            FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
+        )');
+
+        // Table for public shared workspaces (read-only)
+        $con->exec('CREATE TABLE IF NOT EXISTS shared_workspaces (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            workspace_name TEXT UNIQUE NOT NULL,
+            token TEXT UNIQUE NOT NULL,
+            theme TEXT,
+            password TEXT,
+            password_encrypted TEXT,
+            login_required INTEGER DEFAULT 0,
+            allowed_users TEXT,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP
+        )');
+
+        // Notifications table for in-app reminders
+        $con->exec('CREATE TABLE IF NOT EXISTS notifications (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            note_id INTEGER,
+            type TEXT NOT NULL DEFAULT "reminder",
+            message TEXT,
+            is_read INTEGER DEFAULT 0,
+            created DATETIME DEFAULT CURRENT_TIMESTAMP,
+            trigger_at DATETIME,
+            dismissed INTEGER DEFAULT 0,
+            email_enabled INTEGER DEFAULT 1,
+            email_sent_at DATETIME,
+            email_attempts INTEGER DEFAULT 0,
+            email_last_attempt_at DATETIME,
+            email_error TEXT,
+            FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
+        )');
+
         // === COLUMN MIGRATIONS ===
 
         // Add missing columns to entries if they don't exist (migration for old backups)
@@ -473,114 +491,109 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");
 
-        // === Update schema version ===
+        // Ensure reminder email delivery columns exist for databases created before SMTP reminders.
+        try {
+            $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('email_sent_at', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_sent_at DATETIME");
+            }
+            if (!in_array('email_enabled', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_enabled INTEGER DEFAULT 1");
+            }
+            if (!in_array('email_attempts', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_attempts INTEGER DEFAULT 0");
+            }
+            if (!in_array('email_last_attempt_at', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_last_attempt_at DATETIME");
+            }
+            if (!in_array('email_error', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN email_error TEXT");
+            }
+            $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
+        } catch (Exception $e) {
+            error_log('Could not ensure reminder email columns: ' . $e->getMessage());
+        }
+
+        // Ensure linked_note_id column exists (may be missing from restored backups)
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('linked_note_id', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add linked_note_id column: ' . $e->getMessage());
+        }
+
+        // === DATA DIRECTORIES ===
+        // $dbDir points to data/users/{id}/database, so we go up one level to get data/users/{id}/
+        $dataDir = dirname($dbDir);
+        $requiredDirs = ['attachments', 'database', 'entries'];
+        foreach ($requiredDirs as $dir) {
+            $fullPath = $dataDir . '/' . $dir;
+            createDirectoryWithPermissions($fullPath);
+        }
+
+        // === WELCOME NOTE & LEGACY REPAIR ===
+        // Create welcome note and Getting Started folder if no notes exist (first installation)
+        try {
+            // Check if ANY notes exist (including in trash) - only create welcome note on true first installation
+            $totalNoteCount = $con->query("SELECT COUNT(*) FROM entries")->fetchColumn();
+
+            if ($totalNoteCount == 0) {
+                // Create "Getting Started" folder first
+                $con->exec("INSERT OR IGNORE INTO folders (name, workspace, created) VALUES ('Getting Started', 'Poznote', datetime('now'))");
+
+                // Get the folder ID
+                $folderStmt = $con->query("SELECT id FROM folders WHERE name = 'Getting Started' AND workspace = 'Poznote'");
+                $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
+                $folderId = $folderData ? (int)$folderData['id'] : null;
+
+                // Create welcome note content (kept in a separate template file)
+                $welcomeTemplateFile = __DIR__ . '/welcome_note.html';
+                $welcomeContent = @file_get_contents($welcomeTemplateFile);
+
+                // Fallback in case the template file is missing
+                if ($welcomeContent === false || trim($welcomeContent) === '') {
+                    $welcomeContent = '<p>Welcome to Poznote.</p>';
+                }
+
+                // Insert the welcome note
+                $now_utc = gmdate('Y-m-d H:i:s', time());
+                $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc, $activeUserId, $activeUserId]);
+
+                $welcomeNoteId = $con->lastInsertId();
+
+                // Create the HTML file for the welcome note
+                $entriesDir = $dataDir . '/entries';
+                createDirectoryWithPermissions($entriesDir);
+
+                $welcomeFile = $entriesDir . '/' . $welcomeNoteId . '.html';
+                file_put_contents($welcomeFile, $welcomeContent);
+                setFilePermissions($welcomeFile, 0644);
+            }
+            // Legacy migration: ensure folder_id is populated and entry snippets exist.
+            // Only runs on schema-version changes (and after backup restores, which
+            // call repairDatabaseEntries() explicitly) - not on every request.
+            if (function_exists('repairDatabaseEntries')) {
+                repairDatabaseEntries($con);
+            }
+        } catch(Exception $e) {
+            // Log error but don't fail database connection
+            error_log("Failed to create welcome note: " . $e->getMessage());
+        }
+
+        // === Update schema version (last, so a failed bootstrap retries on the next request) ===
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '" . $CURRENT_SCHEMA_VERSION . "')");
     }
     // --- End schema versioning ---
 
-    try {
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachment_previews_in_note', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");
-        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
-    } catch (Exception $e) {
-        error_log('Could not ensure display settings: ' . $e->getMessage());
-    }
-
-    // Always ensure reminder email delivery columns exist for databases created before SMTP reminders.
-    try {
-        $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        if (!in_array('email_sent_at', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_sent_at DATETIME");
-        }
-        if (!in_array('email_enabled', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_enabled INTEGER DEFAULT 1");
-        }
-        if (!in_array('email_attempts', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_attempts INTEGER DEFAULT 0");
-        }
-        if (!in_array('email_last_attempt_at', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_last_attempt_at DATETIME");
-        }
-        if (!in_array('email_error', $existingColumns)) {
-            $con->exec("ALTER TABLE notifications ADD COLUMN email_error TEXT");
-        }
-        $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
-    } catch (Exception $e) {
-        error_log('Could not ensure reminder email columns: ' . $e->getMessage());
-    }
-
-    // Always ensure linked_note_id column exists (may have been removed and re-added)
-    try {
-        $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
-        $existingColumns = array_column($cols, 'name');
-        if (!in_array('linked_note_id', $existingColumns)) {
-            $con->exec("ALTER TABLE entries ADD COLUMN linked_note_id INTEGER REFERENCES entries(id) ON DELETE SET NULL");
-        }
-    } catch (Exception $e) {
-        error_log('Could not add linked_note_id column: ' . $e->getMessage());
-    }
-    
-    // Ensure required data directories exist
-    // $dbDir points to data/users/{id}/database, so we go up one level to get data/users/{id}/
-    $dataDir = dirname($dbDir);
-    $requiredDirs = ['attachments', 'database', 'entries'];
-    foreach ($requiredDirs as $dir) {
-        $fullPath = $dataDir . '/' . $dir;
-        createDirectoryWithPermissions($fullPath);
-    }
-
-    // Create welcome note and Getting Started folder if no notes exist (first installation)
-    try {
-        // Check if ANY notes exist (including in trash) - only create welcome note on true first installation
-        $totalNoteCount = $con->query("SELECT COUNT(*) FROM entries")->fetchColumn();
-        
-        if ($totalNoteCount == 0) {
-            // Create "Getting Started" folder first
-            $con->exec("INSERT OR IGNORE INTO folders (name, workspace, created) VALUES ('Getting Started', 'Poznote', datetime('now'))");
-            
-            // Get the folder ID
-            $folderStmt = $con->query("SELECT id FROM folders WHERE name = 'Getting Started' AND workspace = 'Poznote'");
-            $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
-            $folderId = $folderData ? (int)$folderData['id'] : null;
-            
-            // Create welcome note content (kept in a separate template file)
-            $welcomeTemplateFile = __DIR__ . '/welcome_note.html';
-            $welcomeContent = @file_get_contents($welcomeTemplateFile);
-
-            // Fallback in case the template file is missing
-            if ($welcomeContent === false || trim($welcomeContent) === '') {
-                $welcomeContent = '<p>Welcome to Poznote.</p>';
-            }
-
-            // Insert the welcome note
-            $now_utc = gmdate('Y-m-d H:i:s', time());
-            $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc, $activeUserId, $activeUserId]);
-            
-            $welcomeNoteId = $con->lastInsertId();
-            
-            // Create the HTML file for the welcome note
-            $dataDir = dirname($dbDir);
-            $entriesDir = $dataDir . '/entries';
-            createDirectoryWithPermissions($entriesDir);
-            
-            $welcomeFile = $entriesDir . '/' . $welcomeNoteId . '.html';
-            file_put_contents($welcomeFile, $welcomeContent);
-            setFilePermissions($welcomeFile, 0644);
-        }
-        // Legacy migration: ensure folder_id is populated and entries are fixed
-        if (function_exists('repairDatabaseEntries')) {
-            repairDatabaseEntries($con);
-        }
-    } catch(Exception $e) {
-        // Log error but don't fail database connection
-        error_log("Failed to create welcome note: " . $e->getMessage());
-    }
-
 } catch(PDOException $e) {
-    die("Connection failed: " . $e->getMessage());
+    error_log("Poznote: database connection failed: " . $e->getMessage());
+    http_response_code(503);
+    die("Database connection failed. Please contact the administrator or check the server logs.");
 }
 
 ?>

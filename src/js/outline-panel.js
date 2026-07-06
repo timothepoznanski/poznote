@@ -902,6 +902,25 @@ function extractHeadings(noteElement) {
             const lines = markdownContent.split('\n');
             let inCodeBlock = false;
 
+            // Index preview headings once up front. Scanning every preview
+            // heading (and reading layout via offsetParent) for each source
+            // heading is quadratic and interleaves DOM reads with the anchor
+            // writes below, forcing reflows on heading-rich notes.
+            const previewHeadingsByText = new Map();
+            let hasVisiblePreview = false;
+            if (markdownPreview) {
+                hasVisiblePreview = markdownPreview.offsetParent !== null;
+                markdownPreview.querySelectorAll(HEADING_SELECTOR).forEach(h => {
+                    const headingText = getHeadingTextContent(h);
+                    let sameTextHeadings = previewHeadingsByText.get(headingText);
+                    if (!sameTextHeadings) {
+                        sameTextHeadings = [];
+                        previewHeadingsByText.set(headingText, sameTextHeadings);
+                    }
+                    sameTextHeadings.push(h);
+                });
+            }
+
             lines.forEach((line, lineIndex) => {
                 if (isMarkdownFence(line)) {
                     inCodeBlock = !inCodeBlock;
@@ -928,19 +947,15 @@ function extractHeadings(noteElement) {
                         .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1'); // links [text](url)
                     const id = `md-heading-${lineIndex}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
-                    // Find corresponding element in preview if available
+                    // Find corresponding element in preview if available.
+                    // Consuming from the queue maps repeated heading texts to
+                    // their occurrences in document order.
                     let previewElement = null;
-                    if (markdownPreview) {
-                        const previewHeadings = markdownPreview.querySelectorAll(HEADING_SELECTOR);
-                        // Try to find matching heading by text content
-                        for (const h of previewHeadings) {
-                            if (getHeadingTextContent(h) === text) {
-                                previewElement = h;
-                                if (!h.id) h.id = id;
-                                addHeadingAnchorLink(h);
-                                break;
-                            }
-                        }
+                    const sameTextHeadings = previewHeadingsByText.get(text);
+                    if (sameTextHeadings && sameTextHeadings.length > 0) {
+                        previewElement = sameTextHeadings.shift();
+                        if (!previewElement.id) previewElement.id = id;
+                        addHeadingAnchorLink(previewElement);
                     }
 
                     headings.push({
@@ -951,7 +966,7 @@ function extractHeadings(noteElement) {
                         lineNumber: lineIndex,
                         isMarkdownSource: true,
                         isSplitMode: isSplitMode,
-                        hasPreview: markdownPreview && markdownPreview.offsetParent !== null
+                        hasPreview: hasVisiblePreview
                     });
                 }
             });

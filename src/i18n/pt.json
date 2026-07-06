@@ -38,6 +38,7 @@
       }
     },
     "download": "Baixar",
+    "print": "Imprimir",
     "create": "Criar",
     "duplicate": "Duplicar",
     "move": "Mover",
@@ -951,6 +952,11 @@
       "workspace_destination": "Selecione o espaço de trabalho de destino:",
       "target_folder": "Selecione a pasta de destino:",
       "recent_folders": "Pastas recentes",
+      "new_folder": "Nova pasta",
+      "new_workspace": "Novo espaço de trabalho",
+      "folder_name_placeholder": "Nome da pasta (use / para subpastas)",
+      "workspace_name_placeholder": "Nome do espaço de trabalho",
+      "enter_workspace_name": "Por favor, insira um nome de espaço de trabalho",
       "enter_folder_name": "Por favor, insira um nome de pasta"
     },
     "move_folder_files": {
@@ -1095,10 +1101,6 @@
       "json": {
         "title": "Baixar como JSON",
         "description": "Baixar os dados brutos da lista de tarefas como arquivo JSON"
-      },
-      "print": {
-        "title": "Imprimir para PDF (Navegador)",
-        "description": "Usar o diálogo de impressão nativo do navegador para salvar como PDF"
       }
     },
     "task_move": {
@@ -1327,9 +1329,9 @@
       "duplicate_title_in_folder": "Já existe outra nota com o mesmo título nesta pasta.",
       "note_id_required": "note_id obrigatório",
       "note_not_found": "Nota não encontrada",
-      "invalid_custom_token": "Token personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
-      "token_already_in_use": "Token já em uso",
-      "no_token_generated": "Nenhum token gerado",
+      "invalid_custom_token": "Link personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
+      "token_already_in_use": "Link personalizado já em uso",
+      "no_token_generated": "Nenhum link gerado",
       "server_error": "Erro do servidor: {{error}}"
     }
   },
@@ -1392,8 +1394,8 @@
     },
     "share_modal": {
       "description": "Uma URL compartilhada cria um link público para esta nota. Depois que a URL for criada, outras opções serão oferecidas, como proteger a nota com senha ou personalizar a URL de compartilhamento.",
-      "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "meu_token_personalizado-1",
+      "custom_token": "Link personalizado (opcional)",
+      "custom_token_placeholder": "meu-link-personalizado-1",
       "custom_token_example": "O que dará, por exemplo:",
       "password": "Senha (opcional)",
       "password_placeholder": "Digite uma senha",
@@ -1412,12 +1414,12 @@
       "copy": "Copiar",
       "revoke": "Revogar",
       "renew": "Renovar",
-      "renew_token": "Renovar token",
+      "renew_token": "Renovar link",
       "manage": "Editar",
       "create_url": "Criar url",
       "no_link_yet": "Nenhum link público ainda",
-      "custom_token": "Token personalizado (opcional)",
-      "custom_token_placeholder": "my_custom_token-1",
+      "custom_token": "Link personalizado (opcional)",
+      "custom_token_placeholder": "meu-link-personalizado-1",
       "indexable": "Permitir indexação por motores de busca",
       "indexable_mobile": "Permitir indexação",
       "tasklist_access": "Acesso público à lista de tarefas",
@@ -1903,7 +1905,7 @@
       "path": "Caminho",
       "url": "URL Compartilhada",
       "folder": "Pasta",
-      "token": "Token",
+      "token": "Link",
       "actions": "Ações"
     },
     "actions": {
@@ -1917,7 +1919,7 @@
     "shared_folder_title": "Pasta compartilhada",
     "note_shared_through_folder": "Nota compartilhada via pasta",
     "folder_shared_through_parent": "Pasta compartilhada via pasta pai",
-    "token_help": "O token é a parte única que você escolhe no link público. Por exemplo, usando projeto-2026, a URL de uma nota pode ficar https://seu-dominio.exemplo/projeto-2026 e a de uma pasta https://seu-dominio.exemplo/folder/projeto-2026.",
+    "token_help": "O link personalizado é a parte única que você escolhe na URL pública. Por exemplo, usando projeto-2026, a URL de uma nota pode ficar https://seu-dominio.exemplo/projeto-2026 e a de uma pasta https://seu-dominio.exemplo/folder/projeto-2026.",
     "indexable": "Indexável",
     "password_protected": "Protegido por senha",
     "add_password_title": "Adicionar proteção por senha",
@@ -1934,8 +1936,8 @@
       "unlock": "Desbloquear"
     },
     "errors": {
-      "token_missing": "Token ausente",
-      "token_or_folder_auth_missing": "Token ou autorização da pasta ausente",
+      "token_missing": "Link ausente",
+      "token_or_folder_auth_missing": "Link ou autorização da pasta ausente",
       "shared_folder_not_found": "Pasta compartilhada não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "folder_not_found": "Pasta não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
