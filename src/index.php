@@ -60,22 +60,21 @@ $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 $showGitSync = $gitEnabled; // All users with configured git can sync
 $gitProvider = function_exists('getGitProviderName') ? getGitProviderName($gitSync->getProvider()) : 'Git';
 
-// Check if we need to redirect to include workspace from database settings
-// Only redirect if no workspace parameter is present in GET
+// Resolve the workspace when no parameter is present, without redirecting
+// (a redirect costs a full extra round trip: auth + db_connect run twice).
+// A replaceState snippet in <head> reflects the resolved workspace in the
+// URL so client scripts that read it from location.search keep working.
+$workspaceResolvedInternally = null;
 if (!isset($_GET['workspace']) && !isset($_POST['workspace'])) {
     // Use getWorkspaceFilter() which handles the full priority logic:
     // 1. default_workspace if set to a specific workspace
     // 2. last_opened_workspace from database
     // 3. First available workspace as fallback
     $resolvedWorkspace = getWorkspaceFilter();
-    
+
     if ($resolvedWorkspace && $resolvedWorkspace !== '') {
-        // Build redirect URL preserving other parameters
-        $params = $_GET;
-        $params['workspace'] = $resolvedWorkspace;
-        $queryString = http_build_query($params);
-        header('Location: index.php?' . $queryString);
-        exit;
+        $_GET['workspace'] = $resolvedWorkspace;
+        $workspaceResolvedInternally = $resolvedWorkspace;
     }
 }
 
@@ -204,6 +203,21 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $v; ?>">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <?php if ($workspaceResolvedInternally !== null): ?>
+    <script>
+        // The workspace was resolved server-side without a redirect; reflect
+        // it in the URL for scripts that read it from location.search.
+        (function () {
+            try {
+                var url = new URL(window.location.href);
+                if (!url.searchParams.has('workspace')) {
+                    url.searchParams.set('workspace', <?php echo json_encode($workspaceResolvedInternally, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);
+                    history.replaceState(history.state, '', url);
+                }
+            } catch (_error) {}
+        })();
+    </script>
+    <?php endif; ?>
     <script>
         (function () {
             try {
@@ -233,19 +247,10 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
     <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
-    <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
-    <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
-    <script src="js/toolbar.js?v=<?php echo $v; ?>"></script>
-    <script src="js/markdown-formatting.js?v=<?php echo $v; ?>"></script>
-    <script src="js/checklist.js?v=<?php echo $v; ?>"></script>
-    <script src="js/bulletlist.js?v=<?php echo $v; ?>"></script>
-    <script src="js/note-loader-common.js?v=<?php echo $v; ?>"></script>
-    <script src="js/note-reference.js?v=<?php echo $v; ?>"></script>
-    <script src="js/template-selector.js?v=<?php echo $v; ?>"></script>
-    <script src="js/linked-note-selector.js?v=<?php echo $v; ?>"></script>
-    <script src="js/search-replace.js?v=<?php echo $v; ?>"></script>
+    <!-- Editor/toolbar modules served as one concatenated deferred bundle
+         (see index_js.php). The js/*.js files stay the source of truth. -->
+    <script defer src="index_js.php?group=head&v=<?php echo $v; ?>"></script>
     <script defer src="js/codemirror-dist/markdown-codemirror.iife.js?v=<?php echo $v; ?>"></script>
-    <script src="js/markdown-handler.js?v=<?php echo $v; ?>"></script>
     <!-- Mermaid (2.7 MB) and KaTeX are loaded on demand by js/lazy-libs.js, only
          when a note actually contains a diagram or a math element -->
     <script defer src="js/lazy-libs.js?v=<?php echo $v; ?>"></script>
@@ -368,7 +373,7 @@ if ($isPublicWorkspaceReadonly) {
             'defaultImageBorderNoPadding' => poznoteSettingEnabled($settings['default_image_border_no_padding'], false)
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
-    <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
+    <!-- js/error-handler.js is bundled as the first file of index_js.php?group=app -->
 
     <!-- Workspace data for JavaScript (CSP compliant) -->
     <script type="application/json" id="workspace-display-map-data"><?php
@@ -572,51 +577,10 @@ if ($isPublicWorkspaceReadonly) {
         
     </div>  <!-- Close main-container -->
 
-<!-- Modules refactorisés de script.js -->
-<script src="js/globals.js?v=<?php echo $v; ?>"></script>
-<script src="js/workspaces.js?v=<?php echo $v; ?>"></script>
+<!-- Application modules served as one concatenated deferred bundle (see
+     index_js.php). Inline scripts below (DEFAULT_NOTE_TITLES, calendar
+     translations) execute during parsing, i.e. before the deferred bundle. -->
 <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
-<script src="js/notes.js?v=<?php echo $v; ?>"></script>
-<script src="js/ui.js?v=<?php echo $v; ?>"></script>
-<script src="js/note-edit-lock.js?v=<?php echo $v; ?>"></script>
-<script src="js/date-time-format.js?v=<?php echo $v; ?>"></script>
-<script src="js/attachments.js?v=<?php echo $v; ?>"></script>
-<script src="js/tags-modal.js?v=<?php echo $v; ?>"></script>
-<!-- Event management modules -->
-<script src="js/events-utils.js?v=<?php echo $v; ?>"></script>
-<script src="js/events-auto-save.js?v=<?php echo $v; ?>"></script>
-<script src="js/events-drag-drop.js?v=<?php echo $v; ?>"></script>
-<script src="js/note-history.js?v=<?php echo $v; ?>"></script>
-<script src="js/events-navigation.js?v=<?php echo $v; ?>"></script>
-<script src="js/events-rich-text-editing.js?v=<?php echo $v; ?>"></script>
-<script src="js/events-text-selection.js?v=<?php echo $v; ?>"></script>
-<script src="js/utils.js?v=<?php echo $v; ?>"></script>
-<script src="js/search-highlight.js?v=<?php echo $v; ?>"></script>
-<script src="js/slash-command.js?v=<?php echo $v; ?>"></script>
-<script src="js/pwa-helpers.js?v=<?php echo $v; ?>"></script>
-<script src="js/share.js?v=<?php echo $v; ?>"></script>
-<script src="js/reminders.js?v=<?php echo $v; ?>"></script>
-<script src="js/folder-hierarchy.js?v=<?php echo $v; ?>"></script>
-<script src="js/math-renderer.js?v=<?php echo $v; ?>"></script>
-<script src="js/modals-events.js?v=<?php echo $v; ?>"></script>
-<script src="js/index-events.js?v=<?php echo $v; ?>"></script>
-<script src="js/main.js?v=<?php echo $v; ?>"></script>
-<script src="js/resize-column.js?v=<?php echo $v; ?>"></script>
-<script src="js/outline-panel.js?v=<?php echo $v; ?>"></script>
-<script src="js/unified-search.js?v=<?php echo $v; ?>"></script>
-<script src="js/clickable-tags.js?v=<?php echo $v; ?>"></script>
-<script src="js/font-size-settings.js?v=<?php echo $v; ?>"></script>
-<script src="js/index-icon-scale-settings.js?v=<?php echo $v; ?>"></script>
-<script src="js/background-settings.js?v=<?php echo $v; ?>"></script>
-<script src="js/tasklist.js?v=<?php echo $v; ?>"></script>
-<script src="js/excalidraw.js?v=<?php echo $v; ?>"></script>
-<script src="js/copy-code-on-focus.js?v=<?php echo $v; ?>"></script>
-<script src="js/table-context-menu.js?v=<?php echo $v; ?>"></script>
-<script src="js/system-menu.js?v=<?php echo $v; ?>"></script>
-<script src="js/notes-list-events.js?v=<?php echo $v; ?>"></script>
-<script src="js/folder-icon.js?v=<?php echo $v; ?>"></script>
-<script src="js/kanban.js?v=<?php echo $v; ?>"></script>
-<script src="js/tabs.js?v=<?php echo $v; ?>"></script>
 <!-- Calendar translations -->
 <script>
 window.calendarTranslations = {
@@ -656,10 +620,7 @@ window.calendarTranslations = {
     }
 };
 </script>
-<script src="js/calendar.js?v=<?php echo $v; ?>"></script>
-<script src="js/backlinks.js?v=<?php echo $v; ?>"></script>
-<script src="js/snapshots.js?v=<?php echo $v; ?>"></script>
-<script src="js/ui-customization.js?v=<?php echo $v; ?>"></script>
+<script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>
 
 <?php if (!$isPublicWorkspaceReadonly && $note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->

@@ -369,6 +369,13 @@
         var folderId = parseInt(element.getAttribute('data-folder-id'), 10);
         var sortType = element.getAttribute('data-sort-type') || 'modified';
 
+        // Persist the new sort on the folder's toggle so the shared menu shows
+        // the right active option next time it opens for this folder
+        var folderToggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+        if (folderToggle) {
+            folderToggle.setAttribute('data-current-sort', sortType);
+        }
+
         // Update UI: checkmark and active highlighting
         var parentMenu = element.closest('.folder-actions-menu');
         if (parentMenu) {

@@ -2761,37 +2761,87 @@ function createNoteInFolder() {
 }
 
 // Folder actions menu toggle functions
-function toggleFolderActionsMenu(folderId) {
-    // Close all other folder menus first
-    document.querySelectorAll('.folder-actions-menu.show').forEach(function (menu) {
-        if (menu.id !== 'folder-actions-menu-' + folderId) {
-            menu.classList.remove('show');
-        }
+//
+// A single shared dropdown (#folder-actions-menu, rendered once by
+// folders_display.php) serves every folder's three-dot toggle. On open it is
+// populated from the toggle's data attributes (folder id/name, note count,
+// shared state, current sort) and positioned next to the toggle.
+
+function populateFolderActionsMenu(menu, toggle) {
+    var folderId = toggle.getAttribute('data-folder-id') || '';
+    var folderName = toggle.getAttribute('data-folder-name') || '';
+    var noteCount = parseInt(toggle.getAttribute('data-note-count'), 10) || 0;
+    var isShared = toggle.getAttribute('data-shared') === '1';
+    var currentSort = toggle.getAttribute('data-current-sort') || '';
+
+    menu.setAttribute('data-folder-id', folderId);
+
+    // Copy folder identity onto every action item (handlers read it there)
+    menu.querySelectorAll('[data-action]').forEach(function (item) {
+        item.setAttribute('data-folder-id', folderId);
+        item.setAttribute('data-folder-name', folderName);
     });
 
-    // Toggle the current menu
-    var menu = document.getElementById('folder-actions-menu-' + folderId);
-    if (menu) {
-        var isShowing = menu.classList.toggle('show');
+    // Items only relevant when the folder contains notes
+    menu.querySelectorAll('.requires-notes').forEach(function (item) {
+        item.style.display = noteCount > 0 ? '' : 'none';
+    });
 
-        // If closing, unexpand sort submenus
-        if (!isShowing) {
-            menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
-                submenu.style.display = 'none';
-            });
-            menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
-                chevron.style.transform = 'rotate(0deg)';
-            });
-        }
+    // Share item: show the variant matching the folder's shared state
+    menu.querySelectorAll('.share-state-shared').forEach(function (item) {
+        item.style.display = isShared ? '' : 'none';
+    });
+    menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
+        item.style.display = isShared ? 'none' : '';
+    });
 
-        // If showing, check if menu would overflow viewport and adjust position
-        if (isShowing) {
-            adjustMenuPosition(menu);
+    // Sort options: highlight the active one and reflect it in the header label
+    var activeLabel = null;
+    menu.querySelectorAll('[data-action="sort-folder"]').forEach(function (item) {
+        var isActive = currentSort && item.getAttribute('data-sort-type') === currentSort;
+        item.classList.toggle('active', !!isActive);
+        if (isActive) {
+            var optionLabel = item.querySelector('.sort-option-label');
+            if (optionLabel) activeLabel = optionLabel.textContent;
         }
+    });
+    var headerLabel = menu.querySelector('.sort-header-label');
+    if (headerLabel) {
+        headerLabel.textContent = activeLabel || headerLabel.getAttribute('data-default-label') || headerLabel.textContent;
     }
+
+    // Start with the sort submenu collapsed
+    menu.querySelectorAll('.sort-submenu').forEach(function (submenu) {
+        submenu.style.display = 'none';
+    });
+    menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
+        chevron.style.transform = 'rotate(0deg)';
+    });
 }
 
-function adjustMenuPosition(menu) {
+function toggleFolderActionsMenu(folderId) {
+    var menu = document.getElementById('folder-actions-menu');
+    if (!menu) return;
+
+    var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+    if (!toggle) return;
+
+    // Clicking the toggle of the folder whose menu is already open closes it;
+    // any other toggle re-populates and moves the menu
+    var isOpenForFolder = menu.classList.contains('show') &&
+        menu.getAttribute('data-folder-id') === String(folderId);
+
+    if (isOpenForFolder) {
+        closeFolderActionsMenu(folderId);
+        return;
+    }
+
+    populateFolderActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    adjustMenuPosition(menu, toggle);
+}
+
+function adjustMenuPosition(menu, toggleButton) {
     // Reset any previous adjustments
     menu.style.bottom = '';
     menu.style.top = '';
@@ -2802,8 +2852,9 @@ function adjustMenuPosition(menu) {
     menu.style.maxHeight = '';
     menu.style.overflowY = '';
 
-    // Get the parent toggle button to position relative to it
-    var toggleButton = menu.previousElementSibling;
+    // Position relative to the toggle button (passed for the shared folder
+    // menu; falls back to the previous sibling for legacy inline menus)
+    toggleButton = toggleButton || menu.previousElementSibling;
     if (!toggleButton) {
         return;
     }
@@ -2864,7 +2915,9 @@ function adjustMenuPosition(menu) {
 }
 
 function closeFolderActionsMenu(folderId) {
-    var menu = document.getElementById('folder-actions-menu-' + folderId);
+    // Single shared menu: folderId is accepted for backwards compatibility
+    // but closing is unconditional
+    var menu = document.getElementById('folder-actions-menu');
     if (menu) {
         menu.classList.remove('show');
         // Unexpand sort submenus
@@ -2879,8 +2932,9 @@ function closeFolderActionsMenu(folderId) {
 
 // Close folder menus when clicking outside
 document.addEventListener('click', function (event) {
-    // If click is not inside a folder-actions element, close all menus
-    if (!event.target.closest('.folder-actions')) {
+    // If click is neither on a folder-actions toggle nor inside the shared
+    // dropdown (which lives outside .folder-actions), close all menus
+    if (!event.target.closest('.folder-actions') && !event.target.closest('.folder-actions-menu')) {
         document.querySelectorAll('.folder-actions-menu.show').forEach(function (menu) {
             menu.classList.remove('show');
             // Unexpand sort submenus

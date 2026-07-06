@@ -334,8 +334,13 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
 
 /**
  * Generate available actions for a folder
- * OPTIMIZED: Uses cached shared folders data to avoid N+1 queries
- * 
+ *
+ * Only emits the three-dot toggle button. The dropdown itself is a single
+ * shared menu rendered once per page by renderFolderActionsMenu(); the
+ * toggle carries everything the client needs to populate it (folder id/name,
+ * note count, shared state, current sort). This keeps the sidebar DOM small:
+ * one menu instead of ~15 hidden menu items per folder.
+ *
  * @param int $folderId Folder ID
  * @param string $folderName Folder name
  * @param PDO $con Database connection
@@ -346,12 +351,11 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
  */
 function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $currentSort = null) {
     static $sharedFoldersCache = null;
-    
-    $actions = "";
-    
-    // Escape folder name for HTML attribute context
-    $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
-    
+
+    if ($folderName === FAVORITES_FOLDER_NAME) {
+        return "";
+    }
+
     // Pre-load all shared folders on first call to avoid N+1 queries
     if ($sharedFoldersCache === null) {
         $sharedFoldersCache = [];
@@ -364,126 +368,126 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
             $sharedFoldersCache = [];
         }
     }
-    
-    // Check if folder is shared using cache
+
     $isShared = isset($sharedFoldersCache[(int)$folderId]);
-    
-    if ($folderName !== FAVORITES_FOLDER_NAME) {
-        // Create three-dot menu
-        $actions .= "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu' data-folder-id='$folderId' title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>";
-        $actions .= "<i class='lucide lucide-more-vertical'></i>";
-        $actions .= "</div>";
-        
-        // Create dropdown menu
-        $actions .= "<div class='folder-actions-menu' id='folder-actions-menu-$folderId'>";
-        
-        // Create note action
-        $actions .= "<div class='folder-actions-menu-item' data-action='create-note-in-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-plus-circle'></i>";
-        $actions .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
-        $actions .= "</div>";
-        
-        // Kanban view action
-        $actions .= "<div class='folder-actions-menu-item kanban-view-action' data-action='open-kanban-view' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-columns-2'></i>";
-        $actions .= "<span>" . t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view') . "</span>";
-        $actions .= "</div>";
+    $htmlEscapedFolderName = htmlspecialchars($folderName, ENT_QUOTES);
+    $htmlCurrentSort = htmlspecialchars((string)($currentSort ?? ''), ENT_QUOTES);
 
-        // Open all notes in tabs action (only if folder has notes, hidden on mobile)
-        if ($noteCount > 0) {
-            $actions .= "<div class='folder-actions-menu-item open-all-tabs-action' data-action='open-all-notes-in-tabs' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='lucide lucide-layers'></i>";
-            $actions .= "<span>" . t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes') . "</span>";
-            $actions .= "</div>";
-        }
-        
-        // Move all files action (only if folder has notes)
-        if ($noteCount > 0) {
-            $actions .= "<div class='folder-actions-menu-item' data-action='move-folder-files' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='lucide lucide-folder-open'></i>";
-            $actions .= "<span>" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files') . "</span>";
-            $actions .= "</div>";
-        }
-        
-        // Move folder action
-        $actions .= "<div class='folder-actions-menu-item' data-action='move-entire-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-folder-output'></i>";
-        $actions .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
-        $actions .= "</div>";
-        
-        // Download folder action (only if folder has notes)
-        if ($noteCount > 0) {
-            $actions .= "<div class='folder-actions-menu-item' data-action='download-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='lucide lucide-download'></i>";
-            $actions .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
-            $actions .= "</div>";
-        }
-        
-        // Share folder action
-        if ($isShared) {
-            $actions .= "<div class='folder-actions-menu-item shared' data-action='share-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='lucide lucide-cloud'></i>";
-            $actions .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
-            $actions .= "</div>";
-        } else {
-            $actions .= "<div class='folder-actions-menu-item' data-action='share-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-            $actions .= "<i class='lucide lucide-cloud'></i>";
-            $actions .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
-            $actions .= "</div>";
-        }
-        
-        // Rename folder action
-        $actions .= "<div class='folder-actions-menu-item' data-action='rename-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-pencil'></i>";
-        $actions .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
-        $actions .= "</div>";
-        
-        // Change folder icon action
-        $actions .= "<div class='folder-actions-menu-item' data-action='change-folder-icon' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-palette'></i>";
-        $actions .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
-        $actions .= "</div>";
-        
-        // Sort Options Definition
-        $sortTypes = [
-            'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
-            'created' => ['icon' => 'lucide lucide-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
-            'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')]
-        ];
+    return "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu'"
+        . " data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'"
+        . " data-note-count='" . (int)$noteCount . "' data-shared='" . ($isShared ? '1' : '0') . "'"
+        . " data-current-sort='$htmlCurrentSort'"
+        . " title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>"
+        . "<i class='lucide lucide-more-vertical'></i>"
+        . "</div>";
+}
 
-        // Determine active label
-        $currentLabel = isset($sortTypes[$currentSort]) ? $sortTypes[$currentSort]['label'] : t_h('sort.header', [], 'Sort by');
+/**
+ * Render the single shared folder-actions dropdown menu.
+ *
+ * Emitted once per page (see notes_list.php). On open, the client
+ * (toggleFolderActionsMenu in js/utils.js) copies the folder id/name onto
+ * every action item, shows/hides the count-dependent and share-state items,
+ * marks the active sort option and positions the menu next to the toggle.
+ *
+ * @return string HTML for the shared dropdown menu
+ */
+function renderFolderActionsMenu() {
+    $menu = "<div class='folder-actions-menu' id='folder-actions-menu'>";
 
-        // Sort Submenu Toggle (Accordion style)
-        $actions .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu' data-folder-id='$folderId'>";
-        $actions .= "<i class='lucide lucide-arrow-up-down-amount-down'></i>";
-        $actions .= "<span class='sort-header-label'>" . $currentLabel . "</span>";
-        $actions .= "</div>";
+    // Create note action
+    $menu .= "<div class='folder-actions-menu-item' data-action='create-note-in-folder'>";
+    $menu .= "<i class='lucide lucide-plus-circle'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.create', [], 'Create note') . "</span>";
+    $menu .= "</div>";
 
-        // Sort Options Container
-        $actions .= "<div class='sort-submenu' style='display: none; background: rgba(0,0,0,0.03);'>";
+    // Kanban view action
+    $menu .= "<div class='folder-actions-menu-item kanban-view-action' data-action='open-kanban-view'>";
+    $menu .= "<i class='lucide lucide-columns-2'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view') . "</span>";
+    $menu .= "</div>";
 
-        foreach ($sortTypes as $type => $data) {
-            $isActive = ($currentSort === $type);
-            $activeClass = $isActive ? ' active' : '';
-            
-            $actions .= "<div class='folder-actions-menu-item$activeClass submenu-item' data-action='sort-folder' data-sort-type='$type' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName' style='padding-left: 28px;'>";
-            $actions .= "<i class='" . $data['icon'] . "'></i>";
-            $actions .= "<span class='sort-option-label'>" . $data['label'] . "</span>";
-            $actions .= "</div>";
-        }
-        $actions .= "</div>"; // Close sort-submenu
-        
-        // Delete folder action
-        $actions .= "<div class='folder-actions-menu-item danger' data-action='delete-folder' data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'>";
-        $actions .= "<i class='lucide lucide-trash-2'></i>";
-        $actions .= "<span>" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . "</span>";
-        $actions .= "</div>";
-        
-        $actions .= "</div>"; // Close dropdown menu
+    // Open all notes in tabs action (shown only if folder has notes, hidden on mobile)
+    $menu .= "<div class='folder-actions-menu-item open-all-tabs-action requires-notes' data-action='open-all-notes-in-tabs'>";
+    $menu .= "<i class='lucide lucide-layers'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes') . "</span>";
+    $menu .= "</div>";
+
+    // Move all files action (shown only if folder has notes)
+    $menu .= "<div class='folder-actions-menu-item requires-notes' data-action='move-folder-files'>";
+    $menu .= "<i class='lucide lucide-folder-open'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.move_all_files', [], 'Move all files') . "</span>";
+    $menu .= "</div>";
+
+    // Move folder action
+    $menu .= "<div class='folder-actions-menu-item' data-action='move-entire-folder'>";
+    $menu .= "<i class='lucide lucide-folder-output'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
+    $menu .= "</div>";
+
+    // Download folder action (shown only if folder has notes)
+    $menu .= "<div class='folder-actions-menu-item requires-notes' data-action='download-folder'>";
+    $menu .= "<i class='lucide lucide-download'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.download_folder', [], 'Download folder') . "</span>";
+    $menu .= "</div>";
+
+    // Share folder action: two variants, the client shows the one matching
+    // the folder's shared state (data-shared on the toggle)
+    $menu .= "<div class='folder-actions-menu-item shared share-state-shared' data-action='share-folder'>";
+    $menu .= "<i class='lucide lucide-cloud'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.is_public', [], 'Is public') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item share-state-not-shared' data-action='share-folder'>";
+    $menu .= "<i class='lucide lucide-cloud'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
+    $menu .= "</div>";
+
+    // Rename folder action
+    $menu .= "<div class='folder-actions-menu-item' data-action='rename-folder'>";
+    $menu .= "<i class='lucide lucide-pencil'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
+    $menu .= "</div>";
+
+    // Change folder icon action
+    $menu .= "<div class='folder-actions-menu-item' data-action='change-folder-icon'>";
+    $menu .= "<i class='lucide lucide-palette'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
+    $menu .= "</div>";
+
+    // Sort Options Definition
+    $sortTypes = [
+        'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
+        'created' => ['icon' => 'lucide lucide-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
+        'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')]
+    ];
+
+    // Sort Submenu Toggle (Accordion style); the client swaps the label for
+    // the active sort option, falling back to data-default-label
+    $defaultSortLabel = t_h('sort.header', [], 'Sort by');
+    $menu .= "<div class='folder-actions-menu-item' data-action='toggle-sort-submenu'>";
+    $menu .= "<i class='lucide lucide-arrow-up-down-amount-down'></i>";
+    $menu .= "<span class='sort-header-label' data-default-label='" . $defaultSortLabel . "'>" . $defaultSortLabel . "</span>";
+    $menu .= "</div>";
+
+    // Sort Options Container
+    $menu .= "<div class='sort-submenu' style='display: none; background: rgba(0,0,0,0.03);'>";
+    foreach ($sortTypes as $type => $data) {
+        $menu .= "<div class='folder-actions-menu-item submenu-item' data-action='sort-folder' data-sort-type='$type' style='padding-left: 28px;'>";
+        $menu .= "<i class='" . $data['icon'] . "'></i>";
+        $menu .= "<span class='sort-option-label'>" . $data['label'] . "</span>";
+        $menu .= "</div>";
     }
-    
-    return $actions;
+    $menu .= "</div>"; // Close sort-submenu
+
+    // Delete folder action
+    $menu .= "<div class='folder-actions-menu-item danger' data-action='delete-folder'>";
+    $menu .= "<i class='lucide lucide-trash-2'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.delete_folder', [], 'Delete') . "</span>";
+    $menu .= "</div>";
+
+    $menu .= "</div>"; // Close dropdown menu
+
+    return $menu;
 }
 
 /**
