@@ -582,7 +582,7 @@
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "attachments_at_bottom": "Pièces jointes en bas",
-      "backlinks_at_bottom": "Liens retour en bas",
+      "backlinks_at_bottom": "Backlinks en bas",
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
       "notes_dashboard": "Tableau de notes",
@@ -2659,7 +2659,7 @@
     }
   },
   "backlinks": {
-    "title": "Rétroliens"
+    "title": "Backlinks"
   },
   "password": {
     "status": {
