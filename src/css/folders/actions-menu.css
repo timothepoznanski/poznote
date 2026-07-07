@@ -105,7 +105,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     border: 1px solid #d1d5db;
     border-radius: 6px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    min-width: 180px;
+    min-width: 190px;
     padding: 4px 0;
     z-index: 10000;
     display: none;
@@ -116,14 +116,14 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-menu-item {
-    padding: 6px 14px;
+    padding: 7px 14px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
     color: #374151;
     transition: background-color 0.15s ease;
-    font-size: 0.85em;
+    font-size: 0.9em;
 }
 
 .folder-actions-menu-item:hover {
@@ -131,9 +131,9 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-menu-item i {
-    font-size: 0.8em;
+    font-size: 0.85em;
     color: #6b7280;
-    width: 14px;
+    width: 15px;
 }
 
 .folder-actions-menu-item:hover i {

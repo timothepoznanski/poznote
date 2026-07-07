@@ -814,6 +814,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			lastSyncTimestamp: <?php echo json_encode(is_array($dashboardLastSyncInfo) ? ($dashboardLastSyncInfo['timestamp'] ?? '') : ''); ?>
 		};
 		</script>
+		<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/navigation.js"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/notifications-modal.js?v=<?php echo file_exists(__DIR__ . '/js/notifications-modal.js') ? filemtime(__DIR__ . '/js/notifications-modal.js') : $cache_v; ?>"></script>

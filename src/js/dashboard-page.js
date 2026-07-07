@@ -171,10 +171,14 @@
             }
         }
 
+        // Named target: reuses the same Poznote notes tab if already open
+        // (instead of spawning a new tab per click or replacing the dashboard).
+        // In standalone PWA mode a named target would escape the app window,
+        // so navigate in place instead.
+        var linkTarget = shouldReuseCurrentPwaWindow(note.url) ? '' : ' target="poznote-notes"';
+
         return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '">' +
-            // Named target: reuses the same Poznote notes tab if already open
-            // (instead of spawning a new tab per click or replacing the dashboard).
-            '<a class="dash-card-link" href="' + esc(note.url) + '" target="poznote-notes">' +
+            '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + '>' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
             '</a>' +

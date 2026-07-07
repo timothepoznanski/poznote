@@ -323,7 +323,10 @@ body.outline-collapsed .toggle-outline-btn i {
         pointer-events: none;
     }
 
-    /* When open on mobile, make it overlay the content */
+    /* When open on mobile, make it overlay the content.
+       Padding/overflow are restated because a stale desktop
+       .outline-collapsed class (e.g. after a landscape->portrait
+       rotation) would otherwise leave the panel with padding: 0. */
     body.outline-mobile-open #outline-panel {
         position: fixed;
         right: 0;
@@ -332,6 +335,9 @@ body.outline-collapsed .toggle-outline-btn i {
         box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
         width: 80% !important;
         max-width: 320px !important;
+        padding: 16px;
+        overflow-y: auto;
+        overflow-x: hidden;
         transform: translateX(0);
         opacity: 1;
         pointer-events: auto;
