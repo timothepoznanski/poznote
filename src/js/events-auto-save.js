@@ -704,10 +704,7 @@ function triggerBackgroundPush() {
             'Content-Type': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify({
-            workspace: window.selectedWorkspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : null),
-            async: true
-        }),
+        body: JSON.stringify({ async: true }),
         keepalive: true
     })
     .then(res => res.json())

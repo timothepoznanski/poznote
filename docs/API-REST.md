@@ -1958,25 +1958,16 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /git-sync/push
 ```
 
-Push notes to the configured Git repository.
+Push all notes to the configured Git repository (all workspaces).
 
 **Request Body (JSON):**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `workspace` | string | Workspace to push (optional, pushes all if omitted) |
 | `async` | boolean | Run the push in the background (poll `/git-sync/progress`) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  http://YOUR_SERVER/api/v1/git-sync/push
-```
-
-Push a specific workspace:
-```bash
-curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  -H "Content-Type: application/json" \
-  -d '{"workspace": "Personal"}' \
   http://YOUR_SERVER/api/v1/git-sync/push
 ```
 
@@ -1986,13 +1977,12 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /git-sync/pull
 ```
 
-Pull notes from the configured Git repository.
+Pull all notes from the configured Git repository (all workspaces).
 
 **Request Body (JSON):**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `workspace` | string | Workspace to pull (optional, pulls all if omitted) |
 | `async` | boolean | Run the pull in the background (poll `/git-sync/progress`) |
 
 ```bash

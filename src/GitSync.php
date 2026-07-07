@@ -601,11 +601,10 @@ class GitSync {
     }
     
     /**
-     * Push all notes to Git repository repository
-     * @param string|null $workspaceFilter Optional workspace to filter by
+     * Push all notes to Git repository
      * @return array Results with success status, counts, and errors
      */
-    public function pushNotes($workspaceFilter = null) {
+    public function pushNotes() {
         set_time_limit(0); 
 
         if (!$this->isConfigured()) {
@@ -779,22 +778,19 @@ class GitSync {
     
     /**
      * Pull notes from GitHub repository
-     * @param string|null $workspaceTarget Optional workspace to pull into
+     * All entries and attachments are pulled regardless of workspace.
      * @return array Results with success status, counts, and errors
      */
-    public function pullNotes($workspaceTarget = null) {
+    public function pullNotes() {
         set_time_limit(0);
 
         if (!$this->isConfigured()) {
             return ['success' => false, 'error' => 'Git sync is not configured'];
         }
-        
+
         if (!$this->con) {
             return ['success' => false, 'error' => 'Database connection required'];
         }
-
-        // Note: $workspaceTarget is kept for API compatibility but ignored —
-        // all entries and attachments are pulled regardless of workspace.
 
         $results = [
             'success' => true,

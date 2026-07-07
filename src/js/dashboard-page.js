@@ -588,7 +588,7 @@
         fetchDashboardGitJson('api/v1/git-sync/' + action, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ workspace: gitTxt.workspace || '', async: true })
+            body: JSON.stringify({ async: true })
         })
             .then(function (data) {
                 startResponseReceived = true;
