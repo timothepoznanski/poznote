@@ -7,7 +7,7 @@ This guide explains how to configure and use the Poznote MCP server with VS Code
 - Visual Studio Code installed
 - **GitHub Copilot subscription:** A paid (or trial) [GitHub Copilot](https://github.com/features/copilot) plan is required, with the Copilot Chat extension enabled in VS Code
 - Poznote MCP server running (via Docker Compose)
-- MCP server accessible on localhost (default port: 8045)
+- MCP server accessible on 127.0.0.1 (default port: 8045)
 
 ## Configuration
 
@@ -36,7 +36,7 @@ If the file doesn't exist, create it with the following configuration :
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://localhost:8045/mcp"
+      "url": "http://127.0.0.1:8045/mcp"
     }
   }
 }
@@ -59,7 +59,7 @@ If your Poznote instance runs on a remote server, use SSH port forwarding to sec
 If you prefer the command line, create a classic SSH tunnel:
 
 ```bash
-ssh -L 8045:localhost:8045 user@your-server
+ssh -L 8045:127.0.0.1:8045 user@your-server
 ```
 
 Keep this connection open while using VS Code Copilot with Poznote.
@@ -80,13 +80,13 @@ Use the same `mcp.json` configuration as for local installation:
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://localhost:8045/mcp"
+      "url": "http://127.0.0.1:8045/mcp"
     }
   }
 }
 ```
 
-The SSH tunnel or VS Code forwarded port exposes the remote MCP server to your local machine, so VS Code connects to `localhost`.
+The SSH tunnel or VS Code forwarded port exposes the remote MCP server to your local machine, so VS Code connects to `127.0.0.1`.
 
 ## Usage Examples
 
@@ -155,7 +155,7 @@ If VS Code Copilot cannot connect to the MCP server:
 
 1. **Check if the MCP server is running:**
    ```bash
-   curl http://localhost:8045/mcp
+   curl http://127.0.0.1:8045/mcp
    ```
    (Replace `8045` with your configured port)
 
@@ -166,7 +166,7 @@ If VS Code Copilot cannot connect to the MCP server:
    ```
 
 3. **Check port binding:**
-   Ensure the port is bound to localhost in `docker-compose.yml`:
+   Ensure the port is bound to 127.0.0.1 in `docker-compose.yml`:
    ```yaml
    ports:
      - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
@@ -274,11 +274,11 @@ If you run multiple Poznote instances, you can configure them with different nam
   "servers": {
     "poznote-personal": {
       "type": "http",
-      "url": "http://localhost:8045/mcp"
+      "url": "http://127.0.0.1:8045/mcp"
     },
     "poznote-work": {
       "type": "http",
-      "url": "http://localhost:9045/mcp"
+      "url": "http://127.0.0.1:9045/mcp"
     }
   }
 }
@@ -298,7 +298,7 @@ If your MCP server runs on a different port, update the URL in `mcp.json`:
   "servers": {
     "poznote": {
       "type": "http",
-      "url": "http://localhost:YOUR_PORT/mcp"
+      "url": "http://127.0.0.1:YOUR_PORT/mcp"
     }
   }
 }
@@ -306,12 +306,12 @@ If your MCP server runs on a different port, update the URL in `mcp.json`:
 
 ## Security Notes
 
-⚠️ **Important:** The MCP server does not implement authentication for incoming requests. It should only be accessible from localhost or through a secure tunnel.
+⚠️ **Important:** The MCP server does not implement authentication for incoming requests. It should only be accessible from 127.0.0.1 or through a secure tunnel.
 
 **Default configuration (secure):**
 ```yaml
 ports:
-  - "127.0.0.1:8045:8045"  # Only accessible from localhost
+  - "127.0.0.1:8045:8045"  # Only accessible from 127.0.0.1
 ```
 
 **For remote access, always use SSH tunneling** as described in the [Remote Server Setup](#remote-server-setup) section.
