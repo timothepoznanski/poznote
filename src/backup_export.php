@@ -145,8 +145,10 @@ function createCompleteBackup($userId = null) {
     // Add all note entries (HTML and Markdown) from user's data
     $entriesPath = $userDataManager->getUserEntriesPath();
     if ($entriesPath && is_dir($entriesPath)) {
+        // Include trashed notes: their files are exported too, and a trashed
+        // tasklist mistaken for an HTML note would get its JSON mangled below
         $noteTypeMap = [];
-        $typesResult = $tempCon->query("SELECT id, type FROM entries WHERE trash = 0");
+        $typesResult = $tempCon->query("SELECT id, type FROM entries");
         if ($typesResult) {
             while ($typeRow = $typesResult->fetch(PDO::FETCH_ASSOC)) {
                 $noteTypeMap[(int)$typeRow['id']] = $typeRow['type'] ?? 'note';
@@ -406,7 +408,9 @@ function createCompleteBackup($userId = null) {
         unlink($zipFileName);
         exit;
     } else {
-        unlink($zipFileName);
+        if (file_exists($zipFileName)) {
+            unlink($zipFileName);
+        }
         return ['success' => false, 'error' => t('backup_export.errors.failed_to_create_backup_file')];
     }
 }
@@ -434,7 +438,8 @@ function removeCopyButtonsFromHtml($html) {
         $button->parentNode->removeChild($button);
     }
 
-    return $dom->saveHTML();
+    // Strip the xml processing instruction added above for UTF-8 handling
+    return preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
 }
 
 /**
