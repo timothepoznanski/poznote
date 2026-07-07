@@ -171,11 +171,12 @@
             }
         }
 
-        // Named target: reuses the same Poznote notes tab if already open
-        // (instead of spawning a new tab per click or replacing the dashboard).
-        // In standalone PWA mode a named target would escape the app window,
-        // so navigate in place instead.
-        var linkTarget = shouldReuseCurrentPwaWindow(note.url) ? '' : ' target="poznote-notes"';
+        // Always navigate in place: on desktop widths, index.php's internal
+        // tab bar (tabs.js) handles newtab=1 itself and adds an in-app tab.
+        // On narrow/mobile widths (browser or PWA) there is no internal tab
+        // bar, but a named target would still spawn a new browser tab on
+        // first click, so navigating in place keeps everything in one tab.
+        var linkTarget = '';
 
         return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '">' +
             '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + '>' +
