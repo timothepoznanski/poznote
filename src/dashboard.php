@@ -804,7 +804,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		};
 		window.DASHBOARD_GIT = {
 			provider: <?php echo json_encode($dashboardGitProviderName); ?>,
-			workspace: <?php echo json_encode($pageWorkspace); ?>,
 			configUrl: <?php echo json_encode($dashboardGitConfigUrl); ?>,
 			confirmPush: <?php echo json_encode(t('git_sync.confirm_push', $dashboardGitProviderParams, 'Push all notes to Git?')); ?>,
 			confirmPull: <?php echo json_encode(t('git_sync.confirm_pull', $dashboardGitProviderParams, 'Pull all notes from Git? This may overwrite local changes.')); ?>,

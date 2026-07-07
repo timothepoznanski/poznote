@@ -2332,7 +2332,7 @@ paths:
   /git-sync/push:
     post:
       tags: [Git Sync]
-      summary: Push notes to the configured Git repository
+      summary: Push all notes to the configured Git repository (all workspaces)
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
@@ -2341,9 +2341,6 @@ paths:
             schema:
               type: object
               properties:
-                workspace:
-                  type: string
-                  description: Workspace to push (pushes all if omitted)
                 async:
                   type: boolean
                   description: Run in background (poll /git-sync/progress)
@@ -2356,7 +2353,7 @@ paths:
   /git-sync/pull:
     post:
       tags: [Git Sync]
-      summary: Pull notes from the configured Git repository
+      summary: Pull all notes from the configured Git repository (all workspaces)
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       requestBody:
@@ -2365,9 +2362,6 @@ paths:
             schema:
               type: object
               properties:
-                workspace:
-                  type: string
-                  description: Workspace to pull (pulls all if omitted)
                 async:
                   type: boolean
                   description: Run in background (poll /git-sync/progress)

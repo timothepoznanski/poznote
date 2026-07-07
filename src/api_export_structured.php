@@ -145,7 +145,10 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
     
     // Get the note content from the file
     $entryFilePath = getEntryFilename($noteId, $noteType);
-    
+
+    // Relative path from the note's location back to the attachments/ folder at the ZIP root
+    $attachmentsPrefix = str_repeat('../', substr_count($zipFolderPath, '/')) . 'attachments/';
+
     if (file_exists($entryFilePath) && is_readable($entryFilePath)) {
         $content = file_get_contents($entryFilePath);
         
@@ -161,11 +164,11 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
             if (isset($noteAttachments[$noteId])) {
                 $content = preg_replace_callback(
                     '#\!\[([^\]]*)\]\(/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9._-]+)\)#',
-                    function($matches) use ($noteAttachments, $noteId) {
+                    function($matches) use ($noteAttachments, $noteId, $attachmentsPrefix) {
                         $altText = $matches[1];
                         $attachmentId = resolveAttachmentReferenceId($matches[2], $noteAttachments[$noteId]);
                         $extension = $noteAttachments[$noteId][$attachmentId] ?? '';
-                        return '![' . $altText . '](../attachments/' . $attachmentId . $extension . ')';
+                        return '![' . $altText . '](' . $attachmentsPrefix . $attachmentId . $extension . ')';
                     },
                     $content
                 );
@@ -177,10 +180,10 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
             if (isset($noteAttachments[$noteId])) {
                 $content = preg_replace_callback(
                     '#/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9._-]+)#',
-                    function($matches) use ($noteAttachments, $noteId) {
+                    function($matches) use ($noteAttachments, $noteId, $attachmentsPrefix) {
                         $attachmentId = resolveAttachmentReferenceId($matches[1], $noteAttachments[$noteId]);
                         $extension = $noteAttachments[$noteId][$attachmentId] ?? '';
-                        return '../attachments/' . $attachmentId . $extension;
+                        return $attachmentsPrefix . $attachmentId . $extension;
                     },
                     $content
                 );

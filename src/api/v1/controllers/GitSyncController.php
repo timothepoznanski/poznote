@@ -92,7 +92,7 @@ class GitSyncController {
     /**
      * POST /api/v1/git-sync/push
      * Push notes to Git
-     * Body: { "workspace": "optional_workspace_filter" }
+     * Body: { "async": true } to run in the background
      */
     public function push() {
         if (!$this->requireActiveAccountOwner()) {
@@ -112,32 +112,29 @@ class GitSyncController {
         
         $input = json_decode(file_get_contents('php://input'), true);
         if (!is_array($input)) $input = [];
-        $workspace = isset($input['workspace']) ? $input['workspace'] : null;
-        if ($workspace === '') $workspace = null;
 
         if (!empty($input['async'])) {
-            $this->startAsyncSync('push', $workspace);
+            $this->startAsyncSync('push');
             return;
         }
-        
+
         $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
-        $result = $sync->pushNotes($workspace);
-        
+        $result = $sync->pushNotes();
+
         // Store result in session for display after page reload if requested
         if (session_status() === PHP_SESSION_NONE) session_start();
         $_SESSION['last_sync_result'] = [
             'action' => 'push',
-            'workspace' => $workspace,
             'result' => $result
         ];
-        
+
         echo json_encode($result);
     }
     
     /**
      * POST /api/v1/git-sync/pull
      * Pull notes from Git
-     * Body: { "workspace": "target_workspace" }
+     * Body: { "async": true } to run in the background
      */
     public function pull() {
         if (!$this->requireActiveAccountOwner()) {
@@ -157,25 +154,22 @@ class GitSyncController {
         
         $input = json_decode(file_get_contents('php://input'), true);
         if (!is_array($input)) $input = [];
-        $workspace = isset($input['workspace']) ? $input['workspace'] : null;
-        if ($workspace === '') $workspace = null;
 
         if (!empty($input['async'])) {
-            $this->startAsyncSync('pull', $workspace);
+            $this->startAsyncSync('pull');
             return;
         }
-        
+
         $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
-        $result = $sync->pullNotes($workspace);
-        
+        $result = $sync->pullNotes();
+
         // Store result in session for display after page reload if requested
         if (session_status() === PHP_SESSION_NONE) session_start();
         $_SESSION['last_sync_result'] = [
             'action' => 'pull',
-            'workspace' => $workspace,
             'result' => $result
         ];
-        
+
         echo json_encode($result);
     }
     
@@ -213,7 +207,6 @@ class GitSyncController {
                     $result = [
                         'id' => $state['running']['id'] ?? null,
                         'action' => $state['running']['action'] ?? 'sync',
-                        'workspace' => $state['running']['workspace'] ?? null,
                         'result' => [
                             'success' => false,
                             'errors' => [['error' => 'Git sync was interrupted or timed out.']]
@@ -225,10 +218,9 @@ class GitSyncController {
                     $this->writeAsyncStateFile($stateFile, $state);
                 }
 
-                if ($result && isset($result['action'], $result['result']) && array_key_exists('workspace', $result)) {
+                if ($result && isset($result['action'], $result['result'])) {
                     $_SESSION['last_sync_result'] = [
                         'action' => $result['action'],
-                        'workspace' => $result['workspace'],
                         'result' => $result['result']
                     ];
                     $_SESSION['git_sync_async_result'] = $result;
@@ -254,11 +246,11 @@ class GitSyncController {
         session_write_close();
     }
 
-    private function startAsyncSync(string $action, ?string $workspace): void {
+    private function startAsyncSync(string $action): void {
         if (!function_exists('fastcgi_finish_request')) {
             $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
-            $result = $action === 'push' ? $sync->pushNotes($workspace) : $sync->pullNotes($workspace);
-            $this->storeSyncResult($action, $workspace, $result);
+            $result = $action === 'push' ? $sync->pushNotes() : $sync->pullNotes();
+            $this->storeSyncResult($action, $result);
             echo json_encode($result);
             return;
         }
@@ -285,7 +277,6 @@ class GitSyncController {
         $running = [
             'id' => $jobId,
             'action' => $action,
-            'workspace' => $workspace,
             'started' => time()
         ];
 
@@ -310,20 +301,18 @@ class GitSyncController {
 
         $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $sync->setProgressStateFile($stateFile);
-        $result = $action === 'push' ? $sync->pushNotes($workspace) : $sync->pullNotes($workspace);
-        $this->storeAsyncFileResult($stateFile, $jobId, $action, $workspace, $result);
+        $result = $action === 'push' ? $sync->pushNotes() : $sync->pullNotes();
+        $this->storeAsyncFileResult($stateFile, $jobId, $action, $result);
     }
 
-    private function storeSyncResult(string $action, ?string $workspace, array $result): void {
+    private function storeSyncResult(string $action, array $result): void {
         if (session_status() === PHP_SESSION_NONE) session_start();
         $_SESSION['last_sync_result'] = [
             'action' => $action,
-            'workspace' => $workspace,
             'result' => $result
         ];
         $_SESSION['git_sync_async_result'] = [
             'action' => $action,
-            'workspace' => $workspace,
             'result' => $result,
             'finished' => time()
         ];
@@ -331,14 +320,13 @@ class GitSyncController {
         session_write_close();
     }
 
-    private function storeAsyncFileResult(string $stateFile, string $jobId, string $action, ?string $workspace, array $result): void {
+    private function storeAsyncFileResult(string $stateFile, string $jobId, string $action, array $result): void {
         $state = $this->readAsyncStateFile($stateFile) ?: [];
 
         $state['running'] = null;
         $state['result'] = [
             'id' => $jobId,
             'action' => $action,
-            'workspace' => $workspace,
             'result' => $result,
             'finished' => time()
         ];

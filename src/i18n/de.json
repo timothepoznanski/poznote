@@ -568,7 +568,7 @@
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "attachment_previews_in_note": "Anhangsvorschauen",
       "attachments_at_bottom": "Anhänge unten",
-      "backlinks_at_bottom": "Rückverweise unten",
+      "backlinks_at_bottom": "Backlinks unten",
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board",
@@ -2444,7 +2444,7 @@
     }
   },
   "backlinks": {
-    "title": "Rückverweise"
+    "title": "Backlinks"
   },
   "password": {
     "status": {
