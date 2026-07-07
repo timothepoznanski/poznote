@@ -20,7 +20,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 ### Components
 
 - **`server.py`** — MCP server (HTTP / streamable-http)
-  - Exposes MCP endpoint at `http://localhost:8045/mcp`
+  - Exposes MCP endpoint at `http://127.0.0.1:8045/mcp`
   - Defines tools (actions) for note management
   - Orchestrates calls between the AI and the Poznote API
 
@@ -127,7 +127,7 @@ docker-compose up -d
 docker ps | grep mcp
 
 # Test the endpoint
-curl http://localhost:8045/mcp
+curl http://127.0.0.1:8045/mcp
 ```
 
 To disable the MCP server, comment out the `mcp-server` service in `docker-compose.yml`.
@@ -148,9 +148,9 @@ Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
 ## Security
 
-The MCP server starts automatically with Poznote and listens on **localhost only**, it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. The localhost port mapping is defined in `docker-compose.yml`, while the internal MCP service token is generated automatically in `data/.mcp_token`.
+The MCP server starts automatically with Poznote and listens on **127.0.0.1 only**, it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. The 127.0.0.1 port mapping is defined in `docker-compose.yml`, while the internal MCP service token is generated automatically in `data/.mcp_token`.
 
-### Why localhost-only is both normal and secure
+### Why 127.0.0.1-only is both normal and secure
 
 By default, the MCP server listens **only on `127.0.0.1`** (your local machine), never on a public interface:
 
@@ -159,17 +159,17 @@ ports:
   - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
 ```
 
-This is intentional and the correct setup. The MCP server does not implement its own authentication for incoming connections, any client that can reach the endpoint can read, create, modify, and delete notes. Binding to localhost guarantees that only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration: the server is not reachable from the outside.
+This is intentional and the correct setup. The MCP server does not implement its own authentication for incoming connections, any client that can reach the endpoint can read, create, modify, and delete notes. Binding to 127.0.0.1 guarantees that only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration: the server is not reachable from the outside.
 
 ### Remote access
 
 If Poznote runs on a remote server and you want to connect from your workstation, use SSH port forwarding — do **not** expose the port publicly:
 
 ```bash
-ssh -L 8045:localhost:8045 user@your-server
+ssh -L 8045:127.0.0.1:8045 user@your-server
 ```
 
-Then point your AI assistant to `http://localhost:8045/mcp` as usual.
+Then point your AI assistant to `http://127.0.0.1:8045/mcp` as usual.
 
 ### Production environments
 

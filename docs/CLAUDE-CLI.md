@@ -10,7 +10,7 @@ This guide explains how to configure and use the Poznote MCP server with Claude 
   ```
 - Claude CLI installed (`npm install -g @anthropic-ai/claude-cli` or similar)
 - Poznote MCP server running (via Docker Compose)
-- MCP server accessible on localhost (default port: 8045)
+- MCP server accessible on 127.0.0.1 (default port: 8045)
 
 ## Installation
 
@@ -29,7 +29,7 @@ You should see the MCP server running. Note the port number in the output (defau
 Add the Poznote MCP server using the HTTP transport:
 
 ```bash
-claude mcp add --transport http poznote http://localhost:8045/mcp
+claude mcp add --transport http poznote http://127.0.0.1:8045/mcp
 ```
 
 > **Note:** Replace `8045` with your actual MCP server port if you've customized it in your `docker-compose.yml`.
@@ -166,7 +166,7 @@ Then ask questions naturally:
 
 If your MCP server runs on a different port (check your `docker-compose.yml` for the `POZNOTE_MCP_PORT` setting):
 ```bash
-claude mcp add --transport http poznote http://localhost:YOUR_PORT/mcp
+claude mcp add --transport http poznote http://127.0.0.1:YOUR_PORT/mcp
 ```
 
 ### Removing the Server
@@ -180,8 +180,8 @@ claude mcp remove poznote
 
 If you run multiple Poznote instances on different ports, you can configure them with different names:
 ```bash
-claude mcp add --transport http poznote-personal http://localhost:8045/mcp
-claude mcp add --transport http poznote-work http://localhost:9045/mcp
+claude mcp add --transport http poznote-personal http://127.0.0.1:8045/mcp
+claude mcp add --transport http poznote-work http://127.0.0.1:9045/mcp
 ```
 
 Then specify which instance to use in your queries:
@@ -197,7 +197,7 @@ If Claude CLI cannot connect to the MCP server:
 
 1. **Check if the MCP server is running:**
    ```bash
-   curl http://localhost:8045/mcp
+   curl http://127.0.0.1:8045/mcp
    ```
    (Replace `8045` with your configured port)
 
@@ -208,7 +208,7 @@ If Claude CLI cannot connect to the MCP server:
    ```
 
 3. **Check port binding:**
-   Ensure the port is bound to localhost in `docker-compose.yml`:
+   Ensure the port is bound to 127.0.0.1 in `docker-compose.yml`:
    ```yaml
    ports:
      - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
@@ -239,17 +239,17 @@ docker logs -f poznote-mcp
 
 ## Security Notes
 
-⚠️ **Important:** The MCP server does not implement authentication for incoming requests. It should only be accessible from localhost or through a secure tunnel.
+⚠️ **Important:** The MCP server does not implement authentication for incoming requests. It should only be accessible from 127.0.0.1 or through a secure tunnel.
 
 **Default configuration (secure):**
 ```yaml
 ports:
-  - "127.0.0.1:8045:8045"  # Only accessible from localhost
+  - "127.0.0.1:8045:8045"  # Only accessible from 127.0.0.1
 ```
 
 **For remote access, use SSH tunneling:**
 ```bash
-ssh -L 8045:localhost:8045 user@your-server
+ssh -L 8045:127.0.0.1:8045 user@your-server
 ```
 
 ## Available MCP Tools
