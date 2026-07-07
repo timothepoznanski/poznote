@@ -37,19 +37,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $restoreImportPostAllowed = true;
         switch ($action) {
-        case 'restore':
-            if (isset($_FILES['backup_file']) && $_FILES['backup_file']['error'] === UPLOAD_ERR_OK) {
-                $result = restoreBackup($_FILES['backup_file']);
-                if ($result['success']) {
-                    $restore_message = t('restore_import.messages.database_restored');
-                } else {
-                    $restore_error = t('restore_import.errors.restore_error', ['error' => $result['error']]);
-                }
-            } else {
-                $restore_error = t('restore_import.errors.no_backup_file_or_upload');
-            }
-            break;
-            
         case 'complete_restore':
             if (isset($_FILES['complete_backup_file']) && $_FILES['complete_backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreCompleteBackup($_FILES['complete_backup_file']);
@@ -134,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $restoreImportAction = $_POST['action'] ?? '';
 $directCopyRestoreSubmitted = $restoreImportPostAllowed && $restoreImportAction === 'restore_cli_upload';
-$restoreBackupContentOpen = $restoreImportPostAllowed && in_array($restoreImportAction, ['restore', 'complete_restore', 'check_cli_upload', 'restore_cli_upload'], true);
+$restoreBackupContentOpen = $restoreImportPostAllowed && in_array($restoreImportAction, ['complete_restore', 'check_cli_upload', 'restore_cli_upload'], true);
 $standardRestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'complete_restore';
 $directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPostAllowed && $restoreImportAction === 'check_cli_upload');
 

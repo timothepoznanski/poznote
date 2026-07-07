@@ -2089,7 +2089,21 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $zip->close();
         unlink($tempFile);
         $tempFile = null; // Mark as cleaned
-        
+
+        // VALIDATE BACKUP CONTENT BEFORE ANY DESTRUCTIVE OPERATION
+        // A complete backup must contain the SQL dump; refuse anything else
+        // so a wrong ZIP never wipes existing data.
+        $sqlFile = $tempExtractDir . '/database/poznote_backup.sql';
+        if (!file_exists($sqlFile)) {
+            deleteDirectory($tempExtractDir);
+            $tempExtractDir = null;
+            return [
+                'success' => false,
+                'error' => 'Invalid backup file: database/poznote_backup.sql not found in ZIP. Nothing was restored.',
+                'message' => ''
+            ];
+        }
+
         // CLEAR ENTRIES DIRECTORY BEFORE RESTORATION
         $entriesPath = getEntriesPath();
         if (is_dir($entriesPath)) {
@@ -2137,28 +2151,11 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $databaseRestored = false;
         $skippedAttachments = [];
         
-        // Restore database if SQL file exists
-        $sqlFile = $tempExtractDir . '/database/poznote_backup.sql';
-        if (file_exists($sqlFile)) {
-            $dbResult = restoreDatabaseFromFile($sqlFile);
-            $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
-            if (!$dbResult['success']) $hasErrors = true;
-            $databaseRestored = $dbResult['success'];
-            
-            // Fix orphaned folders and missing entries immediately after DB restore
-            if ($dbResult['success']) {
-                global $con;
-                if (isset($con)) {
-                    $repairResult = repairDatabaseEntries($con);
-                    if ($repairResult['success'] && ($repairResult['folders_fixed'] > 0 || $repairResult['entries_fixed'] > 0)) {
-                        $results[] = "Migration: Fixed {$repairResult['folders_fixed']} folders and {$repairResult['entries_fixed']} entry snippets";
-                    }
-                }
-            }
-            // Note: Schema migration is now handled inside restoreDatabaseFromFile()
-        } else {
-            $results[] = 'Database: No SQL file found in backup';
-        }
+        // Restore database (presence of the SQL file was validated before the wipe)
+        $dbResult = restoreDatabaseFromFile($sqlFile);
+        $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
+        if (!$dbResult['success']) $hasErrors = true;
+        $databaseRestored = $dbResult['success'];
         
         // Restore entries if entries directory exists in backup
         $entriesDir = $tempExtractDir . '/entries';
@@ -2197,7 +2194,26 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         } else {
             $results[] = 'Attachments: No attachments directory found in backup (attachments directory cleared)';
         }
-        
+
+        // Fix orphaned folders and missing entry snippets, now that both the
+        // database and the note files are restored. Use a fresh connection to
+        // the restored database: the global $con still points at the deleted
+        // pre-restore database file and must not be used for writes here.
+        if ($databaseRestored) {
+            try {
+                $repairCon = new PDO('sqlite:' . poznoteGetActiveDatabasePath());
+                $repairCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $repairCon->exec('PRAGMA busy_timeout = 5000');
+                $repairResult = repairDatabaseEntries($repairCon);
+                if ($repairResult['success'] && ($repairResult['folders_fixed'] > 0 || $repairResult['entries_fixed'] > 0)) {
+                    $results[] = "Migration: Fixed {$repairResult['folders_fixed']} folders and {$repairResult['entries_fixed']} entry snippets";
+                }
+                $repairCon = null;
+            } catch (Throwable $e) {
+                error_log('Post-restore repair failed: ' . $e->getMessage());
+            }
+        }
+
         // Clean up temporary directory
         deleteDirectory($tempExtractDir);
         $tempExtractDir = null; // Mark as cleaned
@@ -2252,6 +2268,13 @@ function restoreDatabaseFromFile($sqlFile) {
             if (file_put_contents($dbPath, '') === false) {
                 return ['success' => false, 'error' => 'Failed to delete or clear existing database file. Please check permissions or restarting the service.'];
             }
+        }
+    }
+    // Remove leftover WAL/SHM files so the old connection's journal cannot
+    // be replayed into the freshly restored database
+    foreach (['-wal', '-shm'] as $suffix) {
+        if (file_exists($dbPath . $suffix)) {
+            @unlink($dbPath . $suffix);
         }
     }
     
