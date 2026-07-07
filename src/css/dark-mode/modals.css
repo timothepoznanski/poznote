@@ -629,21 +629,20 @@ body.dark-mode #fontSizeModal .modal-buttons .btn-primary {
 }
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-primary:hover,
 body.dark-mode #fontSizeModal .modal-buttons .btn-primary:hover {
-body.dark-mode #fontSizeModal .modal-footer .btn-cancel:hover {
     background-color: #c82333 !important;
     border-color: #bd2130 !important;
-html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel,
-body.dark-mode #fontSizeModal .modal-buttons .btn-cancel {
-
-/* ============================================
-   Share Modal
-   ============================================ */
+    opacity: 1 !important;
+}
 
 html[data-theme='dark'] #fontSizeModal .modal-buttons .btn-cancel:hover,
 body.dark-mode #fontSizeModal .modal-buttons .btn-cancel:hover {
     background-color: var(--dm-surface-hover);
     color: #e0e0e0;
 }
+
+/* ============================================
+   Share Modal
+   ============================================ */
 
 html[data-theme='dark'] #shareModal h3,
 body.dark-mode #shareModal h3 {
