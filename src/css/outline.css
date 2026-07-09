@@ -14,7 +14,7 @@
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px;
+    padding: 0px 16px 16px 16px;
     box-sizing: border-box;
     background: #f8f9fa;
     flex-shrink: 0;
@@ -34,9 +34,12 @@
 
 /* Outline header */
 .outline-header {
-    position: relative;
-    margin-bottom: 16px;
-    padding-bottom: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    margin: -16px -16px 16px;
+    padding: 16px 16px 12px;
+    background: #f8f9fa;
     /* border-bottom: 1px solid #dee2e6; */
 }
 
@@ -52,8 +55,8 @@
 
 .outline-close-btn {
     position: absolute;
-    top: 6px;
-    right: 0;
+    top: 12px;
+    right: 15px;
     width: 24px;
     height: 24px;
     border: none;
@@ -84,6 +87,8 @@
     list-style: none;
     padding: 0;
     margin: 0;
+    /* Reserve room so the last items can scroll clear of the sticky header above */
+    padding-bottom: 45px;
 }
 
 .outline-nav-item {
@@ -335,7 +340,7 @@ body.outline-collapsed .toggle-outline-btn i {
         box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
         width: 80% !important;
         max-width: 320px !important;
-        padding: 16px;
+        padding: 0px 16px 16px 16px;
         overflow-y: auto;
         overflow-x: hidden;
         transform: translateX(0);
@@ -383,6 +388,7 @@ html[data-theme='dark'] #outline-panel {
 
 body.dark-mode .outline-header,
 html[data-theme='dark'] .outline-header {
+    background: var(--dm-sidebar-bg);
     border-bottom-color: var(--dm-border);
 }
 

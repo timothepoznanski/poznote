@@ -1,7 +1,12 @@
 // Resizable left column functionality
 let isResizing = false;
+let hasInitializedResizableColumn = false;
 
 function initResizableColumn() {
+    if (hasInitializedResizableColumn) {
+        return; // Already initialized (guards against double init from defer + DOMContentLoaded)
+    }
+
     const resizeHandle = document.getElementById('resizeHandle');
     const leftCol = document.getElementById('left_col');
     const rightCol = document.getElementById('right_col');
@@ -9,6 +14,8 @@ function initResizableColumn() {
     if (!resizeHandle || !leftCol || !rightCol) {
         return; // Elements not found or mobile version
     }
+
+    hasInitializedResizableColumn = true;
 
     // Load saved width from localStorage
     const savedWidth = localStorage.getItem('leftColWidth');
