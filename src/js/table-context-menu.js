@@ -253,6 +253,21 @@
             const noteentry = table.closest('.noteentry[contenteditable="true"]');
             if (!noteentry) return;
 
+            // Keep the browser's default menu when text is selected in the
+            // table (so the user can copy the selection)
+            const sel = window.getSelection();
+            if (sel && !sel.isCollapsed && sel.rangeCount > 0 && sel.getRangeAt(0).intersectsNode(table)) {
+                return;
+            }
+
+            // Keep the browser's default menu when a range of cells is
+            // highlighted (blue selection) so the user can copy the cells
+            if (window.pzTableCellSelection &&
+                window.pzTableCellSelection.isActive() &&
+                window.pzTableCellSelection.getTable() === table) {
+                return;
+            }
+
             e.preventDefault();
             e.stopPropagation();
 

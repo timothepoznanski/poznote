@@ -1398,7 +1398,7 @@ function handleRichTextPaste(htmlData) {
     // If content was copied from a Poznote HTML note, preserve all formatting as-is
     var poznoteMarker = '<!-- poznote-internal -->';
     if (htmlData.includes(poznoteMarker)) {
-        var fullHtml = htmlData.replace(poznoteMarker, '');
+        var fullHtml = htmlData.replace(poznoteMarker, '').replace('<!-- poznote-table-cells -->', '');
         if (!fullHtml || fullHtml.trim() === '') return false;
         document.execCommand('insertHTML', false, fullHtml);
         triggerNoteSave();
