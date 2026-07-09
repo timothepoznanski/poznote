@@ -1085,7 +1085,28 @@ function scrollToHeading(heading) {
                 const editorScrollContainer = (cmApi && typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(markdownEditor))
                     ? (markdownEditor.querySelector('.cm-scroller') || markdownEditor)
                     : markdownEditor;
+
+                // In split mode the two panes scroll internally, so the outer
+                // container (#right_col) must stay put. Revealing a position in
+                // CodeMirror uses scrollIntoView, which also nudges ancestor
+                // scroll containers — pinning the outer scrollTop keeps the
+                // toolbar from creeping up when a bottom heading is selected.
+                const outerScrollContainer = getOutlineScrollContainer();
+                const pinnedScrollTop = outerScrollContainer ? outerScrollContainer.scrollTop : null;
+                const restoreOuterScrollTop = () => {
+                    if (outerScrollContainer && outerScrollContainer.scrollTop !== pinnedScrollTop) {
+                        outerScrollContainer.scrollTop = pinnedScrollTop;
+                    }
+                };
+
                 scrollMarkdownEditorLineToTop(markdownEditor, heading.lineNumber, editorScrollContainer, OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET);
+
+                if (pinnedScrollTop !== null) {
+                    restoreOuterScrollTop();
+                    // scrollMarkdownEditorLineToTop finishes its CodeMirror
+                    // adjustment on the next frame; restore again afterwards.
+                    requestAnimationFrame(restoreOuterScrollTop);
+                }
             }
 
             // Scroll preview to heading element
