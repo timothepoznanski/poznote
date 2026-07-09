@@ -127,11 +127,43 @@
         // Show bar with animation
         bar.style.display = 'block';
 
+        // The bar lives in the sticky .note-header, above the split panes. Showing it grows
+        // the header, so recompute the split pane height — otherwise the panes keep their old
+        // (too tall) height, #right_col overflows and can be scrolled, carrying the sticky
+        // header (and this bar) off the top of the viewport when a match is revealed.
+        refreshMarkdownSplitPaneHeight(noteId);
+
         // Focus search input
         setTimeout(() => {
             if (searchInput) searchInput.focus();
         }, 100);
     };
+
+    /**
+     * Recompute the markdown split pane height (no-op outside split mode) so the panes
+     * shrink to fit the space left below the (now taller/shorter) note-header.
+     */
+    function refreshMarkdownSplitPaneHeight(noteId) {
+        if (typeof window.updateMarkdownSplitPaneHeight === 'function') {
+            window.updateMarkdownSplitPaneHeight(noteId);
+        }
+    }
+
+    /**
+     * Reset the outer scroll of the split-mode note back to the top. The split panes own
+     * their own scrolling, so any scroll on #right_col / .innernote is spurious and would
+     * push the sticky note-header (with the search bar) out of view.
+     */
+    function pinSplitOuterScroll(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        const containers = [
+            document.getElementById('right_col'),
+            noteEntry ? noteEntry.closest('.innernote') : null
+        ];
+        containers.forEach(el => {
+            if (el && el.scrollTop) el.scrollTop = 0;
+        });
+    }
 
     /**
      * Close the search and replace bar
@@ -156,15 +188,18 @@
         if (bar) {
             bar.style.display = 'none';
         }
-        
+
         // Clear inputs
         const searchInput = document.getElementById('searchInput' + noteId);
         const replaceInput = document.getElementById('replaceInput' + noteId);
         const countEl = document.getElementById('searchCount' + noteId);
-        
+
         if (searchInput) searchInput.value = '';
         if (replaceInput) replaceInput.value = '';
         if (countEl) countEl.textContent = '';
+
+        // Header shrank back — give the split panes the reclaimed space.
+        refreshMarkdownSplitPaneHeight(noteId);
     }
 
     /**
@@ -179,6 +214,9 @@
         if (replaceRow) {
             replaceRow.style.display = state.replaceVisible ? 'flex' : 'none';
         }
+
+        // Toggling the replace row changes the header height too.
+        refreshMarkdownSplitPaneHeight(noteId);
 
         // Focus replace input when shown
         if (state.replaceVisible) {
@@ -452,6 +490,9 @@
         const state = getNoteState(noteId);
         if (index < 0 || index >= state.matches.length) return;
 
+        const noteEntryEl = getNoteEntry(noteId);
+        const inSplit = !!(noteEntryEl && noteEntryEl.classList.contains('markdown-split-mode'));
+
         const cmEditor = getMarkdownCodeMirrorEditor(noteId);
         const cmApi = window.PoznoteMarkdownCodeMirror;
         const cmMatch = state.matches[index];
@@ -461,6 +502,14 @@
             }
             if (typeof cmApi.revealPos === 'function') {
                 cmApi.revealPos(cmEditor, cmMatch.from, 'center');
+            }
+            // In split mode the panes scroll internally; the outer containers must not.
+            // CodeMirror's reveal can nudge #right_col/.innernote to bring the match into
+            // view, which would carry the sticky note-header (and the search bar) off-screen.
+            // Pin now and again next frame, since the reveal may scroll asynchronously.
+            if (inSplit) {
+                pinSplitOuterScroll(noteId);
+                window.requestAnimationFrame(() => pinSplitOuterScroll(noteId));
             }
             return;
         }
