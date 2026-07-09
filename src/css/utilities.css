@@ -49,8 +49,7 @@
     .note-edit-toolbar .btn-download,
     .note-edit-toolbar .btn-convert,
     .note-edit-toolbar .btn-info,
-    .note-edit-toolbar .btn-open-new-tab,
-    .note-edit-toolbar .btn-search-replace {
+    .note-edit-toolbar .btn-open-new-tab {
         display: none !important;
     }
 
@@ -58,7 +57,8 @@
     .mobile-toolbar-menu [data-action="show-snapshot"],
     .mobile-toolbar-menu [data-action="insert-audio-file"],
     .mobile-toolbar-menu [data-action="clear-completed-tasks"],
-    .mobile-toolbar-menu [data-action="uncheck-all-tasks"] {
+    .mobile-toolbar-menu [data-action="uncheck-all-tasks"],
+    .mobile-toolbar-menu [data-selector=".btn-search-replace"] {
         display: none !important;
     }
 }

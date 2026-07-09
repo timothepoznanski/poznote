@@ -1190,29 +1190,67 @@ function toggleInlineCode() {
       sel.removeAllRanges();
       sel.addRange(newRange);
 
-      // Get the new selected text
-      const newSelectedText = sel.toString();
-
-      // Escape HTML and create inline code for the new selection
-      const escapedText = newSelectedText
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-
-      const codeHTML = `<code>${escapedText}</code>`;
-      document.execCommand('insertHTML', false, codeHTML);
+      // Wrap the new selection (with hyphens) in inline code
+      insertInlineCode(sel.toString());
       return;
     }
   }
 
-  // Escape HTML and create inline code for normal selections
-  const escapedText = selectedText
+  // Wrap normal selections in inline code
+  insertInlineCode(selectedText);
+}
+
+/**
+ * Replace the current selection with a real <code> element.
+ *
+ * We insert through document.execCommand('insertHTML', ...) so the operation is
+ * recorded on the browser's native undo stack (Ctrl+Z). A plain
+ * range.insertNode would keep the <code> tag but is NOT undoable — worse, it
+ * corrupts the native stack so Ctrl+Z then chews through earlier typing while
+ * the code stays stuck.
+ *
+ * The catch: when the selection sits inside an element carrying an inline
+ * font-family, Chrome "normalizes" the inserted markup, dropping the <code>
+ * tag (and any attribute/class we put on it) and re-emitting a styled <span>
+ * that copies code's background/color/size but NOT its font — so the word keeps
+ * the surrounding font instead of the monospace face.
+ *
+ * Since the tag and our markers don't survive, we detect that stripped span by
+ * diffing the note's elements before and after the insertion: the newly created
+ * non-<code> element that holds exactly our text is the culprit, and we convert
+ * it back to <code>. Undo still removes it in one step because the surrounding
+ * insertHTML operation is what's on the stack.
+ */
+function insertInlineCode(text) {
+  const sel = window.getSelection();
+  if (!sel || !sel.rangeCount) return;
+
+  const escapedText = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  const codeHTML = `<code>${escapedText}</code>`;
-  document.execCommand('insertHTML', false, codeHTML);
+  let container = sel.getRangeAt(0).commonAncestorContainer;
+  if (container.nodeType === 3) container = container.parentNode;
+  const noteEntry = container && container.closest ? container.closest('.noteentry') : null;
+  const scope = noteEntry || document;
+
+  // Snapshot existing elements so we can spot the one the insertion creates.
+  const before = new Set(scope.querySelectorAll('*'));
+
+  document.execCommand('insertHTML', false, '<code>' + escapedText + '</code>');
+
+  // If Chrome kept the <code> tag we're done. Otherwise find the new styled
+  // element holding our text and rebuild it as <code> so monospace applies.
+  scope.querySelectorAll('*').forEach(function (el) {
+    if (before.has(el) || el.tagName === 'CODE') return;
+    const style = el.getAttribute && el.getAttribute('style') || '';
+    if (el.textContent === text && /background-color/.test(style) && /color/.test(style)) {
+      const code = document.createElement('code');
+      code.textContent = el.textContent;
+      el.replaceWith(code);
+    }
+  });
 }
 
 /**

@@ -866,12 +866,18 @@ function handleNoteEntryKeydown(e) {
             var checkNode = container.nodeType === 3 ? container.parentElement : container;
             var inMarkdownEditor = checkNode && checkNode.closest && checkNode.closest('.markdown-editor');
             var inCodeBlock = checkNode && checkNode.closest && (checkNode.closest('pre') || checkNode.closest('code'));
+            var inRichTextNote = checkNode && checkNode.closest && checkNode.closest('.noteentry[contenteditable="true"]');
 
-            if (inMarkdownEditor || inCodeBlock) {
+            if (inMarkdownEditor || inCodeBlock || inRichTextNote) {
                 e.preventDefault();
 
-                // Insert 4 spaces for Tab
-                var tabString = '    ';
+                // Insert 4 spaces for Tab. In the rich-text note (default white-space),
+                // consecutive plain spaces collapse to one, so use non-breaking spaces.
+                // The markdown editor and code blocks use pre white-space, so plain
+                // spaces are fine there.
+                var tabString = inRichTextNote && !inMarkdownEditor && !inCodeBlock
+                    ? '    '
+                    : '    ';
 
                 if (selection.rangeCount) {
                     var range = selection.getRangeAt(0);
@@ -1392,7 +1398,7 @@ function handleRichTextPaste(htmlData) {
     // If content was copied from a Poznote HTML note, preserve all formatting as-is
     var poznoteMarker = '<!-- poznote-internal -->';
     if (htmlData.includes(poznoteMarker)) {
-        var fullHtml = htmlData.replace(poznoteMarker, '');
+        var fullHtml = htmlData.replace(poznoteMarker, '').replace('<!-- poznote-table-cells -->', '');
         if (!fullHtml || fullHtml.trim() === '') return false;
         document.execCommand('insertHTML', false, fullHtml);
         triggerNoteSave();

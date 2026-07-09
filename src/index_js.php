@@ -73,6 +73,7 @@ $groups = [
         'js/excalidraw.js',
         'js/copy-code-on-focus.js',
         'js/table-context-menu.js',
+        'js/table-cell-selection.js',
         'js/system-menu.js',
         'js/notes-list-events.js',
         'js/folder-icon.js',
