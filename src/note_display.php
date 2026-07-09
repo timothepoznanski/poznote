@@ -144,10 +144,6 @@
                             echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" data-action="exec-remove-format"><i class="lucide lucide-eraser"></i></button>';
                         }
 
-                        if ($note_type === 'note' || $note_type === 'markdown') {
-                            echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
-                        }
-
                         if ($note_type === 'tasklist') {
                             echo '<div class="tasklist-actions-dropdown">';
                             echo '<button type="button" class="toolbar-btn btn-tasklist-actions note-action-btn" title="' . t_h('tasklist.actions', [], 'Task list actions') . '" data-action="toggle-tasklist-actions" data-note-id="' . $row['id'] . '" aria-haspopup="true" aria-expanded="false"><i class="lucide lucide-check-square"></i></button>';
@@ -278,6 +274,10 @@
                         }
                     }
 
+                    if ($note_type === 'note' || $note_type === 'markdown') {
+                        echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
+                    }
+
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
                         echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
@@ -341,6 +341,7 @@
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<div class="search-replace-bar" id="searchReplaceBar'.$row['id'].'" style="display: none;">';
                         echo '<div class="search-replace-controls">';
+                        echo '<button type="button" class="search-replace-btn search-replace-toggle-btn" id="searchToggleReplaceBtn'.$row['id'].'" title="'.t_h('search_replace.toggle_replace', [], 'Toggle replace').'" aria-expanded="false"><i class="lucide lucide-chevron-down"></i></button>';
                         echo '<div class="search-replace-input-group">';
                         echo '<input type="text" class="search-replace-input" id="searchInput'.$row['id'].'" placeholder="'.t_h('search_replace.search_placeholder', [], 'Find...').'" autocomplete="off">';
                         echo '<span class="search-replace-count" id="searchCount'.$row['id'].'"></span>';

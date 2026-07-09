@@ -121,8 +121,19 @@
 
         if (searchInput) searchInput.value = '';
         if (replaceInput) replaceInput.value = '';
-        if (replaceRow) replaceRow.style.display = 'flex';
+        if (replaceRow) replaceRow.style.display = 'none';
         if (countEl) countEl.textContent = '';
+
+        // Reset the replace-toggle chevron to its collapsed state
+        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            const icon = toggleBtn.querySelector('i.lucide');
+            if (icon) {
+                icon.classList.remove('lucide-chevron-up');
+                icon.classList.add('lucide-chevron-down');
+            }
+        }
 
         // Show bar with animation
         bar.style.display = 'block';
@@ -213,6 +224,17 @@
 
         if (replaceRow) {
             replaceRow.style.display = state.replaceVisible ? 'flex' : 'none';
+        }
+
+        // Update the chevron icon and aria state
+        const toggleBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', state.replaceVisible ? 'true' : 'false');
+            const icon = toggleBtn.querySelector('i.lucide');
+            if (icon) {
+                icon.classList.toggle('lucide-chevron-up', state.replaceVisible);
+                icon.classList.toggle('lucide-chevron-down', !state.replaceVisible);
+            }
         }
 
         // Toggling the replace row changes the header height too.
@@ -825,7 +847,12 @@
             nextBtn.addEventListener('click', () => nextMatch(noteId));
         }
 
-        // Toggle replace button
+        // Toggle replace row button (chevron)
+        const toggleReplaceBtn = document.getElementById('searchToggleReplaceBtn' + noteId);
+        if (toggleReplaceBtn) {
+            toggleReplaceBtn.addEventListener('click', () => toggleReplaceRow(noteId));
+        }
+
         // Replace button
         const replaceBtn = document.getElementById('replaceBtn' + noteId);
         if (replaceBtn) {

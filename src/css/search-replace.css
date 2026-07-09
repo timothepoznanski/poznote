@@ -127,10 +127,6 @@
     transition: transform 0.2s;
 }
 
-.search-replace-toggle-btn.active i {
-    transform: rotate(90deg);
-}
-
 /* Close button */
 .search-replace-close-btn {
     background: transparent;
