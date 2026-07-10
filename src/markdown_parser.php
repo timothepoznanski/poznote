@@ -885,9 +885,20 @@ function parseMarkdown($text) {
             $firstLine = isset($blockquoteLines[0]) ? trim($blockquoteLines[0]) : '';
             $calloutType = null;
             $calloutRemainder = '';
+            $calloutCustomTitle = null;
 
-            // Match callout keywords (optionally bolded, with optional separator and text after)
-            if (preg_match('/^\s*(?:\*\*|__)?(Note|Tip|Important|Warning|Caution)(?:\*\*|__)?(?:[:\s\-]+(.*))?$/i', $firstLine, $lm)) {
+            // Match GitHub-style [!TYPE] syntax with optional custom title on the same line.
+            // The text after the "]" is the title (not the body), e.g. "> [!WARNING] Custom title".
+            if (preg_match('/^\s*\[!(Note|Tip|Important|Warning|Caution)\]\s*(.*)$/i', $firstLine, $lm)) {
+                $calloutType = strtolower($lm[1]);
+                $customTitle = isset($lm[2]) ? trim($lm[2]) : '';
+                if ($customTitle !== '') {
+                    $calloutCustomTitle = $customTitle;
+                }
+            }
+            // Fall back to the bare keyword syntax (optionally bolded, with optional body after).
+            // Here any trailing text is the body, matching the previous behaviour.
+            elseif (preg_match('/^\s*(?:\*\*|__)?(Note|Tip|Important|Warning|Caution)(?:\*\*|__)?(?:[:\s\-]+(.*))?$/i', $firstLine, $lm)) {
                 $calloutType = strtolower($lm[1]);
                 $calloutRemainder = isset($lm[2]) ? trim($lm[2]) : '';
             }
@@ -903,12 +914,16 @@ function parseMarkdown($text) {
                     $bodyLines[] = $blockquoteLines[$bi];
                 }
 
-                // Use translation if available
-                $defaultTitle = ucfirst($calloutType);
-                if (function_exists('t')) {
-                    $titleHtml = t('slash_menu.callout_' . $calloutType, [], $defaultTitle);
+                // Use the custom title if provided, otherwise the translated default.
+                if ($calloutCustomTitle !== null) {
+                    $titleHtml = $calloutCustomTitle;
                 } else {
-                    $titleHtml = $defaultTitle;
+                    $defaultTitle = ucfirst($calloutType);
+                    if (function_exists('t')) {
+                        $titleHtml = t('slash_menu.callout_' . $calloutType, [], $defaultTitle);
+                    } else {
+                        $titleHtml = $defaultTitle;
+                    }
                 }
                 $bodyHtml = implode('<br>', array_map(function($l) use ($applyInlineStyles) { return $applyInlineStyles($l); }, $bodyLines));
 

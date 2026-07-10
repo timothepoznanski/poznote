@@ -2081,7 +2081,19 @@
                 icon: 'lucide-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
                 submenu: CALLOUT_TYPES.map(function (c) {
-                    var prefix = c.id === 'plain' ? '> ' : '> ' + c.fallback + '\n> ';
+                    // Callouts use the GitHub-style [!Type] syntax so the title after it
+                    // can be customized. We pre-fill the default (translated) title after
+                    // "]" so users see they can change it, and leave the caret inside the
+                    // callout body (end of the inserted text) so they can type right away.
+                    var prefix;
+                    if (c.id === 'plain') {
+                        prefix = '> ';
+                    } else {
+                        // The bracket keyword stays the English type so the parser detects
+                        // it; the visible title uses the translated label.
+                        var title = t(c.labelKey, null, c.fallback);
+                        prefix = '> [!' + c.fallback + '] ' + title + '\n> ';
+                    }
                     return { id: c.id, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownAtCursor(prefix, 0); } };
                 })
             },
