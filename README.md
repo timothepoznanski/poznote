@@ -231,9 +231,65 @@ The Poznote Helm chart is maintained by the HelmForge community as a Kubernetes-
 
 </details>
 
-> If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
+<a id="rootless"></a>
+<details>
+<summary><strong>🔒 Rootless (non-root container)</strong></summary>
 
-> Need to run without root inside the container (Kubernetes restricted `PodSecurityStandard`, rootless Podman, etc)? See [Running rootless](docs/TROUBLESHOOTING.md#running-rootless) in the Troubleshooting Guide.
+Poznote also ships a rootless image variant that runs entirely as an unprivileged user (uid/gid `1000`) instead of root — for environments that forbid root inside containers (Kubernetes restricted `PodSecurityStandard`, rootless Podman, `docker run --user`, etc). It works exactly like the default image; the only differences are that it listens internally on port `8080` and cannot fix the ownership of your data directory at startup.
+
+#### Step 1: Prerequisite
+
+1. Install [Docker engine](https://docs.docker.com/engine/install/)
+2. Install [Docker Compose](https://docs.docker.com/compose/install/linux)
+
+#### Step 2: Deploy Poznote
+
+Create a new directory:
+```bash
+mkdir poznote
+```
+
+Navigate to the Poznote directory:
+```bash
+cd poznote
+```
+
+Create the data directory and make it owned by uid/gid `1000` (**required**: unlike the default image, the rootless container cannot fix this ownership itself at startup):
+```bash
+mkdir -p data
+sudo chown -R 1000:1000 data
+```
+
+Create the environment file:
+```bash
+curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
+```
+
+Edit the `.env` file:
+```bash
+vi .env
+```
+
+Download the rootless Docker Compose configuration file:
+```bash
+curl -o docker-compose.rootless.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.rootless.yml
+```
+
+Download the latest Poznote rootless Webserver and Poznote MCP images:
+```bash
+docker compose -f docker-compose.rootless.yml pull
+```
+
+Start Poznote containers:
+```bash
+docker compose -f docker-compose.rootless.yml up -d
+```
+
+To migrate an existing Poznote instance to the rootless variant, or for more details, see [Running rootless](docs/TROUBLESHOOTING.md#running-rootless) in the Troubleshooting Guide.
+
+</details>
+
+> If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
 ## Access
 

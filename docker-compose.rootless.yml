@@ -1,9 +1,9 @@
 # Poznote Docker Compose Configuration - rootless variant
 #
-# Builds the webserver from the "rootless" stage of the Dockerfile instead of
-# pulling the published ghcr.io image. The whole container runs as an
-# unprivileged user (uid/gid 1000) instead of root - see the Dockerfile's
-# `rootless` stage and docs/TROUBLESHOOTING.md for details and prerequisites.
+# Runs the published rootless image variant instead of the default
+# root-running image. The whole container runs as an unprivileged user
+# (uid/gid 1000) instead of root - see the Dockerfile's `rootless` stage
+# and docs/TROUBLESHOOTING.md for details and prerequisites.
 #
 # IMPORTANT: unlike docker-compose.yml, this container cannot fix ownership
 # of a mismatched host bind mount at startup (it has no root privileges to do
@@ -24,9 +24,12 @@
 
 services:
   webserver:
-    build:
-      context: .
-      target: rootless
+    image: ghcr.io/timothepoznanski/poznote:6-rootless
+    # To build from source instead of pulling the published image, replace
+    # the image line above with:
+    #   build:
+    #     context: .
+    #     target: rootless
     restart: always
     env_file: .env
     environment:

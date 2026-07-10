@@ -62,14 +62,19 @@ sudo chown -R 1000:1000 data
 
 If this step is skipped, the container exits immediately at startup with an error explaining exactly what to run.
 
-To build and run the rootless variant:
+For a fresh install, follow the [Rootless install method](../README.md#rootless) in the README. To migrate an existing Poznote instance, stop it, back up and re-own your data directory, then start the rootless variant:
 
 ```bash
-docker compose -f docker-compose.rootless.yml build
+docker compose down
+sudo chown -R 1000:1000 data
+curl -o docker-compose.rootless.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.rootless.yml
+docker compose -f docker-compose.rootless.yml pull
 docker compose -f docker-compose.rootless.yml up -d
 ```
 
 The rootless webserver listens internally on port `8080` instead of `80` (unprivileged ports only); `HTTP_WEB_PORT` from your `.env` still controls the host-side port, unchanged.
+
+To build the rootless image from source instead of pulling it, replace the `image:` line in `docker-compose.rootless.yml` with `build: { context: ., target: rootless }` (a clone of this repository is then required).
 
 </details>
 
