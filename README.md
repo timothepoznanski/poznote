@@ -233,7 +233,7 @@ The Poznote Helm chart is maintained by the HelmForge community as a Kubernetes-
 
 <a id="rootless"></a>
 <details>
-<summary><strong>🔒 Rootless (non-root container)</strong></summary><br>
+<summary><strong>🔒 Rootless</strong></summary><br>
 
 Poznote also ships a rootless image variant that runs entirely as an unprivileged user (uid/gid `1000`) instead of root — for environments that forbid root inside containers (Kubernetes restricted `PodSecurityStandard`, rootless Podman, `docker run --user`, etc). It works exactly like the default image; the only differences are that it listens internally on port `8080` and cannot fix the ownership of your data directory at startup.
 
