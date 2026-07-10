@@ -233,6 +233,8 @@ The Poznote Helm chart is maintained by the HelmForge community as a Kubernetes-
 
 > If you encounter installation issues, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
 
+> Need to run without root inside the container (Kubernetes restricted `PodSecurityStandard`, rootless Podman, etc)? See [Running rootless](docs/TROUBLESHOOTING.md#running-rootless) in the Troubleshooting Guide.
+
 ## Access
 
 After installation, access Poznote in your web browser:
