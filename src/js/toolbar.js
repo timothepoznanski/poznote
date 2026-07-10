@@ -54,23 +54,42 @@ window.savedRanges = {};
     { key: 'editor.colors.none', fallback: 'None', value: 'none' }
   ];
 
-  // Use global translation function from globals.js
-  const tr = window.t || function(key, vars, fallback) {
+  // Highlight (background) colors — same picker UI as text color.
+  const HIGHLIGHT_COLORS = [
+    { key: 'editor.highlights.yellow', fallback: 'Yellow', value: '#ffe066' },
+    { key: 'editor.highlights.red', fallback: 'Red', value: '#ffa8a8' },
+    { key: 'editor.highlights.green', fallback: 'Green', value: '#b2f2bb' },
+    { key: 'editor.highlights.blue', fallback: 'Blue', value: '#a5d8ff' },
+    { key: 'editor.highlights.pink', fallback: 'Pink', value: '#ffc9de' },
+    { key: 'editor.highlights.orange', fallback: 'Orange', value: '#ffd8a8' },
+    { key: 'editor.highlights.purple', fallback: 'Purple', value: '#d0bfff' },
+    { key: 'editor.highlights.gray', fallback: 'Gray', value: '#dee2e6' },
+    { key: 'editor.colors.none', fallback: 'None', value: 'none' }
+  ];
+
+  // Use global translation function from globals.js.
+  // Resolve window.t lazily: it may not be defined yet when this script loads.
+  function tr(key, fallback) {
+    if (typeof window.t === 'function') {
+      return window.t(key, null, fallback);
+    }
     return fallback || key;
-  };
+  }
 
   // Save/restore selection helpers
-  function saveSelection() {
+  function saveSelection(key) {
+    key = key || 'color';
     const sel = window.getSelection();
     if (sel.rangeCount > 0) {
-      window.savedRanges.color = sel.getRangeAt(0).cloneRange();
+      window.savedRanges[key] = sel.getRangeAt(0).cloneRange();
     } else {
-      window.savedRanges.color = null;
+      window.savedRanges[key] = null;
     }
   }
 
-  function restoreSelection() {
-    const r = window.savedRanges.color;
+  function restoreSelection(key) {
+    key = key || 'color';
+    const r = window.savedRanges[key];
     if (r) {
       const sel = window.getSelection();
       sel.removeAllRanges();
@@ -170,16 +189,17 @@ window.savedRanges = {};
     const prev = document.querySelector('.color-palette-popup');
     if (prev) prev.remove();
     window.savedRanges.color = null;
+    window.savedRanges.highlight = null;
   }
 
   // Build popup DOM
-  function buildPopup() {
+  function buildPopup(colors) {
     const popup = document.createElement('div');
     popup.className = 'color-palette-popup';
     const grid = document.createElement('div');
     grid.className = 'color-grid';
 
-    COLORS.forEach(c => {
+    (colors || COLORS).forEach(c => {
       const item = document.createElement('button');
       item.type = 'button';
       item.className = 'color-item';
@@ -252,27 +272,68 @@ window.savedRanges = {};
     popup.style.setProperty('--caret-x', Math.max(8, Math.min(caretX, popupRect.width - 8)) + 'px');
   }
 
-  function getColorTriggerButton(triggerButton) {
-    if (triggerButton && triggerButton.classList && triggerButton.classList.contains('btn-color')) {
+  function getColorTriggerButton(triggerButton, selector) {
+    if (triggerButton && triggerButton.classList && triggerButton.classList.contains(selector.slice(1))) {
       return triggerButton;
     }
 
     const activeElement = document.activeElement;
-    if (activeElement && activeElement.classList && activeElement.classList.contains('btn-color')) {
+    if (activeElement && activeElement.classList && activeElement.classList.contains(selector.slice(1))) {
       return activeElement;
     }
 
-    return document.querySelector('.btn-color');
+    return document.querySelector(selector);
   }
 
-  // Main entry: show popup centered under the palette button
-  function toggleRedColor(triggerButton) {
+  // Apply a highlight (background) color to the saved selection, or remove it.
+  function applyHighlightToSelection(color) {
+    // Markdown mode uses the plain-text == wrapping (single style available)
+    if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+      if (typeof applyMarkdownHighlight === 'function') {
+        restoreSelection('highlight');
+        applyMarkdownHighlight(color);
+      }
+      return;
+    }
+
+    // HTML mode
+    restoreSelection('highlight');
+
+    try {
+      document.execCommand('styleWithCSS', false, true);
+    } catch (e) {
+      // ignore
+    }
+
+    if (color === 'none') {
+      try {
+        document.execCommand('hiliteColor', false, 'inherit');
+      } catch (e) {
+        // ignore
+      }
+    } else {
+      try {
+        document.execCommand('hiliteColor', false, color);
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    try {
+      document.execCommand('styleWithCSS', false, false);
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // Generic popup opener shared by the text-color and highlight buttons.
+  function openColorPopup(triggerButton, options) {
     try {
       removeExistingPopup();
-      saveSelection();
+      saveSelection(options.key);
 
-      const btn = getColorTriggerButton(triggerButton);
-      const popup = buildPopup();
+      const btn = getColorTriggerButton(triggerButton, options.selector);
+      const popup = buildPopup(options.colors);
       document.body.appendChild(popup);
 
       positionColorPopup(popup, btn);
@@ -281,8 +342,8 @@ window.savedRanges = {};
       setTimeout(() => popup.classList.add('show'), 10);
 
       // Dismiss on outside click / Escape
-      const closePopup = setupPopupDismiss(popup, '.btn-color', function () {
-        window.savedRanges.color = null;
+      const closePopup = setupPopupDismiss(popup, options.selector, function () {
+        window.savedRanges[options.key] = null;
       });
 
       // Click handler
@@ -290,7 +351,7 @@ window.savedRanges = {};
         const btnItem = e.target.closest('.color-item');
         if (!btnItem) return;
         const color = btnItem.getAttribute('data-color');
-        applyColorToSelection(color);
+        options.apply(color);
         closePopup();
       });
 
@@ -299,53 +360,34 @@ window.savedRanges = {};
     }
   }
 
+  // Main entry: show text-color popup centered under the palette button
+  function toggleRedColor(triggerButton) {
+    openColorPopup(triggerButton, {
+      key: 'color',
+      selector: '.btn-color',
+      colors: COLORS,
+      apply: applyColorToSelection
+    });
+  }
+
+  // Main entry: show highlight-color popup centered under the highlight button
+  function toggleYellowHighlight(triggerButton) {
+    openColorPopup(triggerButton, {
+      key: 'highlight',
+      selector: '.btn-highlight',
+      colors: HIGHLIGHT_COLORS,
+      apply: applyHighlightToSelection
+    });
+  }
+
   // Export
   window.toggleRedColor = toggleRedColor;
-  // Also expose applyColorToSelection in case other scripts call it
+  window.toggleYellowHighlight = toggleYellowHighlight;
+  // Also expose apply helpers in case other scripts call them
   window.applyColorToSelection = applyColorToSelection;
+  window.applyHighlightToSelection = applyHighlightToSelection;
 
 })();
-
-function toggleYellowHighlight() {
-  // Check if we're in markdown mode
-  if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
-    if (typeof applyMarkdownHighlight === 'function') {
-      applyMarkdownHighlight('#ffe066');
-    }
-    return;
-  }
-
-  // HTML mode - original logic
-  const sel = window.getSelection();
-  if (sel.rangeCount > 0) {
-    const range = sel.getRangeAt(0);
-    let allYellow = true, hasText = false;
-    const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
-      acceptNode: function (node) {
-        if (!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
-        return NodeFilter.FILTER_ACCEPT;
-      }
-    });
-    let node = treeWalker.currentNode;
-    while (node) {
-      if (node.nodeType === 3 && node.nodeValue.trim() !== '') {
-        hasText = true;
-        let parent = node.parentNode;
-        let bg = '';
-        if (parent && parent.style && parent.style.backgroundColor) bg = parent.style.backgroundColor.replace(/\s/g, '').toLowerCase();
-        if (bg !== '#ffe066' && bg !== 'rgb(255,224,102)') allYellow = false;
-      }
-      node = treeWalker.nextNode();
-    }
-    document.execCommand('styleWithCSS', false, true);
-    if (hasText && allYellow) {
-      document.execCommand('hiliteColor', false, 'inherit');
-    } else {
-      document.execCommand('hiliteColor', false, '#ffe066');
-    }
-    document.execCommand('styleWithCSS', false, false);
-  }
-}
 
 function applyHtmlBlockStyle(style) {
   var sel = window.getSelection();

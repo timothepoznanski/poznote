@@ -816,6 +816,16 @@
       "remove": "Eliminar enlace",
       "cancel": "Cancelar",
       "save": "Guardar"
+    },
+    "highlights": {
+      "yellow": "Amarillo",
+      "red": "Rojo",
+      "green": "Verde",
+      "blue": "Azul",
+      "pink": "Rosa",
+      "orange": "Naranja",
+      "purple": "Morado",
+      "gray": "Gris"
     }
   },
   "info": {

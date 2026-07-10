@@ -815,6 +815,16 @@
       "remove": "Link entfernen",
       "cancel": "Abbrechen",
       "save": "Speichern"
+    },
+    "highlights": {
+      "yellow": "Gelb",
+      "red": "Rot",
+      "green": "Grün",
+      "blue": "Blau",
+      "pink": "Rosa",
+      "orange": "Orange",
+      "purple": "Lila",
+      "gray": "Grau"
     }
   },
   "info": {

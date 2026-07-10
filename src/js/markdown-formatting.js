@@ -815,7 +815,40 @@
      * Apply markdown highlight formatting
      */
     function applyMarkdownHighlight(color) {
+        // Markdown's == highlight syntax has no per-color variant. When a real
+        // color is chosen, wrap the selection in an inline-styled span so the
+        // chosen highlight color is preserved; the plain == form stays the
+        // default for the standard yellow highlight and for "none".
+        if (color && color !== 'none' && color !== '#ffe066' &&
+            typeof applyMarkdownBackgroundSpan === 'function') {
+            applyMarkdownBackgroundSpan(color);
+            return;
+        }
         wrapSelectionWithMarkdown('==', '==');
+    }
+
+    /**
+     * Wrap the current markdown selection in an inline background-color span.
+     */
+    function applyMarkdownBackgroundSpan(color) {
+        var context = getCurrentMarkdownEditContext();
+        var sel = context.selection;
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if ((!sel || sel.rangeCount === 0) && !editor) return;
+
+        var selectedText = offsets && editor
+            ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
+            : (sel ? sel.toString() : '');
+
+        if (!selectedText) return;
+
+        var styledText = '<span style="background-color:' + color + '">' + selectedText + '</span>';
+        if (editor && offsets) {
+            replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, styledText, offsets.start, offsets.start + styledText.length);
+            return;
+        }
+        document.execCommand('insertText', false, styledText);
     }
 
     /**

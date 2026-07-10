@@ -1126,6 +1126,16 @@
       "remove": "Remove link",
       "cancel": "Cancel",
       "save": "Save"
+    },
+    "highlights": {
+      "yellow": "Yellow",
+      "red": "Red",
+      "green": "Green",
+      "blue": "Blue",
+      "pink": "Pink",
+      "orange": "Orange",
+      "purple": "Purple",
+      "gray": "Gray"
     }
   },
   "excalidraw": {
