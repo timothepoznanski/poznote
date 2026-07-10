@@ -2659,12 +2659,28 @@ function parseMarkdown(text) {
 
             // Detect GitHub-style callouts (Note, Tip, Important, Warning, Caution)
             let firstLine = blockquoteLines.length > 0 ? blockquoteLines[0].trim() : '';
-            let calloutMatch = firstLine.match(/^\s*(?:\*\*|__)?(Note|Tip|Important|Warning|Caution)(?:\*\*|__)?(?:[:\s\-]+(.*))?$/i);
+            let calloutType = null;
+            let calloutRemainder = '';
+            let calloutCustomTitle = null;
 
-            if (calloutMatch) {
-                let calloutType = calloutMatch[1].toLowerCase();
-                let calloutRemainder = calloutMatch[2] ? calloutMatch[2].trim() : '';
+            // GitHub-style [!TYPE] syntax: text after "]" is the custom title, not the body.
+            let bracketMatch = firstLine.match(/^\s*\[!(Note|Tip|Important|Warning|Caution)\]\s*(.*)$/i);
+            if (bracketMatch) {
+                calloutType = bracketMatch[1].toLowerCase();
+                let customTitle = bracketMatch[2] ? bracketMatch[2].trim() : '';
+                if (customTitle) {
+                    calloutCustomTitle = customTitle;
+                }
+            } else {
+                // Bare keyword syntax: any trailing text is the body.
+                let calloutMatch = firstLine.match(/^\s*(?:\*\*|__)?(Note|Tip|Important|Warning|Caution)(?:\*\*|__)?(?:[:\s\-]+(.*))?$/i);
+                if (calloutMatch) {
+                    calloutType = calloutMatch[1].toLowerCase();
+                    calloutRemainder = calloutMatch[2] ? calloutMatch[2].trim() : '';
+                }
+            }
 
+            if (calloutType) {
                 // Build body lines
                 let bodyLines = [];
                 if (calloutRemainder) {
@@ -2674,8 +2690,13 @@ function parseMarkdown(text) {
                     bodyLines.push(blockquoteLines[bi]);
                 }
 
-                let defaultTitle = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
-                let titleHtml = (window.t ? window.t('slash_menu.callout_' + calloutType, null, defaultTitle) : defaultTitle);
+                let titleHtml;
+                if (calloutCustomTitle !== null) {
+                    titleHtml = calloutCustomTitle;
+                } else {
+                    let defaultTitle = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
+                    titleHtml = (window.t ? window.t('slash_menu.callout_' + calloutType, null, defaultTitle) : defaultTitle);
+                }
                 let bodyHtml = bodyLines.map(l => applyInlineStyles(l)).join('<br>');
 
                 // GitHub-style callout icons

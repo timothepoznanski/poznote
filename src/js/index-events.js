@@ -477,7 +477,7 @@
                 break;
             case 'toggle-yellow-highlight':
                 if (typeof toggleYellowHighlight === 'function') {
-                    toggleYellowHighlight();
+                    toggleYellowHighlight(target);
                 }
                 break;
             case 'change-font-size':

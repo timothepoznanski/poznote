@@ -698,9 +698,24 @@ function createEditor(host, options = {}) {
     }
   })
 
+  // CodeMirror sets autocorrect="off" on its contenteditable by default. On
+  // Windows, Chromium then disables the OS text services (TSF) for the field,
+  // which silently breaks the native emoji panel (Win + . / Win + ;): the
+  // panel opens but selecting an emoji inserts nothing. Re-enabling the
+  // attribute restores the panel ("on" matches the default of a plain
+  // contenteditable, i.e. the same behavior as Poznote's HTML notes).
+  // autocapitalize="off" was bisected as harmless and is left untouched.
+  // Scoped to Windows, the only platform with this panel. Empirically
+  // bisected via a standalone repro page, 2026-07 (see git history of
+  // src/emoji-test.html).
+  const isWindows = /Win/.test((navigator && (navigator.platform || navigator.userAgent)) || '')
+
   const state = EditorState.create({
     doc: String(options.value || ''),
     extensions: [
+      ...(isWindows
+        ? [EditorView.contentAttributes.of({ autocorrect: 'on' })]
+        : []),
       history(),
       drawSelection(),
       bracketMatching(),

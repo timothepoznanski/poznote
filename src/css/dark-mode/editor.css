@@ -329,6 +329,55 @@ body.dark-mode [style*="background-color: #ffe066"] {
     color: #ffff99 !important;
 }
 
+/* Highlighter tool — other colors.
+   The picker applies light pastel backgrounds; in dark mode the note text is
+   light, so force dark text on those spans to keep the highlighted text
+   readable while preserving the chosen highlight color. */
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(255, 168, 168)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#ffa8a8"],
+html[data-theme='dark'] .noteentry [style*="background-color: #ffa8a8"],
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(178, 242, 187)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#b2f2bb"],
+html[data-theme='dark'] .noteentry [style*="background-color: #b2f2bb"],
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(165, 216, 255)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#a5d8ff"],
+html[data-theme='dark'] .noteentry [style*="background-color: #a5d8ff"],
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(255, 201, 222)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#ffc9de"],
+html[data-theme='dark'] .noteentry [style*="background-color: #ffc9de"],
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(255, 216, 168)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#ffd8a8"],
+html[data-theme='dark'] .noteentry [style*="background-color: #ffd8a8"],
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(208, 191, 255)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#d0bfff"],
+html[data-theme='dark'] .noteentry [style*="background-color: #d0bfff"],
+html[data-theme='dark'] .noteentry [style*="background-color: rgb(222, 226, 230)"],
+html[data-theme='dark'] .noteentry [style*="background-color:#dee2e6"],
+html[data-theme='dark'] .noteentry [style*="background-color: #dee2e6"],
+body.dark-mode .noteentry [style*="background-color: rgb(255, 168, 168)"],
+body.dark-mode .noteentry [style*="background-color:#ffa8a8"],
+body.dark-mode .noteentry [style*="background-color: #ffa8a8"],
+body.dark-mode .noteentry [style*="background-color: rgb(178, 242, 187)"],
+body.dark-mode .noteentry [style*="background-color:#b2f2bb"],
+body.dark-mode .noteentry [style*="background-color: #b2f2bb"],
+body.dark-mode .noteentry [style*="background-color: rgb(165, 216, 255)"],
+body.dark-mode .noteentry [style*="background-color:#a5d8ff"],
+body.dark-mode .noteentry [style*="background-color: #a5d8ff"],
+body.dark-mode .noteentry [style*="background-color: rgb(255, 201, 222)"],
+body.dark-mode .noteentry [style*="background-color:#ffc9de"],
+body.dark-mode .noteentry [style*="background-color: #ffc9de"],
+body.dark-mode .noteentry [style*="background-color: rgb(255, 216, 168)"],
+body.dark-mode .noteentry [style*="background-color:#ffd8a8"],
+body.dark-mode .noteentry [style*="background-color: #ffd8a8"],
+body.dark-mode .noteentry [style*="background-color: rgb(208, 191, 255)"],
+body.dark-mode .noteentry [style*="background-color:#d0bfff"],
+body.dark-mode .noteentry [style*="background-color: #d0bfff"],
+body.dark-mode .noteentry [style*="background-color: rgb(222, 226, 230)"],
+body.dark-mode .noteentry [style*="background-color:#dee2e6"],
+body.dark-mode .noteentry [style*="background-color: #dee2e6"] {
+    color: #1a1a1a !important;
+}
+
 /* Horizontal rules */
 html[data-theme='dark'] hr,
 body.dark-mode hr {
@@ -365,6 +414,13 @@ body.dark-mode .color-palette-popup {
 html[data-theme='dark'] .color-palette-popup .color-grid,
 body.dark-mode .color-palette-popup .color-grid {
     background: var(--dm-surface) !important;
+}
+
+/* Outline swatches so dark ones (e.g. the black text color) stay visible
+   against the dark popup background. */
+html[data-theme='dark'] .color-palette-popup .color-swatch,
+body.dark-mode .color-palette-popup .color-swatch {
+    border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 /* Toolbar vertical menu */

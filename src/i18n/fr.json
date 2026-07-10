@@ -835,6 +835,16 @@
       "title": "Supprimer le bloc de code",
       "confirm_title": "Supprimer le bloc de code",
       "confirm_message": "Voulez-vous supprimer ce bloc de code ?"
+    },
+    "highlights": {
+      "yellow": "Jaune",
+      "red": "Rouge",
+      "green": "Vert",
+      "blue": "Bleu",
+      "pink": "Rose",
+      "orange": "Orange",
+      "purple": "Violet",
+      "gray": "Gris"
     }
   },
   "info": {

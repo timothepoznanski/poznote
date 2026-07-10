@@ -815,6 +815,16 @@
       "remove": "移除链接",
       "cancel": "取消",
       "save": "保存"
+    },
+    "highlights": {
+      "yellow": "黄色",
+      "red": "红色",
+      "green": "绿色",
+      "blue": "蓝色",
+      "pink": "粉色",
+      "orange": "橙色",
+      "purple": "紫色",
+      "gray": "灰色"
     }
   },
   "info": {

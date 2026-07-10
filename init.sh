@@ -7,8 +7,32 @@ DATA_DIR="/var/www/html/data"
 DB_PATH="$DATA_DIR/database/poznote.db"
 MCP_TOKEN_FILE="${POZNOTE_SERVICE_TOKEN_FILE:-$DATA_DIR/.mcp_token}"
 
+# Used by the rootless build stage of the Dockerfile: when this script is
+# not running as root, it cannot chown files/directories it does not
+# already own (e.g. a host bind mount created with a different uid). Only
+# root (uid 0) can perform the ownership fixups below; running non-root
+# skips them and instead verifies the data directory is already owned by
+# the current user, failing fast with an actionable message if not.
+CURRENT_UID="$(id -u)"
+
+# Rootless (non-root) fail-fast check: must happen before anything else
+# touches $DATA_DIR, since a non-root process cannot create/write inside a
+# mount point it does not own (unlike root, which can chown its way out of
+# a mismatch later in this script).
+if [ "$CURRENT_UID" != "0" ]; then
+    DATA_DIR_OWNER_UID="$(stat -c '%u' "$DATA_DIR" 2>/dev/null || echo "")"
+    if [ "$DATA_DIR_OWNER_UID" != "$CURRENT_UID" ]; then
+        echo "ERROR: $DATA_DIR is owned by uid $DATA_DIR_OWNER_UID, but this container is running as uid $CURRENT_UID (non-root)." >&2
+        echo "Running rootlessly, this container cannot chown a mounted volume it does not already own." >&2
+        echo "Fix ownership on the host before starting the container, e.g.:" >&2
+        echo "    sudo chown -R $CURRENT_UID:$CURRENT_UID ./data" >&2
+        exit 1
+    fi
+fi
+
 # Ensure data directory exists with correct permissions
 mkdir -p "$DATA_DIR"
+
 mkdir -p "$DATA_DIR/database"
 
 if [ ! -s "$MCP_TOKEN_FILE" ]; then
@@ -42,12 +66,14 @@ else
     echo "Warning: automatic orphan snapshot cleanup failed; continuing startup."
 fi
 
-echo "Setting correct permissions recursively on $DATA_DIR..."
-
-# Fix ownership and permissions for the entire data tree
-chown -R www-data:www-data "$DATA_DIR"
-find "$DATA_DIR" -type d -exec chmod 775 {} +
-find "$DATA_DIR" -type f -exec chmod 664 {} +
+if [ "$CURRENT_UID" = "0" ]; then
+    echo "Setting correct permissions recursively on $DATA_DIR..."
+    chown -R www-data:www-data "$DATA_DIR"
+    find "$DATA_DIR" -type d -exec chmod 775 {} +
+    find "$DATA_DIR" -type f -exec chmod 664 {} +
+else
+    echo "Running as non-root (uid $CURRENT_UID); $DATA_DIR is already correctly owned, skipping chown."
+fi
 
 echo "Final permissions check for $DATA_DIR:"
 ls -la "$DATA_DIR"
@@ -92,11 +118,15 @@ fi
 MASTER_DB="$DATA_DIR/master.db"
 if [ -f "$MASTER_DB" ]; then
     echo "Master database found, ensuring permissions..."
-    chown www-data:www-data "$MASTER_DB"
+    if [ "$CURRENT_UID" = "0" ]; then
+        chown www-data:www-data "$MASTER_DB"
+    fi
     chmod 664 "$MASTER_DB"
 fi
 
 if [ -f "$MCP_TOKEN_FILE" ]; then
-    chown www-data:www-data "$MCP_TOKEN_FILE"
+    if [ "$CURRENT_UID" = "0" ]; then
+        chown www-data:www-data "$MCP_TOKEN_FILE"
+    fi
     chmod 644 "$MCP_TOKEN_FILE"
 fi

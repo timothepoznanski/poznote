@@ -1,0 +1,60 @@
+# Poznote Docker Compose Configuration - rootless variant
+#
+# Runs the published rootless image variant instead of the default
+# root-running image. The whole container runs as an unprivileged user
+# (uid/gid 1000) instead of root - see the Dockerfile's `rootless` stage
+# and docs/TROUBLESHOOTING.md for details and prerequisites.
+#
+# IMPORTANT: unlike docker-compose.yml, this container cannot fix ownership
+# of a mismatched host bind mount at startup (it has no root privileges to do
+# so). Before the first start, make sure ./data is owned by uid/gid 1000:
+#
+#   mkdir -p data
+#   sudo chown -R 1000:1000 data
+#
+# If this step is skipped, the container will exit at startup with a clear
+# error explaining what to run.
+#
+# 1. docker-compose.rootless.yml:
+#    curl -o docker-compose.rootless.yml https://raw.githubusercontent.com/timothepoznanski/poznote/main/docker-compose.rootless.yml
+#
+# 2. .env.template (compare with your .env):
+#    curl -o .env.template https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
+#    sdiff .env .env.template  # Add any new variables to your .env
+
+services:
+  webserver:
+    image: ghcr.io/timothepoznanski/poznote:6-rootless
+    # To build from source instead of pulling the published image, replace
+    # the image line above with:
+    #   build:
+    #     context: .
+    #     target: rootless
+    restart: always
+    env_file: .env
+    environment:
+      SQLITE_DATABASE: /var/www/html/data/database/poznote.db
+    ports:
+      - "${HTTP_WEB_PORT}:8080"
+    volumes:
+      - "./data:/var/www/html/data"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=5", "-O", "/dev/null", "http://127.0.0.1:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  mcp-server:
+    image: ghcr.io/timothepoznanski/poznote-mcp:6
+    container_name: poznote-mcp
+    restart: always
+    environment:
+      POZNOTE_API_URL: http://webserver:8080/api/v1
+      POZNOTE_DEBUG: ${POZNOTE_DEBUG:-false}
+    ports:
+      - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
+    volumes:
+      - "./data:/var/www/html/data:ro"
+    depends_on:
+      - webserver

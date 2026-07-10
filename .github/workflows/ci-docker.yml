@@ -1,0 +1,107 @@
+name: CI - Docker build
+
+# Build both image variants (default and rootless) whenever the Docker
+# packaging changes, so a broken variant is caught at PR/push time instead
+# of at publish time. The rootless variant in particular has build-time
+# assertions in the Dockerfile (sed-patched config) that only run here.
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'Dockerfile'
+      - 'docker/**'
+      - 'init.sh'
+      - 'docker-compose*.yml'
+      - '.github/workflows/ci-docker.yml'
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - 'docker/**'
+      - 'init.sh'
+      - 'docker-compose*.yml'
+      - '.github/workflows/ci-docker.yml'
+
+jobs:
+  build-images:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build default image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: poznote:ci
+
+      - name: Build rootless image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: rootless
+          load: true
+          tags: poznote:ci-rootless
+
+      - name: Smoke test default image
+        run: |
+          docker run -d --name poznote-default \
+            -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
+            -p 127.0.0.1:8081:80 poznote:ci
+
+          healthy=""
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8081/api/health >/dev/null 2>&1; then
+              healthy=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "$healthy" ]; then
+            echo "❌ default image failed to become healthy" >&2
+            docker logs poznote-default >&2
+            exit 1
+          fi
+          echo "✅ default image healthy"
+
+      - name: Smoke test rootless image
+        run: |
+          # The rootless container cannot chown a mismatched bind mount, so
+          # pre-own the data directory as uid/gid 1000 (same as real usage)
+          mkdir -p rootless-data
+          sudo chown -R 1000:1000 rootless-data
+
+          docker run -d --name poznote-rootless \
+            -e SQLITE_DATABASE=/var/www/html/data/database/poznote.db \
+            -v "$PWD/rootless-data:/var/www/html/data" \
+            -p 127.0.0.1:8082:8080 poznote:ci-rootless
+
+          healthy=""
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8082/api/health >/dev/null 2>&1; then
+              healthy=1
+              break
+            fi
+            sleep 2
+          done
+
+          if [ -z "$healthy" ]; then
+            echo "❌ rootless image failed to become healthy" >&2
+            docker logs poznote-rootless >&2
+            exit 1
+          fi
+
+          # Verify the whole container actually runs unprivileged
+          uid="$(docker exec poznote-rootless id -u)"
+          if [ "$uid" != "1000" ]; then
+            echo "❌ rootless container is running as uid $uid, expected 1000" >&2
+            exit 1
+          fi
+          echo "✅ rootless image healthy and running as uid 1000"
