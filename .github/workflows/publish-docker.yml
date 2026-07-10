@@ -146,9 +146,17 @@ jobs:
           else
             echo "🧪 Pre-release version detected (test/beta) - will NOT tag as 'latest' or major/minor versions"
           fi
-          
+
+          # Rootless variant tags, derived from the same list: 'latest' becomes
+          # 'rootless', every other tag gets a '-rootless' suffix
+          # (e.g. poznote:6.30.5-rootless, poznote:6-rootless, poznote:rootless)
+          ROOTLESS_TAGS=$(echo "$TAGS" | sed -E 's/:latest$/:rootless/; t; s/$/-rootless/')
+
           echo "tags<<EOF" >> $GITHUB_OUTPUT
           echo "$TAGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "rootless_tags<<EOF" >> $GITHUB_OUTPUT
+          echo "$ROOTLESS_TAGS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Determine MCP Docker tags
@@ -216,6 +224,20 @@ jobs:
             VERSION=${{ steps.check_version.outputs.version_clean }}
             APP_VERSION=${{ steps.check_version.outputs.version_clean }}
           tags: ${{ steps.docker_tags.outputs.tags }}
+
+      - name: Build and push Poznote rootless image
+        if: steps.check_version.outputs.needs_update == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: rootless
+          push: true
+          platforms: ${{ steps.docker_platforms.outputs.platforms }}
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VERSION=${{ steps.check_version.outputs.version_clean }}
+            APP_VERSION=${{ steps.check_version.outputs.version_clean }}
+          tags: ${{ steps.docker_tags.outputs.rootless_tags }}
 
       - name: Build and push MCP image
         if: steps.check_version.outputs.needs_update == 'true'
@@ -394,8 +416,10 @@ jobs:
         run: |
           echo "🧹 Cleaning up old Docker images..."
           
-          # Keep only the 20 most recent Docker image versions
-          KEEP_COUNT=20
+          # Keep only the most recent Docker image versions. Each release now
+          # publishes 2 tagged versions of the poznote package (default +
+          # rootless), so 40 versions = ~20 releases.
+          KEEP_COUNT=40
           PACKAGE_NAME="poznote"
           
           # Debug: Get all package versions with their tags for analysis
@@ -409,13 +433,15 @@ jobs:
           
           echo "📋 All versions found:"
           echo "$all_versions_debug" | head -20  # Show first 20 for debugging
-          
-          # Get all package versions (excluding 'latest' tag and untagged versions)
+
+          # Get all package versions (excluding untagged versions and the
+          # floating 'latest'/'rootless' tags, which always point at the
+          # current release and must never be deleted)
           versions=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
-            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] != "latest")] | sort_by(.created_at) | reverse | .[].id' \
+            --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags | index("latest") == null and index("rootless") == null)] | sort_by(.created_at) | reverse | .[].id' \
             2>/dev/null || echo "")
           
           if [ -z "$versions" ]; then
@@ -494,6 +520,7 @@ jobs:
           # ------------------------------------------------------------------------------------------------
           echo ""
           echo "🧹 Cleaning up old Docker images for MCP..."
+          KEEP_COUNT=20  # single variant, so 20 versions = ~20 releases
           PACKAGE_NAME="poznote-mcp"
           
           # Get all package versions (excluding 'latest' tag and untagged versions)
