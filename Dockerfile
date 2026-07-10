@@ -87,18 +87,12 @@ LABEL org.opencontainers.image.description="Poznote is a personal note-taking an
 # mounts can be pre-chowned deterministically (see docs/TROUBLESHOOTING.md).
 RUN addgroup -g 1000 poznote && adduser -u 1000 -G poznote -s /bin/sh -D poznote
 
-# php-fpm global config override: only needed for the rootless variant (the
-# stock error_log path is owned by root and unwritable by a non-root master
-# process) - see the file for the full explanation.
-COPY docker/php-fpm/php-fpm.rootless.conf /usr/local/etc/php-fpm.rootless.conf
-
 # Patch the shared nginx/supervisord/php-fpm config in place instead of
 # maintaining full rootless copies:
 #   - nginx: listen on the unprivileged 8080 port, and drop the "user"
 #     directive (only meaningful for a root master process)
 #   - supervisord: no "user=" directives left to drop privileges from, since
-#     supervisord itself already runs as "poznote" (see USER below); point
-#     php-fpm at the rootless global config via -y
+#     supervisord itself already runs as "poznote"
 #   - php-fpm pool: drop "user"/"group" (only meaningful for a root master
 #     process; harmless when left in, since FPM just logs a NOTICE and
 #     ignores them, but stripping them keeps startup logs clean)
@@ -107,12 +101,15 @@ RUN sed -i 's/listen 80;/listen 8080;/' /etc/nginx/http.d/default.conf \
     && sed -i \
          -e '/^user=root$/d' \
          -e '/^user=www-data$/d' \
-         -e 's#^command=php-fpm -F$#command=php-fpm -F -y /usr/local/etc/php-fpm.rootless.conf#' \
          /etc/supervisor/conf.d/supervisord.conf \
     && sed -i \
          -e '/^user = www-data$/d' \
          -e '/^group = www-data$/d' \
-         /usr/local/etc/php-fpm.d/www.conf
+         /usr/local/etc/php-fpm.d/www.conf \
+    && grep -q 'listen 8080;' /etc/nginx/http.d/default.conf \
+    && ! grep -q '^user ' /etc/nginx/nginx.conf \
+    && ! grep -qE '^user=(root|www-data)$' /etc/supervisor/conf.d/supervisord.conf \
+    && ! grep -qE '^(user|group) = www-data$' /usr/local/etc/php-fpm.d/www.conf
 
 # Runtime directories that root would normally create/open on demand at
 # startup. Since nothing here runs as root, they must be pre-created and

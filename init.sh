@@ -7,16 +7,13 @@ DATA_DIR="/var/www/html/data"
 DB_PATH="$DATA_DIR/database/poznote.db"
 MCP_TOKEN_FILE="${POZNOTE_SERVICE_TOKEN_FILE:-$DATA_DIR/.mcp_token}"
 
-# Used by the rootless image variant (Dockerfile.rootless): when this script
-# is not running as root, it cannot chown files/directories it does not
+# Used by the rootless build stage of the Dockerfile: when this script is
+# not running as root, it cannot chown files/directories it does not
 # already own (e.g. a host bind mount created with a different uid). Only
 # root (uid 0) can perform the ownership fixups below; running non-root
 # skips them and instead verifies the data directory is already owned by
 # the current user, failing fast with an actionable message if not.
 CURRENT_UID="$(id -u)"
-
-# Ensure data directory exists with correct permissions
-mkdir -p "$DATA_DIR"
 
 # Rootless (non-root) fail-fast check: must happen before anything else
 # touches $DATA_DIR, since a non-root process cannot create/write inside a
@@ -32,6 +29,9 @@ if [ "$CURRENT_UID" != "0" ]; then
         exit 1
     fi
 fi
+
+# Ensure data directory exists with correct permissions
+mkdir -p "$DATA_DIR"
 
 mkdir -p "$DATA_DIR/database"
 
