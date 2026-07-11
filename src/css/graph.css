@@ -1,0 +1,311 @@
+/**
+ * Graph view — full-page force-directed visualization of note links.
+ * Light styles by default, dark overrides via html[data-theme="dark"]
+ * (kept here rather than in the css/dark-mode bundle).
+ */
+
+html.graph-page,
+body.graph-page {
+    height: 100%;
+    margin: 0;
+}
+
+body.graph-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f8f9fa;
+    overflow: hidden;
+}
+
+.graph-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* Toolbar ------------------------------------------------------------- */
+
+.graph-toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.graph-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.graph-search-wrapper {
+    flex: 1 1 220px;
+    max-width: 340px;
+}
+
+.graph-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background: #ffffff;
+    color: #111827;
+}
+
+.graph-search-input:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+.graph-options {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-left: auto;
+}
+
+.graph-orphans-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #4b5563;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.graph-stats {
+    font-size: 13px;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+/* Canvas --------------------------------------------------------------- */
+
+.graph-canvas-wrapper {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#graphSvg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+}
+
+#graphSvg:active {
+    cursor: grabbing;
+}
+
+/* Nodes and edges ------------------------------------------------------ */
+
+.graph-edge {
+    stroke: #c6cbd2;
+    stroke-width: 1.2;
+    vector-effect: non-scaling-stroke;
+}
+
+.graph-node {
+    cursor: pointer;
+}
+
+.graph-node circle {
+    stroke: #ffffff;
+    stroke-width: 1.5;
+    vector-effect: non-scaling-stroke;
+}
+
+.graph-label {
+    font-size: 11px;
+    fill: #4b5563;
+    text-anchor: middle;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Crowded graphs: labels only on zoom, hover or search */
+.labels-hidden .graph-label {
+    display: none;
+}
+
+.labels-hidden .graph-node.hl .graph-label,
+.labels-hidden .graph-node.search-hit .graph-label {
+    display: block;
+}
+
+/* Hover highlight: dim everything except the hovered neighborhood */
+#graphSvg.has-highlight .graph-node:not(.hl),
+#graphSvg.has-highlight .graph-edge:not(.hl) {
+    opacity: 0.15;
+}
+
+.graph-edge.hl {
+    stroke: #8a939e;
+    stroke-width: 1.8;
+}
+
+/* Search: dim non-matching nodes */
+#graphSvg.has-search .graph-node:not(.search-hit) {
+    opacity: 0.12;
+}
+
+#graphSvg.has-search .graph-edge {
+    opacity: 0.12;
+}
+
+.graph-node.search-hit circle {
+    stroke: #007DB8;
+    stroke-width: 2.5;
+}
+
+/* Tooltip --------------------------------------------------------------- */
+
+.graph-tooltip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: 280px;
+    padding: 8px 10px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    font-size: 13px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.graph-tooltip-title {
+    font-weight: 600;
+    color: #111827;
+}
+
+.graph-tooltip-meta {
+    margin-top: 2px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Loading / empty states ------------------------------------------------ */
+
+.graph-loading,
+.graph-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #6b7280;
+    text-align: center;
+    padding: 20px;
+}
+
+.graph-loading .lucide,
+.graph-empty .lucide {
+    font-size: 42px;
+    opacity: 0.4;
+}
+
+.graph-empty p {
+    margin: 0;
+}
+
+.graph-empty-hint {
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+.initially-hidden {
+    display: none !important;
+}
+
+/* Dark mode ------------------------------------------------------------- */
+
+html[data-theme="dark"] body.graph-page {
+    background: var(--dm-bg, #252526);
+}
+
+html[data-theme="dark"] .graph-toolbar {
+    background: var(--dm-surface, #333333);
+    border-bottom-color: var(--dm-border, #404040);
+}
+
+html[data-theme="dark"] .graph-search-input {
+    background: var(--dm-content-bg, #252526);
+    border-color: var(--dm-border, #404040);
+    color: var(--dm-text, #bebebe);
+}
+
+html[data-theme="dark"] .graph-search-input:focus {
+    border-color: var(--dm-accent, #4a9eff);
+}
+
+html[data-theme="dark"] .graph-orphans-toggle,
+html[data-theme="dark"] .graph-stats,
+html[data-theme="dark"] .graph-loading,
+html[data-theme="dark"] .graph-empty {
+    color: var(--dm-text-muted, #c5c5c5);
+}
+
+html[data-theme="dark"] .graph-edge {
+    stroke: #4a4f56;
+}
+
+html[data-theme="dark"] .graph-edge.hl {
+    stroke: #7d8590;
+}
+
+html[data-theme="dark"] .graph-node circle {
+    stroke: var(--dm-bg, #252526);
+}
+
+html[data-theme="dark"] .graph-label {
+    fill: var(--dm-text-muted, #c5c5c5);
+}
+
+html[data-theme="dark"] .graph-node.search-hit circle {
+    stroke: var(--dm-accent, #4a9eff);
+}
+
+html[data-theme="dark"] .graph-tooltip {
+    background: var(--dm-surface, #333333);
+    border-color: var(--dm-border, #404040);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .graph-tooltip-title {
+    color: var(--dm-text, #bebebe);
+}
+
+html[data-theme="dark"] .graph-tooltip-meta {
+    color: var(--dm-text-muted, #c5c5c5);
+}
+
+/* Responsive ------------------------------------------------------------ */
+
+@media (max-width: 640px) {
+    .graph-toolbar {
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .graph-options {
+        margin-left: 0;
+    }
+
+    .graph-actions .btn {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}

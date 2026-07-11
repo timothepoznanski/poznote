@@ -293,10 +293,13 @@ body.dark-mode .dashboard-sidebar-sep {
     padding: 0;
     color: #007DB8;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 400;
     line-height: 1;
     font-variant-numeric: tabular-nums;
     pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .dashboard-notifications-btn.has-notifications .dashboard-topbar-count {
@@ -934,47 +937,11 @@ body.dark-mode .dashboard-mobile-back:hover .lucide {
     color: var(--dm-accent, #60a5fa);
 }
 
-/* ---------- Desktop settings link (hidden on mobile) ---------- */
-.dashboard-desktop-settings {
-    text-decoration: none;
-}
-
-.dashboard-desktop-settings:hover {
-    color: #007DB8;
-}
-
-.dashboard-desktop-settings:hover .lucide {
-    color: #007DB8;
-}
-
-:root[data-theme='dark'] .dashboard-desktop-settings:hover,
-body.dark-mode .dashboard-desktop-settings:hover {
-    color: var(--dm-accent, #60a5fa);
-}
-
-:root[data-theme='dark'] .dashboard-desktop-settings:hover .lucide,
-body.dark-mode .dashboard-desktop-settings:hover .lucide {
-    color: var(--dm-accent, #60a5fa);
-}
-
-
-
-/* ---------- Git sync labels ---------- */
-
-#dashboardGitPushBtn .dashboard-topbar-count,
-#dashboardGitPullBtn .dashboard-topbar-count {
-    font-weight: 500;
-}
-
 /* ---------- Responsive ---------- */
 
 @media (max-width: 800px) {
     .dashboard-mobile-back {
         display: flex;
-    }
-
-    .dashboard-top-info .dashboard-desktop-settings {
-        display: none;
     }
 
     .dashboard-topbar {
@@ -1018,34 +985,29 @@ body.dark-mode .dashboard-desktop-settings:hover .lucide {
 
     .dashboard-topbar-actions {
         display: grid;
-        grid-template-columns: repeat(5, 50px);
+        grid-template-columns: repeat(6, 44px);
         justify-content: center;
         align-items: center;
-        gap: 10px 16px;
+        gap: 4px 10px;
         overflow-x: visible;
         padding: 0 2px;
     }
 
     .dashboard-topbar-actions .dashboard-topbar-btn {
-        border: 1px solid #d1d5db;
-        width: 50px;
-        height: 50px;
-        padding: 4px 4px 14px;
-    }
-
-    :root[data-theme='dark'] .dashboard-topbar-actions .dashboard-topbar-btn,
-    body.dark-mode .dashboard-topbar-actions .dashboard-topbar-btn {
-        border-color: var(--dm-border);
+        border: none;
+        width: 44px;
+        height: 44px;
+        padding: 2px 2px 12px;
     }
 
     .dashboard-topbar-btn .lucide {
-        width: 21px;
-        height: 21px;
+        width: 20px;
+        height: 20px;
     }
 
     .dashboard-topbar-count {
-        font-size: 12px;
-        bottom: 4px;
+        font-size: 11px;
+        bottom: 3px;
     }
 
     .dashboard-grid-container {

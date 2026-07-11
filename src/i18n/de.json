@@ -613,7 +613,8 @@
     "note": "Notiz",
     "notes": "Notizen",
     "support_poznote": "Poznote unterstützen",
-    "version": "Version"
+    "version": "Version",
+    "graph": "Graph"
   },
   "search": {
     "placeholder": "Suchen...",
@@ -2647,5 +2648,22 @@
     "no_folder": "Andere Notizen",
     "toggle_all": "Alle Notizen anzeigen",
     "toggle_favorites": "Nur Favoriten anzeigen"
+  },
+  "graph": {
+    "title": "Notiz-Graph",
+    "loading": "Graph wird erstellt...",
+    "empty": "Keine Notizen anzuzeigen.",
+    "empty_hint": "Verknüpfen Sie Notizen mit [[Notiztitel]], um hier Verbindungen zu sehen.",
+    "show_orphans": "Unverknüpfte Notizen",
+    "show_orphans_hint": "Notizen ohne Verknüpfungen anzeigen",
+    "show_labels": "Notiztitel",
+    "show_labels_hint": "Notiztitel unter den Punkten anzeigen",
+    "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
+    "search": {
+      "placeholder": "Notiz suchen..."
+    },
+    "tooltip": {
+      "links": "{{count}} Verknüpfungen"
+    }
   }
 }
