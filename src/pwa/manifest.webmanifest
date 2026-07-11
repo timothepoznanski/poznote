@@ -31,5 +31,15 @@
       "focus-existing",
       "auto"
     ]
+  },
+  "share_target": {
+    "action": "../share-target.php",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
   }
 }
