@@ -26,9 +26,16 @@ $redirectAfter = $_GET['redirect'] ?? null;
 // Only allow relative paths within the application (no external URLs or protocol-relative URLs)
 $redirectAfter = oidc_sanitize_redirect($redirectAfter);
 
+// Optional login hint (email of the last account used on this device), forwarded
+// to the identity provider so it can skip its account chooser
+$loginHint = $_GET['login_hint'] ?? null;
+if (!is_string($loginHint) || $loginHint === '' || strlen($loginHint) > 254 || preg_match('/[\x00-\x1F\x7F\s]/', $loginHint)) {
+    $loginHint = null;
+}
+
 try {
     // Build the OIDC authorization URL and redirect the user to the identity provider
-    $url = oidc_build_authorization_url($redirectAfter);
+    $url = oidc_build_authorization_url($redirectAfter, $loginHint);
     header('Location: ' . $url);
     exit;
 } catch (Exception $e) {

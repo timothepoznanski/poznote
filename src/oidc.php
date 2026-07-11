@@ -191,7 +191,7 @@ function oidc_create_pkce_pair() {
     return ['verifier' => $verifier, 'challenge' => $challenge];
 }
 
-function oidc_build_authorization_url($redirectAfter = null) {
+function oidc_build_authorization_url($redirectAfter = null, $loginHint = null) {
     $cfg = oidc_get_provider_config();
 
     $state = oidc_random_string(32);
@@ -217,6 +217,12 @@ function oidc_build_authorization_url($redirectAfter = null) {
         'code_challenge' => $pkce['challenge'],
         'code_challenge_method' => 'S256',
     ];
+
+    // Hint the provider about which account to use so it can skip its account
+    // chooser (which breaks out of the PWA Custom Tab on mobile).
+    if (is_string($loginHint) && $loginHint !== '') {
+        $params['login_hint'] = $loginHint;
+    }
 
     return $cfg['authorization_endpoint'] . '?' . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
 }
