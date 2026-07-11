@@ -2797,6 +2797,8 @@
     "empty_hint": "使用 [[笔记标题]] 链接笔记，即可在此查看连接。",
     "show_orphans": "未链接的笔记",
     "show_orphans_hint": "显示没有链接的笔记",
+    "show_labels": "笔记标题",
+    "show_labels_hint": "在圆点下方显示笔记标题",
     "stats": "{{notes}} 篇笔记 · {{links}} 个链接",
     "search": {
       "placeholder": "查找笔记..."

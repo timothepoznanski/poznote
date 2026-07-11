@@ -2871,6 +2871,8 @@
     "empty_hint": "Reliez vos notes avec [[Titre de la note]] pour voir les connexions ici.",
     "show_orphans": "Notes sans liens",
     "show_orphans_hint": "Afficher les notes sans aucun lien",
+    "show_labels": "Titres des notes",
+    "show_labels_hint": "Afficher les titres des notes sous les points",
     "stats": "{{notes}} notes · {{links}} liens",
     "search": {
       "placeholder": "Rechercher une note..."

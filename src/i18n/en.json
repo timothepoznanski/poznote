@@ -2364,6 +2364,8 @@
     "empty_hint": "Link notes together with [[Note Title]] to see connections here.",
     "show_orphans": "Unlinked notes",
     "show_orphans_hint": "Show notes that have no links",
+    "show_labels": "Note titles",
+    "show_labels_hint": "Show note titles under the dots",
     "stats": "{{notes}} notes · {{links}} links",
     "search": {
       "placeholder": "Find a note..."

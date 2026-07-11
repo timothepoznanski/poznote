@@ -54,6 +54,7 @@
     var VELOCITY_RETAIN = 0.6;
 
     var showOrphans = true;
+    var showLabels = true;
     var searchTerm = '';
     var hoveredNode = null;
 
@@ -152,6 +153,8 @@
 
         renderSvg();
         updateStats();
+        fitView();
+        initLabelDefault();
         startSimulation(1);
     }
 
@@ -200,8 +203,13 @@
     }
 
     function updateLabelVisibility() {
-        // Hide labels when the average on-screen distance between nodes is
-        // too small for them to be readable; zoom, hover and search reveal them.
+        // The checkbox is authoritative; hover and search always reveal labels
+        viewport.classList.toggle('labels-hidden', !showLabels);
+    }
+
+    function isGraphCrowded() {
+        // True when the average on-screen distance between nodes is too small
+        // for labels to be readable. Only used to pick the checkbox default.
         var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         var visible = 0;
         nodes.forEach(function (node) {
@@ -212,13 +220,16 @@
             if (node.y < minY) { minY = node.y; }
             if (node.y > maxY) { maxY = node.y; }
         });
-        var crowded = false;
-        if (visible > 1) {
-            var area = Math.max(1, (maxX - minX) * (maxY - minY));
-            var screenSpacing = Math.sqrt(area / visible) * scale;
-            crowded = screenSpacing < 95;
-        }
-        viewport.classList.toggle('labels-hidden', crowded);
+        if (visible <= 1) { return false; }
+        var area = Math.max(1, (maxX - minX) * (maxY - minY));
+        return Math.sqrt(area / visible) * scale < 95;
+    }
+
+    function initLabelDefault() {
+        showLabels = !isGraphCrowded();
+        var toggle = document.getElementById('graphShowLabels');
+        if (toggle) { toggle.checked = showLabels; }
+        updateLabelVisibility();
     }
 
     function updateOrphanVisibility() {
@@ -668,6 +679,14 @@
             orphansToggle.addEventListener('change', function () {
                 showOrphans = orphansToggle.checked;
                 updateOrphanVisibility();
+            });
+        }
+
+        var labelsToggle = document.getElementById('graphShowLabels');
+        if (labelsToggle) {
+            labelsToggle.addEventListener('change', function () {
+                showLabels = labelsToggle.checked;
+                updateLabelVisibility();
             });
         }
 

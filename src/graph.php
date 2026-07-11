@@ -59,6 +59,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<input type="checkbox" id="graphShowOrphans" checked>
 					<span><?php echo t_h('graph.show_orphans', [], 'Unlinked notes'); ?></span>
 				</label>
+				<label class="graph-orphans-toggle" title="<?php echo t_h('graph.show_labels_hint', [], 'Show note titles under the dots'); ?>">
+					<input type="checkbox" id="graphShowLabels" checked>
+					<span><?php echo t_h('graph.show_labels', [], 'Note titles'); ?></span>
+				</label>
 				<span class="graph-stats" id="graphStats" data-txt-stats="<?php echo t_h('graph.stats', [], '{{notes}} notes · {{links}} links'); ?>"></span>
 			</div>
 		</div>
