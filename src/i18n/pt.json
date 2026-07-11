@@ -611,7 +611,8 @@
     "note": "nota",
     "notes": "notas",
     "support_poznote": "Apoiar o Poznote",
-    "version": "Versão"
+    "version": "Versão",
+    "graph": "Grafo"
   },
   "search": {
     "placeholder": "Buscar...",
@@ -2650,5 +2651,20 @@
     "no_folder": "Outras notas",
     "toggle_all": "Mostrar todas as notas",
     "toggle_favorites": "Mostrar apenas favoritos"
+  },
+  "graph": {
+    "title": "Grafo de notas",
+    "loading": "Construindo o grafo...",
+    "empty": "Nenhuma nota para exibir.",
+    "empty_hint": "Conecte suas notas com [[Título da nota]] para ver as conexões aqui.",
+    "show_orphans": "Notas sem links",
+    "show_orphans_hint": "Mostrar notas sem links",
+    "stats": "{{notes}} notas · {{links}} links",
+    "search": {
+      "placeholder": "Procurar uma nota..."
+    },
+    "tooltip": {
+      "links": "{{count}} links"
+    }
   }
 }

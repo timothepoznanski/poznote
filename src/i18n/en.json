@@ -1682,7 +1682,8 @@
     "support_poznote": "Support Poznote",
     "version": "Version",
     "filter_placeholder": "Filter",
-    "no_filter_results": "No results found."
+    "no_filter_results": "No results found.",
+    "graph": "Graph"
   },
   "search": {
     "placeholder": "Search...",
@@ -2355,5 +2356,20 @@
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",
     "toggle_favorites": "Show favorites only"
+  },
+  "graph": {
+    "title": "Note graph",
+    "loading": "Building graph...",
+    "empty": "No notes to display.",
+    "empty_hint": "Link notes together with [[Note Title]] to see connections here.",
+    "show_orphans": "Unlinked notes",
+    "show_orphans_hint": "Show notes that have no links",
+    "stats": "{{notes}} notes · {{links}} links",
+    "search": {
+      "placeholder": "Find a note..."
+    },
+    "tooltip": {
+      "links": "{{count}} links"
+    }
   }
 }

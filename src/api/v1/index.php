@@ -131,6 +131,7 @@ require_once __DIR__ . '/controllers/SystemController.php';
 require_once __DIR__ . '/controllers/GitSyncController.php';
 require_once __DIR__ . '/controllers/PublicController.php';
 require_once __DIR__ . '/controllers/BacklinksController.php';
+require_once __DIR__ . '/controllers/GraphController.php';
 require_once __DIR__ . '/controllers/SnapshotsController.php';
 require_once __DIR__ . '/controllers/RemindersController.php';
 
@@ -276,6 +277,7 @@ $systemController = new SystemController($con);
 $gitSyncController = new GitSyncController($con);
 $publicController = new PublicController($con);
 $backlinksController = new BacklinksController($con);
+$graphController = new GraphController($con);
 $snapshotsController = new SnapshotsController($con);
 $remindersController = new RemindersController($con);
 
@@ -296,6 +298,11 @@ $router->get('/notes/search', function($params) use ($notesController) {
 // Backlinks for a note (must come before /notes/{id})
 $router->get('/notes/{id}/backlinks', function($params) use ($backlinksController) {
     $backlinksController->index($params['id']);
+});
+
+// Note-link graph (nodes + edges) for the graph view
+$router->get('/graph', function($params) use ($graphController) {
+    $graphController->index();
 });
 
 // List notes with attachments

@@ -540,6 +540,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -569,11 +570,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
-				<a href="settings.php" class="dashboard-top-info-item dashboard-desktop-settings" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
-					<i class="lucide lucide-settings"></i>
-					<span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
-				</a>
-			</div>
+							</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
 					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
@@ -616,6 +613,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-download"></i>
 						<span class="dashboard-topbar-count">Pull</span>
 					</button>
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('graph.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardGraphBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.graph', [], 'Graph'); ?>" aria-label="<?php echo t_h('home.graph', [], 'Graph'); ?>">
+						<i class="lucide lucide-network"></i>
+						<span class="dashboard-topbar-count"><?php echo t_h('home.graph', [], 'Graph'); ?></span>
+					</a>
+					<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>" aria-label="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
+						<i class="lucide lucide-settings"></i>
+						<span class="dashboard-topbar-count"><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
+					</a>
 				</nav>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>

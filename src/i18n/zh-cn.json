@@ -614,7 +614,8 @@
     "note": "笔记",
     "notes": "笔记",
     "support_poznote": "支持 Poznote",
-    "version": "版本"
+    "version": "版本",
+    "graph": "图谱"
   },
   "search": {
     "placeholder": "搜索...",
@@ -2788,5 +2789,20 @@
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",
     "toggle_favorites": "仅显示收藏"
+  },
+  "graph": {
+    "title": "笔记图谱",
+    "loading": "正在构建图谱...",
+    "empty": "没有可显示的笔记。",
+    "empty_hint": "使用 [[笔记标题]] 链接笔记，即可在此查看连接。",
+    "show_orphans": "未链接的笔记",
+    "show_orphans_hint": "显示没有链接的笔记",
+    "stats": "{{notes}} 篇笔记 · {{links}} 个链接",
+    "search": {
+      "placeholder": "查找笔记..."
+    },
+    "tooltip": {
+      "links": "{{count}} 个链接"
+    }
   }
 }
