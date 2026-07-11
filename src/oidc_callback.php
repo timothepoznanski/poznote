@@ -47,8 +47,17 @@ try {
         $redirectConfig = ['redirectAfter' => $sanitizedRedirectAfter];
     }
     
+    // Remember the account email on this device so future SSO logins can send a
+    // login_hint and skip the provider's account chooser (which escapes the PWA
+    // Custom Tab on mobile)
+    $loginHintEmail = $_SESSION['oidc_claims']['email'] ?? null;
+
     echo '<!DOCTYPE html><html><head>';
     echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';
+    if (is_string($loginHintEmail) && $loginHintEmail !== '') {
+        echo '<script type="application/json" id="oidc-login-hint-data">' . json_encode(['email' => $loginHintEmail], JSON_HEX_TAG | JSON_HEX_AMP) . '</script>';
+        echo '<script src="js/oidc-login-hint.js"></script>';
+    }
     echo '<script src="js/workspace-redirect.js"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', getUserLanguage()) . '</body></html>';
     exit;

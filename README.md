@@ -44,6 +44,7 @@ https://poznote.com/index.html#press
 - [Multiple Instances](#multiple-instances)
 - [MCP Server](#mcp-server)
 - [Chrome Extension](#chrome-extension)
+- [Share to Poznote on Android](#share-to-poznote-on-android)
 - [API Documentation](#api-documentation)
 - [Tech Stack](#tech-stack)
 
@@ -927,6 +928,17 @@ The **Poznote URL Saver** is a browser extension that allows you to quickly save
 </p>
 
 Install the extension directly from the Chrome Web Store → [Install extension](https://chromewebstore.google.com/detail/bmjclfamahegmgillaghhmnbkjebipbh?utm_source=item-share-cb)
+
+## Share to Poznote on Android
+
+On Android, Poznote appears in the system **Share** menu once the PWA is installed. Share a page from Chrome (or a link/text from any app), pick Poznote, and a new note is created with the page title and a clickable link — no extension needed.
+
+To use it:
+
+1. Open your Poznote instance in Chrome on Android and install it as an app (menu → **Add to Home screen** → **Install**).
+2. In any app, tap **Share**, then choose **Poznote**.
+
+> If Poznote does not appear in the share menu right away, make sure the app is installed (not just a bookmark). If you installed the PWA before this feature was released, Chrome picks up the new capability automatically after a few days, or immediately if you reinstall the app.
 
 ## API Documentation
 
