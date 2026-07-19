@@ -566,6 +566,42 @@ if ($isPublicWorkspaceReadonly) {
         </ul>
     </div>
 
+    <?php
+    $aiChatEnabled = getSetting('ai_chat_enabled', '0') === '1'
+        && trim((string)getSetting('ai_chat_url', '')) !== ''
+        && trim((string)getSetting('ai_chat_model', '')) !== '';
+    ?>
+    <?php if ($aiChatEnabled): ?>
+    <!-- AI CHAT PANEL -->
+    <div id="ai-chat-panel">
+        <div class="ai-chat-header">
+            <h2 class="ai-chat-title"><i class="lucide lucide-bot"></i> <span data-i18n="ai_chat.title">AI Assistant</span></h2>
+            <button type="button" class="ai-chat-header-btn" data-action="ai-chat-clear" aria-label="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>" title="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>">
+                <i class="lucide lucide-trash"></i>
+            </button>
+            <button type="button" class="ai-chat-header-btn" data-action="toggle-ai-chat" aria-label="<?php echo t_h('common.close'); ?>" title="<?php echo t_h('common.close'); ?>">
+                <i class="lucide lucide-x"></i>
+            </button>
+        </div>
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="ai-chat-empty" data-i18n="ai_chat.empty">Ask anything about your notes. The currently opened note can be shared with the assistant as context.</div>
+        </div>
+        <div class="ai-chat-context" id="ai-chat-context" hidden>
+            <label>
+                <input type="checkbox" id="ai-chat-context-toggle" checked>
+                <span data-i18n="ai_chat.use_note_context">Include current note:</span>
+                <span class="ai-chat-context-title" id="ai-chat-context-title"></span>
+            </label>
+        </div>
+        <form id="ai-chat-form" class="ai-chat-inputbar">
+            <textarea id="ai-chat-input" rows="1" placeholder="<?php echo t_h('ai_chat.placeholder', [], 'Ask the assistant...'); ?>" data-i18n-placeholder="ai_chat.placeholder"></textarea>
+            <button type="submit" id="ai-chat-send" class="ai-chat-send-btn" title="<?php echo t_h('ai_chat.send', [], 'Send'); ?>">
+                <i class="lucide lucide-arrow-up"></i>
+            </button>
+        </form>
+    </div>
+    <?php endif; ?>
+
     <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
     <script type="application/json" id="tasklist-init-data"><?php echo json_encode($tasklist_ids); ?></script>

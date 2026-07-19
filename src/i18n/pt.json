@@ -424,7 +424,8 @@
       "import_limits": "Limites de importação",
       "git_sync_toggle": "Sincronização Git",
       "oidc_config": "OIDC / SSO",
-      "smtp_config": "SMTP / E-mail"
+      "smtp_config": "SMTP / E-mail",
+      "ai_assistant": "Assistente IA"
     },
     "install_app": {
       "launching": "A instalação vai começar. Por favor, aguarde...",
@@ -2696,5 +2697,38 @@
     "tooltip": {
       "links": "{{count}} links"
     }
+  },
+  "ai_settings": {
+    "title": "Assistente IA",
+    "description": "Conecte o Poznote a um servidor de IA compatível com OpenAI (Ollama, LM Studio, OpenAI, ...) para conversar com um assistente sobre as suas notas.",
+    "config_title": "Configuração",
+    "enable_label": "Ativar o assistente IA",
+    "enable_description": "Mostra um botão de chat IA na barra de ferramentas das notas.",
+    "url_label": "URL do servidor",
+    "url_description": "URL base de uma API compatível com OpenAI. Para o Ollama no host Docker, use http://host.docker.internal:11434",
+    "model_label": "Modelo",
+    "api_key_label": "Chave de API (opcional)",
+    "api_key_description": "Deixe vazio para um servidor Ollama local. Necessária para provedores na nuvem.",
+    "save": "Salvar configuração",
+    "test": "Testar conexão",
+    "testing": "Testando conexão...",
+    "test_success": "Conexão bem-sucedida. {{count}} modelo(s) disponível(is).",
+    "test_failure": "Falha na conexão: {{error}}",
+    "footer_note": "O servidor de IA é chamado a partir do servidor Poznote, não do seu navegador. As conversas são enviadas ao servidor configurado; com uma instância local do Ollama nada sai da sua máquina.",
+    "messages": {
+      "saved": "Configuração salva com sucesso.",
+      "save_error": "Falha ao salvar a configuração."
+    }
+  },
+  "ai_chat": {
+    "title": "Assistente IA",
+    "toolbar_button": "Assistente IA",
+    "empty": "Pergunte o que quiser sobre as suas notas. A nota aberta atualmente pode ser compartilhada com o assistente como contexto.",
+    "placeholder": "Pergunte ao assistente...",
+    "send": "Enviar",
+    "stop": "Parar",
+    "clear": "Limpar conversa",
+    "error": "Erro: {{error}}",
+    "use_note_context": "Incluir a nota atual:"
   }
 }

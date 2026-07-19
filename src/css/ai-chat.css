@@ -1,0 +1,225 @@
+/**
+ * AI Chat Panel Styles
+ *
+ * Slide-in panel on the right side of the notes page, used to chat
+ * with the configured AI assistant (see ai_settings.php).
+ */
+
+#ai-chat-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    border-left: 1px solid #dee2e6;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+}
+
+#ai-chat-panel.ai-chat-open {
+    transform: translateX(0);
+}
+
+/* Header */
+.ai-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px 12px;
+    flex-shrink: 0;
+}
+
+.ai-chat-title {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-chat-header-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 15px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ai-chat-header-btn:hover,
+.ai-chat-header-btn:focus {
+    background: rgba(0, 125, 184, 0.1);
+    color: #007DB8;
+}
+
+/* Messages area */
+.ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ai-chat-empty {
+    color: #6c757d;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 40px;
+    padding: 0 12px;
+}
+
+.ai-chat-msg {
+    max-width: 90%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.ai-chat-msg-user {
+    align-self: flex-end;
+    background: #007DB8;
+    color: #fff;
+    border-bottom-right-radius: 3px;
+}
+
+.ai-chat-msg-assistant {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #212529;
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 3px;
+}
+
+.ai-chat-msg-error {
+    align-self: stretch;
+    background: #fdecea;
+    color: #b02a37;
+    border: 1px solid #f5c2c7;
+    font-size: 12.5px;
+}
+
+.ai-chat-msg-assistant.ai-chat-pending::after {
+    content: '▍';
+    animation: ai-chat-blink 1s steps(2, start) infinite;
+}
+
+@keyframes ai-chat-blink {
+    to { visibility: hidden; }
+}
+
+/* Context row */
+.ai-chat-context {
+    flex-shrink: 0;
+    padding: 6px 16px;
+    border-top: 1px solid #dee2e6;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.ai-chat-context label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    min-width: 0;
+}
+
+.ai-chat-context-title {
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+/* Input bar */
+.ai-chat-inputbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+#ai-chat-input {
+    flex: 1;
+    resize: none;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    font-family: inherit;
+    line-height: 1.4;
+    max-height: 120px;
+    background: #ffffff;
+    color: #212529;
+    box-sizing: border-box;
+}
+
+#ai-chat-input:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+.ai-chat-send-btn {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    background: #007DB8;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.15s ease;
+}
+
+.ai-chat-send-btn:hover {
+    background: #006699;
+}
+
+.ai-chat-send-btn:disabled {
+    background: #adb5bd;
+    cursor: default;
+}
+
+/* Toolbar button active state */
+.toolbar-btn.btn-ai-chat.ai-chat-active i {
+    color: #007DB8;
+}
+
+@media (max-width: 800px) {
+    #ai-chat-panel {
+        width: 100%;
+        border-left: none;
+    }
+}

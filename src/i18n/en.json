@@ -136,7 +136,8 @@
       "import_limits": "Import Limits",
       "git_sync_toggle": "Git Sync",
       "oidc_config": "OIDC / SSO",
-      "smtp_config": "SMTP / Email"
+      "smtp_config": "SMTP / Email",
+      "ai_assistant": "AI Assistant"
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -2405,5 +2406,38 @@
     "modal": {
       "create_button": "Create & link"
     }
+  },
+  "ai_settings": {
+    "title": "AI Assistant",
+    "description": "Connect Poznote to an OpenAI-compatible AI server (Ollama, LM Studio, OpenAI, ...) to chat with an assistant about your notes.",
+    "config_title": "Configuration",
+    "enable_label": "Enable AI assistant",
+    "enable_description": "Shows an AI chat button in the note toolbar.",
+    "url_label": "Server URL",
+    "url_description": "Base URL of an OpenAI-compatible API. For Ollama running on the Docker host, use http://host.docker.internal:11434",
+    "model_label": "Model",
+    "api_key_label": "API key (optional)",
+    "api_key_description": "Leave empty for a local Ollama server. Required for cloud providers.",
+    "save": "Save Configuration",
+    "test": "Test connection",
+    "testing": "Testing connection...",
+    "test_success": "Connection successful. {{count}} model(s) available.",
+    "test_failure": "Connection failed: {{error}}",
+    "footer_note": "The AI server is called from the Poznote server, not from your browser. Chat conversations are sent to the configured server; with a local Ollama instance nothing leaves your machine.",
+    "messages": {
+      "saved": "Configuration saved successfully.",
+      "save_error": "Failed to save configuration."
+    }
+  },
+  "ai_chat": {
+    "title": "AI Assistant",
+    "toolbar_button": "AI assistant",
+    "empty": "Ask anything about your notes. The currently opened note can be shared with the assistant as context.",
+    "placeholder": "Ask the assistant...",
+    "send": "Send",
+    "stop": "Stop",
+    "clear": "Clear conversation",
+    "error": "Error: {{error}}",
+    "use_note_context": "Include current note:"
   }
 }
