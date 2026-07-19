@@ -503,6 +503,53 @@
     }
 
     /**
+     * Create a new note (titled from the modal's search text) and insert a
+     * reference to it at the saved cursor position.
+     */
+    async function createNoteAndInsertReference() {
+        const btn = document.getElementById('noteReferenceCreateBtn');
+        const searchInput = document.getElementById('noteReferenceSearch');
+        const title = searchInput ? searchInput.value.trim() : '';
+        const workspace = getCurrentWorkspace();
+        const sourceEntry = currentNoteId ? document.getElementById('entry' + currentNoteId) : null;
+
+        if (btn) btn.disabled = true;
+        try {
+            // Same folder as the source note; markdown source creates a markdown note
+            const source = await getSourceNoteInfo(workspace, sourceEntry);
+            const response = await fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({
+                    heading: title,
+                    workspace: workspace,
+                    folder_id: source.folder_id,
+                    type: source.type === 'markdown' ? 'markdown' : 'note'
+                })
+            });
+            const data = await response.json();
+            if (!data.success || !data.note) {
+                throw new Error(data.error || 'Create failed');
+            }
+
+            // Insert the reference (closes the modal and restores the cursor)
+            insertNoteReference(data.note.id, data.note.heading);
+
+            // Refresh the notes list so the new note appears in the left column
+            if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                window.refreshNotesListAfterFolderAction(data.note.folder_id);
+            }
+        } catch (e) {
+            console.error('Error creating note from reference modal:', e);
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(tr('note_reference.broken.error_creating', {}, 'Error creating note'), 'error');
+            }
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    }
+
+    /**
      * Navigate to a referenced note
      */
     window.navigateToNote = function(noteId) {
@@ -562,14 +609,28 @@
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                // Select first result on Enter
+                // Select first result on Enter; with no match, create the note
                 const firstItem = document.querySelector('.note-reference-item');
                 if (firstItem) {
                     firstItem.click();
+                } else if (searchInput.value.trim() !== '') {
+                    createNoteAndInsertReference();
                 }
             } else if (e.key === 'Escape') {
                 closeNoteReferenceModal();
             }
+        });
+    }
+
+    /**
+     * Initialize the "create & link" button
+     */
+    function initCreateButton() {
+        const btn = document.getElementById('noteReferenceCreateBtn');
+        if (!btn) return;
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            createNoteAndInsertReference();
         });
     }
 
@@ -594,6 +655,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initSearchInput();
             initModalBackdrop();
+            initCreateButton();
         });
     }
 
@@ -674,20 +736,270 @@
     }
 
     /**
-     * Create a broken link element for an unresolved reference
+     * Create a broken link element for an unresolved reference.
+     * Clicking it offers to create the missing note (title pre-filled).
      */
     function createBrokenLink(title) {
         const span = document.createElement('span');
         span.className = 'note-internal-link note-link-broken';
         span.textContent = title;
-        span.title = 'Note not found';
-        
-        // Prevent event propagation
-        span.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-        
+        span.title = tr('note_reference.broken.tooltip', {}, 'Note not found — click to create it');
+
+        // Clicks are handled by the document-level capture listener below
         return span;
+    }
+
+    // ============================================================================
+    // DEAD ID-BASED LINK DETECTION
+    // ============================================================================
+
+    /**
+     * Extract the target note id from an internal link (data-note-id or
+     * an index.php?note=ID style href). Returns null for external links.
+     */
+    function extractInternalNoteId(link) {
+        const dataId = link.getAttribute('data-note-id');
+        if (dataId && /^\d+$/.test(dataId)) return dataId;
+        const href = link.getAttribute('href') || '';
+        const match = /(?:^|\/)index\.php\?[^#\s]*\bnote=(\d+)\b|^\?[^#\s]*\bnote=(\d+)\b/.exec(href);
+        return match ? (match[1] || match[2]) : null;
+    }
+
+    /**
+     * Mark id-based internal links whose target note no longer exists as broken.
+     * Covers links inserted via the reference modal ([title](index.php?note=ID)
+     * in markdown, <a href="index.php?note=ID"> in HTML notes).
+     */
+    async function markDeadInternalLinks(container) {
+        const byId = new Map();
+        container.querySelectorAll('a[href], a[data-note-id]').forEach(link => {
+            if (link.classList.contains('note-link-broken')) return;
+            const id = extractInternalNoteId(link);
+            if (!id) return;
+            if (!byId.has(id)) byId.set(id, []);
+            byId.get(id).push(link);
+        });
+
+        await Promise.all(Array.from(byId.entries()).map(async ([id, links]) => {
+            try {
+                // No workspace filter: a link may target a note in another workspace
+                const response = await fetch(`/api/v1/notes/resolve?reference=${encodeURIComponent(id)}`);
+                const data = await response.json();
+                if (data.success && data.id) return;
+                // Only mark on a definitive "not found", not on server errors
+                if (response.status !== 404) return;
+                links.forEach(link => {
+                    link.classList.add('note-internal-link', 'note-link-broken');
+                    link.title = tr('note_reference.broken.tooltip', {}, 'Note not found — click to create it');
+                });
+            } catch (e) {
+                // Network error: leave the link untouched
+            }
+        }));
+    }
+
+    // ============================================================================
+    // CREATE NOTE FROM BROKEN LINK
+    // ============================================================================
+
+    /**
+     * Repair every broken link matching a title: spans are replaced by resolved
+     * links, dead anchors are repointed to the resolved note.
+     */
+    function activateBrokenLinks(title, noteId, heading, workspace) {
+        const wanted = String(title).trim();
+        document.querySelectorAll('.note-link-broken').forEach(el => {
+            if ((el.textContent || '').trim() !== wanted) return;
+            if (el.tagName === 'A') {
+                el.classList.remove('note-link-broken');
+                el.setAttribute('data-note-id', noteId);
+                el.setAttribute('href', `index.php?note=${noteId}`);
+                el.title = `Go to: ${heading || title}`;
+            } else {
+                el.replaceWith(createResolvedLink(noteId, heading, title, workspace));
+            }
+        });
+    }
+
+    /**
+     * Best-effort persistence of a dead-link repair in the source note content.
+     * The repair flow is idempotent, so if saving is not possible a later click
+     * re-resolves by title instead of creating a duplicate.
+     */
+    function persistRepointedLinks(deadId, newId, noteEntry) {
+        if (!deadId || String(deadId) === String(newId)) return;
+        if (typeof triggerAutoSaveForNote !== 'function') return;
+
+        // With internal tabs several .noteentry elements can coexist; only the
+        // one containing the clicked link (passed by the caller) is the source.
+        noteEntry = noteEntry || document.querySelector('.noteentry[data-note-id]');
+        if (!noteEntry) return;
+        const sourceId = noteEntry.getAttribute('data-note-id');
+        // The element captured at click time may have been replaced since (a
+        // preview click can flip the note to edit mode and re-render it) —
+        // patching a detached element would be silently lost. Use the live one.
+        const liveEntry = document.getElementById('entry' + sourceId);
+        if (liveEntry) noteEntry = liveEntry;
+        const noteType = noteEntry.getAttribute('data-note-type');
+
+        if (noteType === 'markdown') {
+            if (!repointMarkdownSource(noteEntry, deadId, newId)) return;
+            triggerAutoSaveForNote(sourceId);
+        } else if (noteType === 'note' || !noteType) {
+            // HTML note: the repointed DOM is the content itself
+            triggerAutoSaveForNote(sourceId);
+        }
+    }
+
+    /**
+     * Rewrite index.php?note=deadId to newId in every representation of a
+     * markdown note's source: the data-markdown-content mirror, the CodeMirror
+     * editor and the plain contenteditable editor. All are patched regardless
+     * of the current view mode — clicking a preview link can flip the note to
+     * edit mode mid-flow, silently changing which one the save path reads.
+     * Returns true if something was patched.
+     */
+    function repointMarkdownSource(noteEntry, deadId, newId) {
+        const re = new RegExp('(index\\.php\\?[^()\\s"\']*\\bnote=)' + deadId + '\\b', 'g');
+        let changed = false;
+
+        const attrSource = noteEntry.getAttribute('data-markdown-content') || '';
+        const attrPatched = attrSource.replace(re, '$1' + newId);
+        if (attrPatched !== attrSource) {
+            noteEntry.setAttribute('data-markdown-content', attrPatched);
+            changed = true;
+        }
+
+        const editorDiv = noteEntry.querySelector('.markdown-editor');
+        if (!editorDiv) return changed;
+
+        if (typeof isCodeMirrorMarkdownEditor === 'function' && isCodeMirrorMarkdownEditor(editorDiv)) {
+            const source = typeof getCodeMirrorMarkdownContent === 'function'
+                ? getCodeMirrorMarkdownContent(editorDiv) : null;
+            if (source != null) {
+                const patched = source.replace(re, '$1' + newId);
+                if (patched !== source && typeof setCodeMirrorMarkdownContent === 'function'
+                    && setCodeMirrorMarkdownContent(editorDiv, patched)) {
+                    changed = true;
+                }
+            }
+        } else {
+            // Plain contenteditable editor: patch text nodes in place to
+            // preserve the line structure
+            const walker = document.createTreeWalker(editorDiv, NodeFilter.SHOW_TEXT);
+            let node;
+            while (node = walker.nextNode()) {
+                const patched = node.nodeValue.replace(re, '$1' + newId);
+                if (patched !== node.nodeValue) {
+                    node.nodeValue = patched;
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    /**
+     * Get folder_id and type of the currently opened note (the link's source)
+     */
+    async function getSourceNoteInfo(workspace, noteEntry) {
+        noteEntry = noteEntry || document.querySelector('.noteentry[data-note-id]');
+        const sourceId = noteEntry ? noteEntry.getAttribute('data-note-id') : null;
+        if (!sourceId) return { folder_id: null, type: 'note' };
+
+        try {
+            const response = await fetch(`/api/v1/notes/${encodeURIComponent(sourceId)}?workspace=${encodeURIComponent(workspace)}`);
+            const data = await response.json();
+            if (data.success && data.note) {
+                return { folder_id: data.note.folder_id || null, type: data.note.type || 'note' };
+            }
+        } catch (e) {
+            console.error('Error fetching source note info:', e);
+        }
+        return { folder_id: null, type: 'note' };
+    }
+
+    /**
+     * Create the missing note, activate its links and open it
+     */
+    async function createNoteFromBrokenLink(title, workspace, deadId, sourceEntry) {
+        // New note goes in the same folder as the source note; markdown sources
+        // create markdown notes, everything else creates a standard note.
+        const source = await getSourceNoteInfo(workspace, sourceEntry);
+
+        try {
+            const response = await fetch('/api/v1/notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({
+                    heading: title,
+                    workspace: workspace,
+                    folder_id: source.folder_id,
+                    type: source.type === 'markdown' ? 'markdown' : 'note'
+                })
+            });
+            const data = await response.json();
+
+            if (!data.success || !data.note) {
+                throw new Error(data.error || 'Create failed');
+            }
+
+            activateBrokenLinks(title, data.note.id, data.note.heading, workspace);
+            persistRepointedLinks(deadId, data.note.id, sourceEntry);
+
+            // Open the new note (refreshes the notes list on desktop)
+            if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
+                window.navigateToCreatedNoteInInternalTab(data.note.id, data.note.heading, workspace, data.note.folder_id);
+            } else {
+                navigateToNote(data.note.id);
+            }
+        } catch (e) {
+            console.error('Error creating note from broken link:', e);
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(tr('note_reference.broken.error_creating', {}, 'Error creating note'), 'error');
+            }
+        }
+    }
+
+    /**
+     * Handle a click on a broken link: re-resolve first (the note may have been
+     * created since rendering), otherwise ask to create it.
+     */
+    async function handleBrokenLinkClick(el) {
+        const title = (el.textContent || '').trim();
+        if (!title) return;
+
+        // Dead id-based anchor: remember the old id to patch the source content
+        const deadId = el.tagName === 'A' ? extractInternalNoteId(el) : null;
+        const sourceEntry = el.closest('.noteentry[data-note-id]');
+        const workspace = getCurrentWorkspace();
+
+        // The note may exist by now (stale span persisted in HTML content,
+        // or a note matching a dead link's text)
+        const resolved = await resolveReference(title, workspace);
+        if (resolved.success) {
+            activateBrokenLinks(title, resolved.id, resolved.heading, workspace);
+            persistRepointedLinks(deadId, resolved.id, sourceEntry);
+            navigateToNote(resolved.id);
+            return;
+        }
+
+        // Interpolate manually: tr may be the fallback helper (globals.js not
+        // loaded yet at capture time), which ignores vars.
+        const message = tr('note_reference.broken.confirm_message', { title: title }, 'Create a new note "{{title}}"?')
+            .split('{{title}}').join(title);
+
+        if (typeof window.showConfirmModal === 'function') {
+            window.showConfirmModal(
+                tr('note_reference.broken.confirm_title', {}, 'Create note'),
+                message,
+                function() { createNoteFromBrokenLink(title, workspace, deadId, sourceEntry); },
+                { confirmText: tr('note_reference.broken.confirm_button', {}, 'Create') }
+            );
+        } else if (window.confirm(message)) {
+            createNoteFromBrokenLink(title, workspace, deadId, sourceEntry);
+        }
     }
 
     /**
@@ -772,6 +1084,9 @@
         for (const textNode of textNodes) {
             await processTextNode(textNode, workspace);
         }
+
+        // Also flag id-based internal links whose target no longer exists
+        await markDeadInternalLinks(container);
     };
 
     // ============================================================================
@@ -785,6 +1100,21 @@
     /**
      * Handle clicks on internal note links
      */
+    /**
+     * Broken links are handled in the CAPTURE phase with stopPropagation:
+     * letting the click bubble would trigger side effects like the markdown
+     * preview flipping to edit mode (re-rendering the note mid-flow) or a
+     * task entering edit mode.
+     */
+    document.addEventListener('click', function(e) {
+        const broken = e.target.closest && e.target.closest('.note-link-broken');
+        if (broken) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleBrokenLinkClick(broken);
+        }
+    }, true);
+
     document.addEventListener('click', function(e) {
         const link = e.target.closest('a.note-internal-link, a[data-note-reference="true"]');
         if (link) {

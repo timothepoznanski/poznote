@@ -2339,5 +2339,17 @@
     "tooltip": {
       "links": "{{count}} связей"
     }
+  },
+  "note_reference": {
+    "broken": {
+      "tooltip": "Заметка не найдена — нажмите, чтобы создать её",
+      "confirm_title": "Создать заметку",
+      "confirm_message": "Создать новую заметку «{{title}}»?",
+      "confirm_button": "Создать",
+      "error_creating": "Ошибка при создании заметки"
+    },
+    "modal": {
+      "create_button": "Создать и связать"
+    }
   }
 }

@@ -246,11 +246,15 @@ a.note-internal-link:hover {
     text-decoration: underline;
 }
 
-/* Broken/not found link */
-span.note-link-broken {
+/* Broken/not found link (span or dead anchor) — clickable to create the missing note */
+.note-internal-link.note-link-broken {
     color: var(--error-color, #dc3545);
     text-decoration: line-through;
-    cursor: not-allowed;
+    cursor: pointer;
+}
+
+.note-internal-link.note-link-broken:hover {
+    text-decoration: underline line-through;
 }
 
 .toolbar-btn.btn-note-reference i {
@@ -333,7 +337,7 @@ span.note-link-broken {
     text-decoration: underline;
 }
 
-[data-theme="dark"] span.note-link-broken {
+[data-theme="dark"] .note-internal-link.note-link-broken {
     color: #f48fb1;
 }
 

@@ -927,6 +927,7 @@ try {
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-note-reference-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="noteReferenceCreateBtn"><?php echo t_h('note_reference.modal.create_button', [], 'Create & link'); ?></button>
         </div>
     </div>
 </div>

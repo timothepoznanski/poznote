@@ -270,7 +270,8 @@
     "untitled": "Sem título",
     "modal": {
       "search_placeholder": "Buscar por uma nota...",
-      "recent_notes": "Notas recentes"
+      "recent_notes": "Notas recentes",
+      "create_button": "Criar e vincular"
     },
     "empty": {
       "no_notes_found": "Nenhuma nota encontrada",
@@ -279,6 +280,13 @@
     },
     "error": {
       "loading_notes": "Erro ao carregar notas"
+    },
+    "broken": {
+      "tooltip": "Nota não encontrada — clique para criá-la",
+      "confirm_title": "Criar nota",
+      "confirm_message": "Criar uma nova nota “{{title}}”?",
+      "confirm_button": "Criar",
+      "error_creating": "Erro ao criar a nota"
     }
   },
   "attachments": {

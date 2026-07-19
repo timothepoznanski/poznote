@@ -2373,5 +2373,17 @@
     "tooltip": {
       "links": "{{count}} links"
     }
+  },
+  "note_reference": {
+    "broken": {
+      "tooltip": "Note not found — click to create it",
+      "confirm_title": "Create note",
+      "confirm_message": "Create a new note \"{{title}}\"?",
+      "confirm_button": "Create",
+      "error_creating": "Error creating note"
+    },
+    "modal": {
+      "create_button": "Create & link"
+    }
   }
 }

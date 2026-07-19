@@ -272,7 +272,8 @@
     "untitled": "无标题",
     "modal": {
       "search_placeholder": "搜索笔记...",
-      "recent_notes": "最近的笔记"
+      "recent_notes": "最近的笔记",
+      "create_button": "新建并链接"
     },
     "empty": {
       "no_notes_found": "未找到笔记",
@@ -281,6 +282,13 @@
     },
     "error": {
       "loading_notes": "加载笔记时出错"
+    },
+    "broken": {
+      "tooltip": "未找到笔记 — 点击创建",
+      "confirm_title": "创建笔记",
+      "confirm_message": "创建新笔记“{{title}}”？",
+      "confirm_button": "创建",
+      "error_creating": "创建笔记时出错"
     }
   },
   "attachments": {

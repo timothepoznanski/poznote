@@ -271,7 +271,8 @@
     "untitled": "Ohne Titel",
     "modal": {
       "search_placeholder": "Nach einer Notiz suchen...",
-      "recent_notes": "Kürzliche Notizen"
+      "recent_notes": "Kürzliche Notizen",
+      "create_button": "Erstellen & verlinken"
     },
     "empty": {
       "no_notes_found": "Keine Notizen gefunden",
@@ -280,6 +281,13 @@
     },
     "error": {
       "loading_notes": "Fehler beim Laden der Notizen"
+    },
+    "broken": {
+      "tooltip": "Notiz nicht gefunden — klicken, um sie zu erstellen",
+      "confirm_title": "Notiz erstellen",
+      "confirm_message": "Neue Notiz „{{title}}“ erstellen?",
+      "confirm_button": "Erstellen",
+      "error_creating": "Fehler beim Erstellen der Notiz"
     }
   },
   "attachments": {
