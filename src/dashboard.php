@@ -805,7 +805,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		};
 		window.NOTIFICATIONS_TXT = {
 			dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,
-			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>
+			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>,
+			repeats: <?php echo json_encode(t('reminder.repeats', [], 'Repeats')); ?>
 		};
 		window.DASHBOARD_GIT = {
 			provider: <?php echo json_encode($dashboardGitProviderName); ?>,

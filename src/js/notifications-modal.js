@@ -67,13 +67,16 @@
             var heading = escapeHtml(notification.note_heading || notification.message || 'Note');
             var notificationId = escapeHtml(notification.id || '');
             var noteId = escapeHtml(notification.note_id || '');
+            var repeatBadge = notification.recurrence
+                ? '<i class="lucide lucide-repeat notification-repeat-icon" title="' + escapeHtml(labels.repeats || 'Repeats') + '"></i>'
+                : '';
 
             return '<div class="notification-item' + (isUnread ? ' unread' : '') + '" data-notification-id="' + notificationId + '" data-note-id="' + noteId + '">'
                 + '<div class="notification-content">'
                 + '<div class="notification-icon"><i class="lucide lucide-bell"></i></div>'
                 + '<div class="notification-text">'
                 + '<div class="notification-heading">' + heading + '</div>'
-                + '<div class="notification-time">' + timeAgo + '</div>'
+                + '<div class="notification-time">' + timeAgo + repeatBadge + '</div>'
                 + '</div>'
                 + '</div>'
                 + '<div class="notification-actions">'

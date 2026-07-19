@@ -272,7 +272,8 @@
     "untitled": "无标题",
     "modal": {
       "search_placeholder": "搜索笔记...",
-      "recent_notes": "最近的笔记"
+      "recent_notes": "最近的笔记",
+      "create_button": "新建并链接"
     },
     "empty": {
       "no_notes_found": "未找到笔记",
@@ -281,6 +282,13 @@
     },
     "error": {
       "loading_notes": "加载笔记时出错"
+    },
+    "broken": {
+      "tooltip": "未找到笔记 — 点击创建",
+      "confirm_title": "创建笔记",
+      "confirm_message": "创建新笔记“{{title}}”？",
+      "confirm_button": "创建",
+      "error_creating": "创建笔记时出错"
     }
   },
   "attachments": {
@@ -797,6 +805,8 @@
       "insert_emoji": "插入表情符号",
       "insert_table": "插入表格",
       "insert_checklist": "插入清单",
+      "toggle_checklist": "切换清单",
+      "remove_checklist": "移除复选框",
       "add_separator": "添加分隔符",
       "insert_note_reference": "插入笔记引用",
       "create_linked_note": "创建快捷方式",
@@ -894,6 +904,7 @@
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
+      "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
@@ -2730,6 +2741,7 @@
     "dismiss_all": "全部删除",
     "set_success": "提醒已设置于",
     "removed": "提醒已移除",
+    "repeats": "重复提醒",
     "just_now": "刚刚",
     "new_notifications": "您有",
     "notification_s": "条通知",
@@ -2757,7 +2769,23 @@
       "email_toggle": "给我发送邮件",
       "email_hint": "发送至 {{email}}",
       "select_date": "请选择日期和时间",
-      "past_time": "请选择一个未来的时间"
+      "past_time": "请选择一个未来的时间",
+      "repeat_label": "重复",
+      "repeat_none": "不重复",
+      "repeat_hourly": "每小时",
+      "repeat_daily": "每天",
+      "repeat_weekly": "每周",
+      "repeat_monthly": "每月",
+      "repeat_yearly": "每年",
+      "repeat_custom": "自定义...",
+      "repeat_hint": "下一次提醒将在您关闭通知后安排。",
+      "repeat_every": "每",
+      "repeat_minutes": "分钟",
+      "repeat_hours": "小时",
+      "repeat_days": "天",
+      "repeat_weeks": "周",
+      "repeat_months": "个月",
+      "repeat_years": "年"
     }
   },
   "settings_password": {

@@ -282,7 +282,8 @@
     "untitled": "Sans titre",
     "modal": {
       "search_placeholder": "Rechercher une note...",
-      "recent_notes": "Notes récentes"
+      "recent_notes": "Notes récentes",
+      "create_button": "Créer et lier"
     },
     "empty": {
       "no_notes_found": "Aucune note trouvée",
@@ -291,6 +292,13 @@
     },
     "error": {
       "loading_notes": "Erreur lors du chargement des notes"
+    },
+    "broken": {
+      "tooltip": "Note introuvable — cliquez pour la créer",
+      "confirm_title": "Créer la note",
+      "confirm_message": "Créer une nouvelle note « {{title}} » ?",
+      "confirm_button": "Créer",
+      "error_creating": "Erreur lors de la création de la note"
     }
   },
   "attachments": {
@@ -814,6 +822,8 @@
       "insert_emoji": "Insérer un emoji",
       "insert_table": "Insérer un tableau",
       "insert_checklist": "Insérer une checklist",
+      "toggle_checklist": "Basculer en checklist",
+      "remove_checklist": "Supprimer les cases à cocher",
       "add_separator": "Ajouter un séparateur",
       "insert_note_reference": "Insérer une référence de note",
       "create_linked_note": "Créer un raccourci",
@@ -920,6 +930,7 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
+      "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
@@ -2804,6 +2815,7 @@
     "dismiss_all": "Tout supprimer",
     "set_success": "Rappel défini pour",
     "removed": "Rappel supprimé",
+    "repeats": "Se répète",
     "just_now": "À l'instant",
     "new_notifications": "Vous avez",
     "notification_s": "notification(s)",
@@ -2831,7 +2843,23 @@
       "email_toggle": "M’envoyer un email",
       "email_hint": "À l’adresse {{email}}",
       "select_date": "Veuillez sélectionner une date et une heure",
-      "past_time": "Veuillez sélectionner une date future"
+      "past_time": "Veuillez sélectionner une date future",
+      "repeat_label": "Répétition",
+      "repeat_none": "Ne se répète pas",
+      "repeat_hourly": "Toutes les heures",
+      "repeat_daily": "Tous les jours",
+      "repeat_weekly": "Toutes les semaines",
+      "repeat_monthly": "Tous les mois",
+      "repeat_yearly": "Tous les ans",
+      "repeat_custom": "Personnalisé...",
+      "repeat_hint": "Le prochain rappel est planifié lorsque vous fermez la notification.",
+      "repeat_every": "Tous les",
+      "repeat_minutes": "minute(s)",
+      "repeat_hours": "heure(s)",
+      "repeat_days": "jour(s)",
+      "repeat_weeks": "semaine(s)",
+      "repeat_months": "mois",
+      "repeat_years": "an(s)"
     }
   },
   "settings_password": {

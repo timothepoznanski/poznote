@@ -1,0 +1,48 @@
+/**
+ * Emoji Shortcode Autocomplete Styles
+ *
+ * Small completion menu shown next to the caret while typing ":shortcode"
+ * in a note editor. Visual language mirrors the slash command menu.
+ */
+
+.emoji-autocomplete-menu {
+    position: fixed;
+    z-index: 9999;
+    min-width: 180px;
+    max-width: 260px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    padding: 4px;
+}
+
+.emoji-autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.emoji-autocomplete-item:hover,
+.emoji-autocomplete-item.selected {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.emoji-autocomplete-emoji {
+    width: 22px;
+    min-width: 22px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.emoji-autocomplete-name {
+    font-size: 13px;
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

@@ -415,6 +415,7 @@
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
+      "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
@@ -1109,6 +1110,8 @@
       "insert_emoji": "Insert emoji",
       "insert_table": "Insert table",
       "insert_checklist": "Insert checklist",
+      "toggle_checklist": "Toggle checklist",
+      "remove_checklist": "Remove checkboxes",
       "add_separator": "Add separator",
       "insert_note_reference": "Insert note reference",
       "open_in_new_tab": "Open in new tab",
@@ -2297,6 +2300,7 @@
     "dismiss_all": "Delete all",
     "set_success": "Reminder set for",
     "removed": "Reminder removed",
+    "repeats": "Repeats",
     "just_now": "Just now",
     "new_notifications": "You have",
     "notification_s": "notification(s)",
@@ -2324,7 +2328,23 @@
       "email_toggle": "Send me an email",
       "email_hint": "To {{email}}",
       "select_date": "Please select a date and time",
-      "past_time": "Please select a future time"
+      "past_time": "Please select a future time",
+      "repeat_label": "Repeat",
+      "repeat_none": "Does not repeat",
+      "repeat_hourly": "Hourly",
+      "repeat_daily": "Daily",
+      "repeat_weekly": "Weekly",
+      "repeat_monthly": "Monthly",
+      "repeat_yearly": "Yearly",
+      "repeat_custom": "Custom...",
+      "repeat_hint": "The next reminder is scheduled when you dismiss the notification.",
+      "repeat_every": "Every",
+      "repeat_minutes": "minute(s)",
+      "repeat_hours": "hour(s)",
+      "repeat_days": "day(s)",
+      "repeat_weeks": "week(s)",
+      "repeat_months": "month(s)",
+      "repeat_years": "year(s)"
     }
   },
   "settings_password": {
@@ -2372,6 +2392,18 @@
     },
     "tooltip": {
       "links": "{{count}} links"
+    }
+  },
+  "note_reference": {
+    "broken": {
+      "tooltip": "Note not found — click to create it",
+      "confirm_title": "Create note",
+      "confirm_message": "Create a new note \"{{title}}\"?",
+      "confirm_button": "Create",
+      "error_creating": "Error creating note"
+    },
+    "modal": {
+      "create_button": "Create & link"
     }
   }
 }

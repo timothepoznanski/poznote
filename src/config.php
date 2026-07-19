@@ -33,6 +33,7 @@ function poznoteGetThemeAssetVersion() {
         'js/excalidraw-dist/excalidraw-bundle.iife.js',
         'js/codemirror-dist/markdown-codemirror.iife.js',
         'js/slash-command.js',
+        'js/emoji-autocomplete.js',
         'css/dark-mode/variables.css',
         'css/dark-mode/layout.css',
         'css/dark-mode/menus.css',

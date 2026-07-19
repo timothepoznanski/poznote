@@ -13,6 +13,7 @@ let reminderInitialDisplayText = '';
 let reminderHasInitialReminder = false;
 let reminderInitialEmailEnabled = false;
 let reminderEmailAvailable = false;
+let reminderInitialRecurrence = '';
 const REMINDER_NOTIFICATION_POLL_INTERVAL = 45000;
 
 function parseReminderDate(value) {
@@ -85,6 +86,49 @@ function getReminderEmailEnabled() {
     return !!controls.available && !!controls.input && controls.input.checked;
 }
 
+function syncReminderRepeatCustomVisibility() {
+    const select = document.getElementById('reminderRepeatSelect');
+    const customRow = document.getElementById('reminderRepeatCustom');
+    const hint = document.getElementById('reminderRepeatHint');
+    if (!select || !customRow) return;
+    customRow.classList.toggle('initially-hidden', select.value !== 'custom');
+    if (hint) hint.classList.toggle('initially-hidden', select.value === '');
+}
+
+function getReminderRecurrenceValue() {
+    const select = document.getElementById('reminderRepeatSelect');
+    if (!select) return '';
+    if (select.value !== 'custom') return select.value;
+
+    const interval = parseInt(document.getElementById('reminderRepeatInterval')?.value, 10);
+    const unit = document.getElementById('reminderRepeatUnit')?.value || 'd';
+    if (!interval || interval < 1) return '';
+    return Math.min(interval, 999) + unit;
+}
+
+function setReminderRecurrenceValue(recurrence) {
+    const select = document.getElementById('reminderRepeatSelect');
+    if (!select) return;
+
+    const value = String(recurrence || '');
+    const match = value.match(/^([1-9]\d{0,2})([ihdwmy])$/);
+    const presets = ['1h', '1d', '1w', '1m', '1y'];
+
+    if (!match) {
+        select.value = '';
+    } else if (presets.indexOf(value) !== -1) {
+        select.value = value;
+    } else {
+        select.value = 'custom';
+        const intervalInput = document.getElementById('reminderRepeatInterval');
+        const unitSelect = document.getElementById('reminderRepeatUnit');
+        if (intervalInput) intervalInput.value = match[1];
+        if (unitSelect) unitSelect.value = match[2];
+    }
+
+    syncReminderRepeatCustomVisibility();
+}
+
 function updateNotificationIndicators(count) {
     const hasUnreadNotifications = count > 0;
     document.querySelectorAll('.sidebar-home').forEach(function(button) {
@@ -145,7 +189,8 @@ function syncReminderPreviewFromInput() {
 
     const hasDateChanged = dateInput.value !== reminderInitialInputValue;
     const hasEmailChanged = reminderEmailAvailable && getReminderEmailEnabled() !== reminderInitialEmailEnabled;
-    const canSave = (hasDateChanged || hasEmailChanged) && !!dateInput.value;
+    const hasRecurrenceChanged = getReminderRecurrenceValue() !== reminderInitialRecurrence;
+    const canSave = (hasDateChanged || hasEmailChanged || hasRecurrenceChanged) && !!dateInput.value;
     saveBtn.classList.toggle('initially-hidden', !canSave);
 
     if (!hasDateChanged || !dateInput.value) {
@@ -183,6 +228,8 @@ function openReminderModal(noteId, currentReminderAt) {
     reminderEmailAvailable = getReminderEmailControls().available;
     reminderInitialEmailEnabled = reminderEmailAvailable;
     setReminderEmailOption(reminderInitialEmailEnabled);
+    reminderInitialRecurrence = '';
+    setReminderRecurrenceValue('');
 
     // Set minimum date to now
     const now = new Date();
@@ -225,6 +272,8 @@ function openReminderModal(noteId, currentReminderAt) {
 
             reminderInitialEmailEnabled = reminderEmailAvailable && !!data.email_enabled;
             setReminderEmailOption(reminderInitialEmailEnabled);
+            reminderInitialRecurrence = data.recurrence || '';
+            setReminderRecurrenceValue(reminderInitialRecurrence);
             syncReminderPreviewFromInput();
         })
         .catch(function() {});
@@ -244,6 +293,7 @@ function closeReminderModal() {
     reminderHasInitialReminder = false;
     reminderInitialEmailEnabled = false;
     reminderEmailAvailable = false;
+    reminderInitialRecurrence = '';
 }
 
 /**
@@ -257,7 +307,9 @@ function saveReminder() {
     const dateInput = document.getElementById('reminderDateInput');
     const emailEnabled = getReminderEmailEnabled();
     const emailChanged = reminderEmailAvailable && emailEnabled !== reminderInitialEmailEnabled;
-    if (!dateInput || (dateInput.value === reminderInitialInputValue && !emailChanged)) {
+    const recurrence = getReminderRecurrenceValue();
+    const recurrenceChanged = recurrence !== reminderInitialRecurrence;
+    if (!dateInput || (dateInput.value === reminderInitialInputValue && !emailChanged && !recurrenceChanged)) {
         return;
     }
 
@@ -290,7 +342,8 @@ function saveReminder() {
         credentials: 'same-origin',
         body: JSON.stringify({
             reminder_at: utcIso,
-            email_enabled: emailEnabled
+            email_enabled: emailEnabled,
+            recurrence: recurrence || null
         })
     })
     .then(r => r.json())
@@ -450,6 +503,26 @@ if (reminderEmailInput) {
         syncReminderPreviewFromInput();
     });
 }
+
+const reminderRepeatSelect = document.getElementById('reminderRepeatSelect');
+if (reminderRepeatSelect) {
+    reminderRepeatSelect.addEventListener('change', function() {
+        syncReminderRepeatCustomVisibility();
+        syncReminderPreviewFromInput();
+    });
+}
+
+['reminderRepeatInterval', 'reminderRepeatUnit'].forEach(function(id) {
+    const control = document.getElementById(id);
+    if (control) {
+        control.addEventListener('input', function() {
+            syncReminderPreviewFromInput();
+        });
+        control.addEventListener('change', function() {
+            syncReminderPreviewFromInput();
+        });
+    }
+});
 
 pollNotificationIndicators();
 setInterval(pollNotificationIndicators, REMINDER_NOTIFICATION_POLL_INTERVAL);

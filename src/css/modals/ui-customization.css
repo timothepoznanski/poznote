@@ -106,6 +106,16 @@
     border-bottom: 1px solid rgba(128, 128, 128, 0.2);
 }
 
+.ui-custom-section-hint {
+    font-size: 0.82em;
+    opacity: 0.7;
+    margin: -4px 0 10px 0;
+}
+
+#uiCustomizationModal.ui-custom-filtering .ui-custom-section-hint {
+    display: none;
+}
+
 .ui-custom-toggle-all {
     font-size: 0.78em;
     font-weight: 500;

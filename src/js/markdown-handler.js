@@ -2423,6 +2423,39 @@ function parseMarkdown(text) {
         return text;
     }
 
+    // Render the collected lines of a blockquote/callout body: heading lines
+    // become real <h1>-<h6> elements, everything else keeps the historical
+    // inline-styles-joined-by-<br> behavior. Blank lines adjacent to a heading
+    // are dropped since the heading provides its own spacing.
+    function renderQuoteLines(quoteLines) {
+        let htmlParts = [];
+        let textRun = [];
+        let skipBlankAfterHeading = false;
+        function flushRun() {
+            if (textRun.length) {
+                htmlParts.push(textRun.map(l => applyInlineStyles(l)).join('<br>'));
+                textRun = [];
+            }
+        }
+        for (let ql of quoteLines) {
+            let hm = ql.match(/^(#{1,6})\s+(.+)$/);
+            if (hm) {
+                while (textRun.length && textRun[textRun.length - 1].trim() === '') textRun.pop();
+                flushRun();
+                let level = hm[1].length;
+                htmlParts.push('<h' + level + '>' + applyInlineStyles(hm[2]) + '</h' + level + '>');
+                skipBlankAfterHeading = true;
+            } else if (skipBlankAfterHeading && ql.trim() === '') {
+                continue;
+            } else {
+                skipBlankAfterHeading = false;
+                textRun.push(ql);
+            }
+        }
+        flushRun();
+        return htmlParts.join('');
+    }
+
     // Process line by line for block-level elements
     let lines = html.split('\n');
     let result = [];
@@ -2662,12 +2695,17 @@ function parseMarkdown(text) {
             let calloutType = null;
             let calloutRemainder = '';
             let calloutCustomTitle = null;
+            let calloutFold = null;
 
-            // GitHub-style [!TYPE] syntax: text after "]" is the custom title, not the body.
-            let bracketMatch = firstLine.match(/^\s*\[!(Note|Tip|Important|Warning|Caution)\]\s*(.*)$/i);
+            // [!TYPE] syntax: any type name is accepted (unknown ones fall back to
+            // the note look). An Obsidian fold marker may follow the bracket:
+            // "+" = collapsible & open, "-" = collapsible & collapsed.
+            // Text after that is the custom title, not the body.
+            let bracketMatch = firstLine.match(/^\s*\[!([A-Za-z][A-Za-z0-9_-]*)\]([+-])?\s*(.*)$/);
             if (bracketMatch) {
                 calloutType = bracketMatch[1].toLowerCase();
-                let customTitle = bracketMatch[2] ? bracketMatch[2].trim() : '';
+                calloutFold = bracketMatch[2] || null;
+                let customTitle = bracketMatch[3] ? bracketMatch[3].trim() : '';
                 if (customTitle) {
                     calloutCustomTitle = customTitle;
                 }
@@ -2697,7 +2735,7 @@ function parseMarkdown(text) {
                     let defaultTitle = calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
                     titleHtml = (window.t ? window.t('slash_menu.callout_' + calloutType, null, defaultTitle) : defaultTitle);
                 }
-                let bodyHtml = bodyLines.map(l => applyInlineStyles(l)).join('<br>');
+                let bodyHtml = renderQuoteLines(bodyLines);
 
                 // GitHub-style callout icons
                 let iconSvg = '';
@@ -2717,16 +2755,28 @@ function parseMarkdown(text) {
                     case 'caution':
                         iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4.47.22A.75.75 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.75.75 0 0 1-.22.53l-4.25 4.25A.75.75 0 0 1 11 16H5a.75.75 0 0 1-.53-.22L.22 11.53A.75.75 0 0 1 0 11V5a.75.75 0 0 1 .22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>';
                         break;
+                    default:
+                        // Unknown/custom callout types use the note (info) icon
+                        iconSvg = '<svg class="callout-icon-svg" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>';
+                        break;
                 }
 
-                result.push('<aside class="callout callout-' + calloutType + '">' +
-                    '<div class="callout-title">' + iconSvg + '<span class="callout-title-text">' + applyInlineStyles(titleHtml) + '</span></div>' +
-                    '<div class="callout-body">' + bodyHtml + '</div>' +
-                    '</aside>');
+                let titleInner = iconSvg + '<span class="callout-title-text">' + applyInlineStyles(titleHtml) + '</span>';
+                if (calloutFold) {
+                    let foldChevron = '<svg class="callout-fold-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.72a.749.749 0 0 1 1.06 0Z"></path></svg>';
+                    result.push('<details class="callout callout-' + calloutType + '"' + (calloutFold === '+' ? ' open' : '') + '>' +
+                        '<summary class="callout-title">' + titleInner + foldChevron + '</summary>' +
+                        '<div class="callout-body">' + bodyHtml + '</div>' +
+                        '</details>');
+                } else {
+                    result.push('<aside class="callout callout-' + calloutType + '">' +
+                        '<div class="callout-title">' + titleInner + '</div>' +
+                        '<div class="callout-body">' + bodyHtml + '</div>' +
+                        '</aside>');
+                }
             } else {
                 // Regular blockquote
-                let content = blockquoteLines.map(l => applyInlineStyles(l)).join('<br>');
-                result.push('<blockquote>' + content + '</blockquote>');
+                result.push('<blockquote>' + renderQuoteLines(blockquoteLines) + '</blockquote>');
             }
             continue;
         }

@@ -408,6 +408,7 @@
     "ui_customization": {
       "title": "Настройка интерфейса",
       "description": "Показывать или скрывать элементы интерфейса. Неотмеченные элементы будут скрыты.",
+      "toolbar_hint": "Кнопки форматирования (жирный, списки, код…) появляются только при выделении текста в заметке. Остальные действия собраны в меню ⋮.",
       "reminder_bell": "Значок колокольчика (напоминание)",
       "filter_placeholder": "Фильтровать элементы...",
       "no_results": "Подходящие элементы не найдены.",
@@ -1094,6 +1095,8 @@
       "insert_emoji": "Вставить эмодзи",
       "insert_table": "Вставить таблицу",
       "insert_checklist": "Вставить чек-лист",
+      "toggle_checklist": "Переключить чек-лист",
+      "remove_checklist": "Убрать чекбоксы",
       "add_separator": "Добавить разделитель",
       "insert_note_reference": "Вставить ссылку на заметку",
       "open_in_new_tab": "Открыть в новой вкладке",
@@ -2263,6 +2266,7 @@
     "dismiss_all": "Удалить все",
     "set_success": "Напоминание установлено на",
     "removed": "Напоминание удалено",
+    "repeats": "Повторяется",
     "just_now": "Только что",
     "new_notifications": "У вас",
     "notification_s": "уведомление(й)",
@@ -2290,7 +2294,23 @@
       "email_toggle": "Отправить мне письмо",
       "email_hint": "На адрес {{email}}",
       "select_date": "Выберите дату и время",
-      "past_time": "Выберите дату в будущем"
+      "past_time": "Выберите дату в будущем",
+      "repeat_label": "Повтор",
+      "repeat_none": "Не повторяется",
+      "repeat_hourly": "Ежечасно",
+      "repeat_daily": "Ежедневно",
+      "repeat_weekly": "Еженедельно",
+      "repeat_monthly": "Ежемесячно",
+      "repeat_yearly": "Ежегодно",
+      "repeat_custom": "Другой интервал...",
+      "repeat_hint": "Следующее напоминание планируется после закрытия уведомления.",
+      "repeat_every": "Каждые",
+      "repeat_minutes": "мин.",
+      "repeat_hours": "ч.",
+      "repeat_days": "дн.",
+      "repeat_weeks": "нед.",
+      "repeat_months": "мес.",
+      "repeat_years": "лет"
     }
   },
   "settings_password": {
@@ -2338,6 +2358,18 @@
     },
     "tooltip": {
       "links": "{{count}} связей"
+    }
+  },
+  "note_reference": {
+    "broken": {
+      "tooltip": "Заметка не найдена — нажмите, чтобы создать её",
+      "confirm_title": "Создать заметку",
+      "confirm_message": "Создать новую заметку «{{title}}»?",
+      "confirm_button": "Создать",
+      "error_creating": "Ошибка при создании заметки"
+    },
+    "modal": {
+      "create_button": "Создать и связать"
     }
   }
 }

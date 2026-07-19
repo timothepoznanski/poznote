@@ -140,6 +140,59 @@ function initTextSelectionHandlers() {
         return null;
     }
 
+    // Classify a markdown selection: 'task' | 'ul' | 'ol' when every
+    // non-empty selected line is that list type, null otherwise
+    function getMarkdownListSelectionType(editor, range) {
+        var offsets = getSelectionOffsetsWithinMarkdownEditor(editor, range);
+        if (!offsets) return null;
+
+        var selectionStart = Math.min(offsets.start, offsets.end);
+        var selectionEnd = Math.max(offsets.start, offsets.end);
+
+        var text = getMarkdownEditorPlainText(editor);
+        var lines = text.split('\n');
+        var position = 0;
+        var selectionType = null;
+
+        for (var i = 0; i < lines.length; i++) {
+            var lineStart = position;
+            var lineEnd = lineStart + lines[i].length;
+
+            if (lineStart <= selectionEnd && lineEnd >= selectionStart) {
+                if (lines[i].trim() !== '') {
+                    var lineType = null;
+                    if (/^\s*[-*+]\s+\[[ xX]\]/.test(lines[i])) {
+                        lineType = 'task';
+                    } else if (/^\s*[-*+]\s+/.test(lines[i])) {
+                        lineType = 'ul';
+                    } else if (/^\s*\d+(?:\.\d+)*\.\s+/.test(lines[i])) {
+                        lineType = 'ol';
+                    }
+                    if (!lineType) return null;
+                    if (selectionType && selectionType !== lineType) return null;
+                    selectionType = lineType;
+                }
+            }
+
+            if (lineStart > selectionEnd) break;
+            position = lineEnd + 1;
+        }
+
+        return selectionType;
+    }
+
+    function isListSelectionAllowedButton(button, selectionType) {
+        if (!button || !button.classList) return false;
+
+        if (button.classList.contains('btn-task-remove')) {
+            return selectionType === 'task';
+        }
+
+        return button.classList.contains('btn-task-list')
+            || button.classList.contains('btn-list-ul')
+            || button.classList.contains('btn-list-ol');
+    }
+
     function getElementFromNode(node) {
         if (!node) return null;
         return node.nodeType === 3 ? node.parentElement : node;
@@ -510,8 +563,21 @@ function initTextSelectionHandlers() {
                     setMobileFormattingToolbarActive(false);
                 } else if (editableElement) {
                     // Text selected in an editable area: show formatting buttons, hide actions
+                    // With CodeMirror the walk stops on .cm-content, so resolve the host editor
+                    var listSelectionEditor = editableElement.closest
+                        ? editableElement.closest('.markdown-editor')
+                        : null;
+                    var listSelectionType = listSelectionEditor
+                        ? getMarkdownListSelectionType(listSelectionEditor, range)
+                        : null;
                     for (var i = 0; i < textFormatButtons.length; i++) {
                         if (isPlainCodeSelection && isPlainCodeBlockedButton(textFormatButtons[i])) {
+                            textFormatButtons[i].classList.remove('show-on-selection');
+                        } else if (listSelectionType && !isListSelectionAllowedButton(textFormatButtons[i], listSelectionType)) {
+                            // List-only selection: keep just the list conversion/toggle buttons
+                            textFormatButtons[i].classList.remove('show-on-selection');
+                        } else if (!listSelectionType && textFormatButtons[i].classList.contains('btn-task-remove')) {
+                            // Remove-checkboxes only makes sense on a checkbox selection
                             textFormatButtons[i].classList.remove('show-on-selection');
                         } else {
                             textFormatButtons[i].classList.add('show-on-selection');

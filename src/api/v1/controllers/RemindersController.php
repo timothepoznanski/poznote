@@ -35,7 +35,7 @@ class RemindersController {
 
             $stmt = $this->con->prepare("
                 SELECT n.id, n.note_id, n.type, n.message, n.is_read, n.created, n.trigger_at,
-                       e.heading AS note_heading
+                       e.heading AS note_heading, e.reminder_recurrence AS recurrence
                 FROM notifications n
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
                 WHERE n.dismissed = 0
@@ -122,6 +122,8 @@ class RemindersController {
      *   - reminder_at: ISO datetime string (required)
      *   - message: Custom reminder message (optional)
      *   - email_enabled: Whether to send an email for this reminder (optional)
+     *   - recurrence: Repeat interval as "<count><unit>" with unit i/h/d/w/m/y
+     *     (minute/hour/day/week/month/year), e.g. "30i", "1h", "2w" (optional)
      */
     public function setReminder(string $id): void {
         if (!is_numeric($id)) {
@@ -142,9 +144,15 @@ class RemindersController {
         $reminderAt = $input['reminder_at'] ?? null;
         $message = isset($input['message']) ? trim($input['message']) : '';
         $emailEnabled = !empty($input['email_enabled']) && $this->isReminderEmailAvailable();
-        
+
         if (empty($reminderAt)) {
             $this->sendError(400, 'reminder_at is required');
+            return;
+        }
+
+        $recurrence = $this->normalizeRecurrence($input['recurrence'] ?? null);
+        if ($recurrence === false) {
+            $this->sendError(400, 'Invalid recurrence format (expected e.g. "30i", "1h", "1d", "2w", "3m", "1y")');
             return;
         }
         
@@ -169,8 +177,8 @@ class RemindersController {
             }
             
             // Update entries table
-            $stmt = $this->con->prepare("UPDATE entries SET reminder_at = ? WHERE id = ?");
-            $stmt->execute([$reminderAtUtc, $noteId]);
+            $stmt = $this->con->prepare("UPDATE entries SET reminder_at = ?, reminder_recurrence = ? WHERE id = ?");
+            $stmt->execute([$reminderAtUtc, $recurrence, $noteId]);
             
             // Remove any existing pending (non-triggered) notification for this note
             $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND dismissed = 0")->execute([$noteId]);
@@ -186,7 +194,8 @@ class RemindersController {
             $this->sendSuccess([
                 'note_id' => $noteId,
                 'reminder_at' => $reminderAtUtc,
-                'email_enabled' => $emailEnabled
+                'email_enabled' => $emailEnabled,
+                'recurrence' => $recurrence
             ]);
         } catch (Exception $e) {
             error_log('RemindersController::setReminder error: ' . $e->getMessage());
@@ -208,7 +217,7 @@ class RemindersController {
         
         try {
             // Clear reminder on the note
-            $stmt = $this->con->prepare("UPDATE entries SET reminder_at = NULL WHERE id = ?");
+            $stmt = $this->con->prepare("UPDATE entries SET reminder_at = NULL, reminder_recurrence = NULL WHERE id = ?");
             $stmt->execute([$noteId]);
             
             // Remove pending notifications for this note
@@ -237,7 +246,7 @@ class RemindersController {
         
         try {
             $stmt = $this->con->prepare("
-                SELECT e.reminder_at,
+                SELECT e.reminder_at, e.reminder_recurrence,
                        COALESCE(n.email_enabled, 1) AS email_enabled
                 FROM entries e
                 LEFT JOIN notifications n ON n.note_id = e.id AND n.dismissed = 0
@@ -247,16 +256,17 @@ class RemindersController {
             ");
             $stmt->execute([$noteId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$row) {
                 $this->sendError(404, 'Note not found');
                 return;
             }
-            
+
             $this->sendSuccess([
                 'note_id' => $noteId,
                 'reminder_at' => $row['reminder_at'],
-                'email_enabled' => !empty($row['email_enabled'])
+                'email_enabled' => !empty($row['email_enabled']),
+                'recurrence' => $row['reminder_recurrence'] ?: null
             ]);
         } catch (Exception $e) {
             $this->sendError(500, 'Failed to get reminder');
@@ -296,16 +306,27 @@ class RemindersController {
         try {
             $stmt = $this->con->prepare("UPDATE notifications SET dismissed = 1 WHERE id = ?");
             $stmt->execute([(int)$id]);
-            
-            // Also clear the reminder_at on the associated note
-            $noteStmt = $this->con->prepare("SELECT note_id FROM notifications WHERE id = ?");
-            $noteStmt->execute([(int)$id]);
-            $noteId = $noteStmt->fetchColumn();
-            if ($noteId) {
-                $this->con->prepare("UPDATE entries SET reminder_at = NULL WHERE id = ?")->execute([$noteId]);
+
+            // For recurring reminders, schedule the next occurrence; otherwise clear the reminder
+            $infoStmt = $this->con->prepare("
+                SELECT n.note_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
+                       n.trigger_at, e.reminder_at, e.reminder_recurrence
+                FROM notifications n
+                LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
+                WHERE n.id = ?
+            ");
+            $infoStmt->execute([(int)$id]);
+            $info = $infoStmt->fetch(PDO::FETCH_ASSOC);
+
+            $nextReminderAt = null;
+            if ($info && !empty($info['note_id'])) {
+                $nextReminderAt = $this->scheduleNextOccurrence($info);
+                if ($nextReminderAt === null) {
+                    $this->con->prepare("UPDATE entries SET reminder_at = NULL WHERE id = ?")->execute([$info['note_id']]);
+                }
             }
-            
-            $this->sendSuccess(['id' => (int)$id]);
+
+            $this->sendSuccess(['id' => (int)$id, 'next_reminder_at' => $nextReminderAt]);
         } catch (Exception $e) {
             $this->sendError(500, 'Failed to dismiss notification');
         }
@@ -318,22 +339,127 @@ class RemindersController {
     public function dismissAll(): void {
         try {
             $now = gmdate('Y-m-d H:i:s');
+
+            // Collect due recurring notifications before dismissing them
+            $recurringStmt = $this->con->prepare("
+                SELECT n.note_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
+                       n.trigger_at, e.reminder_at, e.reminder_recurrence
+                FROM notifications n
+                JOIN entries e ON e.id = n.note_id AND e.trash = 0
+                WHERE n.dismissed = 0 AND n.trigger_at <= ?
+                  AND e.reminder_recurrence IS NOT NULL AND e.reminder_recurrence != ''
+            ");
+            $recurringStmt->execute([$now]);
+            $recurring = $recurringStmt->fetchAll(PDO::FETCH_ASSOC);
+
             $this->con->prepare("
                 UPDATE notifications SET dismissed = 1
                 WHERE dismissed = 0 AND trigger_at <= ?
             ")->execute([$now]);
-            
-            // Clear reminder_at on all notes that had dismissed reminders
-            $this->con->exec("
+
+            // Schedule the next occurrence of each recurring reminder
+            foreach ($recurring as $info) {
+                $this->scheduleNextOccurrence($info);
+            }
+
+            // Clear reminder_at on all notes whose reminder was not rolled forward
+            $this->con->prepare("
                 UPDATE entries SET reminder_at = NULL
                 WHERE reminder_at IS NOT NULL
-                  AND reminder_at <= '" . $now . "'
-            ");
-            
+                  AND reminder_at <= ?
+            ")->execute([$now]);
+
             $this->sendSuccess([]);
         } catch (Exception $e) {
             $this->sendError(500, 'Failed to dismiss all notifications');
         }
+    }
+
+    /**
+     * Normalize a recurrence value from client input.
+     * Returns the canonical string ("<count><unit>", unit i/h/d/w/m/y for
+     * minute/hour/day/week/month/year), null when absent/none, or false when invalid.
+     */
+    private function normalizeRecurrence($value) {
+        if ($value === null) {
+            return null;
+        }
+        if (!is_string($value)) {
+            return false;
+        }
+        $value = strtolower(trim($value));
+        if ($value === '' || $value === 'none') {
+            return null;
+        }
+        return preg_match('/^[1-9]\d{0,2}[ihdwmy]$/', $value) ? $value : false;
+    }
+
+    /**
+     * Compute the next occurrence of a recurrence after now, anchored to the previous schedule.
+     */
+    private function nextOccurrenceUtc(string $fromUtc, string $recurrence): ?string {
+        if (!preg_match('/^([1-9]\d{0,2})([ihdwmy])$/', $recurrence, $m)) {
+            return null;
+        }
+        $count = (int)$m[1];
+        $unit = $m[2];
+        $nowTs = time();
+
+        try {
+            $from = new DateTime($fromUtc, new DateTimeZone('UTC'));
+        } catch (Exception $e) {
+            return null;
+        }
+
+        // Fixed-length units: jump straight to the first occurrence after now
+        $seconds = ['i' => 60, 'h' => 3600, 'd' => 86400, 'w' => 604800];
+        if (isset($seconds[$unit])) {
+            $stepSec = $count * $seconds[$unit];
+            $fromTs = $from->getTimestamp();
+            $steps = max(1, (int)floor(($nowTs - $fromTs) / $stepSec) + 1);
+            $nextTs = $fromTs + $steps * $stepSec;
+            if ($nextTs <= $nowTs) {
+                $nextTs += $stepSec;
+            }
+            return gmdate('Y-m-d H:i:s', $nextTs);
+        }
+
+        // Calendar units (month/year) advance step by step
+        $step = '+' . $count . ' ' . ($unit === 'm' ? 'month' : 'year');
+        $next = $from;
+        $guard = 0;
+        do {
+            $next->modify($step);
+        } while ($next->getTimestamp() <= $nowTs && ++$guard < 1000);
+
+        return $next->getTimestamp() > $nowTs ? $next->format('Y-m-d H:i:s') : null;
+    }
+
+    /**
+     * Re-arm a recurring reminder from a dismissed notification's data.
+     * Expects keys: note_id, message, email_enabled, trigger_at, reminder_at, reminder_recurrence.
+     * Returns the next reminder datetime (UTC) or null when the reminder does not recur.
+     */
+    private function scheduleNextOccurrence(array $info): ?string {
+        $recurrence = trim((string)($info['reminder_recurrence'] ?? ''));
+        $anchor = $info['reminder_at'] ?: $info['trigger_at'];
+        if ($recurrence === '' || empty($info['note_id']) || empty($anchor)) {
+            return null;
+        }
+
+        $next = $this->nextOccurrenceUtc((string)$anchor, $recurrence);
+        if ($next === null) {
+            return null;
+        }
+
+        $this->con->prepare("UPDATE entries SET reminder_at = ? WHERE id = ?")
+            ->execute([$next, $info['note_id']]);
+        $this->con->prepare("
+            INSERT INTO notifications (note_id, type, message, trigger_at, email_enabled, created)
+            VALUES (?, 'reminder', ?, ?, ?, datetime('now'))
+        ")->execute([$info['note_id'], $info['message'], $next, (int)$info['email_enabled']]);
+
+        return $next;
     }
     
     private function isReminderEmailAvailable(): bool {

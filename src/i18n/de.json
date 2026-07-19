@@ -271,7 +271,8 @@
     "untitled": "Ohne Titel",
     "modal": {
       "search_placeholder": "Nach einer Notiz suchen...",
-      "recent_notes": "Kürzliche Notizen"
+      "recent_notes": "Kürzliche Notizen",
+      "create_button": "Erstellen & verlinken"
     },
     "empty": {
       "no_notes_found": "Keine Notizen gefunden",
@@ -280,6 +281,13 @@
     },
     "error": {
       "loading_notes": "Fehler beim Laden der Notizen"
+    },
+    "broken": {
+      "tooltip": "Notiz nicht gefunden — klicken, um sie zu erstellen",
+      "confirm_title": "Notiz erstellen",
+      "confirm_message": "Neue Notiz „{{title}}“ erstellen?",
+      "confirm_button": "Erstellen",
+      "error_creating": "Fehler beim Erstellen der Notiz"
     }
   },
   "attachments": {
@@ -799,6 +807,8 @@
       "insert_emoji": "Emoji einfügen",
       "insert_table": "Tabelle einfügen",
       "insert_checklist": "Checkliste einfügen",
+      "toggle_checklist": "Checkliste umschalten",
+      "remove_checklist": "Kontrollkästchen entfernen",
       "add_separator": "Trennlinie hinzufügen",
       "insert_note_reference": "Notiz-Referenz einfügen",
       "create_linked_note": "Verknüpfung erstellen",
@@ -894,6 +904,7 @@
     "ui_customization": {
       "title": "Oberfläche anpassen",
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
+      "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
@@ -2589,6 +2600,7 @@
     "dismiss_all": "Alle löschen",
     "set_success": "Erinnerung gesetzt für",
     "removed": "Erinnerung entfernt",
+    "repeats": "Wiederholt sich",
     "just_now": "Gerade eben",
     "new_notifications": "Sie haben",
     "notification_s": "Benachrichtigung(en)",
@@ -2616,7 +2628,23 @@
       "email_toggle": "Mir eine E-Mail senden",
       "email_hint": "An {{email}}",
       "select_date": "Bitte wählen Sie Datum und Uhrzeit",
-      "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt"
+      "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt",
+      "repeat_label": "Wiederholung",
+      "repeat_none": "Keine Wiederholung",
+      "repeat_hourly": "Stündlich",
+      "repeat_daily": "Täglich",
+      "repeat_weekly": "Wöchentlich",
+      "repeat_monthly": "Monatlich",
+      "repeat_yearly": "Jährlich",
+      "repeat_custom": "Benutzerdefiniert...",
+      "repeat_hint": "Die nächste Erinnerung wird geplant, wenn Sie die Benachrichtigung schließen.",
+      "repeat_every": "Alle",
+      "repeat_minutes": "Minute(n)",
+      "repeat_hours": "Stunde(n)",
+      "repeat_days": "Tag(e)",
+      "repeat_weeks": "Woche(n)",
+      "repeat_months": "Monat(e)",
+      "repeat_years": "Jahr(e)"
     }
   },
   "settings_password": {

@@ -272,7 +272,8 @@
     "untitled": "Sin título",
     "modal": {
       "search_placeholder": "Buscar una nota...",
-      "recent_notes": "Notas recientes"
+      "recent_notes": "Notas recientes",
+      "create_button": "Crear y enlazar"
     },
     "empty": {
       "no_notes_found": "No se encontraron notas",
@@ -281,6 +282,13 @@
     },
     "error": {
       "loading_notes": "Error al cargar notas"
+    },
+    "broken": {
+      "tooltip": "Nota no encontrada — haz clic para crearla",
+      "confirm_title": "Crear nota",
+      "confirm_message": "¿Crear una nueva nota «{{title}}»?",
+      "confirm_button": "Crear",
+      "error_creating": "Error al crear la nota"
     }
   },
   "attachments": {
@@ -800,6 +808,8 @@
       "insert_emoji": "Insertar emoji",
       "insert_table": "Insertar tabla",
       "insert_checklist": "Insertar lista de verificación",
+      "toggle_checklist": "Alternar lista de verificación",
+      "remove_checklist": "Quitar casillas de verificación",
       "add_separator": "Agregar separador",
       "insert_note_reference": "Insertar referencia de nota",
       "create_linked_note": "Crear atajo",
@@ -895,6 +905,7 @@
     "ui_customization": {
       "title": "Personalización de interfaz",
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
+      "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
@@ -2589,6 +2600,7 @@
     "dismiss_all": "Eliminar todo",
     "set_success": "Recordatorio establecido para",
     "removed": "Recordatorio eliminado",
+    "repeats": "Se repite",
     "just_now": "Ahora mismo",
     "new_notifications": "Tiene",
     "notification_s": "notificación(es)",
@@ -2616,7 +2628,23 @@
       "email_toggle": "Enviarme un correo",
       "email_hint": "A {{email}}",
       "select_date": "Seleccione una fecha y hora",
-      "past_time": "Seleccione una fecha futura"
+      "past_time": "Seleccione una fecha futura",
+      "repeat_label": "Repetir",
+      "repeat_none": "No se repite",
+      "repeat_hourly": "Cada hora",
+      "repeat_daily": "Diariamente",
+      "repeat_weekly": "Semanalmente",
+      "repeat_monthly": "Mensualmente",
+      "repeat_yearly": "Anualmente",
+      "repeat_custom": "Personalizado...",
+      "repeat_hint": "El próximo recordatorio se programa al cerrar la notificación.",
+      "repeat_every": "Cada",
+      "repeat_minutes": "minuto(s)",
+      "repeat_hours": "hora(s)",
+      "repeat_days": "día(s)",
+      "repeat_weeks": "semana(s)",
+      "repeat_months": "mes(es)",
+      "repeat_years": "año(s)"
     }
   },
   "settings_password": {

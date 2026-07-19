@@ -42,6 +42,36 @@ try {
                 <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
                 <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
             </div>
+            <div class="reminder-repeat-row">
+                <label class="reminder-repeat-label" for="reminderRepeatSelect">
+                    <i class="lucide lucide-repeat"></i>
+                    <?php echo t_h('reminder.modal.repeat_label', [], 'Repeat'); ?>
+                </label>
+                <select id="reminderRepeatSelect" class="reminder-repeat-select">
+                    <option value=""><?php echo t_h('reminder.modal.repeat_none', [], 'Does not repeat'); ?></option>
+                    <option value="1h"><?php echo t_h('reminder.modal.repeat_hourly', [], 'Hourly'); ?></option>
+                    <option value="1d"><?php echo t_h('reminder.modal.repeat_daily', [], 'Daily'); ?></option>
+                    <option value="1w"><?php echo t_h('reminder.modal.repeat_weekly', [], 'Weekly'); ?></option>
+                    <option value="1m"><?php echo t_h('reminder.modal.repeat_monthly', [], 'Monthly'); ?></option>
+                    <option value="1y"><?php echo t_h('reminder.modal.repeat_yearly', [], 'Yearly'); ?></option>
+                    <option value="custom"><?php echo t_h('reminder.modal.repeat_custom', [], 'Custom...'); ?></option>
+                </select>
+            </div>
+            <div class="reminder-repeat-custom initially-hidden" id="reminderRepeatCustom">
+                <span class="reminder-repeat-every"><?php echo t_h('reminder.modal.repeat_every', [], 'Every'); ?></span>
+                <input type="number" id="reminderRepeatInterval" class="reminder-repeat-interval" min="1" max="999" value="1">
+                <select id="reminderRepeatUnit" class="reminder-repeat-unit">
+                    <option value="i"><?php echo t_h('reminder.modal.repeat_minutes', [], 'minute(s)'); ?></option>
+                    <option value="h"><?php echo t_h('reminder.modal.repeat_hours', [], 'hour(s)'); ?></option>
+                    <option value="d"><?php echo t_h('reminder.modal.repeat_days', [], 'day(s)'); ?></option>
+                    <option value="w"><?php echo t_h('reminder.modal.repeat_weeks', [], 'week(s)'); ?></option>
+                    <option value="m"><?php echo t_h('reminder.modal.repeat_months', [], 'month(s)'); ?></option>
+                    <option value="y"><?php echo t_h('reminder.modal.repeat_years', [], 'year(s)'); ?></option>
+                </select>
+            </div>
+            <div class="reminder-repeat-hint initially-hidden" id="reminderRepeatHint">
+                <?php echo t_h('reminder.modal.repeat_hint', [], 'The next reminder is scheduled when you dismiss the notification.'); ?>
+            </div>
             <div class="reminder-email-option <?php echo $reminderEmailAvailable ? '' : 'initially-hidden'; ?>" id="reminderEmailOption">
                 <label class="reminder-email-label" for="reminderEmailInput">
                     <span class="reminder-email-copy">
@@ -927,6 +957,7 @@ try {
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-note-reference-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="noteReferenceCreateBtn"><?php echo t_h('note_reference.modal.create_button', [], 'Create & link'); ?></button>
         </div>
     </div>
 </div>
@@ -1309,6 +1340,7 @@ try {
                 <!-- Toolbar Section -->
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.toolbar_hint', [], 'Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.'); ?></p>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-bold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-italic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
@@ -1319,6 +1351,8 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-highlight" checked><span><?php echo t_h('editor.toolbar.highlight', [], 'Highlight'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-list-ul" checked><span><?php echo t_h('editor.toolbar.bullet_list', [], 'Bullet list'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-list-ol" checked><span><?php echo t_h('editor.toolbar.numbered_list', [], 'Numbered list'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-task-list" checked><span><?php echo t_h('editor.toolbar.toggle_checklist', [], 'Toggle checklist'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-task-remove" checked><span><?php echo t_h('editor.toolbar.remove_checklist', [], 'Remove checkboxes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-text-height" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-code" checked><span><?php echo t_h('editor.toolbar.code_block', [], 'Code block'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-inline-code" checked><span><?php echo t_h('editor.toolbar.inline_code', [], 'Inline code'); ?></span></label>
