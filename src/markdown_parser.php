@@ -721,7 +721,41 @@ function parseMarkdown($text) {
         
         return $text;
     };
-    
+
+    // Render the collected lines of a blockquote/callout body: heading lines
+    // become real <h1>-<h6> elements, everything else keeps the historical
+    // inline-styles-joined-by-<br> behavior. Blank lines adjacent to a heading
+    // are dropped since the heading provides its own spacing.
+    $renderQuoteLines = function($quoteLines) use ($applyInlineStyles) {
+        $htmlParts = [];
+        $textRun = [];
+        $skipBlankAfterHeading = false;
+        $flushRun = function() use (&$textRun, &$htmlParts, $applyInlineStyles) {
+            if (count($textRun) > 0) {
+                $htmlParts[] = implode('<br>', array_map($applyInlineStyles, $textRun));
+                $textRun = [];
+            }
+        };
+        foreach ($quoteLines as $ql) {
+            if (preg_match('/^(#{1,6})\s+(.+)$/', $ql, $hm)) {
+                while (count($textRun) > 0 && trim($textRun[count($textRun) - 1]) === '') {
+                    array_pop($textRun);
+                }
+                $flushRun();
+                $level = strlen($hm[1]);
+                $htmlParts[] = '<h' . $level . '>' . $applyInlineStyles($hm[2]) . '</h' . $level . '>';
+                $skipBlankAfterHeading = true;
+            } elseif ($skipBlankAfterHeading && trim($ql) === '') {
+                continue;
+            } else {
+                $skipBlankAfterHeading = false;
+                $textRun[] = $ql;
+            }
+        }
+        $flushRun();
+        return implode('', $htmlParts);
+    };
+
     // STEP 7: Process block-level elements (headers, lists, tables, etc.)
     $lines = explode("\n", $html);
     $result = [];
@@ -886,12 +920,16 @@ function parseMarkdown($text) {
             $calloutType = null;
             $calloutRemainder = '';
             $calloutCustomTitle = null;
+            $calloutFold = null;
 
-            // Match GitHub-style [!TYPE] syntax with optional custom title on the same line.
-            // The text after the "]" is the title (not the body), e.g. "> [!WARNING] Custom title".
-            if (preg_match('/^\s*\[!(Note|Tip|Important|Warning|Caution)\]\s*(.*)$/i', $firstLine, $lm)) {
+            // [!TYPE] syntax: any type name is accepted (unknown ones fall back to
+            // the note look). An Obsidian fold marker may follow the bracket:
+            // "+" = collapsible & open, "-" = collapsible & collapsed.
+            // The text after that is the title (not the body), e.g. "> [!WARNING] Custom title".
+            if (preg_match('/^\s*\[!([A-Za-z][A-Za-z0-9_-]*)\]([+-])?\s*(.*)$/', $firstLine, $lm)) {
                 $calloutType = strtolower($lm[1]);
-                $customTitle = isset($lm[2]) ? trim($lm[2]) : '';
+                $calloutFold = (isset($lm[2]) && $lm[2] !== '') ? $lm[2] : null;
+                $customTitle = isset($lm[3]) ? trim($lm[3]) : '';
                 if ($customTitle !== '') {
                     $calloutCustomTitle = $customTitle;
                 }
@@ -925,7 +963,7 @@ function parseMarkdown($text) {
                         $titleHtml = $defaultTitle;
                     }
                 }
-                $bodyHtml = implode('<br>', array_map(function($l) use ($applyInlineStyles) { return $applyInlineStyles($l); }, $bodyLines));
+                $bodyHtml = $renderQuoteLines($bodyLines);
 
                 // GitHub-style callout icons (matching the screenshot)
                 switch ($calloutType) {
@@ -954,17 +992,22 @@ function parseMarkdown($text) {
                         break;
                 }
 
-                $result[] = '<aside class="callout callout-' . $calloutType . '">'
-                         . '<div class="callout-title">' . $iconSvg . '<span class="callout-title-text">' . $applyInlineStyles($titleHtml) . '</span></div>'
-                         . '<div class="callout-body">' . $bodyHtml . '</div>'
-                         . '</aside>';
+                $titleInner = $iconSvg . '<span class="callout-title-text">' . $applyInlineStyles($titleHtml) . '</span>';
+                if ($calloutFold !== null) {
+                    $foldChevron = '<svg class="callout-fold-icon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.72a.749.749 0 0 1 1.06 0Z"></path></svg>';
+                    $result[] = '<details class="callout callout-' . $calloutType . '"' . ($calloutFold === '+' ? ' open' : '') . '>'
+                             . '<summary class="callout-title">' . $titleInner . $foldChevron . '</summary>'
+                             . '<div class="callout-body">' . $bodyHtml . '</div>'
+                             . '</details>';
+                } else {
+                    $result[] = '<aside class="callout callout-' . $calloutType . '">'
+                             . '<div class="callout-title">' . $titleInner . '</div>'
+                             . '<div class="callout-body">' . $bodyHtml . '</div>'
+                             . '</aside>';
+                }
             } else {
                 // Regular blockquote
-                $content = implode('<br>', array_map(function($line) use ($applyInlineStyles) {
-                    return $applyInlineStyles($line);
-                }, $blockquoteLines));
-
-                $result[] = '<blockquote>' . $content . '</blockquote>';
+                $result[] = '<blockquote>' . $renderQuoteLines($blockquoteLines) . '</blockquote>';
             }
             continue;
         }
