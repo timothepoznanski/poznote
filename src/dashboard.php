@@ -541,6 +541,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
+	<link type="text/css" rel="stylesheet" href="css/ai-chat.css?v=<?php echo $cache_v; ?>"/>
 </head>
 <body class="favorites-page dashboard-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -617,6 +618,18 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-network"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('home.graph', [], 'Graph'); ?></span>
 					</a>
+					<?php
+					require_once 'users/db_master.php';
+					$dashAiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
+						&& trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
+						&& trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
+					if ($dashAiChatEnabled):
+					?>
+					<button type="button" id="dashboardAiChatBtn" class="dashboard-topbar-btn" data-action="toggle-ai-chat" title="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>" aria-label="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>">
+						<i class="lucide lucide-bot"></i>
+						<span class="dashboard-topbar-count">AI</span>
+					</button>
+					<?php endif; ?>
 					<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>" aria-label="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
 						<i class="lucide lucide-settings"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
@@ -824,5 +837,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/notifications-modal.js?v=<?php echo file_exists(__DIR__ . '/js/notifications-modal.js') ? filemtime(__DIR__ . '/js/notifications-modal.js') : $cache_v; ?>"></script>
 		<script src="js/dashboard-page.js?v=<?php echo file_exists(__DIR__ . '/js/dashboard-page.js') ? filemtime(__DIR__ . '/js/dashboard-page.js') : $cache_v; ?>"></script>
+		<?php if (!empty($dashAiChatEnabled)): ?>
+		<?php include 'ai_chat_panel.php'; ?>
+		<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
+		<script src="js/markdown-handler.js?v=<?php echo $cache_v; ?>"></script>
+		<script src="js/ai-chat.js?v=<?php echo file_exists(__DIR__ . '/js/ai-chat.js') ? filemtime(__DIR__ . '/js/ai-chat.js') : $cache_v; ?>"></script>
+		<?php endif; ?>
 </body>
 </html>

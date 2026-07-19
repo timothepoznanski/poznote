@@ -524,18 +524,6 @@ if ($workspace !== '') {
         . 'Tool searches cover all workspaces unless you pass a workspace filter.';
 }
 
-$noteId = isset($input['note_id']) ? intval($input['note_id']) : 0;
-if ($noteId > 0) {
-    $note = aiReadNote($con, $noteId);
-    if ($note !== null) {
-        $system .= "\n\nThe user currently has this note open:\n"
-            . 'Title: ' . $note['title'] . ' (id ' . $note['id'] . ")\n"
-            . ($note['tags'] !== '' ? 'Tags: ' . $note['tags'] . "\n" : '')
-            . "Content:\n---\n" . $note['content'] . "\n---"
-            . ($note['truncated'] ? "\n(note content truncated)" : '');
-    }
-}
-
 array_unshift($messages, ['role' => 'system', 'content' => $system]);
 
 // ---------------------------------------------------------------------------

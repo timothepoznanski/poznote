@@ -28,37 +28,6 @@
         return !!p && p.classList.contains('ai-chat-open');
     }
 
-    function currentNoteId() {
-        // window.noteid is only set once the user interacts with a note, so
-        // fall back to the URL and the rendered note card.
-        var id = (typeof window.noteid !== 'undefined') ? parseInt(window.noteid, 10) : -1;
-        if (id > 0) return id;
-        var fromUrl = parseInt(new URLSearchParams(window.location.search).get('note'), 10);
-        if (fromUrl > 0) return fromUrl;
-        var card = document.querySelector('.notecard[id^="note"]');
-        if (card) {
-            var fromDom = parseInt(card.id.slice(4), 10);
-            if (fromDom > 0) return fromDom;
-        }
-        return 0;
-    }
-
-    function currentNoteTitle() {
-        var id = currentNoteId();
-        if (!id) return '';
-        var input = document.getElementById('inp' + id);
-        return input ? input.value : '';
-    }
-
-    function updateContextRow() {
-        var row = document.getElementById('ai-chat-context');
-        if (!row) return;
-        var id = currentNoteId();
-        row.hidden = !id;
-        var titleEl = document.getElementById('ai-chat-context-title');
-        if (titleEl) titleEl.textContent = id ? currentNoteTitle() : '';
-    }
-
     function scrollToBottom() {
         var el = messagesEl();
         if (el) el.scrollTop = el.scrollHeight;
@@ -267,7 +236,6 @@
             b.classList.toggle('ai-chat-active', open);
         });
         if (open) {
-            updateContextRow();
             var input = document.getElementById('ai-chat-input');
             if (input && window.matchMedia('(min-width: 801px)').matches) input.focus();
         }
@@ -282,7 +250,7 @@
             el.innerHTML = '';
             var hint = document.createElement('div');
             hint.className = 'ai-chat-empty';
-            hint.textContent = t('ai_chat.empty', {}, 'Ask anything — the assistant can search and read all your notes.');
+            hint.textContent = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, rename and edit your notes.');
             el.appendChild(hint);
         }
     }
@@ -302,11 +270,6 @@
         appendBubble('ai-chat-msg-user', text);
 
         var body = { messages: conversation };
-        var contextToggle = document.getElementById('ai-chat-context-toggle');
-        var noteId = currentNoteId();
-        if (noteId && (!contextToggle || contextToggle.checked)) {
-            body.note_id = noteId;
-        }
         if (document.body.dataset.workspace) {
             body.workspace = document.body.dataset.workspace;
         }
@@ -419,13 +382,33 @@
         var form = document.getElementById('ai-chat-form');
         if (!form) return;
 
+        // Panel open/clear triggers, handled here so the panel works on any
+        // page that includes it (notes page, dashboard, ...)
+        document.addEventListener('click', function (e) {
+            var toggleBtn = e.target.closest('[data-action="toggle-ai-chat"]');
+            if (toggleBtn) {
+                e.preventDefault();
+                toggle();
+                return;
+            }
+            var clearBtn = e.target.closest('[data-action="ai-chat-clear"]');
+            if (clearBtn) {
+                e.preventDefault();
+                clear();
+            }
+        });
+
         restoreConversation();
 
-        // Keep the "include current note" row in sync when the user
-        // switches notes while the panel is open
-        document.addEventListener('noteLoaded', function () {
-            if (isOpen()) updateContextRow();
-        });
+        // Arriving from the dashboard's AI button: open the panel and drop
+        // the parameter so a plain reload doesn't reopen it
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('ai_chat') === '1') {
+            if (!isOpen()) toggle();
+            params.delete('ai_chat');
+            var qs = params.toString();
+            history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : ''));
+        }
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -449,7 +432,6 @@
 
     window.AIChat = {
         toggle: toggle,
-        clear: clear,
-        refreshContext: updateContextRow
+        clear: clear
     };
 })();

@@ -836,12 +836,6 @@ body.dark-mode .ai-chat-notice {
     border-color: #55471f;
 }
 
-html[data-theme='dark'] .ai-chat-context,
-body.dark-mode .ai-chat-context {
-    border-top-color: var(--dm-border);
-    color: var(--dm-text-muted);
-}
-
 html[data-theme='dark'] .ai-chat-inputbar,
 body.dark-mode .ai-chat-inputbar {
     background: var(--dm-bg);

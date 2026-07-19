@@ -780,3 +780,26 @@
         });
     });
 })();
+
+// Mobile scroll hint on the topbar icons row: show a chevron on the right
+// edge while more icons are hidden past the viewport
+(function () {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var wrap = document.querySelector('.dashboard-topbar-scroll');
+        if (!wrap) return;
+        var nav = wrap.querySelector('.dashboard-topbar-actions');
+        if (!nav) return;
+
+        function update() {
+            var canScroll = nav.scrollWidth > nav.clientWidth + 2;
+            var atEnd = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 2;
+            wrap.classList.toggle('has-scroll-right', canScroll && !atEnd);
+        }
+
+        nav.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        update();
+    });
+})();

@@ -92,6 +92,7 @@ a.ai-chat-header-btn {
     text-align: center;
     margin-top: 40px;
     padding: 0 12px;
+    white-space: pre-line; /* the hint text contains a deliberate line break */
 }
 
 .ai-chat-msg {
@@ -224,38 +225,13 @@ a.ai-chat-header-btn {
     to { visibility: hidden; }
 }
 
-/* Context row */
-.ai-chat-context {
-    flex-shrink: 0;
-    padding: 6px 16px;
-    border-top: 1px solid #dee2e6;
-    font-size: 12px;
-    color: #6c757d;
-}
-
-.ai-chat-context label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-    min-width: 0;
-}
-
-.ai-chat-context-title {
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    min-width: 0;
-}
-
 /* Input bar */
 .ai-chat-inputbar {
     flex-shrink: 0;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 8px;
-    padding: 10px 16px calc(12px + env(safe-area-inset-bottom));
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid #dee2e6;
     background: #f8f9fa;
 }
@@ -307,8 +283,7 @@ a.ai-chat-header-btn {
 
 /* icons.css applies a global gray filter to all lucide icons; without this
    exclusion the white send arrow renders gray on the blue button */
-#ai-chat-panel [class*="lucide-"],
-.sidebar-ai-chat [class*="lucide-"] {
+#ai-chat-panel [class*="lucide-"] {
     filter: none !important;
     color: inherit;
 }
@@ -347,40 +322,6 @@ a.ai-chat-header-btn {
     border: 1px solid #f0e0b0;
     border-radius: 8px;
     padding: 6px 10px;
-}
-
-/* Global open button in the sidebar header (mirrors the shared
-   .sidebar-settings/.sidebar-plus styling from sidebar.css) */
-.sidebar-ai-chat {
-    background: transparent;
-    border: none;
-    color: #6c757d !important;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 4px 5px;
-    border-radius: 6px;
-    position: relative;
-    min-width: 30px;
-    min-height: 30px;
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-.sidebar-ai-chat:hover {
-    background: rgba(0, 125, 184, 0.1);
-}
-
-.sidebar-ai-chat:focus {
-    outline: 2px solid #007DB8;
-    outline-offset: 2px;
-}
-
-.sidebar-ai-chat.ai-chat-active,
-.sidebar-ai-chat.ai-chat-active i {
-    color: #007DB8 !important;
 }
 
 @media (max-width: 800px) {

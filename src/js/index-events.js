@@ -589,16 +589,8 @@
                 break;
 
             // Note actions with noteId
-            case 'toggle-ai-chat':
-                if (window.AIChat) {
-                    window.AIChat.toggle(noteId);
-                }
-                break;
-            case 'ai-chat-clear':
-                if (window.AIChat) {
-                    window.AIChat.clear();
-                }
-                break;
+            // (toggle-ai-chat / ai-chat-clear are handled in ai-chat.js so the
+            // panel also works on pages without index-events.js)
             case 'toggle-favorite':
                 if (noteId && typeof toggleFavorite === 'function') {
                     toggleFavorite(noteId);

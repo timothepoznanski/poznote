@@ -430,11 +430,6 @@ if ($isPublicWorkspaceReadonly) {
                         <i class="lucide lucide-settings"></i>
                         <span class="update-badge update-badge-hidden"></span>
                     </button>
-                    <?php if ($aiChatEnabled): ?>
-                    <button id="sidebar-ai-chat-btn" class="sidebar-ai-chat btn-ai-chat" data-action="toggle-ai-chat" title="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>" aria-label="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>">
-                        <i class="lucide lucide-bot"></i>
-                    </button>
-                    <?php endif; ?>
                     <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
                         <i class="lucide lucide-plus-circle"></i>
                     </button>
@@ -579,39 +574,7 @@ if ($isPublicWorkspaceReadonly) {
     </div>
 
     <?php if ($aiChatEnabled): ?>
-    <!-- AI CHAT PANEL -->
-    <div id="ai-chat-panel">
-        <div class="ai-chat-header">
-            <h2 class="ai-chat-title"><i class="lucide lucide-bot"></i> <span data-i18n="ai_chat.title">AI Assistant</span></h2>
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-            <a class="ai-chat-header-btn" href="ai_settings.php" aria-label="<?php echo t_h('ai_settings.title', [], 'AI Assistant'); ?>" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
-                <i class="lucide lucide-settings"></i>
-            </a>
-            <?php endif; ?>
-            <button type="button" class="ai-chat-header-btn" data-action="ai-chat-clear" aria-label="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>" title="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>">
-                <i class="lucide lucide-trash"></i>
-            </button>
-            <button type="button" class="ai-chat-header-btn" data-action="toggle-ai-chat" aria-label="<?php echo t_h('common.close'); ?>" title="<?php echo t_h('common.close'); ?>">
-                <i class="lucide lucide-x"></i>
-            </button>
-        </div>
-        <div class="ai-chat-messages" id="ai-chat-messages">
-            <div class="ai-chat-empty" data-i18n="ai_chat.empty">Ask anything — the assistant can search and read all your notes.</div>
-        </div>
-        <div class="ai-chat-context" id="ai-chat-context" hidden>
-            <label>
-                <input type="checkbox" id="ai-chat-context-toggle">
-                <span data-i18n="ai_chat.use_note_context">Include current note:</span>
-                <span class="ai-chat-context-title" id="ai-chat-context-title"></span>
-            </label>
-        </div>
-        <form id="ai-chat-form" class="ai-chat-inputbar">
-            <textarea id="ai-chat-input" rows="1" placeholder="<?php echo t_h('ai_chat.placeholder', [], 'Ask the assistant...'); ?>" data-i18n-placeholder="ai_chat.placeholder"></textarea>
-            <button type="submit" id="ai-chat-send" class="ai-chat-send-btn" title="<?php echo t_h('ai_chat.send', [], 'Send'); ?>">
-                <i class="lucide lucide-arrow-up"></i>
-            </button>
-        </form>
-    </div>
+    <?php include 'ai_chat_panel.php'; ?>
     <?php endif; ?>
 
     <!-- Data for initialization (used by index-events.js) -->

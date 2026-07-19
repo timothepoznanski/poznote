@@ -300,15 +300,10 @@ $aiLocalHost = aiChatLocalDefaultHost();
         function applyProvider(initial) {
             var p = PROVIDERS[providerSel.value] || PROVIDERS.custom;
             urlGroup.style.display = p.fixedUrl ? 'none' : '';
-            if (p.fixedUrl) {
+            if (p.fixedUrl || !initial) {
+                // Switching provider always resets the URL to that provider's
+                // default — predictable, and never keeps a stale URL around
                 urlInput.value = p.url;
-            } else if (!initial) {
-                // Replace a default/fixed URL left over from another provider,
-                // but keep a hand-edited one (e.g. custom Ollama port)
-                var current = urlInput.value.trim();
-                if (current === '' || DEFAULT_URLS.indexOf(current) !== -1) {
-                    urlInput.value = p.url;
-                }
             }
             keyGroup.style.display = (p.key === 'none') ? 'none' : '';
             keyLabel.textContent = (p.key === 'required') ? i18n.apiKeyRequired : i18n.apiKeyOptional;
