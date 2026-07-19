@@ -2741,6 +2741,7 @@
     "dismiss_all": "全部删除",
     "set_success": "提醒已设置于",
     "removed": "提醒已移除",
+    "repeats": "重复提醒",
     "just_now": "刚刚",
     "new_notifications": "您有",
     "notification_s": "条通知",
@@ -2768,7 +2769,23 @@
       "email_toggle": "给我发送邮件",
       "email_hint": "发送至 {{email}}",
       "select_date": "请选择日期和时间",
-      "past_time": "请选择一个未来的时间"
+      "past_time": "请选择一个未来的时间",
+      "repeat_label": "重复",
+      "repeat_none": "不重复",
+      "repeat_hourly": "每小时",
+      "repeat_daily": "每天",
+      "repeat_weekly": "每周",
+      "repeat_monthly": "每月",
+      "repeat_yearly": "每年",
+      "repeat_custom": "自定义...",
+      "repeat_hint": "下一次提醒将在您关闭通知后安排。",
+      "repeat_every": "每",
+      "repeat_minutes": "分钟",
+      "repeat_hours": "小时",
+      "repeat_days": "天",
+      "repeat_weeks": "周",
+      "repeat_months": "个月",
+      "repeat_years": "年"
     }
   },
   "settings_password": {

@@ -165,7 +165,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 16;
+    $CURRENT_SCHEMA_VERSION = 17;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -438,15 +438,18 @@ try {
             }
         }
 
-        // Add reminder_at column to entries
+        // Add reminder_at and reminder_recurrence columns to entries
         try {
             $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
             $existingColumns = array_column($cols, 'name');
             if (!in_array('reminder_at', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN reminder_at DATETIME");
             }
+            if (!in_array('reminder_recurrence', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN reminder_recurrence TEXT");
+            }
         } catch (Exception $e) {
-            error_log('Could not add reminder_at column to entries: ' . $e->getMessage());
+            error_log('Could not add reminder columns to entries: ' . $e->getMessage());
         }
 
         // === INDEXES ===

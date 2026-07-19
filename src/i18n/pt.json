@@ -2603,6 +2603,7 @@
     "dismiss_all": "Excluir tudo",
     "set_success": "Lembrete definido para",
     "removed": "Lembrete removido",
+    "repeats": "Repete-se",
     "just_now": "Agora mesmo",
     "new_notifications": "Você tem",
     "notification_s": "notificação(ões)",
@@ -2630,7 +2631,23 @@
       "email_toggle": "Enviar-me um e-mail",
       "email_hint": "Para {{email}}",
       "select_date": "Selecione uma data e hora",
-      "past_time": "Selecione uma data futura"
+      "past_time": "Selecione uma data futura",
+      "repeat_label": "Repetir",
+      "repeat_none": "Não se repete",
+      "repeat_hourly": "A cada hora",
+      "repeat_daily": "Diariamente",
+      "repeat_weekly": "Semanalmente",
+      "repeat_monthly": "Mensalmente",
+      "repeat_yearly": "Anualmente",
+      "repeat_custom": "Personalizado...",
+      "repeat_hint": "O próximo lembrete é agendado quando você fecha a notificação.",
+      "repeat_every": "A cada",
+      "repeat_minutes": "minuto(s)",
+      "repeat_hours": "hora(s)",
+      "repeat_days": "dia(s)",
+      "repeat_weeks": "semana(s)",
+      "repeat_months": "mês(es)",
+      "repeat_years": "ano(s)"
     }
   },
   "settings_password": {

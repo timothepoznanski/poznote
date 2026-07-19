@@ -697,11 +697,12 @@ Set (or replace) a reminder on a note.
 | `reminder_at` | datetime | Yes | When to trigger the reminder (ISO 8601) |
 | `message` | string | No | Optional reminder message |
 | `email_enabled` | boolean | No | Also send an email (if email is configured) |
+| `recurrence` | string | No | Repeat interval as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` for minute/hour/day/week/month/year (e.g. `30i` every 30 minutes, `1h` hourly, `2w` every 2 weeks). Dismissing the notification schedules the next occurrence. |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
-  -d '{"reminder_at": "2026-07-10T09:00:00Z", "message": "Review this note"}' \
+  -d '{"reminder_at": "2026-07-10T09:00:00Z", "message": "Review this note", "recurrence": "1w"}' \
   http://YOUR_SERVER/api/v1/notes/123/reminder
 ```
 

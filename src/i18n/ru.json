@@ -2266,6 +2266,7 @@
     "dismiss_all": "Удалить все",
     "set_success": "Напоминание установлено на",
     "removed": "Напоминание удалено",
+    "repeats": "Повторяется",
     "just_now": "Только что",
     "new_notifications": "У вас",
     "notification_s": "уведомление(й)",
@@ -2293,7 +2294,23 @@
       "email_toggle": "Отправить мне письмо",
       "email_hint": "На адрес {{email}}",
       "select_date": "Выберите дату и время",
-      "past_time": "Выберите дату в будущем"
+      "past_time": "Выберите дату в будущем",
+      "repeat_label": "Повтор",
+      "repeat_none": "Не повторяется",
+      "repeat_hourly": "Ежечасно",
+      "repeat_daily": "Ежедневно",
+      "repeat_weekly": "Еженедельно",
+      "repeat_monthly": "Ежемесячно",
+      "repeat_yearly": "Ежегодно",
+      "repeat_custom": "Другой интервал...",
+      "repeat_hint": "Следующее напоминание планируется после закрытия уведомления.",
+      "repeat_every": "Каждые",
+      "repeat_minutes": "мин.",
+      "repeat_hours": "ч.",
+      "repeat_days": "дн.",
+      "repeat_weeks": "нед.",
+      "repeat_months": "мес.",
+      "repeat_years": "лет"
     }
   },
   "settings_password": {

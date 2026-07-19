@@ -2300,6 +2300,7 @@
     "dismiss_all": "Delete all",
     "set_success": "Reminder set for",
     "removed": "Reminder removed",
+    "repeats": "Repeats",
     "just_now": "Just now",
     "new_notifications": "You have",
     "notification_s": "notification(s)",
@@ -2327,7 +2328,23 @@
       "email_toggle": "Send me an email",
       "email_hint": "To {{email}}",
       "select_date": "Please select a date and time",
-      "past_time": "Please select a future time"
+      "past_time": "Please select a future time",
+      "repeat_label": "Repeat",
+      "repeat_none": "Does not repeat",
+      "repeat_hourly": "Hourly",
+      "repeat_daily": "Daily",
+      "repeat_weekly": "Weekly",
+      "repeat_monthly": "Monthly",
+      "repeat_yearly": "Yearly",
+      "repeat_custom": "Custom...",
+      "repeat_hint": "The next reminder is scheduled when you dismiss the notification.",
+      "repeat_every": "Every",
+      "repeat_minutes": "minute(s)",
+      "repeat_hours": "hour(s)",
+      "repeat_days": "day(s)",
+      "repeat_weeks": "week(s)",
+      "repeat_months": "month(s)",
+      "repeat_years": "year(s)"
     }
   },
   "settings_password": {

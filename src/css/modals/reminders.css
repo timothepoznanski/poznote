@@ -79,6 +79,101 @@
     border-color: var(--accent-color, #4a90d9);
 }
 
+.reminder-repeat-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reminder-repeat-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.reminder-repeat-label i {
+    width: 16px;
+    height: 16px;
+    color: var(--accent-color, #4a90d9);
+    flex-shrink: 0;
+}
+
+/* Compact sizing must out-rank the global iOS-zoom rule
+   (.modal-content select { font-size:16px/padding:12px !important } in responsive.css) */
+#reminderModal .reminder-repeat-select,
+#reminderModal .reminder-repeat-unit,
+#reminderModal .reminder-repeat-interval {
+    padding: 4px 8px !important;
+    margin: 0;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    font-size: 13px !important;
+    background: var(--input-bg, #fff);
+    color: inherit;
+    box-sizing: border-box;
+}
+
+/* Touch devices keep 16px to avoid iOS focus zoom */
+@media (pointer: coarse) {
+    #reminderModal .reminder-repeat-select,
+    #reminderModal .reminder-repeat-unit,
+    #reminderModal .reminder-repeat-interval {
+        padding: 8px 10px !important;
+        font-size: 16px !important;
+    }
+}
+
+.reminder-repeat-select:focus,
+.reminder-repeat-unit:focus,
+.reminder-repeat-interval:focus {
+    outline: none;
+    border-color: var(--accent-color, #4a90d9);
+    box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
+}
+
+.reminder-repeat-select {
+    flex: 1;
+    min-width: 0;
+}
+
+.reminder-repeat-hint {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--text-secondary, #777);
+    margin-top: -6px;
+}
+
+.reminder-repeat-custom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.reminder-repeat-custom.initially-hidden {
+    display: none;
+}
+
+.reminder-repeat-interval {
+    width: 72px;
+}
+
+.reminder-repeat-unit {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-repeat-icon {
+    width: 12px;
+    height: 12px;
+    vertical-align: -2px;
+    margin-left: 6px;
+    opacity: 0.7;
+}
+
 .reminder-email-option {
     border: 1px solid var(--border-color, #ddd);
     border-radius: 8px;

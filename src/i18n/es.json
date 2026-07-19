@@ -2600,6 +2600,7 @@
     "dismiss_all": "Eliminar todo",
     "set_success": "Recordatorio establecido para",
     "removed": "Recordatorio eliminado",
+    "repeats": "Se repite",
     "just_now": "Ahora mismo",
     "new_notifications": "Tiene",
     "notification_s": "notificación(es)",
@@ -2627,7 +2628,23 @@
       "email_toggle": "Enviarme un correo",
       "email_hint": "A {{email}}",
       "select_date": "Seleccione una fecha y hora",
-      "past_time": "Seleccione una fecha futura"
+      "past_time": "Seleccione una fecha futura",
+      "repeat_label": "Repetir",
+      "repeat_none": "No se repite",
+      "repeat_hourly": "Cada hora",
+      "repeat_daily": "Diariamente",
+      "repeat_weekly": "Semanalmente",
+      "repeat_monthly": "Mensualmente",
+      "repeat_yearly": "Anualmente",
+      "repeat_custom": "Personalizado...",
+      "repeat_hint": "El próximo recordatorio se programa al cerrar la notificación.",
+      "repeat_every": "Cada",
+      "repeat_minutes": "minuto(s)",
+      "repeat_hours": "hora(s)",
+      "repeat_days": "día(s)",
+      "repeat_weeks": "semana(s)",
+      "repeat_months": "mes(es)",
+      "repeat_years": "año(s)"
     }
   },
   "settings_password": {

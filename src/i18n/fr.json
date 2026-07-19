@@ -2815,6 +2815,7 @@
     "dismiss_all": "Tout supprimer",
     "set_success": "Rappel défini pour",
     "removed": "Rappel supprimé",
+    "repeats": "Se répète",
     "just_now": "À l'instant",
     "new_notifications": "Vous avez",
     "notification_s": "notification(s)",
@@ -2842,7 +2843,23 @@
       "email_toggle": "M’envoyer un email",
       "email_hint": "À l’adresse {{email}}",
       "select_date": "Veuillez sélectionner une date et une heure",
-      "past_time": "Veuillez sélectionner une date future"
+      "past_time": "Veuillez sélectionner une date future",
+      "repeat_label": "Répétition",
+      "repeat_none": "Ne se répète pas",
+      "repeat_hourly": "Toutes les heures",
+      "repeat_daily": "Tous les jours",
+      "repeat_weekly": "Toutes les semaines",
+      "repeat_monthly": "Tous les mois",
+      "repeat_yearly": "Tous les ans",
+      "repeat_custom": "Personnalisé...",
+      "repeat_hint": "Le prochain rappel est planifié lorsque vous fermez la notification.",
+      "repeat_every": "Tous les",
+      "repeat_minutes": "minute(s)",
+      "repeat_hours": "heure(s)",
+      "repeat_days": "jour(s)",
+      "repeat_weeks": "semaine(s)",
+      "repeat_months": "mois",
+      "repeat_years": "an(s)"
     }
   },
   "settings_password": {

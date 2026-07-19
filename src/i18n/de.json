@@ -2600,6 +2600,7 @@
     "dismiss_all": "Alle löschen",
     "set_success": "Erinnerung gesetzt für",
     "removed": "Erinnerung entfernt",
+    "repeats": "Wiederholt sich",
     "just_now": "Gerade eben",
     "new_notifications": "Sie haben",
     "notification_s": "Benachrichtigung(en)",
@@ -2627,7 +2628,23 @@
       "email_toggle": "Mir eine E-Mail senden",
       "email_hint": "An {{email}}",
       "select_date": "Bitte wählen Sie Datum und Uhrzeit",
-      "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt"
+      "past_time": "Bitte wählen Sie einen zukünftigen Zeitpunkt",
+      "repeat_label": "Wiederholung",
+      "repeat_none": "Keine Wiederholung",
+      "repeat_hourly": "Stündlich",
+      "repeat_daily": "Täglich",
+      "repeat_weekly": "Wöchentlich",
+      "repeat_monthly": "Monatlich",
+      "repeat_yearly": "Jährlich",
+      "repeat_custom": "Benutzerdefiniert...",
+      "repeat_hint": "Die nächste Erinnerung wird geplant, wenn Sie die Benachrichtigung schließen.",
+      "repeat_every": "Alle",
+      "repeat_minutes": "Minute(n)",
+      "repeat_hours": "Stunde(n)",
+      "repeat_days": "Tag(e)",
+      "repeat_weeks": "Woche(n)",
+      "repeat_months": "Monat(e)",
+      "repeat_years": "Jahr(e)"
     }
   },
   "settings_password": {
