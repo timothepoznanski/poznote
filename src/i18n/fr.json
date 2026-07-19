@@ -2924,23 +2924,34 @@
     "save": "Enregistrer la configuration",
     "test": "Tester la connexion",
     "testing": "Test de la connexion...",
-    "test_success": "Connexion réussie. {{count}} modèle(s) disponible(s).",
+    "test_success": "Connexion réussie. {{count}} modèle(s) disponible(s). Cliquez sur un modèle ci-dessous et enregistrez.",
     "test_failure": "Échec de la connexion : {{error}}",
     "footer_note": "Le serveur IA est appelé depuis le serveur Poznote, pas depuis votre navigateur. Les conversations sont envoyées au serveur configuré ; avec une instance Ollama locale, rien ne quitte votre machine.",
     "messages": {
       "saved": "Configuration enregistrée avec succès.",
       "save_error": "Échec de l'enregistrement de la configuration."
-    }
+    },
+    "provider_label": "Fournisseur d'IA",
+    "provider_custom": "Autre (URL personnalisée)",
+    "api_key_label_required": "Clé API",
+    "model_description": "Utilisez « Test connection » pour lister les modèles disponibles sur le serveur."
   },
   "ai_chat": {
     "title": "Assistant IA",
     "toolbar_button": "Assistant IA",
-    "empty": "Posez une question sur vos notes. La note actuellement ouverte peut être partagée avec l'assistant comme contexte.",
+    "empty": "Posez une question. L'assistant peut chercher et lire toutes vos notes.",
     "placeholder": "Demandez à l'assistant...",
     "send": "Envoyer",
     "stop": "Arrêter",
     "clear": "Effacer la conversation",
     "error": "Erreur : {{error}}",
-    "use_note_context": "Inclure la note actuelle :"
+    "use_note_context": "Inclure la note actuelle :",
+    "tool_search": "Recherche dans les notes : {{query}}",
+    "tool_read": "Lecture de la note #{{id}}",
+    "tool_list": "Liste des notes récentes",
+    "no_tools_notice": "Ce modèle ne supporte pas les outils — l'assistant ne peut pas parcourir vos notes.",
+    "tool_rename": "Renommage de la note #{{id}} en « {{title}} »",
+    "tool_update": "Modification de la note #{{id}}",
+    "tool_create": "Création de la note : {{title}}"
   }
 }

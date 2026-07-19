@@ -2421,23 +2421,34 @@
     "save": "Save Configuration",
     "test": "Test connection",
     "testing": "Testing connection...",
-    "test_success": "Connection successful. {{count}} model(s) available.",
+    "test_success": "Connection successful. {{count}} model(s) available. Click a model below and save.",
     "test_failure": "Connection failed: {{error}}",
     "footer_note": "The AI server is called from the Poznote server, not from your browser. Chat conversations are sent to the configured server; with a local Ollama instance nothing leaves your machine.",
     "messages": {
       "saved": "Configuration saved successfully.",
       "save_error": "Failed to save configuration."
-    }
+    },
+    "provider_label": "AI provider",
+    "provider_custom": "Other (custom URL)",
+    "api_key_label_required": "API key",
+    "model_description": "Use \"Test connection\" to list the models available on the server."
   },
   "ai_chat": {
     "title": "AI Assistant",
     "toolbar_button": "AI assistant",
-    "empty": "Ask anything about your notes. The currently opened note can be shared with the assistant as context.",
+    "empty": "Ask anything. The assistant can search and read all your notes.",
     "placeholder": "Ask the assistant...",
     "send": "Send",
     "stop": "Stop",
     "clear": "Clear conversation",
     "error": "Error: {{error}}",
-    "use_note_context": "Include current note:"
+    "use_note_context": "Include current note:",
+    "tool_search": "Searching notes: {{query}}",
+    "tool_read": "Reading note #{{id}}",
+    "tool_list": "Listing recent notes",
+    "no_tools_notice": "This model does not support tools — the assistant cannot browse your notes.",
+    "tool_rename": "Renaming note #{{id}} to \"{{title}}\"",
+    "tool_update": "Editing note #{{id}}",
+    "tool_create": "Creating note: {{title}}"
   }
 }

@@ -323,24 +323,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- AI Assistant -->
-            <div class="home-card settings-card-clickable" id="ai-assistant-card" data-href="ai_settings.php">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-bot"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span>
-                    <?php
-                    $aiChatEnabledCard = isset($con) && getSetting('ai_chat_enabled', '0') === '1'
-                        && trim((string)getSetting('ai_chat_url', '')) !== ''
-                        && trim((string)getSetting('ai_chat_model', '')) !== '';
-                    ?>
-                    <span class="setting-status <?php echo $aiChatEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $aiChatEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
-                    </span>
-                </div>
-            </div>
-
             <!-- Browser Extension -->
             <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
                 <div class="home-card-icon">
@@ -673,6 +655,25 @@ if ($isAdmin) {
                             echo t_h('smtp_admin.status.not_configured', [], 'Not configured');
                         }
                         ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- AI Assistant (instance-wide configuration) -->
+            <div class="home-card settings-card-clickable" id="ai-assistant-card" data-href="ai_settings.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-bot"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span>
+                    <?php
+                    require_once 'users/db_master.php';
+                    $aiChatEnabledCard = getGlobalSetting('ai_chat_enabled', '0') === '1'
+                        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
+                        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
+                    ?>
+                    <span class="setting-status <?php echo $aiChatEnabledCard ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $aiChatEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
                     </span>
                 </div>
             </div>

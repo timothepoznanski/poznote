@@ -2850,23 +2850,34 @@
     "save": "保存配置",
     "test": "测试连接",
     "testing": "正在测试连接...",
-    "test_success": "连接成功。可用模型：{{count}} 个。",
+    "test_success": "连接成功。{{count}} 个可用模型。点击下方模型并保存。",
     "test_failure": "连接失败：{{error}}",
     "footer_note": "AI 服务器由 Poznote 服务器调用，而不是您的浏览器。聊天内容会发送到所配置的服务器；使用本地 Ollama 实例时，数据不会离开您的机器。",
     "messages": {
       "saved": "配置保存成功。",
       "save_error": "配置保存失败。"
-    }
+    },
+    "provider_label": "AI 服务商",
+    "provider_custom": "其他（自定义 URL）",
+    "api_key_label_required": "API 密钥",
+    "model_description": "点击“Test connection”列出服务器上可用的模型。"
   },
   "ai_chat": {
     "title": "AI 助手",
     "toolbar_button": "AI 助手",
-    "empty": "就您的笔记提出任何问题。当前打开的笔记可以作为上下文分享给助手。",
+    "empty": "随便提问——助手可以搜索并阅读你的所有笔记。",
     "placeholder": "向助手提问...",
     "send": "发送",
     "stop": "停止",
     "clear": "清空对话",
     "error": "错误：{{error}}",
-    "use_note_context": "包含当前笔记："
+    "use_note_context": "包含当前笔记：",
+    "tool_search": "搜索笔记：{{query}}",
+    "tool_read": "正在读取笔记 #{{id}}",
+    "tool_list": "列出最近的笔记",
+    "no_tools_notice": "该模型不支持工具调用——助手无法浏览你的笔记。",
+    "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
+    "tool_update": "正在编辑笔记 #{{id}}",
+    "tool_create": "正在创建笔记：{{title}}"
   }
 }

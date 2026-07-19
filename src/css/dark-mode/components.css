@@ -799,6 +799,43 @@ body.dark-mode .ai-chat-msg-error {
     border-color: #5c2e33;
 }
 
+html[data-theme='dark'] .ai-chat-md code,
+html[data-theme='dark'] .ai-chat-md pre,
+body.dark-mode .ai-chat-md code,
+body.dark-mode .ai-chat-md pre {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .ai-chat-md blockquote,
+body.dark-mode .ai-chat-md blockquote {
+    border-left-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-md th,
+html[data-theme='dark'] .ai-chat-md td,
+body.dark-mode .ai-chat-md th,
+body.dark-mode .ai-chat-md td {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .ai-chat-md a,
+body.dark-mode .ai-chat-md a {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .ai-chat-tool,
+body.dark-mode .ai-chat-tool {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-notice,
+body.dark-mode .ai-chat-notice {
+    color: #d8b95c;
+    background: #322a15;
+    border-color: #55471f;
+}
+
 html[data-theme='dark'] .ai-chat-context,
 body.dark-mode .ai-chat-context {
     border-top-color: var(--dm-border);

@@ -71,6 +71,11 @@
     color: #007DB8;
 }
 
+/* The settings shortcut is a link styled like the header buttons */
+a.ai-chat-header-btn {
+    text-decoration: none;
+}
+
 /* Messages area */
 .ai-chat-messages {
     flex: 1;
@@ -114,6 +119,87 @@
     border-bottom-left-radius: 3px;
 }
 
+/* Assistant bubbles rendered as markdown: block elements provide the
+   structure, so drop the pre-wrap used for plain-text bubbles */
+.ai-chat-msg.ai-chat-md {
+    white-space: normal;
+}
+
+.ai-chat-md p,
+.ai-chat-md ul,
+.ai-chat-md ol,
+.ai-chat-md pre,
+.ai-chat-md blockquote,
+.ai-chat-md table {
+    margin: 0 0 8px;
+}
+
+.ai-chat-md > :last-child {
+    margin-bottom: 0;
+}
+
+.ai-chat-md h1,
+.ai-chat-md h2,
+.ai-chat-md h3,
+.ai-chat-md h4,
+.ai-chat-md h5,
+.ai-chat-md h6 {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 10px 0 6px;
+}
+
+.ai-chat-md ul,
+.ai-chat-md ol {
+    padding-left: 20px;
+}
+
+.ai-chat-md code {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 0.9em;
+    color: inherit; /* the global `code` rule hardcodes #333, unreadable on dark bubbles */
+}
+
+.ai-chat-md pre {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.ai-chat-md pre code {
+    background: none;
+    padding: 0;
+}
+
+.ai-chat-md blockquote {
+    border-left: 3px solid #ced4da;
+    padding-left: 10px;
+    color: #6c757d;
+}
+
+.ai-chat-md table {
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.ai-chat-md th,
+.ai-chat-md td {
+    border: 1px solid #dee2e6;
+    padding: 3px 8px;
+}
+
+.ai-chat-md a {
+    color: #007DB8;
+}
+
+.ai-chat-md img {
+    max-width: 100%;
+}
+
 .ai-chat-msg-error {
     align-self: stretch;
     background: #fdecea;
@@ -123,7 +209,14 @@
 }
 
 .ai-chat-msg-assistant.ai-chat-pending::after {
-    content: '▍';
+    /* CSS-drawn caret: block characters like ▍ render too thick */
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    vertical-align: text-bottom;
+    background: currentColor;
+    margin-left: 2px;
     animation: ai-chat-blink 1s steps(2, start) infinite;
 }
 
@@ -212,9 +305,82 @@
     cursor: default;
 }
 
-/* Toolbar button active state */
-.toolbar-btn.btn-ai-chat.ai-chat-active i {
-    color: #007DB8;
+/* icons.css applies a global gray filter to all lucide icons; without this
+   exclusion the white send arrow renders gray on the blue button */
+#ai-chat-panel [class*="lucide-"],
+.sidebar-ai-chat [class*="lucide-"] {
+    filter: none !important;
+    color: inherit;
+}
+
+/* Stop state: filled square (deliberately not a lucide outline glyph) */
+.ai-chat-stop-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: currentColor;
+}
+
+/* Tool activity lines (assistant searching/reading notes) */
+.ai-chat-tool {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6c757d;
+    padding: 0 4px;
+    max-width: 90%;
+    overflow-wrap: anywhere;
+}
+
+/* One-time warning when the model doesn't support tool calling */
+.ai-chat-notice {
+    align-self: stretch;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+    color: #8a6d1a;
+    background: #fdf6e3;
+    border: 1px solid #f0e0b0;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+/* Global open button in the sidebar header (mirrors the shared
+   .sidebar-settings/.sidebar-plus styling from sidebar.css) */
+.sidebar-ai-chat {
+    background: transparent;
+    border: none;
+    color: #6c757d !important;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 5px;
+    border-radius: 6px;
+    position: relative;
+    min-width: 30px;
+    min-height: 30px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.sidebar-ai-chat:hover {
+    background: rgba(0, 125, 184, 0.1);
+}
+
+.sidebar-ai-chat:focus {
+    outline: 2px solid #007DB8;
+    outline-offset: 2px;
+}
+
+.sidebar-ai-chat.ai-chat-active,
+.sidebar-ai-chat.ai-chat-active i {
+    color: #007DB8 !important;
 }
 
 @media (max-width: 800px) {

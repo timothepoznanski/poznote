@@ -193,14 +193,6 @@
                         echo '<button type="button" class="toolbar-btn btn-reminder note-action-btn'.$reminder_class.'" title="'.t_h('reminder.toolbar_button', [], 'Set reminder').'" data-action="open-reminder-modal" data-note-id="'.$row['id'].'" data-reminder-at="'.htmlspecialchars($row['reminder_at'] ?? '', ENT_QUOTES).'"><i class="lucide lucide-bell"></i></button>';
                     }
                     
-                    // AI chat button (only when the AI assistant is configured)
-                    $aiChatToolbarEnabled = getSetting('ai_chat_enabled', '0') === '1'
-                        && trim((string)getSetting('ai_chat_url', '')) !== ''
-                        && trim((string)getSetting('ai_chat_model', '')) !== '';
-                    if ($aiChatToolbarEnabled && !$isPublicWorkspaceReadonly) {
-                        echo '<button type="button" class="toolbar-btn btn-ai-chat note-action-btn" title="'.t_h('ai_chat.toolbar_button', [], 'AI assistant').'" data-action="toggle-ai-chat" data-note-id="'.$row['id'].'"><i class="lucide lucide-bot"></i></button>';
-                    }
-
                     // Open in new tab button
                     echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="lucide lucide-external-link"></i></button>';
 

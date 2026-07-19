@@ -42,6 +42,7 @@ https://poznote.com/index.html#press
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
 - [Multiple Instances](#multiple-instances)
+- [AI Assistant](#ai-assistant)
 - [MCP Server](#mcp-server)
 - [Chrome Extension](#chrome-extension)
 - [Share to Poznote on Android](#share-to-poznote-on-android)
@@ -893,6 +894,24 @@ Server: my-server.com
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
+
+## AI Assistant
+
+Poznote includes an integrated AI chat that connects to any OpenAI-compatible server — a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, or a cloud provider like OpenAI. Once configured, a robot button appears in the sidebar and opens a chat panel.
+
+The assistant is global, MCP-style: it has tools to **search and read all your notes**, and uses them on its own to answer questions — "what do my notes say about X?", cross-note summaries, finding that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown, and the currently opened note can additionally be shared as context.
+
+To enable it, go to **Settings → AI Assistant** (administrator only) and pick a provider: **Ollama** or **LM Studio** for a local server (just the URL, no key), **Anthropic** or **OpenAI** for a cloud provider (just an API key, the URL is set for you), or a custom OpenAI-compatible URL. Then use **Test connection** — it verifies the server is reachable and lists its available models so you can pick one with a click. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat button.
+
+Example with Ollama running on the Docker host:
+
+- **Server URL:** `http://host.docker.internal:11434` (Docker Desktop). On Linux, use the Docker bridge IP instead (usually `http://172.17.0.1:11434`), and make sure Ollama listens on that interface (`OLLAMA_HOST=0.0.0.0`).
+- **Model:** a model that supports tool calling, e.g. `llama3.1`, `qwen3` or `mistral` — required for the assistant to browse your notes. With a model that lacks tool support, the chat still works but cannot access your notes on its own.
+- **API key:** leave empty (only needed for cloud providers)
+
+The AI server is called from the Poznote server, never from your browser. With a local Ollama instance, your notes and conversations never leave your machine.
+
+The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header. To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
 
 ## MCP Server
 

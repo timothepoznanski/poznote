@@ -399,6 +399,13 @@ if ($isPublicWorkspaceReadonly) {
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, icon, icon_color FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
+
+    // AI assistant availability (instance-wide config, used for the sidebar
+    // button and the chat panel below)
+    require_once 'users/db_master.php';
+    $aiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
+        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
+        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
     ?>
 
         
@@ -423,6 +430,11 @@ if ($isPublicWorkspaceReadonly) {
                         <i class="lucide lucide-settings"></i>
                         <span class="update-badge update-badge-hidden"></span>
                     </button>
+                    <?php if ($aiChatEnabled): ?>
+                    <button id="sidebar-ai-chat-btn" class="sidebar-ai-chat btn-ai-chat" data-action="toggle-ai-chat" title="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>" aria-label="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>">
+                        <i class="lucide lucide-bot"></i>
+                    </button>
+                    <?php endif; ?>
                     <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
                         <i class="lucide lucide-plus-circle"></i>
                     </button>
@@ -566,16 +578,16 @@ if ($isPublicWorkspaceReadonly) {
         </ul>
     </div>
 
-    <?php
-    $aiChatEnabled = getSetting('ai_chat_enabled', '0') === '1'
-        && trim((string)getSetting('ai_chat_url', '')) !== ''
-        && trim((string)getSetting('ai_chat_model', '')) !== '';
-    ?>
     <?php if ($aiChatEnabled): ?>
     <!-- AI CHAT PANEL -->
     <div id="ai-chat-panel">
         <div class="ai-chat-header">
             <h2 class="ai-chat-title"><i class="lucide lucide-bot"></i> <span data-i18n="ai_chat.title">AI Assistant</span></h2>
+            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
+            <a class="ai-chat-header-btn" href="ai_settings.php" aria-label="<?php echo t_h('ai_settings.title', [], 'AI Assistant'); ?>" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
+                <i class="lucide lucide-settings"></i>
+            </a>
+            <?php endif; ?>
             <button type="button" class="ai-chat-header-btn" data-action="ai-chat-clear" aria-label="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>" title="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>">
                 <i class="lucide lucide-trash"></i>
             </button>
@@ -584,11 +596,11 @@ if ($isPublicWorkspaceReadonly) {
             </button>
         </div>
         <div class="ai-chat-messages" id="ai-chat-messages">
-            <div class="ai-chat-empty" data-i18n="ai_chat.empty">Ask anything about your notes. The currently opened note can be shared with the assistant as context.</div>
+            <div class="ai-chat-empty" data-i18n="ai_chat.empty">Ask anything — the assistant can search and read all your notes.</div>
         </div>
         <div class="ai-chat-context" id="ai-chat-context" hidden>
             <label>
-                <input type="checkbox" id="ai-chat-context-toggle" checked>
+                <input type="checkbox" id="ai-chat-context-toggle">
                 <span data-i18n="ai_chat.use_note_context">Include current note:</span>
                 <span class="ai-chat-context-title" id="ai-chat-context-title"></span>
             </label>

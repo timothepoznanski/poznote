@@ -2709,23 +2709,34 @@
     "save": "Guardar configuración",
     "test": "Probar conexión",
     "testing": "Probando conexión...",
-    "test_success": "Conexión correcta. {{count}} modelo(s) disponible(s).",
+    "test_success": "Conexión correcta. {{count}} modelo(s) disponible(s). Haz clic en un modelo abajo y guarda.",
     "test_failure": "Error de conexión: {{error}}",
     "footer_note": "El servidor de IA se llama desde el servidor de Poznote, no desde tu navegador. Las conversaciones se envían al servidor configurado; con una instancia local de Ollama nada sale de tu máquina.",
     "messages": {
       "saved": "Configuración guardada correctamente.",
       "save_error": "No se pudo guardar la configuración."
-    }
+    },
+    "provider_label": "Proveedor de IA",
+    "provider_custom": "Otro (URL personalizada)",
+    "api_key_label_required": "Clave API",
+    "model_description": "Usa «Test connection» para listar los modelos disponibles en el servidor."
   },
   "ai_chat": {
     "title": "Asistente IA",
     "toolbar_button": "Asistente IA",
-    "empty": "Pregunta lo que quieras sobre tus notas. La nota abierta actualmente puede compartirse con el asistente como contexto.",
+    "empty": "Pregunta lo que quieras: el asistente puede buscar y leer todas tus notas.",
     "placeholder": "Pregunta al asistente...",
     "send": "Enviar",
     "stop": "Detener",
     "clear": "Borrar conversación",
     "error": "Error: {{error}}",
-    "use_note_context": "Incluir la nota actual:"
+    "use_note_context": "Incluir la nota actual:",
+    "tool_search": "Buscando en las notas: {{query}}",
+    "tool_read": "Leyendo la nota #{{id}}",
+    "tool_list": "Listando notas recientes",
+    "no_tools_notice": "Este modelo no admite herramientas: el asistente no puede consultar tus notas.",
+    "tool_rename": "Renombrando la nota #{{id}} a «{{title}}»",
+    "tool_update": "Editando la nota #{{id}}",
+    "tool_create": "Creando la nota: {{title}}"
   }
 }

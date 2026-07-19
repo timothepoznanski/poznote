@@ -2709,23 +2709,34 @@
     "save": "Konfiguration speichern",
     "test": "Verbindung testen",
     "testing": "Verbindung wird getestet...",
-    "test_success": "Verbindung erfolgreich. {{count}} Modell(e) verfügbar.",
+    "test_success": "Verbindung erfolgreich. {{count}} Modell(e) verfügbar. Klicken Sie unten auf ein Modell und speichern Sie.",
     "test_failure": "Verbindung fehlgeschlagen: {{error}}",
     "footer_note": "Der KI-Server wird vom Poznote-Server aus aufgerufen, nicht von Ihrem Browser. Chat-Unterhaltungen werden an den konfigurierten Server gesendet; bei einer lokalen Ollama-Instanz verlässt nichts Ihren Rechner.",
     "messages": {
       "saved": "Konfiguration erfolgreich gespeichert.",
       "save_error": "Konfiguration konnte nicht gespeichert werden."
-    }
+    },
+    "provider_label": "KI-Anbieter",
+    "provider_custom": "Anderer (eigene URL)",
+    "api_key_label_required": "API-Schlüssel",
+    "model_description": "Mit „Test connection“ die auf dem Server verfügbaren Modelle auflisten."
   },
   "ai_chat": {
     "title": "KI-Assistent",
     "toolbar_button": "KI-Assistent",
-    "empty": "Stellen Sie Fragen zu Ihren Notizen. Die aktuell geöffnete Notiz kann dem Assistenten als Kontext übergeben werden.",
+    "empty": "Stellen Sie eine Frage. Der Assistent kann alle Ihre Notizen durchsuchen und lesen.",
     "placeholder": "Fragen Sie den Assistenten...",
     "send": "Senden",
     "stop": "Stoppen",
     "clear": "Unterhaltung löschen",
     "error": "Fehler: {{error}}",
-    "use_note_context": "Aktuelle Notiz einbeziehen:"
+    "use_note_context": "Aktuelle Notiz einbeziehen:",
+    "tool_search": "Notizen durchsuchen: {{query}}",
+    "tool_read": "Notiz #{{id}} wird gelesen",
+    "tool_list": "Neueste Notizen auflisten",
+    "no_tools_notice": "Dieses Modell unterstützt keine Tools — der Assistent kann Ihre Notizen nicht durchsuchen.",
+    "tool_rename": "Notiz #{{id}} wird umbenannt in „{{title}}“",
+    "tool_update": "Notiz #{{id}} wird bearbeitet",
+    "tool_create": "Notiz wird erstellt: {{title}}"
   }
 }
