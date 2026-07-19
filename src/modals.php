@@ -1310,6 +1310,7 @@ try {
                 <!-- Toolbar Section -->
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.toolbar_hint', [], 'Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.'); ?></p>
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-bold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-italic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
@@ -1320,6 +1321,8 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-highlight" checked><span><?php echo t_h('editor.toolbar.highlight', [], 'Highlight'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-list-ul" checked><span><?php echo t_h('editor.toolbar.bullet_list', [], 'Bullet list'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-list-ol" checked><span><?php echo t_h('editor.toolbar.numbered_list', [], 'Numbered list'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-task-list" checked><span><?php echo t_h('editor.toolbar.toggle_checklist', [], 'Toggle checklist'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-task-remove" checked><span><?php echo t_h('editor.toolbar.remove_checklist', [], 'Remove checkboxes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-text-height" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-code" checked><span><?php echo t_h('editor.toolbar.code_block', [], 'Code block'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-inline-code" checked><span><?php echo t_h('editor.toolbar.inline_code', [], 'Inline code'); ?></span></label>

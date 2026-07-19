@@ -415,6 +415,7 @@
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
+      "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
@@ -1109,6 +1110,8 @@
       "insert_emoji": "Insert emoji",
       "insert_table": "Insert table",
       "insert_checklist": "Insert checklist",
+      "toggle_checklist": "Toggle checklist",
+      "remove_checklist": "Remove checkboxes",
       "add_separator": "Add separator",
       "insert_note_reference": "Insert note reference",
       "open_in_new_tab": "Open in new tab",

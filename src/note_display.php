@@ -133,9 +133,11 @@
                         echo '<button type="button" class="toolbar-btn btn-link text-format-btn" title="' . t_h('editor.toolbar.link') . '" data-action="add-link"><i class="lucide lucide-link"></i></button>';
                         echo '<button type="button" class="toolbar-btn btn-color text-format-btn" title="' . t_h('editor.toolbar.text_color') . '" data-action="toggle-red-color"><i class="lucide lucide-palette"></i></button>';
                         echo '<button type="button" class="toolbar-btn btn-highlight text-format-btn" title="' . t_h('editor.toolbar.highlight') . '" data-action="toggle-yellow-highlight"><i class="lucide lucide-paintbrush"></i></button>';
-                        if ($note_type !== 'markdown') {
-                            echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="' . t_h('editor.toolbar.bullet_list') . '" data-action="exec-unordered-list"><i class="lucide lucide-list-ul"></i></button>';
-                            echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="' . t_h('editor.toolbar.numbered_list') . '" data-action="exec-ordered-list"><i class="lucide lucide-list-ol"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-list-ul text-format-btn" title="' . t_h('editor.toolbar.bullet_list') . '" data-action="exec-unordered-list"><i class="lucide lucide-list-ul"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-list-ol text-format-btn" title="' . t_h('editor.toolbar.numbered_list') . '" data-action="exec-ordered-list"><i class="lucide lucide-list-ol"></i></button>';
+                        if ($note_type === 'markdown') {
+                            echo '<button type="button" class="toolbar-btn btn-task-list text-format-btn" title="' . t_h('editor.toolbar.toggle_checklist', [], 'Toggle checklist') . '" data-action="exec-task-list"><i class="lucide lucide-list-check"></i></button>';
+                            echo '<button type="button" class="toolbar-btn btn-task-remove text-format-btn" title="' . t_h('editor.toolbar.remove_checklist', [], 'Remove checkboxes') . '" data-action="exec-task-remove"><i class="lucide lucide-minus-square"></i></button>';
                         }
                         echo '<button type="button" class="toolbar-btn btn-text-height text-format-btn" title="' . t_h('slash_menu.title', [], 'Title') . '" data-action="change-font-size"><i class="lucide lucide-type-height"></i></button>';
                         echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" data-action="toggle-code-block"><i class="lucide lucide-code"></i></button>';

@@ -459,6 +459,20 @@
                     document.execCommand('insertOrderedList');
                 }
                 break;
+            case 'exec-task-list':
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof toggleMarkdownList === 'function') {
+                        toggleMarkdownList('task');
+                    }
+                }
+                break;
+            case 'exec-task-remove':
+                if (typeof isInMarkdownEditor === 'function' && isInMarkdownEditor()) {
+                    if (typeof toggleMarkdownList === 'function') {
+                        toggleMarkdownList('task-remove');
+                    }
+                }
+                break;
             case 'exec-remove-format':
                 // For markdown, this doesn't make much sense, but we keep it
                 document.execCommand('removeFormat');

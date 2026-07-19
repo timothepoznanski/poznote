@@ -808,6 +808,8 @@
       "insert_emoji": "Insertar emoji",
       "insert_table": "Insertar tabla",
       "insert_checklist": "Insertar lista de verificación",
+      "toggle_checklist": "Alternar lista de verificación",
+      "remove_checklist": "Quitar casillas de verificación",
       "add_separator": "Agregar separador",
       "insert_note_reference": "Insertar referencia de nota",
       "create_linked_note": "Crear atajo",
@@ -903,6 +905,7 @@
     "ui_customization": {
       "title": "Personalización de interfaz",
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
+      "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",

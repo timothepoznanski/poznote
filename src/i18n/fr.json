@@ -822,6 +822,8 @@
       "insert_emoji": "Insérer un emoji",
       "insert_table": "Insérer un tableau",
       "insert_checklist": "Insérer une checklist",
+      "toggle_checklist": "Basculer en checklist",
+      "remove_checklist": "Supprimer les cases à cocher",
       "add_separator": "Ajouter un séparateur",
       "insert_note_reference": "Insérer une référence de note",
       "create_linked_note": "Créer un raccourci",
@@ -928,6 +930,7 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
+      "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",

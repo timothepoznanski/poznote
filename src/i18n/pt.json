@@ -806,6 +806,8 @@
       "insert_emoji": "Inserir emoji",
       "insert_table": "Inserir tabela",
       "insert_checklist": "Inserir lista de tarefas",
+      "toggle_checklist": "Alternar lista de tarefas",
+      "remove_checklist": "Remover caixas de seleção",
       "add_separator": "Adicionar separador",
       "insert_note_reference": "Inserir referência de nota",
       "create_linked_note": "Criar atalho",
@@ -901,6 +903,7 @@
     "ui_customization": {
       "title": "Personalização da interface",
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
+      "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",

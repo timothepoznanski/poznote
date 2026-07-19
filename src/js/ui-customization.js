@@ -20,6 +20,8 @@
         'btn-highlight': 'format',
         'btn-list-ul': 'format',
         'btn-list-ol': 'format',
+        'btn-task-list': 'format',
+        'btn-task-remove': 'format',
         'btn-text-height': 'format',
         'btn-code': 'format',
         'btn-inline-code': 'format',

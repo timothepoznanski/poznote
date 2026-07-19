@@ -442,26 +442,73 @@
             charCount += lineLength;
         }
 
-        // Toggle list markers for affected lines
-        var listMarker = listType === 'ul' ? '- ' : '1. ';
-        var listPattern = listType === 'ul' ? /^[\s]*[-*+]\s+/ : /^[\s]*\d+(?:\.\d+)*\.\s+/;
-        
         var modified = false;
-        for (var i = startLine; i <= endLine; i++) {
-            if (lines[i].trim() === '') continue; // Skip empty lines
-            
-            if (listPattern.test(lines[i])) {
-                // Remove list marker
-                lines[i] = lines[i].replace(listPattern, '');
-                modified = true;
+
+        if (listType === 'task' || listType === 'task-remove') {
+            var taskLinePattern = /^(\s*[-*+]\s+)\[[ xX]\]/;
+            var nonEmptyLines = [];
+            var allTasks = true;
+            for (var i = startLine; i <= endLine; i++) {
+                if (lines[i].trim() === '') continue;
+                nonEmptyLines.push(i);
+                if (!taskLinePattern.test(lines[i])) allTasks = false;
+            }
+
+            if (listType === 'task-remove') {
+                // Strip checkbox markers, leaving plain text
+                nonEmptyLines.forEach(function (idx) {
+                    if (!taskLinePattern.test(lines[idx])) return;
+                    lines[idx] = lines[idx].replace(/^(\s*)[-*+]\s+\[[ xX]\]\s*/, '$1');
+                    modified = true;
+                });
+            } else if (nonEmptyLines.length && allTasks) {
+                // Selection is already a checklist: check everything,
+                // or uncheck everything when all boxes are already checked
+                var allChecked = nonEmptyLines.every(function (idx) {
+                    return /^\s*[-*+]\s+\[[xX]\]/.test(lines[idx]);
+                });
+                nonEmptyLines.forEach(function (idx) {
+                    lines[idx] = lines[idx].replace(taskLinePattern, '$1[' + (allChecked ? ' ' : 'x') + ']');
+                });
+                modified = nonEmptyLines.length > 0;
             } else {
-                // Add list marker
-                var indent = lines[i].match(/^[\s]*/)[0];
-                if (listType === 'ol') {
-                    listMarker = (i - startLine + 1) + '. ';
+                // Convert plain/bullet/numbered lines into unchecked boxes
+                nonEmptyLines.forEach(function (idx) {
+                    if (taskLinePattern.test(lines[idx])) return;
+                    var indent = lines[idx].match(/^[\s]*/)[0];
+                    var rest = lines[idx].trimStart()
+                        .replace(/^[-*+]\s+/, '')
+                        .replace(/^\d+(?:\.\d+)*\.\s+/, '');
+                    lines[idx] = indent + '- [ ] ' + rest;
+                    modified = true;
+                });
+            }
+        } else {
+            // Toggle list markers for affected lines
+            var listMarker = listType === 'ul' ? '- ' : '1. ';
+            var listPattern = listType === 'ul' ? /^[\s]*[-*+]\s+(?!\[[ xX]\]\s)/ : /^[\s]*\d+(?:\.\d+)*\.\s+/;
+
+            for (var i = startLine; i <= endLine; i++) {
+                if (lines[i].trim() === '') continue; // Skip empty lines
+
+                if (listPattern.test(lines[i])) {
+                    // Remove list marker
+                    lines[i] = lines[i].replace(listPattern, '');
+                    modified = true;
+                } else {
+                    // Add list marker
+                    var indent = lines[i].match(/^[\s]*/)[0];
+                    if (listType === 'ol') {
+                        listMarker = (i - startLine + 1) + '. ';
+                    }
+                    // Strip any other list marker first so line types convert instead of nesting
+                    var rest = lines[i].trimStart()
+                        .replace(/^[-*+]\s+\[[ xX]\]\s*/, '')
+                        .replace(/^[-*+]\s+/, '')
+                        .replace(/^\d+(?:\.\d+)*\.\s+/, '');
+                    lines[i] = indent + listMarker + rest;
+                    modified = true;
                 }
-                lines[i] = indent + listMarker + lines[i].trimStart();
-                modified = true;
             }
         }
 

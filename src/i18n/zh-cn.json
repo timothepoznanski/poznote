@@ -805,6 +805,8 @@
       "insert_emoji": "插入表情符号",
       "insert_table": "插入表格",
       "insert_checklist": "插入清单",
+      "toggle_checklist": "切换清单",
+      "remove_checklist": "移除复选框",
       "add_separator": "添加分隔符",
       "insert_note_reference": "插入笔记引用",
       "create_linked_note": "创建快捷方式",
@@ -902,6 +904,7 @@
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
+      "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
