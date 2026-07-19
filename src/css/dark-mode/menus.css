@@ -382,3 +382,25 @@ html[data-theme='dark'] .dropdown-divider,
 body.dark-mode .dropdown-divider {
     background-color: var(--dm-border);
 }
+
+/* ============================================
+   Emoji Autocomplete Menu
+   ============================================ */
+
+html[data-theme='dark'] .emoji-autocomplete-menu,
+body.dark-mode .emoji-autocomplete-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .emoji-autocomplete-item:hover,
+html[data-theme='dark'] .emoji-autocomplete-item.selected,
+body.dark-mode .emoji-autocomplete-item:hover,
+body.dark-mode .emoji-autocomplete-item.selected {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .emoji-autocomplete-name,
+body.dark-mode .emoji-autocomplete-name {
+    color: #ffffff;
+}

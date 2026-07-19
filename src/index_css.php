@@ -49,6 +49,7 @@ $groups = [
         'css/calendar.css',
         'css/table-picker.css',
         'css/slash-commands.css',
+        'css/emoji-autocomplete.css',
         'css/drag-drop.css',
         'css/icons.css',
         'css/tabs.css',
