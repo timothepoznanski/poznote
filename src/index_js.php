@@ -65,6 +65,7 @@ $groups = [
         'js/main.js',
         'js/resize-column.js',
         'js/outline-panel.js',
+        'js/ai-chat.js',
         'js/unified-search.js',
         'js/clickable-tags.js',
         'js/font-size-settings.js',

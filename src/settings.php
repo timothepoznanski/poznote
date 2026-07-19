@@ -659,6 +659,25 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- AI Assistant (instance-wide configuration) -->
+            <div class="home-card settings-card-clickable" id="ai-assistant-card" data-href="ai_settings.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-bot"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span>
+                    <?php
+                    require_once 'users/db_master.php';
+                    $aiChatEnabledCard = getGlobalSetting('ai_chat_enabled', '0') === '1'
+                        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
+                        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
+                    ?>
+                    <span class="setting-status <?php echo $aiChatEnabledCard ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $aiChatEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                    </span>
+                </div>
+            </div>
+
             <!-- Git Sync Global Toggle -->
             <div class="home-card" id="git-sync-enabled-card">
                 <div class="home-card-icon">

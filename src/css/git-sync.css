@@ -157,6 +157,11 @@ body.git-sync-page {
     margin-top: 2px;
 }
 
+/* display:flex above would otherwise override the hidden attribute */
+.config-hint[hidden] {
+    display: none;
+}
+
 /* Badges */
 .badge {
     display: inline-block;
@@ -943,6 +948,8 @@ select.git-field-input {
     margin-top: 6px;
     display: flex;
     justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .git-config-form .btn-primary {

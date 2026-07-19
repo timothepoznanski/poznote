@@ -425,7 +425,8 @@
       "import_limits": "Importlimits",
       "git_sync_toggle": "Git-Synchronisierung",
       "oidc_config": "OIDC / SSO",
-      "smtp_config": "SMTP / E-Mail"
+      "smtp_config": "SMTP / E-Mail",
+      "ai_assistant": "KI-Assistent"
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -2693,5 +2694,48 @@
     "tooltip": {
       "links": "{{count}} Verknüpfungen"
     }
+  },
+  "ai_settings": {
+    "title": "KI-Assistent",
+    "description": "Verbinden Sie Poznote mit einem OpenAI-kompatiblen KI-Server (Ollama, LM Studio, OpenAI, ...), um mit einem Assistenten über Ihre Notizen zu chatten.",
+    "config_title": "Konfiguration",
+    "enable_label": "KI-Assistent aktivieren",
+    "enable_description": "Zeigt eine KI-Chat-Schaltfläche in der Notiz-Symbolleiste an.",
+    "url_label": "Server-URL",
+    "url_description": "Basis-URL einer OpenAI-kompatiblen API. Für Ollama auf dem Docker-Host: http://host.docker.internal:11434",
+    "model_label": "Modell",
+    "api_key_label": "API-Schlüssel (optional)",
+    "api_key_description": "Für einen lokalen Ollama-Server leer lassen. Für Cloud-Anbieter erforderlich.",
+    "save": "Konfiguration speichern",
+    "test": "Verbindung testen",
+    "testing": "Verbindung wird getestet...",
+    "test_success": "Verbindung erfolgreich. {{count}} Modell(e) verfügbar. Klicken Sie unten auf ein Modell und speichern Sie.",
+    "test_failure": "Verbindung fehlgeschlagen: {{error}}",
+    "footer_note": "Der KI-Server wird vom Poznote-Server aus aufgerufen, nicht von Ihrem Browser. Chat-Unterhaltungen werden an den konfigurierten Server gesendet; bei einer lokalen Ollama-Instanz verlässt nichts Ihren Rechner.",
+    "messages": {
+      "saved": "Konfiguration erfolgreich gespeichert.",
+      "save_error": "Konfiguration konnte nicht gespeichert werden."
+    },
+    "provider_label": "KI-Anbieter",
+    "provider_custom": "Anderer (eigene URL)",
+    "api_key_label_required": "API-Schlüssel",
+    "model_description": "Mit „Test connection“ die auf dem Server verfügbaren Modelle auflisten."
+  },
+  "ai_chat": {
+    "title": "KI-Assistent",
+    "toolbar_button": "KI-Assistent",
+    "empty": "Stellen Sie eine Frage.\nDer Assistent kann Ihre Notizen durchsuchen, lesen, erstellen, umbenennen und bearbeiten.",
+    "placeholder": "Fragen Sie den Assistenten...",
+    "send": "Senden",
+    "stop": "Stoppen",
+    "clear": "Unterhaltung löschen",
+    "error": "Fehler: {{error}}",
+    "tool_search": "Notizen durchsuchen: {{query}}",
+    "tool_read": "Notiz #{{id}} wird gelesen",
+    "tool_list": "Neueste Notizen auflisten",
+    "no_tools_notice": "Dieses Modell unterstützt keine Tools — der Assistent kann Ihre Notizen nicht durchsuchen.",
+    "tool_rename": "Notiz #{{id}} wird umbenannt in „{{title}}“",
+    "tool_update": "Notiz #{{id}} wird bearbeitet",
+    "tool_create": "Notiz wird erstellt: {{title}}"
   }
 }

@@ -4,6 +4,9 @@ MCP (Model Context Protocol) server for Poznote — enables AI-powered note mana
 
 This server supports **HTTP transport only** (MCP `streamable-http`).
 
+> [!TIP]
+> Looking for a chat with a local model (e.g. Ollama) directly inside Poznote? You don't need the MCP server for that — use the built-in [AI Assistant](../README.md#ai-assistant) instead (**Settings → AI Assistant**). The MCP server is for connecting *external* MCP-capable assistants to your notes; Ollama alone is a model runtime, not an MCP client, and cannot connect to it directly.
+
 ## Quick Start
 
 Choose your preferred AI assistant:

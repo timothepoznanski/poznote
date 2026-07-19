@@ -50,6 +50,7 @@ $groups = [
         'css/table-picker.css',
         'css/slash-commands.css',
         'css/emoji-autocomplete.css',
+        'css/ai-chat.css',
         'css/drag-drop.css',
         'css/icons.css',
         'css/tabs.css',
