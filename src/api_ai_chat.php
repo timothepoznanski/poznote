@@ -531,7 +531,12 @@ array_unshift($messages, ['role' => 'system', 'content' => $system]);
 // ---------------------------------------------------------------------------
 
 set_time_limit(0);
-ignore_user_abort(false);
+// Keep running after the browser disconnects so the streaming loop can shut
+// down cleanly: with ignore_user_abort(false), PHP kills the script from
+// inside the curl callbacks (longjmp out of curl_exec), which leaks the
+// connection to the AI server and lets it generate to completion. The
+// disconnect is detected via connection_aborted() in the curl watchdog below.
+ignore_user_abort(true);
 while (ob_get_level() > 0) {
     ob_end_clean();
 }
@@ -554,10 +559,12 @@ function aiStreamRound($url, $headers, $payload) {
         'status' => null,
         'errorBody' => '',
         'curlErr' => '',
+        'aborted' => false,
         'content' => '',
         'toolCalls' => [],   // index => ['id' =>, 'name' =>, 'arguments' =>]
     ];
     $lineBuf = '';
+    $lastPing = 0;
 
     $handleLine = function ($line) use (&$state) {
         if (strpos($line, 'data:') !== 0) return;
@@ -609,7 +616,31 @@ function aiStreamRound($url, $headers, $payload) {
             foreach ($lines as $line) {
                 $handleLine(rtrim($line, "\r"));
             }
+            if (connection_aborted()) {
+                $state['aborted'] = true;
+                return -1; // abort the transfer so the AI server stops generating
+            }
             return strlen($chunk);
+        },
+        // Client-disconnect watchdog. While the model generates without
+        // emitting content (thinking, tool-call deltas), nothing is written
+        // to the browser, so PHP cannot notice it is gone; the periodic SSE
+        // comment forces an output attempt, and aborting the transfer closes
+        // the upstream connection, which makes the AI server cancel the
+        // generation.
+        CURLOPT_NOPROGRESS => false,
+        CURLOPT_PROGRESSFUNCTION => function () use (&$state, &$lastPing) {
+            $now = time();
+            if ($now !== $lastPing) {
+                $lastPing = $now;
+                echo ": ping\n\n";
+                flush();
+            }
+            if (connection_aborted()) {
+                $state['aborted'] = true;
+                return 1;
+            }
+            return 0;
         },
     ]);
     $ok = curl_exec($ch);
@@ -642,6 +673,9 @@ for ($round = 0; $round < $maxRounds; $round++) {
 
     $state = aiStreamRound($completionsUrl, $upstreamHeaders, $payload);
 
+    if ($state['aborted']) {
+        exit;
+    }
     if ($state['status'] !== null && $state['status'] >= 400) {
         $detail = 'HTTP ' . $state['status'];
         $decoded = json_decode($state['errorBody'], true);
