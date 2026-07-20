@@ -5,7 +5,7 @@ MCP (Model Context Protocol) server for Poznote — enables AI-powered note mana
 This server supports **HTTP transport only** (MCP `streamable-http`).
 
 > [!TIP]
-> Looking for a chat with a local model (e.g. Ollama) directly inside Poznote? You don't need the MCP server for that — use the built-in [AI Assistant](../README.md#ai-assistant) instead (**Settings → Admin Tools → AI Assistant**). The MCP server is for connecting *external* MCP-capable assistants to your notes; Ollama alone is a model runtime, not an MCP client, and cannot connect to it directly.
+> Looking for a chat with a local model (e.g. Ollama) directly inside Poznote? You don't need the MCP server for that — use the built-in [AI Assistant](AI-ASSISTANT.md) instead (**Settings → Admin Tools → AI Assistant**). The MCP server is for connecting *external* MCP-capable assistants to your notes; Ollama alone is a model runtime, not an MCP client, and cannot connect to it directly.
 
 ## Quick Start
 
@@ -43,7 +43,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List all notes from a workspace
 - `search_notes` — Search notes by text query, with optional creation date range
-- `create_note` — Create a new note (⚠️ si aucun workspace n'est précisé dans le prompt, la note est créée dans le workspace par défaut de l'utilisateur ; spécifiez toujours le workspace cible)
+- `create_note` — Create a new note (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
 - `update_note` — Update an existing note
 - `delete_note` — Delete a note by ID
 - `create_folder` — Create a new folder
