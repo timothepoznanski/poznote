@@ -265,6 +265,7 @@
         if (!text) return;
         input.value = '';
         input.style.height = 'auto';
+        input.style.overflowY = 'hidden';
 
         conversation.push({ role: 'user', content: text });
         appendBubble('ai-chat-msg-user', text);
@@ -426,6 +427,7 @@
             input.addEventListener('input', function () {
                 input.style.height = 'auto';
                 input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+                input.style.overflowY = input.scrollHeight > 120 ? 'auto' : 'hidden';
             });
         }
     });

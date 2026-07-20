@@ -246,6 +246,9 @@ a.ai-chat-header-btn {
     font-family: inherit;
     line-height: 1.4;
     max-height: 120px;
+    /* No scrollbar while auto-growing (Windows shows arrow buttons on any
+       sub-pixel overflow); the JS switches it to auto at max height */
+    overflow-y: hidden;
     background: #ffffff;
     color: #212529;
     box-sizing: border-box;
