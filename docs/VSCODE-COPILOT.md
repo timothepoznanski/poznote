@@ -113,7 +113,7 @@ Once configured, you can interact with your Poznote instance directly from VS Co
 
 ### Creating and Updating Notes
 
-> **Workspace** : si vous ne précisez pas le workspace dans votre demande, la note sera créée dans le workspace par défaut de l'utilisateur connecté. Indiquez explicitement le workspace souhaité pour éviter toute confusion, par exemple : *"dans le workspace 'Projets'"*.
+> **Workspace**: if you do not specify the workspace in your request, the note is created in the connected user's default workspace. Explicitly name the target workspace to avoid any confusion, for example: *"in workspace 'Projets'"*.
 
 ```
 @poznote Create a note titled "Meeting Notes" in workspace "Projets" with content about the new feature

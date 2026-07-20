@@ -897,20 +897,15 @@ Server: my-server.com
 
 ## AI Assistant
 
-Poznote includes an integrated AI chat that connects to any OpenAI-compatible server — a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, or a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI. Once configured, an **AI** button appears in the dashboard toolbar and opens the chat panel right there.
+Poznote includes an integrated AI chat that connects to any OpenAI-compatible server, a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, or a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI. Once configured, an **AI** button appears in the dashboard toolbar and opens the chat panel right there.
 
-The assistant is global, MCP-style: it has tools to **search and read all your notes**, and uses them on its own to answer questions — "what do my notes say about X?", cross-note summaries, finding that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
+The assistant is global, MCP-style: it has tools to **search and read all your notes**, and uses them on its own to answer questions, like "what do my notes say about X?", cross-note summaries, finding that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
 
-To enable it, go to **Settings → Admin Tools → AI Assistant** (administrator only) and pick a provider: **Ollama** or **LM Studio** for a local server (just a URL, no key — the URL is pre-filled with the address of your Docker host, as seen from the Poznote container), **Anthropic** or **OpenAI** for a cloud provider (just an API key, the URL is set for you), or a custom OpenAI-compatible URL. Then use **Test connection** — it verifies the server is reachable and lists its available models so you can pick one with a click. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
+To enable it, go to **Settings → Admin Tools → AI Assistant** (administrator only), pick a provider and use **Test connection** to verify the server and choose a model. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
 
-Notes for Ollama:
+For the full configuration guide, covering providers, choosing a model, and how to connect a local Ollama/LM Studio server from the Poznote container (finding the right URL, `OLLAMA_HOST`, Docker networking), see the [AI Assistant documentation](docs/AI-ASSISTANT.md).
 
-- Ollama must listen on an interface reachable from the Poznote container — not only on `127.0.0.1`. The simplest is `OLLAMA_HOST=0.0.0.0` (or bind it to the Docker bridge interface). The pre-filled URL usually just works; adjust the port if yours differs.
-- Pick a model that supports **tool calling**, e.g. `qwen3`, `llama3.1` or `mistral` — required for the assistant to browse your notes. With a model that lacks tool support, the chat still works (a notice tells you so) but cannot access your notes on its own.
-
-The AI server is called from the Poznote server, never from your browser. With a local Ollama instance, your notes and conversations never leave your machine.
-
-The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header. To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
+The AI server is called from the Poznote server, never from your browser. With a local Ollama instance, your notes and conversations never leave your machine. To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
 
 ## MCP Server
 
