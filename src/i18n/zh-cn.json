@@ -427,7 +427,8 @@
       "import_limits": "导入限制",
       "git_sync_toggle": "Git 同步",
       "oidc_config": "OIDC / SSO",
-      "smtp_config": "SMTP / 邮件"
+      "smtp_config": "SMTP / 邮件",
+      "ai_assistant": "AI 助手"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -2834,5 +2835,48 @@
     "tooltip": {
       "links": "{{count}} 个链接"
     }
+  },
+  "ai_settings": {
+    "title": "AI 助手",
+    "description": "将 Poznote 连接到兼容 OpenAI 的 AI 服务器（Ollama、LM Studio、OpenAI 等），与助手讨论您的笔记。",
+    "config_title": "配置",
+    "enable_label": "启用 AI 助手",
+    "enable_description": "在笔记工具栏中显示 AI 聊天按钮。",
+    "url_label": "服务器 URL",
+    "url_description": "兼容 OpenAI 的 API 基础 URL。若 Ollama 运行在 Docker 主机上，请使用 http://host.docker.internal:11434",
+    "model_label": "模型",
+    "api_key_label": "API 密钥（可选）",
+    "api_key_description": "本地 Ollama 服务器可留空。云服务商需要填写。",
+    "save": "保存配置",
+    "test": "测试连接",
+    "testing": "正在测试连接...",
+    "test_success": "连接成功。{{count}} 个可用模型。点击下方模型并保存。",
+    "test_failure": "连接失败：{{error}}",
+    "footer_note": "AI 服务器由 Poznote 服务器调用，而不是您的浏览器。聊天内容会发送到所配置的服务器；使用本地 Ollama 实例时，数据不会离开您的机器。",
+    "messages": {
+      "saved": "配置保存成功。",
+      "save_error": "配置保存失败。"
+    },
+    "provider_label": "AI 服务商",
+    "provider_custom": "其他（自定义 URL）",
+    "api_key_label_required": "API 密钥",
+    "model_description": "点击“Test connection”列出服务器上可用的模型。"
+  },
+  "ai_chat": {
+    "title": "AI 助手",
+    "toolbar_button": "AI 助手",
+    "empty": "提出问题。\n助手可以搜索、阅读、创建、重命名和编辑你的笔记。",
+    "placeholder": "向助手提问...",
+    "send": "发送",
+    "stop": "停止",
+    "clear": "清空对话",
+    "error": "错误：{{error}}",
+    "tool_search": "搜索笔记：{{query}}",
+    "tool_read": "正在读取笔记 #{{id}}",
+    "tool_list": "列出最近的笔记",
+    "no_tools_notice": "该模型不支持工具调用——助手无法浏览你的笔记。",
+    "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
+    "tool_update": "正在编辑笔记 #{{id}}",
+    "tool_create": "正在创建笔记：{{title}}"
   }
 }

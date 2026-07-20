@@ -744,3 +744,129 @@ body.dark-mode .info-box {
     border-color: var(--dm-accent);
     color: #b0d4f1;
 }
+
+/* ============================================
+   AI Chat Panel
+   ============================================ */
+
+html[data-theme='dark'] #ai-chat-panel,
+body.dark-mode #ai-chat-panel {
+    background: var(--dm-bg);
+    border-left-color: var(--dm-border);
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme='dark'] .ai-chat-title,
+body.dark-mode .ai-chat-title {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-header-btn,
+body.dark-mode .ai-chat-header-btn {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-header-btn:hover,
+html[data-theme='dark'] .ai-chat-header-btn:focus,
+body.dark-mode .ai-chat-header-btn:hover,
+body.dark-mode .ai-chat-header-btn:focus {
+    background: var(--dm-surface-hover);
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .ai-chat-empty,
+body.dark-mode .ai-chat-empty {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-msg-user,
+body.dark-mode .ai-chat-msg-user {
+    background: var(--dm-active);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .ai-chat-msg-assistant,
+body.dark-mode .ai-chat-msg-assistant {
+    background: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .ai-chat-msg-error,
+body.dark-mode .ai-chat-msg-error {
+    background: #3a1f22;
+    color: #e8a0a8;
+    border-color: #5c2e33;
+}
+
+html[data-theme='dark'] .ai-chat-md code,
+html[data-theme='dark'] .ai-chat-md pre,
+body.dark-mode .ai-chat-md code,
+body.dark-mode .ai-chat-md pre {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .ai-chat-md blockquote,
+body.dark-mode .ai-chat-md blockquote {
+    border-left-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-md th,
+html[data-theme='dark'] .ai-chat-md td,
+body.dark-mode .ai-chat-md th,
+body.dark-mode .ai-chat-md td {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .ai-chat-md a,
+body.dark-mode .ai-chat-md a {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .ai-chat-tool,
+body.dark-mode .ai-chat-tool {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .ai-chat-notice,
+body.dark-mode .ai-chat-notice {
+    color: #d8b95c;
+    background: #322a15;
+    border-color: #55471f;
+}
+
+html[data-theme='dark'] .ai-chat-inputbar,
+body.dark-mode .ai-chat-inputbar {
+    background: var(--dm-bg);
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #ai-chat-input,
+body.dark-mode #ai-chat-input {
+    background: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] #ai-chat-input:focus,
+body.dark-mode #ai-chat-input:focus {
+    border-color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .ai-chat-send-btn,
+body.dark-mode .ai-chat-send-btn {
+    background: var(--dm-accent);
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .ai-chat-send-btn:disabled,
+body.dark-mode .ai-chat-send-btn:disabled {
+    background: var(--dm-surface-hover);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .toolbar-btn.btn-ai-chat.ai-chat-active i,
+body.dark-mode .toolbar-btn.btn-ai-chat.ai-chat-active i {
+    color: var(--dm-accent);
+}

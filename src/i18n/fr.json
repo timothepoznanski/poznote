@@ -437,7 +437,8 @@
       "import_limits": "Limites d'import",
       "git_sync_toggle": "Synchronisation Git",
       "oidc_config": "OIDC / SSO",
-      "smtp_config": "SMTP / Email"
+      "smtp_config": "SMTP / Email",
+      "ai_assistant": "Assistant IA"
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -2908,5 +2909,48 @@
     "tooltip": {
       "links": "{{count}} liens"
     }
+  },
+  "ai_settings": {
+    "title": "Assistant IA",
+    "description": "Connectez Poznote à un serveur IA compatible OpenAI (Ollama, LM Studio, OpenAI, ...) pour discuter de vos notes avec un assistant.",
+    "config_title": "Configuration",
+    "enable_label": "Activer l'assistant IA",
+    "enable_description": "Affiche un bouton de chat IA dans la barre d'outils des notes.",
+    "url_label": "URL du serveur",
+    "url_description": "URL de base d'une API compatible OpenAI. Pour Ollama sur l'hôte Docker, utilisez http://host.docker.internal:11434",
+    "model_label": "Modèle",
+    "api_key_label": "Clé API (optionnelle)",
+    "api_key_description": "Laissez vide pour un serveur Ollama local. Requise pour les fournisseurs cloud.",
+    "save": "Enregistrer la configuration",
+    "test": "Tester la connexion",
+    "testing": "Test de la connexion...",
+    "test_success": "Connexion réussie. {{count}} modèle(s) disponible(s). Cliquez sur un modèle ci-dessous et enregistrez.",
+    "test_failure": "Échec de la connexion : {{error}}",
+    "footer_note": "Le serveur IA est appelé depuis le serveur Poznote, pas depuis votre navigateur. Les conversations sont envoyées au serveur configuré ; avec une instance Ollama locale, rien ne quitte votre machine.",
+    "messages": {
+      "saved": "Configuration enregistrée avec succès.",
+      "save_error": "Échec de l'enregistrement de la configuration."
+    },
+    "provider_label": "Fournisseur d'IA",
+    "provider_custom": "Autre (URL personnalisée)",
+    "api_key_label_required": "Clé API",
+    "model_description": "Utilisez « Test connection » pour lister les modèles disponibles sur le serveur."
+  },
+  "ai_chat": {
+    "title": "Assistant IA",
+    "toolbar_button": "Assistant IA",
+    "empty": "Posez une question.\nL'assistant peut chercher, lire, créer, renommer et modifier vos notes.",
+    "placeholder": "Demandez à l'assistant...",
+    "send": "Envoyer",
+    "stop": "Arrêter",
+    "clear": "Effacer la conversation",
+    "error": "Erreur : {{error}}",
+    "tool_search": "Recherche dans les notes : {{query}}",
+    "tool_read": "Lecture de la note #{{id}}",
+    "tool_list": "Liste des notes récentes",
+    "no_tools_notice": "Ce modèle ne supporte pas les outils — l'assistant ne peut pas parcourir vos notes.",
+    "tool_rename": "Renommage de la note #{{id}} en « {{title}} »",
+    "tool_update": "Modification de la note #{{id}}",
+    "tool_create": "Création de la note : {{title}}"
   }
 }

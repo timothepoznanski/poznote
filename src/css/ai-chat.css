@@ -1,0 +1,332 @@
+/**
+ * AI Chat Panel Styles
+ *
+ * Slide-in panel on the right side of the notes page, used to chat
+ * with the configured AI assistant (see ai_settings.php).
+ */
+
+#ai-chat-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 380px;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    border-left: 1px solid #dee2e6;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+}
+
+#ai-chat-panel.ai-chat-open {
+    transform: translateX(0);
+}
+
+/* Header */
+.ai-chat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 16px 12px;
+    flex-shrink: 0;
+}
+
+.ai-chat-title {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-chat-header-btn {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 15px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ai-chat-header-btn:hover,
+.ai-chat-header-btn:focus {
+    background: rgba(0, 125, 184, 0.1);
+    color: #007DB8;
+}
+
+/* The settings shortcut is a link styled like the header buttons */
+a.ai-chat-header-btn {
+    text-decoration: none;
+}
+
+/* Messages area */
+.ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ai-chat-empty {
+    color: #6c757d;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 40px;
+    padding: 0 12px;
+    white-space: pre-line; /* the hint text contains a deliberate line break */
+}
+
+.ai-chat-msg {
+    max-width: 90%;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+.ai-chat-msg-user {
+    align-self: flex-end;
+    background: #007DB8;
+    color: #fff;
+    border-bottom-right-radius: 3px;
+}
+
+.ai-chat-msg-assistant {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #212529;
+    border: 1px solid #dee2e6;
+    border-bottom-left-radius: 3px;
+}
+
+/* Assistant bubbles rendered as markdown: block elements provide the
+   structure, so drop the pre-wrap used for plain-text bubbles */
+.ai-chat-msg.ai-chat-md {
+    white-space: normal;
+}
+
+.ai-chat-md p,
+.ai-chat-md ul,
+.ai-chat-md ol,
+.ai-chat-md pre,
+.ai-chat-md blockquote,
+.ai-chat-md table {
+    margin: 0 0 8px;
+}
+
+.ai-chat-md > :last-child {
+    margin-bottom: 0;
+}
+
+.ai-chat-md h1,
+.ai-chat-md h2,
+.ai-chat-md h3,
+.ai-chat-md h4,
+.ai-chat-md h5,
+.ai-chat-md h6 {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 10px 0 6px;
+}
+
+.ai-chat-md ul,
+.ai-chat-md ol {
+    padding-left: 20px;
+}
+
+.ai-chat-md code {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 4px;
+    padding: 1px 4px;
+    font-size: 0.9em;
+    color: inherit; /* the global `code` rule hardcodes #333, unreadable on dark bubbles */
+}
+
+.ai-chat-md pre {
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 6px;
+    padding: 8px 10px;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.ai-chat-md pre code {
+    background: none;
+    padding: 0;
+}
+
+.ai-chat-md blockquote {
+    border-left: 3px solid #ced4da;
+    padding-left: 10px;
+    color: #6c757d;
+}
+
+.ai-chat-md table {
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.ai-chat-md th,
+.ai-chat-md td {
+    border: 1px solid #dee2e6;
+    padding: 3px 8px;
+}
+
+.ai-chat-md a {
+    color: #007DB8;
+}
+
+.ai-chat-md img {
+    max-width: 100%;
+}
+
+.ai-chat-msg-error {
+    align-self: stretch;
+    background: #fdecea;
+    color: #b02a37;
+    border: 1px solid #f5c2c7;
+    font-size: 12.5px;
+}
+
+.ai-chat-msg-assistant.ai-chat-pending::after {
+    /* CSS-drawn caret: block characters like ▍ render too thick */
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    vertical-align: text-bottom;
+    background: currentColor;
+    margin-left: 2px;
+    animation: ai-chat-blink 1s steps(2, start) infinite;
+}
+
+@keyframes ai-chat-blink {
+    to { visibility: hidden; }
+}
+
+/* Input bar */
+.ai-chat-inputbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    border-top: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+#ai-chat-input {
+    flex: 1;
+    resize: none;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    font-family: inherit;
+    line-height: 1.4;
+    max-height: 120px;
+    background: #ffffff;
+    color: #212529;
+    box-sizing: border-box;
+}
+
+#ai-chat-input:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+.ai-chat-send-btn {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 8px;
+    background: #007DB8;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.15s ease;
+}
+
+.ai-chat-send-btn:hover {
+    background: #006699;
+}
+
+.ai-chat-send-btn:disabled {
+    background: #adb5bd;
+    cursor: default;
+}
+
+/* icons.css applies a global gray filter to all lucide icons; without this
+   exclusion the white send arrow renders gray on the blue button */
+#ai-chat-panel [class*="lucide-"] {
+    filter: none !important;
+    color: inherit;
+}
+
+/* Stop state: filled square (deliberately not a lucide outline glyph) */
+.ai-chat-stop-icon {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: currentColor;
+}
+
+/* Tool activity lines (assistant searching/reading notes) */
+.ai-chat-tool {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #6c757d;
+    padding: 0 4px;
+    max-width: 90%;
+    overflow-wrap: anywhere;
+}
+
+/* One-time warning when the model doesn't support tool calling */
+.ai-chat-notice {
+    align-self: stretch;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 12px;
+    color: #8a6d1a;
+    background: #fdf6e3;
+    border: 1px solid #f0e0b0;
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+@media (max-width: 800px) {
+    #ai-chat-panel {
+        width: 100%;
+        border-left: none;
+    }
+}

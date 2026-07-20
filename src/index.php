@@ -399,6 +399,13 @@ if ($isPublicWorkspaceReadonly) {
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, icon, icon_color FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
+
+    // AI assistant availability (instance-wide config, used for the sidebar
+    // button and the chat panel below)
+    require_once 'users/db_master.php';
+    $aiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
+        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
+        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
     ?>
 
         
@@ -565,6 +572,10 @@ if ($isPublicWorkspaceReadonly) {
             </div>
         </ul>
     </div>
+
+    <?php if ($aiChatEnabled): ?>
+    <?php include 'ai_chat_panel.php'; ?>
+    <?php endif; ?>
 
     <!-- Data for initialization (used by index-events.js) -->
     <?php if (!empty($tasklist_ids)): ?>
