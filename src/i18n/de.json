@@ -1011,12 +1011,10 @@
       "title_in_folder": "Erstellen in {{folder}}",
       "folder_fallback": "Ordner",
       "note": {
-        "title": "HTML-Notiz",
-        "description": "Nicht Markdown"
+        "title": "HTML-Notiz"
       },
       "markdown": {
-        "title": "Markdown-Notiz",
-        "description": "Nicht HTML"
+        "title": "Markdown-Notiz"
       },
       "task_list": {
         "title": "Aufgabenliste"
@@ -2737,5 +2735,14 @@
     "tool_rename": "Notiz #{{id}} wird umbenannt in „{{title}}“",
     "tool_update": "Notiz #{{id}} wird bearbeitet",
     "tool_create": "Notiz wird erstellt: {{title}}"
+  },
+  "diary": {
+    "title": "Tagebuch",
+    "today_button": "Heutiger Eintrag",
+    "today_button_title": "Heutigen Eintrag öffnen (bei Bedarf erstellen)",
+    "today_badge": "Heute",
+    "empty": "Noch keine Tagebucheinträge. Klicken Sie auf \"Heutiger Eintrag\", um den ersten zu schreiben. Er wird in {{folder}} gespeichert.",
+    "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",
+    "create_card_title": "Tagebucheintrag"
   }
 }

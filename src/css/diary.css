@@ -1,0 +1,78 @@
+/* Diary page - month-grouped board of daily notes.
+   Builds on css/dashboard.css (cards, topbar, grid). */
+
+.diary-month {
+    margin-top: 22px;
+}
+
+.diary-month:first-child {
+    margin-top: 8px;
+}
+
+.diary-month-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 2px;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid #e5e7eb;
+}
+
+/* Header actions: same .btn style as admin/users.php, centered */
+.diary-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0 4px;
+}
+
+.diary-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+/* favorites.css provides .btn/.btn-secondary but not .btn-primary
+   (dark mode is covered by css/dark-mode/components.css) */
+.diary-page .btn-primary {
+    background: #007cba;
+    color: white !important;
+}
+
+.diary-page .btn-primary:hover {
+    background: #005a8a;
+}
+
+/* Highlight today's card in the grid */
+.diary-card-today {
+    border-color: #007DB8;
+}
+
+.diary-today-tag {
+    background: #007DB8;
+    color: #ffffff;
+}
+
+.diary-empty .lucide {
+    color: #007DB8;
+}
+
+/* Dark mode */
+:root[data-theme='dark'] .diary-month-title,
+body.dark-mode .diary-month-title {
+    color: #e5e7eb;
+    border-bottom-color: #374151;
+}
+
+:root[data-theme='dark'] .diary-card-today,
+body.dark-mode .diary-card-today {
+    border-color: #0e6ba8;
+}
+
+:root[data-theme='dark'] .diary-today-tag,
+body.dark-mode .diary-today-tag {
+    background: #0e6ba8;
+    color: #f3f4f6;
+}

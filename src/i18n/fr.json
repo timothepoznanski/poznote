@@ -1043,12 +1043,10 @@
       "title_in_folder": "Créer dans {{folder}}",
       "folder_fallback": "dossier",
       "note": {
-        "title": "Note HTML",
-        "description": "Pas Markdown"
+        "title": "Note HTML"
       },
       "markdown": {
-        "title": "Note Markdown",
-        "description": "Pas HTML"
+        "title": "Note Markdown"
       },
       "task_list": {
         "title": "Liste de tâches"
@@ -2952,5 +2950,14 @@
     "tool_rename": "Renommage de la note #{{id}} en « {{title}} »",
     "tool_update": "Modification de la note #{{id}}",
     "tool_create": "Création de la note : {{title}}"
+  },
+  "diary": {
+    "title": "Journal",
+    "today_button": "Note du jour",
+    "today_button_title": "Ouvrir la note du jour (la créer si besoin)",
+    "today_badge": "Aujourd'hui",
+    "empty": "Aucune note de journal pour le moment. Cliquez sur « Note du jour » pour écrire la première. Elle sera rangée dans {{folder}}.",
+    "create_error": "Impossible de créer la note du jour.",
+    "create_card_title": "Note de journal"
   }
 }

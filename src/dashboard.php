@@ -19,55 +19,7 @@ $currentLang = getUserLanguage();
  * @return array{text: string, tasks: ?array, search: string}
  */
 function dashboardBuildNotePreview($noteId, $type) {
-    $file = getEntryFilename($noteId, $type);
-    if (!is_readable($file)) {
-        return ['text' => '', 'tasks' => null, 'search' => ''];
-    }
-
-    $raw = @file_get_contents($file);
-    if ($raw === false || $raw === '') {
-        return ['text' => '', 'tasks' => null, 'search' => ''];
-    }
-
-    if ($type === 'tasklist') {
-        $json = normalizeTasklistJsonContent($raw);
-        $items = json_decode($json !== '' ? $json : $raw, true);
-        $tasks = [];
-        $taskSearch = [];
-        if (is_array($items)) {
-            foreach ($items as $item) {
-                if (!is_array($item)) continue;
-                $label = trim((string)($item['text'] ?? ''));
-                if ($label === '') continue;
-                $taskSearch[] = $label;
-                if (count($tasks) < 4) {
-                    $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
-                }
-            }
-        }
-        return ['text' => '', 'tasks' => $tasks, 'search' => implode(' ', $taskSearch)];
-    }
-
-    if ($type === 'markdown') {
-        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $raw);
-        $text = preg_replace('/^#{1,6}\s+/m', '', $text);
-        $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
-        $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
-        $text = str_replace(['**', '__', '*', '`', '> '], ' ', $text);
-    } else {
-        $text = $raw;
-    }
-
-    $text = strip_tags($text);
-    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $text = preg_replace('/\s+/u', ' ', $text);
-    $text = trim((string)$text);
-    $previewText = $text;
-    if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > 220) {
-        $previewText = rtrim(mb_substr($previewText, 0, 220, 'UTF-8')) . '…';
-    }
-
-    return ['text' => $previewText, 'tasks' => null, 'search' => $text];
+    return buildNoteCardPreview($noteId, $type);
 }
 
 function dashboardFolderHasNotes(int $id, array &$folders): bool {
@@ -605,6 +557,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
 						<i class="lucide lucide-trash-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['trash'] ?? 0); ?></span>
+					</a>
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('diary.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('diary.title', [], 'Diary'); ?>" aria-label="<?php echo t_h('diary.title', [], 'Diary'); ?>">
+						<i class="lucide lucide-book-open"></i>
+						<span class="dashboard-topbar-count"><?php echo t_h('diary.title', [], 'Diary'); ?></span>
 					</a>
 					<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="push" title="Push" aria-label="Push">
 						<i class="lucide lucide-upload"></i>

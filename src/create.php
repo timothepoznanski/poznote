@@ -77,7 +77,6 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span>
-                    <span class="home-card-description"><?php echo t_h('modals.create.note.description', [], 'Simple Note'); ?></span>
                 </div>
             </a>
 
@@ -88,7 +87,6 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span>
-                    <span class="home-card-description"><?php echo t_h('modals.create.markdown.description', [], 'Rich text'); ?></span>
                 </div>
             </a>
 
@@ -99,6 +97,16 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
+                </div>
+            </a>
+
+            <!-- Diary entry -->
+            <a href="#" class="home-card" id="create-diary-entry-card" data-create-type="diary" title="<?php echo t_h('diary.create_card_title', [], 'Diary entry'); ?>">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-book-open"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('diary.create_card_title', [], 'Diary entry'); ?></span>
                 </div>
             </a>
 

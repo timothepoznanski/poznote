@@ -571,12 +571,10 @@
       "title_in_folder": "Create in {{folder}}",
       "folder_fallback": "folder",
       "note": {
-        "title": "HTML Note",
-        "description": "Not Markdown"
+        "title": "HTML Note"
       },
       "markdown": {
-        "title": "Markdown note",
-        "description": "Not HTML"
+        "title": "Markdown note"
       },
       "task_list": {
         "title": "Task List"
@@ -2449,5 +2447,14 @@
     "tool_rename": "Renaming note #{{id}} to \"{{title}}\"",
     "tool_update": "Editing note #{{id}}",
     "tool_create": "Creating note: {{title}}"
+  },
+  "diary": {
+    "title": "Diary",
+    "today_button": "Today's entry",
+    "today_button_title": "Open today's entry (create it if needed)",
+    "today_badge": "Today",
+    "empty": "No diary entries yet. Click \"Today's entry\" to write your first one. It will be stored in {{folder}}.",
+    "create_error": "Could not create the diary entry.",
+    "create_card_title": "Diary entry"
   }
 }

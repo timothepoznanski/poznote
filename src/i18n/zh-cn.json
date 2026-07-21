@@ -1022,12 +1022,10 @@
       "title_in_folder": "在 {{folder}} 中创建",
       "folder_fallback": "文件夹",
       "note": {
-        "title": "HTML 笔记",
-        "description": "非 Markdown"
+        "title": "HTML 笔记"
       },
       "markdown": {
-        "title": "Markdown 笔记",
-        "description": "非 HTML"
+        "title": "Markdown 笔记"
       },
       "task_list": {
         "title": "任务列表"
@@ -2878,5 +2876,14 @@
     "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
     "tool_update": "正在编辑笔记 #{{id}}",
     "tool_create": "正在创建笔记：{{title}}"
+  },
+  "diary": {
+    "title": "日记",
+    "today_button": "今日日记",
+    "today_button_title": "打开今天的日记（如不存在则创建）",
+    "today_badge": "今天",
+    "empty": "还没有日记条目。点击\"今日日记\"来写第一篇，它将保存在 {{folder}} 中。",
+    "create_error": "无法创建日记条目。",
+    "create_card_title": "日记条目"
   }
 }

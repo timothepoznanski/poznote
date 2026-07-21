@@ -2726,6 +2726,12 @@ function executeCreateAction() {
         case 'kanban':
             showKanbanStructureModal();
             break;
+        case 'diary':
+            // The diary page owns the open-or-create logic for today's entry
+            // (diary-page.js auto-triggers it when today=1 is present).
+            var diaryWs = window.selectedWorkspace || '';
+            window.location.href = 'diary.php?today=1' + (diaryWs ? '&workspace=' + encodeURIComponent(diaryWs) : '');
+            break;
         case 'template':
             if (typeof openTemplateNoteSelectorModal === 'function') {
                 openTemplateNoteSelectorModal();

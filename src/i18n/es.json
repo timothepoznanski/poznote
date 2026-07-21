@@ -1012,12 +1012,10 @@
       "title_in_folder": "Crear en {{folder}}",
       "folder_fallback": "carpeta",
       "note": {
-        "title": "Nota HTML",
-        "description": "No Markdown"
+        "title": "Nota HTML"
       },
       "markdown": {
-        "title": "Nota Markdown",
-        "description": "No HTML"
+        "title": "Nota Markdown"
       },
       "task_list": {
         "title": "Lista de tareas"
@@ -2737,5 +2735,14 @@
     "tool_rename": "Renombrando la nota #{{id}} a «{{title}}»",
     "tool_update": "Editando la nota #{{id}}",
     "tool_create": "Creando la nota: {{title}}"
+  },
+  "diary": {
+    "title": "Diario",
+    "today_button": "Entrada de hoy",
+    "today_button_title": "Abrir la entrada de hoy (crearla si es necesario)",
+    "today_badge": "Hoy",
+    "empty": "Aún no hay entradas de diario. Haz clic en \"Entrada de hoy\" para escribir la primera. Se guardará en {{folder}}.",
+    "create_error": "No se pudo crear la entrada del diario.",
+    "create_card_title": "Entrada de diario"
   }
 }
