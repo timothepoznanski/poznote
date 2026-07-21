@@ -3136,3 +3136,60 @@ function requireSettingsPassword() {
     header('Location: ' . (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/admin/') !== false ? '../' : '') . 'settings.php');
     exit;
 }
+
+/**
+ * Build a short plain-text excerpt (or task preview) for a note card.
+ * Shared by the dashboard and diary board views.
+ * @return array{text: string, tasks: ?array, search: string}
+ */
+function buildNoteCardPreview($noteId, $type) {
+    $file = getEntryFilename($noteId, $type);
+    if (!is_readable($file)) {
+        return ['text' => '', 'tasks' => null, 'search' => ''];
+    }
+
+    $raw = @file_get_contents($file);
+    if ($raw === false || $raw === '') {
+        return ['text' => '', 'tasks' => null, 'search' => ''];
+    }
+
+    if ($type === 'tasklist') {
+        $json = normalizeTasklistJsonContent($raw);
+        $items = json_decode($json !== '' ? $json : $raw, true);
+        $tasks = [];
+        $taskSearch = [];
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                if (!is_array($item)) continue;
+                $label = trim((string)($item['text'] ?? ''));
+                if ($label === '') continue;
+                $taskSearch[] = $label;
+                if (count($tasks) < 4) {
+                    $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
+                }
+            }
+        }
+        return ['text' => '', 'tasks' => $tasks, 'search' => implode(' ', $taskSearch)];
+    }
+
+    if ($type === 'markdown') {
+        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $raw);
+        $text = preg_replace('/^#{1,6}\s+/m', '', $text);
+        $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
+        $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
+        $text = str_replace(['**', '__', '*', '`', '> '], ' ', $text);
+    } else {
+        $text = $raw;
+    }
+
+    $text = strip_tags($text);
+    $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $text = preg_replace('/\s+/u', ' ', $text);
+    $text = trim((string)$text);
+    $previewText = $text;
+    if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > 220) {
+        $previewText = rtrim(mb_substr($previewText, 0, 220, 'UTF-8')) . '…';
+    }
+
+    return ['text' => $previewText, 'tasks' => null, 'search' => $text];
+}

@@ -563,12 +563,10 @@
       "title_in_folder": "Создать в {{folder}}",
       "folder_fallback": "папка",
       "note": {
-        "title": "HTML-заметка",
-        "description": "Не Markdown"
+        "title": "HTML-заметка"
       },
       "markdown": {
-        "title": "Заметка Markdown",
-        "description": "Не HTML"
+        "title": "Заметка Markdown"
       },
       "task_list": {
         "title": "Список задач"
@@ -2415,5 +2413,14 @@
     "tool_rename": "Переименование заметки #{{id}} в «{{title}}»",
     "tool_update": "Изменение заметки #{{id}}",
     "tool_create": "Создание заметки: {{title}}"
+  },
+  "diary": {
+    "title": "Дневник",
+    "today_button": "Запись за сегодня",
+    "today_button_title": "Открыть сегодняшнюю запись (создать при необходимости)",
+    "today_badge": "Сегодня",
+    "empty": "Записей в дневнике пока нет. Нажмите «Запись за сегодня», чтобы создать первую. Она будет сохранена в {{folder}}.",
+    "create_error": "Не удалось создать запись дневника.",
+    "create_card_title": "Запись в дневнике"
   }
 }
