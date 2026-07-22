@@ -497,6 +497,221 @@ body.dark-mode .dashboard-debug-info pre {
     margin-top: 14px;
 }
 
+/* ---------- View menu (card size + layout) ---------- */
+
+/* Row holding the View button and the filter bar, centered like the filter */
+.board-filter-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.board-filter-row .dashboard-topbar-filter {
+    margin: 0;
+    flex-shrink: 1;
+}
+
+.board-view-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.board-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 33px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #6b7280;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.board-view-btn:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+}
+
+.board-view-btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+/* The layout toggle shows the layout a click switches TO:
+   list icon in grid mode, grid icon in list mode */
+.board-view-layout-toggle .lucide-grid {
+    display: none;
+}
+
+.board-view-controls.is-list .board-view-layout-toggle .lucide-layout-list {
+    display: none;
+}
+
+.board-view-controls.is-list .board-view-layout-toggle .lucide-grid {
+    display: inline-block;
+}
+
+/* Card size has no effect in list layout: hide its button */
+.board-view-controls.is-list .board-view-size-btn {
+    display: none;
+}
+
+.board-view-size-letter {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ---------- View variants: card size ---------- */
+
+.view-size-small .dashboard-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-auto-rows: 92px;
+    gap: 10px;
+}
+
+.view-size-small .board-card-excerpt {
+    max-height: calc(2 * 1.5em);
+}
+
+.view-size-small .dash-card-thumb {
+    width: 42px;
+    height: 42px;
+}
+
+/* Folder cards: shrink icon and paddings so the name stays visible in 92px */
+.view-size-small .dash-folder-card {
+    padding: 4px 10px 8px;
+}
+
+.view-size-small .dash-folder-card .dash-card-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.view-size-small .dash-folder-card .dash-card-icon .lucide,
+.view-size-small .dash-folder-card .dash-card-icon [class^="lucide-"],
+.view-size-small .dash-folder-card .dash-card-icon [class*=" lucide-"] {
+    width: 20px;
+    height: 20px;
+}
+
+.view-size-small .dash-folder-card .dash-card-name {
+    -webkit-line-clamp: 1;
+}
+
+.view-size-small .dash-folder-card .dash-card-count {
+    margin-top: 2px;
+}
+
+.view-size-large .dashboard-grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-auto-rows: 210px;
+    gap: 16px;
+}
+
+.view-size-large .board-card-excerpt {
+    max-height: calc(7 * 1.5em);
+}
+
+.view-size-large .dash-card-thumb {
+    width: 104px;
+    height: 104px;
+}
+
+/* ---------- View variants: list layout ---------- */
+
+.view-layout-list .dashboard-grid-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.view-layout-list .dash-note-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+}
+
+.view-layout-list .dash-card-link {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.view-layout-list .dash-card-note-title {
+    margin-bottom: 0;
+    flex-shrink: 0;
+    max-width: 40%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.view-layout-list .dash-card-body {
+    align-items: center;
+}
+
+.view-layout-list .board-card-excerpt {
+    max-height: 1.5em;
+}
+
+.view-layout-list .board-card-tasks {
+    max-height: 1.6em;
+}
+
+.view-layout-list .dash-card-thumb {
+    width: 34px;
+    height: 34px;
+}
+
+.view-layout-list .board-card-footer {
+    margin: 0 0 0 auto;
+    flex-shrink: 0;
+}
+
+.view-layout-list .dash-folder-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 10px 14px;
+    text-align: left;
+}
+
+.view-layout-list .dash-folder-card .dash-card-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.view-layout-list .dash-folder-card .dash-card-icon .lucide,
+.view-layout-list .dash-folder-card .dash-card-icon [class^="lucide-"],
+.view-layout-list .dash-folder-card .dash-card-icon [class*=" lucide-"] {
+    width: 20px;
+    height: 20px;
+}
+
+.view-layout-list .dash-card-name {
+    width: auto;
+    -webkit-line-clamp: 1;
+}
+
+.view-layout-list .dash-folder-card .dash-card-name {
+    margin: 0;
+}
+
+.view-layout-list .dash-folder-card .dash-card-count {
+    margin: 0 0 0 auto;
+}
+
 /* ---------- Base card ---------- */
 
 .dash-card {
@@ -625,14 +840,61 @@ body.dark-mode .dashboard-debug-info pre {
 }
 
 /* Reuse note content classes from existing styles */
+/* Optional thumbnail (first image of the note) next to the excerpt */
+.dash-card-body {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    min-width: 0;
+    flex: 1;
+    min-height: 0;
+}
+
+.dash-card-body .board-card-excerpt,
+.dash-card-body .board-card-tasks {
+    flex: 1;
+    min-width: 0;
+}
+
+.dash-card-thumb {
+    flex-shrink: 0;
+    width: 62px;
+    height: 62px;
+    /* Shrink with the available card space instead of getting chopped by
+       the card's overflow (which would swallow the bottom of the frame) */
+    max-height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f3f4f6;
+    position: relative;
+}
+
+/* Frame drawn over the image: a plain border gets swallowed by the image
+   edge on subpixel boundaries (the bottom side disappears) */
+.dash-card-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(17, 24, 39, 0.16);
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+.dash-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
 .board-card-excerpt {
     font-size: 12.5px;
     line-height: 1.5;
     color: #6b7280;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    /* Whole-line clipping; -webkit-line-clamp misplaces its ellipsis around
+       the forced breaks (<br>) used to keep the note's line structure */
+    max-height: calc(3 * 1.5em);
     word-break: break-word;
     flex: 1;
     min-height: 0;
@@ -892,6 +1154,30 @@ body.dark-mode .board-card-excerpt,
 body.dark-mode .board-card-tasks {
     color: var(--dm-text-muted);
 }
+
+:root[data-theme='dark'] .dash-card-thumb,
+body.dark-mode .dash-card-thumb {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+:root[data-theme='dark'] .dash-card-thumb::after,
+body.dark-mode .dash-card-thumb::after {
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+:root[data-theme='dark'] .board-view-btn,
+body.dark-mode .board-view-btn {
+    background: var(--dm-surface, #262626);
+    border-color: var(--dm-border, #404040);
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
+:root[data-theme='dark'] .board-view-btn:hover,
+body.dark-mode .board-view-btn:hover {
+    border-color: var(--dm-accent, #4a9eff);
+    color: var(--dm-accent, #4a9eff);
+}
+
 
 :root[data-theme='dark'] .board-card-tag,
 body.dark-mode .board-card-tag {

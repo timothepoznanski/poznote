@@ -3140,17 +3140,17 @@ function requireSettingsPassword() {
 /**
  * Build a short plain-text excerpt (or task preview) for a note card.
  * Shared by the dashboard and diary board views.
- * @return array{text: string, tasks: ?array, search: string}
+ * @return array{text: string, tasks: ?array, search: string, image: ?string}
  */
 function buildNoteCardPreview($noteId, $type) {
     $file = getEntryFilename($noteId, $type);
     if (!is_readable($file)) {
-        return ['text' => '', 'tasks' => null, 'search' => ''];
+        return ['text' => '', 'tasks' => null, 'search' => '', 'image' => null];
     }
 
     $raw = @file_get_contents($file);
     if ($raw === false || $raw === '') {
-        return ['text' => '', 'tasks' => null, 'search' => ''];
+        return ['text' => '', 'tasks' => null, 'search' => '', 'image' => null];
     }
 
     if ($type === 'tasklist') {
@@ -3169,7 +3169,27 @@ function buildNoteCardPreview($noteId, $type) {
                 }
             }
         }
-        return ['text' => '', 'tasks' => $tasks, 'search' => implode(' ', $taskSearch)];
+        return ['text' => '', 'tasks' => $tasks, 'search' => implode(' ', $taskSearch), 'image' => null];
+    }
+
+    // First image of the note, shown as a card thumbnail. Only attachment
+    // URLs, http(s) sources and small data URIs are kept (a multi-MB base64
+    // image would bloat the page's embedded JSON).
+    $image = null;
+    if ($type === 'markdown') {
+        if (preg_match('/!\[[^\]]*\]\(\s*([^)\s]+)/', $raw, $im)) {
+            $image = $im[1];
+        }
+    } else {
+        if (preg_match('/<img[^>]+src=["\']([^"\']+)["\']/i', $raw, $im)) {
+            $image = html_entity_decode($im[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        }
+    }
+    if ($image !== null) {
+        $isSmallDataUri = stripos($image, 'data:image/') === 0 && strlen($image) < 65536;
+        if (!$isSmallDataUri && !preg_match('#^(/?api/v1/notes/\d+/attachments/|https?://|attachments/)#i', $image)) {
+            $image = null;
+        }
     }
 
     if ($type === 'markdown') {
@@ -3179,17 +3199,135 @@ function buildNoteCardPreview($noteId, $type) {
         $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
         $text = str_replace(['**', '__', '*', '`', '> '], ' ', $text);
     } else {
-        $text = $raw;
+        // HTML notes: turn line-breaking tags into newlines before stripping
+        // so the excerpt keeps the note's line structure.
+        $text = preg_replace('/<br\s*\/?>/i', "\n", $raw);
+        $text = preg_replace('/<\/?(p|div|li|h[1-6]|tr|blockquote|pre|ul|ol|table)(\s[^>]*)?>/i', "\n", $text);
     }
 
     $text = strip_tags($text);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $text = preg_replace('/\s+/u', ' ', $text);
+    $text = str_replace("\r", '', $text);
+    // Collapse spaces but keep single line breaks: views that want them render
+    // the excerpt with white-space: pre-line (diary), others show spaces.
+    $text = preg_replace('/[^\S\n]+/u', ' ', $text);
+    $text = preg_replace('/ ?\n ?/u', "\n", $text);
+    $text = preg_replace('/\n{2,}/u', "\n", $text);
     $text = trim((string)$text);
     $previewText = $text;
     if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > 220) {
         $previewText = rtrim(mb_substr($previewText, 0, 220, 'UTF-8')) . '…';
     }
 
-    return ['text' => $previewText, 'tasks' => null, 'search' => $text];
+    $search = preg_replace('/\s+/u', ' ', $text);
+    return ['text' => $previewText, 'tasks' => null, 'search' => $search, 'image' => $image];
+}
+
+/**
+ * Render the view controls (layout toggle + card size cycle) used by the
+ * dashboard and diary boards, next to the filter bar. $prefix namespaces the
+ * localStorage keys so each page remembers its own settings. The layout
+ * button toggles grid/list; the size button cycles small/medium/large and is
+ * hidden in list layout (board-view-menu.js drives both).
+ */
+function renderBoardViewMenu(string $prefix) {
+    echo '<div class="board-view-controls" data-view-prefix="' . htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8') . '">' .
+        '<button type="button" class="board-view-btn board-view-layout-toggle"' .
+            ' data-label-grid="' . t_h('dashboard.view.layout_grid', [], 'Grid') . '"' .
+            ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '">' .
+            '<i class="lucide lucide-layout-list"></i>' .
+            '<i class="lucide lucide-grid"></i>' .
+        '</button>' .
+        '<button type="button" class="board-view-btn board-view-size-btn"' .
+            ' data-label-small="' . t_h('dashboard.view.size_small', [], 'Small') . '"' .
+            ' data-label-medium="' . t_h('dashboard.view.size_medium', [], 'Medium') . '"' .
+            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '"' .
+            ' title="' . t_h('dashboard.view.size', [], 'Card size') . '">' .
+            '<span class="board-view-size-letter"></span>' .
+        '</button>' .
+    '</div>';
+}
+
+/**
+ * Name of the root diary folder. The diary_folder setting wins; otherwise the
+ * localized default for the user's language. If a root folder created under
+ * another language's default (or the historical "Diary") already exists in
+ * the workspace, it keeps being used so the journal is not split in two.
+ */
+function getDiaryRootFolderName(?PDO $con = null, ?string $workspace = null) {
+    $name = trim((string)getSetting('diary_folder', ''));
+    if ($name !== '') return $name;
+
+    $localized = trim((string)t('diary.folder_name', [], 'Diary'));
+    if ($localized === '') $localized = 'Diary';
+
+    if ($con !== null && $workspace !== null) {
+        // All localized defaults (must match diary.folder_name in src/i18n/)
+        $candidates = array_values(array_unique(array_merge(
+            [$localized],
+            ['Diary', 'Journal', 'Tagebuch', 'Diario', 'Diário', 'Дневник', '日记']
+        )));
+        $placeholders = implode(',', array_fill(0, count($candidates), '?'));
+        $stmt = $con->prepare("SELECT name FROM folders WHERE name IN ($placeholders) AND workspace = ? AND parent_id IS NULL");
+        $stmt->execute(array_merge($candidates, [$workspace]));
+        $existing = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($candidates as $candidate) {
+            if (in_array($candidate, $existing, true)) return $candidate;
+        }
+    }
+    return $localized;
+}
+
+/**
+ * Ids of every folder in the diary subtree (Diary/YYYY/MM ...) of a workspace.
+ * Returns an empty array when the root diary folder does not exist yet.
+ * @return int[]
+ */
+function getDiaryFolderIds(PDO $con, string $workspace): array {
+    $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
+    $stmt->execute([getDiaryRootFolderName($con, $workspace), $workspace]);
+    $diaryRootId = $stmt->fetchColumn();
+    if ($diaryRootId === false) {
+        return [];
+    }
+    $diaryRootId = (int)$diaryRootId;
+
+    $stmt = $con->prepare("SELECT id, parent_id FROM folders WHERE workspace = ?");
+    $stmt->execute([$workspace]);
+    $childrenByParent = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $parent = $row['parent_id'] !== null ? (int)$row['parent_id'] : 0;
+        $childrenByParent[$parent][] = (int)$row['id'];
+    }
+
+    $diaryFolderIds = [$diaryRootId];
+    $queue = [$diaryRootId];
+    while ($queue) {
+        $current = array_shift($queue);
+        foreach ($childrenByParent[$current] ?? [] as $childId) {
+            $diaryFolderIds[] = $childId;
+            $queue[] = $childId;
+        }
+    }
+    return $diaryFolderIds;
+}
+
+/**
+ * Id of the diary entry titled with the given YYYY-MM-DD date, or null.
+ * Searches the whole diary subtree so entries keep working after being
+ * re-dated (renamed) or left in an older month folder.
+ */
+function findDiaryEntryIdForDate(PDO $con, string $workspace, string $date): ?int {
+    $folderIds = getDiaryFolderIds($con, $workspace);
+    if (empty($folderIds)) {
+        return null;
+    }
+    $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
+    $stmt = $con->prepare(
+        "SELECT id FROM entries WHERE trash = 0 AND heading = ? AND folder_id IN ($placeholders) AND workspace = ?" .
+        " ORDER BY id ASC LIMIT 1"
+    );
+    $stmt->execute(array_merge([$date], $folderIds, [$workspace]));
+    $id = $stmt->fetchColumn();
+    return $id !== false ? (int)$id : null;
 }

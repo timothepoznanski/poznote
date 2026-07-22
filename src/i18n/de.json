@@ -2435,7 +2435,10 @@
       "title": "Notizen vom",
       "open": "Öffnen",
       "open_all": "Alle öffnen",
-      "close": "Schließen"
+      "close": "Schließen",
+      "no_notes": "Keine Notizen an diesem Tag.",
+      "diary_open": "Tagebucheintrag öffnen",
+      "diary_create": "Tagebucheintrag erstellen"
     }
   },
   "workspace_menu": {
@@ -2674,7 +2677,17 @@
     "unpin": "Aus Favoriten entfernen",
     "no_folder": "Andere Notizen",
     "toggle_all": "Alle Notizen anzeigen",
-    "toggle_favorites": "Nur Favoriten anzeigen"
+    "toggle_favorites": "Nur Favoriten anzeigen",
+    "view": {
+      "button": "Ansicht",
+      "size": "Kartengröße",
+      "size_small": "Klein",
+      "size_medium": "Mittel",
+      "size_large": "Groß",
+      "layout": "Anordnung",
+      "layout_grid": "Raster",
+      "layout_list": "Liste"
+    }
   },
   "graph": {
     "title": "Notiz-Graph",
@@ -2743,6 +2756,7 @@
     "today_badge": "Heute",
     "empty": "Noch keine Tagebucheinträge. Klicken Sie auf \"Heutiger Eintrag\", um den ersten zu schreiben. Er wird in {{folder}} gespeichert.",
     "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",
-    "create_card_title": "Tagebucheintrag"
+    "create_card_title": "Tagebucheintrag",
+    "folder_name": "Tagebuch"
   }
 }

@@ -42,8 +42,9 @@
     }
 
     function monthKey(note) {
-        // note.created is 'YYYY-MM-DD' in the user's timezone
-        return String(note.created || '').slice(0, 7);
+        // note.entryDate is 'YYYY-MM-DD': the title date when the title is a
+        // valid date, otherwise the creation date in the user's timezone.
+        return String(note.entryDate || note.created || '').slice(0, 7);
     }
 
     function monthLabel(key) {
@@ -76,7 +77,16 @@
             });
             content += '</ul>';
         } else if (note.text) {
-            content = '<div class="board-card-excerpt">' + esc(note.text) + '</div>';
+            // The preview keeps the note's line breaks; render them as <br>
+            // (line-clamp handles <br> correctly, unlike white-space: pre-line)
+            content = '<div class="board-card-excerpt">' + esc(note.text).replace(/\n/g, '<br>') + '</div>';
+        }
+
+        // First image of the note as a thumbnail next to the excerpt
+        if (note.image) {
+            content = '<div class="dash-card-body">' + content +
+                '<div class="dash-card-thumb"><img src="' + esc(note.image) + '" alt="" loading="lazy" decoding="async"></div>' +
+            '</div>';
         }
 
         var footer = '';
@@ -128,7 +138,7 @@
             noResults.style.display = (activeFilterTerm && visibleNotes.length === 0) ? 'block' : 'none';
         }
 
-        // Notes arrive sorted by created DESC; group them by month preserving order.
+        // Notes arrive sorted by entry date DESC; group them by month preserving order.
         var html = '';
         var currentMonth = null;
         visibleNotes.forEach(function (note) {

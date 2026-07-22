@@ -648,6 +648,9 @@ class NotesController {
      *   - folder_id: Folder ID (alternative to folder_name)
      *   - workspace: Workspace name
      *   - type: Note type (note, markdown, excalidraw)
+     *   - created_date: Optional YYYY-MM-DD date to backdate the note to
+     *     (stored at midday UTC so DATE(created) matches that day in the
+     *     calendar endpoints). Used by diary entry creation.
      */
     public function create(): void {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -731,6 +734,12 @@ class NotesController {
             
             // Create the note
             $now_utc = gmdate('Y-m-d H:i:s', time());
+            $created_utc = $now_utc;
+            if (isset($input['created_date'])
+                && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', trim($input['created_date']), $cd)
+                && checkdate((int)$cd[2], (int)$cd[3], (int)$cd[1])) {
+                $created_utc = trim($input['created_date']) . ' 12:00:00';
+            }
             
             // Validate linked_note_id if provided
             if ($linked_note_id !== null) {
@@ -754,7 +763,7 @@ class NotesController {
             $actorUserId = $this->getActorUserId();
             $stmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, linked_note_id, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $now_utc, $now_utc, $actorUserId, $actorUserId])) {
+            if ($stmt->execute([$heading, $entrycontent, $tags, $folder, $folder_id, $workspace, $type, $linked_note_id, $created_utc, $now_utc, $actorUserId, $actorUserId])) {
                 $id = $this->con->lastInsertId();
                 
                 // Notes in a shared folder inherit access through the folder only.
@@ -798,7 +807,7 @@ class NotesController {
                         'workspace' => $workspace,
                         'type' => $type,
                         'folder_id' => $folder_id,
-                        'created' => $now_utc
+                        'created' => $created_utc
                     ],
                     'share_delta' => $wasShared ? 1 : 0
                 ]);
@@ -904,7 +913,28 @@ class NotesController {
             if ($tags !== null && !empty($tags)) {
                 $tags = $this->sanitizeTags($tags);
             }
-            
+
+            // Diary entries follow their date title: renaming one to another
+            // YYYY-MM-DD moves it into the matching Diary/YYYY/MM folder
+            // (created on demand). Skipped when the request itself moves the
+            // note to a different folder.
+            $diaryFolderMoved = false;
+            $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
+            if ($heading !== $note['heading']
+                && (!isset($input['folder_id']) || $folder_id === $currentFolderId)
+                && $currentFolderId !== null
+                && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $heading, $dm)
+                && checkdate((int)$dm[2], (int)$dm[3], (int)$dm[1])
+                && in_array($currentFolderId, getDiaryFolderIds($this->con, $note['workspace']), true)) {
+                $targetPath = getDiaryRootFolderName($this->con, $workspace) . '/' . $dm[1] . '/' . $dm[2];
+                $targetId = resolveFolderPathToId($workspace, $targetPath, true, $this->con);
+                if ($targetId && (int)$targetId !== $currentFolderId) {
+                    $folder_id = (int)$targetId;
+                    $folder = $dm[2];
+                    $diaryFolderMoved = true;
+                }
+            }
+
             // Check heading uniqueness if changed
             if ($heading !== $note['heading']) {
                 $checkQuery = "SELECT id FROM entries WHERE heading = ? AND trash = 0 AND id != ?";
@@ -1053,6 +1083,12 @@ class NotesController {
                         'updated' => $now_utc
                     ]
                 ];
+                if ($diaryFolderMoved) {
+                    // The client must adopt the new folder id, otherwise its
+                    // next autosave would move the note back.
+                    $response['note']['folder_id'] = $folder_id;
+                    $response['note']['folder_moved'] = true;
+                }
 
                 // Include updated linked note IDs if any
                 if (!empty($updatedLinkedNotes)) {

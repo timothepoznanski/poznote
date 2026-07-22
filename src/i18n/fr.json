@@ -2650,7 +2650,10 @@
       "title": "Notes du",
       "open": "Ouvrir",
       "open_all": "Tout ouvrir",
-      "close": "Fermer"
+      "close": "Fermer",
+      "no_notes": "Aucune note ce jour-là.",
+      "diary_open": "Ouvrir la note de journal",
+      "diary_create": "Créer la note de journal"
     }
   },
   "workspace_menu": {
@@ -2889,7 +2892,17 @@
     "unpin": "Retirer des favoris",
     "no_folder": "Autres notes",
     "toggle_all": "Afficher toutes les notes",
-    "toggle_favorites": "Afficher seulement les favoris"
+    "toggle_favorites": "Afficher seulement les favoris",
+    "view": {
+      "button": "Vue",
+      "size": "Taille des cartes",
+      "size_small": "Petites",
+      "size_medium": "Moyennes",
+      "size_large": "Grandes",
+      "layout": "Disposition",
+      "layout_grid": "Grille",
+      "layout_list": "Liste"
+    }
   },
   "graph": {
     "title": "Graphe des notes",
@@ -2958,6 +2971,7 @@
     "today_badge": "Aujourd'hui",
     "empty": "Aucune note de journal pour le moment. Cliquez sur « Note du jour » pour écrire la première. Elle sera rangée dans {{folder}}.",
     "create_error": "Impossible de créer la note du jour.",
-    "create_card_title": "Note de journal"
+    "create_card_title": "Note de journal",
+    "folder_name": "Journal"
   }
 }

@@ -146,7 +146,15 @@
             });
             content += '</ul>';
         } else if (note.text) {
-            content = '<div class="board-card-excerpt">' + esc(note.text) + '</div>';
+            // The preview keeps the note's line breaks; render them as <br>
+            content = '<div class="board-card-excerpt">' + esc(note.text).replace(/\n/g, '<br>') + '</div>';
+        }
+
+        // First image of the note as a thumbnail next to the excerpt
+        if (note.image) {
+            content = '<div class="dash-card-body">' + content +
+                '<div class="dash-card-thumb"><img src="' + esc(note.image) + '" alt="" loading="lazy" decoding="async"></div>' +
+            '</div>';
         }
 
         var footer = '';

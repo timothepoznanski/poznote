@@ -2579,7 +2579,10 @@
       "title": "笔记来自",
       "open": "打开",
       "open_all": "全部打开",
-      "close": "关闭"
+      "close": "关闭",
+      "no_notes": "这一天没有笔记。",
+      "diary_open": "打开日记条目",
+      "diary_create": "创建日记条目"
     }
   },
   "workspace_menu": {
@@ -2815,7 +2818,17 @@
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",
-    "toggle_favorites": "仅显示收藏"
+    "toggle_favorites": "仅显示收藏",
+    "view": {
+      "button": "视图",
+      "size": "卡片大小",
+      "size_small": "小",
+      "size_medium": "中",
+      "size_large": "大",
+      "layout": "布局",
+      "layout_grid": "网格",
+      "layout_list": "列表"
+    }
   },
   "graph": {
     "title": "笔记图谱",
@@ -2884,6 +2897,7 @@
     "today_badge": "今天",
     "empty": "还没有日记条目。点击\"今日日记\"来写第一篇，它将保存在 {{folder}} 中。",
     "create_error": "无法创建日记条目。",
-    "create_card_title": "日记条目"
+    "create_card_title": "日记条目",
+    "folder_name": "日记"
   }
 }

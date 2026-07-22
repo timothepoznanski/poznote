@@ -145,6 +145,11 @@ body.dark-mode .calendar-note-title {
     color: var(--dm-text, #e0e0e0);
 }
 
+:root[data-theme='dark'] .calendar-notes-empty,
+body.dark-mode .calendar-notes-empty {
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
 :root[data-theme='dark'] .calendar-note-open-btn,
 body.dark-mode .calendar-note-open-btn {
     background: #007DB8;

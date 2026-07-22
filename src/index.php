@@ -627,7 +627,11 @@ window.calendarTranslations = {
         title: <?php echo json_encode(t('calendar.modal.title')); ?>,
         open: <?php echo json_encode(t('calendar.modal.open')); ?>,
         open_all: <?php echo json_encode(t('calendar.modal.open_all')); ?>,
-        close: <?php echo json_encode(t('calendar.modal.close')); ?>
+        close: <?php echo json_encode(t('calendar.modal.close')); ?>,
+        no_notes: <?php echo json_encode(t('calendar.modal.no_notes', [], 'No notes on this day.')); ?>,
+        diary_open: <?php echo json_encode(t('calendar.modal.diary_open', [], 'Open diary entry')); ?>,
+        diary_create: <?php echo json_encode(t('calendar.modal.diary_create', [], 'Create diary entry')); ?>,
+        diary_error: <?php echo json_encode(t('diary.create_error', [], 'Could not create the diary entry.')); ?>
     }
 };
 </script>

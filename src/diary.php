@@ -20,11 +20,21 @@ $currentLang = getUserLanguage();
 // "Today's entry" call always lands in a real workspace.
 $diaryWorkspace = $pageWorkspace !== '' ? $pageWorkspace : getFirstWorkspaceName();
 
-$diaryRootName = trim((string)getSetting('diary_folder', 'Diary'));
-if ($diaryRootName === '') $diaryRootName = 'Diary';
+$diaryRootName = getDiaryRootFolderName(isset($con) ? $con : null, $diaryWorkspace);
 
 function diaryBuildPageUrl(string $page, string $pageWorkspace): string {
     return $page . ($pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : '');
+}
+
+/**
+ * The day a diary entry belongs to: its YYYY-MM-DD title when valid (so
+ * renaming an entry re-dates it), otherwise its creation date.
+ */
+function diaryEntryDate(string $heading, string $created): string {
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $heading, $m) && checkdate((int)$m[2], (int)$m[3], (int)$m[1])) {
+        return $heading;
+    }
+    return $created;
 }
 
 function diaryBuildNoteData(array $note, string $pageWorkspace): array {
@@ -35,16 +45,19 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
     $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
     $iconColor = !empty($note['icon_color']) ? (string)$note['icon_color'] : '';
+    $created = convertUtcToUserTimezone((string)($note['created'] ?? ''), 'Y-m-d');
     return [
         'id'        => $noteId,
         'heading'   => $heading,
+        'entryDate' => diaryEntryDate(trim((string)($note['heading'] ?? '')), $created),
         // newtab=1 tells tabs.js to open the note as a new internal tab (see js/tabs.js).
         'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
         'text'      => $preview['text'],
         'tasks'     => $preview['tasks'],
+        'image'     => $preview['image'] ?? null,
         'tags'      => $tags,
         'search'    => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
-        'created'   => convertUtcToUserTimezone((string)($note['created'] ?? ''), 'Y-m-d'),
+        'created'   => $created,
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
         'icon'      => $iconRaw,
         'iconColor' => $iconColor,
@@ -64,33 +77,9 @@ $diaryFolderPath = $diaryRootName . '/' . $userNow->format('Y') . '/' . $userNow
 
 try {
     if (isset($con)) {
-        // Root diary folder for this workspace (may not exist yet).
-        $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
-        $stmt->execute([$diaryRootName, $diaryWorkspace]);
-        $diaryRootId = $stmt->fetchColumn();
+        $diaryFolderIds = getDiaryFolderIds($con, $diaryWorkspace);
 
-        if ($diaryRootId !== false) {
-            $diaryRootId = (int)$diaryRootId;
-
-            // Collect the whole diary subtree (Diary/YYYY/MM ...).
-            $stmt = $con->prepare("SELECT id, parent_id FROM folders WHERE workspace = ?");
-            $stmt->execute([$diaryWorkspace]);
-            $childrenByParent = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $parent = $row['parent_id'] !== null ? (int)$row['parent_id'] : 0;
-                $childrenByParent[$parent][] = (int)$row['id'];
-            }
-
-            $diaryFolderIds = [$diaryRootId];
-            $queue = [$diaryRootId];
-            while ($queue) {
-                $current = array_shift($queue);
-                foreach ($childrenByParent[$current] ?? [] as $childId) {
-                    $diaryFolderIds[] = $childId;
-                    $queue[] = $childId;
-                }
-            }
-
+        if (!empty($diaryFolderIds)) {
             $placeholders = implode(',', array_fill(0, count($diaryFolderIds), '?'));
             $stmt = $con->prepare(
                 "SELECT id, heading, type, tags, created, updated, icon, icon_color FROM entries" .
@@ -106,6 +95,12 @@ try {
                 }
                 $diaryNotes[] = $noteData;
             }
+
+            // Display order follows the entry date (title-based), not creation
+            // order, so re-dated entries land on their day of happening.
+            usort($diaryNotes, function ($a, $b) {
+                return strcmp($b['entryDate'], $a['entryDate']) ?: ($b['id'] <=> $a['id']);
+            });
         }
     }
 } catch (Exception $e) {
@@ -163,6 +158,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					<?php echo t_h('diary.today_button', [], "Today's entry"); ?>
 				</button>
 			</div>
+			<div class="board-filter-row">
+			<?php renderBoardViewMenu('diary'); ?>
 			<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 				<i class="lucide lucide-search dashboard-filter-icon"></i>
 				<input
@@ -175,6 +172,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
 					<i class="lucide lucide-x"></i>
 				</button>
+			</div>
 			</div>
 		</header>
 
@@ -209,5 +207,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<script src="js/navigation.js"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/diary-page.js?v=<?php echo file_exists(__DIR__ . '/js/diary-page.js') ? filemtime(__DIR__ . '/js/diary-page.js') : $cache_v; ?>"></script>
+	<script src="js/board-view-menu.js?v=<?php echo file_exists(__DIR__ . '/js/board-view-menu.js') ? filemtime(__DIR__ . '/js/board-view-menu.js') : $cache_v; ?>"></script>
 </body>
 </html>

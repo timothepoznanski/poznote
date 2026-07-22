@@ -333,6 +333,13 @@
     background: #005a8a;
 }
 
+.calendar-notes-empty {
+    padding: 12px 4px;
+    color: #6b7280;
+    font-size: 14px;
+    text-align: center;
+}
+
 .calendar-notes-modal .modal-footer {
     padding: 16px 24px;
     border-top: 1px solid #e6eef8;
@@ -341,7 +348,6 @@
     justify-content: flex-end;
     gap: 12px;
 }
-
 .calendar-notes-modal .btn-open-all {
     background: #007DB8;
     color: #ffffff;
