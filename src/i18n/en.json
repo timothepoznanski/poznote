@@ -2063,7 +2063,10 @@
       "title": "Notes from",
       "open": "Open",
       "open_all": "Open All",
-      "close": "Close"
+      "close": "Close",
+      "no_notes": "No notes on this day.",
+      "diary_open": "Open diary entry",
+      "diary_create": "Create diary entry"
     }
   },
   "workspace_menu": {
@@ -2374,7 +2377,17 @@
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",
-    "toggle_favorites": "Show favorites only"
+    "toggle_favorites": "Show favorites only",
+    "view": {
+      "button": "View",
+      "size": "Card size",
+      "size_small": "Small",
+      "size_medium": "Medium",
+      "size_large": "Large",
+      "layout": "Layout",
+      "layout_grid": "Grid",
+      "layout_list": "List"
+    }
   },
   "graph": {
     "title": "Note graph",
@@ -2455,6 +2468,7 @@
     "today_badge": "Today",
     "empty": "No diary entries yet. Click \"Today's entry\" to write your first one. It will be stored in {{folder}}.",
     "create_error": "Could not create the diary entry.",
-    "create_card_title": "Diary entry"
+    "create_card_title": "Diary entry",
+    "folder_name": "Diary"
   }
 }

@@ -337,6 +337,19 @@ function saveNoteToServer(options) {
                     window.setNeedsAutoPush(true);
                 }
 
+                // A diary rename moved the note to its date folder: adopt the
+                // new folder id (so the next autosave does not move it back)
+                // and refresh the sidebar.
+                if (data.note && data.note.folder_moved) {
+                    var movedFolderInput = document.getElementById('folderId' + noteid);
+                    if (movedFolderInput && data.note.folder_id) {
+                        movedFolderInput.value = data.note.folder_id;
+                    }
+                    if (typeof refreshSidebarAfterMove === 'function') {
+                        refreshSidebarAfterMove(data);
+                    }
+                }
+
                 // Update linked notes in the list if any were updated
                 if (data.note && data.updated_linked_notes && data.updated_linked_notes.length > 0) {
                     var newTitle = data.note.heading;

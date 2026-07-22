@@ -2435,7 +2435,10 @@
       "title": "Notas del",
       "open": "Abrir",
       "open_all": "Abrir todo",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "no_notes": "No hay notas en este día.",
+      "diary_open": "Abrir entrada de diario",
+      "diary_create": "Crear entrada de diario"
     }
   },
   "workspace_menu": {
@@ -2674,7 +2677,17 @@
     "unpin": "Quitar de favoritos",
     "no_folder": "Otras notas",
     "toggle_all": "Mostrar todas las notas",
-    "toggle_favorites": "Mostrar solo favoritos"
+    "toggle_favorites": "Mostrar solo favoritos",
+    "view": {
+      "button": "Vista",
+      "size": "Tamaño de tarjetas",
+      "size_small": "Pequeñas",
+      "size_medium": "Medianas",
+      "size_large": "Grandes",
+      "layout": "Disposición",
+      "layout_grid": "Cuadrícula",
+      "layout_list": "Lista"
+    }
   },
   "graph": {
     "title": "Grafo de notas",
@@ -2743,6 +2756,7 @@
     "today_badge": "Hoy",
     "empty": "Aún no hay entradas de diario. Haz clic en \"Entrada de hoy\" para escribir la primera. Se guardará en {{folder}}.",
     "create_error": "No se pudo crear la entrada del diario.",
-    "create_card_title": "Entrada de diario"
+    "create_card_title": "Entrada de diario",
+    "folder_name": "Diario"
   }
 }

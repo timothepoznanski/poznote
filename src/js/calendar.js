@@ -22,7 +22,17 @@ class MiniCalendar {
             weekdays: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
             previousMonth: 'Previous month',
             nextMonth: 'Next month',
-            today: 'Today'
+            today: 'Today',
+            modal: {
+                title: 'Notes from',
+                open: 'Open',
+                open_all: 'Open All',
+                close: 'Close',
+                no_notes: 'No notes on this day.',
+                diary_open: 'Open diary entry',
+                diary_create: 'Create diary entry',
+                diary_error: 'Could not create the diary entry.'
+            }
         };
     }
 
@@ -344,18 +354,16 @@ class MiniCalendar {
             }
         });
 
-        // Click on day to filter notes by date
+        // Click on day to show that day's notes (and diary entry action).
+        // Days without notes open the popup too, so a diary entry can be
+        // created for any past date.
         container.addEventListener('click', (e) => {
             const dayElement = e.target.closest('.mini-calendar-day:not(.mini-calendar-day-empty)');
             if (!dayElement) return;
 
             const day = dayElement.getAttribute('data-day');
-            const notesCount = parseInt(dayElement.getAttribute('data-notes-count'), 10);
-
-            if (notesCount > 0) {
-                const dateStr = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                this.filterNotesByDate(dateStr);
-            }
+            const dateStr = `${this.currentYear}-${String(this.currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            this.filterNotesByDate(dateStr);
         });
     }
 
@@ -364,25 +372,86 @@ class MiniCalendar {
      */
     async filterNotesByDate(dateStr) {
         try {
-            // Fetch notes created on this date
-            const response = await fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-on-date.php', { date: dateStr }));
-            if (!response.ok) {
+            // Fetch the day's notes and its diary entry status in parallel
+            const [notesResponse, diaryResponse] = await Promise.all([
+                fetch(this.buildCalendarApiUrl('api/v1/calendar/notes-on-date.php', { date: dateStr })),
+                fetch(this.buildCalendarApiUrl('api/v1/calendar/diary-entry.php', { date: dateStr }))
+            ]);
+
+            if (!notesResponse.ok) {
                 console.error('Failed to fetch notes for date:', dateStr);
                 return;
             }
 
-            const notes = await response.json();
+            const notes = await notesResponse.json();
+            const diary = diaryResponse.ok ? await diaryResponse.json() : null;
 
-            if (!notes || notes.length === 0) {
-                console.log('No notes found for date:', dateStr);
-                return;
-            }
-
-            // Show modal with notes list
-            this.showNotesModal(notes, dateStr);
+            // Show modal with notes list and diary entry action
+            this.showNotesModal(notes || [], dateStr, diary);
 
         } catch (error) {
             console.error('Error opening notes for date:', error);
+        }
+    }
+
+    /**
+     * Open a note in a new internal tab (fallback: full page load)
+     */
+    openNoteInTab(noteId, noteTitle) {
+        if (window.tabManager) {
+            window.tabManager.openInNewTab(noteId, noteTitle || 'Untitled');
+        } else {
+            window.location.href = `index.php?note=${noteId}`;
+        }
+    }
+
+    /**
+     * Open the diary entry for a date, creating it first when needed.
+     * `diary` is the api/v1/calendar/diary-entry.php payload for that date.
+     */
+    async openOrCreateDiaryEntry(diary, dateStr, button) {
+        if (diary.exists && diary.id) {
+            this.openNoteInTab(diary.id, dateStr);
+            return true;
+        }
+
+        button.disabled = true;
+        try {
+            const response = await fetch('api/v1/notes', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({
+                    heading: dateStr,
+                    folder_name: diary.folder,
+                    workspace: diary.workspace,
+                    type: 'note',
+                    created_date: dateStr
+                })
+            });
+            const result = await response.json();
+            if (result.success && result.note) {
+                this.openNoteInTab(result.note.id, dateStr);
+                // Refresh the folder tree (and thereby the calendar dots) so
+                // the new entry shows up without a manual reload. The sidebar
+                // refresh rebuilds the mini calendar with fresh data.
+                if (typeof refreshNotesListAfterFolderAction === 'function') {
+                    refreshNotesListAfterFolderAction(result.note.folder_id);
+                } else {
+                    this.refresh();
+                }
+                return true;
+            }
+            throw new Error(result.error || result.message || '');
+        } catch (error) {
+            button.disabled = false;
+            const message = this.translations.modal.diary_error || 'Could not create the diary entry.';
+            if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+                window.modalAlert.alert(message, 'error');
+            } else {
+                window.alert(message);
+            }
+            return false;
         }
     }
 
@@ -398,8 +467,25 @@ class MiniCalendar {
     /**
      * Show modal with list of notes from a specific date
      */
-    showNotesModal(notes, dateStr) {
+    showNotesModal(notes, dateStr, diary) {
         const formattedDate = this.formatDateForModal(dateStr);
+
+        const notesHtml = notes.length > 0
+            ? notes.map(note => `
+                <div class="calendar-note-item" data-note-id="${note.id}">
+                    <span class="calendar-note-title">${this.escapeHtml(note.title || 'Untitled')}</span>
+                    <button class="calendar-note-open-btn" data-note-id="${note.id}" data-note-title="${this.escapeHtml(note.title || 'Untitled')}">
+                        ${this.translations.modal.open}
+                    </button>
+                </div>
+            `).join('')
+            : `<div class="calendar-notes-empty">${this.translations.modal.no_notes || 'No notes on this day.'}</div>`;
+
+        const diaryBtnHtml = diary
+            ? `<button class="btn-open-all calendar-diary-entry-btn" data-action="diary-entry">
+                    ${diary.exists ? (this.translations.modal.diary_open || 'Open diary entry') : (this.translations.modal.diary_create || 'Create diary entry')}
+               </button>`
+            : '';
 
         // Create modal HTML
         const modalHtml = `
@@ -410,18 +496,12 @@ class MiniCalendar {
                     </div>
                     <div class="modal-body">
                         <div class="calendar-notes-list">
-                            ${notes.map(note => `
-                                <div class="calendar-note-item" data-note-id="${note.id}">
-                                    <span class="calendar-note-title">${this.escapeHtml(note.title || 'Untitled')}</span>
-                                    <button class="calendar-note-open-btn" data-note-id="${note.id}" data-note-title="${this.escapeHtml(note.title || 'Untitled')}">
-                                        ${this.translations.modal.open}
-                                    </button>
-                                </div>
-                            `).join('')}
+                            ${notesHtml}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn-open-all" data-action="open-all">${this.translations.modal.open_all}</button>
+                        ${notes.length > 0 ? `<button class="btn-open-all" data-action="open-all">${this.translations.modal.open_all}</button>` : ''}
+                        ${diaryBtnHtml}
                         <button class="btn-close-red" data-action="close-modal">${this.translations.modal.close}</button>
                     </div>
                 </div>
@@ -460,6 +540,14 @@ class MiniCalendar {
                 });
                 // Close modal after opening all notes
                 modal.remove();
+            });
+        });
+
+        // Open (or create) the diary entry for this day
+        modal.querySelectorAll('[data-action="diary-entry"]').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const opened = await this.openOrCreateDiaryEntry(diary, dateStr, btn);
+                if (opened) modal.remove();
             });
         });
 

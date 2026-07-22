@@ -46,6 +46,7 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
         'text'      => $preview['text'],
         'tasks'     => $preview['tasks'],
+        'image'     => $preview['image'] ?? null,
         'tags'      => $tags,
         'search'    => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
@@ -591,6 +592,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<span class="dashboard-topbar-count"><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
 					</a>
 				</nav>
+				<div class="board-filter-row">
+				<?php renderBoardViewMenu('dashboard'); ?>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
 					<input
@@ -603,6 +606,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
 						<i class="lucide lucide-x"></i>
 					</button>
+				</div>
 				</div>
 			</header>
 
@@ -793,6 +797,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/notifications-modal.js?v=<?php echo file_exists(__DIR__ . '/js/notifications-modal.js') ? filemtime(__DIR__ . '/js/notifications-modal.js') : $cache_v; ?>"></script>
 		<script src="js/dashboard-page.js?v=<?php echo file_exists(__DIR__ . '/js/dashboard-page.js') ? filemtime(__DIR__ . '/js/dashboard-page.js') : $cache_v; ?>"></script>
+		<script src="js/board-view-menu.js?v=<?php echo file_exists(__DIR__ . '/js/board-view-menu.js') ? filemtime(__DIR__ . '/js/board-view-menu.js') : $cache_v; ?>"></script>
 		<?php if (!empty($dashAiChatEnabled)): ?>
 		<?php include 'ai_chat_panel.php'; ?>
 		<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>

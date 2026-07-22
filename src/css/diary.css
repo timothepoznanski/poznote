@@ -18,9 +18,11 @@
     border-bottom: 1.5px solid #e5e7eb;
 }
 
-/* Header actions: same .btn style as admin/users.php, centered */
+/* Header actions: same .btn style as admin/users.php, centered.
+   Labels never wrap inside a button; on narrow screens the row wraps. */
 .diary-actions {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -32,6 +34,7 @@
     align-items: center;
     gap: 8px;
     font-size: 14px;
+    white-space: nowrap;
 }
 
 /* favorites.css provides .btn/.btn-secondary but not .btn-primary
