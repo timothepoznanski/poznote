@@ -1,3 +1,45 @@
+// Per-user localStorage wrapper so display preferences (theme, font sizes,
+// icon scale) don't leak between accounts sharing the same browser.
+// The user id comes from the poznote_uid cookie set by auth.php; without it
+// (login page, public pages) the legacy shared keys are used as before.
+// On first read for a given user, the legacy shared value is migrated to the
+// user-scoped key so existing preferences are kept.
+window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
+    var uid = '';
+    try {
+        var match = document.cookie.match(/(?:^|;\s*)poznote_uid=(\d+)/);
+        if (match) uid = match[1];
+    } catch (e) {}
+
+    function scopedKey(key) {
+        return uid ? key + '::u' + uid : key;
+    }
+
+    return {
+        getItem: function (key) {
+            try {
+                var value = localStorage.getItem(scopedKey(key));
+                if (value === null && uid) {
+                    var legacy = localStorage.getItem(key);
+                    if (legacy !== null) {
+                        localStorage.setItem(scopedKey(key), legacy);
+                        return legacy;
+                    }
+                }
+                return value;
+            } catch (e) {
+                return null;
+            }
+        },
+        setItem: function (key, value) {
+            try { localStorage.setItem(scopedKey(key), value); } catch (e) {}
+        },
+        removeItem: function (key) {
+            try { localStorage.removeItem(scopedKey(key)); } catch (e) {}
+        }
+    };
+})();
+
 // Theme initialization - runs synchronously in <head> to prevent FOUC
 (function () {
     try {
@@ -26,7 +68,7 @@
         }
 
         var forcedTheme = window.__poznoteForcedTheme;
-        var t = normalizeTheme(forcedTheme) || normalizeTheme(localStorage.getItem('poznote-theme')) || 'system';
+        var t = normalizeTheme(forcedTheme) || normalizeTheme(window.__poznoteUserStorage.getItem('poznote-theme')) || 'system';
         if (t === 'system') {
             t = getSystemTheme();
         }

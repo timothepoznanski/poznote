@@ -2,6 +2,10 @@
  * Font size settings module for note editor
  */
 
+// Per-user storage (defined in theme-init.js); falls back to the shared
+// localStorage keys on pages loaded without theme-init.js.
+const fontSizeStore = window.__poznoteUserStorage || window.localStorage;
+
 // Function to show font size settings prompt
 function showNoteFontSizePrompt() {
     // Close settings menus
@@ -85,21 +89,21 @@ function updateFontSizePreview() {
 // Function to load current font size settings
 function loadCurrentFontSizes() {
     // Load note font size from localStorage
-    const noteFontSize = localStorage.getItem('note_font_size') || '15';
+    const noteFontSize = fontSizeStore.getItem('note_font_size') || '15';
     const fontSizeInput = document.getElementById('fontSizeInput');
     if (fontSizeInput) {
         fontSizeInput.value = noteFontSize;
     }
 
     // Load sidebar font size from localStorage
-    const sidebarFontSize = localStorage.getItem('sidebar_font_size') || '13';
+    const sidebarFontSize = fontSizeStore.getItem('sidebar_font_size') || '13';
     const sidebarFontSizeInput = document.getElementById('sidebarFontSizeInput');
     if (sidebarFontSizeInput) {
         sidebarFontSizeInput.value = sidebarFontSize;
     }
 
     // Load code block font size from localStorage
-    const codeBlockFontSize = localStorage.getItem('code_block_font_size') || '15';
+    const codeBlockFontSize = fontSizeStore.getItem('code_block_font_size') || '15';
     const codeBlockFontSizeInput = document.getElementById('codeBlockFontSizeInput');
     if (codeBlockFontSizeInput) {
         codeBlockFontSizeInput.value = codeBlockFontSize;
@@ -130,9 +134,9 @@ function saveFontSize() {
 
     try {
         // Save to localStorage instead of database
-        localStorage.setItem('note_font_size', fontSize);
-        localStorage.setItem('sidebar_font_size', sidebarFontSize);
-        localStorage.setItem('code_block_font_size', codeBlockFontSize);
+        fontSizeStore.setItem('note_font_size', fontSize);
+        fontSizeStore.setItem('sidebar_font_size', sidebarFontSize);
+        fontSizeStore.setItem('code_block_font_size', codeBlockFontSize);
 
         closeFontSizeModal();
 
@@ -162,13 +166,13 @@ function applyFontSizeToNotes() {
     // Note: The font sizes are now handled via CSS variables on :root
     // Loading from localStorage to ensure UI is in sync (e.g. on page load)
 
-    const noteFontSize = localStorage.getItem('note_font_size') || '15';
+    const noteFontSize = fontSizeStore.getItem('note_font_size') || '15';
     document.documentElement.style.setProperty('--note-font-size', noteFontSize + 'px');
 
-    const sidebarFontSize = localStorage.getItem('sidebar_font_size') || '13';
+    const sidebarFontSize = fontSizeStore.getItem('sidebar_font_size') || '13';
     document.documentElement.style.setProperty('--sidebar-font-size', sidebarFontSize + 'px');
 
-    const codeBlockFontSize = localStorage.getItem('code_block_font_size') || '15';
+    const codeBlockFontSize = fontSizeStore.getItem('code_block_font_size') || '15';
     document.documentElement.style.setProperty('--code-block-font-size', codeBlockFontSize + 'px');
 }
 

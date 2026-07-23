@@ -350,7 +350,7 @@
         fontBadges.forEach(function (config) {
             var badge = document.getElementById(config.id);
             if (badge) {
-                var size = localStorage.getItem(config.key) || config.default;
+                var size = (window.__poznoteUserStorage || localStorage).getItem(config.key) || config.default;
                 badge.textContent = tr(config.i18nKey, { size: size }, config.fallback + size + 'px');
                 badge.className = 'setting-status enabled';
             }
@@ -360,7 +360,7 @@
     function refreshIndexIconScaleBadge() {
         var badge = document.getElementById('index-icon-scale-badge');
         if (badge) {
-            var scale = localStorage.getItem('index_icon_scale') || '1.0';
+            var scale = (window.__poznoteUserStorage || localStorage).getItem('index_icon_scale') || '1.0';
             badge.textContent = parseFloat(scale).toFixed(1) + 'x';
             badge.className = 'setting-status enabled';
         }

@@ -111,6 +111,50 @@ function setRememberMeCookie(string $value, int $expires): void {
     ]);
 }
 
+/**
+ * Expose the authenticated user's id to the browser so client-side display
+ * preferences (theme, font sizes, icon scale) can be stored per user instead
+ * of being shared by every account using the same browser.
+ * Not HttpOnly on purpose: JS needs to read it, and the id is not sensitive.
+ * Re-synced on every authenticated request because several Poznote instances
+ * on the same host share the cookie jar (cookies ignore the port).
+ */
+function syncUserPreferenceCookie(): void {
+    $userId = (int)(getAuthenticatedUserId() ?? 0);
+    if ($userId <= 0 || headers_sent()) {
+        return;
+    }
+
+    if ((string)($_COOKIE['poznote_uid'] ?? '') === (string)$userId) {
+        return;
+    }
+
+    setcookie('poznote_uid', (string)$userId, [
+        'expires'  => time() + 365 * 24 * 60 * 60,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $GLOBALS['isSecure'] ?? false,
+        'httponly' => false,
+        'samesite' => 'Lax'
+    ]);
+    $_COOKIE['poznote_uid'] = (string)$userId;
+}
+
+function clearUserPreferenceCookie(): void {
+    if (headers_sent()) {
+        return;
+    }
+    setcookie('poznote_uid', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => $GLOBALS['isSecure'] ?? false,
+        'httponly' => false,
+        'samesite' => 'Lax'
+    ]);
+    unset($_COOKIE['poznote_uid']);
+}
+
 function createRememberMeHash(string $username, int $userId, int $timestamp, string $secret): string {
     return hash_hmac('sha256', $username . ':' . $userId . ':' . $timestamp, $secret);
 }
@@ -181,6 +225,8 @@ function setAuthenticatedIdentity(array $authUser, ?string $authMethod = null): 
     } elseif (($_SESSION['auth_method'] ?? '') !== 'public_workspace') {
         unset($_SESSION['auth_method']);
     }
+
+    syncUserPreferenceCookie();
 }
 
 function setActiveUserAccount(array $targetUser): bool {
@@ -1268,6 +1314,7 @@ function logout() {
     if (isset($_COOKIE[REMEMBER_ME_COOKIE])) {
         setRememberMeCookie('', time() - 3600);
     }
+    clearUserPreferenceCookie();
 
     if (is_string($oidcLogoutUrl) && $oidcLogoutUrl !== '') {
         header('Location: ' . $oidcLogoutUrl);
@@ -1288,6 +1335,8 @@ function requireAuth() {
         header('Location: ' . (isAccountSelectionRequired() ? 'login.php?select_account=1' : 'login.php'));
         exit;
     }
+
+    syncUserPreferenceCookie();
 
     enforcePublicWorkspaceRequestAccess();
 }
