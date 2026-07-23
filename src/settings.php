@@ -125,9 +125,14 @@ try {
     $settingsPageUserId = getCurrentUserId();
     if ($settingsPageUserId && function_exists('hasCustomPassword')) {
         $settingsPageUserProfile = function_exists('getUserProfileById') ? getUserProfileById((int)$settingsPageUserId) : null;
+        $settingsPagePasswordChangedAt = is_array($settingsPageUserProfile) ? ($settingsPageUserProfile['password_changed_at'] ?? null) : null;
+        if (!empty($settingsPagePasswordChangedAt)) {
+            // Stored by SQLite CURRENT_TIMESTAMP (UTC); show it in the user's timezone.
+            $settingsPagePasswordChangedAt = convertUtcToUserTimezone($settingsPagePasswordChangedAt, getUserDateTimeFormatPattern() ?: 'Y-m-d H:i');
+        }
         $settingsPageConfig['passwordStatus'] = [
             'has_custom_password' => hasCustomPassword((int)$settingsPageUserId),
-            'password_changed_at' => is_array($settingsPageUserProfile) ? ($settingsPageUserProfile['password_changed_at'] ?? null) : null,
+            'password_changed_at' => $settingsPagePasswordChangedAt,
         ];
     }
 } catch (Exception $e) {
