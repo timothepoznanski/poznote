@@ -293,7 +293,7 @@ To migrate an existing Poznote instance to the rootless variant, or for more det
 
 <a id="railway"></a>
 <details>
-<summary><strong>🚂 Railway</strong></summary>
+<summary><strong>🚂 Railway</strong></summary><br>
 
 Deploy Poznote in the cloud without managing a server, using the official Railway template.
 
