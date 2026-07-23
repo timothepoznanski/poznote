@@ -559,6 +559,7 @@
     "title": "Anzeige",
     "cards": {
       "theme_mode": "Thema",
+      "main_font": "App-Schriftart",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_sort_order": "Notizen-Sortierreihenfolge",
@@ -932,6 +933,14 @@
     },
     "input": {
       "placeholder": "Text eingeben"
+    },
+    "main_font": {
+      "title": "App-Schriftart",
+      "description": "Wählen Sie die Hauptschriftart der Oberfläche. Andere Schriftarten als Inter verwenden die auf Ihrem Gerät installierten Schriften.",
+      "options": {
+        "inter": "Inter (Standard)",
+        "system": "System"
+      }
     },
     "font_size": {
       "title": "Schriftgröße",

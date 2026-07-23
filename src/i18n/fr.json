@@ -572,6 +572,7 @@
     "title": "Affichage",
     "cards": {
       "theme_mode": "Thème",
+      "main_font": "Police de l'application",
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
       "note_sort_order": "Tri des notes",
@@ -958,6 +959,14 @@
     },
     "input": {
       "placeholder": "Saisir le texte"
+    },
+    "main_font": {
+      "title": "Police de l'application",
+      "description": "Choisissez la police principale de l'interface. Les polices autres qu'Inter utilisent les polices installées sur votre appareil.",
+      "options": {
+        "inter": "Inter (par défaut)",
+        "system": "Système"
+      }
     },
     "font_size": {
       "title": "Taille de police",

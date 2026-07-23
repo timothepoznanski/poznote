@@ -778,6 +778,29 @@ try {
     </div>
 </div>
 
+<!-- Main font selection modal -->
+<div id="mainFontModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.main_font.title', [], 'App font'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.main_font.description', [], 'Fonts other than Inter use the fonts installed on your device.'); ?></p>
+            <select id="mainFontSelect">
+                <option value="inter" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.main_font.options.inter', [], 'Inter (default)'); ?></option>
+                <option value="system" style="font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;"><?php echo t_h('modals.main_font.options.system', [], 'System'); ?></option>
+                <option value="arial" style="font-family: Arial, Helvetica, sans-serif;">Arial</option>
+                <option value="verdana" style="font-family: Verdana, sans-serif;">Verdana</option>
+                <option value="trebuchet" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
+                <option value="georgia" style="font-family: Georgia, serif;">Georgia</option>
+                <option value="times" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="mainFontModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveMainFontModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Timezone modal -->
 <div id="timezoneModal" class="modal">
     <div class="modal-content">

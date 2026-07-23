@@ -424,6 +424,17 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- App Font -->
+            <div class="home-card" id="main-font-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-type"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span>
+                    <span id="main-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
                 <div class="home-card-icon">

@@ -557,6 +557,7 @@
     "title": "Exibição",
     "cards": {
       "theme_mode": "Tema",
+      "main_font": "Fonte do aplicativo",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_sort_order": "Ordem de classificação das notas",
@@ -931,6 +932,14 @@
     },
     "input": {
       "placeholder": "Insira texto"
+    },
+    "main_font": {
+      "title": "Fonte do aplicativo",
+      "description": "Escolha a fonte principal da interface. Fontes diferentes de Inter usam as fontes instaladas no seu dispositivo.",
+      "options": {
+        "inter": "Inter (padrão)",
+        "system": "Sistema"
+      }
     },
     "font_size": {
       "title": "Tamanho da Fonte",

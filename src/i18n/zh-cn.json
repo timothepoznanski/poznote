@@ -560,6 +560,7 @@
     "title": "显示",
     "cards": {
       "theme_mode": "主题",
+      "main_font": "应用字体",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_sort_order": "笔记排序规则",
@@ -932,6 +933,14 @@
     },
     "input": {
       "placeholder": "输入文本"
+    },
+    "main_font": {
+      "title": "应用字体",
+      "description": "选择界面的主要字体。除 Inter 外的字体将使用您设备上安装的字体。",
+      "options": {
+        "inter": "Inter（默认）",
+        "system": "系统"
+      }
     },
     "font_size": {
       "title": "字体大小",
