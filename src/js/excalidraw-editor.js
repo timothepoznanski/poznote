@@ -189,7 +189,7 @@
     function getPoznoteTheme() {
         try {
             var theme = normalizePoznoteTheme(window.__poznoteForcedTheme)
-                || normalizePoznoteTheme(localStorage.getItem('poznote-theme'))
+                || normalizePoznoteTheme((window.__poznoteUserStorage || localStorage).getItem('poznote-theme'))
                 || 'system';
             if (theme === 'system') {
                 theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';

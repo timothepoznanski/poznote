@@ -2,6 +2,10 @@
  * Index icon scale settings module
  */
 
+// Per-user storage (defined in theme-init.js); falls back to the shared
+// localStorage keys on pages loaded without theme-init.js.
+const indexIconScaleStore = window.__poznoteUserStorage || window.localStorage;
+
 
 // Function to show index icon scale settings prompt
 function showIndexIconScalePrompt() {
@@ -53,7 +57,7 @@ function loadCurrentIndexIconScale() {
     const scaleInput = document.getElementById('indexIconScaleInput');
     const scaleValueDisplay = document.getElementById('indexIconScaleValue');
 
-    const scale = localStorage.getItem('index_icon_scale') || '1.0';
+    const scale = indexIconScaleStore.getItem('index_icon_scale') || '1.0';
     if (scaleInput) {
         scaleInput.value = scale;
     }
@@ -71,7 +75,7 @@ function saveIndexIconScale() {
     const scale = parseFloat(scaleInput.value).toFixed(1);
 
     // Save to localStorage for immediate effect
-    localStorage.setItem('index_icon_scale', scale);
+    indexIconScaleStore.setItem('index_icon_scale', scale);
 
     updateIndexIconScaleBadge(scale);
     closeIndexIconScaleModal();
@@ -159,7 +163,7 @@ function applyIndexIconScale(scale) {
     // 1. Check data attribute (from PHP)
     // 2. Fallback to localStorage
     // 3. Fallback to default 1.0
-    let scale = localStorage.getItem('index_icon_scale') || '1.0';
+    let scale = indexIconScaleStore.getItem('index_icon_scale') || '1.0';
 
     if (parseFloat(scale) !== 1.0) {
         if (document.readyState === 'loading') {

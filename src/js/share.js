@@ -302,7 +302,7 @@ async function createPublicShare(noteId) {
         }
 
         // Build request body
-        const theme = localStorage.getItem('poznote-theme') || 'light';
+        const theme = (window.__poznoteUserStorage || localStorage).getItem('poznote-theme') || 'light';
         const requestBody = { theme: theme, indexable: indexable };
         requestBody.access_mode = getSelectedShareAccessMode('full');
         if (customToken) requestBody.custom_token = customToken;
@@ -612,7 +612,7 @@ function showShareModal(url, options) {
             renewBtn.onclick = async function (ev) {
                 try { ev && ev.stopPropagation(); ev && ev.preventDefault(); } catch (e) { }
                 try {
-                    const theme = localStorage.getItem('poznote-theme') || 'light';
+                    const theme = (window.__poznoteUserStorage || localStorage).getItem('poznote-theme') || 'light';
                     const resp = await fetch('/api/v1/notes/' + noteId + '/share', {
                         method: 'POST',
                         credentials: 'same-origin',
@@ -950,7 +950,7 @@ async function createPublicFolderShare(folderId) {
         }
 
         // Build request body
-        const theme = localStorage.getItem('poznote-theme') || 'light';
+        const theme = (window.__poznoteUserStorage || localStorage).getItem('poznote-theme') || 'light';
         const requestBody = { theme: theme, indexable: indexable };
         if (customToken) requestBody.custom_token = customToken;
         if (password) requestBody.password = password;

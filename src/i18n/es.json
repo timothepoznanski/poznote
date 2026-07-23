@@ -560,6 +560,7 @@
     "title": "Pantalla",
     "cards": {
       "theme_mode": "Tema",
+      "main_font": "Fuente de la aplicación",
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_sort_order": "Orden de clasificación de notas",
@@ -933,6 +934,14 @@
     },
     "input": {
       "placeholder": "Ingresa texto"
+    },
+    "main_font": {
+      "title": "Fuente de la aplicación",
+      "description": "Elige la fuente principal de la interfaz. Las fuentes distintas de Inter usan las fuentes instaladas en tu dispositivo.",
+      "options": {
+        "inter": "Inter (predeterminada)",
+        "system": "Sistema"
+      }
     },
     "font_size": {
       "title": "Tamaño de fuente",

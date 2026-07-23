@@ -304,6 +304,18 @@ class UsersController {
     }
 
     /**
+     * password_changed_at is stored by SQLite CURRENT_TIMESTAMP (UTC); convert
+     * it to the viewer's timezone and date format for display.
+     */
+    private function formatPasswordChangedAt($value) {
+        if (empty($value) || !function_exists('convertUtcToUserTimezone')) {
+            return $value;
+        }
+        $pattern = function_exists('getUserDateTimeFormatPattern') ? getUserDateTimeFormatPattern() : null;
+        return convertUtcToUserTimezone($value, $pattern ?: 'Y-m-d H:i');
+    }
+
+    /**
      * GET /api/v1/users/me/password-status - Check if current user has a custom password
      */
     public function passwordStatus() {
@@ -321,7 +333,7 @@ class UsersController {
         
         return [
             'has_custom_password' => hasCustomPassword($userId),
-            'password_changed_at' => $user['password_changed_at'] ?? null
+            'password_changed_at' => $this->formatPasswordChangedAt($user['password_changed_at'] ?? null)
         ];
     }
 
@@ -383,7 +395,7 @@ class UsersController {
         return [
             'user_id' => (int)$id,
             'has_custom_password' => hasCustomPassword((int)$id),
-            'password_changed_at' => $user['password_changed_at'] ?? null
+            'password_changed_at' => $this->formatPasswordChangedAt($user['password_changed_at'] ?? null)
         ];
     }
 

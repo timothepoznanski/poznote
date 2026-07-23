@@ -2,6 +2,44 @@
  * Excalidraw Editor Theme Initialization
  * Must run in <head> to prevent flash of unstyled content
  */
+
+// Same per-user storage wrapper as theme-init.js (this page does not load it).
+window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
+    var uid = '';
+    try {
+        var match = document.cookie.match(/(?:^|;\s*)poznote_uid=(\d+)/);
+        if (match) uid = match[1];
+    } catch (e) {}
+
+    function scopedKey(key) {
+        return uid ? key + '::u' + uid : key;
+    }
+
+    return {
+        getItem: function (key) {
+            try {
+                var value = localStorage.getItem(scopedKey(key));
+                if (value === null && uid) {
+                    var legacy = localStorage.getItem(key);
+                    if (legacy !== null) {
+                        localStorage.setItem(scopedKey(key), legacy);
+                        return legacy;
+                    }
+                }
+                return value;
+            } catch (e) {
+                return null;
+            }
+        },
+        setItem: function (key, value) {
+            try { localStorage.setItem(scopedKey(key), value); } catch (e) {}
+        },
+        removeItem: function (key) {
+            try { localStorage.removeItem(scopedKey(key)); } catch (e) {}
+        }
+    };
+})();
+
 (function() {
     'use strict';
 
@@ -49,7 +87,7 @@
     
     try {
         var theme = normalizeThemeMode(window.__poznoteForcedTheme)
-            || normalizeThemeMode(localStorage.getItem('poznote-theme'))
+            || normalizeThemeMode(window.__poznoteUserStorage.getItem('poznote-theme'))
             || 'system';
         if (theme === 'system') {
             theme = getSystemTheme();

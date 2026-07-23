@@ -206,6 +206,7 @@
     "title": "Display",
     "cards": {
       "theme_mode": "Theme",
+      "main_font": "App font",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
@@ -444,6 +445,14 @@
     },
     "input": {
       "placeholder": "Enter text"
+    },
+    "main_font": {
+      "title": "App font",
+      "description": "Choose the main interface font. Fonts other than Inter use the fonts installed on your device.",
+      "options": {
+        "inter": "Inter (default)",
+        "system": "System"
+      }
     },
     "font_size": {
       "title": "Font Size",

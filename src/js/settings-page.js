@@ -350,17 +350,81 @@
         fontBadges.forEach(function (config) {
             var badge = document.getElementById(config.id);
             if (badge) {
-                var size = localStorage.getItem(config.key) || config.default;
+                var size = (window.__poznoteUserStorage || localStorage).getItem(config.key) || config.default;
                 badge.textContent = tr(config.i18nKey, { size: size }, config.fallback + size + 'px');
                 badge.className = 'setting-status enabled';
             }
         });
     }
 
+    function getMainFontLabel(fontKey) {
+        var labels = {
+            inter: tr('modals.main_font.options.inter', {}, 'Inter (default)'),
+            system: tr('modals.main_font.options.system', {}, 'System'),
+            arial: 'Arial',
+            verdana: 'Verdana',
+            trebuchet: 'Trebuchet MS',
+            georgia: 'Georgia',
+            times: 'Times New Roman'
+        };
+        return labels[fontKey] || labels.inter;
+    }
+
+    // Probe which main-font options actually resolve on this device.
+    // FontFace.load() rejects when every local() source is missing, which
+    // tests exactly what the @font-face override in theme-init.js will do
+    // (a plain font-family lookup would go through OS font substitution
+    // and report fonts as available when local() would not find them).
+    var mainFontAvailability = null;
+    function probeMainFonts(callback) {
+        if (mainFontAvailability) { callback(mainFontAvailability); return; }
+
+        var fonts = window.__poznoteMainFonts || {};
+        var keys = Object.keys(fonts);
+        var result = { inter: true };
+
+        if (typeof window.FontFace !== 'function') {
+            keys.forEach(function (key) { result[key] = true; });
+            mainFontAvailability = result;
+            callback(result);
+            return;
+        }
+
+        var pending = keys.length;
+        function done() {
+            pending--;
+            if (pending === 0) {
+                mainFontAvailability = result;
+                callback(result);
+            }
+        }
+        keys.forEach(function (key) {
+            var src = fonts[key].regular.map(function (n) { return "local('" + n + "')"; }).join(', ');
+            try {
+                new FontFace('__poznote-font-probe-' + key, src).load().then(
+                    function () { result[key] = true; done(); },
+                    function () { result[key] = false; done(); }
+                );
+            } catch (e) {
+                result[key] = true;
+                done();
+            }
+        });
+    }
+
+    function refreshMainFontBadge() {
+        var badge = document.getElementById('main-font-badge');
+        if (badge) {
+            var font = (window.__poznoteUserStorage || localStorage).getItem('main_font') || 'inter';
+            badge.textContent = getMainFontLabel(font);
+            badge.className = 'setting-status enabled';
+        }
+    }
+
     function refreshIndexIconScaleBadge() {
         var badge = document.getElementById('index-icon-scale-badge');
         if (badge) {
-            var scale = localStorage.getItem('index_icon_scale') || '1.0';
+            var scale = (window.__poznoteUserStorage || localStorage).getItem('index_icon_scale') || '1.0';
             badge.textContent = parseFloat(scale).toFixed(1) + 'x';
             badge.className = 'setting-status enabled';
         }
@@ -1142,6 +1206,32 @@
             });
         }
 
+        // Main font card - opens font selection modal
+        var mainFontCard = document.getElementById('main-font-card');
+        if (mainFontCard) {
+            mainFontCard.addEventListener('click', function () {
+                var modal = document.getElementById('mainFontModal');
+                if (!modal) return;
+                var current = (window.__poznoteUserStorage || localStorage).getItem('main_font') || 'inter';
+                probeMainFonts(function (available) {
+                    var select = document.getElementById('mainFontSelect');
+                    if (select) {
+                        for (var i = 0; i < select.options.length; i++) {
+                            var option = select.options[i];
+                            // Hide fonts this device does not have; keep the
+                            // stored choice visible even if it is unavailable
+                            // here so it can be changed.
+                            var show = option.value === current || available[option.value] !== false;
+                            option.hidden = !show;
+                            option.disabled = !show;
+                        }
+                        select.value = current;
+                    }
+                    modal.style.display = 'flex';
+                });
+            });
+        }
+
         // Login display card - delegates to ui.js
         var loginDisplayCard = document.getElementById('login-display-card');
         if (loginDisplayCard && typeof window.showLoginDisplayNamePrompt === 'function') {
@@ -1361,6 +1451,22 @@
             });
         }
 
+        // Save main font modal button
+        var saveMainFontBtn = document.getElementById('saveMainFontModalBtn');
+        if (saveMainFontBtn) {
+            saveMainFontBtn.addEventListener('click', function () {
+                var select = document.getElementById('mainFontSelect');
+                var selected = (select && select.value) || 'inter';
+                (window.__poznoteUserStorage || localStorage).setItem('main_font', selected);
+                if (typeof window.__poznoteApplyMainFont === 'function') {
+                    window.__poznoteApplyMainFont(selected);
+                }
+                try { closeModal('mainFontModal'); } catch (e) { }
+                refreshMainFontBadge();
+                reloadOpener();
+            });
+        }
+
         // ---- Custom CSS upload modal ----
         var uploadCustomCssBtn = document.getElementById('uploadCustomCssBtn');
         var customCssFileInput = document.getElementById('customCssFileInput');
@@ -1483,6 +1589,7 @@
             refreshLanguageBadge();
             refreshLoginDisplayBadge();
             refreshFontSizeBadge();
+            refreshMainFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
             refreshTasklistInsertOrderBadge();
@@ -1557,6 +1664,7 @@
         document.addEventListener('poznote:i18n:loaded', function () {
             refreshLanguageBadge();
             refreshFontSizeBadge();
+            refreshMainFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
             refreshTasklistInsertOrderBadge();

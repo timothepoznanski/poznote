@@ -97,6 +97,39 @@
         return modal;
     }
 
+    // Re-apply translations on an already-built modal without touching typed
+    // values. Needed because the modal can be created (auto-open via
+    // ?open=change-password, or a fast click) before the async i18n strings
+    // have finished loading, in which case it was built with English fallbacks.
+    function applyPasswordModalTranslations() {
+        var modal = document.getElementById('changePasswordModal');
+        if (!modal) return;
+
+        var title = modal.querySelector('h3');
+        if (title) title.textContent = tr('password.modal.title', {}, 'Change Password');
+
+        var description = modal.querySelector('.change-password-description');
+        if (description) description.textContent = tr('password.modal.description', {}, 'Enter your current password and choose a new one.');
+
+        var placeholders = [
+            { id: 'cpCurrentPassword', key: 'password.modal.current', fallback: 'Current password' },
+            { id: 'cpNewPassword', key: 'password.modal.new', fallback: 'New password' },
+            { id: 'cpConfirmPassword', key: 'password.modal.confirm', fallback: 'Confirm new password' }
+        ];
+        placeholders.forEach(function (entry) {
+            var input = document.getElementById(entry.id);
+            if (input) input.placeholder = tr(entry.key, {}, entry.fallback);
+        });
+
+        var cancelBtn = document.getElementById('cpCancelBtn');
+        if (cancelBtn) cancelBtn.textContent = tr('common.cancel', {}, 'Cancel');
+
+        var saveBtn = document.getElementById('cpSaveBtn');
+        if (saveBtn) saveBtn.textContent = tr('common.save', {}, 'Save');
+    }
+
+    document.addEventListener('poznote:i18n:loaded', applyPasswordModalTranslations);
+
     function showPasswordModal() {
         var modal = createPasswordModal();
 
@@ -243,12 +276,9 @@
         initPasswordChange();
     }
 
-    // Also run after translations load
-    if (window.loadPoznoteI18n) {
-        window.loadPoznoteI18n().then(function () {
-            refreshPasswordStatusBadge();
-        }).catch(function () {
-            // Ignore translation load failures for this optional refresh.
-        });
-    }
+    // Re-render the badge once translations are loaded (globals.js already
+    // fetches them at DOMContentLoaded; no need to trigger a second fetch).
+    document.addEventListener('poznote:i18n:loaded', function () {
+        refreshPasswordStatusBadge();
+    });
 })();

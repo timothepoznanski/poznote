@@ -6,6 +6,10 @@
 (function () {
     'use strict';
 
+    // Per-user storage (defined in theme-init.js); falls back to the shared
+    // localStorage keys on pages loaded without theme-init.js.
+    var themeStore = window.__poznoteUserStorage || window.localStorage;
+
     var palettes = {
         dark: {
             contentBg: '#252526',
@@ -47,13 +51,13 @@
             return;
         }
 
-        var savedTheme = normalizeThemeMode(localStorage.getItem('poznote-theme')) || 'system';
+        var savedTheme = normalizeThemeMode(themeStore.getItem('poznote-theme')) || 'system';
 
         if (savedTheme === 'system') {
             // Listen for system theme changes
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
                 // Only re-apply if no manual preference is set
-                var currentMode = normalizeThemeMode(localStorage.getItem('poznote-theme')) || 'system';
+                var currentMode = normalizeThemeMode(themeStore.getItem('poznote-theme')) || 'system';
                 if (currentMode === 'system') {
                     applyTheme('system', false);
                 }
@@ -90,10 +94,12 @@
         if (theme === 'system') {
             selectedTheme = getSystemTheme();
             if (save !== false) {
-                localStorage.removeItem('poznote-theme');
+                // Store 'system' explicitly instead of removing the key, so an
+                // absent user-scoped key keeps meaning "not migrated yet".
+                themeStore.setItem('poznote-theme', 'system');
             }
         } else if (save !== false) {
-            localStorage.setItem('poznote-theme', theme);
+            themeStore.setItem('poznote-theme', theme);
         }
 
         var effectiveTheme = getEffectiveTheme(selectedTheme);
@@ -138,7 +144,7 @@
 
     // Toggle between light and dark mode (Legacy support for old UI if needed)
     function toggleTheme() {
-        var currentTheme = localStorage.getItem('poznote-theme') || 'system';
+        var currentTheme = themeStore.getItem('poznote-theme') || 'system';
         var newTheme;
 
         if (currentTheme === 'system') {
@@ -199,7 +205,7 @@
         var forcedTheme = getForcedTheme();
         if (forcedTheme) return forcedTheme;
 
-        return normalizeThemeMode(localStorage.getItem('poznote-theme')) || 'system';
+        return normalizeThemeMode(themeStore.getItem('poznote-theme')) || 'system';
     }
 
     // Make functions globally available

@@ -125,9 +125,14 @@ try {
     $settingsPageUserId = getCurrentUserId();
     if ($settingsPageUserId && function_exists('hasCustomPassword')) {
         $settingsPageUserProfile = function_exists('getUserProfileById') ? getUserProfileById((int)$settingsPageUserId) : null;
+        $settingsPagePasswordChangedAt = is_array($settingsPageUserProfile) ? ($settingsPageUserProfile['password_changed_at'] ?? null) : null;
+        if (!empty($settingsPagePasswordChangedAt)) {
+            // Stored by SQLite CURRENT_TIMESTAMP (UTC); show it in the user's timezone.
+            $settingsPagePasswordChangedAt = convertUtcToUserTimezone($settingsPagePasswordChangedAt, getUserDateTimeFormatPattern() ?: 'Y-m-d H:i');
+        }
         $settingsPageConfig['passwordStatus'] = [
             'has_custom_password' => hasCustomPassword((int)$settingsPageUserId),
-            'password_changed_at' => is_array($settingsPageUserProfile) ? ($settingsPageUserProfile['password_changed_at'] ?? null) : null,
+            'password_changed_at' => $settingsPagePasswordChangedAt,
         ];
     }
 } catch (Exception $e) {
@@ -416,6 +421,17 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span>
                     <span id="theme-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- App Font -->
+            <div class="home-card" id="main-font-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-type"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span>
+                    <span id="main-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 
