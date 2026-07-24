@@ -35,16 +35,9 @@
 .ui-custom-filter .ui-custom-filter-input {
     flex: 1;
     min-width: 0;
-}
-
-.ui-custom-toggle-all-global {
-    box-sizing: border-box;
-    font-size: 0.92em;
-    padding: 0 14px;
-    border-radius: 8px;
-    border: 1px solid rgba(128, 128, 128, 0.25);
-    white-space: nowrap;
-    opacity: 1;
+    /* Cancel .modal-content input margins (base.css) so the input fills the
+       flex row and align-items: stretch gives it and the button equal heights. */
+    margin: 0;
 }
 
 .ui-custom-sections-scroll {
@@ -150,6 +143,19 @@
 
 .ui-custom-toggle-all:hover {
     background: rgba(128, 128, 128, 0.12);
+    opacity: 1;
+}
+
+/* Global check/uncheck-all button: must match the filter input's box metrics
+   (same font-size, vertical padding, border and radius). Declared after the
+   base .ui-custom-toggle-all rule so these overrides win the cascade. */
+.ui-custom-toggle-all-global {
+    box-sizing: border-box;
+    font-size: 0.92em;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    white-space: nowrap;
     opacity: 1;
 }
 
