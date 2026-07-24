@@ -1881,6 +1881,11 @@
     window.refreshCustomCssBadge = refreshCustomCssBadge;
     window.getSetting = getSetting;
     window.setSetting = setSetting;
+    // Allow other modules (e.g. modals that write settings directly via fetch)
+    // to keep the local settingsCache in sync so badges refresh without a page reload.
+    window.updateSettingCache = function (key, value) {
+        settingsCache[key] = value;
+    };
     window.showCustomCssModal = showCustomCssModal;
 
 })();
