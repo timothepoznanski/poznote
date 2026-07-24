@@ -917,6 +917,7 @@
         "toolbar": "Symbolleiste",
         "slash_menu": "Slash-Menü",
         "panels": "Sonstiges",
+        "dashboard_toolbar": "Dashboard-Symbolleiste",
         "folder_actions": "Ordneraktionen"
       },
       "check_all": "Alle auswählen",

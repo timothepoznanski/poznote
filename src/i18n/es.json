@@ -918,6 +918,7 @@
         "toolbar": "Barra de herramientas",
         "slash_menu": "Menú slash",
         "panels": "Otros",
+        "dashboard_toolbar": "Barra de herramientas del panel",
         "folder_actions": "Acciones de carpeta"
       },
       "check_all": "Marcar todo",

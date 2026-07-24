@@ -421,6 +421,7 @@
         "toolbar": "Панель инструментов",
         "slash_menu": "Slash-меню",
         "panels": "Другое",
+        "dashboard_toolbar": "Панель инструментов дашборда",
         "folder_actions": "Действия с папками"
       },
       "check_all": "Выбрать все",

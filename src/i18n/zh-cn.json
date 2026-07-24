@@ -917,6 +917,7 @@
         "toolbar": "工具栏",
         "slash_menu": "斜杠菜单",
         "panels": "其他",
+        "dashboard_toolbar": "仪表板工具栏",
         "folder_actions": "文件夹操作"
       },
       "check_all": "全选",

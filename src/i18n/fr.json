@@ -943,6 +943,7 @@
         "toolbar": "Barre d'outils",
         "slash_menu": "Menu slash",
         "panels": "Autre",
+        "dashboard_toolbar": "Barre d'outils du tableau de bord",
         "folder_actions": "Actions des dossiers"
       },
       "badge_all_visible": "Tout visible",

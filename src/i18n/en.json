@@ -428,6 +428,7 @@
         "toolbar": "Toolbar",
         "slash_menu": "Slash Menu",
         "panels": "Other",
+        "dashboard_toolbar": "Dashboard Toolbar",
         "folder_actions": "Folder Actions"
       },
       "badge_all_visible": "All visible",

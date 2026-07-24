@@ -527,7 +527,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 							</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardNotesBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
 						<i class="lucide lucide-sticky-note"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['notes'] ?? 0); ?></span>
 					</a>
@@ -539,27 +539,27 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-bell"></i>
 						<span class="dashboard-topbar-count" id="dashboardNotificationsCount"><?php echo (int)($dashboardTopbarCounts['notifications'] ?? 0); ?></span>
 					</button>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_tags.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_tags.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTagsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
 						<i class="lucide lucide-tags"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['tags'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_folders.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('home.folders', [], 'Folders'); ?>" aria-label="<?php echo t_h('home.folders', [], 'Folders'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_folders.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardFoldersBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.folders', [], 'Folders'); ?>" aria-label="<?php echo t_h('home.folders', [], 'Folders'); ?>">
 						<i class="lucide lucide-folder-open"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['folders'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('shared.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('home.shares', [], 'Shares'); ?>" aria-label="<?php echo t_h('home.shares', [], 'Shares'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('shared.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardSharesBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.shares', [], 'Shares'); ?>" aria-label="<?php echo t_h('home.shares', [], 'Shares'); ?>">
 						<i class="lucide lucide-share-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['shares'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('attachments_list.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('attachments_list.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardAttachmentsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
 						<i class="lucide lucide-paperclip"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['attachments'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTrashBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
 						<i class="lucide lucide-trash-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['trash'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('diary.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('diary.title', [], 'Diary'); ?>" aria-label="<?php echo t_h('diary.title', [], 'Diary'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('diary.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardDiaryBtn" class="dashboard-topbar-btn" title="<?php echo t_h('diary.title', [], 'Diary'); ?>" aria-label="<?php echo t_h('diary.title', [], 'Diary'); ?>">
 						<i class="lucide lucide-book-open"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('diary.title', [], 'Diary'); ?></span>
 					</a>

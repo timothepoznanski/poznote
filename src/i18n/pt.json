@@ -916,6 +916,7 @@
         "toolbar": "Barra de ferramentas",
         "slash_menu": "Menu slash",
         "panels": "Outros",
+        "dashboard_toolbar": "Barra de ferramentas do painel",
         "folder_actions": "Ações de pasta"
       },
       "check_all": "Marcar todos",
