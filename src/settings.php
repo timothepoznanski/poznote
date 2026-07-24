@@ -383,6 +383,16 @@ if ($isAdmin) {
                 </div>
             </a>
 
+            <!-- Storage Statistics (own account) -->
+            <div class="home-card settings-card-clickable" id="storage-stats-user-card" data-href="storage-stats-user.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-pie-chart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                </div>
+            </div>
+
         </div>
 
         <!-- DISPLAY CATEGORY -->
@@ -747,6 +757,16 @@ if ($isAdmin) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span>
+                </div>
+            </div>
+
+            <!-- Storage Statistics -->
+            <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-pie-chart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
                 </div>
             </div>
 

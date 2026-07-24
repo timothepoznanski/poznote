@@ -423,6 +423,7 @@
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "orphan_scanner": "孤立附件扫描器",
+      "storage_stats": "存储统计",
       "change_password": "修改密码",
       "import_limits": "导入限制",
       "git_sync_toggle": "Git 同步",
@@ -2619,6 +2620,20 @@
       "modal_title": "孤立文件",
       "modal_title_user": "孤立文件 - 用户",
       "files_label": "文件"
+    },
+    "storage_stats": {
+      "title": "存储统计",
+      "description": "每个账户的笔记数量和已用磁盘空间。",
+      "user_description": "您账户的笔记数量和已用磁盘空间。",
+      "table_account": "账户",
+      "table_notes": "笔记",
+      "table_trash": "回收站",
+      "table_db": "数据库 (MB)",
+      "table_entries": "文件 (MB)",
+      "table_attachments": "附件 (MB)",
+      "table_total": "合计 (MB)",
+      "table_total_row": "合计",
+      "no_accounts": "未找到账户。"
     }
   },
   "password": {

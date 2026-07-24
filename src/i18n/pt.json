@@ -419,6 +419,7 @@
       "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
       "orphan_scanner": "Scanner de anexos órfãos",
+      "storage_stats": "Estatísticas de armazenamento",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
       "import_limits": "Limites de importação",
@@ -2478,6 +2479,20 @@
       "modal_title": "Arquivos órfãos",
       "modal_title_user": "Arquivos órfãos - Usuário",
       "files_label": "arquivos"
+    },
+    "storage_stats": {
+      "title": "Estatísticas de armazenamento",
+      "description": "Número de notas e espaço em disco usado por cada conta.",
+      "user_description": "Número de notas e espaço em disco usado pela sua conta.",
+      "table_account": "Conta",
+      "table_notes": "Notas",
+      "table_trash": "Lixeira",
+      "table_db": "Banco de dados (MB)",
+      "table_entries": "Arquivos (MB)",
+      "table_attachments": "Anexos (MB)",
+      "table_total": "Total (MB)",
+      "table_total_row": "Total",
+      "no_accounts": "Nenhuma conta encontrada."
     }
   },
   "backlinks": {

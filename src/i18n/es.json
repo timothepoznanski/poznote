@@ -421,6 +421,7 @@
       "install_app": "Instalar aplicación",
       "release_notes": "Notas de la versión",
       "orphan_scanner": "Escáner de archivos adjuntos huérfanos",
+      "storage_stats": "Estadísticas de almacenamiento",
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
       "import_limits": "Límites de importación",
@@ -2475,6 +2476,20 @@
       "modal_title": "Archivos huérfanos",
       "modal_title_user": "Archivos huérfanos - Usuario",
       "files_label": "archivos"
+    },
+    "storage_stats": {
+      "title": "Estadísticas de almacenamiento",
+      "description": "Número de notas y espacio en disco utilizado por cada cuenta.",
+      "user_description": "Número de notas y espacio en disco utilizado por tu cuenta.",
+      "table_account": "Cuenta",
+      "table_notes": "Notas",
+      "table_trash": "Papelera",
+      "table_db": "Base de datos (MB)",
+      "table_entries": "Archivos (MB)",
+      "table_attachments": "Adjuntos (MB)",
+      "table_total": "Total (MB)",
+      "table_total_row": "Total",
+      "no_accounts": "No se encontraron cuentas."
     }
   },
   "backlinks": {

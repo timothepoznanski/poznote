@@ -132,6 +132,7 @@
       "install_app": "Установить приложение",
       "release_notes": "Примечания к выпуску",
       "orphan_scanner": "Сканер потерянных вложений",
+      "storage_stats": "Статистика хранилища",
       "change_password": "Сменить пароль",
       "import_limits": "Лимиты импорта",
       "git_sync_toggle": "Синхронизация Git",
@@ -2073,6 +2074,20 @@
       "modal_title": "Потерянные файлы",
       "modal_title_user": "Потерянные файлы - Пользователь",
       "files_label": "файлов"
+    },
+    "storage_stats": {
+      "title": "Статистика хранилища",
+      "description": "Количество заметок и объём дискового пространства для каждой учётной записи.",
+      "user_description": "Количество заметок и объём дискового пространства вашей учётной записи.",
+      "table_account": "Учётная запись",
+      "table_notes": "Заметки",
+      "table_trash": "Корзина",
+      "table_db": "База данных (МБ)",
+      "table_entries": "Файлы (МБ)",
+      "table_attachments": "Вложения (МБ)",
+      "table_total": "Всего (МБ)",
+      "table_total_row": "Всего",
+      "no_accounts": "Учётные записи не найдены."
     }
   },
   "multiuser": {

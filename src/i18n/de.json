@@ -420,6 +420,7 @@
       "install_app": "App installieren",
       "release_notes": "Versionshinweise",
       "orphan_scanner": "Verwaiste Anhänge-Scanner",
+      "storage_stats": "Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
       "import_limits": "Importlimits",
@@ -2475,6 +2476,20 @@
       "modal_title": "Verwaiste Dateien",
       "modal_title_user": "Verwaiste Dateien - Benutzer",
       "files_label": "Dateien"
+    },
+    "storage_stats": {
+      "title": "Speicherstatistik",
+      "description": "Anzahl der Notizen und belegter Speicherplatz pro Konto.",
+      "user_description": "Anzahl der Notizen und belegter Speicherplatz Ihres Kontos.",
+      "table_account": "Konto",
+      "table_notes": "Notizen",
+      "table_trash": "Papierkorb",
+      "table_db": "Datenbank (MB)",
+      "table_entries": "Dateien (MB)",
+      "table_attachments": "Anhänge (MB)",
+      "table_total": "Gesamt (MB)",
+      "table_total_row": "Gesamt",
+      "no_accounts": "Keine Konten gefunden."
     }
   },
   "backlinks": {

@@ -132,6 +132,7 @@
       "custom_css": "Custom CSS path",
       "release_notes": "Release Notes",
       "orphan_scanner": "Orphan attachments scanner",
+      "storage_stats": "Storage statistics",
       "change_password": "Change Password",
       "import_limits": "Import Limits",
       "git_sync_toggle": "Git Sync",
@@ -2103,6 +2104,20 @@
       "modal_title": "Orphan Files",
       "modal_title_user": "Orphan Files - User",
       "files_label": "files"
+    },
+    "storage_stats": {
+      "title": "Storage statistics",
+      "description": "Number of notes and disk space used by each account.",
+      "user_description": "Number of notes and disk space used by your account.",
+      "table_account": "Account",
+      "table_notes": "Notes",
+      "table_trash": "Trash",
+      "table_db": "Database (MB)",
+      "table_entries": "Files (MB)",
+      "table_attachments": "Attachments (MB)",
+      "table_total": "Total (MB)",
+      "table_total_row": "Total",
+      "no_accounts": "No accounts found."
     }
   },
   "backlinks": {

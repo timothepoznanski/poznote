@@ -433,6 +433,7 @@
       "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
+      "storage_stats": "Statistiques de stockage",
       "change_password": "Changer le mot de passe",
       "import_limits": "Limites d'import",
       "git_sync_toggle": "Synchronisation Git",
@@ -2690,6 +2691,20 @@
       "modal_title": "Fichiers orphelins",
       "modal_title_user": "Fichiers orphelins - Utilisateur",
       "files_label": "fichiers"
+    },
+    "storage_stats": {
+      "title": "Statistiques de stockage",
+      "description": "Nombre de notes et espace disque utilisé par chaque compte.",
+      "user_description": "Nombre de notes et espace disque utilisé par votre compte.",
+      "table_account": "Compte",
+      "table_notes": "Notes",
+      "table_trash": "Corbeille",
+      "table_db": "Base de données (Mo)",
+      "table_entries": "Fichiers (Mo)",
+      "table_attachments": "Pièces jointes (Mo)",
+      "table_total": "Total (Mo)",
+      "table_total_row": "Total",
+      "no_accounts": "Aucun compte trouvé."
     }
   },
   "backlinks": {
