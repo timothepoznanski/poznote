@@ -537,6 +537,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
+				<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-top-info-item dashboard-top-info-link" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
+					<i class="lucide lucide-settings" aria-hidden="true"></i>
+					<span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
+				</a>
 							</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
@@ -600,10 +604,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<span class="dashboard-topbar-count">AI</span>
 					</button>
 					<?php endif; ?>
-					<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>" aria-label="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
-						<i class="lucide lucide-settings"></i>
-						<span class="dashboard-topbar-count"><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
-					</a>
 				</nav>
 				<div class="board-filter-row">
 				<?php renderBoardViewMenu('dashboard'); ?>

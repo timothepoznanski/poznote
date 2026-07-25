@@ -1507,12 +1507,16 @@ body.dark-mode .dashboard-empty {
 }
 
 :root[data-theme='dark'] .dashboard-mobile-back:hover,
-body.dark-mode .dashboard-mobile-back:hover {
+body.dark-mode .dashboard-mobile-back:hover,
+:root[data-theme='dark'] .dashboard-top-info-link:hover,
+body.dark-mode .dashboard-top-info-link:hover {
     color: var(--dm-accent, #60a5fa);
 }
 
 :root[data-theme='dark'] .dashboard-mobile-back:hover .lucide,
-body.dark-mode .dashboard-mobile-back:hover .lucide {
+body.dark-mode .dashboard-mobile-back:hover .lucide,
+:root[data-theme='dark'] .dashboard-top-info-link:hover .lucide,
+body.dark-mode .dashboard-top-info-link:hover .lucide {
     color: var(--dm-accent, #60a5fa);
 }
 
@@ -1707,13 +1711,21 @@ body.dark-mode .dashboard-version-badge {
     transition: color 0.15s ease;
 }
 
+.dashboard-top-info-link {
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
 .dashboard-workspace-trigger:hover,
-.dashboard-user-trigger:hover {
+.dashboard-user-trigger:hover,
+.dashboard-top-info-link:hover {
     color: #007DB8;
 }
 
 .dashboard-workspace-trigger:hover .lucide,
-.dashboard-user-trigger:hover .lucide {
+.dashboard-user-trigger:hover .lucide,
+.dashboard-top-info-link:hover .lucide {
     color: #007DB8;
 }
 
