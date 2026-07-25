@@ -90,7 +90,7 @@ class SystemController {
         ]);
         
         $response = @file_get_contents('https://api.github.com/repos/timothepoznanski/poznote/releases/latest', false, $context);
-        
+
         if ($response === false) {
             $err = error_get_last();
             $result['success'] = false;
@@ -99,10 +99,47 @@ class SystemController {
             return $result;
         }
 
+        // Extract the real HTTP status code from the response headers so we can
+        // distinguish rate limiting (403/429) from a genuinely malformed body.
+        $httpStatus = $this->parseHttpStatus($http_response_header ?? []);
         $release = json_decode($response, true);
+
+        if ($httpStatus === 403 || $httpStatus === 429) {
+            $result['success'] = false;
+            $ghMessage = is_array($release) && !empty($release['message']) ? $release['message'] : '';
+            // GitHub uses 403/429 both for rate limiting and for abuse detection.
+            $isRateLimit = stripos($ghMessage, 'rate limit') !== false
+                || stripos($ghMessage, 'quota') !== false;
+            if ($isRateLimit) {
+                $result['error'] = 'GitHub API rate limit reached for this server\'s IP address (HTTP '
+                    . $httpStatus . '). On shared hosting (e.g. Railway) the 60 requests/hour limit is '
+                    . 'shared with other tenants, so this can happen without you checking. It resets '
+                    . 'within the hour, or set a GITHUB_TOKEN to raise the limit.';
+            } else {
+                $result['error'] = 'GitHub refused the request (HTTP ' . $httpStatus . ')'
+                    . ($ghMessage !== '' ? ': ' . $ghMessage : '');
+            }
+            return $result;
+        }
+
+        if ($httpStatus === 404) {
+            $result['success'] = false;
+            $result['error'] = 'Update server returned "not found" (HTTP 404). The releases endpoint may have moved.';
+            return $result;
+        }
+
+        if ($httpStatus !== null && $httpStatus >= 400) {
+            $result['success'] = false;
+            $ghMessage = is_array($release) && !empty($release['message']) ? $release['message'] : '';
+            $result['error'] = 'Update server returned an error (HTTP ' . $httpStatus . ')'
+                . ($ghMessage !== '' ? ': ' . $ghMessage : '');
+            return $result;
+        }
+
         if (!is_array($release) || empty($release['tag_name'])) {
             $result['success'] = false;
-            $result['error'] = 'Invalid response from update server';
+            $result['error'] = 'Invalid response from update server'
+                . ($httpStatus !== null ? ' (HTTP ' . $httpStatus . ')' : '');
             return $result;
         }
 
@@ -116,7 +153,22 @@ class SystemController {
 
         return $result;
     }
-    
+
+    /**
+     * Extract the numeric HTTP status code from a $http_response_header array
+     * as populated by file_get_contents(). Returns the code from the last
+     * status line (to account for redirects), or null if none is found.
+     */
+    private function parseHttpStatus($headers) {
+        $status = null;
+        foreach ($headers as $header) {
+            if (preg_match('#^HTTP/\S+\s+(\d{3})#', $header, $m)) {
+                $status = (int)$m[1];
+            }
+        }
+        return $status;
+    }
+
     /**
      * GET /api/v1/system/i18n
      */

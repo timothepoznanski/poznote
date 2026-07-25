@@ -6,6 +6,7 @@
     var FAVORITES_KEY = 'dashboard_favorites';
     var FILTER_VALUE_KEY = 'dashboard_filter_value';
     var NAV_PATH_KEY = 'dashboard_nav_path';
+    var COLOR_FILTER_KEY = 'dashboard_color_filter';
     var SYNC_RESULT_SCROLL_KEY = 'dashboard_git_sync_result_scroll_top';
     (function syncFavoritesFromStorage() {
         try {
@@ -116,7 +117,16 @@
         var count = countNotes(folder);
         var iconStyle = folder.color ? ' style="color:' + esc(folder.color) + ' !important"' : '';
         var search = folder.name.toLowerCase();
-        return '<button class="dash-card dash-folder-card" data-type="folder" data-folder-index="' + index + '" data-search="' + esc(search) + '">' +
+        // Same --note-color mechanism as note cards (see buildNoteCard).
+        var colorAttrs = '';
+        if (folder.cardColorHex) {
+            colorAttrs = ' data-color="' + esc(folder.cardColor || '') + '"' +
+                ' style="--note-color:' + esc(folder.cardColorHex) + '"';
+        }
+
+        return '<button class="dash-card dash-folder-card' + (folder.cardColorHex ? ' has-note-color' : '') + '"' +
+            ' data-type="folder" data-folder-index="' + index + '"' +
+            ' data-folder-id="' + esc(String(folder.id)) + '" data-search="' + esc(search) + '"' + colorAttrs + '>' +
             '<div class="dash-card-icon"><i class="' + esc(folder.icon) + '"' + iconStyle + '></i></div>' +
             '<span class="dash-card-name">' + esc(folder.name) + '</span>' +
             '<span class="dash-card-count">' + count + '</span>' +
@@ -186,7 +196,28 @@
         // first click, so navigating in place keeps everything in one tab.
         var linkTarget = '';
 
-        return '<div class="dash-card dash-note-card" data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '">' +
+        // The tint is driven entirely by --note-color; dashboard.css derives the
+        // background and border from it with color-mix(), separately for light
+        // and dark mode, so any custom hex works without extra rules.
+        var colorAttrs = '';
+        if (note.colorHex) {
+            colorAttrs = ' data-color="' + esc(note.color || '') + '"' +
+                ' style="--note-color:' + esc(note.colorHex) + '"';
+        }
+
+        // The pin button sits outside .dash-card-link so clicking it never
+        // navigates to the note.
+        var pinTxt = window.DASHBOARD_PIN_TXT || {};
+        var pinLabel = note.pinned ? (pinTxt.unpin || 'Unpin') : (pinTxt.pin || 'Pin to top');
+        var pinBtn = '<button type="button" class="dash-card-pin" data-pin-note-id="' + note.id + '"' +
+            ' aria-pressed="' + (note.pinned ? 'true' : 'false') + '"' +
+            ' title="' + esc(pinLabel) + '" aria-label="' + esc(pinLabel) + '">' +
+            '<i class="lucide lucide-pin"></i></button>';
+
+        return '<div class="dash-card dash-note-card' + (note.colorHex ? ' has-note-color' : '') +
+            (note.pinned ? ' is-pinned' : '') + '"' +
+            ' data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '"' + colorAttrs + '>' +
+            pinBtn +
             '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + '>' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
@@ -202,12 +233,30 @@
         if (!grid) return;
 
         var html = '';
-        if (activeFilterTerm) {
-            var matchingNotes = getAllNotes().filter(function (note) {
-                return noteMatchesSearch(note, activeFilterTerm);
+        // A text term or a color filter both search the whole tree rather than
+        // the current folder, so results are never hidden behind navigation.
+        if (activeFilterTerm || activeColorFilter) {
+            // Folders carry colors too, so a pure color filter lists the
+            // matching folders alongside the matching notes. A text term still
+            // searches notes only, as before.
+            var matchingFolders = [];
+            if (activeColorFilter && !activeFilterTerm) {
+                collectFolders(rootData, matchingFolders);
+                matchingFolders = matchingFolders.filter(folderMatchesColor);
+            }
+
+            // Cards here come from all over the tree, so rank them globally:
+            // baseOrder is only meaningful among siblings.
+            var matchingNotes = sortPinnedFirst(getAllNotes().filter(function (note) {
+                if (activeFilterTerm && !noteMatchesSearch(note, activeFilterTerm)) return false;
+                return noteMatchesColor(note);
+            }), 'globalOrder');
+
+            matchingFolders.forEach(function (folder) {
+                html += buildFolderCard(folder, findFolderIndexInParent(folder));
             });
             matchingNotes.forEach(function (note) { html += buildNoteCard(note); });
-            setNoResultsVisible(matchingNotes.length === 0);
+            setNoResultsVisible(matchingFolders.length === 0 && matchingNotes.length === 0);
         } else {
             level.folders.forEach(function (folder, i) { html += buildFolderCard(folder, i); });
             level.notes.forEach(function (note)         { html += buildNoteCard(note); });
@@ -220,7 +269,7 @@
         var bc = document.getElementById('dashboardBreadcrumb');
         if (!bc) return;
 
-        if (activeFilterTerm || navStack.length === 0) {
+        if (activeFilterTerm || activeColorFilter || navStack.length === 0) {
             bc.style.display = 'none';
             bc.innerHTML = '';
             return;
@@ -301,6 +350,57 @@
         }
     }
 
+    // Navigate by id: in a filtered view the cards come from anywhere in the
+    // tree, so the positional index above no longer identifies a folder.
+    // Rebuilds the whole ancestor chain so the breadcrumb stays correct.
+    function buildFolderPath(folderId, level, trail) {
+        var node = level || rootData;
+        var folders = node.folders || [];
+        for (var i = 0; i < folders.length; i++) {
+            var next = (trail || []).concat([folders[i]]);
+            if (String(folders[i].id) === String(folderId)) return next;
+            var found = buildFolderPath(folderId, folders[i], next);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    function navigateIntoById(folderId) {
+        var path = buildFolderPath(folderId);
+        if (!path) return false;
+        // Entering a folder from a filtered view drops the color filter,
+        // otherwise the folder would open onto a filtered subset.
+        if (activeColorFilter) {
+            activeColorFilter = null;
+            saveColorFilter();
+            updateColorFilterButtonState();
+        }
+        navStack = path;
+        saveNavigationPath();
+        renderAll();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return true;
+    }
+
+    function collectFolders(level, out) {
+        (level.folders || []).forEach(function (folder) {
+            out.push(folder);
+            collectFolders(folder, out);
+        });
+    }
+
+    // Position of a folder within its own parent, for the index-based path.
+    function findFolderIndexInParent(folder) {
+        var path = buildFolderPath(folder.id);
+        if (!path) return 0;
+        var parent = path.length > 1 ? path[path.length - 2] : rootData;
+        var siblings = parent.folders || [];
+        for (var i = 0; i < siblings.length; i++) {
+            if (String(siblings[i].id) === String(folder.id)) return i;
+        }
+        return 0;
+    }
+
     function navigateTo(depth) {
         navStack = navStack.slice(0, depth);
         saveNavigationPath();
@@ -312,6 +412,435 @@
     function applyFilter(term) {
         activeFilterTerm = normalizeSearchText(term.trim());
         renderAll();
+    }
+
+    // --- Note color picker ---
+    //
+    // Opened by right-clicking a note card. The chosen value is either a
+    // palette id or a custom '#rrggbb'; both go to PUT /notes/{id}/color, and
+    // the in-memory note is patched so the grid re-renders with the new tint
+    // without a page reload.
+
+    var colorTargetNoteId = null;
+    var colorTargetType = 'note';   // 'note' | 'folder'
+    var colorPendingValue = null;   // palette id, '#rrggbb', or '' to clear
+    // Active color filter: null = off, a palette id, a custom hex, or
+    // '__any__' / '__none__'. Persisted per workspace so the board comes back
+    // filtered the way it was left.
+    var activeColorFilter = null;
+
+    function saveColorFilter() {
+        try {
+            var key = dashboardStorageKey(COLOR_FILTER_KEY);
+            if (activeColorFilter) {
+                localStorage.setItem(key, activeColorFilter);
+            } else {
+                localStorage.removeItem(key);
+            }
+        } catch (e) { /* localStorage unavailable */ }
+    }
+
+    function restoreColorFilter() {
+        try {
+            activeColorFilter = localStorage.getItem(dashboardStorageKey(COLOR_FILTER_KEY)) || null;
+        } catch (e) {
+            activeColorFilter = null;
+        }
+        updateColorFilterButtonState();
+    }
+
+    function noteMatchesColor(note) {
+        if (!activeColorFilter) return true;
+        if (activeColorFilter === '__any__')  return !!note.colorHex;
+        if (activeColorFilter === '__none__') return !note.colorHex;
+        return note.color === activeColorFilter;
+    }
+
+    // Folders keep their card color under cardColor/cardColorHex, because
+    // 'color' already means the folder icon color.
+    function folderMatchesColor(folder) {
+        if (!activeColorFilter) return true;
+        if (activeColorFilter === '__any__')  return !!folder.cardColorHex;
+        // '__none__' would list every uncolored folder, which is just noise.
+        if (activeColorFilter === '__none__') return false;
+        return folder.cardColor === activeColorFilter;
+    }
+
+    function getPalette() {
+        return Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
+    }
+
+    function paletteHexFor(value) {
+        if (!value) return '';
+        if (value.charAt(0) === '#') return value;
+        var palette = getPalette();
+        for (var i = 0; i < palette.length; i++) {
+            if (palette[i].id === value) return palette[i].hex;
+        }
+        return '';
+    }
+
+    function findNoteById(noteId) {
+        var notes = getAllNotes();
+        for (var i = 0; i < notes.length; i++) {
+            if (String(notes[i].id) === String(noteId)) return notes[i];
+        }
+        return null;
+    }
+
+    // --- Pinning ---
+    //
+    // Pinned notes sort ahead of the rest inside their own folder. The server
+    // already delivers them in that order; this re-sorts in place after a
+    // toggle so the card moves without a page reload.
+
+    // Rank each note by its position in the server's updated-DESC order, once,
+    // before any pinning reorders the arrays. Without this, unpinning could only
+    // restore the order the array happened to be in, not the original one.
+    // Both ranks come from the server (see dashboardBuildNoteData in
+    // dashboard.php) and describe the updated-DESC order with pinning ignored:
+    // baseOrder within a note's own folder, globalOrder across the whole tree.
+    // Sorting on them means unpinning restores the original position rather
+    // than whatever order the array was left in.
+
+    // Same grouping as dashboardSortPinnedFirst() in dashboard.php: pinned
+    // first, each group falling back to the original updated-DESC order.
+    function sortPinnedFirst(notes, orderKey) {
+        var key = orderKey || 'baseOrder';
+        return (notes || []).slice().sort(function (a, b) {
+            var pinDiff = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+            if (pinDiff !== 0) return pinDiff;
+            return (a[key] || 0) - (b[key] || 0);
+        });
+    }
+
+    function resortLevel(level) {
+        var node = level || rootData;
+        node.notes = sortPinnedFirst(node.notes);
+        (node.folders || []).forEach(resortLevel);
+    }
+
+    function toggleNotePinned(noteId) {
+        var note = findNoteById(noteId);
+        if (!note) return;
+
+        var nextPinned = !note.pinned;
+        fetch('api/v1/notes/' + encodeURIComponent(noteId) + '/pinned', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ pinned: nextPinned })
+        }).then(function (response) {
+            if (!response.ok) throw new Error('pin update failed');
+            return response.json();
+        }).then(function (data) {
+            note.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
+            resortLevel(rootData);
+            renderAll();
+        }).catch(function () {
+            var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
+                'Could not update the pinned state.';
+            if (typeof window.showNotificationPopup === 'function') {
+                window.showNotificationPopup(message, 'error');
+            } else {
+                alert(message);
+            }
+        });
+    }
+
+    // Depth-first search over the whole tree: the picker may be opened on a
+    // folder that is not in the level currently displayed.
+    function findFolderById(folderId, level) {
+        var node = level || rootData;
+        var folders = node.folders || [];
+        for (var i = 0; i < folders.length; i++) {
+            if (String(folders[i].id) === String(folderId)) return folders[i];
+            var found = findFolderById(folderId, folders[i]);
+            if (found) return found;
+        }
+        return null;
+    }
+
+    // The object the picker is currently editing, note or folder.
+    function currentColorTarget() {
+        if (colorTargetNoteId === null) return null;
+        return colorTargetType === 'folder'
+            ? findFolderById(colorTargetNoteId)
+            : findNoteById(colorTargetNoteId);
+    }
+
+    function markSelectedSwatch() {
+        var grid = document.getElementById('noteColorGrid');
+        if (!grid) return;
+        Array.prototype.forEach.call(grid.querySelectorAll('.note-color-option'), function (option) {
+            var isSelected = option.getAttribute('data-color-value') === colorPendingValue;
+            option.classList.toggle('selected', isSelected);
+            option.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+        });
+    }
+
+    function buildColorGrid() {
+        var grid = document.getElementById('noteColorGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+
+        getPalette().forEach(function (entry) {
+            var option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'note-color-option';
+            option.setAttribute('role', 'radio');
+            option.setAttribute('data-color-value', entry.id);
+            option.title = entry.name;
+            option.setAttribute('aria-label', entry.name);
+            option.innerHTML = '<span class="note-color-swatch" style="background-color:' + esc(entry.hex) + '"></span>' +
+                '<span class="note-color-name">' + esc(entry.name) + '</span>';
+            option.addEventListener('click', function () {
+                colorPendingValue = entry.id;
+                markSelectedSwatch();
+            });
+            grid.appendChild(option);
+        });
+    }
+
+    function openNoteColorModal(targetId, targetType) {
+        var modal = document.getElementById('noteColorModal');
+        if (!modal) return;
+
+        var isFolder = targetType === 'folder';
+        var target = isFolder ? findFolderById(targetId) : findNoteById(targetId);
+        if (!target) return;
+
+        colorTargetNoteId = targetId;
+        colorTargetType = isFolder ? 'folder' : 'note';
+        colorPendingValue = (isFolder ? target.cardColor : target.color) || '';
+
+        var txt = window.NOTE_COLOR_TXT || {};
+        var headingEl = document.getElementById('noteColorModalTitle');
+        if (headingEl) {
+            headingEl.textContent = isFolder
+                ? (txt.folderModalTitle || 'Folder color')
+                : (txt.modalTitle || 'Note color');
+        }
+
+        var titleEl = document.getElementById('noteColorModalNoteTitle');
+        if (titleEl) titleEl.textContent = (isFolder ? target.name : target.heading) || '';
+
+        buildColorGrid();
+        markSelectedSwatch();
+
+        var customInput = document.getElementById('noteColorCustomInput');
+        if (customInput) {
+            customInput.value = paletteHexFor(colorPendingValue) || '#3b82f6';
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    function closeNoteColorModal() {
+        var modal = document.getElementById('noteColorModal');
+        if (modal) modal.style.display = 'none';
+        colorTargetNoteId = null;
+        colorPendingValue = null;
+    }
+
+    function applyNoteColor(value) {
+        if (colorTargetNoteId === null) return;
+        var targetId = colorTargetNoteId;
+        var isFolder = colorTargetType === 'folder';
+        var endpoint = (isFolder ? 'api/v1/folders/' : 'api/v1/notes/') +
+            encodeURIComponent(targetId) + '/color';
+
+        fetch(endpoint, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ color: value })
+        }).then(function (response) {
+            if (!response.ok) throw new Error('color update failed');
+            return response.json();
+        }).then(function (data) {
+            var target = isFolder ? findFolderById(targetId) : findNoteById(targetId);
+            if (target && isFolder) {
+                target.cardColor = (data && data.color) || '';
+                target.cardColorHex = (data && data.color_hex) || '';
+            } else if (target) {
+                target.color = (data && data.color) || '';
+                target.colorHex = (data && data.color_hex) || '';
+            }
+            closeNoteColorModal();
+            renderAll();
+        }).catch(function () {
+            var message = (window.NOTE_COLOR_TXT && window.NOTE_COLOR_TXT.applyError) || 'Could not update the note color.';
+            if (typeof window.showNotificationPopup === 'function') {
+                window.showNotificationPopup(message, 'error');
+            } else {
+                alert(message);
+            }
+        });
+    }
+
+    function buildColorFilterMenu() {
+        var menu = document.getElementById('dashboardColorFilterMenu');
+        if (!menu) return;
+        menu.innerHTML = '';
+
+        var txt = window.NOTE_COLOR_TXT || {};
+        var entries = [
+            { value: null, label: txt.filterAll || 'All notes', hex: null },
+            { value: '__any__', label: txt.filterAnyColor || 'Any color', hex: null },
+            { value: '__none__', label: txt.filterNoColor || 'No color', hex: null }
+        ].concat(getPalette().map(function (entry) {
+            return { value: entry.id, label: entry.name, hex: entry.hex };
+        }));
+
+        // Custom per-note colors belong to no palette entry, so they would
+        // otherwise be unfilterable. List every custom hex actually in use,
+        // sorted so the menu order stays stable between openings.
+        var customHexes = {};
+        getAllNotes().forEach(function (note) {
+            if (note.color && String(note.color).charAt(0) === '#') {
+                customHexes[note.color] = true;
+            }
+        });
+        Object.keys(customHexes).sort().forEach(function (hex) {
+            entries.push({ value: hex, label: hex, hex: hex });
+        });
+
+        entries.forEach(function (entry) {
+            var item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'dashboard-color-filter-item' +
+                (activeColorFilter === entry.value ? ' active' : '');
+            item.innerHTML = (entry.hex
+                    ? '<span class="note-color-swatch" style="background-color:' + esc(entry.hex) + '"></span>'
+                    : '<span class="note-color-swatch note-color-swatch-empty"></span>') +
+                '<span>' + esc(entry.label) + '</span>';
+            item.addEventListener('click', function () {
+                activeColorFilter = entry.value;
+                saveColorFilter();
+                closeColorFilterMenu();
+                updateColorFilterButtonState();
+                renderAll();
+            });
+            menu.appendChild(item);
+        });
+    }
+
+    // The menu is position:fixed (the topbar clips absolute children), so it is
+    // anchored to the button here and kept inside the viewport.
+    function positionColorFilterMenu() {
+        var btn = document.getElementById('dashboardColorFilterBtn');
+        var menu = document.getElementById('dashboardColorFilterMenu');
+        if (!btn || !menu || menu.hidden) return;
+
+        var rect = btn.getBoundingClientRect();
+        var top = rect.bottom + 6;
+        menu.style.top = top + 'px';
+        // Cap to the space actually left below the button so every entry stays
+        // reachable by scrolling instead of being cut off by the viewport.
+        menu.style.maxHeight = Math.max(160, window.innerHeight - top - 12) + 'px';
+
+        var width = menu.offsetWidth || 180;
+        var left = Math.min(rect.left, window.innerWidth - width - 8);
+        menu.style.left = Math.max(8, left) + 'px';
+    }
+
+    function updateColorFilterButtonState() {
+        var btn = document.getElementById('dashboardColorFilterBtn');
+        if (btn) btn.classList.toggle('active', !!activeColorFilter);
+    }
+
+    function closeColorFilterMenu() {
+        var menu = document.getElementById('dashboardColorFilterMenu');
+        var btn = document.getElementById('dashboardColorFilterBtn');
+        if (menu) menu.hidden = true;
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function initColorFilter() {
+        var btn = document.getElementById('dashboardColorFilterBtn');
+        var menu = document.getElementById('dashboardColorFilterMenu');
+        if (!btn || !menu) return;
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (menu.hidden) {
+                buildColorFilterMenu();
+                menu.hidden = false;
+                positionColorFilterMenu();
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                closeColorFilterMenu();
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) {
+                closeColorFilterMenu();
+            }
+        });
+
+        window.addEventListener('resize', positionColorFilterMenu);
+        window.addEventListener('scroll', positionColorFilterMenu, true);
+    }
+
+    function initNoteColorPicker() {
+        // Right-click anywhere on a note or folder card opens the picker.
+        document.addEventListener('contextmenu', function (e) {
+            if (!e.target.closest) return;
+            // The pin button keeps the browser's own menu rather than the picker.
+            if (e.target.closest('.dash-card-pin')) return;
+
+            var noteCard = e.target.closest('.dash-note-card');
+            if (noteCard) {
+                e.preventDefault();
+                openNoteColorModal(noteCard.getAttribute('data-note-id'), 'note');
+                return;
+            }
+
+            var folderCard = e.target.closest('.dash-folder-card');
+            if (folderCard) {
+                e.preventDefault();
+                openNoteColorModal(folderCard.getAttribute('data-folder-id'), 'folder');
+            }
+        });
+
+        var applyBtn = document.getElementById('noteColorApplyBtn');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', function () {
+                applyNoteColor(colorPendingValue || '');
+            });
+        }
+
+        var clearBtn = document.getElementById('noteColorClearBtn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () { applyNoteColor(''); });
+        }
+
+        var customInput = document.getElementById('noteColorCustomInput');
+        if (customInput) {
+            customInput.addEventListener('input', function () {
+                colorPendingValue = customInput.value;
+                markSelectedSwatch();
+            });
+        }
+
+        Array.prototype.forEach.call(
+            document.querySelectorAll('[data-action="close-note-color-modal"]'),
+            function (btn) { btn.addEventListener('click', closeNoteColorModal); }
+        );
+
+        var modal = document.getElementById('noteColorModal');
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeNoteColorModal();
+            });
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && colorTargetNoteId !== null) closeNoteColorModal();
+        });
     }
 
     // --- Git sync ---
@@ -655,8 +1184,12 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         restoreNavigationPath();
+        // Restore before the first render so the board comes up already filtered.
+        restoreColorFilter();
         renderAll();
         restoreDashboardGitSyncResultPosition();
+        initNoteColorPicker();
+        initColorFilter();
         window.addEventListener('pagehide', saveNavigationPath);
 
         var toggleFavoritesBtn = document.getElementById('dashboardToggleFavorites');
@@ -772,6 +1305,16 @@
         }
 
         document.addEventListener('click', function (e) {
+            // Checked first: the pin button sits inside a card, so letting the
+            // event fall through would also open the note.
+            var pinBtn = e.target.closest('.dash-card-pin');
+            if (pinBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleNotePinned(pinBtn.getAttribute('data-pin-note-id'));
+                return;
+            }
+
             var bcBtn = e.target.closest('.bc-home, .bc-item');
             if (bcBtn) {
                 var depth = parseInt(bcBtn.getAttribute('data-depth') || '0', 10);
@@ -781,6 +1324,10 @@
 
             var folderCard = e.target.closest('.dash-folder-card');
             if (folderCard) {
+                // Prefer the id: in a color-filtered view the cards come from
+                // anywhere in the tree, so the positional index is meaningless.
+                var folderId = folderCard.getAttribute('data-folder-id');
+                if (folderId && navigateIntoById(folderId)) return;
                 var idx = parseInt(folderCard.getAttribute('data-folder-index') || '0', 10);
                 navigateInto(idx);
                 return;

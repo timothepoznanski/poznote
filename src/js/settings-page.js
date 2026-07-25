@@ -90,6 +90,7 @@
             'language',
             'show_note_created',
             'show_note_icons',
+            'note_color_palette',
             'hide_folder_counts',
             'hide_folder_actions',
             'notes_without_folders_after_folders',
@@ -103,6 +104,7 @@
             'note_list_sort',
             'note_age_filter_days',
             'tasklist_insert_order',
+            'diary_default_note_type',
             'toolbar_mode',
             'timezone',
             'date_time_format',
@@ -421,6 +423,78 @@
         }
     }
 
+    function getMarkdownFontLabel(fontKey) {
+        var labels = {
+            inherit: tr('modals.markdown_font.options.inherit', {}, 'App font (default)'),
+            monospace: tr('modals.markdown_font.options.monospace', {}, 'System monospace'),
+            courier: 'Courier New',
+            consolas: 'Consolas',
+            menlo: 'Menlo',
+            monaco: 'Monaco',
+            jetbrains: 'JetBrains Mono',
+            cascadia: 'Cascadia Code',
+            fira: 'Fira Code',
+            sourcecodepro: 'Source Code Pro',
+            ubuntumono: 'Ubuntu Mono'
+        };
+        return labels[fontKey] || labels.inherit;
+    }
+
+    // Probe which markdown-editor fonts exist on this device. Only the first
+    // name of each stack is tested: the rest are fallbacks that would make an
+    // absent font look available. 'inherit' is the default and 'monospace' is
+    // a generic family, so both always resolve.
+    var markdownFontAvailability = null;
+    var MARKDOWN_FONT_ALWAYS_AVAILABLE = { monospace: true, inherit: true };
+    function probeMarkdownFonts(callback) {
+        if (markdownFontAvailability) { callback(markdownFontAvailability); return; }
+
+        var fonts = window.__poznoteEditorFonts || {};
+        var keys = Object.keys(fonts).filter(function (key) {
+            return !MARKDOWN_FONT_ALWAYS_AVAILABLE[key];
+        });
+        var result = {};
+        Object.keys(MARKDOWN_FONT_ALWAYS_AVAILABLE).forEach(function (key) { result[key] = true; });
+
+        if (typeof window.FontFace !== 'function' || keys.length === 0) {
+            keys.forEach(function (key) { result[key] = true; });
+            markdownFontAvailability = result;
+            callback(result);
+            return;
+        }
+
+        var pending = keys.length;
+        function done() {
+            pending--;
+            if (pending === 0) {
+                markdownFontAvailability = result;
+                callback(result);
+            }
+        }
+        keys.forEach(function (key) {
+            // First entry of the stack, minus any surrounding quotes.
+            var primary = fonts[key].split(',')[0].trim().replace(/^['"]|['"]$/g, '');
+            try {
+                new FontFace('__poznote-md-font-probe-' + key, "local('" + primary + "')").load().then(
+                    function () { result[key] = true; done(); },
+                    function () { result[key] = false; done(); }
+                );
+            } catch (e) {
+                result[key] = true;
+                done();
+            }
+        });
+    }
+
+    function refreshMarkdownFontBadge() {
+        var badge = document.getElementById('markdown-font-badge');
+        if (badge) {
+            var font = (window.__poznoteUserStorage || localStorage).getItem('markdown_font') || 'inherit';
+            badge.textContent = getMarkdownFontLabel(font);
+            badge.className = 'setting-status enabled';
+        }
+    }
+
     function refreshIndexIconScaleBadge() {
         var badge = document.getElementById('index-icon-scale-badge');
         if (badge) {
@@ -484,6 +558,137 @@
         });
     }
 
+    // --- Note color palette editor ---
+    //
+    // The palette is stored as JSON under 'note_color_palette'. An empty stored
+    // value means "use the factory palette", which is what Reset writes back.
+
+    var paletteDraft = [];
+
+    function defaultPalette() {
+        return Array.isArray(window.NOTE_COLOR_DEFAULT_PALETTE)
+            ? JSON.parse(JSON.stringify(window.NOTE_COLOR_DEFAULT_PALETTE))
+            : [];
+    }
+
+    function parsePalette(value) {
+        if (!value) return defaultPalette();
+        try {
+            var parsed = typeof value === 'string' ? JSON.parse(value) : value;
+            return Array.isArray(parsed) && parsed.length ? parsed : defaultPalette();
+        } catch (e) {
+            return defaultPalette();
+        }
+    }
+
+    function refreshNoteColorPaletteBadge() {
+        getSetting('note_color_palette', function (value) {
+            var badge = document.getElementById('note-color-palette-badge');
+            if (!badge) return;
+            var count = parsePalette(value).length;
+            badge.textContent = tr('modals.note_color_palette.count', { count: count }, count + ' colors');
+            badge.className = 'setting-status enabled';
+        });
+    }
+
+    // Derive a stable id from the color name so notes keep their color when the
+    // palette is edited. Existing entries keep the id they were saved with.
+    function paletteIdFromName(name, index) {
+        var id = String(name || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        return id || ('color' + (index + 1));
+    }
+
+    function renderPaletteEditor() {
+        var list = document.getElementById('noteColorPaletteList');
+        if (!list) return;
+        list.innerHTML = '';
+
+        paletteDraft.forEach(function (entry, index) {
+            var row = document.createElement('div');
+            row.className = 'note-palette-row';
+
+            var colorInput = document.createElement('input');
+            colorInput.type = 'color';
+            colorInput.value = entry.hex || '#3b82f6';
+            colorInput.className = 'note-palette-color';
+            colorInput.addEventListener('input', function () {
+                paletteDraft[index].hex = colorInput.value;
+            });
+
+            var nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.value = entry.name || '';
+            nameInput.maxLength = 40;
+            nameInput.className = 'note-palette-name';
+            nameInput.placeholder = tr('modals.note_color_palette.name_placeholder', {}, 'Color name');
+            nameInput.addEventListener('input', function () {
+                paletteDraft[index].name = nameInput.value;
+            });
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'note-palette-remove';
+            removeBtn.title = tr('modals.note_color_palette.remove', {}, 'Remove');
+            removeBtn.innerHTML = '<i class="lucide lucide-trash-2"></i>';
+            removeBtn.addEventListener('click', function () {
+                paletteDraft.splice(index, 1);
+                renderPaletteEditor();
+            });
+
+            row.appendChild(colorInput);
+            row.appendChild(nameInput);
+            row.appendChild(removeBtn);
+            list.appendChild(row);
+        });
+    }
+
+    function openNoteColorPaletteModal() {
+        var modal = document.getElementById('noteColorPaletteModal');
+        if (!modal) return;
+        getSetting('note_color_palette', function (value) {
+            paletteDraft = parsePalette(value);
+            renderPaletteEditor();
+            modal.style.display = 'flex';
+        });
+    }
+
+    function saveNoteColorPalette() {
+        var cleaned = [];
+        var usedIds = {};
+
+        paletteDraft.forEach(function (entry, index) {
+            var hex = String(entry.hex || '').trim();
+            if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)) return;
+
+            var name = String(entry.name || '').trim();
+            // Keep the original id when the entry already had one, so notes
+            // already using it stay colored.
+            var id = entry.id ? String(entry.id) : paletteIdFromName(name, index);
+            id = id.toLowerCase().replace(/[^a-z0-9_-]/g, '') || ('color' + (index + 1));
+            while (usedIds[id]) { id = id + '-' + (index + 1); }
+            usedIds[id] = true;
+
+            cleaned.push({ id: id, name: name || id, hex: hex.toLowerCase() });
+        });
+
+        if (!cleaned.length) {
+            var emptyMsg = tr('modals.note_color_palette.empty_error', {}, 'Add at least one color, or reset to defaults.');
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(emptyMsg, 'error');
+            } else {
+                alert(emptyMsg);
+            }
+            return;
+        }
+
+        setSetting('note_color_palette', JSON.stringify(cleaned), function (success) {
+            if (success) {
+                try { closeModal('noteColorPaletteModal'); } catch (e) { }
+                refreshNoteColorPaletteBadge();
+            }
+        });
+    }
+
     function getNoteAgeFilterLabel(value) {
         var days = parseInt(value, 10);
         if (isNaN(days) || days <= 0) {
@@ -535,6 +740,29 @@
                 if (icon) {
                     icon.classList.toggle('lucide-arrow-up', isTop);
                     icon.classList.toggle('lucide-arrow-down', !isTop);
+                }
+            }
+        });
+    }
+
+    function refreshDiaryNoteTypeBadge() {
+        getSetting('diary_default_note_type', function (value) {
+            var badge = document.getElementById('diary-note-type-badge');
+            if (!badge) return;
+
+            var isMarkdown = value === 'markdown';
+
+            badge.textContent = isMarkdown
+                ? tr('modals.create.markdown.title', {}, 'Markdown Note')
+                : tr('modals.create.note.title', {}, 'Note');
+            badge.className = 'setting-status enabled';
+
+            var card = document.getElementById('diary-note-type-card');
+            if (card) {
+                var icon = card.querySelector('.home-card-icon i');
+                if (icon) {
+                    icon.classList.toggle('lucide-file-code', isMarkdown);
+                    icon.classList.toggle('lucide-book-open', !isMarkdown);
                 }
             }
         });
@@ -1130,6 +1358,32 @@
             noteAgeFilterCard.addEventListener('click', openNoteAgeFilterModal);
         }
 
+        var noteColorPaletteCard = document.getElementById('note-color-palette-card');
+        if (noteColorPaletteCard) {
+            noteColorPaletteCard.addEventListener('click', openNoteColorPaletteModal);
+        }
+
+        var paletteAddBtn = document.getElementById('noteColorPaletteAddBtn');
+        if (paletteAddBtn) {
+            paletteAddBtn.addEventListener('click', function () {
+                paletteDraft.push({ id: '', name: '', hex: '#3b82f6' });
+                renderPaletteEditor();
+            });
+        }
+
+        var paletteResetBtn = document.getElementById('noteColorPaletteResetBtn');
+        if (paletteResetBtn) {
+            paletteResetBtn.addEventListener('click', function () {
+                paletteDraft = defaultPalette();
+                renderPaletteEditor();
+            });
+        }
+
+        var paletteSaveBtn = document.getElementById('saveNoteColorPaletteBtn');
+        if (paletteSaveBtn) {
+            paletteSaveBtn.addEventListener('click', saveNoteColorPalette);
+        }
+
         var timezoneCard = document.getElementById('timezone-card');
         if (timezoneCard) {
             timezoneCard.addEventListener('click', showTimezonePrompt);
@@ -1189,6 +1443,24 @@
             });
         }
 
+        // Diary entry format card - toggles between HTML and markdown notes
+        var diaryNoteTypeCard = document.getElementById('diary-note-type-card');
+        if (diaryNoteTypeCard) {
+            diaryNoteTypeCard.addEventListener('click', function () {
+                getSetting('diary_default_note_type', function (currentValue) {
+                    var next = currentValue === 'markdown' ? 'html' : 'markdown';
+                    setSetting('diary_default_note_type', next, function (success) {
+                        if (success) {
+                            refreshDiaryNoteTypeBadge();
+                            reloadOpener();
+                        } else {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        }
+                    });
+                });
+            });
+        }
+
         // Theme mode card - opens theme selection modal
         var themeModeCard = document.getElementById('theme-mode-card');
         if (themeModeCard) {
@@ -1215,6 +1487,32 @@
                 var current = (window.__poznoteUserStorage || localStorage).getItem('main_font') || 'inter';
                 probeMainFonts(function (available) {
                     var select = document.getElementById('mainFontSelect');
+                    if (select) {
+                        for (var i = 0; i < select.options.length; i++) {
+                            var option = select.options[i];
+                            // Hide fonts this device does not have; keep the
+                            // stored choice visible even if it is unavailable
+                            // here so it can be changed.
+                            var show = option.value === current || available[option.value] !== false;
+                            option.hidden = !show;
+                            option.disabled = !show;
+                        }
+                        select.value = current;
+                    }
+                    modal.style.display = 'flex';
+                });
+            });
+        }
+
+        // Markdown editor font card - opens font selection modal
+        var markdownFontCard = document.getElementById('markdown-font-card');
+        if (markdownFontCard) {
+            markdownFontCard.addEventListener('click', function () {
+                var modal = document.getElementById('markdownFontModal');
+                if (!modal) return;
+                var current = (window.__poznoteUserStorage || localStorage).getItem('markdown_font') || 'inherit';
+                probeMarkdownFonts(function (available) {
+                    var select = document.getElementById('markdownFontSelect');
                     if (select) {
                         for (var i = 0; i < select.options.length; i++) {
                             var option = select.options[i];
@@ -1467,6 +1765,22 @@
             });
         }
 
+        // Save markdown editor font modal button
+        var saveMarkdownFontBtn = document.getElementById('saveMarkdownFontModalBtn');
+        if (saveMarkdownFontBtn) {
+            saveMarkdownFontBtn.addEventListener('click', function () {
+                var select = document.getElementById('markdownFontSelect');
+                var selected = (select && select.value) || 'inherit';
+                (window.__poznoteUserStorage || localStorage).setItem('markdown_font', selected);
+                if (typeof window.__poznoteApplyEditorFont === 'function') {
+                    window.__poznoteApplyEditorFont(selected);
+                }
+                try { closeModal('markdownFontModal'); } catch (e) { }
+                refreshMarkdownFontBadge();
+                reloadOpener();
+            });
+        }
+
         // ---- Custom CSS upload modal ----
         var uploadCustomCssBtn = document.getElementById('uploadCustomCssBtn');
         var customCssFileInput = document.getElementById('customCssFileInput');
@@ -1590,9 +1904,12 @@
             refreshLoginDisplayBadge();
             refreshFontSizeBadge();
             refreshMainFontBadge();
+            refreshMarkdownFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
+            refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
+            refreshDiaryNoteTypeBadge();
             refreshToolbarModeBadge();
             refreshTimezoneBadge();
             refreshDateTimeFormatBadge();
@@ -1665,9 +1982,12 @@
             refreshLanguageBadge();
             refreshFontSizeBadge();
             refreshMainFontBadge();
+            refreshMarkdownFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
+            refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
+            refreshDiaryNoteTypeBadge();
             refreshToolbarModeBadge();
             refreshDateTimeFormatBadge();
             refreshInstallAppBadge();
@@ -1779,12 +2099,37 @@
             : (btn.getAttribute('data-label-check') || 'Check all');
     }
 
+    function updateGlobalToggleBtn(modal) {
+        var btn = modal.querySelector('#uiCustomizationToggleAll');
+        if (!btn) return;
+
+        var checkboxes = modal.querySelectorAll('[data-ui-key]');
+        var allChecked = checkboxes.length > 0
+            && Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+
+        btn.textContent = allChecked
+            ? (btn.getAttribute('data-label-uncheck') || 'Uncheck all')
+            : (btn.getAttribute('data-label-check') || 'Check all');
+    }
+
     function initSectionToggleButtons(modal) {
         // Update button labels based on current state
         modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+        updateGlobalToggleBtn(modal);
 
-        // Click: toggle all checkboxes in the section
+        // Click: toggle all checkboxes (globally, or within one section)
         modal.addEventListener('click', function (e) {
+            var globalBtn = e.target.closest('#uiCustomizationToggleAll');
+            if (globalBtn) {
+                var allCheckboxes = modal.querySelectorAll('[data-ui-key]');
+                var everyChecked = allCheckboxes.length > 0
+                    && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
+                allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
+                modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+                updateGlobalToggleBtn(modal);
+                return;
+            }
+
             var btn = e.target.closest('.ui-custom-toggle-all');
             if (!btn) return;
 
@@ -1795,14 +2140,16 @@
             var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
             checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
             updateSectionToggleBtn(section);
+            updateGlobalToggleBtn(modal);
         });
 
-        // Change: keep button label in sync when individual checkboxes change
+        // Change: keep button labels in sync when individual checkboxes change
         modal.addEventListener('change', function (e) {
             if (!e.target || !e.target.getAttribute('data-ui-key')) return;
 
             var section = e.target.closest('.ui-custom-section');
             if (section) updateSectionToggleBtn(section);
+            updateGlobalToggleBtn(modal);
         });
     }
 
@@ -1821,6 +2168,7 @@
 
             // Update toggle-all buttons to reflect current state
             modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+            updateGlobalToggleBtn(modal);
 
             var filterInput = document.getElementById('uiCustomizationFilterInput');
             if (filterInput) {
@@ -1846,6 +2194,7 @@
     window.refreshNoteSortBadge = refreshNoteSortBadge;
     window.refreshNoteAgeFilterBadge = refreshNoteAgeFilterBadge;
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
+    window.refreshDiaryNoteTypeBadge = refreshDiaryNoteTypeBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshDateTimeFormatBadge = refreshDateTimeFormatBadge;
@@ -1853,6 +2202,11 @@
     window.refreshCustomCssBadge = refreshCustomCssBadge;
     window.getSetting = getSetting;
     window.setSetting = setSetting;
+    // Allow other modules (e.g. modals that write settings directly via fetch)
+    // to keep the local settingsCache in sync so badges refresh without a page reload.
+    window.updateSettingCache = function (key, value) {
+        settingsCache[key] = value;
+    };
     window.showCustomCssModal = showCustomCssModal;
 
 })();

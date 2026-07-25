@@ -132,6 +132,7 @@
       "custom_css": "Custom CSS path",
       "release_notes": "Release Notes",
       "orphan_scanner": "Orphan attachments scanner",
+      "storage_stats": "Storage statistics",
       "change_password": "Change Password",
       "import_limits": "Import Limits",
       "git_sync_toggle": "Git Sync",
@@ -207,15 +208,18 @@
     "cards": {
       "theme_mode": "Theme",
       "main_font": "App font",
+      "markdown_font": "Markdown editor font",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
       "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
+      "diary_default_note_type": "Diary entry format",
       "timezone": "Timezone",
       "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",
       "show_note_icons": "Show note icons",
+      "note_color_palette": "Note colors",
       "show_folder_counts": "Show folder note counts",
       "notes_without_folders_after": "Show notes after folders",
       "show_folder_actions": "Show folder actions",
@@ -428,6 +432,7 @@
         "toolbar": "Toolbar",
         "slash_menu": "Slash Menu",
         "panels": "Other",
+        "dashboard_toolbar": "Dashboard Toolbar",
         "folder_actions": "Folder Actions"
       },
       "badge_all_visible": "All visible",
@@ -452,6 +457,14 @@
       "options": {
         "inter": "Inter (default)",
         "system": "System"
+      }
+    },
+    "markdown_font": {
+      "title": "Markdown editor font",
+      "description": "Font used while editing a markdown note. The rendered preview keeps the app font. Fonts use those installed on your device.",
+      "options": {
+        "inherit": "App font (default)",
+        "monospace": "System monospace"
       }
     },
     "font_size": {
@@ -713,6 +726,16 @@
         "alphabetical": "Alphabetical"
       }
     },
+    "note_color_palette": {
+      "title": "Note colors",
+      "description": "Customize the colors you can assign to notes. Renaming or recoloring an entry updates every note using it.",
+      "add": "Add color",
+      "remove": "Remove",
+      "reset": "Reset to defaults",
+      "name_placeholder": "Color name",
+      "count": "{{count}} colors",
+      "empty_error": "Add at least one color, or reset to defaults."
+    },
     "note_age_filter": {
       "title": "Note age filter",
       "description": "Choose how far back modified notes should appear",
@@ -789,6 +812,17 @@
       "no_notes_in_folder": "This folder contains no notes",
       "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
     }
+  },
+  "note_color": {
+    "modal_title": "Note color",
+    "folder_modal_title": "Folder color",
+    "custom": "Custom color",
+    "remove": "Remove color",
+    "apply_error": "Could not update the note color.",
+    "filter": "Filter by color",
+    "filter_all": "All notes",
+    "filter_any": "Any color",
+    "filter_none": "No color"
   },
   "tabs": {
     "context_menu": {
@@ -1402,7 +1436,20 @@
       "complete_backup": "Drop backup ZIP here",
       "database": "Drop SQL file here",
       "notes": "Drop notes ZIP here",
-      "attachments": "Drop attachments ZIP here"
+      "attachments": "Drop attachments ZIP here",
+      "sidebar": {
+        "drop_here": "Drop note files to import them",
+        "drop_into_folder": "Drop to import into \"{{folder}}\"",
+        "folder_not_allowed": "Cannot import into \"{{folder}}\"",
+        "importing": "Importing notes...",
+        "import_done": "Notes imported.",
+        "import_failed": "Import failed.",
+        "no_supported_files": "No supported files were dropped. Allowed types: {{allowed}}",
+        "skipped_files": "{{count}} unsupported file(s) were skipped."
+      },
+      "errors": {
+        "system_folder": "Notes cannot be imported into the \"{{folder}}\" folder."
+      }
     },
     "modals": {
       "import_confirm": {
@@ -2102,6 +2149,20 @@
       "modal_title": "Orphan Files",
       "modal_title_user": "Orphan Files - User",
       "files_label": "files"
+    },
+    "storage_stats": {
+      "title": "Storage statistics",
+      "description": "Number of notes and disk space used by each account.",
+      "user_description": "Number of notes and disk space used by your account.",
+      "table_account": "Account",
+      "table_notes": "Notes",
+      "table_trash": "Trash",
+      "table_db": "Database (MB)",
+      "table_entries": "Files (MB)",
+      "table_attachments": "Attachments (MB)",
+      "table_total": "Total (MB)",
+      "table_total_row": "Total",
+      "no_accounts": "No accounts found."
     }
   },
   "backlinks": {
@@ -2383,6 +2444,9 @@
     "title": "Notes board",
     "empty": "No favorite notes yet. Mark notes as favorites to pin them to this board.",
     "filter_placeholder": "Filter by title, content or tag...",
+    "pin_note": "Pin to top",
+    "unpin_note": "Unpin",
+    "pin_error": "Could not update the pinned state.",
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",

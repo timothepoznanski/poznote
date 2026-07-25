@@ -73,6 +73,15 @@ function isPublicWorkspaceReadOnly() {
     return !!(document.body && document.body.classList.contains('public-workspace-readonly'));
 }
 
+// True when the drag comes from outside the browser (OS files) rather than
+// from a note/folder being moved inside the app. Those drops are handled by
+// js/sidebar-file-import.js, so the folder handlers must ignore them.
+function isExternalFileDrag(e) {
+    if (window.currentDragData) return false;
+    if (!e.dataTransfer || !e.dataTransfer.types) return false;
+    return Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1;
+}
+
 // Initialize drag-and-drop for notes between folders and workspace
 function setupNoteDragDropEvents() {
     // Remove existing event listeners to avoid duplicates
@@ -881,6 +890,8 @@ function applyFolderDropIndicator(folderHeader, position) {
 
 // Enhanced folder drag enter handler to avoid flicker on nested elements
 function handleFolderDragEnterEnhanced(e) {
+    if (isExternalFileDrag(e)) return;
+
     var folderHeader = e.target.closest('.folder-header');
     if (!folderHeader) return;
 
@@ -917,6 +928,8 @@ function handleFolderDragEnterEnhanced(e) {
 
 // Enhanced folder drag over handler that supports both notes and folders
 function handleFolderDragOverEnhanced(e) {
+    if (isExternalFileDrag(e)) return;
+
     e.preventDefault();
 
     var folderHeader = e.target.closest('.folder-header');
@@ -980,6 +993,9 @@ function handleFolderDragLeaveEnhanced(e) {
 
 // Enhanced folder drop handler that supports both notes and folders
 function handleFolderDropEnhanced(e) {
+    // External files are imported as new notes elsewhere, not moved.
+    if (isExternalFileDrag(e)) return;
+
     e.preventDefault();
 
     var folderHeader = e.target.closest('.folder-header');

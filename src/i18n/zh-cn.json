@@ -423,6 +423,7 @@
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "orphan_scanner": "孤立附件扫描器",
+      "storage_stats": "存储统计",
       "change_password": "修改密码",
       "import_limits": "导入限制",
       "git_sync_toggle": "Git 同步",
@@ -561,11 +562,13 @@
     "cards": {
       "theme_mode": "主题",
       "main_font": "应用字体",
+      "markdown_font": "Markdown 编辑器字体",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_sort_order": "笔记排序规则",
       "note_age_filter": "笔记时间筛选",
       "tasklist_insert_order": "任务列表插入顺序",
+      "diary_default_note_type": "日记条目格式",
       "timezone": "时区",
       "date_time_format": "日期和时间格式",
       "show_note_created": "显示笔记创建日期",
@@ -583,7 +586,8 @@
       "default_image_border_no_padding": "默认图片边框",
       "ui_customization": "元素可见性",
       "notes_dashboard": "笔记看板",
-      "spellcheck_html_notes": "拼写检查"
+      "spellcheck_html_notes": "拼写检查",
+      "note_color_palette": "笔记颜色"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -917,6 +921,7 @@
         "toolbar": "工具栏",
         "slash_menu": "斜杠菜单",
         "panels": "其他",
+        "dashboard_toolbar": "仪表板工具栏",
         "folder_actions": "文件夹操作"
       },
       "check_all": "全选",
@@ -940,6 +945,14 @@
       "options": {
         "inter": "Inter（默认）",
         "system": "系统"
+      }
+    },
+    "markdown_font": {
+      "title": "Markdown 编辑器字体",
+      "description": "编辑 Markdown 笔记时使用的字体。渲染后的预览仍使用应用字体。字体将使用您设备上安装的字体。",
+      "options": {
+        "inherit": "应用字体（默认）",
+        "monospace": "系统等宽字体"
       }
     },
     "font_size": {
@@ -1154,6 +1167,16 @@
         "alphabetical": "字母顺序"
       }
     },
+    "note_color_palette": {
+      "title": "笔记颜色",
+      "description": "自定义可分配给笔记的颜色。重命名或修改某个颜色会同步更新所有使用它的笔记。",
+      "add": "添加颜色",
+      "remove": "删除",
+      "reset": "恢复默认",
+      "name_placeholder": "颜色名称",
+      "count": "{{count}} 种颜色",
+      "empty_error": "请至少添加一种颜色，或恢复默认设置。"
+    },
     "note_age_filter": {
       "title": "笔记时间筛选",
       "description": "选择显示最近修改笔记的时间范围",
@@ -1229,6 +1252,17 @@
       "no_notes_in_folder": "此文件夹不包含笔记",
       "too_many_notes": "此文件夹包含 {{count}} 条笔记。为避免浏览器负担过重，仅打开前 {{max}} 条。"
     }
+  },
+  "note_color": {
+    "modal_title": "笔记颜色",
+    "folder_modal_title": "文件夹颜色",
+    "custom": "自定义颜色",
+    "remove": "移除颜色",
+    "apply_error": "无法更新笔记颜色。",
+    "filter": "按颜色筛选",
+    "filter_all": "全部笔记",
+    "filter_any": "任意颜色",
+    "filter_none": "无颜色"
   },
   "tabs": {
     "context_menu": {
@@ -1731,7 +1765,20 @@
       "complete_backup": "将备份 ZIP 拖放到此处",
       "database": "将 SQL 文件拖放到此处",
       "notes": "将笔记 ZIP 拖放到此处",
-      "attachments": "将附件 ZIP 拖放到此处"
+      "attachments": "将附件 ZIP 拖放到此处",
+      "sidebar": {
+        "drop_here": "拖放笔记文件以导入",
+        "drop_into_folder": "拖放以导入到“{{folder}}”",
+        "folder_not_allowed": "无法导入到“{{folder}}”",
+        "importing": "正在导入笔记...",
+        "import_done": "笔记已导入。",
+        "import_failed": "导入失败。",
+        "no_supported_files": "未拖放任何受支持的文件。允许的类型：{{allowed}}",
+        "skipped_files": "已跳过 {{count}} 个不受支持的文件。"
+      },
+      "errors": {
+        "system_folder": "无法将笔记导入到“{{folder}}”文件夹。"
+      }
     },
     "modals": {
       "import_confirm": {
@@ -2618,6 +2665,20 @@
       "modal_title": "孤立文件",
       "modal_title_user": "孤立文件 - 用户",
       "files_label": "文件"
+    },
+    "storage_stats": {
+      "title": "存储统计",
+      "description": "每个账户的笔记数量和已用磁盘空间。",
+      "user_description": "您账户的笔记数量和已用磁盘空间。",
+      "table_account": "账户",
+      "table_notes": "笔记",
+      "table_trash": "回收站",
+      "table_db": "数据库 (MB)",
+      "table_entries": "文件 (MB)",
+      "table_attachments": "附件 (MB)",
+      "table_total": "合计 (MB)",
+      "table_total_row": "合计",
+      "no_accounts": "未找到账户。"
     }
   },
   "password": {
@@ -2824,6 +2885,9 @@
     "title": "笔记看板",
     "empty": "还没有收藏的笔记。将笔记标记为收藏即可固定到此便签板。",
     "filter_placeholder": "按标题、内容或标签筛选...",
+    "pin_note": "置顶",
+    "unpin_note": "取消置顶",
+    "pin_error": "无法更新置顶状态。",
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",

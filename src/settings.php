@@ -96,6 +96,7 @@ $settingsPageUserKeys = [
     'language',
     'show_note_created',
     'show_note_icons',
+    'note_color_palette',
     'hide_folder_counts',
     'hide_folder_actions',
     'notes_without_folders_after_folders',
@@ -109,6 +110,7 @@ $settingsPageUserKeys = [
     'note_list_sort',
     'note_age_filter_days',
     'tasklist_insert_order',
+    'diary_default_note_type',
     'toolbar_mode',
     'timezone',
     'date_time_format',
@@ -383,6 +385,16 @@ if ($isAdmin) {
                 </div>
             </a>
 
+            <!-- Storage Statistics (own account) -->
+            <div class="home-card settings-card-clickable" id="storage-stats-user-card" data-href="storage-stats-user.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-pie-chart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                </div>
+            </div>
+
         </div>
 
         <!-- DISPLAY CATEGORY -->
@@ -432,6 +444,17 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span>
                     <span id="main-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Markdown Editor Font -->
+            <div class="home-card" id="markdown-font-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-file-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span>
+                    <span id="markdown-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 
@@ -506,6 +529,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Diary Entry Note Type -->
+            <div class="home-card" id="diary-note-type-card">
+                <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span>
+                    <span id="diary-note-type-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Show Note Created -->
             <div class="home-card" id="show-created-card">
                 <div class="home-card-icon"><i class="lucide lucide-calendar-alt"></i></div>
@@ -521,6 +553,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span>
                     <span id="note-icons-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Note Color Palette -->
+            <div class="home-card" id="note-color-palette-card">
+                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span>
+                    <span id="note-color-palette-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 
@@ -750,6 +791,16 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Storage Statistics -->
+            <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-pie-chart"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                </div>
+            </div>
+
         </div>
         <?php endif; ?>
 
@@ -842,6 +893,10 @@ if ($isAdmin) {
     <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
+    <script>
+    // Factory palette, used by the "Reset to defaults" action in the editor.
+    window.NOTE_COLOR_DEFAULT_PALETTE = <?php echo json_encode(getDefaultNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+    </script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>

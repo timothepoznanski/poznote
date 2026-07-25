@@ -713,6 +713,25 @@ try {
     </div>
 </div>
 
+<!-- Note color palette editor -->
+<div id="noteColorPaletteModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.note_color_palette.title', [], 'Note colors'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.note_color_palette.description', [], 'Customize the colors you can assign to notes. Renaming or recoloring an entry updates every note using it.'); ?></p>
+            <div id="noteColorPaletteList" class="note-palette-list"></div>
+            <button type="button" class="note-palette-add" id="noteColorPaletteAddBtn">
+                <i class="lucide lucide-plus"></i> <?php echo t_h('modals.note_color_palette.add', [], 'Add color'); ?>
+            </button>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-secondary" id="noteColorPaletteResetBtn"><?php echo t_h('modals.note_color_palette.reset', [], 'Reset to defaults'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteColorPaletteModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveNoteColorPaletteBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note age filter modal -->
 <div id="noteAgeFilterModal" class="modal">
     <div class="modal-content">
@@ -797,6 +816,33 @@ try {
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="mainFontModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveMainFontModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Markdown editor font selection modal -->
+<div id="markdownFontModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.markdown_font.title', [], 'Markdown editor font'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.markdown_font.description', [], 'Font used while editing a markdown note. The rendered preview keeps the app font. Fonts use those installed on your device.'); ?></p>
+            <select id="markdownFontSelect">
+                <option value="inherit" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.markdown_font.options.inherit', [], 'App font (default)'); ?></option>
+                <option value="monospace" style="font-family: monospace;"><?php echo t_h('modals.markdown_font.options.monospace', [], 'System monospace'); ?></option>
+                <option value="courier" style="font-family: 'Courier New', Courier, monospace;">Courier New</option>
+                <option value="consolas" style="font-family: Consolas, monospace;">Consolas</option>
+                <option value="menlo" style="font-family: Menlo, monospace;">Menlo</option>
+                <option value="monaco" style="font-family: Monaco, monospace;">Monaco</option>
+                <option value="jetbrains" style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</option>
+                <option value="cascadia" style="font-family: 'Cascadia Code', monospace;">Cascadia Code</option>
+                <option value="fira" style="font-family: 'Fira Code', monospace;">Fira Code</option>
+                <option value="sourcecodepro" style="font-family: 'Source Code Pro', monospace;">Source Code Pro</option>
+                <option value="ubuntumono" style="font-family: 'Ubuntu Mono', monospace;">Ubuntu Mono</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownFontModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveMarkdownFontModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
@@ -1286,6 +1332,7 @@ try {
         <div class="modal-body">
             <p class="ui-custom-description"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
             <div class="ui-custom-filter">
+                <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
                 <input
                     type="search"
                     id="uiCustomizationFilterInput"
@@ -1321,12 +1368,15 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:restore-import-card" checked><span><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-user-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:spellcheck-html-notes-card" checked><span><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:theme-mode-card" checked><span><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-font-card" checked><span><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
@@ -1334,8 +1384,10 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-sort-card" checked><span><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:show-created-card" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-icons-card" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-counts-card" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
@@ -1355,6 +1407,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:version-card" checked><span><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
@@ -1438,9 +1491,28 @@ try {
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-icon-kanban" checked><span><?php echo t_h('home.kanban', [], 'Kanban'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Dashboard Toolbar Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.dashboard_toolbar', [], 'Dashboard Toolbar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardToggleFavorites" checked><span><?php echo t_h('dashboard.toggle_favorites', [], 'Show favorites only'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGitPushBtn" checked><span>Push</span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGitPullBtn" checked><span>Pull</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardSettingsBtn" checked><span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span></label>
                 </div>
                 </div>
 

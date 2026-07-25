@@ -38,6 +38,8 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
     $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
     $iconColor = !empty($note['icon_color']) ? (string)$note['icon_color'] : '';
+    $noteColor = !empty($note['color']) ? (string)$note['color'] : '';
+    $noteColorHex = $noteColor !== '' ? resolveNoteColorHex($noteColor) : '';
     return [
         'id'        => $noteId,
         'heading'   => $heading,
@@ -52,7 +54,33 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
         'icon'      => $iconRaw,
         'iconColor' => $iconColor,
+        // 'color' is the stored value (palette id or custom hex); 'colorHex' is
+        // what the card is actually tinted with. An id whose palette entry was
+        // deleted resolves to '' and renders as an uncolored card.
+        'color'       => $noteColor,
+        'colorHex'    => $noteColorHex,
+        'pinned'      => !empty($note['pinned']),
+        'globalOrder' => (int)($note['globalOrder'] ?? 0),
     ];
+}
+
+/**
+ * Pinned notes first, each group keeping the order it already had
+ * (updated DESC, as returned by the query).
+ *
+ * Each note also carries 'baseOrder', its rank in that unpinned order. The
+ * board JS sorts on it after a pin toggle, so unpinning drops a note back
+ * exactly where it started instead of leaving it stranded at the top.
+ */
+function dashboardSortPinnedFirst(array $notes): array {
+    $pinned = [];
+    $rest   = [];
+    foreach ($notes as $i => $note) {
+        $note['baseOrder'] = $i;
+        if (!empty($note['pinned'])) $pinned[] = $note;
+        else $rest[] = $note;
+    }
+    return array_merge($pinned, $rest);
 }
 
 function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, string $pageWorkspace): array {
@@ -60,7 +88,9 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
     $childIds = $f['children'];
     usort($childIds, fn($a, $b) => ($insertOrder[$a] ?? 0) - ($insertOrder[$b] ?? 0));
 
-    $notes = array_map(fn($n) => dashboardBuildNoteData($n, $pageWorkspace), $f['notes']);
+    $notes = dashboardSortPinnedFirst(
+        array_map(fn($n) => dashboardBuildNoteData($n, $pageWorkspace), $f['notes'])
+    );
 
     $childFolders = [];
     foreach ($childIds as $childId) {
@@ -74,6 +104,8 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
         'name'    => $f['name'],
         'icon'    => $f['icon'],
         'color'   => $f['color'],
+        'cardColor'    => $f['cardColor'] ?? '',
+        'cardColorHex' => $f['cardColorHex'] ?? '',
         'folders' => $childFolders,
         'notes'   => $notes,
     ];
@@ -340,7 +372,7 @@ try {
     if (isset($con)) {
         $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
         $stmtF = $con->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, display_order FROM folders" . $folderWhere .
+            "SELECT id, name, parent_id, icon, icon_color, color, display_order FROM folders" . $folderWhere .
             " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
         );
         $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
@@ -355,7 +387,11 @@ try {
                 'name'     => trim($f['name']),
                 'parent'   => $f['parent_id'] !== null ? (int)$f['parent_id'] : null,
                 'icon'     => !empty($f['icon']) ? convertFontAwesomeToLucide($f['icon']) : 'lucide lucide-folder',
+                // 'color' is the icon color (legacy name); 'cardColor'/'cardColorHex'
+                // carry the card background color, like notes.
                 'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
+                'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
+                'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
                 'notes'    => [],
                 'children' => [],
             ];
@@ -369,7 +405,7 @@ try {
         }
         unset($fd);
 
-        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color FROM entries WHERE trash = 0";
+        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned FROM entries WHERE trash = 0";
         $params = [];
         if ($favoritesOnly) {
             $query .= " AND favorite = 1";
@@ -383,7 +419,12 @@ try {
         $stmt->execute($params);
 
         $noFolderNotes = [];
+        // Rank in the query's updated-DESC order, before the rows are split by
+        // folder. The filtered board mixes notes from the whole tree, so it
+        // needs this tree-wide rank rather than the per-folder one.
+        $globalOrder = 0;
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $row['globalOrder'] = $globalOrder++;
             $fid = $row['folder_id'] !== null ? (int)$row['folder_id'] : null;
             if ($fid !== null && isset($folders[$fid])) {
                 $folders[$fid]['notes'][] = $row;
@@ -403,6 +444,7 @@ try {
         foreach ($noFolderNotes as $note) {
             $dashboardData['notes'][] = dashboardBuildNoteData($note, $pageWorkspace);
         }
+        $dashboardData['notes'] = dashboardSortPinnedFirst($dashboardData['notes']);
 
         $isEmpty = empty($dashboardData['folders']) && empty($dashboardData['notes']);
     }
@@ -524,10 +566,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
+				<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-top-info-item dashboard-top-info-link" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
+					<i class="lucide lucide-settings" aria-hidden="true"></i>
+					<span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
+				</a>
 							</div>
 			<header class="dashboard-topbar">
 				<nav class="dashboard-topbar-actions">
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardNotesBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
 						<i class="lucide lucide-sticky-note"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['notes'] ?? 0); ?></span>
 					</a>
@@ -539,27 +585,27 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-bell"></i>
 						<span class="dashboard-topbar-count" id="dashboardNotificationsCount"><?php echo (int)($dashboardTopbarCounts['notifications'] ?? 0); ?></span>
 					</button>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_tags.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_tags.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTagsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
 						<i class="lucide lucide-tags"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['tags'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_folders.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('home.folders', [], 'Folders'); ?>" aria-label="<?php echo t_h('home.folders', [], 'Folders'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_folders.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardFoldersBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.folders', [], 'Folders'); ?>" aria-label="<?php echo t_h('home.folders', [], 'Folders'); ?>">
 						<i class="lucide lucide-folder-open"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['folders'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('shared.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('home.shares', [], 'Shares'); ?>" aria-label="<?php echo t_h('home.shares', [], 'Shares'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('shared.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardSharesBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.shares', [], 'Shares'); ?>" aria-label="<?php echo t_h('home.shares', [], 'Shares'); ?>">
 						<i class="lucide lucide-share-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['shares'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('attachments_list.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('attachments_list.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardAttachmentsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
 						<i class="lucide lucide-paperclip"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['attachments'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTrashBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
 						<i class="lucide lucide-trash-2"></i>
 						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['trash'] ?? 0); ?></span>
 					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('diary.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="dashboard-topbar-btn" title="<?php echo t_h('diary.title', [], 'Diary'); ?>" aria-label="<?php echo t_h('diary.title', [], 'Diary'); ?>">
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('diary.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardDiaryBtn" class="dashboard-topbar-btn" title="<?php echo t_h('diary.title', [], 'Diary'); ?>" aria-label="<?php echo t_h('diary.title', [], 'Diary'); ?>">
 						<i class="lucide lucide-book-open"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('diary.title', [], 'Diary'); ?></span>
 					</a>
@@ -587,13 +633,15 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<span class="dashboard-topbar-count">AI</span>
 					</button>
 					<?php endif; ?>
-					<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>" aria-label="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
-						<i class="lucide lucide-settings"></i>
-						<span class="dashboard-topbar-count"><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
-					</a>
 				</nav>
 				<div class="board-filter-row">
 				<?php renderBoardViewMenu('dashboard'); ?>
+				<div class="dashboard-color-filter-wrap">
+					<button type="button" id="dashboardColorFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('note_color.filter', [], 'Filter by color'); ?>" aria-label="<?php echo t_h('note_color.filter', [], 'Filter by color'); ?>" aria-haspopup="true" aria-expanded="false">
+						<i class="lucide lucide-palette"></i>
+					</button>
+					<div id="dashboardColorFilterMenu" class="dashboard-color-filter-menu" hidden></div>
+				</div>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
 					<input
@@ -771,8 +819,40 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			</div>
 		</div>
 
+		<div id="noteColorModal" class="modal">
+			<div class="modal-content">
+				<h3 id="noteColorModalTitle"><?php echo t_h('note_color.modal_title', [], 'Note color'); ?></h3>
+				<p class="note-color-modal-subtitle" id="noteColorModalNoteTitle"></p>
+				<div class="note-color-grid" id="noteColorGrid"></div>
+				<div class="note-color-custom">
+					<label for="noteColorCustomInput"><?php echo t_h('note_color.custom', [], 'Custom color'); ?></label>
+					<input type="color" id="noteColorCustomInput" value="#3b82f6">
+				</div>
+				<div class="modal-buttons">
+					<button type="button" class="btn-danger" id="noteColorClearBtn"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></button>
+					<button type="button" class="btn-cancel" data-action="close-note-color-modal"><?php echo t_h('common.cancel'); ?></button>
+					<button type="button" class="btn-primary" id="noteColorApplyBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
+				</div>
+			</div>
+		</div>
+
 		<script>
+		window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+		window.NOTE_COLOR_TXT = {
+			applyError: <?php echo json_encode(t('note_color.apply_error', [], 'Could not update the note color.')); ?>,
+			custom: <?php echo json_encode(t('note_color.custom', [], 'Custom color')); ?>,
+			modalTitle: <?php echo json_encode(t('note_color.modal_title', [], 'Note color')); ?>,
+			folderModalTitle: <?php echo json_encode(t('note_color.folder_modal_title', [], 'Folder color')); ?>,
+			filterAll: <?php echo json_encode(t('note_color.filter_all', [], 'All notes')); ?>,
+			filterAnyColor: <?php echo json_encode(t('note_color.filter_any', [], 'Any color')); ?>,
+			filterNoColor: <?php echo json_encode(t('note_color.filter_none', [], 'No color')); ?>
+		};
 		window.DASHBOARD_DATA      = <?php echo json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+		window.DASHBOARD_PIN_TXT = {
+			pin: <?php echo json_encode(t('dashboard.pin_note', [], 'Pin to top')); ?>,
+			unpin: <?php echo json_encode(t('dashboard.unpin_note', [], 'Unpin')); ?>,
+			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>
+		};
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>
 		};

@@ -1000,6 +1000,7 @@ class GitSync {
                         if (isset($meta['created']))     { $setClauses[] = 'created = ?';     $params[] = $meta['created']; }
                         if (array_key_exists('icon', $meta))       { $setClauses[] = 'icon = ?';       $params[] = $meta['icon']; }
                         if (array_key_exists('icon_color', $meta)) { $setClauses[] = 'icon_color = ?'; $params[] = $meta['icon_color']; }
+                        if (array_key_exists('color', $meta))      { $setClauses[] = 'color = ?';      $params[] = $meta['color']; }
                     };
 
                     foreach ($downloadedNotes as $note) {
@@ -1034,9 +1035,10 @@ class GitSync {
                             $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
                             $icon        = $meta['icon']        ?? null;
                             $iconColor   = $meta['icon_color']  ?? null;
+                            $noteColor   = $meta['color']       ?? null;
                             $this->con->prepare(
-                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated, $icon, $iconColor]);
+                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated, icon, icon_color, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated, $icon, $iconColor, $noteColor]);
                             $results['pulled']++;
                             $results['debug'][] = "  {$filename} → created (heading: {$heading})";
                         }
@@ -1073,9 +1075,10 @@ class GitSync {
                             $updated     = $meta['updated']     ?? gmdate('Y-m-d H:i:s');
                             $icon        = $meta['icon']        ?? null;
                             $iconColor   = $meta['icon_color']  ?? null;
+                            $noteColor   = $meta['color']       ?? null;
                             $this->con->prepare(
-                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated, icon, icon_color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated, $icon, $iconColor]);
+                                'INSERT INTO entries (id, heading, entry, type, workspace, tags, folder_id, folder, attachments, favorite, created, updated, icon, icon_color, color) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                            )->execute([$noteId, $heading, $content, $type, $workspace, $tags, $folderId, $folder, $attachments, $favorite, $created, $updated, $icon, $iconColor, $noteColor]);
                             $results['pulled']++;
                         }
                     }
@@ -1458,7 +1461,7 @@ class GitSync {
 
         // Notes
         $stmt  = $this->con->query(
-            'SELECT id, heading, tags, folder_id, folder, workspace, type, attachments, favorite, created, updated, icon, icon_color FROM entries WHERE trash = 0'
+            'SELECT id, heading, tags, folder_id, folder, workspace, type, attachments, favorite, created, updated, icon, icon_color, color FROM entries WHERE trash = 0'
         );
         $notes = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -1475,6 +1478,7 @@ class GitSync {
                 'updated'     => $row['updated']      ?? null,
                 'icon'        => $row['icon']         ?? null,
                 'icon_color'  => $row['icon_color']   ?? null,
+                'color'       => $row['color']        ?? null,
             ];
         }
 

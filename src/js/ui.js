@@ -294,6 +294,12 @@ function showLoginDisplayNamePrompt() {
 
             if (resp && resp.success) {
                 modal.style.display = 'none';
+                // Keep the settings cache in sync so the badge shows the new value
+                // instead of a stale cached one (which required a page refresh before).
+                if (typeof window.updateSettingCache === 'function') {
+                    var savedValue = Object.prototype.hasOwnProperty.call(resp, 'value') ? resp.value : val;
+                    window.updateSettingCache('login_display_name', savedValue);
+                }
                 // Refresh settings.php if we're on that page
                 if (window.location.pathname.includes('settings.php')) {
                     if (typeof window.refreshLoginDisplayBadge === 'function') {

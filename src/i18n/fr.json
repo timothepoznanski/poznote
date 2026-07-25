@@ -433,6 +433,7 @@
       "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
+      "storage_stats": "Statistiques de stockage",
       "change_password": "Changer le mot de passe",
       "import_limits": "Limites d'import",
       "git_sync_toggle": "Synchronisation Git",
@@ -573,15 +574,18 @@
     "cards": {
       "theme_mode": "Thème",
       "main_font": "Police de l'application",
+      "markdown_font": "Police de l'éditeur markdown",
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
       "note_sort_order": "Tri des notes",
       "note_age_filter": "Filtre d’ancienneté",
       "tasklist_insert_order": "Ordre d'insertion des tâches",
+      "diary_default_note_type": "Format des entrées de journal",
       "timezone": "Fuseau horaire",
       "date_time_format": "Format date et heure",
       "show_note_created": "Afficher la date de création",
       "show_note_icons": "Afficher les icônes des notes",
+      "note_color_palette": "Couleurs des notes",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
       "show_folder_actions": "Afficher les actions de dossier",
@@ -943,6 +947,7 @@
         "toolbar": "Barre d'outils",
         "slash_menu": "Menu slash",
         "panels": "Autre",
+        "dashboard_toolbar": "Barre d'outils du tableau de bord",
         "folder_actions": "Actions des dossiers"
       },
       "badge_all_visible": "Tout visible",
@@ -966,6 +971,14 @@
       "options": {
         "inter": "Inter (par défaut)",
         "system": "Système"
+      }
+    },
+    "markdown_font": {
+      "title": "Police de l'éditeur markdown",
+      "description": "Police utilisée lors de l'édition d'une note markdown. L'aperçu affiché conserve la police de l'application. Les polices utilisent celles installées sur votre appareil.",
+      "options": {
+        "inherit": "Police de l'application (par défaut)",
+        "monospace": "Monospace système"
       }
     },
     "font_size": {
@@ -1186,6 +1199,16 @@
         "alphabetical": "Alphabétique"
       }
     },
+    "note_color_palette": {
+      "title": "Couleurs des notes",
+      "description": "Personnalisez les couleurs attribuables aux notes. Renommer ou modifier une couleur met à jour toutes les notes qui l'utilisent.",
+      "add": "Ajouter une couleur",
+      "remove": "Supprimer",
+      "reset": "Réinitialiser",
+      "name_placeholder": "Nom de la couleur",
+      "count": "{{count}} couleurs",
+      "empty_error": "Ajoutez au moins une couleur ou réinitialisez."
+    },
     "note_age_filter": {
       "title": "Filtre d’ancienneté des notes",
       "description": "Choisissez jusqu’où remonter pour afficher les notes modifiées",
@@ -1273,6 +1296,17 @@
       "no_notes_in_folder": "Ce dossier ne contient aucune note",
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
     }
+  },
+  "note_color": {
+    "modal_title": "Couleur de la note",
+    "folder_modal_title": "Couleur du dossier",
+    "custom": "Couleur personnalisée",
+    "remove": "Retirer la couleur",
+    "apply_error": "Impossible de mettre à jour la couleur de la note.",
+    "filter": "Filtrer par couleur",
+    "filter_all": "Toutes les notes",
+    "filter_any": "N'importe quelle couleur",
+    "filter_none": "Sans couleur"
   },
   "tabs": {
     "context_menu": {
@@ -1848,7 +1882,20 @@
       "complete_backup": "Déposer le ZIP de sauvegarde ici",
       "database": "Déposer le fichier SQL ici",
       "notes": "Déposer le ZIP de notes ici",
-      "attachments": "Déposer le ZIP de pièces jointes ici"
+      "attachments": "Déposer le ZIP de pièces jointes ici",
+      "sidebar": {
+        "drop_here": "Déposez des fichiers de notes pour les importer",
+        "drop_into_folder": "Déposez pour importer dans \"{{folder}}\"",
+        "folder_not_allowed": "Impossible d'importer dans \"{{folder}}\"",
+        "importing": "Importation des notes...",
+        "import_done": "Notes importées.",
+        "import_failed": "Échec de l'importation.",
+        "no_supported_files": "Aucun fichier pris en charge n'a été déposé. Types autorisés : {{allowed}}",
+        "skipped_files": "{{count}} fichier(s) non pris en charge ont été ignorés."
+      },
+      "errors": {
+        "system_folder": "Les notes ne peuvent pas être importées dans le dossier \"{{folder}}\"."
+      }
     }
   },
   "markdown_guide": {
@@ -2689,6 +2736,20 @@
       "modal_title": "Fichiers orphelins",
       "modal_title_user": "Fichiers orphelins - Utilisateur",
       "files_label": "fichiers"
+    },
+    "storage_stats": {
+      "title": "Statistiques de stockage",
+      "description": "Nombre de notes et espace disque utilisé par chaque compte.",
+      "user_description": "Nombre de notes et espace disque utilisé par votre compte.",
+      "table_account": "Compte",
+      "table_notes": "Notes",
+      "table_trash": "Corbeille",
+      "table_db": "Base de données (Mo)",
+      "table_entries": "Fichiers (Mo)",
+      "table_attachments": "Pièces jointes (Mo)",
+      "table_total": "Total (Mo)",
+      "table_total_row": "Total",
+      "no_accounts": "Aucun compte trouvé."
     }
   },
   "backlinks": {
@@ -2898,6 +2959,9 @@
     "title": "Tableau de notes",
     "empty": "Aucune note favorite pour le moment. Ajoutez des notes aux favoris pour les épingler sur ce tableau.",
     "filter_placeholder": "Filtrer par titre, contenu ou étiquette...",
+    "pin_note": "Épingler en haut",
+    "unpin_note": "Désépingler",
+    "pin_error": "Impossible de mettre à jour l'épinglage.",
     "unpin": "Retirer des favoris",
     "no_folder": "Autres notes",
     "toggle_all": "Afficher toutes les notes",

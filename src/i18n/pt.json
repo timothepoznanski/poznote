@@ -419,6 +419,7 @@
       "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
       "orphan_scanner": "Scanner de anexos órfãos",
+      "storage_stats": "Estatísticas de armazenamento",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
       "import_limits": "Limites de importação",
@@ -558,11 +559,13 @@
     "cards": {
       "theme_mode": "Tema",
       "main_font": "Fonte do aplicativo",
+      "markdown_font": "Fonte do editor markdown",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_sort_order": "Ordem de classificação das notas",
       "note_age_filter": "Filtro de antiguidade",
       "tasklist_insert_order": "Ordem de inserção das tarefas",
+      "diary_default_note_type": "Formato das entradas do diário",
       "timezone": "Fuso Horário",
       "date_time_format": "Formato de data e hora",
       "show_note_created": "Mostrar Data de Criação da Nota",
@@ -580,7 +583,8 @@
       "default_image_border_no_padding": "Borda padrão de imagem",
       "ui_customization": "Visibilidade dos elementos",
       "notes_dashboard": "Quadro de notas",
-      "spellcheck_html_notes": "Verificação ortográfica"
+      "spellcheck_html_notes": "Verificação ortográfica",
+      "note_color_palette": "Cores das notas"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -916,6 +920,7 @@
         "toolbar": "Barra de ferramentas",
         "slash_menu": "Menu slash",
         "panels": "Outros",
+        "dashboard_toolbar": "Barra de ferramentas do painel",
         "folder_actions": "Ações de pasta"
       },
       "check_all": "Marcar todos",
@@ -939,6 +944,14 @@
       "options": {
         "inter": "Inter (padrão)",
         "system": "Sistema"
+      }
+    },
+    "markdown_font": {
+      "title": "Fonte do editor markdown",
+      "description": "Fonte usada ao editar uma nota markdown. A pré-visualização mantém a fonte do aplicativo. As fontes usam as instaladas no seu dispositivo.",
+      "options": {
+        "inherit": "Fonte do aplicativo (padrão)",
+        "monospace": "Monoespaçada do sistema"
       }
     },
     "font_size": {
@@ -1152,6 +1165,16 @@
         "alphabetical": "Alfabética"
       }
     },
+    "note_color_palette": {
+      "title": "Cores das notas",
+      "description": "Personalize as cores que pode atribuir às notas. Renomear ou alterar uma cor atualiza todas as notas que a utilizam.",
+      "add": "Adicionar cor",
+      "remove": "Remover",
+      "reset": "Repor predefinições",
+      "name_placeholder": "Nome da cor",
+      "count": "{{count}} cores",
+      "empty_error": "Adicione pelo menos uma cor ou reponha as predefinições."
+    },
     "note_age_filter": {
       "title": "Filtro de antiguidade das notas",
       "description": "Escolha até quando as notas modificadas devem aparecer",
@@ -1238,6 +1261,17 @@
       "no_notes_in_folder": "Esta pasta não contém notas",
       "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador."
     }
+  },
+  "note_color": {
+    "modal_title": "Cor da nota",
+    "folder_modal_title": "Cor da pasta",
+    "custom": "Cor personalizada",
+    "remove": "Remover cor",
+    "apply_error": "Não foi possível atualizar a cor da nota.",
+    "filter": "Filtrar por cor",
+    "filter_all": "Todas as notas",
+    "filter_any": "Qualquer cor",
+    "filter_none": "Sem cor"
   },
   "tabs": {
     "context_menu": {
@@ -1735,7 +1769,20 @@
       "complete_backup": "Soltar ZIP de backup aqui",
       "database": "Soltar arquivo SQL aqui",
       "notes": "Soltar ZIP de notas aqui",
-      "attachments": "Soltar ZIP de anexos aqui"
+      "attachments": "Soltar ZIP de anexos aqui",
+      "sidebar": {
+        "drop_here": "Solte arquivos de notas para importá-los",
+        "drop_into_folder": "Solte para importar em \"{{folder}}\"",
+        "folder_not_allowed": "Não é possível importar em \"{{folder}}\"",
+        "importing": "Importando notas...",
+        "import_done": "Notas importadas.",
+        "import_failed": "Falha na importação.",
+        "no_supported_files": "Nenhum arquivo compatível foi solto. Tipos permitidos: {{allowed}}",
+        "skipped_files": "{{count}} arquivo(s) não compatíveis foram ignorados."
+      },
+      "errors": {
+        "system_folder": "As notas não podem ser importadas para a pasta \"{{folder}}\"."
+      }
     },
     "modals": {
       "import_confirm": {
@@ -2477,6 +2524,20 @@
       "modal_title": "Arquivos órfãos",
       "modal_title_user": "Arquivos órfãos - Usuário",
       "files_label": "arquivos"
+    },
+    "storage_stats": {
+      "title": "Estatísticas de armazenamento",
+      "description": "Número de notas e espaço em disco usado por cada conta.",
+      "user_description": "Número de notas e espaço em disco usado pela sua conta.",
+      "table_account": "Conta",
+      "table_notes": "Notas",
+      "table_trash": "Lixeira",
+      "table_db": "Banco de dados (MB)",
+      "table_entries": "Arquivos (MB)",
+      "table_attachments": "Anexos (MB)",
+      "table_total": "Total (MB)",
+      "table_total_row": "Total",
+      "no_accounts": "Nenhuma conta encontrada."
     }
   },
   "backlinks": {
@@ -2686,6 +2747,9 @@
     "title": "Quadro de notas",
     "empty": "Ainda não há notas favoritas. Marque notas como favoritas para fixá-las neste quadro.",
     "filter_placeholder": "Filtrar por título, conteúdo ou etiqueta...",
+    "pin_note": "Fixar no topo",
+    "unpin_note": "Desafixar",
+    "pin_error": "Não foi possível atualizar o estado de fixação.",
     "unpin": "Remover dos favoritos",
     "no_folder": "Outras notas",
     "toggle_all": "Mostrar todas as notas",

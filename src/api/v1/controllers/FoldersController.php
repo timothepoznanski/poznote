@@ -356,7 +356,7 @@ class FoldersController {
             return;
         }
         
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, display_order, created FROM folders WHERE workspace = ?');
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color, display_order, created FROM folders WHERE workspace = ?');
         $stmt->execute([$workspace]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -369,6 +369,8 @@ class FoldersController {
                 'parent_id' => $r['parent_id'] !== null ? (int)$r['parent_id'] : null,
                 'icon' => $this->normalizeFolderIcon($r['icon'] ?? null),
                 'icon_color' => $r['icon_color'] ?? null,
+                'color' => $r['color'] ?? null,
+                'color_hex' => !empty($r['color']) ? (resolveNoteColorHex($r['color']) ?: null) : null,
                 'display_order' => (int)($r['display_order'] ?? 0),
                 'created' => $r['created'] ?? null,
             ];
@@ -383,6 +385,8 @@ class FoldersController {
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
                     'icon_color' => $f['icon_color'],
+                    'color' => $f['color'],
+                    'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
@@ -405,6 +409,8 @@ class FoldersController {
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
                     'icon_color' => $f['icon_color'],
+                    'color' => $f['color'],
+                    'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
                     'path' => $this->computeFolderPath($id, $foldersById),
                 ];
@@ -429,7 +435,7 @@ class FoldersController {
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, display_order, created, workspace FROM folders WHERE id = ?' . $wsCond);
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color, display_order, created, workspace FROM folders WHERE id = ?' . $wsCond);
         $stmt->execute(array_merge([$folderId], $wsParams));
 
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -463,6 +469,8 @@ class FoldersController {
                 'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
                 'icon' => $this->normalizeFolderIcon($folder['icon'] ?? null),
                 'icon_color' => $folder['icon_color'],
+                'color' => $folder['color'] ?? null,
+                'color_hex' => !empty($folder['color']) ? (resolveNoteColorHex($folder['color']) ?: null) : null,
                 'display_order' => (int)($folder['display_order'] ?? 0),
                 'workspace' => $folder['workspace'],
                 'path' => $this->computeFolderPath($folderId, $foldersById),
@@ -1175,7 +1183,50 @@ class FoldersController {
             $this->sendError('Database error', 500);
         }
     }
-    
+
+    /**
+     * PUT /api/v1/folders/{id}/color - Set or clear the folder color.
+     *
+     * Accepts a palette id ('blue') or a custom '#rrggbb' literal, sharing the
+     * note color palette. An empty value clears the color.
+     */
+    public function updateColor(string $id): void {
+        $folderId = (int)$id;
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+
+        $data = $this->getInputData();
+        $rawColor = trim($data['color'] ?? '');
+        $colorValue = normalizeStoredNoteColor($rawColor);
+        if ($rawColor !== '' && $colorValue === null) {
+            $this->sendError('Invalid color: expected a palette id or a #rrggbb value', 400);
+            return;
+        }
+
+        $existsStmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
+        $existsStmt->execute([$folderId]);
+        if (!$existsStmt->fetchColumn()) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+
+        $stmt = $this->db->prepare("UPDATE folders SET color = ? WHERE id = ?");
+        $success = $stmt->execute([$colorValue, $folderId]);
+
+        if ($success) {
+            $this->sendJson([
+                'success' => true,
+                'message' => 'Folder color updated successfully',
+                'color' => $colorValue,
+                'color_hex' => $colorValue !== null ? resolveNoteColorHex($colorValue) : null
+            ]);
+        } else {
+            $this->sendError('Database error', 500);
+        }
+    }
+
     /**
      * GET /api/v1/folders/{id}/notes - Get note count in folder
      */

@@ -425,7 +425,7 @@ class MiniCalendar {
                     heading: dateStr,
                     folder_name: diary.folder,
                     workspace: diary.workspace,
-                    type: 'note',
+                    type: diary.noteType === 'markdown' ? 'markdown' : 'note',
                     created_date: dateStr
                 })
             });

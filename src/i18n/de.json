@@ -420,6 +420,7 @@
       "install_app": "App installieren",
       "release_notes": "Versionshinweise",
       "orphan_scanner": "Verwaiste Anhänge-Scanner",
+      "storage_stats": "Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
       "import_limits": "Importlimits",
@@ -560,11 +561,13 @@
     "cards": {
       "theme_mode": "Thema",
       "main_font": "App-Schriftart",
+      "markdown_font": "Markdown-Editor-Schriftart",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_sort_order": "Notizen-Sortierreihenfolge",
       "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
+      "diary_default_note_type": "Format der Tagebucheinträge",
       "timezone": "Zeitzone",
       "date_time_format": "Datums- und Uhrzeitformat",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
@@ -582,7 +585,8 @@
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board",
-      "spellcheck_html_notes": "Rechtschreibprüfung"
+      "spellcheck_html_notes": "Rechtschreibprüfung",
+      "note_color_palette": "Notizfarben"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -917,6 +921,7 @@
         "toolbar": "Symbolleiste",
         "slash_menu": "Slash-Menü",
         "panels": "Sonstiges",
+        "dashboard_toolbar": "Dashboard-Symbolleiste",
         "folder_actions": "Ordneraktionen"
       },
       "check_all": "Alle auswählen",
@@ -940,6 +945,14 @@
       "options": {
         "inter": "Inter (Standard)",
         "system": "System"
+      }
+    },
+    "markdown_font": {
+      "title": "Markdown-Editor-Schriftart",
+      "description": "Schriftart beim Bearbeiten einer Markdown-Notiz. Die gerenderte Vorschau behält die App-Schriftart. Die Schriftarten verwenden die auf Ihrem Gerät installierten Schriften.",
+      "options": {
+        "inherit": "App-Schriftart (Standard)",
+        "monospace": "System-Monospace"
       }
     },
     "font_size": {
@@ -1153,6 +1166,16 @@
         "alphabetical": "Alphabetisch"
       }
     },
+    "note_color_palette": {
+      "title": "Notizfarben",
+      "description": "Passen Sie die Farben an, die Sie Notizen zuweisen können. Das Umbenennen oder Ändern eines Eintrags aktualisiert alle Notizen, die ihn verwenden.",
+      "add": "Farbe hinzufügen",
+      "remove": "Entfernen",
+      "reset": "Auf Standard zurücksetzen",
+      "name_placeholder": "Farbname",
+      "count": "{{count}} Farben",
+      "empty_error": "Fügen Sie mindestens eine Farbe hinzu oder setzen Sie zurück."
+    },
     "note_age_filter": {
       "title": "Altersfilter für Notizen",
       "description": "Wählen Sie, wie weit zurück geänderte Notizen angezeigt werden",
@@ -1239,6 +1262,17 @@
       "no_notes_in_folder": "Dieser Ordner enthält keine Notizen",
       "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
     }
+  },
+  "note_color": {
+    "modal_title": "Notizfarbe",
+    "folder_modal_title": "Ordnerfarbe",
+    "custom": "Eigene Farbe",
+    "remove": "Farbe entfernen",
+    "apply_error": "Die Notizfarbe konnte nicht aktualisiert werden.",
+    "filter": "Nach Farbe filtern",
+    "filter_all": "Alle Notizen",
+    "filter_any": "Beliebige Farbe",
+    "filter_none": "Ohne Farbe"
   },
   "tabs": {
     "context_menu": {
@@ -1731,7 +1765,20 @@
       "complete_backup": "Sicherungs-ZIP hier ablegen",
       "database": "SQL-Datei hier ablegen",
       "notes": "Notizen-ZIP hier ablegen",
-      "attachments": "Anhänge-ZIP hier ablegen"
+      "attachments": "Anhänge-ZIP hier ablegen",
+      "sidebar": {
+        "drop_here": "Notizdateien ablegen, um sie zu importieren",
+        "drop_into_folder": "Ablegen, um in \"{{folder}}\" zu importieren",
+        "folder_not_allowed": "Import in \"{{folder}}\" nicht möglich",
+        "importing": "Notizen werden importiert...",
+        "import_done": "Notizen importiert.",
+        "import_failed": "Import fehlgeschlagen.",
+        "no_supported_files": "Es wurden keine unterstützten Dateien abgelegt. Erlaubte Typen: {{allowed}}",
+        "skipped_files": "{{count}} nicht unterstützte Datei(en) wurden übersprungen."
+      },
+      "errors": {
+        "system_folder": "Notizen können nicht in den Ordner \"{{folder}}\" importiert werden."
+      }
     },
     "modals": {
       "import_confirm": {
@@ -2474,6 +2521,20 @@
       "modal_title": "Verwaiste Dateien",
       "modal_title_user": "Verwaiste Dateien - Benutzer",
       "files_label": "Dateien"
+    },
+    "storage_stats": {
+      "title": "Speicherstatistik",
+      "description": "Anzahl der Notizen und belegter Speicherplatz pro Konto.",
+      "user_description": "Anzahl der Notizen und belegter Speicherplatz Ihres Kontos.",
+      "table_account": "Konto",
+      "table_notes": "Notizen",
+      "table_trash": "Papierkorb",
+      "table_db": "Datenbank (MB)",
+      "table_entries": "Dateien (MB)",
+      "table_attachments": "Anhänge (MB)",
+      "table_total": "Gesamt (MB)",
+      "table_total_row": "Gesamt",
+      "no_accounts": "Keine Konten gefunden."
     }
   },
   "backlinks": {
@@ -2683,6 +2744,9 @@
     "title": "Notiz-Board",
     "empty": "Noch keine favorisierten Notizen. Markieren Sie Notizen als Favoriten, um sie an dieses Board zu heften.",
     "filter_placeholder": "Nach Titel, Inhalt oder Tag filtern...",
+    "pin_note": "Oben anheften",
+    "unpin_note": "Loslösen",
+    "pin_error": "Der Anheft-Status konnte nicht aktualisiert werden.",
     "unpin": "Aus Favoriten entfernen",
     "no_folder": "Andere Notizen",
     "toggle_all": "Alle Notizen anzeigen",

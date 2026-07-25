@@ -165,7 +165,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 17;
+    $CURRENT_SCHEMA_VERSION = 20;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -199,10 +199,12 @@ try {
             folder_id INTEGER REFERENCES folders(id) ON DELETE SET NULL,
             workspace TEXT DEFAULT "Poznote",
             favorite INTEGER DEFAULT 0,
+            pinned INTEGER DEFAULT 0,
             attachments TEXT,
             type TEXT DEFAULT "note",
             icon TEXT,
             icon_color TEXT,
+            color TEXT,
             created_by_user_id INTEGER,
             updated_by_user_id INTEGER
         )');
@@ -312,6 +314,12 @@ try {
             if (!in_array('icon_color', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN icon_color TEXT");
             }
+            if (!in_array('color', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN color TEXT");
+            }
+            if (!in_array('pinned', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN pinned INTEGER DEFAULT 0");
+            }
             if (!in_array('created_by_user_id', $existingColumns)) {
                 $con->exec("ALTER TABLE entries ADD COLUMN created_by_user_id INTEGER");
             }
@@ -339,6 +347,9 @@ try {
             }
             if (!in_array('icon_color', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN icon_color TEXT");
+            }
+            if (!in_array('color', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN color TEXT");
             }
             if (!in_array('kanban_enabled', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");

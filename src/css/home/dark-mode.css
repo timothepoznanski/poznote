@@ -51,6 +51,11 @@ body.dark-mode .home-card-count {
     color: var(--dm-text-muted);
 }
 
+html[data-theme='dark'] .home-card-description,
+body.dark-mode .home-card-description {
+    color: var(--dm-text-muted);
+}
+
 html[data-theme='dark'] .home-card-icon,
 body.dark-mode .home-card-icon {
     background: rgba(0, 125, 184, 0.2);

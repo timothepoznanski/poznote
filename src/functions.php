@@ -809,6 +809,163 @@ function renderEditableNoteIcon($noteId, $noteTitle, $iconClass = '', $iconColor
     return "<i class='" . htmlspecialchars($classes, ENT_QUOTES) . "' data-custom-icon='" . ($hasCustomNoteIcon ? 'true' : 'false') . "' data-action='open-note-icon-picker' data-note-id='" . htmlspecialchars((string)$noteId, ENT_QUOTES) . "' data-note-title='" . htmlspecialchars((string)$noteTitle, ENT_QUOTES) . "'$iconColorAttr title='" . $changeIconTitle . "' aria-label='" . $changeIconTitle . "'$iconStyle></i>";
 }
 
+/* ---------------------------------------------------------------------------
+ * Note colors
+ *
+ * A note stores a single value in entries.color:
+ *   - a palette id ('blue', 'green', ...)  -> resolved through the user palette,
+ *     so editing the palette instantly recolors every note using that id;
+ *   - a literal '#rrggbb'                  -> a per-note custom override;
+ *   - NULL / ''                            -> no color, appearance unchanged.
+ * ------------------------------------------------------------------------- */
+
+define('NOTE_COLOR_PALETTE_SETTING', 'note_color_palette');
+
+/**
+ * Factory palette, used when the user has never customized theirs.
+ * Ids are stable identifiers; names are translation keys' fallbacks.
+ */
+function getDefaultNoteColorPalette() {
+    return [
+        ['id' => 'blue',   'name' => 'Blue',   'hex' => '#3b82f6'],
+        ['id' => 'green',  'name' => 'Green',  'hex' => '#22c55e'],
+        ['id' => 'yellow', 'name' => 'Yellow', 'hex' => '#eab308'],
+        ['id' => 'orange', 'name' => 'Orange', 'hex' => '#f97316'],
+        ['id' => 'red',    'name' => 'Red',    'hex' => '#ef4444'],
+        ['id' => 'purple', 'name' => 'Purple', 'hex' => '#a855f7'],
+        ['id' => 'pink',   'name' => 'Pink',   'hex' => '#ec4899'],
+        ['id' => 'gray',   'name' => 'Gray',   'hex' => '#6b7280'],
+    ];
+}
+
+/**
+ * True when $value is a valid #rgb / #rrggbb literal.
+ */
+function isNoteColorHex($value) {
+    return is_string($value) && preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/', trim($value)) === 1;
+}
+
+/**
+ * Normalize a hex color to lowercase #rrggbb, or '' when invalid.
+ */
+function normalizeNoteColorHex($value) {
+    $value = strtolower(trim((string)$value));
+    if (!isNoteColorHex($value)) {
+        return '';
+    }
+    if (strlen($value) === 4) {
+        // #abc -> #aabbcc
+        $value = '#' . $value[1] . $value[1] . $value[2] . $value[2] . $value[3] . $value[3];
+    }
+    return $value;
+}
+
+/**
+ * Validate and clean a palette structure coming from user input or storage.
+ * Returns a list of ['id','name','hex'] entries, or [] when nothing is usable.
+ */
+function sanitizeNoteColorPalette($palette) {
+    if (is_string($palette)) {
+        $palette = json_decode($palette, true);
+    }
+    if (!is_array($palette)) {
+        return [];
+    }
+
+    $clean = [];
+    $seenIds = [];
+    foreach ($palette as $entry) {
+        if (!is_array($entry)) {
+            continue;
+        }
+        $hex = normalizeNoteColorHex($entry['hex'] ?? '');
+        if ($hex === '') {
+            continue;
+        }
+        $id = strtolower(trim((string)($entry['id'] ?? '')));
+        // Ids are used verbatim in CSS class-like data attributes and in the DB.
+        $id = preg_replace('/[^a-z0-9_-]/', '', $id);
+        if ($id === '' || isset($seenIds[$id])) {
+            continue;
+        }
+        $name = trim((string)($entry['name'] ?? ''));
+        if ($name === '') {
+            $name = ucfirst($id);
+        }
+        $seenIds[$id] = true;
+        $clean[] = [
+            'id'   => $id,
+            'name' => mb_substr($name, 0, 40),
+            'hex'  => $hex,
+        ];
+        if (count($clean) >= 24) {
+            break; // keep the picker and the settings editor manageable
+        }
+    }
+
+    return $clean;
+}
+
+/**
+ * The palette in effect for the current user, falling back to the defaults.
+ */
+function getNoteColorPalette() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $stored = sanitizeNoteColorPalette(getSetting(NOTE_COLOR_PALETTE_SETTING, ''));
+    $cached = !empty($stored) ? $stored : getDefaultNoteColorPalette();
+    return $cached;
+}
+
+/**
+ * Resolve a stored entries.color value to a concrete hex color.
+ * Returns '' when the note has no color, or when its palette id no longer
+ * exists (a deleted palette entry simply renders as uncolored).
+ */
+function resolveNoteColorHex($storedColor, $palette = null) {
+    $storedColor = trim((string)$storedColor);
+    if ($storedColor === '') {
+        return '';
+    }
+    if (isNoteColorHex($storedColor)) {
+        return normalizeNoteColorHex($storedColor);
+    }
+
+    $palette = $palette ?? getNoteColorPalette();
+    foreach ($palette as $entry) {
+        if ($entry['id'] === strtolower($storedColor)) {
+            return $entry['hex'];
+        }
+    }
+    return '';
+}
+
+/**
+ * Validate a value destined for entries.color. Returns the value to store
+ * (palette id or normalized hex), or null to clear the color.
+ */
+function normalizeStoredNoteColor($value, $palette = null) {
+    $value = trim((string)$value);
+    if ($value === '') {
+        return null;
+    }
+    if (isNoteColorHex($value)) {
+        return normalizeNoteColorHex($value);
+    }
+
+    $value = strtolower($value);
+    $palette = $palette ?? getNoteColorPalette();
+    foreach ($palette as $entry) {
+        if ($entry['id'] === $value) {
+            return $entry['id'];
+        }
+    }
+    return null;
+}
+
 /**
  * Global settings cache - loads all settings in one query and caches them
  * This dramatically reduces database queries when settings are accessed multiple times
@@ -3246,6 +3403,14 @@ function renderBoardViewMenu(string $prefix) {
             '<span class="board-view-size-letter"></span>' .
         '</button>' .
     '</div>';
+}
+
+/**
+ * Note type used when creating a diary entry: 'markdown' when the
+ * diary_default_note_type setting asks for it, 'note' (HTML) otherwise.
+ */
+function getDiaryDefaultNoteType(): string {
+    return trim((string)getSetting('diary_default_note_type', '')) === 'markdown' ? 'markdown' : 'note';
 }
 
 /**

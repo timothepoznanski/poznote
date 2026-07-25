@@ -353,7 +353,7 @@ class NotesController {
             }
             
             // Build query for notes
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color FROM entries WHERE trash = 0";
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color FROM entries WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
@@ -445,6 +445,8 @@ class NotesController {
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $row['icon'] = $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON;
                 $row['icon_color'] = $row['icon_color'] ?? null;
+                $row['color'] = $row['color'] ?? null;
+                $row['color_hex'] = $row['color'] !== null ? (resolveNoteColorHex($row['color']) ?: null) : null;
                 $notes[] = $row;
             }
             
@@ -535,13 +537,13 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
@@ -559,13 +561,13 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
@@ -624,6 +626,8 @@ class NotesController {
                     'linked_note_id' => $row['linked_note_id'] ? (int)$row['linked_note_id'] : null,
                     'icon' => $this->normalizeNoteIcon($row['icon'] ?? null) ?? self::DEFAULT_NOTE_ICON,
                     'icon_color' => $row['icon_color'] ?? null,
+                    'color' => $row['color'] ?? null,
+                    'color_hex' => !empty($row['color']) ? (resolveNoteColorHex($row['color']) ?: null) : null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
                     'reminder_at' => $row['reminder_at'] ?? null,
@@ -1167,7 +1171,113 @@ class NotesController {
             $this->sendError(500, 'Database error occurred');
         }
     }
-    
+
+    /**
+     * PUT /api/v1/notes/{id}/color - Set or clear the note color.
+     *
+     * Accepts a palette id ('blue') or a custom '#rrggbb' literal.
+     * An empty value clears the color.
+     */
+    public function updateColor(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input)) {
+            $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        $rawColor = isset($input['color']) ? trim((string)$input['color']) : '';
+        $colorValue = normalizeStoredNoteColor($rawColor);
+        if ($rawColor !== '' && $colorValue === null) {
+            $this->sendError(400, 'Invalid color: expected a palette id or a #rrggbb value');
+            return;
+        }
+
+        try {
+            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt->execute([$noteId]);
+            if (!$existsStmt->fetchColumn()) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $stmt = $this->con->prepare('UPDATE entries SET color = ? WHERE id = ?');
+            $success = $stmt->execute([$colorValue, $noteId]);
+
+            if (!$success) {
+                $this->sendError(500, 'Database error while updating note color');
+                return;
+            }
+
+            $this->sendSuccess([
+                'message' => 'Note color updated successfully',
+                'color' => $colorValue,
+                'color_hex' => $colorValue !== null ? resolveNoteColorHex($colorValue) : null
+            ]);
+
+            $this->triggerGitSync($noteId, 'push');
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
+    /**
+     * PUT /api/v1/notes/{id}/pinned
+     * Pin or unpin a note. Pinned notes sort first on the dashboard board.
+     *
+     * Body: { "pinned": true|false }
+     *
+     * The caller sends the desired state rather than toggling, so two boards
+     * open at once cannot flip each other's result.
+     * Pinning is board presentation state, so it is deliberately not pushed to Git.
+     */
+    public function updatePinned(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input) || !array_key_exists('pinned', $input)) {
+            $this->sendError(400, 'Invalid JSON in request body: expected a "pinned" boolean');
+            return;
+        }
+
+        $pinned = filter_var($input['pinned'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($pinned === null) {
+            $this->sendError(400, 'Invalid value for "pinned": expected a boolean');
+            return;
+        }
+
+        try {
+            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt->execute([$noteId]);
+            if (!$existsStmt->fetchColumn()) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $stmt = $this->con->prepare('UPDATE entries SET pinned = ? WHERE id = ?');
+            if (!$stmt->execute([$pinned ? 1 : 0, $noteId])) {
+                $this->sendError(500, 'Database error while updating pinned state');
+                return;
+            }
+
+            $this->sendSuccess([
+                'message' => 'Note pinned state updated successfully',
+                'pinned'  => $pinned
+            ]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
     /**
      * DELETE /api/v1/notes/{id}
      * Delete a note (soft delete by default)
@@ -1660,7 +1770,7 @@ class NotesController {
         $extraResponse  = $options['extraResponse'] ?? [];
 
         try {
-            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$id]);
             $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -1730,7 +1840,7 @@ class NotesController {
 
             // Insert new note
             $actorUserId = $this->getActorUserId();
-            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
+            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
             $insertStmt->execute([
                 $newHeading,
                 $originalNote['tags'],
@@ -1741,6 +1851,7 @@ class NotesController {
                 $newAttachments,
                 $originalNote['icon'],
                 $originalNote['icon_color'],
+                $originalNote['color'],
                 $actorUserId,
                 $actorUserId
             ]);

@@ -448,6 +448,29 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/icon
 ```
 
+### Set Note Color
+
+```
+PUT /notes/{id}/color
+```
+
+Set the color used to tint the note card on the dashboard. Send an empty `color` to remove it.
+
+**Request Body (JSON):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `color` | string | Palette id (e.g. `blue`) or custom hex (e.g. `#8bc34a`), empty to remove |
+
+Palette ids come from the user's note color palette, configurable in Settings. Notes storing a palette id follow the palette when it is edited; a custom hex is stored as-is. Note objects returned by the API expose both `color` (the stored value) and `color_hex` (the resolved color, `null` when the note has no color or its palette entry was deleted).
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"color": "blue"}' \
+  http://YOUR_SERVER/api/v1/notes/123/color
+```
+
 ### Toggle Favorite
 
 ```
@@ -1306,6 +1329,29 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"icon": "fa-folder-open"}' \
   http://YOUR_SERVER/api/v1/folders/12/icon
+```
+
+### Set Folder Color
+
+```
+PUT /folders/{id}/color
+```
+
+Set the color used to tint the folder card on the dashboard. Uses the same note color palette as notes. Send an empty `color` to remove it.
+
+**Request Body (JSON):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `color` | string | Palette id (e.g. `blue`) or custom hex (e.g. `#8bc34a`), empty to remove |
+
+Folder objects returned by `GET /folders` and `GET /folders/{id}` expose both `color` (the stored value) and `color_hex` (the resolved color, `null` when the folder has no color or its palette entry was deleted).
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"color": "purple"}' \
+  http://YOUR_SERVER/api/v1/folders/12/color
 ```
 
 ### Empty Folder
@@ -2480,6 +2526,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/folders/{id}/move` | Move folder |
 | `POST` | `/folders/{id}/empty` | Empty folder |
 | `PUT` | `/folders/{id}/icon` | Update icon |
+| `PUT` | `/folders/{id}/color` | Update card color |
 | `POST` | `/folders/move-files` | Move files |
 | `POST` | `/folders/reorder` | Reorder folders |
 | `POST` | `/folders/kanban-structure` | Create Kanban |

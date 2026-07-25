@@ -191,8 +191,16 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, interactive-widget=resizes-content"/>
     <title><?php echo getPageTitle(); ?></title>
     <?php 
-    // Cache version based on app version plus theme assets to force reload on theme changes
-    $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
+    // Cache version based on app version plus theme assets to force reload on theme changes.
+    // The bundled js/*.js mtimes are folded in too: the index_js.php bundles are served
+    // `immutable`, so a change to any bundled file must change this URL to be picked up.
+    require_once 'index_js.php';
+    $v = poznoteBuildAssetCacheVersion(getAppVersion());
+    $indexJsVersion = poznoteGetIndexJsAssetVersion();
+    if ($indexJsVersion !== '') {
+        $v .= '-' . $indexJsVersion;
+    }
+    $v = rawurlencode($v);
     ?>
     <meta name="theme-color" content="#111827">
     <meta name="mobile-web-app-capable" content="yes">

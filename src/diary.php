@@ -195,6 +195,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		todayTitle: <?php echo json_encode($todayTitle); ?>,
 		folderPath: <?php echo json_encode($diaryFolderPath); ?>,
 		workspace: <?php echo json_encode($diaryWorkspace); ?>,
+		noteType: <?php echo json_encode(getDiaryDefaultNoteType()); ?>,
 		pageWorkspace: <?php echo json_encode($pageWorkspace); ?>,
 		lang: <?php echo json_encode($currentLang); ?>,
 		txt: {
