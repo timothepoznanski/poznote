@@ -121,7 +121,13 @@ try {
                         <td><?php echo poznoteFormatMb((int)$sizes['database']); ?></td>
                         <td><?php echo poznoteFormatMb((int)$sizes['entries']); ?></td>
                         <td><?php echo poznoteFormatMb((int)$sizes['attachments']); ?></td>
-                        <td><strong><?php echo poznoteFormatMb((int)$sizes['total']); ?></strong></td>
+                        <td><strong><?php
+                            // Sum of the three displayed columns so the row adds up.
+                            // Excludes backups/snapshots/backgrounds, which are not
+                            // part of the backup export either.
+                            $displayedTotal = (int)$sizes['database'] + (int)$sizes['entries'] + (int)$sizes['attachments'];
+                            echo poznoteFormatMb($displayedTotal);
+                        ?></strong></td>
                     </tr>
                 </tbody>
             </table>
