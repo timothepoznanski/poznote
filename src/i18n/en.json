@@ -214,6 +214,7 @@
       "note_sort_order": "Note sorting",
       "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
+      "diary_default_note_type": "Diary entry format",
       "timezone": "Timezone",
       "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",

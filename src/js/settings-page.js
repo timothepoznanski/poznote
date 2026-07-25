@@ -104,6 +104,7 @@
             'note_list_sort',
             'note_age_filter_days',
             'tasklist_insert_order',
+            'diary_default_note_type',
             'toolbar_mode',
             'timezone',
             'date_time_format',
@@ -739,6 +740,29 @@
                 if (icon) {
                     icon.classList.toggle('lucide-arrow-up', isTop);
                     icon.classList.toggle('lucide-arrow-down', !isTop);
+                }
+            }
+        });
+    }
+
+    function refreshDiaryNoteTypeBadge() {
+        getSetting('diary_default_note_type', function (value) {
+            var badge = document.getElementById('diary-note-type-badge');
+            if (!badge) return;
+
+            var isMarkdown = value === 'markdown';
+
+            badge.textContent = isMarkdown
+                ? tr('modals.create.markdown.title', {}, 'Markdown Note')
+                : tr('modals.create.note.title', {}, 'Note');
+            badge.className = 'setting-status enabled';
+
+            var card = document.getElementById('diary-note-type-card');
+            if (card) {
+                var icon = card.querySelector('.home-card-icon i');
+                if (icon) {
+                    icon.classList.toggle('lucide-file-code', isMarkdown);
+                    icon.classList.toggle('lucide-book-open', !isMarkdown);
                 }
             }
         });
@@ -1419,6 +1443,24 @@
             });
         }
 
+        // Diary entry format card - toggles between HTML and markdown notes
+        var diaryNoteTypeCard = document.getElementById('diary-note-type-card');
+        if (diaryNoteTypeCard) {
+            diaryNoteTypeCard.addEventListener('click', function () {
+                getSetting('diary_default_note_type', function (currentValue) {
+                    var next = currentValue === 'markdown' ? 'html' : 'markdown';
+                    setSetting('diary_default_note_type', next, function (success) {
+                        if (success) {
+                            refreshDiaryNoteTypeBadge();
+                            reloadOpener();
+                        } else {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        }
+                    });
+                });
+            });
+        }
+
         // Theme mode card - opens theme selection modal
         var themeModeCard = document.getElementById('theme-mode-card');
         if (themeModeCard) {
@@ -1867,6 +1909,7 @@
             refreshNoteAgeFilterBadge();
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
+            refreshDiaryNoteTypeBadge();
             refreshToolbarModeBadge();
             refreshTimezoneBadge();
             refreshDateTimeFormatBadge();
@@ -1944,6 +1987,7 @@
             refreshNoteAgeFilterBadge();
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
+            refreshDiaryNoteTypeBadge();
             refreshToolbarModeBadge();
             refreshDateTimeFormatBadge();
             refreshInstallAppBadge();
@@ -2150,6 +2194,7 @@
     window.refreshNoteSortBadge = refreshNoteSortBadge;
     window.refreshNoteAgeFilterBadge = refreshNoteAgeFilterBadge;
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
+    window.refreshDiaryNoteTypeBadge = refreshDiaryNoteTypeBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshDateTimeFormatBadge = refreshDateTimeFormatBadge;

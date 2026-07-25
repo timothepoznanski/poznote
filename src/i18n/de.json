@@ -567,6 +567,7 @@
       "note_sort_order": "Notizen-Sortierreihenfolge",
       "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
+      "diary_default_note_type": "Format der Tagebucheinträge",
       "timezone": "Zeitzone",
       "date_time_format": "Datums- und Uhrzeitformat",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",

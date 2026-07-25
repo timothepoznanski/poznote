@@ -110,6 +110,7 @@ $settingsPageUserKeys = [
     'note_list_sort',
     'note_age_filter_days',
     'tasklist_insert_order',
+    'diary_default_note_type',
     'toolbar_mode',
     'timezone',
     'date_time_format',
@@ -525,6 +526,15 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span>
                     <span id="tasklist-insert-order-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Diary Entry Note Type -->
+            <div class="home-card" id="diary-note-type-card">
+                <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span>
+                    <span id="diary-note-type-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 

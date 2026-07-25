@@ -321,13 +321,67 @@
     border-color: #fca5a5;
 }
 
-.modal-content .note-palette-add {
+/* "Add color" is a secondary action inside the modal body, not a footer
+   button. css/home/buttons.css gives every .btn-secondary a solid grey fill,
+   which reads as a primary action here, so this overrides it with a quiet
+   outlined style. The extra .modal-content scope wins on specificity. */
+.modal-content .note-palette-add,
+.modal-content button.note-palette-add {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    margin-top: 4px;
+    margin: 4px 0 6px;
     padding: 7px 12px;
+    border: 1px dashed #cbd5e1;
     border-radius: 7px;
+    background: transparent;
+    color: #4b5563 !important;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal-content .note-palette-add:hover,
+.modal-content button.note-palette-add:hover {
+    border-color: #007DB8;
+    color: #007DB8 !important;
+    background: #f0f9ff;
+}
+
+.modal-content .note-palette-add .lucide {
+    width: 15px;
+    height: 15px;
+}
+
+/* .modal-buttons uses margin-top:auto, which collapses to nothing here and
+   leaves the footer flush against "Add color". Scoped to this modal only. */
+#noteColorPaletteModal .modal-buttons {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+}
+
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons,
+body.dark-mode #noteColorPaletteModal .modal-buttons {
+    border-top-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .modal-content .note-palette-add,
+body.dark-mode .modal-content .note-palette-add,
+:root[data-theme='dark'] .modal-content button.note-palette-add,
+body.dark-mode .modal-content button.note-palette-add {
+    border-color: var(--dm-border);
+    background: transparent;
+    color: var(--dm-text-muted) !important;
+}
+
+:root[data-theme='dark'] .modal-content .note-palette-add:hover,
+body.dark-mode .modal-content .note-palette-add:hover,
+:root[data-theme='dark'] .modal-content button.note-palette-add:hover,
+body.dark-mode .modal-content button.note-palette-add:hover {
+    border-color: #007DB8;
+    color: #007DB8 !important;
+    background: var(--dm-surface-hover);
 }
 
 :root[data-theme='dark'] .note-palette-row input.note-palette-name,

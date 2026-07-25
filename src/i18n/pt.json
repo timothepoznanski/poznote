@@ -565,6 +565,7 @@
       "note_sort_order": "Ordem de classificação das notas",
       "note_age_filter": "Filtro de antiguidade",
       "tasklist_insert_order": "Ordem de inserção das tarefas",
+      "diary_default_note_type": "Formato das entradas do diário",
       "timezone": "Fuso Horário",
       "date_time_format": "Formato de data e hora",
       "show_note_created": "Mostrar Data de Criação da Nota",

@@ -13,6 +13,9 @@ require_once 'db_connect.php';
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
 
+// Shown on the diary card so the format its entries get is visible up front.
+$diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
+
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -107,6 +110,11 @@ $currentLang = getUserLanguage();
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('diary.create_card_title', [], 'Diary entry'); ?></span>
+                    <span class="home-card-description"><?php
+                        echo $diaryNoteTypeIsMarkdown
+                            ? t_h('modals.create.markdown.title', [], 'Markdown note')
+                            : t_h('modals.create.note.title', [], 'HTML Note');
+                    ?></span>
                 </div>
             </a>
 

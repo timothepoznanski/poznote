@@ -190,7 +190,7 @@
                 heading: data.todayTitle,
                 folder_name: data.folderPath,
                 workspace: data.workspace,
-                type: 'note'
+                type: data.noteType === 'markdown' ? 'markdown' : 'note'
             })
         })
             .then(function (response) { return response.json(); })

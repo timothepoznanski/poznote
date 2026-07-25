@@ -3406,6 +3406,14 @@ function renderBoardViewMenu(string $prefix) {
 }
 
 /**
+ * Note type used when creating a diary entry: 'markdown' when the
+ * diary_default_note_type setting asks for it, 'note' (HTML) otherwise.
+ */
+function getDiaryDefaultNoteType(): string {
+    return trim((string)getSetting('diary_default_note_type', '')) === 'markdown' ? 'markdown' : 'note';
+}
+
+/**
  * Name of the root diary folder. The diary_folder setting wins; otherwise the
  * localized default for the user's language. If a root folder created under
  * another language's default (or the historical "Diary") already exists in

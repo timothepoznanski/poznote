@@ -3,9 +3,9 @@
  * Calendar API - Diary entry lookup for a specific date
  *
  * Returns the diary entry (note titled YYYY-MM-DD inside the diary subtree)
- * for the requested date, plus the folder path and workspace to use when the
- * entry does not exist yet. Used by the mini calendar day popup to offer an
- * "open or create diary entry" action.
+ * for the requested date, plus the folder path, workspace and note type to use
+ * when the entry does not exist yet. Used by the mini calendar day popup to
+ * offer an "open or create diary entry" action.
  */
 
 // Authentication check
@@ -38,7 +38,8 @@ try {
         'exists'    => $entryId !== null,
         'id'        => $entryId,
         'folder'    => getDiaryRootFolderName($con, $workspace) . '/' . $m[1] . '/' . $m[2],
-        'workspace' => $workspace
+        'workspace' => $workspace,
+        'noteType'  => getDiaryDefaultNoteType()
     ]);
 
 } catch (Exception $e) {

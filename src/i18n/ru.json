@@ -214,6 +214,7 @@
       "note_sort_order": "Сортировка заметок",
       "note_age_filter": "Фильтр по дате",
       "tasklist_insert_order": "Позиция новых задач",
+      "diary_default_note_type": "Формат записей дневника",
       "timezone": "Часовой пояс",
       "date_time_format": "Формат даты и времени",
       "show_note_created": "Показывать дату создания",
