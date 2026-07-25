@@ -583,7 +583,8 @@
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board",
-      "spellcheck_html_notes": "Rechtschreibprüfung"
+      "spellcheck_html_notes": "Rechtschreibprüfung",
+      "note_color_palette": "Notizfarben"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -1155,6 +1156,16 @@
         "alphabetical": "Alphabetisch"
       }
     },
+    "note_color_palette": {
+      "title": "Notizfarben",
+      "description": "Passen Sie die Farben an, die Sie Notizen zuweisen können. Das Umbenennen oder Ändern eines Eintrags aktualisiert alle Notizen, die ihn verwenden.",
+      "add": "Farbe hinzufügen",
+      "remove": "Entfernen",
+      "reset": "Auf Standard zurücksetzen",
+      "name_placeholder": "Farbname",
+      "count": "{{count}} Farben",
+      "empty_error": "Fügen Sie mindestens eine Farbe hinzu oder setzen Sie zurück."
+    },
     "note_age_filter": {
       "title": "Altersfilter für Notizen",
       "description": "Wählen Sie, wie weit zurück geänderte Notizen angezeigt werden",
@@ -1241,6 +1252,17 @@
       "no_notes_in_folder": "Dieser Ordner enthält keine Notizen",
       "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
     }
+  },
+  "note_color": {
+    "modal_title": "Notizfarbe",
+    "folder_modal_title": "Ordnerfarbe",
+    "custom": "Eigene Farbe",
+    "remove": "Farbe entfernen",
+    "apply_error": "Die Notizfarbe konnte nicht aktualisiert werden.",
+    "filter": "Nach Farbe filtern",
+    "filter_all": "Alle Notizen",
+    "filter_any": "Beliebige Farbe",
+    "filter_none": "Ohne Farbe"
   },
   "tabs": {
     "context_menu": {

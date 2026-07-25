@@ -95,6 +95,20 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
+        if ($key === 'note_color_palette') {
+            // Stored as JSON: [{"id":"blue","name":"Blue","hex":"#3b82f6"}, ...]
+            // An empty value resets the user to the factory palette.
+            $raw = is_string($value) ? trim($value) : $value;
+            if ($raw === '' || $raw === null || $raw === '[]') {
+                return '';
+            }
+            $palette = sanitizeNoteColorPalette($raw);
+            if (empty($palette)) {
+                throw new InvalidArgumentException('invalid note color palette', 400);
+            }
+            return json_encode($palette, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
         if ($key === 'attachment_previews_in_note') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

@@ -713,6 +713,25 @@ try {
     </div>
 </div>
 
+<!-- Note color palette editor -->
+<div id="noteColorPaletteModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.note_color_palette.title', [], 'Note colors'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.note_color_palette.description', [], 'Customize the colors you can assign to notes. Renaming or recoloring an entry updates every note using it.'); ?></p>
+            <div id="noteColorPaletteList" class="note-palette-list"></div>
+            <button type="button" class="btn-secondary note-palette-add" id="noteColorPaletteAddBtn">
+                <i class="lucide lucide-plus"></i> <?php echo t_h('modals.note_color_palette.add', [], 'Add color'); ?>
+            </button>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-secondary" id="noteColorPaletteResetBtn"><?php echo t_h('modals.note_color_palette.reset', [], 'Reset to defaults'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteColorPaletteModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveNoteColorPaletteBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note age filter modal -->
 <div id="noteAgeFilterModal" class="modal">
     <div class="modal-content">

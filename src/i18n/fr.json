@@ -583,6 +583,7 @@
       "date_time_format": "Format date et heure",
       "show_note_created": "Afficher la date de création",
       "show_note_icons": "Afficher les icônes des notes",
+      "note_color_palette": "Couleurs des notes",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
       "show_folder_actions": "Afficher les actions de dossier",
@@ -1188,6 +1189,16 @@
         "alphabetical": "Alphabétique"
       }
     },
+    "note_color_palette": {
+      "title": "Couleurs des notes",
+      "description": "Personnalisez les couleurs attribuables aux notes. Renommer ou modifier une couleur met à jour toutes les notes qui l'utilisent.",
+      "add": "Ajouter une couleur",
+      "remove": "Supprimer",
+      "reset": "Réinitialiser",
+      "name_placeholder": "Nom de la couleur",
+      "count": "{{count}} couleurs",
+      "empty_error": "Ajoutez au moins une couleur ou réinitialisez."
+    },
     "note_age_filter": {
       "title": "Filtre d’ancienneté des notes",
       "description": "Choisissez jusqu’où remonter pour afficher les notes modifiées",
@@ -1275,6 +1286,17 @@
       "no_notes_in_folder": "Ce dossier ne contient aucune note",
       "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
     }
+  },
+  "note_color": {
+    "modal_title": "Couleur de la note",
+    "folder_modal_title": "Couleur du dossier",
+    "custom": "Couleur personnalisée",
+    "remove": "Retirer la couleur",
+    "apply_error": "Impossible de mettre à jour la couleur de la note.",
+    "filter": "Filtrer par couleur",
+    "filter_all": "Toutes les notes",
+    "filter_any": "N'importe quelle couleur",
+    "filter_none": "Sans couleur"
   },
   "tabs": {
     "context_menu": {

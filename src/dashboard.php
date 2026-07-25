@@ -38,6 +38,8 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
     $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
     $iconColor = !empty($note['icon_color']) ? (string)$note['icon_color'] : '';
+    $noteColor = !empty($note['color']) ? (string)$note['color'] : '';
+    $noteColorHex = $noteColor !== '' ? resolveNoteColorHex($noteColor) : '';
     return [
         'id'        => $noteId,
         'heading'   => $heading,
@@ -52,6 +54,11 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
         'icon'      => $iconRaw,
         'iconColor' => $iconColor,
+        // 'color' is the stored value (palette id or custom hex); 'colorHex' is
+        // what the card is actually tinted with. An id whose palette entry was
+        // deleted resolves to '' and renders as an uncolored card.
+        'color'     => $noteColor,
+        'colorHex'  => $noteColorHex,
     ];
 }
 
@@ -74,6 +81,8 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
         'name'    => $f['name'],
         'icon'    => $f['icon'],
         'color'   => $f['color'],
+        'cardColor'    => $f['cardColor'] ?? '',
+        'cardColorHex' => $f['cardColorHex'] ?? '',
         'folders' => $childFolders,
         'notes'   => $notes,
     ];
@@ -340,7 +349,7 @@ try {
     if (isset($con)) {
         $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
         $stmtF = $con->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, display_order FROM folders" . $folderWhere .
+            "SELECT id, name, parent_id, icon, icon_color, color, display_order FROM folders" . $folderWhere .
             " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
         );
         $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
@@ -355,7 +364,11 @@ try {
                 'name'     => trim($f['name']),
                 'parent'   => $f['parent_id'] !== null ? (int)$f['parent_id'] : null,
                 'icon'     => !empty($f['icon']) ? convertFontAwesomeToLucide($f['icon']) : 'lucide lucide-folder',
+                // 'color' is the icon color (legacy name); 'cardColor'/'cardColorHex'
+                // carry the card background color, like notes.
                 'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
+                'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
+                'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
                 'notes'    => [],
                 'children' => [],
             ];
@@ -369,7 +382,7 @@ try {
         }
         unset($fd);
 
-        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color FROM entries WHERE trash = 0";
+        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color FROM entries WHERE trash = 0";
         $params = [];
         if ($favoritesOnly) {
             $query .= " AND favorite = 1";
@@ -594,6 +607,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				</nav>
 				<div class="board-filter-row">
 				<?php renderBoardViewMenu('dashboard'); ?>
+				<div class="dashboard-color-filter-wrap">
+					<button type="button" id="dashboardColorFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('note_color.filter', [], 'Filter by color'); ?>" aria-label="<?php echo t_h('note_color.filter', [], 'Filter by color'); ?>" aria-haspopup="true" aria-expanded="false">
+						<i class="lucide lucide-palette"></i>
+					</button>
+					<div id="dashboardColorFilterMenu" class="dashboard-color-filter-menu" hidden></div>
+				</div>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
 					<input
@@ -771,7 +790,34 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			</div>
 		</div>
 
+		<div id="noteColorModal" class="modal">
+			<div class="modal-content">
+				<h3 id="noteColorModalTitle"><?php echo t_h('note_color.modal_title', [], 'Note color'); ?></h3>
+				<p class="note-color-modal-subtitle" id="noteColorModalNoteTitle"></p>
+				<div class="note-color-grid" id="noteColorGrid"></div>
+				<div class="note-color-custom">
+					<label for="noteColorCustomInput"><?php echo t_h('note_color.custom', [], 'Custom color'); ?></label>
+					<input type="color" id="noteColorCustomInput" value="#3b82f6">
+				</div>
+				<div class="modal-buttons">
+					<button type="button" class="btn-danger" id="noteColorClearBtn"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></button>
+					<button type="button" class="btn-cancel" data-action="close-note-color-modal"><?php echo t_h('common.cancel'); ?></button>
+					<button type="button" class="btn-primary" id="noteColorApplyBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
+				</div>
+			</div>
+		</div>
+
 		<script>
+		window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+		window.NOTE_COLOR_TXT = {
+			applyError: <?php echo json_encode(t('note_color.apply_error', [], 'Could not update the note color.')); ?>,
+			custom: <?php echo json_encode(t('note_color.custom', [], 'Custom color')); ?>,
+			modalTitle: <?php echo json_encode(t('note_color.modal_title', [], 'Note color')); ?>,
+			folderModalTitle: <?php echo json_encode(t('note_color.folder_modal_title', [], 'Folder color')); ?>,
+			filterAll: <?php echo json_encode(t('note_color.filter_all', [], 'All notes')); ?>,
+			filterAnyColor: <?php echo json_encode(t('note_color.filter_any', [], 'Any color')); ?>,
+			filterNoColor: <?php echo json_encode(t('note_color.filter_none', [], 'No color')); ?>
+		};
 		window.DASHBOARD_DATA      = <?php echo json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>

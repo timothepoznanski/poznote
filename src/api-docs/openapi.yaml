@@ -129,6 +129,18 @@ components:
           type: string
           nullable: true
           example: "lucide-folder"
+        color:
+          type: string
+          nullable: true
+          example: "purple"
+          description: Stored card color, a palette id or a custom hex.
+        color_hex:
+          type: string
+          nullable: true
+          example: "#a855f7"
+          description: >
+            Resolved card color. Null when the folder has no color or its
+            palette entry was deleted.
 
     Workspace:
       type: object
@@ -732,6 +744,41 @@ paths:
       responses:
         '200':
           description: Icon updated
+
+  /notes/{id}/color:
+    put:
+      tags: [Notes]
+      summary: Update note color
+      description: >
+        Set the note color used to tint its card. Accepts a palette id from the
+        user's note color palette, or a custom `#rrggbb` value. Send an empty
+        string to remove the color.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                color:
+                  type: string
+                  example: "blue"
+                  description: >
+                    Palette id (e.g. `blue`) or custom hex (e.g. `#8bc34a`).
+                    Empty string removes the color.
+      responses:
+        '200':
+          description: Color updated
+        '400':
+          description: Invalid color value
+        '404':
+          description: Note not found
 
   /notes/{id}/create-template:
     post:
@@ -1721,6 +1768,41 @@ paths:
       responses:
         '200':
           description: Icon updated
+
+  /folders/{id}/color:
+    put:
+      tags: [Folders]
+      summary: Update folder color
+      description: >
+        Set the color used to tint the folder card on the dashboard. Shares the
+        note color palette: accepts a palette id or a custom `#rrggbb` value.
+        Send an empty string to remove the color.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                color:
+                  type: string
+                  example: "purple"
+                  description: >
+                    Palette id (e.g. `purple`) or custom hex (e.g. `#8bc34a`).
+                    Empty string removes the color.
+      responses:
+        '200':
+          description: Color updated
+        '400':
+          description: Invalid color value
+        '404':
+          description: Folder not found
 
   /folders/{id}/notes:
     get:

@@ -377,6 +377,11 @@ $router->put('/notes/{id}/icon', function($params) use ($notesController) {
     $notesController->updateIcon($params['id']);
 });
 
+// Update note color
+$router->put('/notes/{id}/color', function($params) use ($notesController) {
+    $notesController->updateColor($params['id']);
+});
+
 // Toggle favorite status for a note
 $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
@@ -562,6 +567,11 @@ $router->post('/folders/{id}/empty', function($params) use ($foldersController) 
 // Update folder icon
 $router->put('/folders/{id}/icon', function($params) use ($foldersController) {
     $foldersController->updateIcon($params['id']);
+});
+
+// Update folder color
+$router->put('/folders/{id}/color', function($params) use ($foldersController) {
+    $foldersController->updateColor($params['id']);
 });
 
 // Get note count in folder

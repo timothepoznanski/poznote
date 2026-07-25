@@ -240,6 +240,114 @@
 }
 
 /* ============================================
+   Note color palette editor
+   ============================================ */
+
+.note-palette-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+    max-height: 42vh;
+    overflow-y: auto;
+    /* room for the scrollbar so it never sits on the remove buttons */
+    padding-right: 4px;
+}
+
+.note-palette-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* .modal-content input above sets padding/margins that would squash these,
+   so both rules re-assert what the row needs at a higher specificity. */
+.modal-content .note-palette-row input.note-palette-color {
+    width: 44px;
+    height: 34px;
+    flex: 0 0 auto;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* Let the chosen color fill the control instead of sitting in a small inset
+   square, which is the browser default for input[type=color]. */
+.modal-content .note-palette-row input.note-palette-color::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.modal-content .note-palette-row input.note-palette-color::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.modal-content .note-palette-row input.note-palette-color::-moz-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.modal-content .note-palette-row input.note-palette-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 34px;
+    padding: 0 10px;
+    margin: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.note-palette-remove {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: none;
+    color: #b91c1c;
+    cursor: pointer;
+}
+
+.note-palette-remove:hover {
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.modal-content .note-palette-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    padding: 7px 12px;
+    border-radius: 7px;
+}
+
+:root[data-theme='dark'] .note-palette-row input.note-palette-name,
+body.dark-mode .note-palette-row input.note-palette-name,
+:root[data-theme='dark'] .note-palette-row input.note-palette-color,
+body.dark-mode .note-palette-row input.note-palette-color,
+:root[data-theme='dark'] .note-palette-remove,
+body.dark-mode .note-palette-remove {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .note-palette-remove:hover,
+body.dark-mode .note-palette-remove:hover {
+    background: var(--dm-surface-hover);
+    color: #fca5a5;
+}
+
+/* ============================================
    Move Task List (used in multiple modals)
    ============================================ */
 

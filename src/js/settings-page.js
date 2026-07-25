@@ -90,6 +90,7 @@
             'language',
             'show_note_created',
             'show_note_icons',
+            'note_color_palette',
             'hide_folder_counts',
             'hide_folder_actions',
             'notes_without_folders_after_folders',
@@ -481,6 +482,137 @@
 
             badge.textContent = sortLabel;
             badge.className = 'setting-status enabled';
+        });
+    }
+
+    // --- Note color palette editor ---
+    //
+    // The palette is stored as JSON under 'note_color_palette'. An empty stored
+    // value means "use the factory palette", which is what Reset writes back.
+
+    var paletteDraft = [];
+
+    function defaultPalette() {
+        return Array.isArray(window.NOTE_COLOR_DEFAULT_PALETTE)
+            ? JSON.parse(JSON.stringify(window.NOTE_COLOR_DEFAULT_PALETTE))
+            : [];
+    }
+
+    function parsePalette(value) {
+        if (!value) return defaultPalette();
+        try {
+            var parsed = typeof value === 'string' ? JSON.parse(value) : value;
+            return Array.isArray(parsed) && parsed.length ? parsed : defaultPalette();
+        } catch (e) {
+            return defaultPalette();
+        }
+    }
+
+    function refreshNoteColorPaletteBadge() {
+        getSetting('note_color_palette', function (value) {
+            var badge = document.getElementById('note-color-palette-badge');
+            if (!badge) return;
+            var count = parsePalette(value).length;
+            badge.textContent = tr('modals.note_color_palette.count', { count: count }, count + ' colors');
+            badge.className = 'setting-status enabled';
+        });
+    }
+
+    // Derive a stable id from the color name so notes keep their color when the
+    // palette is edited. Existing entries keep the id they were saved with.
+    function paletteIdFromName(name, index) {
+        var id = String(name || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
+        return id || ('color' + (index + 1));
+    }
+
+    function renderPaletteEditor() {
+        var list = document.getElementById('noteColorPaletteList');
+        if (!list) return;
+        list.innerHTML = '';
+
+        paletteDraft.forEach(function (entry, index) {
+            var row = document.createElement('div');
+            row.className = 'note-palette-row';
+
+            var colorInput = document.createElement('input');
+            colorInput.type = 'color';
+            colorInput.value = entry.hex || '#3b82f6';
+            colorInput.className = 'note-palette-color';
+            colorInput.addEventListener('input', function () {
+                paletteDraft[index].hex = colorInput.value;
+            });
+
+            var nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.value = entry.name || '';
+            nameInput.maxLength = 40;
+            nameInput.className = 'note-palette-name';
+            nameInput.placeholder = tr('modals.note_color_palette.name_placeholder', {}, 'Color name');
+            nameInput.addEventListener('input', function () {
+                paletteDraft[index].name = nameInput.value;
+            });
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'note-palette-remove';
+            removeBtn.title = tr('modals.note_color_palette.remove', {}, 'Remove');
+            removeBtn.innerHTML = '<i class="lucide lucide-trash-2"></i>';
+            removeBtn.addEventListener('click', function () {
+                paletteDraft.splice(index, 1);
+                renderPaletteEditor();
+            });
+
+            row.appendChild(colorInput);
+            row.appendChild(nameInput);
+            row.appendChild(removeBtn);
+            list.appendChild(row);
+        });
+    }
+
+    function openNoteColorPaletteModal() {
+        var modal = document.getElementById('noteColorPaletteModal');
+        if (!modal) return;
+        getSetting('note_color_palette', function (value) {
+            paletteDraft = parsePalette(value);
+            renderPaletteEditor();
+            modal.style.display = 'flex';
+        });
+    }
+
+    function saveNoteColorPalette() {
+        var cleaned = [];
+        var usedIds = {};
+
+        paletteDraft.forEach(function (entry, index) {
+            var hex = String(entry.hex || '').trim();
+            if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex)) return;
+
+            var name = String(entry.name || '').trim();
+            // Keep the original id when the entry already had one, so notes
+            // already using it stay colored.
+            var id = entry.id ? String(entry.id) : paletteIdFromName(name, index);
+            id = id.toLowerCase().replace(/[^a-z0-9_-]/g, '') || ('color' + (index + 1));
+            while (usedIds[id]) { id = id + '-' + (index + 1); }
+            usedIds[id] = true;
+
+            cleaned.push({ id: id, name: name || id, hex: hex.toLowerCase() });
+        });
+
+        if (!cleaned.length) {
+            var emptyMsg = tr('modals.note_color_palette.empty_error', {}, 'Add at least one color, or reset to defaults.');
+            if (typeof showNotificationPopup === 'function') {
+                showNotificationPopup(emptyMsg, 'error');
+            } else {
+                alert(emptyMsg);
+            }
+            return;
+        }
+
+        setSetting('note_color_palette', JSON.stringify(cleaned), function (success) {
+            if (success) {
+                try { closeModal('noteColorPaletteModal'); } catch (e) { }
+                refreshNoteColorPaletteBadge();
+            }
         });
     }
 
@@ -1130,6 +1262,32 @@
             noteAgeFilterCard.addEventListener('click', openNoteAgeFilterModal);
         }
 
+        var noteColorPaletteCard = document.getElementById('note-color-palette-card');
+        if (noteColorPaletteCard) {
+            noteColorPaletteCard.addEventListener('click', openNoteColorPaletteModal);
+        }
+
+        var paletteAddBtn = document.getElementById('noteColorPaletteAddBtn');
+        if (paletteAddBtn) {
+            paletteAddBtn.addEventListener('click', function () {
+                paletteDraft.push({ id: '', name: '', hex: '#3b82f6' });
+                renderPaletteEditor();
+            });
+        }
+
+        var paletteResetBtn = document.getElementById('noteColorPaletteResetBtn');
+        if (paletteResetBtn) {
+            paletteResetBtn.addEventListener('click', function () {
+                paletteDraft = defaultPalette();
+                renderPaletteEditor();
+            });
+        }
+
+        var paletteSaveBtn = document.getElementById('saveNoteColorPaletteBtn');
+        if (paletteSaveBtn) {
+            paletteSaveBtn.addEventListener('click', saveNoteColorPalette);
+        }
+
         var timezoneCard = document.getElementById('timezone-card');
         if (timezoneCard) {
             timezoneCard.addEventListener('click', showTimezonePrompt);
@@ -1592,6 +1750,7 @@
             refreshMainFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
+            refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshToolbarModeBadge();
             refreshTimezoneBadge();
@@ -1667,6 +1826,7 @@
             refreshMainFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
+            refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshToolbarModeBadge();
             refreshDateTimeFormatBadge();

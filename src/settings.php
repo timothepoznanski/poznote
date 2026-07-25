@@ -96,6 +96,7 @@ $settingsPageUserKeys = [
     'language',
     'show_note_created',
     'show_note_icons',
+    'note_color_palette',
     'hide_folder_counts',
     'hide_folder_actions',
     'notes_without_folders_after_folders',
@@ -534,6 +535,15 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Note Color Palette -->
+            <div class="home-card" id="note-color-palette-card">
+                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span>
+                    <span id="note-color-palette-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Show Folder Counts -->
             <div class="home-card desktop-only" id="folder-counts-card">
                 <div class="home-card-icon"><i class="lucide lucide-hash"></i></div>
@@ -862,6 +872,10 @@ if ($isAdmin) {
     <script src="js/background-settings.js"></script>
     <script src="js/copy-code-on-focus.js"></script>
     <script src="js/modals-events.js"></script>
+    <script>
+    // Factory palette, used by the "Reset to defaults" action in the editor.
+    window.NOTE_COLOR_DEFAULT_PALETTE = <?php echo json_encode(getDefaultNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+    </script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>

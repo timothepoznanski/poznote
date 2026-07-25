@@ -584,7 +584,8 @@
       "default_image_border_no_padding": "默认图片边框",
       "ui_customization": "元素可见性",
       "notes_dashboard": "笔记看板",
-      "spellcheck_html_notes": "拼写检查"
+      "spellcheck_html_notes": "拼写检查",
+      "note_color_palette": "笔记颜色"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -1156,6 +1157,16 @@
         "alphabetical": "字母顺序"
       }
     },
+    "note_color_palette": {
+      "title": "笔记颜色",
+      "description": "自定义可分配给笔记的颜色。重命名或修改某个颜色会同步更新所有使用它的笔记。",
+      "add": "添加颜色",
+      "remove": "删除",
+      "reset": "恢复默认",
+      "name_placeholder": "颜色名称",
+      "count": "{{count}} 种颜色",
+      "empty_error": "请至少添加一种颜色，或恢复默认设置。"
+    },
     "note_age_filter": {
       "title": "笔记时间筛选",
       "description": "选择显示最近修改笔记的时间范围",
@@ -1231,6 +1242,17 @@
       "no_notes_in_folder": "此文件夹不包含笔记",
       "too_many_notes": "此文件夹包含 {{count}} 条笔记。为避免浏览器负担过重，仅打开前 {{max}} 条。"
     }
+  },
+  "note_color": {
+    "modal_title": "笔记颜色",
+    "folder_modal_title": "文件夹颜色",
+    "custom": "自定义颜色",
+    "remove": "移除颜色",
+    "apply_error": "无法更新笔记颜色。",
+    "filter": "按颜色筛选",
+    "filter_all": "全部笔记",
+    "filter_any": "任意颜色",
+    "filter_none": "无颜色"
   },
   "tabs": {
     "context_menu": {

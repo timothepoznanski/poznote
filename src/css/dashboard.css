@@ -731,6 +731,278 @@ body.dark-mode .dashboard-debug-info pre {
     transform: translateY(-2px);
 }
 
+/* ---------- Note color tint ----------
+   Cards carrying a note color get --note-color inline (see buildNoteCard in
+   js/dashboard-page.js). Everything else is derived from that single value with
+   color-mix(), so palette colors and per-note custom hex values behave alike.
+   Light mode mixes the hue into white; the dark rules below mix it into the
+   dark surface instead, which keeps text contrast intact in both themes. */
+
+.dash-card.has-note-color {
+    background: color-mix(in srgb, var(--note-color) 12%, #ffffff);
+    border-color: color-mix(in srgb, var(--note-color) 45%, #ffffff);
+}
+
+.dash-card.has-note-color:hover {
+    background: color-mix(in srgb, var(--note-color) 18%, #ffffff);
+    border-color: color-mix(in srgb, var(--note-color) 70%, #ffffff);
+    box-shadow: 0 3px 12px color-mix(in srgb, var(--note-color) 28%, transparent);
+}
+
+/* Tag chips sit on the tinted background, so lift them slightly */
+.dash-card.has-note-color .board-card-tag {
+    background: color-mix(in srgb, var(--note-color) 16%, #ffffff);
+}
+
+/* ---------- Note color filter (topbar) ---------- */
+
+.dashboard-color-filter-wrap {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+/* Sits in .board-filter-row next to the view controls, so it matches
+   .board-view-btn rather than the topbar icon buttons. */
+.dashboard-color-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 33px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #6b7280;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.dashboard-color-filter-btn:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+}
+
+.dashboard-color-filter-btn.active {
+    border-color: #007DB8;
+    color: #007DB8;
+    background: #eff6ff;
+}
+
+.dashboard-color-filter-btn .lucide {
+    width: 18px;
+    height: 18px;
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-btn,
+body.dark-mode .dashboard-color-filter-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-btn:hover,
+body.dark-mode .dashboard-color-filter-btn:hover,
+:root[data-theme='dark'] .dashboard-color-filter-btn.active,
+body.dark-mode .dashboard-color-filter-btn.active {
+    border-color: #007DB8;
+    color: #007DB8;
+    background: var(--dm-surface-hover);
+}
+
+/* Fixed rather than absolute: the topbar is an overflow-x:auto scroller, which
+   would clip an absolutely positioned dropdown. JS sets top/left on open. */
+.dashboard-color-filter-menu {
+    position: fixed;
+    z-index: 1200;
+    min-width: 180px;
+    /* Height is set by JS to the space left below the button, so a long
+       palette plus custom colors stays reachable instead of overflowing. */
+    max-height: 320px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px;
+    background: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.dashboard-color-filter-menu[hidden] {
+    display: none;
+}
+
+.dashboard-color-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 7px 9px;
+    border: none;
+    border-radius: 7px;
+    background: none;
+    font-size: 13px;
+    color: #1f2937;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dashboard-color-filter-item:hover {
+    background: #f3f4f6;
+}
+
+.dashboard-color-filter-item.active {
+    background: #eff6ff;
+    font-weight: 600;
+}
+
+.note-color-swatch-empty {
+    background: repeating-linear-gradient(45deg, #e5e7eb 0 4px, #f9fafb 4px 8px);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-menu,
+body.dark-mode .dashboard-color-filter-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-item,
+body.dark-mode .dashboard-color-filter-item {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dashboard-color-filter-item:hover,
+body.dark-mode .dashboard-color-filter-item:hover,
+:root[data-theme='dark'] .dashboard-color-filter-item.active,
+body.dark-mode .dashboard-color-filter-item.active {
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .note-color-swatch-empty,
+body.dark-mode .note-color-swatch-empty {
+    background: repeating-linear-gradient(45deg, #374151 0 4px, #1f2937 4px 8px);
+}
+
+/* ---------- Note color picker modal ---------- */
+
+.note-color-modal-subtitle {
+    margin: 4px 0 14px;
+    font-size: 13px;
+    color: #6b7280;
+    word-break: break-word;
+}
+
+.note-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.note-color-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 9px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 9px;
+    background: #ffffff;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.note-color-option:hover {
+    border-color: #9ca3af;
+}
+
+.note-color-option.selected {
+    border-color: #007DB8;
+    background: #eff6ff;
+}
+
+.note-color-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.note-color-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #1f2937;
+}
+
+.note-color-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 13px;
+    color: #374151;
+}
+
+.note-color-custom input[type="color"] {
+    width: 52px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: none;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.note-color-custom input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+.note-color-custom input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+.note-color-custom input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 6px;
+}
+
+:root[data-theme='dark'] .note-color-modal-subtitle,
+body.dark-mode .note-color-modal-subtitle {
+    color: var(--dm-text-muted);
+}
+
+:root[data-theme='dark'] .note-color-option,
+body.dark-mode .note-color-option {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .note-color-option.selected,
+body.dark-mode .note-color-option.selected {
+    border-color: #007DB8;
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .note-color-name,
+body.dark-mode .note-color-name {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .note-color-custom,
+body.dark-mode .note-color-custom {
+    color: var(--dm-text);
+    border-top-color: var(--dm-border);
+}
+
 /* ---------- Folder card ---------- */
 
 .dash-folder-card {
@@ -1130,6 +1402,27 @@ body.dark-mode .dash-card {
 body.dark-mode .dash-card:hover {
     border-color: #007DB8;
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* Note color tint, dark theme: the same hue mixed into the dark surface
+   instead of white, so colored cards stay dark enough to read on. */
+:root[data-theme='dark'] .dash-card.has-note-color,
+body.dark-mode .dash-card.has-note-color {
+    background: color-mix(in srgb, var(--note-color) 22%, var(--dm-surface));
+    border-color: color-mix(in srgb, var(--note-color) 55%, var(--dm-surface));
+}
+
+:root[data-theme='dark'] .dash-card.has-note-color:hover,
+body.dark-mode .dash-card.has-note-color:hover {
+    background: color-mix(in srgb, var(--note-color) 30%, var(--dm-surface));
+    border-color: color-mix(in srgb, var(--note-color) 75%, var(--dm-surface));
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-theme='dark'] .dash-card.has-note-color .board-card-tag,
+body.dark-mode .dash-card.has-note-color .board-card-tag {
+    background: color-mix(in srgb, var(--note-color) 26%, var(--dm-surface));
+    color: var(--dm-text);
 }
 
 :root[data-theme='dark'] .dash-card-name,

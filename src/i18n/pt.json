@@ -581,7 +581,8 @@
       "default_image_border_no_padding": "Borda padrão de imagem",
       "ui_customization": "Visibilidade dos elementos",
       "notes_dashboard": "Quadro de notas",
-      "spellcheck_html_notes": "Verificação ortográfica"
+      "spellcheck_html_notes": "Verificação ortográfica",
+      "note_color_palette": "Cores das notas"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -1154,6 +1155,16 @@
         "alphabetical": "Alfabética"
       }
     },
+    "note_color_palette": {
+      "title": "Cores das notas",
+      "description": "Personalize as cores que pode atribuir às notas. Renomear ou alterar uma cor atualiza todas as notas que a utilizam.",
+      "add": "Adicionar cor",
+      "remove": "Remover",
+      "reset": "Repor predefinições",
+      "name_placeholder": "Nome da cor",
+      "count": "{{count}} cores",
+      "empty_error": "Adicione pelo menos uma cor ou reponha as predefinições."
+    },
     "note_age_filter": {
       "title": "Filtro de antiguidade das notas",
       "description": "Escolha até quando as notas modificadas devem aparecer",
@@ -1240,6 +1251,17 @@
       "no_notes_in_folder": "Esta pasta não contém notas",
       "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador."
     }
+  },
+  "note_color": {
+    "modal_title": "Cor da nota",
+    "folder_modal_title": "Cor da pasta",
+    "custom": "Cor personalizada",
+    "remove": "Remover cor",
+    "apply_error": "Não foi possível atualizar a cor da nota.",
+    "filter": "Filtrar por cor",
+    "filter_all": "Todas as notas",
+    "filter_any": "Qualquer cor",
+    "filter_none": "Sem cor"
   },
   "tabs": {
     "context_menu": {
