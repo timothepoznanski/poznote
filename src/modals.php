@@ -820,6 +820,33 @@ try {
     </div>
 </div>
 
+<!-- Markdown editor font selection modal -->
+<div id="markdownFontModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.markdown_font.title', [], 'Markdown editor font'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.markdown_font.description', [], 'Font used while editing a markdown note. The rendered preview keeps the app font. Fonts use those installed on your device.'); ?></p>
+            <select id="markdownFontSelect">
+                <option value="inherit" style="font-family: 'Inter', sans-serif;"><?php echo t_h('modals.markdown_font.options.inherit', [], 'App font (default)'); ?></option>
+                <option value="monospace" style="font-family: monospace;"><?php echo t_h('modals.markdown_font.options.monospace', [], 'System monospace'); ?></option>
+                <option value="courier" style="font-family: 'Courier New', Courier, monospace;">Courier New</option>
+                <option value="consolas" style="font-family: Consolas, monospace;">Consolas</option>
+                <option value="menlo" style="font-family: Menlo, monospace;">Menlo</option>
+                <option value="monaco" style="font-family: Monaco, monospace;">Monaco</option>
+                <option value="jetbrains" style="font-family: 'JetBrains Mono', monospace;">JetBrains Mono</option>
+                <option value="cascadia" style="font-family: 'Cascadia Code', monospace;">Cascadia Code</option>
+                <option value="fira" style="font-family: 'Fira Code', monospace;">Fira Code</option>
+                <option value="sourcecodepro" style="font-family: 'Source Code Pro', monospace;">Source Code Pro</option>
+                <option value="ubuntumono" style="font-family: 'Ubuntu Mono', monospace;">Ubuntu Mono</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownFontModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveMarkdownFontModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Timezone modal -->
 <div id="timezoneModal" class="modal">
     <div class="modal-content">
@@ -1349,6 +1376,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:theme-mode-card" checked><span><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-font-card" checked><span><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>

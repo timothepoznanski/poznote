@@ -446,6 +446,17 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Markdown Editor Font -->
+            <div class="home-card" id="markdown-font-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-file-code"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span>
+                    <span id="markdown-font-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
                 <div class="home-card-icon">

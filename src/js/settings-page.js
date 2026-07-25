@@ -422,6 +422,78 @@
         }
     }
 
+    function getMarkdownFontLabel(fontKey) {
+        var labels = {
+            inherit: tr('modals.markdown_font.options.inherit', {}, 'App font (default)'),
+            monospace: tr('modals.markdown_font.options.monospace', {}, 'System monospace'),
+            courier: 'Courier New',
+            consolas: 'Consolas',
+            menlo: 'Menlo',
+            monaco: 'Monaco',
+            jetbrains: 'JetBrains Mono',
+            cascadia: 'Cascadia Code',
+            fira: 'Fira Code',
+            sourcecodepro: 'Source Code Pro',
+            ubuntumono: 'Ubuntu Mono'
+        };
+        return labels[fontKey] || labels.inherit;
+    }
+
+    // Probe which markdown-editor fonts exist on this device. Only the first
+    // name of each stack is tested: the rest are fallbacks that would make an
+    // absent font look available. 'inherit' is the default and 'monospace' is
+    // a generic family, so both always resolve.
+    var markdownFontAvailability = null;
+    var MARKDOWN_FONT_ALWAYS_AVAILABLE = { monospace: true, inherit: true };
+    function probeMarkdownFonts(callback) {
+        if (markdownFontAvailability) { callback(markdownFontAvailability); return; }
+
+        var fonts = window.__poznoteEditorFonts || {};
+        var keys = Object.keys(fonts).filter(function (key) {
+            return !MARKDOWN_FONT_ALWAYS_AVAILABLE[key];
+        });
+        var result = {};
+        Object.keys(MARKDOWN_FONT_ALWAYS_AVAILABLE).forEach(function (key) { result[key] = true; });
+
+        if (typeof window.FontFace !== 'function' || keys.length === 0) {
+            keys.forEach(function (key) { result[key] = true; });
+            markdownFontAvailability = result;
+            callback(result);
+            return;
+        }
+
+        var pending = keys.length;
+        function done() {
+            pending--;
+            if (pending === 0) {
+                markdownFontAvailability = result;
+                callback(result);
+            }
+        }
+        keys.forEach(function (key) {
+            // First entry of the stack, minus any surrounding quotes.
+            var primary = fonts[key].split(',')[0].trim().replace(/^['"]|['"]$/g, '');
+            try {
+                new FontFace('__poznote-md-font-probe-' + key, "local('" + primary + "')").load().then(
+                    function () { result[key] = true; done(); },
+                    function () { result[key] = false; done(); }
+                );
+            } catch (e) {
+                result[key] = true;
+                done();
+            }
+        });
+    }
+
+    function refreshMarkdownFontBadge() {
+        var badge = document.getElementById('markdown-font-badge');
+        if (badge) {
+            var font = (window.__poznoteUserStorage || localStorage).getItem('markdown_font') || 'inherit';
+            badge.textContent = getMarkdownFontLabel(font);
+            badge.className = 'setting-status enabled';
+        }
+    }
+
     function refreshIndexIconScaleBadge() {
         var badge = document.getElementById('index-icon-scale-badge');
         if (badge) {
@@ -1390,6 +1462,32 @@
             });
         }
 
+        // Markdown editor font card - opens font selection modal
+        var markdownFontCard = document.getElementById('markdown-font-card');
+        if (markdownFontCard) {
+            markdownFontCard.addEventListener('click', function () {
+                var modal = document.getElementById('markdownFontModal');
+                if (!modal) return;
+                var current = (window.__poznoteUserStorage || localStorage).getItem('markdown_font') || 'inherit';
+                probeMarkdownFonts(function (available) {
+                    var select = document.getElementById('markdownFontSelect');
+                    if (select) {
+                        for (var i = 0; i < select.options.length; i++) {
+                            var option = select.options[i];
+                            // Hide fonts this device does not have; keep the
+                            // stored choice visible even if it is unavailable
+                            // here so it can be changed.
+                            var show = option.value === current || available[option.value] !== false;
+                            option.hidden = !show;
+                            option.disabled = !show;
+                        }
+                        select.value = current;
+                    }
+                    modal.style.display = 'flex';
+                });
+            });
+        }
+
         // Login display card - delegates to ui.js
         var loginDisplayCard = document.getElementById('login-display-card');
         if (loginDisplayCard && typeof window.showLoginDisplayNamePrompt === 'function') {
@@ -1625,6 +1723,22 @@
             });
         }
 
+        // Save markdown editor font modal button
+        var saveMarkdownFontBtn = document.getElementById('saveMarkdownFontModalBtn');
+        if (saveMarkdownFontBtn) {
+            saveMarkdownFontBtn.addEventListener('click', function () {
+                var select = document.getElementById('markdownFontSelect');
+                var selected = (select && select.value) || 'inherit';
+                (window.__poznoteUserStorage || localStorage).setItem('markdown_font', selected);
+                if (typeof window.__poznoteApplyEditorFont === 'function') {
+                    window.__poznoteApplyEditorFont(selected);
+                }
+                try { closeModal('markdownFontModal'); } catch (e) { }
+                refreshMarkdownFontBadge();
+                reloadOpener();
+            });
+        }
+
         // ---- Custom CSS upload modal ----
         var uploadCustomCssBtn = document.getElementById('uploadCustomCssBtn');
         var customCssFileInput = document.getElementById('customCssFileInput');
@@ -1748,6 +1862,7 @@
             refreshLoginDisplayBadge();
             refreshFontSizeBadge();
             refreshMainFontBadge();
+            refreshMarkdownFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
             refreshNoteColorPaletteBadge();
@@ -1824,6 +1939,7 @@
             refreshLanguageBadge();
             refreshFontSizeBadge();
             refreshMainFontBadge();
+            refreshMarkdownFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
             refreshNoteColorPaletteBadge();

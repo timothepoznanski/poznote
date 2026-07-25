@@ -562,6 +562,7 @@
     "cards": {
       "theme_mode": "主题",
       "main_font": "应用字体",
+      "markdown_font": "Markdown 编辑器字体",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_sort_order": "笔记排序规则",
@@ -943,6 +944,14 @@
       "options": {
         "inter": "Inter（默认）",
         "system": "系统"
+      }
+    },
+    "markdown_font": {
+      "title": "Markdown 编辑器字体",
+      "description": "编辑 Markdown 笔记时使用的字体。渲染后的预览仍使用应用字体。字体将使用您设备上安装的字体。",
+      "options": {
+        "inherit": "应用字体（默认）",
+        "monospace": "系统等宽字体"
       }
     },
     "font_size": {

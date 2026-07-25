@@ -183,3 +183,59 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
         // Fallback silently if localStorage unavailable
     }
 })();
+
+// Markdown editor font - runs synchronously in <head> to avoid a font flash.
+// Only the editing view (the CodeMirror instance) is affected, the rendered
+// preview keeps the app font. Unlike the app font above, this targets a
+// specific selector instead of the 'Inter' @font-face, because the editor
+// font must change without touching the rest of the interface.
+// Default ('inherit') keeps the app font, which is what the editor shows
+// today: noteentry.css forces 'Inter' with !important on every element inside
+// a note, so the plain .cm-editor rule in markdown.css never takes effect.
+(function () {
+    // Each stack lists the Windows/macOS names plus common Linux equivalents,
+    // then a generic family as a last resort. These go into a font-family
+    // declaration (not local()), so generic names like monospace work.
+    // There is no entry for 'inherit': it is the default and means "no
+    // override", which is what the editor already shows today.
+    var EDITOR_FONTS = {
+        courier: "'Courier New', Courier, monospace",
+        consolas: "Consolas, 'Liberation Mono', 'DejaVu Sans Mono', monospace",
+        menlo: "Menlo, 'DejaVu Sans Mono', monospace",
+        monaco: "Monaco, 'DejaVu Sans Mono', monospace",
+        jetbrains: "'JetBrains Mono', 'DejaVu Sans Mono', monospace",
+        cascadia: "'Cascadia Code', 'Cascadia Mono', 'DejaVu Sans Mono', monospace",
+        fira: "'Fira Code', 'Fira Mono', 'DejaVu Sans Mono', monospace",
+        sourcecodepro: "'Source Code Pro', 'DejaVu Sans Mono', monospace",
+        ubuntumono: "'Ubuntu Mono', 'DejaVu Sans Mono', monospace",
+        monospace: "monospace"
+    };
+
+    function applyEditorFont(fontKey) {
+        var existing = document.getElementById('markdown-font-override');
+        if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+        }
+        var stack = EDITOR_FONTS[fontKey];
+        if (!stack) return; // 'inherit' or unknown value -> app font
+
+        // noteentry.css forces 'Inter' with !important on nearly every element
+        // inside a note, including the editor's own divs. The :is() list plus
+        // the repeated id raises specificity above that rule so this wins.
+        var style = document.createElement('style');
+        style.id = 'markdown-font-override';
+        style.textContent =
+            '.markdown-codemirror-host :is(.cm-editor, .cm-scroller, .cm-content, .cm-line, .cm-line *, ' +
+            '#markdown-font#markdown-font#markdown-font) { font-family: ' + stack + ' !important; }';
+        document.documentElement.appendChild(style);
+    }
+
+    window.__poznoteApplyEditorFont = applyEditorFont;
+    window.__poznoteEditorFonts = EDITOR_FONTS;
+
+    try {
+        applyEditorFont(window.__poznoteUserStorage.getItem('markdown_font'));
+    } catch (e) {
+        // Fallback silently if localStorage unavailable
+    }
+})();

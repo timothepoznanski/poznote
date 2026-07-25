@@ -208,6 +208,7 @@
     "cards": {
       "theme_mode": "Theme",
       "main_font": "App font",
+      "markdown_font": "Markdown editor font",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_sort_order": "Note sorting",
@@ -455,6 +456,14 @@
       "options": {
         "inter": "Inter (default)",
         "system": "System"
+      }
+    },
+    "markdown_font": {
+      "title": "Markdown editor font",
+      "description": "Font used while editing a markdown note. The rendered preview keeps the app font. Fonts use those installed on your device.",
+      "options": {
+        "inherit": "App font (default)",
+        "monospace": "System monospace"
       }
     },
     "font_size": {

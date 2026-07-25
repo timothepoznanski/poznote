@@ -562,6 +562,7 @@
     "cards": {
       "theme_mode": "Tema",
       "main_font": "Fuente de la aplicación",
+      "markdown_font": "Fuente del editor markdown",
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_sort_order": "Orden de clasificación de notas",
@@ -944,6 +945,14 @@
       "options": {
         "inter": "Inter (predeterminada)",
         "system": "Sistema"
+      }
+    },
+    "markdown_font": {
+      "title": "Fuente del editor markdown",
+      "description": "Fuente utilizada al editar una nota markdown. La vista previa mantiene la fuente de la aplicación. Las fuentes usan las instaladas en tu dispositivo.",
+      "options": {
+        "inherit": "Fuente de la aplicación (predeterminada)",
+        "monospace": "Monoespaciada del sistema"
       }
     },
     "font_size": {

@@ -561,6 +561,7 @@
     "cards": {
       "theme_mode": "Thema",
       "main_font": "App-Schriftart",
+      "markdown_font": "Markdown-Editor-Schriftart",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_sort_order": "Notizen-Sortierreihenfolge",
@@ -943,6 +944,14 @@
       "options": {
         "inter": "Inter (Standard)",
         "system": "System"
+      }
+    },
+    "markdown_font": {
+      "title": "Markdown-Editor-Schriftart",
+      "description": "Schriftart beim Bearbeiten einer Markdown-Notiz. Die gerenderte Vorschau behält die App-Schriftart. Die Schriftarten verwenden die auf Ihrem Gerät installierten Schriften.",
+      "options": {
+        "inherit": "App-Schriftart (Standard)",
+        "monospace": "System-Monospace"
       }
     },
     "font_size": {
