@@ -1755,7 +1755,20 @@
       "complete_backup": "Sicherungs-ZIP hier ablegen",
       "database": "SQL-Datei hier ablegen",
       "notes": "Notizen-ZIP hier ablegen",
-      "attachments": "Anhänge-ZIP hier ablegen"
+      "attachments": "Anhänge-ZIP hier ablegen",
+      "sidebar": {
+        "drop_here": "Notizdateien ablegen, um sie zu importieren",
+        "drop_into_folder": "Ablegen, um in \"{{folder}}\" zu importieren",
+        "folder_not_allowed": "Import in \"{{folder}}\" nicht möglich",
+        "importing": "Notizen werden importiert...",
+        "import_done": "Notizen importiert.",
+        "import_failed": "Import fehlgeschlagen.",
+        "no_supported_files": "Es wurden keine unterstützten Dateien abgelegt. Erlaubte Typen: {{allowed}}",
+        "skipped_files": "{{count}} nicht unterstützte Datei(en) wurden übersprungen."
+      },
+      "errors": {
+        "system_folder": "Notizen können nicht in den Ordner \"{{folder}}\" importiert werden."
+      }
     },
     "modals": {
       "import_confirm": {

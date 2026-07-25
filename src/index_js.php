@@ -47,6 +47,7 @@ $groups = [
         'js/events-utils.js',
         'js/events-auto-save.js',
         'js/events-drag-drop.js',
+        'js/sidebar-file-import.js',
         'js/note-history.js',
         'js/events-navigation.js',
         'js/events-rich-text-editing.js',

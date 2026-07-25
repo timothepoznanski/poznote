@@ -1755,7 +1755,20 @@
       "complete_backup": "将备份 ZIP 拖放到此处",
       "database": "将 SQL 文件拖放到此处",
       "notes": "将笔记 ZIP 拖放到此处",
-      "attachments": "将附件 ZIP 拖放到此处"
+      "attachments": "将附件 ZIP 拖放到此处",
+      "sidebar": {
+        "drop_here": "拖放笔记文件以导入",
+        "drop_into_folder": "拖放以导入到“{{folder}}”",
+        "folder_not_allowed": "无法导入到“{{folder}}”",
+        "importing": "正在导入笔记...",
+        "import_done": "笔记已导入。",
+        "import_failed": "导入失败。",
+        "no_supported_files": "未拖放任何受支持的文件。允许的类型：{{allowed}}",
+        "skipped_files": "已跳过 {{count}} 个不受支持的文件。"
+      },
+      "errors": {
+        "system_folder": "无法将笔记导入到“{{folder}}”文件夹。"
+      }
     },
     "modals": {
       "import_confirm": {

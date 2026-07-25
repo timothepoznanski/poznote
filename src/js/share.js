@@ -143,6 +143,12 @@ function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
                         restoreFolderStates();
                     }
 
+                    // The drag & drop import overlay lives inside #left_col and
+                    // was destroyed by the innerHTML swap above.
+                    if (typeof window.reinitializeSidebarFileImportOverlay === 'function') {
+                        window.reinitializeSidebarFileImportOverlay();
+                    }
+
                     if (typeof window.reinitializeFavoritesToggle === 'function') {
                         window.reinitializeFavoritesToggle();
                     }

@@ -335,3 +335,102 @@ a.links_arbo_left.dragging,
 .folder-content {
     pointer-events: auto;
 }
+
+/* ==========================================================================
+   Drag & drop import of external note files onto the sidebar
+   (see js/sidebar-file-import.js)
+   ========================================================================== */
+
+#left_col {
+    position: relative;
+}
+
+/* Subtle outline on the whole sidebar while files are dragged over it */
+#left_col.file-import-drop-active {
+    outline: 2px dashed rgba(0, 123, 255, 0.5);
+    outline-offset: -4px;
+}
+
+/* The folder that will receive the imported notes */
+.folder-header.file-import-drop-target {
+    background-color: rgba(0, 123, 255, 0.15) !important;
+    border: 2px dashed #007bff !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 12px rgba(0, 123, 255, 0.35) !important;
+    padding: 4px !important;
+    margin: 2px 0 !important;
+    transition: all 0.2s ease !important;
+}
+
+.sidebar-file-import-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 90px 16px 16px;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(1px);
+    pointer-events: none;
+    text-align: center;
+}
+
+.sidebar-file-import-overlay.visible {
+    display: flex;
+}
+
+.sidebar-file-import-overlay-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px;
+    border: 2px dashed #007bff;
+    border-radius: 12px;
+    background: rgba(0, 123, 255, 0.06);
+    max-width: 100%;
+}
+
+.sidebar-file-import-overlay-inner .lucide {
+    font-size: 28px;
+    color: #007bff;
+    background-color: #007bff;
+}
+
+.sidebar-file-import-overlay-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c3d5a;
+    overflow-wrap: anywhere;
+}
+
+/* Spinner shown while the files are uploading */
+.sidebar-file-import-overlay.busy .lucide {
+    animation: sidebar-file-import-pulse 1s ease-in-out infinite;
+}
+
+@keyframes sidebar-file-import-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+}
+
+#left_col.file-import-busy {
+    cursor: progress;
+}
+
+/* Dark mode */
+html[data-theme='dark'] .sidebar-file-import-overlay,
+body.dark-mode .sidebar-file-import-overlay {
+    background: rgba(24, 26, 30, 0.9);
+}
+
+html[data-theme='dark'] .sidebar-file-import-overlay-text,
+body.dark-mode .sidebar-file-import-overlay-text {
+    color: #cfe4ff;
+}
+
+html[data-theme='dark'] .sidebar-file-import-overlay-inner,
+body.dark-mode .sidebar-file-import-overlay-inner {
+    background: rgba(0, 123, 255, 0.12);
+}

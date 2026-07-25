@@ -1756,7 +1756,20 @@
       "complete_backup": "Soltar ZIP de respaldo aquí",
       "database": "Soltar archivo SQL aquí",
       "notes": "Soltar ZIP de notas aquí",
-      "attachments": "Soltar ZIP de adjuntos aquí"
+      "attachments": "Soltar ZIP de adjuntos aquí",
+      "sidebar": {
+        "drop_here": "Suelta archivos de notas para importarlos",
+        "drop_into_folder": "Suelta para importar en \"{{folder}}\"",
+        "folder_not_allowed": "No se puede importar en \"{{folder}}\"",
+        "importing": "Importando notas...",
+        "import_done": "Notas importadas.",
+        "import_failed": "Error al importar.",
+        "no_supported_files": "No se soltó ningún archivo compatible. Tipos permitidos: {{allowed}}",
+        "skipped_files": "Se omitieron {{count}} archivo(s) no compatibles."
+      },
+      "errors": {
+        "system_folder": "Las notas no se pueden importar en la carpeta \"{{folder}}\"."
+      }
     },
     "modals": {
       "import_confirm": {

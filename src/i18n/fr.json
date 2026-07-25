@@ -1872,7 +1872,20 @@
       "complete_backup": "Déposer le ZIP de sauvegarde ici",
       "database": "Déposer le fichier SQL ici",
       "notes": "Déposer le ZIP de notes ici",
-      "attachments": "Déposer le ZIP de pièces jointes ici"
+      "attachments": "Déposer le ZIP de pièces jointes ici",
+      "sidebar": {
+        "drop_here": "Déposez des fichiers de notes pour les importer",
+        "drop_into_folder": "Déposez pour importer dans \"{{folder}}\"",
+        "folder_not_allowed": "Impossible d'importer dans \"{{folder}}\"",
+        "importing": "Importation des notes...",
+        "import_done": "Notes importées.",
+        "import_failed": "Échec de l'importation.",
+        "no_supported_files": "Aucun fichier pris en charge n'a été déposé. Types autorisés : {{allowed}}",
+        "skipped_files": "{{count}} fichier(s) non pris en charge ont été ignorés."
+      },
+      "errors": {
+        "system_folder": "Les notes ne peuvent pas être importées dans le dossier \"{{folder}}\"."
+      }
     }
   },
   "markdown_guide": {

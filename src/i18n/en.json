@@ -1426,7 +1426,20 @@
       "complete_backup": "Drop backup ZIP here",
       "database": "Drop SQL file here",
       "notes": "Drop notes ZIP here",
-      "attachments": "Drop attachments ZIP here"
+      "attachments": "Drop attachments ZIP here",
+      "sidebar": {
+        "drop_here": "Drop note files to import them",
+        "drop_into_folder": "Drop to import into \"{{folder}}\"",
+        "folder_not_allowed": "Cannot import into \"{{folder}}\"",
+        "importing": "Importing notes...",
+        "import_done": "Notes imported.",
+        "import_failed": "Import failed.",
+        "no_supported_files": "No supported files were dropped. Allowed types: {{allowed}}",
+        "skipped_files": "{{count}} unsupported file(s) were skipped."
+      },
+      "errors": {
+        "system_folder": "Notes cannot be imported into the \"{{folder}}\" folder."
+      }
     },
     "modals": {
       "import_confirm": {
