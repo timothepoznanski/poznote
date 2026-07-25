@@ -19,7 +19,14 @@
  * run before first paint), pwa/pwa.js, codemirror, lazy-libs, highlight.
  */
 
-$groups = [
+/**
+ * The bundle groups, also used by index.php to build the ?v= cache version so
+ * editing any bundled file busts the (immutable) bundle URL. Without this the
+ * version only tracked release + theme assets, and a change to a file bundled
+ * here stayed invisible until one of those changed.
+ */
+function poznoteGetIndexJsGroups(): array {
+    return [
     'head' => [
         'js/theme-manager.js',
         'js/modal-alerts.js',
@@ -87,7 +94,38 @@ $groups = [
         'js/snapshots.js',
         'js/ui-customization.js',
     ],
-];
+    ];
+}
+
+/**
+ * Newest mtime across every bundled file, for cache-busting the bundle URLs.
+ */
+function poznoteGetIndexJsAssetVersion(): string {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $newest = 0;
+    foreach (poznoteGetIndexJsGroups() as $files) {
+        foreach ($files as $file) {
+            $mtime = @filemtime(__DIR__ . '/' . $file);
+            if ($mtime !== false) {
+                $newest = max($newest, (int) $mtime);
+            }
+        }
+    }
+
+    $cached = $newest > 0 ? (string) $newest : '';
+    return $cached;
+}
+
+// Included (not requested) by index.php purely for the helpers above.
+if (basename($_SERVER['SCRIPT_NAME'] ?? '') !== 'index_js.php') {
+    return;
+}
+
+$groups = poznoteGetIndexJsGroups();
 
 $group = $_GET['group'] ?? 'app';
 if (!isset($groups[$group])) {

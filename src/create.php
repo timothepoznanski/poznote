@@ -207,7 +207,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 
                 // Execute create action
                 if (typeof executeCreateAction === 'function') {
-                    const immediateExitTypes = ['html', 'markdown', 'list', 'workspace'];
+                    const immediateExitTypes = ['html', 'markdown', 'list', 'workspace', 'diary'];
                     if (immediateExitTypes.includes(createType) && typeof showNoteCreationLoading === 'function') {
                         showNoteCreationLoading(this);
                         window.setTimeout(executeCreateAction, 80);

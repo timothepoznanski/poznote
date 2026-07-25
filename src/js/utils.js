@@ -2727,10 +2727,7 @@ function executeCreateAction() {
             showKanbanStructureModal();
             break;
         case 'diary':
-            // The diary page owns the open-or-create logic for today's entry
-            // (diary-page.js auto-triggers it when today=1 is present).
-            var diaryWs = window.selectedWorkspace || '';
-            window.location.href = 'diary.php?today=1' + (diaryWs ? '&workspace=' + encodeURIComponent(diaryWs) : '');
+            createDiaryEntryForToday();
             break;
         case 'template':
             if (typeof openTemplateNoteSelectorModal === 'function') {
@@ -2875,6 +2872,77 @@ function createNoteOfType(noteType, globalFnNames) {
             });
         }
     }
+}
+
+/**
+ * Open today's diary entry, creating it first when it does not exist yet.
+ * Goes straight to the note: routing through diary.php?today=1 made the diary
+ * board render for a moment before the note replaced it.
+ * api/v1/calendar/diary-entry.php supplies the target folder, workspace and
+ * the configured note type (see the diary_default_note_type setting).
+ */
+function createDiaryEntryForToday() {
+    var diaryWs = window.selectedWorkspace || '';
+    // Local date, so the entry matches the user's today rather than UTC's.
+    var now = new Date();
+    var today = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
+
+    var lookupUrl = 'api/v1/calendar/diary-entry.php?date=' + encodeURIComponent(today) +
+        (diaryWs ? '&workspace=' + encodeURIComponent(diaryWs) : '');
+
+    function openEntry(noteId, workspace) {
+        var url = 'index.php?note=' + encodeURIComponent(noteId) + '&newtab=1';
+        if (workspace) url += '&workspace=' + encodeURIComponent(workspace);
+        window.location.href = url;
+    }
+
+    function fail(error) {
+        if (typeof window.hideNoteCreationLoading === 'function') {
+            window.hideNoteCreationLoading();
+        }
+        var message = (window.t ? window.t('diary.create_error', {}, 'Could not create the diary entry.')
+            : 'Could not create the diary entry.');
+        if (typeof showNotificationPopup === 'function') {
+            showNotificationPopup(message + (error ? ' ' + error : ''), 'error');
+        } else {
+            window.alert(message);
+        }
+    }
+
+    fetch(lookupUrl, { credentials: 'same-origin' })
+        .then(function (response) { return response.json(); })
+        .then(function (diary) {
+            if (diary && diary.error) throw new Error(diary.error);
+
+            if (diary.exists && diary.id) {
+                openEntry(diary.id, diary.workspace || diaryWs);
+                return null;
+            }
+
+            return fetch('api/v1/notes', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({
+                    heading: today,
+                    folder_name: diary.folder,
+                    workspace: diary.workspace,
+                    type: diary.noteType === 'markdown' ? 'markdown' : 'note',
+                    created_date: today
+                })
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (result) {
+                    if (result.success && result.note) {
+                        openEntry(result.note.id, result.note.workspace || diary.workspace);
+                    } else {
+                        fail(result.error || result.message || '');
+                    }
+                });
+        })
+        .catch(function (error) { fail(error.message); });
 }
 
 function createHtmlNote() {
