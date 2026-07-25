@@ -679,6 +679,18 @@ body.dark-mode .dashboard-debug-info pre {
     flex-shrink: 0;
 }
 
+/* In list layout the row is horizontal, so the pin sits inline at the start
+   instead of overlaying the top-right corner. */
+.view-layout-list .dash-card-pin {
+    position: static;
+    order: -1;
+    flex-shrink: 0;
+}
+
+.view-layout-list .dash-card-note-title {
+    padding-right: 0;
+}
+
 .view-layout-list .dash-folder-card {
     flex-direction: row;
     justify-content: flex-start;
@@ -1094,6 +1106,59 @@ body.dark-mode .note-color-custom {
     margin-bottom: 7px;
     color: #1f2937;
     word-break: break-word;
+    /* Room for the pin button, which overlays the card's top-right corner. */
+    padding-right: 22px;
+}
+
+/* ---------- Pin button ----------
+   Sits outside .dash-card-link (see buildNoteCard) so a click pins instead of
+   opening the note. Hidden until the card is hovered or focused, but always
+   visible once the note is pinned. */
+
+.dash-card-pin {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.dash-card:hover .dash-card-pin,
+.dash-card-pin:focus-visible,
+.dash-note-card.is-pinned .dash-card-pin {
+    opacity: 1;
+}
+
+.dash-card-pin:hover {
+    background: rgba(0, 125, 184, 0.12);
+}
+
+/* Lucide icons are CSS masks, so the color comes from background-color. */
+.dash-card-pin i {
+    width: 14px;
+    height: 14px;
+    background-color: #9ca3af;
+}
+
+.dash-card-pin:hover i,
+.dash-note-card.is-pinned .dash-card-pin i {
+    background-color: #007DB8;
+}
+
+/* A pinned card reads as pinned even before the button is noticed. */
+.dash-note-card.is-pinned {
+    border-color: rgba(0, 125, 184, 0.45);
 }
 
 .dash-note-icon {
@@ -1439,6 +1504,24 @@ body.dark-mode .dash-card-count {
 :root[data-theme='dark'] .dash-card-note-title,
 body.dark-mode .dash-card-note-title {
     color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dash-card-pin:hover,
+body.dark-mode .dash-card-pin:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+:root[data-theme='dark'] .dash-card-pin i,
+body.dark-mode .dash-card-pin i {
+    background-color: var(--dm-text-muted);
+}
+
+/* Restated after the muted rule above, which is specific enough to win otherwise. */
+:root[data-theme='dark'] .dash-card-pin:hover i,
+body.dark-mode .dash-card-pin:hover i,
+:root[data-theme='dark'] .dash-note-card.is-pinned .dash-card-pin i,
+body.dark-mode .dash-note-card.is-pinned .dash-card-pin i {
+    background-color: #4aa8d8;
 }
 
 :root[data-theme='dark'] .board-card-excerpt,

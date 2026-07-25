@@ -1227,6 +1227,58 @@ class NotesController {
     }
 
     /**
+     * PUT /api/v1/notes/{id}/pinned
+     * Pin or unpin a note. Pinned notes sort first on the dashboard board.
+     *
+     * Body: { "pinned": true|false }
+     *
+     * The caller sends the desired state rather than toggling, so two boards
+     * open at once cannot flip each other's result.
+     * Pinning is board presentation state, so it is deliberately not pushed to Git.
+     */
+    public function updatePinned(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input) || !array_key_exists('pinned', $input)) {
+            $this->sendError(400, 'Invalid JSON in request body: expected a "pinned" boolean');
+            return;
+        }
+
+        $pinned = filter_var($input['pinned'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($pinned === null) {
+            $this->sendError(400, 'Invalid value for "pinned": expected a boolean');
+            return;
+        }
+
+        try {
+            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt->execute([$noteId]);
+            if (!$existsStmt->fetchColumn()) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $stmt = $this->con->prepare('UPDATE entries SET pinned = ? WHERE id = ?');
+            if (!$stmt->execute([$pinned ? 1 : 0, $noteId])) {
+                $this->sendError(500, 'Database error while updating pinned state');
+                return;
+            }
+
+            $this->sendSuccess([
+                'message' => 'Note pinned state updated successfully',
+                'pinned'  => $pinned
+            ]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
+    /**
      * DELETE /api/v1/notes/{id}
      * Delete a note (soft delete by default)
      * 

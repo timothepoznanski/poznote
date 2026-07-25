@@ -387,6 +387,11 @@ $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
 });
 
+// Pin/unpin a note (pinned notes sort first on the dashboard)
+$router->put('/notes/{id}/pinned', function($params) use ($notesController) {
+    $notesController->updatePinned($params['id']);
+});
+
 // Duplicate a note
 $router->post('/notes/{id}/duplicate', function($params) use ($notesController) {
     $notesController->duplicate($params['id']);

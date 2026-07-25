@@ -205,8 +205,19 @@
                 ' style="--note-color:' + esc(note.colorHex) + '"';
         }
 
-        return '<div class="dash-card dash-note-card' + (note.colorHex ? ' has-note-color' : '') + '"' +
+        // The pin button sits outside .dash-card-link so clicking it never
+        // navigates to the note.
+        var pinTxt = window.DASHBOARD_PIN_TXT || {};
+        var pinLabel = note.pinned ? (pinTxt.unpin || 'Unpin') : (pinTxt.pin || 'Pin to top');
+        var pinBtn = '<button type="button" class="dash-card-pin" data-pin-note-id="' + note.id + '"' +
+            ' aria-pressed="' + (note.pinned ? 'true' : 'false') + '"' +
+            ' title="' + esc(pinLabel) + '" aria-label="' + esc(pinLabel) + '">' +
+            '<i class="lucide lucide-pin"></i></button>';
+
+        return '<div class="dash-card dash-note-card' + (note.colorHex ? ' has-note-color' : '') +
+            (note.pinned ? ' is-pinned' : '') + '"' +
             ' data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '"' + colorAttrs + '>' +
+            pinBtn +
             '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + '>' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
@@ -234,10 +245,12 @@
                 matchingFolders = matchingFolders.filter(folderMatchesColor);
             }
 
-            var matchingNotes = getAllNotes().filter(function (note) {
+            // Cards here come from all over the tree, so rank them globally:
+            // baseOrder is only meaningful among siblings.
+            var matchingNotes = sortPinnedFirst(getAllNotes().filter(function (note) {
                 if (activeFilterTerm && !noteMatchesSearch(note, activeFilterTerm)) return false;
                 return noteMatchesColor(note);
-            });
+            }), 'globalOrder');
 
             matchingFolders.forEach(function (folder) {
                 html += buildFolderCard(folder, findFolderIndexInParent(folder));
@@ -473,6 +486,66 @@
             if (String(notes[i].id) === String(noteId)) return notes[i];
         }
         return null;
+    }
+
+    // --- Pinning ---
+    //
+    // Pinned notes sort ahead of the rest inside their own folder. The server
+    // already delivers them in that order; this re-sorts in place after a
+    // toggle so the card moves without a page reload.
+
+    // Rank each note by its position in the server's updated-DESC order, once,
+    // before any pinning reorders the arrays. Without this, unpinning could only
+    // restore the order the array happened to be in, not the original one.
+    // Both ranks come from the server (see dashboardBuildNoteData in
+    // dashboard.php) and describe the updated-DESC order with pinning ignored:
+    // baseOrder within a note's own folder, globalOrder across the whole tree.
+    // Sorting on them means unpinning restores the original position rather
+    // than whatever order the array was left in.
+
+    // Same grouping as dashboardSortPinnedFirst() in dashboard.php: pinned
+    // first, each group falling back to the original updated-DESC order.
+    function sortPinnedFirst(notes, orderKey) {
+        var key = orderKey || 'baseOrder';
+        return (notes || []).slice().sort(function (a, b) {
+            var pinDiff = (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+            if (pinDiff !== 0) return pinDiff;
+            return (a[key] || 0) - (b[key] || 0);
+        });
+    }
+
+    function resortLevel(level) {
+        var node = level || rootData;
+        node.notes = sortPinnedFirst(node.notes);
+        (node.folders || []).forEach(resortLevel);
+    }
+
+    function toggleNotePinned(noteId) {
+        var note = findNoteById(noteId);
+        if (!note) return;
+
+        var nextPinned = !note.pinned;
+        fetch('api/v1/notes/' + encodeURIComponent(noteId) + '/pinned', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ pinned: nextPinned })
+        }).then(function (response) {
+            if (!response.ok) throw new Error('pin update failed');
+            return response.json();
+        }).then(function (data) {
+            note.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
+            resortLevel(rootData);
+            renderAll();
+        }).catch(function () {
+            var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
+                'Could not update the pinned state.';
+            if (typeof window.showNotificationPopup === 'function') {
+                window.showNotificationPopup(message, 'error');
+            } else {
+                alert(message);
+            }
+        });
     }
 
     // Depth-first search over the whole tree: the picker may be opened on a
@@ -716,6 +789,8 @@
         // Right-click anywhere on a note or folder card opens the picker.
         document.addEventListener('contextmenu', function (e) {
             if (!e.target.closest) return;
+            // The pin button keeps the browser's own menu rather than the picker.
+            if (e.target.closest('.dash-card-pin')) return;
 
             var noteCard = e.target.closest('.dash-note-card');
             if (noteCard) {
@@ -1230,6 +1305,16 @@
         }
 
         document.addEventListener('click', function (e) {
+            // Checked first: the pin button sits inside a card, so letting the
+            // event fall through would also open the note.
+            var pinBtn = e.target.closest('.dash-card-pin');
+            if (pinBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleNotePinned(pinBtn.getAttribute('data-pin-note-id'));
+                return;
+            }
+
             var bcBtn = e.target.closest('.bc-home, .bc-item');
             if (bcBtn) {
                 var depth = parseInt(bcBtn.getAttribute('data-depth') || '0', 10);

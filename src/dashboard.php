@@ -57,9 +57,30 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         // 'color' is the stored value (palette id or custom hex); 'colorHex' is
         // what the card is actually tinted with. An id whose palette entry was
         // deleted resolves to '' and renders as an uncolored card.
-        'color'     => $noteColor,
-        'colorHex'  => $noteColorHex,
+        'color'       => $noteColor,
+        'colorHex'    => $noteColorHex,
+        'pinned'      => !empty($note['pinned']),
+        'globalOrder' => (int)($note['globalOrder'] ?? 0),
     ];
+}
+
+/**
+ * Pinned notes first, each group keeping the order it already had
+ * (updated DESC, as returned by the query).
+ *
+ * Each note also carries 'baseOrder', its rank in that unpinned order. The
+ * board JS sorts on it after a pin toggle, so unpinning drops a note back
+ * exactly where it started instead of leaving it stranded at the top.
+ */
+function dashboardSortPinnedFirst(array $notes): array {
+    $pinned = [];
+    $rest   = [];
+    foreach ($notes as $i => $note) {
+        $note['baseOrder'] = $i;
+        if (!empty($note['pinned'])) $pinned[] = $note;
+        else $rest[] = $note;
+    }
+    return array_merge($pinned, $rest);
 }
 
 function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, string $pageWorkspace): array {
@@ -67,7 +88,9 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
     $childIds = $f['children'];
     usort($childIds, fn($a, $b) => ($insertOrder[$a] ?? 0) - ($insertOrder[$b] ?? 0));
 
-    $notes = array_map(fn($n) => dashboardBuildNoteData($n, $pageWorkspace), $f['notes']);
+    $notes = dashboardSortPinnedFirst(
+        array_map(fn($n) => dashboardBuildNoteData($n, $pageWorkspace), $f['notes'])
+    );
 
     $childFolders = [];
     foreach ($childIds as $childId) {
@@ -382,7 +405,7 @@ try {
         }
         unset($fd);
 
-        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color FROM entries WHERE trash = 0";
+        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned FROM entries WHERE trash = 0";
         $params = [];
         if ($favoritesOnly) {
             $query .= " AND favorite = 1";
@@ -396,7 +419,12 @@ try {
         $stmt->execute($params);
 
         $noFolderNotes = [];
+        // Rank in the query's updated-DESC order, before the rows are split by
+        // folder. The filtered board mixes notes from the whole tree, so it
+        // needs this tree-wide rank rather than the per-folder one.
+        $globalOrder = 0;
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $row['globalOrder'] = $globalOrder++;
             $fid = $row['folder_id'] !== null ? (int)$row['folder_id'] : null;
             if ($fid !== null && isset($folders[$fid])) {
                 $folders[$fid]['notes'][] = $row;
@@ -416,6 +444,7 @@ try {
         foreach ($noFolderNotes as $note) {
             $dashboardData['notes'][] = dashboardBuildNoteData($note, $pageWorkspace);
         }
+        $dashboardData['notes'] = dashboardSortPinnedFirst($dashboardData['notes']);
 
         $isEmpty = empty($dashboardData['folders']) && empty($dashboardData['notes']);
     }
@@ -819,6 +848,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			filterNoColor: <?php echo json_encode(t('note_color.filter_none', [], 'No color')); ?>
 		};
 		window.DASHBOARD_DATA      = <?php echo json_encode($dashboardData, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+		window.DASHBOARD_PIN_TXT = {
+			pin: <?php echo json_encode(t('dashboard.pin_note', [], 'Pin to top')); ?>,
+			unpin: <?php echo json_encode(t('dashboard.unpin_note', [], 'Unpin')); ?>,
+			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>
+		};
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>
 		};
