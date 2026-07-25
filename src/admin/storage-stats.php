@@ -111,7 +111,10 @@ function collectStorageStats(): array {
         $row['db_bytes']          = poznoteDirSize($databaseDir);
         $row['entries_bytes']     = poznoteDirSize($entriesDir);
         $row['attachments_bytes'] = poznoteDirSize($attachmentsDir);
-        $row['total_bytes']       = poznoteDirSize($userPath);
+        // Total is the sum of the three displayed columns so the row adds up.
+        // It deliberately excludes backups/snapshots/backgrounds, which are not
+        // part of the backup export either.
+        $row['total_bytes']       = $row['db_bytes'] + $row['entries_bytes'] + $row['attachments_bytes'];
 
         if (file_exists($dbPath)) {
             try {
