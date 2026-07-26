@@ -34,12 +34,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Cache scopes match the ones used by publish-docker.yml so CI runs
+      # reuse the layers already built for releases on main.
       - name: Build default image
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
           tags: poznote:ci
+          cache-from: type=gha,scope=poznote-linux-amd64
+          cache-to: type=gha,mode=max,scope=poznote-linux-amd64
 
       - name: Build rootless image
         uses: docker/build-push-action@v6
@@ -48,6 +52,10 @@ jobs:
           target: rootless
           load: true
           tags: poznote:ci-rootless
+          cache-from: |
+            type=gha,scope=poznote-rootless-linux-amd64
+            type=gha,scope=poznote-linux-amd64
+          cache-to: type=gha,mode=max,scope=poznote-rootless-linux-amd64
 
       - name: Smoke test default image
         run: |
