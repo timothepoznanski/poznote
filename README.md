@@ -205,9 +205,7 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Poznote Cloud</strong></summary><br>
 
-Use Poznote without installing or maintaining anything: we host it for you.
-
-[Get started with Poznote Cloud](https://poznote.com/index.html#cloud)
+Use Poznote without installing or maintaining anything: we host it for you. [Get started with Poznote Cloud](https://poznote.com/index.html#cloud)
 
 </details>
 
