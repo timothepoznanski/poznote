@@ -55,16 +55,6 @@ https://poznote.com/index.html#press
 
 Choose your preferred installation method below:
 
-<a id="poznote-cloud"></a>
-<details>
-<summary><strong>☁️ Poznote Cloud</strong></summary><br>
-
-Use Poznote without installing or maintaining anything: we host it for you.
-
-[Get started with Poznote Cloud](https://poznote.com/index.html#cloud)
-
-</details>
-
 <a id="windows"></a>
 <details>
 <summary><strong>🖥️ Windows</strong></summary>
@@ -208,6 +198,16 @@ Start Poznote containers:
 ```bash
 docker compose up -d
 ```
+
+</details>
+
+<a id="poznote-cloud"></a>
+<details>
+<summary><strong>☁️ Poznote Cloud</strong></summary><br>
+
+Use Poznote without installing or maintaining anything: we host it for you.
+
+[Get started with Poznote Cloud](https://poznote.com/index.html#cloud)
 
 </details>
 
