@@ -58,6 +58,7 @@ function initializeMasterDatabase(PDO $con): void {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE,
+            email_verified INTEGER DEFAULT 0,
             first_name TEXT,
             last_name TEXT,
             active INTEGER DEFAULT 1,
@@ -97,6 +98,13 @@ function initializeMasterDatabase(PDO $con): void {
 
         if (!in_array('last_name', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN last_name TEXT");
+        }
+
+        if (!in_array('email_verified', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0");
+            // Emails that predate self-service editing were all set by an
+            // administrator, so they are trusted for OIDC account matching.
+            $con->exec("UPDATE users SET email_verified = 1 WHERE email IS NOT NULL AND email != ''");
         }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
@@ -641,6 +649,24 @@ function getUserProfileByEmail(string $email): ?array {
 }
 
 /**
+ * Get user profile by email, restricted to VERIFIED emails (set by an admin
+ * or synced from the OIDC provider). Used for OIDC account matching so a
+ * self-set, unverified email can never capture someone else's SSO login.
+ */
+function getUserProfileByVerifiedEmail(string $email): ?array {
+    try {
+        if (trim($email) === '') return null;
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT * FROM users WHERE email = ? AND email_verified = 1");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? withComputedDisplayName($user) : null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
  * Get user profile by OIDC subject (sub claim)
  */
 function getUserProfileByOidcSubject(string $oidcSubject): ?array {
@@ -712,13 +738,16 @@ function createUserProfile(string $username, ?string $email = null): array {
             }
         }
         
+        // createUserProfile is only reachable from trusted flows (admin
+        // creation, OIDC provisioning), so a provided email counts as verified.
         $stmt = $con->prepare("
-            INSERT INTO users (username, email, active)
-            VALUES (?, ?, 1)
+            INSERT INTO users (username, email, email_verified, active)
+            VALUES (?, ?, ?, 1)
         ");
         $stmt->execute([
             $username,
-            $email
+            $email,
+            ($email !== null && trim((string)$email) !== '') ? 1 : 0
         ]);
         
         $userId = (int)$con->lastInsertId();
@@ -752,7 +781,7 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'first_name', 'last_name', 'active', 'is_admin', 'oidc_subject'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'oidc_subject'];
         $updates = [];
         $params = [];
 
@@ -772,6 +801,26 @@ function updateUserProfile(int $id, array $data): array {
                 return ['success' => false, 'error' => 'Username already exists'];
             }
             $data['username'] = $newUsername;
+        }
+
+        if (array_key_exists('email', $data)) {
+            $newEmail = trim((string)$data['email']);
+            if ($newEmail !== '') {
+                $stmt = $masterCon->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+                $stmt->execute([$newEmail, $id]);
+                if ($stmt->fetch()) {
+                    return ['success' => false, 'error' => 'Email already exists'];
+                }
+            }
+            $data['email'] = $newEmail;
+            // Fail secure: an email change drops the verified flag unless the
+            // caller (admin flow, OIDC sync) explicitly marks it verified.
+            if (!array_key_exists('email_verified', $data)) {
+                $data['email_verified'] = 0;
+            }
+        }
+        if (array_key_exists('email_verified', $data)) {
+            $data['email_verified'] = (int)(bool)$data['email_verified'];
         }
 
         foreach (['first_name', 'last_name'] as $nameField) {
@@ -930,7 +979,7 @@ function listAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, email, first_name, last_name, is_admin, active, created_at, last_login
+            SELECT id, username, email, email_verified, first_name, last_name, is_admin, active, created_at, last_login
             FROM users
             ORDER BY username
         ");

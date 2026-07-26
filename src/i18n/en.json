@@ -586,7 +586,7 @@
     },
     "user_settings_info": {
       "title": "Account Settings",
-      "message": "You can change your username, name and password from Settings. To edit your email or OIDC Subject (UUID), please contact the administrator of this Poznote instance.",
+      "message": "You can change your username, name, email and password from Settings.",
       "change_password_button": "Change Password",
       "edit_profile_button": "Edit Profile"
     },
@@ -2249,7 +2249,7 @@
     "card": "My Profile",
     "modal": {
       "title": "My Profile",
-      "description": "Update your username and your first and last name.",
+      "description": "Update your personal information.",
       "username": "Username",
       "first_name": "First name",
       "last_name": "Last name"
@@ -2257,7 +2257,9 @@
     "errors": {
       "username_required": "Username is required",
       "username_invalid": "Username may only contain letters, digits, dots, underscores and dashes, and cannot be a number",
-      "username_taken": "This username is already taken"
+      "username_taken": "This username is already taken",
+      "email_invalid": "Invalid email address",
+      "email_taken": "This email is already in use"
     }
   },
   "password": {

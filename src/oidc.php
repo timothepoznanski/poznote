@@ -823,12 +823,24 @@ function oidc_find_or_provision_user($claims) {
         $user = getUserProfileByOidcSubject($sub);
     }
 
+    // Fallback matching for profiles not linked by sub yet. A profile already
+    // linked to a DIFFERENT sub belongs to someone else's SSO identity and
+    // must never be re-captured through a username or email collision.
+    $oidcRejectForeignLink = function (?array $candidate) use ($sub): ?array {
+        if ($candidate && !empty($candidate['oidc_subject']) && $candidate['oidc_subject'] !== $sub) {
+            return null;
+        }
+        return $candidate;
+    };
+
     if (!$user && is_string($preferredUsername) && $preferredUsername !== '') {
-        $user = getUserProfileByUsername($preferredUsername);
+        $user = $oidcRejectForeignLink(getUserProfileByUsername($preferredUsername));
     }
 
+    // Only VERIFIED emails (admin-set or provider-synced) take part in
+    // matching: a self-set email must not capture someone's first SSO login.
     if (!$user && is_string($email) && $email !== '') {
-        $user = getUserProfileByEmail($email);
+        $user = $oidcRejectForeignLink(getUserProfileByVerifiedEmail($email));
     }
 
     if (!$user) {
@@ -881,7 +893,8 @@ function oidc_find_or_provision_user($claims) {
         // Only auto-sync email when target email is unused or already on this same user.
         $existingByEmail = getUserProfileByEmail($email);
         if (!$existingByEmail || (int)$existingByEmail['id'] === (int)$user['id']) {
-            updateUserProfile((int)$user['id'], ['email' => $email]);
+            // Provider-synced emails are trusted for future matching.
+            updateUserProfile((int)$user['id'], ['email' => $email, 'email_verified' => 1]);
             $user['email'] = $email;
         }
     }

@@ -119,6 +119,18 @@ class UsersController {
             }
         }
 
+        if (array_key_exists('email', $data)) {
+            $email = trim((string)$data['email']);
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                http_response_code(400);
+                return ['error' => 'Invalid email address'];
+            }
+            $updates['email'] = $email;
+            // Self-set emails stay unverified: OIDC account matching only
+            // considers verified (admin-set or provider-synced) emails.
+            $updates['email_verified'] = 0;
+        }
+
         if (empty($updates)) {
             http_response_code(400);
             return ['error' => 'No valid fields to update'];
@@ -145,6 +157,7 @@ class UsersController {
             'success' => true,
             'id' => (int)$userId,
             'username' => $user['username'] ?? $updates['username'] ?? null,
+            'email' => $user['email'] ?? null,
             'first_name' => $user['first_name'] ?? null,
             'last_name' => $user['last_name'] ?? null,
             'display_name' => $user['display_name'] ?? null
@@ -275,7 +288,12 @@ class UsersController {
             http_response_code(404);
             return ['error' => 'User profile not found'];
         }
-        
+
+        // An admin-set email is trusted for OIDC account matching.
+        if (isset($data['email']) && !array_key_exists('email_verified', $data)) {
+            $data['email_verified'] = 1;
+        }
+
         $result = updateUserProfile((int)$id, $data);
         
         if (!$result['success']) {

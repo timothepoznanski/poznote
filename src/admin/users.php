@@ -87,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'first_name' => $firstName,
                     'last_name' => $lastName,
                     'email' => $email,
+                    // Admin-set emails are trusted for OIDC account matching.
+                    'email_verified' => 1,
                     'oidc_subject' => $oidcSubject
                 ]);
 

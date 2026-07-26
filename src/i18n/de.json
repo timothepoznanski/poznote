@@ -1026,7 +1026,7 @@
     },
     "user_settings_info": {
       "title": "Kontoeinstellungen",
-      "message": "Sie koennen Ihren Benutzernamen, Ihren Namen und Ihr Passwort in den Einstellungen aendern. Um Ihre E-Mail oder Ihr OIDC-Subject (UUID) zu bearbeiten, wenden Sie sich bitte an den Administrator dieser Poznote-Instanz.",
+      "message": "Sie koennen Ihren Benutzernamen, Ihren Namen, Ihre E-Mail und Ihr Passwort in den Einstellungen aendern.",
       "change_password_button": "Passwort aendern",
       "edit_profile_button": "Profil bearbeiten"
     },
@@ -2549,7 +2549,7 @@
     "card": "Mein Profil",
     "modal": {
       "title": "Mein Profil",
-      "description": "Aktualisieren Sie Ihren Benutzernamen sowie Ihren Vor- und Nachnamen.",
+      "description": "Aktualisieren Sie Ihre persoenlichen Daten.",
       "username": "Benutzername",
       "first_name": "Vorname",
       "last_name": "Nachname"
@@ -2557,7 +2557,9 @@
     "errors": {
       "username_required": "Benutzername ist erforderlich",
       "username_invalid": "Der Benutzername darf nur Buchstaben, Ziffern, Punkte, Unterstriche und Bindestriche enthalten und darf nicht rein numerisch sein",
-      "username_taken": "Dieser Benutzername ist bereits vergeben"
+      "username_taken": "Dieser Benutzername ist bereits vergeben",
+      "email_invalid": "Ungueltige E-Mail-Adresse",
+      "email_taken": "Diese E-Mail wird bereits verwendet"
     }
   },
   "password": {

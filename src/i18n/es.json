@@ -1027,7 +1027,7 @@
     },
     "user_settings_info": {
       "title": "Configuración de cuenta",
-      "message": "Puedes cambiar tu nombre de usuario, tu nombre y tu contraseña desde Configuración. Para editar tu email u OIDC Subject (UUID), por favor contacta al administrador de esta instancia de Poznote.",
+      "message": "Puedes cambiar tu nombre de usuario, tu nombre, tu email y tu contraseña desde Configuración.",
       "change_password_button": "Cambiar contraseña",
       "edit_profile_button": "Editar perfil"
     },
@@ -2549,7 +2549,7 @@
     "card": "Mi perfil",
     "modal": {
       "title": "Mi perfil",
-      "description": "Actualiza tu nombre de usuario, tu nombre y tus apellidos.",
+      "description": "Actualiza tu información personal.",
       "username": "Nombre de usuario",
       "first_name": "Nombre",
       "last_name": "Apellidos"
@@ -2557,7 +2557,9 @@
     "errors": {
       "username_required": "El nombre de usuario es obligatorio",
       "username_invalid": "El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos, y no puede ser únicamente numérico",
-      "username_taken": "Este nombre de usuario ya está en uso"
+      "username_taken": "Este nombre de usuario ya está en uso",
+      "email_invalid": "Dirección de email no válida",
+      "email_taken": "Este email ya está en uso"
     }
   },
   "password": {

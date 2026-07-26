@@ -93,6 +93,7 @@ $settingsPageConfig = [
         'username' => (string)($currentUser['username'] ?? ''),
         'first_name' => (string)($currentUser['first_name'] ?? ''),
         'last_name' => (string)($currentUser['last_name'] ?? ''),
+        'email' => (string)($currentUser['email'] ?? ''),
     ],
 ];
 

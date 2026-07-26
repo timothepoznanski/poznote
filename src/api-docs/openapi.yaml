@@ -2701,8 +2701,11 @@ paths:
                     type: boolean
     patch:
       tags: [Users]
-      summary: Update current user's profile (username, first/last name)
-      description: Does NOT require X-User-ID header. Only provided fields are updated.
+      summary: Update current user's profile (username, first/last name, email)
+      description: >-
+        Does NOT require X-User-ID header. Only provided fields are updated.
+        A self-set email is stored as unverified: OIDC account matching only
+        considers verified (admin-set or provider-synced) emails.
       requestBody:
         required: true
         content:
@@ -2720,11 +2723,14 @@ paths:
                 last_name:
                   type: string
                   maxLength: 100
+                email:
+                  type: string
+                  format: email
       responses:
         '200':
           description: Profile updated
         '400':
-          description: Invalid username, username already taken, or no valid fields
+          description: Invalid or already-taken username/email, or no valid fields
 
   /users/me/password:
     post:

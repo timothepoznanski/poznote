@@ -38,7 +38,7 @@
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('profile.modal.title', {}, 'My Profile') + '</h3>' +
-                '<p class="text-small-muted edit-profile-description">' + tr('profile.modal.description', {}, 'Update your username and your first and last name.') + '</p>' +
+                '<p class="text-small-muted edit-profile-description">' + tr('profile.modal.description', {}, 'Update your personal information.') + '</p>' +
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<label for="epUsername" class="text-small-muted">' + tr('profile.modal.username', {}, 'Username') + '</label>' +
                     '<input type="text" id="epUsername" autocomplete="username" maxlength="60" placeholder="' + tr('profile.modal.username', {}, 'Username') + '" style="width:100%;box-sizing:border-box;">' +
@@ -50,6 +50,10 @@
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<label for="epLastName" class="text-small-muted">' + tr('profile.modal.last_name', {}, 'Last name') + '</label>' +
                     '<input type="text" id="epLastName" autocomplete="family-name" maxlength="100" placeholder="' + tr('profile.modal.last_name', {}, 'Last name') + '" style="width:100%;box-sizing:border-box;">' +
+                '</div>' +
+                '<div class="form-group" id="epEmailGroup" style="margin-bottom: 8px;">' +
+                    '<label for="epEmail" class="text-small-muted">' + tr('multiuser.admin.email', {}, 'Email') + '</label>' +
+                    '<input type="email" id="epEmail" autocomplete="email" maxlength="254" placeholder="' + tr('multiuser.admin.email', {}, 'Email') + '" style="width:100%;box-sizing:border-box;">' +
                 '</div>' +
                 '<div id="epError" class="error" style="color:#dc3545;margin-bottom:10px;display:none;"></div>' +
                 '<div class="modal-buttons">' +
@@ -72,12 +76,13 @@
         if (title) title.textContent = tr('profile.modal.title', {}, 'My Profile');
 
         var description = modal.querySelector('.edit-profile-description');
-        if (description) description.textContent = tr('profile.modal.description', {}, 'Update your username and your first and last name.');
+        if (description) description.textContent = tr('profile.modal.description', {}, 'Update your personal information.');
 
         var fields = [
             { id: 'epUsername', key: 'profile.modal.username', fallback: 'Username' },
             { id: 'epFirstName', key: 'profile.modal.first_name', fallback: 'First name' },
-            { id: 'epLastName', key: 'profile.modal.last_name', fallback: 'Last name' }
+            { id: 'epLastName', key: 'profile.modal.last_name', fallback: 'Last name' },
+            { id: 'epEmail', key: 'multiuser.admin.email', fallback: 'Email' }
         ];
         fields.forEach(function (entry) {
             var input = document.getElementById(entry.id);
@@ -99,6 +104,7 @@
         document.getElementById('epUsername').value = (profile && profile.username) || '';
         document.getElementById('epFirstName').value = (profile && profile.first_name) || '';
         document.getElementById('epLastName').value = (profile && profile.last_name) || '';
+        document.getElementById('epEmail').value = (profile && profile.email) || '';
     }
 
     function showProfileModal() {
@@ -140,7 +146,7 @@
         document.getElementById('epSaveBtn').addEventListener('click', submitProfileChange);
 
         // Enter key triggers save
-        ['epUsername', 'epFirstName', 'epLastName'].forEach(function (id) {
+        ['epUsername', 'epFirstName', 'epLastName', 'epEmail'].forEach(function (id) {
             document.getElementById(id).addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') submitProfileChange();
             });
@@ -170,6 +176,7 @@
         var username = document.getElementById('epUsername').value.trim();
         var firstName = document.getElementById('epFirstName').value.trim();
         var lastName = document.getElementById('epLastName').value.trim();
+        var email = document.getElementById('epEmail').value.trim();
         var errorEl = document.getElementById('epError');
 
         errorEl.style.display = 'none';
@@ -186,6 +193,19 @@
             return;
         }
 
+        if (email !== '' && !/^\S+@\S+\.\S+$/.test(email)) {
+            errorEl.textContent = tr('profile.errors.email_invalid', {}, 'Invalid email address');
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        var payload = {
+            username: username,
+            first_name: firstName,
+            last_name: lastName,
+            email: email
+        };
+
         var saveBtn = document.getElementById('epSaveBtn');
         saveBtn.disabled = true;
         saveBtn.textContent = tr('common.loading', {}, 'Loading...');
@@ -197,11 +217,7 @@
                 'Accept': 'application/json'
             },
             credentials: 'same-origin',
-            body: JSON.stringify({
-                username: username,
-                first_name: firstName,
-                last_name: lastName
-            })
+            body: JSON.stringify(payload)
         })
             .then(function (r) { return r.json().then(function (data) { return { status: r.status, data: data }; }); })
             .then(function (result) {
@@ -221,6 +237,10 @@
                         msg = tr('profile.errors.username_required', {}, msg);
                     } else if (msg.indexOf('Username may only contain') === 0 || msg === 'Username cannot be purely numeric') {
                         msg = tr('profile.errors.username_invalid', {}, msg);
+                    } else if (msg === 'Email already exists') {
+                        msg = tr('profile.errors.email_taken', {}, msg);
+                    } else if (msg === 'Invalid email address') {
+                        msg = tr('profile.errors.email_invalid', {}, msg);
                     }
                     errorEl.textContent = msg;
                     errorEl.style.display = 'block';
