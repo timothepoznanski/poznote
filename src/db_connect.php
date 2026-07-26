@@ -16,8 +16,17 @@ if (!function_exists('createDirectoryWithPermissions')) {
 $dbPath = SQLITE_DATABASE; // Default path (fallback)
 $activeUserId = null;
 
+// Public share API requests always act on the share owner's data. The visitor
+// may be logged in as a different user on the same instance, so for these
+// requests the share token must take precedence over the session. The
+// controllers still validate the token (and share password) themselves.
+$routingUri = (string)($_SERVER['REQUEST_URI'] ?? '');
+$forcePublicTokenRouting = !empty($_GET['token'])
+    && (strpos($routingUri, '/api/v1/public/') !== false
+        || preg_match('#/api/v1/notes/\d+/attachments/#', $routingUri));
+
 // Use user-specific database if authenticated
-if (isset($_SESSION['user_id']) && $_SESSION['user_id']) {
+if (!$forcePublicTokenRouting && isset($_SESSION['user_id']) && $_SESSION['user_id']) {
     $activeUserId = (int)$_SESSION['user_id'];
     require_once __DIR__ . '/users/UserDataManager.php';
     $userDataManager = new UserDataManager($activeUserId);
