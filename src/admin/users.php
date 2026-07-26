@@ -436,8 +436,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                             </span>
                         </th>
                         <th><?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                     </tr>
                 </thead>
@@ -495,7 +496,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 </div>
                             </td>
 
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>">
+                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?>">
                                 <input
                                     type="checkbox"
                                     <?php echo $user['is_admin'] ? 'checked' : ''; ?>
@@ -535,6 +536,17 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 <?php endif; ?>
                             </td>
 
+                            <td class="text-center user-created-cell" data-label="<?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?>">
+                                <?php
+                                    $userCreatedDate = convertUtcToUserTimezone((string)($user['created_at'] ?? ''), 'Y-m-d');
+                                    $userCreatedFull = formatUtcDateTimeForDisplay((string)($user['created_at'] ?? ''), 'Y-m-d H:i');
+                                ?>
+                                <?php if ($userCreatedDate !== ''): ?>
+                                    <span class="user-created-date" title="<?php echo htmlspecialchars($userCreatedFull, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($userCreatedDate); ?></span>
+                                <?php else: ?>
+                                    <em class="user-created-date"><?php echo t_h('multiuser.admin.not_defined', [], 'not defined'); ?></em>
+                                <?php endif; ?>
+                            </td>
 
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">

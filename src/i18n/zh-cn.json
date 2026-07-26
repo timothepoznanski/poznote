@@ -2354,6 +2354,7 @@
       },
       "id": "ID",
       "administrator": "管理员",
+      "administrator_short": "管理员",
       "click_to_activate": "点击激活",
       "click_to_deactivate": "点击停用",
       "toggle_admin": "切换管理员角色",

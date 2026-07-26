@@ -2475,6 +2475,7 @@
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
+      "administrator_short": "Admin",
       "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur.",
       "processing": "Traitement...",
       "errors_label": "Erreurs :",

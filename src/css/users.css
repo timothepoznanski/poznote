@@ -272,6 +272,10 @@ body.dark-mode .users-header-help:focus-visible {
     font-weight: 600;
 }
 
+.users-table td.user-created-cell {
+    white-space: nowrap;
+}
+
 .users-table tbody tr {
     background: transparent;
 }
@@ -314,6 +318,11 @@ html[data-theme='dark'] .users-table td {
 
 .user-email-empty {
     opacity: 0.8;
+}
+
+.user-created-date {
+    color: var(--text-muted, #666);
+    font-size: 0.9em;
 }
 
 .account-access-summary {
