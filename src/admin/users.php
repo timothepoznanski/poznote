@@ -421,7 +421,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <thead>
                     <tr>
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?></th>
                         <th><?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?></th>
                         <th><?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?></th>
                         <th>
@@ -436,8 +438,6 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                             </span>
                         </th>
                         <th><?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                     </tr>
@@ -448,73 +448,8 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                             <td class="text-center user-id-cell" data-label="<?php echo t_h('multiuser.admin.id', [], 'ID'); ?>">
                                 <?php echo $user['id']; ?>
                             </td>
-                            <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>" class="user-username-cell">
-                                <div class="user-info">
-                                    <div class="user-username">
-                                        <?php echo htmlspecialchars($user['username']); ?>
-                                        <?php if ($user['is_admin']): ?>
-                                            (<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>)
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </td>
-                            <?php
-                                $userFirstName = trim((string)($user['first_name'] ?? ''));
-                                $userLastName = trim((string)($user['last_name'] ?? ''));
-                            ?>
-                            <td data-label="<?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>" class="<?php echo $userFirstName === '' ? 'user-name-empty' : ''; ?>">
-                                <?php echo htmlspecialchars($userFirstName); ?>
-                            </td>
-                            <td data-label="<?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>" class="<?php echo $userLastName === '' ? 'user-name-empty' : ''; ?>">
-                                <?php echo htmlspecialchars($userLastName); ?>
-                            </td>
-                            <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
-                                <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
-                                    <?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : '<em>' . t_h('multiuser.admin.not_defined', [], 'not defined') . '</em>'; ?>
-                                </div>
-                            </td>
-
-                            <td data-label="<?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?>">
-                                <?php
-                                    $accessIds = $accountAccessMap[(int)$user['id']] ?? [];
-                                    $accessNames = [];
-                                    foreach ($accessIds as $accessId) {
-                                        if (isset($userNamesById[(int)$accessId])) {
-                                            $accessNames[] = $userNamesById[(int)$accessId];
-                                        }
-                                    }
-                                ?>
-                                <div class="account-access-summary">
-                                    <?php if (empty($accessNames)): ?>
-                                        <?php echo t_h('multiuser.admin.account_access.own_only', [], 'Own account only'); ?>
-                                    <?php else: ?>
-                                        <?php
-                                            array_unshift($accessNames, t('multiuser.admin.account_access.own_account', [], 'Own account'));
-                                            echo htmlspecialchars(implode(', ', $accessNames), ENT_QUOTES, 'UTF-8');
-                                        ?>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?>">
-                                <input
-                                    type="checkbox"
-                                    <?php echo $user['is_admin'] ? 'checked' : ''; ?>
-                                    <?php echo ($user['id'] === 1 || $user['id'] === $currentAuthUserId) ? 'disabled' : ''; ?>
-                                    title="<?php echo htmlspecialchars(
-                                        $user['id'] === 1
-                                            ? t('multiuser.admin.admin_id_1_locked', [], 'Administrator role cannot be removed from user ID 1')
-                                            : ($user['id'] === $currentAuthUserId
-                                                ? t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role')
-                                                : t('multiuser.admin.toggle_admin', [], 'Grant or revoke administrator privileges')),
-                                        ENT_QUOTES,
-                                        'UTF-8'
-                                    ); ?>"
-                                    onchange="this.checked ? toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 1, false, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>) : toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 0); if(!this.checked) { /* unchecking is direct */ } else { this.checked = false; }">
-                            </td>
 
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
-
                                 <?php if ($user['id'] === $currentAuthUserId): ?>
                                     <span class="badge badge-active badge-not-allowed" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
                                         <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
@@ -534,6 +469,69 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                         </span>
                                     <?php endif; ?>
                                 <?php endif; ?>
+                            </td>
+
+                            <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>" class="user-username-cell">
+                                <div class="user-info">
+                                    <div class="user-username">
+                                        <?php echo htmlspecialchars($user['username']); ?>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?>">
+                                <input
+                                    type="checkbox"
+                                    <?php echo $user['is_admin'] ? 'checked' : ''; ?>
+                                    <?php echo ($user['id'] === 1 || $user['id'] === $currentAuthUserId) ? 'disabled' : ''; ?>
+                                    title="<?php echo htmlspecialchars(
+                                        $user['id'] === 1
+                                            ? t('multiuser.admin.admin_id_1_locked', [], 'Administrator role cannot be removed from user ID 1')
+                                            : ($user['id'] === $currentAuthUserId
+                                                ? t('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role')
+                                                : t('multiuser.admin.toggle_admin', [], 'Grant or revoke administrator privileges')),
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ); ?>"
+                                    onchange="this.checked ? toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 1, false, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>) : toggleUserStatus(<?php echo (int)$user['id']; ?>, 'is_admin', 0); if(!this.checked) { /* unchecking is direct */ } else { this.checked = false; }">
+                            </td>
+                            <?php
+                                $userFirstName = trim((string)($user['first_name'] ?? ''));
+                                $userLastName = trim((string)($user['last_name'] ?? ''));
+                            ?>
+                            <td data-label="<?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>" class="<?php echo $userFirstName === '' ? 'user-name-empty' : ''; ?>">
+                                <div class="user-name-value"><?php echo htmlspecialchars($userFirstName); ?></div>
+                            </td>
+                            <td data-label="<?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>" class="<?php echo $userLastName === '' ? 'user-name-empty' : ''; ?>">
+                                <div class="user-name-value"><?php echo htmlspecialchars($userLastName); ?></div>
+                            </td>
+                            <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
+                                <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
+                                    <?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : '<em>' . t_h('multiuser.admin.not_defined', [], 'not defined') . '</em>'; ?>
+                                </div>
+                            </td>
+
+                            <td data-label="<?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?>">
+                                <?php
+                                    $accessIds = $accountAccessMap[(int)$user['id']] ?? [];
+                                    $accessNames = [];
+                                    foreach ($accessIds as $accessId) {
+                                        if (isset($userNamesById[(int)$accessId])) {
+                                            $accessNames[] = $userNamesById[(int)$accessId];
+                                        }
+                                    }
+                                ?>
+                                <?php
+                                    if (empty($accessNames)) {
+                                        $accessSummary = t('multiuser.admin.account_access.own_only', [], 'Own account only');
+                                    } else {
+                                        array_unshift($accessNames, t('multiuser.admin.account_access.own_account', [], 'Own account'));
+                                        $accessSummary = implode(', ', $accessNames);
+                                    }
+                                ?>
+                                <div class="account-access-summary" title="<?php echo htmlspecialchars($accessSummary, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php echo htmlspecialchars($accessSummary, ENT_QUOTES, 'UTF-8'); ?>
+                                </div>
                             </td>
 
                             <td class="text-center user-created-cell" data-label="<?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?>">

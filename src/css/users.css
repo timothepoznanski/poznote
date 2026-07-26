@@ -25,7 +25,7 @@ body.dark-mode {
 }
 
 .admin-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
     /* padding-bottom: 120px; */
@@ -306,6 +306,7 @@ html[data-theme='dark'] .users-table td {
     padding: 4px 8px;
     border-radius: 4px;
     display: inline-block;
+    white-space: nowrap;
 }
 
 .user-email {
@@ -320,6 +321,11 @@ html[data-theme='dark'] .users-table td {
     opacity: 0.8;
 }
 
+.user-name-value {
+    color: var(--text-muted, #666);
+    font-size: 0.9em;
+}
+
 .user-created-date {
     color: var(--text-muted, #666);
     font-size: 0.9em;
@@ -330,7 +336,9 @@ html[data-theme='dark'] .users-table td {
     font-size: 0.9em;
     line-height: 1.45;
     max-width: 260px;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Badges */
@@ -946,6 +954,20 @@ input.admin-toggle:disabled:checked+.slider {
     /* Hide empty first/last name rows in the mobile card view */
     .users-table td.user-name-empty {
         display: none !important;
+    }
+
+    /* Card view: let the username wrap on narrow screens instead of overflowing */
+    .user-username {
+        white-space: normal;
+    }
+
+    /* Card view has one field per row, so let the access list wrap normally */
+    .account-access-summary {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        overflow-wrap: anywhere;
+        text-align: right;
     }
 
     /* Unified Label Styling */

@@ -2771,6 +2771,10 @@
       "api_audience": "OIDC Bearer JWT API 请求接受的 aud claim。留空则使用 Client ID。多个 audience 请用逗号分隔。",
       "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",
       "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
+    },
+    "actions": {
+      "copy_all": "复制全部",
+      "copied": "已复制！"
     }
   },
   "smtp_admin": {

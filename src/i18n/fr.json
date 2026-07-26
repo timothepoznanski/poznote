@@ -2845,6 +2845,10 @@
       "api_audience": "Claim aud accepté pour les requêtes API avec Bearer JWT OIDC. Laisser vide pour utiliser le Client ID. Séparer plusieurs audiences par des virgules.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
+    },
+    "actions": {
+      "copy_all": "Tout copier",
+      "copied": "Copié !"
     }
   },
   "smtp_admin": {

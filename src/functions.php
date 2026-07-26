@@ -1458,8 +1458,13 @@ function formatDateTime($timestamp) {
  * @return string The directory path
  */
 function getDataPath(string $type): string {
-    global $activeUserId;
-    $userId = $_SESSION['user_id'] ?? $activeUserId;
+    global $activeUserId, $forcePublicTokenRouting;
+    // Public share requests are routed to the share owner's data (see
+    // db_connect.php): the visitor may be logged in as a different user, so
+    // their session user_id must not win over the resolved owner id.
+    $userId = !empty($forcePublicTokenRouting)
+        ? $activeUserId
+        : ($_SESSION['user_id'] ?? $activeUserId);
 
     $methodMap = [
         'entries' => 'getUserEntriesPath',
