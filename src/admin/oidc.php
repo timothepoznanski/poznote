@@ -252,6 +252,29 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
         body.dark-mode .oidc-chip-remove:hover {
             background: rgba(255, 255, 255, 0.18);
         }
+        .oidc-chip-label-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .oidc-chip-copy {
+            border: none;
+            background: none;
+            padding: 0;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #2E8CFA;
+            cursor: pointer;
+        }
+        .oidc-chip-copy:hover {
+            text-decoration: underline;
+        }
+        .oidc-chip-copy.is-copied {
+            color: #2e9e5b;
+            text-decoration: none;
+            cursor: default;
+        }
         .oidc-field .oidc-chip-box input[type="text"].oidc-chip-entry {
             flex: 1 1 140px;
             width: auto;
@@ -532,7 +555,11 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                     </div>
 
                     <div class="oidc-field">
-                        <label for="oidc_allowed_users_entry"><?php echo t_h('oidc_admin.fields.allowed_users', [], 'Allowed users'); ?></label>
+                        <div class="oidc-chip-label-row">
+                            <label for="oidc_allowed_users_entry"><?php echo t_h('oidc_admin.fields.allowed_users', [], 'Allowed users'); ?></label>
+                            <button type="button" id="oidc_allowed_users_copy" class="oidc-chip-copy" hidden
+                                data-copied-label="<?php echo h(t('oidc_admin.actions.copied', [], 'Copied!')); ?>"><?php echo t_h('oidc_admin.actions.copy_all', [], 'Copy all'); ?></button>
+                        </div>
                         <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.allowed_users', [], 'Type an email or username and press Enter to add it. Leave empty to allow all authenticated users.'); ?></span>
                         <div class="oidc-chip-box" id="oidc_allowed_users_box" data-remove-label="<?php echo h(t('common.delete', [], 'Delete')); ?>">
                             <input type="hidden" id="oidc_allowed_users" name="oidc_allowed_users" value="<?php echo h($settings['oidc_allowed_users']); ?>">
@@ -608,6 +635,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var box = document.getElementById('oidc_allowed_users_box');
     var hidden = document.getElementById('oidc_allowed_users');
     var entry = document.getElementById('oidc_allowed_users_entry');
+    var copyBtn = document.getElementById('oidc_allowed_users_copy');
 
     if (!box || !hidden || !entry) {
         return;
@@ -646,6 +674,7 @@ document.addEventListener('DOMContentLoaded', function () {
             box.insertBefore(chip, entry);
         });
         hidden.value = values.join(',');
+        if (copyBtn) copyBtn.hidden = values.length === 0;
     }
 
     function commitEntry() {
@@ -681,6 +710,45 @@ document.addEventListener('DOMContentLoaded', function () {
     box.addEventListener('click', function (e) {
         if (e.target === box) entry.focus();
     });
+
+    if (copyBtn) {
+        var copyDefaultLabel = copyBtn.textContent;
+        var copyResetTimer = null;
+
+        function writeToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            }
+            var tmp = document.createElement('textarea');
+            tmp.value = text;
+            tmp.setAttribute('readonly', '');
+            tmp.style.position = 'fixed';
+            tmp.style.opacity = '0';
+            document.body.appendChild(tmp);
+            tmp.select();
+            try {
+                document.execCommand('copy');
+                return Promise.resolve();
+            } catch (err) {
+                return Promise.reject(err);
+            } finally {
+                document.body.removeChild(tmp);
+            }
+        }
+
+        copyBtn.addEventListener('click', function () {
+            if (!values.length) return;
+            writeToClipboard(values.join(', ')).then(function () {
+                copyBtn.textContent = copyBtn.getAttribute('data-copied-label') || 'Copied!';
+                copyBtn.classList.add('is-copied');
+                clearTimeout(copyResetTimer);
+                copyResetTimer = setTimeout(function () {
+                    copyBtn.textContent = copyDefaultLabel;
+                    copyBtn.classList.remove('is-copied');
+                }, 1500);
+            }).catch(function () {});
+        });
+    }
 
     var form = box.closest('form');
     if (form) {

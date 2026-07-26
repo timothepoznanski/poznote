@@ -320,6 +320,11 @@ html[data-theme='dark'] .users-table td {
     opacity: 0.8;
 }
 
+.user-name-value {
+    color: var(--text-muted, #666);
+    font-size: 0.9em;
+}
+
 .user-created-date {
     color: var(--text-muted, #666);
     font-size: 0.9em;

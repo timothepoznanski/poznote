@@ -463,10 +463,10 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 $userLastName = trim((string)($user['last_name'] ?? ''));
                             ?>
                             <td data-label="<?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>" class="<?php echo $userFirstName === '' ? 'user-name-empty' : ''; ?>">
-                                <?php echo htmlspecialchars($userFirstName); ?>
+                                <div class="user-name-value"><?php echo htmlspecialchars($userFirstName); ?></div>
                             </td>
                             <td data-label="<?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>" class="<?php echo $userLastName === '' ? 'user-name-empty' : ''; ?>">
-                                <?php echo htmlspecialchars($userLastName); ?>
+                                <div class="user-name-value"><?php echo htmlspecialchars($userLastName); ?></div>
                             </td>
                             <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
                                 <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
