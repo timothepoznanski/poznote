@@ -113,8 +113,7 @@ Alternatively, install Poznote in a directory outside of `/root`, such as `/opt/
 <br>
 
 1. Try to log with "admin" or "admin_change_me" and your password.
-2. Check if the user's role (Admin vs User) matches the password you are using from the `.env` file.
-3. Ensure no extra spaces were added when editing the `.env` variables.
-4. If you can log in as an administrator (admin) but not as a standard user, check if the profile is marked as **active** in the User Management panel.
+2. Passwords are managed through the Poznote interface, not through `.env`. Until a password is changed in the UI, the built-in defaults apply: `admin` for administrators, `user` for standard users.
+3. If you can log in as an administrator but not as a standard user, check if the profile is marked as **active** in the User Management panel.
 
 </details>
