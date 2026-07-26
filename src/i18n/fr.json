@@ -1676,7 +1676,8 @@
       "oidc_disabled": "Votre compte a été désactivé par un administrateur. Veuillez le contacter pour plus d'informations.",
       "oidc_no_profile": "Aucun profil utilisateur trouvé pour \"{{identifier}}\". Veuillez contacter un administrateur pour créer votre profil.",
       "oidc_failed": "Échec de la connexion SSO. Veuillez réessayer.",
-      "oidc_unauthorized": "Vous n'êtes pas autorisé à accéder à cette application. Veuillez contacter votre administrateur."
+      "oidc_unauthorized": "Vous n'êtes pas autorisé à accéder à cette application. Veuillez contacter votre administrateur.",
+      "oidc_signup_limit": "Cette instance n'accepte plus de nouveaux comptes. Veuillez contacter l'administrateur."
     },
     "account_select": {
       "intro": "Choisissez le compte de notes à ouvrir.",
@@ -2824,6 +2825,7 @@
       "groups_claim": "Claim des groupes",
       "allowed_groups": "Groupes autorisés",
       "auto_create_users": "Créer automatiquement les profils à la première connexion OIDC",
+      "max_users": "Nombre maximum de comptes",
       "allowed_users": "Utilisateurs autorisés",
       "api_audience": "Audience JWT de l'API",
       "disable_normal_login": "Désactiver la connexion par mot de passe (SSO uniquement)",
@@ -2841,6 +2843,8 @@
       "groups_claim": "Nom du claim contenant les groupes de l'utilisateur (défaut : groups)",
       "allowed_groups": "Liste de groupes autorisés séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "auto_create_users": "Recommandé avec le contrôle d'accès par groupes",
+      "max_users": "Une fois ce nombre de profils atteint, la création automatique s'arrête et les nouveaux venus ne peuvent plus s'inscrire. Les utilisateurs existants continuent de se connecter normalement. Utilisez 0 pour ne pas fixer de limite.",
+      "max_users_current": "Actuellement : {{count}} profil(s).",
       "allowed_users": "Saisissez un email ou un nom d'utilisateur puis appuyez sur Entrée pour l'ajouter. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "api_audience": "Claim aud accepté pour les requêtes API avec Bearer JWT OIDC. Laisser vide pour utiliser le Client ID. Séparer plusieurs audiences par des virgules.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",

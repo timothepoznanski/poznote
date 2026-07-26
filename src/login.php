@@ -166,6 +166,8 @@ if (isset($_GET['oidc_error'])) {
     } elseif ($_GET['oidc_error'] === 'no_profile') {
         $identifier = $_GET['identifier'] ?? 'unknown';
         $oidcError = t('login.errors.oidc_no_profile', ['identifier' => $identifier], 'No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.', $currentLang ?? 'en');
+    } elseif ($_GET['oidc_error'] === 'signup_limit') {
+        $oidcError = t('login.errors.oidc_signup_limit', [], 'This instance is not accepting new accounts. Please contact the administrator.', $currentLang ?? 'en');
     } elseif ($_GET['oidc_error'] === 'disabled') {
         $oidcError = t('login.errors.oidc_disabled', [], 'Your account has been disabled by an administrator. Please contact them for more information.', $currentLang ?? 'en');
     } elseif ($_GET['oidc_error'] === '1') {

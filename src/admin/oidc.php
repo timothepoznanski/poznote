@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Save each setting
         $booleanKeys = ['oidc_enabled', 'oidc_disable_basic_auth', 'oidc_auto_create_users'];
-        $textKeys = ['oidc_provider_name', 'oidc_issuer', 'oidc_scopes', 'oidc_api_audience', 'oidc_discovery_url', 'oidc_redirect_uri', 'oidc_end_session_endpoint', 'oidc_post_logout_redirect_uri', 'oidc_groups_claim', 'oidc_allowed_groups', 'oidc_allowed_users'];
+        $textKeys = ['oidc_provider_name', 'oidc_issuer', 'oidc_scopes', 'oidc_api_audience', 'oidc_discovery_url', 'oidc_redirect_uri', 'oidc_end_session_endpoint', 'oidc_post_logout_redirect_uri', 'oidc_groups_claim', 'oidc_allowed_groups', 'oidc_allowed_users', 'oidc_max_users'];
 
         $allOk = true;
         foreach ($booleanKeys as $key) {
@@ -52,6 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Normalize issuer: remove trailing slash
             if ($key === 'oidc_issuer') {
                 $val = rtrim($val, '/');
+            }
+            // Normalize the signup cap: anything not a positive integer means
+            // "no limit", stored as 0.
+            if ($key === 'oidc_max_users') {
+                $val = ($val === '' || !ctype_digit($val)) ? '0' : (string)(int)$val;
             }
             if (!setGlobalSetting($key, $val)) {
                 $allOk = false;
@@ -101,6 +106,7 @@ $settings = [
     'oidc_allowed_groups' => getOidcSetting('oidc_allowed_groups', ''),
     'oidc_auto_create_users' => getOidcSettingBool('oidc_auto_create_users', false),
     'oidc_allowed_users' => getOidcSetting('oidc_allowed_users', ''),
+    'oidc_max_users' => getOidcSetting('oidc_max_users', '0'),
 ];
 
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
@@ -552,6 +558,21 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                             <label for="oidc_auto_create_users"><?php echo t_h('oidc_admin.fields.auto_create_users', [], 'Auto-create user profiles on first OIDC login'); ?></label>
                         </div>
                         <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.auto_create_users', [], 'Recommended when using group-based access control'); ?></span>
+                    </div>
+
+                    <div class="oidc-field">
+                        <label for="oidc_max_users"><?php echo t_h('oidc_admin.fields.max_users', [], 'Maximum number of accounts'); ?></label>
+                        <span class="oidc-hint">
+                            <?php echo t_h('oidc_admin.hints.max_users', [], 'Once this many user profiles exist, auto-creation stops and new people can no longer sign up. Existing users keep signing in normally. Use 0 for no limit.'); ?>
+                            <?php
+                                require_once __DIR__ . '/../users/db_master.php';
+                                $currentUserCount = countUserProfiles();
+                                if ($currentUserCount !== null) {
+                                    echo ' <strong>' . h(t('oidc_admin.hints.max_users_current', ['count' => $currentUserCount], 'Currently: {{count}} profile(s).')) . '</strong>';
+                                }
+                            ?>
+                        </span>
+                        <input type="number" min="0" step="1" id="oidc_max_users" name="oidc_max_users" value="<?php echo h($settings['oidc_max_users']); ?>" placeholder="0">
                     </div>
 
                     <div class="oidc-field">

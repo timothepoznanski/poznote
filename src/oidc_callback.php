@@ -69,6 +69,8 @@ try {
     // Check if the error is due to unauthorized user
     if (strpos($e->getMessage(), 'not authorized') !== false) {
         header('Location: login.php?oidc_error=unauthorized');
+    } elseif (strpos($e->getMessage(), 'signup limit reached') !== false) {
+        header('Location: login.php?oidc_error=signup_limit');
     } elseif (strpos($e->getMessage(), 'No user profile found') !== false) {
         preg_match('/"([^"]+)"/', $e->getMessage(), $matches);
         $identifier = $matches[1] ?? 'unknown';

@@ -1618,7 +1618,8 @@
       "oidc_disabled": "您的账户已被管理员禁用。请联系管理员了解更多信息。",
       "oidc_no_profile": "未找到 \"{{identifier}}\" 的用户个人资料。请联系管理员创建您的个人资料。",
       "oidc_failed": "SSO 登录失败。请稍后再试。",
-      "oidc_unauthorized": "您无权访问此应用程序。请联系您的管理员。"
+      "oidc_unauthorized": "您无权访问此应用程序。请联系您的管理员。",
+      "oidc_signup_limit": "此实例不再接受新账户。请联系管理员。"
     },
     "account_select": {
       "intro": "选择要打开的笔记账户。",
@@ -2750,6 +2751,7 @@
       "groups_claim": "Groups Claim",
       "allowed_groups": "允许的组",
       "auto_create_users": "首次通过 OIDC 登录时自动创建用户资料",
+      "max_users": "最大账户数量",
       "allowed_users": "允许的用户",
       "api_audience": "API JWT 受众",
       "disable_normal_login": "禁用用户名/密码登录（仅 SSO）",
@@ -2767,6 +2769,8 @@
       "groups_claim": "包含用户组的令牌 claim 名称（默认：groups）",
       "allowed_groups": "以逗号分隔的允许组列表。留空则允许所有已认证用户。",
       "auto_create_users": "使用基于组的访问控制时推荐启用",
+      "max_users": "当用户配置文件达到该数量后，自动创建将停止，新用户将无法注册。现有用户仍可正常登录。填写 0 表示不限制。",
+      "max_users_current": "当前：{{count}} 个配置文件。",
       "allowed_users": "输入邮箱或用户名后按回车键添加。留空则允许所有已认证用户。",
       "api_audience": "OIDC Bearer JWT API 请求接受的 aud claim。留空则使用 Client ID。多个 audience 请用逗号分隔。",
       "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",

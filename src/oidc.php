@@ -723,6 +723,34 @@ function oidc_is_auto_create_users_enabled() {
     return defined('OIDC_AUTO_CREATE_USERS') && OIDC_AUTO_CREATE_USERS === true;
 }
 
+/**
+ * Cap on the total number of profiles auto-creation may reach. 0 = unlimited.
+ */
+function oidc_max_users() {
+    return defined('OIDC_MAX_USERS') ? (int)OIDC_MAX_USERS : 0;
+}
+
+/**
+ * Whether auto-provisioning one more profile would exceed the cap. Only gates
+ * NEW profiles: users who already have one keep signing in past the cap.
+ */
+function oidc_signup_cap_reached() {
+    $max = oidc_max_users();
+    if ($max <= 0) {
+        return false;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    $count = countUserProfiles();
+    // Fail closed: if the count is unavailable we refuse to create rather than
+    // risk blowing past the cap.
+    if ($count === null) {
+        return true;
+    }
+
+    return $count >= $max;
+}
+
 function oidc_build_username_candidates($claims) {
     $preferredUsername = $claims['preferred_username'] ?? null;
     $nickname = $claims['nickname'] ?? null;
@@ -849,11 +877,18 @@ function oidc_find_or_provision_user($claims) {
             throw new Exception('No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.');
         }
 
+        if (oidc_signup_cap_reached()) {
+            throw new Exception('signup limit reached: this instance is not accepting new accounts.');
+        }
+
         $username = oidc_generate_available_username($claims);
         $newEmail = (is_string($email) && trim($email) !== '') ? trim($email) : null;
-        $creation = createUserProfile($username, $newEmail);
+        $creation = createUserProfile($username, $newEmail, oidc_max_users() ?: null);
         if (empty($creation['success']) || empty($creation['user_id'])) {
             $error = $creation['error'] ?? 'unknown error';
+            if (strpos($error, 'signup limit reached') !== false) {
+                throw new Exception('signup limit reached: this instance is not accepting new accounts.');
+            }
             throw new Exception('Failed to auto-create user profile: ' . $error);
         }
 
