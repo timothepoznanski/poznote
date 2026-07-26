@@ -1,5 +1,12 @@
 name: Publish Docker image
 
+# Each architecture is built natively (AMD64 on ubuntu-latest, ARM64 on
+# GitHub's free ARM runners) in parallel jobs, instead of emulating ARM64
+# with QEMU on a single x86 runner. Per-arch images are pushed by digest,
+# then merged into multi-arch manifest lists in the publish job. Build
+# layers are cached in the GitHub Actions cache (type=gha) so releases
+# that don't touch the base layers rebuild quickly.
+
 on:
   push:
     branches:
@@ -8,12 +15,16 @@ on:
       - 'src/version.txt'
 
 jobs:
-  build-and-push:
+  check-version:
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
-      packages: write
+
+    outputs:
+      needs_update: ${{ steps.check_version.outputs.needs_update }}
+      version: ${{ steps.check_version.outputs.version }}
+      build_matrix: ${{ steps.platforms.outputs.matrix }}
 
     steps:
       - name: Checkout code
@@ -86,7 +97,6 @@ jobs:
           if [ "$version_is_newer" = "true" ]; then
               echo "needs_update=true" >> $GITHUB_OUTPUT
               echo "version=$new_version" >> $GITHUB_OUTPUT
-              echo "version_clean=$new_version" >> $GITHUB_OUTPUT
               echo "📦 New version detected: $new_version (latest tag: $latest_version)"
           else
               echo "needs_update=false" >> $GITHUB_OUTPUT
@@ -99,29 +109,155 @@ jobs:
           git tag ${{ steps.check_version.outputs.version }}
           git push origin ${{ steps.check_version.outputs.version }}
 
+      - name: Determine build matrix
+        id: platforms
+        run: |
+          VERSION="${{ steps.check_version.outputs.version }}"
+
+          # Only build ARM for stable versions (not beta versions). Each
+          # platform builds natively on a matching runner (no QEMU).
+          if [[ "$VERSION" == *"-beta"* ]]; then
+            matrix='{"include":[{"platform":"linux/amd64","runner":"ubuntu-latest"}]}'
+            echo "🧪 Beta version detected - building only for AMD64 (no ARM)"
+          else
+            matrix='{"include":[{"platform":"linux/amd64","runner":"ubuntu-latest"},{"platform":"linux/arm64","runner":"ubuntu-24.04-arm"}]}'
+            echo "📦 Stable/test version - building for AMD64 and ARM64"
+          fi
+
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+
+  build:
+    needs: check-version
+    if: needs.check-version.outputs.needs_update == 'true'
+
+    strategy:
+      matrix: ${{ fromJSON(needs.check-version.outputs.build_matrix) }}
+
+    runs-on: ${{ matrix.runner }}
+
+    permissions:
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Prepare platform pair
+        run: |
+          platform="${{ matrix.platform }}"
+          echo "PLATFORM_PAIR=${platform//\//-}" >> $GITHUB_ENV
+
       - name: Log in to GitHub Container Registry
-        if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up QEMU
-        if: steps.check_version.outputs.needs_update == 'true'
-        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Poznote image (by digest)
+        id: build_default
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VERSION=${{ needs.check-version.outputs.version }}
+            APP_VERSION=${{ needs.check-version.outputs.version }}
+          outputs: type=image,name=ghcr.io/${{ github.repository_owner }}/poznote,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=poznote-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=max,scope=poznote-${{ env.PLATFORM_PAIR }}
+
+      - name: Build and push Poznote rootless image (by digest)
+        id: build_rootless
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: rootless
+          platforms: ${{ matrix.platform }}
+          build-args: |
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            VERSION=${{ needs.check-version.outputs.version }}
+            APP_VERSION=${{ needs.check-version.outputs.version }}
+          outputs: type=image,name=ghcr.io/${{ github.repository_owner }}/poznote,push-by-digest=true,name-canonical=true,push=true
+          cache-from: |
+            type=gha,scope=poznote-rootless-${{ env.PLATFORM_PAIR }}
+            type=gha,scope=poznote-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=max,scope=poznote-rootless-${{ env.PLATFORM_PAIR }}
+
+      - name: Build and push MCP image (by digest)
+        id: build_mcp
+        uses: docker/build-push-action@v6
+        with:
+          context: ./mcp-server
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=ghcr.io/${{ github.repository_owner }}/poznote-mcp,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=poznote-mcp-${{ env.PLATFORM_PAIR }}
+          cache-to: type=gha,mode=max,scope=poznote-mcp-${{ env.PLATFORM_PAIR }}
+
+      - name: Export digests
+        run: |
+          mkdir -p "${{ runner.temp }}/digests/default" "${{ runner.temp }}/digests/rootless" "${{ runner.temp }}/digests/mcp"
+
+          digest="${{ steps.build_default.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/default/${digest#sha256:}"
+
+          digest="${{ steps.build_rootless.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/rootless/${digest#sha256:}"
+
+          digest="${{ steps.build_mcp.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/mcp/${digest#sha256:}"
+
+      - name: Upload digests
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ env.PLATFORM_PAIR }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [check-version, build]
+    if: needs.check-version.outputs.needs_update == 'true'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        if: steps.check_version.outputs.needs_update == 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Determine Docker tags
-        if: steps.check_version.outputs.needs_update == 'true'
         id: docker_tags
         run: |
-          VERSION="${{ steps.check_version.outputs.version_clean }}"
+          VERSION="${{ needs.check-version.outputs.version }}"
           TAGS="ghcr.io/${{ github.repository_owner }}/poznote:$VERSION"
-          
+
           # Only add semantic version tags and 'latest' for stable versions (not test or beta versions)
           if [[ "$VERSION" != *"-test"* ]] && [[ "$VERSION" != *"-beta"* ]]; then
             # Extract major, minor, and patch version numbers
@@ -129,18 +265,18 @@ jobs:
               MAJOR="${BASH_REMATCH[1]}"
               MINOR="${BASH_REMATCH[2]}"
               PATCH="${BASH_REMATCH[3]}"
-              
+
               # Add major version tag (e.g., poznote:4)
               TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:$MAJOR"
-              
+
               # Add major.minor version tag (e.g., poznote:4.1)
               TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:$MAJOR.$MINOR"
-              
+
               echo "📦 Stable version detected - will tag as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest"
             else
               echo "⚠️  Version doesn't match semver pattern, skipping major/minor tags"
             fi
-            
+
             # Add latest tag
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote:latest"
           else
@@ -160,12 +296,11 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Determine MCP Docker tags
-        if: steps.check_version.outputs.needs_update == 'true'
         id: mcp_docker_tags
         run: |
-          VERSION="${{ steps.check_version.outputs.version_clean }}"
+          VERSION="${{ needs.check-version.outputs.version }}"
           TAGS="ghcr.io/${{ github.repository_owner }}/poznote-mcp:$VERSION"
-          
+
           # Only add semantic version tags and 'latest' for stable versions
           if [[ "$VERSION" != *"-test"* ]] && [[ "$VERSION" != *"-beta"* ]]; then
             # Extract major, minor, and patch version numbers
@@ -173,86 +308,57 @@ jobs:
               MAJOR="${BASH_REMATCH[1]}"
               MINOR="${BASH_REMATCH[2]}"
               PATCH="${BASH_REMATCH[3]}"
-              
+
               # Add major version tag (e.g., poznote-mcp:4)
               TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:$MAJOR"
-              
+
               # Add major.minor version tag (e.g., poznote-mcp:4.1)
               TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:$MAJOR.$MINOR"
-              
+
               echo "📦 Stable version detected - will tag MCP as: $VERSION, $MAJOR, $MAJOR.$MINOR, latest"
             else
               echo "⚠️  Version doesn't match semver pattern, skipping major/minor tags"
             fi
-            
+
             # Add latest tag
             TAGS="$TAGS"$'\n'"ghcr.io/${{ github.repository_owner }}/poznote-mcp:latest"
           else
             echo "🧪 Pre-release version detected (test/beta) - will NOT tag MCP with major/minor or 'latest'"
           fi
-          
+
           echo "tags<<EOF" >> $GITHUB_OUTPUT
           echo "$TAGS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Determine Docker platforms
-        if: steps.check_version.outputs.needs_update == 'true'
-        id: docker_platforms
+      - name: Create multi-arch manifests
         run: |
-          VERSION="${{ steps.check_version.outputs.version_clean }}"
-          
-          # Only build ARM for stable versions (not beta versions)
-          if [[ "$VERSION" == *"-beta"* ]]; then
-            PLATFORMS="linux/amd64"
-            echo "🧪 Beta version detected - building only for AMD64 (no ARM)"
-          else
-            PLATFORMS="linux/amd64,linux/arm64"
-            echo "📦 Stable/test version - building for AMD64 and ARM64"
-          fi
-          
-          echo "platforms=$PLATFORMS" >> $GITHUB_OUTPUT
+          # Merge the per-arch images (pushed by digest in the build jobs)
+          # into one manifest list per tag.
+          create_manifest() {
+            local repo="$1" digest_dir="$2" tags="$3"
+            local tag_args="" refs="" f t
 
-      - name: Build and push Poznote image
-        if: steps.check_version.outputs.needs_update == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: ${{ steps.docker_platforms.outputs.platforms }}
-          build-args: |
-            BUILD_DATE=${{ github.event.head_commit.timestamp }}
-            VERSION=${{ steps.check_version.outputs.version_clean }}
-            APP_VERSION=${{ steps.check_version.outputs.version_clean }}
-          tags: ${{ steps.docker_tags.outputs.tags }}
+            while IFS= read -r t; do
+              [ -n "$t" ] && tag_args="$tag_args -t $t"
+            done <<< "$tags"
 
-      - name: Build and push Poznote rootless image
-        if: steps.check_version.outputs.needs_update == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          target: rootless
-          push: true
-          platforms: ${{ steps.docker_platforms.outputs.platforms }}
-          build-args: |
-            BUILD_DATE=${{ github.event.head_commit.timestamp }}
-            VERSION=${{ steps.check_version.outputs.version_clean }}
-            APP_VERSION=${{ steps.check_version.outputs.version_clean }}
-          tags: ${{ steps.docker_tags.outputs.rootless_tags }}
+            for f in "${{ runner.temp }}/digests/$digest_dir"/*; do
+              refs="$refs $repo@sha256:$(basename "$f")"
+            done
 
-      - name: Build and push MCP image
-        if: steps.check_version.outputs.needs_update == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: ./mcp-server
-          push: true
-          platforms: ${{ steps.docker_platforms.outputs.platforms }}
-          tags: ${{ steps.mcp_docker_tags.outputs.tags }}
+            echo "📦 Creating manifest for $repo ($digest_dir):"
+            docker buildx imagetools create $tag_args $refs
+            docker buildx imagetools inspect "$(echo "$tags" | head -n1)"
+          }
+
+          create_manifest "ghcr.io/${{ github.repository_owner }}/poznote" default "${{ steps.docker_tags.outputs.tags }}"
+          create_manifest "ghcr.io/${{ github.repository_owner }}/poznote" rootless "${{ steps.docker_tags.outputs.rootless_tags }}"
+          create_manifest "ghcr.io/${{ github.repository_owner }}/poznote-mcp" mcp "${{ steps.mcp_docker_tags.outputs.tags }}"
 
       - name: Create GitHub release
-        if: steps.check_version.outputs.needs_update == 'true'
         run: |
-          VERSION="${{ steps.check_version.outputs.version }}"
-          
+          VERSION="${{ needs.check-version.outputs.version }}"
+
           # Check if this is a test or beta version
           if [[ "$VERSION" == *"-test"* ]] || [[ "$VERSION" == *"-beta"* ]]; then
             PRERELEASE_FLAG="--prerelease"
@@ -261,25 +367,25 @@ jobs:
             PRERELEASE_FLAG=""
             echo "📦 Creating stable release: $VERSION"
           fi
-          
+
           RELEASE_NOTES=""
-          
+
           # Method 1: Try to find PR number in recent commit messages (last 10 commits)
           echo "🔍 Searching for PR in recent commits..."
           PR_NUMBER=$(git log -10 --pretty=%s | grep -oP '(?<=#)\d+(?=\))' | head -1 || echo "")
-          
+
           # Method 2: If no PR found, try to find PR associated with current commit via GitHub API
           if [ -z "$PR_NUMBER" ]; then
             echo "🔍 Searching for PR via GitHub API..."
             COMMIT_SHA=$(git rev-parse HEAD)
             PR_NUMBER=$(gh pr list --search "$COMMIT_SHA" --state merged --json number --jq '.[0].number' 2>/dev/null || echo "")
           fi
-          
+
           # If we found a PR number, get the PR description
           if [ -n "$PR_NUMBER" ]; then
             echo "📝 Found PR #$PR_NUMBER, fetching description..."
             PR_BODY=$(gh pr view $PR_NUMBER --json body --jq '.body' 2>/dev/null || echo "")
-            
+
             if [ -n "$PR_BODY" ]; then
               RELEASE_NOTES="$PR_BODY"
               echo "✅ Using PR #$PR_NUMBER description as release notes"
@@ -289,7 +395,7 @@ jobs:
           else
             echo "⚠️ No PR found in recent history or via API"
           fi
-          
+
           # Fallback: Default message if no PR description found
           if [ -z "$RELEASE_NOTES" ]; then
             RELEASE_NOTES="Automatic release for version $VERSION
@@ -297,131 +403,23 @@ jobs:
           This release was automatically created when a new version was detected in the repository."
             echo "📋 Using default release notes"
           fi
-          
+
           gh release create $VERSION $PRERELEASE_FLAG \
             --title "Release $VERSION" \
             --notes "$RELEASE_NOTES"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-#      - name: Delete oldest release and tag
-#        if: steps.check_version.outputs.needs_update == 'true'
-#        run: |
-#          # Keep only the 20 most recent releases
-#          KEEP_COUNT=20
-#          
-#          # Verify GitHub CLI is available (should be pre-installed on GitHub runners)
-#          if ! command -v gh &> /dev/null; then
-#            echo "❌ GitHub CLI not available, skipping cleanup"
-#            exit 0
-#          fi
-#          
-#          # Get all releases sorted by creation date (newest first), excluding pre-releases
-#          all_releases=$(gh release list --limit 1000 --json tagName,createdAt,isPrerelease --jq 'sort_by(.createdAt) | reverse | .[] | select(.isPrerelease | not) | .tagName')
-#          
-#          # Count total releases
-#          total_releases=$(echo "$all_releases" | wc -l)
-#          echo "📊 Total releases: $total_releases"
-#          
-#          if [ "$total_releases" -gt "$KEEP_COUNT" ]; then
-#            # Get releases to delete (everything after the first KEEP_COUNT)
-#            releases_to_delete=$(echo "$all_releases" | tail -n +$((KEEP_COUNT + 1)))
-#            
-#            echo "🗑️  Deleting old releases (keeping $KEEP_COUNT most recent, excluding test versions):"
-#            
-#            # Delete each old release and its tag
-#            while IFS= read -r tag; do
-#              if [ -n "$tag" ]; then
-#                echo "  - Deleting release: $tag"
-#                
-#                # Delete the release
-#                gh release delete "$tag" --yes 2>/dev/null || echo "    ⚠️  Failed to delete release $tag"
-#                
-#                # Delete the tag remotely (with better error handling)
-#                if git ls-remote --tags origin | grep -q "refs/tags/$tag$"; then
-#                  git push origin --delete "$tag" 2>/dev/null && echo "    ✅ Deleted remote tag: $tag" || echo "    ⚠️  Failed to delete remote tag: $tag"
-#                else
-#                  echo "    ℹ️  Remote tag $tag not found (already deleted or never existed)"
-#                fi
-#                
-#                echo "    ✅ Processed: $tag"
-#              fi
-#            done <<< "$releases_to_delete"
-#            
-#            echo "✅ Cleanup completed - kept $KEEP_COUNT most recent releases"
-#          else
-#            echo "ℹ️  No cleanup needed (only $total_releases releases, keeping $KEEP_COUNT)"
-#          fi
-#          
-#          # Additional cleanup: Remove orphaned tags (tags without releases)
-#          echo ""
-#          echo "🧹 Cleaning up orphaned tags..."
-#          
-#          # Get all remote tags (only version format without 'v' prefix)
-#          all_tags=$(git ls-remote --tags origin | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/.*refs\/tags\///' | sort -V)
-#          
-#          if [ -z "$all_tags" ]; then
-#            echo "ℹ️  No version tags found"
-#          else
-#            total_tags=$(echo "$all_tags" | wc -l)
-#            echo "📊 Total version tags found: $total_tags"
-#            
-#            # Get all current release tags
-#            current_release_tags=$(gh release list --limit 1000 --json tagName --jq '.[].tagName' | sort) || {
-#              echo "⚠️  Failed to get releases, skipping orphaned tag cleanup"
-#              current_release_tags=""
-#            }
-#            
-#            if [ -n "$current_release_tags" ]; then
-#              # Find orphaned tags (tags that don't have corresponding releases)
-#              orphaned_tags=""
-#              while IFS= read -r tag; do
-#                if [ -n "$tag" ] && ! echo "$current_release_tags" | grep -q "^$tag$"; then
-#                  orphaned_tags="$orphaned_tags$tag\n"
-#                fi
-#              done <<< "$all_tags"
-#              
-#              if [ -n "$orphaned_tags" ] && [ "$orphaned_tags" != "\n" ]; then
-#                orphaned_count=$(echo -e "$orphaned_tags" | grep -v '^$' | wc -l)
-#                echo "🗑️  Found $orphaned_count orphaned tags to delete:"
-#                
-#                echo -e "$orphaned_tags" | grep -v '^$' | while IFS= read -r tag; do
-#                  if [ -n "$tag" ]; then
-#                    echo "  - Deleting orphaned tag: $tag"
-#                    git push origin --delete "$tag" 2>/dev/null && echo "    ✅ Deleted orphaned tag: $tag" || echo "    ⚠️  Failed to delete orphaned tag: $tag"
-#                  fi
-#                done
-#                
-#                echo "✅ Orphaned tags cleanup completed"
-#              else
-#                echo "ℹ️  No orphaned tags found"
-#              fi
-#            else
-#              echo "ℹ️  No current releases found, skipping orphaned tag comparison"
-#            fi
-#          fi
-#          
-#          # Final summary
-#          echo ""
-#          echo "📈 Summary:"
-#          final_releases=$(gh release list --limit 1000 --json tagName --jq '.[].tagName' | wc -l) || echo "Unknown"
-#          final_tags=$(git ls-remote --tags origin | grep -E 'refs/tags/[0-9]+\.[0-9]+\.[0-9]+$' | wc -l)
-#          echo "  - Releases: $final_releases"
-#          echo "  - Version tags: $final_tags"
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Clean up old Docker images
-        if: steps.check_version.outputs.needs_update == 'true'
         run: |
           echo "🧹 Cleaning up old Docker images..."
-          
+
           # Keep only the most recent Docker image versions. Each release now
           # publishes 2 tagged versions of the poznote package (default +
           # rootless), so 40 versions = ~20 releases.
           KEEP_COUNT=40
           PACKAGE_NAME="poznote"
-          
+
           # Debug: Get all package versions with their tags for analysis
           echo "🔍 Analyzing all Docker image versions..."
           all_versions_debug=$(gh api \
@@ -430,7 +428,7 @@ jobs:
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq '.[] | {id: .id, tags: .metadata.container.tags, created_at: .created_at}' \
             2>/dev/null || echo "[]")
-          
+
           echo "📋 All versions found:"
           echo "$all_versions_debug" | head -20  # Show first 20 for debugging
 
@@ -443,28 +441,28 @@ jobs:
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags | index("latest") == null and index("rootless") == null)] | sort_by(.created_at) | reverse | .[].id' \
             2>/dev/null || echo "")
-          
+
           if [ -z "$versions" ]; then
             echo "ℹ️  No Docker image versions found or failed to fetch"
             exit 0
           fi
-          
+
           # Convert to array and count
           versions_array=($versions)
           total_versions=${#versions_array[@]}
-          
+
           echo "📊 Total Docker image versions: $total_versions"
-          
+
           if [ "$total_versions" -gt "$KEEP_COUNT" ]; then
             # Calculate how many to delete
             to_delete_count=$((total_versions - KEEP_COUNT))
             echo "🗑️  Deleting $to_delete_count old Docker image versions (keeping $KEEP_COUNT most recent):"
-            
+
             # Delete the oldest versions (they're at the end of our reversed array)
             for ((i=KEEP_COUNT; i<total_versions; i++)); do
               version_id=${versions_array[$i]}
               echo "  - Deleting Docker image version ID: $version_id"
-              
+
               gh api \
                 --method DELETE \
                 -H "Accept: application/vnd.github+json" \
@@ -472,49 +470,49 @@ jobs:
                 "/user/packages/container/${PACKAGE_NAME}/versions/${version_id}" \
                 2>/dev/null && echo "    ✅ Deleted version ID: $version_id" || echo "    ⚠️  Failed to delete version ID: $version_id"
             done
-            
+
             echo "✅ Docker images cleanup completed - kept $KEEP_COUNT most recent versions"
           else
             echo "ℹ️  No Docker images cleanup needed (only $total_versions versions, keeping $KEEP_COUNT)"
           fi
-          
+
           # Final count with detailed breakdown
           echo ""
           echo "📊 Final analysis:"
-          
+
           final_versions_tagged=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] != "latest")] | length' \
             2>/dev/null || echo "Unknown")
-            
+
           final_versions_latest=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq '[.[] | select(.metadata.container.tags[]? == "latest")] | length' \
             2>/dev/null || echo "Unknown")
-            
+
           final_versions_untagged=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq '[.[] | select(.metadata.container.tags | length == 0)] | length' \
             2>/dev/null || echo "Unknown")
-            
+
           final_versions_total=$(gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq 'length' \
             2>/dev/null || echo "Unknown")
-            
+
           echo "  📈 Tagged versions (managed by cleanup): $final_versions_tagged"
           echo "  🏷️  Latest tagged versions: $final_versions_latest"
           echo "  🚫 Untagged versions: $final_versions_untagged"
           echo "  📦 Total versions: $final_versions_total"
-          
+
           # ------------------------------------------------------------------------------------------------
           # CLEANUP FOR MCP IMAGE (Duplicated logic)
           # ------------------------------------------------------------------------------------------------
@@ -522,7 +520,7 @@ jobs:
           echo "🧹 Cleaning up old Docker images for MCP..."
           KEEP_COUNT=20  # single variant, so 20 versions = ~20 releases
           PACKAGE_NAME="poznote-mcp"
-          
+
           # Get all package versions (excluding 'latest' tag and untagged versions)
           versions=$(gh api \
             -H "Accept: application/vnd.github+json" \
@@ -530,7 +528,7 @@ jobs:
             "/user/packages/container/${PACKAGE_NAME}/versions" \
             --jq '[.[] | select(.metadata.container.tags | length > 0) | select(.metadata.container.tags[] != "latest")] | sort_by(.created_at) | reverse | .[].id' \
             2>/dev/null || echo "")
-          
+
           if [ -z "$versions" ]; then
             echo "ℹ️  No Docker image versions found for MCP or failed to fetch"
             # Do not exit here to allow workflow to finish cleanly
@@ -538,19 +536,19 @@ jobs:
             # Convert to array and count
             versions_array=($versions)
             total_versions=${#versions_array[@]}
-            
+
             echo "📊 Total MCP Docker image versions: $total_versions"
-            
+
             if [ "$total_versions" -gt "$KEEP_COUNT" ]; then
               # Calculate how many to delete
               to_delete_count=$((total_versions - KEEP_COUNT))
               echo "🗑️  Deleting $to_delete_count old MCP Docker image versions (keeping $KEEP_COUNT most recent):"
-              
+
               # Delete the oldest versions
               for ((i=KEEP_COUNT; i<total_versions; i++)); do
                 version_id=${versions_array[$i]}
                 echo "  - Deleting MCP Docker image version ID: $version_id"
-                
+
                 gh api \
                   --method DELETE \
                   -H "Accept: application/vnd.github+json" \
@@ -558,7 +556,7 @@ jobs:
                   "/user/packages/container/${PACKAGE_NAME}/versions/${version_id}" \
                   2>/dev/null && echo "    ✅ Deleted version ID: $version_id" || echo "    ⚠️  Failed to delete version ID: $version_id"
               done
-              
+
               echo "✅ MCP Docker images cleanup completed"
             else
               echo "ℹ️  No MCP Docker images cleanup needed (only $total_versions versions)"
@@ -566,4 +564,3 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
