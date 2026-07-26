@@ -2538,6 +2538,7 @@
       "table_attachments": "Anhänge (MB)",
       "table_total": "Gesamt (MB)",
       "table_total_row": "Gesamt",
+      "filter_placeholder": "Konten filtern...",
       "no_accounts": "Keine Konten gefunden."
     }
   },

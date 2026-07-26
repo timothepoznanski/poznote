@@ -255,6 +255,9 @@ html[data-theme='dark'] .ci-notice.warning { color: #fde047; }
 }
 .results-table tr:last-child td { border-bottom: none; }
 
+/* Rows hidden by the filter bar (storage stats). */
+.results-table tbody tr.filter-hidden { display: none !important; }
+
 .file-list-preview { 
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace;
     font-size: 0.85em; 
@@ -554,6 +557,19 @@ html[data-theme='dark'] .status-deleted {
     /* Hide less important columns on mobile */
     .results-table .hide-mobile {
         display: none;
+    }
+
+    /* Storage stats: keep every column on mobile and let the table
+       scroll sideways inside its container instead. */
+    .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .table-scroll .results-table {
+        min-width: 640px;
+    }
+    .table-scroll .results-table .hide-mobile {
+        display: table-cell;
     }
     
     /* Show short headers on mobile */

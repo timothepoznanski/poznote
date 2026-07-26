@@ -2163,6 +2163,7 @@
       "table_attachments": "Attachments (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "filter_placeholder": "Filter accounts...",
       "no_accounts": "No accounts found."
     }
   },

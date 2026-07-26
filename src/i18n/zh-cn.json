@@ -2682,6 +2682,7 @@
       "table_attachments": "附件 (MB)",
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
+      "filter_placeholder": "筛选账户...",
       "no_accounts": "未找到账户。"
     }
   },

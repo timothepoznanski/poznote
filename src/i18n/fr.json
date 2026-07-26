@@ -2753,6 +2753,7 @@
       "table_attachments": "Pièces jointes (Mo)",
       "table_total": "Total (Mo)",
       "table_total_row": "Total",
+      "filter_placeholder": "Filtrer les comptes...",
       "no_accounts": "Aucun compte trouvé."
     }
   },

@@ -161,6 +161,7 @@ foreach ($stats as $r) {
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/home/search.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
@@ -173,6 +174,31 @@ foreach ($stats as $r) {
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
+    <script>
+    /**
+     * Filter the stats table rows against the search input value
+     */
+    function initStorageStatsFilter() {
+        const input = document.getElementById('storage-filter-input');
+        if (!input) return;
+
+        input.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            document.querySelectorAll('.results-table tbody tr').forEach(function (row) {
+                row.classList.toggle('filter-hidden', query !== '' && !row.textContent.toLowerCase().includes(query));
+            });
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && this.value !== '') {
+                this.value = '';
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initStorageStatsFilter);
+    </script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 <div class="admin-container">
@@ -188,7 +214,14 @@ foreach ($stats as $r) {
             <p><?php echo t_h('admin_tools.storage_stats.description', [], 'Number of notes and disk space used by each account.'); ?></p>
         </div>
 
-        <div class="results-container">
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="lucide lucide-search home-search-icon"></i>
+                <input type="text" id="storage-filter-input" class="home-search-input" placeholder="<?php echo t_h('admin_tools.storage_stats.filter_placeholder', [], 'Filter accounts...'); ?>" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="results-container table-scroll">
             <table class="results-table">
                 <thead>
                     <tr>

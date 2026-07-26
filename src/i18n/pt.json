@@ -2541,6 +2541,7 @@
       "table_attachments": "Anexos (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "filter_placeholder": "Filtrar contas...",
       "no_accounts": "Nenhuma conta encontrada."
     }
   },

@@ -2133,6 +2133,7 @@
       "table_attachments": "Вложения (МБ)",
       "table_total": "Всего (МБ)",
       "table_total_row": "Всего",
+      "filter_placeholder": "Фильтровать учётные записи...",
       "no_accounts": "Учётные записи не найдены."
     }
   },
