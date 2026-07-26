@@ -232,6 +232,9 @@ define('CUSTOM_CSS_PATH', poznoteResolveCustomCssPath());
 // Optional password to protect access to the Settings page.
 define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
 
+// Optional: hide the "Restrict to specific users" toggles in share dialogs.
+define('HIDE_RESTRICT_USERS', _envBool('POZNOTE_HIDE_RESTRICT_USERS', false));
+
 /**
  * Resolve a global setting from the database with environment variable fallback.
  */

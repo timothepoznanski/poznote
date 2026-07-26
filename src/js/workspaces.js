@@ -661,6 +661,7 @@ function showWorkspaceShareOptionsModal(button) {
     var previewShareUrl = currentShareUrl || button.getAttribute('data-preview-url') || '';
     var currentPasswordValue = button.getAttribute('data-password-value') || '';
     var selectedUserIds = parseWorkspaceShareAllowedUsers(button);
+    var hideRestrictUsers = document.body && document.body.getAttribute('data-hide-restrict-users') === '1';
     var availableUsers = [];
     var usersLoaded = false;
     var initialLoginRequired = button.getAttribute('data-login-required') === '1' || selectedUserIds.length > 0;
@@ -899,7 +900,9 @@ function showWorkspaceShareOptionsModal(button) {
     userListContainer.className = 'share-user-list-container';
     userListContainer.style.display = specificUsersCheckbox.checked ? 'block' : 'none';
     specificUsersWrap.appendChild(userListContainer);
-    content.appendChild(specificUsersWrap);
+    if (!hideRestrictUsers) {
+        content.appendChild(specificUsersWrap);
+    }
 
     function renderUserCheckboxes() {
         userListContainer.innerHTML = '';
@@ -973,6 +976,7 @@ function showWorkspaceShareOptionsModal(button) {
     }
 
     function updateUserRestrictionVisibility() {
+        if (hideRestrictUsers) return;
         specificUsersWrap.style.display = loginCheckbox.checked ? 'block' : 'none';
         userListContainer.style.display = loginCheckbox.checked && specificUsersCheckbox.checked ? 'block' : 'none';
         if (loginCheckbox.checked && specificUsersCheckbox.checked && !usersLoaded) {
@@ -985,7 +989,7 @@ function showWorkspaceShareOptionsModal(button) {
 
     loginCheckbox.addEventListener('change', updateUserRestrictionVisibility);
     specificUsersCheckbox.addEventListener('change', updateUserRestrictionVisibility);
-    if (loginCheckbox.checked && specificUsersCheckbox.checked) {
+    if (loginCheckbox.checked && specificUsersCheckbox.checked && !hideRestrictUsers) {
         loadAvailableUsers();
     }
 
