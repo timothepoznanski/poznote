@@ -603,6 +603,21 @@ function withComputedDisplayName(?array $user): ?array {
 }
 
 /**
+ * Count user profiles. Returns null when the count cannot be established, so
+ * callers enforcing a cap can fail closed instead of reading a failure as 0.
+ */
+function countUserProfiles(): ?int {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("SELECT COUNT(*) FROM users");
+        $count = $stmt->fetchColumn();
+        return $count === false ? null : (int)$count;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
  * Get user profile by ID
  */
 function getUserProfileById(int $id): ?array {
@@ -712,23 +727,23 @@ function updateUserOidcSubject(int $userId, string $oidcSubject): void {
  * Create a new user profile
  */
 
-function createUserProfile(string $username, ?string $email = null): array {
+function createUserProfile(string $username, ?string $email = null, ?int $maxUsers = null): array {
     try {
         $con = getMasterConnection();
-        
+
         // Reject purely numeric usernames — they would be ambiguous with user IDs
         // in the Basic Auth lookup (which accepts both usernames and numeric IDs).
         if (ctype_digit($username)) {
             return ['success' => false, 'error' => 'Username cannot be purely numeric'];
         }
-        
+
         // Check if username exists
         $stmt = $con->prepare("SELECT id FROM users WHERE username = ?");
         $stmt->execute([$username]);
         if ($stmt->fetch()) {
             return ['success' => false, 'error' => 'Username already exists'];
         }
-        
+
         // Check if email exists
         if ($email) {
             $stmt = $con->prepare("SELECT id FROM users WHERE email = ?");
@@ -737,7 +752,21 @@ function createUserProfile(string $username, ?string $email = null): array {
                 return ['success' => false, 'error' => 'Email already exists'];
             }
         }
-        
+
+        // When the caller enforces a profile cap (OIDC self-signup), re-check it
+        // inside the write transaction: two concurrent signups could otherwise
+        // both pass an earlier check and land on the same last free slot.
+        $useCap = $maxUsers !== null && $maxUsers > 0;
+        if ($useCap) {
+            $con->beginTransaction();
+            $stmt = $con->query("SELECT COUNT(*) FROM users");
+            $current = $stmt->fetchColumn();
+            if ($current === false || (int)$current >= $maxUsers) {
+                $con->rollBack();
+                return ['success' => false, 'error' => 'signup limit reached'];
+            }
+        }
+
         // createUserProfile is only reachable from trusted flows (admin
         // creation, OIDC provisioning), so a provided email counts as verified.
         $stmt = $con->prepare("
@@ -749,8 +778,12 @@ function createUserProfile(string $username, ?string $email = null): array {
             $email,
             ($email !== null && trim((string)$email) !== '') ? 1 : 0
         ]);
-        
+
         $userId = (int)$con->lastInsertId();
+
+        if ($useCap) {
+            $con->commit();
+        }
         
         // Sync username and email to user's local DB for recovery
         require_once __DIR__ . '/UserDataManager.php';
@@ -762,6 +795,9 @@ function createUserProfile(string $username, ?string $email = null): array {
         
         return ['success' => true, 'user_id' => $userId];
     } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
         return ['success' => false, 'error' => $e->getMessage()];
     }
 }

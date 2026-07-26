@@ -224,6 +224,10 @@ define('OIDC_GROUPS_CLAIM', trim(_oidc('oidc_groups_claim', 'groups')));
 define('OIDC_ALLOWED_GROUPS', _oidc('oidc_allowed_groups', ''));
 define('OIDC_AUTO_CREATE_USERS', _oidcBool('oidc_auto_create_users', false));
 define('OIDC_ALLOWED_USERS', _oidc('oidc_allowed_users', ''));
+// Cap on how many user profiles auto-creation may bring the instance to.
+// 0 (the default) means unlimited. Existing profiles, however they were
+// created, count toward the cap.
+define('OIDC_MAX_USERS', max(0, (int)_oidc('oidc_max_users', '0')));
 
 // Optional: load an extra stylesheet from src/css/ on every HTML page.
 // The preferred source is the Advanced section in settings.php.

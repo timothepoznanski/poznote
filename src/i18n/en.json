@@ -1289,7 +1289,8 @@
       "oidc_disabled": "Your account has been disabled by an administrator. Please contact them for more information.",
       "oidc_no_profile": "No user profile found for \"{{identifier}}\". Please contact an administrator to create your profile.",
       "oidc_failed": "SSO login failed. Please try again.",
-      "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator."
+      "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator.",
+      "oidc_signup_limit": "This instance is not accepting new accounts. Please contact the administrator."
     },
     "account_select": {
       "intro": "Choose the note account to open.",
@@ -2310,6 +2311,7 @@
       "groups_claim": "Groups claim",
       "allowed_groups": "Allowed groups",
       "auto_create_users": "Auto-create user profiles on first OIDC login",
+      "max_users": "Maximum number of accounts",
       "allowed_users": "Allowed users",
       "api_audience": "API JWT audience",
       "disable_normal_login": "Disable username/password login (SSO only)",
@@ -2327,6 +2329,8 @@
       "groups_claim": "Token claim name containing user groups (default: groups)",
       "allowed_groups": "Comma-separated list of allowed groups. Leave empty to allow all authenticated users.",
       "auto_create_users": "Recommended when using group-based access control",
+      "max_users": "Once this many user profiles exist, auto-creation stops and new people can no longer sign up. Existing users keep signing in normally. Use 0 for no limit.",
+      "max_users_current": "Currently: {{count}} profile(s).",
       "allowed_users": "Type an email or username and press Enter to add it. Leave empty to allow all authenticated users.",
       "api_audience": "Accepted aud claim for OIDC Bearer JWT API requests. Leave empty to use the Client ID. Use commas for multiple audiences.",
       "disable_normal_login": "When enabled, only OIDC login is available on the login page",

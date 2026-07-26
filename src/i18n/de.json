@@ -1618,7 +1618,8 @@
       "oidc_disabled": "Ihr Konto wurde von einem Administrator deaktiviert. Bitte kontaktieren Sie ihn für weitere Informationen.",
       "oidc_no_profile": "Kein Benutzerprofil für \"{{identifier}}\" gefunden. Bitte kontaktieren Sie einen Administrator, um Ihr Profil zu erstellen.",
       "oidc_failed": "SSO-Anmeldung fehlgeschlagen. Bitte erneut versuchen.",
-      "oidc_unauthorized": "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen. Bitte wenden Sie sich an Ihren Administrator."
+      "oidc_unauthorized": "Sie sind nicht berechtigt, auf diese Anwendung zuzugreifen. Bitte wenden Sie sich an Ihren Administrator.",
+      "oidc_signup_limit": "Diese Instanz nimmt keine neuen Konten mehr an. Bitte wenden Sie sich an den Administrator."
     },
     "account_select": {
       "intro": "Wählen Sie das Notizkonto aus, das geöffnet werden soll.",
@@ -2610,6 +2611,7 @@
       "groups_claim": "Groups-Claim",
       "allowed_groups": "Erlaubte Gruppen",
       "auto_create_users": "Benutzerprofile bei der ersten OIDC-Anmeldung automatisch erstellen",
+      "max_users": "Maximale Anzahl an Konten",
       "allowed_users": "Erlaubte Benutzer",
       "api_audience": "JWT-Audience der API",
       "disable_normal_login": "Anmeldung mit Benutzername/Passwort deaktivieren (nur SSO)",
@@ -2627,6 +2629,8 @@
       "groups_claim": "Name des Token-Claims mit den Benutzergruppen (Standard: groups)",
       "allowed_groups": "Kommagetrennte Liste erlaubter Gruppen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "auto_create_users": "Empfohlen bei gruppenbasierter Zugriffskontrolle",
+      "max_users": "Sobald diese Anzahl an Benutzerprofilen erreicht ist, wird die automatische Erstellung gestoppt und neue Personen können sich nicht mehr registrieren. Bestehende Benutzer melden sich weiterhin normal an. Verwenden Sie 0 für keine Begrenzung.",
+      "max_users_current": "Aktuell: {{count}} Profil(e).",
       "allowed_users": "E-Mail oder Benutzernamen eingeben und mit der Eingabetaste hinzufügen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "api_audience": "Akzeptierter aud-Claim für API-Anfragen mit OIDC Bearer JWT. Leer lassen, um die Client ID zu verwenden. Mehrere Audiences mit Kommas trennen.",
       "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",

@@ -1622,7 +1622,8 @@
       "oidc_disabled": "A sua conta foi desativada por un administrador. Por favor, contacte-o para mais informações.",
       "oidc_no_profile": "Nenhum perfil de utilizador encontrado para \"{{identifier}}\". Por favor, contacte um administrador para criar o seu perfil.",
       "oidc_failed": "Falha no login SSO. Por favor, tente novamente.",
-      "oidc_unauthorized": "Você não está autorizado a acessar esta aplicação. Por favor, entre em contato com o administrador."
+      "oidc_unauthorized": "Você não está autorizado a acessar esta aplicação. Por favor, entre em contato com o administrador.",
+      "oidc_signup_limit": "Esta instância não está aceitando novas contas. Entre em contato com o administrador."
     },
     "account_select": {
       "intro": "Escolha a conta de notas a abrir.",
@@ -2613,6 +2614,7 @@
       "groups_claim": "Claim de grupos",
       "allowed_groups": "Grupos permitidos",
       "auto_create_users": "Criar automaticamente perfis de utilizador no primeiro login OIDC",
+      "max_users": "Número máximo de contas",
       "allowed_users": "Utilizadores permitidos",
       "api_audience": "Audiência JWT da API",
       "disable_normal_login": "Desativar login com utilizador/palavra-passe (apenas SSO)",
@@ -2630,6 +2632,8 @@
       "groups_claim": "Nome do claim do token que contém os grupos do utilizador (predefinição: groups)",
       "allowed_groups": "Lista de grupos permitidos separada por vírgulas. Deixe vazio para permitir todos os utilizadores autenticados.",
       "auto_create_users": "Recomendado ao usar controlo de acesso baseado em grupos",
+      "max_users": "Assim que esse número de perfis for atingido, a criação automática é interrompida e novas pessoas não poderão mais se inscrever. Os usuários existentes continuam entrando normalmente. Use 0 para não definir limite.",
+      "max_users_current": "Atualmente: {{count}} perfil(is).",
       "allowed_users": "Escreva um email ou nome de utilizador e prima Enter para o adicionar. Deixe vazio para permitir todos os utilizadores autenticados.",
       "api_audience": "Claim aud aceite para pedidos API com Bearer JWT OIDC. Deixe vazio para usar o Client ID. Use vírgulas para várias audiências.",
       "disable_normal_login": "Quando ativado, apenas o login OIDC estará disponível na página de autenticação",
