@@ -1297,7 +1297,7 @@ try {
         <div class="modal-buttons">
             <button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=profile#my-profile-card'"><?php echo t_h('modals.user_settings_info.edit_profile_button', [], 'Edit Profile'); ?></button>
             <button type="button" class="btn-primary" data-action="open-password-settings"><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
-            <button type="button" data-action="close-user-settings-info-modal"><?php echo t_h('common.close'); ?></button>
+            <button type="button" class="btn-danger" data-action="close-user-settings-info-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>
