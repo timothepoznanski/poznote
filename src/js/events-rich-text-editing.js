@@ -1283,14 +1283,20 @@ function handleIframePaste(plainText) {
  * @returns {boolean} True if code paste was handled
  */
 function handleCodePaste(htmlData, plainText) {
-    // Detect code editor HTML signatures
-    var codeSignatures = [
-        'Consolas', 'Monaco', 'Courier New', 'monospace',
-        'Segoe UI Mono', 'vscode', 'monaco-editor'
-    ];
+    if (!htmlData) return false;
 
-    var isCode = codeSignatures.some(function (sig) {
-        return htmlData && htmlData.includes(sig);
+    // Code editors (VS Code, Monaco, etc.) put the whole snippet in a single
+    // container styled inline with a monospace font and white-space: pre.
+    // Only that exact shape counts as code: web pages that merely contain a
+    // code example (monospace font somewhere in the payload) must keep their
+    // tables, headings and lists intact (see discussion #1170).
+    var doc = new DOMParser().parseFromString(htmlData, 'text/html');
+    if (doc.body.children.length !== 1) return false;
+
+    var rootStyle = (doc.body.children[0].getAttribute('style') || '').toLowerCase();
+    var monospaceFonts = ['consolas', 'monaco', 'courier new', 'monospace', 'menlo', 'segoe ui mono'];
+    var isCode = /white-space:\s*pre/.test(rootStyle) && monospaceFonts.some(function (font) {
+        return rootStyle.indexOf(font) !== -1;
     });
 
     if (!isCode) return false;
