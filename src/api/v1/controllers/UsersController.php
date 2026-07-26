@@ -59,9 +59,138 @@ class UsersController {
             'id' => $user['id'],
             'username' => $user['username'],
             'email' => $user['email'],
+            'first_name' => $user['first_name'] ?? null,
+            'last_name' => $user['last_name'] ?? null,
+            'display_name' => $user['display_name'] ?? $user['username'],
             'is_admin' => (bool)$user['is_admin'],
             'active' => (bool)$user['active']
         ];
+    }
+
+    /**
+     * PATCH /api/v1/users/me - Update current user's profile (username, first/last name)
+     */
+    public function updateMe() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+
+        $userId = getCurrentUserId();
+        if (!$userId) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            http_response_code(400);
+            return ['error' => 'Invalid request body'];
+        }
+
+        $updates = [];
+
+        if (array_key_exists('username', $data)) {
+            $username = trim((string)$data['username']);
+            if ($username === '') {
+                http_response_code(400);
+                return ['error' => 'Username is required'];
+            }
+            if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{0,59}$/', $username)) {
+                http_response_code(400);
+                return ['error' => 'Username may only contain letters, digits, dots, underscores and dashes (max 60 characters)'];
+            }
+            if (ctype_digit($username)) {
+                http_response_code(400);
+                return ['error' => 'Username cannot be purely numeric'];
+            }
+            $updates['username'] = $username;
+        }
+
+        foreach (['first_name', 'last_name'] as $nameField) {
+            if (array_key_exists($nameField, $data)) {
+                $value = trim((string)$data[$nameField]);
+                // Strip control characters; names are free text otherwise.
+                $value = preg_replace('/[\x00-\x1F\x7F]/u', '', $value) ?? '';
+                if (mb_strlen($value) > 100) {
+                    http_response_code(400);
+                    return ['error' => 'Name fields must be 100 characters or fewer'];
+                }
+                $updates[$nameField] = $value;
+            }
+        }
+
+        if (array_key_exists('email', $data)) {
+            $email = trim((string)$data['email']);
+            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                http_response_code(400);
+                return ['error' => 'Invalid email address'];
+            }
+            $updates['email'] = $email;
+            // Self-set emails stay unverified: OIDC account matching only
+            // considers verified (admin-set or provider-synced) emails.
+            $updates['email_verified'] = 0;
+        }
+
+        if (empty($updates)) {
+            http_response_code(400);
+            return ['error' => 'No valid fields to update'];
+        }
+
+        $usernameChanged = isset($updates['username']);
+
+        $result = updateUserProfile((int)$userId, $updates);
+
+        if (!$result['success']) {
+            http_response_code(400);
+            return ['error' => $result['error']];
+        }
+
+        $user = getUserProfileById((int)$userId);
+
+        // The remember-me token embeds the username: re-issue it after a rename
+        // so the user's other tabs/next visit stay logged in.
+        if ($usernameChanged && $user) {
+            $this->reissueRememberMeCookie($user);
+        }
+
+        return [
+            'success' => true,
+            'id' => (int)$userId,
+            'username' => $user['username'] ?? $updates['username'] ?? null,
+            'email' => $user['email'] ?? null,
+            'first_name' => $user['first_name'] ?? null,
+            'last_name' => $user['last_name'] ?? null,
+            'display_name' => $user['display_name'] ?? null
+        ];
+    }
+
+    /**
+     * Rebuild the remember-me cookie after a username change (the token embeds
+     * the username, so the old cookie would no longer validate).
+     */
+    private function reissueRememberMeCookie(array $user) {
+        if (!defined('REMEMBER_ME_COOKIE')
+            || empty($_COOKIE[REMEMBER_ME_COOKIE])
+            || !function_exists('getRememberMeSecret')
+            || !function_exists('buildRememberMeToken')
+            || !function_exists('setRememberMeCookie')) {
+            return;
+        }
+
+        $decoded = base64_decode($_COOKIE[REMEMBER_ME_COOKIE]);
+        if ($decoded === false) {
+            return;
+        }
+
+        $parts = explode(':', $decoded);
+        if (count($parts) !== 4 || (int)$parts[1] !== (int)$user['id']) {
+            return;
+        }
+
+        $timestamp = (int)$parts[2];
+        $secret = getRememberMeSecret($user);
+        $token = buildRememberMeToken((string)$user['username'], (int)$user['id'], $timestamp, $secret);
+        setRememberMeCookie($token, $timestamp + REMEMBER_ME_DURATION);
     }
     
     /**
@@ -159,7 +288,12 @@ class UsersController {
             http_response_code(404);
             return ['error' => 'User profile not found'];
         }
-        
+
+        // An admin-set email is trusted for OIDC account matching.
+        if (isset($data['email']) && !array_key_exists('email_verified', $data)) {
+            $data['email_verified'] = 1;
+        }
+
         $result = updateUserProfile((int)$id, $data);
         
         if (!$result['success']) {

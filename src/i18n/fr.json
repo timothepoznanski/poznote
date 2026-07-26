@@ -1058,8 +1058,9 @@
     },
     "user_settings_info": {
       "title": "Paramètres du compte",
-      "message": "Vous pouvez changer votre mot de passe depuis les paramètres. Pour modifier votre email, nom d’utilisateur ou OIDC Subject (UUID), veuillez contacter l’administrateur de cette instance Poznote.",
-      "change_password_button": "Changer le mot de passe"
+      "message": "Vous pouvez changer votre nom d’utilisateur, votre prénom, votre nom, votre email et votre mot de passe depuis les paramètres.",
+      "change_password_button": "Changer le mot de passe",
+      "edit_profile_button": "Modifier le profil"
     },
     "create": {
       "title_in_folder": "Créer dans {{folder}}",
@@ -2381,6 +2382,9 @@
       "users_list": "Liste des utilisateurs",
       "create_user": "Créer un utilisateur",
       "edit_user": "Modifier l'utilisateur",
+      "filter_placeholder": "Filtrer les utilisateurs...",
+      "first_name": "Prénom",
+      "last_name": "Nom",
       "delete_user": "Supprimer l'utilisateur",
       "reset_password": "Réinitialiser le mot de passe",
       "logout_all_sessions": "Déconnecter toutes les sessions",
@@ -2471,6 +2475,7 @@
         "repair_registry_error": "Erreur de reconstruction : {{error}}"
       },
       "administrator": "Administrateur",
+      "administrator_short": "Admin",
       "admin_note": "Utilisez la case à cocher Admin pour accorder ou révoquer les privilèges d'administrateur pour un autre utilisateur.",
       "processing": "Traitement...",
       "errors_label": "Erreurs :",
@@ -2749,11 +2754,29 @@
       "table_attachments": "Pièces jointes (Mo)",
       "table_total": "Total (Mo)",
       "table_total_row": "Total",
+      "filter_placeholder": "Filtrer les comptes...",
       "no_accounts": "Aucun compte trouvé."
     }
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "profile": {
+    "card": "Mon profil",
+    "modal": {
+      "title": "Mon profil",
+      "description": "Modifiez vos informations personnelles.",
+      "username": "Nom d’utilisateur",
+      "first_name": "Prénom",
+      "last_name": "Nom"
+    },
+    "errors": {
+      "username_required": "Le nom d’utilisateur est requis",
+      "username_invalid": "Le nom d’utilisateur ne peut contenir que des lettres, chiffres, points, tirets et tirets bas, et ne peut pas être uniquement numérique",
+      "username_taken": "Ce nom d’utilisateur est déjà utilisé",
+      "email_invalid": "Adresse email invalide",
+      "email_taken": "Cet email est déjà utilisé"
+    }
   },
   "password": {
     "status": {
@@ -2818,7 +2841,7 @@
       "groups_claim": "Nom du claim contenant les groupes de l'utilisateur (défaut : groups)",
       "allowed_groups": "Liste de groupes autorisés séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "auto_create_users": "Recommandé avec le contrôle d'accès par groupes",
-      "allowed_users": "Emails/noms d'utilisateur séparés par des virgules. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
+      "allowed_users": "Saisissez un email ou un nom d'utilisateur puis appuyez sur Entrée pour l'ajouter. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "api_audience": "Claim aud accepté pour les requêtes API avec Bearer JWT OIDC. Laisser vide pour utiliser le Client ID. Séparer plusieurs audiences par des virgules.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"

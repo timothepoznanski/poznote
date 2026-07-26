@@ -2689,8 +2689,48 @@ paths:
                     type: integer
                   username:
                     type: string
+                  first_name:
+                    type: string
+                    nullable: true
+                  last_name:
+                    type: string
+                    nullable: true
+                  display_name:
+                    type: string
                   is_admin:
                     type: boolean
+    patch:
+      tags: [Users]
+      summary: Update current user's profile (username, first/last name, email)
+      description: >-
+        Does NOT require X-User-ID header. Only provided fields are updated.
+        A self-set email is stored as unverified: OIDC account matching only
+        considers verified (admin-set or provider-synced) emails.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  maxLength: 60
+                  pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,59}$'
+                first_name:
+                  type: string
+                  maxLength: 100
+                last_name:
+                  type: string
+                  maxLength: 100
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Profile updated
+        '400':
+          description: Invalid or already-taken username/email, or no valid fields
 
   /users/me/password:
     post:

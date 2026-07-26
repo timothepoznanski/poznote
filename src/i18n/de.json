@@ -1026,8 +1026,9 @@
     },
     "user_settings_info": {
       "title": "Kontoeinstellungen",
-      "message": "Sie koennen Ihr Passwort in den Einstellungen aendern. Um Ihre E-Mail, Ihren Benutzernamen oder Ihr OIDC-Subject (UUID) zu bearbeiten, wenden Sie sich bitte an den Administrator dieser Poznote-Instanz.",
-      "change_password_button": "Passwort aendern"
+      "message": "Sie koennen Ihren Benutzernamen, Ihren Namen, Ihre E-Mail und Ihr Passwort in den Einstellungen aendern.",
+      "change_password_button": "Passwort aendern",
+      "edit_profile_button": "Profil bearbeiten"
     },
     "create": {
       "title_in_folder": "Erstellen in {{folder}}",
@@ -2320,13 +2321,18 @@
       "username": "Benutzer",
       "email": "E-Mail",
       "administrator": "Administrator",
+      "administrator_short": "Admin",
       "status": "Status",
+      "created_at": "Erstellt am",
       "actions": "Aktionen",
       "active": "Aktiv",
       "inactive": "Inaktiv",
       "not_defined": "nicht festgelegt",
       "create_user": "Profil erstellen",
       "edit_user": "Benutzer bearbeiten",
+      "filter_placeholder": "Benutzer filtern...",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
       "click_to_activate": "Zum Aktivieren klicken",
       "click_to_deactivate": "Zum Deaktivieren klicken",
       "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
@@ -2534,11 +2540,29 @@
       "table_attachments": "Anhänge (MB)",
       "table_total": "Gesamt (MB)",
       "table_total_row": "Gesamt",
+      "filter_placeholder": "Konten filtern...",
       "no_accounts": "Keine Konten gefunden."
     }
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "profile": {
+    "card": "Mein Profil",
+    "modal": {
+      "title": "Mein Profil",
+      "description": "Aktualisieren Sie Ihre persoenlichen Daten.",
+      "username": "Benutzername",
+      "first_name": "Vorname",
+      "last_name": "Nachname"
+    },
+    "errors": {
+      "username_required": "Benutzername ist erforderlich",
+      "username_invalid": "Der Benutzername darf nur Buchstaben, Ziffern, Punkte, Unterstriche und Bindestriche enthalten und darf nicht rein numerisch sein",
+      "username_taken": "Dieser Benutzername ist bereits vergeben",
+      "email_invalid": "Ungueltige E-Mail-Adresse",
+      "email_taken": "Diese E-Mail wird bereits verwendet"
+    }
   },
   "password": {
     "status": {
@@ -2603,7 +2627,7 @@
       "groups_claim": "Name des Token-Claims mit den Benutzergruppen (Standard: groups)",
       "allowed_groups": "Kommagetrennte Liste erlaubter Gruppen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "auto_create_users": "Empfohlen bei gruppenbasierter Zugriffskontrolle",
-      "allowed_users": "Kommagetrennte E-Mails/Benutzernamen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
+      "allowed_users": "E-Mail oder Benutzernamen eingeben und mit der Eingabetaste hinzufügen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "api_audience": "Akzeptierter aud-Claim für API-Anfragen mit OIDC Bearer JWT. Leer lassen, um die Client ID zu verwenden. Mehrere Audiences mit Kommas trennen.",
       "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",
       "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"

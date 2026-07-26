@@ -20,7 +20,7 @@ require_once 'users/db_master.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
-$username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$username = htmlspecialchars(($currentUser['display_name'] ?? '') ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
 
 $message = '';

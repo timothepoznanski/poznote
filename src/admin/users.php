@@ -68,10 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 break;
 
-            // Update existing user profile (username, email, OIDC subject)
+            // Update existing user profile (username, name, email, OIDC subject)
             case 'update_profile':
                 $userId = (int)($_POST['user_id'] ?? 0);
                 $username = trim($_POST['username'] ?? '');
+                $firstName = trim($_POST['first_name'] ?? '');
+                $lastName = trim($_POST['last_name'] ?? '');
                 $email = trim($_POST['email'] ?? '');
                 $oidcSubject = trim($_POST['oidc_subject'] ?? '');
 
@@ -82,7 +84,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $result = updateUserProfile($userId, [
                     'username' => $username,
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
                     'email' => $email,
+                    // Admin-set emails are trusted for OIDC account matching.
+                    'email_verified' => 1,
                     'oidc_subject' => $oidcSubject
                 ]);
 
@@ -188,6 +194,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/home/search.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
@@ -279,9 +286,11 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         document.getElementById('rename_title_user').textContent = username || '';
     }
 
-    function renameUser(userId, currentUsername, currentEmail, currentOidcSubject) {
+    function renameUser(userId, currentUsername, currentEmail, currentOidcSubject, currentFirstName, currentLastName) {
         document.getElementById('rename_user_id').value = userId;
         document.getElementById('rename_username').value = currentUsername;
+        document.getElementById('rename_first_name').value = currentFirstName || '';
+        document.getElementById('rename_last_name').value = currentLastName || '';
         document.getElementById('rename_email').value = currentEmail || '';
         document.getElementById('rename_oidc_subject').value = currentOidcSubject || '';
         updateRenameModalTitle(currentUsername);
@@ -296,10 +305,54 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             action: 'update_profile',
             user_id: document.getElementById('rename_user_id').value,
             username: document.getElementById('rename_username').value,
+            first_name: document.getElementById('rename_first_name').value,
+            last_name: document.getElementById('rename_last_name').value,
             email: document.getElementById('rename_email').value,
             oidc_subject: document.getElementById('rename_oidc_subject').value
         });
     }
+
+    /**
+     * Filter the users table rows against the search input value
+     */
+    function initUsersFilter() {
+        const input = document.getElementById('users-filter-input');
+        if (!input) return;
+
+        input.addEventListener('input', function () {
+            const query = this.value.trim().toLowerCase();
+            document.querySelectorAll('.users-table tbody tr').forEach(function (row) {
+                // A class (not inline style) so it also wins over the mobile
+                // card view's "display: flex !important" row rule.
+                row.classList.toggle('filter-hidden', query !== '' && !row.textContent.toLowerCase().includes(query));
+            });
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && this.value !== '') {
+                this.value = '';
+                this.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initUsersFilter);
+
+    /**
+     * Mobile card view: tapping the user line collapses/expands the card.
+     * On desktop the class has no effect (the CSS lives in the mobile media query).
+     */
+    function initMobileUserCards() {
+        const mobileView = window.matchMedia('(max-width: 768px)');
+        document.querySelectorAll('.users-table tbody td.user-username-cell').forEach(function (cell) {
+            cell.addEventListener('click', function () {
+                if (!mobileView.matches) return;
+                cell.closest('tr').classList.toggle('user-card-expanded');
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initMobileUserCards);
 
     function openAccessModal(userId, username, accessIds) {
         const normalizedAccessIds = (Array.isArray(accessIds) ? accessIds : []).map(Number);
@@ -354,6 +407,14 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             <div class="message message-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
+        <!-- Filter Bar -->
+        <div class="home-search-container">
+            <div class="home-search-wrapper">
+                <i class="lucide lucide-search home-search-icon"></i>
+                <input type="text" id="users-filter-input" class="home-search-input" placeholder="<?php echo t_h('multiuser.admin.filter_placeholder', [], 'Filter users...'); ?>" autocomplete="off">
+            </div>
+        </div>
+
         <!-- Users Table -->
         <div class="table-responsive">
             <table class="users-table">
@@ -361,6 +422,8 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                     <tr>
                         <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
                         <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
+                        <th><?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?></th>
+                        <th><?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?></th>
                         <th>
                             <span class="users-table-header-with-help">
                                 <?php echo t_h('multiuser.admin.email', [], 'Email'); ?>
@@ -373,8 +436,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                             </span>
                         </th>
                         <th><?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
+                        <th class="text-center"><?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                     </tr>
                 </thead>
@@ -384,7 +448,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                             <td class="text-center user-id-cell" data-label="<?php echo t_h('multiuser.admin.id', [], 'ID'); ?>">
                                 <?php echo $user['id']; ?>
                             </td>
-                            <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>">
+                            <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>" class="user-username-cell">
                                 <div class="user-info">
                                     <div class="user-username">
                                         <?php echo htmlspecialchars($user['username']); ?>
@@ -393,6 +457,16 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                         <?php endif; ?>
                                     </div>
                                 </div>
+                            </td>
+                            <?php
+                                $userFirstName = trim((string)($user['first_name'] ?? ''));
+                                $userLastName = trim((string)($user['last_name'] ?? ''));
+                            ?>
+                            <td data-label="<?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>" class="<?php echo $userFirstName === '' ? 'user-name-empty' : ''; ?>">
+                                <?php echo htmlspecialchars($userFirstName); ?>
+                            </td>
+                            <td data-label="<?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>" class="<?php echo $userLastName === '' ? 'user-name-empty' : ''; ?>">
+                                <?php echo htmlspecialchars($userLastName); ?>
                             </td>
                             <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
                                 <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
@@ -422,7 +496,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 </div>
                             </td>
 
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator', [], 'Administrator'); ?>">
+                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?>">
                                 <input
                                     type="checkbox"
                                     <?php echo $user['is_admin'] ? 'checked' : ''; ?>
@@ -462,6 +536,17 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 <?php endif; ?>
                             </td>
 
+                            <td class="text-center user-created-cell" data-label="<?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?>">
+                                <?php
+                                    $userCreatedDate = convertUtcToUserTimezone((string)($user['created_at'] ?? ''), 'Y-m-d');
+                                    $userCreatedFull = formatUtcDateTimeForDisplay((string)($user['created_at'] ?? ''), 'Y-m-d H:i');
+                                ?>
+                                <?php if ($userCreatedDate !== ''): ?>
+                                    <span class="user-created-date" title="<?php echo htmlspecialchars($userCreatedFull, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($userCreatedDate); ?></span>
+                                <?php else: ?>
+                                    <em class="user-created-date"><?php echo t_h('multiuser.admin.not_defined', [], 'not defined'); ?></em>
+                                <?php endif; ?>
+                            </td>
 
                             <td class="text-center" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
                                 <div class="actions actions-center">
@@ -471,7 +556,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                     </button>
 
                                         <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.edit_user', [], 'Edit User'); ?>"
-                                            onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>)">
+                                            onclick="renameUser(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['email'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['oidc_subject'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['first_name'] ?? ''), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($user['last_name'] ?? ''), ENT_QUOTES); ?>)">
                                         <i class="lucide-pencil"></i>
                                     </button>
 
@@ -537,6 +622,12 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <input type="hidden" id="rename_user_id">
                 <label class="profile-modal-label"><?php echo t_h('multiuser.admin.username', [], 'Username'); ?>&nbsp;:</label>
                 <input type="text" id="rename_username" placeholder="<?php echo t_h('multiuser.admin.username', [], 'Username'); ?>" oninput="updateRenameModalTitle(this.value)" onkeydown="if(event.key==='Enter') submitRename()">
+
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>&nbsp;:</label>
+                <input type="text" id="rename_first_name" maxlength="100" placeholder="<?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
+
+                <label class="profile-modal-label"><?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>&nbsp;:</label>
+                <input type="text" id="rename_last_name" maxlength="100" placeholder="<?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>" onkeydown="if(event.key==='Enter') submitRename()">
 
                 <label class="profile-modal-label"><?php echo t_h('multiuser.admin.email', [], 'Email'); ?>&nbsp;:</label>
                 <input type="email" id="rename_email" placeholder="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>" onkeydown="if(event.key==='Enter') submitRename()">

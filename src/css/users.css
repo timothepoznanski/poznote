@@ -32,6 +32,19 @@ body.dark-mode {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* The shared home-search bar (css/home/search.css) assumes a global
+   border-box reset that this page does not have: without this the input
+   overflows its wrapper by its padding width on mobile. */
+.home-search-input {
+    box-sizing: border-box;
+}
+
+/* Rows hidden by the filter bar; must beat the mobile card view's
+   "display: flex !important" row rule, hence the extra specificity. */
+.users-table tbody tr.filter-hidden {
+    display: none !important;
+}
+
 .admin-header {
     /* display: flex; */
     justify-content: space-between;
@@ -259,6 +272,10 @@ body.dark-mode .users-header-help:focus-visible {
     font-weight: 600;
 }
 
+.users-table td.user-created-cell {
+    white-space: nowrap;
+}
+
 .users-table tbody tr {
     background: transparent;
 }
@@ -301,6 +318,11 @@ html[data-theme='dark'] .users-table td {
 
 .user-email-empty {
     opacity: 0.8;
+}
+
+.user-created-date {
+    color: var(--text-muted, #666);
+    font-size: 0.9em;
 }
 
 .account-access-summary {
@@ -410,21 +432,21 @@ html[data-theme='dark'] .users-table td {
 
 .profile-modal-content {
     max-width: 540px;
-    padding: 34px;
+    padding: 24px 28px;
 }
 
 .profile-modal-content .modal-title {
-    margin-bottom: 22px;
+    margin-bottom: 14px;
 }
 
 .profile-modal-fields {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 8px;
 }
 
 .profile-modal-fields input {
-    margin-bottom: 10px;
+    margin-bottom: 0;
 }
 
 .profile-modal-label {
@@ -921,6 +943,11 @@ input.admin-toggle:disabled:checked+.slider {
         background: var(--bg-secondary, #f8f8f8);
     }
 
+    /* Hide empty first/last name rows in the mobile card view */
+    .users-table td.user-name-empty {
+        display: none !important;
+    }
+
     /* Unified Label Styling */
     .users-table td::before {
         content: attr(data-label);
@@ -1021,16 +1048,16 @@ input.admin-toggle:disabled:checked+.slider {
     }
 
     .profile-modal-content {
-        padding: 28px 24px 24px;
+        padding: 22px 20px 20px;
     }
 
     .profile-modal-content .modal-title {
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         line-height: 1.2;
     }
 
     .profile-modal-fields {
-        gap: 16px;
+        gap: 10px;
     }
 
     .profile-modal-help {
@@ -1038,8 +1065,44 @@ input.admin-toggle:disabled:checked+.slider {
     }
 
     #renameModal .form-actions {
-        margin-top: 24px;
+        margin-top: 16px;
         gap: 12px;
+    }
+
+    /* Collapsible cards: only the user line is visible until tapped */
+    .users-table tbody tr:not(.user-card-expanded) td:not(.user-username-cell) {
+        display: none !important;
+    }
+
+    /* Keep the user line on top of the expanded card (it is the toggle handle) */
+    .users-table tbody tr {
+        display: flex !important;
+        flex-direction: column;
+    }
+
+    .users-table td.user-username-cell {
+        order: -1;
+    }
+
+    .users-table tbody tr:not(.user-card-expanded) td.user-username-cell {
+        border-bottom: none !important;
+    }
+
+    .users-table td.user-username-cell {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
+
+    .users-table td.user-username-cell::after {
+        content: '\25B8'; /* ▸ */
+        color: var(--text-muted, #666);
+        margin-left: 10px;
+        flex-shrink: 0;
+    }
+
+    .users-table tr.user-card-expanded td.user-username-cell::after {
+        content: '\25BE'; /* ▾ */
     }
 }
 

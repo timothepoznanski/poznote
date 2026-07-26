@@ -1037,8 +1037,9 @@
     },
     "user_settings_info": {
       "title": "账户设置",
-      "message": "您可以在设置中更改密码。若要修改电子邮件、用户名或 OIDC Subject (UUID)，请联系此 Poznote 实例的管理员。",
-      "change_password_button": "更改密码"
+      "message": "您可以在设置中更改用户名、姓名、电子邮件和密码。",
+      "change_password_button": "更改密码",
+      "edit_profile_button": "编辑资料"
     },
     "create": {
       "title_in_folder": "在 {{folder}} 中创建",
@@ -2321,6 +2322,9 @@
       "users_list": "用户列表",
       "create_user": "创建用户",
       "edit_user": "编辑用户",
+      "filter_placeholder": "筛选用户...",
+      "first_name": "名字",
+      "last_name": "姓氏",
       "delete_user": "删除用户",
       "reset_password": "重置密码",
       "logout_all_sessions": "注销所有会话",
@@ -2350,6 +2354,7 @@
       },
       "id": "ID",
       "administrator": "管理员",
+      "administrator_short": "管理员",
       "click_to_activate": "点击激活",
       "click_to_deactivate": "点击停用",
       "toggle_admin": "切换管理员角色",
@@ -2678,7 +2683,25 @@
       "table_attachments": "附件 (MB)",
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
+      "filter_placeholder": "筛选账户...",
       "no_accounts": "未找到账户。"
+    }
+  },
+  "profile": {
+    "card": "我的资料",
+    "modal": {
+      "title": "我的资料",
+      "description": "更新您的个人信息。",
+      "username": "用户名",
+      "first_name": "名字",
+      "last_name": "姓氏"
+    },
+    "errors": {
+      "username_required": "用户名为必填项",
+      "username_invalid": "用户名只能包含字母、数字、点、下划线和连字符，且不能为纯数字",
+      "username_taken": "该用户名已被使用",
+      "email_invalid": "电子邮件地址无效",
+      "email_taken": "该电子邮件已被使用"
     }
   },
   "password": {
@@ -2744,7 +2767,7 @@
       "groups_claim": "包含用户组的令牌 claim 名称（默认：groups）",
       "allowed_groups": "以逗号分隔的允许组列表。留空则允许所有已认证用户。",
       "auto_create_users": "使用基于组的访问控制时推荐启用",
-      "allowed_users": "以逗号分隔的邮箱/用户名。留空则允许所有已认证用户。",
+      "allowed_users": "输入邮箱或用户名后按回车键添加。留空则允许所有已认证用户。",
       "api_audience": "OIDC Bearer JWT API 请求接受的 aud claim。留空则使用 Client ID。多个 audience 请用逗号分隔。",
       "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",
       "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"

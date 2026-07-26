@@ -52,6 +52,7 @@
 
             txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
+            hideRestrictUsers: body.getAttribute('data-hide-restrict-users') === '1',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
             txtRestrictUsersMobile: body.getAttribute('data-txt-restrict-users-mobile') || 'Restrict',
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
@@ -1420,7 +1421,9 @@
         userListContainer.appendChild(userListLoading);
 
         restrictUsersWrap.appendChild(userListContainer);
-        content.appendChild(restrictUsersWrap);
+        if (!config.hideRestrictUsers) {
+            content.appendChild(restrictUsersWrap);
+        }
 
         var availableUsers = [];
         var selectedUserIds = (options.allowedUsers && Array.isArray(options.allowedUsers))
@@ -1498,7 +1501,7 @@
             }
         });
 
-        if (restrictCheckbox.checked) {
+        if (restrictCheckbox.checked && !config.hideRestrictUsers) {
             loadAvailableUsers();
         }
         // ---- End user restriction section ----
@@ -1549,7 +1552,7 @@
             // Determine allowed_users change
             var nextAllowedUsers = restrictCheckbox.checked ? selectedUserIds.slice() : null;
             var prevAllowedUsers = options.allowedUsers || null;
-            var allowedUsersChanged = JSON.stringify(nextAllowedUsers) !== JSON.stringify(prevAllowedUsers);
+            var allowedUsersChanged = !config.hideRestrictUsers && JSON.stringify(nextAllowedUsers) !== JSON.stringify(prevAllowedUsers);
 
             if ((!nextToken || !tokenChanged) && !protocolChanged && !indexableChanged && !accessModeChanged && !passwordShouldBeSaved && !allowedUsersChanged) {
                 closeModal();

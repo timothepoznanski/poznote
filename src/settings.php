@@ -20,7 +20,7 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 // Get current user and language settings
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
-$username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$username = htmlspecialchars(($currentUser['display_name'] ?? '') ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
 
 // Check if current user is admin (used multiple times in template)
@@ -89,6 +89,12 @@ $settingsPageConfig = [
     'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
     'settings' => [],
     'passwordStatus' => null,
+    'profile' => [
+        'username' => (string)($currentUser['username'] ?? ''),
+        'first_name' => (string)($currentUser['first_name'] ?? ''),
+        'last_name' => (string)($currentUser['last_name'] ?? ''),
+        'email' => (string)($currentUser['email'] ?? ''),
+    ],
 ];
 
 $settingsPageUserKeys = [
@@ -288,6 +294,17 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
                     <span class="setting-status enabled"><?php echo $workspaces_count; ?></span>
+                </div>
+            </div>
+
+            <!-- My Profile (username, first/last name) -->
+            <div class="home-card" id="my-profile-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-user"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('profile.card', [], 'My Profile'); ?></span>
+                    <span id="profile-username-badge" class="setting-status enabled"><?php echo htmlspecialchars((string)($currentUser['username'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
                 </div>
             </div>
 
@@ -900,5 +917,6 @@ if ($isAdmin) {
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
+    <script src="js/profile.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/profile.js') ?: time(); ?>"></script>
 </body>
 </html>

@@ -117,8 +117,14 @@ function dashboardBuildPageUrl(string $page, string $pageWorkspace): string {
 
 function dashboardGetCurrentUsername(): string {
     $sessionUser = $_SESSION['user'] ?? null;
-    if (is_array($sessionUser) && trim((string)($sessionUser['username'] ?? '')) !== '') {
-        return trim((string)$sessionUser['username']);
+    if (is_array($sessionUser)) {
+        $name = trim((string)($sessionUser['display_name'] ?? ''));
+        if ($name === '') {
+            $name = trim((string)($sessionUser['username'] ?? ''));
+        }
+        if ($name !== '') {
+            return $name;
+        }
     }
 
     $userId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
@@ -126,8 +132,12 @@ function dashboardGetCurrentUsername(): string {
         try {
             require_once __DIR__ . '/users/db_master.php';
             $profile = getUserProfileById($userId);
-            if (is_array($profile) && trim((string)($profile['username'] ?? '')) !== '') {
-                return trim((string)$profile['username']);
+            $name = trim((string)($profile['display_name'] ?? ''));
+            if ($name === '' && is_array($profile)) {
+                $name = trim((string)($profile['username'] ?? ''));
+            }
+            if ($name !== '') {
+                return $name;
             }
         } catch (Exception $e) {}
     }
@@ -811,10 +821,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<div id="dashboardUserInfoModal" class="modal">
 			<div class="modal-content">
 				<h3><?php echo t_h('modals.user_settings_info.title', [], 'Account Settings'); ?></h3>
-				<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo t_h('modals.user_settings_info.message', [], 'You can change your password from Settings. To edit your email, username, or OIDC Subject (UUID), please contact the administrator of this Poznote instance.'); ?></p>
+				<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo t_h('modals.user_settings_info.message', [], 'You can change your username, name, email and password from Settings.'); ?></p>
 				<div class="modal-buttons">
+					<button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=profile#my-profile-card'"><?php echo t_h('modals.user_settings_info.edit_profile_button', [], 'Edit Profile'); ?></button>
 					<button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=change-password#change-password-card'"><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
-					<button type="button" data-action="close-dashboard-user-info-modal"><?php echo t_h('common.close'); ?></button>
+					<button type="button" class="btn-danger" data-action="close-dashboard-user-info-modal"><?php echo t_h('common.close'); ?></button>
 				</div>
 			</div>
 		</div>

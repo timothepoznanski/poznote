@@ -58,6 +58,9 @@ function initializeMasterDatabase(PDO $con): void {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE,
+            email_verified INTEGER DEFAULT 0,
+            first_name TEXT,
+            last_name TEXT,
             active INTEGER DEFAULT 1,
             is_admin INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -87,6 +90,21 @@ function initializeMasterDatabase(PDO $con): void {
         
         if (!in_array('password_changed_at', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN password_changed_at DATETIME");
+        }
+
+        if (!in_array('first_name', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN first_name TEXT");
+        }
+
+        if (!in_array('last_name', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN last_name TEXT");
+        }
+
+        if (!in_array('email_verified', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0");
+            // Emails that predate self-service editing were all set by an
+            // administrator, so they are trusted for OIDC account matching.
+            $con->exec("UPDATE users SET email_verified = 1 WHERE email IS NOT NULL AND email != ''");
         }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
@@ -560,6 +578,31 @@ function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginU
 }
 
 /**
+ * Compute the display name for a user row: "First Last" when set, username otherwise.
+ */
+function buildUserDisplayName(?array $user): string {
+    if (!$user) {
+        return '';
+    }
+    $name = trim(trim((string)($user['first_name'] ?? '')) . ' ' . trim((string)($user['last_name'] ?? '')));
+    if ($name === '') {
+        $name = trim((string)($user['username'] ?? ''));
+    }
+    return $name;
+}
+
+/**
+ * Attach the computed display_name to a user row (display_name is not a real column).
+ */
+function withComputedDisplayName(?array $user): ?array {
+    if (!$user) {
+        return null;
+    }
+    $user['display_name'] = buildUserDisplayName($user);
+    return $user;
+}
+
+/**
  * Get user profile by ID
  */
 function getUserProfileById(int $id): ?array {
@@ -568,7 +611,7 @@ function getUserProfileById(int $id): ?array {
         $stmt = $con->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        return $user ? withComputedDisplayName($user) : null;
     } catch (Exception $e) {
         return null;
     }
@@ -583,7 +626,7 @@ function getUserProfileByUsername(string $username): ?array {
         $stmt = $con->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        return $user ? withComputedDisplayName($user) : null;
     } catch (Exception $e) {
         return null;
     }
@@ -599,7 +642,25 @@ function getUserProfileByEmail(string $email): ?array {
         $stmt = $con->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        return $user ? withComputedDisplayName($user) : null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
+ * Get user profile by email, restricted to VERIFIED emails (set by an admin
+ * or synced from the OIDC provider). Used for OIDC account matching so a
+ * self-set, unverified email can never capture someone else's SSO login.
+ */
+function getUserProfileByVerifiedEmail(string $email): ?array {
+    try {
+        if (trim($email) === '') return null;
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT * FROM users WHERE email = ? AND email_verified = 1");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user ? withComputedDisplayName($user) : null;
     } catch (Exception $e) {
         return null;
     }
@@ -615,7 +676,7 @@ function getUserProfileByOidcSubject(string $oidcSubject): ?array {
         $stmt = $con->prepare("SELECT * FROM users WHERE oidc_subject = ?");
         $stmt->execute([$oidcSubject]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $user ?: null;
+        return $user ? withComputedDisplayName($user) : null;
     } catch (Exception $e) {
         return null;
     }
@@ -677,13 +738,16 @@ function createUserProfile(string $username, ?string $email = null): array {
             }
         }
         
+        // createUserProfile is only reachable from trusted flows (admin
+        // creation, OIDC provisioning), so a provided email counts as verified.
         $stmt = $con->prepare("
-            INSERT INTO users (username, email, active)
-            VALUES (?, ?, 1)
+            INSERT INTO users (username, email, email_verified, active)
+            VALUES (?, ?, ?, 1)
         ");
         $stmt->execute([
             $username,
-            $email
+            $email,
+            ($email !== null && trim((string)$email) !== '') ? 1 : 0
         ]);
         
         $userId = (int)$con->lastInsertId();
@@ -717,10 +781,55 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'active', 'is_admin', 'oidc_subject'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'oidc_subject'];
         $updates = [];
         $params = [];
-        
+
+        if (array_key_exists('username', $data)) {
+            $newUsername = trim((string)$data['username']);
+            if ($newUsername === '') {
+                return ['success' => false, 'error' => 'Username is required'];
+            }
+            // Same rule as createUserProfile: numeric usernames would be ambiguous
+            // with user IDs in the Basic Auth lookup.
+            if (ctype_digit($newUsername)) {
+                return ['success' => false, 'error' => 'Username cannot be purely numeric'];
+            }
+            $stmt = $masterCon->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+            $stmt->execute([$newUsername, $id]);
+            if ($stmt->fetch()) {
+                return ['success' => false, 'error' => 'Username already exists'];
+            }
+            $data['username'] = $newUsername;
+        }
+
+        if (array_key_exists('email', $data)) {
+            $newEmail = trim((string)$data['email']);
+            if ($newEmail !== '') {
+                $stmt = $masterCon->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+                $stmt->execute([$newEmail, $id]);
+                if ($stmt->fetch()) {
+                    return ['success' => false, 'error' => 'Email already exists'];
+                }
+            }
+            $data['email'] = $newEmail;
+            // Fail secure: an email change drops the verified flag unless the
+            // caller (admin flow, OIDC sync) explicitly marks it verified.
+            if (!array_key_exists('email_verified', $data)) {
+                $data['email_verified'] = 0;
+            }
+        }
+        if (array_key_exists('email_verified', $data)) {
+            $data['email_verified'] = (int)(bool)$data['email_verified'];
+        }
+
+        foreach (['first_name', 'last_name'] as $nameField) {
+            if (array_key_exists($nameField, $data)) {
+                $trimmedName = trim((string)$data[$nameField]);
+                $data[$nameField] = $trimmedName !== '' ? $trimmedName : null;
+            }
+        }
+
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
                 if ($key === 'active' || $key === 'is_admin') {
@@ -766,6 +875,7 @@ function updateUserProfile(int $id, array $data): array {
             $stmt->execute([$id]);
             $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($updatedUser) {
+                $updatedUser = withComputedDisplayName($updatedUser);
                 $_SESSION['user'] = $updatedUser;
                 if ($isAuthenticatedUser) {
                     $_SESSION['login_user'] = $updatedUser;
@@ -776,12 +886,13 @@ function updateUserProfile(int $id, array $data): array {
             $stmt->execute([$id]);
             $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($updatedUser) {
-                $_SESSION['login_user'] = $updatedUser;
+                $_SESSION['login_user'] = withComputedDisplayName($updatedUser);
             }
         }
         
-        // If username or email was updated, sync to local DB
-        if (isset($data['username']) || isset($data['email'])) {
+        // If username, email or names were updated, sync to local DB
+        if (isset($data['username']) || isset($data['email'])
+            || array_key_exists('first_name', $data) || array_key_exists('last_name', $data)) {
             require_once __DIR__ . '/UserDataManager.php';
             $udm = new UserDataManager($id);
             
@@ -796,6 +907,15 @@ function updateUserProfile(int $id, array $data): array {
             }
             if (isset($data['email'])) {
                 $udm->syncEmail($data['email'], $useCon);
+            }
+            if (array_key_exists('first_name', $data) || array_key_exists('last_name', $data)) {
+                $freshUser = $updatedUser ?? null;
+                if ($freshUser === null) {
+                    $stmt = $masterCon->prepare("SELECT first_name, last_name FROM users WHERE id = ?");
+                    $stmt->execute([$id]);
+                    $freshUser = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+                }
+                $udm->syncProfileNames($freshUser['first_name'] ?? null, $freshUser['last_name'] ?? null, $useCon);
             }
         }
         
@@ -859,8 +979,8 @@ function listAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, email, is_admin, active, created_at, last_login
-            FROM users 
+            SELECT id, username, email, email_verified, first_name, last_name, is_admin, active, created_at, last_login
+            FROM users
             ORDER BY username
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -480,7 +480,9 @@ body.public-note-page {
     cursor: default;
 }
 
-.public-task-edit-modal {
+/* .alert-modal.* specificity needed: modal-alerts.css loads after this file
+   and its .alert-modal { max-width: 400px } would win otherwise */
+.alert-modal.public-task-edit-modal {
     width: min(92vw, 720px);
     max-width: 720px;
 }

@@ -189,6 +189,83 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
             border-color: #2E8CFA;
             box-shadow: 0 0 0 2px rgba(46, 140, 250, 0.2);
         }
+        .oidc-chip-box {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fff;
+            cursor: text;
+            box-sizing: border-box;
+        }
+        .oidc-chip-box:focus-within {
+            border-color: #2E8CFA;
+            box-shadow: 0 0 0 2px rgba(46, 140, 250, 0.2);
+        }
+        html[data-theme='dark'] .oidc-chip-box,
+        body.dark-mode .oidc-chip-box {
+            background: var(--input-bg, #2a2a2a);
+            border-color: var(--border-color, #444);
+        }
+        .oidc-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: 100%;
+            padding: 3px 4px 3px 10px;
+            border-radius: 12px;
+            background: var(--tag-bg, #e8f0fe);
+            color: var(--tag-color, #1967d2);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        html[data-theme='dark'] .oidc-chip,
+        body.dark-mode .oidc-chip {
+            background: rgba(46, 140, 250, 0.15);
+            color: #6eb5ff;
+        }
+        .oidc-chip-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .oidc-chip-remove {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 15px;
+            line-height: 1;
+            padding: 2px 4px;
+            border-radius: 50%;
+        }
+        .oidc-chip-remove:hover {
+            background: rgba(0, 0, 0, 0.12);
+        }
+        html[data-theme='dark'] .oidc-chip-remove:hover,
+        body.dark-mode .oidc-chip-remove:hover {
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .oidc-field .oidc-chip-box input[type="text"].oidc-chip-entry {
+            flex: 1 1 140px;
+            width: auto;
+            min-width: 140px;
+            border: none;
+            box-shadow: none;
+            outline: none;
+            padding: 4px 2px;
+            background: transparent;
+        }
+        html[data-theme='dark'] .oidc-field .oidc-chip-box input[type="text"].oidc-chip-entry,
+        body.dark-mode .oidc-field .oidc-chip-box input[type="text"].oidc-chip-entry {
+            background: transparent;
+        }
         .oidc-switch-row {
             display: flex;
             align-items: flex-start;
@@ -455,9 +532,12 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                     </div>
 
                     <div class="oidc-field">
-                        <label for="oidc_allowed_users"><?php echo t_h('oidc_admin.fields.allowed_users', [], 'Allowed users'); ?></label>
-                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.allowed_users', [], 'Comma-separated emails/usernames. Leave empty to allow all authenticated users.'); ?></span>
-                        <input type="text" id="oidc_allowed_users" name="oidc_allowed_users" value="<?php echo h($settings['oidc_allowed_users']); ?>" placeholder="">
+                        <label for="oidc_allowed_users_entry"><?php echo t_h('oidc_admin.fields.allowed_users', [], 'Allowed users'); ?></label>
+                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.allowed_users', [], 'Type an email or username and press Enter to add it. Leave empty to allow all authenticated users.'); ?></span>
+                        <div class="oidc-chip-box" id="oidc_allowed_users_box" data-remove-label="<?php echo h(t('common.delete', [], 'Delete')); ?>">
+                            <input type="hidden" id="oidc_allowed_users" name="oidc_allowed_users" value="<?php echo h($settings['oidc_allowed_users']); ?>">
+                            <input type="text" id="oidc_allowed_users_entry" class="oidc-chip-entry" placeholder="user@example.com" autocomplete="off">
+                        </div>
                     </div>
                 </div>
 
@@ -522,6 +602,94 @@ document.addEventListener('DOMContentLoaded', function () {
 
     enabledCheckbox.addEventListener('change', syncOidcVisibility);
     syncOidcVisibility();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    var box = document.getElementById('oidc_allowed_users_box');
+    var hidden = document.getElementById('oidc_allowed_users');
+    var entry = document.getElementById('oidc_allowed_users_entry');
+
+    if (!box || !hidden || !entry) {
+        return;
+    }
+
+    var removeLabel = box.getAttribute('data-remove-label') || 'Delete';
+    var values = hidden.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    values = values.filter(function (v, i) {
+        return values.findIndex(function (o) { return o.toLowerCase() === v.toLowerCase(); }) === i;
+    });
+
+    function render() {
+        box.querySelectorAll('.oidc-chip').forEach(function (chip) { chip.remove(); });
+        values.forEach(function (value, index) {
+            var chip = document.createElement('span');
+            chip.className = 'oidc-chip';
+
+            var label = document.createElement('span');
+            label.className = 'oidc-chip-label';
+            label.textContent = value;
+
+            var removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'oidc-chip-remove';
+            removeBtn.title = removeLabel;
+            removeBtn.setAttribute('aria-label', removeLabel + ' ' + value);
+            removeBtn.textContent = '×';
+            removeBtn.addEventListener('click', function () {
+                values.splice(index, 1);
+                render();
+                entry.focus();
+            });
+
+            chip.appendChild(label);
+            chip.appendChild(removeBtn);
+            box.insertBefore(chip, entry);
+        });
+        hidden.value = values.join(',');
+    }
+
+    function commitEntry() {
+        entry.value.split(',').forEach(function (part) {
+            var v = part.trim();
+            if (!v) return;
+            var exists = values.some(function (o) { return o.toLowerCase() === v.toLowerCase(); });
+            if (!exists) values.push(v);
+        });
+        entry.value = '';
+        render();
+    }
+
+    entry.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            if (entry.value.trim()) commitEntry();
+        } else if (e.key === 'Backspace' && entry.value === '' && values.length) {
+            values.pop();
+            render();
+        }
+    });
+
+    // Splits pasted comma-separated lists into chips immediately
+    entry.addEventListener('input', function () {
+        if (entry.value.indexOf(',') !== -1) commitEntry();
+    });
+
+    entry.addEventListener('blur', function () {
+        if (entry.value.trim()) commitEntry();
+    });
+
+    box.addEventListener('click', function (e) {
+        if (e.target === box) entry.focus();
+    });
+
+    var form = box.closest('form');
+    if (form) {
+        form.addEventListener('submit', function () {
+            if (entry.value.trim()) commitEntry();
+        });
+    }
+
+    render();
 });
 </script>
 </body>

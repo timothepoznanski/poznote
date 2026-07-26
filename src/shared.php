@@ -174,6 +174,7 @@ usort($shared_folders, function($a, $b) {
       data-txt-filter-folders="<?php echo t_h('public.filter_folders', [], 'Folders'); ?>"
 	data-txt-no-shared-notes="<?php echo t_h('public.no_shared_notes', [], 'No shared notes yet.'); ?>"
 	data-txt-no-shared-folders="<?php echo t_h('public.no_shared_folders', [], 'No shared folders yet.'); ?>"
+	data-hide-restrict-users="<?php echo HIDE_RESTRICT_USERS ? '1' : '0'; ?>"
 	data-txt-restrict-users="<?php echo t_h('public.restrict_users', [], 'Restrict to specific users'); ?>"
 	data-txt-restrict-users-mobile="<?php echo t_h('public.restrict_users_mobile', [], 'Restrict'); ?>"
 	data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"
@@ -266,6 +267,6 @@ usort($shared_folders, function($a, $b) {
 	
 	<script src="js/navigation.js"></script>
 	<script src="js/pwa-helpers.js"></script>
-	<script src="js/shared-page.js"></script>
+	<script src="js/shared-page.js?v=<?php echo @filemtime('js/shared-page.js') ?: time(); ?>"></script>
 </body>
 </html>

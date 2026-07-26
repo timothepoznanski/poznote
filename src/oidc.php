@@ -823,12 +823,24 @@ function oidc_find_or_provision_user($claims) {
         $user = getUserProfileByOidcSubject($sub);
     }
 
+    // Fallback matching for profiles not linked by sub yet. A profile already
+    // linked to a DIFFERENT sub belongs to someone else's SSO identity and
+    // must never be re-captured through a username or email collision.
+    $oidcRejectForeignLink = function (?array $candidate) use ($sub): ?array {
+        if ($candidate && !empty($candidate['oidc_subject']) && $candidate['oidc_subject'] !== $sub) {
+            return null;
+        }
+        return $candidate;
+    };
+
     if (!$user && is_string($preferredUsername) && $preferredUsername !== '') {
-        $user = getUserProfileByUsername($preferredUsername);
+        $user = $oidcRejectForeignLink(getUserProfileByUsername($preferredUsername));
     }
 
+    // Only VERIFIED emails (admin-set or provider-synced) take part in
+    // matching: a self-set email must not capture someone's first SSO login.
     if (!$user && is_string($email) && $email !== '') {
-        $user = getUserProfileByEmail($email);
+        $user = $oidcRejectForeignLink(getUserProfileByVerifiedEmail($email));
     }
 
     if (!$user) {
@@ -843,6 +855,17 @@ function oidc_find_or_provision_user($claims) {
         if (empty($creation['success']) || empty($creation['user_id'])) {
             $error = $creation['error'] ?? 'unknown error';
             throw new Exception('Failed to auto-create user profile: ' . $error);
+        }
+
+        // Seed first/last name from standard OIDC claims on provisioning only,
+        // so a user-edited name is never overwritten on later logins.
+        $givenName = is_string($claims['given_name'] ?? null) ? trim($claims['given_name']) : '';
+        $familyName = is_string($claims['family_name'] ?? null) ? trim($claims['family_name']) : '';
+        if ($givenName !== '' || $familyName !== '') {
+            updateUserProfile((int)$creation['user_id'], [
+                'first_name' => $givenName,
+                'last_name' => $familyName,
+            ]);
         }
 
         $user = getUserProfileById((int)$creation['user_id']);
@@ -870,7 +893,8 @@ function oidc_find_or_provision_user($claims) {
         // Only auto-sync email when target email is unused or already on this same user.
         $existingByEmail = getUserProfileByEmail($email);
         if (!$existingByEmail || (int)$existingByEmail['id'] === (int)$user['id']) {
-            updateUserProfile((int)$user['id'], ['email' => $email]);
+            // Provider-synced emails are trusted for future matching.
+            updateUserProfile((int)$user['id'], ['email' => $email, 'email_verified' => 1]);
             $user['email'] = $email;
         }
     }

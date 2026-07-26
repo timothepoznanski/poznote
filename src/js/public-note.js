@@ -348,16 +348,17 @@
 
         // Optimistic UI update
         const taskItem = checkbox.closest('.task-item, .task-list-item');
+        const revertPosition = taskItem && !isMarkdown
+            ? { parent: taskItem.parentNode, next: taskItem.nextSibling }
+            : null;
         if (taskItem) {
             taskItem.classList.toggle('completed', completed);
 
-            // Move to bottom if completed
-            if (completed) {
-                const parent = taskItem.parentNode;
-                // Add a small delay for the animation/feel
+            if (!isMarkdown) {
+                // Small delay so the user sees the checkmark before the move
                 setTimeout(() => {
-                    if (checkbox.checked) { // Double check it's still checked
-                        parent.appendChild(taskItem);
+                    if (checkbox.checked === completed) {
+                        resortPublicTask(taskItem);
                     }
                 }, 300);
             }
@@ -373,18 +374,44 @@
                 if (!data.success) {
                     console.error('Failed to update task', data.error);
                     location.reload(); // Revert by reloading
-                } else if (!isMarkdown) {
-                    // For tasklists, sorting on server might have changed indices
-                    // Let's reload to be safe and keep UI in sync with server sort
-                    setTimeout(() => location.reload(), 800);
                 }
             })
             .catch(err => {
                 console.error('Network error', err);
                 checkbox.checked = !completed;
-                if (taskItem) taskItem.classList.toggle('completed', !completed);
+                if (taskItem) {
+                    taskItem.classList.toggle('completed', !completed);
+                    if (revertPosition && revertPosition.parent) {
+                        revertPosition.parent.insertBefore(taskItem, revertPosition.next);
+                        renumberPublicTasks(revertPosition.parent);
+                    }
+                }
             });
     });
+
+    /**
+     * Mirror the server's stable re-sort after a toggle: the toggled task
+     * lands at the boundary between uncompleted and completed tasks (top of
+     * the completed section when checking, bottom of the uncompleted section
+     * when unchecking), then data-index attributes are renumbered so they
+     * keep matching the server-side array without reloading the page.
+     */
+    function resortPublicTask(taskItem) {
+        const parent = taskItem.parentNode;
+        if (!parent) return;
+        const firstCompleted = Array.from(parent.querySelectorAll('.task-item'))
+            .find(el => el !== taskItem && el.classList.contains('completed')) || null;
+        parent.insertBefore(taskItem, firstCompleted);
+        renumberPublicTasks(parent);
+    }
+
+    function renumberPublicTasks(parent) {
+        Array.from(parent.querySelectorAll('.task-item')).forEach((el, i) => {
+            el.setAttribute('data-index', String(i));
+            const cb = el.querySelector('.task-checkbox');
+            if (cb) cb.setAttribute('data-index', String(i));
+        });
+    }
 
     /**
      * Handle adding a new task
