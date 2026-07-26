@@ -793,8 +793,8 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <link rel="stylesheet" href="css/notes/attachments-row.css?v=<?php echo filemtime(__DIR__ . '/css/notes/attachments-row.css'); ?>">
     <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
     <link rel="stylesheet" href="css/outline.css?v=<?php echo filemtime(__DIR__ . '/css/outline.css'); ?>">
-    <link rel="stylesheet" href="css/modal-alerts.css">
-    <link rel="stylesheet" href="css/tasks.css">
+    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo file_exists(__DIR__ . '/css/modal-alerts.css') ? filemtime(__DIR__ . '/css/modal-alerts.css') : '1'; ?>">
+    <link rel="stylesheet" href="css/tasks.css?v=<?php echo file_exists(__DIR__ . '/css/tasks.css') ? filemtime(__DIR__ . '/css/tasks.css') : '1'; ?>">
     <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
     <link rel="stylesheet" href="css/syntax-highlight.css?v=<?php echo file_exists(__DIR__ . '/css/syntax-highlight.css') ? filemtime(__DIR__ . '/css/syntax-highlight.css') : '1'; ?>">
     <link rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo filemtime(__DIR__ . '/js/katex/katex.min.css'); ?>">
