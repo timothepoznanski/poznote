@@ -845,6 +845,17 @@ function oidc_find_or_provision_user($claims) {
             throw new Exception('Failed to auto-create user profile: ' . $error);
         }
 
+        // Seed first/last name from standard OIDC claims on provisioning only,
+        // so a user-edited name is never overwritten on later logins.
+        $givenName = is_string($claims['given_name'] ?? null) ? trim($claims['given_name']) : '';
+        $familyName = is_string($claims['family_name'] ?? null) ? trim($claims['family_name']) : '';
+        if ($givenName !== '' || $familyName !== '') {
+            updateUserProfile((int)$creation['user_id'], [
+                'first_name' => $givenName,
+                'last_name' => $familyName,
+            ]);
+        }
+
         $user = getUserProfileById((int)$creation['user_id']);
         if (!$user) {
             throw new Exception('Failed to load auto-created user profile');

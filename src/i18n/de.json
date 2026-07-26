@@ -1026,8 +1026,9 @@
     },
     "user_settings_info": {
       "title": "Kontoeinstellungen",
-      "message": "Sie koennen Ihr Passwort in den Einstellungen aendern. Um Ihre E-Mail, Ihren Benutzernamen oder Ihr OIDC-Subject (UUID) zu bearbeiten, wenden Sie sich bitte an den Administrator dieser Poznote-Instanz.",
-      "change_password_button": "Passwort aendern"
+      "message": "Sie koennen Ihren Benutzernamen, Ihren Namen und Ihr Passwort in den Einstellungen aendern. Um Ihre E-Mail oder Ihr OIDC-Subject (UUID) zu bearbeiten, wenden Sie sich bitte an den Administrator dieser Poznote-Instanz.",
+      "change_password_button": "Passwort aendern",
+      "edit_profile_button": "Profil bearbeiten"
     },
     "create": {
       "title_in_folder": "Erstellen in {{folder}}",
@@ -2327,6 +2328,9 @@
       "not_defined": "nicht festgelegt",
       "create_user": "Profil erstellen",
       "edit_user": "Benutzer bearbeiten",
+      "filter_placeholder": "Benutzer filtern...",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
       "click_to_activate": "Zum Aktivieren klicken",
       "click_to_deactivate": "Zum Deaktivieren klicken",
       "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
@@ -2539,6 +2543,21 @@
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "profile": {
+    "card": "Mein Profil",
+    "modal": {
+      "title": "Mein Profil",
+      "description": "Aktualisieren Sie Ihren Benutzernamen sowie Ihren Vor- und Nachnamen.",
+      "username": "Benutzername",
+      "first_name": "Vorname",
+      "last_name": "Nachname"
+    },
+    "errors": {
+      "username_required": "Benutzername ist erforderlich",
+      "username_invalid": "Der Benutzername darf nur Buchstaben, Ziffern, Punkte, Unterstriche und Bindestriche enthalten und darf nicht rein numerisch sein",
+      "username_taken": "Dieser Benutzername ist bereits vergeben"
+    }
   },
   "password": {
     "status": {

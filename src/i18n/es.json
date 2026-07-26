@@ -1027,8 +1027,9 @@
     },
     "user_settings_info": {
       "title": "Configuración de cuenta",
-      "message": "Puedes cambiar tu contraseña desde Configuración. Para editar tu email, nombre de usuario u OIDC Subject (UUID), por favor contacta al administrador de esta instancia de Poznote.",
-      "change_password_button": "Cambiar contraseña"
+      "message": "Puedes cambiar tu nombre de usuario, tu nombre y tu contraseña desde Configuración. Para editar tu email u OIDC Subject (UUID), por favor contacta al administrador de esta instancia de Poznote.",
+      "change_password_button": "Cambiar contraseña",
+      "edit_profile_button": "Editar perfil"
     },
     "create": {
       "title_in_folder": "Crear en {{folder}}",
@@ -2328,6 +2329,9 @@
       "not_defined": "no definido",
       "create_user": "Crear perfil",
       "edit_user": "Editar usuario",
+      "filter_placeholder": "Filtrar usuarios...",
+      "first_name": "Nombre",
+      "last_name": "Apellidos",
       "click_to_activate": "Haga clic para activar",
       "click_to_deactivate": "Haga clic para desactivar",
       "toggle_admin": "Conceder o revocar privilegios de administrador",
@@ -2539,6 +2543,21 @@
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "profile": {
+    "card": "Mi perfil",
+    "modal": {
+      "title": "Mi perfil",
+      "description": "Actualiza tu nombre de usuario, tu nombre y tus apellidos.",
+      "username": "Nombre de usuario",
+      "first_name": "Nombre",
+      "last_name": "Apellidos"
+    },
+    "errors": {
+      "username_required": "El nombre de usuario es obligatorio",
+      "username_invalid": "El nombre de usuario solo puede contener letras, números, puntos, guiones y guiones bajos, y no puede ser únicamente numérico",
+      "username_taken": "Este nombre de usuario ya está en uso"
+    }
   },
   "password": {
     "status": {

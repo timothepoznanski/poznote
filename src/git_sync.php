@@ -18,7 +18,7 @@ require_once 'GitSync.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
-$username = htmlspecialchars($currentUser['display_name'] ?: $currentUser['username']);
+$username = htmlspecialchars(($currentUser['display_name'] ?? '') ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
 
 // Initialize GitSync

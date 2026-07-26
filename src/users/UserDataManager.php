@@ -301,4 +301,34 @@ class UserDataManager {
             return false;
         }
     }
+
+    /**
+     * Sync first/last name to user's local settings table for redundancy (disaster recovery)
+     * @param string|null $firstName
+     * @param string|null $lastName
+     * @param PDO|null $con Optional existing database connection to use
+     * @return bool
+     */
+    public function syncProfileNames($firstName, $lastName, $con = null) {
+        $dbPath = $this->getUserDatabasePath();
+        if (!file_exists($dbPath)) {
+            return true;
+        }
+
+        try {
+            if ($con === null) {
+                $con = new PDO('sqlite:' . $dbPath);
+                $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $con->exec('PRAGMA busy_timeout = 5000');
+            }
+
+            $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
+            $ok = $stmt->execute(['user_profile_first_name', (string)($firstName ?? '')]);
+            $ok = $stmt->execute(['user_profile_last_name', (string)($lastName ?? '')]) && $ok;
+            return $ok;
+        } catch (Exception $e) {
+            error_log("Failed to sync profile names for user " . $this->userId . ": " . $e->getMessage());
+            return false;
+        }
+    }
 }

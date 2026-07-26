@@ -1037,8 +1037,9 @@
     },
     "user_settings_info": {
       "title": "账户设置",
-      "message": "您可以在设置中更改密码。若要修改电子邮件、用户名或 OIDC Subject (UUID)，请联系此 Poznote 实例的管理员。",
-      "change_password_button": "更改密码"
+      "message": "您可以在设置中更改用户名、姓名和密码。若要修改电子邮件或 OIDC Subject (UUID)，请联系此 Poznote 实例的管理员。",
+      "change_password_button": "更改密码",
+      "edit_profile_button": "编辑资料"
     },
     "create": {
       "title_in_folder": "在 {{folder}} 中创建",
@@ -2321,6 +2322,9 @@
       "users_list": "用户列表",
       "create_user": "创建用户",
       "edit_user": "编辑用户",
+      "filter_placeholder": "筛选用户...",
+      "first_name": "名字",
+      "last_name": "姓氏",
       "delete_user": "删除用户",
       "reset_password": "重置密码",
       "logout_all_sessions": "注销所有会话",
@@ -2679,6 +2683,21 @@
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
       "no_accounts": "未找到账户。"
+    }
+  },
+  "profile": {
+    "card": "我的资料",
+    "modal": {
+      "title": "我的资料",
+      "description": "更新您的用户名以及姓名。",
+      "username": "用户名",
+      "first_name": "名字",
+      "last_name": "姓氏"
+    },
+    "errors": {
+      "username_required": "用户名为必填项",
+      "username_invalid": "用户名只能包含字母、数字、点、下划线和连字符，且不能为纯数字",
+      "username_taken": "该用户名已被使用"
     }
   },
   "password": {

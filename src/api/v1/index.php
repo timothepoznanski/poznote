@@ -848,6 +848,11 @@ $router->get('/users/me', function($params) use ($usersController) {
     echo json_encode($usersController->me());
 });
 
+// Update current authenticated user's profile (username, first/last name)
+$router->patch('/users/me', function($params) use ($usersController) {
+    echo json_encode($usersController->updateMe());
+});
+
 // Change current user's password
 $router->post('/users/me/password', function($params) use ($usersController) {
     echo json_encode($usersController->changePassword());

@@ -1058,8 +1058,9 @@
     },
     "user_settings_info": {
       "title": "Paramètres du compte",
-      "message": "Vous pouvez changer votre mot de passe depuis les paramètres. Pour modifier votre email, nom d’utilisateur ou OIDC Subject (UUID), veuillez contacter l’administrateur de cette instance Poznote.",
-      "change_password_button": "Changer le mot de passe"
+      "message": "Vous pouvez changer votre nom d’utilisateur, votre prénom, votre nom et votre mot de passe depuis les paramètres. Pour modifier votre email ou OIDC Subject (UUID), veuillez contacter l’administrateur de cette instance Poznote.",
+      "change_password_button": "Changer le mot de passe",
+      "edit_profile_button": "Modifier le profil"
     },
     "create": {
       "title_in_folder": "Créer dans {{folder}}",
@@ -2381,6 +2382,9 @@
       "users_list": "Liste des utilisateurs",
       "create_user": "Créer un utilisateur",
       "edit_user": "Modifier l'utilisateur",
+      "filter_placeholder": "Filtrer les utilisateurs...",
+      "first_name": "Prénom",
+      "last_name": "Nom",
       "delete_user": "Supprimer l'utilisateur",
       "reset_password": "Réinitialiser le mot de passe",
       "logout_all_sessions": "Déconnecter toutes les sessions",
@@ -2754,6 +2758,21 @@
   },
   "backlinks": {
     "title": "Backlinks"
+  },
+  "profile": {
+    "card": "Mon profil",
+    "modal": {
+      "title": "Mon profil",
+      "description": "Modifiez votre nom d’utilisateur ainsi que votre prénom et votre nom.",
+      "username": "Nom d’utilisateur",
+      "first_name": "Prénom",
+      "last_name": "Nom"
+    },
+    "errors": {
+      "username_required": "Le nom d’utilisateur est requis",
+      "username_invalid": "Le nom d’utilisateur ne peut contenir que des lettres, chiffres, points, tirets et tirets bas, et ne peut pas être uniquement numérique",
+      "username_taken": "Ce nom d’utilisateur est déjà utilisé"
+    }
   },
   "password": {
     "status": {

@@ -60,7 +60,7 @@ class WorkspacesController {
             if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
                  $authUser = getAuthenticatedUser();
                  if ($authUser) {
-                     $actingAs = $authUser['display_name'] ?: $authUser['username'];
+                     $actingAs = ($authUser['display_name'] ?? '') ?: $authUser['username'];
                  }
             }
             
