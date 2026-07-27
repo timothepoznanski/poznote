@@ -2697,6 +2697,11 @@
       "body_text": "Este é um e-mail de teste do Poznote.\n\nSe o recebeu, a sua configuração SMTP funciona.",
       "body_html_intro": "Este é um e-mail de teste do Poznote.",
       "body_html_success": "Se o recebeu, a sua configuração SMTP funciona."
+    },
+    "section_notifications": "Notificações de novos utilizadores",
+    "notifications": {
+      "description": "Enviar um e-mail aos administradores selecionados quando for criada uma nova conta de utilizador.",
+      "no_candidates": "Nenhum administrador tem ainda endereço de e-mail. Adicione um a um perfil de administrador na página Utilizadores para ativar as notificações."
     }
   },
   "reminder": {
@@ -2866,5 +2871,20 @@
     "create_error": "Não foi possível criar a entrada do diário.",
     "create_card_title": "Entrada de diário",
     "folder_name": "Diário"
+  },
+  "new_user_email": {
+    "subject": "Novo utilizador Poznote: {{user}}",
+    "heading": "Novo utilizador",
+    "intro": "Foi criada uma nova conta de utilizador no Poznote.",
+    "username_label": "Nome de utilizador",
+    "email_label": "E-mail",
+    "source_label": "Criado através de",
+    "created_label": "Criado em",
+    "source_oidc": "Início de sessão único (OIDC)",
+    "source_other": "Administração",
+    "no_email": "Não indicado",
+    "manage_link": "Gerir utilizadores: {{url}}",
+    "manage_button": "Gerir utilizadores",
+    "footer": "Recebe este e-mail porque as notificações de novos utilizadores estão ativadas na sua conta de administrador."
   }
 }
