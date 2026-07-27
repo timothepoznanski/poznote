@@ -1023,14 +1023,23 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
 
 /**
  * List all user profiles (for admin)
+ * $sort must be one of the whitelisted keys below; anything else falls back to id_asc.
  */
-function listAllUserProfiles(): array {
+function listAllUserProfiles(string $sort = 'id_asc'): array {
+    $orderClauses = [
+        'id_asc' => 'id ASC',
+        'id_desc' => 'id DESC',
+        'username_asc' => 'username COLLATE NOCASE ASC',
+        'username_desc' => 'username COLLATE NOCASE DESC',
+    ];
+    $orderBy = $orderClauses[$sort] ?? $orderClauses['id_asc'];
+
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
             SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login
             FROM users
-            ORDER BY username
+            ORDER BY $orderBy
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
