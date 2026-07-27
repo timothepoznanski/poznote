@@ -2394,6 +2394,11 @@
       "body_text": "This is a test email from Poznote.\n\nIf you received it, your SMTP configuration works.",
       "body_html_intro": "This is a test email from Poznote.",
       "body_html_success": "If you received it, your SMTP configuration works."
+    },
+    "section_notifications": "New user notifications",
+    "notifications": {
+      "description": "Send an email to the selected administrators when a new user account is created.",
+      "no_candidates": "No administrator has an email address yet. Add one to an admin profile in the Users page to enable notifications."
     }
   },
   "reminder": {
@@ -2575,5 +2580,20 @@
     "create_error": "Could not create the diary entry.",
     "create_card_title": "Diary entry",
     "folder_name": "Diary"
+  },
+  "new_user_email": {
+    "subject": "New Poznote user: {{user}}",
+    "heading": "New user",
+    "intro": "A new user account was created in Poznote.",
+    "username_label": "Username",
+    "email_label": "Email",
+    "source_label": "Created via",
+    "created_label": "Created at",
+    "source_oidc": "Single sign-on (OIDC)",
+    "source_other": "Administration",
+    "no_email": "Not provided",
+    "manage_link": "Manage users: {{url}}",
+    "manage_button": "Manage users",
+    "footer": "You receive this email because new-user notifications are enabled for your admin account."
   }
 }

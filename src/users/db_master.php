@@ -63,6 +63,7 @@ function initializeMasterDatabase(PDO $con): void {
             last_name TEXT,
             active INTEGER DEFAULT 1,
             is_admin INTEGER DEFAULT 0,
+            notify_new_user INTEGER DEFAULT 0,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_login DATETIME
@@ -105,6 +106,10 @@ function initializeMasterDatabase(PDO $con): void {
             // Emails that predate self-service editing were all set by an
             // administrator, so they are trusted for OIDC account matching.
             $con->exec("UPDATE users SET email_verified = 1 WHERE email IS NOT NULL AND email != ''");
+        }
+
+        if (!in_array('notify_new_user', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN notify_new_user INTEGER DEFAULT 0");
         }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
@@ -817,7 +822,7 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'oidc_subject'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'oidc_subject'];
         $updates = [];
         $params = [];
 
@@ -868,7 +873,7 @@ function updateUserProfile(int $id, array $data): array {
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
-                if ($key === 'active' || $key === 'is_admin') {
+                if ($key === 'active' || $key === 'is_admin' || $key === 'notify_new_user') {
                     $value = (int)(bool)$value;
                 }
                 $updates[] = "$key = ?";
@@ -896,6 +901,14 @@ function updateUserProfile(int $id, array $data): array {
             }
         }
         
+        // Losing the admin role, being deactivated, or losing the email address
+        // makes the user undeliverable for new-user notifications, so drop the
+        // opt-in instead of leaving it stale.
+        $emailCleared = array_key_exists('email', $data) && trim((string)$data['email']) === '';
+        if (($newActive !== 1 || $newIsAdmin !== 1 || $emailCleared) && !array_key_exists('notify_new_user', $data)) {
+            $updates[] = "notify_new_user = 0";
+        }
+
         $updates[] = "updated_at = CURRENT_TIMESTAMP";
         $params[] = $id;
         
@@ -1015,13 +1028,99 @@ function listAllUserProfiles(): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, email, email_verified, first_name, last_name, is_admin, active, created_at, last_login
+            SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login
             FROM users
             ORDER BY username
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         return [];
+    }
+}
+
+/**
+ * List the active admins who opted in to new-user notifications.
+ * Admins without an email address cannot be notified, so they are skipped.
+ */
+function listNewUserNotificationRecipients(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT id, username, email, first_name, last_name
+            FROM users
+            WHERE notify_new_user = 1
+              AND is_admin = 1
+              AND active = 1
+              AND email IS NOT NULL
+              AND email != ''
+            ORDER BY username
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * List the active admins with an email address, i.e. those who can be offered
+ * the new-user notification opt-in.
+ */
+function listNewUserNotificationCandidates(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT id, username, email, first_name, last_name, notify_new_user
+            FROM users
+            WHERE is_admin = 1
+              AND active = 1
+              AND email IS NOT NULL
+              AND email != ''
+            ORDER BY username
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Replace the set of admins subscribed to new-user notifications.
+ * Ids that are not eligible admins are ignored rather than rejected.
+ */
+function setNewUserNotificationRecipients(array $userIds): bool {
+    try {
+        $con = getMasterConnection();
+
+        $eligible = [];
+        foreach (listNewUserNotificationCandidates() as $candidate) {
+            $eligible[(int)$candidate['id']] = true;
+        }
+
+        $selected = [];
+        foreach ($userIds as $userId) {
+            $userId = (int)$userId;
+            if (isset($eligible[$userId])) {
+                $selected[$userId] = true;
+            }
+        }
+
+        $con->beginTransaction();
+        $con->exec("UPDATE users SET notify_new_user = 0 WHERE notify_new_user = 1");
+        if (!empty($selected)) {
+            $stmt = $con->prepare("UPDATE users SET notify_new_user = 1 WHERE id = ?");
+            foreach (array_keys($selected) as $userId) {
+                $stmt->execute([$userId]);
+            }
+        }
+        $con->commit();
+
+        return true;
+    } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        error_log('Failed to save new user notification recipients: ' . $e->getMessage());
+        return false;
     }
 }
 

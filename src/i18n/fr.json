@@ -2908,6 +2908,11 @@
       "body_text": "Ceci est un email de test envoyé par Poznote.\n\nSi vous l’avez reçu, votre configuration SMTP fonctionne.",
       "body_html_intro": "Ceci est un email de test envoyé par Poznote.",
       "body_html_success": "Si vous l’avez reçu, votre configuration SMTP fonctionne."
+    },
+    "section_notifications": "Notifications de nouvel utilisateur",
+    "notifications": {
+      "description": "Envoyer un e-mail aux administrateurs sélectionnés lorsqu'un nouveau compte utilisateur est créé.",
+      "no_candidates": "Aucun administrateur n'a d'adresse e-mail pour le moment. Ajoutez-en une à un profil administrateur dans la page Utilisateurs pour activer les notifications."
     }
   },
   "reminder": {
@@ -3077,5 +3082,20 @@
     "create_error": "Impossible de créer la note du jour.",
     "create_card_title": "Note de journal",
     "folder_name": "Journal"
+  },
+  "new_user_email": {
+    "subject": "Nouvel utilisateur Poznote : {{user}}",
+    "heading": "Nouvel utilisateur",
+    "intro": "Un nouveau compte utilisateur a été créé dans Poznote.",
+    "username_label": "Nom d'utilisateur",
+    "email_label": "E-mail",
+    "source_label": "Créé via",
+    "created_label": "Créé le",
+    "source_oidc": "Authentification unique (OIDC)",
+    "source_other": "Administration",
+    "no_email": "Non renseigné",
+    "manage_link": "Gérer les utilisateurs : {{url}}",
+    "manage_button": "Gérer les utilisateurs",
+    "footer": "Vous recevez cet e-mail car les notifications de nouvel utilisateur sont activées pour votre compte administrateur."
   }
 }

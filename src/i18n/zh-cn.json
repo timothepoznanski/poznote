@@ -2834,6 +2834,11 @@
       "body_text": "这是来自 Poznote 的测试邮件。\n\n如果您收到了，说明您的 SMTP 配置正常。",
       "body_html_intro": "这是来自 Poznote 的测试邮件。",
       "body_html_success": "如果您收到了，说明您的 SMTP 配置正常。"
+    },
+    "section_notifications": "新用户通知",
+    "notifications": {
+      "description": "创建新用户账户时，向选定的管理员发送邮件。",
+      "no_candidates": "目前没有管理员设置了电子邮件地址。请在“用户”页面为管理员资料添加地址以启用通知。"
     }
   },
   "reminder": {
@@ -3003,5 +3008,20 @@
     "create_error": "无法创建日记条目。",
     "create_card_title": "日记条目",
     "folder_name": "日记"
+  },
+  "new_user_email": {
+    "subject": "新的 Poznote 用户：{{user}}",
+    "heading": "新用户",
+    "intro": "Poznote 中创建了一个新的用户账户。",
+    "username_label": "用户名",
+    "email_label": "电子邮件",
+    "source_label": "创建方式",
+    "created_label": "创建时间",
+    "source_oidc": "单点登录 (OIDC)",
+    "source_other": "管理后台",
+    "no_email": "未提供",
+    "manage_link": "管理用户：{{url}}",
+    "manage_button": "管理用户",
+    "footer": "您收到此邮件是因为您的管理员账户已启用新用户通知。"
   }
 }

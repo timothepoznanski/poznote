@@ -907,6 +907,19 @@ function oidc_find_or_provision_user($claims) {
         if (!$user) {
             throw new Exception('Failed to load auto-created user profile');
         }
+
+        // Best-effort: a failing notification must never block the signup.
+        try {
+            require_once __DIR__ . '/NewUserNotificationService.php';
+            (new NewUserNotificationService())->notifyNewUser(
+                (int)$creation['user_id'],
+                $username,
+                $newEmail,
+                'oidc'
+            );
+        } catch (Throwable $e) {
+            error_log('New user notification failed after OIDC provisioning: ' . $e->getMessage());
+        }
     }
 
     if (!$user['active']) {

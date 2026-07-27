@@ -722,33 +722,42 @@ function parseMarkdown($text) {
         return $text;
     };
 
-    // Render the collected lines of a blockquote/callout body: heading lines
-    // become real <h1>-<h6> elements, everything else keeps the historical
-    // inline-styles-joined-by-<br> behavior. Blank lines adjacent to a heading
-    // are dropped since the heading provides its own spacing.
+    // Render the collected lines of a blockquote/callout body: heading and
+    // horizontal-rule lines become real <h1>-<h6>/<hr> elements, everything
+    // else keeps the historical inline-styles-joined-by-<br> behavior. Blank
+    // lines adjacent to those blocks are dropped since the block provides its
+    // own spacing.
     $renderQuoteLines = function($quoteLines) use ($applyInlineStyles) {
         $htmlParts = [];
         $textRun = [];
-        $skipBlankAfterHeading = false;
+        $skipBlankAfterBlock = false;
         $flushRun = function() use (&$textRun, &$htmlParts, $applyInlineStyles) {
             if (count($textRun) > 0) {
                 $htmlParts[] = implode('<br>', array_map($applyInlineStyles, $textRun));
                 $textRun = [];
             }
         };
+        $trimTrailingBlanks = function() use (&$textRun) {
+            while (count($textRun) > 0 && trim($textRun[count($textRun) - 1]) === '') {
+                array_pop($textRun);
+            }
+        };
         foreach ($quoteLines as $ql) {
             if (preg_match('/^(#{1,6})\s+(.+)$/', $ql, $hm)) {
-                while (count($textRun) > 0 && trim($textRun[count($textRun) - 1]) === '') {
-                    array_pop($textRun);
-                }
+                $trimTrailingBlanks();
                 $flushRun();
                 $level = strlen($hm[1]);
                 $htmlParts[] = '<h' . $level . '>' . $applyInlineStyles($hm[2]) . '</h' . $level . '>';
-                $skipBlankAfterHeading = true;
-            } elseif ($skipBlankAfterHeading && trim($ql) === '') {
+                $skipBlankAfterBlock = true;
+            } elseif (preg_match('/^\s*(\*{3,}|-{3,}|_{3,})\s*$/', $ql)) {
+                $trimTrailingBlanks();
+                $flushRun();
+                $htmlParts[] = '<hr>';
+                $skipBlankAfterBlock = true;
+            } elseif ($skipBlankAfterBlock && trim($ql) === '') {
                 continue;
             } else {
-                $skipBlankAfterHeading = false;
+                $skipBlankAfterBlock = false;
                 $textRun[] = $ql;
             }
         }

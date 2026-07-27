@@ -186,6 +186,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     setGlobalSetting('smtp_reminder_cutoff_at', gmdate('Y-m-d H:i:s'));
                 }
 
+                // New-user notification recipients. The checkbox list only shows
+                // eligible admins, so anything else posted is ignored.
+                $postedRecipients = $_POST['notify_new_user_ids'] ?? [];
+                if (!is_array($postedRecipients)) {
+                    $postedRecipients = [];
+                }
+                $selectedRecipients = array_map('intval', $postedRecipients);
+                if (!setNewUserNotificationRecipients($selectedRecipients)) {
+                    $allOk = false;
+                }
+
                 if (!$allOk) {
                     $error = t('smtp_admin.error_saving', [], 'Error saving SMTP configuration.');
                 } elseif ($action === 'test') {
@@ -219,6 +230,7 @@ $settings = [
 ];
 $smtp_configured = smtp_is_configured($settings);
 $smtp_enabled = smtp_is_enabled($smtp_configured);
+$notifyCandidates = listNewUserNotificationCandidates();
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo smtp_h($currentLang); ?>">
@@ -260,6 +272,49 @@ $smtp_enabled = smtp_is_enabled($smtp_configured);
         }
         .smtp-field { margin-bottom: 16px; }
         .smtp-field:last-child { margin-bottom: 0; }
+        .smtp-section-hint {
+            margin: 0 0 16px;
+            font-size: 0.92rem;
+            line-height: 1.45;
+            color: var(--text-secondary, #666);
+        }
+        .smtp-section-hint:last-child { margin-bottom: 0; }
+        .smtp-recipients {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+        }
+        .smtp-recipient {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color, #ddd);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .smtp-recipient:hover {
+            border-color: var(--accent-color, #007cba);
+        }
+        .smtp-recipient input[type="checkbox"] {
+            margin: 2px 0 0;
+            flex: 0 0 auto;
+        }
+        .smtp-recipient-copy {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .smtp-recipient-name {
+            font-weight: 600;
+            font-size: 0.92rem;
+            word-break: break-word;
+        }
+        .smtp-recipient-email {
+            font-size: 0.85rem;
+            color: var(--text-secondary, #666);
+            word-break: break-all;
+        }
         .smtp-field label {
             display: block;
             font-weight: 600;
@@ -622,6 +677,42 @@ $smtp_enabled = smtp_is_enabled($smtp_configured);
                     <input type="text" id="smtp_from_name" name="smtp_from_name" value="<?php echo smtp_h($settings['smtp_from_name']); ?>" placeholder="Poznote">
                 </div>
             </div>
+        </div>
+
+        <div class="settings-section smtp-section">
+            <h2><?php echo t_h('smtp_admin.section_notifications', [], 'New user notifications'); ?></h2>
+            <p class="smtp-section-hint">
+                <?php echo t_h('smtp_admin.notifications.description', [], 'Send an email to the selected administrators when a new user account is created.'); ?>
+            </p>
+            <?php if (empty($notifyCandidates)): ?>
+                <p class="smtp-section-hint">
+                    <?php echo t_h('smtp_admin.notifications.no_candidates', [], 'No administrator has an email address yet. Add one to an admin profile in the Users page to enable notifications.'); ?>
+                </p>
+            <?php else: ?>
+                <div class="smtp-recipients">
+                    <?php foreach ($notifyCandidates as $candidate): ?>
+                        <?php
+                            $candidateId = (int)$candidate['id'];
+                            $candidateName = trim(trim((string)($candidate['first_name'] ?? '')) . ' ' . trim((string)($candidate['last_name'] ?? '')));
+                            if ($candidateName === '') {
+                                $candidateName = (string)$candidate['username'];
+                            }
+                        ?>
+                        <label class="smtp-recipient" for="notify_user_<?php echo $candidateId; ?>">
+                            <input
+                                type="checkbox"
+                                id="notify_user_<?php echo $candidateId; ?>"
+                                name="notify_new_user_ids[]"
+                                value="<?php echo $candidateId; ?>"
+                                <?php echo !empty($candidate['notify_new_user']) ? 'checked' : ''; ?>>
+                            <span class="smtp-recipient-copy">
+                                <span class="smtp-recipient-name"><?php echo smtp_h($candidateName); ?></span>
+                                <span class="smtp-recipient-email"><?php echo smtp_h((string)$candidate['email']); ?></span>
+                            </span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="smtp-actions">

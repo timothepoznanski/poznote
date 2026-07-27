@@ -2694,6 +2694,11 @@
       "body_text": "Dies ist eine Test-E-Mail von Poznote.\n\nWenn Sie sie erhalten haben, funktioniert Ihre SMTP-Konfiguration.",
       "body_html_intro": "Dies ist eine Test-E-Mail von Poznote.",
       "body_html_success": "Wenn Sie sie erhalten haben, funktioniert Ihre SMTP-Konfiguration."
+    },
+    "section_notifications": "Benachrichtigungen über neue Benutzer",
+    "notifications": {
+      "description": "Eine E-Mail an die ausgewählten Administratoren senden, wenn ein neues Benutzerkonto erstellt wird.",
+      "no_candidates": "Noch kein Administrator hat eine E-Mail-Adresse. Fügen Sie auf der Seite Benutzer einem Administratorprofil eine hinzu, um Benachrichtigungen zu aktivieren."
     }
   },
   "reminder": {
@@ -2863,5 +2868,20 @@
     "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",
     "create_card_title": "Tagebucheintrag",
     "folder_name": "Tagebuch"
+  },
+  "new_user_email": {
+    "subject": "Neuer Poznote-Benutzer: {{user}}",
+    "heading": "Neuer Benutzer",
+    "intro": "In Poznote wurde ein neues Benutzerkonto erstellt.",
+    "username_label": "Benutzername",
+    "email_label": "E-Mail",
+    "source_label": "Erstellt über",
+    "created_label": "Erstellt am",
+    "source_oidc": "Single Sign-on (OIDC)",
+    "source_other": "Administration",
+    "no_email": "Nicht angegeben",
+    "manage_link": "Benutzer verwalten: {{url}}",
+    "manage_button": "Benutzer verwalten",
+    "footer": "Sie erhalten diese E-Mail, weil Benachrichtigungen über neue Benutzer für Ihr Administratorkonto aktiviert sind."
   }
 }
