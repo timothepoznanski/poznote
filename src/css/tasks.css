@@ -421,6 +421,15 @@
     line-height: 1.45;
 }
 
+/* Separators inside a callout: the page-level hr margin is far too tall for a
+   compact callout body, and the rule should follow the callout's own color. */
+.callout .callout-body hr {
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.25;
+    margin: 0.85em 0;
+}
+
 /* Ensure callouts look good inside notes (inherit text color) */
 .noteentry .callout,
 .innernote .callout {

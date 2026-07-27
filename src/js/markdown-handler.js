@@ -2423,32 +2423,41 @@ function parseMarkdown(text) {
         return text;
     }
 
-    // Render the collected lines of a blockquote/callout body: heading lines
-    // become real <h1>-<h6> elements, everything else keeps the historical
-    // inline-styles-joined-by-<br> behavior. Blank lines adjacent to a heading
-    // are dropped since the heading provides its own spacing.
+    // Render the collected lines of a blockquote/callout body: heading and
+    // horizontal-rule lines become real <h1>-<h6>/<hr> elements, everything
+    // else keeps the historical inline-styles-joined-by-<br> behavior. Blank
+    // lines adjacent to those blocks are dropped since the block provides its
+    // own spacing.
     function renderQuoteLines(quoteLines) {
         let htmlParts = [];
         let textRun = [];
-        let skipBlankAfterHeading = false;
+        let skipBlankAfterBlock = false;
         function flushRun() {
             if (textRun.length) {
                 htmlParts.push(textRun.map(l => applyInlineStyles(l)).join('<br>'));
                 textRun = [];
             }
         }
+        function trimTrailingBlanks() {
+            while (textRun.length && textRun[textRun.length - 1].trim() === '') textRun.pop();
+        }
         for (let ql of quoteLines) {
             let hm = ql.match(/^(#{1,6})\s+(.+)$/);
             if (hm) {
-                while (textRun.length && textRun[textRun.length - 1].trim() === '') textRun.pop();
+                trimTrailingBlanks();
                 flushRun();
                 let level = hm[1].length;
                 htmlParts.push('<h' + level + '>' + applyInlineStyles(hm[2]) + '</h' + level + '>');
-                skipBlankAfterHeading = true;
-            } else if (skipBlankAfterHeading && ql.trim() === '') {
+                skipBlankAfterBlock = true;
+            } else if (ql.match(/^\s*(\*{3,}|-{3,}|_{3,})\s*$/)) {
+                trimTrailingBlanks();
+                flushRun();
+                htmlParts.push('<hr>');
+                skipBlankAfterBlock = true;
+            } else if (skipBlankAfterBlock && ql.trim() === '') {
                 continue;
             } else {
-                skipBlankAfterHeading = false;
+                skipBlankAfterBlock = false;
                 textRun.push(ql);
             }
         }
