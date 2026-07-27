@@ -23,8 +23,8 @@ import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 // searchKeymap includes Mod-f (Ctrl+F) which would intercept the browser's native find.
 // We filter it out so Ctrl+F opens the browser find dialog instead of CodeMirror's panel.
 const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod-f')
-import { Compartment, EditorSelection, EditorState, StateEffect, StateField } from '@codemirror/state'
-import { Decoration, EditorView, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
+import { Compartment, EditorSelection, EditorState, RangeSetBuilder, StateEffect, StateField } from '@codemirror/state'
+import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
 
 const instances = new WeakMap()
@@ -55,6 +55,45 @@ const searchHighlightField = StateField.define({
     return value.map(transaction.changes)
   },
   provide: field => EditorView.decorations.from(field)
+})
+
+// Table rows are padded with spaces so their pipes line up in the raw source (see
+// formatMarkdownTableBlockLines in markdown-handler.js). That alignment is only
+// visible in a fixed-width font, so lines that look like table rows are tagged with
+// a class that markdown.css uses to switch them to a monospace font.
+const markdownTableLineDecoration = Decoration.line({ class: 'cm-md-table-line' })
+
+function buildMarkdownTableLineDecorations(view) {
+  const builder = new RangeSetBuilder()
+  let lastLineFrom = -1
+
+  for (const range of view.visibleRanges) {
+    let pos = range.from
+    while (pos <= range.to) {
+      const line = view.state.doc.lineAt(pos)
+      if (line.from > lastLineFrom && /^[ \t]*\|/.test(line.text)) {
+        builder.add(line.from, line.from, markdownTableLineDecoration)
+        lastLineFrom = line.from
+      }
+      pos = line.to + 1
+    }
+  }
+
+  return builder.finish()
+}
+
+const markdownTableLinePlugin = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.decorations = buildMarkdownTableLineDecorations(view)
+  }
+
+  update(update) {
+    if (update.docChanged || update.viewportChanged) {
+      this.decorations = buildMarkdownTableLineDecorations(update.view)
+    }
+  }
+}, {
+  decorations: plugin => plugin.decorations
 })
 
 const excalidrawBlockRegex = /<div\b(?=[^>]*\bclass\s*=\s*(["'])[^"']*\bexcalidraw-container\b[^"']*\1)[^>]*>[\s\S]*?<\/div>/gi
@@ -550,6 +589,35 @@ function replaceRange(host, start, end, replacement) {
   return true
 }
 
+// Like replaceRange, but does not scroll and does not steal focus. Used for
+// background rewrites such as table re-alignment at save time. Without `anchor`
+// the user's selection is kept (mapped through the change); with `anchor` the
+// cursor is placed at that offset (in the post-change document) in the same
+// transaction. Rewriting during IME composition would cancel the composition,
+// so those calls are refused.
+function replaceRangeKeepSelection(host, start, end, replacement, anchor) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  if (instance.view.composing) return false
+
+  const docLength = instance.view.state.doc.length
+  const from = Math.max(0, Math.min(start, docLength))
+  const to = Math.max(from, Math.min(end, docLength))
+  const insert = String(replacement || '')
+
+  const spec = {
+    changes: { from, to, insert },
+    userEvent: 'input.format'
+  }
+  if (typeof anchor === 'number' && Number.isFinite(anchor)) {
+    const newDocLength = docLength - (to - from) + insert.length
+    spec.selection = { anchor: Math.max(0, Math.min(Math.round(anchor), newDocLength)) }
+  }
+
+  instance.view.dispatch(spec)
+  return true
+}
+
 function getCoordsAtPos(host, position, side = 1) {
   const instance = getInstance(host)
   if (!instance) return null
@@ -752,6 +820,7 @@ function createEditor(host, options = {}) {
       excalidrawPlaceholderField,
       placeholder(placeholderText),
       EditorView.lineWrapping,
+      markdownTableLinePlugin,
       readOnlyCompartment.of(createReadOnlyExtensions(!!options.readOnly)),
       themeCompartment.of(createThemeExtensions()),
       updateListener,
@@ -841,6 +910,7 @@ window.PoznoteMarkdownCodeMirror = {
   getSelectionOffsets,
   setSelection,
   replaceRange,
+  replaceRangeKeepSelection,
   getCoordsAtPos,
   scrollToPos,
   revealPos,

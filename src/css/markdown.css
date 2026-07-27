@@ -35,6 +35,14 @@
     box-shadow: none !important;
 }
 
+/* Table rows are space-padded so their pipes line up (formatMarkdownTableBlockLines
+   in markdown-handler.js); that alignment is only visible in a fixed-width font.
+   The unmatched #id inside :is() only boosts specificity above the forced-Inter
+   rule in notes/noteentry.css. */
+.markdown-editor .cm-line:is(#poznote-md-table-font-boost, .cm-md-table-line) {
+    font-family: 'Courier New', Courier, monospace !important;
+}
+
 .markdown-editor:empty:before {
     content: attr(data-ph);
     color: #999;

@@ -1975,7 +1975,14 @@ function buildMarkdownTable(rows, cols) {
   const header = Array.from({ length: cols }, (_, i) => `Column ${i + 1}`).join(' | ');
   const separator = Array.from({ length: cols }, () => '---').join(' | ');
   const row = Array.from({ length: cols }, () => ' ').join(' | ');
-  return `\n| ${header} |\n| ${separator} |\n${Array.from({ length: rows - 1 }, () => `| ${row} |`).join('\n')}\n`;
+  const lines = [`| ${header} |`, `| ${separator} |`].concat(
+    Array.from({ length: rows - 1 }, () => `| ${row} |`)
+  );
+  if (typeof window.formatMarkdownTableBlockLines === 'function') {
+    const formatted = window.formatMarkdownTableBlockLines(lines);
+    if (formatted) return `\n${formatted.join('\n')}\n`;
+  }
+  return `\n${lines.join('\n')}\n`;
 }
 
 function toggleTablePicker(triggerElement) {

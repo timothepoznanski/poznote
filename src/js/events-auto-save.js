@@ -477,6 +477,10 @@ function emergencySave(noteId) {
             ent = entryElem.innerHTML;
         }
     } else if (noteType === 'markdown') {
+        // Align table columns at save time (the caret's own table is left as-is)
+        if (typeof window.formatMarkdownTablesBeforeSave === 'function') {
+            window.formatMarkdownTablesBeforeSave(noteId);
+        }
         // For markdown notes, save the raw markdown content
         if (typeof getMarkdownContentForNote === 'function') {
             const markdownContent = getMarkdownContentForNote(noteId);
