@@ -134,6 +134,7 @@
       "orphan_scanner": "Orphan attachments scanner",
       "storage_stats": "Storage statistics",
       "change_password": "Change Password",
+      "delete_account": "Delete Account",
       "import_limits": "Import Limits",
       "git_sync_toggle": "Git Sync",
       "oidc_config": "OIDC / SSO",
@@ -2284,6 +2285,22 @@
       "incorrect_current": "Current password is incorrect"
     },
     "success": "Password changed successfully."
+  },
+  "delete_account": {
+    "modal": {
+      "title": "Delete Account",
+      "description": "This will permanently delete your account and all of its data (notes, files, attachments). This action cannot be undone.",
+      "confirm_placeholder": "Type your username to confirm",
+      "password_placeholder": "Current password",
+      "button": "Delete my account"
+    },
+    "errors": {
+      "confirm_mismatch": "Username confirmation does not match",
+      "password_required": "Password is required",
+      "password_incorrect": "Password is incorrect",
+      "cannot_delete": "This account cannot be deleted",
+      "last_admin": "The last administrator account cannot be deleted"
+    }
   },
   "oidc_admin": {
     "title": "OIDC Configuration",

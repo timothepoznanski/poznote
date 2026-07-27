@@ -863,6 +863,11 @@ $router->get('/users/me/password-status', function($params) use ($usersControlle
     echo json_encode($usersController->passwordStatus());
 });
 
+// Delete current user's own account and all its data
+$router->delete('/users/me', function($params) use ($usersController) {
+    echo json_encode($usersController->deleteMe());
+});
+
 // Get user ID by username (admin only, used by backup scripts)
 $router->get('/users/lookup/{username}', function($params) use ($usersController) {
     echo json_encode($usersController->lookup($params['username']));

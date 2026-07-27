@@ -2731,6 +2731,37 @@ paths:
           description: Profile updated
         '400':
           description: Invalid or already-taken username/email, or no valid fields
+    delete:
+      tags: [Users]
+      summary: Delete current user's own account and all its data
+      description: >-
+        Does NOT require X-User-ID header. Permanently deletes the account,
+        including all notes, files and attachments. The username must be
+        repeated in the body as confirmation, and password sessions must also
+        re-enter the current password (OIDC sessions skip the password check).
+        User ID 1 and the last active admin cannot be deleted. On success the
+        session is destroyed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirm_username]
+              properties:
+                confirm_username:
+                  type: string
+                  description: Must exactly match the current username
+                password:
+                  type: string
+                  description: Current password (required for non-OIDC sessions)
+      responses:
+        '200':
+          description: Account deleted; response includes a redirect URL for the login page
+        '400':
+          description: Username confirmation mismatch, missing password, or account cannot be deleted
+        '403':
+          description: Password is incorrect
 
   /users/me/password:
     post:

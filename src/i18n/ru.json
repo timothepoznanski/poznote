@@ -134,6 +134,7 @@
       "orphan_scanner": "Сканер потерянных вложений",
       "storage_stats": "Статистика хранилища",
       "change_password": "Сменить пароль",
+      "delete_account": "Удалить аккаунт",
       "import_limits": "Лимиты импорта",
       "git_sync_toggle": "Синхронизация Git",
       "oidc_config": "OIDC / SSO",
@@ -2250,6 +2251,22 @@
       "incorrect_current": "Текущий пароль неверен"
     },
     "success": "Пароль успешно изменен."
+  },
+  "delete_account": {
+    "modal": {
+      "title": "Удалить аккаунт",
+      "description": "Ваш аккаунт и все его данные (заметки, файлы, вложения) будут безвозвратно удалены. Это действие нельзя отменить.",
+      "confirm_placeholder": "Введите имя пользователя для подтверждения",
+      "password_placeholder": "Текущий пароль",
+      "button": "Удалить мой аккаунт"
+    },
+    "errors": {
+      "confirm_mismatch": "Имя пользователя не совпадает",
+      "password_required": "Требуется пароль",
+      "password_incorrect": "Неверный пароль",
+      "cannot_delete": "Этот аккаунт нельзя удалить",
+      "last_admin": "Нельзя удалить последний аккаунт администратора"
+    }
   },
   "oidc_admin": {
     "title": "Настройка OIDC",

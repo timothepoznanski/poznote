@@ -435,6 +435,7 @@
       "orphan_scanner": "Scanner de pièces jointes orphelines",
       "storage_stats": "Statistiques de stockage",
       "change_password": "Changer le mot de passe",
+      "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
       "git_sync_toggle": "Synchronisation Git",
       "oidc_config": "OIDC / SSO",
@@ -2798,6 +2799,22 @@
       "incorrect_current": "Le mot de passe actuel est incorrect"
     },
     "success": "Mot de passe modifié avec succès."
+  },
+  "delete_account": {
+    "modal": {
+      "title": "Supprimer le compte",
+      "description": "Votre compte et toutes ses données (notes, fichiers, pièces jointes) seront définitivement supprimés. Cette action est irréversible.",
+      "confirm_placeholder": "Saisissez votre nom d'utilisateur pour confirmer",
+      "password_placeholder": "Mot de passe actuel",
+      "button": "Supprimer mon compte"
+    },
+    "errors": {
+      "confirm_mismatch": "Le nom d'utilisateur ne correspond pas",
+      "password_required": "Le mot de passe est requis",
+      "password_incorrect": "Mot de passe incorrect",
+      "cannot_delete": "Ce compte ne peut pas être supprimé",
+      "last_admin": "Impossible de supprimer le dernier compte administrateur"
+    }
   },
   "oidc_admin": {
     "title": "Configuration OIDC",

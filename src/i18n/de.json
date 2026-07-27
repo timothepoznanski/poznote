@@ -423,6 +423,7 @@
       "storage_stats": "Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
+      "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
       "git_sync_toggle": "Git-Synchronisierung",
       "oidc_config": "OIDC / SSO",
@@ -2584,6 +2585,22 @@
       "incorrect_current": "Das aktuelle Passwort ist falsch"
     },
     "success": "Passwort erfolgreich geändert."
+  },
+  "delete_account": {
+    "modal": {
+      "title": "Konto löschen",
+      "description": "Ihr Konto und alle zugehörigen Daten (Notizen, Dateien, Anhänge) werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirm_placeholder": "Geben Sie Ihren Benutzernamen zur Bestätigung ein",
+      "password_placeholder": "Aktuelles Passwort",
+      "button": "Mein Konto löschen"
+    },
+    "errors": {
+      "confirm_mismatch": "Der Benutzername stimmt nicht überein",
+      "password_required": "Passwort ist erforderlich",
+      "password_incorrect": "Passwort ist falsch",
+      "cannot_delete": "Dieses Konto kann nicht gelöscht werden",
+      "last_admin": "Das letzte Administratorkonto kann nicht gelöscht werden"
+    }
   },
   "oidc_admin": {
     "title": "OIDC-Konfiguration",

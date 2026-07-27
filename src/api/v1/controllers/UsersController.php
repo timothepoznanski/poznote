@@ -438,6 +438,87 @@ class UsersController {
     }
 
     /**
+     * DELETE /api/v1/users/me - Delete current user's own account and all its data
+     */
+    public function deleteMe() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/db_master.php';
+
+        $userId = getCurrentUserId();
+        if (!$userId) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $user = getUserProfileById((int)$userId);
+        if (!$user) {
+            http_response_code(404);
+            return ['error' => 'User profile not found'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        $confirmUsername = trim((string)($data['confirm_username'] ?? ''));
+        if ($confirmUsername !== (string)$user['username']) {
+            http_response_code(400);
+            return ['error' => 'Username confirmation does not match'];
+        }
+
+        // OIDC sessions have no password the user is guaranteed to know
+        // (verifyUserPassword would fall back to the env default), so the
+        // re-authentication step only applies to password sessions.
+        $isOidcSession = ($_SESSION['auth_method'] ?? '') === 'oidc';
+        if (!$isOidcSession) {
+            $password = (string)($data['password'] ?? '');
+            if ($password === '') {
+                http_response_code(400);
+                return ['error' => 'Password is required'];
+            }
+            if (!verifyUserPassword((int)$userId, $password)) {
+                http_response_code(403);
+                return ['error' => 'Password is incorrect'];
+            }
+        }
+
+        // deleteUserProfile refuses user ID 1 and the last active admin.
+        $result = deleteUserProfile((int)$userId, true);
+        if (!$result['success']) {
+            http_response_code(400);
+            return ['error' => $result['error']];
+        }
+
+        // Close the now-orphaned session like logout() does, but return the
+        // destination as JSON instead of redirecting (this is an API call).
+        $redirect = 'login.php';
+        if ($isOidcSession) {
+            $oidcPath = dirname(__DIR__, 3) . '/oidc.php';
+            if (is_file($oidcPath)) {
+                require_once $oidcPath;
+                if (function_exists('oidc_logout_redirect_url')) {
+                    $oidcUrl = oidc_logout_redirect_url();
+                    if (is_string($oidcUrl) && $oidcUrl !== '') {
+                        $redirect = $oidcUrl;
+                    }
+                }
+            }
+        }
+
+        session_destroy();
+        if (defined('REMEMBER_ME_COOKIE') && isset($_COOKIE[REMEMBER_ME_COOKIE]) && function_exists('setRememberMeCookie')) {
+            setRememberMeCookie('', time() - 3600);
+        }
+        if (function_exists('clearUserPreferenceCookie')) {
+            clearUserPreferenceCookie();
+        }
+
+        return ['success' => true, 'redirect' => $redirect];
+    }
+
+    /**
      * password_changed_at is stored by SQLite CURRENT_TIMESTAMP (UTC); convert
      * it to the viewer's timezone and date format for display.
      */

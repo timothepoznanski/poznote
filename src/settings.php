@@ -95,6 +95,7 @@ $settingsPageConfig = [
         'last_name' => (string)($currentUser['last_name'] ?? ''),
         'email' => (string)($currentUser['email'] ?? ''),
     ],
+    'isOidcSession' => (($_SESSION['auth_method'] ?? '') === 'oidc'),
 ];
 
 $settingsPageUserKeys = [
@@ -318,6 +319,18 @@ if ($isAdmin) {
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
+
+            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
+            <!-- Delete Account -->
+            <div class="home-card" id="delete-account-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-trash-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -918,5 +931,6 @@ if ($isAdmin) {
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
     <script src="js/profile.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/profile.js') ?: time(); ?>"></script>
+    <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>
 </body>
 </html>

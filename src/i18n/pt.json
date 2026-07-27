@@ -422,6 +422,7 @@
       "storage_stats": "Estatísticas de armazenamento",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
+      "delete_account": "Eliminar conta",
       "import_limits": "Limites de importação",
       "git_sync_toggle": "Sincronização Git",
       "oidc_config": "OIDC / SSO",
@@ -2587,6 +2588,22 @@
       "incorrect_current": "A palavra-passe atual está incorreta"
     },
     "success": "Palavra-passe alterada com sucesso."
+  },
+  "delete_account": {
+    "modal": {
+      "title": "Eliminar conta",
+      "description": "A sua conta e todos os seus dados (notas, ficheiros, anexos) serão eliminados permanentemente. Esta ação não pode ser anulada.",
+      "confirm_placeholder": "Escreva o seu nome de utilizador para confirmar",
+      "password_placeholder": "Palavra-passe atual",
+      "button": "Eliminar a minha conta"
+    },
+    "errors": {
+      "confirm_mismatch": "O nome de utilizador não corresponde",
+      "password_required": "A palavra-passe é obrigatória",
+      "password_incorrect": "Palavra-passe incorreta",
+      "cannot_delete": "Esta conta não pode ser eliminada",
+      "last_admin": "Não é possível eliminar a última conta de administrador"
+    }
   },
   "oidc_admin": {
     "title": "Configuração OIDC",

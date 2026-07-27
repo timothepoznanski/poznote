@@ -425,6 +425,7 @@
       "orphan_scanner": "孤立附件扫描器",
       "storage_stats": "存储统计",
       "change_password": "修改密码",
+      "delete_account": "删除账户",
       "import_limits": "导入限制",
       "git_sync_toggle": "Git 同步",
       "oidc_config": "OIDC / SSO",
@@ -2724,6 +2725,22 @@
       "incorrect_current": "当前密码错误"
     },
     "success": "密码修改成功。"
+  },
+  "delete_account": {
+    "modal": {
+      "title": "删除账户",
+      "description": "您的账户及其所有数据（笔记、文件、附件）将被永久删除。此操作无法撤销。",
+      "confirm_placeholder": "输入您的用户名以确认",
+      "password_placeholder": "当前密码",
+      "button": "删除我的账户"
+    },
+    "errors": {
+      "confirm_mismatch": "用户名不匹配",
+      "password_required": "请输入密码",
+      "password_incorrect": "密码错误",
+      "cannot_delete": "此账户无法删除",
+      "last_admin": "无法删除最后一个管理员账户"
+    }
   },
   "oidc_admin": {
     "title": "OIDC 配置",
