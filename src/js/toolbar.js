@@ -1473,6 +1473,46 @@ function toggleEmojiPicker() {
     return;
   }
 
+  // For note content, the icon picker modal replaced the emoji popup.
+  // Plain text inputs (title, task fields) cannot hold HTML icons, so they
+  // keep the emoji popup below.
+  const isInputContext = !!window.savedActiveInput ||
+    (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('css-title'));
+  if (!isInputContext && typeof window.showInsertIconModal === 'function') {
+    const activeMarkdownEditor = document.activeElement && document.activeElement.closest &&
+      document.activeElement.closest('.markdown-editor');
+    if (!isCursorInEditableNote() && !activeMarkdownEditor) {
+      window.showCursorWarning();
+      return;
+    }
+    // Save the caret so the icon can be inserted where the user was typing
+    try {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount) {
+        window.savedRanges.emoji = sel.getRangeAt(0).cloneRange();
+      }
+    } catch (e) { }
+    // Markdown notes: also snapshot the CodeMirror selection, since the DOM
+    // range does not survive the modal taking focus away from the editor
+    window.savedRanges.emojiCM = null;
+    try {
+      const api = window.PoznoteMarkdownCodeMirror;
+      const sel = window.getSelection();
+      let node = sel && sel.rangeCount ? sel.getRangeAt(0).commonAncestorContainer : document.activeElement;
+      if (node && node.nodeType === 3) node = node.parentNode;
+      const editor = (node && node.closest && node.closest('.markdown-editor')) || activeMarkdownEditor;
+      if (editor && api && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor) &&
+          typeof api.getSelectionOffsets === 'function') {
+        const offsets = api.getSelectionOffsets(editor);
+        if (offsets) {
+          window.savedRanges.emojiCM = { editor: editor, start: offsets.start, end: offsets.end };
+        }
+      }
+    } catch (e) { }
+    window.showInsertIconModal();
+    return;
+  }
+
   // If the cursor is not in an editable note, warn immediately
   // instead of waiting until an emoji is selected.
   if (!isCursorInEditableNote() && !window.savedActiveInput) {

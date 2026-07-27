@@ -2505,6 +2505,16 @@ function parseMarkdown(text) {
         return '\n' + placeholder + '\n';
     });
 
+    // Protect inline note icons inserted via the icon picker (strictly
+    // validated: a lucide class name plus an optional color style only)
+    text = text.replace(/<i class="lucide (lucide-[a-z0-9-]+) note-inline-icon"(?: style="color:\s*(#[0-9a-fA-F]{3,8}|rgba?\([0-9,.\s]+\))\s*;?\s*")?><\/i>/g, function (match, iconClass, color) {
+        let placeholder = '\x00PTAG' + protectedIndex + '\x00';
+        let styleAttr = color ? ' style="color: ' + color + ';"' : '';
+        protectedElements[protectedIndex] = '<i class="lucide ' + iconClass + ' note-inline-icon"' + styleAttr + '></i>';
+        protectedIndex++;
+        return placeholder;
+    });
+
     // Protect inline span tags with style attributes (for colors, backgrounds, etc.)
     // Match: <span style="...">content</span>
     text = text.replace(/<span\s+style="([^"]+)">([^<]*)<\/span>/gi, function (match, styleAttr, content) {

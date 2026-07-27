@@ -1583,7 +1583,7 @@
             {
                 id: 'emoji',
                 icon: 'lucide-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
+                label: t('slash_menu.emoji', null, 'Icon'),
                 action: function () {
                     openEmojiForInput(savedEditableElement);
                 }
@@ -1607,7 +1607,7 @@
             {
                 id: 'emoji',
                 icon: 'lucide-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
+                label: t('slash_menu.emoji', null, 'Icon'),
                 action: function () {
                     openEmojiForInput(savedEditableElement);
                 }
@@ -1643,7 +1643,7 @@
             emoji: {
                 id: 'emoji',
                 icon: 'lucide-smile',
-                label: t('slash_menu.emoji', null, 'Emoji'),
+                label: t('slash_menu.emoji', null, 'Icon'),
                 mobileHidden: true,
                 action: function () {
                     if (typeof window.toggleEmojiPicker === 'function') {

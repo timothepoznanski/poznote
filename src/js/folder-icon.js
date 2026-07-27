@@ -242,10 +242,192 @@ const FOLDER_ICONS = [
     'lucide-wifi',
     'lucide-wind',
     'lucide-yen-sign',
-    'lucide-columns'
+    'lucide-columns',
+    // Animals
+    'lucide-bird',
+    'lucide-cat',
+    'lucide-dog',
+    'lucide-fish',
+    'lucide-fish-symbol',
+    'lucide-rabbit',
+    'lucide-rat',
+    'lucide-snail',
+    'lucide-squirrel',
+    'lucide-turtle',
+    'lucide-worm',
+    'lucide-panda',
+    'lucide-shrimp',
+    'lucide-shell',
+    'lucide-bone',
+    'lucide-egg',
+    'lucide-origami',
+    // Food & drink
+    'lucide-banana',
+    'lucide-carrot',
+    'lucide-cherry',
+    'lucide-citrus',
+    'lucide-cookie',
+    'lucide-croissant',
+    'lucide-cup-soda',
+    'lucide-dessert',
+    'lucide-donut',
+    'lucide-egg-fried',
+    'lucide-grape',
+    'lucide-ham',
+    'lucide-beef',
+    'lucide-ice-cream-bowl',
+    'lucide-ice-cream-cone',
+    'lucide-lollipop',
+    'lucide-martini',
+    'lucide-milk',
+    'lucide-popcorn',
+    'lucide-popsicle',
+    'lucide-salad',
+    'lucide-sandwich',
+    'lucide-soup',
+    'lucide-wheat',
+    'lucide-wine',
+    'lucide-beer',
+    'lucide-candy-cane',
+    'lucide-chef-hat',
+    'lucide-cooking-pot',
+    'lucide-utensils',
+    // Weather & nature
+    'lucide-cloud-rain',
+    'lucide-cloud-snow',
+    'lucide-cloud-lightning',
+    'lucide-cloud-moon',
+    'lucide-cloud-fog',
+    'lucide-rainbow',
+    'lucide-sunrise',
+    'lucide-sunset',
+    'lucide-thermometer',
+    'lucide-tornado',
+    'lucide-droplet',
+    'lucide-droplets',
+    'lucide-trees',
+    'lucide-tree-palm',
+    'lucide-tree-pine',
+    'lucide-tent-tree',
+    'lucide-clover',
+    'lucide-flower-2',
+    'lucide-mountain-snow',
+    'lucide-sun-snow',
+    'lucide-moon-star',
+    'lucide-sparkles',
+    // Transport
+    'lucide-ship',
+    'lucide-ship-wheel',
+    'lucide-sailboat',
+    'lucide-train-front',
+    'lucide-tram-front',
+    'lucide-ambulance',
+    'lucide-fuel',
+    'lucide-car-front',
+    'lucide-caravan',
+    'lucide-forklift',
+    // Music & media
+    'lucide-piano',
+    'lucide-radio',
+    'lucide-disc',
+    'lucide-speaker',
+    'lucide-boom-box',
+    'lucide-mic-vocal',
+    'lucide-clapperboard',
+    'lucide-podcast',
+    'lucide-audio-lines',
+    // Games & sport
+    'lucide-volleyball',
+    'lucide-dices',
+    'lucide-dice-5',
+    'lucide-spade',
+    'lucide-club',
+    'lucide-joystick',
+    'lucide-tent',
+    'lucide-footprints',
+    'lucide-telescope',
+    // Home & objects
+    'lucide-lamp',
+    'lucide-lamp-desk',
+    'lucide-bed',
+    'lucide-sofa',
+    'lucide-armchair',
+    'lucide-bath',
+    'lucide-shirt',
+    'lucide-watch',
+    'lucide-backpack',
+    'lucide-luggage',
+    'lucide-alarm-clock',
+    'lucide-hourglass',
+    'lucide-scissors',
+    'lucide-ruler',
+    'lucide-pipette',
+    'lucide-wand',
+    'lucide-party-popper',
+    // Tech
+    'lucide-keyboard',
+    'lucide-mouse',
+    'lucide-cpu',
+    'lucide-hard-drive',
+    'lucide-usb',
+    'lucide-bluetooth',
+    'lucide-router',
+    'lucide-webcam',
+    'lucide-projector',
+    // Places
+    'lucide-castle',
+    'lucide-church',
+    'lucide-landmark',
+    'lucide-hotel',
+    'lucide-library',
+    // People & symbols
+    'lucide-brain',
+    'lucide-skull',
+    'lucide-ghost',
+    'lucide-baby',
+    'lucide-accessibility',
+    'lucide-percent',
+    'lucide-sparkle',
+    'lucide-sigma',
+    'lucide-pi',
+    'lucide-recycle',
+    'lucide-biohazard',
+    'lucide-radiation',
+    'lucide-heart-pulse',
+    'lucide-frown',
+    'lucide-laugh',
+    'lucide-angry',
+    'lucide-meh',
+    'lucide-sun-moon',
+    'lucide-handshake'
 ];
 
 const DEFAULT_NOTE_ICON = 'lucide-file-text';
+
+// Recently used icons (per-user storage, most recent first)
+const RECENT_ICONS_KEY = 'recent_icons';
+const RECENT_ICONS_MAX = 12;
+
+function getRecentIcons() {
+    try {
+        const raw = (window.__poznoteUserStorage || localStorage).getItem(RECENT_ICONS_KEY);
+        const recents = JSON.parse(raw || '[]');
+        return Array.isArray(recents) ? recents.filter(cls => FOLDER_ICONS.includes(cls)) : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function addRecentIcon(iconClass) {
+    if (!iconClass) return;
+    const recents = getRecentIcons().filter(cls => cls !== iconClass);
+    recents.unshift(iconClass);
+    try {
+        (window.__poznoteUserStorage || localStorage).setItem(RECENT_ICONS_KEY, JSON.stringify(recents.slice(0, RECENT_ICONS_MAX)));
+    } catch (e) {
+        // Storage unavailable: recents are a convenience only
+    }
+}
 
 let currentIconTargetType = 'folder';
 let currentFolderIdForIcon = null;
@@ -374,8 +556,16 @@ function showChangeNoteIconModal(noteId, noteTitle) {
     showChangeIconModal('note', noteId, noteTitle);
 }
 
+/**
+ * Show the icon modal to insert an icon into the note content at the cursor.
+ * The caller must save the caret in window.savedRanges.emoji beforehand.
+ */
+function showInsertIconModal() {
+    showChangeIconModal('insert', null, null);
+}
+
 function showChangeIconModal(targetType, targetId, targetName) {
-    currentIconTargetType = targetType === 'note' ? 'note' : 'folder';
+    currentIconTargetType = (targetType === 'note' || targetType === 'insert') ? targetType : 'folder';
     currentFolderIdForIcon = targetId;
     currentFolderNameForIcon = targetName;
     // '' means: use default folder icon (toggle open/closed). null means: not initialized.
@@ -393,9 +583,11 @@ function showChangeIconModal(targetType, targetId, targetName) {
     iconGrid.innerHTML = '';
 
     // Get the current folder icon and color (if any)
-    const folderElement = currentIconTargetType === 'note'
-        ? document.querySelector(`.note-icon[data-note-id="${targetId}"]`)
-        : document.querySelector(`[data-folder-id="${targetId}"] .folder-icon`);
+    const folderElement = currentIconTargetType === 'insert'
+        ? null
+        : (currentIconTargetType === 'note'
+            ? document.querySelector(`.note-icon[data-note-id="${targetId}"]`)
+            : document.querySelector(`[data-folder-id="${targetId}"] .folder-icon`));
     let currentIcon = null;
     let currentColor = '';
     if (folderElement) {
@@ -412,45 +604,51 @@ function showChangeIconModal(targetType, targetId, targetName) {
         currentColor = folderElement.getAttribute('data-icon-color') || '';
     }
 
-    // If no custom icon is set, we consider this folder to be using the default toggle icon.
-    selectedIconClass = currentIcon || '';
+    // In insert mode there is no "default icon" concept: an icon must be
+    // picked before Apply does anything, so selectedIconClass stays null.
+    if (currentIconTargetType !== 'insert') {
+        // If no custom icon is set, we consider this folder to be using the default toggle icon.
+        selectedIconClass = currentIcon || '';
 
-    // Create a "Default" icon item (keeps the open/closed toggle behaviour)
-    const defaultIconItem = document.createElement('div');
-    defaultIconItem.className = 'folder-icon-item';
-    defaultIconItem.dataset.iconClass = '';
-    defaultIconItem.dataset.iconName = (window.t ? window.t('folder_icon.default', null, 'Default') : 'Default');
-    defaultIconItem.title = defaultIconItem.dataset.iconName;
+        // Create a "Default" icon item (keeps the open/closed toggle behaviour)
+        const defaultIconItem = document.createElement('div');
+        defaultIconItem.className = 'folder-icon-item';
+        defaultIconItem.dataset.iconClass = '';
+        defaultIconItem.dataset.iconName = (window.t ? window.t('folder_icon.default', null, 'Default') : 'Default');
+        defaultIconItem.title = defaultIconItem.dataset.iconName;
 
-    if (selectedIconClass === '') {
-        defaultIconItem.classList.add('selected');
-        setTimeout(() => {
-            defaultIconItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        if (selectedIconClass === '') {
+            defaultIconItem.classList.add('selected');
+            setTimeout(() => {
+                defaultIconItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        const defaultIcon = document.createElement('i');
+        // Use the same base class style as existing UI (no need to add "fas")
+        defaultIcon.className = currentIconTargetType === 'note' ? DEFAULT_NOTE_ICON : 'lucide-folder';
+        defaultIconItem.appendChild(defaultIcon);
+
+        defaultIconItem.addEventListener('click', function () {
+            document.querySelectorAll('.folder-icon-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            defaultIconItem.classList.add('selected');
+            selectedIconClass = '';
+        });
+
+        iconGrid.appendChild(defaultIconItem);
     }
 
-    const defaultIcon = document.createElement('i');
-    // Use the same base class style as existing UI (no need to add "fas")
-    defaultIcon.className = currentIconTargetType === 'note' ? DEFAULT_NOTE_ICON : 'lucide-folder';
-    defaultIconItem.appendChild(defaultIcon);
-
-    defaultIconItem.addEventListener('click', function () {
-        document.querySelectorAll('.folder-icon-item').forEach(item => {
-            item.classList.remove('selected');
-        });
-        defaultIconItem.classList.add('selected');
-        selectedIconClass = '';
-    });
-
-    iconGrid.appendChild(defaultIconItem);
+    // The "Set default icon" button is meaningless when inserting into content
+    const resetBtn = document.getElementById('resetFolderIconBtn');
+    if (resetBtn) {
+        resetBtn.style.display = currentIconTargetType === 'insert' ? 'none' : '';
+    }
 
     // Create icon items
     FOLDER_ICONS.forEach(iconClass => {
-        const iconItem = document.createElement('div');
-        iconItem.className = 'folder-icon-item';
-        iconItem.dataset.iconClass = iconClass;
-        iconItem.dataset.iconName = getIconTranslation(iconClass);
-        iconItem.title = getIconTranslation(iconClass);
+        const iconItem = buildIconGridItem(iconClass);
 
         if (iconClass === currentIcon) {
             iconItem.classList.add('selected');
@@ -460,22 +658,6 @@ function showChangeIconModal(targetType, targetId, targetName) {
                 iconItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }, 100);
         }
-
-        const icon = document.createElement('i');
-        icon.className = iconClass;
-
-        iconItem.appendChild(icon);
-        iconItem.addEventListener('click', function () {
-            // Remove selected class from all items
-            document.querySelectorAll('.folder-icon-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            // Add selected class to clicked item
-            iconItem.classList.add('selected');
-            selectedIconClass = iconClass;
-
-            // Don't save immediately - let user choose color first
-        });
 
         iconGrid.appendChild(iconItem);
     });
@@ -524,6 +706,71 @@ function showChangeIconModal(targetType, targetId, targetName) {
     // Show modal
     modal.style.display = 'flex';
     modal.style.alignItems = 'flex-start';
+
+    // Populate the recently used row (after showing the modal, so the
+    // single-row trimming below can measure the layout)
+    populateRecentIcons();
+}
+
+/**
+ * Fill the recently used row, keeping only the icons that fit on one line
+ */
+function populateRecentIcons() {
+    const recentSection = document.getElementById('folderIconRecentSection');
+    const recentGrid = document.getElementById('folderIconRecentGrid');
+    if (!recentSection || !recentGrid) return;
+
+    recentGrid.innerHTML = '';
+    const recents = getRecentIcons();
+    if (!recents.length) {
+        recentSection.style.display = 'none';
+        return;
+    }
+
+    recentSection.style.display = '';
+    recents.forEach(iconClass => {
+        recentGrid.appendChild(buildIconGridItem(iconClass));
+    });
+
+    // Remove items that wrapped to a second line
+    const items = recentGrid.children;
+    if (items.length) {
+        const firstTop = items[0].offsetTop;
+        for (let i = items.length - 1; i > 0; i--) {
+            if (items[i].offsetTop > firstTop) {
+                recentGrid.removeChild(items[i]);
+            }
+        }
+    }
+}
+
+/**
+ * Build a selectable icon item for the picker grids (main grid and recent row)
+ */
+function buildIconGridItem(iconClass) {
+    const iconItem = document.createElement('div');
+    iconItem.className = 'folder-icon-item';
+    iconItem.dataset.iconClass = iconClass;
+    iconItem.dataset.iconName = getIconTranslation(iconClass);
+    iconItem.title = iconItem.dataset.iconName;
+
+    const icon = document.createElement('i');
+    icon.className = iconClass;
+    iconItem.appendChild(icon);
+
+    iconItem.addEventListener('click', function () {
+        // Remove selected class from all items (both grids)
+        document.querySelectorAll('.folder-icon-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        // Add selected class to clicked item
+        iconItem.classList.add('selected');
+        selectedIconClass = iconClass;
+
+        // Don't save immediately - let user choose color first
+    });
+
+    return iconItem;
 }
 
 /**
@@ -564,7 +811,15 @@ function setupColorPicker(currentColor) {
  */
 function filterIcons(searchQuery) {
     const query = searchQuery.toLowerCase().trim();
-    const iconItems = document.querySelectorAll('.folder-icon-item');
+
+    // Hide the recently used row while searching (results show in the main grid)
+    const recentSection = document.getElementById('folderIconRecentSection');
+    if (recentSection) {
+        const hasRecents = !!document.querySelector('#folderIconRecentGrid .folder-icon-item');
+        recentSection.style.display = (query || !hasRecents) ? 'none' : '';
+    }
+
+    const iconItems = document.querySelectorAll('#folderIconGrid .folder-icon-item');
 
     iconItems.forEach(item => {
         const iconName = item.dataset.iconName.toLowerCase();
@@ -587,6 +842,10 @@ function closeFolderIconModal() {
     if (modal) {
         modal.style.display = 'none';
     }
+    // Insert mode: drop the caret saved for insertion (cancel or done)
+    if (currentIconTargetType === 'insert' && window.savedRanges) {
+        window.savedRanges.emoji = null;
+    }
     currentIconTargetType = 'folder';
     currentFolderIdForIcon = null;
     currentFolderNameForIcon = null;
@@ -595,9 +854,89 @@ function closeFolderIconModal() {
 }
 
 /**
+ * Insert the chosen icon into the note content at the saved caret position.
+ * Icons are inline <i> elements; class and style survive the HTML sanitizer,
+ * and .note-inline-icon keeps them out of the global grey/hover icon filters.
+ */
+function insertIconAtCursor(iconClass, iconColor) {
+    // Markdown notes: insert the icon as raw inline HTML through the
+    // CodeMirror API, using the selection snapshot taken before the modal
+    // stole focus from the editor
+    const cmSnapshot = window.savedRanges && window.savedRanges.emojiCM;
+    const cmApi = window.PoznoteMarkdownCodeMirror;
+    if (cmSnapshot && cmApi && typeof cmApi.replaceRange === 'function') {
+        const colorAttr = iconColor ? ` style="color: ${iconColor};"` : '';
+        const text = `<i class="lucide ${iconClass} note-inline-icon"${colorAttr}></i> `;
+        const from = Math.min(cmSnapshot.start, cmSnapshot.end);
+        const to = Math.max(cmSnapshot.start, cmSnapshot.end);
+        try {
+            if (typeof cmApi.focus === 'function') cmApi.focus(cmSnapshot.editor);
+            cmApi.replaceRange(cmSnapshot.editor, from, to, text);
+            if (typeof cmApi.setSelection === 'function') {
+                cmApi.setSelection(cmSnapshot.editor, from + text.length, from + text.length);
+            }
+        } catch (e) { }
+        window.savedRanges.emojiCM = null;
+        window.savedRanges.emoji = null;
+        return;
+    }
+
+    const sel = window.getSelection();
+    try {
+        if (window.savedRanges && window.savedRanges.emoji) {
+            sel.removeAllRanges();
+            sel.addRange(window.savedRanges.emoji);
+        }
+    } catch (e) { }
+
+    if (!sel || !sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === 3) container = container.parentNode;
+    const noteentry = container.closest && container.closest('.noteentry');
+
+    if (!noteentry) {
+        if (typeof window.showCursorWarning === 'function') window.showCursorWarning();
+        if (window.savedRanges) window.savedRanges.emoji = null;
+        return;
+    }
+
+    try {
+        noteentry.focus({ preventScroll: true });
+    } catch (e) {
+        try { noteentry.focus(); } catch (e2) { }
+    }
+
+    const icon = document.createElement('i');
+    icon.className = 'lucide ' + iconClass + ' note-inline-icon';
+    if (iconColor) icon.style.color = iconColor;
+    range.deleteContents();
+    range.insertNode(icon);
+    // Leave the caret after a following space so typing continues normally
+    const space = document.createTextNode(' ');
+    icon.after(space);
+    range.setStartAfter(space);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+
+    noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+    if (window.savedRanges) window.savedRanges.emoji = null;
+}
+
+/**
  * Save the selected folder icon
  */
 function saveFolderIcon() {
+    // Insert mode: put the icon into the note content instead of saving it
+    if (currentIconTargetType === 'insert') {
+        if (!selectedIconClass) return;
+        insertIconAtCursor(selectedIconClass, selectedIconColor);
+        addRecentIcon(selectedIconClass);
+        closeFolderIconModal();
+        return;
+    }
+
     // selectedIconClass can be '' to keep the default toggle icon
     if (!currentFolderIdForIcon || selectedIconClass === null) return;
 
@@ -621,6 +960,9 @@ function saveFolderIcon() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Remember custom icons for the "Recently used" row
+                addRecentIcon(selectedIconClass);
+
                 // Update the icon in the UI
                 if (isNoteIcon) {
                     updateNoteIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);

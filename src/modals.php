@@ -1036,6 +1036,9 @@ try {
         <div class="folder-icon-search-wrapper">
             <input type="text" id="folderIconSearchInput" placeholder="<?php echo t_h('modals.folder_icon.search_placeholder', [], 'Search icons...'); ?>" autocomplete="off">
         </div>
+        <div class="folder-icon-recent-section" id="folderIconRecentSection" style="display: none;">
+            <div class="folder-icon-grid folder-icon-recent-grid" id="folderIconRecentGrid"></div>
+        </div>
         <div class="folder-icon-grid" id="folderIconGrid">
             <!-- Icons will be populated here -->
         </div>
@@ -1473,7 +1476,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:quote" checked><span><?php echo t_h('slash_menu.quote', [], 'Quote'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:media" checked><span><?php echo t_h('slash_menu.media', [], 'Media'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Icon'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>

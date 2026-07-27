@@ -30,10 +30,15 @@
     font-size: 14px;
 }
 
+/* Reduce space above the search bar */
+.folder-icon-modal-content {
+    padding-top: 14px;
+}
+
 /* Search input wrapper */
 .folder-icon-search-wrapper {
     position: relative;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 .folder-icon-search-wrapper input {
@@ -49,6 +54,21 @@
 
 .folder-icon-search-wrapper input:focus {
     border-color: #6366f1;
+}
+
+/* Recently used icons row */
+.folder-icon-recent-section {
+    margin-bottom: 8px;
+}
+
+.folder-icon-grid.folder-icon-recent-grid {
+    max-height: none;
+    overflow: visible;
+    margin-bottom: 0;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 0;
 }
 
 .folder-icon-grid {
