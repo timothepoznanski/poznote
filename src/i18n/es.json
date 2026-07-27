@@ -10,6 +10,7 @@
   "common": {
     "notes": "Notas",
     "back_to_home": "Panel",
+    "back": "Volver",
     "back_to_notes": "Notas",
     "back_to_settings": "Configuración",
     "close": "Cerrar",

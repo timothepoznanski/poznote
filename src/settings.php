@@ -44,6 +44,9 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
         $spCacheV = @file_get_contents('version.txt');
         if ($spCacheV === false) { $spCacheV = time(); }
         $spCacheV = urlencode(poznoteBuildAssetCacheVersion(trim($spCacheV)));
+        $spBackHref = $note_id
+            ? 'index.php?note=' . intval($note_id)
+            : 'dashboard.php?workspace=' . urlencode($pageWorkspace);
         ?>
         <!doctype html>
         <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -67,6 +70,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
                     <input type="password" name="settings_password" placeholder="<?php echo t_h('settings_password.placeholder', [], 'Enter settings password', $currentLang); ?>" required autofocus>
                     <button type="submit"><?php echo t_h('settings_password.unlock', [], 'Unlock', $currentLang); ?></button>
                 </form>
+                <a class="password-back-link" href="<?php echo htmlspecialchars($spBackHref, ENT_QUOTES, 'UTF-8'); ?>">&larr; <?php echo t_h('common.back', [], 'Back', $currentLang); ?></a>
             </div>
         </body>
         </html>
