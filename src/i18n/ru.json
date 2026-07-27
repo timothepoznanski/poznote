@@ -1721,6 +1721,7 @@
     "notes": "заметок",
     "support_poznote": "Поддержать Poznote",
     "version": "Версия",
+    "filter_placeholder": "Фильтровать...",
     "graph": "Граф"
   },
   "search": {

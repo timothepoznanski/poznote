@@ -1742,7 +1742,7 @@
     "notes": "notes",
     "support_poznote": "Support Poznote",
     "version": "Version",
-    "filter_placeholder": "Filter",
+    "filter_placeholder": "Filter...",
     "no_filter_results": "No results found.",
     "graph": "Graph"
   },

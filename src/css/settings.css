@@ -103,3 +103,139 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
         display: none !important;
     }
 }
+
+/* ---------- Filter row: view toggle + search input ---------- */
+
+.settings-filter-row {
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+/* The row's bottom margin collapses with the first category title's larger
+   top margin (1.5rem), so shrink the title's margin for the gap to change */
+.settings-filter-row + .settings-category-title {
+    margin-top: 1rem;
+}
+
+/* home/responsive.css hides .home-search-container on desktop; the settings
+   filter row must stay visible at every width (loaded after responsive.css) */
+@media (min-width: 801px) {
+    .settings-filter-row {
+        display: flex;
+    }
+}
+
+.settings-filter-row .home-search-wrapper {
+    margin: 0;
+}
+
+/* Same look as the dashboard's .board-view-btn */
+.settings-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #6b7280;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.settings-view-toggle:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+}
+
+.settings-view-toggle .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+/* The toggle shows the layout a click switches TO:
+   list icon in grid mode, grid icon in list mode */
+.settings-view-toggle .lucide-grid {
+    display: none;
+}
+
+.settings-view-toggle.is-list .lucide-layout-list {
+    display: none;
+}
+
+.settings-view-toggle.is-list .lucide-grid {
+    display: inline-block;
+}
+
+html[data-theme='dark'] .settings-view-toggle,
+body.dark-mode .settings-view-toggle {
+    background: var(--dm-surface, #262626);
+    border-color: var(--dm-border, #404040);
+    color: var(--dm-text-muted, #a0a0a0);
+}
+
+html[data-theme='dark'] .settings-view-toggle:hover,
+body.dark-mode .settings-view-toggle:hover {
+    border-color: var(--dm-accent, #4a9eff);
+    color: var(--dm-accent, #4a9eff);
+}
+
+/* ---------- List layout: cards become compact full-width rows ---------- */
+
+.view-list .home-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.view-list .home-card {
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+.view-list .home-card:hover {
+    transform: none;
+}
+
+.view-list .home-card-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.view-list .home-card-icon i {
+    font-size: 15px;
+}
+
+.view-list .home-card-content {
+    flex: 1;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.view-list .home-card-title {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+/* Status badges move to the right edge of the row */
+.view-list .home-card-content > .setting-status,
+.view-list .home-card-content > .home-card-count,
+.view-list .home-card-content > div {
+    margin-left: auto;
+}
+
+.view-list .home-card-content > div {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.view-list .setting-status {
+    align-self: center;
+    flex-shrink: 0;
+}

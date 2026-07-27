@@ -280,10 +280,16 @@ if ($isAdmin) {
             </a>
         </div>
 
-        <div class="home-search-container">
+        <div class="home-search-container settings-filter-row">
+            <button type="button" id="settingsViewToggle" class="settings-view-toggle"
+                data-label-grid="<?php echo t_h('dashboard.view.layout_grid', [], 'Grid'); ?>"
+                data-label-list="<?php echo t_h('dashboard.view.layout_list', [], 'List'); ?>">
+                <i class="lucide lucide-layout-list"></i>
+                <i class="lucide lucide-grid"></i>
+            </button>
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
-                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter...'); ?>" autocomplete="off">
             </div>
         </div>
 

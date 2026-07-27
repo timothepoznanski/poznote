@@ -647,7 +647,7 @@
     "notes": "notes",
     "support_poznote": "Soutenir Poznote",
     "version": "Version",
-    "filter_placeholder": "Filtrer",
+    "filter_placeholder": "Filtrer...",
     "no_filter_results": "Aucun résultat trouvé.",
     "graph": "Graphe"
   },
