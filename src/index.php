@@ -427,10 +427,10 @@ if ($isPublicWorkspaceReadonly) {
             </div>
             <div class="sidebar-title-actions">
                 <?php if (!$isPublicWorkspaceReadonly): ?>
-                    <button class="sidebar-folder-toggle" data-action="toggle-all-folders" title="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>" aria-label="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>">
+                    <button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>" aria-label="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>">
                         <i class="lucide lucide-chevron-down"></i>
                     </button>
-                    <button class="sidebar-home<?php echo $notifications_count > 0 ? ' has-notifications-dot' : ''; ?>" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
+                    <button class="sidebar-home<?php echo $notifications_count > 0 ? ' has-notifications-dot' : ''; ?>" id="sidebarDashboardBtn" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
                         <i class="lucide lucide-layout-dashboard"></i>
                         <span class="sidebar-notifications-dot" aria-hidden="true"></span>
                     </button>
@@ -438,7 +438,7 @@ if ($isPublicWorkspaceReadonly) {
                         <i class="lucide lucide-settings"></i>
                         <span class="update-badge update-badge-hidden"></span>
                     </button>
-                    <button class="sidebar-plus" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
+                    <button class="sidebar-plus" id="sidebarCreateBtn" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
                         <i class="lucide lucide-plus-circle"></i>
                     </button>
                 <?php else: ?>

@@ -915,6 +915,10 @@
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
+      "dashboard_user": "Benutzer",
+      "dashboard_filter_bar": "Filterleiste",
+      "view_layout_toggle": "Umschalter Raster / Liste",
+      "index_search_bar": "Suchleiste",
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
       "sections": {
@@ -924,8 +928,9 @@
         "toolbar": "Symbolleiste",
         "slash_menu": "Slash-Menü",
         "panels": "Sonstiges",
-        "dashboard_toolbar": "Dashboard-Symbolleiste",
-        "folder_actions": "Ordneraktionen"
+        "dashboard_toolbar": "Dashboard",
+        "folder_actions": "Ordneraktionen",
+        "workspace_menu": "Workspace-Menü"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",

@@ -940,6 +940,10 @@
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
+      "dashboard_user": "Utilisateur",
+      "dashboard_filter_bar": "Barre de filtre",
+      "view_layout_toggle": "Bascule grille / liste",
+      "index_search_bar": "Barre de recherche",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "sections": {
@@ -949,8 +953,9 @@
         "toolbar": "Barre d'outils",
         "slash_menu": "Menu slash",
         "panels": "Autre",
-        "dashboard_toolbar": "Barre d'outils du tableau de bord",
-        "folder_actions": "Actions des dossiers"
+        "dashboard_toolbar": "Tableau de bord",
+        "folder_actions": "Actions des dossiers",
+        "workspace_menu": "Menu du workspace"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count": "{{count}} masqué(s)",

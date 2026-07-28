@@ -6,7 +6,6 @@
     'use strict';
 
     var NON_HIDEABLE_UI_KEYS = {
-        'card:check-updates-card': true,
         'card:home-support-card': true
     };
 
@@ -143,6 +142,10 @@
             }
 
             if (action === 'uncheck-all-tasks' && hiddenKeyMap['toolbar:btn-uncheck-all']) {
+                return false;
+            }
+
+            if (action === 'print-note' && hiddenKeyMap['toolbar:btn-print']) {
                 return false;
             }
         }
@@ -286,6 +289,10 @@
         syncSectionVisibility('admin-tools', 'admin-tools-grid');
     }
 
+    function syncSettingsDocumentationSection() {
+        syncSectionVisibility('settings-documentation-section-title', 'settings-documentation-section-grid');
+    }
+
     function scheduleVisibilitySync() {
         if (syncScheduled) return;
 
@@ -301,6 +308,7 @@
             syncSettingsActionsSection();
             syncSettingsDisplaySection();
             syncSettingsAdminToolsSection();
+            syncSettingsDocumentationSection();
         });
     }
 
@@ -354,7 +362,11 @@
                         rules.push('.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }');
                     } else if (id === 'btn-uncheck-all') {
                         rules.push('.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }');
+                    } else if (id === 'btn-print') {
+                        rules.push('.mobile-toolbar-menu [data-action="print-note"] { display: none !important; }');
                     }
+                } else if (type === 'wsmenu') {
+                    rules.push('.workspace-menu-item[data-action="' + id + '"] { display: none !important; }');
                 } else if (type === 'folder') {
                     rules.push('.folder-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
                     if (id === 'toggle-sort-submenu') {

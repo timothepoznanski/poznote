@@ -916,6 +916,10 @@
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
+      "dashboard_user": "Usuario",
+      "dashboard_filter_bar": "Barra de filtro",
+      "view_layout_toggle": "Alternar cuadrícula / lista",
+      "index_search_bar": "Barra de búsqueda",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
       "sections": {
@@ -925,8 +929,9 @@
         "toolbar": "Barra de herramientas",
         "slash_menu": "Menú slash",
         "panels": "Otros",
-        "dashboard_toolbar": "Barra de herramientas del panel",
-        "folder_actions": "Acciones de carpeta"
+        "dashboard_toolbar": "Panel",
+        "folder_actions": "Acciones de carpeta",
+        "workspace_menu": "Menú del espacio de trabajo"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",

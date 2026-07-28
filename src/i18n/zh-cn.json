@@ -915,6 +915,10 @@
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
+      "dashboard_user": "用户",
+      "dashboard_filter_bar": "筛选栏",
+      "view_layout_toggle": "网格 / 列表切换",
+      "index_search_bar": "搜索栏",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "sections": {
@@ -924,8 +928,9 @@
         "toolbar": "工具栏",
         "slash_menu": "斜杠菜单",
         "panels": "其他",
-        "dashboard_toolbar": "仪表板工具栏",
-        "folder_actions": "文件夹操作"
+        "dashboard_toolbar": "仪表盘",
+        "folder_actions": "文件夹操作",
+        "workspace_menu": "工作区菜单"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",

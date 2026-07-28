@@ -994,7 +994,6 @@ function getSetting($key, $default = null) {
 
 function poznoteGetNonHideableUiKeys() {
     return [
-        'card:check-updates-card' => true,
         'card:home-support-card' => true,
     ];
 }
@@ -1073,7 +1072,11 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '.mobile-toolbar-menu [data-action="clear-completed-tasks"] { display: none !important; }';
             } elseif ($id === 'btn-uncheck-all') {
                 $rules[] = '.mobile-toolbar-menu [data-action="uncheck-all-tasks"] { display: none !important; }';
+            } elseif ($id === 'btn-print') {
+                $rules[] = '.mobile-toolbar-menu [data-action="print-note"] { display: none !important; }';
             }
+        } elseif ($type === 'wsmenu') {
+            $rules[] = '.workspace-menu-item[data-action="' . $id . '"] { display: none !important; }';
         } elseif ($type === 'folder') {
             $rules[] = '.folder-actions-menu-item[data-action="' . $id . '"] { display: none !important; }';
             if ($id === 'toggle-sort-submenu') {
@@ -3393,14 +3396,15 @@ function buildNoteCardPreview($noteId, $type) {
  * hidden in list layout (board-view-menu.js drives both).
  */
 function renderBoardViewMenu(string $prefix) {
-    echo '<div class="board-view-controls" data-view-prefix="' . htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8') . '">' .
-        '<button type="button" class="board-view-btn board-view-layout-toggle"' .
+    $idPrefix = htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8');
+    echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '">' .
+        '<button type="button" id="' . $idPrefix . 'ViewLayoutBtn" class="board-view-btn board-view-layout-toggle"' .
             ' data-label-grid="' . t_h('dashboard.view.layout_grid', [], 'Grid') . '"' .
             ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '">' .
             '<i class="lucide lucide-layout-list"></i>' .
             '<i class="lucide lucide-grid"></i>' .
         '</button>' .
-        '<button type="button" class="board-view-btn board-view-size-btn"' .
+        '<button type="button" id="' . $idPrefix . 'ViewSizeBtn" class="board-view-btn board-view-size-btn"' .
             ' data-label-small="' . t_h('dashboard.view.size_small', [], 'Small') . '"' .
             ' data-label-medium="' . t_h('dashboard.view.size_medium', [], 'Medium') . '"' .
             ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '"' .

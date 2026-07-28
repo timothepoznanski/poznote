@@ -914,6 +914,10 @@
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
+      "dashboard_user": "Usuário",
+      "dashboard_filter_bar": "Barra de filtro",
+      "view_layout_toggle": "Alternar grade / lista",
+      "index_search_bar": "Barra de pesquisa",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",
       "sections": {
@@ -923,8 +927,9 @@
         "toolbar": "Barra de ferramentas",
         "slash_menu": "Menu slash",
         "panels": "Outros",
-        "dashboard_toolbar": "Barra de ferramentas do painel",
-        "folder_actions": "Ações de pasta"
+        "dashboard_toolbar": "Painel",
+        "folder_actions": "Ações de pasta",
+        "workspace_menu": "Menu do espaço de trabalho"
       },
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
