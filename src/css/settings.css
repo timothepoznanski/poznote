@@ -185,6 +185,13 @@ body.dark-mode .settings-view-toggle:hover {
 
 /* ---------- List layout: cards become compact full-width rows ---------- */
 
+/* On desktop the rows don't need the full grid width: halve the container */
+@media (min-width: 1024px) {
+    .home-container.view-list {
+        max-width: 600px;
+    }
+}
+
 .view-list .home-grid {
     display: flex;
     flex-direction: column;
