@@ -416,6 +416,7 @@
       "guestbook": "Poznote Gästebuch",
       "support": "Poznote unterstützen",
       "buy_me_a_coffee": "Spendiere mir einen Kaffee",
+      "ui_customization_global": "Sichtbarkeit von Elementen (alle Benutzer)",
       "custom_css": "Benutzerdefinierte CSS-Datei",
       "install_extension": "Erweiterung installieren",
       "install_app": "App installieren",
@@ -916,6 +917,9 @@
     "ui_customization": {
       "title": "Oberfläche anpassen",
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
+      "title_global": "Oberfläche anpassen (alle Benutzer)",
+      "description_global": "Oberflächenelemente für alle Benutzer dieser Instanz ein- oder ausblenden. Nicht angehakte Elemente werden für alle ausgeblendet.",
+      "locked_by_admin": "Vom Administrator für alle Benutzer ausgeblendet",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
       "dashboard_user": "Benutzer",

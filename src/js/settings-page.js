@@ -116,6 +116,9 @@
         if (document.getElementById('login-display-badge')) {
             keys.push('login_display_name');
         }
+        if (document.getElementById('ui-customization-admin-badge')) {
+            keys.push('hidden_ui_elements_global');
+        }
         if (document.getElementById('custom-css-badge')) {
             keys.push('custom_css_path');
         }
@@ -1583,6 +1586,12 @@
             uiCustomizationCard.addEventListener('click', showUiCustomizationModal);
         }
 
+        // UI Customization admin card - same modal, edits the instance-wide setting
+        var uiCustomizationAdminCard = document.getElementById('ui-customization-admin-card');
+        if (uiCustomizationAdminCard) {
+            uiCustomizationAdminCard.addEventListener('click', showUiCustomizationGlobalModal);
+        }
+
         // Init section toggle-all buttons (event delegation, one-time setup)
         var uiCustomModal = document.getElementById('uiCustomizationModal');
         if (uiCustomModal) {
@@ -1599,15 +1608,25 @@
                 var hidden = [];
                 var checkboxes = modal.querySelectorAll('[data-ui-key]');
                 checkboxes.forEach(function (cb) {
+                    var key = cb.getAttribute('data-ui-key');
+                    if (cb.disabled) {
+                        // Admin-locked in user mode: keep the user's own stored
+                        // preference untouched instead of adopting the lock state.
+                        if (uiCustomizationUserHiddenSnapshot.indexOf(key) !== -1) {
+                            hidden.push(key);
+                        }
+                        return;
+                    }
                     if (!cb.checked) {
-                        hidden.push(cb.getAttribute('data-ui-key'));
+                        hidden.push(key);
                     }
                 });
 
-                setSetting('hidden_ui_elements', JSON.stringify(hidden), function (success) {
+                setSetting(getUiCustomizationSettingKey(uiCustomizationModalMode), JSON.stringify(hidden), function (success) {
                     if (success) {
                         try { closeModal('uiCustomizationModal'); } catch (e) { }
                         refreshUiCustomizationBadge();
+                        refreshUiCustomizationAdminBadge();
                         reloadOpener();
                         reloadCurrentSettingsPage();
                     } else {
@@ -1955,6 +1974,7 @@
             refreshImportLimitsBadges();
             refreshGitSyncEnabledBadge();
             refreshUiCustomizationBadge();
+            refreshUiCustomizationAdminBadge();
         });
 
         // Search functionality - filters settings cards
@@ -2061,6 +2081,20 @@
 
     // ========== UI Customization ==========
 
+    // 'user' edits hidden_ui_elements (current user), 'global' edits
+    // hidden_ui_elements_global (admin-only, applies to every user).
+    var uiCustomizationModalMode = 'user';
+    var uiCustomizationUserHiddenSnapshot = [];
+
+    function getUiCustomizationSettingKey(mode) {
+        return mode === 'global' ? 'hidden_ui_elements_global' : 'hidden_ui_elements';
+    }
+
+    function getGloballyHiddenUiKeys() {
+        var keys = window.__POZNOTE_GLOBAL_HIDDEN_UI_ELEMENTS__;
+        return Array.isArray(keys) ? keys : [];
+    }
+
     function getSupportedUiCustomizationKeys() {
         var modal = document.getElementById('uiCustomizationModal');
         var allowed = Object.create(null);
@@ -2151,11 +2185,28 @@
         });
     }
 
+    function refreshUiCustomizationAdminBadge() {
+        var badge = document.getElementById('ui-customization-admin-badge');
+        if (!badge) return;
+
+        getSetting('hidden_ui_elements_global', function (value) {
+            var hidden = parseHiddenUiCustomization(value);
+
+            if (hidden.length === 0) {
+                badge.textContent = tr('modals.ui_customization.badge_all_visible', {}, 'All visible');
+                badge.className = 'setting-status enabled';
+            } else {
+                badge.textContent = tr('modals.ui_customization.badge_hidden_count', { count: hidden.length }, hidden.length + ' hidden');
+                badge.className = 'setting-status disabled';
+            }
+        });
+    }
+
     function updateSectionToggleBtn(section) {
         var btn = section.querySelector('.ui-custom-toggle-all');
         if (!btn) return;
 
-        var checkboxes = section.querySelectorAll('[data-ui-key]');
+        var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
         var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
 
         btn.textContent = allChecked
@@ -2167,7 +2218,7 @@
         var btn = modal.querySelector('#uiCustomizationToggleAll');
         if (!btn) return;
 
-        var checkboxes = modal.querySelectorAll('[data-ui-key]');
+        var checkboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
         var allChecked = checkboxes.length > 0
             && Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
 
@@ -2185,7 +2236,7 @@
         modal.addEventListener('click', function (e) {
             var globalBtn = e.target.closest('#uiCustomizationToggleAll');
             if (globalBtn) {
-                var allCheckboxes = modal.querySelectorAll('[data-ui-key]');
+                var allCheckboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
                 var everyChecked = allCheckboxes.length > 0
                     && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
                 allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
@@ -2200,7 +2251,7 @@
             var section = btn.closest('.ui-custom-section');
             if (!section) return;
 
-            var checkboxes = section.querySelectorAll('[data-ui-key]');
+            var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
             var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
             checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
             updateSectionToggleBtn(section);
@@ -2217,17 +2268,46 @@
         });
     }
 
-    function showUiCustomizationModal() {
+    function openUiCustomizationModal(mode) {
         var modal = document.getElementById('uiCustomizationModal');
         if (!modal) return;
 
-        getSetting('hidden_ui_elements', function (value) {
-            var hidden = parseHiddenUiCustomization(value);
+        uiCustomizationModalMode = mode === 'global' ? 'global' : 'user';
 
-            // Set checkboxes: checked = visible (not in hidden list)
+        var title = document.getElementById('uiCustomizationModalTitle');
+        if (title) {
+            title.textContent = title.getAttribute(uiCustomizationModalMode === 'global' ? 'data-title-global' : 'data-title-user') || title.textContent;
+        }
+        var description = document.getElementById('uiCustomizationModalDescription');
+        if (description) {
+            description.textContent = description.getAttribute(uiCustomizationModalMode === 'global' ? 'data-description-global' : 'data-description-user') || description.textContent;
+        }
+
+        getSetting(getUiCustomizationSettingKey(uiCustomizationModalMode), function (value) {
+            var hidden = parseHiddenUiCustomization(value);
+            var globallyHidden = uiCustomizationModalMode === 'user' ? getGloballyHiddenUiKeys() : [];
+            var lockedTitle = tr('modals.ui_customization.locked_by_admin', {}, 'Hidden for all users by the administrator');
+
+            uiCustomizationUserHiddenSnapshot = uiCustomizationModalMode === 'user' ? hidden : [];
+
+            // Set checkboxes: checked = visible (not in hidden list). Keys the
+            // admin hides for everyone are locked in user mode.
             var checkboxes = modal.querySelectorAll('[data-ui-key]');
             checkboxes.forEach(function (cb) {
-                cb.checked = hidden.indexOf(cb.getAttribute('data-ui-key')) === -1;
+                var key = cb.getAttribute('data-ui-key');
+                var locked = globallyHidden.indexOf(key) !== -1;
+                var item = cb.closest('.ui-custom-item');
+
+                cb.disabled = locked;
+                cb.checked = locked ? false : hidden.indexOf(key) === -1;
+                if (item) {
+                    item.classList.toggle('ui-custom-item-locked', locked);
+                    if (locked) {
+                        item.setAttribute('title', lockedTitle);
+                    } else {
+                        item.removeAttribute('title');
+                    }
+                }
             });
 
             // Update toggle-all buttons to reflect current state
@@ -2243,6 +2323,14 @@
 
             modal.style.display = 'flex';
         });
+    }
+
+    function showUiCustomizationModal() {
+        openUiCustomizationModal('user');
+    }
+
+    function showUiCustomizationGlobalModal() {
+        openUiCustomizationModal('global');
     }
 
     // ========== Global API ==========

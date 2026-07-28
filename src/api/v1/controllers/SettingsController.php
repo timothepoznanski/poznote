@@ -13,6 +13,7 @@ class SettingsController {
     
     // Global settings that should be stored in master database
     private $globalSettings = [
+        'hidden_ui_elements_global',
         'login_display_name',
         'custom_css_path',
         'git_sync_enabled',
@@ -222,6 +223,28 @@ class SettingsController {
 
         if (in_array($key, ['smtp_host', 'smtp_username', 'smtp_password', 'smtp_from_name', 'smtp_reminder_cutoff_at'], true)) {
             return substr(trim((string) $value), 0, 1000);
+        }
+
+        if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global') {
+            $raw = is_string($value) ? trim($value) : $value;
+            if ($raw === '' || $raw === null || $raw === '[]') {
+                return '[]';
+            }
+            $decoded = json_decode((string) $raw, true);
+            if (!is_array($decoded)) {
+                throw new InvalidArgumentException('value must be a JSON array of element keys', 400);
+            }
+            $keys = [];
+            foreach ($decoded as $entry) {
+                if (!is_string($entry) || $entry === '' || strlen($entry) > 200) {
+                    throw new InvalidArgumentException('value must be a JSON array of element keys', 400);
+                }
+                $keys[$entry] = true;
+                if (count($keys) > 500) {
+                    throw new InvalidArgumentException('too many element keys', 400);
+                }
+            }
+            return json_encode(array_keys($keys), JSON_UNESCAPED_SLASHES);
         }
 
         return is_string($value) ? $value : (string) $value;

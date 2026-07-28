@@ -158,6 +158,7 @@ if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
         $settingsPageGlobalKeys = [
+            'hidden_ui_elements_global',
             'login_display_name',
             'custom_css_path',
             'import_max_individual_files',
@@ -819,6 +820,17 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
                     <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Element visibility for all users -->
+            <div class="home-card" id="ui-customization-admin-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-eye-off"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.ui_customization_global', [], 'Element visibility (all users)'); ?></span>
+                    <span id="ui-customization-admin-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
                 </div>
             </div>
 

@@ -1331,10 +1331,14 @@ try {
 <div id="uiCustomizationModal" class="modal">
     <div class="modal-content modal-content-wide">
         <div class="modal-header">
-            <h3><?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?></h3>
+            <h3 id="uiCustomizationModalTitle"
+                data-title-user="<?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?>"
+                data-title-global="<?php echo t_h('modals.ui_customization.title_global', [], 'UI Customization (all users)'); ?>"><?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?></h3>
         </div>
         <div class="modal-body">
-            <p class="ui-custom-description"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
+            <p class="ui-custom-description" id="uiCustomizationModalDescription"
+                data-description-user="<?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?>"
+                data-description-global="<?php echo t_h('modals.ui_customization.description_global', [], 'Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone.'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
             <div class="ui-custom-filter">
                 <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
                 <input

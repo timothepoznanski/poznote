@@ -998,6 +998,44 @@ function poznoteGetNonHideableUiKeys() {
     ];
 }
 
+function poznoteGetGlobalHiddenUiElements() {
+    static $globalHiddenKeys = null;
+
+    if ($globalHiddenKeys !== null) {
+        return $globalHiddenKeys;
+    }
+
+    $globalHiddenKeys = [];
+
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        if (!function_exists('getGlobalSetting')) {
+            return $globalHiddenKeys;
+        }
+        $rawValue = getGlobalSetting('hidden_ui_elements_global', '[]');
+    } catch (Exception $e) {
+        return $globalHiddenKeys;
+    }
+
+    $decoded = json_decode((string)$rawValue, true);
+    if (!is_array($decoded)) {
+        return $globalHiddenKeys;
+    }
+
+    $nonHideable = poznoteGetNonHideableUiKeys();
+    $seen = [];
+    foreach ($decoded as $key) {
+        if (!is_string($key) || isset($nonHideable[$key])) {
+            continue;
+        }
+
+        $seen[$key] = true;
+    }
+
+    $globalHiddenKeys = array_keys($seen);
+    return $globalHiddenKeys;
+}
+
 function poznoteGetHiddenUiElements() {
     static $hiddenKeys = null;
 
@@ -1005,23 +1043,27 @@ function poznoteGetHiddenUiElements() {
         return $hiddenKeys;
     }
 
-    $hiddenKeys = [];
+    // Effective hidden set: admin-enforced (all users) keys merged with the
+    // current user's personal preferences.
+    $merged = [];
+    foreach (poznoteGetGlobalHiddenUiElements() as $key) {
+        $merged[$key] = true;
+    }
+
     $rawValue = getSetting('hidden_ui_elements', '[]');
     $decoded = json_decode((string)$rawValue, true);
-    if (!is_array($decoded)) {
-        return $hiddenKeys;
-    }
+    if (is_array($decoded)) {
+        $nonHideable = poznoteGetNonHideableUiKeys();
+        foreach ($decoded as $key) {
+            if (!is_string($key) || isset($nonHideable[$key])) {
+                continue;
+            }
 
-    $nonHideable = poznoteGetNonHideableUiKeys();
-    foreach ($decoded as $key) {
-        if (!is_string($key) || isset($nonHideable[$key])) {
-            continue;
+            $merged[$key] = true;
         }
-
-        $hiddenKeys[$key] = true;
     }
 
-    $hiddenKeys = array_keys($hiddenKeys);
+    $hiddenKeys = array_keys($merged);
     return $hiddenKeys;
 }
 
@@ -1103,7 +1145,12 @@ function poznoteRenderUiCustomizationBootstrap() {
         $encodedHiddenKeys = '[]';
     }
 
-    echo '<script>window.__POZNOTE_HIDDEN_UI_ELEMENTS__ = ' . $encodedHiddenKeys . ';</script>' . "\n";
+    $encodedGlobalHiddenKeys = json_encode(poznoteGetGlobalHiddenUiElements(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    if ($encodedGlobalHiddenKeys === false) {
+        $encodedGlobalHiddenKeys = '[]';
+    }
+
+    echo '<script>window.__POZNOTE_HIDDEN_UI_ELEMENTS__ = ' . $encodedHiddenKeys . ';window.__POZNOTE_GLOBAL_HIDDEN_UI_ELEMENTS__ = ' . $encodedGlobalHiddenKeys . ';</script>' . "\n";
 
     $rules = poznoteBuildUiCustomizationRules($hiddenKeys);
     if ($rules !== '') {

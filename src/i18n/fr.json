@@ -431,6 +431,7 @@
       "buy_me_a_coffee": "Offrez-moi un café",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
+      "ui_customization_global": "Visibilité des éléments (tous les utilisateurs)",
       "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
@@ -941,6 +942,9 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
+      "title_global": "Personnalisation de l'interface (tous les utilisateurs)",
+      "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde.",
+      "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
       "dashboard_user": "Utilisateur",

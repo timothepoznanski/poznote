@@ -415,6 +415,7 @@
       "guestbook": "Livro de visitas do Poznote",
       "support": "Apoiar Poznote",
       "buy_me_a_coffee": "Oferece-me um café",
+      "ui_customization_global": "Visibilidade dos elementos (todos os usuários)",
       "custom_css": "Arquivo CSS personalizado",
       "install_extension": "Instalar extensão",
       "install_app": "Instalar aplicação",
@@ -915,6 +916,9 @@
     "ui_customization": {
       "title": "Personalização da interface",
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
+      "title_global": "Personalização da interface (todos os usuários)",
+      "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos.",
+      "locked_by_admin": "Oculto para todos os usuários pelo administrador",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
       "dashboard_user": "Usuário",
