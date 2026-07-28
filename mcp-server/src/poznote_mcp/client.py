@@ -196,40 +196,49 @@ class PoznoteClient:
         tags: str | None = None,
         workspace: str | None = None,
         user_id: str | int | None = None,
+        if_version: str | None = None,
     ) -> dict | None:
         """
         Update an existing note
-        
-        Returns the updated note
+
+        Returns the updated note. When if_version is given and the note changed
+        since that version, returns the API's conflict payload (success False,
+        code "version_conflict", current version and content under "current").
         """
         payload = {}
-        
+
         if content is not None:
             payload["content"] = content
         if title is not None:
             payload["heading"] = title
         if tags is not None:
             payload["tags"] = tags
-        
+
         if not payload:
             return None
-        
+
+        if if_version is not None:
+            payload["if_version"] = if_version
+
         params = {}
         self._set_workspace(params, workspace)
-        
+
         response = self.client.patch(
             f"/notes/{note_id}",
             json=payload,
             params=params,
             headers=self._headers_for_user(user_id),
         )
-        
+
         if response.status_code == 404:
             return None
-        
+
+        if response.status_code == 409:
+            return response.json()
+
         response.raise_for_status()
         data = response.json()
-        
+
         if data.get("success"):
             return data.get("note", {"id": note_id})
         return None

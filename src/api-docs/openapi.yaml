@@ -109,6 +109,14 @@ components:
         updated:
           type: string
           format: date-time
+        version:
+          type: string
+          description: >
+            Opaque version token for optimistic concurrency. Returned by
+            GET /notes/{id} (also as an ETag header) and by PATCH /notes/{id}.
+            Pass it back in the PATCH body as if_version (or as an If-Match
+            header) to reject the write with a 409 if the note changed since.
+          example: "9b74c9897bac770ffc029102a200c5de"
 
     Folder:
       type: object
@@ -481,6 +489,11 @@ paths:
       responses:
         '200':
           description: Note details
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: Version token, same value as note.version
           content:
             application/json:
               schema:
@@ -502,6 +515,15 @@ paths:
           required: true
           schema:
             type: integer
+        - name: If-Match
+          in: header
+          required: false
+          schema:
+            type: string
+          description: >
+            Version token for optimistic concurrency (alternative to the
+            if_version body field). The write is rejected with a 409 if the
+            note changed since that version.
       requestBody:
         content:
           application/json:
@@ -518,9 +540,48 @@ paths:
                   type: integer
                   nullable: true
                   description: ID of the folder (optional)
+                if_version:
+                  type: string
+                  description: >
+                    Version token previously returned by GET or PATCH. When
+                    set, the write only succeeds if the note still has that
+                    version; otherwise a 409 is returned with the current
+                    version and content so the caller can merge and retry.
       responses:
         '200':
-          description: Note updated
+          description: Note updated (response includes the new version token)
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: New version token, same value as note.version
+        '409':
+          description: Version conflict, the note was modified since if_version
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  error:
+                    type: string
+                  code:
+                    type: string
+                    example: version_conflict
+                  current:
+                    type: object
+                    properties:
+                      version:
+                        type: string
+                      updated:
+                        type: string
+                        format: date-time
+                      heading:
+                        type: string
+                      content:
+                        type: string
     delete:
       tags: [Notes]
       summary: Delete a note (move to trash)

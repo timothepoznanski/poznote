@@ -307,6 +307,7 @@ Update an existing note by ID. Only include fields you want to modify.
 | `folder_id` | integer | Move to folder |
 | `workspace` | string | Move to workspace |
 | `git_push` | boolean | Trigger Git sync after update |
+| `if_version` | string | Optimistic concurrency token (see below) |
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
@@ -315,6 +316,20 @@ curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
     "heading": "Updated Title",
     "content": "Updated content here",
     "tags": "work,updated"
+  }' \
+  http://YOUR_SERVER/api/v1/notes/123
+```
+
+**Optimistic concurrency:**
+
+`GET /notes/{id}` returns a `version` token (also sent as an `ETag` header). Pass it back in the PATCH body as `if_version`, or as an `If-Match` header. If the note was modified since that version, the write is rejected with a `409` response that includes the current `version`, `updated`, `heading` and `content`, so you can merge your change into the latest content and retry in a single round trip. Without `if_version`, writes behave as before (last write wins). A successful PATCH returns the new `version` token, which lets you chain conditional writes without re-reading the note.
+
+```bash
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Updated content here",
+    "if_version": "9b74c9897bac770ffc029102a200c5de"
   }' \
   http://YOUR_SERVER/api/v1/notes/123
 ```
