@@ -602,7 +602,8 @@
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
       "notes_dashboard": "Tableau de notes",
-      "spellcheck_html_notes": "Vérification orthographique"
+      "spellcheck_html_notes": "Vérification orthographique",
+      "slash_menu_require_alt": "Raccourci du menu de commandes"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -614,7 +615,9 @@
         "full": "Barre d’outils uniquement",
         "slash": "Commandes slash uniquement",
         "both": "Icônes de la barre d’outils + menu de commandes slash"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "Erreur lors de l’enregistrement de la préférence"

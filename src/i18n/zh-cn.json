@@ -589,7 +589,8 @@
       "ui_customization": "元素可见性",
       "notes_dashboard": "笔记看板",
       "spellcheck_html_notes": "拼写检查",
-      "note_color_palette": "笔记颜色"
+      "note_color_palette": "笔记颜色",
+      "slash_menu_require_alt": "命令菜单快捷键"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -598,7 +599,9 @@
         "full": "仅工具栏",
         "slash": "仅斜杠命令",
         "both": "工具栏图标 + 斜杠命令菜单"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "保存偏好设置出错"

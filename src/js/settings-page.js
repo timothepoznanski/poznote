@@ -109,7 +109,8 @@
             'timezone',
             'date_time_format',
             'hidden_ui_elements',
-            'spellcheck_html_notes'
+            'spellcheck_html_notes',
+            'slash_menu_require_alt'
         ];
 
         if (document.getElementById('login-display-badge')) {
@@ -322,6 +323,40 @@
 
         refresh();
         return refresh;
+    }
+
+    // Slash menu trigger: click toggles between typing "/" and pressing "Alt + /".
+    // The status badge shows the active shortcut rather than Enabled/Disabled, since
+    // both states are "on" — only the key combination changes.
+    function setupSlashMenuTriggerCard() {
+        var card = document.getElementById('slash-menu-require-alt-card');
+        var status = document.getElementById('slash-menu-require-alt-status');
+        if (!card && !status) return;
+
+        function refresh() {
+            getSetting('slash_menu_require_alt', function (value) {
+                var requireAlt = isSettingEnabled(value, false, false);
+                if (!status) return;
+                status.textContent = requireAlt
+                    ? tr('display.badges.slash_menu_alt_slash', {}, 'Alt + /')
+                    : tr('display.badges.slash_menu_slash', {}, '/');
+                status.className = 'setting-status enabled';
+            });
+        }
+
+        if (card) {
+            card.addEventListener('click', function () {
+                getSetting('slash_menu_require_alt', function (currentValue) {
+                    var requireAlt = isSettingEnabled(currentValue, false, false);
+                    setSetting('slash_menu_require_alt', requireAlt ? '0' : '1', function () {
+                        refresh();
+                        reloadOpener();
+                    });
+                });
+            });
+        }
+
+        refresh();
     }
 
     // ========== Badge Refresh Functions ==========
@@ -1341,6 +1376,7 @@
         setupToggleCard('backlinks-at-bottom-card', 'backlinks-at-bottom-status', 'backlinks_at_bottom', false, false);
         setupToggleCard('default-image-border-card', 'default-image-border-status', 'default_image_border_no_padding', false, false);
         setupToggleCard('spellcheck-html-notes-card', 'spellcheck-html-notes-status', 'spellcheck_html_notes', false, false);
+        setupSlashMenuTriggerCard();
 
         // Card click handlers for modal settings
         var languageCard = document.getElementById('language-card');

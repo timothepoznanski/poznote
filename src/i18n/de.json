@@ -588,7 +588,8 @@
       "ui_customization": "Sichtbarkeit von Elementen",
       "notes_dashboard": "Notiz-Board",
       "spellcheck_html_notes": "Rechtschreibprüfung",
-      "note_color_palette": "Notizfarben"
+      "note_color_palette": "Notizfarben",
+      "slash_menu_require_alt": "Tastenkürzel für das Befehlsmenü"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -597,7 +598,9 @@
         "full": "Nur Symbolleiste",
         "slash": "Nur Schrägstrich-Befehl",
         "both": "Symbolleistensymbole + Schrägstrich-Befehlsmenü"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "Fehler beim Speichern der Einstellung"

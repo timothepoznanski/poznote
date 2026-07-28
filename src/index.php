@@ -478,6 +478,7 @@ if ($isPublicWorkspaceReadonly) {
             'canUseSettingsApi' => !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser(),
             'settings' => [
                 'emoji_icons_enabled' => getSetting('emoji_icons_enabled', '1'),
+                'slash_menu_require_alt' => getSetting('slash_menu_require_alt', '0'),
                 $currentWorkspaceOpacityKey => getSetting($currentWorkspaceOpacityKey, '25')
             ]
         ];

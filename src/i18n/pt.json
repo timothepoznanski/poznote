@@ -586,7 +586,8 @@
       "ui_customization": "Visibilidade dos elementos",
       "notes_dashboard": "Quadro de notas",
       "spellcheck_html_notes": "Verificação ortográfica",
-      "note_color_palette": "Cores das notas"
+      "note_color_palette": "Cores das notas",
+      "slash_menu_require_alt": "Atalho do menu de comandos"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -595,7 +596,9 @@
         "full": "Apenas barra de ferramentas",
         "slash": "Apenas comando barra",
         "both": "Ícones da barra de ferramentas + menu de comando barra"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "Erro ao salvar preferência"

@@ -235,14 +235,17 @@
       "default_image_border_no_padding": "Default image border",
       "ui_customization": "Element visibility",
       "notes_dashboard": "Notes board",
-      "spellcheck_html_notes": "Spell check"
+      "spellcheck_html_notes": "Spell check",
+      "slash_menu_require_alt": "Command menu shortcut"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
-      "ui_customization_configure": "Configure"
+      "ui_customization_configure": "Configure",
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     }
   },
   "tasklist": {

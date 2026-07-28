@@ -234,14 +234,17 @@
       "ui_customization": "Видимость элементов",
       "notes_dashboard": "Доска заметок",
       "spellcheck_html_notes": "Проверка орфографии",
-      "note_color_palette": "Цвета заметок"
+      "note_color_palette": "Цвета заметок",
+      "slash_menu_require_alt": "Сочетание клавиш для меню команд"
     },
     "badges": {
       "font_size_default": "по умолчанию ({{size}}px)",
       "ui_customization_configure": "Настроить",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
-      "code_block_font_size": "{{size}}px"
+      "code_block_font_size": "{{size}}px",
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     }
   },
   "tasklist": {
