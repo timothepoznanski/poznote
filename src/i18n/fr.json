@@ -1381,7 +1381,7 @@
     "checklist": "Liste de tâches",
     "image": "Image",
     "excalidraw": "Excalidraw",
-    "emoji": "Icône",
+    "emoji": "Emoji",
     "table": "Tableau",
     "separator": "Séparateur",
     "link_to_note": "Lien vers une note",
@@ -1429,7 +1429,8 @@
     "audio_no_note": "Aucune note sélectionnée",
     "audio_invalid_file": "Veuillez sélectionner un fichier audio.",
     "audio_upload_failed": "Échec de l'envoi : {{error}}",
-    "date": "Date"
+    "date": "Date",
+    "icon": "Icône"
   },
   "api": {
     "settings": {

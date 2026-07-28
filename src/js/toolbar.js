@@ -1,7 +1,10 @@
 // === Shared popup helpers ===
 function setupPopupDismiss(popupEl, triggerBtnSelector, onClose) {
   var animDelay = 200;
+  var closed = false;
   function close() {
+    if (closed) return;
+    closed = true;
     popupEl.classList.remove('show');
     setTimeout(function () { if (popupEl.parentNode) popupEl.remove(); }, animDelay);
     document.removeEventListener('click', outsideHandler);
@@ -16,7 +19,10 @@ function setupPopupDismiss(popupEl, triggerBtnSelector, onClose) {
   function keyHandler(e) {
     if (e.key === 'Escape') close();
   }
-  setTimeout(function () { document.addEventListener('click', outsideHandler); }, 100);
+  // If the popup was closed before this deferred registration fires, do not
+  // install the handler: it would never be removed and would run its cleanup
+  // on an unrelated later click.
+  setTimeout(function () { if (!closed) document.addEventListener('click', outsideHandler); }, 100);
   document.addEventListener('keydown', keyHandler);
   return close;
 }
@@ -1460,25 +1466,13 @@ document.addEventListener('keydown', function (e) {
 });
 
 function toggleEmojiPicker() {
+  // Routing: note content opens the icon picker modal, while plain text
+  // inputs (title, task fields) keep the emoji character popup. The emoji
+  // popup itself stays directly reachable via openEmojiCharPicker().
   const existingPicker = document.querySelector('.emoji-picker');
-
-  if (existingPicker) {
-    existingPicker.remove();
-    if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
-      window.resumeTaskEditBlurSave(window.savedActiveInput);
-    }
-    window.savedRanges.emoji = null;
-    window.savedActiveInput = null;
-    window.savedActiveInputSelection = null;
-    return;
-  }
-
-  // For note content, the icon picker modal replaced the emoji popup.
-  // Plain text inputs (title, task fields) cannot hold HTML icons, so they
-  // keep the emoji popup below.
   const isInputContext = !!window.savedActiveInput ||
     (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('css-title'));
-  if (!isInputContext && typeof window.showInsertIconModal === 'function') {
+  if (!existingPicker && !isInputContext && typeof window.showInsertIconModal === 'function') {
     const activeMarkdownEditor = document.activeElement && document.activeElement.closest &&
       document.activeElement.closest('.markdown-editor');
     if (!isCursorInEditableNote() && !activeMarkdownEditor) {
@@ -1510,6 +1504,25 @@ function toggleEmojiPicker() {
       }
     } catch (e) { }
     window.showInsertIconModal();
+    return;
+  }
+
+  openEmojiCharPicker();
+}
+
+// The emoji character popup (toggles when already open). Used for plain text
+// inputs and by the "Emoji" slash menu entries.
+function openEmojiCharPicker() {
+  const existingPicker = document.querySelector('.emoji-picker');
+
+  if (existingPicker) {
+    existingPicker.remove();
+    if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+      window.resumeTaskEditBlurSave(window.savedActiveInput);
+    }
+    window.savedRanges.emoji = null;
+    window.savedActiveInput = null;
+    window.savedActiveInputSelection = null;
     return;
   }
 
@@ -1624,16 +1637,19 @@ function toggleEmojiPicker() {
   }
   clampToViewport(picker, 20);
 
-  // Handle emoji clicks
+  // Handle emoji clicks. Close through setupPopupDismiss's close function so
+  // its document-level listeners are removed; a bare picker.remove() leaves
+  // them active and the next click anywhere would wipe the saved input state.
+  let closePicker = null;
   picker.addEventListener('click', function (e) {
     if (e.target.classList.contains('emoji-item')) {
       const emoji = e.target.getAttribute('data-emoji');
       insertEmoji(emoji);
-      picker.remove();
+      if (closePicker) closePicker(); else picker.remove();
     }
   });
 
-  setupPopupDismiss(picker, '.btn-emoji', function () {
+  closePicker = setupPopupDismiss(picker, '.btn-emoji', function () {
     if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
       window.resumeTaskEditBlurSave(window.savedActiveInput);
     }

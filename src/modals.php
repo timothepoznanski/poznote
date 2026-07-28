@@ -1476,7 +1476,8 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:quote" checked><span><?php echo t_h('slash_menu.quote', [], 'Quote'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:media" checked><span><?php echo t_h('slash_menu.media', [], 'Media'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Icon'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:icon" checked><span><?php echo t_h('slash_menu.icon', [], 'Icon'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>

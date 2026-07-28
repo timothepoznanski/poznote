@@ -881,7 +881,7 @@
     "checklist": "Чек-лист",
     "image": "Изображение",
     "excalidraw": "Excalidraw",
-    "emoji": "Значок",
+    "emoji": "Эмодзи",
     "table": "Таблица",
     "separator": "Разделитель",
     "link_to_note": "Ссылка на заметку",
@@ -920,7 +920,8 @@
     "audio_no_note": "Заметка не выбрана",
     "audio_invalid_file": "Пожалуйста, выберите аудиофайл.",
     "audio_upload_failed": "Ошибка загрузки: {{error}}",
-    "date": "Дата"
+    "date": "Дата",
+    "icon": "Значок"
   },
   "api": {
     "settings": {

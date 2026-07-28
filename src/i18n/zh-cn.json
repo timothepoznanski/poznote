@@ -1331,7 +1331,7 @@
     "checklist": "清单",
     "image": "图片",
     "excalidraw": "Excalidraw",
-    "emoji": "图标",
+    "emoji": "表情符号",
     "table": "表格",
     "separator": "分隔符",
     "link_to_note": "链接到笔记",
@@ -1371,7 +1371,8 @@
     "audio_no_note": "未选择笔记",
     "audio_invalid_file": "请选择音频文件。",
     "audio_upload_failed": "上传失败：{{error}}",
-    "date": "日期"
+    "date": "日期",
+    "icon": "图标"
   },
   "api": {
     "settings": {

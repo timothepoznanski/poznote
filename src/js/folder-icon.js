@@ -843,8 +843,18 @@ function closeFolderIconModal() {
         modal.style.display = 'none';
     }
     // Insert mode: drop the caret saved for insertion (cancel or done)
-    if (currentIconTargetType === 'insert' && window.savedRanges) {
-        window.savedRanges.emoji = null;
+    if (currentIconTargetType === 'insert') {
+        if (window.savedRanges) {
+            window.savedRanges.emoji = null;
+            window.savedRanges.emojiCM = null;
+        }
+        if (window.savedActiveInput) {
+            if (window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+                window.resumeTaskEditBlurSave(window.savedActiveInput);
+            }
+            window.savedActiveInput = null;
+            window.savedActiveInputSelection = null;
+        }
     }
     currentIconTargetType = 'folder';
     currentFolderIdForIcon = null;
@@ -859,6 +869,31 @@ function closeFolderIconModal() {
  * and .note-inline-icon keeps them out of the global grey/hover icon filters.
  */
 function insertIconAtCursor(iconClass, iconColor) {
+    // Text inputs whose content renders as HTML (task text): insert the icon
+    // markup as text at the saved selection
+    const activeInput = window.savedActiveInput;
+    if (activeInput && activeInput.tagName === 'INPUT') {
+        const colorAttr = iconColor ? ` style="color: ${iconColor};"` : '';
+        const html = `<i class="lucide ${iconClass} note-inline-icon"${colorAttr}></i> `;
+        try { activeInput.focus(); } catch (e) { }
+        const maxLength = activeInput.value.length;
+        const saved = window.savedActiveInputSelection;
+        const start = saved ? Math.max(0, Math.min(saved.start, maxLength)) : maxLength;
+        const end = saved ? Math.max(start, Math.min(saved.end, maxLength)) : start;
+        activeInput.setRangeText(html, start, end, 'end');
+        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+        if (activeInput.classList && activeInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+            window.resumeTaskEditBlurSave(activeInput);
+        }
+        window.savedActiveInput = null;
+        window.savedActiveInputSelection = null;
+        if (window.savedRanges) {
+            window.savedRanges.emoji = null;
+            window.savedRanges.emojiCM = null;
+        }
+        return;
+    }
+
     // Markdown notes: insert the icon as raw inline HTML through the
     // CodeMirror API, using the selection snapshot taken before the modal
     // stole focus from the editor

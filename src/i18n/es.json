@@ -1342,7 +1342,7 @@
     "checklist": "Lista de verificación",
     "image": "Imagen",
     "excalidraw": "Excalidraw",
-    "emoji": "Icono",
+    "emoji": "Emoji",
     "table": "Tabla",
     "separator": "Separador",
     "link_to_note": "Enlace a nota",
@@ -1382,7 +1382,8 @@
     "audio_no_note": "Ninguna nota seleccionada",
     "audio_invalid_file": "Por favor, seleccione un archivo de audio.",
     "audio_upload_failed": "Error al subir: {{error}}",
-    "date": "Fecha"
+    "date": "Fecha",
+    "icon": "Icono"
   },
   "api": {
     "settings": {

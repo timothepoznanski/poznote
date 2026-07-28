@@ -1342,7 +1342,7 @@
     "checklist": "Checkliste",
     "image": "Bild",
     "excalidraw": "Excalidraw",
-    "emoji": "Symbol",
+    "emoji": "Emoji",
     "table": "Tabelle",
     "separator": "Trennlinie",
     "link_to_note": "Link zur Notiz",
@@ -1381,7 +1381,8 @@
     "audio_no_note": "Keine Notiz ausgewählt",
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
-    "date": "Datum"
+    "date": "Datum",
+    "icon": "Symbol"
   },
   "api": {
     "settings": {

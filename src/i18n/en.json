@@ -896,7 +896,7 @@
     "checklist": "Checklist",
     "image": "Image",
     "excalidraw": "Excalidraw",
-    "emoji": "Icon",
+    "emoji": "Emoji",
     "table": "Table",
     "separator": "Separator",
     "link_to_note": "Link to note",
@@ -935,7 +935,8 @@
     "audio_no_note": "No note selected",
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
-    "date": "Date"
+    "date": "Date",
+    "icon": "Icon"
   },
   "api": {
     "settings": {

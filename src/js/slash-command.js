@@ -1508,6 +1508,31 @@
         }
     }
 
+    // Open the icon picker modal to insert an icon into a text input whose
+    // content is rendered as HTML (task text)
+    function openIconForInput(input) {
+        if (!input || input.tagName !== 'INPUT') return;
+
+        input.focus();
+        window.savedActiveInput = input;
+        window.savedActiveInputSelection = {
+            start: input.selectionStart,
+            end: input.selectionEnd
+        };
+        if (window.savedRanges) {
+            window.savedRanges.emoji = null;
+            window.savedRanges.emojiCM = null;
+        }
+
+        pauseTaskEditBlurSave(input);
+
+        if (typeof window.showInsertIconModal === 'function') {
+            setTimeout(() => window.showInsertIconModal(), 0);
+        } else {
+            resumeTaskEditBlurSave(input);
+        }
+    }
+
     function openDateForInput(input) {
         if (!input || input.tagName !== 'INPUT') return;
 
@@ -1583,8 +1608,10 @@
             {
                 id: 'emoji',
                 icon: 'lucide-smile',
-                label: t('slash_menu.emoji', null, 'Icon'),
+                label: t('slash_menu.emoji', null, 'Emoji'),
                 action: function () {
+                    // A title is a plain text input: it can only hold
+                    // characters, so emojis are the only icons possible here
                     openEmojiForInput(savedEditableElement);
                 }
             },
@@ -1605,9 +1632,18 @@
         const common = getCommonSlashCommands();
         return filterSlashCommands([
             {
+                id: 'icon',
+                icon: 'lucide-shapes',
+                label: t('slash_menu.icon', null, 'Icon'),
+                action: function () {
+                    // Task text renders as HTML, so real icons can be inserted
+                    openIconForInput(savedEditableElement);
+                }
+            },
+            {
                 id: 'emoji',
                 icon: 'lucide-smile',
-                label: t('slash_menu.emoji', null, 'Icon'),
+                label: t('slash_menu.emoji', null, 'Emoji'),
                 action: function () {
                     openEmojiForInput(savedEditableElement);
                 }
@@ -1640,16 +1676,29 @@
                     }
                 }
             },
-            emoji: {
-                id: 'emoji',
-                icon: 'lucide-smile',
-                label: t('slash_menu.emoji', null, 'Icon'),
+            icon: {
+                id: 'icon',
+                icon: 'lucide-shapes',
+                label: t('slash_menu.icon', null, 'Icon'),
                 mobileHidden: true,
                 action: function () {
                     if (typeof window.toggleEmojiPicker === 'function') {
                         // Small delay to ensure focus and selection have settled
                         // after slash deletion and menu hiding.
                         setTimeout(() => window.toggleEmojiPicker(), 10);
+                    }
+                }
+            },
+            emoji: {
+                id: 'emoji',
+                icon: 'lucide-smile',
+                label: t('slash_menu.emoji', null, 'Emoji'),
+                mobileHidden: true,
+                action: function () {
+                    if (typeof window.openEmojiCharPicker === 'function') {
+                        // Small delay to ensure focus and selection have settled
+                        // after slash deletion and menu hiding.
+                        setTimeout(() => window.openEmojiCharPicker(), 10);
                     }
                 }
             },
@@ -1819,6 +1868,7 @@
                         }
                     },
                     common.excalidraw,
+                    common.icon,
                     common.emoji,
                     {
                         id: 'table',
@@ -2135,6 +2185,7 @@
                         }
                     },
                     common.excalidraw,
+                    common.icon,
                     common.emoji,
                     {
                         id: 'table',
