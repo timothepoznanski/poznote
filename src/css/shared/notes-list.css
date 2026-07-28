@@ -130,8 +130,6 @@
 
 .shared-note-item.shared-hierarchy-item {
     position: relative;
-    --shared-hierarchy-line-color: rgba(13, 110, 253, 0.14);
-    --shared-ancestor-guide-count: var(--shared-indent-level, 0);
 }
 
 .shared-note-item.shared-hierarchy-item::before {
@@ -143,17 +141,13 @@
     right: 0;
     background-image: repeating-linear-gradient(
         to right,
-        var(--shared-hierarchy-line-color) 0 2px,
-        transparent 2px 22px
+        rgba(13, 110, 253, 0.22) 0 2px,
+        transparent 2px 32px
     );
-    background-size: calc(var(--shared-ancestor-guide-count) * 22px) 100%;
+    background-size: calc(var(--shared-indent-level, 0) * 32px) 100%;
     background-position: 22px 0;
     background-repeat: no-repeat;
     pointer-events: none;
-}
-
-.shared-note-item.shared-note-child {
-    --shared-hierarchy-line-color: rgba(13, 110, 253, 0.22);
 }
 
 #foldersList .shared-folder-icon {
