@@ -940,8 +940,7 @@
     "audio_no_note": "No note selected",
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
-    "date": "Date",
-    "icon": "Icon"
+    "date": "Date"
   },
   "api": {
     "settings": {

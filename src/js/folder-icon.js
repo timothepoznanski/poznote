@@ -556,16 +556,8 @@ function showChangeNoteIconModal(noteId, noteTitle) {
     showChangeIconModal('note', noteId, noteTitle);
 }
 
-/**
- * Show the icon modal to insert an icon into the note content at the cursor.
- * The caller must save the caret in window.savedRanges.emoji beforehand.
- */
-function showInsertIconModal() {
-    showChangeIconModal('insert', null, null);
-}
-
 function showChangeIconModal(targetType, targetId, targetName) {
-    currentIconTargetType = (targetType === 'note' || targetType === 'insert') ? targetType : 'folder';
+    currentIconTargetType = targetType === 'note' ? 'note' : 'folder';
     currentFolderIdForIcon = targetId;
     currentFolderNameForIcon = targetName;
     // '' means: use default folder icon (toggle open/closed). null means: not initialized.
@@ -583,11 +575,9 @@ function showChangeIconModal(targetType, targetId, targetName) {
     iconGrid.innerHTML = '';
 
     // Get the current folder icon and color (if any)
-    const folderElement = currentIconTargetType === 'insert'
-        ? null
-        : (currentIconTargetType === 'note'
-            ? document.querySelector(`.note-icon[data-note-id="${targetId}"]`)
-            : document.querySelector(`[data-folder-id="${targetId}"] .folder-icon`));
+    const folderElement = currentIconTargetType === 'note'
+        ? document.querySelector(`.note-icon[data-note-id="${targetId}"]`)
+        : document.querySelector(`[data-folder-id="${targetId}"] .folder-icon`);
     let currentIcon = null;
     let currentColor = '';
     if (folderElement) {
@@ -604,47 +594,37 @@ function showChangeIconModal(targetType, targetId, targetName) {
         currentColor = folderElement.getAttribute('data-icon-color') || '';
     }
 
-    // In insert mode there is no "default icon" concept: an icon must be
-    // picked before Apply does anything, so selectedIconClass stays null.
-    if (currentIconTargetType !== 'insert') {
-        // If no custom icon is set, we consider this folder to be using the default toggle icon.
-        selectedIconClass = currentIcon || '';
+    // If no custom icon is set, we consider this folder to be using the default toggle icon.
+    selectedIconClass = currentIcon || '';
 
-        // Create a "Default" icon item (keeps the open/closed toggle behaviour)
-        const defaultIconItem = document.createElement('div');
-        defaultIconItem.className = 'folder-icon-item';
-        defaultIconItem.dataset.iconClass = '';
-        defaultIconItem.dataset.iconName = (window.t ? window.t('folder_icon.default', null, 'Default') : 'Default');
-        defaultIconItem.title = defaultIconItem.dataset.iconName;
+    // Create a "Default" icon item (keeps the open/closed toggle behaviour)
+    const defaultIconItem = document.createElement('div');
+    defaultIconItem.className = 'folder-icon-item';
+    defaultIconItem.dataset.iconClass = '';
+    defaultIconItem.dataset.iconName = (window.t ? window.t('folder_icon.default', null, 'Default') : 'Default');
+    defaultIconItem.title = defaultIconItem.dataset.iconName;
 
-        if (selectedIconClass === '') {
-            defaultIconItem.classList.add('selected');
-            setTimeout(() => {
-                defaultIconItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
-        }
+    if (selectedIconClass === '') {
+        defaultIconItem.classList.add('selected');
+        setTimeout(() => {
+            defaultIconItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+    }
 
-        const defaultIcon = document.createElement('i');
-        // Use the same base class style as existing UI (no need to add "fas")
-        defaultIcon.className = currentIconTargetType === 'note' ? DEFAULT_NOTE_ICON : 'lucide-folder';
-        defaultIconItem.appendChild(defaultIcon);
+    const defaultIcon = document.createElement('i');
+    // Use the same base class style as existing UI (no need to add "fas")
+    defaultIcon.className = currentIconTargetType === 'note' ? DEFAULT_NOTE_ICON : 'lucide-folder';
+    defaultIconItem.appendChild(defaultIcon);
 
-        defaultIconItem.addEventListener('click', function () {
-            document.querySelectorAll('.folder-icon-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            defaultIconItem.classList.add('selected');
-            selectedIconClass = '';
+    defaultIconItem.addEventListener('click', function () {
+        document.querySelectorAll('.folder-icon-item').forEach(item => {
+            item.classList.remove('selected');
         });
+        defaultIconItem.classList.add('selected');
+        selectedIconClass = '';
+    });
 
-        iconGrid.appendChild(defaultIconItem);
-    }
-
-    // The "Set default icon" button is meaningless when inserting into content
-    const resetBtn = document.getElementById('resetFolderIconBtn');
-    if (resetBtn) {
-        resetBtn.style.display = currentIconTargetType === 'insert' ? 'none' : '';
-    }
+    iconGrid.appendChild(defaultIconItem);
 
     // Create icon items
     FOLDER_ICONS.forEach(iconClass => {
@@ -842,20 +822,6 @@ function closeFolderIconModal() {
     if (modal) {
         modal.style.display = 'none';
     }
-    // Insert mode: drop the caret saved for insertion (cancel or done)
-    if (currentIconTargetType === 'insert') {
-        if (window.savedRanges) {
-            window.savedRanges.emoji = null;
-            window.savedRanges.emojiCM = null;
-        }
-        if (window.savedActiveInput) {
-            if (window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
-                window.resumeTaskEditBlurSave(window.savedActiveInput);
-            }
-            window.savedActiveInput = null;
-            window.savedActiveInputSelection = null;
-        }
-    }
     currentIconTargetType = 'folder';
     currentFolderIdForIcon = null;
     currentFolderNameForIcon = null;
@@ -864,114 +830,9 @@ function closeFolderIconModal() {
 }
 
 /**
- * Insert the chosen icon into the note content at the saved caret position.
- * Icons are inline <i> elements; class and style survive the HTML sanitizer,
- * and .note-inline-icon keeps them out of the global grey/hover icon filters.
- */
-function insertIconAtCursor(iconClass, iconColor) {
-    // Text inputs whose content renders as HTML (task text): insert the icon
-    // markup as text at the saved selection
-    const activeInput = window.savedActiveInput;
-    if (activeInput && activeInput.tagName === 'INPUT') {
-        const colorAttr = iconColor ? ` style="color: ${iconColor};"` : '';
-        const html = `<i class="lucide ${iconClass} note-inline-icon"${colorAttr}></i> `;
-        try { activeInput.focus(); } catch (e) { }
-        const maxLength = activeInput.value.length;
-        const saved = window.savedActiveInputSelection;
-        const start = saved ? Math.max(0, Math.min(saved.start, maxLength)) : maxLength;
-        const end = saved ? Math.max(start, Math.min(saved.end, maxLength)) : start;
-        activeInput.setRangeText(html, start, end, 'end');
-        activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-        if (activeInput.classList && activeInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
-            window.resumeTaskEditBlurSave(activeInput);
-        }
-        window.savedActiveInput = null;
-        window.savedActiveInputSelection = null;
-        if (window.savedRanges) {
-            window.savedRanges.emoji = null;
-            window.savedRanges.emojiCM = null;
-        }
-        return;
-    }
-
-    // Markdown notes: insert the icon as raw inline HTML through the
-    // CodeMirror API, using the selection snapshot taken before the modal
-    // stole focus from the editor
-    const cmSnapshot = window.savedRanges && window.savedRanges.emojiCM;
-    const cmApi = window.PoznoteMarkdownCodeMirror;
-    if (cmSnapshot && cmApi && typeof cmApi.replaceRange === 'function') {
-        const colorAttr = iconColor ? ` style="color: ${iconColor};"` : '';
-        const text = `<i class="lucide ${iconClass} note-inline-icon"${colorAttr}></i> `;
-        const from = Math.min(cmSnapshot.start, cmSnapshot.end);
-        const to = Math.max(cmSnapshot.start, cmSnapshot.end);
-        try {
-            if (typeof cmApi.focus === 'function') cmApi.focus(cmSnapshot.editor);
-            cmApi.replaceRange(cmSnapshot.editor, from, to, text);
-            if (typeof cmApi.setSelection === 'function') {
-                cmApi.setSelection(cmSnapshot.editor, from + text.length, from + text.length);
-            }
-        } catch (e) { }
-        window.savedRanges.emojiCM = null;
-        window.savedRanges.emoji = null;
-        return;
-    }
-
-    const sel = window.getSelection();
-    try {
-        if (window.savedRanges && window.savedRanges.emoji) {
-            sel.removeAllRanges();
-            sel.addRange(window.savedRanges.emoji);
-        }
-    } catch (e) { }
-
-    if (!sel || !sel.rangeCount) return;
-    const range = sel.getRangeAt(0);
-    let container = range.commonAncestorContainer;
-    if (container.nodeType === 3) container = container.parentNode;
-    const noteentry = container.closest && container.closest('.noteentry');
-
-    if (!noteentry) {
-        if (typeof window.showCursorWarning === 'function') window.showCursorWarning();
-        if (window.savedRanges) window.savedRanges.emoji = null;
-        return;
-    }
-
-    try {
-        noteentry.focus({ preventScroll: true });
-    } catch (e) {
-        try { noteentry.focus(); } catch (e2) { }
-    }
-
-    const icon = document.createElement('i');
-    icon.className = 'lucide ' + iconClass + ' note-inline-icon';
-    if (iconColor) icon.style.color = iconColor;
-    range.deleteContents();
-    range.insertNode(icon);
-    // Leave the caret after a following space so typing continues normally
-    const space = document.createTextNode(' ');
-    icon.after(space);
-    range.setStartAfter(space);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-
-    noteentry.dispatchEvent(new Event('input', { bubbles: true }));
-    if (window.savedRanges) window.savedRanges.emoji = null;
-}
-
-/**
  * Save the selected folder icon
  */
 function saveFolderIcon() {
-    // Insert mode: put the icon into the note content instead of saving it
-    if (currentIconTargetType === 'insert') {
-        if (!selectedIconClass) return;
-        insertIconAtCursor(selectedIconClass, selectedIconColor);
-        addRecentIcon(selectedIconClass);
-        closeFolderIconModal();
-        return;
-    }
-
     // selectedIconClass can be '' to keep the default toggle icon
     if (!currentFolderIdForIcon || selectedIconClass === null) return;
 

@@ -1386,8 +1386,7 @@
     "audio_no_note": "Keine Notiz ausgewählt",
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
-    "date": "Datum",
-    "icon": "Symbol"
+    "date": "Datum"
   },
   "api": {
     "settings": {

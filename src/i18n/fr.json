@@ -1434,8 +1434,7 @@
     "audio_no_note": "Aucune note sélectionnée",
     "audio_invalid_file": "Veuillez sélectionner un fichier audio.",
     "audio_upload_failed": "Échec de l'envoi : {{error}}",
-    "date": "Date",
-    "icon": "Icône"
+    "date": "Date"
   },
   "api": {
     "settings": {

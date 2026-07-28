@@ -1466,53 +1466,6 @@ document.addEventListener('keydown', function (e) {
 });
 
 function toggleEmojiPicker() {
-  // Routing: note content opens the icon picker modal, while plain text
-  // inputs (title, task fields) keep the emoji character popup. The emoji
-  // popup itself stays directly reachable via openEmojiCharPicker().
-  const existingPicker = document.querySelector('.emoji-picker');
-  const isInputContext = !!window.savedActiveInput ||
-    (document.activeElement && document.activeElement.classList && document.activeElement.classList.contains('css-title'));
-  if (!existingPicker && !isInputContext && typeof window.showInsertIconModal === 'function') {
-    const activeMarkdownEditor = document.activeElement && document.activeElement.closest &&
-      document.activeElement.closest('.markdown-editor');
-    if (!isCursorInEditableNote() && !activeMarkdownEditor) {
-      window.showCursorWarning();
-      return;
-    }
-    // Save the caret so the icon can be inserted where the user was typing
-    try {
-      const sel = window.getSelection();
-      if (sel && sel.rangeCount) {
-        window.savedRanges.emoji = sel.getRangeAt(0).cloneRange();
-      }
-    } catch (e) { }
-    // Markdown notes: also snapshot the CodeMirror selection, since the DOM
-    // range does not survive the modal taking focus away from the editor
-    window.savedRanges.emojiCM = null;
-    try {
-      const api = window.PoznoteMarkdownCodeMirror;
-      const sel = window.getSelection();
-      let node = sel && sel.rangeCount ? sel.getRangeAt(0).commonAncestorContainer : document.activeElement;
-      if (node && node.nodeType === 3) node = node.parentNode;
-      const editor = (node && node.closest && node.closest('.markdown-editor')) || activeMarkdownEditor;
-      if (editor && api && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor) &&
-          typeof api.getSelectionOffsets === 'function') {
-        const offsets = api.getSelectionOffsets(editor);
-        if (offsets) {
-          window.savedRanges.emojiCM = { editor: editor, start: offsets.start, end: offsets.end };
-        }
-      }
-    } catch (e) { }
-    window.showInsertIconModal();
-    return;
-  }
-
-  openEmojiCharPicker();
-}
-
-// The emoji character popup (toggles when already open). Used for plain text
-// inputs and by the "Emoji" slash menu entries.
-function openEmojiCharPicker() {
   const existingPicker = document.querySelector('.emoji-picker');
 
   if (existingPicker) {

@@ -925,8 +925,7 @@
     "audio_no_note": "Заметка не выбрана",
     "audio_invalid_file": "Пожалуйста, выберите аудиофайл.",
     "audio_upload_failed": "Ошибка загрузки: {{error}}",
-    "date": "Дата",
-    "icon": "Значок"
+    "date": "Дата"
   },
   "api": {
     "settings": {
