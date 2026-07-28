@@ -293,6 +293,9 @@ if ($isAdmin) {
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter...'); ?>" autocomplete="off">
+                <button type="button" id="home-search-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                    <i class="lucide lucide-x"></i>
+                </button>
             </div>
         </div>
 

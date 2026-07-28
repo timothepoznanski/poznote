@@ -1995,10 +1995,17 @@
                 + tr('public.no_filter_results', {}, 'No results found.');
             grid.appendChild(noResults);
 
+            var searchWrapper = searchInput.closest('.home-search-wrapper');
+            var searchClearBtn = document.getElementById('home-search-clear');
+
             // Filter cards based on search term
             searchInput.addEventListener('input', function () {
                 var term = this.value.toLowerCase().trim();
                 var visibleCount = 0;
+
+                if (searchWrapper) {
+                    searchWrapper.classList.toggle('has-value', this.value !== '');
+                }
 
                 cards.forEach(function (card) {
                     var titleEl = card.querySelector('.home-card-title');
@@ -2023,6 +2030,14 @@
 
                 noResults.style.display = (visibleCount === 0) ? 'block' : 'none';
             });
+
+            if (searchClearBtn) {
+                searchClearBtn.addEventListener('click', function () {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                    searchInput.focus();
+                });
+            }
 
             // Keyboard shortcut: press "/" to focus search
             document.addEventListener('keydown', function (e) {

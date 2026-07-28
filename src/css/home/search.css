@@ -47,6 +47,45 @@
     box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
 }
 
+/* The input is content-box, so width:100% + paddings overflows the 500px
+   wrapper; the clear button anchors to the wrapper, so make the input fit it */
+.home-search-wrapper:has(.home-search-clear) .home-search-input {
+    box-sizing: border-box;
+    padding-right: 36px;
+}
+
+.home-search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+}
+
+.home-search-clear .lucide {
+    width: 14px;
+    height: 14px;
+}
+
+.home-search-clear:hover {
+    color: #4b5563;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.home-search-wrapper.has-value .home-search-clear {
+    display: flex;
+}
+
 /* Dark mode - search */
 html[data-theme='dark'] .home-search-input,
 body.dark-mode .home-search-input {
@@ -59,6 +98,12 @@ html[data-theme='dark'] .home-search-input:focus,
 body.dark-mode .home-search-input:focus {
     border-color: #007DB8;
     box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.2);
+}
+
+html[data-theme='dark'] .home-search-clear:hover,
+body.dark-mode .home-search-clear:hover {
+    color: var(--dm-text);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 html[data-theme='dark'] .home-info-line,
