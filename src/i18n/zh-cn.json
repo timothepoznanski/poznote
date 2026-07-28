@@ -2825,6 +2825,7 @@
       "title": "存储统计",
       "description": "每个账户的笔记数量和已用磁盘空间。",
       "user_description": "您账户的笔记数量和已用磁盘空间。",
+      "table_id": "ID",
       "table_account": "账户",
       "table_notes": "笔记",
       "table_trash": "回收站",

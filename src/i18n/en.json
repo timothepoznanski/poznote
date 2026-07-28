@@ -2304,6 +2304,7 @@
       "title": "Storage statistics",
       "description": "Number of notes and disk space used by each account.",
       "user_description": "Number of notes and disk space used by your account.",
+      "table_id": "ID",
       "table_account": "Account",
       "table_notes": "Notes",
       "table_trash": "Trash",

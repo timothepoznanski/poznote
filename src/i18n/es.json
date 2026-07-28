@@ -2682,6 +2682,7 @@
       "title": "Estadísticas de almacenamiento",
       "description": "Número de notas y espacio en disco utilizado por cada cuenta.",
       "user_description": "Número de notas y espacio en disco utilizado por tu cuenta.",
+      "table_id": "ID",
       "table_account": "Cuenta",
       "table_notes": "Notas",
       "table_trash": "Papelera",

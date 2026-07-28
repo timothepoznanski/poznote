@@ -2895,6 +2895,7 @@
       "title": "Statistiques de stockage",
       "description": "Nombre de notes et espace disque utilisé par chaque compte.",
       "user_description": "Nombre de notes et espace disque utilisé par votre compte.",
+      "table_id": "ID",
       "table_account": "Compte",
       "table_notes": "Notes",
       "table_trash": "Corbeille",

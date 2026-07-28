@@ -2682,6 +2682,7 @@
       "title": "Speicherstatistik",
       "description": "Anzahl der Notizen und belegter Speicherplatz pro Konto.",
       "user_description": "Anzahl der Notizen und belegter Speicherplatz Ihres Kontos.",
+      "table_id": "ID",
       "table_account": "Konto",
       "table_notes": "Notizen",
       "table_trash": "Papierkorb",
