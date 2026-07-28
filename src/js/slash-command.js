@@ -4,6 +4,28 @@
 (function () {
     'use strict';
 
+    // Trigger mode: by default the menu opens as soon as "/" is typed. When the
+    // "slash_menu_require_alt" setting is on, a bare "/" stays a literal character
+    // and the menu only opens on Alt + / (see handleAltSlashShortcut).
+    function isAltSlashModeEnabled() {
+        try {
+            if (typeof window.getPoznoteInitialSetting === 'function') {
+                var value = window.getPoznoteInitialSetting('slash_menu_require_alt');
+                if (value !== null && value !== undefined) {
+                    return value === '1' || value === 'true' || value === true;
+                }
+            }
+        } catch (e) { }
+        return false;
+    }
+
+    // Matches the Alt + / chord. On some keyboard layouts Alt + / emits a different
+    // e.key, so accept the physical Slash key (e.code) as well.
+    function isAltSlashEvent(e) {
+        if (!e.altKey || e.ctrlKey || e.metaKey) return false;
+        return e.key === '/' || e.code === 'Slash';
+    }
+
 
     // Available languages for code blocks (used by HTML and Markdown menus)
     var CODE_BLOCK_LANGUAGES = [
@@ -1508,31 +1530,6 @@
         }
     }
 
-    // Open the icon picker modal to insert an icon into a text input whose
-    // content is rendered as HTML (task text)
-    function openIconForInput(input) {
-        if (!input || input.tagName !== 'INPUT') return;
-
-        input.focus();
-        window.savedActiveInput = input;
-        window.savedActiveInputSelection = {
-            start: input.selectionStart,
-            end: input.selectionEnd
-        };
-        if (window.savedRanges) {
-            window.savedRanges.emoji = null;
-            window.savedRanges.emojiCM = null;
-        }
-
-        pauseTaskEditBlurSave(input);
-
-        if (typeof window.showInsertIconModal === 'function') {
-            setTimeout(() => window.showInsertIconModal(), 0);
-        } else {
-            resumeTaskEditBlurSave(input);
-        }
-    }
-
     function openDateForInput(input) {
         if (!input || input.tagName !== 'INPUT') return;
 
@@ -1610,8 +1607,6 @@
                 icon: 'lucide-smile',
                 label: t('slash_menu.emoji', null, 'Emoji'),
                 action: function () {
-                    // A title is a plain text input: it can only hold
-                    // characters, so emojis are the only icons possible here
                     openEmojiForInput(savedEditableElement);
                 }
             },
@@ -1631,15 +1626,6 @@
         const t = window.t || ((key, params, fallback) => fallback);
         const common = getCommonSlashCommands();
         return filterSlashCommands([
-            {
-                id: 'icon',
-                icon: 'lucide-shapes',
-                label: t('slash_menu.icon', null, 'Icon'),
-                action: function () {
-                    // Task text renders as HTML, so real icons can be inserted
-                    openIconForInput(savedEditableElement);
-                }
-            },
             {
                 id: 'emoji',
                 icon: 'lucide-smile',
@@ -1676,29 +1662,16 @@
                     }
                 }
             },
-            icon: {
-                id: 'icon',
-                icon: 'lucide-shapes',
-                label: t('slash_menu.icon', null, 'Icon'),
-                mobileHidden: true,
-                action: function () {
-                    if (typeof window.toggleEmojiPicker === 'function') {
-                        // Small delay to ensure focus and selection have settled
-                        // after slash deletion and menu hiding.
-                        setTimeout(() => window.toggleEmojiPicker(), 10);
-                    }
-                }
-            },
             emoji: {
                 id: 'emoji',
                 icon: 'lucide-smile',
                 label: t('slash_menu.emoji', null, 'Emoji'),
                 mobileHidden: true,
                 action: function () {
-                    if (typeof window.openEmojiCharPicker === 'function') {
+                    if (typeof window.toggleEmojiPicker === 'function') {
                         // Small delay to ensure focus and selection have settled
                         // after slash deletion and menu hiding.
-                        setTimeout(() => window.openEmojiCharPicker(), 10);
+                        setTimeout(() => window.toggleEmojiPicker(), 10);
                     }
                 }
             },
@@ -1868,7 +1841,6 @@
                         }
                     },
                     common.excalidraw,
-                    common.icon,
                     common.emoji,
                     {
                         id: 'table',
@@ -2185,7 +2157,6 @@
                         }
                     },
                     common.excalidraw,
-                    common.icon,
                     common.emoji,
                     {
                         id: 'table',
@@ -3713,7 +3684,7 @@
         editor._cmPrevLength = value.length;
         const lastChar = cursorPos > 0 ? value.charAt(cursorPos - 1) : '';
 
-        if (lastChar === '/' && !isDeleting) {
+        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled()) {
             const textBeforeSlash = value.slice(0, cursorPos - 1);
             const isUrl = /:$/.test(textBeforeSlash) || /:\/$/.test(textBeforeSlash);
 
@@ -3819,7 +3790,7 @@
         // Don't open menu if we're deleting (e.g. backspace landing on a slash)
         const isDeleting = e.inputType && e.inputType.startsWith('delete');
 
-        if (lastChar === '/' && !isDeleting) {
+        if (lastChar === '/' && !isDeleting && !isAltSlashModeEnabled()) {
             // Check if we're typing a URL - don't open menu in that case
             const textBeforeSlash = textBefore.substring(0, textBefore.length - 1);
             // Detect URL pattern: when typing / directly after : or :/ (protocol)
@@ -3832,6 +3803,81 @@
             // If menu is open, update filter from editor
             setTimeout(updateFilterFromEditor, 0);
         }
+    }
+
+    // Alt + / shortcut (only active when the "require Alt" setting is on).
+    // The rest of the menu machinery assumes a literal '/' sits just before the caret
+    // (it is the anchor used for filtering and is removed when a command runs), so this
+    // inserts that '/' first and then opens the menu at the same position a typed slash
+    // would have produced.
+    function handleAltSlashShortcut(e) {
+        if (!isAltSlashEvent(e) || !isAltSlashModeEnabled()) return;
+
+        const target = e.target;
+        if (!target) return;
+
+        // Title inputs and task inputs
+        if (target.tagName === 'INPUT'
+            && (target.classList.contains('css-title') || target.classList.contains('task-input'))) {
+            const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
+            if (target.classList.contains('css-title') && isMobileViewport) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const start = target.selectionStart;
+            const end = target.selectionEnd;
+            target.value = target.value.slice(0, start) + '/' + target.value.slice(end);
+            const caret = start + 1;
+            target.setSelectionRange(caret, caret);
+            showSlashMenuForInput(target, caret);
+            return;
+        }
+
+        // Markdown notes (CodeMirror)
+        const codeMirrorEditor = getCodeMirrorEditorFromTarget(target);
+        if (codeMirrorEditor) {
+            const api = getMarkdownCodeMirrorApi();
+            if (!api || typeof api.getSelectionOffsets !== 'function' || typeof api.replaceRange !== 'function') return;
+
+            const offsets = api.getSelectionOffsets(codeMirrorEditor);
+            if (!offsets) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            api.replaceRange(codeMirrorEditor, offsets.start, offsets.end, '/');
+            const caret = offsets.start + 1;
+            // Keep the delete-detection heuristic in handleCodeMirrorInput in sync with
+            // the text we just inserted, so the next real input isn't read as a deletion.
+            if (typeof api.getValue === 'function') {
+                codeMirrorEditor._cmPrevLength = api.getValue(codeMirrorEditor).length;
+            }
+            showSlashMenuForCodeMirror(codeMirrorEditor, caret - 1, caret);
+            return;
+        }
+
+        // HTML notes (contenteditable)
+        const noteEntry = target.closest && target.closest('.noteentry');
+        if (!noteEntry) return;
+        if (!getEditorContext()) return;
+
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        const slashNode = document.createTextNode('/');
+        range.insertNode(slashNode);
+        range.setStart(slashNode, 1);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+
+        showSlashMenu();
     }
 
     // Handle click outside menu (close)
@@ -3851,6 +3897,7 @@
     // Initialize slash menu system (event listeners)
     function init() {
         document.addEventListener('input', handleInput, true);
+        document.addEventListener('keydown', handleAltSlashShortcut, true);
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
 
@@ -4013,7 +4060,7 @@
                 const pos = target.selectionStart;
 
                 // Check if the last character typed is a slash
-                if (pos > 0 && value[pos - 1] === '/') {
+                if (pos > 0 && value[pos - 1] === '/' && !isAltSlashModeEnabled()) {
                     // Don't show if we're deleting
                     const isDeleting = e.inputType && e.inputType.startsWith('delete');
                     if (!isDeleting) {

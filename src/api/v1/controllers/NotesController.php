@@ -89,6 +89,53 @@ class NotesController {
         return $icon;
     }
 
+    /**
+     * Optimistic-concurrency token for a note. Built from the last-write
+     * timestamp, the heading and a hash of the content, so two writes landing
+     * within the same second still yield distinct tokens.
+     */
+    private function computeNoteVersion(string $updated, string $heading, string $content): string {
+        return md5($updated . '|' . $heading . '|' . md5($content));
+    }
+
+    /**
+     * Load a note's current content the same way show() serves it (file first,
+     * DB entry column as fallback, tasklist resolution), so version tokens
+     * computed here and in show() always agree.
+     */
+    private function loadNoteContentForVersion(int $noteId, string $noteType, ?string $entryColumn): string {
+        $content = '';
+        $filename = getEntryFilename($noteId, $noteType);
+        if (file_exists($filename) && is_readable($filename)) {
+            $read = file_get_contents($filename);
+            if ($read !== false) {
+                $content = $read;
+            }
+        }
+        if ($noteType === 'tasklist') {
+            $content = resolveTasklistStoredContent($content, $entryColumn ?? '');
+        } elseif ($content === '' && $entryColumn !== null) {
+            $content = (string)$entryColumn;
+        }
+        return $content;
+    }
+
+    /**
+     * Version expected by the caller, from the "if_version" body field or an
+     * If-Match header. Returns '' when none was supplied ('*' means any).
+     */
+    private function getExpectedNoteVersion(?array $input): string {
+        $ifVersion = isset($input['if_version']) ? trim((string)$input['if_version']) : '';
+        if ($ifVersion === '' && isset($_SERVER['HTTP_IF_MATCH'])) {
+            $ifVersion = trim($_SERVER['HTTP_IF_MATCH']);
+            if (strpos($ifVersion, 'W/') === 0) {
+                $ifVersion = substr($ifVersion, 2);
+            }
+            $ifVersion = trim($ifVersion, '"');
+        }
+        return $ifVersion === '*' ? '' : $ifVersion;
+    }
+
     private function noteExistsForEditing(int $noteId): bool {
         $stmt = $this->con->prepare("SELECT COUNT(*) FROM entries WHERE id = ? AND trash = 0");
         $stmt->execute([$noteId]);
@@ -612,7 +659,10 @@ class NotesController {
             } elseif ($content === '' && isset($row['entry'])) {
                 $content = (string) ($row['entry'] ?? '');
             }
-            
+
+            $version = $this->computeNoteVersion((string)($row['updated'] ?? ''), (string)($row['heading'] ?? ''), $content);
+            header('ETag: "' . $version . '"');
+
             echo json_encode([
                 'success' => true,
                 'note' => [
@@ -630,6 +680,7 @@ class NotesController {
                     'color_hex' => !empty($row['color']) ? (resolveNoteColorHex($row['color']) ?: null) : null,
                     'created' => $row['created'] ?? null,
                     'updated' => $row['updated'] ?? null,
+                    'version' => $version,
                     'reminder_at' => $row['reminder_at'] ?? null,
                     'content' => $content
                 ]
@@ -860,15 +911,41 @@ class NotesController {
         
         try {
             // Get current note (including attachments for base64 image conversion)
-            $stmt = $this->con->prepare("SELECT id, heading, type, workspace, folder, folder_id, attachments FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT id, heading, type, workspace, folder, folder_id, attachments, updated, entry FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$noteId]);
             $note = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$note) {
                 $this->sendError(404, 'Note not found');
                 return;
             }
-            
+
+            // Optimistic concurrency: when the caller declares which version it
+            // read (body "if_version" or an If-Match header), reject the write
+            // with a 409 if the note changed since. The response carries the
+            // current version and content so the caller can merge and retry
+            // without an extra read.
+            $expectedVersion = $this->getExpectedNoteVersion($input);
+            if ($expectedVersion !== '') {
+                $currentContent = $this->loadNoteContentForVersion($noteId, $note['type'] ?? 'note', $note['entry'] ?? null);
+                $currentVersion = $this->computeNoteVersion((string)($note['updated'] ?? ''), (string)$note['heading'], $currentContent);
+                if (!hash_equals($currentVersion, $expectedVersion)) {
+                    http_response_code(409);
+                    echo json_encode([
+                        'success' => false,
+                        'error' => 'Version conflict: the note was modified since the version you provided',
+                        'code' => 'version_conflict',
+                        'current' => [
+                            'version' => $currentVersion,
+                            'updated' => $note['updated'] ?? null,
+                            'heading' => $note['heading'],
+                            'content' => $currentContent
+                        ]
+                    ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+                    return;
+                }
+            }
+
             // Prepare update data (only update provided fields)
             $heading = isset($input['heading']) ? trim($input['heading']) : $note['heading'];
             $entry = $input['content'] ?? $input['entry'] ?? null;
@@ -1079,12 +1156,20 @@ class NotesController {
                     }
                 }
                 
+                // New version token so the caller can chain conditional writes
+                // without re-reading the note. Content is reloaded through the
+                // same path show() uses, keeping both tokens consistent.
+                $newContent = $this->loadNoteContentForVersion($noteId, $noteType, $entry !== null ? $entrycontent : ($note['entry'] ?? null));
+                $newVersion = $this->computeNoteVersion($now_utc, $heading, $newContent);
+                header('ETag: "' . $newVersion . '"');
+
                 // Prepare response
                 $response = [
                     'note' => [
                         'id' => $noteId,
                         'heading' => $heading,
-                        'updated' => $now_utc
+                        'updated' => $now_utc,
+                        'version' => $newVersion
                     ]
                 ];
                 if ($diaryFolderMoved) {

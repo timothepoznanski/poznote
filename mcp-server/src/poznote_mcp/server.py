@@ -238,7 +238,10 @@ def _api_error_json(exc: Exception) -> str:
 @mcp.tool()
 def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Get a specific note by its ID with full content
-    
+
+    The result includes a "version" token; pass it as if_version to update_note
+    to make the write fail safely if the note changed in between.
+
     Args:
         id: ID of the note to retrieve
         workspace: Workspace name (optional)
@@ -264,6 +267,7 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
         "folder": note.get("folder"),
         "updatedAt": note.get("updated"),
         "createdAt": note.get("created"),
+        "version": note.get("version"),
     }
     
     return json.dumps(result, indent=2, ensure_ascii=False)
@@ -461,9 +465,10 @@ def update_note(
     title: Optional[str] = None,
     tags: Optional[str] = None,
     user_id: Optional[int] = None,
+    if_version: Optional[str] = None,
 ) -> str:
     """Update an existing note. Only provided fields will be updated.
-    
+
     Args:
         id: ID of the note to update
         workspace: Workspace name (optional)
@@ -472,6 +477,11 @@ def update_note(
         title: New title for the note
         tags: New tags (comma-separated)
         user_id: User profile ID to access (optional, overrides default)
+        if_version: Version token from get_note. When set, the write is rejected
+            with a version_conflict result if the note changed since that
+            version; the result then includes the current content and version so
+            you can merge and retry. Recommended whenever you rewrite content
+            you read earlier.
     """
     if content is not None:
         content = _normalize_content(content)
@@ -486,10 +496,23 @@ def update_note(
             tags=tags,
             workspace=workspace,
             user_id=user_id,
+            if_version=if_version,
         )
     except Exception as exc:
         return _api_error_json(exc)
-    
+
+    if result and result.get("code") == "version_conflict":
+        return json.dumps({
+            "success": False,
+            "error": "version_conflict",
+            "message": (
+                f"Note {id} was modified since the version you read. "
+                "Merge your change into the current content below, then retry "
+                "with the new version token."
+            ),
+            "current": result.get("current"),
+        }, indent=2, ensure_ascii=False)
+
     if result:
         return json.dumps({
             "success": True,

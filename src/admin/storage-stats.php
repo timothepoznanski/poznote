@@ -65,6 +65,18 @@ function poznoteGlueUnit(string $label): string {
     return preg_replace('/ (\([^()]*\))\s*$/u', '&nbsp;$1', $label);
 }
 
+/**
+ * Render a sortable column header button for the stats table.
+ * Expects an already HTML-safe label.
+ */
+function poznoteSortHeader(string $escapedLabel, string $type, string $extraClass = ''): string {
+    $class = 'hide-mobile' === $extraClass ? ' class="hide-mobile"' : '';
+    return '<th data-sort-type="' . $type . '"' . $class . '>'
+        . '<button type="button" class="users-sort-link storage-sort-btn">'
+        . $escapedLabel
+        . '<i class="lucide lucide-chevron-down users-sort-icon"></i></button></th>';
+}
+
 function collectStorageStats(): array {
     $dataRoot = dirname(SQLITE_DATABASE, 2);
     $usersDir = $dataRoot . '/users';
@@ -174,6 +186,16 @@ foreach ($stats as $r) {
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
+    <style>
+    .results-table th .storage-sort-btn {
+        background: none;
+        border: none;
+        padding: 0;
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+    }
+    </style>
     <script>
     /**
      * Filter the stats table rows against the search input value
@@ -197,7 +219,49 @@ foreach ($stats as $r) {
         });
     }
 
-    document.addEventListener('DOMContentLoaded', initStorageStatsFilter);
+    /**
+     * Make every column header sort the tbody rows (click toggles asc/desc).
+     * Cells carry their raw value in data-sort; the tfoot totals stay in place.
+     */
+    function initStorageStatsSort() {
+        const table = document.querySelector('.results-table');
+        const tbody = table ? table.querySelector('tbody') : null;
+        if (!tbody || tbody.querySelector('td[colspan]')) return;
+
+        let activeButton = null;
+        let activeDir = 'asc';
+
+        table.querySelectorAll('th .storage-sort-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const th = button.closest('th');
+                const columnIndex = th.cellIndex;
+                const isNumeric = th.dataset.sortType === 'num';
+                activeDir = (button === activeButton && activeDir === 'asc') ? 'desc' : 'asc';
+                activeButton = button;
+
+                const rows = Array.from(tbody.rows);
+                rows.sort(function (a, b) {
+                    const va = a.cells[columnIndex].dataset.sort;
+                    const vb = b.cells[columnIndex].dataset.sort;
+                    const cmp = isNumeric ? (Number(va) - Number(vb)) : va.localeCompare(vb);
+                    return activeDir === 'asc' ? cmp : -cmp;
+                });
+                rows.forEach(function (row) { tbody.appendChild(row); });
+
+                table.querySelectorAll('th .storage-sort-btn').forEach(function (other) {
+                    other.classList.toggle('users-sort-active', other === button);
+                    const icon = other.querySelector('.users-sort-icon');
+                    icon.classList.toggle('lucide-chevron-up', other === button && activeDir === 'asc');
+                    icon.classList.toggle('lucide-chevron-down', other !== button || activeDir === 'desc');
+                });
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initStorageStatsFilter();
+        initStorageStatsSort();
+    });
     </script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -225,42 +289,44 @@ foreach ($stats as $r) {
             <table class="results-table">
                 <thead>
                     <tr>
-                        <th><?php echo t_h('admin_tools.storage_stats.table_account', [], 'Account'); ?></th>
-                        <th><?php echo t_h('admin_tools.storage_stats.table_notes', [], 'Notes'); ?></th>
-                        <th class="hide-mobile"><?php echo t_h('admin_tools.storage_stats.table_trash', [], 'Trash'); ?></th>
-                        <th class="hide-mobile"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')); ?></th>
-                        <th class="hide-mobile"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')); ?></th>
-                        <th class="hide-mobile"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')); ?></th>
-                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_id', [], 'ID'), 'num'); ?>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_account', [], 'Account'), 'text'); ?>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_notes', [], 'Notes'), 'num'); ?>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_trash', [], 'Trash'), 'num', 'hide-mobile'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'num'); ?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($stats as $row): ?>
                         <tr>
-                            <td style="white-space: nowrap;">
+                            <td data-sort="<?php echo $row['user_id']; ?>"><?php echo $row['user_id']; ?></td>
+                            <td style="white-space: nowrap;" data-sort="<?php echo htmlspecialchars(mb_strtolower($row['username'] ?? ''), ENT_QUOTES); ?>">
                                 <?php if ($row['username'] !== null): ?>
-                                    <strong><?php echo htmlspecialchars($row['username'], ENT_QUOTES); ?></strong> <span style="color: var(--text-muted, #999); font-size: 0.8em;">(id&nbsp;<?php echo $row['user_id']; ?>)</span>
+                                    <strong><?php echo htmlspecialchars($row['username'], ENT_QUOTES); ?></strong>
                                 <?php else: ?>
-                                    <strong style="font-size: 0.8em;">(id&nbsp;<?php echo $row['user_id']; ?>)</strong>
+                                    <span style="color: var(--text-muted, #999);">—</span>
                                 <?php endif; ?>
                             </td>
-                            <td>
+                            <td data-sort="<?php echo $row['error'] ? -1 : $row['notes_active']; ?>">
                                 <?php if ($row['error']): ?>
                                     <span style="color:red" title="<?php echo htmlspecialchars($row['error'], ENT_QUOTES); ?>">—</span>
                                 <?php else: ?>
                                     <span class="status-badge status-clean"><?php echo $row['notes_active']; ?></span>
                                 <?php endif; ?>
                             </td>
-                            <td class="hide-mobile"><?php echo $row['notes_trash']; ?></td>
-                            <td class="hide-mobile"><?php echo poznoteFormatMb($row['db_bytes']); ?></td>
-                            <td class="hide-mobile"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
-                            <td class="hide-mobile"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
-                            <td><strong><?php echo poznoteFormatMb($row['total_bytes']); ?></strong></td>
+                            <td class="hide-mobile" data-sort="<?php echo $row['notes_trash']; ?>"><?php echo $row['notes_trash']; ?></td>
+                            <td class="hide-mobile" data-sort="<?php echo $row['db_bytes']; ?>"><?php echo poznoteFormatMb($row['db_bytes']); ?></td>
+                            <td class="hide-mobile" data-sort="<?php echo $row['entries_bytes']; ?>"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
+                            <td class="hide-mobile" data-sort="<?php echo $row['attachments_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
+                            <td data-sort="<?php echo $row['total_bytes']; ?>"><strong><?php echo poznoteFormatMb($row['total_bytes']); ?></strong></td>
                         </tr>
                     <?php endforeach; ?>
                     <?php if (empty($stats)): ?>
                         <tr>
-                            <td colspan="7" style="text-align:center;color:var(--text-muted,#999);">
+                            <td colspan="8" style="text-align:center;color:var(--text-muted,#999);">
                                 <?php echo t_h('admin_tools.storage_stats.no_accounts', [], 'No accounts found.'); ?>
                             </td>
                         </tr>
@@ -269,7 +335,7 @@ foreach ($stats as $r) {
                 <?php if (!empty($stats)): ?>
                 <tfoot>
                     <tr>
-                        <td><strong><?php echo t_h('admin_tools.storage_stats.table_total_row', [], 'Total'); ?></strong></td>
+                        <td colspan="2"><strong><?php echo t_h('admin_tools.storage_stats.table_total_row', [], 'Total'); ?></strong></td>
                         <td><strong><?php echo $totNotesActive; ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo $totNotesTrash; ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totDbBytes); ?></strong></td>

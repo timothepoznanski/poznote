@@ -589,7 +589,8 @@
       "ui_customization": "元素可见性",
       "notes_dashboard": "笔记看板",
       "spellcheck_html_notes": "拼写检查",
-      "note_color_palette": "笔记颜色"
+      "note_color_palette": "笔记颜色",
+      "slash_menu_require_alt": "命令菜单快捷键"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -598,7 +599,9 @@
         "full": "仅工具栏",
         "slash": "仅斜杠命令",
         "both": "工具栏图标 + 斜杠命令菜单"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "保存偏好设置出错"
@@ -915,6 +918,10 @@
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
+      "dashboard_user": "用户",
+      "dashboard_filter_bar": "筛选栏",
+      "view_layout_toggle": "网格 / 列表切换",
+      "index_search_bar": "搜索栏",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "sections": {
@@ -924,8 +931,9 @@
         "toolbar": "工具栏",
         "slash_menu": "斜杠菜单",
         "panels": "其他",
-        "dashboard_toolbar": "仪表板工具栏",
-        "folder_actions": "文件夹操作"
+        "dashboard_toolbar": "仪表盘",
+        "folder_actions": "文件夹操作",
+        "workspace_menu": "工作区菜单"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1371,8 +1379,7 @@
     "audio_no_note": "未选择笔记",
     "audio_invalid_file": "请选择音频文件。",
     "audio_upload_failed": "上传失败：{{error}}",
-    "date": "日期",
-    "icon": "图标"
+    "date": "日期"
   },
   "api": {
     "settings": {
@@ -2825,6 +2832,7 @@
       "title": "存储统计",
       "description": "每个账户的笔记数量和已用磁盘空间。",
       "user_description": "您账户的笔记数量和已用磁盘空间。",
+      "table_id": "ID",
       "table_account": "账户",
       "table_notes": "笔记",
       "table_trash": "回收站",

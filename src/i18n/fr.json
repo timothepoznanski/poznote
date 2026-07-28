@@ -602,7 +602,8 @@
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
       "notes_dashboard": "Tableau de notes",
-      "spellcheck_html_notes": "Vérification orthographique"
+      "spellcheck_html_notes": "Vérification orthographique",
+      "slash_menu_require_alt": "Raccourci du menu de commandes"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -614,7 +615,9 @@
         "full": "Barre d’outils uniquement",
         "slash": "Commandes slash uniquement",
         "both": "Icônes de la barre d’outils + menu de commandes slash"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "Erreur lors de l’enregistrement de la préférence"
@@ -940,6 +943,10 @@
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
+      "dashboard_user": "Utilisateur",
+      "dashboard_filter_bar": "Barre de filtre",
+      "view_layout_toggle": "Bascule grille / liste",
+      "index_search_bar": "Barre de recherche",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "sections": {
@@ -949,8 +956,9 @@
         "toolbar": "Barre d'outils",
         "slash_menu": "Menu slash",
         "panels": "Autre",
-        "dashboard_toolbar": "Barre d'outils du tableau de bord",
-        "folder_actions": "Actions des dossiers"
+        "dashboard_toolbar": "Tableau de bord",
+        "folder_actions": "Actions des dossiers",
+        "workspace_menu": "Menu du workspace"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count": "{{count}} masqué(s)",
@@ -1429,8 +1437,7 @@
     "audio_no_note": "Aucune note sélectionnée",
     "audio_invalid_file": "Veuillez sélectionner un fichier audio.",
     "audio_upload_failed": "Échec de l'envoi : {{error}}",
-    "date": "Date",
-    "icon": "Icône"
+    "date": "Date"
   },
   "api": {
     "settings": {
@@ -2895,6 +2902,7 @@
       "title": "Statistiques de stockage",
       "description": "Nombre de notes et espace disque utilisé par chaque compte.",
       "user_description": "Nombre de notes et espace disque utilisé par votre compte.",
+      "table_id": "ID",
       "table_account": "Compte",
       "table_notes": "Notes",
       "table_trash": "Corbeille",

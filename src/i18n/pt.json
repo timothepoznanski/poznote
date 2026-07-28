@@ -586,7 +586,8 @@
       "ui_customization": "Visibilidade dos elementos",
       "notes_dashboard": "Quadro de notas",
       "spellcheck_html_notes": "Verificação ortográfica",
-      "note_color_palette": "Cores das notas"
+      "note_color_palette": "Cores das notas",
+      "slash_menu_require_alt": "Atalho do menu de comandos"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -595,7 +596,9 @@
         "full": "Apenas barra de ferramentas",
         "slash": "Apenas comando barra",
         "both": "Ícones da barra de ferramentas + menu de comando barra"
-      }
+      },
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     },
     "alerts": {
       "error_saving_preference": "Erro ao salvar preferência"
@@ -914,6 +917,10 @@
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
+      "dashboard_user": "Usuário",
+      "dashboard_filter_bar": "Barra de filtro",
+      "view_layout_toggle": "Alternar grade / lista",
+      "index_search_bar": "Barra de pesquisa",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",
       "sections": {
@@ -923,8 +930,9 @@
         "toolbar": "Barra de ferramentas",
         "slash_menu": "Menu slash",
         "panels": "Outros",
-        "dashboard_toolbar": "Barra de ferramentas do painel",
-        "folder_actions": "Ações de pasta"
+        "dashboard_toolbar": "Painel",
+        "folder_actions": "Ações de pasta",
+        "workspace_menu": "Menu do espaço de trabalho"
       },
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
@@ -1380,8 +1388,7 @@
     "audio_no_note": "Nenhuma nota selecionada",
     "audio_invalid_file": "Por favor, selecione um ficheiro de audio.",
     "audio_upload_failed": "Erro ao enviar: {{error}}",
-    "date": "Data",
-    "icon": "Ícone"
+    "date": "Data"
   },
   "api": {
     "settings": {
@@ -2685,6 +2692,7 @@
       "title": "Estatísticas de armazenamento",
       "description": "Número de notas e espaço em disco usado por cada conta.",
       "user_description": "Número de notas e espaço em disco usado pela sua conta.",
+      "table_id": "ID",
       "table_account": "Conta",
       "table_notes": "Notas",
       "table_trash": "Lixeira",

@@ -560,12 +560,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				</a>
 				<?php foreach ($dashboardContextItems as $item): ?>
 					<?php if ($item['icon'] === 'lucide-layers'): ?>
-					<button type="button" class="dashboard-top-info-item dashboard-workspace-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-workspace-switcher-modal">
+					<button type="button" id="dashboardWorkspaceBtn" class="dashboard-top-info-item dashboard-workspace-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-workspace-switcher-modal">
 						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
 						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
 					</button>
 					<?php elseif ($item['icon'] === 'lucide-user'): ?>
-					<button type="button" class="dashboard-top-info-item dashboard-user-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-user-info-modal">
+					<button type="button" id="dashboardUserBtn" class="dashboard-top-info-item dashboard-user-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-user-info-modal">
 						<i class="lucide <?php echo htmlspecialchars($item['icon'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" aria-hidden="true"></i>
 						<span><?php echo htmlspecialchars($item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
 					</button>

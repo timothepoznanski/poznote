@@ -234,14 +234,17 @@
       "ui_customization": "Видимость элементов",
       "notes_dashboard": "Доска заметок",
       "spellcheck_html_notes": "Проверка орфографии",
-      "note_color_palette": "Цвета заметок"
+      "note_color_palette": "Цвета заметок",
+      "slash_menu_require_alt": "Сочетание клавиш для меню команд"
     },
     "badges": {
       "font_size_default": "по умолчанию ({{size}}px)",
       "ui_customization_configure": "Настроить",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
-      "code_block_font_size": "{{size}}px"
+      "code_block_font_size": "{{size}}px",
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     }
   },
   "tasklist": {
@@ -417,6 +420,10 @@
       "description": "Показывать или скрывать элементы интерфейса. Неотмеченные элементы будут скрыты.",
       "toolbar_hint": "Кнопки форматирования (жирный, списки, код…) появляются только при выделении текста в заметке. Остальные действия собраны в меню ⋮.",
       "reminder_bell": "Значок колокольчика (напоминание)",
+      "dashboard_user": "Пользователь",
+      "dashboard_filter_bar": "Панель фильтра",
+      "view_layout_toggle": "Переключатель сетка / список",
+      "index_search_bar": "Панель поиска",
       "filter_placeholder": "Фильтровать элементы...",
       "no_results": "Подходящие элементы не найдены.",
       "sections": {
@@ -426,8 +433,9 @@
         "toolbar": "Панель инструментов",
         "slash_menu": "Slash-меню",
         "panels": "Другое",
-        "dashboard_toolbar": "Панель инструментов дашборда",
-        "folder_actions": "Действия с папками"
+        "dashboard_toolbar": "Панель",
+        "folder_actions": "Действия с папками",
+        "workspace_menu": "Меню рабочего пространства"
       },
       "check_all": "Выбрать все",
       "uncheck_all": "Снять все",
@@ -920,8 +928,7 @@
     "audio_no_note": "Заметка не выбрана",
     "audio_invalid_file": "Пожалуйста, выберите аудиофайл.",
     "audio_upload_failed": "Ошибка загрузки: {{error}}",
-    "date": "Дата",
-    "icon": "Значок"
+    "date": "Дата"
   },
   "api": {
     "settings": {
@@ -2275,6 +2282,7 @@
       "title": "Статистика хранилища",
       "description": "Количество заметок и объём дискового пространства для каждой учётной записи.",
       "user_description": "Количество заметок и объём дискового пространства вашей учётной записи.",
+      "table_id": "ID",
       "table_account": "Учётная запись",
       "table_notes": "Заметки",
       "table_trash": "Корзина",

@@ -235,14 +235,17 @@
       "default_image_border_no_padding": "Default image border",
       "ui_customization": "Element visibility",
       "notes_dashboard": "Notes board",
-      "spellcheck_html_notes": "Spell check"
+      "spellcheck_html_notes": "Spell check",
+      "slash_menu_require_alt": "Command menu shortcut"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
-      "ui_customization_configure": "Configure"
+      "ui_customization_configure": "Configure",
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/"
     }
   },
   "tasklist": {
@@ -424,6 +427,10 @@
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
+      "dashboard_user": "User",
+      "dashboard_filter_bar": "Filter bar",
+      "view_layout_toggle": "Grid / list toggle",
+      "index_search_bar": "Search bar",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
       "sections": {
@@ -433,8 +440,9 @@
         "toolbar": "Toolbar",
         "slash_menu": "Slash Menu",
         "panels": "Other",
-        "dashboard_toolbar": "Dashboard Toolbar",
-        "folder_actions": "Folder Actions"
+        "dashboard_toolbar": "Dashboard",
+        "folder_actions": "Folder Actions",
+        "workspace_menu": "Workspace Menu"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count": "{{count}} hidden",
@@ -935,8 +943,7 @@
     "audio_no_note": "No note selected",
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
-    "date": "Date",
-    "icon": "Icon"
+    "date": "Date"
   },
   "api": {
     "settings": {
@@ -2304,6 +2311,7 @@
       "title": "Storage statistics",
       "description": "Number of notes and disk space used by each account.",
       "user_description": "Number of notes and disk space used by your account.",
+      "table_id": "ID",
       "table_account": "Account",
       "table_notes": "Notes",
       "table_trash": "Trash",
