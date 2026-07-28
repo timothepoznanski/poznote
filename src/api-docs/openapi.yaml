@@ -42,16 +42,11 @@ tags:
     description: Export operations (legacy endpoints)
 
 security:
-  - BasicAuth: []
   - BearerAuth: []
   - SessionAuth: []
 
 components:
   securitySchemes:
-    BasicAuth:
-      type: http
-      scheme: basic
-      description: HTTP Basic Auth with global username/password. Include X-User-ID header for data endpoints.
     BearerAuth:
       type: http
       scheme: bearer
