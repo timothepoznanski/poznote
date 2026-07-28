@@ -1029,7 +1029,7 @@
     },
     "user_settings_info": {
       "title": "Kontoeinstellungen",
-      "message": "Sie koennen Ihren Benutzernamen, Ihren Namen, Ihre E-Mail und Ihr Passwort in den Einstellungen aendern.",
+      "message": "Sie koennen Ihren Benutzernamen, Ihren Namen und Ihr Passwort in den Einstellungen aendern.",
       "change_password_button": "Passwort aendern",
       "edit_profile_button": "Profil bearbeiten"
     },
@@ -2703,7 +2703,8 @@
       "description": "Aktualisieren Sie Ihre persoenlichen Daten.",
       "username": "Benutzername",
       "first_name": "Vorname",
-      "last_name": "Nachname"
+      "last_name": "Nachname",
+      "email_admin_only": "Nur ein Administrator kann Ihre E-Mail-Adresse aendern."
     },
     "errors": {
       "username_required": "Benutzername ist erforderlich",

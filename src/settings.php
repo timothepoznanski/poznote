@@ -98,6 +98,7 @@ $settingsPageConfig = [
         'first_name' => (string)($currentUser['first_name'] ?? ''),
         'last_name' => (string)($currentUser['last_name'] ?? ''),
         'email' => (string)($currentUser['email'] ?? ''),
+        'is_admin' => (bool)($currentUser['is_admin'] ?? false),
     ],
     'isOidcSession' => (($_SESSION['auth_method'] ?? '') === 'oidc'),
 ];

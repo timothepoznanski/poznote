@@ -119,16 +119,25 @@ class UsersController {
             }
         }
 
+        // Email is admin-managed (or OIDC-provider-synced): a self-set email
+        // would be unusable for OIDC account matching anyway, and for SSO
+        // accounts it would be silently overwritten at the next login.
+        // Admins keep editing their own email here, as they can for anyone
+        // in the admin panel.
         if (array_key_exists('email', $data)) {
+            $currentProfile = getUserProfileById((int)$userId);
+            if (!$currentProfile || !(bool)($currentProfile['is_admin'] ?? false)) {
+                http_response_code(403);
+                return ['error' => 'Email can only be changed by an administrator'];
+            }
             $email = trim((string)$data['email']);
             if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 http_response_code(400);
                 return ['error' => 'Invalid email address'];
             }
             $updates['email'] = $email;
-            // Self-set emails stay unverified: OIDC account matching only
-            // considers verified (admin-set or provider-synced) emails.
-            $updates['email_verified'] = 0;
+            // Admin-set emails are trusted for OIDC account matching.
+            $updates['email_verified'] = ($email !== '') ? 1 : 0;
         }
 
         if (empty($updates)) {

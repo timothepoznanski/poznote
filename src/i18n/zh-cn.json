@@ -1040,7 +1040,7 @@
     },
     "user_settings_info": {
       "title": "账户设置",
-      "message": "您可以在设置中更改用户名、姓名、电子邮件和密码。",
+      "message": "您可以在设置中更改用户名、姓名和密码。",
       "change_password_button": "更改密码",
       "edit_profile_button": "编辑资料"
     },
@@ -2843,7 +2843,8 @@
       "description": "更新您的个人信息。",
       "username": "用户名",
       "first_name": "名字",
-      "last_name": "姓氏"
+      "last_name": "姓氏",
+      "email_admin_only": "只有管理员才能修改您的电子邮件地址。"
     },
     "errors": {
       "username_required": "用户名为必填项",

@@ -587,7 +587,7 @@
     },
     "user_settings_info": {
       "title": "Account Settings",
-      "message": "You can change your username, name, email and password from Settings.",
+      "message": "You can change your username, name and password from Settings.",
       "change_password_button": "Change Password",
       "edit_profile_button": "Edit Profile"
     },
@@ -2402,7 +2402,8 @@
       "description": "Update your personal information.",
       "username": "Username",
       "first_name": "First name",
-      "last_name": "Last name"
+      "last_name": "Last name",
+      "email_admin_only": "Only an administrator can change your email address."
     },
     "errors": {
       "username_required": "Username is required",

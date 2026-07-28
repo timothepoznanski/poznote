@@ -53,7 +53,8 @@
                 '</div>' +
                 '<div class="form-group" id="epEmailGroup" style="margin-bottom: 8px;">' +
                     '<label for="epEmail" class="text-small-muted">' + tr('multiuser.admin.email', {}, 'Email') + '</label>' +
-                    '<input type="email" id="epEmail" autocomplete="email" maxlength="254" placeholder="' + tr('multiuser.admin.email', {}, 'Email') + '" style="width:100%;box-sizing:border-box;">' +
+                    '<input type="email" id="epEmail" disabled style="width:100%;box-sizing:border-box;margin-bottom:0;">' +
+                    '<div class="text-small-muted edit-profile-email-hint" style="margin-top:4px;margin-bottom:16px;">' + tr('profile.modal.email_admin_only', {}, 'Only an administrator can change your email address.') + '</div>' +
                 '</div>' +
                 '<div id="epError" class="error" style="color:#dc3545;margin-bottom:10px;display:none;"></div>' +
                 '<div class="modal-buttons">' +
@@ -91,6 +92,9 @@
             if (label) label.textContent = tr(entry.key, {}, entry.fallback);
         });
 
+        var emailHint = modal.querySelector('.edit-profile-email-hint');
+        if (emailHint) emailHint.textContent = tr('profile.modal.email_admin_only', {}, 'Only an administrator can change your email address.');
+
         var cancelBtn = document.getElementById('epCancelBtn');
         if (cancelBtn) cancelBtn.textContent = tr('common.cancel', {}, 'Cancel');
 
@@ -105,6 +109,13 @@
         document.getElementById('epFirstName').value = (profile && profile.first_name) || '';
         document.getElementById('epLastName').value = (profile && profile.last_name) || '';
         document.getElementById('epEmail').value = (profile && profile.email) || '';
+
+        // Email is admin-managed: the field stays locked for regular users
+        // (the API rejects self-service email changes too).
+        var isAdmin = !!(profile && profile.is_admin);
+        document.getElementById('epEmail').disabled = !isAdmin;
+        var hint = document.querySelector('#epEmailGroup .edit-profile-email-hint');
+        if (hint) hint.style.display = isAdmin ? 'none' : '';
     }
 
     function showProfileModal() {
@@ -145,7 +156,7 @@
         // Save
         document.getElementById('epSaveBtn').addEventListener('click', submitProfileChange);
 
-        // Enter key triggers save
+        // Enter key triggers save (disabled inputs never fire keydown)
         ['epUsername', 'epFirstName', 'epLastName', 'epEmail'].forEach(function (id) {
             document.getElementById(id).addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') submitProfileChange();
@@ -176,7 +187,6 @@
         var username = document.getElementById('epUsername').value.trim();
         var firstName = document.getElementById('epFirstName').value.trim();
         var lastName = document.getElementById('epLastName').value.trim();
-        var email = document.getElementById('epEmail').value.trim();
         var errorEl = document.getElementById('epError');
 
         errorEl.style.display = 'none';
@@ -193,18 +203,24 @@
             return;
         }
 
-        if (email !== '' && !/^\S+@\S+\.\S+$/.test(email)) {
-            errorEl.textContent = tr('profile.errors.email_invalid', {}, 'Invalid email address');
-            errorEl.style.display = 'block';
-            return;
-        }
-
         var payload = {
             username: username,
             first_name: firstName,
-            last_name: lastName,
-            email: email
+            last_name: lastName
         };
+
+        // Only admins have an editable email field; the API rejects the
+        // field from anyone else.
+        var emailInput = document.getElementById('epEmail');
+        if (!emailInput.disabled) {
+            var email = emailInput.value.trim();
+            if (email !== '' && !/^\S+@\S+\.\S+$/.test(email)) {
+                errorEl.textContent = tr('profile.errors.email_invalid', {}, 'Invalid email address');
+                errorEl.style.display = 'block';
+                return;
+            }
+            payload.email = email;
+        }
 
         var saveBtn = document.getElementById('epSaveBtn');
         saveBtn.disabled = true;

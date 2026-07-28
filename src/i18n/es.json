@@ -1030,7 +1030,7 @@
     },
     "user_settings_info": {
       "title": "Configuración de cuenta",
-      "message": "Puedes cambiar tu nombre de usuario, tu nombre, tu email y tu contraseña desde Configuración.",
+      "message": "Puedes cambiar tu nombre de usuario, tu nombre y tu contraseña desde Configuración.",
       "change_password_button": "Cambiar contraseña",
       "edit_profile_button": "Editar perfil"
     },
@@ -2703,7 +2703,8 @@
       "description": "Actualiza tu información personal.",
       "username": "Nombre de usuario",
       "first_name": "Nombre",
-      "last_name": "Apellidos"
+      "last_name": "Apellidos",
+      "email_admin_only": "Solo un administrador puede cambiar tu dirección de email."
     },
     "errors": {
       "username_required": "El nombre de usuario es obligatorio",

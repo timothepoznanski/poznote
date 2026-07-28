@@ -1060,7 +1060,7 @@
     },
     "user_settings_info": {
       "title": "Paramètres du compte",
-      "message": "Vous pouvez changer votre nom d’utilisateur, votre prénom, votre nom, votre email et votre mot de passe depuis les paramètres.",
+      "message": "Vous pouvez changer votre nom d’utilisateur, votre prénom, votre nom et votre mot de passe depuis les paramètres.",
       "change_password_button": "Changer le mot de passe",
       "edit_profile_button": "Modifier le profil"
     },
@@ -2916,7 +2916,8 @@
       "description": "Modifiez vos informations personnelles.",
       "username": "Nom d’utilisateur",
       "first_name": "Prénom",
-      "last_name": "Nom"
+      "last_name": "Nom",
+      "email_admin_only": "Seul un administrateur peut modifier votre adresse email."
     },
     "errors": {
       "username_required": "Le nom d’utilisateur est requis",
