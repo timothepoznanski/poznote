@@ -187,6 +187,11 @@ foreach ($stats as $r) {
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
     <style>
+    /* The 8-column table needs more room than the default 700px admin column,
+       otherwise it overflows to the right and no longer looks centered. */
+    .dr-page {
+        max-width: 960px;
+    }
     .results-table th .storage-sort-btn {
         background: none;
         border: none;
@@ -274,7 +279,6 @@ foreach ($stats as $r) {
 
     <div class="dr-page">
         <div class="dr-hero">
-            <h1><?php echo t_h('admin_tools.storage_stats.title', [], 'Storage statistics'); ?></h1>
             <p><?php echo t_h('admin_tools.storage_stats.description', [], 'Number of notes and disk space used by each account.'); ?></p>
         </div>
 
