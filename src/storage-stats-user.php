@@ -88,7 +88,6 @@ try {
 
     <div class="dr-page">
         <div class="dr-hero">
-            <h1><?php echo t_h('admin_tools.storage_stats.title', [], 'Storage statistics'); ?></h1>
             <p><?php
                 $userDesc = t_h('admin_tools.storage_stats.user_description', [], 'Number of notes and disk space used by your account.');
                 if ($activeUsername !== '') {

@@ -417,6 +417,7 @@
       "website": "Poznote 网站",
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
+      "ui_customization_global": "元素可见性（所有用户）",
       "custom_css": "自定义 CSS 文件",
       "support": "支持 Poznote",
       "buy_me_a_coffee": "请我喝杯咖啡",
@@ -916,6 +917,9 @@
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
+      "title_global": "界面自定义（所有用户）",
+      "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对所有人隐藏。",
+      "locked_by_admin": "已由管理员对所有用户隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
       "dashboard_user": "用户",

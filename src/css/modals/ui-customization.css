@@ -245,3 +245,17 @@
 .dark-mode .ui-custom-item:hover {
     background: rgba(255, 255, 255, 0.08);
 }
+
+/* Items hidden for everyone by the administrator (locked in user mode) */
+.ui-custom-item-locked,
+.ui-custom-item-locked input[type="checkbox"] {
+    cursor: not-allowed;
+}
+
+.ui-custom-item-locked {
+    opacity: 0.5;
+}
+
+.ui-custom-item-locked:hover {
+    background: transparent;
+}

@@ -158,6 +158,7 @@ if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
         $settingsPageGlobalKeys = [
+            'hidden_ui_elements_global',
             'login_display_name',
             'custom_css_path',
             'import_max_individual_files',
@@ -292,6 +293,9 @@ if ($isAdmin) {
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter...'); ?>" autocomplete="off">
+                <button type="button" id="home-search-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                    <i class="lucide lucide-x"></i>
+                </button>
             </div>
         </div>
 
@@ -819,6 +823,17 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
                     <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Element visibility for all users -->
+            <div class="home-card" id="ui-customization-admin-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-eye-off"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.ui_customization_global', [], 'Element visibility (all users)'); ?></span>
+                    <span id="ui-customization-admin-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
                 </div>
             </div>
 
