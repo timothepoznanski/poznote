@@ -1243,6 +1243,390 @@ function buildMarkdownEmptyTableRow(cellCount, indent) {
     return (indent || '') + '|' + new Array(safeCount + 1).join('   |');
 }
 
+function splitMarkdownTableLineCells(line) {
+    var text = String(line || '');
+    var indentMatch = text.match(/^[ \t]*/);
+    var trimmed = text.trim();
+    if (!trimmed || trimmed.indexOf('|') === -1) {
+        return null;
+    }
+
+    var inner = trimmed;
+    if (inner.charAt(0) === '|') {
+        inner = inner.slice(1);
+    }
+    if (inner.length && inner.charAt(inner.length - 1) === '|') {
+        var backslashes = 0;
+        for (var b = inner.length - 2; b >= 0 && inner.charAt(b) === '\\'; b--) {
+            backslashes++;
+        }
+        if (backslashes % 2 === 0) {
+            inner = inner.slice(0, -1);
+        }
+    }
+
+    var cells = [];
+    var current = '';
+    for (var i = 0; i < inner.length; i++) {
+        var ch = inner.charAt(i);
+        if (ch === '\\' && i + 1 < inner.length) {
+            current += ch + inner.charAt(i + 1);
+            i++;
+            continue;
+        }
+        if (ch === '|') {
+            cells.push(current.trim());
+            current = '';
+            continue;
+        }
+        current += ch;
+    }
+    cells.push(current.trim());
+
+    return { indent: indentMatch ? indentMatch[0] : '', cells: cells };
+}
+
+function padMarkdownTableCell(content, width, alignment) {
+    var missing = Math.max(0, width - content.length);
+    if (alignment === 'right') {
+        return ' '.repeat(missing) + content;
+    }
+    if (alignment === 'center') {
+        var before = Math.floor(missing / 2);
+        return ' '.repeat(before) + content + ' '.repeat(missing - before);
+    }
+    return content + ' '.repeat(missing);
+}
+
+function buildMarkdownTableSeparatorCell(width, alignment) {
+    if (alignment === 'center') {
+        return ':' + '-'.repeat(Math.max(1, width - 2)) + ':';
+    }
+    if (alignment === 'right') {
+        return '-'.repeat(Math.max(1, width - 1)) + ':';
+    }
+    if (alignment === 'left') {
+        return ':' + '-'.repeat(Math.max(1, width - 1));
+    }
+    return '-'.repeat(Math.max(3, width));
+}
+
+// Like splitMarkdownTableLineCells, but keeps the raw (untrimmed) cell text and
+// its character offsets within the line, so a caret position can be mapped from
+// the unformatted line to the formatted one.
+function splitMarkdownTableLineCellsWithPositions(line) {
+    var text = String(line || '');
+    var indentMatch = text.match(/^[ \t]*/);
+    var indent = indentMatch ? indentMatch[0] : '';
+    if (text.indexOf('|', indent.length) === -1) {
+        return null;
+    }
+
+    var pos = indent.length;
+    if (text.charAt(pos) === '|') {
+        pos++;
+    }
+
+    var trimmedEnd = text.length;
+    while (trimmedEnd > pos && /\s/.test(text.charAt(trimmedEnd - 1))) {
+        trimmedEnd--;
+    }
+    var endLimit = text.length;
+    if (trimmedEnd > pos && text.charAt(trimmedEnd - 1) === '|') {
+        var backslashes = 0;
+        for (var q = trimmedEnd - 2; q >= 0 && text.charAt(q) === '\\'; q--) {
+            backslashes++;
+        }
+        if (backslashes % 2 === 0) {
+            endLimit = trimmedEnd - 1;
+        }
+    }
+
+    var cells = [];
+    var cellStart = pos;
+    var i = pos;
+    while (i < endLimit) {
+        var ch = text.charAt(i);
+        if (ch === '\\' && i + 1 < endLimit) {
+            i += 2;
+            continue;
+        }
+        if (ch === '|') {
+            cells.push({ raw: text.slice(cellStart, i), start: cellStart, end: i });
+            cellStart = i + 1;
+        }
+        i++;
+    }
+    cells.push({ raw: text.slice(cellStart, endLimit), start: cellStart, end: endLimit });
+
+    return { indent: indent, cells: cells };
+}
+
+// Aligns every column of a markdown table block (header + separator + rows) to the
+// width of its widest cell, so pipes line up in the raw source.
+//
+// caret (optional): { line, ch } within the block. The caret cell's whitespace is
+// preserved up to the caret (a save firing mid-typing must not eat a space the
+// user just typed), the caret row keeps its own cell count, and the returned
+// caret gives the equivalent position in the formatted block.
+//
+// Returns { lines, caret } or null when the input is not a well-formed table block.
+function formatMarkdownTableBlock(tableLines, caret) {
+    if (!tableLines || tableLines.length < 2) {
+        return null;
+    }
+
+    var parsed = [];
+    var separatorFlags = [];
+    for (var i = 0; i < tableLines.length; i++) {
+        var cellsInfo = splitMarkdownTableLineCells(tableLines[i]);
+        if (!cellsInfo || cellsInfo.cells.length === 0) {
+            return null;
+        }
+        parsed.push(cellsInfo);
+        separatorFlags.push(isMarkdownTableSeparatorLine(tableLines[i]));
+    }
+
+    var separatorIndex = separatorFlags.indexOf(true);
+    if (separatorIndex === -1) {
+        return null;
+    }
+
+    var caretInfo = null;
+    if (caret && caret.line >= 0 && caret.line < tableLines.length && !separatorFlags[caret.line]) {
+        var positioned = splitMarkdownTableLineCellsWithPositions(tableLines[caret.line]);
+        if (positioned && positioned.cells.length > 0) {
+            var lineText = String(tableLines[caret.line]);
+            var chOffset = Math.max(0, Math.min(caret.ch, lineText.length));
+            var cellIndex = positioned.cells.length;
+            var rawOffset = 0;
+            for (var k = 0; k < positioned.cells.length; k++) {
+                if (chOffset <= positioned.cells[k].end) {
+                    cellIndex = k;
+                    rawOffset = Math.max(0, chOffset - positioned.cells[k].start);
+                    break;
+                }
+            }
+            caretInfo = { cellIndex: cellIndex, inCell: 0 };
+            if (cellIndex < positioned.cells.length) {
+                var raw = positioned.cells[cellIndex].raw;
+                var leadingLength = (raw.match(/^\s*/) || [''])[0].length;
+                var keepEnd = Math.max(leadingLength + raw.trim().length, Math.min(rawOffset, raw.length));
+                var preserved = raw.slice(leadingLength, keepEnd);
+                parsed[caret.line].cells[cellIndex] = preserved;
+                caretInfo.inCell = Math.max(0, Math.min(rawOffset - leadingLength, preserved.length));
+            }
+        }
+    }
+
+    var columnCount = 0;
+    parsed.forEach(function (info) {
+        columnCount = Math.max(columnCount, info.cells.length);
+    });
+
+    var alignments = [];
+    var widths = [];
+    for (var col = 0; col < columnCount; col++) {
+        var separatorCell = (parsed[separatorIndex].cells[col] || '').trim();
+        var alignLeft = separatorCell.charAt(0) === ':';
+        var alignRight = separatorCell.charAt(separatorCell.length - 1) === ':';
+        alignments.push(alignLeft && alignRight ? 'center' : (alignRight ? 'right' : (alignLeft ? 'left' : '')));
+
+        var width = 3;
+        parsed.forEach(function (info, rowIndex) {
+            if (separatorFlags[rowIndex]) {
+                return;
+            }
+            var cell = info.cells[col] || '';
+            if (cell.length > width) {
+                width = cell.length;
+            }
+        });
+        widths.push(width);
+    }
+
+    var indent = parsed[0].indent;
+    var caretResult = null;
+    var formattedLines = tableLines.map(function (line, rowIndex) {
+        var isCaretRow = !!(caretInfo && caret.line === rowIndex);
+        var rowColumnCount = isCaretRow ? parsed[rowIndex].cells.length : columnCount;
+        var cells = [];
+        var caretCh = -1;
+        for (var col = 0; col < rowColumnCount; col++) {
+            if (separatorFlags[rowIndex]) {
+                cells.push(buildMarkdownTableSeparatorCell(widths[col], alignments[col]));
+                continue;
+            }
+
+            var content = parsed[rowIndex].cells[col] || '';
+            if (isCaretRow && col === caretInfo.cellIndex) {
+                var missing = Math.max(0, widths[col] - content.length);
+                var padBefore = alignments[col] === 'right'
+                    ? missing
+                    : (alignments[col] === 'center' ? Math.floor(missing / 2) : 0);
+                var prefixLength = indent.length + 2;
+                for (var j = 0; j < col; j++) {
+                    prefixLength += widths[j] + 3;
+                }
+                caretCh = prefixLength + padBefore + caretInfo.inCell;
+            }
+            cells.push(padMarkdownTableCell(content, widths[col], alignments[col]));
+        }
+
+        var formattedLine = indent + '| ' + cells.join(' | ') + ' |';
+        if (isCaretRow) {
+            caretResult = {
+                line: rowIndex,
+                ch: caretCh === -1 ? formattedLine.length : Math.min(caretCh, formattedLine.length)
+            };
+        }
+        return formattedLine;
+    });
+
+    return { lines: formattedLines, caret: caretResult };
+}
+
+function formatMarkdownTableBlockLines(tableLines) {
+    var result = formatMarkdownTableBlock(tableLines, null);
+    return result ? result.lines : null;
+}
+
+// Formats the table block containing lines[lineIndex] in place.
+// Returns { start, end } (inclusive line indexes) when a table was formatted, else null.
+function formatMarkdownTableAtLine(lines, lineIndex) {
+    if (!lines || lineIndex < 0 || lineIndex >= lines.length || !isMarkdownTableRowLine(lines[lineIndex] || '')) {
+        return null;
+    }
+
+    var start = lineIndex;
+    while (start > 0 && isMarkdownTableRowLine(lines[start - 1] || '')) {
+        start--;
+    }
+    var end = lineIndex;
+    while (end + 1 < lines.length && isMarkdownTableRowLine(lines[end + 1] || '')) {
+        end++;
+    }
+
+    var formatted = formatMarkdownTableBlockLines(lines.slice(start, end + 1));
+    if (!formatted) {
+        return null;
+    }
+
+    for (var i = 0; i < formatted.length; i++) {
+        lines[start + i] = formatted[i];
+    }
+
+    return { start: start, end: end };
+}
+
+// Called from the auto-save path: re-aligns every table in the note's CodeMirror
+// editor. The caret's own table is formatted with caret tracking (its cell keeps
+// the whitespace typed so far and the caret is remapped to the aligned position);
+// tables overlapping a non-empty selection are left untouched so the selection
+// isn't invalidated, and a separator line being hand-edited is left alone too.
+function formatMarkdownTablesBeforeSave(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) {
+        return;
+    }
+
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    var api = window.PoznoteMarkdownCodeMirror;
+    if (!editorDiv || !api ||
+        typeof api.isCodeMirrorEditor !== 'function' || !api.isCodeMirrorEditor(editorDiv) ||
+        typeof api.replaceRangeKeepSelection !== 'function' || typeof api.getValue !== 'function') {
+        return;
+    }
+
+    var content = api.getValue(editorDiv);
+    if (!content || content.indexOf('|') === -1) {
+        return;
+    }
+
+    var lines = content.split('\n');
+    var lineStarts = getMarkdownLineStartOffsets(content);
+
+    var selectionStartLine = -1;
+    var selectionEndLine = -1;
+    var selectionOffsets = null;
+    if (typeof api.hasFocus === 'function' && api.hasFocus(editorDiv) &&
+        typeof api.getSelectionOffsets === 'function') {
+        selectionOffsets = api.getSelectionOffsets(editorDiv);
+        if (selectionOffsets) {
+            selectionStartLine = getMarkdownLineIndexForOffset(lineStarts, selectionOffsets.start);
+            selectionEndLine = getMarkdownLineIndexForOffset(lineStarts, selectionOffsets.end);
+        }
+    }
+
+    var blocks = [];
+    for (var i = 0; i < lines.length; i++) {
+        if (isMarkdownTableRowLine(lines[i] || '')) {
+            var start = i;
+            while (i + 1 < lines.length && isMarkdownTableRowLine(lines[i + 1] || '')) {
+                i++;
+            }
+            blocks.push({ start: start, end: i });
+        }
+    }
+
+    // Bottom-up so the offsets of the blocks still to process stay valid
+    var changed = false;
+    for (var b = blocks.length - 1; b >= 0; b--) {
+        var block = blocks[b];
+        var caret = null;
+        if (selectionStartLine <= block.end && selectionEndLine >= block.start) {
+            // A non-empty selection must not be rewritten under the user
+            if (!selectionOffsets || selectionOffsets.start !== selectionOffsets.end) {
+                continue;
+            }
+            // Rebuilding the separator while it is being hand-edited would
+            // rewrite the colons/dashes mid-keystroke
+            if (isMarkdownTableSeparatorLine(lines[selectionStartLine] || '')) {
+                continue;
+            }
+            caret = {
+                line: selectionStartLine - block.start,
+                ch: selectionOffsets.start - lineStarts[selectionStartLine]
+            };
+        }
+
+        var original = lines.slice(block.start, block.end + 1).join('\n');
+        var result = formatMarkdownTableBlock(lines.slice(block.start, block.end + 1), caret);
+        if (!result) {
+            continue;
+        }
+
+        var replacement = result.lines.join('\n');
+        if (replacement === original) {
+            continue;
+        }
+
+        var from = lineStarts[block.start];
+        var anchor;
+        if (caret && result.caret) {
+            anchor = from + result.caret.ch;
+            for (var li = 0; li < result.caret.line; li++) {
+                anchor += result.lines[li].length + 1;
+            }
+        }
+
+        // The dispatch fires a synthetic input event; the suppress flag keeps it
+        // from re-marking the note as modified (this content is being saved now)
+        var previousSuppress = editorDiv._suppressMarkdownTableContextInput;
+        editorDiv._suppressMarkdownTableContextInput = true;
+        try {
+            api.replaceRangeKeepSelection(editorDiv, from, from + original.length, replacement, anchor);
+        } finally {
+            editorDiv._suppressMarkdownTableContextInput = previousSuppress;
+        }
+        changed = true;
+    }
+
+    if (changed) {
+        noteEntry.setAttribute('data-markdown-content', api.getValue(editorDiv));
+    }
+}
+
 function handleMarkdownTableEnter(event, editorDiv, noteEntry, noteId) {
     if (!event || event.key !== 'Enter' || event.shiftKey || event.ctrlKey || event.metaKey || event.altKey || !editorDiv || !noteEntry) {
         return false;
@@ -1318,6 +1702,9 @@ function handleMarkdownTableEnter(event, editorDiv, noteEntry, noteId) {
             event.preventDefault();
             event.stopPropagation();
             lines[lineIndex] = '';
+            if (lineIndex > 0) {
+                formatMarkdownTableAtLine(lines, lineIndex - 1);
+            }
             var exitedTableContent = lines.join('\n');
             var exitCaret = getMarkdownLineStartOffsets(exitedTableContent)[lineIndex] || 0;
             updateMarkdownEditorContent(editorDiv, noteEntry, noteId, exitedTableContent, exitCaret, exitCaret);
@@ -1334,10 +1721,13 @@ function handleMarkdownTableEnter(event, editorDiv, noteEntry, noteId) {
 
     var insertedLine = buildMarkdownEmptyTableRow(columnCount, currentIndent);
     lines.splice(lineIndex + 1, 0, insertedLine);
+    formatMarkdownTableAtLine(lines, lineIndex + 1);
 
+    var newRowIndentMatch = (lines[lineIndex + 1] || '').match(/^[ \t]*/);
+    var newRowIndent = newRowIndentMatch ? newRowIndentMatch[0] : currentIndent;
     var newContent = lines.join('\n');
     var newLineStarts = getMarkdownLineStartOffsets(newContent);
-    var caretOffset = (newLineStarts[lineIndex + 1] || newContent.length) + currentIndent.length + 2;
+    var caretOffset = (newLineStarts[lineIndex + 1] || newContent.length) + newRowIndent.length + 2;
 
     updateMarkdownEditorContent(editorDiv, noteEntry, noteId, newContent, caretOffset, caretOffset);
     return true;
@@ -2113,6 +2503,16 @@ function parseMarkdown(text) {
         protectedIndex++;
         markdownExcalidrawIndex++;
         return '\n' + placeholder + '\n';
+    });
+
+    // Protect inline note icons inserted via the icon picker (strictly
+    // validated: a lucide class name plus an optional color style only)
+    text = text.replace(/<i class="lucide (lucide-[a-z0-9-]+) note-inline-icon"(?: style="color:\s*(#[0-9a-fA-F]{3,8}|rgba?\([0-9,.\s]+\))\s*;?\s*")?><\/i>/g, function (match, iconClass, color) {
+        let placeholder = '\x00PTAG' + protectedIndex + '\x00';
+        let styleAttr = color ? ' style="color: ' + color + ';"' : '';
+        protectedElements[protectedIndex] = '<i class="lucide ' + iconClass + ' note-inline-icon"' + styleAttr + '></i>';
+        protectedIndex++;
+        return placeholder;
     });
 
     // Protect inline span tags with style attributes (for colors, backgrounds, etc.)

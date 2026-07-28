@@ -605,6 +605,11 @@
             }
         }
 
+        // Re-align every column of the (possibly resized) table so pipes line up in the source
+        if (typeof window.formatMarkdownTableAtLine === 'function') {
+            window.formatMarkdownTableAtLine(lines, tableStart);
+        }
+
         const newContent = lines.join('\n');
         mdActiveNoteEntry.setAttribute('data-markdown-content', newContent);
 

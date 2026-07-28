@@ -171,8 +171,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// === Users Table Sort (persisted in the settings table) ===
+$allowedUsersSorts = ['id_asc', 'id_desc', 'username_asc', 'username_desc'];
+$requestedSort = $_GET['sort'] ?? '';
+if (in_array($requestedSort, $allowedUsersSorts, true)) {
+    $usersSort = $requestedSort;
+    try {
+        $sortStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $sortStmt->execute(['admin_users_sort', $usersSort]);
+    } catch (Exception $e) {
+        // Non-fatal: the requested sort still applies for this request.
+    }
+} else {
+    $storedSort = getSetting('admin_users_sort');
+    $usersSort = in_array($storedSort, $allowedUsersSorts, true) ? $storedSort : 'id_asc';
+}
+$usersSortColumn = strpos($usersSort, 'username_') === 0 ? 'username' : 'id';
+$usersSortDir = substr($usersSort, strrpos($usersSort, '_') + 1);
+
+/**
+ * Render a sortable column header as a link that toggles the sort direction,
+ * with a chevron showing the current direction on the active column.
+ */
+function renderUsersSortHeader(string $column, string $escapedLabel, string $currentColumn, string $currentDir): string {
+    $isActive = $column === $currentColumn;
+    $nextSort = $column . '_' . (($isActive && $currentDir === 'asc') ? 'desc' : 'asc');
+    $icon = ($isActive && $currentDir === 'asc') ? 'lucide-chevron-up' : 'lucide-chevron-down';
+    return '<a class="users-sort-link' . ($isActive ? ' users-sort-active' : '') . '" href="?sort=' . $nextSort . '">'
+        . $escapedLabel
+        . '<i class="lucide ' . $icon . ' users-sort-icon"></i></a>';
+}
+
 // === Get User List ===
-$users = listAllUserProfiles();
+$users = listAllUserProfiles($usersSort);
 $accountAccessMap = getUserAccountAccessMap();
 $userNamesById = [];
 foreach ($users as $listedUser) {
@@ -420,9 +451,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             <table class="users-table">
                 <thead>
                     <tr>
-                        <th class="text-center col-id"><?php echo t_h('multiuser.admin.id', [], 'ID'); ?></th>
+                        <th class="text-center col-id"><?php echo renderUsersSortHeader('id', t_h('multiuser.admin.id', [], 'ID'), $usersSortColumn, $usersSortDir); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
-                        <th><?php echo t_h('multiuser.admin.username', [], 'User'); ?></th>
+                        <th><?php echo renderUsersSortHeader('username', t_h('multiuser.admin.username', [], 'User'), $usersSortColumn, $usersSortDir); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?></th>
                         <th><?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?></th>
                         <th><?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?></th>

@@ -2149,6 +2149,30 @@ curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/users/me/password-status
 ```
 
+### Delete My Account
+
+```
+DELETE /users/me
+```
+
+Permanently delete the current user's own account and all of its data (notes, files, attachments). This cannot be undone.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `confirm_username` | string | Yes | Must exactly match the current username |
+| `password` | string | Yes* | Current password (*not required for OIDC sessions) |
+
+User ID 1 and the last active admin cannot be deleted. On success the session is destroyed and the response includes a `redirect` URL for the login page.
+
+```bash
+curl -X DELETE -u 'username:password' \
+  -H "Content-Type: application/json" \
+  -d '{"confirm_username": "username", "password": "password"}' \
+  http://YOUR_SERVER/api/v1/users/me
+```
+
 ---
 
 ## Admin (User Management)
@@ -2610,6 +2634,7 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/users/me` | Current user |
 | `POST` | `/users/me/password` | Change password |
 | `GET` | `/users/me/password-status` | Password status |
+| `DELETE` | `/users/me` | Delete own account |
 | `GET` | `/users/lookup/{username}` | Lookup by name |
 
 ### Admin

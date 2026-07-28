@@ -95,6 +95,25 @@
     background: var(--password-accent-hover);
 }
 
+.password-container .password-back-link {
+    display: block;
+    margin-top: 12px;
+    min-height: 40px;
+    line-height: 40px;
+    padding: 0 16px;
+    border: 1px solid var(--password-border);
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: var(--password-muted);
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.password-container .password-back-link:hover {
+    color: var(--password-text);
+    border-color: var(--password-muted);
+}
+
 .password-container .error {
     color: #b42318;
     background: #fef3f2;

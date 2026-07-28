@@ -821,7 +821,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<div id="dashboardUserInfoModal" class="modal">
 			<div class="modal-content">
 				<h3><?php echo t_h('modals.user_settings_info.title', [], 'Account Settings'); ?></h3>
-				<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo t_h('modals.user_settings_info.message', [], 'You can change your username, name, email and password from Settings.'); ?></p>
+				<p style="margin: 16px 0; color: #4b5563; font-size: 14px; line-height: 1.5;"><?php echo t_h('modals.user_settings_info.message', [], 'You can change your username, name and password from Settings.'); ?></p>
 				<div class="modal-buttons">
 					<button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=profile#my-profile-card'"><?php echo t_h('modals.user_settings_info.edit_profile_button', [], 'Edit Profile'); ?></button>
 					<button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=change-password#change-password-card'"><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>

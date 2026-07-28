@@ -44,6 +44,9 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
         $spCacheV = @file_get_contents('version.txt');
         if ($spCacheV === false) { $spCacheV = time(); }
         $spCacheV = urlencode(poznoteBuildAssetCacheVersion(trim($spCacheV)));
+        $spBackHref = $note_id
+            ? 'index.php?note=' . intval($note_id)
+            : 'dashboard.php?workspace=' . urlencode($pageWorkspace);
         ?>
         <!doctype html>
         <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -67,6 +70,7 @@ if (defined('SETTINGS_PASSWORD') && SETTINGS_PASSWORD !== '') {
                     <input type="password" name="settings_password" placeholder="<?php echo t_h('settings_password.placeholder', [], 'Enter settings password', $currentLang); ?>" required autofocus>
                     <button type="submit"><?php echo t_h('settings_password.unlock', [], 'Unlock', $currentLang); ?></button>
                 </form>
+                <a class="password-back-link" href="<?php echo htmlspecialchars($spBackHref, ENT_QUOTES, 'UTF-8'); ?>">&larr; <?php echo t_h('common.back', [], 'Back', $currentLang); ?></a>
             </div>
         </body>
         </html>
@@ -94,7 +98,9 @@ $settingsPageConfig = [
         'first_name' => (string)($currentUser['first_name'] ?? ''),
         'last_name' => (string)($currentUser['last_name'] ?? ''),
         'email' => (string)($currentUser['email'] ?? ''),
+        'is_admin' => (bool)($currentUser['is_admin'] ?? false),
     ],
+    'isOidcSession' => (($_SESSION['auth_method'] ?? '') === 'oidc'),
 ];
 
 $settingsPageUserKeys = [
@@ -275,10 +281,16 @@ if ($isAdmin) {
             </a>
         </div>
 
-        <div class="home-search-container">
+        <div class="home-search-container settings-filter-row">
+            <button type="button" id="settingsViewToggle" class="settings-view-toggle"
+                data-label-grid="<?php echo t_h('dashboard.view.layout_grid', [], 'Grid'); ?>"
+                data-label-list="<?php echo t_h('dashboard.view.layout_list', [], 'List'); ?>">
+                <i class="lucide lucide-layout-list"></i>
+                <i class="lucide lucide-grid"></i>
+            </button>
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
-                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('search.placeholder'); ?>" autocomplete="off">
+                <input type="text" id="home-search-input" class="home-search-input" placeholder="<?php echo t_h('home.filter_placeholder', [], 'Filter...'); ?>" autocomplete="off">
             </div>
         </div>
 
@@ -318,6 +330,18 @@ if ($isAdmin) {
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
+
+            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
+            <!-- Delete Account -->
+            <div class="home-card" id="delete-account-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-trash-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -918,5 +942,6 @@ if ($isAdmin) {
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
     <script src="js/profile.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/profile.js') ?: time(); ?>"></script>
+    <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>
 </body>
 </html>

@@ -1203,7 +1203,13 @@ function linkifyHtml(text) {
         return `<a href="${href}" target="_blank" rel="noopener noreferrer" data-task-url="true" title="${m}" onclick="return handleTaskLinkClick(event);">${displayText}</a>`;
     });
 
-    return replaced;
+    // Restore inline icons inserted via the icon picker (strictly validated:
+    // a lucide class name plus an optional color style only)
+    return replaced.replace(/&lt;i class="lucide (lucide-[a-z0-9-]+) note-inline-icon"(?: style="color:\s*(#[0-9a-fA-F]{3,8}|rgba?\([0-9,.\s]+\))\s*;?\s*")?&gt;&lt;\/i&gt;/g,
+        function (match, iconClass, color) {
+            const style = color ? ' style="color: ' + color + ';"' : '';
+            return '<i class="lucide ' + iconClass + ' note-inline-icon"' + style + '></i>';
+        });
 }
 
 // Export functions globally

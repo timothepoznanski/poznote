@@ -596,6 +596,12 @@ body.dark-mode .folder-icon-grid {
     border-color: var(--dm-border);
 }
 
+html[data-theme='dark'] .folder-icon-grid.folder-icon-recent-grid,
+body.dark-mode .folder-icon-grid.folder-icon-recent-grid {
+    background: none;
+    border: none;
+}
+
 html[data-theme='dark'] .folder-icon-item,
 body.dark-mode .folder-icon-item {
     background: var(--dm-surface);

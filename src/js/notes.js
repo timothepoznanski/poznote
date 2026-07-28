@@ -269,6 +269,10 @@ function saveNoteToServer(options) {
         entcontent = getTaskListData(noteid) || '';
         ent = entcontent; // Also save JSON to HTML file for consistency
     } else if (noteType === 'markdown') {
+        // Align table columns at save time (the caret's own table is left as-is)
+        if (typeof window.formatMarkdownTablesBeforeSave === 'function') {
+            window.formatMarkdownTablesBeforeSave(noteid);
+        }
         // For markdown notes, save the raw markdown content
         if (typeof getMarkdownContentForNote === 'function') {
             var markdownContent = getMarkdownContentForNote(noteid);

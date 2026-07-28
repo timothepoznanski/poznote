@@ -198,6 +198,25 @@ body.dark-mode {
     width: 60px;
 }
 
+.users-sort-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.users-sort-link .users-sort-icon {
+    width: 12px;
+    height: 12px;
+    opacity: 0.35;
+}
+
+.users-sort-link.users-sort-active .users-sort-icon,
+.users-sort-link:hover .users-sort-icon {
+    opacity: 1;
+}
+
 .users-table-header-with-help {
     display: inline-flex;
     align-items: center;
