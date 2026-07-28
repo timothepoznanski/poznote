@@ -49,6 +49,9 @@ security:
 components:
   securitySchemes:
     BasicAuth:
+      # Deliberate: Basic Auth is protected by brute-force throttling, HTTPS is required,
+      # and deployments can disable it entirely via OIDC_DISABLE_BASIC_AUTH.
+      # nosemgrep: yaml.openapi.security.use-of-basic-authentication.use-of-basic-authentication
       type: http
       scheme: basic
       description: HTTP Basic Auth with global username/password. Include X-User-ID header for data endpoints.
