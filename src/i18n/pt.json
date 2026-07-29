@@ -931,6 +931,8 @@
       "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
+      "login_password_form": "Login com e-mail e senha",
+      "login_password_form_hint": "O formulário de e-mail e senha (e o separador “ou”) só é ocultado enquanto o login SSO/OIDC está ativado, para que ninguém perca o acesso. Se necessário, um botão invisível no canto inferior direito da página de login permite exibi-lo novamente.",
       "reminder_bell": "Ícone de sino (lembrete)",
       "dashboard_user": "Usuário",
       "dashboard_filter_bar": "Barra de filtro",
@@ -947,7 +949,8 @@
         "panels": "Outros",
         "dashboard_toolbar": "Painel",
         "folder_actions": "Ações de pasta",
-        "workspace_menu": "Menu do espaço de trabalho"
+        "workspace_menu": "Menu do espaço de trabalho",
+        "login_page": "Página de login"
       },
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
@@ -1632,6 +1635,7 @@
     },
     "redirecting": "Redirecionando...",
     "show_password": "Mostrar senha",
+    "reveal_password_login": "Mostrar o login com e-mail e senha",
     "hide_password": "Ocultar senha",
     "admin_warning": "Inicie sessão com o nome de usuário <code>{{username}}</code> e a senha atual desta conta. Você poderá renomear esta conta nas configurações para maior segurança.",
     "fields": {
@@ -1645,7 +1649,6 @@
     "oidc_button": "Continuar com {{provider}}",
     "oidc_button_account": "Continuar com {{account}}",
     "oidc_other_account": "Entrar com outra conta",
-    "documentation": "Documentação do Poznote",
     "no_profiles": "Nenhum perfil de usuário disponível. Por favor, entre em contato com o administrador.",
     "errors": {
       "invalid_credentials": "Nome de usuário ou senha incorretos.",

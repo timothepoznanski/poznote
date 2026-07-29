@@ -1036,6 +1036,17 @@ function poznoteGetGlobalHiddenUiElements() {
     return $globalHiddenKeys;
 }
 
+function poznoteIsPasswordLoginHiddenByAdmin() {
+    // The login page is pre-auth, so the admin exemption cannot apply there.
+    // Only enforced while OIDC is enabled: hiding the only login method would
+    // lock everyone out of the instance.
+    if (!function_exists('oidc_is_enabled') || !oidc_is_enabled()) {
+        return false;
+    }
+
+    return in_array('login:password-form', poznoteGetGlobalHiddenUiElements(), true);
+}
+
 function poznoteGetEnforcedGlobalHiddenUiElements() {
     // Administrators are exempt from the instance-wide hidden set.
     if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {

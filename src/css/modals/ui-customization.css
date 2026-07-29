@@ -259,3 +259,9 @@
 .ui-custom-item-locked:hover {
     background: transparent;
 }
+
+/* Sections only configurable instance-wide (e.g. the login page): hidden in
+   the per-user modal, shown in the admin "all users" modal */
+#uiCustomizationModal.ui-custom-mode-user .ui-custom-section[data-ui-global-only] {
+    display: none !important;
+}

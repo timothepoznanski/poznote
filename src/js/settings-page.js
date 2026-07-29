@@ -2371,6 +2371,10 @@
 
         uiCustomizationModalMode = mode === 'global' ? 'global' : 'user';
 
+        // Sections marked data-ui-global-only (e.g. the login page) can only be
+        // configured instance-wide; hide them from the per-user modal.
+        modal.classList.toggle('ui-custom-mode-user', uiCustomizationModalMode === 'user');
+
         var title = document.getElementById('uiCustomizationModalTitle');
         if (title) {
             title.textContent = title.getAttribute(uiCustomizationModalMode === 'global' ? 'data-title-global' : 'data-title-user') || title.textContent;
@@ -2393,9 +2397,10 @@
             checkboxes.forEach(function (cb) {
                 var key = cb.getAttribute('data-ui-key');
                 var locked = globallyHidden.indexOf(key) !== -1;
+                var globalOnly = uiCustomizationModalMode === 'user' && !!cb.closest('[data-ui-global-only]');
                 var item = cb.closest('.ui-custom-item');
 
-                cb.disabled = locked;
+                cb.disabled = locked || globalOnly;
                 cb.checked = locked ? false : hidden.indexOf(key) === -1;
                 if (item) {
                     item.classList.toggle('ui-custom-item-locked', locked);

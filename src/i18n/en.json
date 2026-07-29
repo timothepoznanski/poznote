@@ -441,6 +441,8 @@
       "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
       "locked_by_admin": "Hidden for all users by the administrator",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
+      "login_password_form": "Email & password login",
+      "login_password_form_hint": "The email & password form (and the “or” separator) is only hidden while SSO/OIDC login is enabled, so users are never locked out. If needed, an invisible button in the bottom-right corner of the login page reveals the form again.",
       "reminder_bell": "Bell icon (reminder)",
       "dashboard_user": "User",
       "dashboard_filter_bar": "Filter bar",
@@ -457,7 +459,8 @@
         "panels": "Other",
         "dashboard_toolbar": "Dashboard",
         "folder_actions": "Folder Actions",
-        "workspace_menu": "Workspace Menu"
+        "workspace_menu": "Workspace Menu",
+        "login_page": "Login page"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count": "{{count}} hidden",
@@ -1297,6 +1300,7 @@
     },
     "redirecting": "Redirecting...",
     "show_password": "Show password",
+    "reveal_password_login": "Show email & password login",
     "hide_password": "Hide password",
     "admin_warning": "Please log in with the username <code>{{username}}</code> and the current password for this account. You can then rename this account in settings for better security.",
     "fields": {
@@ -1310,7 +1314,6 @@
     "oidc_button": "Continue with {{provider}}",
     "oidc_button_account": "Continue with {{account}}",
     "oidc_other_account": "Sign in with another account",
-    "documentation": "Poznote documentation",
     "no_profiles": "No user profiles available. Please contact the administrator.",
     "errors": {
       "invalid_credentials": "Incorrect username or password.",

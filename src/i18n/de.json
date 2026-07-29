@@ -932,6 +932,8 @@
       "description_global": "Oberflächenelemente für alle Benutzer dieser Instanz ein- oder ausblenden. Nicht angehakte Elemente werden für alle außer Administratoren ausgeblendet.",
       "locked_by_admin": "Vom Administrator für alle Benutzer ausgeblendet",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
+      "login_password_form": "Anmeldung mit E-Mail und Passwort",
+      "login_password_form_hint": "Das E-Mail-/Passwort-Formular (und der „oder“-Trenner) wird nur ausgeblendet, solange die SSO/OIDC-Anmeldung aktiviert ist, damit niemand ausgesperrt wird. Bei Bedarf blendet eine unsichtbare Schaltfläche in der unteren rechten Ecke der Anmeldeseite das Formular wieder ein.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
       "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
@@ -948,7 +950,8 @@
         "panels": "Sonstiges",
         "dashboard_toolbar": "Dashboard",
         "folder_actions": "Ordneraktionen",
-        "workspace_menu": "Workspace-Menü"
+        "workspace_menu": "Workspace-Menü",
+        "login_page": "Anmeldeseite"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1628,6 +1631,7 @@
     },
     "redirecting": "Weiterleitung...",
     "show_password": "Passwort anzeigen",
+    "reveal_password_login": "E-Mail-/Passwort-Anmeldung anzeigen",
     "hide_password": "Passwort ausblenden",
     "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
     "fields": {
@@ -1641,7 +1645,6 @@
     "oidc_button": "Weiter mit {{provider}}",
     "oidc_button_account": "Weiter mit {{account}}",
     "oidc_other_account": "Mit einem anderen Konto anmelden",
-    "documentation": "Poznote-Dokumentation",
     "no_profiles": "Keine Benutzerprofile verfügbar. Bitte kontaktieren Sie den Administrator.",
     "errors": {
       "invalid_credentials": "Falscher Benutzername oder Passwort.",
