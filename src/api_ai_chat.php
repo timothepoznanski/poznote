@@ -375,6 +375,11 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
         if (strlen($content) > 200000) {
             return json_encode(['error' => 'Content too large (200 KB max)']);
         }
+        $quotaError = poznoteCheckNoteQuota($con)
+            ?? poznoteCheckStorageQuota(strlen($content));
+        if ($quotaError !== null) {
+            return json_encode(['error' => $quotaError]);
+        }
         $workspace = $chatWorkspace;
         if ($workspace !== '') {
             $ws = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');

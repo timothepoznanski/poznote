@@ -429,6 +429,7 @@
       "change_password": "修改密码",
       "delete_account": "删除账户",
       "import_limits": "导入限制",
+      "user_quotas": "用户配额",
       "git_sync_toggle": "Git 同步",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
@@ -914,11 +915,21 @@
       "individual_badge": "单个: {{count}}",
       "zip_badge": "ZIP: {{count}}"
     },
+    "user_quotas": {
+      "title": "用户配额",
+      "description": "限制每个用户的笔记数量和存储空间。0 表示不限制。管理员不受限制。您可以在存储统计页面中为每个用户单独设置这些限制。",
+      "max_notes": "每个用户的最大笔记数",
+      "max_storage": "每个用户的最大存储空间（MB）",
+      "notes_badge": "笔记：{{count}}",
+      "notes_badge_unlimited": "笔记：不限",
+      "storage_badge": "存储：{{count}} MB",
+      "storage_badge_unlimited": "存储：不限"
+    },
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
       "title_global": "界面自定义（所有用户）",
-      "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对所有人隐藏。",
+      "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对除管理员外的所有人隐藏。",
       "locked_by_admin": "已由管理员对所有用户隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
@@ -1393,6 +1404,8 @@
     },
     "errors": {
       "workspace_not_found": "未找到工作区",
+      "note_quota_reached": "已达到笔记数量上限：此实例允许该用户最多 {{max}} 条笔记（包含回收站）。",
+      "storage_quota_reached": "已达到存储上限：此实例允许该用户最多 {{max}} MB 存储空间。",
       "linked_note_already_exists": "此笔记已存在快捷方式",
       "method_not_allowed": "方法不允许",
       "invalid_action": "无效操作",
@@ -1626,6 +1639,8 @@
     "remember_me": "保持登录 30 天",
     "button": "登录",
     "oidc_button": "使用 {{provider}} 继续",
+    "oidc_button_account": "使用 {{account}} 继续",
+    "oidc_other_account": "使用其他账号登录",
     "documentation": "Poznote 文档",
     "no_profiles": "没有可用的用户个人资料。请联系管理员。",
     "errors": {
@@ -2845,6 +2860,16 @@
       "table_attachments": "附件 (MB)",
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
+      "table_quota": "配额（数量 / MB）",
+      "quota_admin_exempt": "管理员，不受限制",
+      "user_quota_admin_sentence": "配额不适用于管理员账户。",
+      "user_quota_sentence_both": "管理员已将此账户限制为 {{notes}} 条笔记和 {{storage}} MB 存储空间。",
+      "user_quota_sentence_notes": "管理员已将此账户限制为 {{notes}} 条笔记。存储空间不限。",
+      "user_quota_sentence_storage": "管理员已将此账户限制为 {{storage}} MB 存储空间。笔记数量不限。",
+      "user_quota_sentence_none": "此账户未设置配额：笔记和存储空间均不限。",
+      "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
+      "quota_max_notes_for": "{{user}} 的最大笔记数",
+      "quota_max_storage_for": "{{user}} 的最大存储空间（MB）",
       "filter_placeholder": "筛选账户...",
       "no_accounts": "未找到账户。"
     }

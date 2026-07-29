@@ -246,6 +246,12 @@ function handleUpload() {
         return;
     }
 
+    $quotaError = poznoteCheckStorageQuota((int)$file_size);
+    if ($quotaError !== null) {
+        echo json_encode(['success' => false, 'message' => $quotaError]);
+        return;
+    }
+
     $file_type = $validation['mime_type'];
 
     // Generate unique filename

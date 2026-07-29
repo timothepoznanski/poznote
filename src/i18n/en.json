@@ -137,6 +137,7 @@
       "change_password": "Change Password",
       "delete_account": "Delete Account",
       "import_limits": "Import Limits",
+      "user_quotas": "User quotas",
       "git_sync_toggle": "Git Sync",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
@@ -423,11 +424,21 @@
       "individual_badge": "Individual: {{count}}",
       "zip_badge": "ZIP: {{count}}"
     },
+    "user_quotas": {
+      "title": "User quotas",
+      "description": "Limit the number of notes and the storage space of each user. 0 means unlimited. Administrators are not limited. You can override these limits per user from the storage statistics page.",
+      "max_notes": "Max notes per user",
+      "max_storage": "Max storage per user (MB)",
+      "notes_badge": "Notes: {{count}}",
+      "notes_badge_unlimited": "Notes: unlimited",
+      "storage_badge": "Storage: {{count}} MB",
+      "storage_badge_unlimited": "Storage: unlimited"
+    },
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
       "title_global": "UI Customization (all users)",
-      "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone.",
+      "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
       "locked_by_admin": "Hidden for all users by the administrator",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
@@ -957,6 +968,8 @@
     },
     "errors": {
       "workspace_not_found": "Workspace not found",
+      "note_quota_reached": "Note limit reached: this instance allows at most {{max}} notes for this user (trash included).",
+      "storage_quota_reached": "Storage limit reached: this instance allows at most {{max}} MB of storage for this user.",
       "linked_note_already_exists": "A shortcut already exists for this note",
       "method_not_allowed": "Method not allowed",
       "invalid_action": "Invalid action",
@@ -1295,6 +1308,8 @@
     "remember_me": "Remember me for 30 days",
     "button": "Login",
     "oidc_button": "Continue with {{provider}}",
+    "oidc_button_account": "Continue with {{account}}",
+    "oidc_other_account": "Sign in with another account",
     "documentation": "Poznote documentation",
     "no_profiles": "No user profiles available. Please contact the administrator.",
     "errors": {
@@ -2324,6 +2339,16 @@
       "table_attachments": "Attachments (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "table_quota": "Quota (Count / MB)",
+      "quota_admin_exempt": "Unlimited because admin",
+      "user_quota_admin_sentence": "Quotas do not apply to administrator accounts.",
+      "user_quota_sentence_both": "The administrator has limited this account to {{notes}} notes and {{storage}} MB of storage.",
+      "user_quota_sentence_notes": "The administrator has limited this account to {{notes}} notes. Storage is unlimited.",
+      "user_quota_sentence_storage": "The administrator has limited this account to {{storage}} MB of storage. The number of notes is unlimited.",
+      "user_quota_sentence_none": "No quota is set for this account: notes and storage are unlimited.",
+      "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
+      "quota_max_notes_for": "Max notes for {{user}}",
+      "quota_max_storage_for": "Max storage for {{user}} (MB)",
       "filter_placeholder": "Filter accounts...",
       "no_accounts": "No accounts found."
     }

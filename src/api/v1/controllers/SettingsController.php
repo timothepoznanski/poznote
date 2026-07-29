@@ -19,6 +19,8 @@ class SettingsController {
         'git_sync_enabled',
         'import_max_individual_files',
         'import_max_zip_files',
+        'user_max_notes',
+        'user_max_storage_mb',
         'mcp_user_id',
         'mcp_default_workspace',
         'mcp_debug',
@@ -122,6 +124,14 @@ class SettingsController {
             $intVal = (int) $value;
             if ($intVal < 1 || $intVal > 100000) {
                 throw new InvalidArgumentException('value must be between 1 and 100000', 400);
+            }
+            return (string) $intVal;
+        }
+
+        if ($key === 'user_max_notes' || $key === 'user_max_storage_mb') {
+            $intVal = (int) $value;
+            if ($intVal < 0 || $intVal > 100000000) {
+                throw new InvalidArgumentException('value must be between 0 and 100000000', 400);
             }
             return (string) $intVal;
         }

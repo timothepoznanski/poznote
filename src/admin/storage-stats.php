@@ -86,10 +86,15 @@ function collectStorageStats(): array {
         $usersDir = $dataRoot . '/users';
     }
 
-    // Map user id => username for readable labels.
-    $names = [];
-    foreach (getAllUserProfiles() as $profile) {
-        $names[(int)$profile['id']] = $profile['username'];
+    // Map user id => profile (username, admin flag, per-user quota overrides).
+    $profiles = [];
+    try {
+        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, quota_max_notes, quota_max_storage_mb FROM users");
+        foreach ($stmt as $profile) {
+            $profiles[(int)$profile['id']] = $profile;
+        }
+    } catch (Exception $e) {
+        // Profiles stay empty; rows render with an em dash for the name.
     }
 
     $rows = [];
@@ -107,9 +112,13 @@ function collectStorageStats(): array {
         $databaseDir     = $userPath . '/database';
         $dbPath          = $databaseDir . '/poznote.db';
 
+        $profile = $profiles[(int)$userId] ?? null;
         $row = [
             'user_id'          => (int)$userId,
-            'username'         => $names[(int)$userId] ?? null,
+            'username'         => $profile['username'] ?? null,
+            'is_admin'         => $profile ? (bool)$profile['is_admin'] : false,
+            'quota_max_notes'  => ($profile && $profile['quota_max_notes'] !== null) ? (int)$profile['quota_max_notes'] : null,
+            'quota_max_storage_mb' => ($profile && $profile['quota_max_storage_mb'] !== null) ? (int)$profile['quota_max_storage_mb'] : null,
             'notes_active'     => 0,
             'notes_trash'      => 0,
             'db_bytes'         => 0,
@@ -147,6 +156,17 @@ function collectStorageStats(): array {
 }
 
 $stats = collectStorageStats();
+
+// Global quota defaults (0 = unlimited), overridable per user below.
+$globalMaxNotes     = max(0, (int)getGlobalSetting('user_max_notes', '0'));
+$globalMaxStorageMb = max(0, (int)getGlobalSetting('user_max_storage_mb', '0'));
+
+/**
+ * Format a quota value for display: 0 (unlimited) renders as the infinity sign.
+ */
+function poznoteFormatQuotaValue(int $value): string {
+    return $value > 0 ? (string)$value : '∞';
+}
 
 $totNotesActive     = 0;
 $totNotesTrash      = 0;
@@ -192,6 +212,11 @@ foreach ($stats as $r) {
     .dr-page {
         max-width: 960px;
     }
+    /* More breathing room between the filter bar and the table than the
+       16px search.css default */
+    .home-search-container {
+        margin-bottom: 32px;
+    }
     .results-table th .storage-sort-btn {
         background: none;
         border: none;
@@ -199,6 +224,49 @@ foreach ($stats as $r) {
         font: inherit;
         color: inherit;
         cursor: pointer;
+    }
+    /* Slightly larger column headers, smaller cell values than the
+       admin-tools defaults (0.7rem / 1rem). */
+    .results-table th {
+        font-size: 0.78rem;
+    }
+    .results-table th.quota-header {
+        text-transform: none;
+        letter-spacing: normal;
+    }
+    .results-table td {
+        font-size: 0.85rem;
+    }
+    .quota-edit-btn {
+        background: none;
+        border: none;
+        padding: 0 0 0 6px;
+        color: inherit;
+        cursor: pointer;
+        vertical-align: middle;
+    }
+    .quota-edit-btn .lucide {
+        font-size: 13px;
+    }
+    .quota-override {
+        font-weight: 600;
+    }
+    .quota-inherited {
+        color: var(--text-muted, #999);
+    }
+    #quotaModal .modal-title {
+        margin-bottom: 18px;
+    }
+    .quota-modal-description {
+        margin: 0 0 16px;
+        color: var(--text-muted, #666);
+        font-size: 13px;
+        white-space: pre-line;
+    }
+    #quotaModal .form-group label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
     }
     </style>
     <script>
@@ -209,8 +277,14 @@ foreach ($stats as $r) {
         const input = document.getElementById('storage-filter-input');
         if (!input) return;
 
+        const wrapper = input.closest('.home-search-wrapper');
+        const clearBtn = document.getElementById('storage-filter-clear');
+
         input.addEventListener('input', function () {
             const query = this.value.trim().toLowerCase();
+            if (wrapper) {
+                wrapper.classList.toggle('has-value', this.value !== '');
+            }
             document.querySelectorAll('.results-table tbody tr').forEach(function (row) {
                 row.classList.toggle('filter-hidden', query !== '' && !row.textContent.toLowerCase().includes(query));
             });
@@ -222,6 +296,14 @@ foreach ($stats as $r) {
                 this.dispatchEvent(new Event('input'));
             }
         });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                input.dispatchEvent(new Event('input'));
+                input.focus();
+            });
+        }
     }
 
     /**
@@ -273,6 +355,9 @@ foreach ($stats as $r) {
 <div class="admin-container">
     <div class="admin-header">
         <div class="admin-nav" style="justify-content:center;">
+            <a href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary">
+                <i class="lucide lucide-sticky-note" style="margin-right:5px;"></i><?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
+            </a>
             <a href="../settings.php" class="btn btn-secondary"><?php echo t_h('settings.title', [], 'Settings'); ?></a>
         </div>
     </div>
@@ -286,6 +371,9 @@ foreach ($stats as $r) {
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="storage-filter-input" class="home-search-input" placeholder="<?php echo t_h('admin_tools.storage_stats.filter_placeholder', [], 'Filter accounts...'); ?>" autocomplete="off">
+                <button type="button" id="storage-filter-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                    <i class="lucide lucide-x"></i>
+                </button>
             </div>
         </div>
 
@@ -301,6 +389,7 @@ foreach ($stats as $r) {
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')), 'num', 'hide-mobile'); ?>
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')), 'num', 'hide-mobile'); ?>
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'num'); ?>
+                        <th class="quota-header"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_quota', [], 'Quota (Count / MB)')); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -326,11 +415,31 @@ foreach ($stats as $r) {
                             <td class="hide-mobile" data-sort="<?php echo $row['entries_bytes']; ?>"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
                             <td class="hide-mobile" data-sort="<?php echo $row['attachments_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
                             <td data-sort="<?php echo $row['total_bytes']; ?>"><strong><?php echo poznoteFormatMb($row['total_bytes']); ?></strong></td>
+                            <td style="white-space: nowrap;">
+                                <?php if ($row['is_admin']): ?>
+                                    <span style="color: var(--text-muted, #999);"><?php echo t_h('admin_tools.storage_stats.quota_admin_exempt', [], 'Unlimited because admin'); ?></span>
+                                <?php else: ?>
+                                    <?php
+                                    $effectiveNotes   = $row['quota_max_notes'] ?? $globalMaxNotes;
+                                    $effectiveStorage = $row['quota_max_storage_mb'] ?? $globalMaxStorageMb;
+                                    $hasOverride      = $row['quota_max_notes'] !== null || $row['quota_max_storage_mb'] !== null;
+                                    ?>
+                                    <span class="<?php echo $hasOverride ? 'quota-override' : 'quota-inherited'; ?>"><?php echo poznoteFormatQuotaValue($effectiveNotes) . ' / ' . poznoteFormatQuotaValue($effectiveStorage); ?></span>
+                                    <button type="button" class="quota-edit-btn"
+                                        title="<?php echo t_h('modals.user_quotas.title', [], 'User quotas'); ?>"
+                                        data-user-id="<?php echo $row['user_id']; ?>"
+                                        data-username="<?php echo htmlspecialchars($row['username'] ?? ('#' . $row['user_id']), ENT_QUOTES); ?>"
+                                        data-quota-notes="<?php echo $row['quota_max_notes'] !== null ? $row['quota_max_notes'] : ''; ?>"
+                                        data-quota-storage="<?php echo $row['quota_max_storage_mb'] !== null ? $row['quota_max_storage_mb'] : ''; ?>">
+                                        <i class="lucide lucide-pencil"></i>
+                                    </button>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                     <?php if (empty($stats)): ?>
                         <tr>
-                            <td colspan="8" style="text-align:center;color:var(--text-muted,#999);">
+                            <td colspan="9" style="text-align:center;color:var(--text-muted,#999);">
                                 <?php echo t_h('admin_tools.storage_stats.no_accounts', [], 'No accounts found.'); ?>
                             </td>
                         </tr>
@@ -346,6 +455,7 @@ foreach ($stats as $r) {
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totEntriesBytes); ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totAttachmentBytes); ?></strong></td>
                         <td><strong><?php echo poznoteFormatMb($totBytes); ?></strong></td>
+                        <td></td>
                     </tr>
                 </tfoot>
                 <?php endif; ?>
@@ -353,5 +463,90 @@ foreach ($stats as $r) {
         </div>
     </div>
 </div>
+
+<!-- Per-user quota edit modal -->
+<div class="modal" id="quotaModal">
+    <div class="modal-content">
+        <h2 class="modal-title"><?php echo t_h('modals.user_quotas.title', [], 'User quotas'); ?>&nbsp;: <span id="quota_title_user"></span></h2>
+        <p class="quota-modal-description"><?php echo t_h('admin_tools.storage_stats.quota_modal_description', [], 'Leave a field empty to use the global setting. 0 means unlimited. These values override the global user quotas.'); ?></p>
+        <input type="hidden" id="quota_user_id" value="">
+        <div class="form-group">
+            <label for="quota_max_notes" id="quota_max_notes_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_notes_for', [], 'Max notes for {{user}}'); ?>"></label>
+            <input type="number" id="quota_max_notes" min="0" max="100000000" step="1" placeholder="0">
+        </div>
+        <div class="form-group">
+            <label for="quota_max_storage" id="quota_max_storage_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_for', [], 'Max storage for {{user}} (MB)'); ?>"></label>
+            <input type="number" id="quota_max_storage" min="0" max="100000000" step="1" placeholder="0">
+        </div>
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeQuotaModal()"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+            <button type="button" class="btn btn-primary" onclick="saveQuota()"><?php echo t_h('common.save', [], 'Save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<script>
+function openQuotaModal(btn) {
+    document.getElementById('quota_user_id').value = btn.dataset.userId;
+    document.getElementById('quota_title_user').textContent = btn.dataset.username;
+    ['quota_max_notes_label', 'quota_max_storage_label'].forEach(function (id) {
+        var label = document.getElementById(id);
+        label.textContent = label.dataset.template.replace('{{user}}', btn.dataset.username);
+    });
+    document.getElementById('quota_max_notes').value = btn.dataset.quotaNotes || '';
+    document.getElementById('quota_max_storage').value = btn.dataset.quotaStorage || '';
+    document.getElementById('quotaModal').classList.add('active');
+}
+
+function closeQuotaModal() {
+    document.getElementById('quotaModal').classList.remove('active');
+}
+
+/**
+ * Read a quota input: null when empty (inherit the global setting),
+ * false when invalid, the integer value otherwise.
+ */
+function readQuotaInput(id) {
+    var raw = document.getElementById(id).value.trim();
+    if (raw === '') return null;
+    var value = parseInt(raw, 10);
+    return (isNaN(value) || value < 0 || value > 100000000) ? false : value;
+}
+
+function saveQuota() {
+    var userId = document.getElementById('quota_user_id').value;
+    var notes = readQuotaInput('quota_max_notes');
+    var storage = readQuotaInput('quota_max_storage');
+
+    if (notes === false || storage === false) {
+        alert(<?php echo json_encode(t('common.error', [], 'Error')); ?>);
+        return;
+    }
+
+    fetch('/api/v1/admin/users/' + encodeURIComponent(userId), {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ quota_max_notes: notes, quota_max_storage_mb: storage })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+        if (data && data.error) {
+            alert(data.error);
+        } else {
+            window.location.reload();
+        }
+    })
+    .catch(function () {
+        alert(<?php echo json_encode(t('common.error', [], 'Error')); ?>);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.quota-edit-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () { openQuotaModal(btn); });
+    });
+});
+</script>
 </body>
 </html>

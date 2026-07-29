@@ -191,7 +191,7 @@ function oidc_create_pkce_pair() {
     return ['verifier' => $verifier, 'challenge' => $challenge];
 }
 
-function oidc_build_authorization_url($redirectAfter = null, $loginHint = null) {
+function oidc_build_authorization_url($redirectAfter = null, $loginHint = null, $prompt = null) {
     $cfg = oidc_get_provider_config();
 
     $state = oidc_random_string(32);
@@ -222,6 +222,12 @@ function oidc_build_authorization_url($redirectAfter = null, $loginHint = null) 
     // chooser (which breaks out of the PWA Custom Tab on mobile).
     if (is_string($loginHint) && $loginHint !== '') {
         $params['login_hint'] = $loginHint;
+    }
+
+    // Force the provider's account chooser (used by the "sign in with another
+    // account" button when a previous account is remembered on this device).
+    if (is_string($prompt) && $prompt !== '') {
+        $params['prompt'] = $prompt;
     }
 
     return $cfg['authorization_endpoint'] . '?' . http_build_query($params, '', '&', PHP_QUERY_RFC3986);

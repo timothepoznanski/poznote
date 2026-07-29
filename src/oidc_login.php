@@ -33,9 +33,13 @@ if (!is_string($loginHint) || $loginHint === '' || strlen($loginHint) > 254 || p
     $loginHint = null;
 }
 
+// Optional prompt parameter: only "select_account" is allowed, used to force the
+// provider's account chooser when the user wants to sign in with another account
+$prompt = ($_GET['prompt'] ?? null) === 'select_account' ? 'select_account' : null;
+
 try {
     // Build the OIDC authorization URL and redirect the user to the identity provider
-    $url = oidc_build_authorization_url($redirectAfter, $loginHint);
+    $url = oidc_build_authorization_url($redirectAfter, $loginHint, $prompt);
     header('Location: ' . $url);
     exit;
 } catch (Exception $e) {

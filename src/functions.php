@@ -1036,6 +1036,15 @@ function poznoteGetGlobalHiddenUiElements() {
     return $globalHiddenKeys;
 }
 
+function poznoteGetEnforcedGlobalHiddenUiElements() {
+    // Administrators are exempt from the instance-wide hidden set.
+    if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+        return [];
+    }
+
+    return poznoteGetGlobalHiddenUiElements();
+}
+
 function poznoteGetHiddenUiElements() {
     static $hiddenKeys = null;
 
@@ -1043,10 +1052,10 @@ function poznoteGetHiddenUiElements() {
         return $hiddenKeys;
     }
 
-    // Effective hidden set: admin-enforced (all users) keys merged with the
-    // current user's personal preferences.
+    // Effective hidden set: admin-enforced (non-admin users) keys merged with
+    // the current user's personal preferences.
     $merged = [];
-    foreach (poznoteGetGlobalHiddenUiElements() as $key) {
+    foreach (poznoteGetEnforcedGlobalHiddenUiElements() as $key) {
         $merged[$key] = true;
     }
 
@@ -1145,7 +1154,7 @@ function poznoteRenderUiCustomizationBootstrap() {
         $encodedHiddenKeys = '[]';
     }
 
-    $encodedGlobalHiddenKeys = json_encode(poznoteGetGlobalHiddenUiElements(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    $encodedGlobalHiddenKeys = json_encode(poznoteGetEnforcedGlobalHiddenUiElements(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
     if ($encodedGlobalHiddenKeys === false) {
         $encodedGlobalHiddenKeys = '[]';
     }
@@ -1534,6 +1543,146 @@ function getDataPath(string $type): string {
 function getEntriesPath() { return getDataPath('entries'); }
 function getAttachmentsPath() { return getDataPath('attachments'); }
 function getBackupsPath() { return getDataPath('backups'); }
+
+/**
+ * Per-user quota limits: the administrator's global settings, overridden by
+ * the active user's per-user values when set (admin storage-stats page).
+ * 0 means no limit.
+ * @return array Keys: max_notes (int), max_storage_bytes (int)
+ */
+function poznoteGetUserQuotaLimits(): array {
+    static $limits = null;
+    if ($limits !== null) {
+        return $limits;
+    }
+
+    global $activeUserId;
+    $limits = ['max_notes' => 0, 'max_storage_bytes' => 0];
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        if (function_exists('getGlobalSetting')) {
+            $limits['max_notes'] = max(0, (int) getGlobalSetting('user_max_notes', '0'));
+            $limits['max_storage_bytes'] = max(0, (int) getGlobalSetting('user_max_storage_mb', '0')) * 1024 * 1024;
+        }
+
+        $userId = (int) ($_SESSION['user_id'] ?? $activeUserId ?? 0);
+        if ($userId > 0 && function_exists('getUserQuotaOverrides')) {
+            $overrides = getUserQuotaOverrides($userId);
+            if ($overrides['max_notes'] !== null) {
+                $limits['max_notes'] = max(0, (int) $overrides['max_notes']);
+            }
+            if ($overrides['max_storage_mb'] !== null) {
+                $limits['max_storage_bytes'] = max(0, (int) $overrides['max_storage_mb']) * 1024 * 1024;
+            }
+        }
+    } catch (Exception $e) {
+        // Master database unavailable: fail open, quotas are an admin comfort
+        // feature and must never take the app down.
+    }
+    return $limits;
+}
+
+/**
+ * Quotas restrict regular users; administrators are exempt.
+ */
+function poznoteUserQuotasApply(): bool {
+    return !(function_exists('isCurrentUserAdmin') && isCurrentUserAdmin());
+}
+
+/**
+ * Disk usage of the active account, same perimeter as the admin storage-stats
+ * page: database + note files + attachments. Backups are excluded.
+ * Cached per request; pass $addBytes to keep the cache accurate after a write.
+ */
+function poznoteGetActiveUserStorageUsageBytes(int $addBytes = 0): int {
+    global $poznoteQuotaUsageCache, $activeUserId;
+
+    if (isset($poznoteQuotaUsageCache)) {
+        $poznoteQuotaUsageCache += max(0, $addBytes);
+        return $poznoteQuotaUsageCache;
+    }
+
+    $poznoteQuotaUsageCache = 0;
+    $userId = (int) ($_SESSION['user_id'] ?? $activeUserId ?? 0);
+    if ($userId <= 0) {
+        return $poznoteQuotaUsageCache;
+    }
+
+    require_once __DIR__ . '/users/UserDataManager.php';
+    $dataManager = new UserDataManager($userId);
+    $dirs = [
+        dirname($dataManager->getUserDatabasePath()),
+        $dataManager->getUserEntriesPath(),
+        $dataManager->getUserAttachmentsPath(),
+    ];
+    foreach ($dirs as $dir) {
+        if (!is_dir($dir)) {
+            continue;
+        }
+        try {
+            $it = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($it as $file) {
+                if ($file->isFile()) {
+                    $poznoteQuotaUsageCache += $file->getSize();
+                }
+            }
+        } catch (Exception $e) {
+            // Unreadable directory: count as 0
+        }
+    }
+
+    $poznoteQuotaUsageCache += max(0, $addBytes);
+    return $poznoteQuotaUsageCache;
+}
+
+/**
+ * Check the per-user note count limit before creating $newNotes more notes.
+ * Trashed notes count too: they still exist and can be restored.
+ * @return string|null A user-facing error message, or null when allowed.
+ */
+function poznoteCheckNoteQuota(PDO $con, int $newNotes = 1): ?string {
+    $limits = poznoteGetUserQuotaLimits();
+    if ($limits['max_notes'] <= 0 || !poznoteUserQuotasApply()) {
+        return null;
+    }
+
+    try {
+        $count = (int) $con->query('SELECT COUNT(*) FROM entries')->fetchColumn();
+    } catch (Exception $e) {
+        return null;
+    }
+
+    if ($count + $newNotes > $limits['max_notes']) {
+        return t('api.errors.note_quota_reached', ['max' => $limits['max_notes']],
+            'Note limit reached: this instance allows at most ' . $limits['max_notes'] . ' notes for this user (trash included).');
+    }
+    return null;
+}
+
+/**
+ * Check the per-user storage limit before writing $additionalBytes more bytes.
+ * Negative deltas (content shrinking) are always allowed so a user over quota
+ * can still edit notes to free space.
+ * @return string|null A user-facing error message, or null when allowed.
+ */
+function poznoteCheckStorageQuota(int $additionalBytes = 0): ?string {
+    $limits = poznoteGetUserQuotaLimits();
+    if ($limits['max_storage_bytes'] <= 0 || !poznoteUserQuotasApply()) {
+        return null;
+    }
+    if ($additionalBytes <= 0) {
+        return null;
+    }
+
+    if (poznoteGetActiveUserStorageUsageBytes() + $additionalBytes > $limits['max_storage_bytes']) {
+        $maxMb = (int) round($limits['max_storage_bytes'] / (1024 * 1024));
+        return t('api.errors.storage_quota_reached', ['max' => $maxMb],
+            'Storage limit reached: this instance allows at most ' . $maxMb . ' MB of storage for this user.');
+    }
+    return null;
+}
 
 function poznoteBlockedAttachmentExtensions(): array {
     return [

@@ -69,27 +69,55 @@
             // OIDC login: redirect without creating a Poznote remember-me cookie.
             if (config.oidcEnabled) {
                 var oidcLoginBtn = document.getElementById('oidc-login-btn');
-                
+                var oidcOtherAccountBtn = document.getElementById('oidc-other-account-btn');
+
+                // Email of the last SSO login on this device (stored by
+                // oidc-login-hint.js after a successful SSO login)
+                var loginHint = null;
+                try {
+                    loginHint = localStorage.getItem('poznote_oidc_login_hint');
+                } catch (storageError) {
+                    // localStorage unavailable - hint is best-effort only
+                }
+
+                var startOidcLogin = function (options) {
+                    var params = new URLSearchParams();
+                    if (config.redirectAfter) {
+                        params.set('redirect', config.redirectAfter);
+                    }
+                    if (options && options.loginHint) {
+                        // Sending the hint lets the provider skip its account chooser
+                        // (which escapes the PWA Custom Tab on mobile when several
+                        // accounts are signed in)
+                        params.set('login_hint', options.loginHint);
+                    }
+                    if (options && options.selectAccount) {
+                        params.set('prompt', 'select_account');
+                    }
+                    var query = params.toString();
+                    window.location.href = 'oidc_login.php' + (query ? '?' + query : '');
+                };
+
                 if (oidcLoginBtn) {
+                    // When an account is remembered, show it in the button label and
+                    // reveal the "sign in with another account" alternative
+                    if (loginHint && config.oidcAccountButtonTemplate) {
+                        oidcLoginBtn.textContent = config.oidcAccountButtonTemplate.replace('{{account}}', loginHint);
+                        if (oidcOtherAccountBtn) {
+                            oidcOtherAccountBtn.hidden = false;
+                        }
+                    }
+
                     oidcLoginBtn.addEventListener('click', function (e) {
                         e.preventDefault();
-                        var params = new URLSearchParams();
-                        if (config.redirectAfter) {
-                            params.set('redirect', config.redirectAfter);
-                        }
-                        // Send the email of the last SSO login on this device so the
-                        // provider skips its account chooser (which escapes the PWA
-                        // Custom Tab on mobile when several accounts are signed in)
-                        try {
-                            var loginHint = localStorage.getItem('poznote_oidc_login_hint');
-                            if (loginHint) {
-                                params.set('login_hint', loginHint);
-                            }
-                        } catch (storageError) {
-                            // localStorage unavailable - hint is best-effort only
-                        }
-                        var query = params.toString();
-                        window.location.href = 'oidc_login.php' + (query ? '?' + query : '');
+                        startOidcLogin({ loginHint: loginHint });
+                    });
+                }
+
+                if (oidcOtherAccountBtn) {
+                    oidcOtherAccountBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        startOidcLogin({ selectAccount: true });
                     });
                 }
             }

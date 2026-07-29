@@ -111,6 +111,16 @@ function initializeMasterDatabase(PDO $con): void {
         if (!in_array('notify_new_user', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN notify_new_user INTEGER DEFAULT 0");
         }
+
+        // Per-user quota overrides: NULL inherits the global setting, 0 means
+        // unlimited, any other value is the limit for that user.
+        if (!in_array('quota_max_notes', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN quota_max_notes INTEGER");
+        }
+
+        if (!in_array('quota_max_storage_mb', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN quota_max_storage_mb INTEGER");
+        }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
     }
@@ -822,7 +832,7 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'oidc_subject'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb'];
         $updates = [];
         $params = [];
 
@@ -868,6 +878,23 @@ function updateUserProfile(int $id, array $data): array {
             if (array_key_exists($nameField, $data)) {
                 $trimmedName = trim((string)$data[$nameField]);
                 $data[$nameField] = $trimmedName !== '' ? $trimmedName : null;
+            }
+        }
+
+        // Per-user quota overrides: null or '' clears the override (inherit the
+        // global setting), 0 means unlimited, a positive value is the limit.
+        foreach (['quota_max_notes', 'quota_max_storage_mb'] as $quotaField) {
+            if (array_key_exists($quotaField, $data)) {
+                $rawQuota = $data[$quotaField];
+                if ($rawQuota === null || trim((string)$rawQuota) === '') {
+                    $data[$quotaField] = null;
+                } else {
+                    $quotaValue = (int)$rawQuota;
+                    if ($quotaValue < 0 || $quotaValue > 100000000) {
+                        return ['success' => false, 'error' => $quotaField . ' must be between 0 and 100000000'];
+                    }
+                    $data[$quotaField] = $quotaValue;
+                }
             }
         }
 
@@ -1162,6 +1189,29 @@ function setGlobalSetting(string $key, $value): bool {
     } catch (Exception $e) {
         return false;
     }
+}
+
+/**
+ * Per-user quota overrides. NULL means the user inherits the global setting,
+ * 0 means unlimited, any other value is that user's limit.
+ * @return array Keys: max_notes (int|null), max_storage_mb (int|null)
+ */
+function getUserQuotaOverrides(int $userId): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT quota_max_notes, quota_max_storage_mb FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            return [
+                'max_notes' => $row['quota_max_notes'] !== null ? (int)$row['quota_max_notes'] : null,
+                'max_storage_mb' => $row['quota_max_storage_mb'] !== null ? (int)$row['quota_max_storage_mb'] : null,
+            ];
+        }
+    } catch (Exception $e) {
+        // Fall through to "no overrides"
+    }
+    return ['max_notes' => null, 'max_storage_mb' => null];
 }
 
 /**

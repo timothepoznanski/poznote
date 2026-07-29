@@ -163,6 +163,8 @@ if ($isAdmin) {
             'custom_css_path',
             'import_max_individual_files',
             'import_max_zip_files',
+            'user_max_notes',
+            'user_max_storage_mb',
             'git_sync_enabled',
         ];
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
@@ -336,18 +338,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
-            <!-- Delete Account -->
-            <div class="home-card" id="delete-account-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-trash-2"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
-
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
@@ -440,6 +430,18 @@ if ($isAdmin) {
                     <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
                 </div>
             </div>
+
+            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
+            <!-- Delete Account -->
+            <div class="home-card" id="delete-account-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-trash-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
 
         </div>
 
@@ -811,6 +813,20 @@ if ($isAdmin) {
                     <div>
                         <span id="import-limits-individual-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="import-limits-zip-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Per-user quotas -->
+            <div class="home-card" id="user-quotas-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-gauge"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span>
+                    <div>
+                        <span id="user-quotas-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <span id="user-quotas-storage-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
