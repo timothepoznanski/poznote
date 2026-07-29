@@ -932,6 +932,8 @@
       "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对除管理员外的所有人隐藏。",
       "locked_by_admin": "已由管理员对所有用户隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
+      "login_password_form": "邮箱密码登录",
+      "login_password_form_hint": "仅在启用 SSO/OIDC 登录时才会隐藏邮箱密码表单（以及“或”分隔符），以免用户无法登录。如有需要，登录页面右下角的隐形按钮可重新显示该表单。",
       "reminder_bell": "铃铛图标（提醒）",
       "dashboard_user": "用户",
       "dashboard_filter_bar": "筛选栏",
@@ -948,7 +950,8 @@
         "panels": "其他",
         "dashboard_toolbar": "仪表盘",
         "folder_actions": "文件夹操作",
-        "workspace_menu": "工作区菜单"
+        "workspace_menu": "工作区菜单",
+        "login_page": "登录页面"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1628,6 +1631,7 @@
     },
     "redirecting": "正在重定向...",
     "show_password": "显示密码",
+    "reveal_password_login": "显示邮箱密码登录",
     "hide_password": "隐藏密码",
     "admin_warning": "请使用用户名 <code>{{username}}</code> 和此帐户的当前密码登录，然后可在设置中重命名此帐户以提高安全性。",
     "fields": {
@@ -1641,7 +1645,6 @@
     "oidc_button": "使用 {{provider}} 继续",
     "oidc_button_account": "使用 {{account}} 继续",
     "oidc_other_account": "使用其他账号登录",
-    "documentation": "Poznote 文档",
     "no_profiles": "没有可用的用户个人资料。请联系管理员。",
     "errors": {
       "invalid_credentials": "用户名或密码错误。",

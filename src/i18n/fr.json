@@ -957,6 +957,8 @@
       "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde, sauf les administrateurs.",
       "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
+      "login_password_form": "Connexion par e-mail et mot de passe",
+      "login_password_form_hint": "Le formulaire e-mail / mot de passe (et le séparateur « ou ») n'est masqué que lorsque la connexion SSO/OIDC est activée, afin de ne jamais bloquer l'accès. En cas de besoin, un bouton invisible dans le coin inférieur droit de la page de connexion permet de le réafficher.",
       "reminder_bell": "Icône cloche (rappel)",
       "dashboard_user": "Utilisateur",
       "dashboard_filter_bar": "Barre de filtre",
@@ -973,7 +975,8 @@
         "panels": "Autre",
         "dashboard_toolbar": "Tableau de bord",
         "folder_actions": "Actions des dossiers",
-        "workspace_menu": "Menu du workspace"
+        "workspace_menu": "Menu du workspace",
+        "login_page": "Page de connexion"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count": "{{count}} masqué(s)",
@@ -1685,6 +1688,7 @@
     },
     "redirecting": "Redirection...",
     "show_password": "Afficher le mot de passe",
+    "reveal_password_login": "Afficher la connexion par e-mail et mot de passe",
     "hide_password": "Masquer le mot de passe",
     "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et le mot de passe actuel de ce compte. Vous pourrez ensuite renommer ce compte dans les réglages pour plus de sécurité.",
     "fields": {
@@ -1698,7 +1702,6 @@
     "oidc_button": "Continuer avec {{provider}}",
     "oidc_button_account": "Continuer avec {{account}}",
     "oidc_other_account": "Se connecter avec un autre compte",
-    "documentation": "Documentation Poznote",
     "no_profiles": "Aucun profil utilisateur disponible. Veuillez contacter l'administrateur.",
     "errors": {
       "invalid_credentials": "Nom d’utilisateur ou mot de passe incorrect.",

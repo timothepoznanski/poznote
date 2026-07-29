@@ -933,6 +933,8 @@
       "description_global": "Mostrar u ocultar elementos de la interfaz para todos los usuarios de esta instancia. Los elementos no marcados se ocultarán para todos excepto los administradores.",
       "locked_by_admin": "Oculto para todos los usuarios por el administrador",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
+      "login_password_form": "Inicio de sesión con correo y contraseña",
+      "login_password_form_hint": "El formulario de correo y contraseña (y el separador «o») solo se oculta mientras el inicio de sesión SSO/OIDC está activado, para que nadie pierda el acceso. Si es necesario, un botón invisible en la esquina inferior derecha de la página de inicio de sesión permite mostrarlo de nuevo.",
       "reminder_bell": "Icono de campana (recordatorio)",
       "dashboard_user": "Usuario",
       "dashboard_filter_bar": "Barra de filtro",
@@ -949,7 +951,8 @@
         "panels": "Otros",
         "dashboard_toolbar": "Panel",
         "folder_actions": "Acciones de carpeta",
-        "workspace_menu": "Menú del espacio de trabajo"
+        "workspace_menu": "Menú del espacio de trabajo",
+        "login_page": "Página de inicio de sesión"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1629,6 +1632,7 @@
     },
     "redirecting": "Redirigiendo...",
     "show_password": "Mostrar contraseña",
+    "reveal_password_login": "Mostrar el inicio de sesión con correo y contraseña",
     "hide_password": "Ocultar contraseña",
     "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y la contraseña actual de esta cuenta. Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
     "fields": {
@@ -1642,7 +1646,6 @@
     "oidc_button": "Continuar con {{provider}}",
     "oidc_button_account": "Continuar con {{account}}",
     "oidc_other_account": "Iniciar sesión con otra cuenta",
-    "documentation": "Documentación de Poznote",
     "no_profiles": "No hay perfiles de usuario disponibles. Por favor, contacta al administrador.",
     "errors": {
       "invalid_credentials": "Nombre de usuario o contraseña incorrectos.",
