@@ -2,6 +2,7 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/oidc.php';
+require_once __DIR__ . '/version_helper.php';
 
 if (!oidc_is_enabled()) {
     header('Location: login.php');
@@ -56,9 +57,9 @@ try {
     echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';
     if (is_string($loginHintEmail) && $loginHintEmail !== '') {
         echo '<script type="application/json" id="oidc-login-hint-data">' . json_encode(['email' => $loginHintEmail], JSON_HEX_TAG | JSON_HEX_AMP) . '</script>';
-        echo '<script src="js/oidc-login-hint.js"></script>';
+        echo '<script src="js/oidc-login-hint.js?v=' . rawurlencode(getAppVersion()) . '"></script>';
     }
-    echo '<script src="js/workspace-redirect.js"></script>';
+    echo '<script src="js/workspace-redirect.js?v=' . rawurlencode(getAppVersion()) . '"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', getUserLanguage()) . '</body></html>';
     exit;
 } catch (Exception $e) {
