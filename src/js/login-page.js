@@ -104,7 +104,10 @@
                     if (loginHint && config.oidcAccountButtonTemplate) {
                         oidcLoginBtn.textContent = config.oidcAccountButtonTemplate.replace('{{account}}', loginHint);
                         if (oidcOtherAccountBtn) {
+                            // The inline display:none (not just [hidden]) keeps the
+                            // button dead-proof under a stale cached login.css
                             oidcOtherAccountBtn.hidden = false;
+                            oidcOtherAccountBtn.style.display = '';
                         }
                     }
 

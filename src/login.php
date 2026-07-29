@@ -9,7 +9,12 @@
 require 'auth.php';
 require_once 'functions.php';
 require_once 'oidc.php';
+require_once 'version_helper.php';
 require_once __DIR__ . '/users/db_master.php';
+
+// Cache-busting version for the login page assets; without it browsers keep
+// stale copies of login.css / login-page.js across releases
+$loginAssetV = rawurlencode(getAppVersion());
 
 // Set security headers for login page
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'; form-action 'self';");
@@ -86,7 +91,7 @@ function poznoteRenderLoginRedirectAndExit(?string $redirectAfter, string $curre
 
     echo '<!DOCTYPE html><html><head>';
     echo '<script type="application/json" id="workspace-redirect-data">' . json_encode($redirectConfig) . '</script>';
-    echo '<script src="js/workspace-redirect.js"></script>';
+    echo '<script src="js/workspace-redirect.js?v=' . rawurlencode(getAppVersion()) . '"></script>';
     echo '</head><body>' . t_h('login.redirecting', [], 'Redirecting...', $currentLang) . '</body></html>';
     exit;
 }
@@ -197,18 +202,18 @@ if (isset($_GET['oidc_error'])) {
     <link rel="apple-touch-icon" href="pwa/poznote.png">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="pwa/pwa.js" defer></script>
-    <link rel="stylesheet" href="css/lucide.css">
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/login.css?v=<?php echo $loginAssetV; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css">
-    <link rel="stylesheet" href="css/dark-mode/menus.css">
-    <link rel="stylesheet" href="css/dark-mode/editor.css">
-    <link rel="stylesheet" href="css/dark-mode/modals.css">
-    <link rel="stylesheet" href="css/dark-mode/components.css">
-    <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css">
-    <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $loginAssetV; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $loginAssetV; ?>">
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
@@ -340,7 +345,7 @@ if (isset($_GET['oidc_error'])) {
                 <?php endif; ?>
 
                 <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$showNormalLogin): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
-                <a class="login-button oidc-button oidc-other-account-button" href="#" id="oidc-other-account-btn" hidden><?php echo t_h('login.oidc_other_account', [], 'Sign in with another account', $currentLang ?? 'en'); ?></a>
+                <a class="login-button oidc-button oidc-other-account-button" href="#" id="oidc-other-account-btn" hidden style="display:none"><?php echo t_h('login.oidc_other_account', [], 'Sign in with another account', $currentLang ?? 'en'); ?></a>
             <?php endif; ?>
             
             <?php if ($oidcError): ?>
@@ -367,6 +372,6 @@ if (isset($_GET['oidc_error'])) {
     ];
     ?>
     <script type="application/json" id="login-config"><?php echo json_encode($loginConfig); ?></script>
-    <script src="js/login-page.js"></script>
+    <script src="js/login-page.js?v=<?php echo $loginAssetV; ?>"></script>
 </body>
 </html>
