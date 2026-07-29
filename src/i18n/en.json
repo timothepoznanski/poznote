@@ -438,7 +438,7 @@
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
       "title_global": "UI Customization (all users)",
-      "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone.",
+      "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
       "locked_by_admin": "Hidden for all users by the administrator",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",

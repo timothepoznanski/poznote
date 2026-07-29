@@ -930,7 +930,7 @@
       "title": "Personalización de interfaz",
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
       "title_global": "Personalización de interfaz (todos los usuarios)",
-      "description_global": "Mostrar u ocultar elementos de la interfaz para todos los usuarios de esta instancia. Los elementos no marcados se ocultarán para todos.",
+      "description_global": "Mostrar u ocultar elementos de la interfaz para todos los usuarios de esta instancia. Los elementos no marcados se ocultarán para todos excepto los administradores.",
       "locked_by_admin": "Oculto para todos los usuarios por el administrador",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",

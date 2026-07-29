@@ -1036,6 +1036,15 @@ function poznoteGetGlobalHiddenUiElements() {
     return $globalHiddenKeys;
 }
 
+function poznoteGetEnforcedGlobalHiddenUiElements() {
+    // Administrators are exempt from the instance-wide hidden set.
+    if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+        return [];
+    }
+
+    return poznoteGetGlobalHiddenUiElements();
+}
+
 function poznoteGetHiddenUiElements() {
     static $hiddenKeys = null;
 
@@ -1043,10 +1052,10 @@ function poznoteGetHiddenUiElements() {
         return $hiddenKeys;
     }
 
-    // Effective hidden set: admin-enforced (all users) keys merged with the
-    // current user's personal preferences.
+    // Effective hidden set: admin-enforced (non-admin users) keys merged with
+    // the current user's personal preferences.
     $merged = [];
-    foreach (poznoteGetGlobalHiddenUiElements() as $key) {
+    foreach (poznoteGetEnforcedGlobalHiddenUiElements() as $key) {
         $merged[$key] = true;
     }
 
@@ -1145,7 +1154,7 @@ function poznoteRenderUiCustomizationBootstrap() {
         $encodedHiddenKeys = '[]';
     }
 
-    $encodedGlobalHiddenKeys = json_encode(poznoteGetGlobalHiddenUiElements(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+    $encodedGlobalHiddenKeys = json_encode(poznoteGetEnforcedGlobalHiddenUiElements(), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
     if ($encodedGlobalHiddenKeys === false) {
         $encodedGlobalHiddenKeys = '[]';
     }
