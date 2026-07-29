@@ -1293,6 +1293,8 @@
     "remember_me": "Запомнить меня на 30 дней",
     "button": "Войти",
     "oidc_button": "Продолжить с {{provider}}",
+    "oidc_button_account": "Продолжить с {{account}}",
+    "oidc_other_account": "Использовать другой аккаунт",
     "documentation": "Документация Poznote",
     "no_profiles": "Нет доступных профилей пользователей. Пожалуйста, обратитесь к администратору.",
     "errors": {

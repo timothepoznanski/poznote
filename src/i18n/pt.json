@@ -1643,6 +1643,8 @@
     "remember_me": "Lembrar-me por 30 dias",
     "button": "Login",
     "oidc_button": "Continuar com {{provider}}",
+    "oidc_button_account": "Continuar com {{account}}",
+    "oidc_other_account": "Entrar com outra conta",
     "documentation": "Documentação do Poznote",
     "no_profiles": "Nenhum perfil de usuário disponível. Por favor, entre em contato com o administrador.",
     "errors": {

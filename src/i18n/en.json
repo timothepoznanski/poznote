@@ -1308,6 +1308,8 @@
     "remember_me": "Remember me for 30 days",
     "button": "Login",
     "oidc_button": "Continue with {{provider}}",
+    "oidc_button_account": "Continue with {{account}}",
+    "oidc_other_account": "Sign in with another account",
     "documentation": "Poznote documentation",
     "no_profiles": "No user profiles available. Please contact the administrator.",
     "errors": {

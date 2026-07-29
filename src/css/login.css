@@ -235,6 +235,23 @@ input[type="password"]::placeholder {
     background: #252526;
 }
 
+/* Secondary variant shown when a previous SSO account is remembered.
+   Doubled class keeps these rules above .login-button:hover below. */
+.oidc-other-account-button.oidc-other-account-button {
+    background: transparent;
+    color: #333333;
+    border: 1px solid #cbd5e0;
+}
+
+.oidc-other-account-button.oidc-other-account-button:hover {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: #a0aec0;
+}
+
+.oidc-other-account-button[hidden] {
+    display: none;
+}
+
 .login-button:hover {
     background: #2c5282;
 }
@@ -571,6 +588,16 @@ html[data-theme='dark'] .oidc-divider::after {
 html[data-theme='dark'] .oidc-divider span {
     color: #a0aec0;
     background: var(--dm-bg);
+}
+
+html[data-theme='dark'] .oidc-other-account-button {
+    background: transparent;
+    color: #e2e8f0;
+    border-color: #4a5568;
+}
+
+html[data-theme='dark'] .oidc-other-account-button:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 /* Responsive Design */

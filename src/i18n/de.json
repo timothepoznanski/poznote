@@ -1639,6 +1639,8 @@
     "remember_me": "30 Tage merken",
     "button": "Anmelden",
     "oidc_button": "Weiter mit {{provider}}",
+    "oidc_button_account": "Weiter mit {{account}}",
+    "oidc_other_account": "Mit einem anderen Konto anmelden",
     "documentation": "Poznote-Dokumentation",
     "no_profiles": "Keine Benutzerprofile verfügbar. Bitte kontaktieren Sie den Administrator.",
     "errors": {

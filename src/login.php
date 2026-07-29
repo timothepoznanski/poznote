@@ -340,6 +340,7 @@ if (isset($_GET['oidc_error'])) {
                 <?php endif; ?>
 
                 <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$showNormalLogin): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
+                <a class="login-button oidc-button oidc-other-account-button" href="#" id="oidc-other-account-btn" hidden><?php echo t_h('login.oidc_other_account', [], 'Sign in with another account', $currentLang ?? 'en'); ?></a>
             <?php endif; ?>
             
             <?php if ($oidcError): ?>
@@ -359,6 +360,9 @@ if (isset($_GET['oidc_error'])) {
         'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
         'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en'),
         'oidcEnabled' => !$renderAccountSelection && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        // Template for the OIDC button when the last SSO account is remembered on
+        // this device; {{account}} is replaced client-side with the stored email
+        'oidcAccountButtonTemplate' => t('login.oidc_button_account', [], 'Continue with {{account}}', $currentLang ?? 'en'),
         'redirectAfter' => $redirectAfter
     ];
     ?>

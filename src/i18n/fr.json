@@ -1696,6 +1696,8 @@
     "remember_me": "Se souvenir de moi pendant 30 jours",
     "button": "Se connecter",
     "oidc_button": "Continuer avec {{provider}}",
+    "oidc_button_account": "Continuer avec {{account}}",
+    "oidc_other_account": "Se connecter avec un autre compte",
     "documentation": "Documentation Poznote",
     "no_profiles": "Aucun profil utilisateur disponible. Veuillez contacter l'administrateur.",
     "errors": {

@@ -1639,6 +1639,8 @@
     "remember_me": "保持登录 30 天",
     "button": "登录",
     "oidc_button": "使用 {{provider}} 继续",
+    "oidc_button_account": "使用 {{account}} 继续",
+    "oidc_other_account": "使用其他账号登录",
     "documentation": "Poznote 文档",
     "no_profiles": "没有可用的用户个人资料。请联系管理员。",
     "errors": {

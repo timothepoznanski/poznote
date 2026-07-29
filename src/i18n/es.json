@@ -1640,6 +1640,8 @@
     "remember_me": "Recordarme por 30 días",
     "button": "Inicio de sesión",
     "oidc_button": "Continuar con {{provider}}",
+    "oidc_button_account": "Continuar con {{account}}",
+    "oidc_other_account": "Iniciar sesión con otra cuenta",
     "documentation": "Documentación de Poznote",
     "no_profiles": "No hay perfiles de usuario disponibles. Por favor, contacta al administrador.",
     "errors": {
