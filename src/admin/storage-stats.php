@@ -212,6 +212,11 @@ foreach ($stats as $r) {
     .dr-page {
         max-width: 960px;
     }
+    /* More breathing room between the filter bar and the table than the
+       16px search.css default */
+    .home-search-container {
+        margin-bottom: 32px;
+    }
     .results-table th .storage-sort-btn {
         background: none;
         border: none;
@@ -272,8 +277,14 @@ foreach ($stats as $r) {
         const input = document.getElementById('storage-filter-input');
         if (!input) return;
 
+        const wrapper = input.closest('.home-search-wrapper');
+        const clearBtn = document.getElementById('storage-filter-clear');
+
         input.addEventListener('input', function () {
             const query = this.value.trim().toLowerCase();
+            if (wrapper) {
+                wrapper.classList.toggle('has-value', this.value !== '');
+            }
             document.querySelectorAll('.results-table tbody tr').forEach(function (row) {
                 row.classList.toggle('filter-hidden', query !== '' && !row.textContent.toLowerCase().includes(query));
             });
@@ -285,6 +296,14 @@ foreach ($stats as $r) {
                 this.dispatchEvent(new Event('input'));
             }
         });
+
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                input.value = '';
+                input.dispatchEvent(new Event('input'));
+                input.focus();
+            });
+        }
     }
 
     /**
@@ -336,6 +355,9 @@ foreach ($stats as $r) {
 <div class="admin-container">
     <div class="admin-header">
         <div class="admin-nav" style="justify-content:center;">
+            <a href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary">
+                <i class="lucide lucide-sticky-note" style="margin-right:5px;"></i><?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
+            </a>
             <a href="../settings.php" class="btn btn-secondary"><?php echo t_h('settings.title', [], 'Settings'); ?></a>
         </div>
     </div>
@@ -349,6 +371,9 @@ foreach ($stats as $r) {
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="storage-filter-input" class="home-search-input" placeholder="<?php echo t_h('admin_tools.storage_stats.filter_placeholder', [], 'Filter accounts...'); ?>" autocomplete="off">
+                <button type="button" id="storage-filter-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                    <i class="lucide lucide-x"></i>
+                </button>
             </div>
         </div>
 
