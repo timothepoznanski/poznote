@@ -80,6 +80,14 @@ if ($preview_image && $preview_image['error'] === UPLOAD_ERR_OK) {
 
 // If note_id is 0, we need to create a new note
 if ($note_id === 0) {
+    $quotaError = poznoteCheckNoteQuota($con)
+        ?? poznoteCheckStorageQuota(strlen((string)$diagram_data));
+    if ($quotaError !== null) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => $quotaError]);
+        exit;
+    }
+
     // Get folder from POST or use default
     $folder_id = isset($_POST['folder_id']) ? intval($_POST['folder_id']) : null;
     // If folder_id is 0, treat it as null

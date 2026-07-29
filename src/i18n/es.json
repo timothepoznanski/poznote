@@ -428,6 +428,7 @@
       "change_password": "Cambiar contraseña",
       "delete_account": "Eliminar cuenta",
       "import_limits": "Límites de importación",
+      "user_quotas": "Cuotas de usuario",
       "git_sync_toggle": "Sincronización Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
@@ -914,6 +915,16 @@
       "max_zip_files": "Máx. archivos en ZIP",
       "individual_badge": "Individual: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "user_quotas": {
+      "title": "Cuotas de usuario",
+      "description": "Limita el número de notas y el espacio de almacenamiento de cada usuario. 0 significa ilimitado. Los administradores no están limitados. Puede reemplazar estos límites por usuario desde la página de estadísticas de almacenamiento.",
+      "max_notes": "Máx. de notas por usuario",
+      "max_storage": "Almacenamiento máx. por usuario (MB)",
+      "notes_badge": "Notas: {{count}}",
+      "notes_badge_unlimited": "Notas: ilimitado",
+      "storage_badge": "Almacenamiento: {{count}} MB",
+      "storage_badge_unlimited": "Almacenamiento: ilimitado"
     },
     "ui_customization": {
       "title": "Personalización de interfaz",
@@ -1404,6 +1415,8 @@
     },
     "errors": {
       "workspace_not_found": "Espacio de trabajo no encontrado",
+      "note_quota_reached": "Límite de notas alcanzado: esta instancia permite como máximo {{max}} notas para este usuario (papelera incluida).",
+      "storage_quota_reached": "Límite de almacenamiento alcanzado: esta instancia permite como máximo {{max}} MB de almacenamiento para este usuario.",
       "linked_note_already_exists": "Ya existe un atajo para esta nota",
       "method_not_allowed": "Método no permitido",
       "invalid_action": "Acción inválida",
@@ -2702,6 +2715,16 @@
       "table_attachments": "Adjuntos (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "table_quota": "Cuota (Cantidad / MB)",
+      "quota_admin_exempt": "Ilimitado por ser admin",
+      "user_quota_admin_sentence": "Las cuotas no se aplican a las cuentas de administrador.",
+      "user_quota_sentence_both": "El administrador ha limitado esta cuenta a {{notes}} notas y {{storage}} MB de almacenamiento.",
+      "user_quota_sentence_notes": "El administrador ha limitado esta cuenta a {{notes}} notas. El almacenamiento es ilimitado.",
+      "user_quota_sentence_storage": "El administrador ha limitado esta cuenta a {{storage}} MB de almacenamiento. El número de notas es ilimitado.",
+      "user_quota_sentence_none": "No hay ninguna cuota definida para esta cuenta: las notas y el almacenamiento son ilimitados.",
+      "quota_modal_description": "Deje un campo vacío para usar el ajuste global. 0 significa ilimitado.\nEstos valores reemplazan las cuotas globales de usuario.",
+      "quota_max_notes_for": "Máx. de notas para {{user}}",
+      "quota_max_storage_for": "Almacenamiento máx. para {{user}} (MB)",
       "filter_placeholder": "Filtrar cuentas...",
       "no_accounts": "No se encontraron cuentas."
     }

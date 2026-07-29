@@ -125,6 +125,9 @@
         if (document.getElementById('import-limits-card')) {
             keys.push('import_max_individual_files', 'import_max_zip_files');
         }
+        if (document.getElementById('user-quotas-card')) {
+            keys.push('user_max_notes', 'user_max_storage_mb');
+        }
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
         }
@@ -945,6 +948,36 @@
         });
     }
 
+    function refreshUserQuotasBadges() {
+        var notesBadge = document.getElementById('user-quotas-notes-badge');
+        var storageBadge = document.getElementById('user-quotas-storage-badge');
+        if (!notesBadge && !storageBadge) return;
+
+        getSetting('user_max_notes', function (value) {
+            if (!notesBadge) return;
+            var count = parseInt(value, 10) || 0;
+            if (count > 0) {
+                notesBadge.textContent = tr('modals.user_quotas.notes_badge', { count: String(count) }, 'Notes: ' + count);
+                notesBadge.className = 'setting-status enabled';
+            } else {
+                notesBadge.textContent = tr('modals.user_quotas.notes_badge_unlimited', {}, 'Notes: unlimited');
+                notesBadge.className = 'setting-status disabled';
+            }
+        });
+
+        getSetting('user_max_storage_mb', function (value) {
+            if (!storageBadge) return;
+            var count = parseInt(value, 10) || 0;
+            if (count > 0) {
+                storageBadge.textContent = tr('modals.user_quotas.storage_badge', { count: String(count) }, 'Storage: ' + count + ' MB');
+                storageBadge.className = 'setting-status enabled';
+            } else {
+                storageBadge.textContent = tr('modals.user_quotas.storage_badge_unlimited', {}, 'Storage: unlimited');
+                storageBadge.className = 'setting-status disabled';
+            }
+        });
+    }
+
     function refreshGitSyncEnabledBadge() {
         var badge = document.getElementById('git-sync-enabled-status');
         if (!badge) return;
@@ -1081,6 +1114,21 @@
             indInput.value = (indValue && indValue.trim()) ? indValue.trim() : '50';
             getSetting('import_max_zip_files', function (zipValue) {
                 zipInput.value = (zipValue && zipValue.trim()) ? zipValue.trim() : '300';
+                modal.style.display = 'flex';
+            });
+        });
+    }
+
+    function showUserQuotasModal() {
+        var modal = document.getElementById('userQuotasModal');
+        var notesInput = document.getElementById('userMaxNotesInput');
+        var storageInput = document.getElementById('userMaxStorageInput');
+        if (!modal || !notesInput || !storageInput) return;
+
+        getSetting('user_max_notes', function (notesValue) {
+            notesInput.value = String(parseInt(notesValue, 10) || 0);
+            getSetting('user_max_storage_mb', function (storageValue) {
+                storageInput.value = String(parseInt(storageValue, 10) || 0);
                 modal.style.display = 'flex';
             });
         });
@@ -1445,6 +1493,12 @@
         var importLimitsCard = document.getElementById('import-limits-card');
         if (importLimitsCard) {
             importLimitsCard.addEventListener('click', showImportLimitsModal);
+        }
+
+        // User quotas card - opens modal
+        var userQuotasCard = document.getElementById('user-quotas-card');
+        if (userQuotasCard) {
+            userQuotasCard.addEventListener('click', showUserQuotasModal);
         }
 
         // Git sync global toggle
@@ -1953,6 +2007,33 @@
             });
         }
 
+        // Save user quotas modal button
+        var saveUserQuotasBtn = document.getElementById('saveUserQuotasBtn');
+        if (saveUserQuotasBtn) {
+            saveUserQuotasBtn.addEventListener('click', function () {
+                var notesInput = document.getElementById('userMaxNotesInput');
+                var storageInput = document.getElementById('userMaxStorageInput');
+                var notesVal = notesInput ? parseInt(notesInput.value, 10) : 0;
+                var storageVal = storageInput ? parseInt(storageInput.value, 10) : 0;
+
+                if (isNaN(notesVal) || notesVal < 0 || notesVal > 100000000 || isNaN(storageVal) || storageVal < 0 || storageVal > 100000000) {
+                    alert(tr('common.error', {}, 'Error'));
+                    return;
+                }
+
+                setSetting('user_max_notes', String(notesVal), function (s1) {
+                    setSetting('user_max_storage_mb', String(storageVal), function (s2) {
+                        if (s1 && s2) {
+                            try { closeModal('userQuotasModal'); } catch (e) { }
+                            refreshUserQuotasBadges();
+                        } else {
+                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        }
+                    });
+                });
+            });
+        }
+
         // Load all badges on page load. Most values are already embedded in page-config-data.
         preloadSettings(getSettingsPreloadKeys()).then(function () {
             refreshLanguageBadge();
@@ -1972,6 +2053,7 @@
             refreshIndexIconScaleBadge();
             refreshCustomCssBadge();
             refreshImportLimitsBadges();
+            refreshUserQuotasBadges();
             refreshGitSyncEnabledBadge();
             refreshUiCustomizationBadge();
             refreshUiCustomizationAdminBadge();

@@ -590,6 +590,18 @@ function processNoteFileContent($content, $fileExtension, $noteType) {
  * @return array Keys: success, error, noteId, noteType, content, title
  */
 function importSingleNoteFile($con, $content, $fileName, $fileExtension, $workspace, $folderName, $folderId, $entriesPath, $writeFile = true) {
+    $quotaError = poznoteCheckNoteQuota($con)
+        ?? poznoteCheckStorageQuota(strlen((string)$content));
+    if ($quotaError !== null) {
+        return ['success' => false, 'error' => $quotaError];
+    }
+    // Keep the per-request usage cache accurate while a multi-file import loops
+    // over this function, so later files see the space consumed by earlier ones.
+    $quotaLimits = poznoteGetUserQuotaLimits();
+    if ($quotaLimits['max_storage_bytes'] > 0 && poznoteUserQuotasApply()) {
+        poznoteGetActiveUserStorageUsageBytes(strlen((string)$content));
+    }
+
     $noteType = ($fileExtension === 'md' || $fileExtension === 'markdown') ? 'markdown' : 'note';
 
     $processed = processNoteFileContent($content, $fileExtension, $noteType);

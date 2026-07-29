@@ -427,6 +427,7 @@
       "change_password": "Passwort ändern",
       "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
+      "user_quotas": "Benutzerkontingente",
       "git_sync_toggle": "Git-Synchronisierung",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
@@ -913,6 +914,16 @@
       "max_zip_files": "Max. Dateien im ZIP",
       "individual_badge": "Einzeln: {{count}}",
       "zip_badge": "ZIP: {{count}}"
+    },
+    "user_quotas": {
+      "title": "Benutzerkontingente",
+      "description": "Anzahl der Notizen und Speicherplatz pro Benutzer begrenzen. 0 bedeutet unbegrenzt. Administratoren sind nicht eingeschränkt. Auf der Seite der Speicherstatistiken können Sie diese Limits pro Benutzer überschreiben.",
+      "max_notes": "Max. Notizen pro Benutzer",
+      "max_storage": "Max. Speicher pro Benutzer (MB)",
+      "notes_badge": "Notizen: {{count}}",
+      "notes_badge_unlimited": "Notizen: unbegrenzt",
+      "storage_badge": "Speicher: {{count}} MB",
+      "storage_badge_unlimited": "Speicher: unbegrenzt"
     },
     "ui_customization": {
       "title": "Oberfläche anpassen",
@@ -1403,6 +1414,8 @@
     },
     "errors": {
       "workspace_not_found": "Arbeitsbereich nicht gefunden",
+      "note_quota_reached": "Notizlimit erreicht: Diese Instanz erlaubt höchstens {{max}} Notizen für diesen Benutzer (inklusive Papierkorb).",
+      "storage_quota_reached": "Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB Speicher für diesen Benutzer.",
       "linked_note_already_exists": "Für diese Notiz existiert bereits eine Verknüpfung",
       "method_not_allowed": "Methode nicht erlaubt",
       "invalid_action": "Ungültige Aktion",
@@ -2702,6 +2715,16 @@
       "table_attachments": "Anhänge (MB)",
       "table_total": "Gesamt (MB)",
       "table_total_row": "Gesamt",
+      "table_quota": "Kontingent (Anzahl / MB)",
+      "quota_admin_exempt": "Unbegrenzt, da Admin",
+      "user_quota_admin_sentence": "Kontingente gelten nicht für Administratorkonten.",
+      "user_quota_sentence_both": "Der Administrator hat dieses Konto auf {{notes}} Notizen und {{storage}} MB Speicher begrenzt.",
+      "user_quota_sentence_notes": "Der Administrator hat dieses Konto auf {{notes}} Notizen begrenzt. Der Speicher ist unbegrenzt.",
+      "user_quota_sentence_storage": "Der Administrator hat dieses Konto auf {{storage}} MB Speicher begrenzt. Die Anzahl der Notizen ist unbegrenzt.",
+      "user_quota_sentence_none": "Für dieses Konto ist kein Kontingent festgelegt: Notizen und Speicher sind unbegrenzt.",
+      "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
+      "quota_max_notes_for": "Max. Notizen für {{user}}",
+      "quota_max_storage_for": "Max. Speicher für {{user}} (MB)",
       "filter_placeholder": "Konten filtern...",
       "no_accounts": "Keine Konten gefunden."
     }

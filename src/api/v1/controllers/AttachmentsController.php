@@ -264,6 +264,13 @@ class AttachmentsController {
             return;
         }
 
+        $quotaError = poznoteCheckStorageQuota((int)$file_size);
+        if ($quotaError !== null) {
+            http_response_code(413);
+            echo json_encode(['success' => false, 'message' => $quotaError]);
+            return;
+        }
+
         $file_type = $validation['mime_type'];
 
         // Generate unique filename

@@ -51,6 +51,25 @@ try {
 } catch (Exception $e) {
     // Leave counts at 0 on error.
 }
+
+// Effective quotas for this account (global settings + per-user overrides).
+// Admins are exempt from quotas.
+$quotaIsAdmin  = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+$quotaLimits   = poznoteGetUserQuotaLimits();
+$quotaNotes    = $quotaLimits['max_notes'];
+$quotaStorage  = (int)round($quotaLimits['max_storage_bytes'] / (1024 * 1024));
+
+if ($quotaIsAdmin) {
+    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_admin_sentence', [], 'Quotas do not apply to administrator accounts.');
+} elseif ($quotaNotes > 0 && $quotaStorage > 0) {
+    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_both', ['notes' => $quotaNotes, 'storage' => $quotaStorage], 'The administrator has limited this account to ' . $quotaNotes . ' notes and ' . $quotaStorage . ' MB of storage.');
+} elseif ($quotaNotes > 0) {
+    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_notes', ['notes' => $quotaNotes], 'The administrator has limited this account to ' . $quotaNotes . ' notes. Storage is unlimited.');
+} elseif ($quotaStorage > 0) {
+    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_storage', ['storage' => $quotaStorage], 'The administrator has limited this account to ' . $quotaStorage . ' MB of storage. The number of notes is unlimited.');
+} else {
+    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_none', [], 'No quota is set for this account: notes and storage are unlimited.');
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
@@ -74,6 +93,21 @@ try {
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="css/admin-tools.css?v=<?php echo $v; ?>">
+    <style>
+    /* Same sizes as the admin storage-stats page: slightly larger column
+       headers, smaller cell values than the admin-tools defaults. */
+    .results-table th {
+        font-size: 0.78rem;
+    }
+    .results-table td {
+        font-size: 0.85rem;
+    }
+    .user-quota-line {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        text-align: center;
+    }
+    </style>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
 <div class="admin-container">
@@ -131,6 +165,8 @@ try {
                 </tbody>
             </table>
         </div>
+
+        <p class="user-quota-line"><?php echo $quotaSentence; ?></p>
     </div>
 </div>
 </body>

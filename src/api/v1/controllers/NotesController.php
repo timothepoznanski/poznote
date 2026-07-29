@@ -730,6 +730,13 @@ class NotesController {
         $linked_note_id = isset($input['linked_note_id']) ? (int)$input['linked_note_id'] : null;
         
         try {
+            $quotaError = poznoteCheckNoteQuota($this->con)
+                ?? poznoteCheckStorageQuota(strlen((string)$entry));
+            if ($quotaError !== null) {
+                $this->sendError(403, $quotaError);
+                return;
+            }
+
             // Validate workspace if provided
             if (!empty($workspace)) {
                 $wsStmt = $this->con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
@@ -1046,7 +1053,16 @@ class NotesController {
                 $filename = getEntryFilename($noteId, $noteType);
                 $entriesDir = dirname($filename);
                 createDirectoryWithPermissions($entriesDir);
-                
+
+                // Only the growth of the note file counts against the storage
+                // quota, so a user over quota can still shrink their notes.
+                $existingEntryBytes = is_file($filename) ? (int)filesize($filename) : 0;
+                $quotaError = poznoteCheckStorageQuota(strlen((string)$entry) - $existingEntryBytes);
+                if ($quotaError !== null) {
+                    $this->sendError(403, $quotaError);
+                    return;
+                }
+
                 // Sanitize HTML content to prevent XSS attacks
                 $contentToSave = $entry;
                 
@@ -1748,7 +1764,14 @@ class NotesController {
             $filename = getEntryFilename($noteId, $noteType);
             $entriesDir = dirname($filename);
             createDirectoryWithPermissions($entriesDir);
-            
+
+            $existingEntryBytes = is_file($filename) ? (int)filesize($filename) : 0;
+            $quotaError = poznoteCheckStorageQuota(strlen((string)$content) - $existingEntryBytes);
+            if ($quotaError !== null) {
+                $this->sendError(403, $quotaError);
+                return;
+            }
+
             $write_result = file_put_contents($filename, $content);
             if ($write_result === false) {
                 $this->sendError(500, 'Failed to write file');
@@ -1861,6 +1884,17 @@ class NotesController {
 
             if (!$originalNote) {
                 $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $cloneAttachmentsBytes = 0;
+            foreach ((json_decode($originalNote['attachments'] ?? '', true) ?: []) as $originalAttachment) {
+                $cloneAttachmentsBytes += (int)($originalAttachment['file_size'] ?? 0);
+            }
+            $quotaError = poznoteCheckNoteQuota($this->con)
+                ?? poznoteCheckStorageQuota($cloneAttachmentsBytes + strlen((string)$originalNote['entry']));
+            if ($quotaError !== null) {
+                $this->sendError(403, $quotaError);
                 return;
             }
 

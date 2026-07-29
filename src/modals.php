@@ -205,6 +205,28 @@ try {
     </div>
 </div>
 
+<!-- User Quotas Modal -->
+<div id="userQuotasModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.user_quotas.title', [], 'User quotas'); ?></h3>
+        <p><?php echo t_h('modals.user_quotas.description', [], 'Limit the number of notes and the storage space of each user. 0 means unlimited. Administrators are not limited.'); ?></p>
+        <div class="font-size-controls">
+            <div class="font-size-row">
+                <label for="userMaxNotesInput"><?php echo t_h('modals.user_quotas.max_notes', [], 'Max notes per user'); ?></label>
+                <input type="number" id="userMaxNotesInput" min="0" max="100000000" step="1" value="0">
+            </div>
+            <div class="font-size-row">
+                <label for="userMaxStorageInput"><?php echo t_h('modals.user_quotas.max_storage', [], 'Max storage per user (MB)'); ?></label>
+                <input type="number" id="userMaxStorageInput" min="0" max="100000000" step="1" value="0">
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="userQuotasModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveUserQuotasBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Font Size Settings Modal -->
 <div id="fontSizeModal" class="modal">
     <div class="modal-content">
@@ -1417,6 +1439,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
