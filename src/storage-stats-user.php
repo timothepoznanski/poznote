@@ -116,7 +116,9 @@ if ($quotaIsAdmin) {
             <a href="index.php" class="btn btn-secondary">
                 <i class="lucide lucide-sticky-note" style="margin-right:5px;"></i><?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
             </a>
-            <a href="settings.php" class="btn btn-secondary"><?php echo t_h('settings.title', [], 'Settings'); ?></a>
+            <a href="settings.php" class="btn btn-secondary">
+                <i class="lucide lucide-settings" style="margin-right:5px;"></i><?php echo t_h('settings.title', [], 'Settings'); ?>
+            </a>
         </div>
     </div>
 
