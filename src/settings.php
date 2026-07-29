@@ -338,18 +338,6 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
-            <!-- Delete Account -->
-            <div class="home-card" id="delete-account-card">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-trash-2"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
-
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
                 <div class="home-card-icon">
@@ -442,6 +430,18 @@ if ($isAdmin) {
                     <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
                 </div>
             </div>
+
+            <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
+            <!-- Delete Account -->
+            <div class="home-card" id="delete-account-card">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-trash-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
 
         </div>
 
