@@ -2383,6 +2383,8 @@
       "email": "Email",
       "status": "Статус",
       "created_at": "Создан",
+      "last_login": "Последний вход",
+      "never_connected": "Никогда",
       "actions": "Действия",
       "active": "Активен",
       "inactive": "Неактивен",

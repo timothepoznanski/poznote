@@ -2576,6 +2576,7 @@
       "inactive": "Inactif",
       "created_at": "Créé le",
       "last_login": "Dernière connexion",
+      "never_connected": "Jamais",
       "storage": "Stockage",
       "notes_count": "Notes",
       "attachments_count": "Pièces jointes",

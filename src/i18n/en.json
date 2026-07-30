@@ -2378,6 +2378,8 @@
       "administrator_short": "Admin",
       "status": "Status",
       "created_at": "Created",
+      "last_login": "Last login",
+      "never_connected": "Never",
       "actions": "Actions",
       "active": "Active",
       "inactive": "Inactive",

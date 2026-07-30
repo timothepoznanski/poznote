@@ -2517,6 +2517,7 @@
       "inactive": "未激活",
       "created_at": "创建于",
       "last_login": "上次登录",
+      "never_connected": "从未",
       "storage": "存储",
       "notes_count": "笔记数",
       "attachments_count": "附件数",

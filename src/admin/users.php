@@ -172,7 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // === Users Table Sort (persisted in the settings table) ===
-$allowedUsersSorts = ['id_asc', 'id_desc', 'username_asc', 'username_desc'];
+// 'access' is computed from the account-access map, so it is sorted in PHP below;
+// every other column is sorted in SQL by listAllUserProfiles().
+$sortableUsersColumns = ['id', 'status', 'username', 'admin', 'first_name', 'last_name', 'email', 'access', 'created', 'last_login'];
+$allowedUsersSorts = [];
+foreach ($sortableUsersColumns as $sortableColumn) {
+    $allowedUsersSorts[] = $sortableColumn . '_asc';
+    $allowedUsersSorts[] = $sortableColumn . '_desc';
+}
 $requestedSort = $_GET['sort'] ?? '';
 if (in_array($requestedSort, $allowedUsersSorts, true)) {
     $usersSort = $requestedSort;
@@ -186,7 +193,7 @@ if (in_array($requestedSort, $allowedUsersSorts, true)) {
     $storedSort = getSetting('admin_users_sort');
     $usersSort = in_array($storedSort, $allowedUsersSorts, true) ? $storedSort : 'id_asc';
 }
-$usersSortColumn = strpos($usersSort, 'username_') === 0 ? 'username' : 'id';
+$usersSortColumn = substr($usersSort, 0, strrpos($usersSort, '_'));
 $usersSortDir = substr($usersSort, strrpos($usersSort, '_') + 1);
 
 /**
@@ -205,6 +212,20 @@ function renderUsersSortHeader(string $column, string $escapedLabel, string $cur
 // === Get User List ===
 $users = listAllUserProfiles($usersSort);
 $accountAccessMap = getUserAccountAccessMap();
+
+// "Note access" is derived from the access map, so it cannot be sorted in SQL:
+// order by how many extra accounts the user can open, then by username.
+if ($usersSortColumn === 'access') {
+    usort($users, function ($a, $b) use ($accountAccessMap, $usersSortDir) {
+        $countA = count($accountAccessMap[(int)$a['id']] ?? []);
+        $countB = count($accountAccessMap[(int)$b['id']] ?? []);
+        $cmp = $countA <=> $countB;
+        if ($cmp === 0) {
+            return strcasecmp((string)$a['username'], (string)$b['username']);
+        }
+        return $usersSortDir === 'desc' ? -$cmp : $cmp;
+    });
+}
 $userNamesById = [];
 foreach ($users as $listedUser) {
     $userNamesById[(int)$listedUser['id']] = (string)$listedUser['username'];
@@ -452,14 +473,14 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <thead>
                     <tr>
                         <th class="text-center col-id"><?php echo renderUsersSortHeader('id', t_h('multiuser.admin.id', [], 'ID'), $usersSortColumn, $usersSortDir); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.status', [], 'Status'); ?></th>
+                        <th class="text-center"><?php echo renderUsersSortHeader('status', t_h('multiuser.admin.status', [], 'Status'), $usersSortColumn, $usersSortDir); ?></th>
                         <th><?php echo renderUsersSortHeader('username', t_h('multiuser.admin.username', [], 'User'), $usersSortColumn, $usersSortDir); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?></th>
-                        <th><?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?></th>
-                        <th><?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?></th>
+                        <th class="text-center"><?php echo renderUsersSortHeader('admin', t_h('multiuser.admin.administrator_short', [], 'Admin'), $usersSortColumn, $usersSortDir); ?></th>
+                        <th><?php echo renderUsersSortHeader('first_name', t_h('multiuser.admin.first_name', [], 'First name'), $usersSortColumn, $usersSortDir); ?></th>
+                        <th><?php echo renderUsersSortHeader('last_name', t_h('multiuser.admin.last_name', [], 'Last name'), $usersSortColumn, $usersSortDir); ?></th>
                         <th>
                             <span class="users-table-header-with-help">
-                                <?php echo t_h('multiuser.admin.email', [], 'Email'); ?>
+                                <?php echo renderUsersSortHeader('email', t_h('multiuser.admin.email', [], 'Email'), $usersSortColumn, $usersSortDir); ?>
                                 <span class="users-header-help" tabindex="0" role="img" aria-label="<?php echo t_h('multiuser.admin.email_usage_note', [], 'Users can sign in with their email address instead of their username. Email addresses are also used for OIDC authentication and reminder emails when configured.'); ?>">
                                     <i class="lucide lucide-help-circle"></i>
                                     <span class="users-header-help-tooltip">
@@ -468,8 +489,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 </span>
                             </span>
                         </th>
-                        <th><?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?></th>
-                        <th class="text-center"><?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?></th>
+                        <th><?php echo renderUsersSortHeader('access', t_h('multiuser.admin.account_access.column', [], 'Note access'), $usersSortColumn, $usersSortDir); ?></th>
+                        <th class="text-center"><?php echo renderUsersSortHeader('created', t_h('multiuser.admin.created_at', [], 'Created'), $usersSortColumn, $usersSortDir); ?></th>
+                        <th class="text-center"><?php echo renderUsersSortHeader('last_login', t_h('multiuser.admin.last_login', [], 'Last login'), $usersSortColumn, $usersSortDir); ?></th>
                         <th class="text-center"><?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?></th>
                     </tr>
                 </thead>
@@ -574,6 +596,18 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                     <span class="user-created-date" title="<?php echo htmlspecialchars($userCreatedFull, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($userCreatedDate); ?></span>
                                 <?php else: ?>
                                     <em class="user-created-date"><?php echo t_h('multiuser.admin.not_defined', [], 'not defined'); ?></em>
+                                <?php endif; ?>
+                            </td>
+
+                            <td class="text-center user-created-cell" data-label="<?php echo t_h('multiuser.admin.last_login', [], 'Last login'); ?>">
+                                <?php
+                                    $userLastLoginDate = convertUtcToUserTimezone((string)($user['last_login'] ?? ''), 'Y-m-d');
+                                    $userLastLoginFull = formatUtcDateTimeForDisplay((string)($user['last_login'] ?? ''), 'Y-m-d H:i');
+                                ?>
+                                <?php if ($userLastLoginDate !== ''): ?>
+                                    <span class="user-created-date" title="<?php echo htmlspecialchars($userLastLoginFull, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($userLastLoginDate); ?></span>
+                                <?php else: ?>
+                                    <em class="user-created-date"><?php echo t_h('multiuser.admin.never_connected', [], 'Never'); ?></em>
                                 <?php endif; ?>
                             </td>
 
