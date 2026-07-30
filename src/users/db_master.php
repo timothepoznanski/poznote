@@ -1053,13 +1053,29 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
  * $sort must be one of the whitelisted keys below; anything else falls back to id_asc.
  */
 function listAllUserProfiles(string $sort = 'id_asc'): array {
+    // Text columns push empty values last in both directions; NULL dates sort
+    // as "least recent" (SQLite treats NULL as smallest, so DESC puts them last).
     $orderClauses = [
         'id_asc' => 'id ASC',
         'id_desc' => 'id DESC',
+        'status_asc' => 'active ASC, username COLLATE NOCASE ASC',
+        'status_desc' => 'active DESC, username COLLATE NOCASE ASC',
         'username_asc' => 'username COLLATE NOCASE ASC',
         'username_desc' => 'username COLLATE NOCASE DESC',
+        'admin_asc' => 'is_admin ASC, username COLLATE NOCASE ASC',
+        'admin_desc' => 'is_admin DESC, username COLLATE NOCASE ASC',
+        'first_name_asc' => "(first_name IS NULL OR first_name = '') ASC, first_name COLLATE NOCASE ASC",
+        'first_name_desc' => "(first_name IS NULL OR first_name = '') ASC, first_name COLLATE NOCASE DESC",
+        'last_name_asc' => "(last_name IS NULL OR last_name = '') ASC, last_name COLLATE NOCASE ASC",
+        'last_name_desc' => "(last_name IS NULL OR last_name = '') ASC, last_name COLLATE NOCASE DESC",
+        'email_asc' => "(email IS NULL OR email = '') ASC, email COLLATE NOCASE ASC",
+        'email_desc' => "(email IS NULL OR email = '') ASC, email COLLATE NOCASE DESC",
+        'created_asc' => 'created_at ASC',
+        'created_desc' => 'created_at DESC',
+        'last_login_asc' => 'last_login ASC',
+        'last_login_desc' => 'last_login DESC',
     ];
-    $orderBy = $orderClauses[$sort] ?? $orderClauses['id_asc'];
+    $orderBy = ($orderClauses[$sort] ?? $orderClauses['id_asc']) . ', id ASC';
 
     try {
         $con = getMasterConnection();

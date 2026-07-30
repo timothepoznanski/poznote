@@ -2507,6 +2507,8 @@
       "administrator_short": "Admin",
       "status": "Status",
       "created_at": "Criado em",
+      "last_login": "Último acesso",
+      "never_connected": "Nunca",
       "actions": "Ações",
       "active": "Ativo",
       "inactive": "Inactivo",
