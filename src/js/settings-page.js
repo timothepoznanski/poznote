@@ -110,7 +110,9 @@
             'date_time_format',
             'hidden_ui_elements',
             'spellcheck_html_notes',
-            'slash_menu_require_alt'
+            'slash_menu_require_alt',
+            'note_nav_shortcuts_enabled',
+            'ctrl_s_save_enabled'
         ];
 
         if (document.getElementById('login-display-badge')) {
@@ -1414,6 +1416,15 @@
             window.restoreUpdateBadge();
         }
 
+        // A click on a card's help icon must not trigger the card action
+        document.addEventListener('click', function (e) {
+            var helpIcon = e.target.closest ? e.target.closest('.setting-help') : null;
+            if (helpIcon) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+
         // Setup toggle cards
         setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
         setupToggleCard('note-icons-card', 'note-icons-status', 'show_note_icons', false, false);
@@ -1427,6 +1438,8 @@
         setupToggleCard('backlinks-at-bottom-card', 'backlinks-at-bottom-status', 'backlinks_at_bottom', false, false);
         setupToggleCard('default-image-border-card', 'default-image-border-status', 'default_image_border_no_padding', false, false);
         setupToggleCard('spellcheck-html-notes-card', 'spellcheck-html-notes-status', 'spellcheck_html_notes', false, false);
+        setupToggleCard('note-nav-shortcuts-card', 'note-nav-shortcuts-status', 'note_nav_shortcuts_enabled', false, false);
+        setupToggleCard('ctrl-s-save-card', 'ctrl-s-save-status', 'ctrl_s_save_enabled', false, false);
         setupSlashMenuTriggerCard();
 
         // Card click handlers for modal settings

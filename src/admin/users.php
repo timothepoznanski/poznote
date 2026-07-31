@@ -60,6 +60,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $result = createUserProfile($username, $email);
 
                 if ($result['success']) {
+                    // Best-effort: notify outgoing webhooks of the new account.
+                    try {
+                        require_once __DIR__ . '/../WebhookDispatcher.php';
+                        (new WebhookDispatcher())->dispatchUserCreated((int)$result['user_id'], 'admin');
+                    } catch (Throwable $e) {
+                        error_log('Webhook dispatch failed after admin user creation: ' . $e->getMessage());
+                    }
+
                     // Redirect to refresh the page and show the new user
                     header('Location: ' . $_SERVER['PHP_SELF']);
                     exit;
@@ -82,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                 }
 
+                $profileBefore = getUserProfileById($userId);
+
                 $result = updateUserProfile($userId, [
                     'username' => $username,
                     'first_name' => $firstName,
@@ -93,6 +103,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
 
                 if ($result['success']) {
+                    // Best-effort: notify outgoing webhooks of the change.
+                    try {
+                        require_once __DIR__ . '/../WebhookDispatcher.php';
+                        (new WebhookDispatcher())->dispatchUserProfileChanged($userId, 'admin', $profileBefore);
+                    } catch (Throwable $e) {
+                        error_log('Webhook dispatch failed after admin profile update: ' . $e->getMessage());
+                    }
+
                     // Redirect to refresh the page
                     header('Location: ' . $_SERVER['PHP_SELF']);
                     exit;
@@ -112,9 +130,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     break;
                 }
 
+                // Captured before deletion: the profile row is gone afterwards.
+                $deletedProfile = getUserProfileById($userId);
+
                 $result = deleteUserProfile($userId, $deleteData);
 
                 if ($result['success']) {
+                    // Best-effort: notify outgoing webhooks of the deletion.
+                    if ($deletedProfile) {
+                        try {
+                            require_once __DIR__ . '/../WebhookDispatcher.php';
+                            (new WebhookDispatcher())->dispatchUserDeleted($deletedProfile, 'admin');
+                        } catch (Throwable $e) {
+                            error_log('Webhook dispatch failed after admin user deletion: ' . $e->getMessage());
+                        }
+                    }
+
                     // Redirect to refresh the page
                     header('Location: ' . $_SERVER['PHP_SELF']);
                     exit;
@@ -137,10 +168,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Only allow toggling active/admin fields
                 if ($field === 'active' || $field === 'is_admin') {
+                    $profileBefore = getUserProfileById($userId);
+
                     $data = [$field => (int)$value];
                     $result = updateUserProfile($userId, $data);
 
                     if ($result['success']) {
+                        // Best-effort: notify outgoing webhooks of the change.
+                        try {
+                            require_once __DIR__ . '/../WebhookDispatcher.php';
+                            (new WebhookDispatcher())->dispatchUserProfileChanged($userId, 'admin', $profileBefore);
+                        } catch (Throwable $e) {
+                            error_log('Webhook dispatch failed after admin status toggle: ' . $e->getMessage());
+                        }
+
                         // Redirect to refresh the page
                         header('Location: ' . $_SERVER['PHP_SELF']);
                         exit;

@@ -265,10 +265,39 @@
         }
     }
 
+    /**
+     * Close the active modal when Escape is pressed
+     * @param {Event} e - Keydown event
+     */
+    function handleModalsEscape(e) {
+        if (e.key !== 'Escape' || e.defaultPrevented) return;
+
+        // The alert/confirm overlay handles its own Escape key
+        if (document.querySelector('.alert-modal-overlay.show')) return;
+
+        const openModals = Array.from(document.querySelectorAll('.modal')).filter(function (modal) {
+            return modal.style.display === 'flex' || modal.style.display === 'block';
+        });
+        if (!openModals.length) return;
+
+        // All modals share the same z-index, so the last one in DOM order paints on top
+        const modal = openModals[openModals.length - 1];
+        e.preventDefault();
+
+        // Prefer the modal's own close button so its cleanup logic runs
+        const closeButton = modal.querySelector('[data-action^="close"]');
+        if (closeButton) {
+            closeButton.click();
+        } else if (modal.id && typeof closeModal === 'function') {
+            closeModal(modal.id);
+        }
+    }
+
     // Initialize event listeners when DOM is loaded
     document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('click', handleModalsClick);
         document.addEventListener('change', handleModalsChange);
         document.addEventListener('keypress', handleModalsKeypress);
+        document.addEventListener('keydown', handleModalsEscape);
     });
 })();

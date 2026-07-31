@@ -246,3 +246,21 @@ body.dark-mode .settings-view-toggle:hover {
     align-self: center;
     flex-shrink: 0;
 }
+
+/* The help icon centers vertically at the end of the row, after the badge */
+.view-list .setting-help {
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+}
+
+.view-list .home-card-content {
+    padding-right: 20px;
+}
+
+/* The help icon is hidden on mobile / touch screens: reclaim its space */
+@media (max-width: 800px), (hover: none) {
+    .view-list .home-card-content {
+        padding-right: 0;
+    }
+}

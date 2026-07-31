@@ -129,6 +129,8 @@ $settingsPageUserKeys = [
     'hidden_ui_elements',
     'spellcheck_html_notes',
     'slash_menu_require_alt',
+    'note_nav_shortcuts_enabled',
+    'ctrl_s_save_enabled',
 ];
 
 foreach ($settingsPageUserKeys as $settingsPageKey) {
@@ -191,6 +193,7 @@ try {
 $users_count = 0;
 $smtp_enabled = false;
 $smtp_configured = false;
+$active_webhooks_count = 0;
 if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
@@ -202,10 +205,14 @@ if ($isAdmin) {
         $smtp_enabled_setting = getGlobalSetting('smtp_enabled', null);
         $smtp_enabled = $smtp_configured
             && ($smtp_enabled_setting === null || $smtp_enabled_setting === '' || filter_var($smtp_enabled_setting, FILTER_VALIDATE_BOOLEAN));
+        $active_webhooks_count = count(array_filter(listWebhooks(), static function ($webhook) {
+            return !empty($webhook['active']);
+        }));
     } catch (Exception $e) {
         $users_count = 0;
         $smtp_enabled = false;
         $smtp_configured = false;
+        $active_webhooks_count = 0;
     }
 }
 
@@ -307,6 +314,7 @@ if ($isAdmin) {
 
             <!-- Workspaces -->
             <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.workspaces', [], 'Organize your notes into separate workspaces, each with its own folders and notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-layers"></i>
                 </div>
@@ -318,6 +326,7 @@ if ($isAdmin) {
 
             <!-- My Profile (username, first/last name) -->
             <div class="home-card" id="my-profile-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.my_profile', [], 'View and edit your profile information.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-user"></i>
                 </div>
@@ -329,6 +338,7 @@ if ($isAdmin) {
 
             <!-- Change Password -->
             <div class="home-card" id="change-password-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.change_password', [], 'Change the password used to sign in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-key"></i>
                 </div>
@@ -340,6 +350,7 @@ if ($isAdmin) {
 
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync', [], 'Back up your notes to a Git repository and view the synchronization history.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <?php
                     require_once 'GitSync.php';
@@ -368,6 +379,7 @@ if ($isAdmin) {
 
             <!-- Browser Extension -->
             <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-chrome"></i>
                 </div>
@@ -378,6 +390,7 @@ if ($isAdmin) {
 
             <!-- Install App -->
             <div class="home-card" id="install-app-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.install_app', [], 'Install Poznote as an application on your device (PWA).'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-smartphone"></i>
                 </div>
@@ -390,6 +403,7 @@ if ($isAdmin) {
             <?php if ($isAdmin): ?>
             <!-- Check for Updates -->
             <div class="home-card" id="check-updates-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.check_updates', [], 'Check whether a newer version of Poznote is available.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-refresh-cw-alt"></i>
                     <span class="update-badge update-badge-hidden"></span>
@@ -403,6 +417,7 @@ if ($isAdmin) {
 
             <!-- Backup / Export -->
             <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backup_export', [], 'Download your notes, attachments and database as a backup.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-upload"></i>
                 </div>
@@ -413,6 +428,7 @@ if ($isAdmin) {
 
             <!-- Restore / Import -->
             <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="restore-import-card" title="<?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?>">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.restore_import', [], 'Restore a backup or import notes into this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-download"></i>
                 </div>
@@ -423,6 +439,7 @@ if ($isAdmin) {
 
             <!-- Storage Statistics (own account) -->
             <div class="home-card settings-card-clickable" id="storage-stats-user-card" data-href="storage-stats-user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats_user', [], 'See how much storage your notes and attachments use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-pie-chart"></i>
                 </div>
@@ -434,6 +451,7 @@ if ($isAdmin) {
             <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
             <!-- Delete Account -->
             <div class="home-card" id="delete-account-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.delete_account', [], 'Permanently delete your account and all its data.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-trash-2"></i>
                 </div>
@@ -452,6 +470,7 @@ if ($isAdmin) {
             <?php if ($isAdmin): ?>
             <!-- Login Display -->
             <div class="home-card" id="login-display-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.login_display', [], 'Customize the title displayed on the login page.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-user"></i>
                 </div>
@@ -464,6 +483,7 @@ if ($isAdmin) {
 
             <!-- Language -->
             <div class="home-card" id="language-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.language', [], 'Change the language of the interface.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-flag"></i>
                 </div>
@@ -475,6 +495,7 @@ if ($isAdmin) {
 
             <!-- Theme Mode -->
             <div class="home-card" id="theme-mode-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_mode', [], 'Switch between light, dark or automatic theme.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-sun"></i>
                 </div>
@@ -486,6 +507,7 @@ if ($isAdmin) {
 
             <!-- App Font -->
             <div class="home-card" id="main-font-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.main_font', [], 'Choose the font used throughout the application.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-type"></i>
                 </div>
@@ -497,6 +519,7 @@ if ($isAdmin) {
 
             <!-- Markdown Editor Font -->
             <div class="home-card" id="markdown-font-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_font', [], 'Choose the font used in the markdown editor.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-file-code"></i>
                 </div>
@@ -508,6 +531,7 @@ if ($isAdmin) {
 
             <!-- Font Size -->
             <div class="home-card" id="font-size-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.font_size', [], 'Adjust the font size of notes, sidebar and code blocks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-type-height"></i>
                 </div>
@@ -523,6 +547,7 @@ if ($isAdmin) {
 
             <!-- Index Icon Scale -->
             <div class="home-card" id="index-icon-scale-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.index_icon_scale', [], 'Adjust the size of the icons in the note list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-maximize-2"></i>
                 </div>
@@ -534,6 +559,7 @@ if ($isAdmin) {
 
             <!-- Timezone -->
             <div class="home-card" id="timezone-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.timezone', [], 'Set the timezone used to display dates and times.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-clock"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span>
@@ -543,6 +569,7 @@ if ($isAdmin) {
 
             <!-- Date and Time Format -->
             <div class="home-card" id="date-time-format-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.date_time_format', [], 'Choose how dates and times are displayed.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-calendar"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span>
@@ -552,6 +579,7 @@ if ($isAdmin) {
 
             <!-- Note Sort Order -->
             <div class="home-card" id="note-sort-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_sort', [], 'Choose how notes are ordered in the list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-arrow-up-down-amount-down"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span>
@@ -561,6 +589,7 @@ if ($isAdmin) {
 
             <!-- Note Age Filter -->
             <div class="home-card" id="note-age-filter-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_age_filter', [], 'Only show notes updated within the chosen number of days.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-filter"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span>
@@ -570,6 +599,7 @@ if ($isAdmin) {
 
             <!-- Tasklist Insert Order -->
             <div class="home-card" id="tasklist-insert-order-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tasklist_insert_order', [], 'Choose whether new tasks are added to the top or the bottom of task lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-arrow-down"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span>
@@ -579,6 +609,7 @@ if ($isAdmin) {
 
             <!-- Diary Entry Note Type -->
             <div class="home-card" id="diary-note-type-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.diary_note_type', [], 'Choose the note format used for new diary entries.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span>
@@ -588,6 +619,7 @@ if ($isAdmin) {
 
             <!-- Show Note Created -->
             <div class="home-card" id="show-created-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.show_created', [], 'Show the creation date in the note header.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-calendar-alt"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span>
@@ -597,6 +629,7 @@ if ($isAdmin) {
 
             <!-- Show Note Icons -->
             <div class="home-card" id="note-icons-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_icons', [], 'Show custom icons next to note titles in the list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-text"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span>
@@ -606,6 +639,7 @@ if ($isAdmin) {
 
             <!-- Note Color Palette -->
             <div class="home-card" id="note-color-palette-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_color_palette', [], 'Customize the color palette available for notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span>
@@ -615,6 +649,7 @@ if ($isAdmin) {
 
             <!-- Show Folder Counts -->
             <div class="home-card desktop-only" id="folder-counts-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.folder_counts', [], 'Show the number of notes next to each folder.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-hash"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?></span>
@@ -624,6 +659,7 @@ if ($isAdmin) {
 
             <!-- Notes Without Folders Position -->
             <div class="home-card" id="notes-without-folders-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.notes_without_folders', [], 'Show notes without a folder after the folder list instead of before.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-folder-tree"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
@@ -633,6 +669,7 @@ if ($isAdmin) {
 
             <!-- Note Width -->
             <div class="home-card desktop-only" id="note-width-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_width', [], 'Adjust the maximum width of the note content.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-move-horizontal"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
@@ -642,6 +679,7 @@ if ($isAdmin) {
 
             <!-- Markdown Split Card View -->
             <div class="home-card" id="markdown-split-card-view-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_card_view', [], 'Display markdown notes in a framed split view with editor and preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
@@ -651,6 +689,7 @@ if ($isAdmin) {
 
             <!-- Code Block Word Wrap -->
             <div class="home-card" id="code-wrap-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_wrap', [], 'Wrap long lines in code blocks instead of scrolling horizontally.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
@@ -660,6 +699,7 @@ if ($isAdmin) {
 
             <!-- Attachment Previews in Notes -->
             <div class="home-card" id="attachment-previews-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachment_previews', [], 'Show previews of attachments inside notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-image"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
@@ -669,6 +709,7 @@ if ($isAdmin) {
 
             <!-- Attachments at Bottom -->
             <div class="home-card" id="attachments-at-bottom-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachments_at_bottom', [], 'Show the attachments section at the bottom of notes instead of the top.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-paperclip"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span>
@@ -678,6 +719,7 @@ if ($isAdmin) {
 
             <!-- Backlinks at Bottom -->
             <div class="home-card" id="backlinks-at-bottom-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backlinks_at_bottom', [], 'Show the backlinks section at the bottom of notes instead of the top.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-link"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span>
@@ -687,6 +729,7 @@ if ($isAdmin) {
 
             <!-- Default Image Border (No Padding) -->
             <div class="home-card" id="default-image-border-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.default_image_border', [], 'Display images in notes with a border and no padding by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
@@ -696,6 +739,7 @@ if ($isAdmin) {
 
             <!-- Spellcheck in HTML notes -->
             <div class="home-card" id="spellcheck-html-notes-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.spellcheck_html_notes', [], 'Enable the browser spell checker in HTML notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-list-check"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span>
@@ -705,6 +749,7 @@ if ($isAdmin) {
 
             <!-- Slash menu trigger -->
             <div class="home-card" id="slash-menu-require-alt-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.slash_menu_require_alt', [], 'Choose whether the command menu opens by typing / or Alt + /.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-keyboard"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.slash_menu_require_alt', [], 'Command menu shortcut'); ?></span>
@@ -712,8 +757,29 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Note navigation shortcuts (Alt + Arrow) -->
+            <div class="home-card" id="note-nav-shortcuts-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_nav_shortcuts', [], 'Switch to the previous or next note in the current folder with Alt + ↑/↓.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-arrow-up-down"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_nav_shortcuts', [], 'Switch notes with Alt + ↑/↓'); ?></span>
+                    <span id="note-nav-shortcuts-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Save shortcut (Ctrl + S) -->
+            <div class="home-card" id="ctrl-s-save-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ctrl_s_save', [], 'Save the current note immediately with Ctrl + S (Cmd + S on Mac).'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-save"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.ctrl_s_save', [], 'Save note with Ctrl + S'); ?></span>
+                    <span id="ctrl-s-save-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
             <!-- UI Customization -->
             <div class="home-card" id="ui-customization-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ui_customization', [], 'Hide interface elements you do not use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-eye-off"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.ui_customization', [], 'UI Customization'); ?></span>
@@ -730,6 +796,7 @@ if ($isAdmin) {
 
             <!-- User Management (Admin only) -->
             <div class="home-card settings-card-clickable" id="users-admin-card" data-href="admin/users.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.users_admin', [], 'Create, edit and manage user accounts.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-users-cog"></i>
                 </div>
@@ -741,6 +808,7 @@ if ($isAdmin) {
 
             <!-- OIDC Configuration -->
             <div class="home-card settings-card-clickable" id="oidc-config-card" data-href="admin/oidc.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.oidc_config', [], 'Configure single sign-on with an OpenID Connect provider.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-shield"></i>
                 </div>
@@ -754,6 +822,7 @@ if ($isAdmin) {
 
             <!-- SMTP Configuration -->
             <div class="home-card settings-card-clickable" id="smtp-config-card" data-href="admin/smtp.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.smtp_config', [], 'Configure the SMTP server used to send emails such as reminders.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-mail"></i>
                 </div>
@@ -773,8 +842,23 @@ if ($isAdmin) {
                 </div>
             </div>
 
+            <!-- Outgoing Webhooks -->
+            <div class="home-card settings-card-clickable" id="webhooks-card" data-href="admin/webhooks.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.webhooks', [], 'Send instance events to external services via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-webhook"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Webhooks'); ?></span>
+                    <span class="setting-status <?php echo $active_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $active_webhooks_count > 0 ? $active_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
+                    </span>
+                </div>
+            </div>
+
             <!-- AI Assistant (instance-wide configuration) -->
             <div class="home-card settings-card-clickable" id="ai-assistant-card" data-href="ai_settings.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ai_assistant', [], 'Configure the AI assistant used to chat with your notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-bot"></i>
                 </div>
@@ -794,6 +878,7 @@ if ($isAdmin) {
 
             <!-- Git Sync Global Toggle -->
             <div class="home-card" id="git-sync-enabled-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync_enabled', [], 'Enable or disable Git synchronization on this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-git-branch"></i>
                 </div>
@@ -805,6 +890,7 @@ if ($isAdmin) {
 
             <!-- Import Limits -->
             <div class="home-card" id="import-limits-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.import_limits', [], 'Set the maximum number of files allowed per import.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-upload"></i>
                 </div>
@@ -819,6 +905,7 @@ if ($isAdmin) {
 
             <!-- Per-user quotas -->
             <div class="home-card" id="user-quotas-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.user_quotas', [], 'Limit the number of notes and the storage available per user.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-gauge"></i>
                 </div>
@@ -833,6 +920,7 @@ if ($isAdmin) {
 
             <!-- Custom CSS Path -->
             <div class="home-card" id="custom-css-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_css', [], 'Apply your own CSS to customize the appearance of Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-palette"></i>
                 </div>
@@ -844,6 +932,7 @@ if ($isAdmin) {
 
             <!-- Element visibility for all users -->
             <div class="home-card" id="ui-customization-admin-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ui_customization_admin', [], 'Hide interface elements for all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-eye-off"></i>
                 </div>
@@ -855,6 +944,7 @@ if ($isAdmin) {
 
             <!-- Disaster Recovery -->
             <div class="home-card settings-card-clickable" id="disaster-recovery-card" data-href="admin/disaster-recovery.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.disaster_recovery', [], 'Restore the instance from a backup in case of data loss.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-database"></i>
                 </div>
@@ -865,6 +955,7 @@ if ($isAdmin) {
 
             <!-- Orphan Scanner -->
             <div class="home-card settings-card-clickable" id="orphan-scanner-card" data-href="admin/orphan-scanner.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.orphan_scanner', [], 'Find and clean up attachment files that no longer belong to any note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-scan"></i>
                 </div>
@@ -875,6 +966,7 @@ if ($isAdmin) {
 
             <!-- Storage Statistics -->
             <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats', [], 'See storage usage across all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-pie-chart"></i>
                 </div>
@@ -892,6 +984,7 @@ if ($isAdmin) {
 
             <!-- Version -->
             <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" rel="noopener noreferrer" class="home-card" id="version-card" title="<?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?>">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.version', [], 'Open the release notes of this version on GitHub.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-info-circle"></i>
                 </div>
@@ -903,6 +996,7 @@ if ($isAdmin) {
 
             <!-- GitHub documentation -->
             <a href="https://github.com/timothepoznanski/poznote" target="_blank" rel="noopener noreferrer" class="home-card" id="github-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.github', [], 'Open the Poznote source code on GitHub.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-github"></i>
                 </div>
@@ -914,6 +1008,7 @@ if ($isAdmin) {
             <?php if ($isAdmin): ?>
             <!-- API REST -->
             <div class="home-card" id="api-rest-card" role="button" tabindex="0">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.api_rest', [], 'Show information about the Poznote REST API.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-code"></i>
                 </div>
@@ -925,6 +1020,7 @@ if ($isAdmin) {
 
             <!-- Poznote Website -->
             <a href="https://poznote.com" target="_blank" rel="noopener noreferrer" class="home-card" id="website-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.website', [], 'Open the official Poznote website.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-globe"></i>
                 </div>
@@ -935,6 +1031,7 @@ if ($isAdmin) {
 
             <!-- Support -->
             <a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="home-card" id="support-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.support', [], 'Support the development of Poznote with a donation.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-heart"></i>
                 </div>

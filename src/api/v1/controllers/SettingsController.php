@@ -120,6 +120,10 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
+        if ($key === 'note_nav_shortcuts_enabled' || $key === 'ctrl_s_save_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
         if ($key === 'import_max_individual_files' || $key === 'import_max_zip_files') {
             $intVal = (int) $value;
             if ($intVal < 1 || $intVal > 100000) {

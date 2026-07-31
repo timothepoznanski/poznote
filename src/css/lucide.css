@@ -4966,3 +4966,14 @@
   background-image: none;
 }
 
+
+.lucide-webhook {
+  -webkit-mask-image: url("data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-webhook%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M18%2016.98h-5.99c-1.1%200-1.95.94-2.48%201.9A4%204%200%200%201%202%2017c.01-.7.2-1.4.57-2%27%20%2F%3E%20%3Cpath%20d%3D%27m6%2017%203.13-5.78c.53-.97.1-2.18-.5-3.1a4%204%200%201%201%206.89-4.06%27%20%2F%3E%20%3Cpath%20d%3D%27m12%206%203.13%205.73C15.66%2012.7%2016.9%2013%2018%2013a4%204%200%200%201%200%208%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C!--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-webhook%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27M18%2016.98h-5.99c-1.1%200-1.95.94-2.48%201.9A4%204%200%200%201%202%2017c.01-.7.2-1.4.57-2%27%20%2F%3E%20%3Cpath%20d%3D%27m6%2017%203.13-5.78c.53-.97.1-2.18-.5-3.1a4%204%200%201%201%206.89-4.06%27%20%2F%3E%20%3Cpath%20d%3D%27m12%206%203.13%205.73C15.66%2012.7%2016.9%2013%2018%2013a4%204%200%200%201%200%208%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}

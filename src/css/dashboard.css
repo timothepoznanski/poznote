@@ -1812,6 +1812,27 @@ body.dark-mode .dashboard-version-badge {
     color: #007DB8;
 }
 
+/* Scroll the top info bar horizontally instead of truncating its items,
+   matching the icon bar below it */
+@media (max-width: 800px) {
+    .dashboard-top-info {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 20px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .dashboard-top-info::-webkit-scrollbar {
+        display: none;
+    }
+
+    .dashboard-top-info-item {
+        flex: 0 0 auto;
+    }
+}
+
 /* Workspace switcher modal */
 .workspace-switcher-list {
     display: flex;

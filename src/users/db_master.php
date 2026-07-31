@@ -173,6 +173,20 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
     
+    // Outgoing webhooks: admin-registered endpoints notified of instance events.
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS webhooks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            url TEXT NOT NULL,
+            secret TEXT,
+            events TEXT NOT NULL DEFAULT 'user.created',
+            active INTEGER DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_status TEXT,
+            last_delivery_at DATETIME
+        )
+    ");
+
     // Create indexes
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_active ON users(active)");
@@ -1132,6 +1146,94 @@ function listNewUserNotificationCandidates(): array {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         return [];
+    }
+}
+
+/**
+ * List all registered outgoing webhooks, newest first.
+ */
+function listWebhooks(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("SELECT * FROM webhooks ORDER BY id DESC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * List the active webhooks subscribed to a given event.
+ * The events column holds a comma-separated list of event names.
+ */
+function listActiveWebhooksForEvent(string $event): array {
+    $matching = [];
+    foreach (listWebhooks() as $webhook) {
+        if (empty($webhook['active'])) {
+            continue;
+        }
+        $events = array_map('trim', explode(',', (string)$webhook['events']));
+        if (in_array($event, $events, true)) {
+            $matching[] = $webhook;
+        }
+    }
+    return $matching;
+}
+
+function getWebhookById(int $id): ?array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT * FROM webhooks WHERE id = ?");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+function createWebhook(string $url, string $secret, array $events): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active) VALUES (?, ?, ?, 1)");
+        return $stmt->execute([$url, $secret !== '' ? $secret : null, implode(',', $events)]);
+    } catch (Exception $e) {
+        error_log("Failed to create webhook: " . $e->getMessage());
+        return false;
+    }
+}
+
+function deleteWebhook(int $id): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("DELETE FROM webhooks WHERE id = ?");
+        return $stmt->execute([$id]);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function setWebhookActive(int $id, bool $active): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE webhooks SET active = ? WHERE id = ?");
+        return $stmt->execute([$active ? 1 : 0, $id]);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * Record the outcome of the most recent delivery attempt, e.g. "200" or
+ * "error: timeout", for display on the admin page.
+ */
+function recordWebhookDelivery(int $id, string $status): void {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE webhooks SET last_status = ?, last_delivery_at = CURRENT_TIMESTAMP WHERE id = ?");
+        $stmt->execute([mb_substr($status, 0, 200), $id]);
+    } catch (Exception $e) {
+        // Delivery bookkeeping must never break the dispatch itself.
     }
 }
 

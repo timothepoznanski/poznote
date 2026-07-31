@@ -757,6 +757,23 @@ function oidc_signup_cap_reached() {
     return $count >= $max;
 }
 
+/**
+ * Best-effort webhook when a signup is refused by the cap, so the operator
+ * learns about lost signups in real time. Must never break the login flow.
+ */
+function oidc_notify_signup_cap_reached($preferredUsername, $email) {
+    try {
+        require_once __DIR__ . '/WebhookDispatcher.php';
+        (new WebhookDispatcher())->dispatchSignupCapReached(
+            oidc_max_users() ?: null,
+            is_string($preferredUsername) ? $preferredUsername : null,
+            is_string($email) ? $email : null
+        );
+    } catch (Throwable $e) {
+        error_log('Webhook dispatch failed for signup cap: ' . $e->getMessage());
+    }
+}
+
 function oidc_build_username_candidates($claims) {
     $preferredUsername = $claims['preferred_username'] ?? null;
     $nickname = $claims['nickname'] ?? null;
@@ -884,6 +901,7 @@ function oidc_find_or_provision_user($claims) {
         }
 
         if (oidc_signup_cap_reached()) {
+            oidc_notify_signup_cap_reached($preferredUsername, $email);
             throw new Exception('signup limit reached: this instance is not accepting new accounts.');
         }
 
@@ -893,6 +911,7 @@ function oidc_find_or_provision_user($claims) {
         if (empty($creation['success']) || empty($creation['user_id'])) {
             $error = $creation['error'] ?? 'unknown error';
             if (strpos($error, 'signup limit reached') !== false) {
+                oidc_notify_signup_cap_reached($preferredUsername, $email);
                 throw new Exception('signup limit reached: this instance is not accepting new accounts.');
             }
             throw new Exception('Failed to auto-create user profile: ' . $error);
@@ -926,6 +945,14 @@ function oidc_find_or_provision_user($claims) {
         } catch (Throwable $e) {
             error_log('New user notification failed after OIDC provisioning: ' . $e->getMessage());
         }
+
+        // Best-effort: notify outgoing webhooks of the new account.
+        try {
+            require_once __DIR__ . '/WebhookDispatcher.php';
+            (new WebhookDispatcher())->dispatchUserCreated((int)$creation['user_id'], 'oidc');
+        } catch (Throwable $e) {
+            error_log('Webhook dispatch failed after OIDC provisioning: ' . $e->getMessage());
+        }
     }
 
     if (!$user['active']) {
@@ -947,9 +974,18 @@ function oidc_find_or_provision_user($claims) {
         // Only auto-sync email when target email is unused or already on this same user.
         $existingByEmail = getUserProfileByEmail($email);
         if (!$existingByEmail || (int)$existingByEmail['id'] === (int)$user['id']) {
+            $profileBefore = $user;
             // Provider-synced emails are trusted for future matching.
             updateUserProfile((int)$user['id'], ['email' => $email, 'email_verified' => 1]);
             $user['email'] = $email;
+
+            // Best-effort: notify outgoing webhooks of the email change.
+            try {
+                require_once __DIR__ . '/WebhookDispatcher.php';
+                (new WebhookDispatcher())->dispatchUserProfileChanged((int)$user['id'], 'oidc', $profileBefore);
+            } catch (Throwable $e) {
+                error_log('Webhook dispatch failed after OIDC email sync: ' . $e->getMessage());
+            }
         }
     }
 
