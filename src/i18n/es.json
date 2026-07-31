@@ -432,6 +432,7 @@
       "git_sync_toggle": "Sincronización Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
+      "webhooks": "Webhooks",
       "ai_assistant": "Asistente IA"
     },
     "install_app": {
@@ -2908,6 +2909,42 @@
       "description": "Enviar un correo a los administradores seleccionados cuando se cree una nueva cuenta de usuario.",
       "no_candidates": "Ningún administrador tiene todavía dirección de correo. Añada una a un perfil de administrador en la página Usuarios para activar las notificaciones."
     }
+  },
+  "webhooks_admin": {
+    "title": "Webhooks",
+    "description": "Poznote envía una solicitud HTTP POST con una carga JSON a cada endpoint registrado cuando ocurre un evento suscrito. Si se define un secreto, la carga se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",
+    "section_add": "Añadir un webhook",
+    "section_list": "Webhooks registrados",
+    "fields": {
+      "url": "URL del endpoint",
+      "secret": "Secreto (opcional)",
+      "events": "Eventos"
+    },
+    "hints": {
+      "secret": "Sirve para firmar la carga de modo que el receptor pueda verificar que proviene de esta instancia."
+    },
+    "status": {
+      "none": "Ninguno"
+    },
+    "add_button": "Añadir webhook",
+    "empty": "Todavía no hay ningún webhook registrado.",
+    "signed": "Firmado",
+    "last_delivery": "Última entrega: {{status}} ({{date}} UTC)",
+    "test_button": "Enviar prueba",
+    "enable_button": "Activar",
+    "disable_button": "Desactivar",
+    "added": "Webhook añadido.",
+    "added_duplicate": "Webhook añadido, pero esta URL ya estaba registrada: cada entrada recibirá su propia entrega por cada evento.",
+    "deleted": "Webhook eliminado.",
+    "enabled": "Webhook activado.",
+    "disabled": "Webhook desactivado.",
+    "test_success": "Prueba entregada (HTTP {{status}}).",
+    "test_failure": "La entrega de prueba falló ({{status}}).",
+    "error_csrf": "Envío de formulario no válido. Inténtelo de nuevo.",
+    "error_invalid_url": "La URL del webhook debe empezar por http:// o https://.",
+    "error_no_events": "Seleccione al menos un evento.",
+    "error_saving": "Error al guardar el webhook.",
+    "error_not_found": "Webhook no encontrado."
   },
   "reminder": {
     "toolbar_button": "Establecer recordatorio",

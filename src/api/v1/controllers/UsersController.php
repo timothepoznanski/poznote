@@ -147,11 +147,21 @@ class UsersController {
 
         $usernameChanged = isset($updates['username']);
 
+        $profileBefore = getUserProfileById((int)$userId);
+
         $result = updateUserProfile((int)$userId, $updates);
 
         if (!$result['success']) {
             http_response_code(400);
             return ['error' => $result['error']];
+        }
+
+        // Best-effort: notify outgoing webhooks of the change.
+        try {
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
+            (new WebhookDispatcher())->dispatchUserProfileChanged((int)$userId, 'self', $profileBefore);
+        } catch (Throwable $e) {
+            error_log('Webhook dispatch failed after self profile update: ' . $e->getMessage());
         }
 
         $user = getUserProfileById((int)$userId);
@@ -270,12 +280,20 @@ class UsersController {
         }
         
         $result = createUserProfile($username, $email);
-        
+
         if (!$result['success']) {
             http_response_code(400);
             return ['error' => $result['error']];
         }
-        
+
+        // Best-effort: notify outgoing webhooks of the new account.
+        try {
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
+            (new WebhookDispatcher())->dispatchUserCreated((int)$result['user_id'], 'api');
+        } catch (Throwable $e) {
+            error_log('Webhook dispatch failed after API user creation: ' . $e->getMessage());
+        }
+
         http_response_code(201);
         return [
             'id' => $result['user_id'],
@@ -304,12 +322,21 @@ class UsersController {
         }
 
         $result = updateUserProfile((int)$id, $data);
-        
+
         if (!$result['success']) {
             http_response_code(400);
             return ['error' => $result['error']];
         }
-        
+
+        // Best-effort: notify outgoing webhooks of the change ($user was
+        // loaded above, before the update).
+        try {
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
+            (new WebhookDispatcher())->dispatchUserProfileChanged((int)$id, 'api', $user);
+        } catch (Throwable $e) {
+            error_log('Webhook dispatch failed after API profile update: ' . $e->getMessage());
+        }
+
         return ['message' => 'User profile updated successfully'];
     }
     
@@ -328,14 +355,27 @@ class UsersController {
         }
         
         $deleteData = isset($params['delete_data']) && filter_var($params['delete_data'], FILTER_VALIDATE_BOOL);
-        
+
+        // Captured before deletion: the profile row is gone afterwards.
+        $deletedProfile = getUserProfileById((int)$id);
+
         $result = deleteUserProfile((int)$id, $deleteData);
-        
+
         if (!$result['success']) {
             http_response_code(400);
             return ['error' => $result['error']];
         }
-        
+
+        // Best-effort: notify outgoing webhooks of the deletion.
+        if ($deletedProfile) {
+            try {
+                require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
+                (new WebhookDispatcher())->dispatchUserDeleted($deletedProfile, 'api');
+            } catch (Throwable $e) {
+                error_log('Webhook dispatch failed after API user deletion: ' . $e->getMessage());
+            }
+        }
+
         return ['message' => 'User profile deleted successfully'];
     }
     
@@ -498,6 +538,15 @@ class UsersController {
         if (!$result['success']) {
             http_response_code(400);
             return ['error' => $result['error']];
+        }
+
+        // Best-effort: notify outgoing webhooks of the deletion ($user was
+        // loaded above, before the row disappeared).
+        try {
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
+            (new WebhookDispatcher())->dispatchUserDeleted($user, 'self');
+        } catch (Throwable $e) {
+            error_log('Webhook dispatch failed after account self-deletion: ' . $e->getMessage());
         }
 
         // Close the now-orphaned session like logout() does, but return the

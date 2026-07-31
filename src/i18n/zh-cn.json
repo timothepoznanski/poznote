@@ -433,6 +433,7 @@
       "git_sync_toggle": "Git 同步",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
+      "webhooks": "Webhook",
       "ai_assistant": "AI 助手"
     },
     "install_app": {
@@ -3047,6 +3048,42 @@
       "description": "创建新用户账户时，向选定的管理员发送邮件。",
       "no_candidates": "目前没有管理员设置了电子邮件地址。请在“用户”页面为管理员资料添加地址以启用通知。"
     }
+  },
+  "webhooks_admin": {
+    "title": "Webhook",
+    "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",
+    "section_add": "添加 Webhook",
+    "section_list": "已注册的 Webhook",
+    "fields": {
+      "url": "端点 URL",
+      "secret": "密钥（可选）",
+      "events": "事件"
+    },
+    "hints": {
+      "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。"
+    },
+    "status": {
+      "none": "无"
+    },
+    "add_button": "添加 Webhook",
+    "empty": "尚未注册任何 Webhook。",
+    "signed": "已签名",
+    "last_delivery": "最近投递：{{status}}（{{date}} UTC）",
+    "test_button": "发送测试",
+    "enable_button": "启用",
+    "disable_button": "禁用",
+    "added": "Webhook 已添加。",
+    "added_duplicate": "Webhook 已添加，但该 URL 之前已注册：每个条目都会针对每个事件收到各自的投递。",
+    "deleted": "Webhook 已删除。",
+    "enabled": "Webhook 已启用。",
+    "disabled": "Webhook 已禁用。",
+    "test_success": "测试已投递（HTTP {{status}}）。",
+    "test_failure": "测试投递失败（{{status}}）。",
+    "error_csrf": "表单提交无效。请重试。",
+    "error_invalid_url": "Webhook URL 必须以 http:// 或 https:// 开头。",
+    "error_no_events": "请至少选择一个事件。",
+    "error_saving": "保存 Webhook 时出错。",
+    "error_not_found": "未找到该 Webhook。"
   },
   "reminder": {
     "toolbar_button": "设置提醒",

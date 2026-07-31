@@ -191,6 +191,7 @@ try {
 $users_count = 0;
 $smtp_enabled = false;
 $smtp_configured = false;
+$active_webhooks_count = 0;
 if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
@@ -202,10 +203,14 @@ if ($isAdmin) {
         $smtp_enabled_setting = getGlobalSetting('smtp_enabled', null);
         $smtp_enabled = $smtp_configured
             && ($smtp_enabled_setting === null || $smtp_enabled_setting === '' || filter_var($smtp_enabled_setting, FILTER_VALIDATE_BOOLEAN));
+        $active_webhooks_count = count(array_filter(listWebhooks(), static function ($webhook) {
+            return !empty($webhook['active']);
+        }));
     } catch (Exception $e) {
         $users_count = 0;
         $smtp_enabled = false;
         $smtp_configured = false;
+        $active_webhooks_count = 0;
     }
 }
 
@@ -769,6 +774,19 @@ if ($isAdmin) {
                             echo t_h('smtp_admin.status.not_configured', [], 'Not configured');
                         }
                         ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Outgoing Webhooks -->
+            <div class="home-card settings-card-clickable" id="webhooks-card" data-href="admin/webhooks.php">
+                <div class="home-card-icon">
+                    <i class="lucide lucide-webhook"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Webhooks'); ?></span>
+                    <span class="setting-status <?php echo $active_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $active_webhooks_count > 0 ? $active_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
                     </span>
                 </div>
             </div>

@@ -141,6 +141,7 @@
       "git_sync_toggle": "Git Sync",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
+      "webhooks": "Webhooks",
       "ai_assistant": "AI Assistant"
     },
     "install_app": {
@@ -2607,6 +2608,42 @@
       "description": "Send an email to the selected administrators when a new user account is created.",
       "no_candidates": "No administrator has an email address yet. Add one to an admin profile in the Users page to enable notifications."
     }
+  },
+  "webhooks_admin": {
+    "title": "Webhooks",
+    "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
+    "section_add": "Add a webhook",
+    "section_list": "Registered webhooks",
+    "fields": {
+      "url": "Endpoint URL",
+      "secret": "Secret (optional)",
+      "events": "Events"
+    },
+    "hints": {
+      "secret": "Used to sign the payload so the receiver can verify it comes from this instance."
+    },
+    "status": {
+      "none": "None"
+    },
+    "add_button": "Add webhook",
+    "empty": "No webhook registered yet.",
+    "signed": "Signed",
+    "last_delivery": "Last delivery: {{status}} ({{date}} UTC)",
+    "test_button": "Send test",
+    "enable_button": "Enable",
+    "disable_button": "Disable",
+    "added": "Webhook added.",
+    "added_duplicate": "Webhook added, but this URL was already registered: each entry will receive its own delivery for every event.",
+    "deleted": "Webhook deleted.",
+    "enabled": "Webhook enabled.",
+    "disabled": "Webhook disabled.",
+    "test_success": "Test delivered (HTTP {{status}}).",
+    "test_failure": "Test delivery failed ({{status}}).",
+    "error_csrf": "Invalid form submission. Please try again.",
+    "error_invalid_url": "The webhook URL must start with http:// or https://.",
+    "error_no_events": "Select at least one event.",
+    "error_saving": "Error saving the webhook.",
+    "error_not_found": "Webhook not found."
   },
   "reminder": {
     "toolbar_button": "Set reminder",
