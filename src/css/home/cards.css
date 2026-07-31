@@ -247,3 +247,62 @@ body.dark-mode .home-card-green .home-card-icon {
     font-size: 14px;
     color: #6b7280;
 }
+
+/* Help icon with hover tooltip on settings cards */
+.setting-help {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 5;
+    cursor: help;
+    line-height: 1;
+}
+
+.setting-help .lucide {
+    width: 13px;
+    height: 13px;
+    background-color: #9ca3af;
+    opacity: 0.55;
+    transition: opacity 0.15s ease;
+}
+
+.setting-help:hover .lucide {
+    opacity: 1;
+}
+
+.setting-help::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    right: -4px;
+    width: max-content;
+    max-width: 240px;
+    background: #1f2937;
+    color: #f9fafb;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    padding: 8px 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 50;
+}
+
+.setting-help:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* No hover on mobile / touch screens: hide the help icon entirely */
+@media (max-width: 800px), (hover: none) {
+    .setting-help {
+        display: none;
+    }
+}

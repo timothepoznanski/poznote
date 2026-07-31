@@ -61,6 +61,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/events-text-selection.js',
         'js/utils.js',
         'js/search-highlight.js',
+        'js/keyboard-shortcuts.js',
         'js/slash-command.js',
         'js/emoji-autocomplete.js',
         'js/pwa-helpers.js',
