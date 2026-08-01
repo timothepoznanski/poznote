@@ -1338,63 +1338,228 @@
         fileInput.click();
     }
 
+    function isUsableAnchorRect(rect) {
+        return !!(rect && (rect.left || rect.top || rect.bottom || rect.width || rect.height));
+    }
+
+    // Rect the date picker popup is anchored to. A collapsed DOM selection
+    // often reports an empty 0,0 rect once the slash menu has closed (which
+    // would open the picker over the sidebar), so fall back through CodeMirror
+    // coordinates, the saved range, then the editor element itself.
+    function getCursorAnchorRect(editableElement, savedRange) {
+        let rect = null;
+
+        const api = getMarkdownCodeMirrorApi();
+        if (isMarkdownCodeMirrorEditor(editableElement) && api && typeof api.getCoordsAtPos === 'function') {
+            const snapshot = getCodeMirrorSelectionSnapshot(editableElement);
+            if (snapshot) {
+                try {
+                    rect = api.getCoordsAtPos(editableElement, snapshot.end, 1)
+                        || api.getCoordsAtPos(editableElement, snapshot.end, -1);
+                } catch (e) { }
+            }
+        }
+
+        if (!isUsableAnchorRect(rect)) {
+            const range = savedRange || getSavedDomRange();
+            if (range) {
+                try {
+                    const rects = range.getClientRects();
+                    rect = (rects && rects.length > 0) ? rects[0] : range.getBoundingClientRect();
+                } catch (e) { }
+            }
+        }
+
+        if (!isUsableAnchorRect(rect) && editableElement && editableElement.getBoundingClientRect) {
+            rect = editableElement.getBoundingClientRect();
+        }
+
+        return isUsableAnchorRect(rect) ? rect : null;
+    }
+
+    // Custom date picker popup. The native <input type="date"> picker cannot
+    // be used here: the browser decides where to open it and, at least on
+    // Chromium/Linux, showPicker() ignores the input position entirely and
+    // opens the calendar in the top-left corner of the window (over the
+    // sidebar). This popup is positioned like the slash menu itself.
+    let slashDatePickerCleanup = null;
+
+    function closeSlashDatePicker() {
+        if (slashDatePickerCleanup) slashDatePickerCleanup();
+    }
+
+    function showSlashDatePicker(anchorRect, onPick, onDismiss) {
+        closeSlashDatePicker();
+
+        const t9n = window.calendarTranslations || {};
+        const months = (Array.isArray(t9n.months) && t9n.months.length === 12) ? t9n.months
+            : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const weekdays = (Array.isArray(t9n.weekdays) && t9n.weekdays.length === 7) ? t9n.weekdays
+            : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+        const esc = escapeHtmlAttributeValue;
+
+        const today = new Date();
+        let viewYear = today.getFullYear();
+        let viewMonth = today.getMonth();
+
+        const picker = document.createElement('div');
+        picker.className = 'slash-date-picker';
+
+        function render() {
+            const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+            const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+            // Monday-first, same convention as the sidebar mini calendar
+            const leadingBlanks = firstDay === 0 ? 6 : firstDay - 1;
+
+            let html = '<div class="slash-date-picker-header">'
+                + '<button type="button" class="slash-date-picker-nav" data-nav="-1" title="' + esc(t9n.previousMonth || 'Previous month') + '">&#8249;</button>'
+                + '<span class="slash-date-picker-title">' + esc(months[viewMonth]) + ' ' + viewYear + '</span>'
+                + '<button type="button" class="slash-date-picker-nav" data-nav="1" title="' + esc(t9n.nextMonth || 'Next month') + '">&#8250;</button>'
+                + '</div><div class="slash-date-picker-grid">';
+            for (let i = 0; i < 7; i++) {
+                html += '<span class="slash-date-picker-weekday">' + esc(weekdays[i]) + '</span>';
+            }
+            for (let i = 0; i < leadingBlanks; i++) {
+                html += '<span></span>';
+            }
+            for (let day = 1; day <= daysInMonth; day++) {
+                const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
+                html += '<button type="button" class="slash-date-picker-day' + (isToday ? ' today' : '') + '" data-day="' + day + '">' + day + '</button>';
+            }
+            html += '</div><div class="slash-date-picker-footer">'
+                + '<button type="button" class="slash-date-picker-today-btn" data-today="1">' + esc(t9n.today || 'Today') + '</button>'
+                + '</div>';
+            picker.innerHTML = html;
+        }
+
+        let picked = false;
+        function cleanup() {
+            document.removeEventListener('mousedown', handleOutsideMouseDown, true);
+            document.removeEventListener('keydown', handleEscape, true);
+            if (picker.parentNode) picker.parentNode.removeChild(picker);
+            slashDatePickerCleanup = null;
+            if (!picked && typeof onDismiss === 'function') onDismiss();
+        }
+
+        function pick(date) {
+            picked = true;
+            cleanup();
+            onPick(date);
+        }
+
+        function handleOutsideMouseDown(e) {
+            if (!picker.contains(e.target)) cleanup();
+        }
+
+        function handleEscape(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                e.stopPropagation();
+                cleanup();
+            }
+        }
+
+        // Keep the caret/selection in the editor while interacting with the popup
+        picker.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        picker.addEventListener('click', function (e) {
+            const nav = e.target.closest('[data-nav]');
+            if (nav) {
+                viewMonth += parseInt(nav.getAttribute('data-nav'), 10);
+                if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+                if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+                render();
+                return;
+            }
+            if (e.target.closest('[data-today]')) {
+                pick(new Date(today.getFullYear(), today.getMonth(), today.getDate()));
+                return;
+            }
+            const dayBtn = e.target.closest('[data-day]');
+            if (dayBtn) {
+                pick(new Date(viewYear, viewMonth, parseInt(dayBtn.getAttribute('data-day'), 10)));
+            }
+        });
+
+        render();
+        document.body.appendChild(picker);
+
+        const padding = 8;
+        const pickerRect = picker.getBoundingClientRect();
+        const rect = anchorRect || { left: (window.innerWidth - pickerRect.width) / 2, top: window.innerHeight / 2, bottom: window.innerHeight / 2 };
+        const x = Math.min(rect.left, window.innerWidth - pickerRect.width - padding);
+        let y = rect.bottom + 6;
+        if (y + pickerRect.height > window.innerHeight - padding) {
+            y = Math.max(padding, rect.top - pickerRect.height - 6);
+        }
+        picker.style.left = Math.max(padding, x) + 'px';
+        picker.style.top = y + 'px';
+
+        document.addEventListener('mousedown', handleOutsideMouseDown, true);
+        document.addEventListener('keydown', handleEscape, true);
+
+        slashDatePickerCleanup = cleanup;
+
+        // Keep the mobile virtual keyboard closed while the calendar is open;
+        // the editor gets focused again on pick, when the insertion needs it.
+        if (window.innerWidth < 768) {
+            const active = document.activeElement;
+            if (active && typeof active.blur === 'function') {
+                try { active.blur(); } catch (e) { }
+            }
+        }
+    }
+
     // Insert a date (opens date picker)
     function insertDate() {
         // Find current editor context to restore later
         const context = getEditorContext();
         if (!context) return;
 
-        const dateInput = document.createElement('input');
-        dateInput.type = 'date';
-        dateInput.style.position = 'fixed';
-        dateInput.style.opacity = '0';
-        dateInput.style.zIndex = '9999';
-        dateInput.style.pointerEvents = 'none';
-
-        // Attempt to position near the cursor
+        // The native picker steals focus, which can wipe the selection before
+        // the change handler runs (mobile especially); keep a copy now.
+        let savedInsertionRange = null;
         try {
-            const selection = window.getSelection();
-            if (selection && selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                dateInput.style.left = rect.left + 'px';
-                dateInput.style.top = rect.bottom + 'px';
-            } else {
-                // Fallback to center
-                dateInput.style.left = '50%';
-                dateInput.style.top = '50%';
-                dateInput.style.transform = 'translate(-50%, -50%)';
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount > 0 && context.editableElement.contains(sel.getRangeAt(0).commonAncestorContainer)) {
+                savedInsertionRange = sel.getRangeAt(0).cloneRange();
             }
-        } catch (e) {
-            // Fallback to center
-            dateInput.style.left = '50%';
-            dateInput.style.top = '50%';
-            dateInput.style.transform = 'translate(-50%, -50%)';
-        }
+        } catch (e) { }
 
-        document.body.appendChild(dateInput);
+        const anchorRect = getCursorAnchorRect(context.editableElement, savedInsertionRange);
+        showSlashDatePicker(anchorRect, function (date) {
+            // Focus the editor back before inserting
+            focusEditableElement(context.editableElement);
 
-        dateInput.addEventListener('change', function () {
-            const date = dateInput.value;
-            if (date) {
-                // Focus the editor back before inserting
-                focusEditableElement(context.editableElement);
-
-                // Format the date based on user's locale
-                const formattedDate = new Date(date).toLocaleDateString();
-                if (typeof window.insertHTMLAtSelection === 'function') {
-                    window.insertHTMLAtSelection(formattedDate);
-                } else {
-                    // Fallback for HTML notes
-                    const selection = window.getSelection();
-                    if (selection && selection.rangeCount) {
-                        const range = selection.getRangeAt(0);
-                        range.deleteContents();
-                        range.insertNode(document.createTextNode(formattedDate));
+            // Put the caret back in the editor if the picker wiped it
+            try {
+                const sel = window.getSelection();
+                const inEditor = sel && sel.rangeCount > 0
+                    && context.editableElement.contains(sel.getRangeAt(0).commonAncestorContainer);
+                if (!inEditor && sel) {
+                    let range = savedInsertionRange;
+                    if (!range || !context.editableElement.contains(range.commonAncestorContainer)) {
+                        range = document.createRange();
+                        range.selectNodeContents(context.editableElement);
+                        range.collapse(false);
                     }
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            } catch (e) { }
+
+            // Format the date based on user's locale
+            const formattedDate = date.toLocaleDateString();
+            if (typeof window.insertHTMLAtSelection === 'function') {
+                window.insertHTMLAtSelection(formattedDate);
+            } else {
+                // Fallback for HTML notes
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(formattedDate));
                 }
             }
-            document.body.removeChild(dateInput);
 
             // Trigger input event for autosave
             const noteEntry = context.noteEntry;
@@ -1402,13 +1567,6 @@
                 noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
             }
         });
-
-        // Some browsers need a short delay or user interaction
-        if (dateInput.showPicker) {
-            dateInput.showPicker();
-        } else {
-            dateInput.click();
-        }
     }
 
     // Insert a date in a Markdown editor
@@ -1416,53 +1574,11 @@
         const context = getEditorContext();
         if (!context) return;
 
-        const dateInput = document.createElement('input');
-        dateInput.type = 'date';
-        dateInput.style.position = 'fixed';
-        dateInput.style.opacity = '0';
-        dateInput.style.zIndex = '9999';
-        dateInput.style.pointerEvents = 'none';
-
-        // Attempt to position near the cursor
-        try {
-            const selection = window.getSelection();
-            if (selection && selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                const rect = range.getBoundingClientRect();
-                dateInput.style.left = rect.left + 'px';
-                dateInput.style.top = rect.bottom + 'px';
-            } else {
-                // Fallback to center
-                dateInput.style.left = '50%';
-                dateInput.style.top = '50%';
-                dateInput.style.transform = 'translate(-50%, -50%)';
-            }
-        } catch (e) {
-            // Fallback to center
-            dateInput.style.left = '50%';
-            dateInput.style.top = '50%';
-            dateInput.style.transform = 'translate(-50%, -50%)';
-        }
-
-        document.body.appendChild(dateInput);
-
-        dateInput.addEventListener('change', function () {
-            const date = dateInput.value;
-            if (date) {
-                // Focus the editor back before inserting
-                focusEditableElement(context.editableElement);
-
-                const formattedDate = new Date(date).toLocaleDateString();
-                insertMarkdownAtCursor(formattedDate, 0);
-            }
-            document.body.removeChild(dateInput);
+        const insertionContext = captureEditorInsertionContext();
+        const anchorRect = getCursorAnchorRect(context.editableElement, insertionContext.savedRange);
+        showSlashDatePicker(anchorRect, function (date) {
+            insertMarkdownAtContext(insertionContext, date.toLocaleDateString(), 0);
         });
-
-        if (dateInput.showPicker) {
-            dateInput.showPicker();
-        } else {
-            dateInput.click();
-        }
     }
 
     function isSlashCommandHidden(commandId) {
@@ -1538,64 +1654,35 @@
         const insertionStart = (typeof input.selectionStart === 'number') ? input.selectionStart : Math.max(0, slashOffset);
         const insertionEnd = (typeof input.selectionEnd === 'number') ? input.selectionEnd : insertionStart;
 
-        const dateInput = document.createElement('input');
-        dateInput.type = 'date';
-        dateInput.style.position = 'fixed';
-        dateInput.style.top = '-1000px';
-        dateInput.style.left = '-1000px';
-        document.body.appendChild(dateInput);
+        const inputRect = input.getBoundingClientRect();
+        showSlashDatePicker(isUsableAnchorRect(inputRect) ? inputRect : null, function (date) {
+            const formattedDate = date.toLocaleDateString() + ' ';
+            const text = input.value;
 
-        let cleanedUp = false;
-        function cleanup() {
-            if (cleanedUp) return;
-            cleanedUp = true;
-            if (dateInput.parentNode) {
-                dateInput.parentNode.removeChild(dateInput);
+            const safeStart = Math.max(0, Math.min(insertionStart, text.length));
+            const safeEnd = Math.max(safeStart, Math.min(insertionEnd, text.length));
+
+            if (typeof input.setRangeText === 'function') {
+                input.setRangeText(formattedDate, safeStart, safeEnd, 'end');
+            } else {
+                input.value = text.substring(0, safeStart) + formattedDate + text.substring(safeEnd);
             }
-            resumeTaskEditBlurSave(input);
-        }
 
-        dateInput.addEventListener('change', function () {
-            const date = dateInput.value;
-            if (date) {
-                const formattedDate = new Date(date).toLocaleDateString() + ' ';
-                const text = input.value;
-
-                const safeStart = Math.max(0, Math.min(insertionStart, text.length));
-                const safeEnd = Math.max(safeStart, Math.min(insertionEnd, text.length));
-
-                if (typeof input.setRangeText === 'function') {
-                    input.setRangeText(formattedDate, safeStart, safeEnd, 'end');
-                } else {
-                    input.value = text.substring(0, safeStart) + formattedDate + text.substring(safeEnd);
-                }
-
-                const caretPos = safeStart + formattedDate.length;
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.focus();
+            const caretPos = safeStart + formattedDate.length;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.focus();
+            try {
+                input.setSelectionRange(caretPos, caretPos);
+            } catch (e) { }
+            setTimeout(() => {
                 try {
                     input.setSelectionRange(caretPos, caretPos);
                 } catch (e) { }
-                setTimeout(() => {
-                    try {
-                        input.setSelectionRange(caretPos, caretPos);
-                    } catch (e) { }
-                }, 0);
-            }
-            cleanup();
+            }, 0);
+            resumeTaskEditBlurSave(input);
+        }, function () {
+            resumeTaskEditBlurSave(input);
         });
-
-        dateInput.addEventListener('blur', function () {
-            setTimeout(function () {
-                if (!dateInput.value) cleanup();
-            }, 200);
-        });
-
-        if (dateInput.showPicker) {
-            dateInput.showPicker();
-        } else {
-            dateInput.click();
-        }
     }
 
     // Return title commands for the slash menu (specific to title field)
@@ -1655,7 +1742,6 @@
                 id: 'excalidraw',
                 icon: 'lucide lucide-paint-brush',
                 label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                mobileHidden: true,
                 action: function () {
                     if (typeof window.insertExcalidrawDiagram === 'function') {
                         window.insertExcalidrawDiagram();
@@ -1835,7 +1921,6 @@
                         id: 'date',
                         icon: 'lucide-calendar-alt',
                         label: t('slash_menu.date', null, 'Date'),
-                        mobileHidden: true,
                         action: function () {
                             insertDate();
                         }
@@ -2151,7 +2236,6 @@
                         id: 'date',
                         icon: 'lucide-calendar-alt',
                         label: t('slash_menu.date', null, 'Date'),
-                        mobileHidden: true,
                         action: function () {
                             insertDateMarkdown();
                         }
@@ -2377,14 +2461,28 @@
         }
 
         const selection = window.getSelection();
-        if (!selection.rangeCount) return false;
+        let editableElement = null;
+        let noteEntry = null;
 
-        const range = selection.getRangeAt(0);
-        let container = range.commonAncestorContainer;
-        if (container.nodeType === 3) container = container.parentNode;
+        if (selection.rangeCount) {
+            const range = selection.getRangeAt(0);
+            let container = range.commonAncestorContainer;
+            if (container.nodeType === 3) container = container.parentNode;
 
-        const editableElement = container.closest && container.closest('[contenteditable="true"]');
-        const noteEntry = container.closest && container.closest('.noteentry');
+            editableElement = container.closest && container.closest('[contenteditable="true"]');
+            noteEntry = container.closest && container.closest('.noteentry');
+        }
+
+        if (!editableElement || !noteEntry) {
+            // On mobile the virtual keyboard closing can wipe the selection
+            // between the tap on a menu item and the action running; fall back
+            // to the editable the slash menu was opened from.
+            const saved = savedEditableElement || window._slashCommandSavedEditableElement;
+            if (saved && saved.closest && saved.getAttribute && saved.getAttribute('contenteditable') === 'true') {
+                editableElement = saved;
+                noteEntry = saved.closest('.noteentry');
+            }
+        }
 
         if (!editableElement || !noteEntry) return null;
 
@@ -3168,8 +3266,10 @@
             setTimeout(() => {
                 actionToExecute();
 
-                // Re-focus after insertion to avoid caret jumping on focus (skip if keepSlash)
-                if (!shouldKeepSlash) {
+                // Re-focus after insertion to avoid caret jumping on focus (skip if
+                // keepSlash, or while the date picker popup is open: refocusing would
+                // reopen the mobile keyboard over it — the pick handler refocuses)
+                if (!shouldKeepSlash && !slashDatePickerCleanup) {
                     if (savedEditableElement) {
                         focusEditableElement(savedEditableElement);
                     } else if (savedNoteEntry) {

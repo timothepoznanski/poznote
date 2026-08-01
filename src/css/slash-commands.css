@@ -89,3 +89,103 @@
     color: #6b7280;
     font-size: 13px;
 }
+
+/* ============================================
+   Date Picker Popup (/date command)
+   ============================================ */
+
+.slash-date-picker {
+    position: fixed;
+    z-index: 9999;
+    width: 252px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    padding: 10px;
+    user-select: none;
+}
+
+.slash-date-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.slash-date-picker-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.slash-date-picker-nav,
+.slash-date-picker-day,
+.slash-date-picker-today-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: inherit;
+}
+
+.slash-date-picker-nav {
+    width: 26px;
+    height: 26px;
+    font-size: 16px;
+    line-height: 1;
+    color: #6b7280;
+}
+
+.slash-date-picker-nav:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.slash-date-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    text-align: center;
+}
+
+.slash-date-picker-weekday {
+    font-size: 11px;
+    color: #9ca3af;
+    padding: 2px 0;
+}
+
+.slash-date-picker-day {
+    font-size: 13px;
+    color: #111827;
+    padding: 4px 0;
+}
+
+.slash-date-picker-day:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.slash-date-picker-day.today {
+    background: rgba(11, 120, 230, 0.1);
+    color: #0b78e6;
+    font-weight: 700;
+}
+
+.slash-date-picker-day.today:hover {
+    background: rgba(11, 120, 230, 0.2);
+}
+
+.slash-date-picker-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+.slash-date-picker-today-btn {
+    font-size: 12px;
+    color: #0b78e6;
+    padding: 4px 8px;
+}
+
+.slash-date-picker-today-btn:hover {
+    background: rgba(11, 120, 230, 0.1);
+}

@@ -215,7 +215,6 @@
   },
   "excalidraw": {
     "titles": {
-      "editing_not_available": "Bearbeitung nicht verfügbar",
       "unsaved_note": "Ungespeicherte Notiz",
       "insertion_error": "Einfügefehler",
       "image_not_found": "Bild nicht gefunden"
@@ -250,8 +249,7 @@
     "messages": {
       "disabled_small_screens": "Excalidraw-Bearbeitung ist auf kleinen Bildschirmen für eine bessere Benutzererfahrung deaktiviert.",
       "disabled_mobile": "Excalidraw-Bearbeitung ist auf mobilen Geräten deaktiviert.",
-      "disabled_under_800": "Excalidraw-Bearbeitung ist auf Bildschirmen kleiner als 800px deaktiviert.",
-      "use_desktop_mode_on_phone": "Für eine bessere Benutzererfahrung ist die Excalidraw-Bearbeitung auf Bildschirmen kleiner als 800px deaktiviert. Es sollte jedoch funktionieren, wenn Sie den Browser Ihres Telefons in den Desktop-Modus wechseln."
+      "disabled_under_800": "Excalidraw-Bearbeitung ist auf Bildschirmen kleiner als 800px deaktiviert."
     },
     "spinner": {
       "saving_note": "Notiz wird gespeichert...",

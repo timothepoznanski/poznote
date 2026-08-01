@@ -258,12 +258,14 @@ div[onclick*="openExcalidrawNote"] {
         top: 0 !important;
     }
     
-    /* Force the Excalidraw canvas to be responsive */
+    /* Force the Excalidraw canvas to be responsive. touch-action must stay
+       none (the upstream default): pan-x pan-y would let the browser cancel
+       one-finger drawing strokes with a pointercancel as soon as they move. */
     .excalidraw .excalidraw-canvas,
     canvas[data-testid="excalidraw-canvas"] {
         width: 100% !important;
         max-width: 100% !important;
-        touch-action: pan-x pan-y !important;
+        touch-action: none !important;
     }
     
     /* Ensure the main container is mobile friendly */
@@ -278,6 +280,11 @@ div[onclick*="openExcalidrawNote"] {
     [data-theme="dark"] div[style*="justify-content: space-between"][style*="align-items: center"] {
         background: var(--dm-bg, #252526) !important;
         border-bottom-color: var(--dm-border, #404040) !important;
+    }
+
+    /* The spacer only balances the desktop layout; it steals 100px here */
+    .poznote-toolbar-spacer {
+        display: none;
     }
 }
 
@@ -295,8 +302,7 @@ div[onclick*="openExcalidrawNote"] {
     }
     
     .excalidraw-toolbar .toolbar-btn,
-    button[class*="excalidraw-toolbar-btn"],
-    button[class*="excalidraw-save-btn"] {
+    .poznote-toolbar .excalidraw-btn {
         padding: 4px 8px !important;
         font-size: 11px !important;
     }
@@ -385,11 +391,13 @@ body.excalidraw-editor-page .excalidraw.excalidraw-modal-container {
     z-index: 10050 !important;
 }
 
-/* Ensure the Excalidraw container handles touch */
+/* Ensure the Excalidraw container handles touch. touch-action: none is the
+   upstream Excalidraw default; pan-x pan-y would hand drag gestures to the
+   browser, which cancels drawing strokes (pointercancel) mid-stroke. */
 .excalidraw,
 .excalidraw .excalidraw-canvas-container,
 .excalidraw canvas {
-    touch-action: pan-x pan-y !important;
+    touch-action: none !important;
     user-select: none !important;
     -webkit-user-select: none !important;
     -webkit-touch-callout: none !important;
@@ -592,6 +600,9 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
     display: flex;
     gap: 8px;
     align-items: center;
+    /* The title next to it scrolls; keep the buttons at full width so their
+       labels never wrap past the toolbar's fixed height. */
+    flex-shrink: 0;
 }
 
 .poznote-toolbar-title {
@@ -600,6 +611,18 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
     font-weight: 400;
     font-size: 16px;
     font-family: 'Inter', sans-serif;
+    /* The toolbar has a fixed height: keep long titles on one line and
+       let them scroll sideways instead of wrapping past its bottom edge. */
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow-x: auto;
+    text-align: center;
+    scrollbar-width: none;
+}
+
+.poznote-toolbar-title::-webkit-scrollbar {
+    display: none;
 }
 
 html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar-title,
@@ -615,6 +638,29 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
     width: 100px;
 }
 
+/* On small screens the whole bar scrolls horizontally (buttons included)
+   instead of only the title scrolling next to the fixed buttons. */
+@media (max-width: 800px) {
+    .poznote-toolbar {
+        justify-content: flex-start;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+    }
+
+    .poznote-toolbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .poznote-toolbar-title {
+        /* Natural width: the title overflows the bar and scrolls with it */
+        flex: 0 0 auto;
+        overflow-x: visible;
+        text-align: left;
+    }
+}
+
 /* Excalidraw toolbar button base styles */
 .excalidraw-btn {
     padding: 6px 12px;
@@ -624,6 +670,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
     font-weight: 400;
     color: #ffffff;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 
 .excalidraw-save-btn {
