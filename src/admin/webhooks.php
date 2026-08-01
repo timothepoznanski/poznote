@@ -261,7 +261,8 @@ $webhooks = listWebhooks();
         }
         .webhooks-state.is-enabled { color: #1f8f4e; }
         .webhooks-state.is-disabled { color: #b54747; }
-        .webhooks-item-actions {
+        .webhooks-item-actions,
+        .webhooks-item-actions form {
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
@@ -286,6 +287,14 @@ $webhooks = listWebhooks();
             background: var(--input-bg, #2a2a2a);
             border-color: var(--border-color, #444);
             color: var(--text-primary, #e0e0e0);
+        }
+        @media (max-width: 768px) {
+            /* users.css forces .btn to width:100% on mobile; stack them cleanly */
+            .webhooks-item-actions,
+            .webhooks-item-actions form {
+                width: 100%;
+                flex-direction: column;
+            }
         }
         @media (max-width: 800px) {
             .settings-container.webhooks-page .workspaces-nav {
