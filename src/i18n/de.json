@@ -2837,7 +2837,7 @@
   "delete_account": {
     "modal": {
       "title": "Konto löschen",
-      "description": "Ihr Konto und alle zugehörigen Daten (Notizen, Dateien, Anhänge) werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "description": "Ihr Konto \"{{username}}\" und alle zugehörigen Daten (Notizen, Dateien, Anhänge) werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
       "confirm_placeholder": "Geben Sie Ihren Benutzernamen zur Bestätigung ein",
       "password_placeholder": "Aktuelles Passwort",
       "button": "Mein Konto löschen"

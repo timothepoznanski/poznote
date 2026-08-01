@@ -2837,7 +2837,7 @@
   "delete_account": {
     "modal": {
       "title": "Eliminar cuenta",
-      "description": "Tu cuenta y todos sus datos (notas, archivos, adjuntos) se eliminarán de forma permanente. Esta acción no se puede deshacer.",
+      "description": "Tu cuenta \"{{username}}\" y todos sus datos (notas, archivos, adjuntos) se eliminarán de forma permanente. Esta acción no se puede deshacer.",
       "confirm_placeholder": "Escribe tu nombre de usuario para confirmar",
       "password_placeholder": "Contraseña actual",
       "button": "Eliminar mi cuenta"

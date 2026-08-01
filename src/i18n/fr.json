@@ -3049,7 +3049,7 @@
   "delete_account": {
     "modal": {
       "title": "Supprimer le compte",
-      "description": "Votre compte et toutes ses données (notes, fichiers, pièces jointes) seront définitivement supprimés. Cette action est irréversible.",
+      "description": "Votre compte \"{{username}}\" et toutes ses données (notes, fichiers, pièces jointes) seront définitivement supprimés. Cette action est irréversible.",
       "confirm_placeholder": "Saisissez votre nom d'utilisateur pour confirmer",
       "password_placeholder": "Mot de passe actuel",
       "button": "Supprimer mon compte"

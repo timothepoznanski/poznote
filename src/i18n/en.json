@@ -2538,7 +2538,7 @@
   "delete_account": {
     "modal": {
       "title": "Delete Account",
-      "description": "This will permanently delete your account and all of its data (notes, files, attachments). This action cannot be undone.",
+      "description": "This will permanently delete your account \"{{username}}\" and all of its data (notes, files, attachments). This action cannot be undone.",
       "confirm_placeholder": "Type your username to confirm",
       "password_placeholder": "Current password",
       "button": "Delete my account"

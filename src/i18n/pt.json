@@ -2840,7 +2840,7 @@
   "delete_account": {
     "modal": {
       "title": "Eliminar conta",
-      "description": "A sua conta e todos os seus dados (notas, ficheiros, anexos) serão eliminados permanentemente. Esta ação não pode ser anulada.",
+      "description": "A sua conta \"{{username}}\" e todos os seus dados (notas, ficheiros, anexos) serão eliminados permanentemente. Esta ação não pode ser anulada.",
       "confirm_placeholder": "Escreva o seu nome de utilizador para confirmar",
       "password_placeholder": "Palavra-passe atual",
       "button": "Eliminar a minha conta"

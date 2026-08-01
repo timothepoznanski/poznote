@@ -2976,7 +2976,7 @@
   "delete_account": {
     "modal": {
       "title": "删除账户",
-      "description": "您的账户及其所有数据（笔记、文件、附件）将被永久删除。此操作无法撤销。",
+      "description": "您的账户 \"{{username}}\" 及其所有数据（笔记、文件、附件）将被永久删除。此操作无法撤销。",
       "confirm_placeholder": "输入您的用户名以确认",
       "password_placeholder": "当前密码",
       "button": "删除我的账户"
