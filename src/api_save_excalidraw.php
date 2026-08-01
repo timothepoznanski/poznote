@@ -133,9 +133,12 @@ if ($note_id === 0) {
         exit;
     }
 } else {
-    // Update existing note
-    $stmt = $con->prepare('UPDATE entries SET heading = ?, entry = ?, updated = datetime("now"), updated_by_user_id = ? WHERE id = ? AND workspace = ? AND trash = 0');
-    if (!$stmt->execute([$heading, $diagram_data, $actor_user_id, $note_id, $workspace])) {
+    // Update existing note. The heading is deliberately left untouched: the
+    // editor has no title field, and the posted heading is only meaningful
+    // when creating the note (it may also have been de-duplicated by
+    // generateUniqueTitle at creation time).
+    $stmt = $con->prepare('UPDATE entries SET entry = ?, updated = datetime("now"), updated_by_user_id = ? WHERE id = ? AND workspace = ? AND trash = 0');
+    if (!$stmt->execute([$diagram_data, $actor_user_id, $note_id, $workspace])) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Error updating note']);
         exit;

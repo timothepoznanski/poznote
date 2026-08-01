@@ -239,11 +239,6 @@
         "failed_to_load": "Fehler: Excalidraw konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
         "initializing_prefix": "Fehler beim Initialisieren von Excalidraw: {{error}}",
         "save_failed": "Speichern fehlgeschlagen"
-      },
-      "library_warning": {
-        "line1": "Die Schaltfläche \"Zu Excalidraw hinzufügen\" auf der externen Bibliotheksseite funktioniert bei dieser selbst gehosteten Version nicht.",
-        "line2": "Sie müssen die Bibliotheksdatei (.excalidrawlib) herunterladen und manuell über die \"Öffnen\"-Schaltfläche im Bibliotheksmenü importieren.",
-        "ok": "Ich verstehe"
       }
     },
     "messages": {

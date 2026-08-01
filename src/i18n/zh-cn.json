@@ -240,11 +240,6 @@
         "failed_to_load": "错误：无法加载 Excalidraw。请刷新页面。",
         "initializing_prefix": "初始化 Excalidraw 时出错: {{error}}",
         "save_failed": "保存失败"
-      },
-      "library_warning": {
-        "line1": "外部库页面上的 \"Add to Excalidraw\" 按钮在自托管版本中不起作用。",
-        "line2": "您必须下载库文件 (.excalidrawlib)，然后使用库菜单中的 \"Open\" 按钮手动导入。",
-        "ok": "我明白"
       }
     },
     "messages": {
