@@ -1649,6 +1649,41 @@ function poznoteGetActiveUserStorageUsageBytes(int $addBytes = 0): int {
 }
 
 /**
+ * Best-effort quota.* webhook when an action is refused by a quota, so the
+ * operator learns which users are blocked. Throttled to one delivery per
+ * user, event and hour: a blocked autosave or bulk import retries the same
+ * refused action many times in a row. Must never break the caller.
+ */
+function poznoteNotifyQuotaReached(string $event, array $quota): void {
+    global $activeUserId;
+    static $sentThisRequest = [];
+
+    $userId = (int) ($_SESSION['user_id'] ?? $activeUserId ?? 0);
+    if ($userId <= 0 || isset($sentThisRequest[$event])) {
+        return;
+    }
+    $sentThisRequest[$event] = true;
+
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        if (empty(listActiveWebhooksForEvent($event))) {
+            return;
+        }
+
+        $throttleKey = 'webhook_last_' . str_replace('.', '_', $event) . '_user_' . $userId;
+        if (time() - (int) getGlobalSetting($throttleKey, '0') < 3600) {
+            return;
+        }
+        setGlobalSetting($throttleKey, (string) time());
+
+        require_once __DIR__ . '/WebhookDispatcher.php';
+        (new WebhookDispatcher())->dispatchQuotaReached($event, $userId, $quota);
+    } catch (Throwable $e) {
+        error_log('Webhook dispatch failed for ' . $event . ': ' . $e->getMessage());
+    }
+}
+
+/**
  * Check the per-user note count limit before creating $newNotes more notes.
  * Trashed notes count too: they still exist and can be restored.
  * @return string|null A user-facing error message, or null when allowed.
@@ -1666,6 +1701,10 @@ function poznoteCheckNoteQuota(PDO $con, int $newNotes = 1): ?string {
     }
 
     if ($count + $newNotes > $limits['max_notes']) {
+        poznoteNotifyQuotaReached('quota.notes_reached', [
+            'max_notes' => $limits['max_notes'],
+            'note_count' => $count,
+        ]);
         return t('api.errors.note_quota_reached', ['max' => $limits['max_notes']],
             'Note limit reached: this instance allows at most ' . $limits['max_notes'] . ' notes for this user (trash included).');
     }
@@ -1689,6 +1728,11 @@ function poznoteCheckStorageQuota(int $additionalBytes = 0): ?string {
 
     if (poznoteGetActiveUserStorageUsageBytes() + $additionalBytes > $limits['max_storage_bytes']) {
         $maxMb = (int) round($limits['max_storage_bytes'] / (1024 * 1024));
+        poznoteNotifyQuotaReached('quota.storage_reached', [
+            'max_storage_bytes' => $limits['max_storage_bytes'],
+            'used_bytes' => poznoteGetActiveUserStorageUsageBytes(),
+            'requested_bytes' => $additionalBytes,
+        ]);
         return t('api.errors.storage_quota_reached', ['max' => $maxMb],
             'Storage limit reached: this instance allows at most ' . $maxMb . ' MB of storage for this user.');
     }

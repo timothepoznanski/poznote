@@ -23,6 +23,8 @@ class WebhookDispatcher {
         'user.deactivated',
         'user.deleted',
         'signup.cap_reached',
+        'quota.notes_reached',
+        'quota.storage_reached',
     ];
 
     private const TIMEOUT_SECONDS = 5;
@@ -139,17 +141,41 @@ class WebhookDispatcher {
         ]);
     }
 
-    private function userPayload(array $user, string $source): array {
+    /**
+     * Emitted when an action is refused because the user reached a quota
+     * (quota.notes_reached / quota.storage_reached). Call sites throttle
+     * repeated blocked attempts; see poznoteNotifyQuotaReached().
+     *
+     * @param array $quota limit and current usage, event-specific keys
+     * @return array{delivered:int,failed:int}
+     */
+    public function dispatchQuotaReached(string $event, int $userId, array $quota): array {
+        $user = getUserProfileById($userId);
+        if (!$user) {
+            return ['delivered' => 0, 'failed' => 0];
+        }
+
+        return $this->dispatch($event, [
+            'user' => $this->userPayload($user, null),
+            'quota' => $quota,
+        ]);
+    }
+
+    private function userPayload(array $user, ?string $source): array {
         $email = trim((string)($user['email'] ?? ''));
 
-        return [
+        $payload = [
             'id' => (int)($user['id'] ?? 0),
             'username' => (string)($user['username'] ?? ''),
             'email' => $email !== '' ? $email : null,
             'first_name' => (string)($user['first_name'] ?? ''),
             'last_name' => (string)($user['last_name'] ?? ''),
-            'source' => $source,
         ];
+        if ($source !== null) {
+            $payload['source'] = $source;
+        }
+
+        return $payload;
     }
 
     /**
