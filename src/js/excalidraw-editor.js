@@ -142,18 +142,12 @@
     var initialElements = null;
     var initialAppState = null;
 
-    // Function to enable/disable save buttons based on changes
+    // Function to enable/disable the save button based on changes.
+    // "Save and exit" is intentionally always clickable: it must stay usable
+    // as an exit even right after a save, when there is nothing new to save.
     function updateSaveButtonsState() {
         var saveBtn = document.getElementById('saveBtn');
-        var saveAndExitBtn = document.getElementById('saveAndExitBtn');
-        
-        if (hasChanges) {
-            if (saveBtn) saveBtn.disabled = false;
-            if (saveAndExitBtn) saveAndExitBtn.disabled = false;
-        } else {
-            if (saveBtn) saveBtn.disabled = true;
-            if (saveAndExitBtn) saveAndExitBtn.disabled = true;
-        }
+        if (saveBtn) saveBtn.disabled = !hasChanges;
     }
 
     // Function to check if there are changes
