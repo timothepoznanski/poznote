@@ -43,6 +43,42 @@ body.dark-mode .slash-command-icon:not([style*="color"]) {
     color: #9ca3af;
 }
 
+html[data-theme='dark'] .slash-date-picker,
+body.dark-mode .slash-date-picker {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .slash-date-picker-title,
+html[data-theme='dark'] .slash-date-picker-day,
+body.dark-mode .slash-date-picker-title,
+body.dark-mode .slash-date-picker-day {
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .slash-date-picker-nav:hover,
+html[data-theme='dark'] .slash-date-picker-day:hover,
+body.dark-mode .slash-date-picker-nav:hover,
+body.dark-mode .slash-date-picker-day:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .slash-date-picker-day.today,
+body.dark-mode .slash-date-picker-day.today {
+    background: rgba(59, 130, 246, 0.25);
+    color: #60a5fa;
+}
+
+html[data-theme='dark'] .slash-date-picker-today-btn,
+body.dark-mode .slash-date-picker-today-btn {
+    color: #60a5fa;
+}
+
+html[data-theme='dark'] .slash-date-picker-today-btn:hover,
+body.dark-mode .slash-date-picker-today-btn:hover {
+    background: rgba(59, 130, 246, 0.15);
+}
+
 html[data-theme='dark'] .slash-command-separator,
 body.dark-mode .slash-command-separator {
     background: var(--dm-border);

@@ -27,7 +27,7 @@
 
     // ========== Confirmation Modal ==========
 
-    function createDeleteAccountModal() {
+    function createDeleteAccountModal(username) {
         var existing = document.getElementById('deleteAccountModal');
         if (existing) existing.remove();
 
@@ -43,7 +43,7 @@
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('delete_account.modal.title', {}, 'Delete Account') + '</h3>' +
-                '<p class="text-danger delete-account-description">' + tr('delete_account.modal.description', {}, 'This will permanently delete your account and all of its data (notes, files, attachments). This action cannot be undone.') + '</p>' +
+                '<p class="text-danger delete-account-description">' + tr('delete_account.modal.description', { username: escapeHtml(username) }, 'This will permanently delete your account "{{username}}" and all of its data (notes, files, attachments). This action cannot be undone.') + '</p>' +
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<input type="text" id="daConfirmUsername" autocomplete="off" placeholder="' + tr('delete_account.modal.confirm_placeholder', {}, 'Type your username to confirm') + '" style="width:100%;box-sizing:border-box;">' +
                 '</div>' +
@@ -60,8 +60,8 @@
     }
 
     function showDeleteAccountModal() {
-        var modal = createDeleteAccountModal();
         var username = getUsername();
+        var modal = createDeleteAccountModal(username);
 
         var confirmInput = document.getElementById('daConfirmUsername');
         var deleteBtn = document.getElementById('daDeleteBtn');

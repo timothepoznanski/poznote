@@ -216,7 +216,6 @@
   },
   "excalidraw": {
     "titles": {
-      "editing_not_available": "编辑不可用",
       "unsaved_note": "未保存的笔记",
       "insertion_error": "插入错误",
       "image_not_found": "图片未找到"
@@ -241,18 +240,12 @@
         "failed_to_load": "错误：无法加载 Excalidraw。请刷新页面。",
         "initializing_prefix": "初始化 Excalidraw 时出错: {{error}}",
         "save_failed": "保存失败"
-      },
-      "library_warning": {
-        "line1": "外部库页面上的 \"Add to Excalidraw\" 按钮在自托管版本中不起作用。",
-        "line2": "您必须下载库文件 (.excalidrawlib)，然后使用库菜单中的 \"Open\" 按钮手动导入。",
-        "ok": "我明白"
       }
     },
     "messages": {
       "disabled_small_screens": "为了获得更好的用户体验，Excalidraw 编辑在小屏幕上已禁用。",
       "disabled_mobile": "Excalidraw 编辑在移动设备上已禁用。",
-      "disabled_under_800": "Excalidraw 编辑在小于 800 像素的屏幕上已禁用。",
-      "use_desktop_mode_on_phone": "为了获得更好的用户体验，Excalidraw 编辑在小于 800 像素的屏幕上已禁用。不过，如果将手机浏览器切换到 Desktop 模式，它应该可以工作。"
+      "disabled_under_800": "Excalidraw 编辑在小于 800 像素的屏幕上已禁用。"
     },
     "spinner": {
       "saving_note": "正在保存笔记...",
@@ -439,6 +432,8 @@
       "support": "通过捐赠支持 Poznote 的开发。"
     },
     "title": "设置",
+    "collapse_section": "折叠此部分",
+    "expand_section": "展开此部分",
     "categories": {
       "actions": "操作",
       "admin_tools": "管理工具",
@@ -2983,7 +2978,7 @@
   "delete_account": {
     "modal": {
       "title": "删除账户",
-      "description": "您的账户及其所有数据（笔记、文件、附件）将被永久删除。此操作无法撤销。",
+      "description": "您的账户 \"{{username}}\" 及其所有数据（笔记、文件、附件）将被永久删除。此操作无法撤销。",
       "confirm_placeholder": "输入您的用户名以确认",
       "password_placeholder": "当前密码",
       "button": "删除我的账户"

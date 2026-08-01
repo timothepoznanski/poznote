@@ -93,6 +93,47 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     border-bottom: 1px solid #e5e7eb;
 }
 
+/* Collapsible sections: the whole title toggles, the chevron shows state */
+.settings-category-title.settings-section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.settings-section-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 2px;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: 1.05rem;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.settings-section-header:hover .settings-section-toggle {
+    opacity: 1;
+}
+
+.settings-section-toggle .lucide {
+    transition: transform 0.15s ease;
+}
+
+.settings-category-title.section-collapsed .settings-section-toggle .lucide {
+    transform: rotate(-90deg);
+}
+
+/* An active filter term overrides collapse so matching cards stay visible
+   (settings-page.js toggles .settings-filtering on the container) */
+.home-container:not(.settings-filtering) .home-grid.section-collapsed {
+    display: none;
+}
+
 /* Utility classes */
 .desktop-only {
     display: flex;

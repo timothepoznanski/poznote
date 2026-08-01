@@ -2102,6 +2102,13 @@
                     searchWrapper.classList.toggle('has-value', this.value !== '');
                 }
 
+                // While a filter term is active, collapsed sections are
+                // overridden (CSS gates on this class) so matches stay visible
+                var filterContainer = document.querySelector('.home-container');
+                if (filterContainer) {
+                    filterContainer.classList.toggle('settings-filtering', term !== '');
+                }
+
                 cards.forEach(function (card) {
                     var titleEl = card.querySelector('.home-card-title');
                     var title = titleEl ? titleEl.textContent.toLowerCase() : '';
@@ -2142,6 +2149,63 @@
                 }
             });
         }
+
+        // Collapsible sections: each category title gets a chevron button that
+        // collapses the grid below it, persisted per user.
+        var sectionStore = window.__poznoteUserStorage || window.localStorage;
+        var collapsedSections = [];
+        try {
+            collapsedSections = JSON.parse(sectionStore.getItem('settingsCollapsedSections') || '[]');
+            if (!Array.isArray(collapsedSections)) collapsedSections = [];
+        } catch (e) { /* storage unavailable or corrupt */ }
+
+        var sectionLabelRefreshers = [];
+
+        document.querySelectorAll('.settings-category-title').forEach(function (title) {
+            var sectionGrid = title.nextElementSibling;
+            if (!sectionGrid || !sectionGrid.classList.contains('home-grid')) return;
+            var sectionKey = sectionGrid.id || title.id;
+            if (!sectionKey) return;
+
+            var toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'settings-section-toggle';
+            toggleBtn.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+            if (sectionGrid.id) toggleBtn.setAttribute('aria-controls', sectionGrid.id);
+            title.appendChild(toggleBtn);
+            title.classList.add('settings-section-header');
+
+            var applySectionState = function (collapsed) {
+                title.classList.toggle('section-collapsed', collapsed);
+                sectionGrid.classList.toggle('section-collapsed', collapsed);
+                toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                var label = collapsed
+                    ? tr('settings.expand_section', {}, 'Expand section')
+                    : tr('settings.collapse_section', {}, 'Collapse section');
+                toggleBtn.setAttribute('aria-label', label);
+                toggleBtn.title = label;
+            };
+            applySectionState(collapsedSections.indexOf(sectionKey) !== -1);
+            sectionLabelRefreshers.push(function () {
+                applySectionState(title.classList.contains('section-collapsed'));
+            });
+
+            // The button's click bubbles up here, so one listener covers both
+            title.addEventListener('click', function () {
+                var collapsed = !title.classList.contains('section-collapsed');
+                applySectionState(collapsed);
+                var idx = collapsedSections.indexOf(sectionKey);
+                if (collapsed && idx === -1) collapsedSections.push(sectionKey);
+                if (!collapsed && idx !== -1) collapsedSections.splice(idx, 1);
+                try {
+                    sectionStore.setItem('settingsCollapsedSections', JSON.stringify(collapsedSections));
+                } catch (e) { /* storage unavailable */ }
+            });
+        });
+
+        document.addEventListener('poznote:i18n:loaded', function () {
+            sectionLabelRefreshers.forEach(function (refresh) { refresh(); });
+        });
 
         // Card/list layout toggle next to the filter bar (same pattern as the
         // dashboard's board-view-menu.js), persisted per user.

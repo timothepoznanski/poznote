@@ -166,6 +166,8 @@
       "support": "Support the development of Poznote with a donation."
     },
     "title": "Settings",
+    "collapse_section": "Collapse section",
+    "expand_section": "Expand section",
     "categories": {
       "actions": "Actions",
       "admin_tools": "Admin Tools",
@@ -1275,11 +1277,6 @@
       "orange": "Orange",
       "purple": "Purple",
       "gray": "Gray"
-    }
-  },
-  "excalidraw": {
-    "messages": {
-      "use_desktop_mode_on_phone": "For a better user experience, Excalidraw editing is disabled on screens smaller than 800px. However, it should work if you switch your phone browser to Desktop mode."
     }
   },
   "image_menu": {
@@ -2543,7 +2540,7 @@
   "delete_account": {
     "modal": {
       "title": "Delete Account",
-      "description": "This will permanently delete your account and all of its data (notes, files, attachments). This action cannot be undone.",
+      "description": "This will permanently delete your account \"{{username}}\" and all of its data (notes, files, attachments). This action cannot be undone.",
       "confirm_placeholder": "Type your username to confirm",
       "password_placeholder": "Current password",
       "button": "Delete my account"

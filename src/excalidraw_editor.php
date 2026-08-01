@@ -177,7 +177,7 @@ if ($note_id > 0) {
                 <button id="saveBtn" class="excalidraw-btn excalidraw-save-btn" disabled>
                     <?php echo t_h('common.save', [], 'Save'); ?>
                 </button>
-                <button id="saveAndExitBtn" class="excalidraw-btn excalidraw-btn-blue" disabled>
+                <button id="saveAndExitBtn" class="excalidraw-btn excalidraw-btn-blue">
                     <?php echo t_h('excalidraw.editor.toolbar.save_and_exit', [], 'Save and exit'); ?>
                 </button>
                 <button id="cancelBtn" class="excalidraw-btn excalidraw-btn-red">
@@ -196,23 +196,11 @@ if ($note_id > 0) {
         </div>
     </div>
 
-    <!-- Library Warning Modal -->
-    <div id="libraryWarningModal" class="library-warning-modal">
-        <div class="library-warning-content">
-            <h3 class="library-warning-title"><?php echo t_h('common.warning', [], 'Warning'); ?></h3>
-            <p class="library-warning-text"><?php echo t_h('excalidraw.editor.library_warning.line1', [], 'The "Add to Excalidraw" button on the external library page does not work with this self-hosted version.'); ?></p>
-            <p class="library-warning-text"><?php echo t_h('excalidraw.editor.library_warning.line2', [], 'You must download the library file (.excalidrawlib) and manually import it using the "Open" button in the library menu.'); ?></p>
-            <div class="library-warning-buttons">
-                <button id="libraryWarningCancel" class="library-warning-btn library-warning-btn-cancel"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                <button id="libraryWarningOk" class="library-warning-btn library-warning-btn-ok"><?php echo t_h('excalidraw.editor.library_warning.ok', [], 'I Understand'); ?></button>
-            </div>
-        </div>
-    </div>
-
     <!-- CSP-compliant configuration via JSON -->
     <script type="application/json" id="excalidraw-config"><?php
         $excalidrawConfig = [
             'noteId' => $note_id,
+            'noteTitle' => $note_title,
             'workspace' => $workspace,
             'diagramId' => $diagram_id,
             'isEmbeddedDiagram' => $is_embedded_diagram,

@@ -216,7 +216,6 @@
   },
   "excalidraw": {
     "titles": {
-      "editing_not_available": "Edición no disponible",
       "unsaved_note": "Nota no guardada",
       "insertion_error": "Error de inserción",
       "image_not_found": "Imagen no encontrada"
@@ -241,18 +240,12 @@
         "failed_to_load": "Error: Falló al cargar Excalidraw. Por favor refresca la página.",
         "initializing_prefix": "Error al inicializar Excalidraw: {{error}}",
         "save_failed": "Guardado fallido"
-      },
-      "library_warning": {
-        "line1": "El botón \"Agregar a Excalidraw\" en la página externa de la biblioteca no funciona con esta versión autoalojada.",
-        "line2": "Debes descargar el archivo de biblioteca (.excalidrawlib) y importarlo manualmente usando el botón \"Abrir\" en el menú de la biblioteca.",
-        "ok": "Entendido"
       }
     },
     "messages": {
       "disabled_small_screens": "La edición de Excalidraw está deshabilitada en pantallas pequeñas para una mejor experiencia de usuario.",
       "disabled_mobile": "La edición de Excalidraw está deshabilitada en dispositivos móviles.",
-      "disabled_under_800": "La edición de Excalidraw está deshabilitada en pantallas menores de 800px.",
-      "use_desktop_mode_on_phone": "Para una mejor experiencia de usuario, la edición de Excalidraw está deshabilitada en pantallas menores de 800px. Sin embargo, debería funcionar si cambias el navegador del teléfono al modo Desktop."
+      "disabled_under_800": "La edición de Excalidraw está deshabilitada en pantallas menores de 800px."
     },
     "spinner": {
       "saving_note": "Guardando nota...",
@@ -438,6 +431,8 @@
       "support": "Apoya el desarrollo de Poznote con una donación."
     },
     "title": "Configuración",
+    "collapse_section": "Contraer la sección",
+    "expand_section": "Expandir la sección",
     "categories": {
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
@@ -2844,7 +2839,7 @@
   "delete_account": {
     "modal": {
       "title": "Eliminar cuenta",
-      "description": "Tu cuenta y todos sus datos (notas, archivos, adjuntos) se eliminarán de forma permanente. Esta acción no se puede deshacer.",
+      "description": "Tu cuenta \"{{username}}\" y todos sus datos (notas, archivos, adjuntos) se eliminarán de forma permanente. Esta acción no se puede deshacer.",
       "confirm_placeholder": "Escribe tu nombre de usuario para confirmar",
       "password_placeholder": "Contraseña actual",
       "button": "Eliminar mi cuenta"

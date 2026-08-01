@@ -226,7 +226,6 @@
   },
   "excalidraw": {
     "titles": {
-      "editing_not_available": "Édition non disponible",
       "unsaved_note": "Note non enregistrée",
       "insertion_error": "Erreur d’insertion",
       "image_not_found": "Image introuvable"
@@ -251,18 +250,12 @@
         "failed_to_load": "Erreur : impossible de charger Excalidraw. Veuillez rafraîchir la page.",
         "initializing_prefix": "Erreur lors de l’initialisation d’Excalidraw : {{error}}",
         "save_failed": "Échec de l’enregistrement"
-      },
-      "library_warning": {
-        "line1": "Le bouton \"Add to Excalidraw\" sur la page de bibliothèque externe ne fonctionne pas avec cette version auto-hébergée.",
-        "line2": "Vous devez télécharger le fichier de bibliothèque (.excalidrawlib) et l’importer manuellement via le bouton \"Open\" dans le menu de la bibliothèque.",
-        "ok": "J’ai compris"
       }
     },
     "messages": {
       "disabled_small_screens": "L’édition Excalidraw est désactivée sur les petits écrans pour une meilleure expérience utilisateur.",
       "disabled_mobile": "L’édition Excalidraw est désactivée sur les appareils mobiles.",
-      "disabled_under_800": "L’édition Excalidraw est désactivée sur les écrans de moins de 800px.",
-      "use_desktop_mode_on_phone": "Pour une meilleure expérience utilisateur, l’édition Excalidraw est désactivée sur les écrans de moins de 800px. Cependant, cela devrait fonctionner si vous passez votre téléphone en mode Desktop."
+      "disabled_under_800": "L’édition Excalidraw est désactivée sur les écrans de moins de 800px."
     },
     "spinner": {
       "saving_note": "Enregistrement de la note...",
@@ -449,6 +442,8 @@
       "support": "Soutenez le développement de Poznote par un don."
     },
     "title": "Paramètres",
+    "collapse_section": "Réduire la section",
+    "expand_section": "Développer la section",
     "categories": {
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
@@ -3056,7 +3051,7 @@
   "delete_account": {
     "modal": {
       "title": "Supprimer le compte",
-      "description": "Votre compte et toutes ses données (notes, fichiers, pièces jointes) seront définitivement supprimés. Cette action est irréversible.",
+      "description": "Votre compte \"{{username}}\" et toutes ses données (notes, fichiers, pièces jointes) seront définitivement supprimés. Cette action est irréversible.",
       "confirm_placeholder": "Saisissez votre nom d'utilisateur pour confirmer",
       "password_placeholder": "Mot de passe actuel",
       "button": "Supprimer mon compte"

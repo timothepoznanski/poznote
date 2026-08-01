@@ -4,7 +4,12 @@
  */
 (function() {
     'use strict';
-    
+
+    // Name the window so the "Browse libraries" link targets it: the external
+    // library site returns the chosen library by navigating this window to
+    // <same url>#addLibrary=..., which the Excalidraw bundle picks up live.
+    window.name = '_excalidraw';
+
     // Get configuration from JSON element
     var configEl = document.getElementById('excalidraw-config');
     if (!configEl) {
@@ -55,6 +60,7 @@
     }
 
     var noteId = config.noteId || 0;
+    var noteTitle = config.noteTitle || '';
     var workspace = config.workspace || '';
     var diagramId = config.diagramId || null;
     var isEmbeddedDiagram = config.isEmbeddedDiagram || false;
@@ -136,18 +142,12 @@
     var initialElements = null;
     var initialAppState = null;
 
-    // Function to enable/disable save buttons based on changes
+    // Function to enable/disable the save button based on changes.
+    // "Save and exit" is intentionally always clickable: it must stay usable
+    // as an exit even right after a save, when there is nothing new to save.
     function updateSaveButtonsState() {
         var saveBtn = document.getElementById('saveBtn');
-        var saveAndExitBtn = document.getElementById('saveAndExitBtn');
-        
-        if (hasChanges) {
-            if (saveBtn) saveBtn.disabled = false;
-            if (saveAndExitBtn) saveAndExitBtn.disabled = false;
-        } else {
-            if (saveBtn) saveBtn.disabled = true;
-            if (saveAndExitBtn) saveAndExitBtn.disabled = true;
-        }
+        if (saveBtn) saveBtn.disabled = !hasChanges;
     }
 
     // Function to check if there are changes
@@ -337,31 +337,37 @@
             canvas.toBlob(resolve, 'image/png');
         });
         
-        // Send to server
+        // Send to server. The heading is only used when creating the note:
+        // the toolbar <h3> shows "Poznote - <title>", so its textContent must
+        // never be echoed back as the note title (it used to grow one
+        // "Poznote - " prefix per save).
         var formData = new FormData();
         formData.append('note_id', noteId);
         formData.append('workspace', workspace);
-        var h3 = document.querySelector('h3');
-        formData.append('heading', h3 ? h3.textContent : '');
+        formData.append('heading', noteTitle);
         formData.append('diagram_data', JSON.stringify(data));
         formData.append('preview_image', blob, 'preview.png');
-        
+
         var response = await fetch('api_save_excalidraw.php', {
             method: 'POST',
             body: formData
         });
-        
+
         var result = await response.json();
-        
+
         if (result.success) {
             // Update the note ID if it was a new note
             if (result.note_id && noteId === 0) {
                 noteId = result.note_id;
-                
+
                 // Update URL to include note_id for future reloads
                 var url = new URL(window.location);
                 url.searchParams.set('note_id', noteId);
                 window.history.replaceState({}, '', url);
+                // Let the Excalidraw bundle refresh the browse-libraries
+                // return URL so a later library round trip comes back to
+                // this note instead of a blank note_id=0 editor
+                window.dispatchEvent(new Event('poznote-note-url-changed'));
             }
         } else {
             throw new Error(result.message || TXT_SAVE_FAILED);
@@ -462,19 +468,6 @@
                 if (loadingEl) loadingEl.textContent = tpl(TXT_INIT_ERROR_TEMPLATE, { error: error.message });
             }
         }, 1000);
-
-        // Intercept "Browse Libraries" clicks in the Excalidraw library panel
-        var appContainer = document.getElementById('app');
-        if (appContainer) {
-            appContainer.addEventListener('click', function(event) {
-                var target = event.target.closest('a[href*="libraries.excalidraw.com"]');
-                if (target) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    window.showLibraryWarning(target.href);
-                }
-            }, true);
-        }
 
         // Save button handler
         var saveBtn = document.getElementById('saveBtn');
@@ -619,38 +612,4 @@
             });
         }
     });
-
-    // Library Warning Modal Logic
-    window.showLibraryWarning = function(url) {
-        var modal = document.getElementById('libraryWarningModal');
-        var cancelBtn = document.getElementById('libraryWarningCancel');
-        var okBtn = document.getElementById('libraryWarningOk');
-        
-        if (!modal) return;
-        
-        modal.style.display = 'block';
-        
-        var closeModal = function() {
-            modal.style.display = 'none';
-        };
-        
-        // Remove old event listeners to prevent duplicates if called multiple times
-        var newCancelBtn = cancelBtn.cloneNode(true);
-        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
-        newCancelBtn.addEventListener('click', closeModal);
-        
-        var newOkBtn = okBtn.cloneNode(true);
-        okBtn.parentNode.replaceChild(newOkBtn, okBtn);
-        newOkBtn.addEventListener('click', function() {
-            closeModal();
-            window.open(url, '_blank');
-        });
-        
-        // Close on click outside
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                closeModal();
-            }
-        });
-    };
 })();

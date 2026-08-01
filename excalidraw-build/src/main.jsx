@@ -1,9 +1,20 @@
+import { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Excalidraw, exportToCanvas } from '@excalidraw/excalidraw';
+import { Excalidraw, exportToCanvas, useHandleLibrary } from '@excalidraw/excalidraw';
 import _ from 'lodash';
 
 // Make lodash available globally for Excalidraw
 window._ = _;
+
+// Excalidraw 0.17 still registers a deprecated `unload` listener (it only
+// forwards to its blur handler, which ignores the event object). Chrome logs
+// a deprecation warning for it, so remap `unload` to `pagehide`, the
+// recommended replacement, which fires in the same situations.
+const remapUnloadEvent = (original) => function (type, ...rest) {
+  return original.call(this, type === 'unload' ? 'pagehide' : type, ...rest);
+};
+window.addEventListener = remapUnloadEvent(window.addEventListener);
+window.removeEventListener = remapUnloadEvent(window.removeEventListener);
 
 const normalizeTheme = (theme) => (theme === 'dark' || theme === 'black') ? 'dark' : 'light';
 const TRANSPARENT_COLORS = new Set(['transparent', 'rgba(0,0,0,0)', 'rgba(0, 0, 0, 0)']);
@@ -210,10 +221,34 @@ window.PoznoteExcalidraw = {
         libraryItems: initialLibraryItems
     };
 
-    const ExcalidrawWrapper = () => (
-      <Excalidraw 
+    // Excalidraw interpolates this raw into the browse-libraries href, so
+    // encode it ourselves or our ?note_id=...&workspace=... query would
+    // leak into the outer URL and be lost on the return trip.
+    const buildLibraryReturnUrl = () =>
+      encodeURIComponent(window.location.origin + window.location.pathname + window.location.search);
+
+    const ExcalidrawWrapper = () => {
+      // useHandleLibrary imports libraries arriving via #addLibrary in the URL
+      // (the return trip from the "Browse libraries" flow) and re-runs when the
+      // imperative API becomes available, hence the state.
+      const [apiState, setApiState] = useState(null);
+      useHandleLibrary({ excalidrawAPI: apiState });
+
+      // The editor page rewrites the URL (adds note_id) after the first save
+      // of a new note and fires this event so the return URL follows; without
+      // it, a later library round trip would come back to note_id=0.
+      const [libraryReturnUrl, setLibraryReturnUrl] = useState(buildLibraryReturnUrl);
+      useEffect(() => {
+        const refresh = () => setLibraryReturnUrl(buildLibraryReturnUrl());
+        window.addEventListener('poznote-note-url-changed', refresh);
+        return () => window.removeEventListener('poznote-note-url-changed', refresh);
+      }, []);
+
+      return (
+      <Excalidraw
         initialData={initialData || { elements: [], appState: {} }}
         theme={requestedTheme}
+        libraryReturnUrl={libraryReturnUrl}
         UIOptions={{
           ...options.UIOptions,
           canvasActions: {
@@ -222,8 +257,9 @@ window.PoznoteExcalidraw = {
             changeViewBackgroundColor: false
           }
         }}
-        ref={(api) => {
+        excalidrawAPI={(api) => {
           excalidrawAPI = api;
+          setApiState(api);
           if (api) {
             applyThemeClassToDom();
             scheduleForcedAppState(api);
@@ -289,7 +325,8 @@ window.PoznoteExcalidraw = {
           }
         }}
       />
-    );
+      );
+    };
 
     root.render(<ExcalidrawWrapper />);
 
