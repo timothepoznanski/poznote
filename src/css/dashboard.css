@@ -286,7 +286,7 @@ body.dark-mode .dashboard-sidebar-sep {
 
 .dashboard-topbar-count {
     position: absolute;
-    bottom: 4px;
+    bottom: 2px;
     left: 0;
     right: 0;
     text-align: center;
@@ -294,7 +294,8 @@ body.dark-mode .dashboard-sidebar-sep {
     color: #007DB8;
     font-size: 13px;
     font-weight: 400;
-    line-height: 1;
+    /* 1.2 leaves room for descenders (p, y); overflow:hidden clips them at 1 */
+    line-height: 1.2;
     font-variant-numeric: tabular-nums;
     pointer-events: none;
     overflow: hidden;
