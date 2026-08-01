@@ -550,6 +550,16 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Usage:** Notes marked as templates can be duplicated to create new notes with the same structure, tags, and content, saving time on repetitive tasks.
 </details>
 
+<details>
+<summary><strong>Daily Notes (Diary)</strong></summary>
+&nbsp;
+
+*   **Usage:** Write one note per day, journal-style, from a dedicated Diary board.
+*   **Workflow:** The "Today's entry" button opens today's note, creating it if needed, titled with the current date and stored automatically in a `Diary/YYYY/MM` folder structure.
+*   **Board View:** Entries are displayed as cards grouped by month, newest first, with a filter to quickly find past entries.
+*   **Format:** New entries are created as HTML or Markdown notes, depending on the "Diary entry format" setting under **Settings > Display**.
+</details>
+
 ## Personalization
 
 Poznote offers several built-in personalization options directly from the application, without requiring any configuration file changes.
