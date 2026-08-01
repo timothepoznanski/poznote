@@ -429,6 +429,8 @@
       "support": "Apoie o desenvolvimento do Poznote com uma doação."
     },
     "title": "Configurações",
+    "collapse_section": "Recolher a seção",
+    "expand_section": "Expandir a seção",
     "categories": {
       "actions": "Ações",
       "admin_tools": "Ferramentas de administração",

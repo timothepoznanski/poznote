@@ -166,6 +166,8 @@
       "support": "Поддержите разработку Poznote пожертвованием."
     },
     "title": "Настройки",
+    "collapse_section": "Свернуть раздел",
+    "expand_section": "Развернуть раздел",
     "categories": {
       "actions": "Действия",
       "admin_tools": "Инструменты администратора",

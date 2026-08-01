@@ -442,6 +442,8 @@
       "support": "Soutenez le développement de Poznote par un don."
     },
     "title": "Paramètres",
+    "collapse_section": "Réduire la section",
+    "expand_section": "Développer la section",
     "categories": {
       "actions": "Actions",
       "admin_tools": "Outils d'administration",

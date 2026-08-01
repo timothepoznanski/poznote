@@ -430,6 +430,8 @@
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende."
     },
     "title": "Einstellungen",
+    "collapse_section": "Bereich einklappen",
+    "expand_section": "Bereich ausklappen",
     "categories": {
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",

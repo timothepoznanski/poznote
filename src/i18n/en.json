@@ -166,6 +166,8 @@
       "support": "Support the development of Poznote with a donation."
     },
     "title": "Settings",
+    "collapse_section": "Collapse section",
+    "expand_section": "Expand section",
     "categories": {
       "actions": "Actions",
       "admin_tools": "Admin Tools",

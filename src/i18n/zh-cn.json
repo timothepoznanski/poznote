@@ -432,6 +432,8 @@
       "support": "通过捐赠支持 Poznote 的开发。"
     },
     "title": "设置",
+    "collapse_section": "折叠此部分",
+    "expand_section": "展开此部分",
     "categories": {
       "actions": "操作",
       "admin_tools": "管理工具",
