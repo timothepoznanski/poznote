@@ -1160,7 +1160,7 @@
     "markdown_placeholder": "Напишите свой Markdown или используйте /, чтобы открыть меню команд...",
     "markdown_placeholder_mobile": "Напишите свой Markdown здесь...",
     "excalidraw": {
-      "placeholder_outside": "…"
+      "placeholder_outside": "Пишите вне диаграммы здесь…"
     },
     "messages": {
       "preview_mode_hint": "Вы в режиме предпросмотра. Переключитесь в режим редактирования с помощью кнопки на панели инструментов, чтобы начать писать Markdown.",

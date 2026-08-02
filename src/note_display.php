@@ -527,6 +527,20 @@
                         // This allows iframes, audio, and video to render properly
                         $display_content = unescapeMediaInHtml($display_content);
 
+                        // Normalize the navigation paragraphs around Excalidraw diagrams:
+                        // older insertions stored literal dots as text, and saved data-ph
+                        // hints are frozen in the language active at save time. Rewrite any
+                        // placeholder paragraph that holds no real user text so the hint
+                        // always follows the current UI language
+                        if (strpos($display_content, 'excalidraw-placeholder') !== false) {
+                            $excalidraw_ph = htmlspecialchars(t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…'), ENT_QUOTES);
+                            $display_content = preg_replace(
+                                '/<p class="excalidraw-placeholder"(?:\s+data-ph="[^"]*")?>\s*(?:\.{3}|…|&hellip;|&#8230;)?\s*<\/p>/u',
+                                '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_ph . '"></p>',
+                                $display_content
+                            );
+                        }
+
                         if ($isPublicWorkspaceReadonly) {
                             // Public workspace visitors must never receive raw note HTML
                             // (stored XSS against other users of the instance). Applied
