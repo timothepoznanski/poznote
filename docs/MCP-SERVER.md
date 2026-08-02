@@ -2,7 +2,7 @@
 
 MCP (Model Context Protocol) server for Poznote — enables AI-powered note management through natural language.
 
-This server supports **HTTP transport only** (MCP `streamable-http`).
+This server supports **HTTP transport only** (MCP Streamable HTTP).
 
 > [!TIP]
 > Looking for a chat with a local model (e.g. Ollama) directly inside Poznote? You don't need the MCP server for that — use the built-in [AI Assistant](AI-ASSISTANT.md) instead (**Settings → Admin Tools → AI Assistant**). The MCP server is for connecting *external* MCP-capable assistants to your notes; Ollama alone is a model runtime, not an MCP client, and cannot connect to it directly.
@@ -22,7 +22,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 
 ### Components
 
-- **`server.py`** — MCP server (HTTP / streamable-http)
+- **`server.py`** — MCP server (HTTP / Streamable HTTP)
   - Exposes MCP endpoint at `http://127.0.0.1:8045/mcp`
   - Defines tools (actions) for note management
   - Orchestrates calls between the AI and the Poznote API

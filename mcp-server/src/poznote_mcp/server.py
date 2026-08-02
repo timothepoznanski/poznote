@@ -29,7 +29,7 @@ import sys
 from typing import Optional, Union
 
 import httpx
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP
 
 from .client import PoznoteClient
 
@@ -137,27 +137,10 @@ def _assert_port_available(host: str, port: int) -> None:
 
 # Initialize FastMCP server.
 #
-# NOTE: We don't pre-parse CLI args at import time.
-# We keep a single source of truth for host/port in main(), while keeping tool
-# decorators simple.
-def _env_int(name: str, default: int) -> int:
-    value = os.getenv(name)
-    if not value:
-        return default
-    try:
-        return int(value)
-    except ValueError:
-        return default
-
-
-mcp = FastMCP(
-    "poznote-mcp",
-    stateless_http=True,
-    # FastMCP defaults to 127.0.0.1:8000 for HTTP-based transports.
-    # Poznote MCP expects 0.0.0.0:8045 by default (and the CLI exposes --host/--port).
-    host=os.getenv("MCP_HOST", "0.0.0.0"),
-    port=_env_int("MCP_PORT", 8045),
-)
+# FastMCP 3.x: host/port/stateless_http are no longer constructor options —
+# they are passed to mcp.run() in main(), which stays the single source of
+# truth for network settings.
+mcp = FastMCP("poznote-mcp")
 
 # Poznote client (initialized lazily)
 _client: PoznoteClient | None = None
@@ -1281,11 +1264,15 @@ def main():
         except OSError:
             sys.exit(1)
 
-        # Ensure FastMCP is configured with the host/port that the user passed.
-        # FastMCP binds using mcp.settings.host / mcp.settings.port.
-        mcp.settings.host = host
-        mcp.settings.port = port
-        mcp.run(transport="streamable-http")
+        # FastMCP 3.x: "http" is the canonical name of the streamable-http
+        # transport; the endpoint path stays /mcp.
+        mcp.run(
+            transport="http",
+            host=host,
+            port=port,
+            stateless_http=True,
+            show_banner=False,
+        )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
     except Exception as e:
