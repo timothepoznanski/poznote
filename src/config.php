@@ -236,9 +236,6 @@ define('CUSTOM_CSS_PATH', poznoteResolveCustomCssPath());
 // Optional password to protect access to the Settings page.
 define('SETTINGS_PASSWORD', _env('POZNOTE_SETTINGS_PASSWORD', ''));
 
-// Optional: hide the "Restrict to specific users" toggles in share dialogs.
-define('HIDE_RESTRICT_USERS', _envBool('POZNOTE_HIDE_RESTRICT_USERS', false));
-
 /**
  * Resolve a global setting from the database with environment variable fallback.
  */
@@ -254,6 +251,12 @@ function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '
     }
     return _env($envKey, $default);
 }
+
+// Hide the "Restrict to specific users" toggles in share dialogs.
+// Managed from the admin UI (Settings > Admin Tools); the legacy
+// POZNOTE_HIDE_RESTRICT_USERS env variable is only used as a fallback
+// when the setting has never been saved from the UI.
+define('HIDE_RESTRICT_USERS', filter_var(poznoteResolveGlobalSetting('hide_restrict_users', 'POZNOTE_HIDE_RESTRICT_USERS', 'false'), FILTER_VALIDATE_BOOL));
 
 // ============================================================
 // GIT SYNC CONFIGURATION (GitHub, Forgejo)

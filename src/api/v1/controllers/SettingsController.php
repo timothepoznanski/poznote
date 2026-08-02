@@ -17,6 +17,7 @@ class SettingsController {
         'login_display_name',
         'custom_css_path',
         'git_sync_enabled',
+        'hide_restrict_users',
         'import_max_individual_files',
         'import_max_zip_files',
         'user_max_notes',
@@ -94,7 +95,7 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'git_sync_enabled') {
+        if ($key === 'git_sync_enabled' || $key === 'hide_restrict_users') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 

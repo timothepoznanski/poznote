@@ -28,6 +28,10 @@
     border-color: #007DB8;
     box-shadow: 0 4px 12px rgba(0, 125, 184, 0.15);
     transform: translateY(-2px);
+    /* The transform creates a stacking context: without a z-index the
+       help tooltip (z-index inside the card) paints under later sibling
+       cards. Lift the hovered card above its siblings. */
+    z-index: 10;
 }
 
 .home-card.is-creating {

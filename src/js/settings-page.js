@@ -133,6 +133,9 @@
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
         }
+        if (document.getElementById('hide-restrict-users-card')) {
+            keys.push('hide_restrict_users');
+        }
 
         var unique = Object.create(null);
         return keys.filter(function (key) {
@@ -992,6 +995,18 @@
         });
     }
 
+    function refreshHideRestrictUsersBadge() {
+        var badge = document.getElementById('hide-restrict-users-status');
+        if (!badge) return;
+
+        var txt = getTranslations();
+        getSetting('hide_restrict_users', function (value) {
+            var enabled = value === '1' || value === 'true';
+            badge.textContent = enabled ? txt.enabled : txt.disabled;
+            badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
+        });
+    }
+
     function refreshGitSyncCardBadge() {
         var badge = document.getElementById('git-sync-status-badge');
         if (!badge) return;
@@ -1524,6 +1539,21 @@
                     setSetting('git_sync_enabled', toSet, function () {
                         refreshGitSyncEnabledBadge();
                         refreshGitSyncCardBadge();
+                        reloadOpener();
+                    });
+                });
+            });
+        }
+
+        // Hide "Restrict to specific users" global toggle
+        var hideRestrictUsersCard = document.getElementById('hide-restrict-users-card');
+        if (hideRestrictUsersCard) {
+            hideRestrictUsersCard.addEventListener('click', function () {
+                getSetting('hide_restrict_users', function (currentValue) {
+                    var currently = currentValue === '1' || currentValue === 'true';
+                    var toSet = currently ? '0' : '1';
+                    setSetting('hide_restrict_users', toSet, function () {
+                        refreshHideRestrictUsersBadge();
                         reloadOpener();
                     });
                 });
@@ -2068,6 +2098,7 @@
             refreshImportLimitsBadges();
             refreshUserQuotasBadges();
             refreshGitSyncEnabledBadge();
+            refreshHideRestrictUsersBadge();
             refreshUiCustomizationBadge();
             refreshUiCustomizationAdminBadge();
         });

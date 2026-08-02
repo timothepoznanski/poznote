@@ -196,6 +196,7 @@ if ($isAdmin) {
             'user_max_notes',
             'user_max_storage_mb',
             'git_sync_enabled',
+            'hide_restrict_users',
         ];
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
             $settingsPageConfig['settings'][$settingsPageKey] = getGlobalSetting($settingsPageKey, '');
@@ -915,6 +916,18 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span>
                     <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Hide "Restrict to specific users" toggles in share dialogs -->
+            <div class="home-card" id="hide-restrict-users-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.hide_restrict_users', [], 'Hide the "Restrict to specific users" toggles in share dialogs (shared notes/folders and workspace sharing). Existing restrictions keep working.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-users"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.hide_restrict_users', [], 'Hide share user restriction'); ?></span>
+                    <span id="hide-restrict-users-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 
