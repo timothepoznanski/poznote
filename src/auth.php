@@ -351,12 +351,18 @@ function isAuthenticated() {
             if (count($parts) === 4) {
                 // Format: username:user_id:timestamp:hash
                 list($username, $userId, $timestamp, $hash) = $parts;
-                if (time() - $timestamp < REMEMBER_ME_DURATION) {
+                // The timestamp comes from the cookie: reject anything that is
+                // not a plain integer, and anything dated in the future, so a
+                // far-future value cannot defeat the expiry window.
+                $timestampValid = ctype_digit((string)$timestamp)
+                    && (int)$timestamp <= time() + 60
+                    && time() - (int)$timestamp < REMEMBER_ME_DURATION;
+                if ($timestampValid) {
                     require_once __DIR__ . '/users/db_master.php';
                     $user = getUserProfileById((int)$userId);
                     
-                    if ($user && $user['active'] && $user['username'] === $username) {
-                        $secretToUse = getRememberMeSecret($user);
+                    $secretToUse = $user ? getRememberMeSecret($user) : null;
+                    if ($user && $secretToUse !== null && $user['active'] && $user['username'] === $username) {
                         $expectedHash = createRememberMeHash($username, (int)$userId, (int)$timestamp, $secretToUse);
                         $legacyExpectedHash = createLegacyRememberMeHash($username, (int)$userId, (int)$timestamp, $secretToUse);
                         $validHash = hash_equals($expectedHash, $hash);
@@ -376,58 +382,14 @@ function isAuthenticated() {
                     }
                 }
             } elseif (count($parts) === 3) {
-                // Legacy format: username:timestamp:hash (single-user mode before multi-user migration)
-                // These cookies are from before the multi-user migration and don't contain a user_id.
-                // We need to check if a migration has occurred and invalidate these old cookies.
-                list($username, $timestamp, $hash) = $parts;
-                
-                // Check if migration has occurred by looking for migration_timestamp in global_settings
-                $migrationTimestamp = null;
-                try {
-                    require_once __DIR__ . '/users/db_master.php';
-                    $migrationTimestamp = getGlobalSetting('migration_timestamp');
-                } catch (Exception $e) {
-                    // Ignore errors, proceed without migration check
-                }
-                
-                // If migration occurred and cookie was created before migration, invalidate it
-                // This forces the user to re-login and select their profile
-                if ($migrationTimestamp !== null && (int)$timestamp < (int)$migrationTimestamp) {
-                    // Cookie was created before migration, invalidate it
-                    setRememberMeCookie('', time() - 3600);
-                    error_log("Poznote: Invalidated pre-migration remember-me cookie");
-                    return false;
-                }
-                
-                // If no migration or cookie was created after (shouldn't happen for legacy format),
-                // validate normally but auto-select the first user profile
-                $fallbackUsername = getAuthConfig('POZNOTE_USERNAME', 'admin');
-                if (time() - $timestamp < REMEMBER_ME_DURATION && 
-                    $username === $fallbackUsername &&
-                    $hash === hash('sha256', $username . $timestamp . AUTH_PASSWORD)) {
-                    
-                    // For legacy cookies, we need to associate with a user profile
-                    // Auto-select the first active user (typically the migrated admin user)
-                    require_once __DIR__ . '/users/db_master.php';
-                    $profiles = getAllUserProfiles();
-                    if (!empty($profiles)) {
-                        $firstUser = $profiles[0];
-                        $firstUser = getUserProfileById((int)$firstUser['id']) ?: $firstUser;
-                        $activeAccountSelected = startAuthenticatedUserSession($firstUser);
-                        updateUserLastLogin((int)$firstUser['id']);
-                        
-                        // Upgrade the cookie to the new format with user_id
-                        $newTimestamp = time();
-                        $secretToUse = getRememberMeSecret($firstUser);
-                        $newToken = buildRememberMeToken($username, (int)$firstUser['id'], $newTimestamp, $secretToUse);
-                        setRememberMeCookie($newToken, time() + REMEMBER_ME_DURATION);
-                        
-                        return $activeAccountSelected;
-                    }
-                    
-                    // Fallback if no profiles exist (shouldn't happen)
-                    return false;
-                }
+                // Legacy pre-multi-user format: username:timestamp:hash. It was
+                // signed with the hardcoded AUTH_PASSWORD constant, which is
+                // public, so anyone could mint one and be logged in as the first
+                // profile. These cookies are no longer accepted: the holder is
+                // sent back to the login page and re-issued a signed token.
+                setRememberMeCookie('', time() - 3600);
+                error_log('Poznote: Rejected legacy remember-me cookie (unsigned legacy format)');
+                return false;
             }
         }
         // Invalid token, remove it
@@ -1281,11 +1243,11 @@ function authenticate($username, $password, $rememberMe = false) {
         updateUserLastLogin($userId);
 
         // Set remember me cookie if requested
-        if ($rememberMe) {
+        $secretToUse = $rememberMe ? getRememberMeSecret($user) : null;
+        if ($rememberMe && $secretToUse !== null) {
             $timestamp = time();
             $actualUsername = $user['username'];
-            $secretToUse = getRememberMeSecret($user);
-            
+
             // Format: actual_username:user_id:timestamp:hash
             $token = buildRememberMeToken($actualUsername, (int)$userId, $timestamp, $secretToUse);
             setRememberMeCookie($token, time() + REMEMBER_ME_DURATION);

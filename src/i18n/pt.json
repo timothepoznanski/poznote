@@ -990,8 +990,6 @@
       "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
-      "login_password_form": "Login com e-mail e senha",
-      "login_password_form_hint": "O formulário de e-mail e senha (e o separador “ou”) só é ocultado enquanto o login SSO/OIDC está ativado, para que ninguém perca o acesso. Se necessário, um botão invisível no canto inferior direito da página de login permite exibi-lo novamente.",
       "reminder_bell": "Ícone de sino (lembrete)",
       "dashboard_user": "Usuário",
       "dashboard_filter_bar": "Barra de filtro",
@@ -1008,8 +1006,7 @@
         "panels": "Outros",
         "dashboard_toolbar": "Painel",
         "folder_actions": "Ações de pasta",
-        "workspace_menu": "Menu do espaço de trabalho",
-        "login_page": "Página de login"
+        "workspace_menu": "Menu do espaço de trabalho"
       },
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
@@ -1694,7 +1691,6 @@
     },
     "redirecting": "Redirecionando...",
     "show_password": "Mostrar senha",
-    "reveal_password_login": "Mostrar o login com e-mail e senha",
     "hide_password": "Ocultar senha",
     "admin_warning": "Inicie sessão com o nome de usuário <code>{{username}}</code> e a senha atual desta conta. Você poderá renomear esta conta nas configurações para maior segurança.",
     "fields": {
@@ -2591,6 +2587,26 @@
         "own_only": "Apenas a própria conta",
         "own_account": "A própria conta"
       },
+      "password_management": {
+        "manage_password": "Palavra-passe",
+        "reset_password": "Repor palavra-passe",
+        "set_password": "Definir palavra-passe",
+        "reset_to_default": "Repor a palavra-passe predefinida",
+        "modal_help": "Defina uma palavra-passe personalizada para esta conta ou reponha a predefinida.",
+        "current_mode": "Modo atual",
+        "set_help": "Pelo menos 4 caracteres.",
+        "reset_help": "Remove a palavra-passe personalizada e repõe a palavra-passe predefinida para este utilizador.",
+        "reset_confirm": "Repor a palavra-passe de \"{{username}}\" para a predefinida?",
+        "set_new_password": "Nova palavra-passe para \"{{username}}\":",
+        "reset_success": "Palavra-passe reposta para a predefinida.",
+        "set_success": "Palavra-passe atualizada com sucesso.",
+        "status_custom": "Personalizada",
+        "status_default": "Predefinida",
+        "status_custom_detail": "Este utilizador utiliza uma palavra-passe personalizada.",
+        "status_default_detail": "Este utilizador utiliza a palavra-passe predefinida.",
+        "changed_at_prefix": "Atualizada:",
+        "status_sso_only_detail": "Este utilizador inicia sessão através de SSO e não tem palavra-passe. Defina uma abaixo se o início de sessão com palavra-passe for necessário."
+      },
       "errors": {
         "cannot_delete_self": "Você não pode excluir seu próprio perfil",
         "cannot_change_self": "Você não pode alterar seu próprio status/função",
@@ -2822,14 +2838,19 @@
   "password": {
     "status": {
       "custom": "Senha personalizada",
-      "default": "Padrão"
+      "default": "Padrão",
+      "sso_only": "Apenas SSO"
     },
     "modal": {
       "title": "Mudar palavra-passe",
       "description": "Introduza a sua palavra-passe atual e escolha uma nova.",
       "current": "Palavra-passe atual",
       "new": "Nova palavra-passe",
-      "confirm": "Confirmar nova palavra-passe"
+      "confirm": "Confirmar nova palavra-passe",
+      "status_custom": "Está a utilizar uma palavra-passe definida por si ou pelo administrador.",
+      "status_changed_at": "Última alteração a {{date}}.",
+      "status_default": "Ainda está a utilizar a palavra-passe predefinida. Introduza-a como palavra-passe atual e escolha a sua.",
+      "status_sso_only": "Este perfil não tem palavra-passe: inicia sessão através de SSO. Peça a um administrador para definir uma se precisar de início de sessão com palavra-passe."
     },
     "errors": {
       "all_required": "Todos os campos são obrigatórios",
@@ -2904,6 +2925,11 @@
       "allowed_users": "Escreva um email ou nome de utilizador e prima Enter para o adicionar. Deixe vazio para permitir todos os utilizadores autenticados.",
       "api_audience": "Claim aud aceite para pedidos API com Bearer JWT OIDC. Deixe vazio para usar o Client ID. Use vírgulas para várias audiências.",
       "disable_normal_login": "Quando ativado, apenas o login OIDC estará disponível na página de autenticação",
+      "disable_normal_login_env": "Para desativar o login com palavra-passe (apenas SSO), defina POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true no seu ficheiro .env.",
+      "disable_normal_login_active": "(Atualmente ativo)",
+      "sso_only_admin_password": "Pode colocar esta instância em modo apenas SSO definindo POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true no ficheiro .env.",
+      "sso_only_admin_password_warning": "Antes de o ativar, certifique-se de que pelo menos uma conta de administrador tem uma palavra-passe explícita (Definições > Utilizadores).",
+      "sso_only_admin_password_recovery": "Se o fornecedor de identidade ficar indisponível, a recuperação consiste em voltar a colocar a opção em false e iniciar sessão com essa palavra-passe.",
       "disable_basic_auth": "Quando ativado, os pedidos API com HTTP Basic Auth serão rejeitados (403)"
     },
     "actions": {

@@ -88,7 +88,7 @@ function initializeMasterDatabase(PDO $con): void {
         if (!in_array('password_hash', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN password_hash TEXT");
         }
-        
+
         if (!in_array('password_changed_at', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN password_changed_at DATETIME");
         }
@@ -123,6 +123,33 @@ function initializeMasterDatabase(PDO $con): void {
         }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
+    }
+
+    // Security-sensitive migration, kept in its own try so a failure here can
+    // never skip the column additions above (and vice versa). Marks profiles
+    // that never received an initial credential from an admin, so they must not
+    // answer to the hardcoded default password.
+    try {
+        $cols = $con->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+        if (!in_array('password_login_disabled', array_column($cols, 'name'))) {
+            $con->exec("ALTER TABLE users ADD COLUMN password_login_disabled INTEGER DEFAULT 0");
+            // Backfill the profiles that are exposed right now: linked to an SSO
+            // identity and with no password hash, so they currently answer to the
+            // public default. Profiles that already have a hash are untouched,
+            // they went through a deliberate password set and keep working.
+            // getUserPasswordHash() treats an empty string as "no hash", so the
+            // backfill must too: matching only IS NULL would leave such a row
+            // answering to the public default.
+            $con->exec("
+                UPDATE users
+                SET password_login_disabled = 1
+                WHERE (password_hash IS NULL OR password_hash = '')
+                  AND oidc_subject IS NOT NULL
+                  AND oidc_subject != ''
+            ");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to add password_login_disabled column: " . $e->getMessage());
     }
     
     // Global settings table
@@ -756,7 +783,14 @@ function updateUserOidcSubject(int $userId, string $oidcSubject): void {
  * Create a new user profile
  */
 
-function createUserProfile(string $username, ?string $email = null, ?int $maxUsers = null): array {
+/**
+ * @param bool $disablePasswordLogin Set by flows that provision a profile without
+ *        handing over any initial credential (OIDC auto-provisioning). Such a
+ *        profile must not answer to the hardcoded default password. It is stored
+ *        in the same INSERT as the row itself, so there is no window where the
+ *        profile exists and is still reachable with the public default.
+ */
+function createUserProfile(string $username, ?string $email = null, ?int $maxUsers = null, bool $disablePasswordLogin = false): array {
     try {
         $con = getMasterConnection();
 
@@ -799,13 +833,14 @@ function createUserProfile(string $username, ?string $email = null, ?int $maxUse
         // createUserProfile is only reachable from trusted flows (admin
         // creation, OIDC provisioning), so a provided email counts as verified.
         $stmt = $con->prepare("
-            INSERT INTO users (username, email, email_verified, active)
-            VALUES (?, ?, ?, 1)
+            INSERT INTO users (username, email, email_verified, active, password_login_disabled)
+            VALUES (?, ?, ?, 1, ?)
         ");
         $stmt->execute([
             $username,
             $email,
-            ($email !== null && trim((string)$email) !== '') ? 1 : 0
+            ($email !== null && trim((string)$email) !== '') ? 1 : 0,
+            $disablePasswordLogin ? 1 : 0
         ]);
 
         $userId = (int)$con->lastInsertId();
@@ -1418,7 +1453,9 @@ function setUserPasswordHash(int $userId, string $plainPassword): bool {
     try {
         $con = getMasterConnection();
         $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
-        $stmt = $con->prepare("UPDATE users SET password_hash = ?, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+        // Setting an explicit password re-enables password login: the profile
+        // now has a real credential, so the no-handover flag no longer applies.
+        $stmt = $con->prepare("UPDATE users SET password_hash = ?, password_login_disabled = 0, password_changed_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
         return $stmt->execute([$hash, $userId]);
     } catch (Exception $e) {
         error_log("Failed to set password hash for user $userId: " . $e->getMessage());
@@ -1441,6 +1478,45 @@ function clearUserPasswordHash(int $userId): bool {
 }
 
 /**
+ * Whether a profile is barred from the hardcoded default-password fallback.
+ *
+ * The defaults exist so an admin can hand over initial credentials for a
+ * profile they created. Profiles auto-provisioned by OIDC never went through
+ * that handover, so anyone knowing the username could sign in with 'user' (or
+ * 'admin'). They are flagged at creation time instead of being inferred from
+ * oidc_subject: that column is also stamped onto long-standing password
+ * accounts the first time they use SSO, and keying off it would silently
+ * revoke a password those users legitimately rely on.
+ *
+ * Setting a password hash clears the flag, so a profile can always be given
+ * local credentials deliberately.
+ */
+function isPasswordLoginDisabled(array $user): bool {
+    if (array_key_exists('password_login_disabled', $user)) {
+        return (int)$user['password_login_disabled'] === 1;
+    }
+
+    // Not every profile getter selects the column (getAllUserProfiles() returns
+    // only a few), so re-read it rather than treating a partial row as "allowed"
+    // and failing open.
+    $userId = (int)($user['id'] ?? 0);
+    if ($userId <= 0) {
+        return true; // Unidentifiable profile: refuse the default-password fallback.
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT password_login_disabled FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $value = $stmt->fetchColumn();
+    } catch (Exception $e) {
+        error_log("Failed to read password_login_disabled for user $userId: " . $e->getMessage());
+        return true; // On error, deny rather than fall back to a public constant.
+    }
+
+    return $value !== false && (int)$value === 1;
+}
+
+/**
  * Verify a password against a user's stored hash or hardcoded default.
  * Returns true if password matches.
  */
@@ -1454,12 +1530,20 @@ function verifyUserPassword(int $userId, string $password): bool {
         return password_verify($password, $storedHash);
     }
 
-    // Priority 2: Fall back to hardcoded default password
-    if ((bool)$user['is_admin']) {
-        return $password === AUTH_PASSWORD;
-    } else {
-        return $password === AUTH_USER_PASSWORD;
+    // No hash, and the profile never received an initial credential: password
+    // authentication is not available on it. An admin can still set one through
+    // the reset-password endpoint if a local credential is genuinely wanted.
+    if (isPasswordLoginDisabled($user)) {
+        return false;
     }
+
+    // Priority 2: Fall back to hardcoded default password. The constants live in
+    // auth.php, which db_master.php does not pull in; deny rather than fatal if
+    // this is reached from a context that never loaded it.
+    if ((bool)$user['is_admin']) {
+        return defined('AUTH_PASSWORD') && $password === AUTH_PASSWORD;
+    }
+    return defined('AUTH_USER_PASSWORD') && $password === AUTH_USER_PASSWORD;
 }
 
 /**
@@ -1472,12 +1556,27 @@ function hasCustomPassword(int $userId): bool {
 /**
  * Get the secret used for remember-me cookie signing.
  * Uses DB password hash if available, otherwise hardcoded default password.
+ *
+ * Returns null when no secret can be derived, which means remember-me is not
+ * available for that profile: a profile with no hash and no initial credential
+ * would otherwise be signed with a publicly known constant, letting anyone
+ * forge a valid session cookie from a guessable username, id and timestamp.
  */
-function getRememberMeSecret(array $user): string {
-    $storedHash = getUserPasswordHash((int)$user['id']);
+function getRememberMeSecret(array $user): ?string {
+    $userId = (int)($user['id'] ?? 0);
+    if ($userId <= 0) {
+        return null; // Unidentifiable profile: no secret rather than a constant.
+    }
+
+    $storedHash = getUserPasswordHash($userId);
     if ($storedHash !== null) {
         return $storedHash;
     }
+
+    if (isPasswordLoginDisabled($user)) {
+        return null;
+    }
+
     // Fall back to hardcoded default password
     if ((bool)$user['is_admin']) {
         return defined('AUTH_PASSWORD') ? AUTH_PASSWORD : 'admin';

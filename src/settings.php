@@ -149,11 +149,39 @@ try {
         }
         $settingsPageConfig['passwordStatus'] = [
             'has_custom_password' => hasCustomPassword((int)$settingsPageUserId),
+            // Must mirror the API's password-status payload: this seed is what
+            // the badge renders on page load, so omitting it would show
+            // "Default" for a profile that has no password at all.
+            'password_login_available' => hasCustomPassword((int)$settingsPageUserId)
+                || !(is_array($settingsPageUserProfile) && isPasswordLoginDisabled($settingsPageUserProfile)),
             'password_changed_at' => $settingsPagePasswordChangedAt,
         ];
     }
 } catch (Exception $e) {
     $settingsPageConfig['passwordStatus'] = null;
+}
+
+// Whether a local password is of any use to this user. Hidden in two cases:
+// the instance is SSO-only, so no password would ever be accepted at login;
+// or this profile was provisioned without a credential, so there is no current
+// password to authenticate the change with. Either way the card would only
+// lead to a dead end.
+$settingsShowChangePassword = true;
+try {
+    $oidcPath = __DIR__ . '/oidc.php';
+    if (is_file($oidcPath)) {
+        require_once $oidcPath;
+    }
+    $settingsSsoOnly = function_exists('oidc_is_enabled')
+        && oidc_is_enabled()
+        && defined('OIDC_DISABLE_NORMAL_LOGIN')
+        && OIDC_DISABLE_NORMAL_LOGIN;
+    $settingsNoLocalCredential = isset($settingsPageConfig['passwordStatus']['password_login_available'])
+        && $settingsPageConfig['passwordStatus']['password_login_available'] === false;
+    $settingsShowChangePassword = !$settingsSsoOnly && !$settingsNoLocalCredential;
+} catch (Throwable $e) {
+    // Never let this check hide a card that should be reachable.
+    $settingsShowChangePassword = true;
 }
 
 if ($isAdmin) {
@@ -336,7 +364,8 @@ if ($isAdmin) {
                 </div>
             </div>
 
-            <!-- Change Password -->
+            <!-- Change Password (hidden when sign-in never uses a local password) -->
+            <?php if ($settingsShowChangePassword): ?>
             <div class="home-card" id="change-password-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.change_password', [], 'Change the password used to sign in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
@@ -347,6 +376,7 @@ if ($isAdmin) {
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
+            <?php endif; ?>
 
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">

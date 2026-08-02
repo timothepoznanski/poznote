@@ -998,6 +998,77 @@ function poznoteGetNonHideableUiKeys() {
     ];
 }
 
+/**
+ * Pick the best supported language from an Accept-Language header.
+ *
+ * Used on pre-auth pages (the login page), where no user preference exists yet.
+ * Entries are ranked by their q-value, highest first; for each one an exact
+ * match wins, otherwise the primary subtag is tried so "fr-CA" still selects
+ * "fr". Returns null when nothing matches, leaving the caller's default in place.
+ *
+ * @param string $header        Raw Accept-Language header value.
+ * @param array  $allowedLangs  Supported language codes, lowercase.
+ */
+function poznoteDetectBrowserLanguage(string $header, array $allowedLangs): ?string {
+    $header = trim($header);
+    if ($header === '' || empty($allowedLangs)) {
+        return null;
+    }
+
+    $candidates = [];
+    foreach (explode(',', $header) as $index => $part) {
+        $bits = explode(';', $part);
+        $tag = strtolower(trim($bits[0]));
+        if ($tag === '' || $tag === '*') {
+            continue;
+        }
+
+        // Quality defaults to 1 when the q= parameter is absent or malformed.
+        $quality = 1.0;
+        for ($i = 1; $i < count($bits); $i++) {
+            $param = trim($bits[$i]);
+            if (stripos($param, 'q=') === 0) {
+                $value = substr($param, 2);
+                if (is_numeric($value)) {
+                    $quality = (float)$value;
+                }
+                break;
+            }
+        }
+        if ($quality <= 0) {
+            continue; // q=0 explicitly rejects that language.
+        }
+
+        // Keep the header order as tie-breaker between equal q-values.
+        $candidates[] = ['tag' => $tag, 'q' => $quality, 'order' => $index];
+    }
+
+    usort($candidates, function ($a, $b) {
+        return $a['q'] === $b['q'] ? ($a['order'] <=> $b['order']) : ($b['q'] <=> $a['q']);
+    });
+
+    foreach ($candidates as $candidate) {
+        $tag = $candidate['tag'];
+        if (in_array($tag, $allowedLangs, true)) {
+            return $tag;
+        }
+
+        // "fr-CA" -> "fr". Also lets "zh" reach a "zh-cn" style code when that
+        // is the only variant this instance ships.
+        $primary = explode('-', $tag)[0];
+        if ($primary !== $tag && in_array($primary, $allowedLangs, true)) {
+            return $primary;
+        }
+        foreach ($allowedLangs as $allowed) {
+            if (explode('-', $allowed)[0] === $primary) {
+                return $allowed;
+            }
+        }
+    }
+
+    return null;
+}
+
 function poznoteGetGlobalHiddenUiElements() {
     static $globalHiddenKeys = null;
 
@@ -1034,17 +1105,6 @@ function poznoteGetGlobalHiddenUiElements() {
 
     $globalHiddenKeys = array_keys($seen);
     return $globalHiddenKeys;
-}
-
-function poznoteIsPasswordLoginHiddenByAdmin() {
-    // The login page is pre-auth, so the admin exemption cannot apply there.
-    // Only enforced while OIDC is enabled: hiding the only login method would
-    // lock everyone out of the instance.
-    if (!function_exists('oidc_is_enabled') || !oidc_is_enabled()) {
-        return false;
-    }
-
-    return in_array('login:password-form', poznoteGetGlobalHiddenUiElements(), true);
 }
 
 function poznoteGetEnforcedGlobalHiddenUiElements() {

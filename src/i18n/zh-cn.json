@@ -991,8 +991,6 @@
       "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对除管理员外的所有人隐藏。",
       "locked_by_admin": "已由管理员对所有用户隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
-      "login_password_form": "邮箱密码登录",
-      "login_password_form_hint": "仅在启用 SSO/OIDC 登录时才会隐藏邮箱密码表单（以及“或”分隔符），以免用户无法登录。如有需要，登录页面右下角的隐形按钮可重新显示该表单。",
       "reminder_bell": "铃铛图标（提醒）",
       "dashboard_user": "用户",
       "dashboard_filter_bar": "筛选栏",
@@ -1009,8 +1007,7 @@
         "panels": "其他",
         "dashboard_toolbar": "仪表盘",
         "folder_actions": "文件夹操作",
-        "workspace_menu": "工作区菜单",
-        "login_page": "登录页面"
+        "workspace_menu": "工作区菜单"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1690,7 +1687,6 @@
     },
     "redirecting": "正在重定向...",
     "show_password": "显示密码",
-    "reveal_password_login": "显示邮箱密码登录",
     "hide_password": "隐藏密码",
     "admin_warning": "请使用用户名 <code>{{username}}</code> 和此帐户的当前密码登录，然后可在设置中重命名此帐户以提高安全性。",
     "fields": {
@@ -2609,13 +2605,15 @@
         "set_help": "至少 4 个字符。",
         "reset_help": "删除自定义密码，并恢复为该用户的默认密码。",
         "reset_confirm": "将“{{username}}”的密码重置为默认值？",
+        "set_new_password": "为“{{username}}”设置新密码：",
         "set_success": "密码更新成功。",
         "reset_success": "密码已重置为默认值。",
         "status_custom": "自定义",
         "status_default": "默认",
         "status_custom_detail": "该用户使用自定义密码。",
         "status_default_detail": "该用户使用默认密码。",
-        "changed_at_prefix": "更新时间："
+        "changed_at_prefix": "更新时间：",
+        "status_sso_only_detail": "该用户通过 SSO 登录，没有密码。如需密码登录，请在下方设置一个。"
       },
       "password": "密码",
       "confirm_password": "确认密码",
@@ -2958,14 +2956,19 @@
   "password": {
     "status": {
       "custom": "自定义密码",
-      "default": "默认"
+      "default": "默认",
+      "sso_only": "仅 SSO"
     },
     "modal": {
       "title": "修改密码",
       "description": "输入当前密码并选择新密码。",
       "current": "当前密码",
       "new": "新密码",
-      "confirm": "确认新密码"
+      "confirm": "确认新密码",
+      "status_custom": "您正在使用自己或管理员设置的密码。",
+      "status_changed_at": "上次修改时间：{{date}}。",
+      "status_default": "您仍在使用默认密码。请将其作为当前密码输入，然后设置自己的密码。",
+      "status_sso_only": "该配置文件没有密码：您通过 SSO 登录。如需密码登录，请联系管理员设置。"
     },
     "errors": {
       "all_required": "所有字段均为必填项",
@@ -3040,6 +3043,11 @@
       "allowed_users": "输入邮箱或用户名后按回车键添加。留空则允许所有已认证用户。",
       "api_audience": "OIDC Bearer JWT API 请求接受的 aud claim。留空则使用 Client ID。多个 audience 请用逗号分隔。",
       "disable_normal_login": "启用后，登录页上将只提供 OIDC 登录",
+      "disable_normal_login_env": "要禁用密码登录（仅 SSO），请在 .env 文件中设置 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true。",
+      "disable_normal_login_active": "（当前已启用）",
+      "sso_only_admin_password": "您可以在 .env 文件中设置 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true，使该实例仅允许 SSO 登录。",
+      "sso_only_admin_password_warning": "启用前请确保至少有一个管理员账户已设置明确的密码（设置 > 用户）。",
+      "sso_only_admin_password_recovery": "如果身份提供商不可用，恢复方式是将该选项改回 false，然后使用该密码登录。",
       "disable_basic_auth": "启用后，带有 HTTP Basic Auth 的 API 请求将被拒绝（403）"
     },
     "actions": {

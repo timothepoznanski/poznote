@@ -66,24 +66,6 @@
                 });
             }
 
-            // Escape hatch: when the admin hides the password form behind SSO,
-            // an invisible button in the bottom-right corner reveals it (e.g.
-            // during an SSO outage).
-            var revealPasswordBtn = document.getElementById('reveal-password-login');
-            if (revealPasswordBtn) {
-                revealPasswordBtn.addEventListener('click', function () {
-                    var hiddenElements = document.querySelectorAll('.login-admin-hidden');
-                    for (var i = 0; i < hiddenElements.length; i++) {
-                        hiddenElements[i].classList.remove('login-admin-hidden');
-                    }
-                    revealPasswordBtn.parentNode.removeChild(revealPasswordBtn);
-                    var usernameInput = document.getElementById('username');
-                    if (usernameInput) {
-                        usernameInput.focus();
-                    }
-                });
-            }
-
             // OIDC login: redirect without creating a Poznote remember-me cookie.
             if (config.oidcEnabled) {
                 var oidcLoginBtn = document.getElementById('oidc-login-btn');

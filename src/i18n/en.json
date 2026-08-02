@@ -507,8 +507,6 @@
       "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
       "locked_by_admin": "Hidden for all users by the administrator",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
-      "login_password_form": "Email & password login",
-      "login_password_form_hint": "The email & password form (and the “or” separator) is only hidden while SSO/OIDC login is enabled, so users are never locked out. If needed, an invisible button in the bottom-right corner of the login page reveals the form again.",
       "reminder_bell": "Bell icon (reminder)",
       "dashboard_user": "User",
       "dashboard_filter_bar": "Filter bar",
@@ -525,8 +523,7 @@
         "panels": "Other",
         "dashboard_toolbar": "Dashboard",
         "folder_actions": "Folder Actions",
-        "workspace_menu": "Workspace Menu",
-        "login_page": "Login page"
+        "workspace_menu": "Workspace Menu"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count": "{{count}} hidden",
@@ -1361,7 +1358,6 @@
     },
     "redirecting": "Redirecting...",
     "show_password": "Show password",
-    "reveal_password_login": "Show email & password login",
     "hide_password": "Hide password",
     "admin_warning": "Please log in with the username <code>{{username}}</code> and the current password for this account. You can then rename this account in settings for better security.",
     "fields": {
@@ -2490,7 +2486,8 @@
         "status_default": "Default",
         "status_custom_detail": "This user uses a custom password.",
         "status_default_detail": "This user uses the default password.",
-        "changed_at_prefix": "Updated:"
+        "changed_at_prefix": "Updated:",
+        "status_sso_only_detail": "This user signs in through SSO and has no password. Set one below if password login is needed."
       },
       "errors": {
         "cannot_delete_self": "You cannot delete your own profile",
@@ -2520,14 +2517,19 @@
   "password": {
     "status": {
       "custom": "Custom password",
-      "default": "Default"
+      "default": "Default",
+      "sso_only": "SSO only"
     },
     "modal": {
       "title": "Change Password",
       "description": "Enter your current password and choose a new one.",
       "current": "Current password",
       "new": "New password",
-      "confirm": "Confirm new password"
+      "confirm": "Confirm new password",
+      "status_custom": "You are using a password you set yourself or the admin.",
+      "status_changed_at": "Last changed on {{date}}.",
+      "status_default": "You are still using the default password. Enter it as the current password, then choose your own.",
+      "status_sso_only": "This profile has no password: you sign in through SSO. Ask an administrator to set one if you need password login."
     },
     "errors": {
       "all_required": "All fields are required",
@@ -2602,6 +2604,11 @@
       "allowed_users": "Type an email or username and press Enter to add it. Leave empty to allow all authenticated users.",
       "api_audience": "Accepted aud claim for OIDC Bearer JWT API requests. Leave empty to use the Client ID. Use commas for multiple audiences.",
       "disable_normal_login": "When enabled, only OIDC login is available on the login page",
+      "disable_normal_login_env": "To disable password login (SSO only), set POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in your .env file.",
+      "disable_normal_login_active": "(Currently active)",
+      "sso_only_admin_password": "You can make this instance SSO-only by setting POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in the .env file.",
+      "sso_only_admin_password_warning": "Before enabling it, make sure at least one admin account has an explicit password set (Settings > Users).",
+      "sso_only_admin_password_recovery": "If the identity provider becomes unavailable, recovery means switching the flag back to false and signing in with that password.",
       "disable_basic_auth": "When enabled, API requests with HTTP Basic Auth will be rejected (403)"
     },
     "actions": {

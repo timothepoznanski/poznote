@@ -991,8 +991,6 @@
       "description_global": "Oberflächenelemente für alle Benutzer dieser Instanz ein- oder ausblenden. Nicht angehakte Elemente werden für alle außer Administratoren ausgeblendet.",
       "locked_by_admin": "Vom Administrator für alle Benutzer ausgeblendet",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
-      "login_password_form": "Anmeldung mit E-Mail und Passwort",
-      "login_password_form_hint": "Das E-Mail-/Passwort-Formular (und der „oder“-Trenner) wird nur ausgeblendet, solange die SSO/OIDC-Anmeldung aktiviert ist, damit niemand ausgesperrt wird. Bei Bedarf blendet eine unsichtbare Schaltfläche in der unteren rechten Ecke der Anmeldeseite das Formular wieder ein.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
       "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
@@ -1009,8 +1007,7 @@
         "panels": "Sonstiges",
         "dashboard_toolbar": "Dashboard",
         "folder_actions": "Ordneraktionen",
-        "workspace_menu": "Workspace-Menü",
-        "login_page": "Anmeldeseite"
+        "workspace_menu": "Workspace-Menü"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1690,7 +1687,6 @@
     },
     "redirecting": "Weiterleitung...",
     "show_password": "Passwort anzeigen",
-    "reveal_password_login": "E-Mail-/Passwort-Anmeldung anzeigen",
     "hide_password": "Passwort ausblenden",
     "admin_warning": "Bitte melden Sie sich mit dem Benutzernamen <code>{{username}}</code> und dem aktuellen Passwort dieses Kontos an und benennen Sie dieses Konto in den Einstellungen für mehr Sicherheit um.",
     "fields": {
@@ -2587,6 +2583,26 @@
         "own_only": "Nur eigenes Konto",
         "own_account": "Eigenes Konto"
       },
+      "password_management": {
+        "manage_password": "Passwort",
+        "reset_password": "Passwort zurücksetzen",
+        "set_password": "Passwort festlegen",
+        "reset_to_default": "Auf Standardpasswort zurücksetzen",
+        "modal_help": "Legen Sie ein eigenes Passwort für dieses Konto fest oder setzen Sie es auf den Standard zurück.",
+        "current_mode": "Aktueller Modus",
+        "set_help": "Mindestens 4 Zeichen.",
+        "reset_help": "Entfernt das eigene Passwort und stellt das Standardpasswort für diesen Benutzer wieder her.",
+        "reset_confirm": "Passwort von \"{{username}}\" auf den Standard zurücksetzen?",
+        "set_new_password": "Neues Passwort für \"{{username}}\":",
+        "reset_success": "Passwort auf den Standard zurückgesetzt.",
+        "set_success": "Passwort erfolgreich aktualisiert.",
+        "status_custom": "Benutzerdefiniert",
+        "status_default": "Standard",
+        "status_custom_detail": "Dieser Benutzer verwendet ein benutzerdefiniertes Passwort.",
+        "status_default_detail": "Dieser Benutzer verwendet das Standardpasswort.",
+        "changed_at_prefix": "Aktualisiert:",
+        "status_sso_only_detail": "Dieser Benutzer meldet sich über SSO an und hat kein Passwort. Legen Sie unten eines fest, wenn die Passwortanmeldung benötigt wird."
+      },
       "errors": {
         "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
         "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
@@ -2819,14 +2835,19 @@
   "password": {
     "status": {
       "custom": "Benutzerdefiniertes Passwort",
-      "default": "Standard"
+      "default": "Standard",
+      "sso_only": "Nur SSO"
     },
     "modal": {
       "title": "Passwort ändern",
       "description": "Geben Sie Ihr aktuelles Passwort ein und wählen Sie ein neues.",
       "current": "Aktuelles Passwort",
       "new": "Neues Passwort",
-      "confirm": "Neues Passwort bestätigen"
+      "confirm": "Neues Passwort bestätigen",
+      "status_custom": "Sie verwenden ein Passwort, das Sie selbst oder der Administrator festgelegt hat.",
+      "status_changed_at": "Zuletzt geändert am {{date}}.",
+      "status_default": "Sie verwenden noch das Standardpasswort. Geben Sie es als aktuelles Passwort ein und wählen Sie dann Ihr eigenes.",
+      "status_sso_only": "Dieses Profil hat kein Passwort: Sie melden sich über SSO an. Bitten Sie einen Administrator, eines festzulegen, wenn Sie die Passwortanmeldung benötigen."
     },
     "errors": {
       "all_required": "Alle Felder sind erforderlich",
@@ -2901,6 +2922,11 @@
       "allowed_users": "E-Mail oder Benutzernamen eingeben und mit der Eingabetaste hinzufügen. Leer lassen, um alle authentifizierten Benutzer zuzulassen.",
       "api_audience": "Akzeptierter aud-Claim für API-Anfragen mit OIDC Bearer JWT. Leer lassen, um die Client ID zu verwenden. Mehrere Audiences mit Kommas trennen.",
       "disable_normal_login": "Wenn aktiviert, ist auf der Login-Seite nur die OIDC-Anmeldung verfügbar",
+      "disable_normal_login_env": "Um die Passwortanmeldung zu deaktivieren (nur SSO), setzen Sie POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in Ihrer .env-Datei.",
+      "disable_normal_login_active": "(Derzeit aktiv)",
+      "sso_only_admin_password": "Sie können diese Instanz auf reines SSO umstellen, indem Sie POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in der .env-Datei setzen.",
+      "sso_only_admin_password_warning": "Stellen Sie vorher sicher, dass mindestens ein Administratorkonto ein explizites Passwort hat (Einstellungen > Benutzer).",
+      "sso_only_admin_password_recovery": "Wird der Identitätsanbieter unerreichbar, besteht die Wiederherstellung darin, die Option wieder auf false zu setzen und sich mit diesem Passwort anzumelden.",
       "disable_basic_auth": "Wenn aktiviert, werden API-Anfragen mit HTTP Basic Auth abgelehnt (403)"
     },
     "actions": {

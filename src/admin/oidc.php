@@ -170,6 +170,20 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
         body.dark-mode .oidc-field .oidc-hint {
             color: rgba(255, 255, 255, 0.6);
         }
+        /* Hint kept in the normal text color rather than the muted grey. */
+        .oidc-field .oidc-hint.oidc-hint-plain,
+        html[data-theme='dark'] .oidc-field .oidc-hint.oidc-hint-plain,
+        body.dark-mode .oidc-field .oidc-hint.oidc-hint-plain {
+            color: inherit;
+        }
+        .oidc-field .oidc-hint .oidc-hint-danger {
+            color: #c4392f;
+            font-weight: 600;
+        }
+        html[data-theme='dark'] .oidc-field .oidc-hint .oidc-hint-danger,
+        body.dark-mode .oidc-field .oidc-hint .oidc-hint-danger {
+            color: #ff7b72;
+        }
         .oidc-field input[type="text"],
         .oidc-field input[type="url"] {
             width: 100%;
@@ -474,6 +488,14 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                             <span class="slider"></span>
                         </label>
                     </div>
+                </div>
+
+                <div class="oidc-field">
+                    <span class="oidc-hint oidc-hint-plain">
+                        <?php echo t_h('oidc_admin.hints.sso_only_admin_password', [], 'You can make this instance SSO-only by setting POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true in the .env file.'); ?>
+                        <span class="oidc-hint-danger"><?php echo t_h('oidc_admin.hints.sso_only_admin_password_warning', [], 'Before enabling it, make sure at least one admin account has an explicit password set (Settings > Users).'); ?></span>
+                        <?php echo t_h('oidc_admin.hints.sso_only_admin_password_recovery', [], 'If the identity provider becomes unavailable, recovery means switching the flag back to false and signing in with that password.'); ?>
+                    </span>
                 </div>
 
                 <div id="oidc-general-fields" <?php echo !$settings['oidc_enabled'] ? 'hidden' : ''; ?>>
