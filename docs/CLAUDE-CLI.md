@@ -204,7 +204,7 @@ If Claude CLI cannot connect to the MCP server:
 2. **Verify Docker container status:**
    ```bash
    docker ps | grep mcp
-  docker logs poznote-mcp
+  docker compose logs mcp-server
    ```
 
 3. **Check port binding:**
@@ -234,7 +234,7 @@ Only the exact lowercase values `true` and `false` are recognized. Any other val
 
 Then check the logs:
 ```bash
-docker logs -f poznote-mcp
+docker compose logs -f mcp-server
 ```
 
 ## Security Notes
@@ -315,5 +315,5 @@ claude "List notes for user 2 in Poznote"
 
 For issues or questions:
 - Check the [main MCP documentation](MCP-SERVER.md)
-- Review MCP server logs: `docker logs poznote-mcp`
+- Review MCP server logs: `docker compose logs mcp-server`
 - Verify Poznote API is accessible

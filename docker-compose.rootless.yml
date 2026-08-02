@@ -47,7 +47,6 @@ services:
 
   mcp-server:
     image: ghcr.io/timothepoznanski/poznote-mcp:6
-    container_name: poznote-mcp
     restart: always
     environment:
       POZNOTE_API_URL: http://webserver:8080/api/v1

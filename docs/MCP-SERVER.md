@@ -112,7 +112,7 @@ A simple `docker compose restart mcp-server` does not reload updated environment
 Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
 
 ```bash
-docker logs -f poznote-mcp
+docker compose logs -f mcp-server
 ```
 
 Leave it disabled in normal use — the extra verbosity is not needed day-to-day.
@@ -210,6 +210,6 @@ For detailed usage examples and troubleshooting:
 - **[Claude CLI Setup →](CLAUDE-CLI.md)**
 
 For issues:
-- Check MCP server logs: `docker logs poznote-mcp`
+- Check MCP server logs: `docker compose logs mcp-server`
 - Verify Poznote API is accessible
 - See client-specific troubleshooting guides
