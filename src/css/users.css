@@ -187,6 +187,7 @@ body.dark-mode {
     background: transparent;
     font-weight: 600;
     border-top: 2px solid var(--border-color, #eee);
+    white-space: nowrap;
 }
 
 .users-table th.text-center,

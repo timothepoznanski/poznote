@@ -106,6 +106,7 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
         'color'   => $f['color'],
         'cardColor'    => $f['cardColor'] ?? '',
         'cardColorHex' => $f['cardColorHex'] ?? '',
+        'pinned'  => !empty($f['pinned']),
         'folders' => $childFolders,
         'notes'   => $notes,
     ];
@@ -382,7 +383,7 @@ try {
     if (isset($con)) {
         $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
         $stmtF = $con->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, color, display_order FROM folders" . $folderWhere .
+            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned FROM folders" . $folderWhere .
             " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
         );
         $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
@@ -402,6 +403,7 @@ try {
                 'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
                 'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
                 'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
+                'pinned'   => !empty($f['pinned']),
                 'notes'    => [],
                 'children' => [],
             ];
@@ -835,11 +837,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				<h3 id="noteColorModalTitle"><?php echo t_h('note_color.modal_title', [], 'Note color'); ?></h3>
 				<p class="note-color-modal-subtitle" id="noteColorModalNoteTitle"></p>
 				<div class="note-color-grid" id="noteColorGrid"></div>
-				<div class="note-color-custom">
-					<label for="noteColorCustomInput"><?php echo t_h('note_color.custom', [], 'Custom color'); ?></label>
-					<input type="color" id="noteColorCustomInput" value="#3b82f6">
-				</div>
 				<div class="modal-buttons">
+					<button type="button" class="note-color-manage-btn" onclick="window.location.href='settings.php?open=note-colors#note-color-palette-card'"><i class="lucide lucide-palette"></i> <?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?></button>
 					<button type="button" class="btn-danger" id="noteColorClearBtn"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></button>
 					<button type="button" class="btn-cancel" data-action="close-note-color-modal"><?php echo t_h('common.cancel'); ?></button>
 					<button type="button" class="btn-primary" id="noteColorApplyBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
@@ -851,7 +850,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
 		window.NOTE_COLOR_TXT = {
 			applyError: <?php echo json_encode(t('note_color.apply_error', [], 'Could not update the note color.')); ?>,
-			custom: <?php echo json_encode(t('note_color.custom', [], 'Custom color')); ?>,
 			modalTitle: <?php echo json_encode(t('note_color.modal_title', [], 'Note color')); ?>,
 			folderModalTitle: <?php echo json_encode(t('note_color.folder_modal_title', [], 'Folder color')); ?>,
 			filterAll: <?php echo json_encode(t('note_color.filter_all', [], 'All notes')); ?>,
@@ -862,7 +860,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		window.DASHBOARD_PIN_TXT = {
 			pin: <?php echo json_encode(t('dashboard.pin_note', [], 'Pin to top')); ?>,
 			unpin: <?php echo json_encode(t('dashboard.unpin_note', [], 'Unpin')); ?>,
-			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>
+			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>,
+			others: <?php echo json_encode(t('dashboard.others_section', [], 'Others')); ?>
 		};
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>

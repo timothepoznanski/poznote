@@ -416,6 +416,7 @@
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
+      "hide_restrict_users": "Blendet die Option „Auf bestimmte Benutzer beschränken“ in den Freigabedialogen aus (geteilte Notizen/Ordner und Arbeitsbereich-Freigabe). Bestehende Beschränkungen bleiben aktiv.",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
       "custom_css": "Wenden Sie eigenes CSS an, um das Aussehen von Poznote anzupassen.",
@@ -485,6 +486,7 @@
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
       "git_sync_toggle": "Git-Synchronisierung",
+      "hide_restrict_users": "Benutzerbeschränkung beim Teilen ausblenden",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Webhooks",
@@ -1358,7 +1360,8 @@
     "filter": "Nach Farbe filtern",
     "filter_all": "Alle Notizen",
     "filter_any": "Beliebige Farbe",
-    "filter_none": "Ohne Farbe"
+    "filter_none": "Ohne Farbe",
+    "manage_button": "Farben verwalten"
   },
   "tabs": {
     "context_menu": {
@@ -3113,6 +3116,7 @@
     "pin_note": "Oben anheften",
     "unpin_note": "Loslösen",
     "pin_error": "Der Anheft-Status konnte nicht aktualisiert werden.",
+    "others_section": "Andere",
     "unpin": "Aus Favoriten entfernen",
     "no_folder": "Andere Notizen",
     "toggle_all": "Alle Notizen anzeigen",

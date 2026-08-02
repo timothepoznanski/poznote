@@ -174,7 +174,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 20;
+    $CURRENT_SCHEMA_VERSION = 21;
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -225,6 +225,7 @@ try {
             workspace TEXT DEFAULT "Poznote",
             parent_id INTEGER DEFAULT NULL,
             display_order INTEGER DEFAULT 0,
+            pinned INTEGER DEFAULT 0,
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
         )');
@@ -368,6 +369,9 @@ try {
             }
             if (!in_array('display_order', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN display_order INTEGER DEFAULT 0");
+            }
+            if (!in_array('pinned', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN pinned INTEGER DEFAULT 0");
             }
         } catch (Exception $e) {
             error_log('Could not add missing columns to folders: ' . $e->getMessage());

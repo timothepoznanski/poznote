@@ -418,6 +418,7 @@
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
+      "hide_restrict_users": "在分享对话框中隐藏“限制为特定用户”选项（共享笔记/文件夹和工作区共享）。现有限制仍然有效。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
       "custom_css": "应用您自己的 CSS 来自定义 Poznote 的外观。",
@@ -487,6 +488,7 @@
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
       "git_sync_toggle": "Git 同步",
+      "hide_restrict_users": "隐藏共享用户限制",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
       "webhooks": "Webhook",
@@ -1348,7 +1350,8 @@
     "filter": "按颜色筛选",
     "filter_all": "全部笔记",
     "filter_any": "任意颜色",
-    "filter_none": "无颜色"
+    "filter_none": "无颜色",
+    "manage_button": "管理颜色"
   },
   "tabs": {
     "context_menu": {
@@ -3234,6 +3237,7 @@
     "pin_note": "置顶",
     "unpin_note": "取消置顶",
     "pin_error": "无法更新置顶状态。",
+    "others_section": "其他",
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",

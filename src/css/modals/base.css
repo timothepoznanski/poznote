@@ -389,6 +389,59 @@
     border-top: 1px solid #e5e7eb;
 }
 
+/* Four footer buttons: widen the modal so they fit on one row, stacking
+   back to wrap on small screens. */
+#noteColorPaletteModal .modal-content {
+    max-width: 560px;
+}
+
+#noteColorPaletteModal .modal-buttons {
+    flex-wrap: nowrap;
+}
+
+#noteColorPaletteModal .modal-buttons button {
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    #noteColorPaletteModal .modal-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* "Back to dashboard" footer button: pushed left, quiet outlined style.
+   The .modal-buttons scope out-specifies the blue button:first-child rule
+   above. */
+.modal-buttons button.note-palette-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+    border: 1px solid #d1d5db;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal-buttons button.note-palette-back:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back,
+body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back {
+    border-color: var(--dm-border);
+    background: transparent;
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] #noteColorPaletteModal .modal-buttons button.note-palette-back:hover,
+body.dark-mode #noteColorPaletteModal .modal-buttons button.note-palette-back:hover {
+    border-color: var(--dm-text-muted);
+    background: var(--dm-surface-hover);
+}
+
 :root[data-theme='dark'] #noteColorPaletteModal .modal-buttons,
 body.dark-mode #noteColorPaletteModal .modal-buttons {
     border-top-color: var(--dm-border);

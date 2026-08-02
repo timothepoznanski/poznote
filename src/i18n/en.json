@@ -152,6 +152,7 @@
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
+      "hide_restrict_users": "Hide the \"Restrict to specific users\" toggles in share dialogs (shared notes/folders and workspace sharing). Existing restrictions keep working.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
       "custom_css": "Apply your own CSS to customize the appearance of Poznote.",
@@ -202,6 +203,7 @@
       "import_limits": "Import Limits",
       "user_quotas": "User quotas",
       "git_sync_toggle": "Git Sync",
+      "hide_restrict_users": "Hide share user restriction",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
@@ -913,7 +915,8 @@
     "filter": "Filter by color",
     "filter_all": "All notes",
     "filter_any": "Any color",
-    "filter_none": "No color"
+    "filter_none": "No color",
+    "manage_button": "Manage colors"
   },
   "tabs": {
     "context_menu": {
@@ -1175,7 +1178,7 @@
     "markdown_placeholder": "Write your markdown or use / to open the command menu...",
     "markdown_placeholder_mobile": "Write your markdown here...",
     "excalidraw": {
-      "placeholder_outside": "…"
+      "placeholder_outside": "Write outside the diagram here…"
     },
     "messages": {
       "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
@@ -2795,6 +2798,7 @@
     "pin_note": "Pin to top",
     "unpin_note": "Unpin",
     "pin_error": "Could not update the pinned state.",
+    "others_section": "Others",
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",

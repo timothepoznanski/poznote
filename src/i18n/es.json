@@ -417,6 +417,7 @@
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
+      "hide_restrict_users": "Oculta las opciones «Restringir a usuarios específicos» en los diálogos de compartir (notas/carpetas compartidas y compartición de espacios de trabajo). Las restricciones existentes siguen funcionando.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
       "custom_css": "Aplica tu propio CSS para personalizar la apariencia de Poznote.",
@@ -486,6 +487,7 @@
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
       "git_sync_toggle": "Sincronización Git",
+      "hide_restrict_users": "Ocultar restricción por usuarios",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks",
@@ -1359,7 +1361,8 @@
     "filter": "Filtrar por color",
     "filter_all": "Todas las notas",
     "filter_any": "Cualquier color",
-    "filter_none": "Sin color"
+    "filter_none": "Sin color",
+    "manage_button": "Gestionar colores"
   },
   "tabs": {
     "context_menu": {
@@ -3113,6 +3116,7 @@
     "pin_note": "Fijar arriba",
     "unpin_note": "Dejar de fijar",
     "pin_error": "No se pudo actualizar el estado de fijado.",
+    "others_section": "Otros",
     "unpin": "Quitar de favoritos",
     "no_folder": "Otras notas",
     "toggle_all": "Mostrar todas las notas",

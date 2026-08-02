@@ -747,6 +747,8 @@ try {
             </button>
         </div>
         <div class="modal-buttons">
+            <?php $paletteDashboardHref = 'dashboard.php' . (isset($pageWorkspace) && $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''); ?>
+            <button type="button" class="note-palette-back" onclick="window.location.href='<?php echo htmlspecialchars($paletteDashboardHref, ENT_QUOTES, 'UTF-8'); ?>'"><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></button>
             <button type="button" class="btn-secondary" id="noteColorPaletteResetBtn"><?php echo t_h('modals.note_color_palette.reset', [], 'Reset to defaults'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="noteColorPaletteModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveNoteColorPaletteBtn"><?php echo t_h('common.save'); ?></button>

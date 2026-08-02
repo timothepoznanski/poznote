@@ -498,6 +498,29 @@ body.dark-mode .dashboard-debug-info pre {
     margin-top: 14px;
 }
 
+/* When pinned notes are shown in their own section, #dashboardGrid becomes a
+   plain block wrapper and the inner .dash-grid-section divs carry the grid.
+   The ID keeps this display override ahead of the view-size/layout variants. */
+#dashboardGrid.dash-grid-sectioned {
+    display: block;
+}
+
+.dash-grid-sectioned .dashboard-grid-container {
+    margin-top: 0;
+}
+
+.dash-section-title {
+    margin: 26px 2px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+:root[data-theme='dark'] .dash-section-title,
+body.dark-mode .dash-section-title {
+    color: #9ca3af;
+}
+
 /* ---------- View menu (card size + layout) ---------- */
 
 /* Row holding the View button and the filter bar, centered like the filter */
@@ -952,42 +975,6 @@ body.dark-mode .note-color-swatch-empty {
     color: #1f2937;
 }
 
-.note-color-custom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #e5e7eb;
-    font-size: 13px;
-    color: #374151;
-}
-
-.note-color-custom input[type="color"] {
-    width: 52px;
-    height: 32px;
-    padding: 0;
-    border: 1px solid #d1d5db;
-    border-radius: 7px;
-    background: none;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-.note-color-custom input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0;
-}
-
-.note-color-custom input[type="color"]::-webkit-color-swatch {
-    border: none;
-    border-radius: 6px;
-}
-
-.note-color-custom input[type="color"]::-moz-color-swatch {
-    border: none;
-    border-radius: 6px;
-}
-
 :root[data-theme='dark'] .note-color-modal-subtitle,
 body.dark-mode .note-color-modal-subtitle {
     color: var(--dm-text-muted);
@@ -1010,10 +997,65 @@ body.dark-mode .note-color-name {
     color: var(--dm-text);
 }
 
-:root[data-theme='dark'] .note-color-custom,
-body.dark-mode .note-color-custom {
+/* Four footer buttons: widen the modal so they fit on one row (same
+   recipe as #dashboardUserInfoModal in css/modals/base.css), stacking
+   them on small screens. */
+#noteColorModal .modal-content {
+    max-width: 560px;
+}
+
+#noteColorModal .modal-buttons {
+    flex-wrap: nowrap;
+}
+
+#noteColorModal .modal-buttons button {
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    #noteColorModal .modal-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* First footer button: pushed left, quiet outlined style. The extra
+   .modal-buttons scope out-specifies the blue button:first-child rule
+   in css/modals/base.css. */
+.modal-buttons button.note-color-manage-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-right: auto;
+    white-space: nowrap;
+    border: 1px solid #d1d5db;
+    background: transparent;
+    color: #374151;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.modal-buttons button.note-color-manage-btn:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+.note-color-manage-btn .lucide {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn,
+body.dark-mode .modal-buttons button.note-color-manage-btn {
+    border-color: var(--dm-border);
+    background: transparent;
     color: var(--dm-text);
-    border-top-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .modal-buttons button.note-color-manage-btn:hover,
+body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
+    border-color: var(--dm-text-muted);
+    background: var(--dm-surface-hover);
 }
 
 /* ---------- Folder card ---------- */
@@ -1137,7 +1179,7 @@ body.dark-mode .note-color-custom {
 
 .dash-card:hover .dash-card-pin,
 .dash-card-pin:focus-visible,
-.dash-note-card.is-pinned .dash-card-pin {
+.dash-card.is-pinned .dash-card-pin {
     opacity: 1;
 }
 
@@ -1153,12 +1195,12 @@ body.dark-mode .note-color-custom {
 }
 
 .dash-card-pin:hover i,
-.dash-note-card.is-pinned .dash-card-pin i {
+.dash-card.is-pinned .dash-card-pin i {
     background-color: #007DB8;
 }
 
 /* A pinned card reads as pinned even before the button is noticed. */
-.dash-note-card.is-pinned {
+.dash-card.is-pinned {
     border-color: rgba(0, 125, 184, 0.45);
 }
 
@@ -1520,8 +1562,8 @@ body.dark-mode .dash-card-pin i {
 /* Restated after the muted rule above, which is specific enough to win otherwise. */
 :root[data-theme='dark'] .dash-card-pin:hover i,
 body.dark-mode .dash-card-pin:hover i,
-:root[data-theme='dark'] .dash-note-card.is-pinned .dash-card-pin i,
-body.dark-mode .dash-note-card.is-pinned .dash-card-pin i {
+:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i,
+body.dark-mode .dash-card.is-pinned .dash-card-pin i {
     background-color: #4aa8d8;
 }
 
