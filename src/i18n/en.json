@@ -915,7 +915,8 @@
     "filter": "Filter by color",
     "filter_all": "All notes",
     "filter_any": "Any color",
-    "filter_none": "No color"
+    "filter_none": "No color",
+    "manage_button": "Manage colors"
   },
   "tabs": {
     "context_menu": {

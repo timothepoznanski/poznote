@@ -906,7 +906,8 @@
     "filter": "Фильтр по цвету",
     "filter_all": "Все заметки",
     "filter_any": "Любой цвет",
-    "filter_none": "Без цвета"
+    "filter_none": "Без цвета",
+    "manage_button": "Управлять цветами"
   },
   "tabs": {
     "context_menu": {

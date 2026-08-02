@@ -1350,7 +1350,8 @@
     "filter": "按颜色筛选",
     "filter_all": "全部笔记",
     "filter_any": "任意颜色",
-    "filter_none": "无颜色"
+    "filter_none": "无颜色",
+    "manage_button": "管理颜色"
   },
   "tabs": {
     "context_menu": {

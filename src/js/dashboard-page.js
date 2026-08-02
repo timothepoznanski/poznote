@@ -470,16 +470,6 @@
         return Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
     }
 
-    function paletteHexFor(value) {
-        if (!value) return '';
-        if (value.charAt(0) === '#') return value;
-        var palette = getPalette();
-        for (var i = 0; i < palette.length; i++) {
-            if (palette[i].id === value) return palette[i].hex;
-        }
-        return '';
-    }
-
     function findNoteById(noteId) {
         var notes = getAllNotes();
         for (var i = 0; i < notes.length; i++) {
@@ -627,11 +617,6 @@
 
         buildColorGrid();
         markSelectedSwatch();
-
-        var customInput = document.getElementById('noteColorCustomInput');
-        if (customInput) {
-            customInput.value = paletteHexFor(colorPendingValue) || '#3b82f6';
-        }
 
         modal.style.display = 'flex';
     }
@@ -816,14 +801,6 @@
         var clearBtn = document.getElementById('noteColorClearBtn');
         if (clearBtn) {
             clearBtn.addEventListener('click', function () { applyNoteColor(''); });
-        }
-
-        var customInput = document.getElementById('noteColorCustomInput');
-        if (customInput) {
-            customInput.addEventListener('input', function () {
-                colorPendingValue = customInput.value;
-                markSelectedSwatch();
-            });
         }
 
         Array.prototype.forEach.call(

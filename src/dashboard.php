@@ -835,11 +835,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				<h3 id="noteColorModalTitle"><?php echo t_h('note_color.modal_title', [], 'Note color'); ?></h3>
 				<p class="note-color-modal-subtitle" id="noteColorModalNoteTitle"></p>
 				<div class="note-color-grid" id="noteColorGrid"></div>
-				<div class="note-color-custom">
-					<label for="noteColorCustomInput"><?php echo t_h('note_color.custom', [], 'Custom color'); ?></label>
-					<input type="color" id="noteColorCustomInput" value="#3b82f6">
-				</div>
 				<div class="modal-buttons">
+					<button type="button" class="note-color-manage-btn" onclick="window.location.href='settings.php?open=note-colors#note-color-palette-card'"><i class="lucide lucide-palette"></i> <?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?></button>
 					<button type="button" class="btn-danger" id="noteColorClearBtn"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></button>
 					<button type="button" class="btn-cancel" data-action="close-note-color-modal"><?php echo t_h('common.cancel'); ?></button>
 					<button type="button" class="btn-primary" id="noteColorApplyBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
@@ -851,7 +848,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
 		window.NOTE_COLOR_TXT = {
 			applyError: <?php echo json_encode(t('note_color.apply_error', [], 'Could not update the note color.')); ?>,
-			custom: <?php echo json_encode(t('note_color.custom', [], 'Custom color')); ?>,
 			modalTitle: <?php echo json_encode(t('note_color.modal_title', [], 'Note color')); ?>,
 			folderModalTitle: <?php echo json_encode(t('note_color.folder_modal_title', [], 'Folder color')); ?>,
 			filterAll: <?php echo json_encode(t('note_color.filter_all', [], 'All notes')); ?>,

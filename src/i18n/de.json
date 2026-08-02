@@ -1360,7 +1360,8 @@
     "filter": "Nach Farbe filtern",
     "filter_all": "Alle Notizen",
     "filter_any": "Beliebige Farbe",
-    "filter_none": "Ohne Farbe"
+    "filter_none": "Ohne Farbe",
+    "manage_button": "Farben verwalten"
   },
   "tabs": {
     "context_menu": {

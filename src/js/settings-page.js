@@ -1478,6 +1478,16 @@
             noteColorPaletteCard.addEventListener('click', openNoteColorPaletteModal);
         }
 
+        // Deep link from the note/folder color modal: settings.php?open=note-colors
+        if (new URLSearchParams(window.location.search || '').get('open') === 'note-colors') {
+            openNoteColorPaletteModal();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('open');
+                window.history.replaceState({}, '', cleanUrl.toString());
+            }
+        }
+
         var paletteAddBtn = document.getElementById('noteColorPaletteAddBtn');
         if (paletteAddBtn) {
             paletteAddBtn.addEventListener('click', function () {

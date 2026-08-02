@@ -1393,7 +1393,8 @@
     "filter": "Filtrer par couleur",
     "filter_all": "Toutes les notes",
     "filter_any": "N'importe quelle couleur",
-    "filter_none": "Sans couleur"
+    "filter_none": "Sans couleur",
+    "manage_button": "Gérer les couleurs"
   },
   "tabs": {
     "context_menu": {
