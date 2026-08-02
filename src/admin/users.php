@@ -905,6 +905,13 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                     ? <?php echo json_encode(t('multiuser.admin.password_management.changed_at_prefix', [], 'Updated:')); ?> + ' ' + data.password_changed_at
                     : '';
                 if (resetBtn) resetBtn.style.display = 'inline-block';
+            } else if (data && data.password_login_available === false) {
+                // Provisioned through SSO without a credential: there is no
+                // default password to hand over, so saying there is one would
+                // send the admin looking for a password that does not work.
+                statusSummary.textContent = <?php echo json_encode(t('multiuser.admin.password_management.status_sso_only_detail', [], 'This user signs in through SSO and has no password. Set one below if password login is needed.')); ?>;
+                statusEl.textContent = '';
+                if (resetBtn) resetBtn.style.display = 'none';
             } else {
                 statusSummary.textContent = <?php echo json_encode(t('multiuser.admin.password_management.status_default_detail', [], 'This user uses the default password.')); ?>;
                 statusEl.textContent = '';
@@ -1005,7 +1012,17 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    closeModal('passwordModal');
+                    // Clearing the hash does not always restore access: on an
+                    // SSO-provisioned profile there is no default to fall back
+                    // on. The server explains what actually happened, so keep
+                    // the modal open to show it instead of silently closing.
+                    if (data.needs_attention && data.message) {
+                        successEl.textContent = data.message;
+                        successEl.style.display = 'block';
+                        loadPasswordStatus(userId);
+                    } else {
+                        closeModal('passwordModal');
+                    }
                 } else {
                     errorEl.textContent = data.error || 'Error';
                     errorEl.style.display = 'block';

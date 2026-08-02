@@ -463,7 +463,7 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 2. Users authenticate with the OIDC authorization code flow secured by PKCE.
 3. Access can be restricted with allowed groups and, if needed, a legacy allowed users list.
 4. After authentication, Poznote links the identity in this order: `sub` (`oidc_subject`), then `preferred_username`, then `email`.
-5. If auto-create users is enabled and no profile matches, Poznote creates one automatically.
+5. If auto-create users is enabled and no profile matches, Poznote creates one automatically. Such a profile has **no password at all**: it never went through the initial-credential handover an admin does when creating an account, so it does not answer to the default password. Sign-in goes through the provider, or an admin sets an explicit password from **Settings > Admin Tools > Users**.
 6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
 7. REST API clients can authenticate with `Authorization: Bearer <OIDC JWT>` when OIDC is enabled; Poznote validates the provider JWKS, issuer, expiration, audience, and configured access controls.
 
@@ -483,7 +483,9 @@ POZNOTE_OIDC_CLIENT_SECRET=your_client_secret
 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
 ```
 
-Use `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` if you want to hide the local username/password form and force SSO-only login.
+Use `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` if you want to hide the local username/password form and force SSO-only login. This is the only switch that blocks password authentication: it removes the form, rejects password POSTs server-side, and hides the "Change Password" setting.
+
+> **Recovering from an identity provider outage.** SSO-only means exactly that: while `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, nobody can sign in with a password, admins included, so there is no in-browser escape hatch. This is deliberate, since an attacker who compromised an admin account cannot re-enable password login to give themselves a persistent way in. Recovery needs server access: set `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false` in `.env`, restart the container, and sign in with a local password. Before enabling SSO-only, make sure at least one admin account has an explicit password set (**Settings > Admin Tools > Users**), otherwise flipping the flag back will not help. Note that an admin profile auto-provisioned by OIDC has no password until one is set.
 
 > **Breaking change:** previous OIDC settings in `.env` are no longer read, except `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET`, and `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. After upgrading, re-enter the other OIDC settings from the admin page.
 

@@ -458,33 +458,6 @@ input[type="password"]::placeholder {
     font-size: 1rem;
 }
 
-/* Language selector */
-.language-selector {
-    margin-bottom: 2rem;
-    text-align: center;
-}
-
-.language-select {
-    background: none;
-    border: none;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    cursor: pointer;
-    opacity: 0.8;
-    outline: none;
-    transition: opacity 0.2s, color 0.2s;
-    font-family: inherit;
-}
-
-.language-select:hover {
-    opacity: 1;
-}
-
-.language-select option {
-    background: white;
-    color: #252526;
-}
-
 /* ============================================
    Dark Mode (Login Page)
    ============================================ */
@@ -575,11 +548,6 @@ html[data-theme='dark'] .account-option-badge {
     color: #9cc7ff;
 }
 
-html[data-theme='dark'] .language-select option {
-    background: var(--dm-surface);
-    color: var(--dm-text);
-}
-
 html[data-theme='dark'] .oidc-divider::before,
 html[data-theme='dark'] .oidc-divider::after {
     background: #4a5568;
@@ -649,25 +617,3 @@ html[data-theme='dark'] .oidc-other-account-button:hover {
     text-align: center;
 }
 
-/* Password login hidden instance-wide by the admin (still in the DOM so the
-   corner escape hatch below can reveal it) */
-.login-admin-hidden {
-    display: none !important;
-}
-
-/* Invisible escape hatch pinned to the bottom-right corner of the page:
-   clicking it reveals the admin-hidden password form (e.g. SSO outage) */
-.password-login-reveal {
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    width: 48px;
-    height: 48px;
-    margin: 0;
-    padding: 0;
-    border: none;
-    background: transparent;
-    opacity: 0;
-    cursor: default;
-    z-index: 10;
-}

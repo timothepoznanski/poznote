@@ -208,6 +208,12 @@ class UsersController {
 
         $timestamp = (int)$parts[2];
         $secret = getRememberMeSecret($user);
+        if ($secret === null) {
+            // No signing secret available for this profile: drop the stale cookie
+            // rather than reissuing one the login path would reject anyway.
+            setRememberMeCookie('', time() - 3600);
+            return;
+        }
         $token = buildRememberMeToken((string)$user['username'], (int)$user['id'], $timestamp, $secret);
         setRememberMeCookie($token, $timestamp + REMEMBER_ME_DURATION);
     }
@@ -450,7 +456,26 @@ class UsersController {
             http_response_code(401);
             return ['error' => 'Not authenticated'];
         }
-        
+
+        // A local password is meaningless on an SSO-only instance, and a profile
+        // provisioned without a credential has no current password to
+        // authenticate the change with. Say so instead of failing later with a
+        // misleading "current password is incorrect".
+        $oidcPath = dirname(__DIR__, 3) . '/oidc.php';
+        if (is_file($oidcPath)) {
+            require_once $oidcPath;
+        }
+        if (function_exists('oidc_is_enabled') && oidc_is_enabled()
+            && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN) {
+            http_response_code(403);
+            return ['error' => 'Password login is disabled on this instance: sign-in goes through the identity provider.'];
+        }
+        $profile = getUserProfileById((int)$userId);
+        if ($profile && !hasCustomPassword((int)$userId) && isPasswordLoginDisabled($profile)) {
+            http_response_code(403);
+            return ['error' => 'This profile has no password. Ask an administrator to set one if you need password login.'];
+        }
+
         $data = json_decode(file_get_contents('php://input'), true);
         $currentPassword = $data['current_password'] ?? '';
         $newPassword = $data['new_password'] ?? '';
@@ -603,9 +628,14 @@ class UsersController {
         }
         
         $user = getUserProfileById($userId);
-        
+
         return [
             'has_custom_password' => hasCustomPassword($userId),
+            // A profile provisioned without a credential has no password at
+            // all, rather than the default one: the UI must not advertise a
+            // default that would no longer be accepted.
+            'password_login_available' => hasCustomPassword($userId)
+                || !($user && isPasswordLoginDisabled($user)),
             'password_changed_at' => $this->formatPasswordChangedAt($user['password_changed_at'] ?? null)
         ];
     }
@@ -632,6 +662,19 @@ class UsersController {
             if (!clearUserPasswordHash((int)$id)) {
                 http_response_code(500);
                 return ['error' => 'Failed to reset password'];
+            }
+            // A profile provisioned without a credential has no default to
+            // fall back on, so clearing the hash leaves it without password
+            // login. Say so instead of reporting a reset that restores no access.
+            if (isPasswordLoginDisabled($user)) {
+                return [
+                    'success' => true,
+                    // Flags the outcome as needing the admin's attention: the UI
+                    // keeps the dialog open on this one instead of closing as it
+                    // does for an ordinary reset.
+                    'needs_attention' => true,
+                    'message' => 'Password cleared. This profile is linked to SSO and has no default password: sign-in goes through the identity provider, or set an explicit password.'
+                ];
             }
             return ['success' => true, 'message' => 'Password reset to default'];
         } elseif ($action === 'set_password') {
@@ -668,6 +711,10 @@ class UsersController {
         return [
             'user_id' => (int)$id,
             'has_custom_password' => hasCustomPassword((int)$id),
+            // Kept in sync with /users/me/password-status: without it the admin
+            // panel would report "uses the default password" for a profile where
+            // the default is rejected.
+            'password_login_available' => hasCustomPassword((int)$id) || !isPasswordLoginDisabled($user),
             'password_changed_at' => $this->formatPasswordChangedAt($user['password_changed_at'] ?? null)
         ];
     }

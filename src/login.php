@@ -56,25 +56,13 @@ if ($redirectAfter !== null) {
     $_SESSION['post_login_redirect'] = $redirectAfter;
 }
 
-// Detect language change from selector
+// The login page is pre-auth, so there is no user preference to read yet: pick
+// the language from the browser's Accept-Language header, falling back to the
+// instance language configured in the settings.
 $allowedLangs = ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn'];
-if (isset($_GET['lang'])) {
-    $requestedLang = strtolower(trim((string)$_GET['lang']));
-    if (in_array($requestedLang, $allowedLangs, true)) {
-        setcookie('login_lang', $requestedLang, [
-            'expires' => time() + (86400 * 30),
-            'path' => '/',
-            'secure' => $isSecure ?? false,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ]);
-        $currentLang = $requestedLang;
-    }
-} elseif (isset($_COOKIE['login_lang'])) {
-    $cookieLang = strtolower(trim((string)$_COOKIE['login_lang']));
-    if (in_array($cookieLang, $allowedLangs, true)) {
-        $currentLang = $cookieLang;
-    }
+$browserLang = poznoteDetectBrowserLanguage($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '', $allowedLangs);
+if ($browserLang !== null) {
+    $currentLang = $browserLang;
 }
 
 // Generate CSRF token for login form
@@ -128,9 +116,8 @@ if (isAccountSelectionRequired()) {
 
 // Login form processing
 if ($_POST && ($_POST['action'] ?? '') !== 'select_account' && isset($_POST['username']) && isset($_POST['password'])) {
-    // Only the hard config switch blocks password authentication. The admin
-    // "hide password login" preference is visual only: the concealed form can
-    // be revealed through the invisible corner button and must stay usable.
+    // POZNOTE_OIDC_DISABLE_NORMAL_LOGIN is the only switch that blocks password
+    // authentication, and it is enforced server-side here as well as in the form.
     $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
     if (!$showNormalLogin) {
         header('Location: login.php');
@@ -230,38 +217,11 @@ if (isset($_GET['oidc_error'])) {
         </div>
 
         <?php
+        // Password login is governed solely by POZNOTE_OIDC_DISABLE_NORMAL_LOGIN.
+        // The form is either rendered and usable, or not rendered at all.
         $showNormalLogin = !(function_exists('oidc_is_enabled') && oidc_is_enabled() && defined('OIDC_DISABLE_NORMAL_LOGIN') && OIDC_DISABLE_NORMAL_LOGIN);
-        // Hidden by the admin UI preference: the form is still rendered but
-        // concealed, so the invisible bottom-right button can reveal it (e.g.
-        // during an SSO outage). A failed password attempt keeps it visible so
-        // the error message stays readable.
-        $passwordLoginConcealed = $showNormalLogin && poznoteIsPasswordLoginHiddenByAdmin() && $error === '';
-        $passwordLoginVisible = $showNormalLogin && !$passwordLoginConcealed;
-        $concealedClass = $passwordLoginConcealed ? ' login-admin-hidden' : '';
-        if ($showNormalLogin):
+        $passwordLoginVisible = $showNormalLogin;
         ?>
-        <div class="language-selector">
-            <form method="GET" id="lang-form">
-                <select name="lang" class="language-select" onchange="this.form.submit()">
-                    <?php 
-                    $langs = [
-                        'en' => 'English',
-                        'fr' => 'Français',
-                        'es' => 'Español',
-                        'de' => 'Deutsch',
-                        'pt' => 'Português',
-                        'ru' => 'Русский',
-                        'zh-cn' => '简体中文'
-                    ];
-                    foreach ($langs as $code => $label): ?>
-                        <option value="<?php echo $code; ?>" <?php echo ($currentLang === $code) ? 'selected' : ''; ?>>
-                            <?php echo $label; ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </form>
-        </div>
-        <?php endif; ?>
 
         <?php 
         // Display warning if default 'admin_change_me' user exists
@@ -317,13 +277,13 @@ if (isset($_GET['oidc_error'])) {
             </div>
         <?php else: ?>
             <?php if ($showNormalLogin): ?>
-            <form method="POST" class="password-login-form<?php echo $concealedClass; ?>">
+            <form method="POST" class="password-login-form">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES); ?>">
                 <?php if ($redirectAfter !== null): ?>
                     <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectAfter, ENT_QUOTES); ?>">
                 <?php endif; ?>
                 <div class="form-group">
-                    <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required<?php if (!$passwordLoginConcealed): ?> autofocus<?php endif; ?> autocomplete="username">
+                    <input type="text" id="username" name="username" placeholder="<?php echo t_h('login.fields.username_or_email', [], 'Username or Email', $currentLang ?? 'en'); ?>" required autofocus autocomplete="username">
                 </div>
                 <div class="form-group">
                     <div class="password-wrapper">
@@ -349,7 +309,7 @@ if (isset($_GET['oidc_error'])) {
 
             <?php if (function_exists('oidc_is_enabled') && oidc_is_enabled()): ?>
                 <?php if ($showNormalLogin): ?>
-                    <div class="oidc-divider<?php echo $concealedClass; ?>">
+                    <div class="oidc-divider">
                         <span><?php echo t_h('login.or', [], 'or', $currentLang ?? 'en'); ?></span>
                     </div>
                 <?php endif; ?>
@@ -367,10 +327,6 @@ if (isset($_GET['oidc_error'])) {
             </p>
         <?php endif; ?>
     </div>
-    <?php if (!$renderAccountSelection && $passwordLoginConcealed): ?>
-        <!-- Invisible escape hatch: reveals the admin-hidden password form -->
-        <button type="button" id="reveal-password-login" class="password-login-reveal" aria-label="<?php echo t_h('login.reveal_password_login', [], 'Show email & password login', $currentLang ?? 'en'); ?>"></button>
-    <?php endif; ?>
     <?php
     $loginConfig = [
         'focusOidc' => !$renderAccountSelection && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),

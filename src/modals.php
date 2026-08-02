@@ -1453,16 +1453,6 @@ try {
                 </div>
                 </div>
 
-                <!-- Login Page Section (admin/global mode only: the login page is pre-auth,
-                     so per-user preferences cannot apply there) -->
-                <div class="ui-custom-section" data-ui-global-only="1">
-                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.login_page', [], 'Login page'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
-                <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.login_password_form_hint', [], 'The email & password form (and the “or” separator) is only hidden while SSO/OIDC login is enabled, so users are never locked out. If needed, an invisible button in the bottom-right corner of the login page reveals the form again.'); ?></p>
-                <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="login:password-form" checked><span><?php echo t_h('modals.ui_customization.login_password_form', [], 'Email & password login'); ?></span></label>
-                </div>
-                </div>
-
                 <!-- Toolbar Section -->
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>

@@ -992,8 +992,6 @@
       "description_global": "Mostrar u ocultar elementos de la interfaz para todos los usuarios de esta instancia. Los elementos no marcados se ocultarán para todos excepto los administradores.",
       "locked_by_admin": "Oculto para todos los usuarios por el administrador",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
-      "login_password_form": "Inicio de sesión con correo y contraseña",
-      "login_password_form_hint": "El formulario de correo y contraseña (y el separador «o») solo se oculta mientras el inicio de sesión SSO/OIDC está activado, para que nadie pierda el acceso. Si es necesario, un botón invisible en la esquina inferior derecha de la página de inicio de sesión permite mostrarlo de nuevo.",
       "reminder_bell": "Icono de campana (recordatorio)",
       "dashboard_user": "Usuario",
       "dashboard_filter_bar": "Barra de filtro",
@@ -1010,8 +1008,7 @@
         "panels": "Otros",
         "dashboard_toolbar": "Panel",
         "folder_actions": "Acciones de carpeta",
-        "workspace_menu": "Menú del espacio de trabajo",
-        "login_page": "Página de inicio de sesión"
+        "workspace_menu": "Menú del espacio de trabajo"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1691,7 +1688,6 @@
     },
     "redirecting": "Redirigiendo...",
     "show_password": "Mostrar contraseña",
-    "reveal_password_login": "Mostrar el inicio de sesión con correo y contraseña",
     "hide_password": "Ocultar contraseña",
     "admin_warning": "Inicie sesión con el nombre de usuario <code>{{username}}</code> y la contraseña actual de esta cuenta. Luego podrá cambiar el nombre de esta cuenta en la configuración para mayor seguridad.",
     "fields": {
@@ -2588,6 +2584,26 @@
         "own_only": "Solo su cuenta",
         "own_account": "Su cuenta"
       },
+      "password_management": {
+        "manage_password": "Contraseña",
+        "reset_password": "Restablecer contraseña",
+        "set_password": "Establecer contraseña",
+        "reset_to_default": "Restablecer a la contraseña predeterminada",
+        "modal_help": "Establezca una contraseña personalizada para esta cuenta o restablézcala a la predeterminada.",
+        "current_mode": "Modo actual",
+        "set_help": "Al menos 4 caracteres.",
+        "reset_help": "Elimina la contraseña personalizada y restablece la contraseña predeterminada para este usuario.",
+        "reset_confirm": "¿Restablecer la contraseña de \"{{username}}\" a la predeterminada?",
+        "set_new_password": "Nueva contraseña para \"{{username}}\":",
+        "reset_success": "Contraseña restablecida a la predeterminada.",
+        "set_success": "Contraseña actualizada correctamente.",
+        "status_custom": "Personalizada",
+        "status_default": "Predeterminada",
+        "status_custom_detail": "Este usuario utiliza una contraseña personalizada.",
+        "status_default_detail": "Este usuario utiliza la contraseña predeterminada.",
+        "changed_at_prefix": "Actualizada:",
+        "status_sso_only_detail": "Este usuario inicia sesión mediante SSO y no tiene contraseña. Establezca una a continuación si se necesita el inicio de sesión con contraseña."
+      },
       "errors": {
         "cannot_delete_self": "No puedes borrar tu propio perfil",
         "cannot_change_self": "No puedes cambiar tu propio estado/rol",
@@ -2819,14 +2835,19 @@
   "password": {
     "status": {
       "custom": "Contraseña personalizada",
-      "default": "Predeterminado"
+      "default": "Predeterminado",
+      "sso_only": "Solo SSO"
     },
     "modal": {
       "title": "Cambiar contraseña",
       "description": "Introduce tu contraseña actual y elige una nueva.",
       "current": "Contraseña actual",
       "new": "Nueva contraseña",
-      "confirm": "Confirmar nueva contraseña"
+      "confirm": "Confirmar nueva contraseña",
+      "status_custom": "Está usando una contraseña definida por usted o por el administrador.",
+      "status_changed_at": "Última modificación el {{date}}.",
+      "status_default": "Todavía está usando la contraseña predeterminada. Introdúzcala como contraseña actual y elija la suya.",
+      "status_sso_only": "Este perfil no tiene contraseña: inicia sesión mediante SSO. Pida a un administrador que establezca una si necesita el inicio de sesión con contraseña."
     },
     "errors": {
       "all_required": "Todos los campos son obligatorios",
@@ -2901,6 +2922,11 @@
       "allowed_users": "Escriba un correo electrónico o nombre de usuario y pulse Intro para añadirlo. Déjelo vacío para permitir a todos los usuarios autenticados.",
       "api_audience": "Claim aud aceptado para solicitudes API con Bearer JWT OIDC. Déjelo vacío para usar el Client ID. Use comas para varias audiencias.",
       "disable_normal_login": "Si está activado, solo el inicio de sesión OIDC estará disponible en la página de acceso",
+      "disable_normal_login_env": "Para desactivar el inicio de sesión con contraseña (solo SSO), establezca POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true en su archivo .env.",
+      "disable_normal_login_active": "(Actualmente activo)",
+      "sso_only_admin_password": "Puede poner esta instancia en modo solo SSO estableciendo POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true en el archivo .env.",
+      "sso_only_admin_password_warning": "Antes de activarlo, asegúrese de que al menos una cuenta de administrador tenga una contraseña explícita (Ajustes > Usuarios).",
+      "sso_only_admin_password_recovery": "Si el proveedor de identidad deja de estar disponible, la recuperación consiste en volver a poner la opción en false e iniciar sesión con esa contraseña.",
       "disable_basic_auth": "Si está activado, las solicitudes API con HTTP Basic Auth se rechazarán (403)"
     },
     "actions": {

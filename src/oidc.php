@@ -907,7 +907,10 @@ function oidc_find_or_provision_user($claims) {
 
         $username = oidc_generate_available_username($claims);
         $newEmail = (is_string($email) && trim($email) !== '') ? trim($email) : null;
-        $creation = createUserProfile($username, $newEmail, oidc_max_users() ?: null);
+        // Provisioned without any credential handover: flag it in the same
+        // INSERT so the profile is never reachable with the default password,
+        // not even between this call and the updateUserOidcSubject() below.
+        $creation = createUserProfile($username, $newEmail, oidc_max_users() ?: null, true);
         if (empty($creation['success']) || empty($creation['user_id'])) {
             $error = $creation['error'] ?? 'unknown error';
             if (strpos($error, 'signup limit reached') !== false) {

@@ -31,6 +31,11 @@
         if (data && data.has_custom_password) {
             badge.textContent = tr('password.status.custom', {}, 'Custom password');
             badge.className = 'setting-status enabled';
+        } else if (data && data.password_login_available === false) {
+            // Profile with no password set and no default to fall back on:
+            // signing in goes through the identity provider.
+            badge.textContent = tr('password.status.sso_only', {}, 'SSO only');
+            badge.className = 'setting-status disabled';
         } else {
             badge.textContent = tr('password.status.default', {}, 'Default');
             badge.className = 'setting-status disabled';
@@ -65,6 +70,38 @@
 
     // ========== Password Change Modal ==========
 
+    // Wording for the status line shown at the top of the modal. Tells the user
+    // which password the "Current password" field expects, which is the part
+    // people actually get wrong: on a profile that was never given a password,
+    // the field wants the instance default rather than something they chose.
+    function buildPasswordStatusNotice(data) {
+        // Status not loaded yet: say nothing rather than assert "default
+        // password", which would be wrong for most users.
+        if (!data) {
+            return { text: '', kind: 'unknown' };
+        }
+
+        if (data.has_custom_password) {
+            var custom = tr('password.modal.status_custom', {}, 'You are using a password you set yourself or the admin.');
+            if (data.password_changed_at) {
+                custom += ' ' + tr('password.modal.status_changed_at', { date: data.password_changed_at }, 'Last changed on {{date}}.');
+            }
+            return { text: custom, kind: 'custom' };
+        }
+
+        if (data.password_login_available === false) {
+            return {
+                text: tr('password.modal.status_sso_only', {}, 'This profile has no password: you sign in through SSO. Ask an administrator to set one if you need password login.'),
+                kind: 'sso'
+            };
+        }
+
+        return {
+            text: tr('password.modal.status_default', {}, 'You are still using the default password. Enter it as the current password, then choose your own.'),
+            kind: 'default'
+        };
+    }
+
     function createPasswordModal() {
         var existing = document.getElementById('changePasswordModal');
         if (existing) existing.remove();
@@ -73,9 +110,12 @@
         modal.id = 'changePasswordModal';
         modal.className = 'modal';
 
+        var notice = buildPasswordStatusNotice(passwordStatusCache);
+
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('password.modal.title', {}, 'Change Password') + '</h3>' +
+                '<p id="cpStatusNotice" class="change-password-status change-password-status-' + notice.kind + '"></p>' +
                 '<p class="text-small-muted change-password-description">' + tr('password.modal.description', {}, 'Enter your current password and choose a new one.') + '</p>' +
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<input type="password" id="cpCurrentPassword" autocomplete="current-password" placeholder="' + tr('password.modal.current', {}, 'Current password') + '" style="width:100%;box-sizing:border-box;">' +
@@ -94,6 +134,14 @@
             '</div>';
 
         document.body.appendChild(modal);
+
+        // Set as text, not markup: the notice embeds a server-provided date.
+        var noticeEl = modal.querySelector('#cpStatusNotice');
+        if (noticeEl) {
+            noticeEl.textContent = notice.text;
+            if (notice.text === '') noticeEl.style.display = 'none';
+        }
+
         return modal;
     }
 
@@ -107,6 +155,14 @@
 
         var title = modal.querySelector('h3');
         if (title) title.textContent = tr('password.modal.title', {}, 'Change Password');
+
+        var noticeEl = modal.querySelector('#cpStatusNotice');
+        if (noticeEl) {
+            var notice = buildPasswordStatusNotice(passwordStatusCache);
+            noticeEl.textContent = notice.text;
+            noticeEl.className = 'change-password-status change-password-status-' + notice.kind;
+            noticeEl.style.display = notice.text === '' ? 'none' : '';
+        }
 
         var description = modal.querySelector('.change-password-description');
         if (description) description.textContent = tr('password.modal.description', {}, 'Enter your current password and choose a new one.');

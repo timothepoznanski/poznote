@@ -1016,8 +1016,6 @@
       "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde, sauf les administrateurs.",
       "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
-      "login_password_form": "Connexion par e-mail et mot de passe",
-      "login_password_form_hint": "Le formulaire e-mail / mot de passe (et le séparateur « ou ») n'est masqué que lorsque la connexion SSO/OIDC est activée, afin de ne jamais bloquer l'accès. En cas de besoin, un bouton invisible dans le coin inférieur droit de la page de connexion permet de le réafficher.",
       "reminder_bell": "Icône cloche (rappel)",
       "dashboard_user": "Utilisateur",
       "dashboard_filter_bar": "Barre de filtre",
@@ -1034,8 +1032,7 @@
         "panels": "Autre",
         "dashboard_toolbar": "Tableau de bord",
         "folder_actions": "Actions des dossiers",
-        "workspace_menu": "Menu du workspace",
-        "login_page": "Page de connexion"
+        "workspace_menu": "Menu du workspace"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count": "{{count}} masqué(s)",
@@ -1747,7 +1744,6 @@
     },
     "redirecting": "Redirection...",
     "show_password": "Afficher le mot de passe",
-    "reveal_password_login": "Afficher la connexion par e-mail et mot de passe",
     "hide_password": "Masquer le mot de passe",
     "admin_warning": "Veuillez vous connecter avec le pseudo <code>{{username}}</code> et le mot de passe actuel de ce compte. Vous pourrez ensuite renommer ce compte dans les réglages pour plus de sécurité.",
     "fields": {
@@ -2660,13 +2656,15 @@
         "set_help": "Au moins 4 caractères.",
         "reset_help": "Supprime le mot de passe personnalisé et rétablit le mot de passe par défaut pour cet utilisateur.",
         "reset_confirm": "Réinitialiser le mot de passe de \"{{username}}\" au mot de passe par défaut ?",
+        "set_new_password": "Nouveau mot de passe pour \"{{username}}\" :",
         "set_success": "Mot de passe mis à jour avec succès.",
         "reset_success": "Mot de passe réinitialisé au mot de passe par défaut.",
         "status_custom": "Personnalisé",
         "status_default": "Par défaut",
         "status_custom_detail": "Cet utilisateur utilise un mot de passe personnalisé.",
         "status_default_detail": "Cet utilisateur utilise le mot de passe par défaut.",
-        "changed_at_prefix": "Mise à jour :"
+        "changed_at_prefix": "Mise à jour :",
+        "status_sso_only_detail": "Cet utilisateur se connecte via SSO et n'a pas de mot de passe. Définissez-en un ci-dessous si la connexion par mot de passe est nécessaire."
       },
       "password": "Mot de passe",
       "profile": "Sélectionnez votre profil",
@@ -3031,14 +3029,19 @@
   "password": {
     "status": {
       "custom": "Mot de passe personnalisé",
-      "default": "Par défaut"
+      "default": "Par défaut",
+      "sso_only": "SSO uniquement"
     },
     "modal": {
       "title": "Changer le mot de passe",
       "description": "Entrez votre mot de passe actuel et choisissez-en un nouveau.",
       "current": "Mot de passe actuel",
       "new": "Nouveau mot de passe",
-      "confirm": "Confirmer le nouveau mot de passe"
+      "confirm": "Confirmer le nouveau mot de passe",
+      "status_custom": "Vous utilisez un mot de passe défini par vous ou par l'administrateur.",
+      "status_changed_at": "Dernière modification le {{date}}.",
+      "status_default": "Vous utilisez encore le mot de passe par défaut. Saisissez-le comme mot de passe actuel, puis choisissez le vôtre.",
+      "status_sso_only": "Ce profil n'a pas de mot de passe : vous vous connectez via SSO. Demandez à un administrateur d'en définir un si vous avez besoin de la connexion par mot de passe."
     },
     "errors": {
       "all_required": "Tous les champs sont requis",
@@ -3113,6 +3116,11 @@
       "allowed_users": "Saisissez un email ou un nom d'utilisateur puis appuyez sur Entrée pour l'ajouter. Laisser vide pour autoriser tous les utilisateurs authentifiés.",
       "api_audience": "Claim aud accepté pour les requêtes API avec Bearer JWT OIDC. Laisser vide pour utiliser le Client ID. Séparer plusieurs audiences par des virgules.",
       "disable_normal_login": "Lorsqu'activé, seule la connexion OIDC est disponible sur la page de connexion",
+      "disable_normal_login_env": "Pour désactiver la connexion par mot de passe (SSO uniquement), définissez POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true dans votre fichier .env.",
+      "disable_normal_login_active": "(Actuellement actif)",
+      "sso_only_admin_password": "Vous pouvez passer cette instance en SSO uniquement en définissant POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true dans le fichier .env.",
+      "sso_only_admin_password_warning": "Avant de l'activer, assurez-vous qu'au moins un compte administrateur possède un mot de passe explicite (Réglages > Utilisateurs).",
+      "sso_only_admin_password_recovery": "Si le fournisseur d'identité devient indisponible, la récupération consiste à repasser l'option à false puis à se connecter avec ce mot de passe.",
       "disable_basic_auth": "Lorsqu'activé, les requêtes API avec HTTP Basic Auth seront rejetées (403)"
     },
     "actions": {

@@ -83,6 +83,53 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     color: #5f6873;
 }
 
+/* Status notice: says which password the "current password" field expects. */
+#changePasswordModal .change-password-status {
+    margin: 0 0 10px 0;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+#changePasswordModal .change-password-status-custom {
+    border-left-color: #2e9e5b;
+    background: rgba(46, 158, 91, 0.14);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+/* Still on the shared default: worth acting on, so flag it. */
+#changePasswordModal .change-password-status-default {
+    border-left-color: #d99100;
+    background: rgba(217, 145, 0, 0.16);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+#changePasswordModal .change-password-status-sso {
+    border-left-color: #4a9eff;
+    background: rgba(74, 158, 255, 0.14);
+    color: rgba(255, 255, 255, 0.86);
+}
+
+html[data-theme='light'] #changePasswordModal .change-password-status-custom,
+body:not(.dark-mode) #changePasswordModal .change-password-status-custom {
+    background: rgba(46, 158, 91, 0.1);
+    color: #1f6b3d;
+}
+
+html[data-theme='light'] #changePasswordModal .change-password-status-default,
+body:not(.dark-mode) #changePasswordModal .change-password-status-default {
+    background: rgba(217, 145, 0, 0.12);
+    color: #8a5d00;
+}
+
+html[data-theme='light'] #changePasswordModal .change-password-status-sso,
+body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
+    background: rgba(74, 158, 255, 0.1);
+    color: #1f5fa8;
+}
+
 /* Settings Category Titles */
 .settings-category-title {
     font-size: 1.1rem;
