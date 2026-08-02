@@ -124,9 +124,23 @@
                 ' style="--note-color:' + esc(folder.cardColorHex) + '"';
         }
 
-        return '<button class="dash-card dash-folder-card' + (folder.cardColorHex ? ' has-note-color' : '') + '"' +
+        // The card itself is a <button>, so the pin control is a span with a
+        // button role: nesting real buttons is invalid HTML. The delegated
+        // click handler catches it via .dash-card-pin before the folder
+        // navigation runs.
+        var pinTxt = window.DASHBOARD_PIN_TXT || {};
+        var pinLabel = folder.pinned ? (pinTxt.unpin || 'Unpin') : (pinTxt.pin || 'Pin to top');
+        var pinBtn = '<span class="dash-card-pin" role="button" tabindex="0"' +
+            ' data-pin-folder-id="' + esc(String(folder.id)) + '"' +
+            ' aria-pressed="' + (folder.pinned ? 'true' : 'false') + '"' +
+            ' title="' + esc(pinLabel) + '" aria-label="' + esc(pinLabel) + '">' +
+            '<i class="lucide lucide-pin"></i></span>';
+
+        return '<button class="dash-card dash-folder-card' + (folder.cardColorHex ? ' has-note-color' : '') +
+            (folder.pinned ? ' is-pinned' : '') + '"' +
             ' data-type="folder" data-folder-index="' + index + '"' +
             ' data-folder-id="' + esc(String(folder.id)) + '" data-search="' + esc(search) + '"' + colorAttrs + '>' +
+            pinBtn +
             '<div class="dash-card-icon"><i class="' + esc(folder.icon) + '"' + iconStyle + '></i></div>' +
             '<span class="dash-card-name">' + esc(folder.name) + '</span>' +
             '<span class="dash-card-count">' + count + '</span>' +
@@ -233,6 +247,7 @@
         if (!grid) return;
 
         var html = '';
+        var sectioned = false;
         // A text term or a color filter both search the whole tree rather than
         // the current folder, so results are never hidden behind navigation.
         if (activeFilterTerm || activeColorFilter) {
@@ -258,10 +273,40 @@
             matchingNotes.forEach(function (note) { html += buildNoteCard(note); });
             setNoResultsVisible(matchingFolders.length === 0 && matchingNotes.length === 0);
         } else {
-            level.folders.forEach(function (folder, i) { html += buildFolderCard(folder, i); });
-            level.notes.forEach(function (note)         { html += buildNoteCard(note); });
+            // Pinned folders and notes get their own section at the top;
+            // everything else (folders, then unpinned notes) goes below an
+            // "Others" heading. Folders are partitioned at render time only,
+            // so level.folders keeps its order and the positional
+            // data-folder-index stays valid.
+            var pinnedNotes = [], otherNotes = [];
+            level.notes.forEach(function (note) {
+                (note.pinned ? pinnedNotes : otherNotes).push(note);
+            });
+            var pinnedFolders = [], otherFolders = [];
+            level.folders.forEach(function (folder, i) {
+                (folder.pinned ? pinnedFolders : otherFolders).push({ folder: folder, index: i });
+            });
+
+            var pinnedCount = pinnedFolders.length + pinnedNotes.length;
+            if (pinnedCount > 0 && (otherFolders.length > 0 || otherNotes.length > 0)) {
+                sectioned = true;
+                var pinnedHtml = '', restHtml = '';
+                pinnedFolders.forEach(function (entry) { pinnedHtml += buildFolderCard(entry.folder, entry.index); });
+                pinnedNotes.forEach(function (note) { pinnedHtml += buildNoteCard(note); });
+                otherFolders.forEach(function (entry) { restHtml += buildFolderCard(entry.folder, entry.index); });
+                otherNotes.forEach(function (note) { restHtml += buildNoteCard(note); });
+
+                var othersTitle = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.others) || 'Others';
+                html = '<div class="dashboard-grid-container dash-grid-section">' + pinnedHtml + '</div>' +
+                    '<div class="dash-section-title">' + esc(othersTitle) + '</div>' +
+                    '<div class="dashboard-grid-container dash-grid-section">' + restHtml + '</div>';
+            } else {
+                level.folders.forEach(function (folder, i) { html += buildFolderCard(folder, i); });
+                level.notes.forEach(function (note)         { html += buildNoteCard(note); });
+            }
             setNoResultsVisible(false);
         }
+        grid.classList.toggle('dash-grid-sectioned', sectioned);
         grid.innerHTML = html;
     }
 
@@ -526,6 +571,33 @@
         }).then(function (data) {
             note.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
             resortLevel(rootData);
+            renderAll();
+        }).catch(function () {
+            var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
+                'Could not update the pinned state.';
+            if (typeof window.showNotificationPopup === 'function') {
+                window.showNotificationPopup(message, 'error');
+            } else {
+                alert(message);
+            }
+        });
+    }
+
+    function toggleFolderPinned(folderId) {
+        var folder = findFolderById(folderId);
+        if (!folder) return;
+
+        var nextPinned = !folder.pinned;
+        fetch('api/v1/folders/' + encodeURIComponent(folderId) + '/pinned', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ pinned: nextPinned })
+        }).then(function (response) {
+            if (!response.ok) throw new Error('pin update failed');
+            return response.json();
+        }).then(function (data) {
+            folder.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
             renderAll();
         }).catch(function () {
             var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
@@ -1288,7 +1360,12 @@
             if (pinBtn) {
                 e.preventDefault();
                 e.stopPropagation();
-                toggleNotePinned(pinBtn.getAttribute('data-pin-note-id'));
+                var pinFolderId = pinBtn.getAttribute('data-pin-folder-id');
+                if (pinFolderId !== null) {
+                    toggleFolderPinned(pinFolderId);
+                } else {
+                    toggleNotePinned(pinBtn.getAttribute('data-pin-note-id'));
+                }
                 return;
             }
 
@@ -1309,6 +1386,18 @@
                 navigateInto(idx);
                 return;
             }
+        });
+
+        // The folder pin is a span with role="button" (a real button cannot
+        // nest inside the folder card's <button>), so Enter/Space do not fire
+        // a click natively.
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            var pinBtn = e.target.closest ? e.target.closest('.dash-card-pin[data-pin-folder-id]') : null;
+            if (!pinBtn) return;
+            e.preventDefault();
+            e.stopPropagation();
+            toggleFolderPinned(pinBtn.getAttribute('data-pin-folder-id'));
         });
     });
 })();

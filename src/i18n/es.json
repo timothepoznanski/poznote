@@ -3116,6 +3116,7 @@
     "pin_note": "Fijar arriba",
     "unpin_note": "Dejar de fijar",
     "pin_error": "No se pudo actualizar el estado de fijado.",
+    "others_section": "Otros",
     "unpin": "Quitar de favoritos",
     "no_folder": "Otras notas",
     "toggle_all": "Mostrar todas las notas",

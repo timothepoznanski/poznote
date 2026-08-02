@@ -579,6 +579,11 @@ $router->put('/folders/{id}/color', function($params) use ($foldersController) {
     $foldersController->updateColor($params['id']);
 });
 
+// Pin/unpin a folder (pinned folders sort first on the dashboard)
+$router->put('/folders/{id}/pinned', function($params) use ($foldersController) {
+    $foldersController->updatePinned($params['id']);
+});
+
 // Get note count in folder
 $router->get('/folders/{id}/notes', function($params) use ($foldersController) {
     $foldersController->noteCount($params['id']);

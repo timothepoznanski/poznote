@@ -106,6 +106,7 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
         'color'   => $f['color'],
         'cardColor'    => $f['cardColor'] ?? '',
         'cardColorHex' => $f['cardColorHex'] ?? '',
+        'pinned'  => !empty($f['pinned']),
         'folders' => $childFolders,
         'notes'   => $notes,
     ];
@@ -382,7 +383,7 @@ try {
     if (isset($con)) {
         $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
         $stmtF = $con->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, color, display_order FROM folders" . $folderWhere .
+            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned FROM folders" . $folderWhere .
             " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
         );
         $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
@@ -402,6 +403,7 @@ try {
                 'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
                 'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
                 'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
+                'pinned'   => !empty($f['pinned']),
                 'notes'    => [],
                 'children' => [],
             ];
@@ -858,7 +860,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		window.DASHBOARD_PIN_TXT = {
 			pin: <?php echo json_encode(t('dashboard.pin_note', [], 'Pin to top')); ?>,
 			unpin: <?php echo json_encode(t('dashboard.unpin_note', [], 'Unpin')); ?>,
-			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>
+			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>,
+			others: <?php echo json_encode(t('dashboard.others_section', [], 'Others')); ?>
 		};
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>

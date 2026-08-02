@@ -2798,6 +2798,7 @@
     "pin_note": "Pin to top",
     "unpin_note": "Unpin",
     "pin_error": "Could not update the pinned state.",
+    "others_section": "Others",
     "unpin": "Remove from favorites",
     "no_folder": "Other notes",
     "toggle_all": "Show all notes",

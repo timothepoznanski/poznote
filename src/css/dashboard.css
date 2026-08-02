@@ -498,6 +498,29 @@ body.dark-mode .dashboard-debug-info pre {
     margin-top: 14px;
 }
 
+/* When pinned notes are shown in their own section, #dashboardGrid becomes a
+   plain block wrapper and the inner .dash-grid-section divs carry the grid.
+   The ID keeps this display override ahead of the view-size/layout variants. */
+#dashboardGrid.dash-grid-sectioned {
+    display: block;
+}
+
+.dash-grid-sectioned .dashboard-grid-container {
+    margin-top: 0;
+}
+
+.dash-section-title {
+    margin: 26px 2px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+:root[data-theme='dark'] .dash-section-title,
+body.dark-mode .dash-section-title {
+    color: #9ca3af;
+}
+
 /* ---------- View menu (card size + layout) ---------- */
 
 /* Row holding the View button and the filter bar, centered like the filter */
@@ -1156,7 +1179,7 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 
 .dash-card:hover .dash-card-pin,
 .dash-card-pin:focus-visible,
-.dash-note-card.is-pinned .dash-card-pin {
+.dash-card.is-pinned .dash-card-pin {
     opacity: 1;
 }
 
@@ -1172,12 +1195,12 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 }
 
 .dash-card-pin:hover i,
-.dash-note-card.is-pinned .dash-card-pin i {
+.dash-card.is-pinned .dash-card-pin i {
     background-color: #007DB8;
 }
 
 /* A pinned card reads as pinned even before the button is noticed. */
-.dash-note-card.is-pinned {
+.dash-card.is-pinned {
     border-color: rgba(0, 125, 184, 0.45);
 }
 
@@ -1539,8 +1562,8 @@ body.dark-mode .dash-card-pin i {
 /* Restated after the muted rule above, which is specific enough to win otherwise. */
 :root[data-theme='dark'] .dash-card-pin:hover i,
 body.dark-mode .dash-card-pin:hover i,
-:root[data-theme='dark'] .dash-note-card.is-pinned .dash-card-pin i,
-body.dark-mode .dash-note-card.is-pinned .dash-card-pin i {
+:root[data-theme='dark'] .dash-card.is-pinned .dash-card-pin i,
+body.dark-mode .dash-card.is-pinned .dash-card-pin i {
     background-color: #4aa8d8;
 }
 

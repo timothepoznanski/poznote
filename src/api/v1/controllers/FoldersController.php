@@ -1228,6 +1228,55 @@ class FoldersController {
     }
 
     /**
+     * PUT /api/v1/folders/{id}/pinned
+     * Pin or unpin a folder. Pinned folders sort first on the dashboard board.
+     *
+     * Body: { "pinned": true|false }
+     *
+     * The caller sends the desired state rather than toggling, so two boards
+     * open at once cannot flip each other's result.
+     * Pinning is board presentation state, so it is deliberately not pushed to Git.
+     */
+    public function updatePinned(string $id): void {
+        $folderId = (int)$id;
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+
+        $data = $this->getInputData();
+        if (!array_key_exists('pinned', $data)) {
+            $this->sendError('Invalid JSON in request body: expected a "pinned" boolean', 400);
+            return;
+        }
+
+        $pinned = filter_var($data['pinned'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($pinned === null) {
+            $this->sendError('Invalid value for "pinned": expected a boolean', 400);
+            return;
+        }
+
+        $existsStmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
+        $existsStmt->execute([$folderId]);
+        if (!$existsStmt->fetchColumn()) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+
+        $stmt = $this->db->prepare("UPDATE folders SET pinned = ? WHERE id = ?");
+        if (!$stmt->execute([$pinned ? 1 : 0, $folderId])) {
+            $this->sendError('Database error while updating pinned state', 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Folder pinned state updated successfully',
+            'pinned'  => $pinned
+        ]);
+    }
+
+    /**
      * GET /api/v1/folders/{id}/notes - Get note count in folder
      */
     public function noteCount(string $id): void {

@@ -3237,6 +3237,7 @@
     "pin_note": "置顶",
     "unpin_note": "取消置顶",
     "pin_error": "无法更新置顶状态。",
+    "others_section": "其他",
     "unpin": "取消收藏",
     "no_folder": "其他笔记",
     "toggle_all": "显示所有笔记",
