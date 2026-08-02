@@ -300,6 +300,22 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <style>
+        /* The 11-column table needs ~1660px, more than the shared 1400px
+           admin cap: size the container to its content so wide screens
+           show the whole table instead of empty side margins + a scrollbar. */
+        .admin-container {
+            max-width: fit-content;
+        }
+        /* Pull the filter bar closer to the nav (users.css leaves 45px). */
+        .admin-header {
+            margin-bottom: 0;
+        }
+        /* Tighter rows without separator lines; the ≤768px card view
+           re-asserts its own padding/borders with !important. */
+        .users-table td {
+            border-bottom: none;
+            padding: 8px 15px;
+        }
         .user-current {
             color: #2E8CFA;
             font-weight: 600;

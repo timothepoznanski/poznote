@@ -207,15 +207,39 @@ foreach ($stats as $r) {
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
     <style>
-    /* The 8-column table needs more room than the default 700px admin column,
-       otherwise it overflows to the right and no longer looks centered. */
+    /* The 9-column table is ~1050px wide (nowrap cells), far more than the
+       default 700px admin column: give it room so it can actually center. */
     .dr-page {
-        max-width: 960px;
+        max-width: 1100px;
     }
-    /* More breathing room between the filter bar and the table than the
-       16px search.css default */
+    /* Balance the whitespace around the hero text: users.css puts 45px of
+       header margins above it but only 10px sits below. */
+    .admin-header {
+        margin-bottom: 0;
+    }
+    .dr-hero {
+        padding: 0 0 15px;
+    }
+    /* The table below already carries a 20px margin-top of its own */
     .home-search-container {
-        margin-bottom: 32px;
+        margin-bottom: 12px;
+    }
+    /* Shrink-to-fit and self-center: at width:100% the table's intrinsic
+       width can exceed the column and overflow to the right instead. */
+    .results-table {
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Scroll inside the container on windows narrower than the table
+       (admin-tools.css only enables this under 640px). */
+    .table-scroll {
+        overflow-x: auto;
+    }
+    /* Tighter rows than the 12px 20px admin-tools default */
+    .results-table th,
+    .results-table td {
+        padding: 7px 16px;
     }
     .results-table th .storage-sort-btn {
         background: none;
