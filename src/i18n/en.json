@@ -2931,5 +2931,11 @@
     "manage_link": "Manage users: {{url}}",
     "manage_button": "Manage users",
     "footer": "You receive this email because new-user notifications are enabled for your admin account."
+  },
+  "autosave": {
+    "notification": {
+      "saving": "Saving changes...",
+      "saved": "Saved!"
+    }
   }
 }
