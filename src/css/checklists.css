@@ -93,8 +93,9 @@
     -moz-box-shadow: none !important;
 }
 
-/* Checked state styles */
-.checklist-item-checked .checklist-text,
+/* Checked state styles (direct child only: a nested unchecked item
+   must not inherit the strikethrough of its checked parent) */
+.checklist-item-checked > .checklist-text,
 .checklist-checkbox:checked+.checklist-text {
     text-decoration: line-through;
     opacity: 0.6;
@@ -109,9 +110,9 @@
 }
 
 /* Dark mode */
-html[data-theme='dark'] .checklist-item-checked .checklist-text,
+html[data-theme='dark'] .checklist-item-checked > .checklist-text,
 html[data-theme='dark'] .checklist-checkbox:checked+.checklist-text,
-body.dark-mode .checklist-item-checked .checklist-text,
+body.dark-mode .checklist-item-checked > .checklist-text,
 body.dark-mode .checklist-checkbox:checked+.checklist-text {
     color: #666;
 }
