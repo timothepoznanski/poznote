@@ -400,7 +400,7 @@
       "notes_without_folders": "Zeigen Sie Notizen ohne Ordner nach der Ordnerliste statt davor an.",
       "note_width": "Passen Sie die maximale Breite des Notizinhalts an.",
       "markdown_split_card_view": "Zeigen Sie Markdown-Notizen in einer gerahmten geteilten Ansicht mit Editor und Vorschau an.",
-      "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für Überschriften, Inline-Code, Zitate, Tabellenköpfe und Trennlinien.",
+      "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für jede Überschriftenebene, Inline-Code, Codeblock-Hintergrund, Zitate, Tabellenköpfe und Trennlinien.",
       "code_wrap": "Lange Zeilen in Codeblöcken umbrechen statt horizontal zu scrollen.",
       "attachment_previews": "Zeigen Sie Vorschauen von Anhängen in Notizen an.",
       "attachments_at_bottom": "Zeigen Sie den Anhangsbereich unten statt oben in Notizen an.",
@@ -1264,8 +1264,14 @@
         "custom": "Benutzerdefiniert"
       },
       "elements": {
-        "heading": "Überschriften",
+        "h1": "Überschrift 1",
+        "h2": "Überschrift 2",
+        "h3": "Überschrift 3",
+        "h4": "Überschrift 4",
+        "h5": "Überschrift 5",
+        "h6": "Überschrift 6",
         "code": "Inline-Code",
+        "codeblock": "Codeblock-Hintergrund",
         "quote": "Zitate",
         "table": "Tabellenköpfe",
         "hr": "Trennlinien"

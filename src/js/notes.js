@@ -258,7 +258,9 @@ function saveNoteToServer(options) {
     serializeChecklists(entryElem);
 
     var ent = cleanSearchHighlightsFromElement(entryElem);
-    ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
+    // Collapse any existing run of non-breaking spaces before <br> to exactly
+    // one, so repeated save/reload cycles don't accumulate &nbsp; entities
+    ent = ent.replace(/(?:&nbsp;|\u00A0)*<br\s*[\/]?>/gi, "&nbsp;<br>");
 
     var entcontent = getTextContentFromElement(entryElem);
 
@@ -797,7 +799,7 @@ function getComparableNoteContent(entryElem, noteId) {
         return entryElem.innerHTML || '';
     }
 
-    return cleanSearchHighlightsFromElement(entryElem).replace(/<br\s*[\/]?>/gi, '&nbsp;<br>');
+    return cleanSearchHighlightsFromElement(entryElem).replace(/(?:&nbsp;|\u00A0)*<br\s*[\/]?>/gi, '&nbsp;<br>');
 }
 
 window.getComparableNoteContent = getComparableNoteContent;

@@ -111,6 +111,7 @@
             'timezone',
             'date_time_format',
             'hidden_ui_elements',
+            'settings_pinned_cards',
             'spellcheck_html_notes',
             'slash_menu_require_alt',
             'note_nav_shortcuts_enabled',
@@ -1222,12 +1223,29 @@
     }
 
     var MARKDOWN_COLORED_DEFAULTS = {
-        heading: '#007db8',
+        h1: '#007db8',
+        h2: '#1a7f37',
+        h3: '#8250df',
+        h4: '#bf3989',
+        h5: '#1b7c83',
+        h6: '#656d76',
         code: '#b34e00',
+        codeblock: '#b34e00',
         quote: '#007db8',
         table: '#007db8',
         hr: '#007db8'
     };
+
+    // Values saved before per-level heading colors existed used a single
+    // 'heading' color and had no code block background.
+    function markdownColoredStoredColor(parsed, el) {
+        var isColor = function (v) { return /^#[0-9a-fA-F]{6}$/.test(v || ''); };
+        if (!parsed) return null;
+        if (isColor(parsed[el])) return parsed[el];
+        if (/^h[1-6]$/.test(el) && isColor(parsed.heading)) return parsed.heading;
+        if (el === 'codeblock' && isColor(parsed.code)) return parsed.code;
+        return null;
+    }
 
     function normalizeMarkdownColoredTheme(value) {
         var v = (value || '').trim();
@@ -1277,8 +1295,7 @@
                 var inputs = document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]');
                 inputs.forEach(function (input) {
                     var el = input.getAttribute('data-mdc-element');
-                    var color = parsed && /^#[0-9a-fA-F]{6}$/.test(parsed[el] || '') ? parsed[el] : MARKDOWN_COLORED_DEFAULTS[el];
-                    input.value = color;
+                    input.value = markdownColoredStoredColor(parsed, el) || MARKDOWN_COLORED_DEFAULTS[el];
                 });
                 updateMarkdownColoredCustomRow();
                 modal.style.display = 'flex';
@@ -2309,24 +2326,29 @@
 
         // Pinnable cards: every card gets a pin button. Pinning does NOT move
         // the card — it stays in its section and a live clone of it is shown
-        // in the "Pinned" section at the top. Persisted per user.
-        var pinStore = window.__poznoteUserStorage || window.localStorage;
+        // in the "Pinned" section at the top. Persisted per user in the
+        // settings table; pins saved by older versions in localStorage are
+        // migrated on first load.
         var pinnedGrid = document.getElementById('settings-pinned-section-grid');
         var pinnedTitle = document.getElementById('settings-pinned-section-title');
         if (pinnedGrid && pinnedTitle) {
             var pinnedCardIds = [];
-            try {
-                pinnedCardIds = JSON.parse(pinStore.getItem('settingsPinnedCards') || '[]');
-                if (!Array.isArray(pinnedCardIds)) pinnedCardIds = [];
-            } catch (e) { /* storage unavailable or corrupt */ }
 
             var pinnedClones = {};    // card id -> clone element in the pinned grid
             var cloneObservers = {};  // card id -> MutationObserver keeping the clone in sync
 
-            var savePinnedCards = function () {
+            var parsePinnedCardIds = function (raw) {
                 try {
-                    pinStore.setItem('settingsPinnedCards', JSON.stringify(pinnedCardIds));
-                } catch (e) { /* storage unavailable */ }
+                    var ids = JSON.parse(raw || '[]');
+                    if (!Array.isArray(ids)) return [];
+                    return ids.filter(function (id) { return typeof id === 'string' && id !== ''; });
+                } catch (e) {
+                    return [];
+                }
+            };
+
+            var savePinnedCards = function () {
+                setSetting('settings_pinned_cards', JSON.stringify(pinnedCardIds));
             };
 
             var refreshPinnedSection = function () {
@@ -2437,14 +2459,32 @@
                 applyPinState(card);
             });
 
-            // Build the pinned section in saved order. Ids without a card on
-            // this page (e.g. admin cards seen by a non-admin) stay in storage
-            // but are simply not rendered.
-            pinnedCardIds.forEach(function (id) {
-                var card = document.getElementById(id);
-                if (card && card.classList.contains('home-card')) createPinnedClone(card);
+            // Load saved pins, then build the pinned section in saved order.
+            // Ids without a card on this page (e.g. admin cards seen by a
+            // non-admin) stay in storage but are simply not rendered.
+            getSetting('settings_pinned_cards', function (value) {
+                var raw = typeof value === 'string' ? value : '';
+                if (raw === '') {
+                    // One-time migration of pins saved before they moved to the DB.
+                    var legacyStore = window.__poznoteUserStorage || window.localStorage;
+                    try {
+                        var legacy = legacyStore.getItem('settingsPinnedCards') || '';
+                        if (legacy !== '') {
+                            pinnedCardIds = parsePinnedCardIds(legacy);
+                            legacyStore.removeItem('settingsPinnedCards');
+                            if (pinnedCardIds.length > 0) savePinnedCards();
+                        }
+                    } catch (e) { /* storage unavailable */ }
+                } else {
+                    pinnedCardIds = parsePinnedCardIds(raw);
+                }
+                pinnableCards.forEach(applyPinState);
+                pinnedCardIds.forEach(function (id) {
+                    var card = document.getElementById(id);
+                    if (card && card.classList.contains('home-card')) createPinnedClone(card);
+                });
+                refreshPinnedSection();
             });
-            refreshPinnedSection();
 
             document.addEventListener('poznote:i18n:loaded', function () {
                 pinnableCards.forEach(applyPinState);

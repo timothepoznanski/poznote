@@ -21,7 +21,7 @@ $activeUserId = null;
 // requests the share token must take precedence over the session. The
 // controllers still validate the token (and share password) themselves.
 $routingUri = (string)($_SERVER['REQUEST_URI'] ?? '');
-$forcePublicTokenRouting = !empty($_GET['token'])
+$forcePublicTokenRouting = (!empty($_GET['token']) || !empty($_GET['folder_token']))
     && (strpos($routingUri, '/api/v1/public/') !== false
         || preg_match('#/api/v1/notes/\d+/attachments/#', $routingUri));
 
@@ -37,8 +37,14 @@ if (!$forcePublicTokenRouting && isset($_SESSION['user_id']) && $_SESSION['user_
         $userDataManager->initializeUserDirectories();
     }
 } else {
-    // Check if this is a public shared link access
-    $publicToken = $_GET['token'] ?? null;
+    // Check if this is a public shared link access. Notes inside a shared
+    // folder are opened as public_note.php?id=X&folder_token=Y (no note-level
+    // token), so the folder token is the only way to resolve the share
+    // owner's database — both token types live in the shared_links registry.
+    $publicToken = !empty($_GET['token']) ? $_GET['token'] : null;
+    if (!$publicToken && !empty($_GET['folder_token'])) {
+        $publicToken = $_GET['folder_token'];
+    }
 
     // Also check pretty URLs (tokens are usually alphanumeric/hex), but only for
     // public entry points that accept URI tokens. Other unauthenticated pages

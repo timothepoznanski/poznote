@@ -213,8 +213,14 @@ body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checke
    identical in both themes; the values below are only dark fallbacks. */
 html[data-theme='dark'] body.markdown-colored,
 body.dark-mode.markdown-colored {
-    --mdc-heading: #58a6ff;
+    --mdc-h1: #58a6ff;
+    --mdc-h2: #3fb950;
+    --mdc-h3: #d2a8ff;
+    --mdc-h4: #f778ba;
+    --mdc-h5: #39c5cf;
+    --mdc-h6: #8b949e;
     --mdc-code: #ffa657;
+    --mdc-codeblock: #ffa657;
     --mdc-quote: #58a6ff;
     --mdc-table: #58a6ff;
     --mdc-hr: #58a6ff;
@@ -223,8 +229,21 @@ body.dark-mode.markdown-colored {
 /* Re-assert the editor token mapping over the dark CM palette above */
 html[data-theme='dark'] body.markdown-colored .markdown-codemirror-host,
 body.dark-mode.markdown-colored .markdown-codemirror-host {
-    --poznote-cm-heading: var(--mdc-heading);
+    --poznote-cm-heading: var(--mdc-h1);
+    --poznote-cm-heading1: var(--mdc-h1);
+    --poznote-cm-heading2: var(--mdc-h2);
+    --poznote-cm-heading3: var(--mdc-h3);
+    --poznote-cm-heading4: var(--mdc-h4);
+    --poznote-cm-heading5: var(--mdc-h5);
+    --poznote-cm-heading6: var(--mdc-h6);
     --poznote-cm-monospace: var(--mdc-code);
+}
+
+/* Code block background tint over the dark surface; !important mirrors the
+   light-mode rule in css/markdown.css (see the pre.code-block override) */
+html[data-theme='dark'] body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)),
+body.dark-mode.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
+    background: color-mix(in srgb, var(--mdc-codeblock) 10%, var(--dm-surface)) !important;
 }
 
 /* ============================================

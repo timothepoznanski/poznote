@@ -399,7 +399,7 @@
       "notes_without_folders": "Mostre as notas sem pasta depois da lista de pastas em vez de antes.",
       "note_width": "Ajuste a largura máxima do conteúdo das notas.",
       "markdown_split_card_view": "Exiba notas markdown em uma visão dividida emoldurada com editor e pré-visualização.",
-      "markdown_colored": "Adicione cor às notas markdown: escolha uma cor para títulos, código embutido, citações, cabeçalhos de tabela e separadores.",
+      "markdown_colored": "Adicione cor às notas markdown: escolha uma cor para cada nível de título, código embutido, fundo dos blocos de código, citações, cabeçalhos de tabela e separadores.",
       "code_wrap": "Quebre linhas longas nos blocos de código em vez de rolar horizontalmente.",
       "attachment_previews": "Mostre pré-visualizações dos anexos dentro das notas.",
       "attachments_at_bottom": "Mostre a seção de anexos na parte inferior das notas em vez do topo.",
@@ -1263,8 +1263,14 @@
         "custom": "Personalizado"
       },
       "elements": {
-        "heading": "Títulos",
+        "h1": "Título 1",
+        "h2": "Título 2",
+        "h3": "Título 3",
+        "h4": "Título 4",
+        "h5": "Título 5",
+        "h6": "Título 6",
         "code": "Código embutido",
+        "codeblock": "Fundo dos blocos de código",
         "quote": "Citações",
         "table": "Cabeçalhos de tabela",
         "hr": "Separadores"

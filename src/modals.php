@@ -745,8 +745,14 @@ try {
                 <label><input type="radio" name="markdownColoredTheme" value="custom"> <?php echo t_h('modals.markdown_colored.options.custom', [], 'Custom'); ?></label>
             </div>
             <div id="markdownColoredCustomRow" class="mdc-custom-row">
-                <label><span><?php echo t_h('modals.markdown_colored.elements.heading', [], 'Headings'); ?></span> <input type="color" id="markdownColoredHeadingInput" data-mdc-element="heading" value="#007db8"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h1', [], 'Heading 1'); ?></span> <input type="color" id="markdownColoredH1Input" data-mdc-element="h1" value="#007db8"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h2', [], 'Heading 2'); ?></span> <input type="color" id="markdownColoredH2Input" data-mdc-element="h2" value="#1a7f37"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h3', [], 'Heading 3'); ?></span> <input type="color" id="markdownColoredH3Input" data-mdc-element="h3" value="#8250df"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h4', [], 'Heading 4'); ?></span> <input type="color" id="markdownColoredH4Input" data-mdc-element="h4" value="#bf3989"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h5', [], 'Heading 5'); ?></span> <input type="color" id="markdownColoredH5Input" data-mdc-element="h5" value="#1b7c83"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.h6', [], 'Heading 6'); ?></span> <input type="color" id="markdownColoredH6Input" data-mdc-element="h6" value="#656d76"></label>
                 <label><span><?php echo t_h('modals.markdown_colored.elements.code', [], 'Inline code'); ?></span> <input type="color" id="markdownColoredCodeInput" data-mdc-element="code" value="#b34e00"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.codeblock', [], 'Code block background'); ?></span> <input type="color" id="markdownColoredCodeblockInput" data-mdc-element="codeblock" value="#b34e00"></label>
                 <label><span><?php echo t_h('modals.markdown_colored.elements.quote', [], 'Quotes'); ?></span> <input type="color" id="markdownColoredQuoteInput" data-mdc-element="quote" value="#007db8"></label>
                 <label><span><?php echo t_h('modals.markdown_colored.elements.table', [], 'Table headers'); ?></span> <input type="color" id="markdownColoredTableInput" data-mdc-element="table" value="#007db8"></label>
                 <label><span><?php echo t_h('modals.markdown_colored.elements.hr', [], 'Separators'); ?></span> <input type="color" id="markdownColoredHrInput" data-mdc-element="hr" value="#007db8"></label>

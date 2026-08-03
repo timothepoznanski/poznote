@@ -301,7 +301,17 @@ if ($markdown_colored_theme !== '' && $markdown_colored_theme !== '0' && $markdo
     $extra_body_classes .= ' markdown-colored';
     $customColors = json_decode((string)$settings['markdown_colored_custom'], true);
     if (is_array($customColors)) {
-        foreach (['heading', 'code', 'quote', 'table', 'hr'] as $mdcElement) {
+        // Legacy values stored a single 'heading' color and no code block background
+        $mdcLegacyHeading = (string)($customColors['heading'] ?? '');
+        foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as $mdcLevel) {
+            if (!isset($customColors[$mdcLevel]) && $mdcLegacyHeading !== '') {
+                $customColors[$mdcLevel] = $mdcLegacyHeading;
+            }
+        }
+        if (!isset($customColors['codeblock']) && isset($customColors['code'])) {
+            $customColors['codeblock'] = $customColors['code'];
+        }
+        foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code', 'codeblock', 'quote', 'table', 'hr'] as $mdcElement) {
             $mdcColor = (string)($customColors[$mdcElement] ?? '');
             if (preg_match('/^#[0-9a-fA-F]{6}$/', $mdcColor)) {
                 $markdown_colored_style .= '--mdc-' . $mdcElement . ': ' . $mdcColor . '; ';

@@ -499,7 +499,9 @@ function emergencySave(noteId) {
         } else {
             ent = entryElem.innerHTML;
         }
-        ent = ent.replace(/<br\s*[\/]?>/gi, "&nbsp;<br>");
+        // Collapse any existing run of non-breaking spaces before <br> to exactly
+        // one, so repeated save/reload cycles don't accumulate &nbsp; entities
+        ent = ent.replace(/(?:&nbsp;|\u00A0)*<br\s*[\/]?>/gi, "&nbsp;<br>");
     }
 
     const tags = tagsElem ? tagsElem.value : '';

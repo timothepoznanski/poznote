@@ -207,6 +207,32 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
     font-weight: 700 !important;
 }
 
+/* Per-level heading colors; each level falls back to the shared heading color
+   unless a --poznote-cm-headingN variable is set (colored markdown setting). */
+.markdown-codemirror-host .poznote-cm-heading1 {
+    color: var(--poznote-cm-heading1, var(--poznote-cm-heading)) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-heading2 {
+    color: var(--poznote-cm-heading2, var(--poznote-cm-heading)) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-heading3 {
+    color: var(--poznote-cm-heading3, var(--poznote-cm-heading)) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-heading4 {
+    color: var(--poznote-cm-heading4, var(--poznote-cm-heading)) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-heading5 {
+    color: var(--poznote-cm-heading5, var(--poznote-cm-heading)) !important;
+}
+
+.markdown-codemirror-host .poznote-cm-heading6 {
+    color: var(--poznote-cm-heading6, var(--poznote-cm-heading)) !important;
+}
+
 .markdown-codemirror-host .poznote-cm-link {
     color: var(--poznote-cm-link) !important;
     text-decoration: underline !important;
@@ -577,8 +603,14 @@ body.dark-mode .markdown-preview pre.indented-pre {
    css/dark-mode/editor.css and above the dark-mode preview defaults, so one
    set of rules serves both themes. */
 body.markdown-colored {
-    --mdc-heading: #007db8;
+    --mdc-h1: #007db8;
+    --mdc-h2: #1a7f37;
+    --mdc-h3: #8250df;
+    --mdc-h4: #bf3989;
+    --mdc-h5: #1b7c83;
+    --mdc-h6: #656d76;
     --mdc-code: #b34e00;
+    --mdc-codeblock: #b34e00;
     --mdc-quote: #007db8;
     --mdc-table: #007db8;
     --mdc-hr: #007db8;
@@ -590,16 +622,49 @@ body.markdown-colored {
    variant lives in css/dark-mode/markdown.css because the dark CM palette
    redefines these variables later in the cascade. */
 body.markdown-colored .markdown-codemirror-host {
-    --poznote-cm-heading: var(--mdc-heading);
+    --poznote-cm-heading: var(--mdc-h1);
+    --poznote-cm-heading1: var(--mdc-h1);
+    --poznote-cm-heading2: var(--mdc-h2);
+    --poznote-cm-heading3: var(--mdc-h3);
+    --poznote-cm-heading4: var(--mdc-h4);
+    --poznote-cm-heading5: var(--mdc-h5);
+    --poznote-cm-heading6: var(--mdc-h6);
     --poznote-cm-monospace: var(--mdc-code);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1, h2, h3, h4, h5, h6) {
-    color: var(--mdc-heading) !important;
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1) {
+    color: var(--mdc-h1) !important;
+    border-bottom-color: color-mix(in srgb, var(--mdc-h1) 30%, transparent);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1, h2) {
-    border-bottom-color: color-mix(in srgb, var(--mdc-heading) 30%, transparent);
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h2) {
+    color: var(--mdc-h2) !important;
+    border-bottom-color: color-mix(in srgb, var(--mdc-h2) 30%, transparent);
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h3) {
+    color: var(--mdc-h3) !important;
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h4) {
+    color: var(--mdc-h4) !important;
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h5) {
+    color: var(--mdc-h5) !important;
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
+    color: var(--mdc-h6) !important;
+}
+
+/* Code blocks: tint the block background with the chosen color (mixed into
+   the standard light surface; the dark surface variant lives in
+   css/dark-mode/markdown.css). !important is needed to beat the
+   `background: #F8FAFC !important` on pre.code-block in css/code-blocks.css,
+   so indented and mermaid blocks must be excluded here explicitly. */
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
+    background: color-mix(in srgb, var(--mdc-codeblock) 8%, #f4f4f4) !important;
 }
 
 body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {

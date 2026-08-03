@@ -67,6 +67,36 @@
         }
     }
 
+    var savedToastTimeoutId = null;
+
+    function showSavedToast() {
+        var existing = document.querySelector('.save-notification[data-ctrl-s-toast]');
+        if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+        }
+        if (savedToastTimeoutId) {
+            clearTimeout(savedToastTimeoutId);
+        }
+
+        var notification = document.createElement('div');
+        notification.className = 'save-notification';
+        notification.setAttribute('data-ctrl-s-toast', 'true');
+        notification.innerHTML =
+            '<div class="save-notification-inner">' +
+                '<div class="save-notification-check">✓</div>' +
+                '<span></span>' +
+            '</div>';
+        notification.querySelector('span').textContent =
+            (typeof window.t === 'function') ? window.t('autosave.notification.saved', null, 'Saved!') : 'Saved!';
+
+        document.body.appendChild(notification);
+        savedToastTimeoutId = setTimeout(function () {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 1500);
+    }
+
     function handleShortcutKeydown(e) {
         if (e.defaultPrevented) return;
 
@@ -76,6 +106,7 @@
             e.preventDefault();
             if (typeof window.saveNoteImmediately === 'function') {
                 window.saveNoteImmediately();
+                showSavedToast();
             }
             return;
         }

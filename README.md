@@ -270,6 +270,8 @@ mkdir -p data
 sudo chown -R 1000:1000 data
 ```
 
+`sudo` is often not needed here: if your user already has uid `1000` the `chown` can be skipped, and on rootless Podman/Docker it can run without root, see [Running rootless](docs/TROUBLESHOOTING.md#running-rootless).
+
 Create the environment file:
 ```bash
 curl -o .env https://raw.githubusercontent.com/timothepoznanski/poznote/main/.env.template
