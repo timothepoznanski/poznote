@@ -3338,7 +3338,11 @@
     "empty": "还没有日记条目。点击\"今日日记\"来写第一篇，它将保存在 {{folder}} 中。",
     "create_error": "无法创建日记条目。",
     "create_card_title": "日记条目",
-    "folder_name": "日记"
+    "folder_name": "日记",
+    "new_button": "新建日记",
+    "new_modal_title": "创建新日记",
+    "new_name_placeholder": "日记名称",
+    "new_create_error": "无法创建日记。"
   },
   "new_user_email": {
     "subject": "新的 Poznote 用户：{{user}}",

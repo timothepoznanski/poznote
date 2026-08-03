@@ -481,11 +481,30 @@ class MiniCalendar {
             `).join('')
             : `<div class="calendar-notes-empty">${this.translations.modal.no_notes || 'No notes on this day.'}</div>`;
 
-        const diaryBtnHtml = diary
-            ? `<button class="btn-open-all calendar-diary-entry-btn" data-action="diary-entry">
-                    ${diary.exists ? (this.translations.modal.diary_open || 'Open diary entry') : (this.translations.modal.diary_create || 'Create diary entry')}
-               </button>`
-            : '';
+        // One button per diary when the workspace has several; the payload of
+        // each is normalized to the shape openOrCreateDiaryEntry expects.
+        const diaryTargets = diary
+            ? (Array.isArray(diary.diaries) && diary.diaries.length > 1
+                ? diary.diaries.map(d => ({
+                    exists: d.exists,
+                    id: d.noteId,
+                    folder: d.folder,
+                    workspace: d.workspace,
+                    noteType: d.noteType,
+                    name: d.name
+                }))
+                : [diary])
+            : [];
+
+        const diaryBtnHtml = diaryTargets.map((target, index) => {
+            const label = target.exists
+                ? (this.translations.modal.diary_open || 'Open diary entry')
+                : (this.translations.modal.diary_create || 'Create diary entry');
+            const suffix = diaryTargets.length > 1 ? ` (${this.escapeHtml(target.name || '')})` : '';
+            return `<button class="btn-open-all calendar-diary-entry-btn" data-action="diary-entry" data-diary-index="${index}">
+                    ${label}${suffix}
+               </button>`;
+        }).join('');
 
         // Create modal HTML
         const modalHtml = `
@@ -546,7 +565,8 @@ class MiniCalendar {
         // Open (or create) the diary entry for this day
         modal.querySelectorAll('[data-action="diary-entry"]').forEach(btn => {
             btn.addEventListener('click', async () => {
-                const opened = await this.openOrCreateDiaryEntry(diary, dateStr, btn);
+                const target = diaryTargets[parseInt(btn.getAttribute('data-diary-index'), 10)] || diary;
+                const opened = await this.openOrCreateDiaryEntry(target, dateStr, btn);
                 if (opened) modal.remove();
             });
         });

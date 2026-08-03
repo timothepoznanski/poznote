@@ -3411,7 +3411,11 @@
     "empty": "Aucune note de journal pour le moment. Cliquez sur « Note du jour » pour écrire la première. Elle sera rangée dans {{folder}}.",
     "create_error": "Impossible de créer la note du jour.",
     "create_card_title": "Note de journal",
-    "folder_name": "Journal"
+    "folder_name": "Journal",
+    "new_button": "Nouveau journal",
+    "new_modal_title": "Créer un nouveau journal",
+    "new_name_placeholder": "Nom du journal",
+    "new_create_error": "Impossible de créer le journal."
   },
   "new_user_email": {
     "subject": "Nouvel utilisateur Poznote : {{user}}",

@@ -6,6 +6,10 @@
  * for the requested date, plus the folder path, workspace and note type to use
  * when the entry does not exist yet. Used by the mini calendar day popup to
  * offer an "open or create diary entry" action.
+ *
+ * With several diaries in the workspace, the `diaries` array lists the entry
+ * status of each one; the top-level fields describe the diary selected with
+ * the optional `diary` parameter (root folder id), defaulting to the first.
  */
 
 // Authentication check
@@ -32,14 +36,49 @@ try {
         $workspace = getFirstWorkspaceName();
     }
 
-    $entryId = findDiaryEntryIdForDate($con, $workspace, $date);
+    $noteType = getDiaryDefaultNoteType();
+    $diaries = [];
+    foreach (getDiaryRoots($con, $workspace) as $root) {
+        $entryId = findDiaryEntryIdForDate($con, $workspace, $date, $root['id']);
+        $diaries[] = [
+            'id'        => $root['id'],
+            'name'      => $root['name'],
+            'exists'    => $entryId !== null,
+            'noteId'    => $entryId,
+            'folder'    => $root['name'] . '/' . $m[1] . '/' . $m[2],
+            'workspace' => $workspace,
+            'noteType'  => $noteType
+        ];
+    }
+    if (empty($diaries)) {
+        // No diary yet: describe the default one so the client can create it.
+        $defaultName = getDiaryRootFolderName($con, $workspace);
+        $diaries[] = [
+            'id'        => null,
+            'name'      => $defaultName,
+            'exists'    => false,
+            'noteId'    => null,
+            'folder'    => $defaultName . '/' . $m[1] . '/' . $m[2],
+            'workspace' => $workspace,
+            'noteType'  => $noteType
+        ];
+    }
+
+    $selected = $diaries[0];
+    $diaryParam = isset($_GET['diary']) ? (int)$_GET['diary'] : 0;
+    if ($diaryParam > 0) {
+        foreach ($diaries as $d) {
+            if ($d['id'] === $diaryParam) { $selected = $d; break; }
+        }
+    }
 
     echo json_encode([
-        'exists'    => $entryId !== null,
-        'id'        => $entryId,
-        'folder'    => getDiaryRootFolderName($con, $workspace) . '/' . $m[1] . '/' . $m[2],
+        'exists'    => $selected['exists'],
+        'id'        => $selected['noteId'],
+        'folder'    => $selected['folder'],
         'workspace' => $workspace,
-        'noteType'  => getDiaryDefaultNoteType()
+        'noteType'  => $noteType,
+        'diaries'   => $diaries
     ]);
 
 } catch (Exception $e) {

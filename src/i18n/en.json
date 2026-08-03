@@ -2911,7 +2911,11 @@
     "empty": "No diary entries yet. Click \"Today's entry\" to write your first one. It will be stored in {{folder}}.",
     "create_error": "Could not create the diary entry.",
     "create_card_title": "Diary entry",
-    "folder_name": "Diary"
+    "folder_name": "Diary",
+    "new_button": "New diary",
+    "new_modal_title": "Create a new diary",
+    "new_name_placeholder": "Diary name",
+    "new_create_error": "Could not create the diary."
   },
   "new_user_email": {
     "subject": "New Poznote user: {{user}}",

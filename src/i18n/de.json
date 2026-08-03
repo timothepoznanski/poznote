@@ -3217,7 +3217,11 @@
     "empty": "Noch keine Tagebucheinträge. Klicken Sie auf \"Heutiger Eintrag\", um den ersten zu schreiben. Er wird in {{folder}} gespeichert.",
     "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",
     "create_card_title": "Tagebucheintrag",
-    "folder_name": "Tagebuch"
+    "folder_name": "Tagebuch",
+    "new_button": "Neues Tagebuch",
+    "new_modal_title": "Neues Tagebuch erstellen",
+    "new_name_placeholder": "Name des Tagebuchs",
+    "new_create_error": "Das Tagebuch konnte nicht erstellt werden."
   },
   "new_user_email": {
     "subject": "Neuer Poznote-Benutzer: {{user}}",

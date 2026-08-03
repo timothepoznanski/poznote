@@ -1004,8 +1004,8 @@ class NotesController {
 
             // Diary entries follow their date title: renaming one to another
             // YYYY-MM-DD moves it into the matching Diary/YYYY/MM folder
-            // (created on demand). Skipped when the request itself moves the
-            // note to a different folder.
+            // (created on demand) of the diary it lives in. Skipped when the
+            // request itself moves the note to a different folder.
             $diaryFolderMoved = false;
             $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
             if ($heading !== $note['heading']
@@ -1013,8 +1013,8 @@ class NotesController {
                 && $currentFolderId !== null
                 && preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $heading, $dm)
                 && checkdate((int)$dm[2], (int)$dm[3], (int)$dm[1])
-                && in_array($currentFolderId, getDiaryFolderIds($this->con, $note['workspace']), true)) {
-                $targetPath = getDiaryRootFolderName($this->con, $workspace) . '/' . $dm[1] . '/' . $dm[2];
+                && ($noteDiaryRoot = findDiaryRootForFolder($this->con, $note['workspace'], $currentFolderId)) !== null) {
+                $targetPath = $noteDiaryRoot['name'] . '/' . $dm[1] . '/' . $dm[2];
                 $targetId = resolveFolderPathToId($workspace, $targetPath, true, $this->con);
                 if ($targetId && (int)$targetId !== $currentFolderId) {
                     $folder_id = (int)$targetId;

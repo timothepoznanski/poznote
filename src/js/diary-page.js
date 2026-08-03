@@ -208,10 +208,87 @@
             });
     }
 
+    // --- New diary ---
+
+    function openNewDiaryModal() {
+        var overlay = document.createElement('div');
+        overlay.className = 'modal-overlay diary-new-modal-overlay';
+        overlay.innerHTML =
+            '<div class="modal-dialog diary-new-modal">' +
+                '<div class="modal-header"><h3 class="modal-title">' + esc(txt.newDiaryTitle || 'Create a new diary') + '</h3></div>' +
+                '<div class="modal-body">' +
+                    '<input type="text" class="diary-new-input" maxlength="255" placeholder="' + esc(txt.newDiaryPlaceholder || 'Diary name') + '" autocomplete="off">' +
+                    '<p class="diary-new-error initially-hidden"></p>' +
+                '</div>' +
+                '<div class="modal-footer">' +
+                    '<button type="button" class="btn btn-secondary" data-action="close-modal">' + esc(txt.cancel || 'Cancel') + '</button>' +
+                    '<button type="button" class="btn btn-primary" data-action="create-diary">' + esc(txt.create || 'Create') + '</button>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(overlay);
+
+        var input = overlay.querySelector('.diary-new-input');
+        var errorEl = overlay.querySelector('.diary-new-error');
+        var createBtn = overlay.querySelector('[data-action="create-diary"]');
+
+        function close() { overlay.remove(); }
+
+        function showModalError(message) {
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+        }
+
+        function submit() {
+            var name = input.value.trim();
+            if (!name) {
+                input.focus();
+                return;
+            }
+            createBtn.disabled = true;
+            fetch('api/v1/diary/diaries.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ name: name, workspace: data.workspace })
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (result) {
+                    if (result.success && result.diary) {
+                        var url = 'diary.php?diary=' + encodeURIComponent(result.diary.id);
+                        if (data.pageWorkspace) url += '&workspace=' + encodeURIComponent(data.pageWorkspace);
+                        window.location.href = url;
+                    } else {
+                        createBtn.disabled = false;
+                        showModalError(result.error || txt.newDiaryError || 'Could not create the diary.');
+                    }
+                })
+                .catch(function (err) {
+                    createBtn.disabled = false;
+                    showModalError((txt.newDiaryError || 'Could not create the diary.') + ' ' + err.message);
+                });
+        }
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+        overlay.querySelector('[data-action="close-modal"]').addEventListener('click', close);
+        createBtn.addEventListener('click', submit);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') submit();
+            if (e.key === 'Escape') close();
+        });
+        input.focus();
+    }
+
     // --- Init ---
 
     document.addEventListener('DOMContentLoaded', function () {
         render();
+
+        var newDiaryBtn = document.getElementById('diaryNewBtn');
+        if (newDiaryBtn) {
+            newDiaryBtn.addEventListener('click', openNewDiaryModal);
+        }
 
         var todayBtn = document.getElementById('diaryTodayBtn');
         if (todayBtn) {

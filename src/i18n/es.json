@@ -3217,7 +3217,11 @@
     "empty": "Aún no hay entradas de diario. Haz clic en \"Entrada de hoy\" para escribir la primera. Se guardará en {{folder}}.",
     "create_error": "No se pudo crear la entrada del diario.",
     "create_card_title": "Entrada de diario",
-    "folder_name": "Diario"
+    "folder_name": "Diario",
+    "new_button": "Nuevo diario",
+    "new_modal_title": "Crear un nuevo diario",
+    "new_name_placeholder": "Nombre del diario",
+    "new_create_error": "No se pudo crear el diario."
   },
   "new_user_email": {
     "subject": "Nuevo usuario de Poznote: {{user}}",
