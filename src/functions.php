@@ -3764,18 +3764,79 @@ function getDiaryRootFolderName(?PDO $con = null, ?string $workspace = null) {
 }
 
 /**
- * Ids of every folder in the diary subtree (Diary/YYYY/MM ...) of a workspace.
- * Returns an empty array when the root diary folder does not exist yet.
- * @return int[]
+ * All diaries of a workspace: the root folders flagged is_diary, ordered like
+ * the sidebar (explicit display_order first, then alphabetically).
+ * Lazy migration: when no folder is flagged yet, the historical name-matched
+ * diary root (see getDiaryRootFolderName) is flagged once and returned, so
+ * pre-existing journals keep working without a manual step.
+ * @return array<int, array{id: int, name: string}>
  */
-function getDiaryFolderIds(PDO $con, string $workspace): array {
+function getDiaryRoots(PDO $con, string $workspace): array {
+    $sql = "SELECT id, name FROM folders WHERE is_diary = 1 AND workspace = ? AND parent_id IS NULL" .
+        " ORDER BY (CASE WHEN display_order > 0 THEN display_order ELSE 999999 END), name COLLATE NOCASE";
+    $stmt = $con->prepare($sql);
+    $stmt->execute([$workspace]);
+    $roots = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $roots[] = ['id' => (int)$row['id'], 'name' => (string)$row['name']];
+    }
+    if (!empty($roots)) {
+        return $roots;
+    }
+
+    $legacyName = getDiaryRootFolderName($con, $workspace);
     $stmt = $con->prepare("SELECT id FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL");
-    $stmt->execute([getDiaryRootFolderName($con, $workspace), $workspace]);
-    $diaryRootId = $stmt->fetchColumn();
-    if ($diaryRootId === false) {
+    $stmt->execute([$legacyName, $workspace]);
+    $legacyId = $stmt->fetchColumn();
+    if ($legacyId === false) {
         return [];
     }
-    $diaryRootId = (int)$diaryRootId;
+    $con->prepare("UPDATE folders SET is_diary = 1 WHERE id = ?")->execute([(int)$legacyId]);
+    return [['id' => (int)$legacyId, 'name' => $legacyName]];
+}
+
+/**
+ * The diary a folder belongs to: the flagged root reached by walking up the
+ * parent chain, or null when the folder is outside every diary subtree.
+ * @return array{id: int, name: string}|null
+ */
+function findDiaryRootForFolder(PDO $con, string $workspace, int $folderId): ?array {
+    $roots = getDiaryRoots($con, $workspace);
+    if (empty($roots)) {
+        return null;
+    }
+    $rootsById = array_column($roots, null, 'id');
+    $current = $folderId;
+    $guard = 0;
+    while ($guard++ < 100) {
+        if (isset($rootsById[$current])) {
+            return $rootsById[$current];
+        }
+        $stmt = $con->prepare("SELECT parent_id FROM folders WHERE id = ? AND workspace = ?");
+        $stmt->execute([$current, $workspace]);
+        $parent = $stmt->fetchColumn();
+        if ($parent === false || $parent === null) {
+            return null;
+        }
+        $current = (int)$parent;
+    }
+    return null;
+}
+
+/**
+ * Ids of every folder in the diary subtrees (Diary/YYYY/MM ...) of a
+ * workspace: all diaries by default, one when $rootId is given. Returns an
+ * empty array when no diary folder exists yet.
+ * @return int[]
+ */
+function getDiaryFolderIds(PDO $con, string $workspace, ?int $rootId = null): array {
+    $roots = getDiaryRoots($con, $workspace);
+    if ($rootId !== null) {
+        $roots = array_values(array_filter($roots, fn($r) => $r['id'] === $rootId));
+    }
+    if (empty($roots)) {
+        return [];
+    }
 
     $stmt = $con->prepare("SELECT id, parent_id FROM folders WHERE workspace = ?");
     $stmt->execute([$workspace]);
@@ -3785,8 +3846,9 @@ function getDiaryFolderIds(PDO $con, string $workspace): array {
         $childrenByParent[$parent][] = (int)$row['id'];
     }
 
-    $diaryFolderIds = [$diaryRootId];
-    $queue = [$diaryRootId];
+    $diaryFolderIds = [];
+    $queue = array_column($roots, 'id');
+    $diaryFolderIds = $queue;
     while ($queue) {
         $current = array_shift($queue);
         foreach ($childrenByParent[$current] ?? [] as $childId) {
@@ -3800,10 +3862,11 @@ function getDiaryFolderIds(PDO $con, string $workspace): array {
 /**
  * Id of the diary entry titled with the given YYYY-MM-DD date, or null.
  * Searches the whole diary subtree so entries keep working after being
- * re-dated (renamed) or left in an older month folder.
+ * re-dated (renamed) or left in an older month folder. Scoped to a single
+ * diary when $rootId is given, otherwise the first match across all diaries.
  */
-function findDiaryEntryIdForDate(PDO $con, string $workspace, string $date): ?int {
-    $folderIds = getDiaryFolderIds($con, $workspace);
+function findDiaryEntryIdForDate(PDO $con, string $workspace, string $date, ?int $rootId = null): ?int {
+    $folderIds = getDiaryFolderIds($con, $workspace, $rootId);
     if (empty($folderIds)) {
         return null;
     }

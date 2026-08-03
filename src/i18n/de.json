@@ -400,6 +400,7 @@
       "notes_without_folders": "Zeigen Sie Notizen ohne Ordner nach der Ordnerliste statt davor an.",
       "note_width": "Passen Sie die maximale Breite des Notizinhalts an.",
       "markdown_split_card_view": "Zeigen Sie Markdown-Notizen in einer gerahmten geteilten Ansicht mit Editor und Vorschau an.",
+      "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für Überschriften, Inline-Code, Zitate, Tabellenköpfe und Trennlinien.",
       "code_wrap": "Lange Zeilen in Codeblöcken umbrechen statt horizontal zu scrollen.",
       "attachment_previews": "Zeigen Sie Vorschauen von Anhängen in Notizen an.",
       "attachments_at_bottom": "Zeigen Sie den Anhangsbereich unten statt oben in Notizen an.",
@@ -434,6 +435,7 @@
     "collapse_section": "Bereich einklappen",
     "expand_section": "Bereich ausklappen",
     "categories": {
+      "pinned": "Angepinnt",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
@@ -641,6 +643,7 @@
       "index_icon_scale": "Skalierung der Index-Symbole",
       "note_content_width": "Breite des Notizinhalts",
       "markdown_split_card_view": "Markdown mit Rahmen",
+      "markdown_colored": "Farbiges Markdown",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
       "attachment_previews_in_note": "Anhangsvorschauen",
       "attachments_at_bottom": "Anhänge unten",
@@ -1252,6 +1255,20 @@
         "last_modified": "Zuletzt geändert",
         "last_created": "Zuletzt erstellt",
         "alphabetical": "Alphabetisch"
+      }
+    },
+    "markdown_colored": {
+      "title": "Farbiges Markdown",
+      "options": {
+        "off": "Aus",
+        "custom": "Benutzerdefiniert"
+      },
+      "elements": {
+        "heading": "Überschriften",
+        "code": "Inline-Code",
+        "quote": "Zitate",
+        "table": "Tabellenköpfe",
+        "hr": "Trennlinien"
       }
     },
     "note_color_palette": {
@@ -3200,7 +3217,11 @@
     "empty": "Noch keine Tagebucheinträge. Klicken Sie auf \"Heutiger Eintrag\", um den ersten zu schreiben. Er wird in {{folder}} gespeichert.",
     "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",
     "create_card_title": "Tagebucheintrag",
-    "folder_name": "Tagebuch"
+    "folder_name": "Tagebuch",
+    "new_button": "Neues Tagebuch",
+    "new_modal_title": "Neues Tagebuch erstellen",
+    "new_name_placeholder": "Name des Tagebuchs",
+    "new_create_error": "Das Tagebuch konnte nicht erstellt werden."
   },
   "new_user_email": {
     "subject": "Neuer Poznote-Benutzer: {{user}}",

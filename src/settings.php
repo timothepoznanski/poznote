@@ -113,6 +113,8 @@ $settingsPageUserKeys = [
     'hide_folder_actions',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
+    'markdown_colored',
+    'markdown_colored_custom',
     'code_block_word_wrap',
     'attachment_previews_in_note',
     'attachments_at_bottom',
@@ -336,6 +338,10 @@ if ($isAdmin) {
                 </button>
             </div>
         </div>
+
+        <!-- PINNED CARDS (filled by settings-page.js from the per-user pin list) -->
+        <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
+        <div class="home-grid" id="settings-pinned-section-grid" hidden></div>
 
         <!-- ACTIONS CATEGORY -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions') . ' (' . $username . ')'; ?></h2>
@@ -715,6 +721,16 @@ if ($isAdmin) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
                     <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Colored Markdown -->
+            <div class="home-card" id="markdown-colored-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for headings, inline code, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span>
+                    <span id="markdown-colored-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

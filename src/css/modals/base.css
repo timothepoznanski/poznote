@@ -267,6 +267,58 @@
     flex: 0 0 auto;
 }
 
+/* Colored markdown per-element color pickers */
+.mdc-custom-row {
+    display: none;
+    margin: -8px 0 24px 26px;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mdc-custom-row.visible {
+    display: flex;
+}
+
+.mdc-custom-row label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    max-width: 240px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* css/modals/responsive.css forces `padding: 12px !important` on all modal
+   inputs (iOS zoom guard); with border-box that leaves the swatch 0px tall,
+   so padding and margin must win with !important at higher specificity. */
+.mdc-custom-row input[type="color"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 36px;
+    height: 26px;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 1px solid #d7dee5;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+}
+
+.mdc-custom-row input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.mdc-custom-row input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
+.mdc-custom-row input[type="color"]::-moz-color-swatch {
+    border: none;
+    border-radius: 4px;
+}
+
 /* ============================================
    Note color palette editor
    ============================================ */

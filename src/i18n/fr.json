@@ -412,6 +412,7 @@
       "notes_without_folders": "Affichez les notes sans dossier après la liste des dossiers plutôt qu'avant.",
       "note_width": "Ajustez la largeur maximale du contenu des notes.",
       "markdown_split_card_view": "Affichez les notes markdown dans une vue scindée encadrée avec éditeur et aperçu.",
+      "markdown_colored": "Colorez les notes markdown : choisissez une couleur pour les titres, le code en ligne, les citations, les en-têtes de tableaux et les séparateurs.",
       "code_wrap": "Renvoyez à la ligne les longues lignes des blocs de code au lieu de défiler horizontalement.",
       "attachment_previews": "Affichez un aperçu des pièces jointes dans les notes.",
       "attachments_at_bottom": "Affichez la section des pièces jointes en bas des notes plutôt qu'en haut.",
@@ -446,6 +447,7 @@
     "collapse_section": "Réduire la section",
     "expand_section": "Développer la section",
     "categories": {
+      "pinned": "Épinglés",
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
@@ -656,6 +658,7 @@
       "index_icon_scale": "Taille des icônes (Index)",
       "note_content_width": "Largeur du contenu de la note",
       "markdown_split_card_view": "Markdown encadré",
+      "markdown_colored": "Markdown coloré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "attachments_at_bottom": "Pièces jointes en bas",
@@ -1284,6 +1287,20 @@
         "last_modified": "Dernière modification",
         "last_created": "Dernière création",
         "alphabetical": "Alphabétique"
+      }
+    },
+    "markdown_colored": {
+      "title": "Markdown coloré",
+      "options": {
+        "off": "Désactivé",
+        "custom": "Personnalisé"
+      },
+      "elements": {
+        "heading": "Titres",
+        "code": "Code en ligne",
+        "quote": "Citations",
+        "table": "En-têtes de tableaux",
+        "hr": "Séparateurs"
       }
     },
     "note_color_palette": {
@@ -3394,7 +3411,11 @@
     "empty": "Aucune note de journal pour le moment. Cliquez sur « Note du jour » pour écrire la première. Elle sera rangée dans {{folder}}.",
     "create_error": "Impossible de créer la note du jour.",
     "create_card_title": "Note de journal",
-    "folder_name": "Journal"
+    "folder_name": "Journal",
+    "new_button": "Nouveau journal",
+    "new_modal_title": "Créer un nouveau journal",
+    "new_name_placeholder": "Nom du journal",
+    "new_create_error": "Impossible de créer le journal."
   },
   "new_user_email": {
     "subject": "Nouvel utilisateur Poznote : {{user}}",

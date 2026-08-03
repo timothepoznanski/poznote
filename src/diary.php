@@ -20,10 +20,31 @@ $currentLang = getUserLanguage();
 // "Today's entry" call always lands in a real workspace.
 $diaryWorkspace = $pageWorkspace !== '' ? $pageWorkspace : getFirstWorkspaceName();
 
-$diaryRootName = getDiaryRootFolderName(isset($con) ? $con : null, $diaryWorkspace);
+// All diaries of the workspace; ?diary=<root folder id> selects one, the
+// first (sidebar order) is the default. With no diary yet, the board is empty
+// and the "Today's entry" button creates the default-named one.
+$diaryRoots = isset($con) ? getDiaryRoots($con, $diaryWorkspace) : [];
+$selectedDiary = null;
+$diaryParam = isset($_GET['diary']) ? (int)$_GET['diary'] : 0;
+foreach ($diaryRoots as $root) {
+    if ($root['id'] === $diaryParam) { $selectedDiary = $root; break; }
+}
+if ($selectedDiary === null && !empty($diaryRoots)) {
+    $selectedDiary = $diaryRoots[0];
+}
+
+$diaryRootName = $selectedDiary !== null
+    ? $selectedDiary['name']
+    : getDiaryRootFolderName(isset($con) ? $con : null, $diaryWorkspace);
 
 function diaryBuildPageUrl(string $page, string $pageWorkspace): string {
     return $page . ($pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : '');
+}
+
+function diaryBuildSwitchUrl(string $pageWorkspace, int $diaryId): string {
+    $url = 'diary.php?diary=' . $diaryId;
+    if ($pageWorkspace !== '') $url .= '&workspace=' . urlencode($pageWorkspace);
+    return $url;
 }
 
 /**
@@ -77,7 +98,9 @@ $diaryFolderPath = $diaryRootName . '/' . $userNow->format('Y') . '/' . $userNow
 
 try {
     if (isset($con)) {
-        $diaryFolderIds = getDiaryFolderIds($con, $diaryWorkspace);
+        $diaryFolderIds = $selectedDiary !== null
+            ? getDiaryFolderIds($con, $diaryWorkspace, $selectedDiary['id'])
+            : [];
 
         if (!empty($diaryFolderIds)) {
             $placeholders = implode(',', array_fill(0, count($diaryFolderIds), '?'));
@@ -153,11 +176,26 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					<i class="lucide lucide-layout-dashboard"></i>
 					<?php echo t_h('home.dashboard', [], 'Dashboard'); ?>
 				</a>
+				<button type="button" id="diaryNewBtn" class="btn btn-primary" title="<?php echo t_h('diary.new_modal_title', [], 'Create a new diary'); ?>">
+					<i class="lucide lucide-plus"></i>
+					<?php echo t_h('diary.new_button', [], 'New diary'); ?>
+				</button>
 				<button type="button" id="diaryTodayBtn" class="btn btn-primary" title="<?php echo t_h('diary.today_button_title', [], "Open today's entry (create it if needed)"); ?>">
 					<i class="lucide lucide-calendar-plus"></i>
 					<?php echo t_h('diary.today_button', [], "Today's entry"); ?>
 				</button>
 			</div>
+			<?php if (count($diaryRoots) > 1): ?>
+			<nav class="diary-switcher">
+				<?php foreach ($diaryRoots as $root): ?>
+				<a class="diary-switch-btn<?php echo ($selectedDiary !== null && $root['id'] === $selectedDiary['id']) ? ' diary-switch-active' : ''; ?>"
+				   href="<?php echo htmlspecialchars(diaryBuildSwitchUrl($pageWorkspace, $root['id']), ENT_QUOTES, 'UTF-8'); ?>">
+					<i class="lucide lucide-book-open"></i>
+					<?php echo htmlspecialchars($root['name'], ENT_QUOTES, 'UTF-8'); ?>
+				</a>
+				<?php endforeach; ?>
+			</nav>
+			<?php endif; ?>
 			<div class="board-filter-row">
 			<?php renderBoardViewMenu('diary'); ?>
 			<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
@@ -197,10 +235,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		workspace: <?php echo json_encode($diaryWorkspace); ?>,
 		noteType: <?php echo json_encode(getDiaryDefaultNoteType()); ?>,
 		pageWorkspace: <?php echo json_encode($pageWorkspace); ?>,
+		diaryId: <?php echo json_encode($selectedDiary !== null ? $selectedDiary['id'] : null); ?>,
+		diaries: <?php echo json_encode($diaryRoots, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>,
 		lang: <?php echo json_encode($currentLang); ?>,
 		txt: {
 			createError: <?php echo json_encode(t('diary.create_error', [], 'Could not create the diary entry.')); ?>,
-			today: <?php echo json_encode(t('diary.today_badge', [], 'Today')); ?>
+			today: <?php echo json_encode(t('diary.today_badge', [], 'Today')); ?>,
+			newDiaryTitle: <?php echo json_encode(t('diary.new_modal_title', [], 'Create a new diary')); ?>,
+			newDiaryPlaceholder: <?php echo json_encode(t('diary.new_name_placeholder', [], 'Diary name')); ?>,
+			newDiaryError: <?php echo json_encode(t('diary.new_create_error', [], 'Could not create the diary.')); ?>,
+			create: <?php echo json_encode(t('common.create', [], 'Create')); ?>,
+			cancel: <?php echo json_encode(t('common.cancel', [], 'Cancel')); ?>
 		}
 	};
 	</script>

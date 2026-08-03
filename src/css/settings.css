@@ -335,20 +335,103 @@ body.dark-mode .settings-view-toggle:hover {
     flex-shrink: 0;
 }
 
-/* The help icon centers vertically at the end of the row, after the badge */
-.view-list .setting-help {
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
+/* List view rows are compact: no help icon and no pin button at all (pinning
+   is done from the grid view) */
+.view-list .setting-help,
+.view-list .settings-card-pin {
+    display: none;
 }
 
-.view-list .home-card-content {
-    padding-right: 20px;
+/* ---------- Pin button ----------
+   Added by settings-page.js on every card. Styled exactly like the help icon
+   above (same size, same muted grey) but only revealed while the card is
+   hovered — except on a pinned card, where it stays visible in blue (same
+   pattern as the dashboard pin). Absolutely positioned, so it reserves no
+   space: bottom-right corner in grid view, left of the help icon in list
+   view. */
+
+/* The empty pinned section is hidden through the `hidden` attribute, but the
+   .home-grid display rules above are author styles and would win over the
+   browser's [hidden] { display: none } — re-assert it. */
+.settings-category-title[hidden],
+.home-grid[hidden] {
+    display: none;
 }
 
-/* The help icon is hidden on mobile / touch screens: reclaim its space */
+.settings-card-pin {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    z-index: 5;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.home-card:hover .settings-card-pin,
+.settings-card-pin:focus-visible,
+.home-card.is-pinned .settings-card-pin {
+    opacity: 1;
+}
+
+/* Lucide icons are CSS masks, so the color comes from background-color. */
+.settings-card-pin i {
+    display: block;
+    width: 13px;
+    height: 13px;
+    background-color: #9ca3af;
+    opacity: 0.55;
+    transition: opacity 0.15s ease;
+}
+
+.settings-card-pin:hover i,
+.settings-card-pin:focus-visible i {
+    opacity: 1;
+}
+
+.home-card.is-pinned .settings-card-pin i {
+    background-color: #007DB8;
+    opacity: 1;
+}
+
+/* A pinned card reads as pinned even before the button is noticed. */
+.home-card.is-pinned {
+    border-color: rgba(0, 125, 184, 0.45);
+}
+
+/* Like the pin, the help icon only shows while its card is hovered */
+.home-card .setting-help {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.home-card:hover .setting-help,
+.home-card:focus-within .setting-help {
+    opacity: 1;
+}
+
+/* No hover on touch screens: keep every pin reachable (the help icon is
+   hidden there by the base card styles) */
 @media (max-width: 800px), (hover: none) {
-    .view-list .home-card-content {
-        padding-right: 0;
+    .home-card .settings-card-pin {
+        opacity: 0.6;
     }
+
+    .home-card.is-pinned .settings-card-pin {
+        opacity: 1;
+    }
+}
+
+:root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i,
+body.dark-mode .home-card.is-pinned .settings-card-pin i {
+    background-color: #4aa8d8;
+}
+
+:root[data-theme='dark'] .home-card.is-pinned,
+body.dark-mode .home-card.is-pinned {
+    border-color: rgba(74, 168, 216, 0.45);
 }

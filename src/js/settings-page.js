@@ -95,6 +95,8 @@
             'hide_folder_actions',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
+            'markdown_colored',
+            'markdown_colored_custom',
             'code_block_word_wrap',
             'attachment_previews_in_note',
             'attachments_at_bottom',
@@ -1219,6 +1221,71 @@
         });
     }
 
+    var MARKDOWN_COLORED_DEFAULTS = {
+        heading: '#007db8',
+        code: '#b34e00',
+        quote: '#007db8',
+        table: '#007db8',
+        hr: '#007db8'
+    };
+
+    function normalizeMarkdownColoredTheme(value) {
+        var v = (value || '').trim();
+        if (v === '' || v === '0' || v === 'false') return '0';
+        return 'custom';
+    }
+
+    function markdownColoredThemeLabel(theme) {
+        return theme === 'custom'
+            ? tr('modals.markdown_colored.options.custom', {}, 'Custom')
+            : tr('common.disabled', {}, 'Disabled');
+    }
+
+    function refreshMarkdownColoredBadge() {
+        getSetting('markdown_colored', function (value) {
+            var badge = document.getElementById('markdown-colored-status');
+            if (!badge) return;
+            var theme = normalizeMarkdownColoredTheme(value);
+            badge.textContent = markdownColoredThemeLabel(theme);
+            badge.className = 'setting-status ' + (theme === '0' ? 'disabled' : 'enabled');
+        });
+    }
+
+    function updateMarkdownColoredCustomRow() {
+        var row = document.getElementById('markdownColoredCustomRow');
+        if (!row) return;
+        var radios = document.getElementsByName('markdownColoredTheme');
+        var isCustom = false;
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked && radios[i].value === 'custom') { isCustom = true; break; }
+        }
+        row.classList.toggle('visible', isCustom);
+    }
+
+    function openMarkdownColoredModal() {
+        var modal = document.getElementById('markdownColoredModal');
+        if (!modal) return;
+        getSetting('markdown_colored', function (value) {
+            var theme = normalizeMarkdownColoredTheme(value);
+            var radios = document.getElementsByName('markdownColoredTheme');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].checked = (radios[i].value === theme);
+            }
+            getSetting('markdown_colored_custom', function (customValue) {
+                var parsed = null;
+                try { parsed = JSON.parse(customValue || ''); } catch (e) { }
+                var inputs = document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]');
+                inputs.forEach(function (input) {
+                    var el = input.getAttribute('data-mdc-element');
+                    var color = parsed && /^#[0-9a-fA-F]{6}$/.test(parsed[el] || '') ? parsed[el] : MARKDOWN_COLORED_DEFAULTS[el];
+                    input.value = color;
+                });
+                updateMarkdownColoredCustomRow();
+                modal.style.display = 'flex';
+            });
+        });
+    }
+
     function openNoteAgeFilterModal() {
         var modal = document.getElementById('noteAgeFilterModal');
         if (!modal) return;
@@ -1447,6 +1514,7 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
+        refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('attachment-previews-card', 'attachment-previews-status', 'attachment_previews_in_note', false, false);
         setupToggleCard('attachments-at-bottom-card', 'attachments-at-bottom-status', 'attachments_at_bottom', false, false);
@@ -1466,6 +1534,11 @@
         var noteSortCard = document.getElementById('note-sort-card');
         if (noteSortCard) {
             noteSortCard.addEventListener('click', openNoteSortModal);
+        }
+
+        var markdownColoredCard = document.getElementById('markdown-colored-card');
+        if (markdownColoredCard) {
+            markdownColoredCard.addEventListener('click', openMarkdownColoredModal);
         }
 
         var noteAgeFilterCard = document.getElementById('note-age-filter-card');
@@ -1781,6 +1854,47 @@
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
                     }
                 });
+            });
+        }
+
+        // Colored markdown modal: show color pickers only for the custom template
+        var mdcRadios = document.getElementsByName('markdownColoredTheme');
+        for (var mdcIdx = 0; mdcIdx < mdcRadios.length; mdcIdx++) {
+            mdcRadios[mdcIdx].addEventListener('change', updateMarkdownColoredCustomRow);
+        }
+
+        var saveMarkdownColoredBtn = document.getElementById('saveMarkdownColoredBtn');
+        if (saveMarkdownColoredBtn) {
+            saveMarkdownColoredBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('markdownColoredTheme');
+                var selected = '0';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+
+                function finishMarkdownColored(success) {
+                    if (success) {
+                        try { closeModal('markdownColoredModal'); } catch (e) { }
+                        reloadOpener();
+                        refreshMarkdownColoredBadge();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                }
+
+                if (selected === 'custom') {
+                    var colors = {};
+                    document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]').forEach(function (input) {
+                        var el = input.getAttribute('data-mdc-element');
+                        colors[el] = input.value || MARKDOWN_COLORED_DEFAULTS[el];
+                    });
+                    setSetting('markdown_colored_custom', JSON.stringify(colors), function (ok) {
+                        if (!ok) { finishMarkdownColored(false); return; }
+                        setSetting('markdown_colored', 'custom', finishMarkdownColored);
+                    });
+                } else {
+                    setSetting('markdown_colored', selected, finishMarkdownColored);
+                }
             });
         }
 
@@ -2116,7 +2230,9 @@
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
-        var grid = document.querySelector('.home-grid');
+        // Skip the pinned-cards grid: it may be empty/hidden, and the
+        // "no results" element must live in an always-rendered grid.
+        var grid = document.querySelector('.home-grid:not(#settings-pinned-section-grid)');
 
         if (searchInput && grid) {
             // Create "no results" message element
@@ -2188,6 +2304,150 @@
                     e.preventDefault();
                     searchInput.focus();
                 }
+            });
+        }
+
+        // Pinnable cards: every card gets a pin button. Pinning does NOT move
+        // the card — it stays in its section and a live clone of it is shown
+        // in the "Pinned" section at the top. Persisted per user.
+        var pinStore = window.__poznoteUserStorage || window.localStorage;
+        var pinnedGrid = document.getElementById('settings-pinned-section-grid');
+        var pinnedTitle = document.getElementById('settings-pinned-section-title');
+        if (pinnedGrid && pinnedTitle) {
+            var pinnedCardIds = [];
+            try {
+                pinnedCardIds = JSON.parse(pinStore.getItem('settingsPinnedCards') || '[]');
+                if (!Array.isArray(pinnedCardIds)) pinnedCardIds = [];
+            } catch (e) { /* storage unavailable or corrupt */ }
+
+            var pinnedClones = {};    // card id -> clone element in the pinned grid
+            var cloneObservers = {};  // card id -> MutationObserver keeping the clone in sync
+
+            var savePinnedCards = function () {
+                try {
+                    pinStore.setItem('settingsPinnedCards', JSON.stringify(pinnedCardIds));
+                } catch (e) { /* storage unavailable */ }
+            };
+
+            var refreshPinnedSection = function () {
+                var empty = pinnedGrid.children.length === 0;
+                pinnedTitle.hidden = empty;
+                pinnedGrid.hidden = empty;
+            };
+
+            var applyPinState = function (card) {
+                var pinned = pinnedCardIds.indexOf(card.id) !== -1;
+                card.classList.toggle('is-pinned', pinned);
+                var btn = card.querySelector('.settings-card-pin');
+                if (!btn) return;
+                var label = pinned
+                    ? tr('dashboard.unpin_note', {}, 'Unpin')
+                    : tr('dashboard.pin_note', {}, 'Pin to top');
+                btn.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+                btn.setAttribute('aria-label', label);
+                btn.title = label;
+            };
+
+            // The clone must not duplicate ids: badge refreshers look elements
+            // up by id and have to keep finding the original card.
+            var stripIds = function (root) {
+                root.removeAttribute('id');
+                root.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
+            };
+
+            var syncCloneContent = function (orig, clone) {
+                clone.className = orig.className;
+                clone.innerHTML = orig.innerHTML;
+                stripIds(clone);
+            };
+
+            var createPinnedClone = function (orig) {
+                var clone = orig.cloneNode(true);
+                stripIds(clone);
+                clone.dataset.pinCloneOf = orig.id;
+                // The original's card behavior comes from listeners bound to
+                // the original element, so the clone forwards its clicks —
+                // except <a> cards, whose copied href already navigates.
+                clone.addEventListener('click', function (e) {
+                    if (e.target.closest('.settings-card-pin')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        togglePin(orig);
+                        return;
+                    }
+                    if (clone.tagName !== 'A') orig.click();
+                });
+                // Badges refresh asynchronously on the original (and after
+                // settings changes); mirror every change into the clone.
+                var observer = new MutationObserver(function () {
+                    syncCloneContent(orig, clone);
+                });
+                observer.observe(orig, { subtree: true, childList: true, attributes: true, characterData: true });
+                pinnedClones[orig.id] = clone;
+                cloneObservers[orig.id] = observer;
+                pinnedGrid.appendChild(clone);
+            };
+
+            var removePinnedClone = function (id) {
+                if (cloneObservers[id]) { cloneObservers[id].disconnect(); delete cloneObservers[id]; }
+                if (pinnedClones[id]) { pinnedClones[id].remove(); delete pinnedClones[id]; }
+            };
+
+            var togglePin = function (card) {
+                var idx = pinnedCardIds.indexOf(card.id);
+                if (idx === -1) {
+                    pinnedCardIds.push(card.id);
+                    createPinnedClone(card);
+                } else {
+                    pinnedCardIds.splice(idx, 1);
+                    removePinnedClone(card.id);
+                }
+                applyPinState(card);
+                savePinnedCards();
+                refreshPinnedSection();
+            };
+
+            var pinnableCards = [];
+            document.querySelectorAll('.home-grid:not(#settings-pinned-section-grid) .home-card').forEach(function (card) {
+                if (!card.id) return;
+                pinnableCards.push(card);
+                // A real <button> is not allowed inside the <a> cards, so the
+                // pin is a span with a button role (same as the dashboard
+                // folder cards).
+                var btn = document.createElement('span');
+                btn.className = 'settings-card-pin';
+                btn.setAttribute('role', 'button');
+                btn.setAttribute('tabindex', '0');
+                btn.innerHTML = '<i class="lucide lucide-pin"></i>';
+                // The card itself navigates or opens a modal, so the pin
+                // click must never reach it.
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    togglePin(card);
+                });
+                btn.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        togglePin(card);
+                    }
+                });
+                card.appendChild(btn);
+                applyPinState(card);
+            });
+
+            // Build the pinned section in saved order. Ids without a card on
+            // this page (e.g. admin cards seen by a non-admin) stay in storage
+            // but are simply not rendered.
+            pinnedCardIds.forEach(function (id) {
+                var card = document.getElementById(id);
+                if (card && card.classList.contains('home-card')) createPinnedClone(card);
+            });
+            refreshPinnedSection();
+
+            document.addEventListener('poznote:i18n:loaded', function () {
+                pinnableCards.forEach(applyPinState);
             });
         }
 

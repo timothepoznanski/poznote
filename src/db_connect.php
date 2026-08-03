@@ -174,7 +174,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 21;
+    $CURRENT_SCHEMA_VERSION = 22; // 22: folders.is_diary (multi-diary support)
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -373,6 +373,11 @@ try {
             if (!in_array('pinned', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN pinned INTEGER DEFAULT 0");
             }
+            // Root folders flagged as diaries (multi-diary support); existing
+            // name-matched diary roots are flagged lazily by getDiaryRoots().
+            if (!in_array('is_diary', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN is_diary INTEGER DEFAULT 0");
+            }
         } catch (Exception $e) {
             error_log('Could not add missing columns to folders: ' . $e->getMessage());
         }
@@ -514,6 +519,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_colored', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('slash_menu_require_alt', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_nav_shortcuts_enabled', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ctrl_s_save_enabled', '0')");

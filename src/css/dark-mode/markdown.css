@@ -205,6 +205,29 @@ body.dark-mode .markdown-preview li.task-list-item input[type="checkbox"]:checke
 }
 
 /* ============================================
+   Colored markdown (display setting)
+   ============================================ */
+
+/* The styling rules live in css/markdown.css and read the --mdc-* variables.
+   The user's colors are inlined on <body> and win over these, staying
+   identical in both themes; the values below are only dark fallbacks. */
+html[data-theme='dark'] body.markdown-colored,
+body.dark-mode.markdown-colored {
+    --mdc-heading: #58a6ff;
+    --mdc-code: #ffa657;
+    --mdc-quote: #58a6ff;
+    --mdc-table: #58a6ff;
+    --mdc-hr: #58a6ff;
+}
+
+/* Re-assert the editor token mapping over the dark CM palette above */
+html[data-theme='dark'] body.markdown-colored .markdown-codemirror-host,
+body.dark-mode.markdown-colored .markdown-codemirror-host {
+    --poznote-cm-heading: var(--mdc-heading);
+    --poznote-cm-monospace: var(--mdc-code);
+}
+
+/* ============================================
    Markdown Toolbar Icons
    ============================================ */
 

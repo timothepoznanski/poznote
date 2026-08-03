@@ -48,6 +48,98 @@
     background: #005a8a;
 }
 
+/* Diary switcher: one pill per diary, shown when the workspace has several */
+.diary-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.diary-switch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.diary-switch-btn:hover {
+    border-color: #007cba;
+    color: #007cba;
+}
+
+.diary-switch-btn.diary-switch-active {
+    background: #007cba;
+    border-color: #007cba;
+    color: #ffffff;
+}
+
+/* New-diary modal. The generic .modal-overlay/.modal-dialog styling is not
+   loaded on this page, so the modal is fully styled here. */
+.diary-new-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+}
+
+.diary-new-modal {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    width: min(92vw, 380px);
+    padding: 18px 20px;
+}
+
+.diary-new-modal .modal-title {
+    margin: 0 0 14px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.diary-new-modal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.diary-new-modal .diary-new-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background: transparent;
+    color: inherit;
+}
+
+.diary-new-modal .diary-new-input:focus {
+    outline: none;
+    border-color: #007cba;
+}
+
+.diary-new-modal .diary-new-error {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #dc2626;
+}
+
 /* Highlight today's card in the grid */
 .diary-card-today {
     border-color: #007DB8;
@@ -78,4 +170,39 @@ body.dark-mode .diary-card-today {
 body.dark-mode .diary-today-tag {
     background: #0e6ba8;
     color: #f3f4f6;
+}
+
+:root[data-theme='dark'] .diary-switch-btn,
+body.dark-mode .diary-switch-btn {
+    border-color: #374151;
+    color: #d1d5db;
+}
+
+:root[data-theme='dark'] .diary-switch-btn:hover,
+body.dark-mode .diary-switch-btn:hover {
+    border-color: #0e6ba8;
+    color: #60a5fa;
+}
+
+:root[data-theme='dark'] .diary-switch-btn.diary-switch-active,
+body.dark-mode .diary-switch-btn.diary-switch-active {
+    background: #0e6ba8;
+    border-color: #0e6ba8;
+    color: #f3f4f6;
+}
+
+:root[data-theme='dark'] .diary-new-modal,
+body.dark-mode .diary-new-modal {
+    background: #1f2937;
+}
+
+:root[data-theme='dark'] .diary-new-modal .modal-title,
+body.dark-mode .diary-new-modal .modal-title {
+    color: #e5e7eb;
+}
+
+:root[data-theme='dark'] .diary-new-modal .diary-new-input,
+body.dark-mode .diary-new-modal .diary-new-input {
+    border-color: #374151;
+    color: #e5e7eb;
 }

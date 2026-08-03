@@ -568,6 +568,62 @@ body.dark-mode .markdown-preview pre.indented-pre {
     background-color: #f9f9f9;
 }
 
+/* Colored markdown (the "Colored markdown" display setting).
+   One --mdc-* variable per element; the user's colors are inlined on <body>
+   by index.php, so they apply identically in light and dark mode (the values
+   below are only fallbacks, dark fallbacks in css/dark-mode/markdown.css).
+   The unmatched #id inside :is() boosts specificity above the blanket
+   `.noteentry * { color: var(--dm-text) !important }` rule in
+   css/dark-mode/editor.css and above the dark-mode preview defaults, so one
+   set of rules serves both themes. */
+body.markdown-colored {
+    --mdc-heading: #007db8;
+    --mdc-code: #b34e00;
+    --mdc-quote: #007db8;
+    --mdc-table: #007db8;
+    --mdc-hr: #007db8;
+}
+
+/* Editor: retint the CodeMirror heading and inline-code tokens with the
+   chosen colors; links, markdown markers (quote/list/fence, the meta token)
+   and fenced-code syntax colors keep the standard palette. The dark-mode
+   variant lives in css/dark-mode/markdown.css because the dark CM palette
+   redefines these variables later in the cascade. */
+body.markdown-colored .markdown-codemirror-host {
+    --poznote-cm-heading: var(--mdc-heading);
+    --poznote-cm-monospace: var(--mdc-code);
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1, h2, h3, h4, h5, h6) {
+    color: var(--mdc-heading) !important;
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1, h2) {
+    border-bottom-color: color-mix(in srgb, var(--mdc-heading) 30%, transparent);
+}
+
+body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
+    color: var(--mdc-code) !important;
+    background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent) !important;
+    border-radius: 3px;
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, blockquote) {
+    border-left-color: var(--mdc-quote);
+    background-color: color-mix(in srgb, var(--mdc-quote) 6%, transparent);
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-right: 8px;
+}
+
+body.markdown-colored .markdown-preview table :is(#poznote-md-colored-boost, th) {
+    background-color: color-mix(in srgb, var(--mdc-table) 9%, transparent);
+}
+
+body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
+    border-top-color: color-mix(in srgb, var(--mdc-hr) 35%, transparent);
+}
+
 /* Task lists (checkboxes) */
 .markdown-preview ul.task-list {
     list-style: none;

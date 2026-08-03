@@ -136,6 +136,7 @@
       "notes_without_folders": "Show notes without a folder after the folder list instead of before.",
       "note_width": "Adjust the maximum width of the note content.",
       "markdown_split_card_view": "Display markdown notes in a framed split view with editor and preview.",
+      "markdown_colored": "Color markdown notes: pick a color for headings, inline code, quotes, table headers and separators.",
       "code_wrap": "Wrap long lines in code blocks instead of scrolling horizontally.",
       "attachment_previews": "Show previews of attachments inside notes.",
       "attachments_at_bottom": "Show the attachments section at the bottom of notes instead of the top.",
@@ -170,6 +171,7 @@
     "collapse_section": "Collapse section",
     "expand_section": "Expand section",
     "categories": {
+      "pinned": "Pinned",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
@@ -296,6 +298,7 @@
       "index_icon_scale": "Index icon scaling",
       "note_content_width": "Note content width",
       "markdown_split_card_view": "Framed markdown",
+      "markdown_colored": "Colored markdown",
       "code_block_word_wrap": "Code block word wrap",
       "attachment_previews_in_note": "Attachment previews",
       "attachments_at_bottom": "Attachments at bottom",
@@ -817,6 +820,20 @@
         "last_modified": "Last modified",
         "last_created": "Last created",
         "alphabetical": "Alphabetical"
+      }
+    },
+    "markdown_colored": {
+      "title": "Colored markdown",
+      "options": {
+        "off": "Off",
+        "custom": "Custom"
+      },
+      "elements": {
+        "heading": "Headings",
+        "code": "Inline code",
+        "quote": "Quotes",
+        "table": "Table headers",
+        "hr": "Separators"
       }
     },
     "note_color_palette": {
@@ -2894,7 +2911,11 @@
     "empty": "No diary entries yet. Click \"Today's entry\" to write your first one. It will be stored in {{folder}}.",
     "create_error": "Could not create the diary entry.",
     "create_card_title": "Diary entry",
-    "folder_name": "Diary"
+    "folder_name": "Diary",
+    "new_button": "New diary",
+    "new_modal_title": "Create a new diary",
+    "new_name_placeholder": "Diary name",
+    "new_create_error": "Could not create the diary."
   },
   "new_user_email": {
     "subject": "New Poznote user: {{user}}",
