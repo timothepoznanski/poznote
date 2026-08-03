@@ -1160,8 +1160,8 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 
 .dash-card-pin {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 2px;
+    right: 5px;
     z-index: 2;
     display: flex;
     align-items: center;
@@ -1183,8 +1183,11 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
     opacity: 1;
 }
 
-.dash-card-pin:hover {
-    background: rgba(0, 125, 184, 0.12);
+/* Touch devices have no hover, so the pin button stays visible. */
+@media (hover: none) {
+    .dash-card-pin {
+        opacity: 1;
+    }
 }
 
 /* Lucide icons are CSS masks, so the color comes from background-color. */
@@ -1547,11 +1550,6 @@ body.dark-mode .dash-card-count {
 :root[data-theme='dark'] .dash-card-note-title,
 body.dark-mode .dash-card-note-title {
     color: var(--dm-text);
-}
-
-:root[data-theme='dark'] .dash-card-pin:hover,
-body.dark-mode .dash-card-pin:hover {
-    background: rgba(255, 255, 255, 0.10);
 }
 
 :root[data-theme='dark'] .dash-card-pin i,
