@@ -113,6 +113,38 @@ class SettingsController {
             return json_encode($palette, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
+        if ($key === 'markdown_colored') {
+            $normalized = trim((string) $value);
+            if ($normalized === '' || $normalized === '0' || $normalized === 'false') {
+                return '0';
+            }
+            if ($normalized !== 'custom') {
+                throw new InvalidArgumentException('invalid markdown colored value', 400);
+            }
+            return 'custom';
+        }
+
+        if ($key === 'markdown_colored_custom') {
+            // Stored as JSON: {"heading":"#rrggbb","code":...,"quote":...,"table":...,"hr":...}
+            $raw = is_string($value) ? trim($value) : '';
+            if ($raw === '') {
+                return '';
+            }
+            $decoded = json_decode($raw, true);
+            if (!is_array($decoded)) {
+                throw new InvalidArgumentException('invalid markdown custom colors', 400);
+            }
+            $colors = [];
+            foreach (['heading', 'code', 'quote', 'table', 'hr'] as $element) {
+                $color = (string) ($decoded[$element] ?? '');
+                if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+                    throw new InvalidArgumentException('invalid markdown custom colors', 400);
+                }
+                $colors[$element] = strtolower($color);
+            }
+            return json_encode($colors);
+        }
+
         if ($key === 'attachment_previews_in_note') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

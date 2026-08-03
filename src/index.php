@@ -149,6 +149,8 @@ $settings = [
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
     'markdown_split_card_view' => '1',
+    'markdown_colored' => '0',
+    'markdown_colored_custom' => '',
     'attachment_previews_in_note' => '0',
     'attachments_at_bottom' => '0',
     'backlinks_at_bottom' => '0',
@@ -157,7 +159,7 @@ $settings = [
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -292,6 +294,22 @@ if (!poznoteSettingEnabled($settings['code_block_word_wrap'], true)) {
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
 }
+// Colored markdown ('0' = off, 'custom' = per-element colors chosen by the user)
+$markdown_colored_theme = trim((string)$settings['markdown_colored']);
+$markdown_colored_style = '';
+if ($markdown_colored_theme !== '' && $markdown_colored_theme !== '0' && $markdown_colored_theme !== 'false') {
+    $extra_body_classes .= ' markdown-colored';
+    $customColors = json_decode((string)$settings['markdown_colored_custom'], true);
+    if (is_array($customColors)) {
+        foreach (['heading', 'code', 'quote', 'table', 'hr'] as $mdcElement) {
+            $mdcColor = (string)($customColors[$mdcElement] ?? '');
+            if (preg_match('/^#[0-9a-fA-F]{6}$/', $mdcColor)) {
+                $markdown_colored_style .= '--mdc-' . $mdcElement . ': ' . $mdcColor . '; ';
+            }
+        }
+        $markdown_colored_style = trim($markdown_colored_style);
+    }
+}
 $attachment_previews_in_note_setting = poznoteSettingEnabled($settings['attachment_previews_in_note'], false);
 $attachments_at_bottom_setting = poznoteSettingEnabled($settings['attachments_at_bottom'], false);
 $backlinks_at_bottom_setting = poznoteSettingEnabled($settings['backlinks_at_bottom'], false);
@@ -322,7 +340,7 @@ if ($isPublicWorkspaceReadonly) {
 }
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $markdown_colored_style ? ' style="' . htmlspecialchars($markdown_colored_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>">
     <script>
     (function () {
         try {

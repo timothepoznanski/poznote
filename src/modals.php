@@ -735,6 +735,30 @@ try {
     </div>
 </div>
 
+<!-- Colored markdown modal -->
+<div id="markdownColoredModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.markdown_colored.title', [], 'Colored markdown'); ?></h3>
+        <div class="modal-body">
+            <div class="radio-options">
+                <label><input type="radio" name="markdownColoredTheme" value="0"> <?php echo t_h('modals.markdown_colored.options.off', [], 'Off'); ?></label>
+                <label><input type="radio" name="markdownColoredTheme" value="custom"> <?php echo t_h('modals.markdown_colored.options.custom', [], 'Custom'); ?></label>
+            </div>
+            <div id="markdownColoredCustomRow" class="mdc-custom-row">
+                <label><span><?php echo t_h('modals.markdown_colored.elements.heading', [], 'Headings'); ?></span> <input type="color" id="markdownColoredHeadingInput" data-mdc-element="heading" value="#007db8"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.code', [], 'Inline code'); ?></span> <input type="color" id="markdownColoredCodeInput" data-mdc-element="code" value="#b34e00"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.quote', [], 'Quotes'); ?></span> <input type="color" id="markdownColoredQuoteInput" data-mdc-element="quote" value="#007db8"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.table', [], 'Table headers'); ?></span> <input type="color" id="markdownColoredTableInput" data-mdc-element="table" value="#007db8"></label>
+                <label><span><?php echo t_h('modals.markdown_colored.elements.hr', [], 'Separators'); ?></span> <input type="color" id="markdownColoredHrInput" data-mdc-element="hr" value="#007db8"></label>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="markdownColoredModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveMarkdownColoredBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note color palette editor -->
 <div id="noteColorPaletteModal" class="modal">
     <div class="modal-content">
@@ -1431,6 +1455,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-colored-card" checked><span><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachment-previews-card" checked><span><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachments-at-bottom-card" checked><span><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span></label>

@@ -514,6 +514,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_colored', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('slash_menu_require_alt', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_nav_shortcuts_enabled', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('ctrl_s_save_enabled', '0')");

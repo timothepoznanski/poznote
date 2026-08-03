@@ -95,6 +95,8 @@
             'hide_folder_actions',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
+            'markdown_colored',
+            'markdown_colored_custom',
             'code_block_word_wrap',
             'attachment_previews_in_note',
             'attachments_at_bottom',
@@ -1219,6 +1221,71 @@
         });
     }
 
+    var MARKDOWN_COLORED_DEFAULTS = {
+        heading: '#007db8',
+        code: '#b34e00',
+        quote: '#007db8',
+        table: '#007db8',
+        hr: '#007db8'
+    };
+
+    function normalizeMarkdownColoredTheme(value) {
+        var v = (value || '').trim();
+        if (v === '' || v === '0' || v === 'false') return '0';
+        return 'custom';
+    }
+
+    function markdownColoredThemeLabel(theme) {
+        return theme === 'custom'
+            ? tr('modals.markdown_colored.options.custom', {}, 'Custom')
+            : tr('common.disabled', {}, 'Disabled');
+    }
+
+    function refreshMarkdownColoredBadge() {
+        getSetting('markdown_colored', function (value) {
+            var badge = document.getElementById('markdown-colored-status');
+            if (!badge) return;
+            var theme = normalizeMarkdownColoredTheme(value);
+            badge.textContent = markdownColoredThemeLabel(theme);
+            badge.className = 'setting-status ' + (theme === '0' ? 'disabled' : 'enabled');
+        });
+    }
+
+    function updateMarkdownColoredCustomRow() {
+        var row = document.getElementById('markdownColoredCustomRow');
+        if (!row) return;
+        var radios = document.getElementsByName('markdownColoredTheme');
+        var isCustom = false;
+        for (var i = 0; i < radios.length; i++) {
+            if (radios[i].checked && radios[i].value === 'custom') { isCustom = true; break; }
+        }
+        row.classList.toggle('visible', isCustom);
+    }
+
+    function openMarkdownColoredModal() {
+        var modal = document.getElementById('markdownColoredModal');
+        if (!modal) return;
+        getSetting('markdown_colored', function (value) {
+            var theme = normalizeMarkdownColoredTheme(value);
+            var radios = document.getElementsByName('markdownColoredTheme');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].checked = (radios[i].value === theme);
+            }
+            getSetting('markdown_colored_custom', function (customValue) {
+                var parsed = null;
+                try { parsed = JSON.parse(customValue || ''); } catch (e) { }
+                var inputs = document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]');
+                inputs.forEach(function (input) {
+                    var el = input.getAttribute('data-mdc-element');
+                    var color = parsed && /^#[0-9a-fA-F]{6}$/.test(parsed[el] || '') ? parsed[el] : MARKDOWN_COLORED_DEFAULTS[el];
+                    input.value = color;
+                });
+                updateMarkdownColoredCustomRow();
+                modal.style.display = 'flex';
+            });
+        });
+    }
+
     function openNoteAgeFilterModal() {
         var modal = document.getElementById('noteAgeFilterModal');
         if (!modal) return;
@@ -1447,6 +1514,7 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
+        refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('attachment-previews-card', 'attachment-previews-status', 'attachment_previews_in_note', false, false);
         setupToggleCard('attachments-at-bottom-card', 'attachments-at-bottom-status', 'attachments_at_bottom', false, false);
@@ -1466,6 +1534,11 @@
         var noteSortCard = document.getElementById('note-sort-card');
         if (noteSortCard) {
             noteSortCard.addEventListener('click', openNoteSortModal);
+        }
+
+        var markdownColoredCard = document.getElementById('markdown-colored-card');
+        if (markdownColoredCard) {
+            markdownColoredCard.addEventListener('click', openMarkdownColoredModal);
         }
 
         var noteAgeFilterCard = document.getElementById('note-age-filter-card');
@@ -1781,6 +1854,47 @@
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
                     }
                 });
+            });
+        }
+
+        // Colored markdown modal: show color pickers only for the custom template
+        var mdcRadios = document.getElementsByName('markdownColoredTheme');
+        for (var mdcIdx = 0; mdcIdx < mdcRadios.length; mdcIdx++) {
+            mdcRadios[mdcIdx].addEventListener('change', updateMarkdownColoredCustomRow);
+        }
+
+        var saveMarkdownColoredBtn = document.getElementById('saveMarkdownColoredBtn');
+        if (saveMarkdownColoredBtn) {
+            saveMarkdownColoredBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('markdownColoredTheme');
+                var selected = '0';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+
+                function finishMarkdownColored(success) {
+                    if (success) {
+                        try { closeModal('markdownColoredModal'); } catch (e) { }
+                        reloadOpener();
+                        refreshMarkdownColoredBadge();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                }
+
+                if (selected === 'custom') {
+                    var colors = {};
+                    document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]').forEach(function (input) {
+                        var el = input.getAttribute('data-mdc-element');
+                        colors[el] = input.value || MARKDOWN_COLORED_DEFAULTS[el];
+                    });
+                    setSetting('markdown_colored_custom', JSON.stringify(colors), function (ok) {
+                        if (!ok) { finishMarkdownColored(false); return; }
+                        setSetting('markdown_colored', 'custom', finishMarkdownColored);
+                    });
+                } else {
+                    setSetting('markdown_colored', selected, finishMarkdownColored);
+                }
             });
         }
 

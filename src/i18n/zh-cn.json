@@ -402,6 +402,7 @@
       "notes_without_folders": "将没有文件夹的笔记显示在文件夹列表之后而不是之前。",
       "note_width": "调整笔记内容的最大宽度。",
       "markdown_split_card_view": "以带边框的分栏视图（编辑器和预览）显示 Markdown 笔记。",
+      "markdown_colored": "为 Markdown 笔记上色：为标题、行内代码、引用、表格表头和分隔线分别选择颜色。",
       "code_wrap": "代码块中的长行自动换行，而不是水平滚动。",
       "attachment_previews": "在笔记中显示附件预览。",
       "attachments_at_bottom": "将附件区域显示在笔记底部而不是顶部。",
@@ -642,6 +643,7 @@
       "index_icon_scale": "索引页图标缩放",
       "note_content_width": "笔记内容宽度",
       "markdown_split_card_view": "带边框的 Markdown",
+      "markdown_colored": "彩色 Markdown",
       "code_block_word_wrap": "代码块自动换行",
       "attachment_previews_in_note": "附件预览",
       "attachments_at_bottom": "附件显示在底部",
@@ -1253,6 +1255,20 @@
         "last_modified": "最后修改",
         "last_created": "最后创建",
         "alphabetical": "字母顺序"
+      }
+    },
+    "markdown_colored": {
+      "title": "彩色 Markdown",
+      "options": {
+        "off": "关闭",
+        "custom": "自定义"
+      },
+      "elements": {
+        "heading": "标题",
+        "code": "行内代码",
+        "quote": "引用",
+        "table": "表格表头",
+        "hr": "分隔线"
       }
     },
     "note_color_palette": {

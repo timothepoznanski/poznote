@@ -399,6 +399,7 @@
       "notes_without_folders": "Mostre as notas sem pasta depois da lista de pastas em vez de antes.",
       "note_width": "Ajuste a largura máxima do conteúdo das notas.",
       "markdown_split_card_view": "Exiba notas markdown em uma visão dividida emoldurada com editor e pré-visualização.",
+      "markdown_colored": "Adicione cor às notas markdown: escolha uma cor para títulos, código embutido, citações, cabeçalhos de tabela e separadores.",
       "code_wrap": "Quebre linhas longas nos blocos de código em vez de rolar horizontalmente.",
       "attachment_previews": "Mostre pré-visualizações dos anexos dentro das notas.",
       "attachments_at_bottom": "Mostre a seção de anexos na parte inferior das notas em vez do topo.",
@@ -639,6 +640,7 @@
       "index_icon_scale": "Escala de ícones do índice",
       "note_content_width": "Largura do conteúdo da nota",
       "markdown_split_card_view": "Markdown com moldura",
+      "markdown_colored": "Markdown colorido",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
       "attachment_previews_in_note": "Pré-visualizações de anexos",
       "attachments_at_bottom": "Anexos no final",
@@ -1251,6 +1253,20 @@
         "last_modified": "Última modificação",
         "last_created": "Última criação",
         "alphabetical": "Alfabética"
+      }
+    },
+    "markdown_colored": {
+      "title": "Markdown colorido",
+      "options": {
+        "off": "Desativado",
+        "custom": "Personalizado"
+      },
+      "elements": {
+        "heading": "Títulos",
+        "code": "Código embutido",
+        "quote": "Citações",
+        "table": "Cabeçalhos de tabela",
+        "hr": "Separadores"
       }
     },
     "note_color_palette": {
