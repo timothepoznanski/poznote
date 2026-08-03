@@ -283,7 +283,7 @@ class SettingsController {
             return substr(trim((string) $value), 0, 1000);
         }
 
-        if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global') {
+        if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global' || $key === 'settings_pinned_cards') {
             $raw = is_string($value) ? trim($value) : $value;
             if ($raw === '' || $raw === null || $raw === '[]') {
                 return '[]';

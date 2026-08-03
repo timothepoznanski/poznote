@@ -129,6 +129,7 @@ $settingsPageUserKeys = [
     'timezone',
     'date_time_format',
     'hidden_ui_elements',
+    'settings_pinned_cards',
     'spellcheck_html_notes',
     'slash_menu_require_alt',
     'note_nav_shortcuts_enabled',
