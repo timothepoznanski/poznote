@@ -413,7 +413,8 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
             $cleanContent .= $dom->saveHTML($child);
         }
     } else {
-        $cleanContent = $dom->saveHTML();
+        // Strip the xml processing instruction added above for UTF-8 handling
+        $cleanContent = preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
     }
     
     // Build HTML document

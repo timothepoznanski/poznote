@@ -170,7 +170,8 @@ function removeCopyButtonsFromHtml($html) {
         $button->parentNode->removeChild($button);
     }
 
-    return $dom->saveHTML();
+    // Strip the xml processing instruction added above for UTF-8 handling
+    return preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
 }
 
 /**
