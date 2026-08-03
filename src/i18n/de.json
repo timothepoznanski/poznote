@@ -435,6 +435,7 @@
     "collapse_section": "Bereich einklappen",
     "expand_section": "Bereich ausklappen",
     "categories": {
+      "pinned": "Angepinnt",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",

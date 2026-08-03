@@ -434,6 +434,7 @@
     "collapse_section": "Recolher a seção",
     "expand_section": "Expandir a seção",
     "categories": {
+      "pinned": "Fixados",
       "actions": "Ações",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",

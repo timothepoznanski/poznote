@@ -436,6 +436,7 @@
     "collapse_section": "Contraer la sección",
     "expand_section": "Expandir la sección",
     "categories": {
+      "pinned": "Fijados",
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",

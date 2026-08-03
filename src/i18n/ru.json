@@ -171,6 +171,7 @@
     "collapse_section": "Свернуть раздел",
     "expand_section": "Развернуть раздел",
     "categories": {
+      "pinned": "Закреплённые",
       "actions": "Действия",
       "admin_tools": "Инструменты администратора",
       "display": "Отображение",

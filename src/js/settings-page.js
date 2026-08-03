@@ -2230,7 +2230,9 @@
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
-        var grid = document.querySelector('.home-grid');
+        // Skip the pinned-cards grid: it may be empty/hidden, and the
+        // "no results" element must live in an always-rendered grid.
+        var grid = document.querySelector('.home-grid:not(#settings-pinned-section-grid)');
 
         if (searchInput && grid) {
             // Create "no results" message element
@@ -2302,6 +2304,150 @@
                     e.preventDefault();
                     searchInput.focus();
                 }
+            });
+        }
+
+        // Pinnable cards: every card gets a pin button. Pinning does NOT move
+        // the card — it stays in its section and a live clone of it is shown
+        // in the "Pinned" section at the top. Persisted per user.
+        var pinStore = window.__poznoteUserStorage || window.localStorage;
+        var pinnedGrid = document.getElementById('settings-pinned-section-grid');
+        var pinnedTitle = document.getElementById('settings-pinned-section-title');
+        if (pinnedGrid && pinnedTitle) {
+            var pinnedCardIds = [];
+            try {
+                pinnedCardIds = JSON.parse(pinStore.getItem('settingsPinnedCards') || '[]');
+                if (!Array.isArray(pinnedCardIds)) pinnedCardIds = [];
+            } catch (e) { /* storage unavailable or corrupt */ }
+
+            var pinnedClones = {};    // card id -> clone element in the pinned grid
+            var cloneObservers = {};  // card id -> MutationObserver keeping the clone in sync
+
+            var savePinnedCards = function () {
+                try {
+                    pinStore.setItem('settingsPinnedCards', JSON.stringify(pinnedCardIds));
+                } catch (e) { /* storage unavailable */ }
+            };
+
+            var refreshPinnedSection = function () {
+                var empty = pinnedGrid.children.length === 0;
+                pinnedTitle.hidden = empty;
+                pinnedGrid.hidden = empty;
+            };
+
+            var applyPinState = function (card) {
+                var pinned = pinnedCardIds.indexOf(card.id) !== -1;
+                card.classList.toggle('is-pinned', pinned);
+                var btn = card.querySelector('.settings-card-pin');
+                if (!btn) return;
+                var label = pinned
+                    ? tr('dashboard.unpin_note', {}, 'Unpin')
+                    : tr('dashboard.pin_note', {}, 'Pin to top');
+                btn.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+                btn.setAttribute('aria-label', label);
+                btn.title = label;
+            };
+
+            // The clone must not duplicate ids: badge refreshers look elements
+            // up by id and have to keep finding the original card.
+            var stripIds = function (root) {
+                root.removeAttribute('id');
+                root.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
+            };
+
+            var syncCloneContent = function (orig, clone) {
+                clone.className = orig.className;
+                clone.innerHTML = orig.innerHTML;
+                stripIds(clone);
+            };
+
+            var createPinnedClone = function (orig) {
+                var clone = orig.cloneNode(true);
+                stripIds(clone);
+                clone.dataset.pinCloneOf = orig.id;
+                // The original's card behavior comes from listeners bound to
+                // the original element, so the clone forwards its clicks —
+                // except <a> cards, whose copied href already navigates.
+                clone.addEventListener('click', function (e) {
+                    if (e.target.closest('.settings-card-pin')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        togglePin(orig);
+                        return;
+                    }
+                    if (clone.tagName !== 'A') orig.click();
+                });
+                // Badges refresh asynchronously on the original (and after
+                // settings changes); mirror every change into the clone.
+                var observer = new MutationObserver(function () {
+                    syncCloneContent(orig, clone);
+                });
+                observer.observe(orig, { subtree: true, childList: true, attributes: true, characterData: true });
+                pinnedClones[orig.id] = clone;
+                cloneObservers[orig.id] = observer;
+                pinnedGrid.appendChild(clone);
+            };
+
+            var removePinnedClone = function (id) {
+                if (cloneObservers[id]) { cloneObservers[id].disconnect(); delete cloneObservers[id]; }
+                if (pinnedClones[id]) { pinnedClones[id].remove(); delete pinnedClones[id]; }
+            };
+
+            var togglePin = function (card) {
+                var idx = pinnedCardIds.indexOf(card.id);
+                if (idx === -1) {
+                    pinnedCardIds.push(card.id);
+                    createPinnedClone(card);
+                } else {
+                    pinnedCardIds.splice(idx, 1);
+                    removePinnedClone(card.id);
+                }
+                applyPinState(card);
+                savePinnedCards();
+                refreshPinnedSection();
+            };
+
+            var pinnableCards = [];
+            document.querySelectorAll('.home-grid:not(#settings-pinned-section-grid) .home-card').forEach(function (card) {
+                if (!card.id) return;
+                pinnableCards.push(card);
+                // A real <button> is not allowed inside the <a> cards, so the
+                // pin is a span with a button role (same as the dashboard
+                // folder cards).
+                var btn = document.createElement('span');
+                btn.className = 'settings-card-pin';
+                btn.setAttribute('role', 'button');
+                btn.setAttribute('tabindex', '0');
+                btn.innerHTML = '<i class="lucide lucide-pin"></i>';
+                // The card itself navigates or opens a modal, so the pin
+                // click must never reach it.
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    togglePin(card);
+                });
+                btn.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        togglePin(card);
+                    }
+                });
+                card.appendChild(btn);
+                applyPinState(card);
+            });
+
+            // Build the pinned section in saved order. Ids without a card on
+            // this page (e.g. admin cards seen by a non-admin) stay in storage
+            // but are simply not rendered.
+            pinnedCardIds.forEach(function (id) {
+                var card = document.getElementById(id);
+                if (card && card.classList.contains('home-card')) createPinnedClone(card);
+            });
+            refreshPinnedSection();
+
+            document.addEventListener('poznote:i18n:loaded', function () {
+                pinnableCards.forEach(applyPinState);
             });
         }
 

@@ -339,6 +339,10 @@ if ($isAdmin) {
             </div>
         </div>
 
+        <!-- PINNED CARDS (filled by settings-page.js from the per-user pin list) -->
+        <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
+        <div class="home-grid" id="settings-pinned-section-grid" hidden></div>
+
         <!-- ACTIONS CATEGORY -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions') . ' (' . $username . ')'; ?></h2>
         <div class="home-grid" id="settings-actions-section-grid">

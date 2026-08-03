@@ -447,6 +447,7 @@
     "collapse_section": "Réduire la section",
     "expand_section": "Développer la section",
     "categories": {
+      "pinned": "Épinglés",
       "actions": "Actions",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",

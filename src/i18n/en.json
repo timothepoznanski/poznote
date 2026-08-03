@@ -171,6 +171,7 @@
     "collapse_section": "Collapse section",
     "expand_section": "Expand section",
     "categories": {
+      "pinned": "Pinned",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
