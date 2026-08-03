@@ -807,6 +807,253 @@
     markAsModified(noteentry);
   }
 
+  // ===== SELECTION CONVERSION =====
+
+  /**
+   * Remove zero-width spaces from all text nodes of an element
+   */
+  function stripZeroWidthSpaces(element) {
+    const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(function(node) {
+      node.textContent = node.textContent.replace(/\u200B/g, '');
+      if (!node.textContent) node.remove();
+    });
+  }
+
+  /**
+   * A block that holds no line content (tables, code blocks, separators,
+   * media wrappers) cannot become a checklist item
+   */
+  function isConvertibleBlock(block) {
+    if (block.nodeType === 3) return true;
+    if (block.nodeType !== 1) return false;
+    const tag = block.tagName;
+    if (tag === 'TABLE' || tag === 'PRE' || tag === 'HR' || tag === 'IMG') return false;
+    if (block.querySelector && block.querySelector('table, pre')) return false;
+    if (block.isContentEditable === false && block.getAttribute('contenteditable') === 'false') return false;
+    return true;
+  }
+
+  /**
+   * Blank lines are left in place and split the selection into
+   * separate checklists
+   */
+  function isBlankBlock(block) {
+    if (block.nodeType === 3) return block.textContent.replace(/\u200B/g, '').trim() === '';
+    if (block.nodeType !== 1) return true;
+    if (block.querySelector && block.querySelector('img, video, iframe, input')) return false;
+    return getCleanText(block) === '';
+  }
+
+  /**
+   * Build a checklist item from an existing line, keeping its inline
+   * formatting (bold, links, colors...)
+   */
+  function createChecklistItemFromNode(sourceBlock) {
+    const item = createChecklistItem(false, '');
+    const span = item.querySelector('.' + TEXT_CLASS);
+    while (span.firstChild) span.removeChild(span.firstChild);
+
+    if (sourceBlock.nodeType === 3) {
+      span.appendChild(document.createTextNode(sourceBlock.textContent));
+    } else {
+      while (sourceBlock.firstChild) {
+        span.appendChild(sourceBlock.firstChild);
+      }
+    }
+
+    stripZeroWidthSpaces(span);
+    while (span.lastChild && span.lastChild.nodeType === 1 && span.lastChild.tagName === 'BR') {
+      span.removeChild(span.lastChild);
+    }
+    if (!span.firstChild) {
+      span.appendChild(document.createTextNode('\u200B'));
+    }
+    span.setAttribute('data-value', getCleanText(span));
+    return item;
+  }
+
+  /**
+   * Get the li elements of a list that intersect the selection
+   */
+  function getSelectedListItems(list, range) {
+    const items = Array.prototype.filter.call(list.children, function(child) {
+      return child.tagName === 'LI';
+    });
+    const selected = items.filter(function(li) {
+      try { return range.intersectsNode(li); } catch (e) { return false; }
+    });
+    return selected.length ? selected : items;
+  }
+
+  /**
+   * Convert the selected top-level blocks into checklist items.
+   * Returns the created/kept text spans for selection restore.
+   */
+  function convertBlocksToChecklist(blocks, range, noteentry) {
+    let currentUl = null;
+    const spans = [];
+
+    blocks.forEach(function(block) {
+      if (!isConvertibleBlock(block) || (block.nodeType === 1 && block.tagName !== 'UL' && block.tagName !== 'OL' && isBlankBlock(block)) || (block.nodeType === 3 && isBlankBlock(block))) {
+        currentUl = null;
+        return;
+      }
+
+      if (!currentUl) {
+        currentUl = createChecklist();
+        noteentry.insertBefore(currentUl, block);
+      }
+
+      if (block.nodeType === 1 && (block.tagName === 'UL' || block.tagName === 'OL')) {
+        const isAlreadyChecklist = block.classList.contains(CHECKLIST_CLASS);
+        const lis = Array.prototype.filter.call(block.children, function(child) {
+          return child.tagName === 'LI';
+        });
+        lis.forEach(function(li) {
+          if (isAlreadyChecklist) {
+            currentUl.appendChild(li);
+            const span = li.querySelector('.' + TEXT_CLASS);
+            if (span) spans.push(span);
+          } else {
+            const item = createChecklistItemFromNode(li);
+            currentUl.appendChild(item);
+            spans.push(item.querySelector('.' + TEXT_CLASS));
+          }
+        });
+        block.remove();
+      } else {
+        const item = createChecklistItemFromNode(block);
+        currentUl.appendChild(item);
+        spans.push(item.querySelector('.' + TEXT_CLASS));
+        if (block.parentNode) block.remove();
+      }
+    });
+
+    return spans;
+  }
+
+  /**
+   * Convert the selected items of a checklist back to plain lines,
+   * splitting the checklist when the selection is partial.
+   * Returns the created line divs for selection restore.
+   */
+  function unwrapChecklistItems(checklist, selectedLis) {
+    const parent = checklist.parentNode;
+    const divs = [];
+    const frag = document.createDocumentFragment();
+
+    selectedLis.forEach(function(li) {
+      const div = document.createElement('div');
+      const span = li.querySelector('.' + TEXT_CLASS);
+      const source = span || li;
+      while (source.firstChild) div.appendChild(source.firstChild);
+      stripZeroWidthSpaces(div);
+      if (!div.firstChild) div.appendChild(document.createElement('br'));
+      frag.appendChild(div);
+      divs.push(div);
+    });
+
+    const items = Array.prototype.filter.call(checklist.children, function(child) {
+      return child.tagName === 'LI';
+    });
+    const firstIdx = items.indexOf(selectedLis[0]);
+    const lastIdx = items.indexOf(selectedLis[selectedLis.length - 1]);
+
+    if (firstIdx <= 0 && lastIdx >= items.length - 1) {
+      parent.replaceChild(frag, checklist);
+    } else if (firstIdx <= 0) {
+      parent.insertBefore(frag, checklist);
+      selectedLis.forEach(function(li) { li.remove(); });
+    } else if (lastIdx >= items.length - 1) {
+      parent.insertBefore(frag, checklist.nextSibling);
+      selectedLis.forEach(function(li) { li.remove(); });
+    } else {
+      const tail = createChecklist();
+      items.slice(lastIdx + 1).forEach(function(li) { tail.appendChild(li); });
+      parent.insertBefore(tail, checklist.nextSibling);
+      parent.insertBefore(frag, tail);
+      selectedLis.forEach(function(li) { li.remove(); });
+    }
+
+    return divs;
+  }
+
+  /**
+   * Toggle checklist on the current selection in an HTML note.
+   * Selected lines become checklist items; if the selection is already
+   * entirely inside checklists, the items go back to plain lines.
+   */
+  function toggleChecklistSelection() {
+    if (!isCursorInEditableNote()) {
+      if (typeof window.showCursorWarning === 'function') {
+        window.showCursorWarning();
+      }
+      return;
+    }
+
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+
+    let container = range.commonAncestorContainer;
+    if (container.nodeType === 3) container = container.parentNode;
+    const noteentry = getNoteEntry(container);
+    if (!noteentry) return;
+
+    // Collect the top-level blocks the selection intersects
+    const blocks = Array.prototype.filter.call(noteentry.childNodes, function(node) {
+      try { return range.intersectsNode(node); } catch (e) { return false; }
+    });
+
+    // Drop a trailing block the selection only touches at its very start
+    // (shift+down selections end at offset 0 of the next line)
+    while (blocks.length > 1) {
+      const last = blocks[blocks.length - 1];
+      const startOfLast = document.createRange();
+      if (last.nodeType === 1) {
+        startOfLast.selectNodeContents(last);
+      } else {
+        startOfLast.selectNode(last);
+      }
+      startOfLast.collapse(true);
+      if (range.compareBoundaryPoints(Range.END_TO_END, startOfLast) <= 0) {
+        blocks.pop();
+      } else {
+        break;
+      }
+    }
+    if (!blocks.length) return;
+
+    const allChecklists = blocks.every(function(block) {
+      return block.nodeType === 1 && block.classList && block.classList.contains(CHECKLIST_CLASS);
+    });
+
+    let focusTargets;
+    if (allChecklists) {
+      focusTargets = [];
+      blocks.forEach(function(checklist) {
+        const lis = getSelectedListItems(checklist, range);
+        focusTargets = focusTargets.concat(unwrapChecklistItems(checklist, lis));
+      });
+    } else {
+      focusTargets = convertBlocksToChecklist(blocks, range, noteentry);
+    }
+
+    // Restore the selection over the converted lines
+    if (focusTargets.length) {
+      const newRange = document.createRange();
+      newRange.setStartBefore(focusTargets[0]);
+      newRange.setEndAfter(focusTargets[focusTargets.length - 1]);
+      sel.removeAllRanges();
+      sel.addRange(newRange);
+    }
+
+    markAsModified(noteentry);
+  }
+
   /**
    * Serialize checklists before save
    */
@@ -889,6 +1136,7 @@
   // ===== EXPORTS =====
 
   window.insertChecklist = insertChecklist;
+  window.toggleChecklistSelection = toggleChecklistSelection;
   window.serializeChecklistsBeforeSave = serializeChecklistsBeforeSave;
   window.restoreChecklistsAfterLoad = restoreChecklistsAfterLoad;
 

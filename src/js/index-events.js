@@ -464,6 +464,8 @@
                     if (typeof toggleMarkdownList === 'function') {
                         toggleMarkdownList('task');
                     }
+                } else if (typeof window.toggleChecklistSelection === 'function') {
+                    window.toggleChecklistSelection();
                 }
                 break;
             case 'exec-task-remove':
