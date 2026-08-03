@@ -62,6 +62,18 @@ sudo chown -R 1000:1000 data
 
 If this step is skipped, the container exits immediately at startup with an error explaining exactly what to run.
 
+Note that `sudo` is often not needed for this step:
+
+- If your host user already has uid `1000` (the first user created on most Linux distributions), `mkdir -p data` creates the directory with the right ownership and the `chown` can be skipped entirely.
+- With rootless Podman or rootless Docker, run the chown inside the user namespace instead, without any root privileges:
+
+```bash
+# rootless Podman
+podman unshare chown -R 1000:1000 data
+# rootless Docker
+rootlesskit chown -R 1000:1000 data
+```
+
 For a fresh install, follow the [Rootless install method](../README.md#rootless) in the README. To migrate an existing Poznote instance, stop it, back up and re-own your data directory, then start the rootless variant:
 
 ```bash
