@@ -271,12 +271,12 @@
 .mdc-custom-row {
     display: none;
     margin: -8px 0 24px 26px;
-    flex-direction: column;
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px 24px;
 }
 
 .mdc-custom-row.visible {
-    display: flex;
+    display: grid;
 }
 
 .mdc-custom-row label {

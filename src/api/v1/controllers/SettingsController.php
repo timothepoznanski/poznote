@@ -125,7 +125,7 @@ class SettingsController {
         }
 
         if ($key === 'markdown_colored_custom') {
-            // Stored as JSON: {"heading":"#rrggbb","code":...,"quote":...,"table":...,"hr":...}
+            // Stored as JSON: {"h1":"#rrggbb",...,"h6":...,"code":...,"codeblock":...,"quote":...,"table":...,"hr":...}
             $raw = is_string($value) ? trim($value) : '';
             if ($raw === '') {
                 return '';
@@ -134,8 +134,19 @@ class SettingsController {
             if (!is_array($decoded)) {
                 throw new InvalidArgumentException('invalid markdown custom colors', 400);
             }
+            // Legacy payloads used a single 'heading' color for all levels and
+            // had no code block background; expand them to the current schema.
+            $legacyHeading = (string) ($decoded['heading'] ?? '');
+            foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as $level) {
+                if (!isset($decoded[$level]) && $legacyHeading !== '') {
+                    $decoded[$level] = $legacyHeading;
+                }
+            }
+            if (!isset($decoded['codeblock']) && isset($decoded['code'])) {
+                $decoded['codeblock'] = $decoded['code'];
+            }
             $colors = [];
-            foreach (['heading', 'code', 'quote', 'table', 'hr'] as $element) {
+            foreach (['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'code', 'codeblock', 'quote', 'table', 'hr'] as $element) {
                 $color = (string) ($decoded[$element] ?? '');
                 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
                     throw new InvalidArgumentException('invalid markdown custom colors', 400);

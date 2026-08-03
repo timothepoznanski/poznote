@@ -412,7 +412,7 @@
       "notes_without_folders": "Affichez les notes sans dossier après la liste des dossiers plutôt qu'avant.",
       "note_width": "Ajustez la largeur maximale du contenu des notes.",
       "markdown_split_card_view": "Affichez les notes markdown dans une vue scindée encadrée avec éditeur et aperçu.",
-      "markdown_colored": "Colorez les notes markdown : choisissez une couleur pour les titres, le code en ligne, les citations, les en-têtes de tableaux et les séparateurs.",
+      "markdown_colored": "Colorez les notes markdown : choisissez une couleur pour chaque niveau de titre, le code en ligne, le fond des blocs de code, les citations, les en-têtes de tableaux et les séparateurs.",
       "code_wrap": "Renvoyez à la ligne les longues lignes des blocs de code au lieu de défiler horizontalement.",
       "attachment_previews": "Affichez un aperçu des pièces jointes dans les notes.",
       "attachments_at_bottom": "Affichez la section des pièces jointes en bas des notes plutôt qu'en haut.",
@@ -1296,8 +1296,14 @@
         "custom": "Personnalisé"
       },
       "elements": {
-        "heading": "Titres",
+        "h1": "Titre 1",
+        "h2": "Titre 2",
+        "h3": "Titre 3",
+        "h4": "Titre 4",
+        "h5": "Titre 5",
+        "h6": "Titre 6",
         "code": "Code en ligne",
+        "codeblock": "Fond des blocs de code",
         "quote": "Citations",
         "table": "En-têtes de tableaux",
         "hr": "Séparateurs"

@@ -1222,12 +1222,29 @@
     }
 
     var MARKDOWN_COLORED_DEFAULTS = {
-        heading: '#007db8',
+        h1: '#007db8',
+        h2: '#1a7f37',
+        h3: '#8250df',
+        h4: '#bf3989',
+        h5: '#1b7c83',
+        h6: '#656d76',
         code: '#b34e00',
+        codeblock: '#b34e00',
         quote: '#007db8',
         table: '#007db8',
         hr: '#007db8'
     };
+
+    // Values saved before per-level heading colors existed used a single
+    // 'heading' color and had no code block background.
+    function markdownColoredStoredColor(parsed, el) {
+        var isColor = function (v) { return /^#[0-9a-fA-F]{6}$/.test(v || ''); };
+        if (!parsed) return null;
+        if (isColor(parsed[el])) return parsed[el];
+        if (/^h[1-6]$/.test(el) && isColor(parsed.heading)) return parsed.heading;
+        if (el === 'codeblock' && isColor(parsed.code)) return parsed.code;
+        return null;
+    }
 
     function normalizeMarkdownColoredTheme(value) {
         var v = (value || '').trim();
@@ -1277,8 +1294,7 @@
                 var inputs = document.querySelectorAll('#markdownColoredCustomRow input[data-mdc-element]');
                 inputs.forEach(function (input) {
                     var el = input.getAttribute('data-mdc-element');
-                    var color = parsed && /^#[0-9a-fA-F]{6}$/.test(parsed[el] || '') ? parsed[el] : MARKDOWN_COLORED_DEFAULTS[el];
-                    input.value = color;
+                    input.value = markdownColoredStoredColor(parsed, el) || MARKDOWN_COLORED_DEFAULTS[el];
                 });
                 updateMarkdownColoredCustomRow();
                 modal.style.display = 'flex';

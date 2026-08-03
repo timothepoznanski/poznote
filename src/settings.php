@@ -726,7 +726,7 @@ if ($isAdmin) {
 
             <!-- Colored Markdown -->
             <div class="home-card" id="markdown-colored-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for headings, inline code, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span>
