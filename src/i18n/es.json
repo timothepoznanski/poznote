@@ -1004,6 +1004,8 @@
       "index_search_bar": "Barra de búsqueda",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
+      "show_unchecked_only": "Mostrar solo los elementos desmarcados",
+      "no_unchecked_results": "No hay elementos desmarcados.",
       "sections": {
         "home_cards": "Tarjetas del panel",
         "create_cards": "Tarjetas de creación",

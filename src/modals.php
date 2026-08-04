@@ -1402,8 +1402,14 @@ try {
                     placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>"
                     autocomplete="off">
             </div>
+            <label class="ui-custom-hidden-only">
+                <input type="checkbox" id="uiCustomizationHiddenOnly">
+                <span><?php echo t_h('modals.ui_customization.show_unchecked_only', [], 'Show only unchecked items'); ?></span>
+            </label>
             <div class="ui-custom-sections-scroll">
-                <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
+                <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden
+                    data-empty-default="<?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?>"
+                    data-empty-unchecked="<?php echo t_h('modals.ui_customization.no_unchecked_results', [], 'No unchecked items.'); ?>"><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
 
                 <!-- Create Cards Section -->
                 <div class="ui-custom-section">

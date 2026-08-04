@@ -1002,6 +1002,8 @@
       "index_search_bar": "Barra de pesquisa",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",
+      "show_unchecked_only": "Mostrar apenas os itens desmarcados",
+      "no_unchecked_results": "Nenhum item desmarcado.",
       "sections": {
         "home_cards": "Cartões do painel",
         "create_cards": "Cartões de criação",

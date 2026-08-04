@@ -1003,6 +1003,8 @@
       "index_search_bar": "搜索栏",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
+      "show_unchecked_only": "仅显示未勾选的项目",
+      "no_unchecked_results": "没有未勾选的项目。",
       "sections": {
         "home_cards": "仪表盘卡片",
         "create_cards": "创建卡片",

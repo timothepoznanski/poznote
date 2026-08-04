@@ -512,6 +512,8 @@
       "index_search_bar": "Панель поиска",
       "filter_placeholder": "Фильтровать элементы...",
       "no_results": "Подходящие элементы не найдены.",
+      "show_unchecked_only": "Показывать только снятые элементы",
+      "no_unchecked_results": "Нет снятых элементов.",
       "sections": {
         "home_cards": "Карточки панели",
         "create_cards": "Карточки создания",

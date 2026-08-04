@@ -519,6 +519,8 @@
       "index_search_bar": "Search bar",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
+      "show_unchecked_only": "Show only unchecked items",
+      "no_unchecked_results": "No unchecked items.",
       "sections": {
         "home_cards": "Dashboard Cards",
         "create_cards": "Create Cards",

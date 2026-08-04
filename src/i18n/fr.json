@@ -1028,6 +1028,8 @@
       "index_search_bar": "Barre de recherche",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
+      "show_unchecked_only": "Afficher uniquement les éléments décochés",
+      "no_unchecked_results": "Aucun élément décoché.",
       "sections": {
         "home_cards": "Cartes du tableau de bord",
         "create_cards": "Cartes de création",
