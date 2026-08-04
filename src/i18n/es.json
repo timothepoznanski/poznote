@@ -2899,6 +2899,7 @@
       "password_required": "La contraseña es obligatoria",
       "password_incorrect": "Contraseña incorrecta",
       "cannot_delete": "Esta cuenta no se puede eliminar",
+      "data_not_deleted": "No se pudieron eliminar sus archivos, por lo que se conservó la cuenta. Póngase en contacto con el administrador.",
       "last_admin": "No se puede eliminar la última cuenta de administrador"
     }
   },

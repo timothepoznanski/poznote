@@ -2899,6 +2899,7 @@
       "password_required": "Passwort ist erforderlich",
       "password_incorrect": "Passwort ist falsch",
       "cannot_delete": "Dieses Konto kann nicht gelöscht werden",
+      "data_not_deleted": "Ihre Dateien konnten nicht gelöscht werden, das Konto wurde daher beibehalten. Bitte wenden Sie sich an den Administrator.",
       "last_admin": "Das letzte Administratorkonto kann nicht gelöscht werden"
     }
   },

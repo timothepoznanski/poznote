@@ -1077,7 +1077,20 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
         if ($deleteData) {
             require_once __DIR__ . '/UserDataManager.php';
             $dataManager = new UserDataManager($id);
-            $dataManager->deleteAllUserData();
+            if (!$dataManager->deleteAllUserData()) {
+                // Keep the account row: dropping it here would orphan the notes
+                // and attachments still on disk while reporting a success.
+                $failures = $dataManager->getDeletionFailures();
+                error_log(
+                    'deleteUserProfile: kept user ' . $id . ', could not remove '
+                    . count($failures) . ' path(s), first: ' . ($failures[0] ?? 'unknown')
+                );
+
+                return [
+                    'success' => false,
+                    'error' => 'Could not delete the user data files'
+                ];
+            }
         }
         
         // Delete user's shared links from global registry

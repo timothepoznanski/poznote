@@ -2902,6 +2902,7 @@
       "password_required": "A palavra-passe é obrigatória",
       "password_incorrect": "Palavra-passe incorreta",
       "cannot_delete": "Esta conta não pode ser eliminada",
+      "data_not_deleted": "Não foi possível eliminar os seus ficheiros, pelo que a conta foi mantida. Contacte o administrador.",
       "last_admin": "Não é possível eliminar a última conta de administrador"
     }
   },

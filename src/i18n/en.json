@@ -2581,6 +2581,7 @@
       "password_required": "Password is required",
       "password_incorrect": "Password is incorrect",
       "cannot_delete": "This account cannot be deleted",
+      "data_not_deleted": "Your files could not be deleted, so the account was kept. Please contact the administrator.",
       "last_admin": "The last administrator account cannot be deleted"
     }
   },

@@ -3093,6 +3093,7 @@
       "password_required": "Le mot de passe est requis",
       "password_incorrect": "Mot de passe incorrect",
       "cannot_delete": "Ce compte ne peut pas être supprimé",
+      "data_not_deleted": "Vos fichiers n'ont pas pu être supprimés, le compte a donc été conservé. Contactez l'administrateur.",
       "last_admin": "Impossible de supprimer le dernier compte administrateur"
     }
   },

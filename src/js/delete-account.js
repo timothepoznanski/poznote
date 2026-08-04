@@ -102,7 +102,8 @@
             'Password is required': ['delete_account.errors.password_required', 'Password is required'],
             'Password is incorrect': ['delete_account.errors.password_incorrect', 'Password is incorrect'],
             'Cannot delete user ID 1': ['delete_account.errors.cannot_delete', 'This account cannot be deleted'],
-            'Cannot delete the last admin user': ['delete_account.errors.last_admin', 'The last administrator account cannot be deleted']
+            'Cannot delete the last admin user': ['delete_account.errors.last_admin', 'The last administrator account cannot be deleted'],
+            'Could not delete the user data files': ['delete_account.errors.data_not_deleted', 'Your files could not be deleted, so the account was kept. Please contact the administrator.']
         };
         if (known[msg]) {
             return tr(known[msg][0], {}, known[msg][1]);
