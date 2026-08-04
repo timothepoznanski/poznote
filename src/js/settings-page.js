@@ -2729,15 +2729,37 @@
         if (!badge) return;
 
         getSetting('hidden_ui_elements', function (value) {
-            var hidden = parseHiddenUiCustomization(value);
+            var own = parseHiddenUiCustomization(value);
 
-            if (hidden.length === 0) {
+            // Elements the administrator hides for everyone are applied on top
+            // of the user's own set and cannot be re-enabled from the modal, so
+            // the badge counts them too. The list is empty for administrators,
+            // who are exempt from the instance-wide set.
+            var supported = getSupportedUiCustomizationKeys();
+            var byAdmin = getGloballyHiddenUiKeys().filter(function (key) {
+                return !!supported[key];
+            });
+
+            var union = Object.create(null);
+            own.concat(byAdmin).forEach(function (key) {
+                union[key] = true;
+            });
+            var total = Object.keys(union).length;
+
+            if (total === 0) {
                 badge.textContent = tr('modals.ui_customization.badge_all_visible', {}, 'All visible');
                 badge.className = 'setting-status enabled';
-            } else {
-                badge.textContent = tr('modals.ui_customization.badge_hidden_count', { count: hidden.length }, hidden.length + ' hidden');
-                badge.className = 'setting-status disabled';
+                return;
             }
+
+            badge.textContent = byAdmin.length > 0
+                ? tr(
+                    'modals.ui_customization.badge_hidden_count_admin',
+                    { count: total, admin: byAdmin.length },
+                    total + ' hidden (' + byAdmin.length + ' by the administrator)'
+                )
+                : tr('modals.ui_customization.badge_hidden_count', { count: total }, total + ' hidden');
+            badge.className = 'setting-status disabled';
         });
     }
 

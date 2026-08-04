@@ -1018,6 +1018,7 @@
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
       "badge_all_visible": "Tudo visível",
+      "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
       "badge_hidden_count": "{{count}} oculto(s)"
     },
     "theme": {

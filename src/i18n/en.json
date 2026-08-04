@@ -533,6 +533,7 @@
         "workspace_menu": "Workspace Menu"
       },
       "badge_all_visible": "All visible",
+      "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
       "badge_hidden_count": "{{count}} hidden",
       "check_all": "Check all",
       "uncheck_all": "Uncheck all"

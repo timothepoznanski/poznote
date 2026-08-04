@@ -1019,6 +1019,7 @@
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
       "badge_all_visible": "Alle sichtbar",
+      "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
       "badge_hidden_count": "{{count}} ausgeblendet"
     },
     "theme": {

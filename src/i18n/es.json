@@ -1020,6 +1020,7 @@
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
       "badge_all_visible": "Todo visible",
+      "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} por el administrador)",
       "badge_hidden_count": "{{count}} oculto(s)"
     },
     "theme": {

@@ -528,6 +528,7 @@
       "check_all": "Выбрать все",
       "uncheck_all": "Снять все",
       "badge_all_visible": "Всё видимо",
+      "badge_hidden_count_admin": "{{count}} скрыто ({{admin}} администратором)",
       "badge_hidden_count": "{{count}} скрыто"
     },
     "theme": {

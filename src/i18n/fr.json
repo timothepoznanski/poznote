@@ -1042,6 +1042,7 @@
         "workspace_menu": "Menu du workspace"
       },
       "badge_all_visible": "Tout visible",
+      "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
       "badge_hidden_count": "{{count}} masqué(s)",
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher"
