@@ -2612,7 +2612,17 @@
 
     function getGloballyHiddenUiKeys() {
         var keys = window.__POZNOTE_GLOBAL_HIDDEN_UI_ELEMENTS__;
-        return Array.isArray(keys) ? keys : [];
+        return Array.isArray(keys) ? keys.map(normalizeHiddenUiKey) : [];
+    }
+
+    // Keys renamed after release, so preferences saved under the old name keep
+    // working. See poznoteNormalizeHiddenUiKey() in functions.php.
+    var RENAMED_UI_KEYS = {
+        'toolbar:btn-share': 'toolbar:btn-publish'
+    };
+
+    function normalizeHiddenUiKey(key) {
+        return RENAMED_UI_KEYS[key] || key;
     }
 
     function getSupportedUiCustomizationKeys() {
@@ -2639,9 +2649,11 @@
         if (!Array.isArray(hidden)) hidden = [];
 
         var allowed = getSupportedUiCustomizationKeys();
-        return hidden.filter(function (key) {
-            return typeof key === 'string' && allowed[key];
-        });
+        return hidden
+            .map(normalizeHiddenUiKey)
+            .filter(function (key) {
+                return typeof key === 'string' && allowed[key];
+            });
     }
 
     function normalizeUiCustomizationFilterText(value) {

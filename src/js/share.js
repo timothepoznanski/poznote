@@ -807,7 +807,7 @@ async function openPublicShareModal(noteId) {
  */
 function markShareIconShared(noteId, shared) {
     try {
-        const shareButtons = document.querySelectorAll('.btn-share');
+        const shareButtons = document.querySelectorAll('.btn-publish');
         shareButtons.forEach(button => {
             // Check if this button's data-note-id matches
             const buttonNoteId = button.getAttribute('data-note-id');

@@ -182,7 +182,7 @@
                     }
 
                     if (!$isPublicWorkspaceReadonly) {
-                        echo '<button type="button" class="toolbar-btn btn-share note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-share-2"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-share-2"></i></button>';
                     }
                     
                     $attachment_indicator_class = ($visible_attachments_count > 0) ? ' has-attachments' : '';

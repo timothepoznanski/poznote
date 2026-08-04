@@ -999,6 +999,22 @@ function poznoteGetNonHideableUiKeys() {
 }
 
 /**
+ * Map UI customization keys that were renamed to the name in use today, so
+ * preferences saved under the old key keep working.
+ *
+ * toolbar:btn-share became toolbar:btn-publish because the AdGuard Social
+ * Media list carries an unscoped "##.btn-share" cosmetic rule, which hid the
+ * button in every browser running that list.
+ */
+function poznoteNormalizeHiddenUiKey($key) {
+    static $renamed = [
+        'toolbar:btn-share' => 'toolbar:btn-publish',
+    ];
+
+    return $renamed[$key] ?? $key;
+}
+
+/**
  * Pick the best supported language from an Accept-Language header.
  *
  * Used on pre-auth pages (the login page), where no user preference exists yet.
@@ -1096,7 +1112,12 @@ function poznoteGetGlobalHiddenUiElements() {
     $nonHideable = poznoteGetNonHideableUiKeys();
     $seen = [];
     foreach ($decoded as $key) {
-        if (!is_string($key) || isset($nonHideable[$key])) {
+        if (!is_string($key)) {
+            continue;
+        }
+
+        $key = poznoteNormalizeHiddenUiKey($key);
+        if (isset($nonHideable[$key])) {
             continue;
         }
 
@@ -1135,7 +1156,12 @@ function poznoteGetHiddenUiElements() {
     if (is_array($decoded)) {
         $nonHideable = poznoteGetNonHideableUiKeys();
         foreach ($decoded as $key) {
-            if (!is_string($key) || isset($nonHideable[$key])) {
+            if (!is_string($key)) {
+                continue;
+            }
+
+            $key = poznoteNormalizeHiddenUiKey($key);
+            if (isset($nonHideable[$key])) {
                 continue;
             }
 

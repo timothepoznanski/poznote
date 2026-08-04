@@ -29,7 +29,7 @@
         'btn-checklist': 'action',
         'btn-tasklist-actions': 'action',
         'btn-favorite': 'action',
-        'btn-share': 'action',
+        'btn-publish': 'action',
         'btn-attachment': 'action',
         'btn-reminder': 'action',
         'btn-open-new-tab': 'action',
@@ -68,14 +68,24 @@
         return window.__POZNOTE_HIDDEN_UI_ELEMENTS__.slice();
     }
 
+    // Keys renamed after release, so preferences saved under the old name keep
+    // working. See poznoteNormalizeHiddenUiKey() in functions.php.
+    var RENAMED_UI_KEYS = {
+        'toolbar:btn-share': 'toolbar:btn-publish'
+    };
+
     function sanitizeHiddenKeys(hidden) {
         if (!Array.isArray(hidden)) {
             return [];
         }
 
-        return hidden.filter(function (key) {
-            return typeof key === 'string' && !NON_HIDEABLE_UI_KEYS[key];
-        });
+        return hidden
+            .map(function (key) {
+                return RENAMED_UI_KEYS[key] || key;
+            })
+            .filter(function (key) {
+                return typeof key === 'string' && !NON_HIDEABLE_UI_KEYS[key];
+            });
     }
 
     function publishHiddenKeys(hidden) {
