@@ -249,10 +249,21 @@ foreach ($stats as $r) {
         color: inherit;
         cursor: pointer;
     }
+    /* Bold the header of the column the table is currently sorted on. Needs to
+       live here because the `font: inherit` shorthand above resets weight. */
+    .results-table th .storage-sort-btn.users-sort-active {
+        font-weight: 700;
+    }
+    /* ...and every value in that column too. */
+    .results-table td.sorted-column-cell {
+        font-weight: 700;
+    }
     /* Slightly larger column headers, smaller cell values than the
-       admin-tools defaults (0.7rem / 1rem). */
+       admin-tools defaults (0.7rem / 1rem). Weight is dialled back from the
+       admin-tools 700 so the sorted column's bold header actually stands out. */
     .results-table th {
         font-size: 0.78rem;
+        font-weight: 600;
     }
     .results-table th.quota-header {
         text-transform: none;
@@ -365,6 +376,13 @@ foreach ($stats as $r) {
                     icon.classList.toggle('lucide-chevron-up', other === button && activeDir === 'asc');
                     icon.classList.toggle('lucide-chevron-down', other !== button || activeDir === 'desc');
                 });
+
+                // Bold every value in the sorted column, not just its header.
+                Array.from(tbody.rows).forEach(function (row) {
+                    Array.from(row.cells).forEach(function (cell, index) {
+                        cell.classList.toggle('sorted-column-cell', index === columnIndex);
+                    });
+                });
             });
         });
     }
@@ -424,7 +442,7 @@ foreach ($stats as $r) {
                             <td data-sort="<?php echo $row['user_id']; ?>"><?php echo $row['user_id']; ?></td>
                             <td style="white-space: nowrap;" data-sort="<?php echo htmlspecialchars(mb_strtolower($row['username'] ?? ''), ENT_QUOTES); ?>">
                                 <?php if ($row['username'] !== null): ?>
-                                    <strong><?php echo htmlspecialchars($row['username'], ENT_QUOTES); ?></strong>
+                                    <?php echo htmlspecialchars($row['username'], ENT_QUOTES); ?>
                                 <?php else: ?>
                                     <span style="color: var(--text-muted, #999);">—</span>
                                 <?php endif; ?>
@@ -440,7 +458,7 @@ foreach ($stats as $r) {
                             <td class="hide-mobile" data-sort="<?php echo $row['db_bytes']; ?>"><?php echo poznoteFormatMb($row['db_bytes']); ?></td>
                             <td class="hide-mobile" data-sort="<?php echo $row['entries_bytes']; ?>"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
                             <td class="hide-mobile" data-sort="<?php echo $row['attachments_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
-                            <td data-sort="<?php echo $row['total_bytes']; ?>"><strong><?php echo poznoteFormatMb($row['total_bytes']); ?></strong></td>
+                            <td data-sort="<?php echo $row['total_bytes']; ?>"><?php echo poznoteFormatMb($row['total_bytes']); ?></td>
                             <td style="white-space: nowrap;">
                                 <?php if ($row['is_admin']): ?>
                                     <span style="color: var(--text-muted, #999);"><?php echo t_h('admin_tools.storage_stats.quota_admin_exempt', [], 'Unlimited because admin'); ?></span>

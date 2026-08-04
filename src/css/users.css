@@ -218,6 +218,11 @@ body.dark-mode {
     opacity: 1;
 }
 
+/* Bold the header of the column the table is currently sorted on. */
+.users-sort-link.users-sort-active {
+    font-weight: 700;
+}
+
 .users-table-header-with-help {
     display: inline-flex;
     align-items: center;
@@ -294,6 +299,13 @@ body.dark-mode .users-header-help:focus-visible {
 
 .users-table td.user-created-cell {
     white-space: nowrap;
+}
+
+/* Bold every value in the sorted column (the header itself is handled by
+   .users-sort-active above). Declared after .user-id-cell so it still wins
+   when the table is sorted on the ID column. */
+.users-table td.sorted-column-cell {
+    font-weight: 700;
 }
 
 .users-table tbody tr {

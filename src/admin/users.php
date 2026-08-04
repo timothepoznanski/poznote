@@ -318,7 +318,6 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         }
         .user-current {
             color: #2E8CFA;
-            font-weight: 600;
         }
         [data-theme='dark'] .user-current {
             color: #4a9eff;
@@ -462,6 +461,25 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     }
 
     document.addEventListener('DOMContentLoaded', initMobileUserCards);
+
+    /**
+     * Bold every value in the sorted column, not just its header. The sort is
+     * server-side, so the active header (rendered with .users-sort-active) is
+     * what tells us which column index to mark.
+     */
+    function markSortedUsersColumn() {
+        const table = document.querySelector('.users-table');
+        const activeHeader = table ? table.querySelector('thead .users-sort-active') : null;
+        if (!activeHeader) return;
+
+        const columnIndex = activeHeader.closest('th').cellIndex;
+        table.querySelectorAll('tbody tr').forEach(function (row) {
+            const cell = row.cells[columnIndex];
+            if (cell) cell.classList.add('sorted-column-cell');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', markSortedUsersColumn);
 
     function openAccessModal(userId, username, accessIds) {
         const normalizedAccessIds = (Array.isArray(accessIds) ? accessIds : []).map(Number);
