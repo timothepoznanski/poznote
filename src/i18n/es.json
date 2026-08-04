@@ -1575,30 +1575,16 @@
     },
     "share_modal": {
       "description": "Una URL compartida crea un enlace público a esta nota. Una vez creada la URL, se ofrecerán otras opciones, como proteger la nota con contraseña o personalizar la URL compartida.",
-      "custom_token": "Enlace personalizado (opcional)",
-      "custom_token_placeholder": "mi-enlace-personalizado-1",
-      "custom_token_example": "Lo que dará por ejemplo:",
-      "password": "Contraseña (opcional)",
-      "password_placeholder": "Ingrese una contraseña",
-      "indexable": "Permitir indexación por motores de búsqueda",
       "create_url": "Crear URL",
-      "close": "Cerrar",
       "error_prefix": "Error: ",
       "unknown_error": "Error desconocido al crear el enlace público",
       "error_creating": "Error al crear el enlace público: "
     },
     "public_modal": {
       "title": "URL compartida",
-      "redirect_info": "Este recurso compartido ahora se gestiona desde la página Compartidos, donde puedes editar su configuración pública.",
-      "close": "Cerrar",
-      "open": "Abrir",
-      "copy": "Copiar",
-      "revoke": "Revocar",
       "renew": "Renovar",
       "renew_token": "Renovar enlace",
       "manage": "Editar",
-      "create_url": "Crear url",
-      "no_link_yet": "Aún no hay enlace público",
       "custom_token": "Enlace personalizado (opcional)",
       "custom_token_placeholder": "mi-enlace-personalizado-1",
       "indexable": "Permitir indexación por motores de búsqueda",
@@ -1608,19 +1594,12 @@
       "access_check_only": "Solo marcar o desmarcar",
       "access_full": "Edición completa",
       "password": "Contraseña (opcional)",
-      "password_placeholder": "Ingrese una contraseña",
-      "error_prefix": "Error: ",
-      "unknown_error": "Error desconocido al crear el enlace público",
-      "error_creating": "Error al crear el enlace público: "
+      "password_placeholder": "Ingrese una contraseña"
     },
     "folder_share_modal": {
       "title": "URL de carpeta compartida",
       "create_description": "Una URL compartida crea un enlace público a esta carpeta. Una vez creada la URL, se ofrecerán otras opciones, como proteger la carpeta con contraseña o personalizar la URL compartida.",
-      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta (a menos que esté protegida con contraseña).",
-      "use_https": "HTTPS",
-      "renewed": "Enlace de carpeta compartida renovado",
-      "failed_renew": "Error al renovar el enlace de la carpeta",
-      "failed_revoke": "Error al revocar el enlace de la carpeta"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Permisos",

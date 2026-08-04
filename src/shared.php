@@ -186,6 +186,7 @@ usort($shared_folders, function($a, $b) {
       data-txt-no-shared-with-me="<?php echo t_h('public.no_shared_with_me', [], 'Nothing has been shared with you yet.'); ?>"
       data-txt-copy-url="<?php echo t_h('public.actions.copy_url', [], 'Copy URL'); ?>"
       data-txt-url-copied="<?php echo t_h('public.actions.url_copied', [], 'URL copied!'); ?>"
+      data-txt-share-link-copied="<?php echo t_h('workspaces.share.messages.url_copied', [], 'Share link copied to clipboard!'); ?>"
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
 	data-txt-access-denied-title="<?php echo t_h('public.access_denied_title', [], 'Access Denied'); ?>"
 	data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"

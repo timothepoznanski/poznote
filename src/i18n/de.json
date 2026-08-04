@@ -1574,30 +1574,16 @@
     },
     "share_modal": {
       "description": "Eine geteilte URL erstellt einen öffentlichen Link zu dieser Notiz. Sobald die URL erstellt wurde, stehen weitere Optionen zur Verfügung, zum Beispiel ein Passwortschutz für die Notiz oder eine Anpassung der Freigabe-URL.",
-      "custom_token": "Benutzerdefinierter Link (optional)",
-      "custom_token_placeholder": "mein-benutzerdefinierter-link-1",
-      "custom_token_example": "Das ergibt zum Beispiel:",
-      "password": "Passwort (optional)",
-      "password_placeholder": "Geben Sie ein Passwort ein",
-      "indexable": "Suchmaschinenindizierung zulassen",
       "create_url": "URL erstellen",
-      "close": "Schließen",
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
       "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
     },
     "public_modal": {
       "title": "Geteilte URL",
-      "redirect_info": "Diese Freigabe wird jetzt auf der Seite \"Geteilt\" verwaltet, wo Sie ihre öffentlichen Einstellungen bearbeiten können.",
-      "close": "Schließen",
-      "open": "Öffnen",
-      "copy": "Kopieren",
-      "revoke": "Widerrufen",
       "renew": "Erneuern",
       "renew_token": "Link erneuern",
       "manage": "Bearbeiten",
-      "create_url": "URL erstellen",
-      "no_link_yet": "Noch kein öffentlicher Link",
       "custom_token": "Benutzerdefinierter Link (optional)",
       "custom_token_placeholder": "mein-benutzerdefinierter-link-1",
       "indexable": "Suchmaschinenindizierung zulassen",
@@ -1607,19 +1593,12 @@
       "access_check_only": "Nur abhaken oder Häkchen entfernen",
       "access_full": "Vollständige Bearbeitung",
       "password": "Passwort (optional)",
-      "password_placeholder": "Geben Sie ein Passwort ein",
-      "error_prefix": "Fehler: ",
-      "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
-      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+      "password_placeholder": "Geben Sie ein Passwort ein"
     },
     "folder_share_modal": {
       "title": "Geteilter Ordner URL",
       "create_description": "Eine geteilte URL erstellt einen öffentlichen Link zu diesem Ordner. Sobald die URL erstellt wurde, stehen weitere Optionen zur Verfügung, zum Beispiel ein Passwortschutz für den Ordner oder eine Anpassung der Freigabe-URL.",
-      "description": "Jeder mit diesem Link kann alle Notizen in diesem Ordner ansehen (außer wenn passwortgeschützt).",
-      "use_https": "HTTPS",
-      "renewed": "Ordner-Freigabelink erneuert",
-      "failed_renew": "Fehler beim Erneuern der Ordnerfreigabe",
-      "failed_revoke": "Fehler beim Widerrufen der Ordnerfreigabe"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Berechtigungen",

@@ -682,70 +682,13 @@ body.dark-mode #shareModal h3 {
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] #shareModal .share-url,
-body.dark-mode #shareModal .share-url {
-    background: transparent;
-    border: none;
-    color: #e0e0e0;
-    padding: 0;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-label,
-body.dark-mode #shareModal .share-custom-label {
-    color: #e6e6e6;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-label .optional-text,
-body.dark-mode #shareModal .share-custom-label .optional-text {
-    color: #dc3545;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-input,
-body.dark-mode #shareModal .share-custom-input {
-    background: var(--dm-surface);
-    border: 1px solid var(--dm-border);
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-input::placeholder,
-body.dark-mode #shareModal .share-custom-input::placeholder {
-    color: #666;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-example,
-body.dark-mode #shareModal .share-custom-example,
-html[data-theme='dark'] #folderShareModal .share-custom-example,
-body.dark-mode #folderShareModal .share-custom-example {
-    color: #d7d7d7;
-}
-
-html[data-theme='dark'] #shareModal .share-password-label,
-body.dark-mode #shareModal .share-password-label {
-    color: #e6e6e6;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-token-highlight,
-body.dark-mode #shareModal .share-custom-token-highlight,
-html[data-theme='dark'] #folderShareModal .share-custom-token-highlight,
-body.dark-mode #folderShareModal .share-custom-token-highlight {
-    color: #ff6b81;
-}
-
-html[data-theme='dark'] #shareModal .share-indexable-label,
-body.dark-mode #shareModal .share-indexable-label {
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] #shareModal .toggle-slider,
+/* Toggle switch: shared component, also used outside the share modals */
 html[data-theme='dark'] .toggle-slider,
-body.dark-mode #shareModal .toggle-slider,
 body.dark-mode .toggle-slider {
     background-color: #555;
 }
 
-html[data-theme='dark'] #shareModal input:checked+.toggle-slider,
 html[data-theme='dark'] input:checked+.toggle-slider,
-body.dark-mode #shareModal input:checked+.toggle-slider,
 body.dark-mode input:checked+.toggle-slider {
     background-color: #28a745 !important;
 }
@@ -759,19 +702,6 @@ body.dark-mode #folderShareModal .modal-content {
 
 html[data-theme='dark'] #folderShareModal h3,
 body.dark-mode #folderShareModal h3 {
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] #folderShareModal .share-url,
-body.dark-mode #folderShareModal .share-url {
-    background: transparent;
-    border: none;
-    color: #e0e0e0;
-    padding: 0;
-}
-
-html[data-theme='dark'] #folderShareModal .share-indexable-label,
-body.dark-mode #folderShareModal .share-indexable-label {
     color: #e0e0e0;
 }
 

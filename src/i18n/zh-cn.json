@@ -1570,30 +1570,16 @@
     },
     "share_modal": {
       "description": "共享 URL 会为这条笔记创建一个公开链接。创建后，你还可以使用更多选项，例如为笔记设置密码，或自定义共享 URL。",
-      "custom_token": "自定义链接 (可选)",
-      "custom_token_placeholder": "my-custom-link-1",
-      "custom_token_example": "例如，这将得到：",
-      "password": "密码 (可选)",
-      "password_placeholder": "输入密码",
-      "indexable": "允许搜索引擎索引",
       "create_url": "创建 URL",
-      "close": "关闭",
       "error_prefix": "错误: ",
       "unknown_error": "创建公开共享时发生未知错误",
       "error_creating": "创建公开共享时出错: "
     },
     "public_modal": {
       "title": "已共享 URL",
-      "redirect_info": "这个共享现在通过“已共享”页面管理，你可以在那里修改它的公开设置。",
-      "close": "关闭",
-      "open": "打开",
-      "copy": "复制",
-      "revoke": "撤销",
       "renew": "更新",
       "renew_token": "更新链接",
       "manage": "编辑",
-      "create_url": "创建 URL",
-      "no_link_yet": "尚未创建公开链接",
       "custom_token": "自定义链接 (可选)",
       "custom_token_placeholder": "my-custom-link-1",
       "indexable": "允许搜索引擎索引",
@@ -1603,19 +1589,12 @@
       "access_check_only": "仅勾选或取消勾选",
       "access_full": "完全编辑",
       "password": "密码 (可选)",
-      "password_placeholder": "输入密码",
-      "error_prefix": "错误: ",
-      "unknown_error": "创建公开共享时发生未知错误",
-      "error_creating": "创建公开共享时出错: "
+      "password_placeholder": "输入密码"
     },
     "folder_share_modal": {
       "title": "共享文件夹 URL",
       "create_description": "共享 URL 会为此文件夹创建一个公开链接。创建后，你还可以使用更多选项，例如为文件夹设置密码，或自定义共享 URL。",
-      "description": "任何拥有此链接的人都可以查看此文件夹中的所有笔记（除非有密码保护）。",
-      "use_https": "HTTPS",
-      "renewed": "文件夹共享链接已更新",
-      "failed_renew": "更新文件夹共享失败",
-      "failed_revoke": "撤销文件夹共享失败"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "权限",

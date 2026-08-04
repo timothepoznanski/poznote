@@ -1578,30 +1578,16 @@
     },
     "share_modal": {
       "description": "Uma URL compartilhada cria um link público para esta nota. Depois que a URL for criada, outras opções serão oferecidas, como proteger a nota com senha ou personalizar a URL de compartilhamento.",
-      "custom_token": "Link personalizado (opcional)",
-      "custom_token_placeholder": "meu-link-personalizado-1",
-      "custom_token_example": "O que dará, por exemplo:",
-      "password": "Senha (opcional)",
-      "password_placeholder": "Digite uma senha",
-      "indexable": "Permitir indexação por motores de busca",
       "create_url": "Criar URL",
-      "close": "Fechar",
       "error_prefix": "Erro: ",
       "unknown_error": "Erro desconhecido ao criar compartilhamento público",
       "error_creating": "Erro ao criar compartilhamento público: "
     },
     "public_modal": {
       "title": "URL compartilhada",
-      "redirect_info": "Este compartilhamento agora é gerenciado na página Compartilhados, onde você pode editar suas configurações públicas.",
-      "close": "Fechar",
-      "open": "Abrir",
-      "copy": "Copiar",
-      "revoke": "Revogar",
       "renew": "Renovar",
       "renew_token": "Renovar link",
       "manage": "Editar",
-      "create_url": "Criar url",
-      "no_link_yet": "Nenhum link público ainda",
       "custom_token": "Link personalizado (opcional)",
       "custom_token_placeholder": "meu-link-personalizado-1",
       "indexable": "Permitir indexação por motores de busca",
@@ -1611,19 +1597,12 @@
       "access_check_only": "Apenas marcar ou desmarcar",
       "access_full": "Edição completa",
       "password": "Senha (opcional)",
-      "password_placeholder": "Digite uma senha",
-      "error_prefix": "Erro: ",
-      "unknown_error": "Erro desconhecido ao criar compartilhamento público",
-      "error_creating": "Erro ao criar compartilhamento público: "
+      "password_placeholder": "Digite uma senha"
     },
     "folder_share_modal": {
       "title": "URL da pasta compartilhada",
       "create_description": "Uma URL compartilhada cria um link público para esta pasta. Depois que a URL for criada, outras opções serão oferecidas, como proteger a pasta com senha ou personalizar a URL de compartilhamento.",
-      "description": "Qualquer pessoa com este link pode ver todas as notas desta pasta (exceto se protegida por senha).",
-      "use_https": "HTTPS",
-      "renewed": "Link de compartilhamento da pasta renovado",
-      "failed_renew": "Falha ao renovar o compartilhamento da pasta",
-      "failed_revoke": "Falha ao revogar o compartilhamento da pasta"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Permissões",
