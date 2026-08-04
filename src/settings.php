@@ -199,7 +199,8 @@ if ($isAdmin) {
             'user_max_notes',
             'user_max_storage_mb',
             'git_sync_enabled',
-            'hide_restrict_users',
+            'tenant_isolation',
+            'tenant_isolation_applied_ui_keys',
         ];
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
             $settingsPageConfig['settings'][$settingsPageKey] = getGlobalSetting($settingsPageKey, '');
@@ -966,15 +967,15 @@ if ($isPrimaryAccount) {
                 </div>
             </div>
 
-            <!-- Hide "Restrict to specific users" toggles in share dialogs -->
-            <div class="home-card" id="hide-restrict-users-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.hide_restrict_users', [], 'Hide the "Restrict to specific users" toggles in share dialogs (shared notes/folders and workspace sharing). Existing restrictions keep working.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <!-- Tenant isolation (SaaS mode) -->
+            <div class="home-card" id="tenant-isolation-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: prevent non-admin users from discovering the other accounts of the instance. The user directory becomes admin-only and sharing with specific users is refused. Leave it off for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
-                    <i class="lucide lucide-users"></i>
+                    <i class="lucide lucide-shield"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.hide_restrict_users', [], 'Hide share user restriction'); ?></span>
-                    <span id="hide-restrict-users-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span>
+                    <span id="tenant-isolation-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 

@@ -371,6 +371,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "SaaS 模式：阻止非管理员用户发现实例中的其他账户。用户目录仅限管理员访问，并拒绝与特定用户共享。家庭或团队实例请保持关闭。",
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
@@ -419,7 +420,6 @@
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
-      "hide_restrict_users": "在分享对话框中隐藏“限制为特定用户”选项（共享笔记/文件夹和工作区共享）。现有限制仍然有效。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
       "custom_css": "应用您自己的 CSS 来自定义 Poznote 的外观。",
@@ -464,6 +464,7 @@
       "reload_hint": "正在重载..."
     },
     "cards": {
+      "tenant_isolation": "租户隔离",
       "workspaces": "工作区",
       "user_management": "用户管理",
       "backup_export": "备份 / 导出",
@@ -490,7 +491,6 @@
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
       "git_sync_toggle": "Git 同步",
-      "hide_restrict_users": "隐藏共享用户限制",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
       "webhooks": "Webhook",
@@ -1001,6 +1001,9 @@
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "网格 / 列表切换",
       "index_search_bar": "搜索栏",
+      "share_restrict_users": "分享：限制为特定用户",
+      "share_protocol_toggle": "分享：HTTPS 开关",
+      "share_shared_with_me": "分享：“与我共享”",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "show_unchecked_only": "仅显示未勾选的项目",

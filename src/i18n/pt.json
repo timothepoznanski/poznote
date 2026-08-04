@@ -368,6 +368,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "Modo SaaS: impede que os utilizadores não administradores descubram as outras contas da instância. O diretório de utilizadores fica reservado aos administradores e a partilha com utilizadores específicos é recusada. Deixe desativado numa instância familiar ou de equipa.",
       "workspaces": "Organize suas notas em espaços de trabalho separados, cada um com suas pastas e notas.",
       "my_profile": "Veja e edite as informações do seu perfil.",
       "change_password": "Altere a senha usada para entrar.",
@@ -416,7 +417,6 @@
       "webhooks": "Envie eventos da instância para serviços externos via webhooks.",
       "ai_assistant": "Configure o assistente de IA usado para conversar com suas notas.",
       "git_sync_enabled": "Ative ou desative a sincronização Git nesta instância.",
-      "hide_restrict_users": "Oculta as opções «Restringir a utilizadores específicos» nos diálogos de partilha (notas/pastas partilhadas e partilha de espaços de trabalho). As restrições existentes continuam a funcionar.",
       "import_limits": "Defina o número máximo de arquivos permitidos por importação.",
       "user_quotas": "Limite o número de notas e o armazenamento disponível por usuário.",
       "custom_css": "Aplique seu próprio CSS para personalizar a aparência do Poznote.",
@@ -461,6 +461,7 @@
       "reload_hint": "Recarregando…"
     },
     "cards": {
+      "tenant_isolation": "Isolamento de contas",
       "workspaces": "Espaços de trabalho",
       "backup_export": "Backup / Exportar",
       "restore_import": "Restaurar / Importar",
@@ -487,7 +488,6 @@
       "import_limits": "Limites de importação",
       "user_quotas": "Cotas de usuário",
       "git_sync_toggle": "Sincronização Git",
-      "hide_restrict_users": "Ocultar restrição por utilizadores",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-mail",
       "webhooks": "Webhooks",
@@ -1000,6 +1000,9 @@
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar grade / lista",
       "index_search_bar": "Barra de pesquisa",
+      "share_restrict_users": "Partilha: restringir a utilizadores específicos",
+      "share_protocol_toggle": "Partilha: interruptor HTTPS",
+      "share_shared_with_me": "Partilha: «Partilhado comigo»",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",
       "show_unchecked_only": "Mostrar apenas os itens desmarcados",

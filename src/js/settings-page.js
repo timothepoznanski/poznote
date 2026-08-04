@@ -136,8 +136,8 @@
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
         }
-        if (document.getElementById('hide-restrict-users-card')) {
-            keys.push('hide_restrict_users');
+        if (document.getElementById('tenant-isolation-card')) {
+            keys.push('tenant_isolation', 'tenant_isolation_applied_ui_keys');
         }
 
         var unique = Object.create(null);
@@ -998,12 +998,12 @@
         });
     }
 
-    function refreshHideRestrictUsersBadge() {
-        var badge = document.getElementById('hide-restrict-users-status');
+    function refreshTenantIsolationBadge() {
+        var badge = document.getElementById('tenant-isolation-status');
         if (!badge) return;
 
         var txt = getTranslations();
-        getSetting('hide_restrict_users', function (value) {
+        getSetting('tenant_isolation', function (value) {
             var enabled = value === '1' || value === 'true';
             badge.textContent = enabled ? txt.enabled : txt.disabled;
             badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
@@ -1645,16 +1645,24 @@
             });
         }
 
-        // Hide "Restrict to specific users" global toggle
-        var hideRestrictUsersCard = document.getElementById('hide-restrict-users-card');
-        if (hideRestrictUsersCard) {
-            hideRestrictUsersCard.addEventListener('click', function () {
-                getSetting('hide_restrict_users', function (currentValue) {
+        // Tenant isolation (SaaS mode) global toggle. Enabling it also hides the
+        // controls that became pointless for everyone, so the UI stops offering
+        // what the server now refuses. Turning it back off removes only what the
+        // toggle itself added, leaving the administrator's own choices alone.
+        var tenantIsolationCard = document.getElementById('tenant-isolation-card');
+        if (tenantIsolationCard) {
+            tenantIsolationCard.addEventListener('click', function () {
+                getSetting('tenant_isolation', function (currentValue) {
                     var currently = currentValue === '1' || currentValue === 'true';
-                    var toSet = currently ? '0' : '1';
-                    setSetting('hide_restrict_users', toSet, function () {
-                        refreshHideRestrictUsersBadge();
-                        reloadOpener();
+                    var enabling = !currently;
+
+                    setSetting('tenant_isolation', enabling ? '1' : '0', function () {
+                        syncTenantIsolationHiddenKeys(enabling, function () {
+                            refreshTenantIsolationBadge();
+                            refreshUiCustomizationAdminBadge();
+                            refreshUiCustomizationBadge();
+                            reloadOpener();
+                        });
                     });
                 });
             });
@@ -2244,7 +2252,7 @@
             refreshImportLimitsBadges();
             refreshUserQuotasBadges();
             refreshGitSyncEnabledBadge();
-            refreshHideRestrictUsersBadge();
+            refreshTenantIsolationBadge();
             refreshUiCustomizationBadge();
             refreshUiCustomizationAdminBadge();
         });
@@ -2654,6 +2662,53 @@
             .filter(function (key) {
                 return typeof key === 'string' && allowed[key];
             });
+    }
+
+    // UI keys that tenant isolation hides for every user. They are only the
+    // cosmetic half: the server refuses these actions regardless, so unchecking
+    // one by hand re-displays a control that still fails with a 403.
+    var TENANT_ISOLATION_HIDDEN_KEYS = ['share:restrict-users'];
+
+    // Records which keys this toggle added, so disabling isolation removes those
+    // and not the ones the administrator had already hidden on purpose.
+    var TENANT_ISOLATION_APPLIED_SETTING = 'tenant_isolation_applied_ui_keys';
+
+    function syncTenantIsolationHiddenKeys(enabling, done) {
+        getSetting('hidden_ui_elements_global', function (rawGlobal) {
+            getSetting(TENANT_ISOLATION_APPLIED_SETTING, function (rawApplied) {
+                var hidden = parseHiddenUiCustomization(rawGlobal);
+                var applied = [];
+                try { applied = JSON.parse(rawApplied || '[]'); } catch (e) { applied = []; }
+                if (!Array.isArray(applied)) applied = [];
+
+                var present = Object.create(null);
+                hidden.forEach(function (key) { present[key] = true; });
+
+                var nextApplied;
+                if (enabling) {
+                    // Only claim the keys we actually add: one already hidden by
+                    // the admin must stay hidden when isolation is turned off.
+                    nextApplied = TENANT_ISOLATION_HIDDEN_KEYS.filter(function (key) {
+                        return !present[key];
+                    });
+                    nextApplied.forEach(function (key) {
+                        hidden.push(key);
+                        present[key] = true;
+                    });
+                } else {
+                    var toRemove = Object.create(null);
+                    applied.forEach(function (key) { toRemove[key] = true; });
+                    hidden = hidden.filter(function (key) { return !toRemove[key]; });
+                    nextApplied = [];
+                }
+
+                setSetting('hidden_ui_elements_global', JSON.stringify(hidden), function () {
+                    setSetting(TENANT_ISOLATION_APPLIED_SETTING, JSON.stringify(nextApplied), function () {
+                        if (typeof done === 'function') done();
+                    });
+                });
+            });
+        });
     }
 
     function normalizeUiCustomizationFilterText(value) {

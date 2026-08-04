@@ -376,6 +376,17 @@ async function createPublicShare(noteId) {
     }
 }
 
+/**
+ * True when a share dialog control is hidden through UI customization.
+ * @param {string} key - UI customization key, e.g. 'share:protocol-toggle'
+ * @returns {boolean}
+ */
+function isShareControlHidden(key) {
+    return !!(window.PoznoteUiCustomization
+        && typeof window.PoznoteUiCustomization.isHidden === 'function'
+        && window.PoznoteUiCustomization.isHidden(key));
+}
+
 function getPublicShareBaseUrl() {
     const url = new URL(window.location.href);
     let path = url.pathname;
@@ -536,7 +547,9 @@ function showShareModal(url, options) {
         protocolLabel.appendChild(protocolText);
         protocolLabel.appendChild(toggleSwitch);
         protocolWrap.appendChild(protocolLabel);
-        content.insertBefore(protocolWrap, urlDiv);
+        if (!isShareControlHidden('share:protocol-toggle')) {
+            content.insertBefore(protocolWrap, urlDiv);
+        }
         protocolCheckbox.addEventListener('change', function () {
             const nextProto = protocolCheckbox.checked ? 'https' : 'http';
             setPreferredPublicUrlProtocol(nextProto);
@@ -1133,7 +1146,9 @@ function showFolderShareModal(url, options) {
         protocolLabel.appendChild(protocolText);
         protocolLabel.appendChild(toggleSwitch);
         protocolWrap.appendChild(protocolLabel);
-        content.insertBefore(protocolWrap, urlDiv);
+        if (!isShareControlHidden('share:protocol-toggle')) {
+            content.insertBefore(protocolWrap, urlDiv);
+        }
 
         protocolCheckbox.addEventListener('change', function () {
             const nextProto = protocolCheckbox.checked ? 'https' : 'http';

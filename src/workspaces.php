@@ -559,6 +559,11 @@ if ($_POST) {
                 $rawLoginRequired = strtolower(trim((string)($_POST['login_required'] ?? '0')));
                 $loginRequired = in_array($rawLoginRequired, ['1', 'true', 'yes', 'on'], true);
                 $allowedUserIds = sanitizeWorkspaceShareAllowedUsers($_POST['allowed_users'] ?? []);
+                // Under tenant isolation a non-admin must not be able to name
+                // another account, even by posting raw ids past the hidden UI.
+                if (!empty($allowedUserIds) && function_exists('poznoteCanTargetOtherUsers') && !poznoteCanTargetOtherUsers()) {
+                    $allowedUserIds = [];
+                }
                 if (!empty($allowedUserIds)) {
                     $loginRequired = true;
                 }
@@ -753,7 +758,8 @@ try {
         data-txt-show-password="<?php echo htmlspecialchars(t('login.show_password', [], 'Show password', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
         data-txt-hide-password="<?php echo htmlspecialchars(t('login.hide_password', [], 'Hide password', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
         data-txt-workspace-share-require-login="<?php echo htmlspecialchars(t('workspaces.share.options.require_login', [], 'Require Poznote login', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-        data-hide-restrict-users="<?php echo HIDE_RESTRICT_USERS ? '1' : '0'; ?>"
+        data-hide-restrict-users="<?php echo (!poznoteCanTargetOtherUsers() || poznoteIsUiElementHidden('share:restrict-users')) ? '1' : '0'; ?>"
+        data-hide-protocol-toggle="<?php echo poznoteIsUiElementHidden('share:protocol-toggle') ? '1' : '0'; ?>"
         data-txt-workspace-share-restrict-users="<?php echo htmlspecialchars(t('workspaces.share.options.restrict_users', [], 'Restrict to specific users', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
         data-txt-workspace-share-users-loading="<?php echo htmlspecialchars(t('workspaces.share.options.users_loading', [], 'Loading users...', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
         data-txt-workspace-share-no-users="<?php echo htmlspecialchars(t('workspaces.share.options.no_users_found', [], 'No other users found', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"

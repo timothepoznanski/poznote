@@ -932,7 +932,7 @@ function showWorkspaceShareOptionsModal(button) {
 
             var displayName = document.createElement('span');
             displayName.className = 'share-user-list-name';
-            displayName.textContent = user.username + (user.email ? ' (' + user.email + ')' : '');
+            displayName.textContent = user.username;
 
             row.appendChild(checkbox);
             row.appendChild(displayName);
@@ -959,8 +959,7 @@ function showWorkspaceShareOptionsModal(button) {
                 }).map(function (user) {
                     return {
                         id: parseInt(user.id, 10),
-                        username: user.username || '',
-                        email: user.email || ''
+                        username: user.username || ''
                     };
                 });
                 usersLoaded = true;

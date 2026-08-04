@@ -370,6 +370,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "Modo SaaS: impide que los usuarios no administradores descubran las demás cuentas de la instancia. El directorio de usuarios queda reservado a los administradores y se rechaza compartir con usuarios específicos. Déjelo desactivado en una instancia familiar o de equipo.",
       "workspaces": "Organiza tus notas en espacios de trabajo separados, cada uno con sus carpetas y notas.",
       "my_profile": "Consulta y edita la información de tu perfil.",
       "change_password": "Cambia la contraseña utilizada para iniciar sesión.",
@@ -418,7 +419,6 @@
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
-      "hide_restrict_users": "Oculta las opciones «Restringir a usuarios específicos» en los diálogos de compartir (notas/carpetas compartidas y compartición de espacios de trabajo). Las restricciones existentes siguen funcionando.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
       "custom_css": "Aplica tu propio CSS para personalizar la apariencia de Poznote.",
@@ -463,6 +463,7 @@
       "reload_hint": "Recargando…"
     },
     "cards": {
+      "tenant_isolation": "Aislamiento de cuentas",
       "workspaces": "Espacios de trabajo",
       "backup_export": "Copia de seguridad / Exportar",
       "restore_import": "Restaurar / Importar",
@@ -489,7 +490,6 @@
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
       "git_sync_toggle": "Sincronización Git",
-      "hide_restrict_users": "Ocultar restricción por usuarios",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks",
@@ -1002,6 +1002,9 @@
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar cuadrícula / lista",
       "index_search_bar": "Barra de búsqueda",
+      "share_restrict_users": "Compartir: restringir a usuarios específicos",
+      "share_protocol_toggle": "Compartir: interruptor HTTPS",
+      "share_shared_with_me": "Compartir: «Compartido conmigo»",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
       "show_unchecked_only": "Mostrar solo los elementos desmarcados",

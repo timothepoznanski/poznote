@@ -381,6 +381,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "Mode SaaS : empêche les utilisateurs non administrateurs de découvrir les autres comptes de l'instance. L'annuaire des utilisateurs devient réservé aux administrateurs et le partage avec des utilisateurs spécifiques est refusé. Laissez cette option désactivée pour une instance familiale ou d'équipe.",
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
@@ -429,7 +430,6 @@
       "webhooks": "Envoyez les événements de l'instance vers des services externes via des webhooks.",
       "ai_assistant": "Configurez l'assistant IA utilisé pour discuter avec vos notes.",
       "git_sync_enabled": "Activez ou désactivez la synchronisation Git sur cette instance.",
-      "hide_restrict_users": "Masquez les options « Restreindre à des utilisateurs spécifiques » dans les fenêtres de partage (notes/dossiers partagés et partage d'espaces de travail). Les restrictions existantes restent actives.",
       "import_limits": "Définissez le nombre maximal de fichiers autorisés par import.",
       "user_quotas": "Limitez le nombre de notes et le stockage disponibles par utilisateur.",
       "custom_css": "Appliquez votre propre CSS pour personnaliser l'apparence de Poznote.",
@@ -474,6 +474,7 @@
       "reload_hint": "Rechargement…"
     },
     "cards": {
+      "tenant_isolation": "Isolation des comptes",
       "workspaces": "Espaces de travail",
       "user_management": "Gestion des utilisateurs",
       "backup_export": "Sauvegarde / Export",
@@ -500,7 +501,6 @@
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
       "git_sync_toggle": "Synchronisation Git",
-      "hide_restrict_users": "Masquer la restriction par utilisateurs",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
@@ -1026,6 +1026,9 @@
       "dashboard_filter_bar": "Barre de filtre",
       "view_layout_toggle": "Bascule grille / liste",
       "index_search_bar": "Barre de recherche",
+      "share_restrict_users": "Partage : restreindre à des utilisateurs spécifiques",
+      "share_protocol_toggle": "Partage : bascule HTTPS",
+      "share_shared_with_me": "Partage : « Partagé avec moi »",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "show_unchecked_only": "Afficher uniquement les éléments décochés",

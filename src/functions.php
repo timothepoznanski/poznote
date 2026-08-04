@@ -1238,6 +1238,15 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#outlineResizeHandle { display: none !important; }';
                 $rules[] = '#outlineMobileBackdrop { display: none !important; }';
             }
+        } elseif ($type === 'share') {
+            // Share dialog blocks are built in JS. The CSS rule covers pages that
+            // do not load the customization runtime (shared.php, workspaces.php);
+            // the JS guards keep the hidden controls out of the saved payload.
+            if ($id === 'restrict-users') {
+                $rules[] = '.share-restrict-users-wrap { display: none !important; }';
+            } elseif ($id === 'protocol-toggle') {
+                $rules[] = '.share-protocol-wrap { display: none !important; }';
+            }
         }
     }
 
@@ -1266,6 +1275,30 @@ function poznoteRenderUiCustomizationBootstrap() {
 
 function poznoteUsesFolderIconKanban() {
     return !in_array('panel:folder-icon-kanban', poznoteGetHiddenUiElements(), true);
+}
+
+/**
+ * True when the given UI customization key is hidden for the current user.
+ * Used by pages that build share dialogs in JS and read the state from a
+ * body data-attribute instead of the customization runtime.
+ */
+function poznoteIsUiElementHidden($key) {
+    return in_array($key, poznoteGetHiddenUiElements(), true);
+}
+
+/**
+ * True when the current request may target other accounts of the instance by id
+ * (share restrictions, user directory). Tenant isolation turns an instance into
+ * a SaaS: a non-admin must not be able to learn that the other accounts exist,
+ * so naming them is refused server-side and not merely hidden in the UI.
+ * Admins keep the capability so they can still manage the instance.
+ */
+function poznoteCanTargetOtherUsers() {
+    if (!defined('TENANT_ISOLATION') || !TENANT_ISOLATION) {
+        return true;
+    }
+
+    return function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 }
 
 /**

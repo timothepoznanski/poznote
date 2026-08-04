@@ -17,7 +17,8 @@ class SettingsController {
         'login_display_name',
         'custom_css_path',
         'git_sync_enabled',
-        'hide_restrict_users',
+        'tenant_isolation',
+        'tenant_isolation_applied_ui_keys',
         'import_max_individual_files',
         'import_max_zip_files',
         'user_max_notes',
@@ -95,7 +96,7 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'git_sync_enabled' || $key === 'hide_restrict_users') {
+        if ($key === 'git_sync_enabled' || $key === 'tenant_isolation') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
@@ -283,7 +284,8 @@ class SettingsController {
             return substr(trim((string) $value), 0, 1000);
         }
 
-        if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global' || $key === 'settings_pinned_cards') {
+        if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global' || $key === 'settings_pinned_cards'
+            || $key === 'tenant_isolation_applied_ui_keys') {
             $raw = is_string($value) ? trim($value) : $value;
             if ($raw === '' || $raw === null || $raw === '[]') {
                 return '[]';

@@ -53,6 +53,7 @@
             txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             hideRestrictUsers: body.getAttribute('data-hide-restrict-users') === '1',
+            hideProtocolToggle: body.getAttribute('data-hide-protocol-toggle') === '1',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
             txtRestrictUsersMobile: body.getAttribute('data-txt-restrict-users-mobile') || 'Restrict',
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
@@ -1351,7 +1352,9 @@
         protocolLabel.appendChild(protocolText);
         protocolLabel.appendChild(protocolToggle);
         protocolWrap.appendChild(protocolLabel);
-        content.appendChild(protocolWrap);
+        if (!config.hideProtocolToggle) {
+            content.appendChild(protocolWrap);
+        }
 
         var indexableWrap = document.createElement('div');
         indexableWrap.className = 'share-indexable-wrap';
@@ -1460,7 +1463,7 @@
 
                 var displayName = document.createElement('span');
                 displayName.className = 'share-user-list-name';
-                displayName.textContent = user.username + (user.email ? ' (' + user.email + ')' : '');
+                displayName.textContent = user.username;
 
                 row.appendChild(cb);
                 row.appendChild(displayName);
@@ -1478,7 +1481,7 @@
                 availableUsers = (users || []).filter(function(u) {
                     return parseInt(u.id, 10) !== config.currentUserId;
                 }).map(function(u) {
-                    return { id: parseInt(u.id, 10), username: u.username, email: u.email };
+                    return { id: parseInt(u.id, 10), username: u.username };
                 });
                 renderUserCheckboxes();
             })

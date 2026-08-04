@@ -1481,7 +1481,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-webhooks-card" checked><span><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:hide-restrict-users-card" checked><span><?php echo t_h('settings.cards.hide_restrict_users', [], 'Hide share user restriction'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
@@ -1579,6 +1579,8 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarCreateBtn" checked><span><?php echo t_h('sidebar.create', [], 'Create'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>
                 </div>
                 </div>
 

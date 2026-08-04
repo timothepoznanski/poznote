@@ -426,19 +426,29 @@ class UsersController {
     
     /**
      * GET /api/v1/users/profiles - Get available user profiles (for login selector)
-     * This endpoint is public (no admin required)
+     * Available to any authenticated user, except on an instance running with
+     * TENANT_ISOLATION on: there the directory would let a tenant enumerate the
+     * other customers, so only admins may read it.
      */
     public function profiles() {
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
-        
+
+        if (defined('TENANT_ISOLATION') && TENANT_ISOLATION) {
+            if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
+                http_response_code(403);
+                return ['error' => 'User directory is not available on this instance'];
+            }
+        }
+
         $users = getAllUserProfiles();
-        
-        // Return only public info
+
+        // Only what picking a user actually needs. The email address is personal
+        // data and nothing in the share dialogs requires it to identify a user,
+        // so it is never exposed here, whatever the instance mode.
         return array_map(function($user) {
             return [
                 'id' => (int)$user['id'],
-                'username' => $user['username'],
-                'email' => $user['email'] ?? null
+                'username' => $user['username']
             ];
         }, $users);
     }
