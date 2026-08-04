@@ -952,7 +952,7 @@ input.admin-toggle:disabled:checked+.slider {
     }
 
     .users-table tr {
-        margin-bottom: 25px;
+        margin-bottom: 8px;
         border: 1px solid rgba(120, 120, 120, 0.28) !important;
         border-radius: 8px;
         background: var(--bg-color, #fff);
@@ -970,15 +970,15 @@ input.admin-toggle:disabled:checked+.slider {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 15px !important;
+        padding: 8px 12px !important;
         border-bottom: 1px solid var(--border-color, #eee) !important;
         text-align: left !important;
-        min-height: 50px;
+        min-height: 0;
     }
 
     .users-table td:last-child {
         border-bottom: none !important;
-        padding: 15px !important;
+        padding: 8px 12px !important;
         justify-content: center !important;
         background: var(--bg-secondary, #f8f8f8);
     }
@@ -1012,7 +1012,7 @@ input.admin-toggle:disabled:checked+.slider {
         text-transform: uppercase !important;
         letter-spacing: 0.5px;
         flex-shrink: 0;
-        min-width: 120px !important;
+        min-width: 96px !important;
         text-align: left !important;
     }
 
@@ -1026,7 +1026,7 @@ input.admin-toggle:disabled:checked+.slider {
     }
 
     .users-table td.user-id-cell::before {
-        min-width: 120px !important;
+        min-width: 96px !important;
         /* Ensure same width as others */
     }
 
@@ -1038,10 +1038,10 @@ input.admin-toggle:disabled:checked+.slider {
 
     /* Compact Delete Button */
     .actions-center .btn {
-        width: 44px !important;
-        min-width: 44px !important;
-        max-width: 44px !important;
-        height: 40px !important;
+        width: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        height: 34px !important;
         padding: 0 !important;
         border-radius: 10px;
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1146,6 +1146,9 @@ input.admin-toggle:disabled:checked+.slider {
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
         user-select: none;
+        /* The card header is the tap target, so keep it comfortably tappable
+           even though the other rows are now compact. */
+        min-height: 40px;
     }
 
     .users-table td.user-username-cell::after {
@@ -1170,8 +1173,9 @@ input.admin-toggle:disabled:checked+.slider {
         font-size: 1.2rem;
     }
 
-    .users-table td::before {
-        min-width: 100px !important;
+    .users-table td::before,
+    .users-table td.user-id-cell::before {
+        min-width: 84px !important;
         /* Slightly smaller for very small screens */
     }
 }
