@@ -53,7 +53,7 @@ function getStoredActiveTabNoteId(workspaceName) {
     var workspace = workspaceName || 'default';
 
     try {
-        var raw = localStorage.getItem('poznote_tabs_' + workspace);
+        var raw = localStorage.getItem(window.__poznoteTabsStorageKey(workspace));
         if (!raw) {
             return null;
         }

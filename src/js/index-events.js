@@ -36,7 +36,7 @@
         try {
             var params = new URLSearchParams(window.location.search || '');
             var workspace = window.selectedWorkspace || params.get('workspace') || 'default';
-            var raw = localStorage.getItem('poznote_tabs_' + workspace);
+            var raw = localStorage.getItem(window.__poznoteTabsStorageKey(workspace));
             if (!raw) return null;
 
             var data = JSON.parse(raw);

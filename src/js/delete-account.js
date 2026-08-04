@@ -142,6 +142,11 @@
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 if (data && data.success) {
+                    // The account is gone, so its open tabs and display
+                    // preferences must not outlive it in this browser.
+                    if (typeof window.__poznoteClearUserStorage === 'function') {
+                        window.__poznoteClearUserStorage();
+                    }
                     window.location.href = data.redirect || 'login.php';
                 } else {
                     deleteBtn.disabled = false;

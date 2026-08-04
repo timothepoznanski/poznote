@@ -4,12 +4,17 @@
 // (login page, public pages) the legacy shared keys are used as before.
 // On first read for a given user, the legacy shared value is migrated to the
 // user-scoped key so existing preferences are kept.
-window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
-    var uid = '';
+window.__poznoteUserId = (function () {
     try {
         var match = document.cookie.match(/(?:^|;\s*)poznote_uid=(\d+)/);
-        if (match) uid = match[1];
-    } catch (e) {}
+        return match ? match[1] : '';
+    } catch (e) {
+        return '';
+    }
+})();
+
+window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
+    var uid = window.__poznoteUserId;
 
     function scopedKey(key) {
         return uid ? key + '::u' + uid : key;
@@ -39,6 +44,45 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
         }
     };
 })();
+
+// Open tabs are stored per user and per workspace. Unlike the display
+// preferences above there is no migration from the legacy shared key: adopting
+// the tabs of whoever used the browser before is exactly the leak this scoping
+// prevents, since a tab title exposes another account's note. Tabs left under
+// the legacy key are dropped once so they cannot resurface later.
+window.__poznoteTabsStorageKey = function (workspace) {
+    var key = 'poznote_tabs_' + (workspace || 'default');
+    return window.__poznoteUserId ? key + '::u' + window.__poznoteUserId : key;
+};
+
+(function purgeLegacyTabKeys() {
+    if (!window.__poznoteUserId) return;
+
+    try {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+            var key = localStorage.key(i);
+            if (key && key.indexOf('poznote_tabs_') === 0 && key.indexOf('::u') === -1) {
+                localStorage.removeItem(key);
+            }
+        }
+    } catch (e) {}
+})();
+
+// Drop everything this browser holds for a user id, so deleting an account
+// does not leave its tabs and display preferences behind for the next account.
+window.__poznoteClearUserStorage = function (userId) {
+    var suffix = '::u' + (userId || window.__poznoteUserId);
+    if (suffix === '::u') return;
+
+    try {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
+            var key = localStorage.key(i);
+            if (key && key.length > suffix.length && key.indexOf(suffix, key.length - suffix.length) !== -1) {
+                localStorage.removeItem(key);
+            }
+        }
+    } catch (e) {}
+};
 
 // Theme initialization - runs synchronously in <head> to prevent FOUC
 (function () {
