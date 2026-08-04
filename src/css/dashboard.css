@@ -1155,8 +1155,8 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 
 /* ---------- Pin button ----------
    Sits outside .dash-card-link (see buildNoteCard) so a click pins instead of
-   opening the note. Hidden until the card is hovered or focused, but always
-   visible once the note is pinned. */
+   opening the note. Always on the card, so the affordance is visible without
+   hovering first; its colour still changes on hover and once pinned. */
 
 .dash-card-pin {
     position: absolute;
@@ -1173,21 +1173,7 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
     border-radius: 6px;
     background: transparent;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s ease, background-color 0.15s ease;
-}
-
-.dash-card:hover .dash-card-pin,
-.dash-card-pin:focus-visible,
-.dash-card.is-pinned .dash-card-pin {
-    opacity: 1;
-}
-
-/* Touch devices have no hover, so the pin button stays visible. */
-@media (hover: none) {
-    .dash-card-pin {
-        opacity: 1;
-    }
+    transition: background-color 0.15s ease;
 }
 
 /* Lucide icons are CSS masks, so the color comes from background-color. */
