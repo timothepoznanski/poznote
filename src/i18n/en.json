@@ -2858,6 +2858,7 @@
       "size_small": "Small",
       "size_medium": "Medium",
       "size_large": "Large",
+      "columns": "Maximum columns",
       "layout": "Layout",
       "layout_grid": "Grid",
       "layout_list": "List"

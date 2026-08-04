@@ -3179,6 +3179,7 @@
       "size_small": "Pequenos",
       "size_medium": "Médios",
       "size_large": "Grandes",
+      "columns": "Colunas máximas",
       "layout": "Disposição",
       "layout_grid": "Grelha",
       "layout_list": "Lista"

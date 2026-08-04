@@ -3176,6 +3176,7 @@
       "size_small": "Klein",
       "size_medium": "Mittel",
       "size_large": "Groß",
+      "columns": "Maximale Spalten",
       "layout": "Anordnung",
       "layout_grid": "Raster",
       "layout_list": "Liste"

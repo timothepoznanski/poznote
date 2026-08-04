@@ -3748,6 +3748,10 @@ function renderBoardViewMenu(string $prefix) {
             ' title="' . t_h('dashboard.view.size', [], 'Card size') . '">' .
             '<span class="board-view-size-letter"></span>' .
         '</button>' .
+        '<button type="button" id="' . $idPrefix . 'ViewColumnsBtn" class="board-view-btn board-view-columns-btn"' .
+            ' data-label-columns="' . t_h('dashboard.view.columns', [], 'Maximum columns') . '">' .
+            '<span class="board-view-columns-value"></span>' .
+        '</button>' .
     '</div>';
 }
 

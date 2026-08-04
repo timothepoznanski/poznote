@@ -3370,6 +3370,7 @@
       "size_small": "Petites",
       "size_medium": "Moyennes",
       "size_large": "Grandes",
+      "columns": "Colonnes maximum",
       "layout": "Disposition",
       "layout_grid": "Grille",
       "layout_list": "Liste"
