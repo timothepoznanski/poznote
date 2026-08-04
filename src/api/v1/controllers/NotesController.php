@@ -42,6 +42,23 @@ class NotesController {
         return $this->getNoteLockHolderUserId();
     }
 
+    /**
+     * Best-effort note.created webhook: never let a webhook failure break the
+     * note creation that already succeeded and was answered.
+     */
+    private function dispatchNoteCreatedWebhook(array $note): void {
+        try {
+            require_once __DIR__ . '/../../../WebhookDispatcher.php';
+            $ownerUserId = (int)(getCurrentUserId() ?? 0);
+            // Bearer/Basic credentials mean an external API client; the web UI
+            // reaches the same endpoint through its session cookie.
+            $source = (function_exists('hasApiAuthCredentials') && hasApiAuthCredentials()) ? 'api' : 'ui';
+            (new WebhookDispatcher())->dispatchNoteCreated($ownerUserId, $note, $source);
+        } catch (Throwable $e) {
+            error_log('note.created webhook failed: ' . $e->getMessage());
+        }
+    }
+
     private function getEditorSessionId(?array $input = null): string {
         if (is_array($input) && isset($input['editor_session_id'])) {
             return trim((string) $input['editor_session_id']);
@@ -876,6 +893,19 @@ class NotesController {
 
                 // Trigger auto Git sync
                 $this->triggerGitSync((int)$id, 'push');
+
+                // note.created webhook. Keyed on the account the note belongs
+                // to (getCurrentUserId), not the authenticated actor: an admin
+                // working inside another account must not emit as user 1.
+                // dispatchNoteCreated is a no-op for any account but user 1.
+                $this->dispatchNoteCreatedWebhook([
+                    'id' => (int)$id,
+                    'heading' => $heading,
+                    'type' => $type,
+                    'workspace' => $workspace,
+                    'folder' => $folder,
+                    'created' => $created_utc,
+                ]);
             } else {
                 $this->sendError(500, 'Error while creating the note');
             }

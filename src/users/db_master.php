@@ -1215,6 +1215,37 @@ function listActiveWebhooksForEvent(string $event): array {
     return $matching;
 }
 
+/**
+ * True when the webhook subscribes to at least one event about the primary
+ * account's own content (reminder.* / note.*). User webhooks are managed from
+ * that account's settings page, instance webhooks from the admin page; a
+ * legacy webhook mixing both kinds of events shows up on both pages.
+ */
+function isUserWebhook(array $webhook): bool {
+    foreach (array_map('trim', explode(',', (string)($webhook['events'] ?? ''))) as $event) {
+        if (strpos($event, 'reminder.') === 0 || strpos($event, 'note.') === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * isUserWebhook counterpart: true when the webhook subscribes to at least one
+ * instance-level event (anything that is not reminder.* / note.*).
+ */
+function isInstanceWebhook(array $webhook): bool {
+    foreach (array_map('trim', explode(',', (string)($webhook['events'] ?? ''))) as $event) {
+        if ($event === '') {
+            continue;
+        }
+        if (strpos($event, 'reminder.') !== 0 && strpos($event, 'note.') !== 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function getWebhookById(int $id): ?array {
     try {
         $con = getMasterConnection();

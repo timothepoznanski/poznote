@@ -93,19 +93,19 @@ class ShareController {
         
         try {
             // Verify note exists
-            $stmt = $this->con->prepare('SELECT id, workspace, type FROM entries WHERE id = ?');
+            $stmt = $this->con->prepare('SELECT id, heading, workspace, type FROM entries WHERE id = ?');
             $stmt->execute([$noteId]);
             $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$noteRow) {
                 http_response_code(404);
                 echo json_encode(['success' => false, 'error' => 'Note not found']);
                 return;
             }
-            
+
             $noteWorkspace = $noteRow['workspace'] ?? '';
             $noteType = $noteRow['type'] ?? 'note';
-            
+
             // Handle custom token
             $custom = isset($input['custom_token']) ? trim($input['custom_token']) : '';
             if ($custom !== '') {
@@ -166,8 +166,33 @@ class ShareController {
             }
             
             registerSharedLink($token, $_SESSION['user_id'], 'note', (int)$noteId);
-            
+
             $urls = $this->buildUrls($token);
+
+            // note.shared webhook, best-effort: a failing endpoint must not
+            // break a share that already succeeded. No-op unless the note
+            // belongs to the primary account.
+            try {
+                require_once dirname(dirname(dirname(__DIR__))) . '/WebhookDispatcher.php';
+                (new WebhookDispatcher())->dispatchNoteShared(
+                    (int)(getCurrentUserId() ?? 0),
+                    [
+                        'id' => (int)$noteId,
+                        'heading' => (string)($noteRow['heading'] ?? ''),
+                        'workspace' => (string)$noteWorkspace,
+                    ],
+                    [
+                        'token' => $token,
+                        // buildUrls returns protocol-relative URLs (//host/…);
+                        // receivers need an absolute one they can open.
+                        'url' => (function_exists('getProtocol') ? getProtocol() . ':' : 'https:') . $urls['path'],
+                        'has_password' => !empty($hashedPassword),
+                    ],
+                    (bool)$existsRow
+                );
+            } catch (Throwable $e) {
+                error_log('note.shared webhook failed: ' . $e->getMessage());
+            }
             
             http_response_code($existsRow ? 200 : 201);
             echo json_encode([

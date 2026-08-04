@@ -3141,7 +3141,29 @@
       "no_candidates": "目前没有管理员设置了电子邮件地址。请在“用户”页面为管理员资料添加地址以启用通知。"
     }
   },
+  "webhooks_user": {
+    "title": "用户 Webhook",
+    "card": "用户 Webhook",
+    "card_help": "通过 webhook 将您自己笔记的事件（提醒触发、笔记创建或分享）发送到 ntfy、n8n 等外部服务。",
+    "description": "当您的笔记触发已订阅的事件时（提醒到期、笔记被创建或公开分享），Poznote 会向每个已注册的端点发送带有 JSON payload 的 HTTP POST 请求。仅涉及您自己的笔记。如果设置了密钥，payload 会通过 HMAC-SHA256 签名并放在 X-Poznote-Signature-256 请求头中。",
+    "access_denied": "访问被拒绝。此页面仅供主账户使用。"
+  },
   "webhooks_admin": {
+    "event_help": {
+      "user_created": "已创建用户账户：由管理员、通过 API 或 SSO 注册。Payload：用户资料和创建来源。",
+      "user_updated": "用户资料已更改：用户名、邮箱、姓名或管理员角色。Payload：更新后的资料和已更改字段列表。",
+      "user_activated": "先前停用的用户账户已重新启用。Payload：用户资料。",
+      "user_deactivated": "用户账户已停用，无法再登录。Payload：用户资料。",
+      "user_deleted": "用户账户已删除。Payload：删除前的资料。",
+      "signup_cap_reached": "SSO 注册被拒绝，因为实例已达到最大用户数。Payload：上限以及尝试注册的用户名和邮箱。",
+      "quota_notes_reached": "操作被阻止，因为用户的笔记配额已用完。Payload：用户、上限和当前数量。",
+      "quota_storage_reached": "操作被阻止，因为用户的存储配额已用完。Payload：用户、上限和当前用量。",
+      "reminder_due": "主账户（用户 1）的笔记提醒到达触发时间；其他用户的提醒不会触发 webhook。完整 Payload：笔记（id、标题、工作区、直达链接）和提醒消息。",
+      "reminder_due_title": "与 reminder.due 相同的触发，但不含提醒消息：标识符加上笔记标题和直达链接。",
+      "reminder_due_minimal": "与 reminder.due 相同的触发，但仅含标识符（笔记 id、提醒 id、触发时间）：笔记内容不会离开实例。详情可通过 REST API 获取。",
+      "note_created": "在主账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
+      "note_shared": "为主账户的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。"
+    },
     "title": "Webhook",
     "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",
     "section_add": "添加 Webhook",

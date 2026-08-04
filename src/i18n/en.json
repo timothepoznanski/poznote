@@ -2702,7 +2702,29 @@
       "no_candidates": "No administrator has an email address yet. Add one to an admin profile in the Users page to enable notifications."
     }
   },
+  "webhooks_user": {
+    "title": "User Webhooks",
+    "card": "User Webhooks",
+    "card_help": "Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.",
+    "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
+    "access_denied": "Access denied. This page is reserved for the primary account."
+  },
   "webhooks_admin": {
+    "event_help": {
+      "user_created": "A user account was created, by an admin, through the API or an SSO signup. Payload: the user profile and the creation source.",
+      "user_updated": "A user profile changed: username, email, name or admin role. Payload: the updated profile and the list of changed fields.",
+      "user_activated": "A previously deactivated user account was re-enabled. Payload: the user profile.",
+      "user_deactivated": "A user account was deactivated and can no longer sign in. Payload: the user profile.",
+      "user_deleted": "A user account was deleted. Payload: the profile as it was before deletion.",
+      "signup_cap_reached": "An SSO signup was refused because the instance reached its maximum number of users. Payload: the cap and the attempted username and email.",
+      "quota_notes_reached": "A user action was blocked because their notes quota is reached. Payload: the user, the limit and the current count.",
+      "quota_storage_reached": "A user action was blocked because their storage quota is reached. Payload: the user, the limit and the current usage.",
+      "reminder_due": "A note reminder of the primary account (user 1) reached its trigger time; other users' reminders never trigger webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.",
+      "reminder_due_title": "Same trigger as reminder.due but without the reminder message: identifiers plus the note title and direct link.",
+      "reminder_due_minimal": "Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.",
+      "note_created": "A note was created in the primary account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
+      "note_shared": "A public share link was published for a note of the primary account. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected."
+    },
     "title": "Webhooks",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
     "section_add": "Add a webhook",

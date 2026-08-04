@@ -3023,7 +3023,29 @@
       "no_candidates": "Nenhum administrador tem ainda endereço de e-mail. Adicione um a um perfil de administrador na página Utilizadores para ativar as notificações."
     }
   },
+  "webhooks_user": {
+    "title": "Webhooks de usuário",
+    "card": "Webhooks de usuário",
+    "card_help": "Envie eventos das suas próprias notas (lembrete disparado, nota criada ou compartilhada) para serviços externos como ntfy ou n8n via webhooks.",
+    "description": "O Poznote envia uma solicitação HTTP POST com um payload JSON para cada endpoint registrado quando uma das suas notas dispara um evento assinado: um lembrete vencendo, uma nota criada ou compartilhada publicamente. Apenas suas próprias notas são afetadas. Se um segredo for definido, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",
+    "access_denied": "Acesso negado. Esta página é reservada à conta principal."
+  },
   "webhooks_admin": {
+    "event_help": {
+      "user_created": "Uma conta de usuário foi criada, por um admin, pela API ou por um cadastro SSO. Payload: o perfil do usuário e a origem da criação.",
+      "user_updated": "Um perfil de usuário mudou: nome de usuário, email, nome ou papel de admin. Payload: o perfil atualizado e a lista de campos alterados.",
+      "user_activated": "Uma conta de usuário desativada foi reativada. Payload: o perfil do usuário.",
+      "user_deactivated": "Uma conta de usuário foi desativada e não pode mais entrar. Payload: o perfil do usuário.",
+      "user_deleted": "Uma conta de usuário foi excluída. Payload: o perfil como era antes da exclusão.",
+      "signup_cap_reached": "Um cadastro SSO foi recusado porque a instância atingiu seu número máximo de usuários. Payload: o limite e o nome de usuário e email tentados.",
+      "quota_notes_reached": "Uma ação foi bloqueada porque a cota de notas do usuário foi atingida. Payload: o usuário, o limite e a contagem atual.",
+      "quota_storage_reached": "Uma ação foi bloqueada porque a cota de armazenamento do usuário foi atingida. Payload: o usuário, o limite e o uso atual.",
+      "reminder_due": "Um lembrete de nota da conta principal (usuário 1) chegou ao seu horário de disparo; lembretes de outros usuários nunca disparam webhooks. Payload completo: a nota (id, título, workspace, link direto) e a mensagem do lembrete.",
+      "reminder_due_title": "Mesmo disparo que reminder.due, mas sem a mensagem do lembrete: os identificadores mais o título da nota e o link direto.",
+      "reminder_due_minimal": "Mesmo disparo que reminder.due, mas apenas identificadores (id da nota, id do lembrete, horário de disparo): nenhum conteúdo da nota sai da instância. Os detalhes podem ser obtidos pela API REST.",
+      "note_created": "Uma nota foi criada na conta principal, pela interface ou pela API REST. Payload: apenas metadados (id da nota, título, tipo, workspace, pasta, link direto), nunca o conteúdo da nota.",
+      "note_shared": "Um link público de compartilhamento foi publicado para uma nota da conta principal. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha."
+    },
     "title": "Webhooks",
     "description": "O Poznote envia um pedido HTTP POST com um payload JSON a cada endpoint registado quando ocorre um evento subscrito. Se for definido um segredo, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",
     "section_add": "Adicionar um webhook",
