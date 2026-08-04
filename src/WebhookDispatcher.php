@@ -16,6 +16,38 @@ require_once __DIR__ . '/users/db_master.php';
  */
 class WebhookDispatcher {
 
+    // Instance-level events, managed from the admin webhooks page.
+    public const INSTANCE_EVENTS = [
+        'user.created',
+        'user.updated',
+        'user.activated',
+        'user.deactivated',
+        'user.deleted',
+        'signup.cap_reached',
+        'quota.notes_reached',
+        'quota.storage_reached',
+    ];
+
+    // Events about the primary account's own content, managed from its
+    // settings page (User Webhooks). They only ever fire for user 1: other
+    // users' notes and reminders must not reach these endpoints.
+    public const USER_EVENTS = [
+        'reminder.due',
+        'reminder.due_title',
+        'reminder.due_minimal',
+        'note.created',
+        'note.shared',
+    ];
+
+    // Reminder subset of USER_EVENTS; the worker skips its scan entirely when
+    // no active webhook subscribes to any of them.
+    public const REMINDER_EVENTS = ['reminder.due', 'reminder.due_title', 'reminder.due_minimal'];
+
+    // The primary account, the only one whose content events are dispatched.
+    public const PRIMARY_USER_ID = 1;
+
+    // Every event, INSTANCE_EVENTS + USER_EVENTS (kept literal: constant
+    // expressions cannot call array_merge).
     public const EVENTS = [
         'user.created',
         'user.updated',
@@ -25,6 +57,11 @@ class WebhookDispatcher {
         'signup.cap_reached',
         'quota.notes_reached',
         'quota.storage_reached',
+        'reminder.due',
+        'reminder.due_title',
+        'reminder.due_minimal',
+        'note.created',
+        'note.shared',
     ];
 
     private const TIMEOUT_SECONDS = 5;
@@ -159,6 +196,156 @@ class WebhookDispatcher {
             'user' => $this->userPayload($user, null),
             'quota' => $quota,
         ]);
+    }
+
+    /**
+     * Emitted by the reminder worker when a note reminder reaches its trigger
+     * time. Three variants let the operator choose how much leaves the
+     * instance: reminder.due carries the note heading and the reminder
+     * message, reminder.due_title the heading and link but no message,
+     * reminder.due_minimal only identifiers and the trigger time (a receiver
+     * can then fetch details through the REST API if needed).
+     *
+     * These events only ever concern the primary account, so the payload
+     * carries no user block: the note id identifies the target.
+     *
+     * @param array $notification due row joined with the note (id, note_id,
+     *        message, trigger_at, note_heading, workspace)
+     * @param string $noteUrl direct link to the note, '' when no app URL is
+     *        configured
+     * @return array{delivered:int,failed:int}
+     */
+    public function dispatchReminderDue(array $notification, string $noteUrl = ''): array {
+        $reminderId = (int)($notification['id'] ?? 0);
+        $noteId = (int)($notification['note_id'] ?? 0);
+        $triggerAt = (string)($notification['trigger_at'] ?? '');
+
+        $full = $this->dispatch('reminder.due', [
+            'note' => [
+                'id' => $noteId,
+                'heading' => (string)($notification['note_heading'] ?? ''),
+                'workspace' => (string)($notification['workspace'] ?? ''),
+                'url' => $noteUrl !== '' ? $noteUrl : null,
+            ],
+            'reminder' => [
+                'id' => $reminderId,
+                'message' => (string)($notification['message'] ?? ''),
+                'trigger_at' => $triggerAt,
+            ],
+        ]);
+
+        $title = $this->dispatch('reminder.due_title', [
+            'note' => [
+                'id' => $noteId,
+                'heading' => (string)($notification['note_heading'] ?? ''),
+                'url' => $noteUrl !== '' ? $noteUrl : null,
+            ],
+            'reminder' => [
+                'id' => $reminderId,
+                'trigger_at' => $triggerAt,
+            ],
+        ]);
+
+        $minimal = $this->dispatch('reminder.due_minimal', [
+            'note' => ['id' => $noteId],
+            'reminder' => [
+                'id' => $reminderId,
+                'trigger_at' => $triggerAt,
+            ],
+        ]);
+
+        return [
+            'delivered' => $full['delivered'] + $title['delivered'] + $minimal['delivered'],
+            'failed' => $full['failed'] + $title['failed'] + $minimal['failed'],
+        ];
+    }
+
+    /**
+     * Emitted when the primary account creates a note, through the UI or the
+     * REST API (both go through NotesController::create).
+     *
+     * Call sites can invoke this unconditionally: it is a no-op for any other
+     * user, so a note created by user 2 never reaches the endpoints. Because
+     * the event only ever concerns the primary account, the payload carries no
+     * user block: the note id identifies the target. Only metadata is sent,
+     * never the note body.
+     *
+     * @param string $source how the note was created: 'ui' or 'api'
+     * @return array{delivered:int,failed:int}
+     */
+    public function dispatchNoteCreated(int $userId, array $note, string $source): array {
+        if ($userId !== self::PRIMARY_USER_ID) {
+            return ['delivered' => 0, 'failed' => 0];
+        }
+
+        return $this->dispatch('note.created', [
+            'note' => [
+                'id' => (int)($note['id'] ?? 0),
+                'heading' => (string)($note['heading'] ?? ''),
+                'type' => (string)($note['type'] ?? ''),
+                'workspace' => (string)($note['workspace'] ?? ''),
+                'folder' => (string)($note['folder'] ?? ''),
+                'created' => (string)($note['created'] ?? ''),
+                'url' => $this->noteUrl((int)($note['id'] ?? 0), (string)($note['workspace'] ?? '')),
+            ],
+            'source' => $source,
+        ]);
+    }
+
+    /**
+     * Emitted when the primary account publishes a public share link for one
+     * of its notes. Like dispatchNoteCreated, a no-op for any other user, and
+     * the payload carries no user block.
+     *
+     * $share carries the public token and url; $updated tells receivers the
+     * note was already shared and the link was regenerated.
+     *
+     * @return array{delivered:int,failed:int}
+     */
+    public function dispatchNoteShared(int $userId, array $note, array $share, bool $updated = false): array {
+        if ($userId !== self::PRIMARY_USER_ID) {
+            return ['delivered' => 0, 'failed' => 0];
+        }
+
+        return $this->dispatch('note.shared', [
+            'note' => [
+                'id' => (int)($note['id'] ?? 0),
+                'heading' => (string)($note['heading'] ?? ''),
+                'workspace' => (string)($note['workspace'] ?? ''),
+                'url' => $this->noteUrl((int)($note['id'] ?? 0), (string)($note['workspace'] ?? '')),
+            ],
+            'share' => [
+                'token' => (string)($share['token'] ?? ''),
+                'url' => (string)($share['url'] ?? ''),
+                'has_password' => !empty($share['has_password']),
+                'updated' => $updated,
+            ],
+        ]);
+    }
+
+    /**
+     * Direct link to a note, '' when no app URL is configured. Same source
+     * order as the reminder email channel.
+     */
+    private function noteUrl(int $noteId, string $workspace): string {
+        $baseUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+        if ($baseUrl === '' && function_exists('_env')) {
+            $baseUrl = rtrim(trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))), '/');
+        }
+        if ($noteId <= 0 || $baseUrl === '' || !filter_var($baseUrl, FILTER_VALIDATE_URL)) {
+            return '';
+        }
+        if (!in_array(strtolower((string)parse_url($baseUrl, PHP_URL_SCHEME)), ['http', 'https'], true)) {
+            return '';
+        }
+
+        $params = ['note' => $noteId];
+        $workspace = trim($workspace);
+        if ($workspace !== '') {
+            $params['workspace'] = $workspace;
+        }
+
+        return $baseUrl . '/index.php?' . http_build_query($params);
     }
 
     private function userPayload(array $user, ?string $source): array {

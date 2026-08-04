@@ -1840,6 +1840,11 @@
             });
         }
 
+        var uiCustomizationHiddenOnly = document.getElementById('uiCustomizationHiddenOnly');
+        if (uiCustomizationHiddenOnly) {
+            uiCustomizationHiddenOnly.addEventListener('change', refreshUiCustomizationFilter);
+        }
+
         // Font size card - delegates to font-size-settings.js
         var fontSizeCard = document.getElementById('font-size-card');
         if (fontSizeCard && typeof window.showNoteFontSizePrompt === 'function') {
@@ -2649,22 +2654,30 @@
         return text.replace(/\s+/g, ' ');
     }
 
+    function isUiCustomizationHiddenOnlyActive() {
+        var toggle = document.getElementById('uiCustomizationHiddenOnly');
+        return !!(toggle && toggle.checked);
+    }
+
     function applyUiCustomizationFilter(modal, value) {
         if (!modal) return;
 
         var query = normalizeUiCustomizationFilterText(value);
+        var uncheckedOnly = isUiCustomizationHiddenOnlyActive();
         var sections = modal.querySelectorAll('.ui-custom-section');
         var emptyState = document.getElementById('uiCustomizationFilterEmpty');
         var anyVisible = false;
 
-        modal.classList.toggle('ui-custom-filtering', query.length > 0);
+        modal.classList.toggle('ui-custom-filtering', query.length > 0 || uncheckedOnly);
 
         sections.forEach(function (section) {
             var items = section.querySelectorAll('.ui-custom-item');
             var visibleItems = 0;
 
             items.forEach(function (item) {
-                var matches = !query || normalizeUiCustomizationFilterText(item.textContent).indexOf(query) !== -1;
+                var checkbox = item.querySelector('[data-ui-key]');
+                var matches = (!query || normalizeUiCustomizationFilterText(item.textContent).indexOf(query) !== -1)
+                    && (!uncheckedOnly || !!(checkbox && !checkbox.checked));
 
                 item.hidden = !matches;
                 if (matches) {
@@ -2672,6 +2685,8 @@
                 }
             });
 
+            // Sections keep their title while filtering: only sections without
+            // any matching item are hidden entirely.
             section.hidden = visibleItems === 0;
             if (visibleItems > 0) {
                 anyVisible = true;
@@ -2680,7 +2695,21 @@
 
         if (emptyState) {
             emptyState.hidden = anyVisible;
+
+            // With no text query, an empty list means nothing is unchecked.
+            var emptyLabel = (uncheckedOnly && !query)
+                ? emptyState.getAttribute('data-empty-unchecked')
+                : emptyState.getAttribute('data-empty-default');
+            if (emptyLabel) {
+                emptyState.textContent = emptyLabel;
+            }
         }
+    }
+
+    function refreshUiCustomizationFilter() {
+        var modal = document.getElementById('uiCustomizationModal');
+        var filterInput = document.getElementById('uiCustomizationFilterInput');
+        applyUiCustomizationFilter(modal, filterInput ? filterInput.value : '');
     }
 
     function refreshUiCustomizationBadge() {
@@ -2757,6 +2786,7 @@
                 allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
                 modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
                 updateGlobalToggleBtn(modal);
+                refreshUiCustomizationFilter();
                 return;
             }
 
@@ -2771,6 +2801,7 @@
             checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
             updateSectionToggleBtn(section);
             updateGlobalToggleBtn(modal);
+            refreshUiCustomizationFilter();
         });
 
         // Change: keep button labels in sync when individual checkboxes change
@@ -2780,6 +2811,11 @@
             var section = e.target.closest('.ui-custom-section');
             if (section) updateSectionToggleBtn(section);
             updateGlobalToggleBtn(modal);
+
+            // "Show only unchecked" is live: a newly checked item leaves the list.
+            if (isUiCustomizationHiddenOnlyActive()) {
+                refreshUiCustomizationFilter();
+            }
         });
     }
 
@@ -2837,6 +2873,11 @@
             var filterInput = document.getElementById('uiCustomizationFilterInput');
             if (filterInput) {
                 filterInput.value = '';
+            }
+
+            var hiddenOnlyToggle = document.getElementById('uiCustomizationHiddenOnly');
+            if (hiddenOnlyToggle) {
+                hiddenOnlyToggle.checked = false;
             }
 
             applyUiCustomizationFilter(modal, '');

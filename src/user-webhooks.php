@@ -1,25 +1,29 @@
 <?php
 /**
- * Outgoing Webhooks - Admin Tool
+ * User Webhooks - primary account tool
  *
- * Register HTTP endpoints notified of instance events (e.g. user.created).
+ * Register HTTP endpoints notified about the primary account's own content:
+ * a reminder triggering, a note being created or publicly shared. Only user 1
+ * sees this page, and only user 1's events are ever dispatched: these
+ * webhooks relay personal note data, so they live with the account settings
+ * rather than the instance admin tools.
  */
 
-require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/auth.php';
 requireAuth();
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/functions.php';
 requireSettingsPassword();
 
-if (!isCurrentUserAdmin()) {
+if ((int)(getCurrentUserId() ?? 0) !== 1) {
     header('HTTP/1.1 403 Forbidden');
-    echo '<div style="padding:20px;font-family:sans-serif;color:#721c24;background:#f8d7da;border:1px solid #f5c6cb;border-radius:4px;margin:20px;">' . htmlspecialchars(t('multiuser.admin.access_denied_admin', [], 'Access denied. Admin privileges required.'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div>';
+    echo '<div style="padding:20px;font-family:sans-serif;color:#721c24;background:#f8d7da;border:1px solid #f5c6cb;border-radius:4px;margin:20px;">' . htmlspecialchars(t('webhooks_user.access_denied', [], 'Access denied. This page is reserved for the primary account.'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div>';
     exit;
 }
 
-require_once __DIR__ . '/../users/db_master.php';
-require_once __DIR__ . '/../WebhookDispatcher.php';
-require_once __DIR__ . '/../version_helper.php';
+require_once __DIR__ . '/users/db_master.php';
+require_once __DIR__ . '/WebhookDispatcher.php';
+require_once __DIR__ . '/version_helper.php';
 
 $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 $currentLang = getUserLanguage();
@@ -29,18 +33,18 @@ $success = '';
 $warning = '';
 $error = '';
 
-function webhooks_h($value): string {
+function user_webhooks_h($value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function webhooks_is_valid_url(string $url): bool {
+function user_webhooks_is_valid_url(string $url): bool {
     return filter_var($url, FILTER_VALIDATE_URL) !== false
         && preg_match('#^https?://#i', $url) === 1;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
-    if (!isset($_SESSION['webhooks_csrf_token']) || !hash_equals($_SESSION['webhooks_csrf_token'], $token)) {
+    if (!isset($_SESSION['user_webhooks_csrf_token']) || !hash_equals($_SESSION['user_webhooks_csrf_token'], $token)) {
         $error = t('webhooks_admin.error_csrf', [], 'Invalid form submission. Please try again.');
     } else {
         $action = $_POST['action'] ?? '';
@@ -52,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!is_array($events)) {
                 $events = [];
             }
-            $events = array_values(array_intersect(WebhookDispatcher::INSTANCE_EVENTS, array_map('strval', $events)));
+            $events = array_values(array_intersect(WebhookDispatcher::USER_EVENTS, array_map('strval', $events)));
 
             $urlAlreadyRegistered = false;
             foreach (listWebhooks() as $existing) {
@@ -62,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            if (!webhooks_is_valid_url($url)) {
+            if (!user_webhooks_is_valid_url($url)) {
                 $error = t('webhooks_admin.error_invalid_url', [], 'The webhook URL must start with http:// or https://.');
             } elseif (empty($events)) {
                 $error = t('webhooks_admin.error_no_events', [], 'Select at least one event.');
@@ -78,8 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (in_array($action, ['delete', 'enable', 'disable', 'test'], true)) {
             $id = (int)($_POST['webhook_id'] ?? 0);
             $webhook = $id > 0 ? getWebhookById($id) : null;
-            if ($webhook && !isInstanceWebhook($webhook)) {
-                // Reminder webhooks are managed from the primary account's page
+            if ($webhook && !isUserWebhook($webhook)) {
+                // Instance webhooks are managed from the admin page
                 $webhook = null;
             }
             if (!$webhook) {
@@ -112,21 +116,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$_SESSION['webhooks_csrf_token'] = bin2hex(random_bytes(32));
-// Reminder-only webhooks are managed from the primary account's settings page
-$webhooks = array_values(array_filter(listWebhooks(), 'isInstanceWebhook'));
+$_SESSION['user_webhooks_csrf_token'] = bin2hex(random_bytes(32));
+// Instance webhooks are managed from the admin page
+$webhooks = array_values(array_filter(listWebhooks(), 'isUserWebhook'));
 
 // Hover help for each event, same bubble pattern as the settings cards.
 // i18n keys replace the dots of the event name with underscores.
 $eventHelpDefaults = [
-    'user.created' => 'A user account was created, by an admin, through the API or an SSO signup. Payload: the user profile and the creation source.',
-    'user.updated' => 'A user profile changed: username, email, name or admin role. Payload: the updated profile and the list of changed fields.',
-    'user.activated' => 'A previously deactivated user account was re-enabled. Payload: the user profile.',
-    'user.deactivated' => 'A user account was deactivated and can no longer sign in. Payload: the user profile.',
-    'user.deleted' => 'A user account was deleted. Payload: the profile as it was before deletion.',
-    'signup.cap_reached' => 'An SSO signup was refused because the instance reached its maximum number of users. Payload: the cap and the attempted username and email.',
-    'quota.notes_reached' => 'A user action was blocked because their notes quota is reached. Payload: the user, the limit and the current count.',
-    'quota.storage_reached' => 'A user action was blocked because their storage quota is reached. Payload: the user, the limit and the current usage.',
+    'reminder.due' => 'A note reminder of the primary account (user 1) reached its trigger time; other users\' reminders never trigger webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.',
+    'reminder.due_title' => 'Same trigger as reminder.due but without the reminder message: identifiers plus the note title and direct link.',
+    'reminder.due_minimal' => 'Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.',
+    'note.created' => 'A note was created in the primary account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.',
+    'note.shared' => 'A public share link was published for a note of the primary account. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected.',
 ];
 $eventHelp = [];
 foreach ($eventHelpDefaults as $eventName => $default) {
@@ -134,38 +135,38 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo webhooks_h($currentLang); ?>">
+<html lang="<?php echo user_webhooks_h($currentLang); ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo t_h('webhooks_admin.title', [], 'Webhooks'); ?> - Poznote</title>
+    <title><?php echo t_h('webhooks_user.title', [], 'User Webhooks'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
-    <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="../css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/settings.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/workspaces.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/modals.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/components.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/workspaces-inline.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="../css/webhooks.css?v=<?php echo $v; ?>">
-    <link rel="icon" href="../favicon.ico" type="image/x-icon">
-    <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
+    <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/settings.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/users.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/workspaces.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/workspaces-inline.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/webhooks.css?v=<?php echo $v; ?>">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
 </head>
-<body data-workspace="<?php echo webhooks_h($pageWorkspace); ?>">
+<body data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">
 <div class="settings-container webhooks-page">
     <div class="workspaces-nav">
-        <a href="../index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary">
+        <a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary">
             <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
             <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
         </a>
-        <a href="../settings.php" class="btn btn-secondary">
+        <a href="settings.php" class="btn btn-secondary">
             <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
             <?php echo t_h('common.back_to_settings', [], 'Settings'); ?>
         </a>
@@ -173,17 +174,17 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 
     <?php if ($success || $warning || $error): ?>
         <div class="alert-with-margin alert <?php echo $success ? 'alert-success' : ($warning ? 'alert-warning' : 'alert-danger'); ?>">
-            <?php echo webhooks_h($success ?: ($warning ?: $error)); ?>
+            <?php echo user_webhooks_h($success ?: ($warning ?: $error)); ?>
         </div>
     <?php endif; ?>
 
     <div class="settings-section webhooks-section">
         <h2><?php echo t_h('webhooks_admin.section_add', [], 'Add a webhook'); ?></h2>
         <p class="webhooks-section-hint">
-            <?php echo t_h('webhooks_admin.description', [], 'Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.'); ?>
+            <?php echo t_h('webhooks_user.description', [], 'Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.'); ?>
         </p>
         <form method="POST" action="">
-            <input type="hidden" name="csrf_token" value="<?php echo webhooks_h($_SESSION['webhooks_csrf_token']); ?>">
+            <input type="hidden" name="csrf_token" value="<?php echo user_webhooks_h($_SESSION['user_webhooks_csrf_token']); ?>">
             <input type="hidden" name="action" value="add">
             <div class="webhooks-field">
                 <label for="webhook_url"><?php echo t_h('webhooks_admin.fields.url', [], 'Endpoint URL'); ?></label>
@@ -197,14 +198,14 @@ foreach ($eventHelpDefaults as $eventName => $default) {
             <div class="webhooks-field">
                 <label><?php echo t_h('webhooks_admin.fields.events', [], 'Events'); ?></label>
                 <div class="webhooks-events">
-                    <?php foreach (WebhookDispatcher::INSTANCE_EVENTS as $eventName): ?>
+                    <?php foreach (WebhookDispatcher::USER_EVENTS as $eventName): ?>
                         <span class="webhooks-event">
                             <label class="webhooks-event-label">
-                                <input type="checkbox" name="webhook_events[]" value="<?php echo webhooks_h($eventName); ?>" checked>
-                                <code><?php echo webhooks_h($eventName); ?></code>
+                                <input type="checkbox" name="webhook_events[]" value="<?php echo user_webhooks_h($eventName); ?>" <?php echo $eventName === 'reminder.due' ? 'checked' : ''; ?>>
+                                <code><?php echo user_webhooks_h($eventName); ?></code>
                             </label>
                             <?php if (!empty($eventHelp[$eventName])): ?>
-                                <span class="webhooks-event-help" data-tooltip="<?php echo webhooks_h($eventHelp[$eventName]); ?>"><i class="lucide lucide-help-circle"></i></span>
+                                <span class="webhooks-event-help" data-tooltip="<?php echo user_webhooks_h($eventHelp[$eventName]); ?>"><i class="lucide lucide-help-circle"></i></span>
                             <?php endif; ?>
                         </span>
                     <?php endforeach; ?>
@@ -231,12 +232,12 @@ foreach ($eventHelpDefaults as $eventName => $default) {
                     ?>
                     <div class="webhooks-item">
                         <div class="webhooks-item-info">
-                            <span class="webhooks-item-url"><?php echo webhooks_h($webhook['url']); ?></span>
+                            <span class="webhooks-item-url"><?php echo user_webhooks_h($webhook['url']); ?></span>
                             <span class="webhooks-item-meta">
                                 <span class="webhooks-state <?php echo $isActive ? 'is-enabled' : 'is-disabled'; ?>">
                                     <?php echo $isActive ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
                                 </span>
-                                <span><code><?php echo webhooks_h($webhook['events']); ?></code></span>
+                                <span><code><?php echo user_webhooks_h($webhook['events']); ?></code></span>
                                 <?php if (!empty($webhook['secret'])): ?>
                                     <span><?php echo t_h('webhooks_admin.signed', [], 'Signed'); ?></span>
                                 <?php endif; ?>
@@ -247,7 +248,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
                         </div>
                         <div class="webhooks-item-actions">
                             <form method="POST" action="">
-                                <input type="hidden" name="csrf_token" value="<?php echo webhooks_h($_SESSION['webhooks_csrf_token']); ?>">
+                                <input type="hidden" name="csrf_token" value="<?php echo user_webhooks_h($_SESSION['user_webhooks_csrf_token']); ?>">
                                 <input type="hidden" name="webhook_id" value="<?php echo $webhookId; ?>">
                                 <button type="submit" name="action" value="test" class="btn btn-secondary"><?php echo t_h('webhooks_admin.test_button', [], 'Send test'); ?></button>
                                 <button type="submit" name="action" value="<?php echo $isActive ? 'disable' : 'enable'; ?>" class="btn btn-secondary">

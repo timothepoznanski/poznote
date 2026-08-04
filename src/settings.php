@@ -238,13 +238,27 @@ if ($isAdmin) {
         $smtp_enabled = $smtp_configured
             && ($smtp_enabled_setting === null || $smtp_enabled_setting === '' || filter_var($smtp_enabled_setting, FILTER_VALIDATE_BOOLEAN));
         $active_webhooks_count = count(array_filter(listWebhooks(), static function ($webhook) {
-            return !empty($webhook['active']);
+            return !empty($webhook['active']) && isInstanceWebhook($webhook);
         }));
     } catch (Exception $e) {
         $users_count = 0;
         $smtp_enabled = false;
         $smtp_configured = false;
         $active_webhooks_count = 0;
+    }
+}
+
+// User webhooks are personal to the primary account (user 1)
+$active_user_webhooks_count = 0;
+$isPrimaryAccount = (int)(getCurrentUserId() ?? 0) === 1;
+if ($isPrimaryAccount) {
+    try {
+        require_once 'users/db_master.php';
+        $active_user_webhooks_count = count(array_filter(listWebhooks(), static function ($webhook) {
+            return !empty($webhook['active']) && isUserWebhook($webhook);
+        }));
+    } catch (Exception $e) {
+        $active_user_webhooks_count = 0;
     }
 }
 
@@ -414,6 +428,22 @@ if ($isAdmin) {
                     </span>
                 </div>
             </div>
+
+            <!-- User Webhooks (primary account only) -->
+            <?php if ($isPrimaryAccount): ?>
+            <div class="home-card settings-card-clickable" id="user-webhooks-card" data-href="user-webhooks.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('webhooks_user.card_help', [], 'Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-webhook"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span>
+                    <span class="setting-status <?php echo $active_user_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $active_user_webhooks_count > 0 ? $active_user_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
+                    </span>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <!-- Browser Extension -->
             <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">

@@ -1004,6 +1004,8 @@
       "index_search_bar": "Barra de búsqueda",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
+      "show_unchecked_only": "Mostrar solo los elementos desmarcados",
+      "no_unchecked_results": "No hay elementos desmarcados.",
       "sections": {
         "home_cards": "Tarjetas del panel",
         "create_cards": "Tarjetas de creación",
@@ -3020,7 +3022,29 @@
       "no_candidates": "Ningún administrador tiene todavía dirección de correo. Añada una a un perfil de administrador en la página Usuarios para activar las notificaciones."
     }
   },
+  "webhooks_user": {
+    "title": "Webhooks de usuario",
+    "card": "Webhooks de usuario",
+    "card_help": "Envía eventos de tus propias notas (recordatorio activado, nota creada o compartida) a servicios externos como ntfy o n8n mediante webhooks.",
+    "description": "Poznote envía una solicitud HTTP POST con un payload JSON a cada endpoint registrado cuando una de tus notas activa un evento suscrito: un recordatorio que se cumple, una nota creada o compartida públicamente. Solo se ven afectadas tus propias notas. Si se define un secreto, el payload se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",
+    "access_denied": "Acceso denegado. Esta página está reservada a la cuenta principal."
+  },
   "webhooks_admin": {
+    "event_help": {
+      "user_created": "Se creó una cuenta de usuario, por un administrador, a través de la API o de un registro SSO. Payload: el perfil del usuario y el origen de la creación.",
+      "user_updated": "Cambió un perfil de usuario: nombre de usuario, email, nombre o rol de administrador. Payload: el perfil actualizado y la lista de campos modificados.",
+      "user_activated": "Se reactivó una cuenta de usuario previamente desactivada. Payload: el perfil del usuario.",
+      "user_deactivated": "Se desactivó una cuenta de usuario y ya no puede iniciar sesión. Payload: el perfil del usuario.",
+      "user_deleted": "Se eliminó una cuenta de usuario. Payload: el perfil tal como era antes de la eliminación.",
+      "signup_cap_reached": "Se rechazó un registro SSO porque la instancia alcanzó su número máximo de usuarios. Payload: el límite y el nombre de usuario y email intentados.",
+      "quota_notes_reached": "Se bloqueó una acción porque se alcanzó la cuota de notas del usuario. Payload: el usuario, el límite y el número actual.",
+      "quota_storage_reached": "Se bloqueó una acción porque se alcanzó la cuota de almacenamiento del usuario. Payload: el usuario, el límite y el uso actual.",
+      "reminder_due": "Un recordatorio de nota de la cuenta principal (usuario 1) llegó a su hora de activación; los recordatorios de otros usuarios nunca activan webhooks. Payload completo: la nota (id, título, workspace, enlace directo) y el mensaje del recordatorio.",
+      "reminder_due_title": "Mismo disparador que reminder.due pero sin el mensaje del recordatorio: los identificadores más el título de la nota y el enlace directo.",
+      "reminder_due_minimal": "Mismo disparador que reminder.due pero solo identificadores (id de nota, id de recordatorio, hora de activación): ningún contenido de la nota sale de la instancia. Los detalles pueden obtenerse a través de la API REST.",
+      "note_created": "Se creó una nota en la cuenta principal, desde la interfaz o la API REST. Payload: solo metadatos (id de nota, título, tipo, workspace, carpeta, enlace directo), nunca el contenido de la nota.",
+      "note_shared": "Se publicó un enlace público para una nota de la cuenta principal. Payload: la nota (id, título, workspace, enlace directo), el token público y su URL, y si el enlace está protegido con contraseña."
+    },
     "title": "Webhooks",
     "description": "Poznote envía una solicitud HTTP POST con una carga JSON a cada endpoint registrado cuando ocurre un evento suscrito. Si se define un secreto, la carga se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",
     "section_add": "Añadir un webhook",

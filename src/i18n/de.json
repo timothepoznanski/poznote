@@ -1003,6 +1003,8 @@
       "index_search_bar": "Suchleiste",
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
+      "show_unchecked_only": "Nur abgewählte Elemente anzeigen",
+      "no_unchecked_results": "Keine abgewählten Elemente.",
       "sections": {
         "home_cards": "Dashboard-Karten",
         "create_cards": "Erstellungskarten",
@@ -3020,7 +3022,29 @@
       "no_candidates": "Noch kein Administrator hat eine E-Mail-Adresse. Fügen Sie auf der Seite Benutzer einem Administratorprofil eine hinzu, um Benachrichtigungen zu aktivieren."
     }
   },
+  "webhooks_user": {
+    "title": "Benutzer-Webhooks",
+    "card": "Benutzer-Webhooks",
+    "card_help": "Ereignisse Ihrer eigenen Notizen (Erinnerung ausgelöst, Notiz erstellt oder geteilt) per Webhook an externe Dienste wie ntfy oder n8n senden.",
+    "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpoint, wenn eine Ihrer Notizen ein abonniertes Ereignis auslöst: eine fällige Erinnerung, eine erstellte oder öffentlich geteilte Notiz. Betroffen sind nur Ihre eigenen Notizen. Ist ein Secret gesetzt, wird der Payload mit HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
+    "access_denied": "Zugriff verweigert. Diese Seite ist dem Hauptkonto vorbehalten."
+  },
   "webhooks_admin": {
+    "event_help": {
+      "user_created": "Ein Benutzerkonto wurde erstellt, durch einen Admin, über die API oder eine SSO-Registrierung. Payload: das Benutzerprofil und die Quelle der Erstellung.",
+      "user_updated": "Ein Benutzerprofil wurde geändert: Benutzername, E-Mail, Name oder Admin-Rolle. Payload: das aktualisierte Profil und die Liste der geänderten Felder.",
+      "user_activated": "Ein zuvor deaktiviertes Benutzerkonto wurde wieder aktiviert. Payload: das Benutzerprofil.",
+      "user_deactivated": "Ein Benutzerkonto wurde deaktiviert und kann sich nicht mehr anmelden. Payload: das Benutzerprofil.",
+      "user_deleted": "Ein Benutzerkonto wurde gelöscht. Payload: das Profil im Zustand vor der Löschung.",
+      "signup_cap_reached": "Eine SSO-Registrierung wurde abgelehnt, weil die Instanz ihre maximale Benutzerzahl erreicht hat. Payload: das Limit sowie der versuchte Benutzername und die E-Mail.",
+      "quota_notes_reached": "Eine Aktion wurde blockiert, weil das Notizen-Kontingent des Benutzers erreicht ist. Payload: der Benutzer, das Limit und die aktuelle Anzahl.",
+      "quota_storage_reached": "Eine Aktion wurde blockiert, weil das Speicher-Kontingent des Benutzers erreicht ist. Payload: der Benutzer, das Limit und die aktuelle Nutzung.",
+      "reminder_due": "Eine Notiz-Erinnerung des Hauptkontos (Benutzer 1) hat ihren Auslösezeitpunkt erreicht; Erinnerungen anderer Benutzer lösen nie Webhooks aus. Vollständiger Payload: die Notiz (ID, Titel, Workspace, Direktlink) und die Erinnerungsnachricht.",
+      "reminder_due_title": "Gleicher Auslöser wie reminder.due, aber ohne die Erinnerungsnachricht: die IDs plus Titel und Direktlink der Notiz.",
+      "reminder_due_minimal": "Gleicher Auslöser wie reminder.due, aber nur IDs (Notiz-ID, Erinnerungs-ID, Auslösezeit): kein Notizinhalt verlässt die Instanz. Details können über die REST-API abgerufen werden.",
+      "note_created": "Im Hauptkonto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
+      "note_shared": "Für eine Notiz des Hauptkontos wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist."
+    },
     "title": "Webhooks",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpunkt, wenn ein abonniertes Ereignis eintritt. Ist ein Secret gesetzt, wird die Payload per HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
     "section_add": "Webhook hinzufügen",

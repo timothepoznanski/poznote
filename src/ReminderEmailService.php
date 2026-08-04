@@ -226,6 +226,10 @@ class ReminderEmailService {
             'email_attempts' => 'INTEGER DEFAULT 0',
             'email_last_attempt_at' => 'DATETIME',
             'email_error' => 'TEXT',
+            'webhook_sent_at' => 'DATETIME',
+            'webhook_attempts' => 'INTEGER DEFAULT 0',
+            'webhook_last_attempt_at' => 'DATETIME',
+            'webhook_error' => 'TEXT',
         ];
 
         foreach ($columns as $name => $definition) {
@@ -235,6 +239,7 @@ class ReminderEmailService {
         }
 
         $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
+        $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_webhook_due ON notifications(trigger_at, dismissed, webhook_sent_at, webhook_attempts)');
     }
 
     private function loadDueNotifications(PDO $con, string $cutoffAt, int $limit): array {

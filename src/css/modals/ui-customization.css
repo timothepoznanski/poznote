@@ -40,6 +40,25 @@
     margin: 0;
 }
 
+.ui-custom-hidden-only {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px 0;
+    font-size: 0.88em;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ui-custom-hidden-only input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
 .ui-custom-sections-scroll {
     overflow-y: auto;
     flex: 1;
@@ -94,12 +113,10 @@
     margin-bottom: 0;
 }
 
+/* Filtered view keeps its section titles, so it also keeps enough vertical
+   room for each title to read as a heading rather than as a stray row. */
 #uiCustomizationModal.ui-custom-filtering .ui-custom-section {
-    margin-bottom: 10px;
-}
-
-#uiCustomizationModal.ui-custom-filtering .ui-custom-section-title {
-    display: none;
+    margin-bottom: 16px;
 }
 
 #uiCustomizationModal.ui-custom-filtering .ui-custom-items {

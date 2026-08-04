@@ -1028,6 +1028,8 @@
       "index_search_bar": "Barre de recherche",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
+      "show_unchecked_only": "Afficher uniquement les éléments décochés",
+      "no_unchecked_results": "Aucun élément décoché.",
       "sections": {
         "home_cards": "Cartes du tableau de bord",
         "create_cards": "Cartes de création",
@@ -3214,7 +3216,29 @@
       "no_candidates": "Aucun administrateur n'a d'adresse e-mail pour le moment. Ajoutez-en une à un profil administrateur dans la page Utilisateurs pour activer les notifications."
     }
   },
+  "webhooks_user": {
+    "title": "Webhooks utilisateur",
+    "card": "Webhooks utilisateur",
+    "card_help": "Envoyer les événements de vos propres notes (rappel déclenché, note créée ou partagée) vers des services externes comme ntfy ou n8n via des webhooks.",
+    "description": "Poznote envoie une requête HTTP POST avec un payload JSON à chaque endpoint enregistré quand une de vos notes déclenche un événement auquel vous êtes abonné : un rappel qui arrive à échéance, une note créée ou partagée publiquement. Seules vos propres notes sont concernées. Si un secret est défini, le payload est signé en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",
+    "access_denied": "Accès refusé. Cette page est réservée au compte principal."
+  },
   "webhooks_admin": {
+    "event_help": {
+      "user_created": "Un compte utilisateur a été créé, par un admin, via l'API ou une inscription SSO. Payload : le profil utilisateur et la source de création.",
+      "user_updated": "Un profil utilisateur a changé : nom d'utilisateur, email, nom ou rôle admin. Payload : le profil mis à jour et la liste des champs modifiés.",
+      "user_activated": "Un compte utilisateur désactivé a été réactivé. Payload : le profil utilisateur.",
+      "user_deactivated": "Un compte utilisateur a été désactivé et ne peut plus se connecter. Payload : le profil utilisateur.",
+      "user_deleted": "Un compte utilisateur a été supprimé. Payload : le profil tel qu'il était avant la suppression.",
+      "signup_cap_reached": "Une inscription SSO a été refusée car l'instance a atteint son nombre maximum d'utilisateurs. Payload : la limite ainsi que le nom d'utilisateur et l'email tentés.",
+      "quota_notes_reached": "Une action a été bloquée car le quota de notes de l'utilisateur est atteint. Payload : l'utilisateur, la limite et le nombre actuel.",
+      "quota_storage_reached": "Une action a été bloquée car le quota de stockage de l'utilisateur est atteint. Payload : l'utilisateur, la limite et l'utilisation actuelle.",
+      "reminder_due": "Un rappel de note du compte principal (utilisateur 1) est arrivé à échéance ; les rappels des autres utilisateurs ne déclenchent jamais de webhook. Payload complet : la note (id, titre, workspace, lien direct) et le message du rappel.",
+      "reminder_due_title": "Même déclenchement que reminder.due mais sans le message du rappel : les identifiants plus le titre de la note et le lien direct.",
+      "reminder_due_minimal": "Même déclenchement que reminder.due mais identifiants seulement (id de note, id de rappel, date d'échéance) : aucun contenu de note ne quitte l'instance. Les détails peuvent être récupérés via l'API REST.",
+      "note_created": "Une note a été créée dans le compte principal, depuis l'interface ou l'API REST. Payload : métadonnées seulement (id de note, titre, type, workspace, dossier, lien direct), jamais le contenu de la note.",
+      "note_shared": "Un lien de partage public a été publié pour une note du compte principal. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe."
+    },
     "title": "Webhooks",
     "description": "Poznote envoie une requête HTTP POST avec une charge JSON à chaque endpoint enregistré lorsqu'un événement souscrit se produit. Si un secret est défini, la charge est signée en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",
     "section_add": "Ajouter un webhook",

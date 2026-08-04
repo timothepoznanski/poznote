@@ -1402,8 +1402,14 @@ try {
                     placeholder="<?php echo t_h('modals.ui_customization.filter_placeholder', [], 'Filter items...'); ?>"
                     autocomplete="off">
             </div>
+            <label class="ui-custom-hidden-only">
+                <input type="checkbox" id="uiCustomizationHiddenOnly">
+                <span><?php echo t_h('modals.ui_customization.show_unchecked_only', [], 'Show only unchecked items'); ?></span>
+            </label>
             <div class="ui-custom-sections-scroll">
-                <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
+                <div class="ui-custom-empty" id="uiCustomizationFilterEmpty" hidden
+                    data-empty-default="<?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?>"
+                    data-empty-unchecked="<?php echo t_h('modals.ui_customization.no_unchecked_results', [], 'No unchecked items.'); ?>"><?php echo t_h('modals.ui_customization.no_results', [], 'No matching items found.'); ?></div>
 
                 <!-- Create Cards Section -->
                 <div class="ui-custom-section">
@@ -1472,6 +1478,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:smtp-config-card" checked><span><?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:webhooks-card" checked><span><?php echo t_h('settings.cards.webhooks', [], 'Webhooks'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-webhooks-card" checked><span><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:hide-restrict-users-card" checked><span><?php echo t_h('settings.cards.hide_restrict_users', [], 'Hide share user restriction'); ?></span></label>
