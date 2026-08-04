@@ -1,12 +1,37 @@
 /* Diary page - month-grouped board of daily notes.
    Builds on css/dashboard.css (cards, topbar, grid). */
 
+/* The section carries the card grid's capped width and is centred as one
+   block, so the month title lines up with the left edge of its cards instead
+   of spanning the full-width container. */
 .diary-month {
-    margin-top: 22px;
+    margin: 22px auto 0;
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
 }
 
 .diary-month:first-child {
     margin-top: 8px;
+}
+
+/* The section already applies the cap and centring: the grid fills it and
+   aligns left, so its rows sit under the month title. */
+.diary-month .dashboard-grid-container {
+    max-width: 100%;
+    margin-inline: 0;
+}
+
+/* List rows keep the board's pre-existing 1150px width (see dashboard.css) */
+.view-layout-list .diary-month {
+    max-width: min(100%, 1150px);
+}
+
+/* Phones use the full width, as the board did before the column setting */
+@media (max-width: 800px) {
+    .diary-month {
+        max-width: 100%;
+        margin-inline: 0;
+    }
 }
 
 .diary-month-title {
