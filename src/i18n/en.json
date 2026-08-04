@@ -105,6 +105,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "SaaS mode: prevent non-admin users from discovering the other accounts of the instance. The user directory becomes admin-only and sharing with specific users is refused. Leave it off for a family or team instance.",
       "workspaces": "Organize your notes into separate workspaces, each with its own folders and notes.",
       "my_profile": "View and edit your profile information.",
       "change_password": "Change the password used to sign in.",
@@ -153,7 +154,6 @@
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
-      "hide_restrict_users": "Hide the \"Restrict to specific users\" toggles in share dialogs (shared notes/folders and workspace sharing). Existing restrictions keep working.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
       "custom_css": "Apply your own CSS to customize the appearance of Poznote.",
@@ -179,6 +179,7 @@
       "documentation": "Documentation"
     },
     "cards": {
+      "tenant_isolation": "Tenant isolation",
       "workspaces": "Workspaces",
       "user_management": "User Management",
       "backup_export": "Backup / Export",
@@ -205,7 +206,6 @@
       "import_limits": "Import Limits",
       "user_quotas": "User quotas",
       "git_sync_toggle": "Git Sync",
-      "hide_restrict_users": "Hide share user restriction",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
@@ -517,6 +517,9 @@
       "dashboard_filter_bar": "Filter bar",
       "view_layout_toggle": "Grid / list toggle",
       "index_search_bar": "Search bar",
+      "share_restrict_users": "Share: restrict to specific users",
+      "share_protocol_toggle": "Share: HTTPS toggle",
+      "share_shared_with_me": "Share: \"Shared with me\"",
       "filter_placeholder": "Filter items...",
       "no_results": "No matching items found.",
       "show_unchecked_only": "Show only unchecked items",
@@ -533,6 +536,7 @@
         "workspace_menu": "Workspace Menu"
       },
       "badge_all_visible": "All visible",
+      "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
       "badge_hidden_count": "{{count}} hidden",
       "check_all": "Check all",
       "uncheck_all": "Uncheck all"
@@ -1136,52 +1140,27 @@
     },
     "share_modal": {
       "description": "A shared URL creates a public link to this note. Once the URL is created, you will be able to add more options, such as protecting the note with a password or customizing the share URL.",
-      "custom_token": "Custom link (optional)",
-      "custom_token_placeholder": "my-custom-link-1",
-      "custom_token_example": "This would give for example:",
-      "password": "Password (optional)",
-      "password_placeholder": "Enter a password",
-      "indexable": "Allow indexing by search engines",
-      "tasklist_access": "Public task list access",
-      "access_read_only": "Read only",
-      "access_check_only": "Check or uncheck only",
-      "access_full": "Full edit",
       "create_url": "Create URL",
-      "close": "Close",
       "error_prefix": "Error: ",
       "unknown_error": "Unknown error creating public link",
       "error_creating": "Error creating public link: "
     },
     "public_modal": {
       "title": "Shared URL",
-      "redirect_info": "This share is now managed from the Shared page, where you can edit its public settings.",
-      "close": "Close",
-      "open": "Open",
-      "copy": "Copy",
-      "revoke": "Revoke",
       "renew": "Renew",
       "renew_token": "Renew link",
       "manage": "Edit",
-      "create_url": "Create url",
-      "no_link_yet": "No public link yet",
       "custom_token": "Custom link (optional)",
       "custom_token_placeholder": "my-custom-link-1",
       "indexable": "Allow indexing by search engines",
       "indexable_mobile": "Allow indexing",
       "password": "Password (optional)",
-      "password_placeholder": "Enter a password",
-      "error_prefix": "Error: ",
-      "unknown_error": "Unknown error creating public link",
-      "error_creating": "Error creating public link: "
+      "password_placeholder": "Enter a password"
     },
     "folder_share_modal": {
       "title": "Shared folder URL",
       "create_description": "A shared URL creates a public link to this folder. Once the URL is created, you will be able to add more options, such as protecting the folder with a password or customizing the share URL.",
-      "description": "Anyone with this link can view all notes in this folder (unless password-protected).",
-      "use_https": "HTTPS",
-      "renewed": "Shared folder link renewed",
-      "failed_renew": "Error renewing folder share",
-      "failed_revoke": "Error revoking folder share"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Permissions",
@@ -2580,6 +2559,7 @@
       "password_required": "Password is required",
       "password_incorrect": "Password is incorrect",
       "cannot_delete": "This account cannot be deleted",
+      "data_not_deleted": "Your files could not be deleted, so the account was kept. Please contact the administrator.",
       "last_admin": "The last administrator account cannot be deleted"
     }
   },
@@ -2856,6 +2836,7 @@
       "size_small": "Small",
       "size_medium": "Medium",
       "size_large": "Large",
+      "columns": "Maximum columns",
       "layout": "Layout",
       "layout_grid": "Grid",
       "layout_list": "List"

@@ -118,7 +118,20 @@ window.PoznoteExcalidraw = {
     const getNormalizedElements = (elements = []) => {
       let hasHiddenStrokes = false;
       const nextElements = elements.map((element) => {
-        if (!element || element.isDeleted || !isHiddenStrokeColor(element.strokeColor, requestedTheme)) {
+        // Images are created with strokeColor "transparent" and are filled in
+        // asynchronously: Excalidraw keeps a reference to the element it just
+        // inserted and mutates it with the fileId once the file is read.
+        // Replacing that element with a copy here detaches that reference, the
+        // mutation lands on an orphan object, and the image stays at
+        // status "pending" with no fileId, which renders as a broken
+        // placeholder with no error. They have no stroke to make visible
+        // anyway, so leave them alone.
+        if (
+          !element
+          || element.isDeleted
+          || element.type === 'image'
+          || !isHiddenStrokeColor(element.strokeColor, requestedTheme)
+        ) {
           return element;
         }
 

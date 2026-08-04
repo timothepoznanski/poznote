@@ -370,6 +370,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "Modo SaaS: impide que los usuarios no administradores descubran las demás cuentas de la instancia. El directorio de usuarios queda reservado a los administradores y se rechaza compartir con usuarios específicos. Déjelo desactivado en una instancia familiar o de equipo.",
       "workspaces": "Organiza tus notas en espacios de trabajo separados, cada uno con sus carpetas y notas.",
       "my_profile": "Consulta y edita la información de tu perfil.",
       "change_password": "Cambia la contraseña utilizada para iniciar sesión.",
@@ -418,7 +419,6 @@
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
-      "hide_restrict_users": "Oculta las opciones «Restringir a usuarios específicos» en los diálogos de compartir (notas/carpetas compartidas y compartición de espacios de trabajo). Las restricciones existentes siguen funcionando.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
       "custom_css": "Aplica tu propio CSS para personalizar la apariencia de Poznote.",
@@ -463,6 +463,7 @@
       "reload_hint": "Recargando…"
     },
     "cards": {
+      "tenant_isolation": "Aislamiento de cuentas",
       "workspaces": "Espacios de trabajo",
       "backup_export": "Copia de seguridad / Exportar",
       "restore_import": "Restaurar / Importar",
@@ -489,7 +490,6 @@
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
       "git_sync_toggle": "Sincronización Git",
-      "hide_restrict_users": "Ocultar restricción por usuarios",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks",
@@ -1002,6 +1002,9 @@
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar cuadrícula / lista",
       "index_search_bar": "Barra de búsqueda",
+      "share_restrict_users": "Compartir: restringir a usuarios específicos",
+      "share_protocol_toggle": "Compartir: interruptor HTTPS",
+      "share_shared_with_me": "Compartir: «Compartido conmigo»",
       "filter_placeholder": "Filtrar elementos...",
       "no_results": "No se encontraron elementos coincidentes.",
       "show_unchecked_only": "Mostrar solo los elementos desmarcados",
@@ -1020,6 +1023,7 @@
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
       "badge_all_visible": "Todo visible",
+      "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} por el administrador)",
       "badge_hidden_count": "{{count}} oculto(s)"
     },
     "theme": {
@@ -1571,30 +1575,16 @@
     },
     "share_modal": {
       "description": "Una URL compartida crea un enlace público a esta nota. Una vez creada la URL, se ofrecerán otras opciones, como proteger la nota con contraseña o personalizar la URL compartida.",
-      "custom_token": "Enlace personalizado (opcional)",
-      "custom_token_placeholder": "mi-enlace-personalizado-1",
-      "custom_token_example": "Lo que dará por ejemplo:",
-      "password": "Contraseña (opcional)",
-      "password_placeholder": "Ingrese una contraseña",
-      "indexable": "Permitir indexación por motores de búsqueda",
       "create_url": "Crear URL",
-      "close": "Cerrar",
       "error_prefix": "Error: ",
       "unknown_error": "Error desconocido al crear el enlace público",
       "error_creating": "Error al crear el enlace público: "
     },
     "public_modal": {
       "title": "URL compartida",
-      "redirect_info": "Este recurso compartido ahora se gestiona desde la página Compartidos, donde puedes editar su configuración pública.",
-      "close": "Cerrar",
-      "open": "Abrir",
-      "copy": "Copiar",
-      "revoke": "Revocar",
       "renew": "Renovar",
       "renew_token": "Renovar enlace",
       "manage": "Editar",
-      "create_url": "Crear url",
-      "no_link_yet": "Aún no hay enlace público",
       "custom_token": "Enlace personalizado (opcional)",
       "custom_token_placeholder": "mi-enlace-personalizado-1",
       "indexable": "Permitir indexación por motores de búsqueda",
@@ -1604,19 +1594,12 @@
       "access_check_only": "Solo marcar o desmarcar",
       "access_full": "Edición completa",
       "password": "Contraseña (opcional)",
-      "password_placeholder": "Ingrese una contraseña",
-      "error_prefix": "Error: ",
-      "unknown_error": "Error desconocido al crear el enlace público",
-      "error_creating": "Error al crear el enlace público: "
+      "password_placeholder": "Ingrese una contraseña"
     },
     "folder_share_modal": {
       "title": "URL de carpeta compartida",
       "create_description": "Una URL compartida crea un enlace público a esta carpeta. Una vez creada la URL, se ofrecerán otras opciones, como proteger la carpeta con contraseña o personalizar la URL compartida.",
-      "description": "Cualquiera con este enlace puede ver todas las notas de esta carpeta (a menos que esté protegida con contraseña).",
-      "use_https": "HTTPS",
-      "renewed": "Enlace de carpeta compartida renovado",
-      "failed_renew": "Error al renovar el enlace de la carpeta",
-      "failed_revoke": "Error al revocar el enlace de la carpeta"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Permisos",
@@ -2898,6 +2881,7 @@
       "password_required": "La contraseña es obligatoria",
       "password_incorrect": "Contraseña incorrecta",
       "cannot_delete": "Esta cuenta no se puede eliminar",
+      "data_not_deleted": "No se pudieron eliminar sus archivos, por lo que se conservó la cuenta. Póngase en contacto con el administrador.",
       "last_admin": "No se puede eliminar la última cuenta de administrador"
     }
   },
@@ -3174,6 +3158,7 @@
       "size_small": "Pequeñas",
       "size_medium": "Medianas",
       "size_large": "Grandes",
+      "columns": "Columnas máximas",
       "layout": "Disposición",
       "layout_grid": "Cuadrícula",
       "layout_list": "Lista"

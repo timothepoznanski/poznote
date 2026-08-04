@@ -30,6 +30,7 @@
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtCopyUrl: body.getAttribute('data-txt-copy-url') || 'Copy URL',
             txtUrlCopied: body.getAttribute('data-txt-url-copied') || 'URL copied!',
+            txtShareLinkCopied: body.getAttribute('data-txt-share-link-copied') || 'Share link copied to clipboard!',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
             txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Permissions',
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
@@ -53,6 +54,7 @@
             txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             hideRestrictUsers: body.getAttribute('data-hide-restrict-users') === '1',
+            hideProtocolToggle: body.getAttribute('data-hide-protocol-toggle') === '1',
             txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
             txtRestrictUsersMobile: body.getAttribute('data-txt-restrict-users-mobile') || 'Restrict',
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
@@ -1099,6 +1101,15 @@
         });
     }
 
+    // Same confirmation wording as the workspace share flow
+    function copyShareLink(url) {
+        return copyTextToClipboard(url).then(function() {
+            showCopyToast(getConfig().txtShareLinkCopied);
+        }).catch(function() {
+            window.prompt('Copy this URL', url);
+        });
+    }
+
     function showCopyToast(message) {
         var existing = document.getElementById('shared-copy-toast');
         if (existing) existing.remove();
@@ -1164,6 +1175,18 @@
         titleText.className = 'shared-edit-token-modal-title-link';
         title.appendChild(titleText);
         titleBlock.appendChild(title);
+
+        var titleCopyBtn = document.createElement('button');
+        titleCopyBtn.type = 'button';
+        titleCopyBtn.className = 'btn btn-secondary shared-edit-token-url-copy';
+        titleCopyBtn.title = config.txtCopyUrl;
+        titleCopyBtn.setAttribute('aria-label', config.txtCopyUrl);
+        titleCopyBtn.innerHTML = '<i class="lucide lucide-copy"></i>';
+        titleCopyBtn.addEventListener('click', function() {
+            copyShareLink(titleText.textContent);
+        });
+        titleBlock.appendChild(titleCopyBtn);
+
         content.appendChild(titleBlock);
 
         var tokenRow = document.createElement('div');
@@ -1351,7 +1374,9 @@
         protocolLabel.appendChild(protocolText);
         protocolLabel.appendChild(protocolToggle);
         protocolWrap.appendChild(protocolLabel);
-        content.appendChild(protocolWrap);
+        if (!config.hideProtocolToggle) {
+            content.appendChild(protocolWrap);
+        }
 
         var indexableWrap = document.createElement('div');
         indexableWrap.className = 'share-indexable-wrap';
@@ -1460,7 +1485,7 @@
 
                 var displayName = document.createElement('span');
                 displayName.className = 'share-user-list-name';
-                displayName.textContent = user.username + (user.email ? ' (' + user.email + ')' : '');
+                displayName.textContent = user.username;
 
                 row.appendChild(cb);
                 row.appendChild(displayName);
@@ -1478,7 +1503,7 @@
                 availableUsers = (users || []).filter(function(u) {
                     return parseInt(u.id, 10) !== config.currentUserId;
                 }).map(function(u) {
-                    return { id: parseInt(u.id, 10), username: u.username, email: u.email };
+                    return { id: parseInt(u.id, 10), username: u.username };
                 });
                 renderUserCheckboxes();
             })
@@ -1554,7 +1579,11 @@
             var prevAllowedUsers = options.allowedUsers || null;
             var allowedUsersChanged = !config.hideRestrictUsers && JSON.stringify(nextAllowedUsers) !== JSON.stringify(prevAllowedUsers);
 
+            // Saving always hands the user the link they just configured
+            var savedUrl = buildPreviewUrlForModal(options, nextToken || options.token, nextProtocol);
+
             if ((!nextToken || !tokenChanged) && !protocolChanged && !indexableChanged && !accessModeChanged && !passwordShouldBeSaved && !allowedUsersChanged) {
+                copyShareLink(savedUrl);
                 closeModal();
                 return;
             }
@@ -1570,6 +1599,7 @@
             })
                 .then(function() {
                     setPreferredPublicUrlProtocol(nextProtocol);
+                    copyShareLink(savedUrl);
                     if (tokenChanged && syncFilterWithUpdatedToken(options.token, nextToken)) {
                         applyFilter();
                     } else if (protocolChanged || indexableChanged || accessModeChanged || passwordShouldBeSaved) {

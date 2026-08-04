@@ -344,11 +344,10 @@ body.dark-mode .settings-view-toggle:hover {
 
 /* ---------- Pin button ----------
    Added by settings-page.js on every card. Styled exactly like the help icon
-   above (same size, same muted grey) but only revealed while the card is
-   hovered — except on a pinned card, where it stays visible in blue (same
-   pattern as the dashboard pin). Absolutely positioned, so it reserves no
-   space: bottom-right corner in grid view, left of the help icon in list
-   view. */
+   above (same size, same muted grey) and, like it, always on the card; a
+   pinned card shows it in blue instead (same pattern as the dashboard pin).
+   Absolutely positioned, so it reserves no space: bottom-right corner in grid
+   view, hidden in list view. */
 
 /* The empty pinned section is hidden through the `hidden` attribute, but the
    .home-grid display rules above are author styles and would win over the
@@ -368,14 +367,6 @@ body.dark-mode .settings-view-toggle:hover {
     padding: 0;
     cursor: pointer;
     line-height: 1;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-}
-
-.home-card:hover .settings-card-pin,
-.settings-card-pin:focus-visible,
-.home-card.is-pinned .settings-card-pin {
-    opacity: 1;
 }
 
 /* Lucide icons are CSS masks, so the color comes from background-color. */
@@ -403,28 +394,9 @@ body.dark-mode .settings-view-toggle:hover {
     border-color: rgba(0, 125, 184, 0.45);
 }
 
-/* Like the pin, the help icon only shows while its card is hovered */
-.home-card .setting-help {
-    opacity: 0;
-    transition: opacity 0.15s ease;
-}
-
-.home-card:hover .setting-help,
-.home-card:focus-within .setting-help {
-    opacity: 1;
-}
-
-/* No hover on touch screens: keep every pin reachable (the help icon is
-   hidden there by the base card styles) */
-@media (max-width: 800px), (hover: none) {
-    .home-card .settings-card-pin {
-        opacity: 0.6;
-    }
-
-    .home-card.is-pinned .settings-card-pin {
-        opacity: 1;
-    }
-}
+/* The help icon and the pin stay on the card at all times, so a card advertises
+   both affordances without having to be hovered first. Their own hover states
+   (see the icon rules above) still give the pointer feedback. */
 
 :root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i,
 body.dark-mode .home-card.is-pinned .settings-card-pin i {

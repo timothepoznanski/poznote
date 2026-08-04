@@ -368,6 +368,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "Modo SaaS: impede que os utilizadores não administradores descubram as outras contas da instância. O diretório de utilizadores fica reservado aos administradores e a partilha com utilizadores específicos é recusada. Deixe desativado numa instância familiar ou de equipa.",
       "workspaces": "Organize suas notas em espaços de trabalho separados, cada um com suas pastas e notas.",
       "my_profile": "Veja e edite as informações do seu perfil.",
       "change_password": "Altere a senha usada para entrar.",
@@ -416,7 +417,6 @@
       "webhooks": "Envie eventos da instância para serviços externos via webhooks.",
       "ai_assistant": "Configure o assistente de IA usado para conversar com suas notas.",
       "git_sync_enabled": "Ative ou desative a sincronização Git nesta instância.",
-      "hide_restrict_users": "Oculta as opções «Restringir a utilizadores específicos» nos diálogos de partilha (notas/pastas partilhadas e partilha de espaços de trabalho). As restrições existentes continuam a funcionar.",
       "import_limits": "Defina o número máximo de arquivos permitidos por importação.",
       "user_quotas": "Limite o número de notas e o armazenamento disponível por usuário.",
       "custom_css": "Aplique seu próprio CSS para personalizar a aparência do Poznote.",
@@ -461,6 +461,7 @@
       "reload_hint": "Recarregando…"
     },
     "cards": {
+      "tenant_isolation": "Isolamento de contas",
       "workspaces": "Espaços de trabalho",
       "backup_export": "Backup / Exportar",
       "restore_import": "Restaurar / Importar",
@@ -487,7 +488,6 @@
       "import_limits": "Limites de importação",
       "user_quotas": "Cotas de usuário",
       "git_sync_toggle": "Sincronização Git",
-      "hide_restrict_users": "Ocultar restrição por utilizadores",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-mail",
       "webhooks": "Webhooks",
@@ -1000,6 +1000,9 @@
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar grade / lista",
       "index_search_bar": "Barra de pesquisa",
+      "share_restrict_users": "Partilha: restringir a utilizadores específicos",
+      "share_protocol_toggle": "Partilha: interruptor HTTPS",
+      "share_shared_with_me": "Partilha: «Partilhado comigo»",
       "filter_placeholder": "Filtrar itens...",
       "no_results": "Nenhum item correspondente encontrado.",
       "show_unchecked_only": "Mostrar apenas os itens desmarcados",
@@ -1018,6 +1021,7 @@
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
       "badge_all_visible": "Tudo visível",
+      "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
       "badge_hidden_count": "{{count}} oculto(s)"
     },
     "theme": {
@@ -1574,30 +1578,16 @@
     },
     "share_modal": {
       "description": "Uma URL compartilhada cria um link público para esta nota. Depois que a URL for criada, outras opções serão oferecidas, como proteger a nota com senha ou personalizar a URL de compartilhamento.",
-      "custom_token": "Link personalizado (opcional)",
-      "custom_token_placeholder": "meu-link-personalizado-1",
-      "custom_token_example": "O que dará, por exemplo:",
-      "password": "Senha (opcional)",
-      "password_placeholder": "Digite uma senha",
-      "indexable": "Permitir indexação por motores de busca",
       "create_url": "Criar URL",
-      "close": "Fechar",
       "error_prefix": "Erro: ",
       "unknown_error": "Erro desconhecido ao criar compartilhamento público",
       "error_creating": "Erro ao criar compartilhamento público: "
     },
     "public_modal": {
       "title": "URL compartilhada",
-      "redirect_info": "Este compartilhamento agora é gerenciado na página Compartilhados, onde você pode editar suas configurações públicas.",
-      "close": "Fechar",
-      "open": "Abrir",
-      "copy": "Copiar",
-      "revoke": "Revogar",
       "renew": "Renovar",
       "renew_token": "Renovar link",
       "manage": "Editar",
-      "create_url": "Criar url",
-      "no_link_yet": "Nenhum link público ainda",
       "custom_token": "Link personalizado (opcional)",
       "custom_token_placeholder": "meu-link-personalizado-1",
       "indexable": "Permitir indexação por motores de busca",
@@ -1607,19 +1597,12 @@
       "access_check_only": "Apenas marcar ou desmarcar",
       "access_full": "Edição completa",
       "password": "Senha (opcional)",
-      "password_placeholder": "Digite uma senha",
-      "error_prefix": "Erro: ",
-      "unknown_error": "Erro desconhecido ao criar compartilhamento público",
-      "error_creating": "Erro ao criar compartilhamento público: "
+      "password_placeholder": "Digite uma senha"
     },
     "folder_share_modal": {
       "title": "URL da pasta compartilhada",
       "create_description": "Uma URL compartilhada cria um link público para esta pasta. Depois que a URL for criada, outras opções serão oferecidas, como proteger a pasta com senha ou personalizar a URL de compartilhamento.",
-      "description": "Qualquer pessoa com este link pode ver todas as notas desta pasta (exceto se protegida por senha).",
-      "use_https": "HTTPS",
-      "renewed": "Link de compartilhamento da pasta renovado",
-      "failed_renew": "Falha ao renovar o compartilhamento da pasta",
-      "failed_revoke": "Falha ao revogar o compartilhamento da pasta"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Permissões",
@@ -2901,6 +2884,7 @@
       "password_required": "A palavra-passe é obrigatória",
       "password_incorrect": "Palavra-passe incorreta",
       "cannot_delete": "Esta conta não pode ser eliminada",
+      "data_not_deleted": "Não foi possível eliminar os seus ficheiros, pelo que a conta foi mantida. Contacte o administrador.",
       "last_admin": "Não é possível eliminar a última conta de administrador"
     }
   },
@@ -3177,6 +3161,7 @@
       "size_small": "Pequenos",
       "size_medium": "Médios",
       "size_large": "Grandes",
+      "columns": "Colunas máximas",
       "layout": "Disposição",
       "layout_grid": "Grelha",
       "layout_list": "Lista"

@@ -32,7 +32,7 @@ function showNotificationPopup(message, type) {
     }
 
     // Fallback to old notification system if modalAlert is not available
-    var popup = document.getElementById('notificationPopup');
+    var popup = document.getElementById('poznoteToast');
     var overlay = document.getElementById('notificationOverlay');
 
     if (!popup || !overlay) {

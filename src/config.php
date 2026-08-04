@@ -252,11 +252,12 @@ function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '
     return _env($envKey, $default);
 }
 
-// Hide the "Restrict to specific users" toggles in share dialogs.
-// Managed from the admin UI (Settings > Admin Tools); the legacy
-// POZNOTE_HIDE_RESTRICT_USERS env variable is only used as a fallback
-// when the setting has never been saved from the UI.
-define('HIDE_RESTRICT_USERS', filter_var(poznoteResolveGlobalSetting('hide_restrict_users', 'POZNOTE_HIDE_RESTRICT_USERS', 'false'), FILTER_VALIDATE_BOOL));
+// Tenant isolation ("SaaS mode"). When enabled, non-admin users cannot
+// discover anything about the other accounts on the instance: the user
+// directory is admin-only and the share dialogs stop offering a user list.
+// Leave it off for family/team instances, where sharing between the
+// accounts of the instance is the expected behaviour.
+define('TENANT_ISOLATION', filter_var(poznoteResolveGlobalSetting('tenant_isolation', 'POZNOTE_TENANT_ISOLATION', 'false'), FILTER_VALIDATE_BOOL));
 
 // ============================================================
 // GIT SYNC CONFIGURATION (GitHub, Forgejo)

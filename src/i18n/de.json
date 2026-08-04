@@ -369,6 +369,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "SaaS-Modus: Verhindert, dass Benutzer ohne Administratorrechte die anderen Konten der Instanz entdecken. Das Benutzerverzeichnis ist nur für Administratoren zugänglich und die Freigabe an bestimmte Benutzer wird abgelehnt. Für Familien- oder Teaminstanzen deaktiviert lassen.",
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
@@ -417,7 +418,6 @@
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
-      "hide_restrict_users": "Blendet die Option „Auf bestimmte Benutzer beschränken“ in den Freigabedialogen aus (geteilte Notizen/Ordner und Arbeitsbereich-Freigabe). Bestehende Beschränkungen bleiben aktiv.",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
       "custom_css": "Wenden Sie eigenes CSS an, um das Aussehen von Poznote anzupassen.",
@@ -462,6 +462,7 @@
       "reload_hint": "Lädt neu…"
     },
     "cards": {
+      "tenant_isolation": "Mandantentrennung",
       "workspaces": "Arbeitsbereiche",
       "backup_export": "Sicherung / Export",
       "restore_import": "Wiederherstellen / Importieren",
@@ -488,7 +489,6 @@
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
       "git_sync_toggle": "Git-Synchronisierung",
-      "hide_restrict_users": "Benutzerbeschränkung beim Teilen ausblenden",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Webhooks",
@@ -1001,6 +1001,9 @@
       "dashboard_filter_bar": "Filterleiste",
       "view_layout_toggle": "Umschalter Raster / Liste",
       "index_search_bar": "Suchleiste",
+      "share_restrict_users": "Teilen: auf bestimmte Benutzer beschränken",
+      "share_protocol_toggle": "Teilen: HTTPS-Schalter",
+      "share_shared_with_me": "Teilen: „Mit mir geteilt“",
       "filter_placeholder": "Elemente filtern...",
       "no_results": "Keine passenden Elemente gefunden.",
       "show_unchecked_only": "Nur abgewählte Elemente anzeigen",
@@ -1019,6 +1022,7 @@
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
       "badge_all_visible": "Alle sichtbar",
+      "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
       "badge_hidden_count": "{{count}} ausgeblendet"
     },
     "theme": {
@@ -1570,30 +1574,16 @@
     },
     "share_modal": {
       "description": "Eine geteilte URL erstellt einen öffentlichen Link zu dieser Notiz. Sobald die URL erstellt wurde, stehen weitere Optionen zur Verfügung, zum Beispiel ein Passwortschutz für die Notiz oder eine Anpassung der Freigabe-URL.",
-      "custom_token": "Benutzerdefinierter Link (optional)",
-      "custom_token_placeholder": "mein-benutzerdefinierter-link-1",
-      "custom_token_example": "Das ergibt zum Beispiel:",
-      "password": "Passwort (optional)",
-      "password_placeholder": "Geben Sie ein Passwort ein",
-      "indexable": "Suchmaschinenindizierung zulassen",
       "create_url": "URL erstellen",
-      "close": "Schließen",
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
       "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
     },
     "public_modal": {
       "title": "Geteilte URL",
-      "redirect_info": "Diese Freigabe wird jetzt auf der Seite \"Geteilt\" verwaltet, wo Sie ihre öffentlichen Einstellungen bearbeiten können.",
-      "close": "Schließen",
-      "open": "Öffnen",
-      "copy": "Kopieren",
-      "revoke": "Widerrufen",
       "renew": "Erneuern",
       "renew_token": "Link erneuern",
       "manage": "Bearbeiten",
-      "create_url": "URL erstellen",
-      "no_link_yet": "Noch kein öffentlicher Link",
       "custom_token": "Benutzerdefinierter Link (optional)",
       "custom_token_placeholder": "mein-benutzerdefinierter-link-1",
       "indexable": "Suchmaschinenindizierung zulassen",
@@ -1603,19 +1593,12 @@
       "access_check_only": "Nur abhaken oder Häkchen entfernen",
       "access_full": "Vollständige Bearbeitung",
       "password": "Passwort (optional)",
-      "password_placeholder": "Geben Sie ein Passwort ein",
-      "error_prefix": "Fehler: ",
-      "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
-      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+      "password_placeholder": "Geben Sie ein Passwort ein"
     },
     "folder_share_modal": {
       "title": "Geteilter Ordner URL",
       "create_description": "Eine geteilte URL erstellt einen öffentlichen Link zu diesem Ordner. Sobald die URL erstellt wurde, stehen weitere Optionen zur Verfügung, zum Beispiel ein Passwortschutz für den Ordner oder eine Anpassung der Freigabe-URL.",
-      "description": "Jeder mit diesem Link kann alle Notizen in diesem Ordner ansehen (außer wenn passwortgeschützt).",
-      "use_https": "HTTPS",
-      "renewed": "Ordner-Freigabelink erneuert",
-      "failed_renew": "Fehler beim Erneuern der Ordnerfreigabe",
-      "failed_revoke": "Fehler beim Widerrufen der Ordnerfreigabe"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Berechtigungen",
@@ -2898,6 +2881,7 @@
       "password_required": "Passwort ist erforderlich",
       "password_incorrect": "Passwort ist falsch",
       "cannot_delete": "Dieses Konto kann nicht gelöscht werden",
+      "data_not_deleted": "Ihre Dateien konnten nicht gelöscht werden, das Konto wurde daher beibehalten. Bitte wenden Sie sich an den Administrator.",
       "last_admin": "Das letzte Administratorkonto kann nicht gelöscht werden"
     }
   },
@@ -3174,6 +3158,7 @@
       "size_small": "Klein",
       "size_medium": "Mittel",
       "size_large": "Groß",
+      "columns": "Maximale Spalten",
       "layout": "Anordnung",
       "layout_grid": "Raster",
       "layout_list": "Liste"

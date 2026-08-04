@@ -16,8 +16,8 @@
 /* Blue color for favorite star when it's marked as favorite - #007DB8 */
 .toolbar-btn.btn-favorite.is-favorite i.lucide-star,
 .toolbar-btn.btn-favorite.is-favorite .lucide-star,
-.toolbar-btn.btn-share.is-shared i.lucide-share-2,
-.toolbar-btn.btn-share.is-shared .lucide-share-2,
+.toolbar-btn.btn-publish.is-shared i.lucide-share-2,
+.toolbar-btn.btn-publish.is-shared .lucide-share-2,
 .toolbar-btn.btn-attachment.has-attachments i,
 .toolbar-btn.btn-reminder.has-reminder i {
     color: #007DB8 !important;

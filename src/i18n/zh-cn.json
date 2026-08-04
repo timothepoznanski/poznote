@@ -371,6 +371,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "SaaS 模式：阻止非管理员用户发现实例中的其他账户。用户目录仅限管理员访问，并拒绝与特定用户共享。家庭或团队实例请保持关闭。",
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
@@ -419,7 +420,6 @@
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
-      "hide_restrict_users": "在分享对话框中隐藏“限制为特定用户”选项（共享笔记/文件夹和工作区共享）。现有限制仍然有效。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
       "custom_css": "应用您自己的 CSS 来自定义 Poznote 的外观。",
@@ -464,6 +464,7 @@
       "reload_hint": "正在重载..."
     },
     "cards": {
+      "tenant_isolation": "租户隔离",
       "workspaces": "工作区",
       "user_management": "用户管理",
       "backup_export": "备份 / 导出",
@@ -490,7 +491,6 @@
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
       "git_sync_toggle": "Git 同步",
-      "hide_restrict_users": "隐藏共享用户限制",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
       "webhooks": "Webhook",
@@ -1001,6 +1001,9 @@
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "网格 / 列表切换",
       "index_search_bar": "搜索栏",
+      "share_restrict_users": "分享：限制为特定用户",
+      "share_protocol_toggle": "分享：HTTPS 开关",
+      "share_shared_with_me": "分享：“与我共享”",
       "filter_placeholder": "筛选项目...",
       "no_results": "未找到匹配的项目。",
       "show_unchecked_only": "仅显示未勾选的项目",
@@ -1019,6 +1022,7 @@
       "check_all": "全选",
       "uncheck_all": "取消全选",
       "badge_all_visible": "全部可见",
+      "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
       "badge_hidden_count": "{{count}} 个已隐藏"
     },
     "theme": {
@@ -1566,30 +1570,16 @@
     },
     "share_modal": {
       "description": "共享 URL 会为这条笔记创建一个公开链接。创建后，你还可以使用更多选项，例如为笔记设置密码，或自定义共享 URL。",
-      "custom_token": "自定义链接 (可选)",
-      "custom_token_placeholder": "my-custom-link-1",
-      "custom_token_example": "例如，这将得到：",
-      "password": "密码 (可选)",
-      "password_placeholder": "输入密码",
-      "indexable": "允许搜索引擎索引",
       "create_url": "创建 URL",
-      "close": "关闭",
       "error_prefix": "错误: ",
       "unknown_error": "创建公开共享时发生未知错误",
       "error_creating": "创建公开共享时出错: "
     },
     "public_modal": {
       "title": "已共享 URL",
-      "redirect_info": "这个共享现在通过“已共享”页面管理，你可以在那里修改它的公开设置。",
-      "close": "关闭",
-      "open": "打开",
-      "copy": "复制",
-      "revoke": "撤销",
       "renew": "更新",
       "renew_token": "更新链接",
       "manage": "编辑",
-      "create_url": "创建 URL",
-      "no_link_yet": "尚未创建公开链接",
       "custom_token": "自定义链接 (可选)",
       "custom_token_placeholder": "my-custom-link-1",
       "indexable": "允许搜索引擎索引",
@@ -1599,19 +1589,12 @@
       "access_check_only": "仅勾选或取消勾选",
       "access_full": "完全编辑",
       "password": "密码 (可选)",
-      "password_placeholder": "输入密码",
-      "error_prefix": "错误: ",
-      "unknown_error": "创建公开共享时发生未知错误",
-      "error_creating": "创建公开共享时出错: "
+      "password_placeholder": "输入密码"
     },
     "folder_share_modal": {
       "title": "共享文件夹 URL",
       "create_description": "共享 URL 会为此文件夹创建一个公开链接。创建后，你还可以使用更多选项，例如为文件夹设置密码，或自定义共享 URL。",
-      "description": "任何拥有此链接的人都可以查看此文件夹中的所有笔记（除非有密码保护）。",
-      "use_https": "HTTPS",
-      "renewed": "文件夹共享链接已更新",
-      "failed_renew": "更新文件夹共享失败",
-      "failed_revoke": "撤销文件夹共享失败"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "权限",
@@ -3019,6 +3002,7 @@
       "password_required": "请输入密码",
       "password_incorrect": "密码错误",
       "cannot_delete": "此账户无法删除",
+      "data_not_deleted": "无法删除您的文件，因此账户已保留。请联系管理员。",
       "last_admin": "无法删除最后一个管理员账户"
     }
   },
@@ -3295,6 +3279,7 @@
       "size_small": "小",
       "size_medium": "中",
       "size_large": "大",
+      "columns": "最大列数",
       "layout": "布局",
       "layout_grid": "网格",
       "layout_list": "列表"

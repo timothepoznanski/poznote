@@ -234,6 +234,49 @@ components:
           items:
             type: integer
 
+    Notification:
+      type: object
+      description: >
+        A triggered reminder. Datetimes are UTC in "YYYY-MM-DD HH:MM:SS" format
+        with no timezone suffix, not ISO 8601.
+      properties:
+        id:
+          type: integer
+          description: Notification ID, used by /reminders/{id}/read and /reminders/{id}/dismiss.
+          example: 12
+        note_id:
+          type: integer
+          description: ID of the note this reminder belongs to.
+          example: 42
+        type:
+          type: string
+          example: reminder
+        message:
+          type: string
+          description: Reminder message, falls back to the note heading when none was given.
+          example: "Call the client back"
+        is_read:
+          type: integer
+          enum: [0, 1]
+        created:
+          type: string
+          description: UTC, "YYYY-MM-DD HH:MM:SS".
+          example: "2026-08-01 12:30:00"
+        trigger_at:
+          type: string
+          description: UTC, "YYYY-MM-DD HH:MM:SS".
+          example: "2026-08-10 07:00:00"
+        note_heading:
+          type: string
+          nullable: true
+          description: Heading of the linked note, null if the note was deleted or trashed.
+          example: "Client X"
+        recurrence:
+          type: string
+          nullable: true
+          description: Recurrence of the linked note's reminder, null when it does not repeat.
+          example: "1w"
+
     Error:
       type: object
       properties:
@@ -1081,24 +1124,68 @@ paths:
     get:
       tags: [Reminders]
       summary: Get reminder for a note
+      description: >
+        Returns the reminder set on a note. reminder_at is null when the note
+        has no reminder.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
+          description: Note ID (not a notification ID).
           schema:
             type: integer
       responses:
         '200':
           description: Reminder details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                    example: 42
+                  reminder_at:
+                    type: string
+                    nullable: true
+                    description: UTC, "YYYY-MM-DD HH:MM:SS". Null when no reminder is set.
+                    example: "2026-08-10 07:00:00"
+                  email_enabled:
+                    type: boolean
+                  recurrence:
+                    type: string
+                    nullable: true
+                    description: Recurrence code, null when the reminder does not repeat.
+                    example: "1w"
+        '400':
+          description: Invalid note ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       tags: [Reminders]
       summary: Set a reminder on a note
+      description: >
+        Sets or replaces the reminder on a note. Any existing non-dismissed
+        reminder for that note is removed first, so this endpoint is also how
+        you modify a reminder.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
+          description: Note ID (not a notification ID).
           schema:
             type: integer
       requestBody:
@@ -1112,97 +1199,301 @@ paths:
                 reminder_at:
                   type: string
                   format: date-time
-                  description: When to trigger the reminder (ISO 8601)
+                  description: >
+                    When to trigger the reminder (ISO 8601). Converted to UTC
+                    for storage, so include an explicit offset (for example
+                    2026-08-10T09:00:00+02:00) to avoid ambiguity.
+                  example: "2026-08-10T09:00:00+02:00"
                 message:
                   type: string
-                  description: Optional reminder message
+                  description: Optional reminder message. Defaults to the note heading.
+                  example: "Call the client back"
                 email_enabled:
                   type: boolean
-                  description: Also send an email (if email is configured)
+                  description: >
+                    Also send an email. Silently downgraded to false unless SMTP
+                    is configured and the current user has a valid email address,
+                    so check email_enabled in the response to know what was applied.
+                recurrence:
+                  type: string
+                  nullable: true
+                  pattern: '^[1-9][0-9]{0,2}[ihdwmy]$'
+                  description: >
+                    Repeat interval as `<count><unit>`, count 1-999, unit
+                    i = minutes, h = hours, d = days, w = weeks, m = months,
+                    y = years. For example "30i", "1h", "1d", "2w", "3m", "1y".
+                    Omit it, or send null or "none", for a one-off reminder;
+                    any other value is rejected with a 400.
+
+
+                    Recurring reminders are re-armed on dismissal, not by a
+                    background job: the next occurrence is scheduled when the
+                    notification is dismissed via /reminders/{id}/dismiss or
+                    /reminders/dismiss-all. A client that never dismisses
+                    notifications will never see the reminder repeat.
+                  example: "1w"
       responses:
         '200':
           description: Reminder set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                    example: 42
+                  reminder_at:
+                    type: string
+                    description: The stored trigger time, UTC "YYYY-MM-DD HH:MM:SS".
+                    example: "2026-08-10 07:00:00"
+                  email_enabled:
+                    type: boolean
+                    description: Whether email was actually enabled, see the request field.
+                  recurrence:
+                    type: string
+                    nullable: true
+                    example: "1w"
+        '400':
+          description: >
+            Invalid note ID, malformed JSON body, missing reminder_at,
+            unparseable reminder_at, or invalid recurrence format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
       tags: [Reminders]
       summary: Remove a reminder from a note
+      description: >
+        Clears the reminder and its pending notification. This endpoint does not
+        check that the note exists: it returns 200 for an unknown note ID, so the
+        response is not proof that a note was found.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
+          description: Note ID (not a notification ID).
           schema:
             type: integer
       responses:
         '200':
-          description: Reminder removed
+          description: Reminder removed (also returned when the note does not exist)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                    example: 42
+        '400':
+          description: Invalid note ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /reminders:
     get:
       tags: [Reminders]
       summary: List triggered notifications
+      description: >
+        Lists reminders that are already due (trigger_at <= now) and not
+        dismissed, newest first, capped at 50. Reminders scheduled in the future
+        are not returned.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
+          description: Restrict to notifications whose note belongs to this workspace.
           schema:
             type: string
       responses:
         '200':
           description: Notifications with unread/total counts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  notifications:
+                    type: array
+                    description: Due, non-dismissed notifications, newest first, max 50.
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  unread_count:
+                    type: integer
+                    description: Due, non-dismissed notifications with is_read = 0. Not capped at 50.
+                    example: 1
+                  total_count:
+                    type: integer
+                    description: All due, non-dismissed notifications. Not capped at 50.
+                    example: 3
+        '500':
+          description: Failed to fetch notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /reminders/count:
     get:
       tags: [Reminders]
       summary: Get unread notification count (lightweight polling)
+      description: >
+        Same counters as GET /reminders without the notification list. On an
+        internal error this endpoint still returns 200 with both counters at 0
+        rather than an error status.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
           in: query
+          description: Restrict to notifications whose note belongs to this workspace.
           schema:
             type: string
       responses:
         '200':
           description: Notification counters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  unread_count:
+                    type: integer
+                    example: 1
+                  total_count:
+                    type: integer
+                    example: 3
 
   /reminders/dismiss-all:
     post:
       tags: [Reminders]
       summary: Dismiss all notifications
+      description: >
+        Dismisses every due notification. Recurring reminders are rolled forward
+        to their next occurrence; non-recurring ones have their reminder cleared.
+        Notifications scheduled in the future are left untouched. The response
+        does not report the new occurrence times, read them back with
+        GET /notes/{id}/reminder if you need them.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       responses:
         '200':
-          description: All notifications dismissed
+          description: All due notifications dismissed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Success'
+        '500':
+          description: Failed to dismiss all notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /reminders/{id}/read:
     post:
       tags: [Reminders]
       summary: Mark a notification as read
+      description: >
+        Clears the unread flag, which lowers unread_count but leaves the
+        notification in the list. Use dismiss to remove it. This endpoint does
+        not check that the notification exists.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
+          description: Notification ID, from GET /reminders (not a note ID).
           schema:
             type: integer
       responses:
         '200':
           description: Notification marked as read
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  id:
+                    type: integer
+                    example: 12
+        '400':
+          description: Invalid notification ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /reminders/{id}/dismiss:
     post:
       tags: [Reminders]
       summary: Dismiss a notification
+      description: >
+        Removes the notification from the list. If the linked note has a
+        recurrence, this is what schedules the next occurrence and returns it as
+        next_reminder_at; otherwise the note's reminder is cleared and
+        next_reminder_at is null.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: id
           in: path
           required: true
+          description: Notification ID, from GET /reminders (not a note ID).
           schema:
             type: integer
       responses:
         '200':
           description: Notification dismissed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  id:
+                    type: integer
+                    example: 12
+                  next_reminder_at:
+                    type: string
+                    nullable: true
+                    description: >
+                      Next occurrence for a recurring reminder, UTC
+                      "YYYY-MM-DD HH:MM:SS". Null when the reminder does not
+                      repeat.
+                    example: "2026-08-17 07:00:00"
+        '400':
+          description: Invalid notification ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   # ==================
   # Share Endpoints

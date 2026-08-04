@@ -58,8 +58,8 @@
         }
     }
 
-    function _storageKey() {
-        return 'poznote_tabs_' + _getWorkspace();
+    function _storageKey(workspace) {
+        return window.__poznoteTabsStorageKey(workspace || _getWorkspace());
     }
 
     function _saveToStorage() {
@@ -1192,7 +1192,7 @@
         // Save current tabs for the old workspace explicitly
         if (oldWorkspace) {
             try {
-                localStorage.setItem('poznote_tabs_' + oldWorkspace, JSON.stringify({
+                localStorage.setItem(_storageKey(oldWorkspace), JSON.stringify({
                     tabs: tabs,
                     activeTabId: activeTabId
                 }));

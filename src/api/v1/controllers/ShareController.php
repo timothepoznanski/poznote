@@ -318,6 +318,13 @@ class ShareController {
             if (array_key_exists('allowed_users', $input)) {
                 $allowedUsersValue = $input['allowed_users'];
                 if (is_array($allowedUsersValue) && !empty($allowedUsersValue)) {
+                    // Clearing the restriction stays allowed under tenant isolation;
+                    // only naming other accounts is refused.
+                    if (function_exists('poznoteCanTargetOtherUsers') && !poznoteCanTargetOtherUsers()) {
+                        http_response_code(403);
+                        echo json_encode(['success' => false, 'error' => 'Sharing with specific users is disabled on this instance']);
+                        return;
+                    }
                     $sanitized = array_values(array_unique(array_map('intval', $allowedUsersValue)));
                     $updates[] = 'allowed_users = ?';
                     $params[] = json_encode($sanitized);

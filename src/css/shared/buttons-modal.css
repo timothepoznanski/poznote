@@ -161,10 +161,28 @@ body.shared-page .shared-edit-token-modal {
 }
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
     padding: 0 0 14px;
     margin-bottom: 2px;
     background: linear-gradient(180deg, rgba(0, 125, 184, 0.08), rgba(0, 125, 184, 0));
     border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3 {
+    flex: 1 1 auto;
+}
+
+body.shared-page .shared-edit-token-modal .shared-edit-token-url-copy {
+    flex: 0 0 auto;
+    margin-left: auto;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-field-row {
@@ -393,6 +411,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .bt
     }
 
     body.shared-page .shared-edit-token-modal .shared-edit-token-inline-renew,
+    body.shared-page .shared-edit-token-modal .shared-edit-token-url-copy,
     body.shared-page .shared-edit-token-modal .shared-edit-token-password-toggle {
         width: 48px !important;
         min-width: 48px;

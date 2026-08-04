@@ -22,7 +22,7 @@ try {
 ?>
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
-<div id="notificationPopup"></div>
+<div id="poznoteToast"></div>
 
 <!-- Reminder Modal -->
 <div
@@ -1481,7 +1481,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-webhooks-card" checked><span><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:hide-restrict-users-card" checked><span><?php echo t_h('settings.cards.hide_restrict_users', [], 'Hide share user restriction'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
@@ -1519,7 +1519,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-checklist" checked><span><?php echo t_h('editor.toolbar.insert_checklist', [], 'Checklist'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-tasklist-actions" checked><span><?php echo t_h('tasklist.actions', [], 'Task list actions'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-favorite" checked><span><?php echo t_h('index.toolbar.favorite_add', [], 'Favorite'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-share" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-publish" checked><span><?php echo t_h('index.toolbar.share_note', [], 'Share'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-attachment" checked><span><?php echo t_h('modals.attachment.title', [], 'Attachments'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-reminder" checked><span><?php echo t_h('modals.ui_customization.reminder_bell', [], 'Bell icon (reminder)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-markdown-syntax" checked><span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span></label>
@@ -1579,6 +1579,8 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarCreateBtn" checked><span><?php echo t_h('sidebar.create', [], 'Create'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>
                 </div>
                 </div>
 

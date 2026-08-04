@@ -1,6 +1,6 @@
 /* ============================================
    Modal System - Share Modal & Folder Share
-   Public sharing, toggle switches, URL display
+   "Create a public URL" dialogs, plus the shared toggle switch component
    ============================================ */
 
 /* ============================================
@@ -14,24 +14,6 @@
 
 #shareModal.modal {
     padding-top: 40px !important;
-}
-
-#shareModal .share-url {
-    width: 100%;
-    padding: 0;
-    border: none;
-    background: transparent;
-    box-sizing: border-box;
-    white-space: normal;
-    word-break: break-all;
-    user-select: text;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    cursor: text;
-    border-radius: 6px;
-    margin-top: 24px;
-    margin-bottom: 36px;
-    color: #333;
 }
 
 #shareModal .share-modal-buttons {
@@ -49,135 +31,11 @@
     min-width: fit-content;
 }
 
-/* Protocol Toggle */
-#shareModal .share-protocol-wrap {
-    margin: 20px 0 8px 0;
-}
-
-#shareModal .share-protocol-wrap .share-indexable-label {
-    justify-content: flex-start !important;
-    gap: 10px;
-}
-
-#shareModal .share-protocol-wrap .indexable-label-text {
-    flex: 0 0 auto;
-}
-
-/* Custom Share Token */
-#shareModal .share-custom-wrap {
-    margin: 0 0 12px 0;
-}
-
-#shareModal .share-custom-label {
-    display: block;
-    margin: 30px 0 6px 0;
-    font-size: 15px;
-    font-weight: 500;
-    color: #666;
-}
-
-#shareModal .share-custom-label .optional-text {
-    color: #dc3545;
-}
-
-#shareModal .share-custom-input {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    box-sizing: border-box;
-}
-
-#shareModal .share-custom-example,
-#folderShareModal .share-custom-example {
-    margin: 0 0 6px 0;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #777;
-    word-break: break-all;
-}
-
-#shareModal .share-custom-token-highlight,
-#folderShareModal .share-custom-token-highlight {
-    color: #dc3545;
-}
-
-/* Password */
-#shareModal .share-password-wrap {
-    margin: 15px 0 12px 0;
-}
-
-#shareModal .share-password-label {
-    display: block;
-    margin: 0 0 6px 0;
-    font-size: 15px;
-    font-weight: 500;
-    color: #666;
-}
-
-#shareModal .share-password-label .optional-text {
-    color: #dc3545;
-}
-
-#shareModal .share-password-input {
-    width: 100%;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    box-sizing: border-box;
-}
-
-/* Indexable Toggle */
-#shareModal .share-indexable-wrap {
-    margin: 0 0 20px 0;
-}
-
-#shareModal .share-task-access-wrap {
-    margin: 0 0 20px 0;
-    padding: 12px 14px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-#shareModal .share-task-access-label {
-    padding: 0 6px;
-    font-size: 13px;
-    color: #666;
-}
-
-#shareModal .share-task-access-option {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 8px 0;
-    color: #333;
-    cursor: pointer;
-}
-
-#shareModal .share-task-access-option input {
-    margin: 0;
-}
-
-#shareModal .share-indexable-label {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    font-size: 14px;
-    color: #333;
-    cursor: pointer;
-    user-select: none;
-    gap: 10px;
-}
-
-#shareModal .indexable-label-text {
-    flex: 1;
-}
-
 /* ============================================
    Toggle Switch (shared component)
+   Used by the shared-items and workspace share dialogs
    ============================================ */
 
-#shareModal .toggle-switch,
 .toggle-switch {
     position: relative;
     display: inline-block !important;
@@ -186,7 +44,6 @@
     flex-shrink: 0;
 }
 
-#shareModal .toggle-switch input,
 .toggle-switch input {
     opacity: 0 !important;
     width: 0 !important;
@@ -194,7 +51,6 @@
     position: absolute;
 }
 
-#shareModal .toggle-slider,
 .toggle-slider {
     position: absolute;
     cursor: pointer;
@@ -207,7 +63,6 @@
     border-radius: 24px;
 }
 
-#shareModal .toggle-slider:before,
 .toggle-slider:before {
     position: absolute;
     content: "";
@@ -220,17 +75,14 @@
     border-radius: 50%;
 }
 
-#shareModal input:checked+.toggle-slider,
 input:checked+.toggle-slider {
     background-color: #28a745 !important;
 }
 
-#shareModal input:focus+.toggle-slider,
 input:focus+.toggle-slider {
     box-shadow: 0 0 1px #28a745;
 }
 
-#shareModal input:checked+.toggle-slider:before,
 input:checked+.toggle-slider:before {
     transform: translateX(20px);
 }
@@ -238,30 +90,6 @@ input:checked+.toggle-slider:before {
 /* Button Variants */
 #shareModal .btn-cancel {
     background: #dc3545;
-    color: #ffffff;
-    border: none;
-}
-
-#shareModal .btn-open {
-    background: #28a745;
-    color: #ffffff;
-    border: none;
-}
-
-#shareModal .btn-primary {
-    background: #007DB8;
-    color: #ffffff;
-    border: none;
-}
-
-#shareModal .btn-revoke {
-    background: #6c757d;
-    color: #ffffff;
-    border: none;
-}
-
-#shareModal .btn-renew {
-    background: #007DB8;
     color: #ffffff;
     border: none;
 }
@@ -282,65 +110,10 @@ html[data-theme='dark'] #shareModal h3 {
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] #shareModal .share-url {
-    background: transparent;
-    border: none;
-    color: #e0e0e0;
-    padding: 0;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-label {
-    color: #e6e6e6;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-label .optional-text {
-    color: #dc3545;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-input {
-    background: var(--dm-surface);
-    border: 1px solid var(--dm-border);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] #shareModal .share-custom-input::placeholder {
-    color: #666;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-example,
-html[data-theme='dark'] #folderShareModal .share-custom-example {
-    color: #d7d7d7;
-}
-
-html[data-theme='dark'] #shareModal .share-password-label {
-    color: #e6e6e6;
-}
-
-html[data-theme='dark'] #shareModal .share-custom-token-highlight,
-html[data-theme='dark'] #folderShareModal .share-custom-token-highlight {
-    color: #ff6b81;
-}
-
-html[data-theme='dark'] #shareModal .share-indexable-label {
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] #shareModal .share-task-access-wrap {
-    border-color: var(--dm-border);
-    background: var(--dm-surface);
-}
-
-html[data-theme='dark'] #shareModal .share-task-access-label,
-html[data-theme='dark'] #shareModal .share-task-access-option {
-    color: #e0e0e0;
-}
-
-html[data-theme='dark'] #shareModal .toggle-slider,
 html[data-theme='dark'] .toggle-slider {
     background-color: #555;
 }
 
-html[data-theme='dark'] #shareModal input:checked+.toggle-slider,
 html[data-theme='dark'] input:checked+.toggle-slider {
     background-color: #28a745 !important;
 }
@@ -351,24 +124,6 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 
 #folderShareModal .modal-content {
     max-width: 790px;
-}
-
-#folderShareModal .share-url {
-    width: 100%;
-    padding: 0;
-    border: none;
-    background: transparent;
-    box-sizing: border-box;
-    white-space: normal;
-    word-break: break-all;
-    user-select: text;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    cursor: text;
-    border-radius: 6px;
-    margin-top: 30px;
-    margin-bottom: 30px;
-    color: #333;
 }
 
 #folderShareModal .share-modal-buttons {
@@ -386,30 +141,9 @@ html[data-theme='dark'] input:checked+.toggle-slider {
     min-width: fit-content;
 }
 
-#folderShareModal .share-protocol-wrap {
-    margin: 0 0 8px 0;
-}
-
-#folderShareModal .share-protocol-wrap .share-indexable-label {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 10px;
-}
-
-#folderShareModal .share-protocol-wrap .indexable-label-text {
-    flex: 0 0 auto;
-}
-
 /* Button Variants */
 #folderShareModal .btn-cancel {
     background: #dc3545;
-    color: #ffffff;
-    border: none;
-}
-
-#folderShareModal .btn-open {
-    background: #28a745;
     color: #ffffff;
     border: none;
 }
@@ -418,31 +152,6 @@ html[data-theme='dark'] input:checked+.toggle-slider {
     background: #007DB8;
     color: #ffffff;
     border: none;
-}
-
-#folderShareModal .btn-secondary {
-    background: #6c757d;
-    color: #ffffff;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-#folderShareModal .share-close-wrap {
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
-}
-
-#folderShareModal .share-close-wrap button {
-    white-space: nowrap;
-    padding: 8px 16px;
-    min-width: fit-content;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    transition: background-color 0.2s;
 }
 
 /* Dark Mode - Folder Share Modal */
@@ -455,13 +164,3 @@ html[data-theme='dark'] #folderShareModal h3 {
     color: #e0e0e0;
 }
 
-html[data-theme='dark'] #folderShareModal .share-url {
-    background: transparent;
-    border: none;
-    color: #e0e0e0;
-    padding: 0;
-}
-
-html[data-theme='dark'] #folderShareModal .share-indexable-label {
-    color: #e0e0e0;
-}

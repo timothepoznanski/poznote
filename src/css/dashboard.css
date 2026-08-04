@@ -129,7 +129,9 @@ body.dark-mode .dashboard-sidebar-sep {
 
 .dashboard-container {
     flex: 1;
-    max-width: 1150px;
+    /* Full available width: the card grid fits as many columns as the screen
+       allows (capped by the column-count setting) and centers itself. */
+    max-width: 100%;
     padding-top: 0;
     padding-bottom: 0;
     min-width: 0;
@@ -428,12 +430,17 @@ body.dark-mode .dashboard-debug-info pre {
 
 /* ---------- Breadcrumb ---------- */
 
+/* Shares the card grid's capped width and auto margins so it starts on the
+   cards' left edge instead of hugging the full-width container. */
 .dashboard-breadcrumb {
     display: flex;
     align-items: center;
     gap: 2px;
     padding: 10px 0 2px;
     flex-wrap: wrap;
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    margin-inline: auto;
 }
 
 .bc-home {
@@ -492,23 +499,53 @@ body.dark-mode .dashboard-debug-info pre {
 
 .dashboard-grid-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    /* --dash-col-min is the card width (set per view-size-* variant) and
+       --dash-col-max the chosen maximum column count (default 4).
+       The count is capped by width, not by a fixed track count: auto-fit still
+       drops to fewer columns when the screen is too narrow, so cards keep
+       their width instead of being squeezed. minmax(0, …) keeps the floor at 0
+       because a percentage would resolve against the box being measured. */
+    grid-template-columns: repeat(auto-fit, minmax(0, var(--dash-col-min, 190px)));
+    /* Cards start at the left edge of the grid, so an incomplete last row lines
+       up under the first column instead of being centred on itself. The grid
+       box itself is shrink-wrapped and auto-margined, which centres the whole
+       block of columns on the page. */
+    justify-content: start;
+    /* max-width alone caps the box at N cards plus the N-1 gaps between them,
+       which is what limits the column count. width stays auto: auto-fit only
+       expands into space that is actually available, so shrink-wrapping the
+       box would collapse it to a single column. */
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
     grid-auto-rows: 132px;
-    gap: 14px;
-    margin-top: 14px;
+    gap: var(--dash-col-gap, 14px);
+    margin: 14px auto 0;
 }
 
 /* When pinned notes are shown in their own section, #dashboardGrid becomes a
    plain block wrapper and the inner .dash-grid-section divs carry the grid.
-   The ID keeps this display override ahead of the view-size/layout variants. */
+   The ID keeps this display override ahead of the view-size/layout variants.
+   The wrapper carries the column cap and is centred as one block, so the
+   pinned and Others grids share a left edge instead of each centring on its
+   own card count. */
 #dashboardGrid.dash-grid-sectioned {
     display: block;
+    max-width: min(100%, calc(var(--dash-col-min, 190px) * var(--dash-col-max, 4)
+                  + var(--dash-col-gap, 14px) * (var(--dash-col-max, 4) - 1)));
+    margin-inline: auto;
 }
 
+/* Inside the wrapper the cap is already applied, so the sections fill it and
+   align left. Re-applying the calc here would measure 100% against a parent
+   whose width is still being resolved and collapse them to one column. */
 .dash-grid-sectioned .dashboard-grid-container {
     margin-top: 0;
+    margin-inline: 0;
+    max-width: 100%;
 }
 
+/* Section titles (Pinned / Others) sit inside the centred wrapper, so plain
+   left alignment already puts them on the cards' left edge. */
 .dash-section-title {
     margin: 26px 2px 12px;
     font-size: 13px;
@@ -588,6 +625,24 @@ body.dark-mode .dash-section-title {
     display: none;
 }
 
+/* Column count is a grid-only setting: hide it in list layout too */
+.board-view-controls.is-list .board-view-columns-btn {
+    display: none;
+}
+
+/* Phones keep the fixed 2-column layout, so the setting has nothing to act on */
+@media (max-width: 800px) {
+    .board-view-columns-btn {
+        display: none;
+    }
+}
+
+.board-view-columns-value {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
 .board-view-size-letter {
     font-size: 12px;
     font-weight: 700;
@@ -596,10 +651,15 @@ body.dark-mode .dash-section-title {
 
 /* ---------- View variants: card size ---------- */
 
+/* The size variables live on the container, not the grid, so the breadcrumb
+   (a sibling of the grid) can compute the same capped width. */
+.view-size-small {
+    --dash-col-min: 150px;
+    --dash-col-gap: 10px;
+}
+
 .view-size-small .dashboard-grid-container {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     grid-auto-rows: 92px;
-    gap: 10px;
 }
 
 .view-size-small .board-card-excerpt {
@@ -636,10 +696,13 @@ body.dark-mode .dash-section-title {
     margin-top: 2px;
 }
 
+.view-size-large {
+    --dash-col-min: 250px;
+    --dash-col-gap: 16px;
+}
+
 .view-size-large .dashboard-grid-container {
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     grid-auto-rows: 210px;
-    gap: 16px;
 }
 
 .view-size-large .board-card-excerpt {
@@ -652,6 +715,17 @@ body.dark-mode .dash-section-title {
 }
 
 /* ---------- View variants: list layout ---------- */
+
+/* List rows keep the width the board had before the column setting existed:
+   the container's old 1150px cap, centred. The column-count cap is dropped
+   here (on the sectioned wrapper too, whose id+class selector would keep it). */
+.view-layout-list .dashboard-grid-container,
+.view-layout-list #dashboardGrid.dash-grid-sectioned,
+.view-layout-list .dashboard-breadcrumb {
+    width: auto;
+    max-width: min(100%, 1150px);
+    margin-inline: auto;
+}
 
 .view-layout-list .dashboard-grid-container {
     display: flex;
@@ -1155,8 +1229,8 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 
 /* ---------- Pin button ----------
    Sits outside .dash-card-link (see buildNoteCard) so a click pins instead of
-   opening the note. Hidden until the card is hovered or focused, but always
-   visible once the note is pinned. */
+   opening the note. Always on the card, so the affordance is visible without
+   hovering first; its colour still changes on hover and once pinned. */
 
 .dash-card-pin {
     position: absolute;
@@ -1173,21 +1247,7 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
     border-radius: 6px;
     background: transparent;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s ease, background-color 0.15s ease;
-}
-
-.dash-card:hover .dash-card-pin,
-.dash-card-pin:focus-visible,
-.dash-card.is-pinned .dash-card-pin {
-    opacity: 1;
-}
-
-/* Touch devices have no hover, so the pin button stays visible. */
-@media (hover: none) {
-    .dash-card-pin {
-        opacity: 1;
-    }
+    transition: background-color 0.15s ease;
 }
 
 /* Lucide icons are CSS masks, so the color comes from background-color. */
@@ -1722,11 +1782,32 @@ body.dark-mode .dashboard-top-info-link:hover .lucide {
         bottom: 3px;
     }
 
+    /* Mobile keeps its original 2-column stretched layout: the column-count
+       setting is desktop-only (its button is hidden below 800px), so every
+       desktop-side declaration it relies on is reset here. */
+    .dashboard-grid-container,
+    #dashboardGrid.dash-grid-sectioned,
+    .dashboard-breadcrumb {
+        width: auto;
+        max-width: 100%;
+        margin-inline: 0;
+    }
+
+    /* Phones show 2 stretched columns at S/M. Large cards keep their own
+       250px minimum, which leaves room for only one column on a phone: that
+       single-column L layout is what this breakpoint produced before the
+       column setting existed, and it is preserved below. */
     .dashboard-grid-container {
         grid-template-columns: repeat(2, 1fr);
+        justify-content: stretch;
         grid-auto-rows: 116px;
         gap: 8px;
         margin-top: 8px;
+    }
+
+    .view-size-large .dashboard-grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(min(var(--dash-col-min, 250px), 100%), 1fr));
+        grid-auto-rows: 210px;
     }
 
     .dash-card-name {

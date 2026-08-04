@@ -67,7 +67,7 @@ function getUrlNoteContext() {
 function getStoredActiveTabContext(workspace) {
     try {
         var storageWorkspace = workspace || 'default';
-        var raw = localStorage.getItem('poznote_tabs_' + storageWorkspace);
+        var raw = localStorage.getItem(window.__poznoteTabsStorageKey(storageWorkspace));
         if (!raw) return null;
 
         var data = JSON.parse(raw);

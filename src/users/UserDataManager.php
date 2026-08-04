@@ -12,7 +12,9 @@
 class UserDataManager {
     private $userId;
     private $baseDataPath;
-    
+    /** Paths the last deleteAllUserData() call could not remove. */
+    private $deletionFailures = [];
+
     public function __construct($userId) {
         $this->userId = (int)$userId;
         // Derive data path from the main SQLITE_DATABASE constant to ensure consistency
@@ -212,16 +214,34 @@ class UserDataManager {
      */
     public function deleteAllUserData() {
         $basePath = $this->getUserBasePath();
-        
+        $this->deletionFailures = [];
+
+        if (is_link($basePath)) {
+            // The tree lives somewhere else; removing the link alone would leave
+            // the notes on disk, so report it instead of claiming success.
+            $this->deletionFailures[] = $basePath;
+            return false;
+        }
+
         if (!is_dir($basePath)) {
             return true;
         }
-        
+
         return $this->deleteDirectory($basePath);
     }
-    
+
     /**
-     * Recursively delete a directory
+     * Paths the last deleteAllUserData() call could not remove.
+     * @return array
+     */
+    public function getDeletionFailures() {
+        return $this->deletionFailures;
+    }
+
+    /**
+     * Recursively delete a directory.
+     * Every failure is recorded and propagated: a caller that deletes the
+     * account row on a false return would leave the notes on disk.
      * @param string $path
      * @return bool
      */
@@ -229,19 +249,33 @@ class UserDataManager {
         if (!is_dir($path)) {
             return true;
         }
-        
-        $files = array_diff(scandir($path), ['.', '..']);
-        
-        foreach ($files as $file) {
+
+        $entries = scandir($path);
+        if ($entries === false) {
+            $this->deletionFailures[] = $path;
+            return false;
+        }
+
+        $deleted = true;
+
+        foreach (array_diff($entries, ['.', '..']) as $file) {
             $fullPath = $path . '/' . $file;
-            if (is_dir($fullPath)) {
-                $this->deleteDirectory($fullPath);
-            } else {
-                unlink($fullPath);
+            // Symlinked directories are unlinked, never followed, so a link
+            // cannot lead the recursion outside the user's own tree.
+            if (is_dir($fullPath) && !is_link($fullPath)) {
+                $deleted = $this->deleteDirectory($fullPath) && $deleted;
+            } elseif (!@unlink($fullPath)) {
+                $this->deletionFailures[] = $fullPath;
+                $deleted = false;
             }
         }
-        
-        return rmdir($path);
+
+        if (!@rmdir($path)) {
+            $this->deletionFailures[] = $path;
+            return false;
+        }
+
+        return $deleted;
     }
     
     /**

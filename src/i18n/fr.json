@@ -381,6 +381,7 @@
   },
   "settings": {
     "card_help": {
+      "tenant_isolation": "Mode SaaS : empêche les utilisateurs non administrateurs de découvrir les autres comptes de l'instance. L'annuaire des utilisateurs devient réservé aux administrateurs et le partage avec des utilisateurs spécifiques est refusé. Laissez cette option désactivée pour une instance familiale ou d'équipe.",
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
@@ -429,7 +430,6 @@
       "webhooks": "Envoyez les événements de l'instance vers des services externes via des webhooks.",
       "ai_assistant": "Configurez l'assistant IA utilisé pour discuter avec vos notes.",
       "git_sync_enabled": "Activez ou désactivez la synchronisation Git sur cette instance.",
-      "hide_restrict_users": "Masquez les options « Restreindre à des utilisateurs spécifiques » dans les fenêtres de partage (notes/dossiers partagés et partage d'espaces de travail). Les restrictions existantes restent actives.",
       "import_limits": "Définissez le nombre maximal de fichiers autorisés par import.",
       "user_quotas": "Limitez le nombre de notes et le stockage disponibles par utilisateur.",
       "custom_css": "Appliquez votre propre CSS pour personnaliser l'apparence de Poznote.",
@@ -474,6 +474,7 @@
       "reload_hint": "Rechargement…"
     },
     "cards": {
+      "tenant_isolation": "Isolation des comptes",
       "workspaces": "Espaces de travail",
       "user_management": "Gestion des utilisateurs",
       "backup_export": "Sauvegarde / Export",
@@ -500,7 +501,6 @@
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
       "git_sync_toggle": "Synchronisation Git",
-      "hide_restrict_users": "Masquer la restriction par utilisateurs",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
@@ -1026,6 +1026,9 @@
       "dashboard_filter_bar": "Barre de filtre",
       "view_layout_toggle": "Bascule grille / liste",
       "index_search_bar": "Barre de recherche",
+      "share_restrict_users": "Partage : restreindre à des utilisateurs spécifiques",
+      "share_protocol_toggle": "Partage : bascule HTTPS",
+      "share_shared_with_me": "Partage : « Partagé avec moi »",
       "filter_placeholder": "Filtrer les éléments...",
       "no_results": "Aucun élément correspondant.",
       "show_unchecked_only": "Afficher uniquement les éléments décochés",
@@ -1042,6 +1045,7 @@
         "workspace_menu": "Menu du workspace"
       },
       "badge_all_visible": "Tout visible",
+      "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
       "badge_hidden_count": "{{count}} masqué(s)",
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher"
@@ -1624,52 +1628,27 @@
     },
     "share_modal": {
       "description": "Une URL de partage crée un lien public vers cette note. Une fois l'URL créée, d'autres options seront proposées, comme protéger la note par mot de passe ou personnaliser l'URL de partage.",
-      "custom_token": "Lien personnalisé (optionnel)",
-      "custom_token_placeholder": "mon-lien-personnalise-1",
-      "custom_token_example": "Ce qui donnera par exemple :",
-      "password": "Mot de passe (optionnel)",
-      "password_placeholder": "Saisir un mot de passe",
-      "indexable": "Autoriser l'indexation par les moteurs de recherche",
-      "tasklist_access": "Accès public de la liste de tâches",
-      "access_read_only": "Lecture seule",
-      "access_check_only": "Cocher ou décocher uniquement",
-      "access_full": "Modification complète",
       "create_url": "Créer l'URL",
-      "close": "Fermer",
       "error_prefix": "Erreur : ",
       "unknown_error": "Erreur inconnue lors de la création du partage public",
       "error_creating": "Erreur lors de la création du partage public : "
     },
     "public_modal": {
       "title": "URL partagée",
-      "redirect_info": "Ce partage se gère maintenant depuis la page Partagés, où vous pouvez modifier ses réglages publics.",
-      "close": "Fermer",
-      "open": "Ouvrir",
-      "copy": "Copier",
-      "revoke": "Révoquer",
       "renew": "Renouveler",
       "renew_token": "Renouveler le lien",
       "manage": "Modifier",
-      "create_url": "Créer l'url",
-      "no_link_yet": "Aucun lien public pour le moment",
       "custom_token": "Lien personnalisé (optionnel)",
       "custom_token_placeholder": "mon-lien-personnalise-1",
       "indexable": "Autoriser l'indexation par les moteurs de recherche",
       "indexable_mobile": "Autoriser l'indexation",
       "password": "Mot de passe (optionnel)",
-      "password_placeholder": "Saisir un mot de passe",
-      "error_prefix": "Erreur : ",
-      "unknown_error": "Erreur inconnue lors de la création du partage public",
-      "error_creating": "Erreur lors de la création du partage public : "
+      "password_placeholder": "Saisir un mot de passe"
     },
     "folder_share_modal": {
       "title": "URL du dossier partagé",
       "create_description": "Une URL de partage crée un lien public vers ce dossier. Une fois l'URL créée, d'autres options seront proposées, comme protéger le dossier par mot de passe ou personnaliser l'URL de partage.",
-      "description": "Toute personne avec ce lien peut voir toutes les notes de ce dossier (sauf si un mot de passe a été configuré).",
-      "use_https": "HTTPS",
-      "renewed": "Lien de partage du dossier renouvelé",
-      "failed_renew": "Échec du renouvellement du partage du dossier",
-      "failed_revoke": "Échec de la révocation du partage du dossier"
+      "use_https": "HTTPS"
     },
     "task_permissions": {
       "title": "Permissions",
@@ -3092,6 +3071,7 @@
       "password_required": "Le mot de passe est requis",
       "password_incorrect": "Mot de passe incorrect",
       "cannot_delete": "Ce compte ne peut pas être supprimé",
+      "data_not_deleted": "Vos fichiers n'ont pas pu être supprimés, le compte a donc été conservé. Contactez l'administrateur.",
       "last_admin": "Impossible de supprimer le dernier compte administrateur"
     }
   },
@@ -3368,6 +3348,7 @@
       "size_small": "Petites",
       "size_medium": "Moyennes",
       "size_large": "Grandes",
+      "columns": "Colonnes maximum",
       "layout": "Disposition",
       "layout_grid": "Grille",
       "layout_list": "Liste"
