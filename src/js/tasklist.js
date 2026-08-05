@@ -112,7 +112,8 @@ function initializeTaskList(noteId, noteType) {
                 text: '',
                 completed: false,
                 noteId: noteId,
-                important: false
+                important: false,
+                dueAt: null
             };
         }
 
@@ -122,7 +123,8 @@ function initializeTaskList(noteId, noteType) {
             noteId: noteId,
             completed: !!task.completed,
             important: !!task.important,
-            text: typeof task.text === 'string' ? task.text : String(task.text ?? '')
+            text: typeof task.text === 'string' ? task.text : String(task.text ?? ''),
+            dueAt: normalizeTaskDueAt(task.dueAt)
         };
     });
 
@@ -170,6 +172,64 @@ function extractTasksFromHTML(noteEntry) {
         return null;
     }
 }
+
+// Due dates are stored as 'YYYY-MM-DD' strings (local calendar date), with an
+// optional local time: 'YYYY-MM-DDTHH:MM'.
+function normalizeTaskDueAt(value) {
+    if (typeof value !== 'string') return null;
+    const match = value.trim().match(/^(\d{4}-\d{2}-\d{2})(?:[T ](\d{2}:\d{2}))?/);
+    if (!match) return null;
+    return match[2] ? (match[1] + 'T' + match[2]) : match[1];
+}
+
+function taskDueTimePart(dueAt) {
+    const normalized = normalizeTaskDueAt(dueAt);
+    return (normalized && normalized.length > 10) ? normalized.substring(11, 16) : '';
+}
+
+function localDateStringToday() {
+    const now = new Date();
+    return now.getFullYear() + '-'
+        + String(now.getMonth() + 1).padStart(2, '0') + '-'
+        + String(now.getDate()).padStart(2, '0');
+}
+
+function isTaskDueOverdue(dueAt) {
+    const normalized = normalizeTaskDueAt(dueAt);
+    if (!normalized) return false;
+
+    // ISO-style local strings compare correctly lexicographically
+    if (normalized.length > 10) {
+        const now = new Date();
+        const nowStr = localDateStringToday() + 'T'
+            + String(now.getHours()).padStart(2, '0') + ':'
+            + String(now.getMinutes()).padStart(2, '0');
+        return normalized < nowStr;
+    }
+
+    return normalized < localDateStringToday();
+}
+
+function formatTaskDueDate(dueAt) {
+    const normalized = normalizeTaskDueAt(dueAt);
+    if (!normalized) return '';
+    const date = new Date(
+        parseInt(normalized.substring(0, 4), 10),
+        parseInt(normalized.substring(5, 7), 10) - 1,
+        parseInt(normalized.substring(8, 10), 10),
+        normalized.length > 10 ? parseInt(normalized.substring(11, 13), 10) : 0,
+        normalized.length > 10 ? parseInt(normalized.substring(14, 16), 10) : 0
+    );
+    const dateText = date.toLocaleDateString();
+    if (normalized.length > 10) {
+        return dateText + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return dateText;
+}
+
+window.normalizeTaskDueAt = normalizeTaskDueAt;
+window.isTaskDueOverdue = isTaskDueOverdue;
+window.formatTaskDueDate = formatTaskDueDate;
 
 function escapeAttribute(value) {
     return String(value || '')
@@ -271,12 +331,31 @@ function renderTaskList(noteId, tasks) {
 function renderTasks(tasks, noteId) {
     if (!Array.isArray(tasks)) return '';
 
+    const t = window.t || ((key, params, fallback) => fallback);
+
     return tasks.map(task => {
         const starClass = 'lucide lucide-star';
         const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
-        const title = task.important ? 'Remove important' : 'Mark as important';
-        const moveTitle = window.t ? window.t('tasklist.move_to_list', null, 'Move to another list') : 'Move to another list';
-        
+        const title = task.important
+            ? t('tasklist.unmark_important', null, 'Remove important')
+            : t('tasklist.mark_important', null, 'Mark as important');
+        const moveTitle = t('tasklist.move_to_list', null, 'Move to another list');
+        const dueTitle = t('tasklist.due_date', null, 'Due date');
+        const menuTitle = t('tasklist.task_options', null, 'Task options');
+        const dragTitle = t('tasklist.drag_to_reorder', null, 'Drag to reorder');
+
+        const dueAt = normalizeTaskDueAt(task.dueAt);
+        const dueChipHtml = dueAt
+            ? `<button type="button" class="task-due-chip${(!task.completed && isTaskDueOverdue(dueAt)) ? ' overdue' : ''}" title="${dueTitle}" onclick="openTaskDueDatePicker(${task.id}, ${task.noteId || 'null'}, event)">
+                <i class="lucide lucide-calendar-alt"></i><span>${formatTaskDueDate(dueAt)}</span>
+            </button>`
+            : '';
+        const dueBtnHtml = (!dueAt && !task.completed)
+            ? `<button class="task-due-btn" title="${dueTitle}" onclick="openTaskDueDatePicker(${task.id}, ${task.noteId || 'null'}, event)">
+                <i class="lucide lucide-calendar-alt"></i>
+            </button>`
+            : '';
+
         // Conditional buttons based on completion status
         let buttonsHtml = '';
         if (task.completed) {
@@ -288,28 +367,34 @@ function renderTasks(tasks, noteId) {
             <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
                 <i class="lucide-arrow-right"></i>
             </button>
-            <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
+            <div class="task-drag-handle" title="${dragTitle}">
                 <i class="lucide-grip-vertical"></i>
             </div>`;
         } else {
-            // Incomplete tasks: show favorite and drag buttons
+            // Incomplete tasks: individual buttons on desktop, collapsed into a
+            // three-dot menu on mobile (visibility handled in tasks.css)
             buttonsHtml = `
+            ${dueBtnHtml}
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
             </button>
             <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
                 <i class="lucide-arrow-right"></i>
             </button>
-            <div class="task-drag-handle" title="${window.t ? window.t('tasklist.drag_to_reorder', null, 'Drag to reorder') : 'Drag to reorder'}">
+            <button class="task-menu-btn" title="${menuTitle}" onclick="openTaskActionsMenu(${task.id}, ${task.noteId || 'null'}, event)">
+                <i class="lucide lucide-more-vertical"></i>
+            </button>
+            <div class="task-drag-handle" title="${dragTitle}">
                 <i class="lucide-grip-vertical"></i>
             </div>`;
         }
-        
+
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''}" data-task-id="${task.id}" draggable="false">
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''} ${dueAt ? 'has-due' : ''}" data-task-id="${task.id}" draggable="false">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
-            ${buttonsHtml}
+            ${dueChipHtml}
+            <div class="task-row-actions">${buttonsHtml}</div>
         </div>
         `;
     }).join('');
@@ -357,7 +442,8 @@ function addTask(noteId) {
         text: taskText,
         completed: false,
         noteId: noteId,
-        important: false
+        important: false,
+        dueAt: null
     };
 
     // Insert synchronously using the cached preference (default: bottom).
@@ -788,6 +874,191 @@ function toggleImportant(taskId, noteId) {
     markTaskListAsModified(noteId);
 }
 
+// Open the calendar popup to set or clear a task's due date
+function openTaskDueDatePicker(taskId, noteId, event, anchorRectOverride) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    if (isPublicWorkspaceReadOnly()) return;
+
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    const tasks = parseTaskData(noteEntry);
+    const task = tasks.find(t => String(t.id) === String(taskId));
+    if (!task) return;
+
+    const setDueAt = function (value) {
+        task.dueAt = value;
+        saveAndRenderTasks(noteId, tasks);
+        markTaskListAsModified(noteId);
+    };
+
+    const trigger = event && event.target ? event.target.closest('button') : null;
+    const anchorRect = anchorRectOverride || (trigger ? trigger.getBoundingClientRect() : null);
+
+    if (typeof window.showSlashDatePicker === 'function') {
+        const removeLabel = window.t ? window.t('tasklist.due_remove', null, 'Remove due date') : 'Remove due date';
+        const normalizedDue = normalizeTaskDueAt(task.dueAt);
+        const pickerOptions = {
+            withTime: true,
+            initialTime: taskDueTimePart(task.dueAt),
+            initialDate: normalizedDue ? normalizedDue.substring(0, 10) : null,
+            removeTimeLabel: window.t ? window.t('tasklist.due_remove_time', null, 'Remove time') : 'Remove time'
+        };
+        if (task.dueAt) {
+            pickerOptions.removeLabel = removeLabel;
+            pickerOptions.onRemove = function () { setDueAt(null); };
+        }
+        window.showSlashDatePicker(anchorRect, function (date, time) {
+            const day = date.getFullYear() + '-'
+                + String(date.getMonth() + 1).padStart(2, '0') + '-'
+                + String(date.getDate()).padStart(2, '0');
+            setDueAt(time ? (day + 'T' + time) : day);
+        }, null, pickerOptions);
+        return;
+    }
+
+    // Fallback when slash-command.js is not loaded on this page
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.value = normalizeTaskDueAt(task.dueAt) || '';
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    document.body.appendChild(input);
+    input.addEventListener('change', function () {
+        setDueAt(normalizeTaskDueAt(input.value));
+        input.remove();
+    });
+    input.addEventListener('blur', function () { input.remove(); });
+    try {
+        if (typeof input.showPicker === 'function') input.showPicker();
+        else input.click();
+    } catch (e) {
+        input.remove();
+    }
+}
+
+window.openTaskDueDatePicker = openTaskDueDatePicker;
+
+// Small popup menu with the actions of an incomplete task (due date,
+// important, move). Shown from the three-dot button on mobile.
+let taskActionsMenuCleanup = null;
+
+function closeTaskActionsMenu() {
+    if (taskActionsMenuCleanup) taskActionsMenuCleanup();
+}
+
+function openTaskActionsMenu(taskId, noteId, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    closeTaskActionsMenu();
+
+    if (isPublicWorkspaceReadOnly()) return;
+
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    const tasks = parseTaskData(noteEntry);
+    const task = tasks.find(t => String(t.id) === String(taskId));
+    if (!task) return;
+
+    const t = window.t || ((key, params, fallback) => fallback);
+    const trigger = event && event.target ? event.target.closest('button') : null;
+    const anchorRect = trigger ? trigger.getBoundingClientRect() : null;
+
+    const items = [
+        {
+            icon: 'lucide lucide-calendar-alt',
+            label: t('tasklist.due_date', null, 'Due date'),
+            run: function () {
+                openTaskDueDatePicker(taskId, noteId, null, anchorRect);
+            }
+        },
+        {
+            icon: 'lucide lucide-star',
+            label: task.important
+                ? t('tasklist.unmark_important', null, 'Remove important')
+                : t('tasklist.mark_important', null, 'Mark as important'),
+            run: function () {
+                toggleImportant(taskId, noteId);
+            }
+        },
+        {
+            icon: 'lucide lucide-arrow-right',
+            label: t('tasklist.move_to_list', null, 'Move to another list'),
+            run: function () {
+                openMoveTaskModal(taskId, noteId);
+            }
+        }
+    ];
+
+    const menu = document.createElement('div');
+    menu.className = 'task-actions-menu';
+
+    items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'task-actions-menu-item';
+        const icon = document.createElement('i');
+        icon.className = item.icon;
+        btn.appendChild(icon);
+        btn.appendChild(document.createTextNode(item.label));
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            cleanup();
+            item.run();
+        });
+        menu.appendChild(btn);
+    });
+
+    function cleanup() {
+        document.removeEventListener('mousedown', handleOutsideMouseDown, true);
+        document.removeEventListener('keydown', handleEscape, true);
+        if (menu.parentNode) menu.parentNode.removeChild(menu);
+        taskActionsMenuCleanup = null;
+    }
+
+    function handleOutsideMouseDown(e) {
+        if (!menu.contains(e.target)) cleanup();
+    }
+
+    function handleEscape(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            cleanup();
+        }
+    }
+
+    document.body.appendChild(menu);
+
+    const padding = 8;
+    const menuRect = menu.getBoundingClientRect();
+    const rect = anchorRect || { left: (window.innerWidth - menuRect.width) / 2, top: window.innerHeight / 2, bottom: window.innerHeight / 2 };
+    const x = Math.min(rect.left, window.innerWidth - menuRect.width - padding);
+    let y = rect.bottom + 6;
+    if (y + menuRect.height > window.innerHeight - padding) {
+        y = Math.max(padding, rect.top - menuRect.height - 6);
+    }
+    menu.style.left = Math.max(padding, x) + 'px';
+    menu.style.top = y + 'px';
+
+    document.addEventListener('mousedown', handleOutsideMouseDown, true);
+    document.addEventListener('keydown', handleEscape, true);
+
+    taskActionsMenuCleanup = cleanup;
+}
+
+window.openTaskActionsMenu = openTaskActionsMenu;
+
 // Move task to another tasklist note
 let moveTaskState = {
     taskId: null,
@@ -984,11 +1255,23 @@ async function executeMoveTask() {
         const insertOrder = await getTasklistInsertOrder();
         targetTasks = insertTaskWithOrder(targetTasks, newTask, insertOrder);
 
+        // Pass the tab's editor session id so the save is allowed when this
+        // tab holds (or can acquire) the note's edit lock, like kanban.js does.
+        const editorSessionId = (typeof window.getCurrentEditorSessionId === 'function')
+            ? window.getCurrentEditorSessionId()
+            : '';
+        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        const payload = { content: JSON.stringify(targetTasks) };
+        if (editorSessionId) {
+            headers['X-Editor-Session-ID'] = editorSessionId;
+            payload.editor_session_id = editorSessionId;
+        }
+
         const updateResp = await fetch(`/api/v1/notes/${targetNoteId}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            headers: headers,
             credentials: 'same-origin',
-            body: JSON.stringify({ content: JSON.stringify(targetTasks) })
+            body: JSON.stringify(payload)
         });
 
         const updateData = await updateResp.json();
@@ -1019,6 +1302,275 @@ async function executeMoveTask() {
         if (window.modalAlert) {
             window.modalAlert.alert(
                 window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task',
+                'error'
+            );
+        }
+    } finally {
+        if (spinner && typeof spinner.close === 'function') spinner.close();
+    }
+}
+
+// Quick-capture a task into any tasklist note (opened by the /task slash command)
+let quickTaskState = {
+    targetNoteId: null,
+    notes: []
+};
+
+const QUICK_TASK_TARGET_KEY = 'poznote-quick-task-target';
+
+function getQuickTaskStorage() {
+    return window.__poznoteUserStorage || window.localStorage;
+}
+
+function openQuickTaskModal(prefillText) {
+    const modal = document.getElementById('quickTaskModal');
+    if (!modal) return;
+
+    quickTaskState = {
+        targetNoteId: null,
+        notes: []
+    };
+
+    attachQuickTaskModalHandlers(modal);
+
+    const textInput = document.getElementById('quickTaskTextInput');
+    if (textInput) {
+        textInput.value = typeof prefillText === 'string' ? prefillText : '';
+    }
+
+    const searchInput = document.getElementById('quickTaskSearchInput');
+    if (searchInput) searchInput.value = '';
+
+    const list = document.getElementById('quickTaskList');
+    if (list) list.innerHTML = '';
+
+    updateQuickTaskConfirmState();
+
+    modal.style.display = 'flex';
+    loadQuickTaskTargets('');
+
+    if (textInput) {
+        setTimeout(function() { textInput.focus(); }, 0);
+    }
+}
+
+window.openQuickTaskModal = openQuickTaskModal;
+
+function attachQuickTaskModalHandlers(modal) {
+    if (modal.dataset.handlersAttached === 'true') return;
+
+    const searchInput = document.getElementById('quickTaskSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            loadQuickTaskTargets(e.target.value || '');
+        });
+    }
+
+    const textInput = document.getElementById('quickTaskTextInput');
+    if (textInput) {
+        textInput.addEventListener('input', updateQuickTaskConfirmState);
+        textInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                executeQuickTaskAdd();
+            }
+        });
+    }
+
+    const confirmBtn = document.getElementById('confirmQuickTaskBtn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', executeQuickTaskAdd);
+    }
+
+    modal.dataset.handlersAttached = 'true';
+}
+
+function updateQuickTaskConfirmState() {
+    const confirmBtn = document.getElementById('confirmQuickTaskBtn');
+    const textInput = document.getElementById('quickTaskTextInput');
+    if (!confirmBtn) return;
+
+    const hasText = !!(textInput && textInput.value.trim());
+    confirmBtn.disabled = !(hasText && quickTaskState.targetNoteId);
+}
+
+async function loadQuickTaskTargets(searchQuery) {
+    const list = document.getElementById('quickTaskList');
+    if (!list) return;
+
+    list.innerHTML = '<div class="move-task-empty">' +
+        (window.t ? window.t('modals.task_move.loading', null, 'Loading...') : 'Loading...') +
+        '</div>';
+
+    try {
+        const workspace = getCurrentWorkspace();
+        const response = await fetch(`/api/v1/notes?workspace=${encodeURIComponent(workspace)}`);
+        const data = await response.json();
+
+        let notes = (data && data.success && Array.isArray(data.notes)) ? data.notes : [];
+
+        notes = notes.filter(n => n.type === 'tasklist');
+
+        if (searchQuery && searchQuery.trim()) {
+            const q = searchQuery.toLowerCase().trim();
+            notes = notes.filter(n => (n.heading || '').toLowerCase().includes(q));
+        }
+
+        quickTaskState.notes = notes;
+
+        // Preselect the last used target when it is still available
+        if (!quickTaskState.targetNoteId) {
+            let lastTarget = null;
+            try {
+                lastTarget = getQuickTaskStorage().getItem(QUICK_TASK_TARGET_KEY);
+            } catch (e) { }
+            if (lastTarget && notes.some(n => String(n.id) === String(lastTarget))) {
+                quickTaskState.targetNoteId = lastTarget;
+            }
+        }
+
+        renderQuickTaskTargets(notes);
+        updateQuickTaskConfirmState();
+    } catch (e) {
+        list.innerHTML = '<div class="move-task-empty">' +
+            (window.t ? window.t('modals.task_move.error', null, 'Unable to load task lists.') : 'Unable to load task lists.') +
+            '</div>';
+    }
+}
+
+function renderQuickTaskTargets(notes) {
+    const list = document.getElementById('quickTaskList');
+    if (!list) return;
+
+    list.innerHTML = '';
+
+    if (!notes || notes.length === 0) {
+        list.innerHTML = '<div class="move-task-empty">' +
+            (window.t ? window.t('modals.task_move.empty', null, 'No task lists found.') : 'No task lists found.') +
+            '</div>';
+        return;
+    }
+
+    notes.forEach(note => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'move-task-item';
+
+        if (String(note.id) === String(quickTaskState.targetNoteId)) {
+            item.classList.add('selected');
+        }
+
+        const title = note.heading || (window.t ? window.t('note_reference.untitled', null, 'Untitled') : 'Untitled');
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = title;
+
+        item.appendChild(titleSpan);
+
+        if (note.folder) {
+            const meta = document.createElement('small');
+            meta.textContent = note.folder;
+            item.appendChild(meta);
+        }
+
+        item.addEventListener('click', function() {
+            quickTaskState.targetNoteId = note.id;
+            const items = list.querySelectorAll('.move-task-item');
+            items.forEach(el => el.classList.remove('selected'));
+            item.classList.add('selected');
+            updateQuickTaskConfirmState();
+        });
+
+        list.appendChild(item);
+    });
+}
+
+async function executeQuickTaskAdd() {
+    const textInput = document.getElementById('quickTaskTextInput');
+    const targetNoteId = quickTaskState.targetNoteId;
+    const taskText = textInput ? textInput.value.trim() : '';
+
+    if (!targetNoteId || !taskText) return;
+
+    const spinner = (window.modalAlert && typeof window.modalAlert.showSpinner === 'function')
+        ? window.modalAlert.showSpinner(
+            window.t ? window.t('modals.quick_task.adding', null, 'Adding task...') : 'Adding task...'
+        )
+        : null;
+
+    try {
+        const workspace = getCurrentWorkspace();
+        const noteResp = await fetch(`/api/v1/notes/${targetNoteId}?workspace=${encodeURIComponent(workspace)}`);
+        const noteData = await noteResp.json();
+
+        if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
+            throw new Error('quick task target unavailable');
+        }
+
+        let targetTasks = [];
+        try {
+            targetTasks = JSON.parse(noteData.note.content || '[]');
+            if (!Array.isArray(targetTasks)) targetTasks = [];
+        } catch (e) {
+            targetTasks = [];
+        }
+
+        const newTask = {
+            id: Date.now() + Math.random(),
+            text: taskText,
+            completed: false,
+            noteId: targetNoteId,
+            important: false,
+            dueAt: null
+        };
+
+        const insertOrder = await getTasklistInsertOrder();
+        targetTasks = insertTaskWithOrder(targetTasks, newTask, insertOrder);
+
+        // Pass the tab's editor session id so the save is allowed when this
+        // tab holds (or can acquire) the note's edit lock, like kanban.js does.
+        const editorSessionId = (typeof window.getCurrentEditorSessionId === 'function')
+            ? window.getCurrentEditorSessionId()
+            : '';
+        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        const payload = { content: JSON.stringify(targetTasks) };
+        if (editorSessionId) {
+            headers['X-Editor-Session-ID'] = editorSessionId;
+            payload.editor_session_id = editorSessionId;
+        }
+
+        const updateResp = await fetch(`/api/v1/notes/${targetNoteId}`, {
+            method: 'PATCH',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        });
+
+        const updateData = await updateResp.json();
+        if (!updateData || !updateData.success) {
+            throw new Error('quick task save failed');
+        }
+
+        try {
+            getQuickTaskStorage().setItem(QUICK_TASK_TARGET_KEY, String(targetNoteId));
+        } catch (e) { }
+
+        // If the target note is open in the current view, refresh its list
+        const targetEntry = document.getElementById('entry' + targetNoteId);
+        if (targetEntry && targetEntry.getAttribute('data-note-type') === 'tasklist') {
+            saveAndRenderTasks(targetNoteId, targetTasks);
+        }
+
+        if (typeof closeModal === 'function') {
+            closeModal('quickTaskModal');
+        } else {
+            const modal = document.getElementById('quickTaskModal');
+            if (modal) modal.style.display = 'none';
+        }
+    } catch (e) {
+        if (window.modalAlert) {
+            window.modalAlert.alert(
+                window.t ? window.t('modals.quick_task.error', null, 'Unable to add task') : 'Unable to add task',
                 'error'
             );
         }

@@ -1377,135 +1377,12 @@
         return isUsableAnchorRect(rect) ? rect : null;
     }
 
-    // Custom date picker popup. The native <input type="date"> picker cannot
-    // be used here: the browser decides where to open it and, at least on
-    // Chromium/Linux, showPicker() ignores the input position entirely and
-    // opens the calendar in the top-left corner of the window (over the
-    // sidebar). This popup is positioned like the slash menu itself.
-    let slashDatePickerCleanup = null;
-
-    function closeSlashDatePicker() {
-        if (slashDatePickerCleanup) slashDatePickerCleanup();
-    }
-
-    function showSlashDatePicker(anchorRect, onPick, onDismiss) {
-        closeSlashDatePicker();
-
-        const t9n = window.calendarTranslations || {};
-        const months = (Array.isArray(t9n.months) && t9n.months.length === 12) ? t9n.months
-            : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const weekdays = (Array.isArray(t9n.weekdays) && t9n.weekdays.length === 7) ? t9n.weekdays
-            : ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-        const esc = escapeHtmlAttributeValue;
-
-        const today = new Date();
-        let viewYear = today.getFullYear();
-        let viewMonth = today.getMonth();
-
-        const picker = document.createElement('div');
-        picker.className = 'slash-date-picker';
-
-        function render() {
-            const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-            const firstDay = new Date(viewYear, viewMonth, 1).getDay();
-            // Monday-first, same convention as the sidebar mini calendar
-            const leadingBlanks = firstDay === 0 ? 6 : firstDay - 1;
-
-            let html = '<div class="slash-date-picker-header">'
-                + '<button type="button" class="slash-date-picker-nav" data-nav="-1" title="' + esc(t9n.previousMonth || 'Previous month') + '">&#8249;</button>'
-                + '<span class="slash-date-picker-title">' + esc(months[viewMonth]) + ' ' + viewYear + '</span>'
-                + '<button type="button" class="slash-date-picker-nav" data-nav="1" title="' + esc(t9n.nextMonth || 'Next month') + '">&#8250;</button>'
-                + '</div><div class="slash-date-picker-grid">';
-            for (let i = 0; i < 7; i++) {
-                html += '<span class="slash-date-picker-weekday">' + esc(weekdays[i]) + '</span>';
-            }
-            for (let i = 0; i < leadingBlanks; i++) {
-                html += '<span></span>';
-            }
-            for (let day = 1; day <= daysInMonth; day++) {
-                const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
-                html += '<button type="button" class="slash-date-picker-day' + (isToday ? ' today' : '') + '" data-day="' + day + '">' + day + '</button>';
-            }
-            html += '</div><div class="slash-date-picker-footer">'
-                + '<button type="button" class="slash-date-picker-today-btn" data-today="1">' + esc(t9n.today || 'Today') + '</button>'
-                + '</div>';
-            picker.innerHTML = html;
-        }
-
-        let picked = false;
-        function cleanup() {
-            document.removeEventListener('mousedown', handleOutsideMouseDown, true);
-            document.removeEventListener('keydown', handleEscape, true);
-            if (picker.parentNode) picker.parentNode.removeChild(picker);
-            slashDatePickerCleanup = null;
-            if (!picked && typeof onDismiss === 'function') onDismiss();
-        }
-
-        function pick(date) {
-            picked = true;
-            cleanup();
-            onPick(date);
-        }
-
-        function handleOutsideMouseDown(e) {
-            if (!picker.contains(e.target)) cleanup();
-        }
-
-        function handleEscape(e) {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                e.stopPropagation();
-                cleanup();
-            }
-        }
-
-        // Keep the caret/selection in the editor while interacting with the popup
-        picker.addEventListener('mousedown', function (e) { e.preventDefault(); });
-        picker.addEventListener('click', function (e) {
-            const nav = e.target.closest('[data-nav]');
-            if (nav) {
-                viewMonth += parseInt(nav.getAttribute('data-nav'), 10);
-                if (viewMonth < 0) { viewMonth = 11; viewYear--; }
-                if (viewMonth > 11) { viewMonth = 0; viewYear++; }
-                render();
-                return;
-            }
-            if (e.target.closest('[data-today]')) {
-                pick(new Date(today.getFullYear(), today.getMonth(), today.getDate()));
-                return;
-            }
-            const dayBtn = e.target.closest('[data-day]');
-            if (dayBtn) {
-                pick(new Date(viewYear, viewMonth, parseInt(dayBtn.getAttribute('data-day'), 10)));
-            }
-        });
-
-        render();
-        document.body.appendChild(picker);
-
-        const padding = 8;
-        const pickerRect = picker.getBoundingClientRect();
-        const rect = anchorRect || { left: (window.innerWidth - pickerRect.width) / 2, top: window.innerHeight / 2, bottom: window.innerHeight / 2 };
-        const x = Math.min(rect.left, window.innerWidth - pickerRect.width - padding);
-        let y = rect.bottom + 6;
-        if (y + pickerRect.height > window.innerHeight - padding) {
-            y = Math.max(padding, rect.top - pickerRect.height - 6);
-        }
-        picker.style.left = Math.max(padding, x) + 'px';
-        picker.style.top = y + 'px';
-
-        document.addEventListener('mousedown', handleOutsideMouseDown, true);
-        document.addEventListener('keydown', handleEscape, true);
-
-        slashDatePickerCleanup = cleanup;
-
-        // Keep the mobile virtual keyboard closed while the calendar is open;
-        // the editor gets focused again on pick, when the insertion needs it.
-        if (window.innerWidth < 768) {
-            const active = document.activeElement;
-            if (active && typeof active.blur === 'function') {
-                try { active.blur(); } catch (e) { }
-            }
+    // Positioned calendar popup. The implementation lives in
+    // js/date-picker-popup.js (window.showSlashDatePicker), shared with
+    // tasklist.js (per-task due dates) and the tasks page.
+    function showSlashDatePicker(anchorRect, onPick, onDismiss, options) {
+        if (typeof window.showSlashDatePicker === 'function') {
+            window.showSlashDatePicker(anchorRect, onPick, onDismiss, options);
         }
     }
 
@@ -1897,6 +1774,16 @@
                 ]
             },
             {
+                id: 'task',
+                icon: 'lucide-list-todo',
+                label: t('slash_menu.task', null, 'Add task'),
+                action: function () {
+                    if (typeof window.openQuickTaskModal === 'function') {
+                        window.openQuickTaskModal();
+                    }
+                }
+            },
+            {
                 id: 'quote',
                 icon: 'lucide-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
@@ -2182,6 +2069,16 @@
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
                     { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
                 ]
+            },
+            {
+                id: 'task',
+                icon: 'lucide-list-todo',
+                label: t('slash_menu.task', null, 'Add task'),
+                action: function () {
+                    if (typeof window.openQuickTaskModal === 'function') {
+                        window.openQuickTaskModal();
+                    }
+                }
             },
             {
                 id: 'quote',

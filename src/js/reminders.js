@@ -497,6 +497,48 @@ if (reminderDateInput) {
     });
 }
 
+// Replace the native datetime-local picker with the shared calendar popup
+// (same date + two-step time selection as task due dates) when available.
+function openReminderDatePicker() {
+    const input = document.getElementById('reminderDateInput');
+    if (!input || typeof window.showSlashDatePicker !== 'function') return;
+
+    let initialDate = null;
+    let initialTime = '';
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(input.value || '')) {
+        initialDate = input.value.substring(0, 10);
+        initialTime = input.value.substring(11, 16);
+    }
+
+    window.showSlashDatePicker(input.getBoundingClientRect(), function(date, time) {
+        const day = date.getFullYear() + '-'
+            + String(date.getMonth() + 1).padStart(2, '0') + '-'
+            + String(date.getDate()).padStart(2, '0');
+        // A reminder needs a trigger time; default to 09:00 when none chosen
+        input.value = day + 'T' + (time || '09:00');
+        syncReminderPreviewFromInput();
+    }, null, {
+        withTime: true,
+        initialDate: initialDate,
+        initialTime: initialTime
+    });
+}
+
+if (reminderDateInput && typeof window.showSlashDatePicker === 'function') {
+    reminderDateInput.readOnly = true;
+    reminderDateInput.classList.add('reminder-datetime-input-picker');
+    reminderDateInput.addEventListener('click', function(e) {
+        e.preventDefault();
+        openReminderDatePicker();
+    });
+    reminderDateInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openReminderDatePicker();
+        }
+    });
+}
+
 const reminderEmailInput = document.getElementById('reminderEmailInput');
 if (reminderEmailInput) {
     reminderEmailInput.addEventListener('change', function() {

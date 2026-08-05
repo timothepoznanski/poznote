@@ -747,7 +747,14 @@
     "edit_task": "编辑任务",
     "edit_text_label": "任务文本",
     "edit_hint": "Enter 添加新行。Ctrl+Enter 保存。",
-    "edit_empty_error": "任务文本不能为空。"
+    "edit_empty_error": "任务文本不能为空。",
+    "due_date": "截止日期",
+    "due_remove": "移除日期",
+    "due_remove_time": "移除时间",
+    "move_to_list": "移动到其他清单",
+    "mark_important": "标记为重要",
+    "unmark_important": "取消重要标记",
+    "task_options": "任务选项"
   },
   "tags": {
     "add_single": "添加标签...",
@@ -1344,6 +1351,14 @@
         "user_webhooks": "用户 Webhook",
         "user_webhooks_help": "非管理员用户无法再注册向外部服务发送笔记事件的 webhook。"
       }
+    },
+    "quick_task": {
+      "title": "添加任务",
+      "text_placeholder": "需要做什么？",
+      "description": "选择要添加此任务的任务清单。",
+      "confirm": "添加",
+      "adding": "正在添加任务...",
+      "error": "无法添加任务"
     }
   },
   "notes_list": {
@@ -1495,7 +1510,8 @@
     "audio_no_note": "未选择笔记",
     "audio_invalid_file": "请选择音频文件。",
     "audio_upload_failed": "上传失败：{{error}}",
-    "date": "日期"
+    "date": "日期",
+    "task": "添加任务"
   },
   "api": {
     "settings": {
@@ -3383,5 +3399,18 @@
     "manage_link": "管理用户：{{url}}",
     "manage_button": "管理用户",
     "footer": "您收到此邮件是因为您的管理员账户已启用新用户通知。"
+  },
+  "tasks_page": {
+    "title": "任务",
+    "progress": "已完成 {{completed}} / {{total}} 个任务",
+    "filter_all": "全部",
+    "filter_open": "待办",
+    "filter_important": "重要",
+    "filter_overdue": "已逾期",
+    "filter_dated": "有日期",
+    "filter_completed": "已完成",
+    "filter_placeholder": "按任务、标题或文件夹筛选...",
+    "empty": "还没有任务。创建一个任务清单笔记开始吧。",
+    "empty_filtered": "没有符合此筛选条件的任务。"
   }
 }

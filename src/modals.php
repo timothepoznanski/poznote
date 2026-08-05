@@ -744,6 +744,23 @@ try {
     </div>
 </div>
 
+<!-- Quick Add Task Modal (opened by the /task slash command) -->
+<div id="quickTaskModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.quick_task.title', [], 'Add task'); ?></h3>
+        <div class="modal-body">
+            <input type="text" id="quickTaskTextInput" maxlength="4000" autocomplete="off" placeholder="<?php echo t_h('modals.quick_task.text_placeholder', [], 'What needs to be done?'); ?>">
+            <p><?php echo t_h('modals.quick_task.description', [], 'Choose the task list to add this task to.'); ?></p>
+            <input type="text" id="quickTaskSearchInput" placeholder="<?php echo t_h('modals.task_move.search_placeholder', [], 'Search task lists...'); ?>">
+            <div id="quickTaskList" class="move-task-list"></div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-primary" id="confirmQuickTaskBtn" disabled><?php echo t_h('modals.quick_task.confirm', [], 'Add task'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="quickTaskModal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Note sort order modal -->
 <div id="noteSortModal" class="modal">
     <div class="modal-content">
@@ -1584,6 +1601,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:task" checked><span><?php echo t_h('slash_menu.task', [], 'Add task'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>

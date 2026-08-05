@@ -333,7 +333,14 @@
     "edit_task": "Edit task",
     "edit_text_label": "Task text",
     "edit_hint": "Enter adds a new line. Ctrl+Enter saves.",
-    "edit_empty_error": "Task text cannot be empty."
+    "edit_empty_error": "Task text cannot be empty.",
+    "due_date": "Due date",
+    "due_remove": "Remove due date",
+    "due_remove_time": "Remove time",
+    "move_to_list": "Move to another list",
+    "mark_important": "Mark as important",
+    "unmark_important": "Remove important",
+    "task_options": "Task options"
   },
   "tags": {
     "add_single": "Add tag...",
@@ -908,6 +915,14 @@
         "user_webhooks": "User webhooks",
         "user_webhooks_help": "Non-admin users can no longer register webhooks that send events about their notes to external endpoints."
       }
+    },
+    "quick_task": {
+      "title": "Add task",
+      "text_placeholder": "What needs to be done?",
+      "description": "Choose the task list to add this task to.",
+      "confirm": "Add task",
+      "adding": "Adding task...",
+      "error": "Unable to add task"
     }
   },
   "notes_list": {
@@ -1066,7 +1081,8 @@
     "audio_no_note": "No note selected",
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
-    "date": "Date"
+    "date": "Date",
+    "task": "Add task"
   },
   "api": {
     "settings": {
@@ -2958,5 +2974,18 @@
       "saving": "Saving changes...",
       "saved": "Saved!"
     }
+  },
+  "tasks_page": {
+    "title": "Tasks",
+    "progress": "{{completed}} of {{total}} tasks completed",
+    "filter_all": "All",
+    "filter_open": "To do",
+    "filter_important": "Important",
+    "filter_overdue": "Overdue",
+    "filter_dated": "With due date",
+    "filter_completed": "Completed",
+    "filter_placeholder": "Filter by task, title or folder name...",
+    "empty": "No tasks yet. Create a task list note to get started.",
+    "empty_filtered": "No tasks match this filter."
   }
 }

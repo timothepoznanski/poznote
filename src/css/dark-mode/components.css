@@ -224,6 +224,68 @@ body.dark-mode .task-important-btn.is-favorite i {
     color: #ff6b6b !important;
 }
 
+html[data-theme='dark'] .task-due-btn i,
+body.dark-mode .task-due-btn i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .task-due-btn:hover i,
+body.dark-mode .task-due-btn:hover i {
+    color: #4da3d0;
+}
+
+html[data-theme='dark'] .task-due-chip,
+body.dark-mode .task-due-chip {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: #a8a8a8;
+}
+
+html[data-theme='dark'] .task-due-chip:hover,
+body.dark-mode .task-due-chip:hover {
+    border-color: #4da3d0;
+    color: #4da3d0;
+}
+
+html[data-theme='dark'] .task-due-chip.overdue,
+body.dark-mode .task-due-chip.overdue {
+    background: #3d1f1f;
+    border-color: #8b4545;
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .task-menu-btn i,
+body.dark-mode .task-menu-btn i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .task-menu-btn:hover i,
+body.dark-mode .task-menu-btn:hover i {
+    color: #4da3d0;
+}
+
+html[data-theme='dark'] .task-actions-menu,
+body.dark-mode .task-actions-menu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+html[data-theme='dark'] .task-actions-menu-item,
+body.dark-mode .task-actions-menu-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .task-actions-menu-item:hover,
+body.dark-mode .task-actions-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .task-actions-menu-item i,
+body.dark-mode .task-actions-menu-item i {
+    color: #b0b0b0;
+}
+
 /* Important task styling for dark mode */
 html[data-theme='dark'] .task-item.important,
 body.dark-mode .task-item.important {

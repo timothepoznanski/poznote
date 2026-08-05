@@ -134,6 +134,7 @@ require_once __DIR__ . '/controllers/BacklinksController.php';
 require_once __DIR__ . '/controllers/GraphController.php';
 require_once __DIR__ . '/controllers/SnapshotsController.php';
 require_once __DIR__ . '/controllers/RemindersController.php';
+require_once __DIR__ . '/controllers/TasksController.php';
 
 /**
  * Simple Router class for handling RESTful routes
@@ -280,6 +281,7 @@ $backlinksController = new BacklinksController($con);
 $graphController = new GraphController($con);
 $snapshotsController = new SnapshotsController($con);
 $remindersController = new RemindersController($con);
+$tasksController = new TasksController($con);
 
 // ======================
 // Notes Routes
@@ -303,6 +305,11 @@ $router->get('/notes/{id}/backlinks', function($params) use ($backlinksControlle
 // Note-link graph (nodes + edges) for the graph view
 $router->get('/graph', function($params) use ($graphController) {
     $graphController->index();
+});
+
+// Aggregated tasks of all tasklist notes (global tasks page)
+$router->get('/tasks', function($params) use ($tasksController) {
+    $tasksController->index();
 });
 
 // List notes with attachments

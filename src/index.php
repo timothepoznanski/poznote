@@ -660,6 +660,7 @@ window.calendarTranslations = {
     previousMonth: <?php echo json_encode(t('calendar.buttons.previous_month')); ?>,
     nextMonth: <?php echo json_encode(t('calendar.buttons.next_month')); ?>,
     today: <?php echo json_encode(t('calendar.buttons.today')); ?>,
+    apply: <?php echo json_encode(t('common.apply', [], 'Apply')); ?>,
     showCalendar: <?php echo json_encode(t('calendar.buttons.show_calendar')); ?>,
     hideCalendar: <?php echo json_encode(t('calendar.buttons.hide_calendar')); ?>,
     modal: {

@@ -739,7 +739,7 @@
     "clear_completed": "Erledigte Aufgaben löschen",
     "no_completed_tasks": "Keine erledigten Aufgaben zum Löschen.",
     "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?",
-    "move_to_list": "In eine andere Liste verschieben",
+    "move_to_list": "In andere Liste verschieben",
     "move_success": "Aufgabe verschoben",
     "move_error": "Aufgabe konnte nicht verschoben werden",
     "actions": "Aufgabenlisten-Aktionen",
@@ -749,7 +749,13 @@
     "edit_task": "Aufgabe bearbeiten",
     "edit_text_label": "Aufgabentext",
     "edit_hint": "Enter fügt eine neue Zeile hinzu. Strg+Enter speichert.",
-    "edit_empty_error": "Der Aufgabentext darf nicht leer sein."
+    "edit_empty_error": "Der Aufgabentext darf nicht leer sein.",
+    "due_date": "Fälligkeitsdatum",
+    "due_remove": "Datum entfernen",
+    "due_remove_time": "Uhrzeit entfernen",
+    "mark_important": "Als wichtig markieren",
+    "unmark_important": "Wichtig-Markierung entfernen",
+    "task_options": "Aufgabenoptionen"
   },
   "tags": {
     "add_single": "Tag hinzufügen...",
@@ -1354,6 +1360,14 @@
         "user_webhooks": "Benutzer-Webhooks",
         "user_webhooks_help": "Benutzer ohne Administratorrechte können keine Webhooks mehr registrieren, die Ereignisse über ihre Notizen an externe Dienste senden."
       }
+    },
+    "quick_task": {
+      "title": "Aufgabe hinzufügen",
+      "text_placeholder": "Was ist zu tun?",
+      "description": "Wählen Sie die Aufgabenliste, zu der diese Aufgabe hinzugefügt werden soll.",
+      "confirm": "Hinzufügen",
+      "adding": "Aufgabe wird hinzugefügt...",
+      "error": "Aufgabe konnte nicht hinzugefügt werden"
     }
   },
   "notes_list": {
@@ -1505,7 +1519,8 @@
     "audio_no_note": "Keine Notiz ausgewählt",
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
-    "date": "Datum"
+    "date": "Datum",
+    "task": "Aufgabe hinzufügen"
   },
   "api": {
     "settings": {
@@ -3262,5 +3277,18 @@
     "manage_link": "Benutzer verwalten: {{url}}",
     "manage_button": "Benutzer verwalten",
     "footer": "Sie erhalten diese E-Mail, weil Benachrichtigungen über neue Benutzer für Ihr Administratorkonto aktiviert sind."
+  },
+  "tasks_page": {
+    "title": "Aufgaben",
+    "progress": "{{completed}} von {{total}} Aufgaben erledigt",
+    "filter_all": "Alle",
+    "filter_open": "Offen",
+    "filter_important": "Wichtig",
+    "filter_overdue": "Überfällig",
+    "filter_dated": "Mit Datum",
+    "filter_completed": "Erledigt",
+    "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
+    "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz, um zu beginnen.",
+    "empty_filtered": "Keine Aufgaben entsprechen diesem Filter."
   }
 }

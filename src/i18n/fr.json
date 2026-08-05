@@ -767,7 +767,13 @@
     "edit_task": "Modifier la tâche",
     "edit_text_label": "Texte de la tâche",
     "edit_hint": "Entrée ajoute une ligne. Ctrl+Entrée enregistre.",
-    "edit_empty_error": "Le texte de la tâche ne peut pas être vide."
+    "edit_empty_error": "Le texte de la tâche ne peut pas être vide.",
+    "due_date": "Date d'échéance",
+    "due_remove": "Supprimer la date",
+    "due_remove_time": "Supprimer l'heure",
+    "mark_important": "Marquer comme importante",
+    "unmark_important": "Retirer l'importance",
+    "task_options": "Options de la tâche"
   },
   "tags": {
     "add_single": "Ajouter un tag...",
@@ -1386,6 +1392,14 @@
         "user_webhooks": "Webhooks utilisateur",
         "user_webhooks_help": "Les utilisateurs non administrateurs ne peuvent plus enregistrer de webhooks envoyant des événements sur leurs notes vers des services externes."
       }
+    },
+    "quick_task": {
+      "title": "Ajouter une tâche",
+      "text_placeholder": "Que faut-il faire ?",
+      "description": "Choisissez la liste de tâches où ajouter cette tâche.",
+      "confirm": "Ajouter",
+      "adding": "Ajout de la tâche...",
+      "error": "Impossible d'ajouter la tâche"
     }
   },
   "notes_list": {
@@ -1553,7 +1567,8 @@
     "audio_no_note": "Aucune note sélectionnée",
     "audio_invalid_file": "Veuillez sélectionner un fichier audio.",
     "audio_upload_failed": "Échec de l'envoi : {{error}}",
-    "date": "Date"
+    "date": "Date",
+    "task": "Ajouter une tâche"
   },
   "api": {
     "settings": {
@@ -3452,5 +3467,18 @@
     "manage_link": "Gérer les utilisateurs : {{url}}",
     "manage_button": "Gérer les utilisateurs",
     "footer": "Vous recevez cet e-mail car les notifications de nouvel utilisateur sont activées pour votre compte administrateur."
+  },
+  "tasks_page": {
+    "title": "Tâches",
+    "progress": "{{completed}} tâches terminées sur {{total}}",
+    "filter_all": "Toutes",
+    "filter_open": "À faire",
+    "filter_important": "Importantes",
+    "filter_overdue": "En retard",
+    "filter_dated": "Avec date",
+    "filter_completed": "Terminées",
+    "filter_placeholder": "Filtrer par tâche, titre ou dossier...",
+    "empty": "Aucune tâche pour le moment. Créez une note de type liste de tâches pour commencer.",
+    "empty_filtered": "Aucune tâche ne correspond à ce filtre."
   }
 }

@@ -747,7 +747,13 @@
     "edit_task": "Editar tarefa",
     "edit_text_label": "Texto da tarefa",
     "edit_hint": "Enter adiciona uma nova linha. Ctrl+Enter salva.",
-    "edit_empty_error": "O texto da tarefa não pode ficar vazio."
+    "edit_empty_error": "O texto da tarefa não pode ficar vazio.",
+    "due_date": "Data de vencimento",
+    "due_remove": "Remover data",
+    "due_remove_time": "Remover hora",
+    "mark_important": "Marcar como importante",
+    "unmark_important": "Remover importante",
+    "task_options": "Opções da tarefa"
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",
@@ -1353,6 +1359,14 @@
         "user_webhooks": "Webhooks de usuário",
         "user_webhooks_help": "Os utilizadores não administradores deixam de poder registar webhooks que enviam eventos sobre as suas notas para serviços externos."
       }
+    },
+    "quick_task": {
+      "title": "Adicionar tarefa",
+      "text_placeholder": "O que precisa ser feito?",
+      "description": "Escolha a lista de tarefas onde adicionar esta tarefa.",
+      "confirm": "Adicionar",
+      "adding": "Adicionando tarefa...",
+      "error": "Não foi possível adicionar a tarefa"
     }
   },
   "notes_list": {
@@ -1504,7 +1518,8 @@
     "audio_no_note": "Nenhuma nota selecionada",
     "audio_invalid_file": "Por favor, selecione um ficheiro de audio.",
     "audio_upload_failed": "Erro ao enviar: {{error}}",
-    "date": "Data"
+    "date": "Data",
+    "task": "Adicionar tarefa"
   },
   "api": {
     "settings": {
@@ -3265,5 +3280,18 @@
     "manage_link": "Gerir utilizadores: {{url}}",
     "manage_button": "Gerir utilizadores",
     "footer": "Recebe este e-mail porque as notificações de novos utilizadores estão ativadas na sua conta de administrador."
+  },
+  "tasks_page": {
+    "title": "Tarefas",
+    "progress": "{{completed}} de {{total}} tarefas concluídas",
+    "filter_all": "Todas",
+    "filter_open": "A fazer",
+    "filter_important": "Importantes",
+    "filter_overdue": "Atrasadas",
+    "filter_dated": "Com data",
+    "filter_completed": "Concluídas",
+    "filter_placeholder": "Filtrar por tarefa, título ou pasta...",
+    "empty": "Ainda não há tarefas. Crie uma nota de lista de tarefas para começar.",
+    "empty_filtered": "Nenhuma tarefa corresponde a este filtro."
   }
 }

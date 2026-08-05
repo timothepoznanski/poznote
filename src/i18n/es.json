@@ -750,7 +750,13 @@
     "edit_task": "Editar tarea",
     "edit_text_label": "Texto de la tarea",
     "edit_hint": "Enter añade una nueva línea. Ctrl+Enter guarda.",
-    "edit_empty_error": "El texto de la tarea no puede estar vacío."
+    "edit_empty_error": "El texto de la tarea no puede estar vacío.",
+    "due_date": "Fecha límite",
+    "due_remove": "Quitar fecha",
+    "due_remove_time": "Quitar la hora",
+    "mark_important": "Marcar como importante",
+    "unmark_important": "Quitar importante",
+    "task_options": "Opciones de la tarea"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",
@@ -1355,6 +1361,14 @@
         "user_webhooks": "Webhooks de usuario",
         "user_webhooks_help": "Los usuarios no administradores ya no pueden registrar webhooks que envíen eventos sobre sus notas a servicios externos."
       }
+    },
+    "quick_task": {
+      "title": "Añadir tarea",
+      "text_placeholder": "¿Qué hay que hacer?",
+      "description": "Elige la lista de tareas donde añadir esta tarea.",
+      "confirm": "Añadir",
+      "adding": "Añadiendo tarea...",
+      "error": "No se pudo añadir la tarea"
     }
   },
   "notes_list": {
@@ -1506,7 +1520,8 @@
     "audio_no_note": "Ninguna nota seleccionada",
     "audio_invalid_file": "Por favor, seleccione un archivo de audio.",
     "audio_upload_failed": "Error al subir: {{error}}",
-    "date": "Fecha"
+    "date": "Fecha",
+    "task": "Añadir tarea"
   },
   "api": {
     "settings": {
@@ -3262,5 +3277,18 @@
     "manage_link": "Gestionar usuarios: {{url}}",
     "manage_button": "Gestionar usuarios",
     "footer": "Recibe este correo porque las notificaciones de nuevos usuarios están activadas en su cuenta de administrador."
+  },
+  "tasks_page": {
+    "title": "Tareas",
+    "progress": "{{completed}} de {{total}} tareas completadas",
+    "filter_all": "Todas",
+    "filter_open": "Pendientes",
+    "filter_important": "Importantes",
+    "filter_overdue": "Atrasadas",
+    "filter_dated": "Con fecha",
+    "filter_completed": "Completadas",
+    "filter_placeholder": "Filtrar por tarea, título o carpeta...",
+    "empty": "Aún no hay tareas. Crea una nota de lista de tareas para empezar.",
+    "empty_filtered": "Ninguna tarea coincide con este filtro."
   }
 }
