@@ -1528,10 +1528,8 @@ class NotesController {
             if (is_array($linkedAttachments) && !empty($linkedAttachments)) {
                 foreach ($linkedAttachments as $attachment) {
                     if (isset($attachment['filename'])) {
-                        $attachment_file = getAttachmentsPath() . '/' . $attachment['filename'];
-                        if (file_exists($attachment_file)) {
-                            unlink($attachment_file);
-                        }
+                        // Local disk or S3 bucket
+                        poznoteDeleteAttachmentFile($attachment['filename']);
                     }
                 }
             }
@@ -1556,12 +1554,9 @@ class NotesController {
         if (is_array($attachments) && !empty($attachments)) {
             foreach ($attachments as $attachment) {
                 if (isset($attachment['filename'])) {
-                    $attachment_file = getAttachmentsPath() . '/' . $attachment['filename'];
-                    if (file_exists($attachment_file)) {
-                        if (unlink($attachment_file)) {
-                            $deleted_attachments[] = $attachment['filename'];
-                        }
-                    }
+                    // Local disk or S3 bucket
+                    poznoteDeleteAttachmentFile($attachment['filename']);
+                    $deleted_attachments[] = $attachment['filename'];
                 }
             }
         }
@@ -1946,17 +1941,16 @@ class NotesController {
                 $duplicatedAttachments = [];
 
                 foreach ($originalAttachments as $attachment) {
-                    $originalFilePath = $attachmentsDir . '/' . $attachment['filename'];
+                    // Readable local path (fetched from the bucket in S3 mode)
+                    $originalFilePath = poznoteAttachmentLocalFile($attachment['filename'] ?? '');
 
-                    if (file_exists($originalFilePath)) {
+                    if ($originalFilePath !== null) {
                         $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
                         $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
-                        $newFilePath = $attachmentsDir . '/' . $newFilename;
                         $oldAttachmentId = $attachment['id'];
                         $newAttachmentId = uniqid();
 
-                        if (copy($originalFilePath, $newFilePath)) {
-                            chmod($newFilePath, 0644);
+                        if (poznoteStoreAttachmentFromPath($originalFilePath, $newFilename, $attachment['file_type'] ?? 'application/octet-stream')) {
                             $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
 
                             $duplicatedAttachments[] = [
@@ -2282,11 +2276,10 @@ class NotesController {
                         
                         $attachmentId = uniqid();
                         $filename = $attachmentId . '_' . time() . '.' . $extension;
-                        $filePath = $attachmentsDir . '/' . $filename;
-                        
-                        if (file_put_contents($filePath, $imageData) === false) return $matches[0];
-                        chmod($filePath, 0644);
-                        
+
+                        // Local disk or S3 bucket
+                        if (!poznoteStoreAttachmentContent($imageData, $filename, $mimeType)) return $matches[0];
+
                         $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
                         $attachments[] = [
                             'id' => $attachmentId, 'filename' => $filename,
@@ -2320,11 +2313,10 @@ class NotesController {
                         
                         $attachmentId = uniqid();
                         $filename = $attachmentId . '_' . time() . '.' . $extension;
-                        $filePath = $attachmentsDir . '/' . $filename;
-                        
-                        if (file_put_contents($filePath, $imageData) === false) return $matches[0];
-                        chmod($filePath, 0644);
-                        
+
+                        // Local disk or S3 bucket
+                        if (!poznoteStoreAttachmentContent($imageData, $filename, $mimeType)) return $matches[0];
+
                         $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
                         $attachments[] = [
                             'id' => $attachmentId, 'filename' => $filename,
@@ -2863,14 +2855,12 @@ class NotesController {
         
         $attachmentId = uniqid();
         $filename = $attachmentId . '_' . time() . '.' . $extension;
-        $filePath = $attachmentsDir . '/' . $filename;
-        
-        if (file_put_contents($filePath, $imageData) === false) {
+
+        if (!poznoteStoreAttachmentContent($imageData, $filename, $mimeType)) {
             // Return original if write fails
             return '<img src="data:image/' . $imageType . ';base64,' . $base64Data . '" alt="' . htmlspecialchars($altText) . '">';
         }
-        chmod($filePath, 0644);
-        
+
         $originalFilename = !empty($altText) ? $altText . '.' . $extension : $filename;
         $newAttachments[] = [
             'id' => $attachmentId,

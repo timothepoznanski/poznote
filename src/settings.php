@@ -198,6 +198,7 @@ if ($isAdmin) {
             'import_max_zip_files',
             'user_max_notes',
             'user_max_storage_mb',
+            'user_max_storage_s3_mb',
             'git_sync_enabled',
             'tenant_isolation',
             'tenant_isolation_features',
@@ -957,6 +958,24 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- S3 Attachment Storage (instance-wide configuration) -->
+            <div class="home-card settings-card-clickable" id="s3-storage-card" data-href="s3_settings.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.s3_storage', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-cloud"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.s3_storage', [], 'S3 Storage'); ?></span>
+                    <?php
+                    require_once 'storage/AttachmentStorage.php';
+                    $s3StorageEnabledCard = AttachmentStorage::isEnabled();
+                    ?>
+                    <span class="setting-status <?php echo $s3StorageEnabledCard ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $s3StorageEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                    </span>
+                </div>
+            </div>
+
             <!-- Git Sync Global Toggle -->
             <div class="home-card" id="git-sync-enabled-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync_enabled', [], 'Enable or disable Git synchronization on this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1007,6 +1026,12 @@ if ($canUseUserWebhooks) {
                     <div>
                         <span id="user-quotas-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <span id="user-quotas-storage-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <?php
+                        require_once 'storage/AttachmentStorage.php';
+                        if (AttachmentStorage::isEnabled()):
+                        ?>
+                            <span id="user-quotas-storage-s3-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

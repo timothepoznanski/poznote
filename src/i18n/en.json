@@ -165,7 +165,8 @@
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
-      "support": "Support the development of Poznote with a donation."
+      "support": "Support the development of Poznote with a donation.",
+      "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -209,7 +210,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
-      "ai_assistant": "AI Assistant"
+      "ai_assistant": "AI Assistant",
+      "s3_storage": "S3 Storage"
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -508,11 +510,14 @@
       "title": "User quotas",
       "description": "Limit the number of notes and the storage space of each user. 0 means unlimited. Administrators are not limited. You can override these limits per user from the storage statistics page.",
       "max_notes": "Max notes per user",
-      "max_storage": "Max storage per user (MB)",
+      "max_storage": "Max local storage per user (MB)",
       "notes_badge": "Notes: {{count}}",
       "notes_badge_unlimited": "Notes: unlimited",
       "storage_badge": "Storage: {{count}} MB",
-      "storage_badge_unlimited": "Storage: unlimited"
+      "storage_badge_unlimited": "Storage: unlimited",
+      "max_storage_s3": "Max S3 storage per user (MB)",
+      "storage_s3_badge": "S3: {{count}} MB",
+      "storage_s3_badge_unlimited": "S3: unlimited"
     },
     "ui_customization": {
       "title": "UI Customization",
@@ -1107,7 +1112,8 @@
       "invalid_custom_token": "Invalid custom link.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
       "token_already_in_use": "Custom link already in use",
       "no_token_generated": "No link generated",
-      "server_error": "Server error: {{error}}"
+      "server_error": "Server error: {{error}}",
+      "storage_s3_quota_reached": "S3 storage limit reached: this instance allows at most {{max}} MB of S3 storage for this user."
     }
   },
   "ui": {
@@ -2444,9 +2450,13 @@
       "user_quota_sentence_none": "No quota is set for this account: notes and storage are unlimited.",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
       "quota_max_notes_for": "Max notes for {{user}}",
-      "quota_max_storage_for": "Max storage for {{user}} (MB)",
+      "quota_max_storage_for": "Max local storage for {{user}} (MB)",
       "filter_placeholder": "Filter accounts...",
-      "no_accounts": "No accounts found."
+      "no_accounts": "No accounts found.",
+      "table_attachments_local": "Attachments local (MB)",
+      "table_attachments_s3": "Attachments S3 (MB)",
+      "quota_max_storage_s3_for": "Max S3 storage for {{user}} (MB)",
+      "table_quota_s3": "Quota (Count / local MB / S3 MB)"
     }
   },
   "backlinks": {
@@ -2996,5 +3006,45 @@
     "add_task": "Add task",
     "collapse": "Collapse",
     "expand": "Expand"
+  },
+  "s3_settings": {
+    "title": "S3 Attachment Storage",
+    "description": "Store note attachments in an S3-compatible object storage (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) instead of the local disk. The setting applies to all users of this instance.",
+    "config_title": "Configuration",
+    "enable_label": "Store attachments in S3",
+    "enable_description": "New attachments are written to the bucket. Files still on local disk keep working and can be migrated below.",
+    "endpoint_label": "Endpoint URL",
+    "endpoint_description": "Base URL of the S3 API. Examples: https://s3.amazonaws.com, http://minio:9000, https://<account>.r2.cloudflarestorage.com",
+    "region_label": "Region",
+    "region_description": "Leave \"us-east-1\" for MinIO/Garage and providers that ignore the region.",
+    "bucket_label": "Bucket",
+    "access_key_label": "Access key",
+    "secret_key_label": "Secret key",
+    "path_style_label": "Path-style addressing",
+    "path_style_description": "Keep enabled for MinIO, Garage and most self-hosted servers. Disable only if your provider requires virtual-host style (bucket.endpoint).",
+    "test": "Test connection",
+    "save": "Save Configuration",
+    "testing": "Testing connection...",
+    "test_success": "Connection successful, the bucket is reachable.",
+    "test_failure": "Connection failed: {{error}}",
+    "migration_title": "Migration",
+    "migration_description": "Move existing attachment files between the local disk and the bucket, for every user of the instance. Migration runs in batches and can be safely interrupted and resumed.",
+    "status_local": "On local disk",
+    "status_remote": "In the bucket",
+    "status_unavailable": "unavailable",
+    "files_unit": "{{count}} file(s), {{size}}",
+    "migrate_to_s3": "Migrate local files to S3",
+    "migrate_to_local": "Bring files back to local disk",
+    "migrating": "Migrating... {{moved}} file(s) moved, {{remaining}} remaining",
+    "migration_done": "Migration finished: {{moved}} file(s) moved.",
+    "migration_error": "Migration stopped after an error: {{error}}",
+    "confirm_to_s3": "Move all local attachment files (all users) to the bucket?",
+    "confirm_to_local": "Download all bucket attachments back to the local disk (all users)?",
+    "footer_note": "Attachments are stored under attachments/{user id}/ in the bucket and are always served through Poznote (the bucket can stay private). Git sync ignores attachments while S3 storage is enabled.",
+    "messages": {
+      "saved": "Configuration saved successfully.",
+      "save_error": "Failed to save configuration.",
+      "incomplete": "Endpoint, bucket and credentials are required to enable S3 storage."
+    }
   }
 }

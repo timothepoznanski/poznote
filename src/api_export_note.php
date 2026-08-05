@@ -357,11 +357,16 @@ function convertImageToBase64($imagePath) {
     // Security check: ensure path is within attachments directory
     $realPath = realpath($fullPath);
     $expectedDir = realpath($attachmentsPath);
-    
+
     if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
-        return $imagePath; // Return original path if security check fails
+        // S3 mode: the file may live in the bucket instead of on disk.
+        // basename() keeps the lookup confined to this user's prefix.
+        $realPath = poznoteAttachmentsAreRemote() ? poznoteAttachmentLocalFile(basename((string)$fullPath)) : null;
+        if ($realPath === null) {
+            return $imagePath; // Return original path if security check fails
+        }
     }
-    
+
     if (!file_exists($realPath) || !is_readable($realPath)) {
         return $imagePath; // Return original path if file not found
     }
@@ -772,9 +777,10 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
     
     foreach ($attachments as $attachment) {
         if (isset($attachment['id']) && isset($attachment['filename'])) {
-            $attachmentFile = $attachmentsPath . '/' . $attachment['filename'];
-            
-            if (file_exists($attachmentFile) && is_readable($attachmentFile)) {
+            // Readable local path (fetched from the bucket in S3 mode)
+            $attachmentFile = poznoteAttachmentLocalFile($attachment['filename']);
+
+            if ($attachmentFile !== null) {
                 // Use attachment ID as filename in ZIP to match the HTML references
                 $zipAttachmentName = 'attachments/' . $attachment['id'];
                 
@@ -992,9 +998,10 @@ function exportAsMarkdownZip($content, $note, $con) {
     
     foreach ($attachments as $attachment) {
         if (isset($attachment['id']) && isset($attachment['filename'])) {
-            $attachmentFile = $attachmentsPath . '/' . $attachment['filename'];
-            
-            if (file_exists($attachmentFile) && is_readable($attachmentFile)) {
+            // Readable local path (fetched from the bucket in S3 mode)
+            $attachmentFile = poznoteAttachmentLocalFile($attachment['filename']);
+
+            if ($attachmentFile !== null) {
                 // Use attachment ID as filename in ZIP to match markdown references
                 $zipAttachmentName = 'attachments/' . $attachment['id'];
                 

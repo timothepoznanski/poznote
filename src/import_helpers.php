@@ -994,13 +994,12 @@ function importAttachmentsZip($uploadedFile) {
             continue;
         }
 
-        $targetFile = $attachmentsPath . '/' . $validation['filename'];
-        if (file_put_contents($targetFile, $content) !== false) {
-            chmod($targetFile, 0644);
+        // Store on local disk or in the S3 bucket
+        if (poznoteStoreAttachmentContent($content, $validation['filename'], $validation['mime_type'] ?? 'application/octet-stream')) {
             $importedCount++;
         }
     }
-    
+
     $zip->close();
     unlink($tempFile);
 
@@ -1239,12 +1238,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             
             // Generate unique filename for storage
             $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
-            $targetPath = $attachmentsPath . '/' . $uniqueFilename;
-            
-            // Save the image
-            if (file_put_contents($targetPath, $imageContent) !== false) {
-                chmod($targetPath, 0644);
-                
+
+            // Save the image (local disk or S3 bucket)
+            if (poznoteStoreAttachmentContent($imageContent, $uniqueFilename, 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension))) {
                 // Store mapping by attachment ID for Poznote exports
                 $attachmentIdMap[$attachmentId] = [
                     'unique_filename' => $uniqueFilename,
@@ -1260,12 +1256,9 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             
             // Generate unique filename for storage
             $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
-            $targetPath = $attachmentsPath . '/' . $uniqueFilename;
-            
-            // Save the image
-            if (file_put_contents($targetPath, $imageContent) !== false) {
-                chmod($targetPath, 0644);
-                
+
+            // Save the image (local disk or S3 bucket)
+            if (poznoteStoreAttachmentContent($imageContent, $uniqueFilename, 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension))) {
                 // Store mapping using lowercase key for case-insensitive matching
                 $importedImages[strtolower($originalFilename)] = [
                     'unique_filename' => $uniqueFilename,

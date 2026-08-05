@@ -170,12 +170,11 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 // Add attachments to ZIP in the attachments/ folder
 if (!empty($allNoteAttachments)) {
-    $attachmentsPath = getAttachmentsPath();
-    
     foreach ($allNoteAttachments as $attachmentId => $filename) {
-        $attachmentFile = $attachmentsPath . '/' . $filename;
-        
-        if (file_exists($attachmentFile) && is_readable($attachmentFile)) {
+        // Readable local path (fetched from the bucket in S3 mode)
+        $attachmentFile = poznoteAttachmentLocalFile($filename);
+
+        if ($attachmentFile !== null) {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
             $zipAttachmentName = 'attachments/' . $attachmentId . ($ext ? '.' . $ext : '');
             $zip->addFile($attachmentFile, $zipAttachmentName);

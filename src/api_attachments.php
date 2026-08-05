@@ -97,16 +97,14 @@ function decodeAttachmentList($attachmentsJson) {
     return is_array($attachments) ? $attachments : [];
 }
 
-function buildLegacyAttachmentEtag($filePath, $attachment) {
-    $mtime = @filemtime($filePath) ?: 0;
-    $size = @filesize($filePath) ?: 0;
+function buildLegacyAttachmentEtag(array $stat, $attachment) {
     $userId = $_SESSION['user_id'] ?? ($_SERVER['HTTP_X_USER_ID'] ?? '');
     $identity = implode('|', [
         (string)$userId,
         (string)($attachment['id'] ?? ''),
-        (string)($attachment['filename'] ?? basename($filePath)),
-        (string)$size,
-        (string)$mtime,
+        (string)($attachment['filename'] ?? ''),
+        (string)$stat['size'],
+        (string)$stat['mtime'],
     ]);
 
     return '"' . hash('sha256', $identity) . '"';
@@ -138,9 +136,9 @@ function legacyClientHasFreshAttachment($etag, $lastModified) {
     return $clientModifiedTime !== false && $clientModifiedTime >= $lastModified;
 }
 
-function sendLegacyAttachmentCacheHeaders($filePath, $attachment, $forceDownload = false) {
-    $lastModified = @filemtime($filePath) ?: time();
-    $etag = buildLegacyAttachmentEtag($filePath, $attachment);
+function sendLegacyAttachmentCacheHeaders(array $stat, $attachment, $forceDownload = false) {
+    $lastModified = $stat['mtime'] ?: time();
+    $etag = buildLegacyAttachmentEtag($stat, $attachment);
     $cacheSeconds = $forceDownload ? 0 : 3600;
 
     header_remove('Pragma');
@@ -246,7 +244,7 @@ function handleUpload() {
         return;
     }
 
-    $quotaError = poznoteCheckStorageQuota((int)$file_size);
+    $quotaError = poznoteCheckAttachmentStorageQuota((int)$file_size);
     if ($quotaError !== null) {
         echo json_encode(['success' => false, 'message' => $quotaError]);
         return;
@@ -257,20 +255,16 @@ function handleUpload() {
     // Generate unique filename
     $file_extension = strtolower(pathinfo($validation['filename'], PATHINFO_EXTENSION));
     $unique_filename = uniqid() . '_' . time() . ($file_extension !== '' ? '.' . $file_extension : '');
-    $file_path = $attachments_dir . '/' . $unique_filename;
-    
-    // Re-check if destination directory is writable
-    if (!is_writable($attachments_dir)) {
+
+    // Re-check if destination directory is writable (local storage only)
+    if (!poznoteAttachmentsAreRemote() && !is_writable($attachments_dir)) {
         error_log("Upload failed: Attachments directory is not writable: $attachments_dir");
         echo json_encode(['success' => false, 'message' => 'Attachments directory is not writable']);
         return;
     }
-    
-    // Move uploaded file
-    if (move_uploaded_file($file['tmp_name'], $file_path)) {
-        // Set file permissions
-        chmod($file_path, 0644);
 
+    // Store the uploaded file (local disk or S3 bucket)
+    if (poznoteStoreAttachmentFromPath($file['tmp_name'], $unique_filename, $file_type, true)) {
         $current_attachments = decodeAttachmentList($note['attachments'] ?? '');
 
         // Add new attachment
@@ -299,7 +293,7 @@ function handleUpload() {
                 'filename' => $original_name
             ]);
         } else {
-            unlink($file_path); // Clean up file if database update fails
+            poznoteDeleteAttachmentFile($unique_filename); // Clean up file if database update fails
             error_log("Attachment database update failed");
             echo json_encode(['success' => false, 'message' => 'Database update failed']);
         }
@@ -346,21 +340,19 @@ function handleDelete() {
         // Find and remove attachment
         $file_to_delete = null;
         $updated_attachments = [];
-        
+
         foreach ($attachments as $attachment) {
             if ($attachment['id'] === $attachment_id) {
-                $file_to_delete = $attachments_dir . '/' . $attachment['filename'];
+                $file_to_delete = $attachment['filename'] ?? null;
             } else {
                 $updated_attachments[] = $attachment;
             }
         }
-        
+
         if ($file_to_delete) {
-            // Delete physical file
-            if (file_exists($file_to_delete)) {
-                unlink($file_to_delete);
-            }
-            
+            // Delete physical file (local disk or S3 bucket)
+            poznoteDeleteAttachmentFile($file_to_delete);
+
             // Update database
             $attachments_json = json_encode($updated_attachments);
             $update_query = "UPDATE entries SET attachments = ? WHERE id = ? AND workspace = ? AND trash = 0";
@@ -399,21 +391,23 @@ function handleDownload() {
         
         foreach ($attachments as $attachment) {
             if ($attachment['id'] === $attachment_id) {
-                $file_path = $attachments_dir . '/' . $attachment['filename'];
-                
-                if (file_exists($file_path)) {
+                $storage = poznoteAttachmentStorage();
+                $attachment_filename = (string)($attachment['filename'] ?? '');
+
+                if ($attachment_filename !== '' && $storage->exists($attachment_filename)) {
                     // Clear any output buffer that might exist
                     if (ob_get_level()) {
                         ob_end_clean();
                     }
-                    
+
                     // Set headers for file download/viewing
-                    $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
-                    
+                    $file_type = $attachment['file_type'] ?? 'application/octet-stream';
+
                     // Sanitize filename for Content-Disposition header
                     $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
                     $isInlineView = strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false;
-                    sendLegacyAttachmentCacheHeaders($file_path, $attachment, !$isInlineView);
+                    $stat = $storage->statForHeaders($attachment);
+                    sendLegacyAttachmentCacheHeaders($stat, $attachment, !$isInlineView);
 
                     // For PDFs and images, allow inline viewing
                     if ($isInlineView) {
@@ -426,10 +420,12 @@ function handleDownload() {
                     }
 
                     header('Content-Description: File Transfer');
-                    header('Content-Length: ' . filesize($file_path));
-                    
-                    // Output file
-                    readfile($file_path);
+                    if ($stat['size'] > 0) {
+                        header('Content-Length: ' . $stat['size']);
+                    }
+
+                    // Output file (local disk or S3 stream)
+                    $storage->stream($attachment_filename);
                     exit;
                 } else {
                     http_response_code(404);

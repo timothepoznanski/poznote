@@ -24,6 +24,7 @@ class SettingsController {
         'import_max_zip_files',
         'user_max_notes',
         'user_max_storage_mb',
+        'user_max_storage_s3_mb',
         'mcp_user_id',
         'mcp_default_workspace',
         'mcp_debug',
@@ -200,7 +201,7 @@ class SettingsController {
             return (string) $intVal;
         }
 
-        if ($key === 'user_max_notes' || $key === 'user_max_storage_mb') {
+        if ($key === 'user_max_notes' || $key === 'user_max_storage_mb' || $key === 'user_max_storage_s3_mb') {
             $intVal = (int) $value;
             if ($intVal < 0 || $intVal > 100000000) {
                 throw new InvalidArgumentException('value must be between 0 and 100000000', 400);

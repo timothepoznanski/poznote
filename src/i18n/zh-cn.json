@@ -431,7 +431,8 @@
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
-      "support": "通过捐赠支持 Poznote 的开发。"
+      "support": "通过捐赠支持 Poznote 的开发。",
+      "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。"
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
@@ -494,7 +495,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
       "webhooks": "Webhook",
-      "ai_assistant": "AI 助手"
+      "ai_assistant": "AI 助手",
+      "s3_storage": "S3 存储"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -992,11 +994,14 @@
       "title": "用户配额",
       "description": "限制每个用户的笔记数量和存储空间。0 表示不限制。管理员不受限制。您可以在存储统计页面中为每个用户单独设置这些限制。",
       "max_notes": "每个用户的最大笔记数",
-      "max_storage": "每个用户的最大存储空间（MB）",
+      "max_storage": "每用户本地存储上限 (MB)",
       "notes_badge": "笔记：{{count}}",
       "notes_badge_unlimited": "笔记：不限",
       "storage_badge": "存储：{{count}} MB",
-      "storage_badge_unlimited": "存储：不限"
+      "storage_badge_unlimited": "存储：不限",
+      "max_storage_s3": "每用户 S3 存储上限 (MB)",
+      "storage_s3_badge": "S3:{{count}} MB",
+      "storage_s3_badge_unlimited": "S3:无限制"
     },
     "ui_customization": {
       "title": "界面自定义",
@@ -1536,7 +1541,8 @@
       "invalid_custom_token": "无效的自定义链接。\n\n允许使用：\n\n字母、数字、-、_、. (4-128 个字符)",
       "token_already_in_use": "自定义链接已被使用",
       "no_token_generated": "未生成链接",
-      "server_error": "服务器错误: {{error}}"
+      "server_error": "服务器错误: {{error}}",
+      "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。"
     }
   },
   "ui": {
@@ -2970,9 +2976,13 @@
       "user_quota_sentence_none": "此账户未设置配额：笔记和存储空间均不限。",
       "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
       "quota_max_notes_for": "{{user}} 的最大笔记数",
-      "quota_max_storage_for": "{{user}} 的最大存储空间（MB）",
+      "quota_max_storage_for": "{{user}} 的本地存储上限 (MB)",
       "filter_placeholder": "筛选账户...",
-      "no_accounts": "未找到账户。"
+      "no_accounts": "未找到账户。",
+      "table_attachments_local": "本地附件 (MB)",
+      "table_attachments_s3": "S3 附件 (MB)",
+      "quota_max_storage_s3_for": "{{user}} 的 S3 存储上限 (MB)",
+      "table_quota_s3": "配额(数量 / 本地 MB / S3 MB)"
     }
   },
   "profile": {
@@ -3421,5 +3431,45 @@
     "add_task": "添加任务",
     "collapse": "收起",
     "expand": "展开"
+  },
+  "s3_settings": {
+    "title": "S3 附件存储",
+    "description": "将笔记附件存储在 S3 兼容的对象存储中(AWS S3、MinIO、Garage、Cloudflare R2、Backblaze B2 等),而不是本地磁盘。该设置对本实例的所有用户生效。",
+    "config_title": "配置",
+    "enable_label": "将附件存储到 S3",
+    "enable_description": "新附件将写入存储桶。仍在本地磁盘上的文件继续可用,并可在下方迁移。",
+    "endpoint_label": "端点 URL",
+    "endpoint_description": "S3 API 的基础 URL。示例:https://s3.amazonaws.com、http://minio:9000、https://<账户>.r2.cloudflarestorage.com",
+    "region_label": "区域",
+    "region_description": "对于 MinIO/Garage 及忽略区域的服务商,保留 \"us-east-1\" 即可。",
+    "bucket_label": "存储桶",
+    "access_key_label": "Access Key",
+    "secret_key_label": "Secret Key",
+    "path_style_label": "Path-style 寻址",
+    "path_style_description": "MinIO、Garage 及大多数自托管服务器请保持开启。仅当服务商要求 virtual-host 风格(bucket.endpoint)时才关闭。",
+    "test": "测试连接",
+    "save": "保存配置",
+    "testing": "正在测试连接...",
+    "test_success": "连接成功,存储桶可访问。",
+    "test_failure": "连接失败:{{error}}",
+    "migration_title": "迁移",
+    "migration_description": "在本地磁盘和存储桶之间迁移现有附件文件,覆盖实例的所有用户。迁移按批次执行,可随时安全中断并恢复。",
+    "status_local": "本地磁盘上",
+    "status_remote": "存储桶中",
+    "status_unavailable": "不可用",
+    "files_unit": "{{count}} 个文件,{{size}}",
+    "migrate_to_s3": "将本地文件迁移到 S3",
+    "migrate_to_local": "将文件取回本地磁盘",
+    "migrating": "迁移中... 已移动 {{moved}} 个文件,剩余 {{remaining}} 个",
+    "migration_done": "迁移完成:已移动 {{moved}} 个文件。",
+    "migration_error": "迁移因错误而停止:{{error}}",
+    "confirm_to_s3": "将所有用户的全部本地附件文件移动到存储桶?",
+    "confirm_to_local": "将存储桶中的全部附件下载回本地磁盘(所有用户)?",
+    "footer_note": "附件以 attachments/{用户 id}/ 的形式存储在存储桶中,并始终通过 Poznote 提供访问(存储桶可保持私有)。启用 S3 存储期间,Git 同步会忽略附件。",
+    "messages": {
+      "saved": "配置保存成功。",
+      "save_error": "配置保存失败。",
+      "incomplete": "启用 S3 存储需要填写端点、存储桶和凭据。"
+    }
   }
 }

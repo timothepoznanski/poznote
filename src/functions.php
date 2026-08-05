@@ -1705,6 +1705,73 @@ function getAttachmentsPath() { return getDataPath('attachments'); }
 function getBackupsPath() { return getDataPath('backups'); }
 
 /**
+ * Attachment storage facade for the active user: local disk by default, or
+ * the admin-configured S3-compatible bucket (settings > S3 storage).
+ * All attachment file reads/writes/deletes must go through these helpers.
+ */
+function poznoteAttachmentStorage(): AttachmentStorage {
+    require_once __DIR__ . '/storage/AttachmentStorage.php';
+    return AttachmentStorage::current();
+}
+
+/** Whether attachments are stored remotely (S3) for this instance. */
+function poznoteAttachmentsAreRemote(): bool {
+    return poznoteAttachmentStorage()->isRemote();
+}
+
+/**
+ * A readable local path for an attachment, or null when it does not exist.
+ * In S3 mode the file is fetched to a per-request temp file, so ZIP exports
+ * and inline embedding keep working unchanged.
+ */
+function poznoteAttachmentLocalFile($filename): ?string {
+    if (!is_string($filename) || $filename === '') {
+        return null;
+    }
+    return poznoteAttachmentStorage()->localFile($filename);
+}
+
+/** Store an on-disk file (uploaded or generated) as an attachment. */
+function poznoteStoreAttachmentFromPath(string $sourcePath, string $filename, string $contentType = 'application/octet-stream', bool $isUploadedFile = false): bool {
+    return poznoteAttachmentStorage()->storeFile($sourcePath, $filename, $contentType, $isUploadedFile);
+}
+
+/** Store in-memory content (excalidraw previews, converted base64 images). */
+function poznoteStoreAttachmentContent(string $content, string $filename, string $contentType = 'application/octet-stream'): bool {
+    return poznoteAttachmentStorage()->storeContent($content, $filename, $contentType);
+}
+
+/** Delete an attachment file wherever it lives (bucket and/or local disk). */
+function poznoteDeleteAttachmentFile($filename): void {
+    if (is_string($filename) && $filename !== '') {
+        poznoteAttachmentStorage()->delete($filename);
+    }
+}
+
+/**
+ * Total bytes of the attachments recorded in the active user's database.
+ * Used for quotas and stats in S3 mode, where nothing is on disk to scan.
+ */
+function poznoteSumDbAttachmentBytes(): int {
+    global $con;
+    if (!isset($con)) {
+        return 0;
+    }
+    $total = 0;
+    try {
+        $stmt = $con->query("SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            foreach (poznoteDecodeAttachments($row['attachments'] ?? '') as $attachment) {
+                $total += max(0, (int)($attachment['file_size'] ?? 0));
+            }
+        }
+    } catch (Exception $e) {
+        // Stats/quota input only: never break the caller
+    }
+    return $total;
+}
+
+/**
  * Per-user quota limits: the administrator's global settings, overridden by
  * the active user's per-user values when set (admin storage-stats page).
  * 0 means no limit.
@@ -1717,12 +1784,13 @@ function poznoteGetUserQuotaLimits(): array {
     }
 
     global $activeUserId;
-    $limits = ['max_notes' => 0, 'max_storage_bytes' => 0];
+    $limits = ['max_notes' => 0, 'max_storage_bytes' => 0, 'max_storage_s3_bytes' => 0];
     try {
         require_once __DIR__ . '/users/db_master.php';
         if (function_exists('getGlobalSetting')) {
             $limits['max_notes'] = max(0, (int) getGlobalSetting('user_max_notes', '0'));
             $limits['max_storage_bytes'] = max(0, (int) getGlobalSetting('user_max_storage_mb', '0')) * 1024 * 1024;
+            $limits['max_storage_s3_bytes'] = max(0, (int) getGlobalSetting('user_max_storage_s3_mb', '0')) * 1024 * 1024;
         }
 
         $userId = (int) ($_SESSION['user_id'] ?? $activeUserId ?? 0);
@@ -1733,6 +1801,9 @@ function poznoteGetUserQuotaLimits(): array {
             }
             if ($overrides['max_storage_mb'] !== null) {
                 $limits['max_storage_bytes'] = max(0, (int) $overrides['max_storage_mb']) * 1024 * 1024;
+            }
+            if ($overrides['max_storage_s3_mb'] !== null) {
+                $limits['max_storage_s3_bytes'] = max(0, (int) $overrides['max_storage_s3_mb']) * 1024 * 1024;
             }
         }
     } catch (Exception $e) {
@@ -1795,6 +1866,46 @@ function poznoteGetActiveUserStorageUsageBytes(int $addBytes = 0): int {
 
     $poznoteQuotaUsageCache += max(0, $addBytes);
     return $poznoteQuotaUsageCache;
+}
+
+/**
+ * Bytes of the active user's attachments stored in the S3 bucket: the sizes
+ * recorded in the database for files that are not on the local disk (those
+ * still on disk belong to the local storage perimeter above).
+ * Cached per request; pass $addBytes to keep the cache accurate after a write.
+ */
+function poznoteGetActiveUserS3UsageBytes(int $addBytes = 0): int {
+    global $poznoteQuotaS3UsageCache;
+
+    if (isset($poznoteQuotaS3UsageCache)) {
+        $poznoteQuotaS3UsageCache += max(0, $addBytes);
+        return $poznoteQuotaS3UsageCache;
+    }
+
+    $poznoteQuotaS3UsageCache = 0;
+    global $con;
+    if (!isset($con) || !poznoteAttachmentsAreRemote()) {
+        return $poznoteQuotaS3UsageCache;
+    }
+
+    $attachmentsPath = getAttachmentsPath();
+    try {
+        $stmt = $con->query("SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            foreach (poznoteDecodeAttachments($row['attachments'] ?? '') as $attachment) {
+                $filename = (string)($attachment['filename'] ?? '');
+                if ($filename === '' || file_exists($attachmentsPath . '/' . basename($filename))) {
+                    continue;
+                }
+                $poznoteQuotaS3UsageCache += max(0, (int)($attachment['file_size'] ?? 0));
+            }
+        }
+    } catch (Exception $e) {
+        // Quota input only: never break the caller
+    }
+
+    $poznoteQuotaS3UsageCache += max(0, $addBytes);
+    return $poznoteQuotaS3UsageCache;
 }
 
 /**
@@ -1884,6 +1995,38 @@ function poznoteCheckStorageQuota(int $additionalBytes = 0): ?string {
         ]);
         return t('api.errors.storage_quota_reached', ['max' => $maxMb],
             'Storage limit reached: this instance allows at most ' . $maxMb . ' MB of storage for this user.');
+    }
+    return null;
+}
+
+/**
+ * Quota check for an attachment upload. Attachments count against the S3
+ * quota when they are stored in the bucket, against the local storage quota
+ * otherwise. Returns an error message, or null when the upload is allowed.
+ */
+function poznoteCheckAttachmentStorageQuota(int $additionalBytes = 0): ?string {
+    if (!poznoteAttachmentsAreRemote()) {
+        return poznoteCheckStorageQuota($additionalBytes);
+    }
+
+    $limits = poznoteGetUserQuotaLimits();
+    if ($limits['max_storage_s3_bytes'] <= 0 || !poznoteUserQuotasApply()) {
+        return null;
+    }
+    if ($additionalBytes <= 0) {
+        return null;
+    }
+
+    if (poznoteGetActiveUserS3UsageBytes() + $additionalBytes > $limits['max_storage_s3_bytes']) {
+        $maxMb = (int) round($limits['max_storage_s3_bytes'] / (1024 * 1024));
+        poznoteNotifyQuotaReached('quota.storage_reached', [
+            'pool' => 's3',
+            'max_storage_bytes' => $limits['max_storage_s3_bytes'],
+            'used_bytes' => poznoteGetActiveUserS3UsageBytes(),
+            'requested_bytes' => $additionalBytes,
+        ]);
+        return t('api.errors.storage_s3_quota_reached', ['max' => $maxMb],
+            'S3 storage limit reached: this instance allows at most ' . $maxMb . ' MB of S3 storage for this user.');
     }
     return null;
 }
@@ -2710,6 +2853,13 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             // Create attachments directory if it doesn't exist
             createDirectoryWithPermissions($attachmentsPath);
         }
+
+        // S3 mode: a full restore replaces all attachments, purge the
+        // user's objects from the bucket as well
+        if (poznoteAttachmentsAreRemote()) {
+            $remoteCleared = poznoteAttachmentStorage()->deleteAllRemote();
+            error_log("CLEARED $remoteCleared attachment objects from S3 bucket");
+        }
         
         $results = [];
         $hasErrors = false;
@@ -3015,15 +3165,14 @@ function restoreAttachmentsFromDir($sourceDir) {
                 continue;
             }
 
-            $targetFile = $attachmentsPath . '/' . $validation['filename'];
-            if (copy($filePath, $targetFile)) {
-                chmod($targetFile, 0644);
+            // Store on local disk or in the S3 bucket
+            if (poznoteStoreAttachmentFromPath($filePath, $validation['filename'], $validation['mime_type'] ?? 'application/octet-stream')) {
                 $importedCount++;
                 $restoredFilenames[] = $validation['filename'];
             }
         }
     }
-    
+
     return [
         'success' => true,
         'count' => $importedCount,

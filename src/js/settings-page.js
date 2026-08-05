@@ -131,7 +131,7 @@
             keys.push('import_max_individual_files', 'import_max_zip_files');
         }
         if (document.getElementById('user-quotas-card')) {
-            keys.push('user_max_notes', 'user_max_storage_mb');
+            keys.push('user_max_notes', 'user_max_storage_mb', 'user_max_storage_s3_mb');
         }
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
@@ -984,6 +984,21 @@
                 storageBadge.className = 'setting-status disabled';
             }
         });
+
+        // Only rendered when S3 attachment storage is enabled on the instance
+        var storageS3Badge = document.getElementById('user-quotas-storage-s3-badge');
+        if (storageS3Badge) {
+            getSetting('user_max_storage_s3_mb', function (value) {
+                var count = parseInt(value, 10) || 0;
+                if (count > 0) {
+                    storageS3Badge.textContent = tr('modals.user_quotas.storage_s3_badge', { count: String(count) }, 'S3: ' + count + ' MB');
+                    storageS3Badge.className = 'setting-status enabled';
+                } else {
+                    storageS3Badge.textContent = tr('modals.user_quotas.storage_s3_badge_unlimited', {}, 'S3: unlimited');
+                    storageS3Badge.className = 'setting-status disabled';
+                }
+            });
+        }
     }
 
     function refreshGitSyncEnabledBadge() {
@@ -1174,13 +1189,21 @@
         var modal = document.getElementById('userQuotasModal');
         var notesInput = document.getElementById('userMaxNotesInput');
         var storageInput = document.getElementById('userMaxStorageInput');
+        var storageS3Input = document.getElementById('userMaxStorageS3Input');
         if (!modal || !notesInput || !storageInput) return;
 
         getSetting('user_max_notes', function (notesValue) {
             notesInput.value = String(parseInt(notesValue, 10) || 0);
             getSetting('user_max_storage_mb', function (storageValue) {
                 storageInput.value = String(parseInt(storageValue, 10) || 0);
-                modal.style.display = 'flex';
+                if (!storageS3Input) {
+                    modal.style.display = 'flex';
+                    return;
+                }
+                getSetting('user_max_storage_s3_mb', function (storageS3Value) {
+                    storageS3Input.value = String(parseInt(storageS3Value, 10) || 0);
+                    modal.style.display = 'flex';
+                });
             });
         });
     }
@@ -2225,22 +2248,28 @@
             saveUserQuotasBtn.addEventListener('click', function () {
                 var notesInput = document.getElementById('userMaxNotesInput');
                 var storageInput = document.getElementById('userMaxStorageInput');
+                var storageS3Input = document.getElementById('userMaxStorageS3Input');
                 var notesVal = notesInput ? parseInt(notesInput.value, 10) : 0;
                 var storageVal = storageInput ? parseInt(storageInput.value, 10) : 0;
+                var storageS3Val = storageS3Input ? parseInt(storageS3Input.value, 10) : 0;
 
-                if (isNaN(notesVal) || notesVal < 0 || notesVal > 100000000 || isNaN(storageVal) || storageVal < 0 || storageVal > 100000000) {
+                if (isNaN(notesVal) || notesVal < 0 || notesVal > 100000000 ||
+                    isNaN(storageVal) || storageVal < 0 || storageVal > 100000000 ||
+                    isNaN(storageS3Val) || storageS3Val < 0 || storageS3Val > 100000000) {
                     alert(tr('common.error', {}, 'Error'));
                     return;
                 }
 
                 setSetting('user_max_notes', String(notesVal), function (s1) {
                     setSetting('user_max_storage_mb', String(storageVal), function (s2) {
-                        if (s1 && s2) {
-                            try { closeModal('userQuotasModal'); } catch (e) { }
-                            refreshUserQuotasBadges();
-                        } else {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                        }
+                        setSetting('user_max_storage_s3_mb', String(storageS3Val), function (s3ok) {
+                            if (s1 && s2 && s3ok) {
+                                try { closeModal('userQuotasModal'); } catch (e) { }
+                                refreshUserQuotasBadges();
+                            } else {
+                                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            }
+                        });
                     });
                 });
             });

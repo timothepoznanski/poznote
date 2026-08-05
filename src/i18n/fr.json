@@ -441,7 +441,8 @@
       "github": "Ouvrez le code source de Poznote sur GitHub.",
       "api_rest": "Affichez les informations sur l'API REST de Poznote.",
       "website": "Ouvrez le site officiel de Poznote.",
-      "support": "Soutenez le développement de Poznote par un don."
+      "support": "Soutenez le développement de Poznote par un don.",
+      "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local."
     },
     "title": "Paramètres",
     "collapse_section": "Réduire la section",
@@ -504,7 +505,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
-      "ai_assistant": "Assistant IA"
+      "ai_assistant": "Assistant IA",
+      "s3_storage": "Stockage S3"
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -1016,11 +1018,14 @@
       "title": "Quotas utilisateurs",
       "description": "Limiter le nombre de notes et l'espace de stockage de chaque utilisateur. 0 signifie illimité. Les administrateurs ne sont pas limités. Vous pouvez remplacer ces limites par utilisateur depuis la page des statistiques de stockage.",
       "max_notes": "Nombre max de notes par utilisateur",
-      "max_storage": "Stockage max par utilisateur (Mo)",
+      "max_storage": "Stockage local max par utilisateur (Mo)",
       "notes_badge": "Notes : {{count}}",
       "notes_badge_unlimited": "Notes : illimité",
       "storage_badge": "Stockage : {{count}} Mo",
-      "storage_badge_unlimited": "Stockage : illimité"
+      "storage_badge_unlimited": "Stockage : illimité",
+      "max_storage_s3": "Stockage S3 max par utilisateur (Mo)",
+      "storage_s3_badge": "S3 : {{count}} Mo",
+      "storage_s3_badge_unlimited": "S3 : illimité"
     },
     "ui_customization": {
       "title": "Personnalisation de l'interface",
@@ -1593,7 +1598,8 @@
       "invalid_custom_token": "Lien personnalisé invalide.\n\nCaractères autorisés :\n\nlettres, chiffres, -, _, . (4-128 caractères)",
       "token_already_in_use": "Lien personnalisé déjà utilisé",
       "no_token_generated": "Aucun lien généré",
-      "server_error": "Erreur serveur : {{error}}"
+      "server_error": "Erreur serveur : {{error}}",
+      "storage_s3_quota_reached": "Limite de stockage S3 atteinte : cette instance autorise au maximum {{max}} Mo de stockage S3 pour cet utilisateur."
     }
   },
   "ui": {
@@ -3035,9 +3041,13 @@
       "user_quota_sentence_none": "Aucun quota n'est défini pour ce compte : notes et stockage sont illimités.",
       "quota_modal_description": "Laisser un champ vide pour utiliser le réglage global. 0 signifie illimité.\nCes valeurs remplacent les quotas globaux.",
       "quota_max_notes_for": "Nombre max de notes pour {{user}}",
-      "quota_max_storage_for": "Stockage max pour {{user}} (Mo)",
+      "quota_max_storage_for": "Stockage local max pour {{user}} (Mo)",
       "filter_placeholder": "Filtrer les comptes...",
-      "no_accounts": "Aucun compte trouvé."
+      "no_accounts": "Aucun compte trouvé.",
+      "table_attachments_local": "Pièces jointes locales (Mo)",
+      "table_attachments_s3": "Pièces jointes S3 (Mo)",
+      "quota_max_storage_s3_for": "Stockage S3 max pour {{user}} (Mo)",
+      "table_quota_s3": "Quota (Nombre / Mo local / Mo S3)"
     }
   },
   "backlinks": {
@@ -3489,5 +3499,45 @@
     "add_task": "Ajouter une tâche",
     "collapse": "Replier",
     "expand": "Déplier"
+  },
+  "s3_settings": {
+    "title": "Stockage S3 des pièces jointes",
+    "description": "Stockez les pièces jointes des notes dans un stockage objet compatible S3 (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) au lieu du disque local. Ce réglage s'applique à tous les utilisateurs de l'instance.",
+    "config_title": "Configuration",
+    "enable_label": "Stocker les pièces jointes dans S3",
+    "enable_description": "Les nouvelles pièces jointes sont écrites dans le bucket. Les fichiers encore sur le disque local restent accessibles et peuvent être migrés ci-dessous.",
+    "endpoint_label": "URL du endpoint",
+    "endpoint_description": "URL de base de l'API S3. Exemples : https://s3.amazonaws.com, http://minio:9000, https://<compte>.r2.cloudflarestorage.com",
+    "region_label": "Région",
+    "region_description": "Laissez \"us-east-1\" pour MinIO/Garage et les fournisseurs qui ignorent la région.",
+    "bucket_label": "Bucket",
+    "access_key_label": "Clé d'accès",
+    "secret_key_label": "Clé secrète",
+    "path_style_label": "Adressage path-style",
+    "path_style_description": "À laisser activé pour MinIO, Garage et la plupart des serveurs auto-hébergés. Désactivez uniquement si votre fournisseur exige le style virtual-host (bucket.endpoint).",
+    "test": "Tester la connexion",
+    "save": "Enregistrer la configuration",
+    "testing": "Test de connexion...",
+    "test_success": "Connexion réussie, le bucket est accessible.",
+    "test_failure": "Échec de la connexion : {{error}}",
+    "migration_title": "Migration",
+    "migration_description": "Déplacez les pièces jointes existantes entre le disque local et le bucket, pour tous les utilisateurs de l'instance. La migration s'exécute par lots et peut être interrompue puis reprise sans risque.",
+    "status_local": "Sur le disque local",
+    "status_remote": "Dans le bucket",
+    "status_unavailable": "indisponible",
+    "files_unit": "{{count}} fichier(s), {{size}}",
+    "migrate_to_s3": "Migrer les fichiers locaux vers S3",
+    "migrate_to_local": "Ramener les fichiers sur le disque local",
+    "migrating": "Migration... {{moved}} fichier(s) déplacé(s), {{remaining}} restant(s)",
+    "migration_done": "Migration terminée : {{moved}} fichier(s) déplacé(s).",
+    "migration_error": "Migration arrêtée après une erreur : {{error}}",
+    "confirm_to_s3": "Déplacer tous les fichiers locaux de pièces jointes (tous les utilisateurs) vers le bucket ?",
+    "confirm_to_local": "Télécharger toutes les pièces jointes du bucket vers le disque local (tous les utilisateurs) ?",
+    "footer_note": "Les pièces jointes sont stockées sous attachments/{id utilisateur}/ dans le bucket et toujours servies via Poznote (le bucket peut rester privé). La synchronisation Git ignore les pièces jointes tant que le stockage S3 est activé.",
+    "messages": {
+      "saved": "Configuration enregistrée avec succès.",
+      "save_error": "Échec de l'enregistrement de la configuration.",
+      "incomplete": "Le endpoint, le bucket et les identifiants sont requis pour activer le stockage S3."
+    }
   }
 }

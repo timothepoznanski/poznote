@@ -428,7 +428,8 @@
       "github": "Abra o código-fonte do Poznote no GitHub.",
       "api_rest": "Mostre informações sobre a API REST do Poznote.",
       "website": "Abra o site oficial do Poznote.",
-      "support": "Apoie o desenvolvimento do Poznote com uma doação."
+      "support": "Apoie o desenvolvimento do Poznote com uma doação.",
+      "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local."
     },
     "title": "Configurações",
     "collapse_section": "Recolher a seção",
@@ -491,7 +492,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-mail",
       "webhooks": "Webhooks",
-      "ai_assistant": "Assistente IA"
+      "ai_assistant": "Assistente IA",
+      "s3_storage": "Armazenamento S3"
     },
     "install_app": {
       "launching": "A instalação vai começar. Por favor, aguarde...",
@@ -990,11 +992,14 @@
       "title": "Cotas de usuário",
       "description": "Limite o número de notas e o espaço de armazenamento de cada usuário. 0 significa ilimitado. Administradores não são limitados. Você pode substituir esses limites por usuário na página de estatísticas de armazenamento.",
       "max_notes": "Máx. de notas por usuário",
-      "max_storage": "Armazenamento máx. por usuário (MB)",
+      "max_storage": "Armazenamento local máx. por usuário (MB)",
       "notes_badge": "Notas: {{count}}",
       "notes_badge_unlimited": "Notas: ilimitado",
       "storage_badge": "Armazenamento: {{count}} MB",
-      "storage_badge_unlimited": "Armazenamento: ilimitado"
+      "storage_badge_unlimited": "Armazenamento: ilimitado",
+      "max_storage_s3": "Armazenamento S3 máx. por usuário (MB)",
+      "storage_s3_badge": "S3: {{count}} MB",
+      "storage_s3_badge_unlimited": "S3: ilimitado"
     },
     "ui_customization": {
       "title": "Personalização da interface",
@@ -1544,7 +1549,8 @@
       "invalid_custom_token": "Link personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
       "token_already_in_use": "Link personalizado já em uso",
       "no_token_generated": "Nenhum link gerado",
-      "server_error": "Erro do servidor: {{error}}"
+      "server_error": "Erro do servidor: {{error}}",
+      "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário."
     }
   },
   "ui": {
@@ -2848,9 +2854,13 @@
       "user_quota_sentence_none": "Nenhuma cota está definida para esta conta: notas e armazenamento são ilimitados.",
       "quota_modal_description": "Deixe um campo vazio para usar a configuração global. 0 significa ilimitado.\nEsses valores substituem as cotas globais de usuário.",
       "quota_max_notes_for": "Máx. de notas para {{user}}",
-      "quota_max_storage_for": "Armazenamento máx. para {{user}} (MB)",
+      "quota_max_storage_for": "Armazenamento local máx. para {{user}} (MB)",
       "filter_placeholder": "Filtrar contas...",
-      "no_accounts": "Nenhuma conta encontrada."
+      "no_accounts": "Nenhuma conta encontrada.",
+      "table_attachments_local": "Anexos locais (MB)",
+      "table_attachments_s3": "Anexos S3 (MB)",
+      "quota_max_storage_s3_for": "Armazenamento S3 máx. para {{user}} (MB)",
+      "table_quota_s3": "Cota (Quantidade / MB local / MB S3)"
     }
   },
   "backlinks": {
@@ -3302,5 +3312,45 @@
     "add_task": "Adicionar tarefa",
     "collapse": "Recolher",
     "expand": "Expandir"
+  },
+  "s3_settings": {
+    "title": "Armazenamento S3 de anexos",
+    "description": "Armazene os anexos das notas em um armazenamento de objetos compatível com S3 (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) em vez do disco local. A configuração se aplica a todos os usuários desta instância.",
+    "config_title": "Configuração",
+    "enable_label": "Armazenar anexos no S3",
+    "enable_description": "Os novos anexos são gravados no bucket. Os arquivos ainda no disco local continuam funcionando e podem ser migrados abaixo.",
+    "endpoint_label": "URL do endpoint",
+    "endpoint_description": "URL base da API S3. Exemplos: https://s3.amazonaws.com, http://minio:9000, https://<conta>.r2.cloudflarestorage.com",
+    "region_label": "Região",
+    "region_description": "Deixe \"us-east-1\" para MinIO/Garage e provedores que ignoram a região.",
+    "bucket_label": "Bucket",
+    "access_key_label": "Chave de acesso",
+    "secret_key_label": "Chave secreta",
+    "path_style_label": "Endereçamento path-style",
+    "path_style_description": "Mantenha ativado para MinIO, Garage e a maioria dos servidores auto-hospedados. Desative apenas se o seu provedor exigir o estilo virtual-host (bucket.endpoint).",
+    "test": "Testar conexão",
+    "save": "Salvar configuração",
+    "testing": "Testando conexão...",
+    "test_success": "Conexão bem-sucedida, o bucket está acessível.",
+    "test_failure": "Falha na conexão: {{error}}",
+    "migration_title": "Migração",
+    "migration_description": "Mova os anexos existentes entre o disco local e o bucket, para todos os usuários da instância. A migração é executada em lotes e pode ser interrompida e retomada com segurança.",
+    "status_local": "No disco local",
+    "status_remote": "No bucket",
+    "status_unavailable": "indisponível",
+    "files_unit": "{{count}} arquivo(s), {{size}}",
+    "migrate_to_s3": "Migrar arquivos locais para o S3",
+    "migrate_to_local": "Trazer arquivos de volta ao disco local",
+    "migrating": "Migrando... {{moved}} arquivo(s) movido(s), {{remaining}} restante(s)",
+    "migration_done": "Migração concluída: {{moved}} arquivo(s) movido(s).",
+    "migration_error": "Migração interrompida após um erro: {{error}}",
+    "confirm_to_s3": "Mover todos os arquivos de anexos locais (todos os usuários) para o bucket?",
+    "confirm_to_local": "Baixar todos os anexos do bucket de volta ao disco local (todos os usuários)?",
+    "footer_note": "Os anexos são armazenados em attachments/{id do usuário}/ no bucket e sempre servidos pelo Poznote (o bucket pode permanecer privado). A sincronização Git ignora os anexos enquanto o armazenamento S3 estiver ativado.",
+    "messages": {
+      "saved": "Configuração salva com sucesso.",
+      "save_error": "Falha ao salvar a configuração.",
+      "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar o armazenamento S3."
+    }
   }
 }

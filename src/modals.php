@@ -218,8 +218,12 @@ try {
                 <input type="number" id="userMaxNotesInput" min="0" max="100000000" step="1" value="0">
             </div>
             <div class="font-size-row">
-                <label for="userMaxStorageInput"><?php echo t_h('modals.user_quotas.max_storage', [], 'Max storage per user (MB)'); ?></label>
+                <label for="userMaxStorageInput"><?php echo t_h('modals.user_quotas.max_storage', [], 'Max local storage per user (MB)'); ?></label>
                 <input type="number" id="userMaxStorageInput" min="0" max="100000000" step="1" value="0">
+            </div>
+            <div class="font-size-row">
+                <label for="userMaxStorageS3Input"><?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 storage per user (MB)'); ?></label>
+                <input type="number" id="userMaxStorageS3Input" min="0" max="100000000" step="1" value="0">
             </div>
         </div>
         <div class="modal-buttons">

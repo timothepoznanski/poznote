@@ -429,7 +429,8 @@
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
       "website": "Öffnen Sie die offizielle Poznote-Website.",
-      "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende."
+      "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
+      "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -492,7 +493,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Webhooks",
-      "ai_assistant": "KI-Assistent"
+      "ai_assistant": "KI-Assistent",
+      "s3_storage": "S3-Speicher"
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -991,11 +993,14 @@
       "title": "Benutzerkontingente",
       "description": "Anzahl der Notizen und Speicherplatz pro Benutzer begrenzen. 0 bedeutet unbegrenzt. Administratoren sind nicht eingeschränkt. Auf der Seite der Speicherstatistiken können Sie diese Limits pro Benutzer überschreiben.",
       "max_notes": "Max. Notizen pro Benutzer",
-      "max_storage": "Max. Speicher pro Benutzer (MB)",
+      "max_storage": "Max. lokaler Speicher pro Benutzer (MB)",
       "notes_badge": "Notizen: {{count}}",
       "notes_badge_unlimited": "Notizen: unbegrenzt",
       "storage_badge": "Speicher: {{count}} MB",
-      "storage_badge_unlimited": "Speicher: unbegrenzt"
+      "storage_badge_unlimited": "Speicher: unbegrenzt",
+      "max_storage_s3": "Max. S3-Speicher pro Benutzer (MB)",
+      "storage_s3_badge": "S3: {{count}} MB",
+      "storage_s3_badge_unlimited": "S3: unbegrenzt"
     },
     "ui_customization": {
       "title": "Oberfläche anpassen",
@@ -1540,7 +1545,8 @@
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
-      "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)"
+      "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
+      "storage_s3_quota_reached": "S3-Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB S3-Speicher für diesen Benutzer."
     }
   },
   "ui": {
@@ -2845,9 +2851,13 @@
       "user_quota_sentence_none": "Für dieses Konto ist kein Kontingent festgelegt: Notizen und Speicher sind unbegrenzt.",
       "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
       "quota_max_notes_for": "Max. Notizen für {{user}}",
-      "quota_max_storage_for": "Max. Speicher für {{user}} (MB)",
+      "quota_max_storage_for": "Max. lokaler Speicher für {{user}} (MB)",
       "filter_placeholder": "Konten filtern...",
-      "no_accounts": "Keine Konten gefunden."
+      "no_accounts": "Keine Konten gefunden.",
+      "table_attachments_local": "Anhänge lokal (MB)",
+      "table_attachments_s3": "Anhänge S3 (MB)",
+      "quota_max_storage_s3_for": "Max. S3-Speicher für {{user}} (MB)",
+      "table_quota_s3": "Quota (Anzahl / MB lokal / MB S3)"
     }
   },
   "backlinks": {
@@ -3299,5 +3309,45 @@
     "add_task": "Aufgabe hinzufügen",
     "collapse": "Einklappen",
     "expand": "Ausklappen"
+  },
+  "s3_settings": {
+    "title": "S3-Speicher für Anhänge",
+    "description": "Speichern Sie Notiz-Anhänge in einem S3-kompatiblen Objektspeicher (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) statt auf der lokalen Festplatte. Die Einstellung gilt für alle Benutzer dieser Instanz.",
+    "config_title": "Konfiguration",
+    "enable_label": "Anhänge in S3 speichern",
+    "enable_description": "Neue Anhänge werden in den Bucket geschrieben. Dateien auf der lokalen Festplatte funktionieren weiterhin und können unten migriert werden.",
+    "endpoint_label": "Endpoint-URL",
+    "endpoint_description": "Basis-URL der S3-API. Beispiele: https://s3.amazonaws.com, http://minio:9000, https://<account>.r2.cloudflarestorage.com",
+    "region_label": "Region",
+    "region_description": "Für MinIO/Garage und Anbieter, die die Region ignorieren, \"us-east-1\" belassen.",
+    "bucket_label": "Bucket",
+    "access_key_label": "Access Key",
+    "secret_key_label": "Secret Key",
+    "path_style_label": "Path-Style-Adressierung",
+    "path_style_description": "Für MinIO, Garage und die meisten selbst gehosteten Server aktiviert lassen. Nur deaktivieren, wenn Ihr Anbieter Virtual-Host-Style (bucket.endpoint) verlangt.",
+    "test": "Verbindung testen",
+    "save": "Konfiguration speichern",
+    "testing": "Verbindung wird getestet...",
+    "test_success": "Verbindung erfolgreich, der Bucket ist erreichbar.",
+    "test_failure": "Verbindung fehlgeschlagen: {{error}}",
+    "migration_title": "Migration",
+    "migration_description": "Verschieben Sie vorhandene Anhänge zwischen lokaler Festplatte und Bucket, für alle Benutzer der Instanz. Die Migration läuft in Stapeln und kann gefahrlos unterbrochen und fortgesetzt werden.",
+    "status_local": "Auf lokaler Festplatte",
+    "status_remote": "Im Bucket",
+    "status_unavailable": "nicht verfügbar",
+    "files_unit": "{{count}} Datei(en), {{size}}",
+    "migrate_to_s3": "Lokale Dateien nach S3 migrieren",
+    "migrate_to_local": "Dateien zurück auf die lokale Festplatte holen",
+    "migrating": "Migration läuft... {{moved}} Datei(en) verschoben, {{remaining}} verbleibend",
+    "migration_done": "Migration abgeschlossen: {{moved}} Datei(en) verschoben.",
+    "migration_error": "Migration nach einem Fehler gestoppt: {{error}}",
+    "confirm_to_s3": "Alle lokalen Anhang-Dateien (alle Benutzer) in den Bucket verschieben?",
+    "confirm_to_local": "Alle Bucket-Anhänge zurück auf die lokale Festplatte laden (alle Benutzer)?",
+    "footer_note": "Anhänge werden unter attachments/{Benutzer-ID}/ im Bucket gespeichert und immer über Poznote ausgeliefert (der Bucket kann privat bleiben). Git-Sync ignoriert Anhänge, solange der S3-Speicher aktiviert ist.",
+    "messages": {
+      "saved": "Konfiguration erfolgreich gespeichert.",
+      "save_error": "Konfiguration konnte nicht gespeichert werden.",
+      "incomplete": "Endpoint, Bucket und Zugangsdaten sind erforderlich, um den S3-Speicher zu aktivieren."
+    }
   }
 }

@@ -307,40 +307,41 @@ function createCompleteBackup($userId = null) {
     
     // Add attachments from user's data
     $attachmentsPath = $userDataManager->getUserAttachmentsPath();
-    if ($attachmentsPath && is_dir($attachmentsPath)) {
-        // Build a mapping from attachment filenames to IDs for proper naming in ZIP
-        $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
-        $attachmentsQueryResult = $tempCon->query($query);
-        $filenameToIdMap = [];
-        
-        if ($attachmentsQueryResult) {
-            while ($row = $attachmentsQueryResult->fetch(PDO::FETCH_ASSOC)) {
-                $attachments = json_decode($row['attachments'], true);
-                if (is_array($attachments)) {
-                    foreach ($attachments as $attachment) {
-                        if (isset($attachment['id']) && isset($attachment['filename'])) {
-                            $filenameToIdMap[$attachment['filename']] = $attachment['id'];
-                        }
+    // Build a mapping from attachment filenames to IDs for proper naming in ZIP
+    $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+    $attachmentsQueryResult = $tempCon->query($query);
+    $filenameToIdMap = [];
+
+    if ($attachmentsQueryResult) {
+        while ($row = $attachmentsQueryResult->fetch(PDO::FETCH_ASSOC)) {
+            $attachments = json_decode($row['attachments'], true);
+            if (is_array($attachments)) {
+                foreach ($attachments as $attachment) {
+                    if (isset($attachment['id']) && isset($attachment['filename'])) {
+                        $filenameToIdMap[$attachment['filename']] = $attachment['id'];
                     }
                 }
             }
         }
-        
+    }
+
+    $addedAttachmentFiles = [];
+    if ($attachmentsPath && is_dir($attachmentsPath)) {
         $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($attachmentsPath), 
+            new RecursiveDirectoryIterator($attachmentsPath),
             RecursiveIteratorIterator::LEAVES_ONLY
         );
-        
+
         foreach ($files as $name => $file) {
             if (!$file->isDir()) {
                 $filePath = $file->getRealPath();
                 $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
-                
+
                 // Skip hidden files
                 if (!str_starts_with($relativePath, '.')) {
                     // Get the base filename
                     $filename = basename($relativePath);
-                    
+
                     // If this file is mapped to an attachment ID, use ID.ext as the name in the ZIP
                     if (isset($filenameToIdMap[$filename])) {
                         $attachmentId = $filenameToIdMap[$filename];
@@ -351,7 +352,24 @@ function createCompleteBackup($userId = null) {
                         // Otherwise, just add it with its original name (shouldn't normally happen)
                         $zip->addFile($filePath, 'attachments/' . $relativePath);
                     }
+                    $addedAttachmentFiles[$filename] = true;
                 }
+            }
+        }
+    }
+
+    // S3 mode: fetch the exported user's remaining attachments from the bucket
+    require_once __DIR__ . '/storage/AttachmentStorage.php';
+    $exportStorage = AttachmentStorage::forUser((int)$userId);
+    if ($exportStorage->isRemote()) {
+        foreach ($filenameToIdMap as $filename => $attachmentId) {
+            if (isset($addedAttachmentFiles[$filename])) {
+                continue;
+            }
+            $localCopy = $exportStorage->localFile($filename);
+            if ($localCopy !== null) {
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                $zip->addFile($localCopy, 'attachments/' . $attachmentId . ($ext ? '.' . $ext : ''));
             }
         }
     }

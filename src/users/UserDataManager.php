@@ -126,9 +126,14 @@ class UserDataManager {
         // Entries size
         $stats['entries'] = $this->getDirectorySize($this->getUserEntriesPath());
         
-        // Attachments size
+        // Attachments size. In S3 mode the directory is (mostly) empty:
+        // count the sizes recorded in the user's database instead.
         $stats['attachments'] = $this->getDirectorySize($this->getUserAttachmentsPath());
-        
+        require_once __DIR__ . '/../storage/AttachmentStorage.php';
+        if (AttachmentStorage::isEnabled()) {
+            $stats['attachments'] += $this->sumAttachmentBytesFromDb();
+        }
+
         // Backups size
         $stats['backups'] = $this->getDirectorySize($this->getUserBackupsPath());
         
@@ -137,6 +142,35 @@ class UserDataManager {
         return $stats;
     }
     
+    /**
+     * Sum of the attachment sizes recorded in this user's database (all
+     * entries, trash included). Used when attachments live in an S3 bucket.
+     * @return int
+     */
+    public function sumAttachmentBytesFromDb() {
+        $dbPath = $this->getUserDatabasePath();
+        if (!file_exists($dbPath)) {
+            return 0;
+        }
+        $total = 0;
+        try {
+            $db = new PDO('sqlite:' . $dbPath);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $stmt = $db->query("SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $list = json_decode($row['attachments'] ?? '', true);
+                if (is_array($list)) {
+                    foreach ($list as $attachment) {
+                        $total += max(0, (int)($attachment['file_size'] ?? 0));
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            // Stats input only: never break the caller
+        }
+        return $total;
+    }
+
     /**
      * Get size of a directory
      * @param string $path

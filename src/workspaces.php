@@ -141,10 +141,8 @@ if ($_POST) {
                     if (is_array($attList)) {
                         foreach ($attList as $att) {
                             if (is_array($att) && !empty($att['filename'])) {
-                                $file = $attachmentsPath . DIRECTORY_SEPARATOR . $att['filename'];
-                                if (file_exists($file)) {
-                                    @unlink($file);
-                                }
+                                // Local disk or S3 bucket
+                                poznoteDeleteAttachmentFile($att['filename']);
                             }
                         }
                     }
