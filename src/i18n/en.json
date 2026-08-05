@@ -105,7 +105,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "SaaS mode: prevent non-admin users from discovering the other accounts of the instance. The user directory becomes admin-only and sharing with specific users is refused. Leave it off for a family or team instance.",
+      "tenant_isolation": "SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.",
       "workspaces": "Organize your notes into separate workspaces, each with its own folders and notes.",
       "my_profile": "View and edit your profile information.",
       "change_password": "Change the password used to sign in.",
@@ -165,7 +165,8 @@
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
-      "support": "Support the development of Poznote with a donation."
+      "support": "Support the development of Poznote with a donation.",
+      "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -209,7 +210,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
-      "ai_assistant": "AI Assistant"
+      "ai_assistant": "AI Assistant",
+      "s3_storage": "S3 Storage"
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -333,7 +335,16 @@
     "edit_task": "Edit task",
     "edit_text_label": "Task text",
     "edit_hint": "Enter adds a new line. Ctrl+Enter saves.",
-    "edit_empty_error": "Task text cannot be empty."
+    "edit_empty_error": "Task text cannot be empty.",
+    "due_date": "Due date",
+    "due_remove": "Remove due date",
+    "due_remove_time": "Remove time",
+    "move_to_list": "Move to another list",
+    "mark_important": "Mark as important",
+    "unmark_important": "Remove important",
+    "task_options": "Task options",
+    "remind_me": "Remind me",
+    "remind_me_hint": "A notification fires at the due date and time."
   },
   "tags": {
     "add_single": "Add tag...",
@@ -499,11 +510,14 @@
       "title": "User quotas",
       "description": "Limit the number of notes and the storage space of each user. 0 means unlimited. Administrators are not limited. You can override these limits per user from the storage statistics page.",
       "max_notes": "Max notes per user",
-      "max_storage": "Max storage per user (MB)",
+      "max_storage": "Max local storage per user (MB)",
       "notes_badge": "Notes: {{count}}",
       "notes_badge_unlimited": "Notes: unlimited",
       "storage_badge": "Storage: {{count}} MB",
-      "storage_badge_unlimited": "Storage: unlimited"
+      "storage_badge_unlimited": "Storage: unlimited",
+      "max_storage_s3": "Max S3 storage per user (MB)",
+      "storage_s3_badge": "S3: {{count}} MB",
+      "storage_s3_badge_unlimited": "S3: unlimited"
     },
     "ui_customization": {
       "title": "UI Customization",
@@ -517,6 +531,7 @@
       "dashboard_filter_bar": "Filter bar",
       "view_layout_toggle": "Grid / list toggle",
       "index_search_bar": "Search bar",
+      "tasklist_progress_bar": "Task list progress bar",
       "share_restrict_users": "Share: restrict to specific users",
       "share_protocol_toggle": "Share: HTTPS toggle",
       "share_shared_with_me": "Share: \"Shared with me\"",
@@ -898,6 +913,24 @@
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
       "custom_invalid": "Enter a valid custom format."
+    },
+    "tenant_isolation": {
+      "title": "Tenant isolation",
+      "description": "Block the checked capabilities for non-admin users (SaaS mode). Administrators are never affected. Leave everything unchecked for a family or team instance.",
+      "features": {
+        "user_sharing": "User discovery and sharing",
+        "user_sharing_help": "The user directory becomes admin-only and sharing with specific users is refused.",
+        "user_webhooks": "User webhooks",
+        "user_webhooks_help": "Non-admin users can no longer register webhooks that send events about their notes to external endpoints."
+      }
+    },
+    "quick_task": {
+      "title": "Add task",
+      "text_placeholder": "What needs to be done?",
+      "description": "Choose the task list to add this task to.",
+      "confirm": "Add task",
+      "adding": "Adding task...",
+      "error": "Unable to add task"
     }
   },
   "notes_list": {
@@ -1056,7 +1089,8 @@
     "audio_no_note": "No note selected",
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
-    "date": "Date"
+    "date": "Date",
+    "task": "Add task"
   },
   "api": {
     "settings": {
@@ -1078,7 +1112,8 @@
       "invalid_custom_token": "Invalid custom link.\n\nAllowed:\n\nletters, numbers, -, _, . (4-128 chars)",
       "token_already_in_use": "Custom link already in use",
       "no_token_generated": "No link generated",
-      "server_error": "Server error: {{error}}"
+      "server_error": "Server error: {{error}}",
+      "storage_s3_quota_reached": "S3 storage limit reached: this instance allows at most {{max}} MB of S3 storage for this user."
     }
   },
   "ui": {
@@ -1313,7 +1348,8 @@
       "title": "Backup / Export"
     },
     "common": {
-      "all_workspaces": "all workspaces"
+      "all_workspaces": "all workspaces",
+      "skip_s3_attachments": "Do not include S3 attachments in the zip (lighter archive)"
     },
     "sections": {
       "complete_backup": {
@@ -1334,11 +1370,17 @@
         "warning": "Note: This export type is not designed for a perfect Poznote backup.",
         "select_workspace": "Select workspace:",
         "loading_workspaces": "Loading workspaces..."
+      },
+      "attachments_export": {
+        "title": "Attachments Export",
+        "description": "Download all the attachments of your account in a single ZIP archive.",
+        "description_s3": "With S3 storage enabled, the files are fetched from the bucket; use this archive to add the missing files to a backup made without S3 attachments before restoring it."
       }
     },
     "buttons": {
       "download_complete_backup": "Download complete backup (ZIP)",
-      "download_structured_export": "Download structured export (ZIP)"
+      "download_structured_export": "Download structured export (ZIP)",
+      "download_attachments_export": "Download attachments (ZIP)"
     },
     "spinner": {
       "preparing": "Preparing backup...",
@@ -1431,7 +1473,7 @@
       "select_backup_first": "Please select a backup file first.",
       "restore_error": "Restore error: {{error}}",
       "no_backup_file_or_upload": "No backup file provided or upload error.",
-      "complete_restore_error": "Complete restore error: {{error}} - {{message}}",
+      "complete_restore_error": "Complete restore error: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "No complete backup file provided or upload error.",
       "import_error": "Import error: {{error}}",
       "no_notes_file_or_upload": "No notes file provided or upload error.",
@@ -2415,9 +2457,13 @@
       "user_quota_sentence_none": "No quota is set for this account: notes and storage are unlimited.",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
       "quota_max_notes_for": "Max notes for {{user}}",
-      "quota_max_storage_for": "Max storage for {{user}} (MB)",
+      "quota_max_storage_for": "Max local storage for {{user}} (MB)",
       "filter_placeholder": "Filter accounts...",
-      "no_accounts": "No accounts found."
+      "no_accounts": "No accounts found.",
+      "table_attachments_local": "Attachments local (MB)",
+      "table_attachments_s3": "Attachments S3 (MB)",
+      "quota_max_storage_s3_for": "Max S3 storage for {{user}} (MB)",
+      "table_quota_s3": "Quota (Count / local MB / S3 MB)"
     }
   },
   "backlinks": {
@@ -2689,7 +2735,7 @@
     "card": "User Webhooks",
     "card_help": "Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
-    "access_denied": "Access denied. This page is reserved for the primary account."
+    "access_denied": "Access denied. User webhooks are disabled on this instance."
   },
   "webhooks_admin": {
     "event_help": {
@@ -2701,11 +2747,11 @@
       "signup_cap_reached": "An SSO signup was refused because the instance reached its maximum number of users. Payload: the cap and the attempted username and email.",
       "quota_notes_reached": "A user action was blocked because their notes quota is reached. Payload: the user, the limit and the current count.",
       "quota_storage_reached": "A user action was blocked because their storage quota is reached. Payload: the user, the limit and the current usage.",
-      "reminder_due": "A note reminder of the primary account (user 1) reached its trigger time; other users' reminders never trigger webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.",
+      "reminder_due": "One of your note reminders reached its trigger time; other users' reminders never trigger your webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.",
       "reminder_due_title": "Same trigger as reminder.due but without the reminder message: identifiers plus the note title and direct link.",
       "reminder_due_minimal": "Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.",
-      "note_created": "A note was created in the primary account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
-      "note_shared": "A public share link was published for a note of the primary account. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected."
+      "note_created": "A note was created in your account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
+      "note_shared": "A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected."
     },
     "title": "Webhooks",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
@@ -2794,7 +2840,10 @@
       "repeat_days": "day(s)",
       "repeat_weeks": "week(s)",
       "repeat_months": "month(s)",
-      "repeat_years": "year(s)"
+      "repeat_years": "year(s)",
+      "date_placeholder": "Date",
+      "time_placeholder": "Time",
+      "no_date_configured": "No date configured"
     }
   },
   "settings_password": {
@@ -2948,5 +2997,64 @@
       "saving": "Saving changes...",
       "saved": "Saved!"
     }
+  },
+  "tasks_page": {
+    "title": "Tasks",
+    "progress": "{{completed}} of {{total}} tasks completed",
+    "filter_all": "All",
+    "filter_open": "To do",
+    "filter_important": "Important",
+    "filter_overdue": "Overdue",
+    "filter_dated": "With due date",
+    "filter_completed": "Completed",
+    "filter_placeholder": "Filter by task, title or folder name...",
+    "empty": "No tasks yet. Create a task list note to get started.",
+    "empty_filtered": "No tasks match this filter.",
+    "add_task": "Add task",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "s3_settings": {
+    "title": "S3 Attachment Storage",
+    "description": "Store note attachments in an S3-compatible object storage instead of the local disk.",
+    "description_scope": "The setting applies to all users of this instance.",
+    "attachments_only_note": "Only the attachment files are concerned.",
+    "config_title": "Configuration",
+    "enable_label": "Store attachments in S3",
+    "enable_description": "New attachments are written to the bucket. Files still on local disk keep working and can be migrated below.",
+    "endpoint_label": "Endpoint URL",
+    "endpoint_description": "Base URL of the S3 API. Examples: https://s3.amazonaws.com, http://minio:9000, https://<account>.r2.cloudflarestorage.com",
+    "region_label": "Region",
+    "region_description": "Leave \"us-east-1\" for MinIO/Garage and providers that ignore the region.",
+    "bucket_label": "Bucket",
+    "access_key_label": "Access key",
+    "secret_key_label": "Secret key",
+    "path_style_label": "Path-style addressing",
+    "path_style_description": "Keep enabled for MinIO, Garage and most self-hosted servers. Disable only if your provider requires virtual-host style (bucket.endpoint).",
+    "test": "Test connection",
+    "save": "Save Configuration",
+    "testing": "Testing connection...",
+    "test_success": "Connection successful, the bucket is reachable.",
+    "test_failure": "Connection failed: {{error}}",
+    "migration_title": "Migration",
+    "migration_description": "Move existing attachment files between the local disk and the bucket, for every user of the instance. Migration runs in batches and can be safely interrupted and resumed.",
+    "status_local": "On local disk",
+    "status_remote": "In the bucket",
+    "status_unavailable": "unavailable",
+    "files_unit": "{{count}} file(s), {{size}}",
+    "migrate_to_s3": "Migrate local files to S3",
+    "migrate_to_local": "Bring files back to local disk",
+    "migrating": "Migrating... {{moved}} file(s) moved, {{remaining}} remaining",
+    "migration_done": "Migration finished: {{moved}} file(s) moved.",
+    "migration_error": "Migration stopped after an error: {{error}}",
+    "confirm_to_s3": "Move all local attachment files (all users) to the bucket?",
+    "confirm_to_local": "Download all bucket attachments back to the local disk (all users)?",
+    "footer_note": "Attachments are stored under attachments/{user id}/ in the bucket and are always served through Poznote (the bucket can stay private).",
+    "messages": {
+      "saved": "Configuration saved successfully.",
+      "save_error": "Failed to save configuration.",
+      "incomplete": "Endpoint, bucket and credentials are required to enable S3 storage."
+    },
+    "git_sync_note": "Git sync ignores attachments while S3 storage is enabled."
   }
 }

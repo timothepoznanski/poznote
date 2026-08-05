@@ -96,7 +96,9 @@
 
 .slash-date-picker {
     position: fixed;
-    z-index: 9999;
+    /* Above modals (.modal is 9999, .modal-content 10000) so the popup works
+       from inside dialogs like the reminder modal */
+    z-index: 10001;
     width: 252px;
     background: #ffffff;
     border: 1px solid #e5e7eb;
@@ -174,10 +176,157 @@
     background: rgba(11, 120, 230, 0.2);
 }
 
+.slash-date-picker-day.selected,
+.slash-date-picker-day.selected:hover {
+    background: #0b78e6;
+    color: #ffffff;
+    font-weight: 700;
+}
+
 .slash-date-picker-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
     margin-top: 6px;
+}
+
+.slash-date-picker-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    padding-top: 8px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.slash-date-picker-actions-row .slash-date-picker-apply-btn {
+    margin-left: auto;
+}
+
+.slash-date-picker-time-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    color: #111827;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.slash-date-picker-time-btn i {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.slash-date-picker-time-btn:hover {
+    border-color: #0b78e6;
+    color: #0b78e6;
+}
+
+.slash-date-picker-time-btn:hover i {
+    color: #0b78e6;
+}
+
+/* Two-step time menu: hours grid, then minutes grid */
+.slash-time-grid {
+    display: grid;
+    gap: 2px;
+    text-align: center;
+}
+
+.slash-time-grid.hours {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.slash-time-grid.minutes {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.slash-time-cell {
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    color: #111827;
+    padding: 6px 0;
+}
+
+.slash-time-cell:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.slash-time-cell.selected,
+.slash-time-cell.selected:hover {
+    background: #0b78e6;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.slash-date-picker-apply-btn {
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #0b78e6;
+    padding: 4px 12px;
+}
+
+.slash-date-picker-apply-btn:hover {
+    background: #0961bd;
+}
+
+/* Pill buttons matching the task due-date chip look */
+.slash-date-picker-remove-btn,
+.slash-date-picker-remove-time-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.slash-date-picker-remove-btn i,
+.slash-date-picker-remove-time-btn i {
+    font-size: 12px;
+}
+
+.slash-date-picker-remove-btn {
+    border: 1px solid #f1b8b8;
+    background: #fdf2f2;
+    color: #c62828;
+}
+
+.slash-date-picker-remove-btn:hover {
+    border-color: #d32f2f;
+    background: #fbe4e4;
+}
+
+.slash-date-picker-remove-time-btn {
+    border: 1px solid #d0d7de;
+    background: #f6f8fa;
+    color: #57606a;
+}
+
+.slash-date-picker-remove-time-btn:hover {
+    border-color: #007DB8;
+    color: #007DB8;
 }
 
 .slash-date-picker-today-btn {

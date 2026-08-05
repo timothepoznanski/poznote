@@ -170,8 +170,8 @@ class ShareController {
             $urls = $this->buildUrls($token);
 
             // note.shared webhook, best-effort: a failing endpoint must not
-            // break a share that already succeeded. No-op unless the note
-            // belongs to the primary account.
+            // break a share that already succeeded. Delivery is scoped to the
+            // webhooks of the account owning the note.
             try {
                 require_once dirname(dirname(dirname(__DIR__))) . '/WebhookDispatcher.php';
                 (new WebhookDispatcher())->dispatchNoteShared(

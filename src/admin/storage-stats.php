@@ -89,7 +89,7 @@ function collectStorageStats(): array {
     // Map user id => profile (username, admin flag, per-user quota overrides).
     $profiles = [];
     try {
-        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, quota_max_notes, quota_max_storage_mb FROM users");
+        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb FROM users");
         foreach ($stmt as $profile) {
             $profiles[(int)$profile['id']] = $profile;
         }
@@ -119,11 +119,13 @@ function collectStorageStats(): array {
             'is_admin'         => $profile ? (bool)$profile['is_admin'] : false,
             'quota_max_notes'  => ($profile && $profile['quota_max_notes'] !== null) ? (int)$profile['quota_max_notes'] : null,
             'quota_max_storage_mb' => ($profile && $profile['quota_max_storage_mb'] !== null) ? (int)$profile['quota_max_storage_mb'] : null,
+            'quota_max_storage_s3_mb' => ($profile && $profile['quota_max_storage_s3_mb'] !== null) ? (int)$profile['quota_max_storage_s3_mb'] : null,
             'notes_active'     => 0,
             'notes_trash'      => 0,
             'db_bytes'         => 0,
             'entries_bytes'    => 0,
             'attachments_bytes'=> 0,
+            'attachments_s3_bytes' => 0,
             'total_bytes'      => 0,
             'error'            => null,
         ];
@@ -143,6 +145,28 @@ function collectStorageStats(): array {
                 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $row['notes_active'] = (int)$db->query("SELECT COUNT(*) FROM entries WHERE trash = 0")->fetchColumn();
                 $row['notes_trash']  = (int)$db->query("SELECT COUNT(*) FROM entries WHERE trash = 1")->fetchColumn();
+                // S3 mode: attachments absent from the local directory live in
+                // the bucket; sum their sizes recorded in the database. Files
+                // still on disk (not yet migrated) stay in the local column.
+                require_once __DIR__ . '/../storage/AttachmentStorage.php';
+                if (AttachmentStorage::isEnabled()) {
+                    $s3Bytes = 0;
+                    $attStmt = $db->query("SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
+                    foreach ($attStmt as $attRow) {
+                        $list = json_decode($attRow['attachments'] ?? '', true);
+                        if (is_array($list)) {
+                            foreach ($list as $attachment) {
+                                $filename = (string)($attachment['filename'] ?? '');
+                                if ($filename === '' || file_exists($attachmentsDir . '/' . basename($filename))) {
+                                    continue;
+                                }
+                                $s3Bytes += max(0, (int)($attachment['file_size'] ?? 0));
+                            }
+                        }
+                    }
+                    $row['attachments_s3_bytes'] = $s3Bytes;
+                    $row['total_bytes']         += $s3Bytes;
+                }
                 $db = null;
             } catch (Exception $e) {
                 $row['error'] = $e->getMessage();
@@ -160,6 +184,7 @@ $stats = collectStorageStats();
 // Global quota defaults (0 = unlimited), overridable per user below.
 $globalMaxNotes     = max(0, (int)getGlobalSetting('user_max_notes', '0'));
 $globalMaxStorageMb = max(0, (int)getGlobalSetting('user_max_storage_mb', '0'));
+$globalMaxStorageS3Mb = max(0, (int)getGlobalSetting('user_max_storage_s3_mb', '0'));
 
 /**
  * Format a quota value for display: 0 (unlimited) renders as the infinity sign.
@@ -168,19 +193,25 @@ function poznoteFormatQuotaValue(int $value): string {
     return $value > 0 ? (string)$value : '∞';
 }
 
-$totNotesActive     = 0;
-$totNotesTrash      = 0;
-$totDbBytes         = 0;
-$totEntriesBytes    = 0;
-$totAttachmentBytes = 0;
-$totBytes           = 0;
+// Show a dedicated S3 column when attachments are stored in a bucket
+require_once __DIR__ . '/../storage/AttachmentStorage.php';
+$s3ColumnVisible = AttachmentStorage::isEnabled();
+
+$totNotesActive        = 0;
+$totNotesTrash         = 0;
+$totDbBytes            = 0;
+$totEntriesBytes       = 0;
+$totAttachmentBytes    = 0;
+$totAttachmentS3Bytes  = 0;
+$totBytes              = 0;
 foreach ($stats as $r) {
-    $totNotesActive     += $r['notes_active'];
-    $totNotesTrash      += $r['notes_trash'];
-    $totDbBytes         += $r['db_bytes'];
-    $totEntriesBytes    += $r['entries_bytes'];
-    $totAttachmentBytes += $r['attachments_bytes'];
-    $totBytes           += $r['total_bytes'];
+    $totNotesActive        += $r['notes_active'];
+    $totNotesTrash         += $r['notes_trash'];
+    $totDbBytes            += $r['db_bytes'];
+    $totEntriesBytes       += $r['entries_bytes'];
+    $totAttachmentBytes    += $r['attachments_bytes'];
+    $totAttachmentS3Bytes  += $r['attachments_s3_bytes'];
+    $totBytes              += $r['total_bytes'];
 }
 ?>
 <!DOCTYPE html>
@@ -236,10 +267,12 @@ foreach ($stats as $r) {
     .table-scroll {
         overflow-x: auto;
     }
-    /* Tighter rows than the 12px 20px admin-tools default */
+    /* Tighter rows than the 12px 20px admin-tools default, and headers
+       centered over their (mostly numeric) columns */
     .results-table th,
     .results-table td {
         padding: 7px 16px;
+        text-align: center;
     }
     .results-table th .storage-sort-btn {
         background: none;
@@ -431,9 +464,16 @@ foreach ($stats as $r) {
                         <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_trash', [], 'Trash'), 'num', 'hide-mobile'); ?>
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')), 'num', 'hide-mobile'); ?>
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')), 'num', 'hide-mobile'); ?>
-                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php if ($s3ColumnVisible): ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')), 'num', 'hide-mobile'); ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php else: ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php endif; ?>
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'num'); ?>
-                        <th class="quota-header"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_quota', [], 'Quota (Count / MB)')); ?></th>
+                        <th class="quota-header"><?php echo poznoteGlueUnit($s3ColumnVisible
+                            ? t_h('admin_tools.storage_stats.table_quota_s3', [], 'Quota (Count / local MB / S3 MB)')
+                            : t_h('admin_tools.storage_stats.table_quota', [], 'Quota (Count / MB)')); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -458,6 +498,9 @@ foreach ($stats as $r) {
                             <td class="hide-mobile" data-sort="<?php echo $row['db_bytes']; ?>"><?php echo poznoteFormatMb($row['db_bytes']); ?></td>
                             <td class="hide-mobile" data-sort="<?php echo $row['entries_bytes']; ?>"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
                             <td class="hide-mobile" data-sort="<?php echo $row['attachments_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
+                            <?php if ($s3ColumnVisible): ?>
+                                <td class="hide-mobile" data-sort="<?php echo $row['attachments_s3_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_s3_bytes']); ?></td>
+                            <?php endif; ?>
                             <td data-sort="<?php echo $row['total_bytes']; ?>"><?php echo poznoteFormatMb($row['total_bytes']); ?></td>
                             <td style="white-space: nowrap;">
                                 <?php if ($row['is_admin']): ?>
@@ -466,15 +509,22 @@ foreach ($stats as $r) {
                                     <?php
                                     $effectiveNotes   = $row['quota_max_notes'] ?? $globalMaxNotes;
                                     $effectiveStorage = $row['quota_max_storage_mb'] ?? $globalMaxStorageMb;
-                                    $hasOverride      = $row['quota_max_notes'] !== null || $row['quota_max_storage_mb'] !== null;
+                                    $effectiveStorageS3 = $row['quota_max_storage_s3_mb'] ?? $globalMaxStorageS3Mb;
+                                    $hasOverride      = $row['quota_max_notes'] !== null || $row['quota_max_storage_mb'] !== null
+                                        || ($s3ColumnVisible && $row['quota_max_storage_s3_mb'] !== null);
+                                    $quotaDisplay = poznoteFormatQuotaValue($effectiveNotes) . ' / ' . poznoteFormatQuotaValue($effectiveStorage);
+                                    if ($s3ColumnVisible) {
+                                        $quotaDisplay .= ' / ' . poznoteFormatQuotaValue($effectiveStorageS3);
+                                    }
                                     ?>
-                                    <span class="<?php echo $hasOverride ? 'quota-override' : 'quota-inherited'; ?>"><?php echo poznoteFormatQuotaValue($effectiveNotes) . ' / ' . poznoteFormatQuotaValue($effectiveStorage); ?></span>
+                                    <span class="<?php echo $hasOverride ? 'quota-override' : 'quota-inherited'; ?>"><?php echo $quotaDisplay; ?></span>
                                     <button type="button" class="quota-edit-btn"
                                         title="<?php echo t_h('modals.user_quotas.title', [], 'User quotas'); ?>"
                                         data-user-id="<?php echo $row['user_id']; ?>"
                                         data-username="<?php echo htmlspecialchars($row['username'] ?? ('#' . $row['user_id']), ENT_QUOTES); ?>"
                                         data-quota-notes="<?php echo $row['quota_max_notes'] !== null ? $row['quota_max_notes'] : ''; ?>"
-                                        data-quota-storage="<?php echo $row['quota_max_storage_mb'] !== null ? $row['quota_max_storage_mb'] : ''; ?>">
+                                        data-quota-storage="<?php echo $row['quota_max_storage_mb'] !== null ? $row['quota_max_storage_mb'] : ''; ?>"
+                                        data-quota-storage-s3="<?php echo $row['quota_max_storage_s3_mb'] !== null ? $row['quota_max_storage_s3_mb'] : ''; ?>">
                                         <i class="lucide lucide-pencil"></i>
                                     </button>
                                 <?php endif; ?>
@@ -483,7 +533,7 @@ foreach ($stats as $r) {
                     <?php endforeach; ?>
                     <?php if (empty($stats)): ?>
                         <tr>
-                            <td colspan="9" style="text-align:center;color:var(--text-muted,#999);">
+                            <td colspan="<?php echo $s3ColumnVisible ? 10 : 9; ?>" style="text-align:center;color:var(--text-muted,#999);">
                                 <?php echo t_h('admin_tools.storage_stats.no_accounts', [], 'No accounts found.'); ?>
                             </td>
                         </tr>
@@ -498,6 +548,9 @@ foreach ($stats as $r) {
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totDbBytes); ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totEntriesBytes); ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totAttachmentBytes); ?></strong></td>
+                        <?php if ($s3ColumnVisible): ?>
+                            <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totAttachmentS3Bytes); ?></strong></td>
+                        <?php endif; ?>
                         <td><strong><?php echo poznoteFormatMb($totBytes); ?></strong></td>
                         <td></td>
                     </tr>
@@ -519,9 +572,15 @@ foreach ($stats as $r) {
             <input type="number" id="quota_max_notes" min="0" max="100000000" step="1" placeholder="0">
         </div>
         <div class="form-group">
-            <label for="quota_max_storage" id="quota_max_storage_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_for', [], 'Max storage for {{user}} (MB)'); ?>"></label>
+            <label for="quota_max_storage" id="quota_max_storage_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_for', [], 'Max local storage for {{user}} (MB)'); ?>"></label>
             <input type="number" id="quota_max_storage" min="0" max="100000000" step="1" placeholder="0">
         </div>
+        <?php if ($s3ColumnVisible): ?>
+        <div class="form-group">
+            <label for="quota_max_storage_s3" id="quota_max_storage_s3_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_s3_for', [], 'Max S3 storage for {{user}} (MB)'); ?>"></label>
+            <input type="number" id="quota_max_storage_s3" min="0" max="100000000" step="1" placeholder="0">
+        </div>
+        <?php endif; ?>
         <div class="form-actions">
             <button type="button" class="btn btn-secondary" onclick="closeQuotaModal()"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
             <button type="button" class="btn btn-primary" onclick="saveQuota()"><?php echo t_h('common.save', [], 'Save'); ?></button>
@@ -533,12 +592,14 @@ foreach ($stats as $r) {
 function openQuotaModal(btn) {
     document.getElementById('quota_user_id').value = btn.dataset.userId;
     document.getElementById('quota_title_user').textContent = btn.dataset.username;
-    ['quota_max_notes_label', 'quota_max_storage_label'].forEach(function (id) {
+    ['quota_max_notes_label', 'quota_max_storage_label', 'quota_max_storage_s3_label'].forEach(function (id) {
         var label = document.getElementById(id);
-        label.textContent = label.dataset.template.replace('{{user}}', btn.dataset.username);
+        if (label) label.textContent = label.dataset.template.replace('{{user}}', btn.dataset.username);
     });
     document.getElementById('quota_max_notes').value = btn.dataset.quotaNotes || '';
     document.getElementById('quota_max_storage').value = btn.dataset.quotaStorage || '';
+    var s3Input = document.getElementById('quota_max_storage_s3');
+    if (s3Input) s3Input.value = btn.dataset.quotaStorageS3 || '';
     document.getElementById('quotaModal').classList.add('active');
 }
 
@@ -561,17 +622,22 @@ function saveQuota() {
     var userId = document.getElementById('quota_user_id').value;
     var notes = readQuotaInput('quota_max_notes');
     var storage = readQuotaInput('quota_max_storage');
+    var hasS3Input = !!document.getElementById('quota_max_storage_s3');
+    var storageS3 = hasS3Input ? readQuotaInput('quota_max_storage_s3') : null;
 
-    if (notes === false || storage === false) {
+    if (notes === false || storage === false || storageS3 === false) {
         alert(<?php echo json_encode(t('common.error', [], 'Error')); ?>);
         return;
     }
+
+    var payload = { quota_max_notes: notes, quota_max_storage_mb: storage };
+    if (hasS3Input) payload.quota_max_storage_s3_mb = storageS3;
 
     fetch('/api/v1/admin/users/' + encodeURIComponent(userId), {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ quota_max_notes: notes, quota_max_storage_mb: storage })
+        body: JSON.stringify(payload)
     })
     .then(function (r) { return r.json(); })
     .then(function (data) {

@@ -183,39 +183,32 @@ if ($note_id > 0) {
         if (!is_array($existingAttachments)) $existingAttachments = [];
         
         // Find and remove old Excalidraw preview image
-        $attachmentsPath = getAttachmentsPath();
         $oldAttachmentId = null;
-        
+
         // Extract old attachment ID from existing HTML
         if (!empty($existing_content) && preg_match('/<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9._-]+)"[^>]*data-is-excalidraw="true"/', $existing_content, $matches)) {
             $oldAttachmentId = $matches[1];
         }
-        
+
         // Remove old attachment if found
         if ($oldAttachmentId) {
             $updatedAttachments = [];
             foreach ($existingAttachments as $attachment) {
                 if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
-                    // Delete the old file
-                    $oldFilePath = $attachmentsPath . '/' . $attachment['filename'];
-                    if (file_exists($oldFilePath)) {
-                        @unlink($oldFilePath);
-                    }
+                    // Delete the old file (local disk or S3 bucket)
+                    poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
                 } else {
                     $updatedAttachments[] = $attachment;
                 }
             }
             $existingAttachments = $updatedAttachments;
         }
-        
+
         // Save new image as attachment
         $extension = ($mime_type === 'image/png') ? 'png' : (($mime_type === 'image/jpeg') ? 'jpg' : 'gif');
         $attachmentFilename = $attachmentId . '_' . time() . '.' . $extension;
-        $filePath = $attachmentsPath . '/' . $attachmentFilename;
-        
-        if (file_put_contents($filePath, $image_data) !== false) {
-            chmod($filePath, 0644);
-            
+
+        if (poznoteStoreAttachmentContent($image_data, $attachmentFilename, $mime_type)) {
             // Add to attachments list
             $existingAttachments[] = [
                 'id' => $attachmentId,
@@ -366,7 +359,6 @@ function saveEmbeddedDiagram() {
                 if (!is_array($existingAttachments)) $existingAttachments = [];
                 
                 // Find and remove old Excalidraw image for this diagram
-                $attachmentsPath = getAttachmentsPath();
                 $oldAttachmentId = null;
                 
                 // Extract old attachment ID from existing HTML for this specific diagram
@@ -382,11 +374,8 @@ function saveEmbeddedDiagram() {
                     $updatedAttachments = [];
                     foreach ($existingAttachments as $attachment) {
                         if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
-                            // Delete the old file
-                            $oldFilePath = $attachmentsPath . '/' . $attachment['filename'];
-                            if (file_exists($oldFilePath)) {
-                                @unlink($oldFilePath);
-                            }
+                            // Delete the old file (local disk or S3 bucket)
+                            poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
                         } else {
                             $updatedAttachments[] = $attachment;
                         }
@@ -397,11 +386,8 @@ function saveEmbeddedDiagram() {
                 // Save new image as attachment
                 $attachmentId = uniqid();
                 $filename = $attachmentId . '_' . time() . '.png';
-                $filePath = $attachmentsPath . '/' . $filename;
-                
-                if (file_put_contents($filePath, $image_data) !== false) {
-                    chmod($filePath, 0644);
-                    
+
+                if (poznoteStoreAttachmentContent($image_data, $filename, 'image/png')) {
                     // Add to attachments list
                     $existingAttachments[] = [
                         'id' => $attachmentId,

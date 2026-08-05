@@ -18,11 +18,13 @@ class SettingsController {
         'custom_css_path',
         'git_sync_enabled',
         'tenant_isolation',
+        'tenant_isolation_features',
         'tenant_isolation_applied_ui_keys',
         'import_max_individual_files',
         'import_max_zip_files',
         'user_max_notes',
         'user_max_storage_mb',
+        'user_max_storage_s3_mb',
         'mcp_user_id',
         'mcp_default_workspace',
         'mcp_debug',
@@ -98,6 +100,28 @@ class SettingsController {
 
         if ($key === 'git_sync_enabled' || $key === 'tenant_isolation') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
+        if ($key === 'tenant_isolation_features') {
+            // JSON array of blocked feature keys; '[]' means isolation off.
+            $raw = is_string($value) ? trim($value) : $value;
+            if ($raw === '' || $raw === null || $raw === '[]') {
+                return '[]';
+            }
+            $decoded = json_decode((string) $raw, true);
+            if (!is_array($decoded)) {
+                throw new InvalidArgumentException('value must be a JSON array of feature keys', 400);
+            }
+            $allowedFeatures = ['user_sharing', 'user_webhooks'];
+            $features = [];
+            foreach ($decoded as $feature) {
+                if (!is_string($feature) || !in_array($feature, $allowedFeatures, true)) {
+                    throw new InvalidArgumentException('unknown tenant isolation feature', 400);
+                }
+                $features[$feature] = true;
+            }
+            // Stable order regardless of how the client sent them.
+            return json_encode(array_values(array_intersect($allowedFeatures, array_keys($features))));
         }
 
         if ($key === 'note_color_palette') {
@@ -177,7 +201,7 @@ class SettingsController {
             return (string) $intVal;
         }
 
-        if ($key === 'user_max_notes' || $key === 'user_max_storage_mb') {
+        if ($key === 'user_max_notes' || $key === 'user_max_storage_mb' || $key === 'user_max_storage_s3_mb') {
             $intVal = (int) $value;
             if ($intVal < 0 || $intVal > 100000000) {
                 throw new InvalidArgumentException('value must be between 0 and 100000000', 400);

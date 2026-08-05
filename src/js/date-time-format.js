@@ -112,6 +112,83 @@
         return month + '/' + day + '/' + year + ' ' + hours12 + ':' + minutes + ' ' + (isPm ? 'PM' : 'AM');
     }
 
+    // Split a custom pattern into date and time halves: whitespace-separated
+    // segments containing a date token belong to the date part, the remaining
+    // segments with time tokens form the time part.
+    function splitCustomPattern(pattern) {
+        var segments = normalizeCustomPattern(pattern).split(/\s+/);
+        var dateSegments = [];
+        var timeSegments = [];
+
+        segments.forEach(function (segment) {
+            if (/YYYY|YY|MM|DD/.test(segment)) {
+                dateSegments.push(segment);
+            } else if (/HH|hh|h|mm|ss|SS|A|a/.test(segment)) {
+                timeSegments.push(segment);
+            }
+        });
+
+        return {
+            date: dateSegments.join(' '),
+            time: timeSegments.join(' ')
+        };
+    }
+
+    function formatDateOnly(value, options) {
+        var opts = options || {};
+        var date = parseDate(value, opts);
+        if (!date) {
+            return value ? String(value) : '';
+        }
+
+        var format = getConfiguredFormat();
+        if (format.indexOf('custom:') === 0) {
+            var datePattern = splitCustomPattern(format.slice(7)).date;
+            return datePattern ? formatCustomPattern(date, datePattern) : formatDateTime(value, opts);
+        }
+
+        var year = date.getFullYear();
+        var month = pad(date.getMonth() + 1);
+        var day = pad(date.getDate());
+
+        if (format === 'dmy_hi') {
+            return day + '/' + month + '/' + year;
+        }
+        if (format === 'mdy_hia') {
+            return month + '/' + day + '/' + year;
+        }
+        return year + '-' + month + '-' + day;
+    }
+
+    function formatTimeOnly(value, options) {
+        var opts = options || {};
+        var date = parseDate(value, opts);
+        if (!date) {
+            return value ? String(value) : '';
+        }
+
+        var format = getConfiguredFormat();
+        if (format.indexOf('custom:') === 0) {
+            var timePattern = splitCustomPattern(format.slice(7)).time;
+            return timePattern ? formatCustomPattern(date, timePattern) : formatDateTime(value, opts);
+        }
+
+        var hours24 = pad(date.getHours());
+        var minutes = pad(date.getMinutes());
+
+        if (format === 'ymd_his') {
+            return hours24 + ':' + minutes + ':' + pad(date.getSeconds());
+        }
+        if (format === 'mdy_hia') {
+            var isPm = date.getHours() >= 12;
+            var hours12 = pad((date.getHours() % 12) || 12);
+            return hours12 + ':' + minutes + ' ' + (isPm ? 'PM' : 'AM');
+        }
+        return hours24 + ':' + minutes;
+    }
+
     window.poznoteGetDateTimeFormat = getConfiguredFormat;
     window.poznoteFormatDateTime = formatDateTime;
+    window.poznoteFormatDateOnly = formatDateOnly;
+    window.poznoteFormatTimeOnly = formatTimeOnly;
 })();

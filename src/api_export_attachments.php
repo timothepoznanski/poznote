@@ -126,9 +126,10 @@ if ($queryResult) {
 }
 
 // Add physical files to ZIP
+$addedToZip = [];
 if ($attachmentsPath && is_dir($attachmentsPath)) {
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($attachmentsPath), 
+        new RecursiveDirectoryIterator($attachmentsPath),
         RecursiveIteratorIterator::LEAVES_ONLY
     );
 
@@ -136,14 +137,32 @@ if ($attachmentsPath && is_dir($attachmentsPath)) {
         if (!$file->isDir()) {
             $filePath = $file->getRealPath();
             $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
-            
+
             // Skip hidden files like .gitkeep
             if (!str_starts_with($relativePath, '.')) {
                 if (file_exists($filePath) && is_readable($filePath)) {
                     $zip->addFile($filePath, 'files/' . $relativePath);
+                    $addedToZip[$relativePath] = true;
                     $attachmentCount++;
                 }
             }
+        }
+    }
+}
+
+// S3 mode: fetch the attachments referenced in the database from the bucket
+// (files still on disk, e.g. not yet migrated, were already added above)
+if (poznoteAttachmentsAreRemote()) {
+    foreach ($metadataInfo as $info) {
+        $filename = $info['attachment_data']['filename'] ?? '';
+        if ($filename === '' || isset($addedToZip[$filename])) {
+            continue;
+        }
+        $localCopy = poznoteAttachmentLocalFile($filename);
+        if ($localCopy !== null) {
+            $zip->addFile($localCopy, 'files/' . $filename);
+            $addedToZip[$filename] = true;
+            $attachmentCount++;
         }
     }
 }

@@ -551,8 +551,18 @@ class GitSync {
      * @param string $message Commit message
      * @return array Result
      */
+    /**
+     * When attachments live in an S3 bucket, Git sync leaves them alone:
+     * they are not on disk, and binary files do not belong in the repo.
+     */
+    private function attachmentsInS3(): bool {
+        require_once __DIR__ . '/storage/AttachmentStorage.php';
+        return AttachmentStorage::isEnabled();
+    }
+
     public function pushAttachment($filename, $message = '') {
         if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
+        if ($this->attachmentsInS3()) return ['success' => true, 'skipped' => true, 'reason' => 's3_storage'];
         try {
             require_once __DIR__ . '/functions.php';
             $attachmentsPath = getAttachmentsPath();
@@ -573,6 +583,7 @@ class GitSync {
      */
     public function deleteAttachmentInGit($filename, $message = '') {
         if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
+        if ($this->attachmentsInS3()) return ['success' => true, 'skipped' => true, 'reason' => 's3_storage'];
         try {
             return $this->deleteFile('attachments/' . $filename, $message ?: "Deleted attachment: {$filename}");
         } catch (Exception $e) {
@@ -646,6 +657,9 @@ class GitSync {
             // ── 2. Scan local directories ──
             $entryFiles      = is_dir($entriesPath)     ? array_values(array_filter(array_diff(scandir($entriesPath),     ['.', '..']), fn($f) => is_file($entriesPath     . '/' . $f))) : [];
             $attachmentFiles = is_dir($attachmentsPath) ? array_values(array_filter(array_diff(scandir($attachmentsPath), ['.', '..']), fn($f) => is_file($attachmentsPath . '/' . $f))) : [];
+            // S3 mode: attachments are out of Git sync's scope entirely
+            $skipAttachments = $this->attachmentsInS3();
+            if ($skipAttachments) $attachmentFiles = [];
 
             $expectedPathSet = ['metadata.json' => true];
             foreach ($entryFiles as $filename) {
@@ -657,6 +671,12 @@ class GitSync {
 
             $orphanPaths = [];
             foreach ($shaMap as $remotePath => $_sha) {
+                // In S3 mode, repo attachments are not orphans: the local
+                // directory is empty by design, deleting them would destroy
+                // the repo's history of pre-migration attachments.
+                if ($skipAttachments && strpos($remotePath, 'attachments/') === 0) {
+                    continue;
+                }
                 if (!isset($expectedPathSet[$remotePath])) {
                     $orphanPaths[$remotePath] = $_sha;
                 }
@@ -831,7 +851,10 @@ class GitSync {
                     $ext = pathinfo($path, PATHINFO_EXTENSION);
                     if (in_array($ext, self::SUPPORTED_NOTE_EXTENSIONS)) $noteFiles[] = $path;
                 } elseif (strpos($path, 'attachments/') === 0) {
-                    $attachmentFiles[] = $path;
+                    // S3 mode: do not pull attachments back onto local disk
+                    if (!$this->attachmentsInS3()) {
+                        $attachmentFiles[] = $path;
+                    }
                 }
             }
 

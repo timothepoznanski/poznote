@@ -162,15 +162,12 @@ class TrashController {
                     @unlink($filePath);
                 }
                 
-                // Delete attachment files
+                // Delete attachment files (local disk or S3 bucket)
                 $attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
                 if (is_array($attachments) && !empty($attachments)) {
                     foreach ($attachments as $attachment) {
                         if (isset($attachment['filename'])) {
-                            $attachmentFile = getAttachmentsPath() . '/' . $attachment['filename'];
-                            if (file_exists($attachmentFile)) {
-                                @unlink($attachmentFile);
-                            }
+                            poznoteDeleteAttachmentFile($attachment['filename']);
                         }
                     }
                 }
@@ -238,14 +235,11 @@ class TrashController {
             $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
             $noteType = $note['type'] ?? 'note';
             
-            // Delete attachment files
+            // Delete attachment files (local disk or S3 bucket)
             if (is_array($attachments) && !empty($attachments)) {
                 foreach ($attachments as $attachment) {
                     if (isset($attachment['filename'])) {
-                        $attachmentFile = getAttachmentsPath() . '/' . $attachment['filename'];
-                        if (file_exists($attachmentFile)) {
-                            @unlink($attachmentFile);
-                        }
+                        poznoteDeleteAttachmentFile($attachment['filename']);
                     }
                 }
             }

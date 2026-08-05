@@ -13,6 +13,9 @@ require_once 'version_helper.php';
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());
 
+require_once __DIR__ . '/storage/AttachmentStorage.php';
+$s3StorageEnabled = AttachmentStorage::isEnabled();
+
 $message = '';
 $error = '';
 
@@ -38,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $selectedUserId = $currentUserId;
             }
             
-            $result = createCompleteBackup($selectedUserId);
+            $result = createCompleteBackup($selectedUserId, !empty($_POST['skip_s3_attachments']));
             // createCompleteBackup() handles download directly, so we only get here on error
             if (!$result['success']) {
                 $error = t('backup_export.errors.complete_backup_error', ['error' => $result['error']]);
@@ -99,7 +102,7 @@ function generateSQLDumpForConnection($con) {
     return $sql;
 }
 
-function createCompleteBackup($userId = null) {
+function createCompleteBackup($userId = null, $skipS3Attachments = false) {
     // Use current user if no userId specified
     if ($userId === null) {
         $userId = getCurrentUserId();
@@ -307,40 +310,41 @@ function createCompleteBackup($userId = null) {
     
     // Add attachments from user's data
     $attachmentsPath = $userDataManager->getUserAttachmentsPath();
-    if ($attachmentsPath && is_dir($attachmentsPath)) {
-        // Build a mapping from attachment filenames to IDs for proper naming in ZIP
-        $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
-        $attachmentsQueryResult = $tempCon->query($query);
-        $filenameToIdMap = [];
-        
-        if ($attachmentsQueryResult) {
-            while ($row = $attachmentsQueryResult->fetch(PDO::FETCH_ASSOC)) {
-                $attachments = json_decode($row['attachments'], true);
-                if (is_array($attachments)) {
-                    foreach ($attachments as $attachment) {
-                        if (isset($attachment['id']) && isset($attachment['filename'])) {
-                            $filenameToIdMap[$attachment['filename']] = $attachment['id'];
-                        }
+    // Build a mapping from attachment filenames to IDs for proper naming in ZIP
+    $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+    $attachmentsQueryResult = $tempCon->query($query);
+    $filenameToIdMap = [];
+
+    if ($attachmentsQueryResult) {
+        while ($row = $attachmentsQueryResult->fetch(PDO::FETCH_ASSOC)) {
+            $attachments = json_decode($row['attachments'], true);
+            if (is_array($attachments)) {
+                foreach ($attachments as $attachment) {
+                    if (isset($attachment['id']) && isset($attachment['filename'])) {
+                        $filenameToIdMap[$attachment['filename']] = $attachment['id'];
                     }
                 }
             }
         }
-        
+    }
+
+    $addedAttachmentFiles = [];
+    if ($attachmentsPath && is_dir($attachmentsPath)) {
         $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($attachmentsPath), 
+            new RecursiveDirectoryIterator($attachmentsPath),
             RecursiveIteratorIterator::LEAVES_ONLY
         );
-        
+
         foreach ($files as $name => $file) {
             if (!$file->isDir()) {
                 $filePath = $file->getRealPath();
                 $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
-                
+
                 // Skip hidden files
                 if (!str_starts_with($relativePath, '.')) {
                     // Get the base filename
                     $filename = basename($relativePath);
-                    
+
                     // If this file is mapped to an attachment ID, use ID.ext as the name in the ZIP
                     if (isset($filenameToIdMap[$filename])) {
                         $attachmentId = $filenameToIdMap[$filename];
@@ -351,11 +355,31 @@ function createCompleteBackup($userId = null) {
                         // Otherwise, just add it with its original name (shouldn't normally happen)
                         $zip->addFile($filePath, 'attachments/' . $relativePath);
                     }
+                    $addedAttachmentFiles[$filename] = true;
                 }
             }
         }
     }
-    
+
+    // S3 mode: fetch the exported user's remaining attachments from the
+    // bucket, unless the lighter-zip option was checked. The metadata file
+    // below lists them either way; a full archive can be rebuilt later by
+    // dropping the files from the attachments export into attachments/.
+    require_once __DIR__ . '/storage/AttachmentStorage.php';
+    $exportStorage = AttachmentStorage::forUser((int)$userId);
+    if ($exportStorage->isRemote() && !$skipS3Attachments) {
+        foreach ($filenameToIdMap as $filename => $attachmentId) {
+            if (isset($addedAttachmentFiles[$filename])) {
+                continue;
+            }
+            $localCopy = $exportStorage->localFile($filename);
+            if ($localCopy !== null) {
+                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+                $zip->addFile($localCopy, 'attachments/' . $attachmentId . ($ext ? '.' . $ext : ''));
+            }
+        }
+    }
+
     // Add metadata file for attachments using user's database
     $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
     $queryResult = $tempCon->query($query);
@@ -588,9 +612,17 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
                             ?>
                         </select>
                     </div>
-                    <br>
+                    <?php if (!$s3StorageEnabled): ?><br><?php endif; ?>
                 <?php else: ?>
                     <input type="hidden" name="selected_user_id" value="<?php echo getCurrentUserId(); ?>">
+                <?php endif; ?>
+                <?php if ($s3StorageEnabled): ?>
+                    <div class="form-group form-group-export export-checkbox-group">
+                        <label class="export-checkbox-label">
+                            <input type="checkbox" name="skip_s3_attachments" value="1" id="completeBackupSkipS3">
+                            <?php echo t_h('backup_export.common.skip_s3_attachments', [], 'Do not include S3 attachments in the zip (lighter archive)'); ?>
+                        </label>
+                    </div>
                 <?php endif; ?>
                 <button id="completeBackupBtn" type="submit" class="btn btn-primary">
                     <span><?php echo t_h('backup_export.buttons.download_complete_backup'); ?></span>
@@ -622,11 +654,34 @@ function convertMarkdownApiUrlsToRelativePaths($markdown, $attachmentExtensions,
                 </select>
             </div>
             
+            <?php if ($s3StorageEnabled): ?>
+                <div class="form-group form-group-export export-checkbox-group">
+                    <label class="export-checkbox-label">
+                        <input type="checkbox" id="structuredExportSkipS3">
+                        <?php echo t_h('backup_export.common.skip_s3_attachments', [], 'Do not include S3 attachments in the zip (lighter archive)'); ?>
+                    </label>
+                </div>
+            <?php endif; ?>
             <button id="structuredExportBtn" type="button" class="btn btn-primary">
                 <span><?php echo t_h('backup_export.buttons.download_structured_export'); ?></span>
             </button>
         </div>
-        
+
+        <!-- Attachments Export Section -->
+        <div class="backup-section">
+            <h3><?php echo t_h('backup_export.sections.attachments_export.title', [], 'Attachments Export'); ?></h3>
+            <p>
+                <?php echo t_h('backup_export.sections.attachments_export.description', [], 'Download all the attachments of your account in a single ZIP archive.'); ?>
+                <?php if ($s3StorageEnabled): ?>
+                    <br><br>
+                    <?php echo t_h('backup_export.sections.attachments_export.description_s3', [], 'With S3 storage enabled, the files are fetched from the bucket; use this archive to add the missing files to a backup made without S3 attachments before restoring it.'); ?>
+                <?php endif; ?>
+            </p>
+            <button id="attachmentsExportBtn" type="button" class="btn btn-primary">
+                <span><?php echo t_h('backup_export.buttons.download_attachments_export', [], 'Download attachments (ZIP)'); ?></span>
+            </button>
+        </div>
+
         <!-- Bottom padding for better spacing -->
         <div class="section-bottom-spacer"></div>
     </div>

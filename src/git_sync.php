@@ -244,6 +244,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         <div class="git-sync-header">
             <p class="git-sync-description"><?php echo tp_h('git_sync.description'); ?></p>
+            <?php
+            require_once __DIR__ . '/storage/AttachmentStorage.php';
+            if (AttachmentStorage::isEnabled()): ?>
+                <div class="config-hint">
+                    <i class="lucide lucide-info"></i>
+                    <?php echo t_h('s3_settings.git_sync_note', [], 'Git sync ignores attachments while S3 storage is enabled.'); ?>
+                </div>
+            <?php endif; ?>
         </div>
 
 

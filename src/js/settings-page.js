@@ -131,13 +131,13 @@
             keys.push('import_max_individual_files', 'import_max_zip_files');
         }
         if (document.getElementById('user-quotas-card')) {
-            keys.push('user_max_notes', 'user_max_storage_mb');
+            keys.push('user_max_notes', 'user_max_storage_mb', 'user_max_storage_s3_mb');
         }
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
         }
         if (document.getElementById('tenant-isolation-card')) {
-            keys.push('tenant_isolation', 'tenant_isolation_applied_ui_keys');
+            keys.push('tenant_isolation', 'tenant_isolation_features', 'tenant_isolation_applied_ui_keys');
         }
 
         var unique = Object.create(null);
@@ -984,6 +984,21 @@
                 storageBadge.className = 'setting-status disabled';
             }
         });
+
+        // Only rendered when S3 attachment storage is enabled on the instance
+        var storageS3Badge = document.getElementById('user-quotas-storage-s3-badge');
+        if (storageS3Badge) {
+            getSetting('user_max_storage_s3_mb', function (value) {
+                var count = parseInt(value, 10) || 0;
+                if (count > 0) {
+                    storageS3Badge.textContent = tr('modals.user_quotas.storage_s3_badge', { count: String(count) }, 'S3: ' + count + ' MB');
+                    storageS3Badge.className = 'setting-status enabled';
+                } else {
+                    storageS3Badge.textContent = tr('modals.user_quotas.storage_s3_badge_unlimited', {}, 'S3: unlimited');
+                    storageS3Badge.className = 'setting-status disabled';
+                }
+            });
+        }
     }
 
     function refreshGitSyncEnabledBadge() {
@@ -998,13 +1013,32 @@
         });
     }
 
+    // Blocked tenant isolation features, with the legacy fallback: instances
+    // configured before the feature list existed only had the on/off
+    // tenant_isolation flag, which meant user_sharing.
+    function getTenantIsolationFeatures(callback) {
+        getSetting('tenant_isolation_features', function (rawFeatures) {
+            if (rawFeatures && rawFeatures.trim() !== '') {
+                var features = [];
+                try { features = JSON.parse(rawFeatures); } catch (e) { features = []; }
+                callback(Array.isArray(features) ? features : []);
+                return;
+            }
+
+            getSetting('tenant_isolation', function (rawLegacy) {
+                var legacyOn = rawLegacy === '1' || rawLegacy === 'true';
+                callback(legacyOn ? ['user_sharing'] : []);
+            });
+        });
+    }
+
     function refreshTenantIsolationBadge() {
         var badge = document.getElementById('tenant-isolation-status');
         if (!badge) return;
 
         var txt = getTranslations();
-        getSetting('tenant_isolation', function (value) {
-            var enabled = value === '1' || value === 'true';
+        getTenantIsolationFeatures(function (features) {
+            var enabled = features.length > 0;
             badge.textContent = enabled ? txt.enabled : txt.disabled;
             badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
         });
@@ -1139,17 +1173,37 @@
         });
     }
 
+    function showTenantIsolationModal() {
+        var modal = document.getElementById('tenantIsolationModal');
+        if (!modal) return;
+
+        getTenantIsolationFeatures(function (features) {
+            modal.querySelectorAll('[data-tenant-feature]').forEach(function (checkbox) {
+                checkbox.checked = features.indexOf(checkbox.getAttribute('data-tenant-feature')) !== -1;
+            });
+            modal.style.display = 'flex';
+        });
+    }
+
     function showUserQuotasModal() {
         var modal = document.getElementById('userQuotasModal');
         var notesInput = document.getElementById('userMaxNotesInput');
         var storageInput = document.getElementById('userMaxStorageInput');
+        var storageS3Input = document.getElementById('userMaxStorageS3Input');
         if (!modal || !notesInput || !storageInput) return;
 
         getSetting('user_max_notes', function (notesValue) {
             notesInput.value = String(parseInt(notesValue, 10) || 0);
             getSetting('user_max_storage_mb', function (storageValue) {
                 storageInput.value = String(parseInt(storageValue, 10) || 0);
-                modal.style.display = 'flex';
+                if (!storageS3Input) {
+                    modal.style.display = 'flex';
+                    return;
+                }
+                getSetting('user_max_storage_s3_mb', function (storageS3Value) {
+                    storageS3Input.value = String(parseInt(storageS3Value, 10) || 0);
+                    modal.style.display = 'flex';
+                });
             });
         });
     }
@@ -1645,27 +1699,11 @@
             });
         }
 
-        // Tenant isolation (SaaS mode) global toggle. Enabling it also hides the
-        // controls that became pointless for everyone, so the UI stops offering
-        // what the server now refuses. Turning it back off removes only what the
-        // toggle itself added, leaving the administrator's own choices alone.
+        // Tenant isolation (SaaS mode) - opens the modal listing the
+        // capabilities that can be blocked for non-admin users.
         var tenantIsolationCard = document.getElementById('tenant-isolation-card');
         if (tenantIsolationCard) {
-            tenantIsolationCard.addEventListener('click', function () {
-                getSetting('tenant_isolation', function (currentValue) {
-                    var currently = currentValue === '1' || currentValue === 'true';
-                    var enabling = !currently;
-
-                    setSetting('tenant_isolation', enabling ? '1' : '0', function () {
-                        syncTenantIsolationHiddenKeys(enabling, function () {
-                            refreshTenantIsolationBadge();
-                            refreshUiCustomizationAdminBadge();
-                            refreshUiCustomizationBadge();
-                            reloadOpener();
-                        });
-                    });
-                });
-            });
+            tenantIsolationCard.addEventListener('click', showTenantIsolationModal);
         }
 
         // Tasklist insert order card - toggles between top and bottom
@@ -2210,22 +2248,64 @@
             saveUserQuotasBtn.addEventListener('click', function () {
                 var notesInput = document.getElementById('userMaxNotesInput');
                 var storageInput = document.getElementById('userMaxStorageInput');
+                var storageS3Input = document.getElementById('userMaxStorageS3Input');
                 var notesVal = notesInput ? parseInt(notesInput.value, 10) : 0;
                 var storageVal = storageInput ? parseInt(storageInput.value, 10) : 0;
+                var storageS3Val = storageS3Input ? parseInt(storageS3Input.value, 10) : 0;
 
-                if (isNaN(notesVal) || notesVal < 0 || notesVal > 100000000 || isNaN(storageVal) || storageVal < 0 || storageVal > 100000000) {
+                if (isNaN(notesVal) || notesVal < 0 || notesVal > 100000000 ||
+                    isNaN(storageVal) || storageVal < 0 || storageVal > 100000000 ||
+                    isNaN(storageS3Val) || storageS3Val < 0 || storageS3Val > 100000000) {
                     alert(tr('common.error', {}, 'Error'));
                     return;
                 }
 
                 setSetting('user_max_notes', String(notesVal), function (s1) {
                     setSetting('user_max_storage_mb', String(storageVal), function (s2) {
-                        if (s1 && s2) {
-                            try { closeModal('userQuotasModal'); } catch (e) { }
-                            refreshUserQuotasBadges();
-                        } else {
-                            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                        }
+                        setSetting('user_max_storage_s3_mb', String(storageS3Val), function (s3ok) {
+                            if (s1 && s2 && s3ok) {
+                                try { closeModal('userQuotasModal'); } catch (e) { }
+                                refreshUserQuotasBadges();
+                            } else {
+                                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        // Save tenant isolation modal button
+        var saveTenantIsolationBtn = document.getElementById('saveTenantIsolationBtn');
+        if (saveTenantIsolationBtn) {
+            saveTenantIsolationBtn.addEventListener('click', function () {
+                var modal = document.getElementById('tenantIsolationModal');
+                if (!modal) return;
+
+                var features = [];
+                modal.querySelectorAll('[data-tenant-feature]').forEach(function (checkbox) {
+                    if (checkbox.checked) {
+                        features.push(checkbox.getAttribute('data-tenant-feature'));
+                    }
+                });
+
+                setSetting('tenant_isolation_features', JSON.stringify(features), function (ok) {
+                    if (!ok) {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        return;
+                    }
+
+                    // Legacy on/off flag, kept meaning "user_sharing blocked"
+                    // for the pre-existing server checks and older releases.
+                    var legacyValue = features.indexOf('user_sharing') !== -1 ? '1' : '0';
+                    setSetting('tenant_isolation', legacyValue, function () {
+                        syncTenantIsolationHiddenKeys(features, function () {
+                            try { closeModal('tenantIsolationModal'); } catch (e) { }
+                            refreshTenantIsolationBadge();
+                            refreshUiCustomizationAdminBadge();
+                            refreshUiCustomizationBadge();
+                            reloadOpener();
+                        });
                     });
                 });
             });
@@ -2664,16 +2744,28 @@
             });
     }
 
-    // UI keys that tenant isolation hides for every user. They are only the
-    // cosmetic half: the server refuses these actions regardless, so unchecking
-    // one by hand re-displays a control that still fails with a 403.
-    var TENANT_ISOLATION_HIDDEN_KEYS = ['share:restrict-users'];
+    // UI keys hidden for every user per blocked tenant isolation feature.
+    // They are only the cosmetic half: the server refuses these actions
+    // regardless, so unchecking one by hand re-displays a control that still
+    // fails with a 403.
+    var TENANT_ISOLATION_FEATURE_HIDDEN_KEYS = {
+        'user_sharing': ['share:restrict-users'],
+        'user_webhooks': ['card:user-webhooks-card']
+    };
 
-    // Records which keys this toggle added, so disabling isolation removes those
-    // and not the ones the administrator had already hidden on purpose.
+    // Records which keys the tenant isolation modal added, so unblocking a
+    // feature removes those and not the ones the administrator had already
+    // hidden on purpose.
     var TENANT_ISOLATION_APPLIED_SETTING = 'tenant_isolation_applied_ui_keys';
 
-    function syncTenantIsolationHiddenKeys(enabling, done) {
+    function syncTenantIsolationHiddenKeys(blockedFeatures, done) {
+        var desiredKeys = [];
+        Object.keys(TENANT_ISOLATION_FEATURE_HIDDEN_KEYS).forEach(function (feature) {
+            if (blockedFeatures.indexOf(feature) !== -1) {
+                desiredKeys = desiredKeys.concat(TENANT_ISOLATION_FEATURE_HIDDEN_KEYS[feature]);
+            }
+        });
+
         getSetting('hidden_ui_elements_global', function (rawGlobal) {
             getSetting(TENANT_ISOLATION_APPLIED_SETTING, function (rawApplied) {
                 var hidden = parseHiddenUiCustomization(rawGlobal);
@@ -2681,26 +2773,23 @@
                 try { applied = JSON.parse(rawApplied || '[]'); } catch (e) { applied = []; }
                 if (!Array.isArray(applied)) applied = [];
 
+                // Drop what a previous sync added, then re-add what the current
+                // selection needs: keys the admin hid on purpose are never
+                // claimed, so unblocking a feature leaves them hidden.
+                var previouslyApplied = Object.create(null);
+                applied.forEach(function (key) { previouslyApplied[key] = true; });
+                hidden = hidden.filter(function (key) { return !previouslyApplied[key]; });
+
                 var present = Object.create(null);
                 hidden.forEach(function (key) { present[key] = true; });
 
-                var nextApplied;
-                if (enabling) {
-                    // Only claim the keys we actually add: one already hidden by
-                    // the admin must stay hidden when isolation is turned off.
-                    nextApplied = TENANT_ISOLATION_HIDDEN_KEYS.filter(function (key) {
-                        return !present[key];
-                    });
-                    nextApplied.forEach(function (key) {
-                        hidden.push(key);
-                        present[key] = true;
-                    });
-                } else {
-                    var toRemove = Object.create(null);
-                    applied.forEach(function (key) { toRemove[key] = true; });
-                    hidden = hidden.filter(function (key) { return !toRemove[key]; });
-                    nextApplied = [];
-                }
+                var nextApplied = desiredKeys.filter(function (key) {
+                    return !present[key];
+                });
+                nextApplied.forEach(function (key) {
+                    hidden.push(key);
+                    present[key] = true;
+                });
 
                 setSetting('hidden_ui_elements_global', JSON.stringify(hidden), function () {
                     setSetting(TENANT_ISOLATION_APPLIED_SETTING, JSON.stringify(nextApplied), function () {

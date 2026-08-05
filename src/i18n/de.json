@@ -369,7 +369,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "SaaS-Modus: Verhindert, dass Benutzer ohne Administratorrechte die anderen Konten der Instanz entdecken. Das Benutzerverzeichnis ist nur für Administratoren zugänglich und die Freigabe an bestimmte Benutzer wird abgelehnt. Für Familien- oder Teaminstanzen deaktiviert lassen.",
+      "tenant_isolation": "SaaS-Modus: Wählen Sie, welche Funktionen für Benutzer ohne Administratorrechte blockiert werden, etwa das Entdecken der anderen Konten der Instanz oder das Registrieren persönlicher Webhooks. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
@@ -429,7 +429,8 @@
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
       "website": "Öffnen Sie die offizielle Poznote-Website.",
-      "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende."
+      "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
+      "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -492,7 +493,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Webhooks",
-      "ai_assistant": "KI-Assistent"
+      "ai_assistant": "KI-Assistent",
+      "s3_storage": "S3-Speicher"
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -739,7 +741,7 @@
     "clear_completed": "Erledigte Aufgaben löschen",
     "no_completed_tasks": "Keine erledigten Aufgaben zum Löschen.",
     "confirm_clear_completed": "{{count}} erledigte Aufgabe(n) löschen?",
-    "move_to_list": "In eine andere Liste verschieben",
+    "move_to_list": "In andere Liste verschieben",
     "move_success": "Aufgabe verschoben",
     "move_error": "Aufgabe konnte nicht verschoben werden",
     "actions": "Aufgabenlisten-Aktionen",
@@ -749,7 +751,15 @@
     "edit_task": "Aufgabe bearbeiten",
     "edit_text_label": "Aufgabentext",
     "edit_hint": "Enter fügt eine neue Zeile hinzu. Strg+Enter speichert.",
-    "edit_empty_error": "Der Aufgabentext darf nicht leer sein."
+    "edit_empty_error": "Der Aufgabentext darf nicht leer sein.",
+    "due_date": "Fälligkeitsdatum",
+    "due_remove": "Datum entfernen",
+    "due_remove_time": "Uhrzeit entfernen",
+    "mark_important": "Als wichtig markieren",
+    "unmark_important": "Wichtig-Markierung entfernen",
+    "task_options": "Aufgabenoptionen",
+    "remind_me": "Erinnere mich",
+    "remind_me_hint": "Eine Benachrichtigung wird zum Fälligkeitstermin ausgelöst."
   },
   "tags": {
     "add_single": "Tag hinzufügen...",
@@ -983,11 +993,14 @@
       "title": "Benutzerkontingente",
       "description": "Anzahl der Notizen und Speicherplatz pro Benutzer begrenzen. 0 bedeutet unbegrenzt. Administratoren sind nicht eingeschränkt. Auf der Seite der Speicherstatistiken können Sie diese Limits pro Benutzer überschreiben.",
       "max_notes": "Max. Notizen pro Benutzer",
-      "max_storage": "Max. Speicher pro Benutzer (MB)",
+      "max_storage": "Max. lokaler Speicher pro Benutzer (MB)",
       "notes_badge": "Notizen: {{count}}",
       "notes_badge_unlimited": "Notizen: unbegrenzt",
       "storage_badge": "Speicher: {{count}} MB",
-      "storage_badge_unlimited": "Speicher: unbegrenzt"
+      "storage_badge_unlimited": "Speicher: unbegrenzt",
+      "max_storage_s3": "Max. S3-Speicher pro Benutzer (MB)",
+      "storage_s3_badge": "S3: {{count}} MB",
+      "storage_s3_badge_unlimited": "S3: unbegrenzt"
     },
     "ui_customization": {
       "title": "Oberfläche anpassen",
@@ -1001,6 +1014,7 @@
       "dashboard_filter_bar": "Filterleiste",
       "view_layout_toggle": "Umschalter Raster / Liste",
       "index_search_bar": "Suchleiste",
+      "tasklist_progress_bar": "Fortschrittsbalken der Aufgabenlisten",
       "share_restrict_users": "Teilen: auf bestimmte Benutzer beschränken",
       "share_protocol_toggle": "Teilen: HTTPS-Schalter",
       "share_shared_with_me": "Teilen: „Mit mir geteilt“",
@@ -1344,6 +1358,24 @@
       "move": "Ordner verschieben",
       "workspace": "Ziel-Workspace",
       "parent": "Ziel-Überordner"
+    },
+    "tenant_isolation": {
+      "title": "Mandantentrennung",
+      "description": "Blockiert die angehakten Funktionen für Benutzer ohne Administratorrechte (SaaS-Modus). Administratoren sind nie betroffen. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
+      "features": {
+        "user_sharing": "Benutzersuche und Freigabe",
+        "user_sharing_help": "Das Benutzerverzeichnis ist nur für Administratoren zugänglich und die Freigabe an bestimmte Benutzer wird abgelehnt.",
+        "user_webhooks": "Benutzer-Webhooks",
+        "user_webhooks_help": "Benutzer ohne Administratorrechte können keine Webhooks mehr registrieren, die Ereignisse über ihre Notizen an externe Dienste senden."
+      }
+    },
+    "quick_task": {
+      "title": "Aufgabe hinzufügen",
+      "text_placeholder": "Was ist zu tun?",
+      "description": "Wählen Sie die Aufgabenliste, zu der diese Aufgabe hinzugefügt werden soll.",
+      "confirm": "Hinzufügen",
+      "adding": "Aufgabe wird hinzugefügt...",
+      "error": "Aufgabe konnte nicht hinzugefügt werden"
     }
   },
   "notes_list": {
@@ -1495,7 +1527,8 @@
     "audio_no_note": "Keine Notiz ausgewählt",
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
-    "date": "Datum"
+    "date": "Datum",
+    "task": "Aufgabe hinzufügen"
   },
   "api": {
     "settings": {
@@ -1512,7 +1545,8 @@
       "invalid_action": "Ungültige Aktion",
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
-      "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)"
+      "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
+      "storage_s3_quota_reached": "S3-Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB S3-Speicher für diesen Benutzer."
     }
   },
   "ui": {
@@ -1646,7 +1680,8 @@
       "title": "Sicherung / Export"
     },
     "common": {
-      "all_workspaces": "alle Arbeitsbereiche"
+      "all_workspaces": "alle Arbeitsbereiche",
+      "skip_s3_attachments": "S3-Anhänge nicht in das ZIP aufnehmen (leichteres Archiv)"
     },
     "sections": {
       "complete_backup": {
@@ -1667,11 +1702,17 @@
         "warning": "Hinweis: Dieser Exporttyp ist nicht für eine perfekte Sicherung von Poznote konzipiert.",
         "select_workspace": "Arbeitsbereich auswählen:",
         "loading_workspaces": "Arbeitsbereiche werden geladen..."
+      },
+      "attachments_export": {
+        "title": "Anhang-Export",
+        "description": "Laden Sie alle Anhänge Ihres Kontos in einem einzigen ZIP-Archiv herunter.",
+        "description_s3": "Bei aktiviertem S3-Speicher werden die Dateien aus dem Bucket geholt; verwenden Sie dieses Archiv, um einem ohne S3-Anhänge erstellten Backup vor der Wiederherstellung die fehlenden Dateien hinzuzufügen."
       }
     },
     "buttons": {
       "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)",
-      "download_structured_export": "Strukturierten Export herunterladen (ZIP)"
+      "download_structured_export": "Strukturierten Export herunterladen (ZIP)",
+      "download_attachments_export": "Anhänge herunterladen (ZIP)"
     },
     "spinner": {
       "preparing": "Sicherung wird vorbereitet...",
@@ -1764,7 +1805,7 @@
       "select_backup_first": "Bitte wählen Sie zuerst eine Sicherungsdatei aus.",
       "restore_error": "Wiederherstellungsfehler: {{error}}",
       "no_backup_file_or_upload": "Keine Sicherungsdatei bereitgestellt oder Upload-Fehler.",
-      "complete_restore_error": "Vollständiger Wiederherstellungsfehler: {{error}} - {{message}}",
+      "complete_restore_error": "Vollständiger Wiederherstellungsfehler: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "Keine vollständige Sicherungsdatei bereitgestellt oder Upload-Fehler.",
       "import_error": "Importfehler: {{error}}",
       "no_notes_file_or_upload": "Keine Notizdatei bereitgestellt oder Upload-Fehler.",
@@ -2817,9 +2858,13 @@
       "user_quota_sentence_none": "Für dieses Konto ist kein Kontingent festgelegt: Notizen und Speicher sind unbegrenzt.",
       "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
       "quota_max_notes_for": "Max. Notizen für {{user}}",
-      "quota_max_storage_for": "Max. Speicher für {{user}} (MB)",
+      "quota_max_storage_for": "Max. lokaler Speicher für {{user}} (MB)",
       "filter_placeholder": "Konten filtern...",
-      "no_accounts": "Keine Konten gefunden."
+      "no_accounts": "Keine Konten gefunden.",
+      "table_attachments_local": "Anhänge lokal (MB)",
+      "table_attachments_s3": "Anhänge S3 (MB)",
+      "quota_max_storage_s3_for": "Max. S3-Speicher für {{user}} (MB)",
+      "table_quota_s3": "Quota (Anzahl / MB lokal / MB S3)"
     }
   },
   "backlinks": {
@@ -3011,7 +3056,7 @@
     "card": "Benutzer-Webhooks",
     "card_help": "Ereignisse Ihrer eigenen Notizen (Erinnerung ausgelöst, Notiz erstellt oder geteilt) per Webhook an externe Dienste wie ntfy oder n8n senden.",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpoint, wenn eine Ihrer Notizen ein abonniertes Ereignis auslöst: eine fällige Erinnerung, eine erstellte oder öffentlich geteilte Notiz. Betroffen sind nur Ihre eigenen Notizen. Ist ein Secret gesetzt, wird der Payload mit HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
-    "access_denied": "Zugriff verweigert. Diese Seite ist dem Hauptkonto vorbehalten."
+    "access_denied": "Zugriff verweigert. Benutzer-Webhooks sind auf dieser Instanz deaktiviert."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3023,11 +3068,11 @@
       "signup_cap_reached": "Eine SSO-Registrierung wurde abgelehnt, weil die Instanz ihre maximale Benutzerzahl erreicht hat. Payload: das Limit sowie der versuchte Benutzername und die E-Mail.",
       "quota_notes_reached": "Eine Aktion wurde blockiert, weil das Notizen-Kontingent des Benutzers erreicht ist. Payload: der Benutzer, das Limit und die aktuelle Anzahl.",
       "quota_storage_reached": "Eine Aktion wurde blockiert, weil das Speicher-Kontingent des Benutzers erreicht ist. Payload: der Benutzer, das Limit und die aktuelle Nutzung.",
-      "reminder_due": "Eine Notiz-Erinnerung des Hauptkontos (Benutzer 1) hat ihren Auslösezeitpunkt erreicht; Erinnerungen anderer Benutzer lösen nie Webhooks aus. Vollständiger Payload: die Notiz (ID, Titel, Workspace, Direktlink) und die Erinnerungsnachricht.",
+      "reminder_due": "Eine Ihrer Notiz-Erinnerungen hat ihren Auslösezeitpunkt erreicht; Erinnerungen anderer Benutzer lösen nie Ihre Webhooks aus. Vollständiger Payload: die Notiz (ID, Titel, Workspace, Direktlink) und die Erinnerungsnachricht.",
       "reminder_due_title": "Gleicher Auslöser wie reminder.due, aber ohne die Erinnerungsnachricht: die IDs plus Titel und Direktlink der Notiz.",
       "reminder_due_minimal": "Gleicher Auslöser wie reminder.due, aber nur IDs (Notiz-ID, Erinnerungs-ID, Auslösezeit): kein Notizinhalt verlässt die Instanz. Details können über die REST-API abgerufen werden.",
-      "note_created": "Im Hauptkonto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
-      "note_shared": "Für eine Notiz des Hauptkontos wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist."
+      "note_created": "In Ihrem Konto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
+      "note_shared": "Für eine Ihrer Notizen wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist."
     },
     "title": "Webhooks",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpunkt, wenn ein abonniertes Ereignis eintritt. Ist ein Secret gesetzt, wird die Payload per HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
@@ -3116,7 +3161,10 @@
       "repeat_days": "Tag(e)",
       "repeat_weeks": "Woche(n)",
       "repeat_months": "Monat(e)",
-      "repeat_years": "Jahr(e)"
+      "repeat_years": "Jahr(e)",
+      "date_placeholder": "Datum",
+      "time_placeholder": "Uhrzeit",
+      "no_date_configured": "Kein Datum festgelegt"
     }
   },
   "settings_password": {
@@ -3252,5 +3300,64 @@
     "manage_link": "Benutzer verwalten: {{url}}",
     "manage_button": "Benutzer verwalten",
     "footer": "Sie erhalten diese E-Mail, weil Benachrichtigungen über neue Benutzer für Ihr Administratorkonto aktiviert sind."
+  },
+  "tasks_page": {
+    "title": "Aufgaben",
+    "progress": "{{completed}} von {{total}} Aufgaben erledigt",
+    "filter_all": "Alle",
+    "filter_open": "Offen",
+    "filter_important": "Wichtig",
+    "filter_overdue": "Überfällig",
+    "filter_dated": "Mit Datum",
+    "filter_completed": "Erledigt",
+    "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
+    "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz, um zu beginnen.",
+    "empty_filtered": "Keine Aufgaben entsprechen diesem Filter.",
+    "add_task": "Aufgabe hinzufügen",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen"
+  },
+  "s3_settings": {
+    "title": "S3-Speicher für Anhänge",
+    "description": "Speichern Sie Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte.",
+    "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz.",
+    "attachments_only_note": "Es sind nur die Anhang-Dateien betroffen.",
+    "config_title": "Konfiguration",
+    "enable_label": "Anhänge in S3 speichern",
+    "enable_description": "Neue Anhänge werden in den Bucket geschrieben. Dateien auf der lokalen Festplatte funktionieren weiterhin und können unten migriert werden.",
+    "endpoint_label": "Endpoint-URL",
+    "endpoint_description": "Basis-URL der S3-API. Beispiele: https://s3.amazonaws.com, http://minio:9000, https://<account>.r2.cloudflarestorage.com",
+    "region_label": "Region",
+    "region_description": "Für MinIO/Garage und Anbieter, die die Region ignorieren, \"us-east-1\" belassen.",
+    "bucket_label": "Bucket",
+    "access_key_label": "Access Key",
+    "secret_key_label": "Secret Key",
+    "path_style_label": "Path-Style-Adressierung",
+    "path_style_description": "Für MinIO, Garage und die meisten selbst gehosteten Server aktiviert lassen. Nur deaktivieren, wenn Ihr Anbieter Virtual-Host-Style (bucket.endpoint) verlangt.",
+    "test": "Verbindung testen",
+    "save": "Konfiguration speichern",
+    "testing": "Verbindung wird getestet...",
+    "test_success": "Verbindung erfolgreich, der Bucket ist erreichbar.",
+    "test_failure": "Verbindung fehlgeschlagen: {{error}}",
+    "migration_title": "Migration",
+    "migration_description": "Verschieben Sie vorhandene Anhänge zwischen lokaler Festplatte und Bucket, für alle Benutzer der Instanz. Die Migration läuft in Stapeln und kann gefahrlos unterbrochen und fortgesetzt werden.",
+    "status_local": "Auf lokaler Festplatte",
+    "status_remote": "Im Bucket",
+    "status_unavailable": "nicht verfügbar",
+    "files_unit": "{{count}} Datei(en), {{size}}",
+    "migrate_to_s3": "Lokale Dateien nach S3 migrieren",
+    "migrate_to_local": "Dateien zurück auf die lokale Festplatte holen",
+    "migrating": "Migration läuft... {{moved}} Datei(en) verschoben, {{remaining}} verbleibend",
+    "migration_done": "Migration abgeschlossen: {{moved}} Datei(en) verschoben.",
+    "migration_error": "Migration nach einem Fehler gestoppt: {{error}}",
+    "confirm_to_s3": "Alle lokalen Anhang-Dateien (alle Benutzer) in den Bucket verschieben?",
+    "confirm_to_local": "Alle Bucket-Anhänge zurück auf die lokale Festplatte laden (alle Benutzer)?",
+    "footer_note": "Anhänge werden unter attachments/{Benutzer-ID}/ im Bucket gespeichert und immer über Poznote ausgeliefert (der Bucket kann privat bleiben).",
+    "messages": {
+      "saved": "Konfiguration erfolgreich gespeichert.",
+      "save_error": "Konfiguration konnte nicht gespeichert werden.",
+      "incomplete": "Endpoint, Bucket und Zugangsdaten sind erforderlich, um den S3-Speicher zu aktivieren."
+    },
+    "git_sync_note": "Git-Sync ignoriert Anhänge, solange der S3-Speicher aktiviert ist."
   }
 }

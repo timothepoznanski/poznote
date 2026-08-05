@@ -17,6 +17,44 @@
     min-width: 16px;
 }
 
+/* Completion progress bar at the top of a tasklist note (same look as the
+   global tasks page). Selectors are scoped under .noteentry so margins and
+   the label font-size survive the blanket `.noteentry div { margin: 0 }` and
+   font-size resets from noteentry.css. */
+.noteentry .tasklist-progress {
+    /* The note header leaves ~35px above; slightly tighter below */
+    margin: 0 auto 28px auto;
+    width: 95%;
+}
+
+/* The ID-level :is() boost only carries font-size, which must outgun the
+   !important note-font blanket; color stays at normal specificity so the
+   dark-mode override keeps working */
+.noteentry .tasklist-progress-label:is(#pz-specificity-boost, *) {
+    font-size: 13px !important;
+}
+
+.noteentry .tasklist-progress-label {
+    color: #666;
+    text-align: left;
+    margin-bottom: 6px;
+}
+
+.noteentry .tasklist-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.noteentry .tasklist-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 4px;
+    background-color: #007DB8;
+    transition: width 0.3s ease;
+}
+
 .task-input-container {
     position: relative;
     margin-bottom: 25px;
@@ -324,6 +362,188 @@
 
 .task-move-btn:hover i {
     color: #007DB8;
+}
+
+.task-due-btn {
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-due-btn i {
+    font-size: 16px !important;
+    color: #999;
+    font-family: "Font Awesome 5 Pro" !important;
+    font-style: normal !important;
+    display: inline-block;
+}
+
+.task-due-btn:hover i {
+    color: #007DB8;
+}
+
+/* Due date pill shown next to the task text when a date is set */
+.task-due-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 10px;
+    padding: 2px 8px;
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    background: #f6f8fa;
+    color: #57606a;
+    font-size: 12px;
+    line-height: 1.4;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.task-due-chip i {
+    font-size: 12px !important;
+    color: inherit;
+    background-color: currentColor;
+}
+
+.task-due-chip:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+}
+
+.task-due-chip.overdue {
+    border-color: #f1b8b8;
+    background: #fdf2f2;
+    color: #c62828;
+}
+
+.task-item.completed .task-due-chip {
+    opacity: 0.6;
+    text-decoration: none;
+}
+
+/* Trailing action buttons of a task row */
+.task-row-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* Three-dot menu button: mobile only, replaces the individual action buttons */
+.task-menu-btn {
+    display: none;
+    padding: 4px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-menu-btn i {
+    font-size: 16px !important;
+    color: #999;
+    font-family: "Font Awesome 5 Pro" !important;
+    font-style: normal !important;
+    display: inline-block;
+}
+
+.task-menu-btn:hover i {
+    color: #007DB8;
+}
+
+/* Popup menu opened by the three-dot button */
+.task-actions-menu {
+    position: fixed;
+    z-index: 9999;
+    min-width: 210px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-actions-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    color: #111827;
+    text-align: left;
+}
+
+.task-actions-menu-item:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.task-actions-menu-item i {
+    font-size: 15px;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    /* Incomplete tasks: collapse the individual action buttons into the menu */
+    .task-item:not(.completed) .task-row-actions .task-due-btn,
+    .task-item:not(.completed) .task-row-actions .task-important-btn,
+    .task-item:not(.completed) .task-row-actions .task-move-btn {
+        display: none;
+    }
+
+    .task-item:not(.completed) .task-menu-btn {
+        display: flex;
+    }
+
+    /* Dated tasks: due date on the first line, task text on the next line */
+    .task-item.has-due {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+            "chip chip actions"
+            "check text text";
+        row-gap: 6px;
+        align-items: center;
+    }
+
+    .task-item.has-due .task-due-chip {
+        grid-area: chip;
+        justify-self: start;
+        margin-left: 0;
+    }
+
+    .task-item.has-due .task-checkbox {
+        grid-area: check;
+    }
+
+    .task-item.has-due .task-text {
+        grid-area: text;
+    }
+
+    .task-item.has-due .task-row-actions {
+        grid-area: actions;
+        justify-self: end;
+    }
 }
 
 /* Important task styling */

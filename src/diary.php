@@ -172,7 +172,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					<i class="lucide lucide-sticky-note"></i>
 					<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
 				</a>
-				<a href="<?php echo htmlspecialchars(diaryBuildPageUrl('dashboard.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary">
+				<a href="<?php echo htmlspecialchars(diaryBuildPageUrl('dashboard.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary dashboard-nav-btn">
 					<i class="lucide lucide-layout-dashboard"></i>
 					<?php echo t_h('home.dashboard', [], 'Dashboard'); ?>
 				</a>

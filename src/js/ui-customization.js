@@ -352,6 +352,12 @@
                     if (id === 'ui-customization-card') return;
                     rules.push('#' + id + ' { display: none !important; }');
 
+                    if (id === 'sidebarDashboardBtn') {
+                        // Hiding the Dashboard entry hides every button that
+                        // navigates to the dashboard, on all pages.
+                        rules.push('.dashboard-nav-btn { display: none !important; }');
+                    }
+
                     if (CREATE_MODAL_OPTION_SELECTORS[key]) {
                         rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
                     }
@@ -389,6 +395,8 @@
                         rules.push('#outline-panel { display: none !important; }');
                         rules.push('#outlineResizeHandle { display: none !important; }');
                         rules.push('#outlineMobileBackdrop { display: none !important; }');
+                    } else if (id === 'tasklist-progress') {
+                        rules.push('.tasklist-progress { display: none !important; }');
                     }
                 }
             });

@@ -69,6 +69,14 @@ body.dark-mode .slash-date-picker-day.today {
     color: #60a5fa;
 }
 
+html[data-theme='dark'] .slash-date-picker-day.selected,
+html[data-theme='dark'] .slash-date-picker-day.selected:hover,
+body.dark-mode .slash-date-picker-day.selected,
+body.dark-mode .slash-date-picker-day.selected:hover {
+    background: #2563eb;
+    color: #ffffff;
+}
+
 html[data-theme='dark'] .slash-date-picker-today-btn,
 body.dark-mode .slash-date-picker-today-btn {
     color: #60a5fa;
@@ -77,6 +85,78 @@ body.dark-mode .slash-date-picker-today-btn {
 html[data-theme='dark'] .slash-date-picker-today-btn:hover,
 body.dark-mode .slash-date-picker-today-btn:hover {
     background: rgba(59, 130, 246, 0.15);
+}
+
+html[data-theme='dark'] .slash-date-picker-remove-btn,
+body.dark-mode .slash-date-picker-remove-btn {
+    background: #3d1f1f;
+    border-color: #8b4545;
+    color: #ff6b6b;
+}
+
+html[data-theme='dark'] .slash-date-picker-remove-btn:hover,
+body.dark-mode .slash-date-picker-remove-btn:hover {
+    background: #4c1d1d;
+    border-color: #b91c1c;
+}
+
+html[data-theme='dark'] .slash-date-picker-remove-time-btn,
+body.dark-mode .slash-date-picker-remove-time-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .slash-date-picker-remove-time-btn:hover,
+body.dark-mode .slash-date-picker-remove-time-btn:hover {
+    border-color: #4da3d0;
+    color: #4da3d0;
+}
+
+html[data-theme='dark'] .slash-date-picker-time-btn,
+body.dark-mode .slash-date-picker-time-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .slash-date-picker-time-btn i,
+body.dark-mode .slash-date-picker-time-btn i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .slash-time-cell,
+body.dark-mode .slash-time-cell {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .slash-time-cell:hover,
+body.dark-mode .slash-time-cell:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .slash-time-cell.selected,
+html[data-theme='dark'] .slash-time-cell.selected:hover,
+body.dark-mode .slash-time-cell.selected,
+body.dark-mode .slash-time-cell.selected:hover {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .slash-date-picker-actions-row,
+body.dark-mode .slash-date-picker-actions-row {
+    border-top-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .slash-date-picker-apply-btn,
+body.dark-mode .slash-date-picker-apply-btn {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+html[data-theme='dark'] .slash-date-picker-apply-btn:hover,
+body.dark-mode .slash-date-picker-apply-btn:hover {
+    background: #1d4ed8;
 }
 
 html[data-theme='dark'] .slash-command-separator,

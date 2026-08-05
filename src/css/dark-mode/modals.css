@@ -99,6 +99,23 @@ body.dark-mode #reminderModal .reminder-datetime-input::-webkit-calendar-picker-
     opacity: 0.88;
 }
 
+html[data-theme='dark'] #reminderModal .reminder-datetime-part,
+body.dark-mode #reminderModal .reminder-datetime-part {
+    background: #313338;
+    border-color: #464b53;
+    color: #eef2f7;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-datetime-part i,
+body.dark-mode #reminderModal .reminder-datetime-part i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] #reminderModal .reminder-datetime-part:hover,
+body.dark-mode #reminderModal .reminder-datetime-part:hover {
+    border-color: var(--dm-accent);
+}
+
 html[data-theme='dark'] #reminderModal .reminder-repeat-select,
 html[data-theme='dark'] #reminderModal .reminder-repeat-unit,
 html[data-theme='dark'] #reminderModal .reminder-repeat-interval,
@@ -125,23 +142,6 @@ body.dark-mode #reminderModal .reminder-repeat-interval:focus {
 html[data-theme='dark'] #reminderModal .reminder-repeat-label i,
 body.dark-mode #reminderModal .reminder-repeat-label i {
     color: #7ab8ff;
-}
-
-html[data-theme='dark'] #reminderModal .reminder-quick-btn,
-body.dark-mode #reminderModal .reminder-quick-btn {
-    background: #35383e;
-    border-color: #4a4f57;
-    color: #d7dde5;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-html[data-theme='dark'] #reminderModal .reminder-quick-btn:hover,
-html[data-theme='dark'] #reminderModal .reminder-quick-btn:focus-visible,
-body.dark-mode #reminderModal .reminder-quick-btn:hover,
-body.dark-mode #reminderModal .reminder-quick-btn:focus-visible {
-    background: rgba(74, 158, 255, 0.16);
-    border-color: rgba(74, 158, 255, 0.44);
-    color: #f2f7ff;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-option,

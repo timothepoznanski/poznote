@@ -35,12 +35,14 @@ try {
         <div class="reminder-form">
             <div class="reminder-input-row">
                 <input type="datetime-local" id="reminderDateInput" class="reminder-datetime-input" />
-            </div>
-            <div class="reminder-quick-options">
-                <button type="button" class="reminder-quick-btn" data-minutes="30"><?php echo t_h('reminder.modal.in_30min', [], '30 min'); ?></button>
-                <button type="button" class="reminder-quick-btn" data-hours="1"><?php echo t_h('reminder.modal.in_1h', [], '1 hour'); ?></button>
-                <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
-                <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
+                <button type="button" id="reminderDateBtn" class="reminder-datetime-part initially-hidden">
+                    <i class="lucide lucide-calendar-alt"></i>
+                    <span id="reminderDateBtnLabel"><?php echo t_h('reminder.modal.date_placeholder', [], 'Date'); ?></span>
+                </button>
+                <button type="button" id="reminderTimeBtn" class="reminder-datetime-part initially-hidden">
+                    <i class="lucide lucide-clock"></i>
+                    <span id="reminderTimeBtnLabel"><?php echo t_h('reminder.modal.time_placeholder', [], 'Time'); ?></span>
+                </button>
             </div>
             <div class="reminder-repeat-row">
                 <label class="reminder-repeat-label" for="reminderRepeatSelect">
@@ -216,13 +218,45 @@ try {
                 <input type="number" id="userMaxNotesInput" min="0" max="100000000" step="1" value="0">
             </div>
             <div class="font-size-row">
-                <label for="userMaxStorageInput"><?php echo t_h('modals.user_quotas.max_storage', [], 'Max storage per user (MB)'); ?></label>
+                <label for="userMaxStorageInput"><?php echo t_h('modals.user_quotas.max_storage', [], 'Max local storage per user (MB)'); ?></label>
                 <input type="number" id="userMaxStorageInput" min="0" max="100000000" step="1" value="0">
+            </div>
+            <div class="font-size-row">
+                <label for="userMaxStorageS3Input"><?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 storage per user (MB)'); ?></label>
+                <input type="number" id="userMaxStorageS3Input" min="0" max="100000000" step="1" value="0">
             </div>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="userQuotasModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveUserQuotasBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Tenant Isolation Modal -->
+<div id="tenantIsolationModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.tenant_isolation.title', [], 'Tenant isolation'); ?></h3>
+        <p><?php echo t_h('modals.tenant_isolation.description', [], 'Block the checked capabilities for non-admin users (SaaS mode). Administrators are never affected. Leave everything unchecked for a family or team instance.'); ?></p>
+        <div class="tenant-isolation-features">
+            <label class="tenant-isolation-feature">
+                <input type="checkbox" data-tenant-feature="user_sharing">
+                <span class="tenant-isolation-feature-text">
+                    <span class="tenant-isolation-feature-title"><?php echo t_h('modals.tenant_isolation.features.user_sharing', [], 'User discovery and sharing'); ?></span>
+                    <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_sharing_help', [], 'The user directory becomes admin-only and sharing with specific users is refused.'); ?></span>
+                </span>
+            </label>
+            <label class="tenant-isolation-feature">
+                <input type="checkbox" data-tenant-feature="user_webhooks">
+                <span class="tenant-isolation-feature-text">
+                    <span class="tenant-isolation-feature-title"><?php echo t_h('modals.tenant_isolation.features.user_webhooks', [], 'User webhooks'); ?></span>
+                    <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_webhooks_help', [], 'Non-admin users can no longer register webhooks that send events about their notes to external endpoints.'); ?></span>
+                </span>
+            </label>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="tenantIsolationModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveTenantIsolationBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
@@ -715,6 +749,12 @@ try {
         </div>
     </div>
 </div>
+
+<!-- Quick Add Task Modal (opened by the /task slash command) -->
+<?php include 'quick_task_modal.php'; ?>
+
+<!-- Task Due Date Modal (due date + optional reminder for one task) -->
+<?php include 'task_due_modal.php'; ?>
 
 <!-- Note sort order modal -->
 <div id="noteSortModal" class="modal">
@@ -1556,6 +1596,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:task" checked><span><?php echo t_h('slash_menu.task', [], 'Add task'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>
@@ -1575,6 +1616,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-icon-kanban" checked><span><?php echo t_h('home.kanban', [], 'Kanban'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarDashboardBtn" checked><span><?php echo t_h('sidebar.home', [], 'Dashboard'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarCreateBtn" checked><span><?php echo t_h('sidebar.create', [], 'Create'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
@@ -1607,6 +1649,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTasksBtn" checked><span><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGitPushBtn" checked><span>Push</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGitPullBtn" checked><span>Pull</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
@@ -1615,6 +1658,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'Grid / list toggle'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewSizeBtn" checked><span><?php echo t_h('dashboard.view.size', [], 'Card size'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardColorFilterBtn" checked><span><?php echo t_h('note_color.filter', [], 'Filter by color'); ?></span></label>
                 </div>
                 </div>

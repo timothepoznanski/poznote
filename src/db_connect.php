@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 22; // 22: folders.is_diary (multi-diary support)
+    $CURRENT_SCHEMA_VERSION = 23; // 23: notifications.task_id (per-task due-date reminders)
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -485,6 +485,17 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add reminder columns to entries: ' . $e->getMessage());
+        }
+
+        // Add task_id column to notifications (per-task due-date reminders)
+        try {
+            $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('task_id', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN task_id TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add task_id column to notifications: ' . $e->getMessage());
         }
 
         // === INDEXES ===

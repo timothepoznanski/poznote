@@ -48,35 +48,49 @@
     box-shadow: 0 0 0 2px rgba(74, 144, 217, 0.15);
 }
 
-.reminder-quick-options {
+/* Split date / time triggers driven by the shared calendar popup */
+.reminder-input-row {
     display: flex;
+    gap: 8px;
+}
+
+.reminder-datetime-part {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     gap: 6px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-}
-
-.reminder-quick-options::-webkit-scrollbar {
-    height: 0;
-}
-
-.reminder-quick-btn {
-    padding: 5px 12px;
+    padding: 8px 12px;
     border: 1px solid var(--border-color, #ddd);
-    border-radius: 20px;
-    background: var(--card-bg, #f5f5f5);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--input-bg, #fff);
     color: inherit;
-    font-size: 12px;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
-    white-space: nowrap;
+    box-sizing: border-box;
 }
 
-.reminder-quick-btn:hover {
-    background: var(--accent-color, #4a90d9);
-    color: #fff;
+.reminder-datetime-part:first-of-type {
+    flex: 1;
+}
+
+.reminder-datetime-part i {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.reminder-datetime-part:hover {
     border-color: var(--accent-color, #4a90d9);
+}
+
+.reminder-datetime-part.initially-hidden {
+    display: none;
+}
+
+/* Preview block placeholder when no reminder is configured yet */
+.reminder-current-info.is-empty {
+    font-style: italic;
+    color: #888;
 }
 
 .reminder-repeat-row {

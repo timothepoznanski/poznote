@@ -252,12 +252,44 @@ function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '
     return _env($envKey, $default);
 }
 
-// Tenant isolation ("SaaS mode"). When enabled, non-admin users cannot
-// discover anything about the other accounts on the instance: the user
-// directory is admin-only and the share dialogs stop offering a user list.
-// Leave it off for family/team instances, where sharing between the
-// accounts of the instance is the expected behaviour.
-define('TENANT_ISOLATION', filter_var(poznoteResolveGlobalSetting('tenant_isolation', 'POZNOTE_TENANT_ISOLATION', 'false'), FILTER_VALIDATE_BOOL));
+// Tenant isolation ("SaaS mode"). The admin picks which capabilities are
+// blocked for non-admin users, stored as a JSON array of feature keys:
+//   - user_sharing: non-admin users cannot discover the other accounts of the
+//     instance (admin-only user directory, no sharing with specific users).
+//   - user_webhooks: non-admin users cannot register personal webhooks.
+// Legacy fallback: instances configured before the feature list existed only
+// had the on/off tenant_isolation flag, which meant user_sharing.
+function poznoteResolveTenantIsolationFeatures(): array {
+    $validFeatures = ['user_sharing', 'user_webhooks'];
+
+    $raw = null;
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        $raw = getGlobalSetting('tenant_isolation_features', null);
+    } catch (Exception $e) {
+        // Master DB unavailable: fall through to the environment.
+    }
+    if ($raw === null) {
+        $envRaw = _env('POZNOTE_TENANT_ISOLATION_FEATURES', null);
+        if (is_string($envRaw) && trim($envRaw) !== '') {
+            // Environment uses a comma-separated list, e.g. "user_sharing,user_webhooks".
+            $raw = json_encode(array_map('trim', explode(',', $envRaw)));
+        }
+    }
+
+    if ($raw !== null) {
+        $decoded = json_decode((string)$raw, true);
+        $features = is_array($decoded) ? $decoded : [];
+        return array_values(array_intersect($validFeatures, $features));
+    }
+
+    // Feature list never saved: honour the legacy on/off flag.
+    $legacy = filter_var(poznoteResolveGlobalSetting('tenant_isolation', 'POZNOTE_TENANT_ISOLATION', 'false'), FILTER_VALIDATE_BOOL);
+    return $legacy ? ['user_sharing'] : [];
+}
+define('TENANT_ISOLATION_FEATURES', poznoteResolveTenantIsolationFeatures());
+// Kept for the pre-existing call sites, which all guard account discovery.
+define('TENANT_ISOLATION', in_array('user_sharing', TENANT_ISOLATION_FEATURES, true));
 
 // ============================================================
 // GIT SYNC CONFIGURATION (GitHub, Forgejo)

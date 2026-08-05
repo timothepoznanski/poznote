@@ -621,6 +621,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-book-open"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('diary.title', [], 'Diary'); ?></span>
 					</a>
+					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('tasks.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTasksBtn" class="dashboard-topbar-btn" title="<?php echo t_h('tasks_page.title', [], 'Tasks'); ?>" aria-label="<?php echo t_h('tasks_page.title', [], 'Tasks'); ?>">
+						<i class="lucide lucide-list-todo"></i>
+						<span class="dashboard-topbar-count"><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span>
+					</a>
 					<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="push" title="Push" aria-label="Push">
 						<i class="lucide lucide-upload"></i>
 						<span class="dashboard-topbar-count">Push</span>

@@ -28,6 +28,7 @@ body.graph-page {
 .graph-toolbar {
     display: flex;
     align-items: center;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 12px;
     padding: 10px 14px;
@@ -41,8 +42,8 @@ body.graph-page {
 }
 
 .graph-search-wrapper {
-    flex: 1 1 220px;
-    max-width: 340px;
+    flex: 0 1 340px;
+    min-width: 180px;
 }
 
 .graph-search-input {
@@ -64,8 +65,9 @@ body.graph-page {
 .graph-options {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 14px;
-    margin-left: auto;
 }
 
 .graph-orphans-toggle {
@@ -300,8 +302,8 @@ html[data-theme="dark"] .graph-tooltip-meta {
         padding: 8px 10px;
     }
 
-    .graph-options {
-        margin-left: 0;
+    .graph-actions {
+        justify-content: center;
     }
 
     .graph-actions .btn {

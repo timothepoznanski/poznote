@@ -24,12 +24,16 @@ function startDownload() {
 function startStructuredExport() {
     var workspaceSelect = document.getElementById('structuredExportWorkspaceSelect');
     var workspace = workspaceSelect ? workspaceSelect.value : '';
-    
+    var skipS3 = document.getElementById('structuredExportSkipS3');
+
+    var params = [];
     if (workspace) {
-        window.location.href = 'api_export_structured.php?workspace=' + encodeURIComponent(workspace);
-    } else {
-        window.location.href = 'api_export_structured.php';
+        params.push('workspace=' + encodeURIComponent(workspace));
     }
+    if (skipS3 && skipS3.checked) {
+        params.push('skip_s3_attachments=1');
+    }
+    window.location.href = 'api_export_structured.php' + (params.length ? '?' + params.join('&') : '');
 }
 
 /**

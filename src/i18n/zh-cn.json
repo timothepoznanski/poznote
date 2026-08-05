@@ -371,7 +371,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "SaaS 模式：阻止非管理员用户发现实例中的其他账户。用户目录仅限管理员访问，并拒绝与特定用户共享。家庭或团队实例请保持关闭。",
+      "tenant_isolation": "SaaS 模式：选择对非管理员用户屏蔽哪些功能，例如发现实例中的其他账户或注册个人 webhook。家庭或团队实例请保持全部不勾选。",
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
@@ -431,7 +431,8 @@
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
-      "support": "通过捐赠支持 Poznote 的开发。"
+      "support": "通过捐赠支持 Poznote 的开发。",
+      "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。"
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
@@ -494,7 +495,8 @@
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
       "webhooks": "Webhook",
-      "ai_assistant": "AI 助手"
+      "ai_assistant": "AI 助手",
+      "s3_storage": "S3 存储"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -747,7 +749,16 @@
     "edit_task": "编辑任务",
     "edit_text_label": "任务文本",
     "edit_hint": "Enter 添加新行。Ctrl+Enter 保存。",
-    "edit_empty_error": "任务文本不能为空。"
+    "edit_empty_error": "任务文本不能为空。",
+    "due_date": "截止日期",
+    "due_remove": "移除日期",
+    "due_remove_time": "移除时间",
+    "move_to_list": "移动到其他清单",
+    "mark_important": "标记为重要",
+    "unmark_important": "取消重要标记",
+    "task_options": "任务选项",
+    "remind_me": "提醒我",
+    "remind_me_hint": "将在截止日期和时间触发通知。"
   },
   "tags": {
     "add_single": "添加标签...",
@@ -983,11 +994,14 @@
       "title": "用户配额",
       "description": "限制每个用户的笔记数量和存储空间。0 表示不限制。管理员不受限制。您可以在存储统计页面中为每个用户单独设置这些限制。",
       "max_notes": "每个用户的最大笔记数",
-      "max_storage": "每个用户的最大存储空间（MB）",
+      "max_storage": "每用户本地存储上限 (MB)",
       "notes_badge": "笔记：{{count}}",
       "notes_badge_unlimited": "笔记：不限",
       "storage_badge": "存储：{{count}} MB",
-      "storage_badge_unlimited": "存储：不限"
+      "storage_badge_unlimited": "存储：不限",
+      "max_storage_s3": "每用户 S3 存储上限 (MB)",
+      "storage_s3_badge": "S3:{{count}} MB",
+      "storage_s3_badge_unlimited": "S3:无限制"
     },
     "ui_customization": {
       "title": "界面自定义",
@@ -1001,6 +1015,7 @@
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "网格 / 列表切换",
       "index_search_bar": "搜索栏",
+      "tasklist_progress_bar": "任务列表进度条",
       "share_restrict_users": "分享：限制为特定用户",
       "share_protocol_toggle": "分享：HTTPS 开关",
       "share_shared_with_me": "分享：“与我共享”",
@@ -1334,6 +1349,24 @@
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "标记：YYYY、MM、DD、HH、h、hh、mm、ss、A",
       "custom_invalid": "请输入有效的自定义格式。"
+    },
+    "tenant_isolation": {
+      "title": "租户隔离",
+      "description": "对非管理员用户屏蔽勾选的功能（SaaS 模式）。管理员永不受影响。家庭或团队实例请保持全部不勾选。",
+      "features": {
+        "user_sharing": "用户发现与共享",
+        "user_sharing_help": "用户目录仅限管理员访问，并拒绝与特定用户共享。",
+        "user_webhooks": "用户 Webhook",
+        "user_webhooks_help": "非管理员用户无法再注册向外部服务发送笔记事件的 webhook。"
+      }
+    },
+    "quick_task": {
+      "title": "添加任务",
+      "text_placeholder": "需要做什么？",
+      "description": "选择要添加此任务的任务清单。",
+      "confirm": "添加",
+      "adding": "正在添加任务...",
+      "error": "无法添加任务"
     }
   },
   "notes_list": {
@@ -1485,7 +1518,8 @@
     "audio_no_note": "未选择笔记",
     "audio_invalid_file": "请选择音频文件。",
     "audio_upload_failed": "上传失败：{{error}}",
-    "date": "日期"
+    "date": "日期",
+    "task": "添加任务"
   },
   "api": {
     "settings": {
@@ -1507,7 +1541,8 @@
       "invalid_custom_token": "无效的自定义链接。\n\n允许使用：\n\n字母、数字、-、_、. (4-128 个字符)",
       "token_already_in_use": "自定义链接已被使用",
       "no_token_generated": "未生成链接",
-      "server_error": "服务器错误: {{error}}"
+      "server_error": "服务器错误: {{error}}",
+      "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。"
     }
   },
   "ui": {
@@ -1645,7 +1680,8 @@
       "individual_export": "您还可以通过打开笔记并点击工具栏中的下载图标，以不同格式（PDF、HTML、Markdown、文本）导出单篇笔记。"
     },
     "common": {
-      "all_workspaces": "所有工作区"
+      "all_workspaces": "所有工作区",
+      "skip_s3_attachments": "压缩包中不包含 S3 附件(更轻量的存档)"
     },
     "sections": {
       "complete_backup": {
@@ -1666,11 +1702,17 @@
         "warning": "注意：此导出类型并非为完美备份 Poznote 而设计。",
         "select_workspace": "选择工作区：",
         "loading_workspaces": "正在加载工作区..."
+      },
+      "attachments_export": {
+        "title": "附件导出",
+        "description": "将您账户的所有附件下载为一个 ZIP 压缩包。",
+        "description_s3": "启用 S3 存储时,文件会从存储桶中获取;恢复前,可用此压缩包为不含 S3 附件的备份补全缺失的文件。"
       }
     },
     "buttons": {
       "download_complete_backup": "下载完整备份 (ZIP)",
-      "download_structured_export": "下载结构化导出 (ZIP)"
+      "download_structured_export": "下载结构化导出 (ZIP)",
+      "download_attachments_export": "下载附件(ZIP)"
     },
     "spinner": {
       "home_hint": "可从仪表盘执行推送和拉取操作。",
@@ -1764,7 +1806,7 @@
       "select_backup_first": "请先选择一个备份文件。",
       "restore_error": "还原错误: {{error}}",
       "no_backup_file_or_upload": "未提供备份文件或上传出错。",
-      "complete_restore_error": "完整还原错误: {{error}} - {{message}}",
+      "complete_restore_error": "完整还原错误: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "未提供完整备份文件或上传出错。",
       "import_error": "导入错误: {{error}}",
       "no_notes_file_or_upload": "未提供笔记文件或上传出错。",
@@ -2941,9 +2983,13 @@
       "user_quota_sentence_none": "此账户未设置配额：笔记和存储空间均不限。",
       "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
       "quota_max_notes_for": "{{user}} 的最大笔记数",
-      "quota_max_storage_for": "{{user}} 的最大存储空间（MB）",
+      "quota_max_storage_for": "{{user}} 的本地存储上限 (MB)",
       "filter_placeholder": "筛选账户...",
-      "no_accounts": "未找到账户。"
+      "no_accounts": "未找到账户。",
+      "table_attachments_local": "本地附件 (MB)",
+      "table_attachments_s3": "S3 附件 (MB)",
+      "quota_max_storage_s3_for": "{{user}} 的 S3 存储上限 (MB)",
+      "table_quota_s3": "配额(数量 / 本地 MB / S3 MB)"
     }
   },
   "profile": {
@@ -3132,7 +3178,7 @@
     "card": "用户 Webhook",
     "card_help": "通过 webhook 将您自己笔记的事件（提醒触发、笔记创建或分享）发送到 ntfy、n8n 等外部服务。",
     "description": "当您的笔记触发已订阅的事件时（提醒到期、笔记被创建或公开分享），Poznote 会向每个已注册的端点发送带有 JSON payload 的 HTTP POST 请求。仅涉及您自己的笔记。如果设置了密钥，payload 会通过 HMAC-SHA256 签名并放在 X-Poznote-Signature-256 请求头中。",
-    "access_denied": "访问被拒绝。此页面仅供主账户使用。"
+    "access_denied": "访问被拒绝。此实例已禁用用户 webhook。"
   },
   "webhooks_admin": {
     "event_help": {
@@ -3144,11 +3190,11 @@
       "signup_cap_reached": "SSO 注册被拒绝，因为实例已达到最大用户数。Payload：上限以及尝试注册的用户名和邮箱。",
       "quota_notes_reached": "操作被阻止，因为用户的笔记配额已用完。Payload：用户、上限和当前数量。",
       "quota_storage_reached": "操作被阻止，因为用户的存储配额已用完。Payload：用户、上限和当前用量。",
-      "reminder_due": "主账户（用户 1）的笔记提醒到达触发时间；其他用户的提醒不会触发 webhook。完整 Payload：笔记（id、标题、工作区、直达链接）和提醒消息。",
+      "reminder_due": "您的某条笔记提醒到达触发时间；其他用户的提醒不会触发您的 webhook。完整 Payload：笔记（id、标题、工作区、直达链接）和提醒消息。",
       "reminder_due_title": "与 reminder.due 相同的触发，但不含提醒消息：标识符加上笔记标题和直达链接。",
       "reminder_due_minimal": "与 reminder.due 相同的触发，但仅含标识符（笔记 id、提醒 id、触发时间）：笔记内容不会离开实例。详情可通过 REST API 获取。",
-      "note_created": "在主账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
-      "note_shared": "为主账户的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。"
+      "note_created": "您的账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
+      "note_shared": "为您的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。"
     },
     "title": "Webhook",
     "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",
@@ -3237,7 +3283,10 @@
       "repeat_days": "天",
       "repeat_weeks": "周",
       "repeat_months": "个月",
-      "repeat_years": "年"
+      "repeat_years": "年",
+      "date_placeholder": "日期",
+      "time_placeholder": "时间",
+      "no_date_configured": "未设置日期"
     }
   },
   "settings_password": {
@@ -3373,5 +3422,64 @@
     "manage_link": "管理用户：{{url}}",
     "manage_button": "管理用户",
     "footer": "您收到此邮件是因为您的管理员账户已启用新用户通知。"
+  },
+  "tasks_page": {
+    "title": "任务",
+    "progress": "已完成 {{completed}} / {{total}} 个任务",
+    "filter_all": "全部",
+    "filter_open": "待办",
+    "filter_important": "重要",
+    "filter_overdue": "已逾期",
+    "filter_dated": "有日期",
+    "filter_completed": "已完成",
+    "filter_placeholder": "按任务、标题或文件夹筛选...",
+    "empty": "还没有任务。创建一个任务清单笔记开始吧。",
+    "empty_filtered": "没有符合此筛选条件的任务。",
+    "add_task": "添加任务",
+    "collapse": "收起",
+    "expand": "展开"
+  },
+  "s3_settings": {
+    "title": "S3 附件存储",
+    "description": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
+    "description_scope": "该设置对本实例的所有用户生效。",
+    "attachments_only_note": "仅涉及附件文件。",
+    "config_title": "配置",
+    "enable_label": "将附件存储到 S3",
+    "enable_description": "新附件将写入存储桶。仍在本地磁盘上的文件继续可用,并可在下方迁移。",
+    "endpoint_label": "端点 URL",
+    "endpoint_description": "S3 API 的基础 URL。示例:https://s3.amazonaws.com、http://minio:9000、https://<账户>.r2.cloudflarestorage.com",
+    "region_label": "区域",
+    "region_description": "对于 MinIO/Garage 及忽略区域的服务商,保留 \"us-east-1\" 即可。",
+    "bucket_label": "存储桶",
+    "access_key_label": "Access Key",
+    "secret_key_label": "Secret Key",
+    "path_style_label": "Path-style 寻址",
+    "path_style_description": "MinIO、Garage 及大多数自托管服务器请保持开启。仅当服务商要求 virtual-host 风格(bucket.endpoint)时才关闭。",
+    "test": "测试连接",
+    "save": "保存配置",
+    "testing": "正在测试连接...",
+    "test_success": "连接成功,存储桶可访问。",
+    "test_failure": "连接失败:{{error}}",
+    "migration_title": "迁移",
+    "migration_description": "在本地磁盘和存储桶之间迁移现有附件文件,覆盖实例的所有用户。迁移按批次执行,可随时安全中断并恢复。",
+    "status_local": "本地磁盘上",
+    "status_remote": "存储桶中",
+    "status_unavailable": "不可用",
+    "files_unit": "{{count}} 个文件,{{size}}",
+    "migrate_to_s3": "将本地文件迁移到 S3",
+    "migrate_to_local": "将文件取回本地磁盘",
+    "migrating": "迁移中... 已移动 {{moved}} 个文件,剩余 {{remaining}} 个",
+    "migration_done": "迁移完成:已移动 {{moved}} 个文件。",
+    "migration_error": "迁移因错误而停止:{{error}}",
+    "confirm_to_s3": "将所有用户的全部本地附件文件移动到存储桶?",
+    "confirm_to_local": "将存储桶中的全部附件下载回本地磁盘(所有用户)?",
+    "footer_note": "附件以 attachments/{用户 id}/ 的形式存储在存储桶中,并始终通过 Poznote 提供访问(存储桶可保持私有)。",
+    "messages": {
+      "saved": "配置保存成功。",
+      "save_error": "配置保存失败。",
+      "incomplete": "启用 S3 存储需要填写端点、存储桶和凭据。"
+    },
+    "git_sync_note": "启用 S3 存储期间,Git 同步会忽略附件。"
   }
 }

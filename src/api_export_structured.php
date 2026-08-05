@@ -21,6 +21,7 @@ if (!$rootPath) {
 
 $fileCount = 0;
 $workspace = $_GET['workspace'] ?? null;
+$skipS3Attachments = !empty($_GET['skip_s3_attachments']);
 
 // Get workspace name if workspace is specified
 $workspaceName = 'all';
@@ -209,12 +210,14 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
 
 // Add attachments to ZIP in the attachments/ folder
 if (!empty($allNoteAttachments)) {
-    $attachmentsPath = getAttachmentsPath();
-    
     foreach ($allNoteAttachments as $attachmentId => $filename) {
-        $attachmentFile = $attachmentsPath . '/' . $filename;
-        
-        if (file_exists($attachmentFile) && is_readable($attachmentFile)) {
+        // Readable local path (fetched from the bucket in S3 mode, unless the
+        // lighter-zip option was checked)
+        $attachmentFile = $skipS3Attachments
+            ? poznoteAttachmentLocalOnlyFile($filename)
+            : poznoteAttachmentLocalFile($filename);
+
+        if ($attachmentFile !== null) {
             $ext = pathinfo($filename, PATHINFO_EXTENSION);
             $zipAttachmentName = 'attachments/' . $attachmentId . ($ext ? '.' . $ext : '');
             $zip->addFile($attachmentFile, $zipAttachmentName);

@@ -10,15 +10,28 @@
  */
 
 require_once __DIR__ . '/../../../note_loader.php';
+require_once __DIR__ . '/../../../storage/AttachmentStorage.php';
 
 class AttachmentsController {
     private $con;
     private $attachmentsDir;
-    
+    /** Set when a public share routes the request to the share owner's data */
+    private $storageOwnerUserId = null;
+
     public function __construct($con) {
         $this->con = $con;
         $this->attachmentsDir = $this->getAttachmentsPath();
         $this->ensureDirectory();
+    }
+
+    /**
+     * Attachment storage for the user whose data this request operates on.
+     */
+    private function storage(): AttachmentStorage {
+        if ($this->storageOwnerUserId !== null) {
+            return AttachmentStorage::forUser($this->storageOwnerUserId);
+        }
+        return AttachmentStorage::current();
     }
     
     /**
@@ -89,16 +102,14 @@ class AttachmentsController {
         return $inlineTypes[$extension] ?? null;
     }
 
-    private function buildAttachmentEtag(string $filePath, array $attachment): string {
-        $mtime = @filemtime($filePath) ?: 0;
-        $size = @filesize($filePath) ?: 0;
+    private function buildAttachmentEtag(array $stat, array $attachment): string {
         $userId = $_SESSION['user_id'] ?? ($_SERVER['HTTP_X_USER_ID'] ?? '');
         $identity = implode('|', [
             (string)$userId,
             (string)($attachment['id'] ?? ''),
-            (string)($attachment['filename'] ?? basename($filePath)),
-            (string)$size,
-            (string)$mtime,
+            (string)($attachment['filename'] ?? ''),
+            (string)$stat['size'],
+            (string)$stat['mtime'],
         ]);
 
         return '"' . hash('sha256', $identity) . '"';
@@ -130,9 +141,9 @@ class AttachmentsController {
         return $clientModifiedTime !== false && $clientModifiedTime >= $lastModified;
     }
 
-    private function sendAttachmentCacheHeaders(string $filePath, array $attachment, bool $forceDownload): void {
-        $lastModified = @filemtime($filePath) ?: time();
-        $etag = $this->buildAttachmentEtag($filePath, $attachment);
+    private function sendAttachmentCacheHeaders(array $stat, array $attachment, bool $forceDownload): void {
+        $lastModified = $stat['mtime'] ?: time();
+        $etag = $this->buildAttachmentEtag($stat, $attachment);
         $cacheSeconds = $forceDownload ? 0 : 3600;
 
         header_remove('Pragma');
@@ -264,7 +275,7 @@ class AttachmentsController {
             return;
         }
 
-        $quotaError = poznoteCheckStorageQuota((int)$file_size);
+        $quotaError = poznoteCheckAttachmentStorageQuota((int)$file_size);
         if ($quotaError !== null) {
             http_response_code(413);
             echo json_encode(['success' => false, 'message' => $quotaError]);
@@ -276,20 +287,18 @@ class AttachmentsController {
         // Generate unique filename
         $file_extension = strtolower(pathinfo($validation['filename'], PATHINFO_EXTENSION));
         $unique_filename = uniqid() . '_' . time() . ($file_extension !== '' ? '.' . $file_extension : '');
-        $file_path = $this->attachmentsDir . '/' . $unique_filename;
-        
-        // Check if destination directory is writable
-        if (!is_writable($this->attachmentsDir)) {
+
+        // Check if destination directory is writable (local storage only)
+        if (!$this->storage()->isRemote() && !is_writable($this->attachmentsDir)) {
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Attachments directory is not writable']);
             return;
         }
-        
+
         try {
-            // Move uploaded file
-            if (move_uploaded_file($file['tmp_name'], $file_path)) {
-                chmod($file_path, 0644);
-                
+            // Store the uploaded file (local disk or S3 bucket)
+            if ($this->storage()->storeFile($file['tmp_name'], $unique_filename, $file_type, true)) {
+
                 // Get current attachments
                 if ($workspace) {
                     $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
@@ -331,21 +340,21 @@ class AttachmentsController {
                     
                     if ($success) {
                         $this->triggerGitSync((int)$noteId, 'push', $unique_filename);
-                        
+
                         http_response_code(201);
                         echo json_encode([
-                            'success' => true, 
+                            'success' => true,
                             'message' => 'File uploaded successfully',
                             'attachment_id' => $new_attachment['id'],
                             'filename' => $original_name
                         ]);
                     } else {
-                        unlink($file_path);
+                        $this->storage()->delete($unique_filename);
                         http_response_code(500);
                         echo json_encode(['success' => false, 'message' => 'Database update failed']);
                     }
                 } else {
-                    unlink($file_path);
+                    $this->storage()->delete($unique_filename);
                     http_response_code(404);
                     echo json_encode(['success' => false, 'message' => 'Note not found']);
                 }
@@ -354,9 +363,7 @@ class AttachmentsController {
                 echo json_encode(['success' => false, 'message' => 'Failed to save file']);
             }
         } catch (Exception $e) {
-            if (file_exists($file_path)) {
-                unlink($file_path);
-            }
+            $this->storage()->delete($unique_filename);
             http_response_code(500);
             echo json_encode(['success' => false, 'message' => 'Error uploading attachment: ' . $e->getMessage()]);
         }
@@ -441,22 +448,24 @@ class AttachmentsController {
                 
                 foreach ($attachments as $attachment) {
                     if ($attachment['id'] === $attachmentId) {
-                        $file_path = $this->attachmentsDir . '/' . $attachment['filename'];
-                        
-                        if (file_exists($file_path)) {
+                        $storage = $this->storage();
+                        $attachmentFilename = (string)($attachment['filename'] ?? '');
+
+                        if ($attachmentFilename !== '' && $storage->exists($attachmentFilename)) {
                             // Clear any output buffer
                             while (ob_get_level()) {
                                 ob_end_clean();
                             }
-                            
+
                             // Set headers for file download/viewing
-                            $file_type = $attachment['file_type'] ?? mime_content_type($file_path);
-                            
+                            $file_type = $attachment['file_type'] ?? 'application/octet-stream';
+
                             // Sanitize filename for Content-Disposition header
                             $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
 
                             $inlineTextContentType = $this->getSafeInlineTextContentType($attachment);
-                            $this->sendAttachmentCacheHeaders($file_path, $attachment, $forceDownload);
+                            $stat = $storage->statForHeaders($attachment);
+                            $this->sendAttachmentCacheHeaders($stat, $attachment, $forceDownload);
 
                             if ($forceDownload) {
                                 header('Content-Type: application/octet-stream');
@@ -478,9 +487,11 @@ class AttachmentsController {
                             }
 
                             header('Content-Description: File Transfer');
-                            header('Content-Length: ' . filesize($file_path));
+                            if ($stat['size'] > 0) {
+                                header('Content-Length: ' . $stat['size']);
+                            }
 
-                            readfile($file_path);
+                            $storage->stream($attachmentFilename);
                             exit;
                         } else {
                             http_response_code(404);
@@ -622,6 +633,7 @@ class AttachmentsController {
         $this->con->exec('PRAGMA foreign_keys = ON');
         $this->attachmentsDir = $userDataManager->getUserAttachmentsPath();
         $GLOBALS['activeUserId'] = $userId;
+        $this->storageOwnerUserId = $userId;
 
         return true;
     }
@@ -803,18 +815,16 @@ class AttachmentsController {
                 
                 foreach ($attachments as $attachment) {
                     if ($attachment['id'] === $attachmentId) {
-                        $file_to_delete = $this->attachmentsDir . '/' . $attachment['filename'];
+                        $file_to_delete = $attachment['filename'] ?? null;
                     } else {
                         $updated_attachments[] = $attachment;
                     }
                 }
-                
+
                 if ($file_to_delete) {
-                    // Delete physical file
-                    if (file_exists($file_to_delete)) {
-                        unlink($file_to_delete);
-                    }
-                    
+                    // Delete physical file (local disk or S3 bucket)
+                    $this->storage()->delete($file_to_delete);
+
                     // Clean up inline references from note content to prevent 404s
                     $entry = $result['entry'] ?? '';
                     $content_changed = false;

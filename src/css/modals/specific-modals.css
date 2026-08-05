@@ -1143,3 +1143,46 @@
 #createModal .modal-content {
     margin: 0 auto !important;
 }
+
+/* ============================================
+   Tenant Isolation Modal (#tenantIsolationModal)
+   ============================================ */
+
+#tenantIsolationModal .modal-content {
+    max-width: 460px;
+}
+
+.tenant-isolation-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.tenant-isolation-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.tenant-isolation-feature input[type="checkbox"] {
+    margin-top: 3px;
+    flex: 0 0 auto;
+}
+
+.tenant-isolation-feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tenant-isolation-feature-title {
+    font-weight: 600;
+}
+
+/* Inherit the modal text color so dark mode needs no override. */
+.tenant-isolation-feature-help {
+    font-size: 12px;
+    opacity: 0.7;
+}
