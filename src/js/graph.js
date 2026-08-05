@@ -58,6 +58,28 @@
     var searchTerm = '';
     var hoveredNode = null;
 
+    var PREF_SHOW_ORPHANS = 'graph-show-orphans';
+    var PREF_SHOW_LABELS = 'graph-show-labels';
+
+    function prefStorage() {
+        return window.__poznoteUserStorage || window.localStorage;
+    }
+
+    function readPref(key) {
+        try {
+            var value = prefStorage().getItem(key);
+            return value === null ? null : value === '1';
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function savePref(key, value) {
+        try {
+            prefStorage().setItem(key, value ? '1' : '0');
+        } catch (e) { /* storage unavailable */ }
+    }
+
     /* --------------------------------------------------------------------- */
     /* Data loading                                                            */
     /* --------------------------------------------------------------------- */
@@ -152,7 +174,7 @@
         });
 
         renderSvg();
-        updateStats();
+        updateOrphanVisibility();
         fitView();
         initLabelDefault();
         startSimulation(1);
@@ -226,7 +248,8 @@
     }
 
     function initLabelDefault() {
-        showLabels = !isGraphCrowded();
+        var saved = readPref(PREF_SHOW_LABELS);
+        showLabels = saved === null ? !isGraphCrowded() : saved;
         var toggle = document.getElementById('graphShowLabels');
         if (toggle) { toggle.checked = showLabels; }
         updateLabelVisibility();
@@ -676,8 +699,14 @@
 
         var orphansToggle = document.getElementById('graphShowOrphans');
         if (orphansToggle) {
+            var savedOrphans = readPref(PREF_SHOW_ORPHANS);
+            if (savedOrphans !== null) {
+                showOrphans = savedOrphans;
+                orphansToggle.checked = savedOrphans;
+            }
             orphansToggle.addEventListener('change', function () {
                 showOrphans = orphansToggle.checked;
+                savePref(PREF_SHOW_ORPHANS, showOrphans);
                 updateOrphanVisibility();
             });
         }
@@ -686,6 +715,7 @@
         if (labelsToggle) {
             labelsToggle.addEventListener('change', function () {
                 showLabels = labelsToggle.checked;
+                savePref(PREF_SHOW_LABELS, showLabels);
                 updateLabelVisibility();
             });
         }
