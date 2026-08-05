@@ -85,6 +85,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="tags-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<div class="tags-container">
@@ -94,7 +95,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
 					<?php echo t_h('common.back_to_notes'); ?>
 				</button>
-				<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
+				<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
 					<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
 					<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
 				</button>

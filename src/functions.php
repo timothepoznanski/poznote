@@ -1202,6 +1202,11 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             }
 
             $rules[] = '#' . $id . ' { display: none !important; }';
+            if ($id === 'sidebarDashboardBtn') {
+                // Hiding the Dashboard entry hides every button that navigates
+                // to the dashboard, on all pages.
+                $rules[] = '.dashboard-nav-btn { display: none !important; }';
+            }
             if (isset($createModalOptionSelectors[$key])) {
                 $rules[] = '#createModal ' . $createModalOptionSelectors[$key] . ' { display: none !important; }';
             }

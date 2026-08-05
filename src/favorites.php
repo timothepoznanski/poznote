@@ -38,6 +38,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="favorites-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
@@ -54,7 +55,7 @@ $currentLang = getUserLanguage();
 				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_notes'); ?>
 			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
+			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
 				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
 			</button>

@@ -335,7 +335,7 @@ if ($canUseUserWebhooks) {
                 <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_notes'); ?>
             </a>
-            <a id="backToHomeLink" href="dashboard.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
+            <a id="backToHomeLink" href="dashboard.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn dashboard-nav-btn">
     				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
                 <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
             </a>
