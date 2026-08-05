@@ -17,6 +17,44 @@
     min-width: 16px;
 }
 
+/* Completion progress bar at the top of a tasklist note (same look as the
+   global tasks page). Selectors are scoped under .noteentry so margins and
+   the label font-size survive the blanket `.noteentry div { margin: 0 }` and
+   font-size resets from noteentry.css. */
+.noteentry .tasklist-progress {
+    /* The note header leaves ~35px above; slightly tighter below */
+    margin: 0 auto 28px auto;
+    width: 95%;
+}
+
+/* The ID-level :is() boost only carries font-size, which must outgun the
+   !important note-font blanket; color stays at normal specificity so the
+   dark-mode override keeps working */
+.noteentry .tasklist-progress-label:is(#pz-specificity-boost, *) {
+    font-size: 13px !important;
+}
+
+.noteentry .tasklist-progress-label {
+    color: #666;
+    text-align: left;
+    margin-bottom: 6px;
+}
+
+.noteentry .tasklist-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e9ecef;
+    overflow: hidden;
+}
+
+.noteentry .tasklist-progress-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 4px;
+    background-color: #007DB8;
+    transition: width 0.3s ease;
+}
+
 .task-input-container {
     position: relative;
     margin-bottom: 25px;

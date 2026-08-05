@@ -43,7 +43,7 @@ function saveAndRenderTasks(noteId, tasks) {
     const tasksList = document.getElementById('tasks-list-' + noteId);
     if (tasksList) {
         tasksList.innerHTML = renderTasks(tasks, noteId);
-        
+
         // Process references [[Note Title]] in the newly rendered HTML
         if (typeof window.processNoteReferences === 'function') {
             const workspace = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : (window.selectedWorkspace || '');
@@ -52,6 +52,38 @@ function saveAndRenderTasks(noteId, tasks) {
 
         enableDragAndDrop(noteId);
     }
+
+    updateTaskListProgress(noteId, tasks);
+}
+
+// Completion progress bar of a tasklist note (same as the tasks page)
+function updateTaskListProgress(noteId, tasks) {
+    const section = document.getElementById('tasklist-progress-' + noteId);
+    if (!section) return;
+
+    const total = Array.isArray(tasks) ? tasks.length : 0;
+    if (total === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    const completed = tasks.filter(task => task && task.completed).length;
+    const percent = Math.round((completed / total) * 100);
+
+    const template = window.t
+        ? window.t('tasks_page.progress', null, '{{completed}} of {{total}} tasks completed')
+        : '{{completed}} of {{total}} tasks completed';
+    const label = section.querySelector('.tasklist-progress-label');
+    if (label) {
+        label.textContent = template
+            .replace('{{completed}}', completed)
+            .replace('{{total}}', total) + ' (' + percent + '%)';
+    }
+
+    const fill = section.querySelector('.tasklist-progress-fill');
+    if (fill) fill.style.width = percent + '%';
+
+    section.style.display = '';
 }
 
 // Group tasks by status: important incomplete, normal incomplete, completed
@@ -270,6 +302,12 @@ function renderTaskList(noteId, tasks) {
 
     const taskListHtml = `
         <div class="task-list-container" id="tasklist-${noteId}">
+            <div class="tasklist-progress" id="tasklist-progress-${noteId}" style="display: none;">
+                <div class="tasklist-progress-label"></div>
+                <div class="tasklist-progress-bar">
+                    <div class="tasklist-progress-fill"></div>
+                </div>
+            </div>
             <div class="task-input-container">
           <form class="task-input-form" id="task-input-form-${noteId}" action="javascript:void(0);">
               <input type="text" class="task-input" id="task-input-${noteId}"
@@ -330,6 +368,8 @@ function renderTaskList(noteId, tasks) {
 
     // Enable drag & drop reordering after initial render
     enableDragAndDrop(noteId);
+
+    updateTaskListProgress(noteId, tasks);
 }
 
 // Render individual tasks
@@ -853,6 +893,8 @@ function deleteTask(taskId, noteId) {
 
     // Ensure DnD state is consistent after deletion
     enableDragAndDrop(noteId);
+
+    updateTaskListProgress(noteId, tasks);
 
     markTaskListAsModified(noteId);
 }

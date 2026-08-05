@@ -255,7 +255,8 @@
         var row = document.createElement('div');
         row.className = 'tasks-task-item'
             + (task.completed ? ' completed' : '')
-            + (task.important && !task.completed ? ' important' : '');
+            + (task.important && !task.completed ? ' important' : '')
+            + (task.dueAt ? ' has-due' : '');
 
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';

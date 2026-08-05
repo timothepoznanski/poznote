@@ -9,6 +9,10 @@ require_once 'db_connect.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
+
+$rawVersion = @file_get_contents('version.txt');
+if ($rawVersion === false) $rawVersion = '0.0.0';
+$cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -24,8 +28,8 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
-	<link type="text/css" rel="stylesheet" href="css/slash-commands.css"/>
-	<link type="text/css" rel="stylesheet" href="css/tasks-page.css"/>
+	<link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/tasks-page.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
@@ -142,9 +146,9 @@ $currentLang = getUserLanguage();
 	};
 	</script>
 	<script src="js/navigation.js"></script>
-	<script src="js/date-time-format.js"></script>
-	<script src="js/date-picker-popup.js"></script>
-	<script src="js/tasklist.js"></script>
-	<script src="js/tasks-page.js"></script>
+	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/tasklist.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/tasks-page.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

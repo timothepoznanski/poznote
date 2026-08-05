@@ -286,6 +286,18 @@ body.dark-mode .task-actions-menu-item i {
     color: #b0b0b0;
 }
 
+/* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
+   blanket from dark-mode/editor.css */
+html[data-theme='dark'] .tasklist-progress-label:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-progress-label:is(#pz-specificity-boost, *) {
+    color: #a8a8a8 !important;
+}
+
+html[data-theme='dark'] .tasklist-progress-bar,
+body.dark-mode .tasklist-progress-bar {
+    background-color: var(--dm-surface);
+}
+
 /* Important task styling for dark mode */
 html[data-theme='dark'] .task-item.important,
 body.dark-mode .task-item.important {

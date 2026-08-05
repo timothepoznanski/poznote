@@ -30,9 +30,9 @@ body.tasks-page {
 
 .tasks-progress-header {
     display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
     margin-bottom: 10px;
 }
 
@@ -346,10 +346,46 @@ body.tasks-page {
     display: none;
 }
 
+/* Mobile: dated tasks show the due date on the first line, then the task
+   text on the next line (same layout as in tasklist notes) */
+@media (max-width: 768px) {
+    .tasks-task-item.has-due {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+            "chip chip star"
+            "check text text";
+        row-gap: 6px;
+        align-items: center;
+    }
+
+    .tasks-task-item.has-due .task-due-chip {
+        grid-area: chip;
+        justify-self: start;
+    }
+
+    .tasks-task-item.has-due .tasks-task-checkbox {
+        grid-area: check;
+    }
+
+    .tasks-task-item.has-due .tasks-task-text {
+        grid-area: text;
+    }
+
+    .tasks-task-item.has-due .tasks-task-star {
+        grid-area: star;
+        justify-self: end;
+    }
+}
+
 /* Mobile responsive */
 @media (max-width: 600px) {
     .tasks-title {
         font-size: 20px;
+    }
+
+    .tasks-progress-header {
+        gap: 20px;
     }
 
     .tasks-buttons-container {
@@ -362,10 +398,6 @@ body.tasks-page {
         font-size: 13px;
     }
 
-    .tasks-progress-header {
-        flex-direction: column;
-        gap: 4px;
-    }
 }
 
 /* Dark mode */
