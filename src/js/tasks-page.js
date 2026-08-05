@@ -285,6 +285,11 @@
             due.title = config.txtDue;
             due.innerHTML = '<i class="lucide lucide-calendar-alt"></i>';
             due.appendChild(document.createTextNode(formatDueDate(task.dueAt)));
+            if (task.dueReminder) {
+                var bell = document.createElement('i');
+                bell.className = 'lucide lucide-bell';
+                due.appendChild(bell);
+            }
             due.addEventListener('click', function (e) {
                 openDueDatePicker(note, task, due, e);
             });
@@ -310,6 +315,28 @@
             event.preventDefault();
             event.stopPropagation();
         }
+
+        // Preferred UI: the shared due-date modal (date + time + reminder toggle)
+        if (typeof window.openTaskDueModal === 'function' && document.getElementById('taskDueModal')) {
+            window.openTaskDueModal({
+                noteId: note.id,
+                taskId: task.id,
+                task: task,
+                onSave: function (payload) {
+                    return mutateTaskInNote(note, task, function (target) {
+                        target.dueAt = payload.dueAt;
+                        target.dueReminder = payload.dueReminder;
+                        target.dueReminderEmail = payload.dueReminderEmail;
+                    }).then(function () {
+                        task.dueAt = payload.dueAt;
+                        task.dueReminder = payload.dueReminder;
+                        render();
+                    });
+                }
+            });
+            return;
+        }
+
         if (typeof window.showSlashDatePicker !== 'function') return;
 
         var anchorRect = anchorEl ? anchorEl.getBoundingClientRect() : null;
@@ -396,9 +423,24 @@
         var newCompleted = checkbox.checked;
         checkbox.disabled = true;
 
-        mutateTaskInNote(note, task, function (target) { target.completed = newCompleted; })
+        var clearReminder = newCompleted && task.dueReminder;
+
+        mutateTaskInNote(note, task, function (target) {
+            target.completed = newCompleted;
+            if (clearReminder) target.dueReminder = false;
+        })
             .then(function () {
                 task.completed = newCompleted;
+                if (clearReminder) {
+                    task.dueReminder = false;
+                    // Completing a task cancels its pending reminder
+                    fetch('api/v1/notes/' + note.id + '/task-reminder', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ task_id: String(task.id) })
+                    }).catch(function () { });
+                }
                 render();
             })
             .catch(function () {

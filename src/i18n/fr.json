@@ -773,7 +773,9 @@
     "due_remove_time": "Supprimer l'heure",
     "mark_important": "Marquer comme importante",
     "unmark_important": "Retirer l'importance",
-    "task_options": "Options de la tâche"
+    "task_options": "Options de la tâche",
+    "remind_me": "Me le rappeler",
+    "remind_me_hint": "Une notification se déclenche à la date et l'heure d'échéance."
   },
   "tags": {
     "add_single": "Ajouter un tag...",

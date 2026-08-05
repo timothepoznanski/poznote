@@ -749,6 +749,9 @@ try {
 <!-- Quick Add Task Modal (opened by the /task slash command) -->
 <?php include 'quick_task_modal.php'; ?>
 
+<!-- Task Due Date Modal (due date + optional reminder for one task) -->
+<?php include 'task_due_modal.php'; ?>
+
 <!-- Note sort order modal -->
 <div id="noteSortModal" class="modal">
     <div class="modal-content">

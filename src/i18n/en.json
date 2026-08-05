@@ -340,7 +340,9 @@
     "move_to_list": "Move to another list",
     "mark_important": "Mark as important",
     "unmark_important": "Remove important",
-    "task_options": "Task options"
+    "task_options": "Task options",
+    "remind_me": "Remind me",
+    "remind_me_hint": "A notification fires at the due date and time."
   },
   "tags": {
     "add_single": "Add tag...",

@@ -26,6 +26,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $cache_v; ?>"/>
@@ -112,6 +114,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	</div>
 
 	<?php include 'quick_task_modal.php'; ?>
+	<?php include 'task_due_modal.php'; ?>
 
 	<script>
 	// Minimal shims for the quick-task machinery in tasklist.js: translated
@@ -148,6 +151,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<script src="js/navigation.js"></script>
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/task-due-modal.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/tasklist.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/tasks-page.js?v=<?php echo $cache_v; ?>"></script>
 </body>

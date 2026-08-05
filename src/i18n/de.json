@@ -755,7 +755,9 @@
     "due_remove_time": "Uhrzeit entfernen",
     "mark_important": "Als wichtig markieren",
     "unmark_important": "Wichtig-Markierung entfernen",
-    "task_options": "Aufgabenoptionen"
+    "task_options": "Aufgabenoptionen",
+    "remind_me": "Erinnere mich",
+    "remind_me_hint": "Eine Benachrichtigung wird zum Fälligkeitstermin ausgelöst."
   },
   "tags": {
     "add_single": "Tag hinzufügen...",

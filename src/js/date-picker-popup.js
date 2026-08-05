@@ -115,6 +115,12 @@
                 html += '</div>';
             }
 
+            if (timeOnly && options.removeTimeLabel && selectedTime) {
+                html += '<div class="slash-date-picker-actions-row">'
+                    + '<button type="button" class="slash-date-picker-remove-time-btn" data-remove-time="1"><i class="lucide lucide-clock"></i>' + esc(options.removeTimeLabel) + '</button>'
+                    + '</div>';
+            }
+
             picker.innerHTML = html;
         }
 
@@ -262,9 +268,16 @@
                 return;
             }
             if (e.target.closest('[data-remove-time]')) {
-                // Clear the time in the current selection; the popup stays
-                // open and apply confirms
                 selectedTime = '';
+                if (timeOnly) {
+                    // Time-only mode returns the cleared time right away
+                    picked = true;
+                    cleanup();
+                    onPick(null, '');
+                    return;
+                }
+                // Otherwise clear the selection; the popup stays open and
+                // apply confirms
                 render();
                 return;
             }

@@ -754,7 +754,9 @@
     "move_to_list": "移动到其他清单",
     "mark_important": "标记为重要",
     "unmark_important": "取消重要标记",
-    "task_options": "任务选项"
+    "task_options": "任务选项",
+    "remind_me": "提醒我",
+    "remind_me_hint": "将在截止日期和时间触发通知。"
   },
   "tags": {
     "add_single": "添加标签...",

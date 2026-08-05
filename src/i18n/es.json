@@ -756,7 +756,9 @@
     "due_remove_time": "Quitar la hora",
     "mark_important": "Marcar como importante",
     "unmark_important": "Quitar importante",
-    "task_options": "Opciones de la tarea"
+    "task_options": "Opciones de la tarea",
+    "remind_me": "Recuérdamelo",
+    "remind_me_hint": "Se activa una notificación en la fecha y hora límite."
   },
   "tags": {
     "add_single": "Agregar etiqueta...",

@@ -130,11 +130,12 @@ class TasksController
             }
 
             $clean[] = [
-                'id'        => is_scalar($task['id'] ?? null) ? $task['id'] : null,
-                'text'      => is_scalar($text) ? (string) $text : '',
-                'completed' => !empty($task['completed']),
-                'important' => !empty($task['important']),
-                'dueAt'     => $dueAt,
+                'id'          => is_scalar($task['id'] ?? null) ? $task['id'] : null,
+                'text'        => is_scalar($text) ? (string) $text : '',
+                'completed'   => !empty($task['completed']),
+                'important'   => !empty($task['important']),
+                'dueAt'       => $dueAt,
+                'dueReminder' => !empty($task['dueReminder']),
             ];
         }
 

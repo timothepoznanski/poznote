@@ -390,9 +390,10 @@ function renderTasks(tasks, noteId) {
         const dragTitle = t('tasklist.drag_to_reorder', null, 'Drag to reorder');
 
         const dueAt = normalizeTaskDueAt(task.dueAt);
+        const dueBellHtml = task.dueReminder ? '<i class="lucide lucide-bell"></i>' : '';
         const dueChipHtml = dueAt
             ? `<button type="button" class="task-due-chip${(!task.completed && isTaskDueOverdue(dueAt)) ? ' overdue' : ''}" title="${dueTitle}" onclick="openTaskDueDatePicker(${task.id}, ${task.noteId || 'null'}, event)">
-                <i class="lucide lucide-calendar-alt"></i><span>${formatTaskDueDate(dueAt)}</span>
+                <i class="lucide lucide-calendar-alt"></i><span>${formatTaskDueDate(dueAt)}</span>${dueBellHtml}
             </button>`
             : '';
         const dueBtnHtml = (!dueAt && !task.completed)
@@ -523,6 +524,20 @@ function addTask(noteId) {
     }
 }
 
+// Cancel the pending reminder of a task (completing or deleting it)
+function clearTaskReminderIfAny(noteId, task) {
+    if (!task || !task.dueReminder) return;
+    task.dueReminder = false;
+    try {
+        fetch('/api/v1/notes/' + noteId + '/task-reminder', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ task_id: String(task.id) })
+        });
+    } catch (e) { }
+}
+
 // Toggle task completion
 function toggleTask(taskId, noteId) {
     const noteEntry = document.getElementById('entry' + noteId);
@@ -534,6 +549,11 @@ function toggleTask(taskId, noteId) {
     if (taskIndex === -1) return;
 
     tasks[taskIndex].completed = !tasks[taskIndex].completed;
+
+    // Completing a task cancels its pending reminder
+    if (tasks[taskIndex].completed) {
+        clearTaskReminderIfAny(noteId, tasks[taskIndex]);
+    }
     
     // Reorder tasks to maintain grouping:
     // - important incomplete tasks first
@@ -882,6 +902,9 @@ function deleteTask(taskId, noteId) {
 
     let tasks = parseTaskData(noteEntry);
 
+    const removedTask = tasks.find(task => task.id === taskId);
+    clearTaskReminderIfAny(noteId, removedTask);
+
     tasks = tasks.filter(task => task.id !== taskId);
     noteEntry.dataset.tasklistJson = JSON.stringify(tasks);
 
@@ -945,6 +968,23 @@ function openTaskDueDatePicker(taskId, noteId, event, anchorRectOverride) {
 
     const trigger = event && event.target ? event.target.closest('button') : null;
     const anchorRect = anchorRectOverride || (trigger ? trigger.getBoundingClientRect() : null);
+
+    // Preferred UI: the shared due-date modal (date + time + reminder toggle)
+    if (typeof window.openTaskDueModal === 'function' && document.getElementById('taskDueModal')) {
+        window.openTaskDueModal({
+            noteId: noteId,
+            taskId: task.id,
+            task: task,
+            onSave: function (payload) {
+                task.dueAt = payload.dueAt;
+                task.dueReminder = payload.dueReminder;
+                task.dueReminderEmail = payload.dueReminderEmail;
+                saveAndRenderTasks(noteId, tasks);
+                markTaskListAsModified(noteId);
+            }
+        });
+        return;
+    }
 
     if (typeof window.showSlashDatePicker === 'function') {
         const removeLabel = window.t ? window.t('tasklist.due_remove', null, 'Remove due date') : 'Remove due date';

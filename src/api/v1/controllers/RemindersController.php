@@ -180,9 +180,10 @@ class RemindersController {
             $stmt = $this->con->prepare("UPDATE entries SET reminder_at = ?, reminder_recurrence = ? WHERE id = ?");
             $stmt->execute([$reminderAtUtc, $recurrence, $noteId]);
             
-            // Remove any existing pending (non-triggered) notification for this note
-            $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND dismissed = 0")->execute([$noteId]);
-            
+            // Remove any existing pending (non-triggered) note-level notification
+            // (task-level reminders live in their own rows with a task_id)
+            $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND dismissed = 0 AND task_id IS NULL")->execute([$noteId]);
+
             // Create notification entry
             $notifMessage = $message ?: $note['heading'];
             $stmt = $this->con->prepare("
@@ -219,9 +220,9 @@ class RemindersController {
             // Clear reminder on the note
             $stmt = $this->con->prepare("UPDATE entries SET reminder_at = NULL, reminder_recurrence = NULL WHERE id = ?");
             $stmt->execute([$noteId]);
-            
-            // Remove pending notifications for this note
-            $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND dismissed = 0")->execute([$noteId]);
+
+            // Remove pending note-level notifications (keep task reminders)
+            $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND dismissed = 0 AND task_id IS NULL")->execute([$noteId]);
             
             $this->sendSuccess(['note_id' => $noteId]);
         } catch (Exception $e) {
@@ -230,6 +231,122 @@ class RemindersController {
         }
     }
     
+    /**
+     * POST /api/v1/notes/{id}/task-reminder
+     * Set a reminder for one task of a tasklist note
+     *
+     * Body (JSON):
+     *   - task_id: id of the task inside the note's task JSON (required)
+     *   - reminder_at: ISO datetime string (required)
+     *   - message: notification text, typically the task text (optional)
+     *   - email_enabled: whether to send an email (optional)
+     */
+    public function setTaskReminder(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $this->rememberDetectedAppUrl();
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            $this->sendError(400, 'Invalid JSON in request body');
+            return;
+        }
+
+        $taskId = isset($input['task_id']) && is_scalar($input['task_id']) ? trim((string)$input['task_id']) : '';
+        $reminderAt = $input['reminder_at'] ?? null;
+        $message = isset($input['message']) ? trim((string)$input['message']) : '';
+        $emailEnabled = !empty($input['email_enabled']) && $this->isReminderEmailAvailable();
+
+        if ($taskId === '') {
+            $this->sendError(400, 'task_id is required');
+            return;
+        }
+        if (empty($reminderAt)) {
+            $this->sendError(400, 'reminder_at is required');
+            return;
+        }
+
+        try {
+            $dt = new DateTime($reminderAt);
+            $reminderAtUtc = $dt->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            $this->sendError(400, 'Invalid datetime format for reminder_at');
+            return;
+        }
+
+        try {
+            $stmt = $this->con->prepare("SELECT id, heading FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$noteId]);
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$note) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            // Replace any pending reminder of this task
+            $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND task_id = ? AND dismissed = 0")
+                ->execute([$noteId, $taskId]);
+
+            $notifMessage = $message !== '' ? $message : (string)$note['heading'];
+            $stmt = $this->con->prepare("
+                INSERT INTO notifications (note_id, task_id, type, message, trigger_at, email_enabled, created)
+                VALUES (?, ?, 'reminder', ?, ?, ?, datetime('now'))
+            ");
+            $stmt->execute([$noteId, $taskId, $notifMessage, $reminderAtUtc, $emailEnabled ? 1 : 0]);
+
+            $this->sendSuccess([
+                'note_id' => $noteId,
+                'task_id' => $taskId,
+                'reminder_at' => $reminderAtUtc,
+                'email_enabled' => $emailEnabled
+            ]);
+        } catch (Exception $e) {
+            error_log('RemindersController::setTaskReminder error: ' . $e->getMessage());
+            $this->sendError(500, 'Failed to set task reminder');
+        }
+    }
+
+    /**
+     * DELETE /api/v1/notes/{id}/task-reminder
+     * Remove the pending reminder of one task (body or query: task_id)
+     */
+    public function removeTaskReminder(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        $taskId = '';
+        if (is_array($input) && isset($input['task_id']) && is_scalar($input['task_id'])) {
+            $taskId = trim((string)$input['task_id']);
+        } elseif (isset($_GET['task_id'])) {
+            $taskId = trim((string)$_GET['task_id']);
+        }
+
+        if ($taskId === '') {
+            $this->sendError(400, 'task_id is required');
+            return;
+        }
+
+        try {
+            $this->con->prepare("DELETE FROM notifications WHERE note_id = ? AND task_id = ? AND dismissed = 0")
+                ->execute([$noteId, $taskId]);
+
+            $this->sendSuccess(['note_id' => $noteId, 'task_id' => $taskId]);
+        } catch (Exception $e) {
+            error_log('RemindersController::removeTaskReminder error: ' . $e->getMessage());
+            $this->sendError(500, 'Failed to remove task reminder');
+        }
+    }
+
     /**
      * GET /api/v1/notes/{id}/reminder
      * Get the reminder status for a note
@@ -249,7 +366,7 @@ class RemindersController {
                 SELECT e.reminder_at, e.reminder_recurrence,
                        COALESCE(n.email_enabled, 1) AS email_enabled
                 FROM entries e
-                LEFT JOIN notifications n ON n.note_id = e.id AND n.dismissed = 0
+                LEFT JOIN notifications n ON n.note_id = e.id AND n.dismissed = 0 AND n.task_id IS NULL
                 WHERE e.id = ? AND e.trash = 0
                 ORDER BY n.id DESC
                 LIMIT 1
@@ -309,7 +426,7 @@ class RemindersController {
 
             // For recurring reminders, schedule the next occurrence; otherwise clear the reminder
             $infoStmt = $this->con->prepare("
-                SELECT n.note_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
+                SELECT n.note_id, n.task_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
                        n.trigger_at, e.reminder_at, e.reminder_recurrence
                 FROM notifications n
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
@@ -319,7 +436,9 @@ class RemindersController {
             $info = $infoStmt->fetch(PDO::FETCH_ASSOC);
 
             $nextReminderAt = null;
-            if ($info && !empty($info['note_id'])) {
+            // Task-level reminders are one-shot and independent of the note's
+            // reminder: never reschedule nor clear entries.reminder_at for them
+            if ($info && !empty($info['note_id']) && empty($info['task_id'])) {
                 $nextReminderAt = $this->scheduleNextOccurrence($info);
                 if ($nextReminderAt === null) {
                     $this->con->prepare("UPDATE entries SET reminder_at = NULL WHERE id = ?")->execute([$info['note_id']]);

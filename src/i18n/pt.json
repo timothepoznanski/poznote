@@ -753,7 +753,9 @@
     "due_remove_time": "Remover hora",
     "mark_important": "Marcar como importante",
     "unmark_important": "Remover importante",
-    "task_options": "Opções da tarefa"
+    "task_options": "Opções da tarefa",
+    "remind_me": "Lembrar-me",
+    "remind_me_hint": "Uma notificação é disparada na data e hora de vencimento."
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",

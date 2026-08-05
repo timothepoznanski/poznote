@@ -453,6 +453,14 @@ $router->post('/notes/{id}/reminder', function($params) use ($remindersControlle
 });
 
 // Remove a reminder from a note
+$router->post('/notes/{id}/task-reminder', function($params) use ($remindersController) {
+    $remindersController->setTaskReminder($params['id']);
+});
+
+$router->delete('/notes/{id}/task-reminder', function($params) use ($remindersController) {
+    $remindersController->removeTaskReminder($params['id']);
+});
+
 $router->delete('/notes/{id}/reminder', function($params) use ($remindersController) {
     $remindersController->removeReminder($params['id']);
 });
