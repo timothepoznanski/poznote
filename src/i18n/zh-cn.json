@@ -371,7 +371,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "SaaS 模式：阻止非管理员用户发现实例中的其他账户。用户目录仅限管理员访问，并拒绝与特定用户共享。家庭或团队实例请保持关闭。",
+      "tenant_isolation": "SaaS 模式：选择对非管理员用户屏蔽哪些功能，例如发现实例中的其他账户或注册个人 webhook。家庭或团队实例请保持全部不勾选。",
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
@@ -1334,6 +1334,16 @@
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "标记：YYYY、MM、DD、HH、h、hh、mm、ss、A",
       "custom_invalid": "请输入有效的自定义格式。"
+    },
+    "tenant_isolation": {
+      "title": "租户隔离",
+      "description": "对非管理员用户屏蔽勾选的功能（SaaS 模式）。管理员永不受影响。家庭或团队实例请保持全部不勾选。",
+      "features": {
+        "user_sharing": "用户发现与共享",
+        "user_sharing_help": "用户目录仅限管理员访问，并拒绝与特定用户共享。",
+        "user_webhooks": "用户 Webhook",
+        "user_webhooks_help": "非管理员用户无法再注册向外部服务发送笔记事件的 webhook。"
+      }
     }
   },
   "notes_list": {
@@ -3132,7 +3142,7 @@
     "card": "用户 Webhook",
     "card_help": "通过 webhook 将您自己笔记的事件（提醒触发、笔记创建或分享）发送到 ntfy、n8n 等外部服务。",
     "description": "当您的笔记触发已订阅的事件时（提醒到期、笔记被创建或公开分享），Poznote 会向每个已注册的端点发送带有 JSON payload 的 HTTP POST 请求。仅涉及您自己的笔记。如果设置了密钥，payload 会通过 HMAC-SHA256 签名并放在 X-Poznote-Signature-256 请求头中。",
-    "access_denied": "访问被拒绝。此页面仅供主账户使用。"
+    "access_denied": "访问被拒绝。此实例已禁用用户 webhook。"
   },
   "webhooks_admin": {
     "event_help": {
@@ -3144,11 +3154,11 @@
       "signup_cap_reached": "SSO 注册被拒绝，因为实例已达到最大用户数。Payload：上限以及尝试注册的用户名和邮箱。",
       "quota_notes_reached": "操作被阻止，因为用户的笔记配额已用完。Payload：用户、上限和当前数量。",
       "quota_storage_reached": "操作被阻止，因为用户的存储配额已用完。Payload：用户、上限和当前用量。",
-      "reminder_due": "主账户（用户 1）的笔记提醒到达触发时间；其他用户的提醒不会触发 webhook。完整 Payload：笔记（id、标题、工作区、直达链接）和提醒消息。",
+      "reminder_due": "您的某条笔记提醒到达触发时间；其他用户的提醒不会触发您的 webhook。完整 Payload：笔记（id、标题、工作区、直达链接）和提醒消息。",
       "reminder_due_title": "与 reminder.due 相同的触发，但不含提醒消息：标识符加上笔记标题和直达链接。",
       "reminder_due_minimal": "与 reminder.due 相同的触发，但仅含标识符（笔记 id、提醒 id、触发时间）：笔记内容不会离开实例。详情可通过 REST API 获取。",
-      "note_created": "在主账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
-      "note_shared": "为主账户的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。"
+      "note_created": "您的账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
+      "note_shared": "为您的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。"
     },
     "title": "Webhook",
     "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",

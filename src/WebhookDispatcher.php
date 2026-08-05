@@ -7,7 +7,9 @@ if (!defined('SQLITE_DATABASE')) {
 require_once __DIR__ . '/users/db_master.php';
 
 /**
- * Delivers instance events to the admin-registered outgoing webhooks.
+ * Delivers events to the registered outgoing webhooks: instance events to the
+ * admin-registered webhooks, user-content events to the webhooks of the
+ * account that produced them.
  *
  * Delivery is best-effort and synchronous with a short timeout: a slow or
  * failing endpoint must never break the action (e.g. a signup) that produced
@@ -28,9 +30,10 @@ class WebhookDispatcher {
         'quota.storage_reached',
     ];
 
-    // Events about the primary account's own content, managed from its
-    // settings page (User Webhooks). They only ever fire for user 1: other
-    // users' notes and reminders must not reach these endpoints.
+    // Events about an account's own content, managed from that account's
+    // settings page (User Webhooks). They only ever reach the webhooks
+    // registered by the account that produced them: one user's notes and
+    // reminders must not reach another user's endpoints.
     public const USER_EVENTS = [
         'reminder.due',
         'reminder.due_title',
@@ -42,9 +45,6 @@ class WebhookDispatcher {
     // Reminder subset of USER_EVENTS; the worker skips its scan entirely when
     // no active webhook subscribes to any of them.
     public const REMINDER_EVENTS = ['reminder.due', 'reminder.due_title', 'reminder.due_minimal'];
-
-    // The primary account, the only one whose content events are dispatched.
-    public const PRIMARY_USER_ID = 1;
 
     // Every event, INSTANCE_EVENTS + USER_EVENTS (kept literal: constant
     // expressions cannot call array_merge).
@@ -67,15 +67,37 @@ class WebhookDispatcher {
     private const TIMEOUT_SECONDS = 5;
 
     /**
+     * True when user-content events may be dispatched for this account.
+     * Mirrors poznoteCanUseUserWebhooks() but works from a user id, so the
+     * reminder worker (no session) can apply the same rule: when tenant
+     * isolation blocks the user_webhooks feature, only admins' webhooks fire.
+     */
+    public static function userWebhooksAllowedFor(int $userId): bool {
+        if ($userId <= 0) {
+            return false;
+        }
+        if (!defined('TENANT_ISOLATION_FEATURES')
+            || !in_array('user_webhooks', TENANT_ISOLATION_FEATURES, true)) {
+            return true;
+        }
+
+        $user = getUserProfileById($userId);
+        return $user && !empty($user['is_admin']);
+    }
+
+    /**
      * Send an event to every active webhook subscribed to it.
+     *
+     * $forUserId scopes delivery to one account's webhooks; user events must
+     * always pass it, instance events never.
      *
      * @return array{delivered:int,failed:int}
      */
-    public function dispatch(string $event, array $data): array {
+    public function dispatch(string $event, array $data, ?int $forUserId = null): array {
         $result = ['delivered' => 0, 'failed' => 0];
 
         try {
-            foreach (listActiveWebhooksForEvent($event) as $webhook) {
+            foreach (listActiveWebhooksForEvent($event, $forUserId) as $webhook) {
                 if ($this->deliver($webhook, $event, $data)['success']) {
                     $result['delivered']++;
                 } else {
@@ -206,16 +228,22 @@ class WebhookDispatcher {
      * reminder.due_minimal only identifiers and the trigger time (a receiver
      * can then fetch details through the REST API if needed).
      *
-     * These events only ever concern the primary account, so the payload
-     * carries no user block: the note id identifies the target.
+     * These events only reach the webhooks of the account owning the
+     * reminder, so the payload carries no user block: the note id identifies
+     * the target.
      *
      * @param array $notification due row joined with the note (id, note_id,
      *        message, trigger_at, note_heading, workspace)
      * @param string $noteUrl direct link to the note, '' when no app URL is
      *        configured
+     * @param int $userId account owning the reminder
      * @return array{delivered:int,failed:int}
      */
-    public function dispatchReminderDue(array $notification, string $noteUrl = ''): array {
+    public function dispatchReminderDue(array $notification, string $noteUrl, int $userId): array {
+        if (!self::userWebhooksAllowedFor($userId)) {
+            return ['delivered' => 0, 'failed' => 0];
+        }
+
         $reminderId = (int)($notification['id'] ?? 0);
         $noteId = (int)($notification['note_id'] ?? 0);
         $triggerAt = (string)($notification['trigger_at'] ?? '');
@@ -232,7 +260,7 @@ class WebhookDispatcher {
                 'message' => (string)($notification['message'] ?? ''),
                 'trigger_at' => $triggerAt,
             ],
-        ]);
+        ], $userId);
 
         $title = $this->dispatch('reminder.due_title', [
             'note' => [
@@ -244,7 +272,7 @@ class WebhookDispatcher {
                 'id' => $reminderId,
                 'trigger_at' => $triggerAt,
             ],
-        ]);
+        ], $userId);
 
         $minimal = $this->dispatch('reminder.due_minimal', [
             'note' => ['id' => $noteId],
@@ -252,7 +280,7 @@ class WebhookDispatcher {
                 'id' => $reminderId,
                 'trigger_at' => $triggerAt,
             ],
-        ]);
+        ], $userId);
 
         return [
             'delivered' => $full['delivered'] + $title['delivered'] + $minimal['delivered'],
@@ -261,20 +289,19 @@ class WebhookDispatcher {
     }
 
     /**
-     * Emitted when the primary account creates a note, through the UI or the
-     * REST API (both go through NotesController::create).
+     * Emitted when an account creates a note, through the UI or the REST API
+     * (both go through NotesController::create).
      *
-     * Call sites can invoke this unconditionally: it is a no-op for any other
-     * user, so a note created by user 2 never reaches the endpoints. Because
-     * the event only ever concerns the primary account, the payload carries no
-     * user block: the note id identifies the target. Only metadata is sent,
-     * never the note body.
+     * Delivery is scoped to the webhooks registered by that account, so a
+     * note created by user 2 never reaches another user's endpoints. The
+     * payload carries no user block: the endpoints belong to the note's
+     * owner. Only metadata is sent, never the note body.
      *
      * @param string $source how the note was created: 'ui' or 'api'
      * @return array{delivered:int,failed:int}
      */
     public function dispatchNoteCreated(int $userId, array $note, string $source): array {
-        if ($userId !== self::PRIMARY_USER_ID) {
+        if (!self::userWebhooksAllowedFor($userId)) {
             return ['delivered' => 0, 'failed' => 0];
         }
 
@@ -289,13 +316,13 @@ class WebhookDispatcher {
                 'url' => $this->noteUrl((int)($note['id'] ?? 0), (string)($note['workspace'] ?? '')),
             ],
             'source' => $source,
-        ]);
+        ], $userId);
     }
 
     /**
-     * Emitted when the primary account publishes a public share link for one
-     * of its notes. Like dispatchNoteCreated, a no-op for any other user, and
-     * the payload carries no user block.
+     * Emitted when an account publishes a public share link for one of its
+     * notes. Like dispatchNoteCreated, delivery is scoped to that account's
+     * webhooks and the payload carries no user block.
      *
      * $share carries the public token and url; $updated tells receivers the
      * note was already shared and the link was regenerated.
@@ -303,7 +330,7 @@ class WebhookDispatcher {
      * @return array{delivered:int,failed:int}
      */
     public function dispatchNoteShared(int $userId, array $note, array $share, bool $updated = false): array {
-        if ($userId !== self::PRIMARY_USER_ID) {
+        if (!self::userWebhooksAllowedFor($userId)) {
             return ['delivered' => 0, 'failed' => 0];
         }
 
@@ -320,7 +347,7 @@ class WebhookDispatcher {
                 'has_password' => !empty($share['has_password']),
                 'updated' => $updated,
             ],
-        ]);
+        ], $userId);
     }
 
     /**

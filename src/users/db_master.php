@@ -200,7 +200,9 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
     
-    // Outgoing webhooks: admin-registered endpoints notified of instance events.
+    // Outgoing webhooks. Instance webhooks (user_id NULL) are registered by
+    // admins and notified of instance events; user webhooks belong to a single
+    // account (user_id) and are notified of that account's own content events.
     $con->exec("
         CREATE TABLE IF NOT EXISTS webhooks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -210,9 +212,29 @@ function initializeMasterDatabase(PDO $con): void {
             active INTEGER DEFAULT 1,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_status TEXT,
-            last_delivery_at DATETIME
+            last_delivery_at DATETIME,
+            user_id INTEGER
         )
     ");
+
+    // Migration: user webhooks used to be implicitly owned by the primary
+    // account (user 1); attach the pre-existing rows to it so they keep
+    // working now that every account can register its own.
+    try {
+        $cols = $con->query("PRAGMA table_info(webhooks)")->fetchAll(PDO::FETCH_ASSOC);
+        if (!in_array('user_id', array_column($cols, 'name'))) {
+            $con->exec("ALTER TABLE webhooks ADD COLUMN user_id INTEGER");
+            $con->exec("
+                UPDATE webhooks
+                SET user_id = 1
+                WHERE user_id IS NULL
+                  AND (events LIKE 'reminder.%' OR events LIKE '%,reminder.%'
+                       OR events LIKE 'note.%' OR events LIKE '%,note.%')
+            ");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to add webhooks.user_id column: " . $e->getMessage());
+    }
 
     // Create indexes
     $con->exec("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username)");
@@ -1213,11 +1235,18 @@ function listWebhooks(): array {
 /**
  * List the active webhooks subscribed to a given event.
  * The events column holds a comma-separated list of event names.
+ *
+ * $userId scopes the lookup to one account's webhooks: user events must only
+ * ever reach the endpoints registered by the account that produced them.
+ * Leave it null for instance events, which go to every subscribed webhook.
  */
-function listActiveWebhooksForEvent(string $event): array {
+function listActiveWebhooksForEvent(string $event, ?int $userId = null): array {
     $matching = [];
     foreach (listWebhooks() as $webhook) {
         if (empty($webhook['active'])) {
+            continue;
+        }
+        if ($userId !== null && (int)($webhook['user_id'] ?? 0) !== $userId) {
             continue;
         }
         $events = array_map('trim', explode(',', (string)$webhook['events']));
@@ -1226,6 +1255,33 @@ function listActiveWebhooksForEvent(string $event): array {
         }
     }
     return $matching;
+}
+
+/**
+ * List one account's own webhooks (user webhooks page).
+ */
+function listWebhooksForUser(int $userId): array {
+    return array_values(array_filter(listWebhooks(), static function ($webhook) use ($userId) {
+        return (int)($webhook['user_id'] ?? 0) === $userId;
+    }));
+}
+
+/**
+ * Distinct owner ids of the active webhooks subscribed to at least one of the
+ * given events. Lets the reminder worker scan only the accounts that actually
+ * registered a reminder webhook.
+ */
+function listWebhookUserIdsForEvents(array $events): array {
+    $userIds = [];
+    foreach ($events as $event) {
+        foreach (listActiveWebhooksForEvent($event) as $webhook) {
+            $ownerId = (int)($webhook['user_id'] ?? 0);
+            if ($ownerId > 0) {
+                $userIds[$ownerId] = true;
+            }
+        }
+    }
+    return array_keys($userIds);
 }
 
 /**
@@ -1271,11 +1327,15 @@ function getWebhookById(int $id): ?array {
     }
 }
 
-function createWebhook(string $url, string $secret, array $events): bool {
+/**
+ * $userId is the owning account for a user webhook; null registers an
+ * instance webhook (admin page).
+ */
+function createWebhook(string $url, string $secret, array $events, ?int $userId = null): bool {
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active) VALUES (?, ?, ?, 1)");
-        return $stmt->execute([$url, $secret !== '' ? $secret : null, implode(',', $events)]);
+        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active, user_id) VALUES (?, ?, ?, 1, ?)");
+        return $stmt->execute([$url, $secret !== '' ? $secret : null, implode(',', $events), $userId]);
     } catch (Exception $e) {
         error_log("Failed to create webhook: " . $e->getMessage());
         return false;

@@ -368,7 +368,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "Modo SaaS: impede que os utilizadores não administradores descubram as outras contas da instância. O diretório de utilizadores fica reservado aos administradores e a partilha com utilizadores específicos é recusada. Deixe desativado numa instância familiar ou de equipa.",
+      "tenant_isolation": "Modo SaaS: escolha quais funcionalidades são bloqueadas para os utilizadores não administradores, como descobrir as outras contas da instância ou registar webhooks pessoais. Deixe tudo desmarcado numa instância familiar ou de equipa.",
       "workspaces": "Organize suas notas em espaços de trabalho separados, cada um com suas pastas e notas.",
       "my_profile": "Veja e edite as informações do seu perfil.",
       "change_password": "Altere a senha usada para entrar.",
@@ -1343,6 +1343,16 @@
       "move": "Mover pasta",
       "workspace": "Espaço de trabalho de destino",
       "parent": "Pasta pai de destino"
+    },
+    "tenant_isolation": {
+      "title": "Isolamento de contas",
+      "description": "Bloqueia as funcionalidades marcadas para os utilizadores não administradores (modo SaaS). Os administradores nunca são afetados. Deixe tudo desmarcado numa instância familiar ou de equipa.",
+      "features": {
+        "user_sharing": "Descoberta e partilha entre utilizadores",
+        "user_sharing_help": "O diretório de utilizadores fica reservado aos administradores e a partilha com utilizadores específicos é recusada.",
+        "user_webhooks": "Webhooks de usuário",
+        "user_webhooks_help": "Os utilizadores não administradores deixam de poder registar webhooks que enviam eventos sobre as suas notas para serviços externos."
+      }
     }
   },
   "notes_list": {
@@ -3014,7 +3024,7 @@
     "card": "Webhooks de usuário",
     "card_help": "Envie eventos das suas próprias notas (lembrete disparado, nota criada ou compartilhada) para serviços externos como ntfy ou n8n via webhooks.",
     "description": "O Poznote envia uma solicitação HTTP POST com um payload JSON para cada endpoint registrado quando uma das suas notas dispara um evento assinado: um lembrete vencendo, uma nota criada ou compartilhada publicamente. Apenas suas próprias notas são afetadas. Se um segredo for definido, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",
-    "access_denied": "Acesso negado. Esta página é reservada à conta principal."
+    "access_denied": "Acesso negado. Os webhooks de usuário estão desativados nesta instância."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3026,11 +3036,11 @@
       "signup_cap_reached": "Um cadastro SSO foi recusado porque a instância atingiu seu número máximo de usuários. Payload: o limite e o nome de usuário e email tentados.",
       "quota_notes_reached": "Uma ação foi bloqueada porque a cota de notas do usuário foi atingida. Payload: o usuário, o limite e a contagem atual.",
       "quota_storage_reached": "Uma ação foi bloqueada porque a cota de armazenamento do usuário foi atingida. Payload: o usuário, o limite e o uso atual.",
-      "reminder_due": "Um lembrete de nota da conta principal (usuário 1) chegou ao seu horário de disparo; lembretes de outros usuários nunca disparam webhooks. Payload completo: a nota (id, título, workspace, link direto) e a mensagem do lembrete.",
+      "reminder_due": "Um dos seus lembretes de nota chegou ao seu horário de disparo; lembretes de outros usuários nunca disparam os seus webhooks. Payload completo: a nota (id, título, workspace, link direto) e a mensagem do lembrete.",
       "reminder_due_title": "Mesmo disparo que reminder.due, mas sem a mensagem do lembrete: os identificadores mais o título da nota e o link direto.",
       "reminder_due_minimal": "Mesmo disparo que reminder.due, mas apenas identificadores (id da nota, id do lembrete, horário de disparo): nenhum conteúdo da nota sai da instância. Os detalhes podem ser obtidos pela API REST.",
-      "note_created": "Uma nota foi criada na conta principal, pela interface ou pela API REST. Payload: apenas metadados (id da nota, título, tipo, workspace, pasta, link direto), nunca o conteúdo da nota.",
-      "note_shared": "Um link público de compartilhamento foi publicado para uma nota da conta principal. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha."
+      "note_created": "Uma nota foi criada na sua conta, pela interface ou pela API REST. Payload: apenas metadados (id da nota, título, tipo, workspace, pasta, link direto), nunca o conteúdo da nota.",
+      "note_shared": "Um link público de compartilhamento foi publicado para uma das suas notas. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha."
     },
     "title": "Webhooks",
     "description": "O Poznote envia um pedido HTTP POST com um payload JSON a cada endpoint registado quando ocorre um evento subscrito. Se for definido um segredo, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",

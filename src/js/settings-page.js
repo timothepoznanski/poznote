@@ -137,7 +137,7 @@
             keys.push('git_sync_enabled');
         }
         if (document.getElementById('tenant-isolation-card')) {
-            keys.push('tenant_isolation', 'tenant_isolation_applied_ui_keys');
+            keys.push('tenant_isolation', 'tenant_isolation_features', 'tenant_isolation_applied_ui_keys');
         }
 
         var unique = Object.create(null);
@@ -998,13 +998,32 @@
         });
     }
 
+    // Blocked tenant isolation features, with the legacy fallback: instances
+    // configured before the feature list existed only had the on/off
+    // tenant_isolation flag, which meant user_sharing.
+    function getTenantIsolationFeatures(callback) {
+        getSetting('tenant_isolation_features', function (rawFeatures) {
+            if (rawFeatures && rawFeatures.trim() !== '') {
+                var features = [];
+                try { features = JSON.parse(rawFeatures); } catch (e) { features = []; }
+                callback(Array.isArray(features) ? features : []);
+                return;
+            }
+
+            getSetting('tenant_isolation', function (rawLegacy) {
+                var legacyOn = rawLegacy === '1' || rawLegacy === 'true';
+                callback(legacyOn ? ['user_sharing'] : []);
+            });
+        });
+    }
+
     function refreshTenantIsolationBadge() {
         var badge = document.getElementById('tenant-isolation-status');
         if (!badge) return;
 
         var txt = getTranslations();
-        getSetting('tenant_isolation', function (value) {
-            var enabled = value === '1' || value === 'true';
+        getTenantIsolationFeatures(function (features) {
+            var enabled = features.length > 0;
             badge.textContent = enabled ? txt.enabled : txt.disabled;
             badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
         });
@@ -1136,6 +1155,18 @@
                 zipInput.value = (zipValue && zipValue.trim()) ? zipValue.trim() : '300';
                 modal.style.display = 'flex';
             });
+        });
+    }
+
+    function showTenantIsolationModal() {
+        var modal = document.getElementById('tenantIsolationModal');
+        if (!modal) return;
+
+        getTenantIsolationFeatures(function (features) {
+            modal.querySelectorAll('[data-tenant-feature]').forEach(function (checkbox) {
+                checkbox.checked = features.indexOf(checkbox.getAttribute('data-tenant-feature')) !== -1;
+            });
+            modal.style.display = 'flex';
         });
     }
 
@@ -1645,27 +1676,11 @@
             });
         }
 
-        // Tenant isolation (SaaS mode) global toggle. Enabling it also hides the
-        // controls that became pointless for everyone, so the UI stops offering
-        // what the server now refuses. Turning it back off removes only what the
-        // toggle itself added, leaving the administrator's own choices alone.
+        // Tenant isolation (SaaS mode) - opens the modal listing the
+        // capabilities that can be blocked for non-admin users.
         var tenantIsolationCard = document.getElementById('tenant-isolation-card');
         if (tenantIsolationCard) {
-            tenantIsolationCard.addEventListener('click', function () {
-                getSetting('tenant_isolation', function (currentValue) {
-                    var currently = currentValue === '1' || currentValue === 'true';
-                    var enabling = !currently;
-
-                    setSetting('tenant_isolation', enabling ? '1' : '0', function () {
-                        syncTenantIsolationHiddenKeys(enabling, function () {
-                            refreshTenantIsolationBadge();
-                            refreshUiCustomizationAdminBadge();
-                            refreshUiCustomizationBadge();
-                            reloadOpener();
-                        });
-                    });
-                });
-            });
+            tenantIsolationCard.addEventListener('click', showTenantIsolationModal);
         }
 
         // Tasklist insert order card - toggles between top and bottom
@@ -2231,6 +2246,42 @@
             });
         }
 
+        // Save tenant isolation modal button
+        var saveTenantIsolationBtn = document.getElementById('saveTenantIsolationBtn');
+        if (saveTenantIsolationBtn) {
+            saveTenantIsolationBtn.addEventListener('click', function () {
+                var modal = document.getElementById('tenantIsolationModal');
+                if (!modal) return;
+
+                var features = [];
+                modal.querySelectorAll('[data-tenant-feature]').forEach(function (checkbox) {
+                    if (checkbox.checked) {
+                        features.push(checkbox.getAttribute('data-tenant-feature'));
+                    }
+                });
+
+                setSetting('tenant_isolation_features', JSON.stringify(features), function (ok) {
+                    if (!ok) {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                        return;
+                    }
+
+                    // Legacy on/off flag, kept meaning "user_sharing blocked"
+                    // for the pre-existing server checks and older releases.
+                    var legacyValue = features.indexOf('user_sharing') !== -1 ? '1' : '0';
+                    setSetting('tenant_isolation', legacyValue, function () {
+                        syncTenantIsolationHiddenKeys(features, function () {
+                            try { closeModal('tenantIsolationModal'); } catch (e) { }
+                            refreshTenantIsolationBadge();
+                            refreshUiCustomizationAdminBadge();
+                            refreshUiCustomizationBadge();
+                            reloadOpener();
+                        });
+                    });
+                });
+            });
+        }
+
         // Load all badges on page load. Most values are already embedded in page-config-data.
         preloadSettings(getSettingsPreloadKeys()).then(function () {
             refreshLanguageBadge();
@@ -2664,16 +2715,28 @@
             });
     }
 
-    // UI keys that tenant isolation hides for every user. They are only the
-    // cosmetic half: the server refuses these actions regardless, so unchecking
-    // one by hand re-displays a control that still fails with a 403.
-    var TENANT_ISOLATION_HIDDEN_KEYS = ['share:restrict-users'];
+    // UI keys hidden for every user per blocked tenant isolation feature.
+    // They are only the cosmetic half: the server refuses these actions
+    // regardless, so unchecking one by hand re-displays a control that still
+    // fails with a 403.
+    var TENANT_ISOLATION_FEATURE_HIDDEN_KEYS = {
+        'user_sharing': ['share:restrict-users'],
+        'user_webhooks': ['card:user-webhooks-card']
+    };
 
-    // Records which keys this toggle added, so disabling isolation removes those
-    // and not the ones the administrator had already hidden on purpose.
+    // Records which keys the tenant isolation modal added, so unblocking a
+    // feature removes those and not the ones the administrator had already
+    // hidden on purpose.
     var TENANT_ISOLATION_APPLIED_SETTING = 'tenant_isolation_applied_ui_keys';
 
-    function syncTenantIsolationHiddenKeys(enabling, done) {
+    function syncTenantIsolationHiddenKeys(blockedFeatures, done) {
+        var desiredKeys = [];
+        Object.keys(TENANT_ISOLATION_FEATURE_HIDDEN_KEYS).forEach(function (feature) {
+            if (blockedFeatures.indexOf(feature) !== -1) {
+                desiredKeys = desiredKeys.concat(TENANT_ISOLATION_FEATURE_HIDDEN_KEYS[feature]);
+            }
+        });
+
         getSetting('hidden_ui_elements_global', function (rawGlobal) {
             getSetting(TENANT_ISOLATION_APPLIED_SETTING, function (rawApplied) {
                 var hidden = parseHiddenUiCustomization(rawGlobal);
@@ -2681,26 +2744,23 @@
                 try { applied = JSON.parse(rawApplied || '[]'); } catch (e) { applied = []; }
                 if (!Array.isArray(applied)) applied = [];
 
+                // Drop what a previous sync added, then re-add what the current
+                // selection needs: keys the admin hid on purpose are never
+                // claimed, so unblocking a feature leaves them hidden.
+                var previouslyApplied = Object.create(null);
+                applied.forEach(function (key) { previouslyApplied[key] = true; });
+                hidden = hidden.filter(function (key) { return !previouslyApplied[key]; });
+
                 var present = Object.create(null);
                 hidden.forEach(function (key) { present[key] = true; });
 
-                var nextApplied;
-                if (enabling) {
-                    // Only claim the keys we actually add: one already hidden by
-                    // the admin must stay hidden when isolation is turned off.
-                    nextApplied = TENANT_ISOLATION_HIDDEN_KEYS.filter(function (key) {
-                        return !present[key];
-                    });
-                    nextApplied.forEach(function (key) {
-                        hidden.push(key);
-                        present[key] = true;
-                    });
-                } else {
-                    var toRemove = Object.create(null);
-                    applied.forEach(function (key) { toRemove[key] = true; });
-                    hidden = hidden.filter(function (key) { return !toRemove[key]; });
-                    nextApplied = [];
-                }
+                var nextApplied = desiredKeys.filter(function (key) {
+                    return !present[key];
+                });
+                nextApplied.forEach(function (key) {
+                    hidden.push(key);
+                    present[key] = true;
+                });
 
                 setSetting('hidden_ui_elements_global', JSON.stringify(hidden), function () {
                     setSetting(TENANT_ISOLATION_APPLIED_SETTING, JSON.stringify(nextApplied), function () {

@@ -1,12 +1,13 @@
 <?php
 /**
- * User Webhooks - primary account tool
+ * User Webhooks - per-account tool
  *
- * Register HTTP endpoints notified about the primary account's own content:
- * a reminder triggering, a note being created or publicly shared. Only user 1
- * sees this page, and only user 1's events are ever dispatched: these
- * webhooks relay personal note data, so they live with the account settings
- * rather than the instance admin tools.
+ * Register HTTP endpoints notified about the current account's own content:
+ * a reminder triggering, a note being created or publicly shared. Every user
+ * manages their own endpoints and only their own events are ever dispatched
+ * to them: these webhooks relay personal note data, so they live with the
+ * account settings rather than the instance admin tools. Tenant isolation
+ * can block the feature for non-admin users.
  */
 
 require_once __DIR__ . '/auth.php';
@@ -15,11 +16,13 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/functions.php';
 requireSettingsPassword();
 
-if ((int)(getCurrentUserId() ?? 0) !== 1) {
+if (!poznoteCanUseUserWebhooks()) {
     header('HTTP/1.1 403 Forbidden');
-    echo '<div style="padding:20px;font-family:sans-serif;color:#721c24;background:#f8d7da;border:1px solid #f5c6cb;border-radius:4px;margin:20px;">' . htmlspecialchars(t('webhooks_user.access_denied', [], 'Access denied. This page is reserved for the primary account.'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div>';
+    echo '<div style="padding:20px;font-family:sans-serif;color:#721c24;background:#f8d7da;border:1px solid #f5c6cb;border-radius:4px;margin:20px;">' . htmlspecialchars(t('webhooks_user.access_denied', [], 'Access denied. User webhooks are disabled on this instance.'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</div>';
     exit;
 }
+
+$currentWebhookUserId = (int)(getCurrentUserId() ?? 0);
 
 require_once __DIR__ . '/users/db_master.php';
 require_once __DIR__ . '/WebhookDispatcher.php';
@@ -59,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $events = array_values(array_intersect(WebhookDispatcher::USER_EVENTS, array_map('strval', $events)));
 
             $urlAlreadyRegistered = false;
-            foreach (listWebhooks() as $existing) {
+            foreach (listWebhooksForUser($currentWebhookUserId) as $existing) {
                 if (trim((string)$existing['url']) === $url) {
                     $urlAlreadyRegistered = true;
                     break;
@@ -70,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = t('webhooks_admin.error_invalid_url', [], 'The webhook URL must start with http:// or https://.');
             } elseif (empty($events)) {
                 $error = t('webhooks_admin.error_no_events', [], 'Select at least one event.');
-            } elseif (createWebhook($url, $secret, $events)) {
+            } elseif (createWebhook($url, $secret, $events, $currentWebhookUserId)) {
                 if ($urlAlreadyRegistered) {
                     $warning = t('webhooks_admin.added_duplicate', [], 'Webhook added, but this URL was already registered: each entry will receive its own delivery for every event.');
                 } else {
@@ -82,8 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (in_array($action, ['delete', 'enable', 'disable', 'test'], true)) {
             $id = (int)($_POST['webhook_id'] ?? 0);
             $webhook = $id > 0 ? getWebhookById($id) : null;
-            if ($webhook && !isUserWebhook($webhook)) {
-                // Instance webhooks are managed from the admin page
+            if ($webhook && (int)($webhook['user_id'] ?? 0) !== $currentWebhookUserId) {
+                // Other users' webhooks and admin instance webhooks are out of
+                // reach from this page.
                 $webhook = null;
             }
             if (!$webhook) {
@@ -117,17 +121,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $_SESSION['user_webhooks_csrf_token'] = bin2hex(random_bytes(32));
-// Instance webhooks are managed from the admin page
-$webhooks = array_values(array_filter(listWebhooks(), 'isUserWebhook'));
+// Only the current account's webhooks; instance webhooks are managed from
+// the admin page.
+$webhooks = listWebhooksForUser($currentWebhookUserId);
 
 // Hover help for each event, same bubble pattern as the settings cards.
 // i18n keys replace the dots of the event name with underscores.
 $eventHelpDefaults = [
-    'reminder.due' => 'A note reminder of the primary account (user 1) reached its trigger time; other users\' reminders never trigger webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.',
+    'reminder.due' => 'One of your note reminders reached its trigger time; other users\' reminders never trigger your webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.',
     'reminder.due_title' => 'Same trigger as reminder.due but without the reminder message: identifiers plus the note title and direct link.',
     'reminder.due_minimal' => 'Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.',
-    'note.created' => 'A note was created in the primary account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.',
-    'note.shared' => 'A public share link was published for a note of the primary account. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected.',
+    'note.created' => 'A note was created in your account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.',
+    'note.shared' => 'A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected.',
 ];
 $eventHelp = [];
 foreach ($eventHelpDefaults as $eventName => $default) {

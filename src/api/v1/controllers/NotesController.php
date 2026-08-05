@@ -896,8 +896,8 @@ class NotesController {
 
                 // note.created webhook. Keyed on the account the note belongs
                 // to (getCurrentUserId), not the authenticated actor: an admin
-                // working inside another account must not emit as user 1.
-                // dispatchNoteCreated is a no-op for any account but user 1.
+                // working inside another account must not emit to their own
+                // endpoints. Delivery is scoped to that account's webhooks.
                 $this->dispatchNoteCreatedWebhook([
                     'id' => (int)$id,
                     'heading' => $heading,

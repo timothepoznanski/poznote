@@ -227,6 +227,34 @@ try {
     </div>
 </div>
 
+<!-- Tenant Isolation Modal -->
+<div id="tenantIsolationModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.tenant_isolation.title', [], 'Tenant isolation'); ?></h3>
+        <p><?php echo t_h('modals.tenant_isolation.description', [], 'Block the checked capabilities for non-admin users (SaaS mode). Administrators are never affected. Leave everything unchecked for a family or team instance.'); ?></p>
+        <div class="tenant-isolation-features">
+            <label class="tenant-isolation-feature">
+                <input type="checkbox" data-tenant-feature="user_sharing">
+                <span class="tenant-isolation-feature-text">
+                    <span class="tenant-isolation-feature-title"><?php echo t_h('modals.tenant_isolation.features.user_sharing', [], 'User discovery and sharing'); ?></span>
+                    <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_sharing_help', [], 'The user directory becomes admin-only and sharing with specific users is refused.'); ?></span>
+                </span>
+            </label>
+            <label class="tenant-isolation-feature">
+                <input type="checkbox" data-tenant-feature="user_webhooks">
+                <span class="tenant-isolation-feature-text">
+                    <span class="tenant-isolation-feature-title"><?php echo t_h('modals.tenant_isolation.features.user_webhooks', [], 'User webhooks'); ?></span>
+                    <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_webhooks_help', [], 'Non-admin users can no longer register webhooks that send events about their notes to external endpoints.'); ?></span>
+                </span>
+            </label>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="tenantIsolationModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveTenantIsolationBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Font Size Settings Modal -->
 <div id="fontSizeModal" class="modal">
     <div class="modal-content">

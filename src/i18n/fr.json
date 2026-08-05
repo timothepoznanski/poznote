@@ -381,7 +381,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "Mode SaaS : empêche les utilisateurs non administrateurs de découvrir les autres comptes de l'instance. L'annuaire des utilisateurs devient réservé aux administrateurs et le partage avec des utilisateurs spécifiques est refusé. Laissez cette option désactivée pour une instance familiale ou d'équipe.",
+      "tenant_isolation": "Mode SaaS : choisissez les fonctionnalités bloquées pour les utilisateurs non administrateurs, comme la découverte des autres comptes de l'instance ou l'enregistrement de webhooks personnels. Laissez tout décoché pour une instance familiale ou d'équipe.",
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
@@ -1376,6 +1376,16 @@
       "move": "Déplacer le dossier",
       "workspace": "Workspace de destination",
       "parent": "Dossier parent de destination"
+    },
+    "tenant_isolation": {
+      "title": "Isolation des comptes",
+      "description": "Bloque les fonctionnalités cochées pour les utilisateurs non administrateurs (mode SaaS). Les administrateurs ne sont jamais concernés. Laissez tout décoché pour une instance familiale ou d'équipe.",
+      "features": {
+        "user_sharing": "Découverte et partage entre utilisateurs",
+        "user_sharing_help": "L'annuaire des utilisateurs devient réservé aux administrateurs et le partage avec des utilisateurs spécifiques est refusé.",
+        "user_webhooks": "Webhooks utilisateur",
+        "user_webhooks_help": "Les utilisateurs non administrateurs ne peuvent plus enregistrer de webhooks envoyant des événements sur leurs notes vers des services externes."
+      }
     }
   },
   "notes_list": {
@@ -3201,7 +3211,7 @@
     "card": "Webhooks utilisateur",
     "card_help": "Envoyer les événements de vos propres notes (rappel déclenché, note créée ou partagée) vers des services externes comme ntfy ou n8n via des webhooks.",
     "description": "Poznote envoie une requête HTTP POST avec un payload JSON à chaque endpoint enregistré quand une de vos notes déclenche un événement auquel vous êtes abonné : un rappel qui arrive à échéance, une note créée ou partagée publiquement. Seules vos propres notes sont concernées. Si un secret est défini, le payload est signé en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",
-    "access_denied": "Accès refusé. Cette page est réservée au compte principal."
+    "access_denied": "Accès refusé. Les webhooks utilisateur sont désactivés sur cette instance."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3213,11 +3223,11 @@
       "signup_cap_reached": "Une inscription SSO a été refusée car l'instance a atteint son nombre maximum d'utilisateurs. Payload : la limite ainsi que le nom d'utilisateur et l'email tentés.",
       "quota_notes_reached": "Une action a été bloquée car le quota de notes de l'utilisateur est atteint. Payload : l'utilisateur, la limite et le nombre actuel.",
       "quota_storage_reached": "Une action a été bloquée car le quota de stockage de l'utilisateur est atteint. Payload : l'utilisateur, la limite et l'utilisation actuelle.",
-      "reminder_due": "Un rappel de note du compte principal (utilisateur 1) est arrivé à échéance ; les rappels des autres utilisateurs ne déclenchent jamais de webhook. Payload complet : la note (id, titre, workspace, lien direct) et le message du rappel.",
+      "reminder_due": "Un de vos rappels de note est arrivé à échéance ; les rappels des autres utilisateurs ne déclenchent jamais vos webhooks. Payload complet : la note (id, titre, workspace, lien direct) et le message du rappel.",
       "reminder_due_title": "Même déclenchement que reminder.due mais sans le message du rappel : les identifiants plus le titre de la note et le lien direct.",
       "reminder_due_minimal": "Même déclenchement que reminder.due mais identifiants seulement (id de note, id de rappel, date d'échéance) : aucun contenu de note ne quitte l'instance. Les détails peuvent être récupérés via l'API REST.",
-      "note_created": "Une note a été créée dans le compte principal, depuis l'interface ou l'API REST. Payload : métadonnées seulement (id de note, titre, type, workspace, dossier, lien direct), jamais le contenu de la note.",
-      "note_shared": "Un lien de partage public a été publié pour une note du compte principal. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe."
+      "note_created": "Une note a été créée dans votre compte, depuis l'interface ou l'API REST. Payload : métadonnées seulement (id de note, titre, type, workspace, dossier, lien direct), jamais le contenu de la note.",
+      "note_shared": "Un lien de partage public a été publié pour une de vos notes. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe."
     },
     "title": "Webhooks",
     "description": "Poznote envoie une requête HTTP POST avec une charge JSON à chaque endpoint enregistré lorsqu'un événement souscrit se produit. Si un secret est défini, la charge est signée en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",

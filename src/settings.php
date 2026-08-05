@@ -200,6 +200,7 @@ if ($isAdmin) {
             'user_max_storage_mb',
             'git_sync_enabled',
             'tenant_isolation',
+            'tenant_isolation_features',
             'tenant_isolation_applied_ui_keys',
         ];
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
@@ -249,14 +250,15 @@ if ($isAdmin) {
     }
 }
 
-// User webhooks are personal to the primary account (user 1)
+// User webhooks are personal to each account; tenant isolation can block
+// them for non-admin users.
 $active_user_webhooks_count = 0;
-$isPrimaryAccount = (int)(getCurrentUserId() ?? 0) === 1;
-if ($isPrimaryAccount) {
+$canUseUserWebhooks = poznoteCanUseUserWebhooks();
+if ($canUseUserWebhooks) {
     try {
         require_once 'users/db_master.php';
-        $active_user_webhooks_count = count(array_filter(listWebhooks(), static function ($webhook) {
-            return !empty($webhook['active']) && isUserWebhook($webhook);
+        $active_user_webhooks_count = count(array_filter(listWebhooksForUser((int)(getCurrentUserId() ?? 0)), static function ($webhook) {
+            return !empty($webhook['active']);
         }));
     } catch (Exception $e) {
         $active_user_webhooks_count = 0;
@@ -430,8 +432,8 @@ if ($isPrimaryAccount) {
                 </div>
             </div>
 
-            <!-- User Webhooks (primary account only) -->
-            <?php if ($isPrimaryAccount): ?>
+            <!-- User Webhooks (per account; tenant isolation can block non-admins) -->
+            <?php if ($canUseUserWebhooks): ?>
             <div class="home-card settings-card-clickable" id="user-webhooks-card" data-href="user-webhooks.php">
                 <span class="setting-help" data-tooltip="<?php echo t_h('webhooks_user.card_help', [], 'Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
@@ -969,7 +971,7 @@ if ($isPrimaryAccount) {
 
             <!-- Tenant isolation (SaaS mode) -->
             <div class="home-card" id="tenant-isolation-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: prevent non-admin users from discovering the other accounts of the instance. The user directory becomes admin-only and sharing with specific users is refused. Leave it off for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-shield"></i>
                 </div>

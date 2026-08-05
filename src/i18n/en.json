@@ -105,7 +105,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "SaaS mode: prevent non-admin users from discovering the other accounts of the instance. The user directory becomes admin-only and sharing with specific users is refused. Leave it off for a family or team instance.",
+      "tenant_isolation": "SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.",
       "workspaces": "Organize your notes into separate workspaces, each with its own folders and notes.",
       "my_profile": "View and edit your profile information.",
       "change_password": "Change the password used to sign in.",
@@ -898,6 +898,16 @@
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
       "custom_invalid": "Enter a valid custom format."
+    },
+    "tenant_isolation": {
+      "title": "Tenant isolation",
+      "description": "Block the checked capabilities for non-admin users (SaaS mode). Administrators are never affected. Leave everything unchecked for a family or team instance.",
+      "features": {
+        "user_sharing": "User discovery and sharing",
+        "user_sharing_help": "The user directory becomes admin-only and sharing with specific users is refused.",
+        "user_webhooks": "User webhooks",
+        "user_webhooks_help": "Non-admin users can no longer register webhooks that send events about their notes to external endpoints."
+      }
     }
   },
   "notes_list": {
@@ -2689,7 +2699,7 @@
     "card": "User Webhooks",
     "card_help": "Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
-    "access_denied": "Access denied. This page is reserved for the primary account."
+    "access_denied": "Access denied. User webhooks are disabled on this instance."
   },
   "webhooks_admin": {
     "event_help": {
@@ -2701,11 +2711,11 @@
       "signup_cap_reached": "An SSO signup was refused because the instance reached its maximum number of users. Payload: the cap and the attempted username and email.",
       "quota_notes_reached": "A user action was blocked because their notes quota is reached. Payload: the user, the limit and the current count.",
       "quota_storage_reached": "A user action was blocked because their storage quota is reached. Payload: the user, the limit and the current usage.",
-      "reminder_due": "A note reminder of the primary account (user 1) reached its trigger time; other users' reminders never trigger webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.",
+      "reminder_due": "One of your note reminders reached its trigger time; other users' reminders never trigger your webhooks. Full payload: the note (id, title, workspace, direct link) and the reminder message.",
       "reminder_due_title": "Same trigger as reminder.due but without the reminder message: identifiers plus the note title and direct link.",
       "reminder_due_minimal": "Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.",
-      "note_created": "A note was created in the primary account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
-      "note_shared": "A public share link was published for a note of the primary account. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected."
+      "note_created": "A note was created in your account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
+      "note_shared": "A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected."
     },
     "title": "Webhooks",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",

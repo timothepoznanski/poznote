@@ -369,7 +369,7 @@
   },
   "settings": {
     "card_help": {
-      "tenant_isolation": "SaaS-Modus: Verhindert, dass Benutzer ohne Administratorrechte die anderen Konten der Instanz entdecken. Das Benutzerverzeichnis ist nur für Administratoren zugänglich und die Freigabe an bestimmte Benutzer wird abgelehnt. Für Familien- oder Teaminstanzen deaktiviert lassen.",
+      "tenant_isolation": "SaaS-Modus: Wählen Sie, welche Funktionen für Benutzer ohne Administratorrechte blockiert werden, etwa das Entdecken der anderen Konten der Instanz oder das Registrieren persönlicher Webhooks. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
@@ -1344,6 +1344,16 @@
       "move": "Ordner verschieben",
       "workspace": "Ziel-Workspace",
       "parent": "Ziel-Überordner"
+    },
+    "tenant_isolation": {
+      "title": "Mandantentrennung",
+      "description": "Blockiert die angehakten Funktionen für Benutzer ohne Administratorrechte (SaaS-Modus). Administratoren sind nie betroffen. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
+      "features": {
+        "user_sharing": "Benutzersuche und Freigabe",
+        "user_sharing_help": "Das Benutzerverzeichnis ist nur für Administratoren zugänglich und die Freigabe an bestimmte Benutzer wird abgelehnt.",
+        "user_webhooks": "Benutzer-Webhooks",
+        "user_webhooks_help": "Benutzer ohne Administratorrechte können keine Webhooks mehr registrieren, die Ereignisse über ihre Notizen an externe Dienste senden."
+      }
     }
   },
   "notes_list": {
@@ -3011,7 +3021,7 @@
     "card": "Benutzer-Webhooks",
     "card_help": "Ereignisse Ihrer eigenen Notizen (Erinnerung ausgelöst, Notiz erstellt oder geteilt) per Webhook an externe Dienste wie ntfy oder n8n senden.",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpoint, wenn eine Ihrer Notizen ein abonniertes Ereignis auslöst: eine fällige Erinnerung, eine erstellte oder öffentlich geteilte Notiz. Betroffen sind nur Ihre eigenen Notizen. Ist ein Secret gesetzt, wird der Payload mit HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
-    "access_denied": "Zugriff verweigert. Diese Seite ist dem Hauptkonto vorbehalten."
+    "access_denied": "Zugriff verweigert. Benutzer-Webhooks sind auf dieser Instanz deaktiviert."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3023,11 +3033,11 @@
       "signup_cap_reached": "Eine SSO-Registrierung wurde abgelehnt, weil die Instanz ihre maximale Benutzerzahl erreicht hat. Payload: das Limit sowie der versuchte Benutzername und die E-Mail.",
       "quota_notes_reached": "Eine Aktion wurde blockiert, weil das Notizen-Kontingent des Benutzers erreicht ist. Payload: der Benutzer, das Limit und die aktuelle Anzahl.",
       "quota_storage_reached": "Eine Aktion wurde blockiert, weil das Speicher-Kontingent des Benutzers erreicht ist. Payload: der Benutzer, das Limit und die aktuelle Nutzung.",
-      "reminder_due": "Eine Notiz-Erinnerung des Hauptkontos (Benutzer 1) hat ihren Auslösezeitpunkt erreicht; Erinnerungen anderer Benutzer lösen nie Webhooks aus. Vollständiger Payload: die Notiz (ID, Titel, Workspace, Direktlink) und die Erinnerungsnachricht.",
+      "reminder_due": "Eine Ihrer Notiz-Erinnerungen hat ihren Auslösezeitpunkt erreicht; Erinnerungen anderer Benutzer lösen nie Ihre Webhooks aus. Vollständiger Payload: die Notiz (ID, Titel, Workspace, Direktlink) und die Erinnerungsnachricht.",
       "reminder_due_title": "Gleicher Auslöser wie reminder.due, aber ohne die Erinnerungsnachricht: die IDs plus Titel und Direktlink der Notiz.",
       "reminder_due_minimal": "Gleicher Auslöser wie reminder.due, aber nur IDs (Notiz-ID, Erinnerungs-ID, Auslösezeit): kein Notizinhalt verlässt die Instanz. Details können über die REST-API abgerufen werden.",
-      "note_created": "Im Hauptkonto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
-      "note_shared": "Für eine Notiz des Hauptkontos wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist."
+      "note_created": "In Ihrem Konto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
+      "note_shared": "Für eine Ihrer Notizen wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist."
     },
     "title": "Webhooks",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpunkt, wenn ein abonniertes Ereignis eintritt. Ist ein Secret gesetzt, wird die Payload per HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",

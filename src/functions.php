@@ -1302,6 +1302,29 @@ function poznoteCanTargetOtherUsers() {
 }
 
 /**
+ * True when the given tenant isolation feature is blocked on this instance
+ * (for non-admin users; the per-request admin exemption is up to the caller).
+ */
+function poznoteTenantIsolationBlocks($feature) {
+    return defined('TENANT_ISOLATION_FEATURES')
+        && in_array($feature, TENANT_ISOLATION_FEATURES, true);
+}
+
+/**
+ * True when the current user may manage personal webhooks. Blocked for
+ * non-admin users when tenant isolation blocks the user_webhooks feature:
+ * webhooks relay note metadata to arbitrary endpoints, which a SaaS operator
+ * may not want to offer to tenants. Admins keep the capability.
+ */
+function poznoteCanUseUserWebhooks() {
+    if (!poznoteTenantIsolationBlocks('user_webhooks')) {
+        return true;
+    }
+
+    return function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+}
+
+/**
  * Clean content for search by removing base64 images and other heavy data
  * This is used to keep the database entry column lightweight for search functionality
  */
