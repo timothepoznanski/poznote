@@ -1680,7 +1680,8 @@
       "title": "Sicherung / Export"
     },
     "common": {
-      "all_workspaces": "alle Arbeitsbereiche"
+      "all_workspaces": "alle Arbeitsbereiche",
+      "skip_s3_attachments": "S3-Anhänge nicht in das ZIP aufnehmen (leichteres Archiv)"
     },
     "sections": {
       "complete_backup": {
@@ -1701,11 +1702,17 @@
         "warning": "Hinweis: Dieser Exporttyp ist nicht für eine perfekte Sicherung von Poznote konzipiert.",
         "select_workspace": "Arbeitsbereich auswählen:",
         "loading_workspaces": "Arbeitsbereiche werden geladen..."
+      },
+      "attachments_export": {
+        "title": "Anhang-Export",
+        "description": "Laden Sie alle Anhänge Ihres Kontos in einem einzigen ZIP-Archiv herunter.",
+        "description_s3": "Bei aktiviertem S3-Speicher werden die Dateien aus dem Bucket geholt; verwenden Sie dieses Archiv, um einem ohne S3-Anhänge erstellten Backup vor der Wiederherstellung die fehlenden Dateien hinzuzufügen."
       }
     },
     "buttons": {
       "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)",
-      "download_structured_export": "Strukturierten Export herunterladen (ZIP)"
+      "download_structured_export": "Strukturierten Export herunterladen (ZIP)",
+      "download_attachments_export": "Anhänge herunterladen (ZIP)"
     },
     "spinner": {
       "preparing": "Sicherung wird vorbereitet...",
@@ -1798,7 +1805,7 @@
       "select_backup_first": "Bitte wählen Sie zuerst eine Sicherungsdatei aus.",
       "restore_error": "Wiederherstellungsfehler: {{error}}",
       "no_backup_file_or_upload": "Keine Sicherungsdatei bereitgestellt oder Upload-Fehler.",
-      "complete_restore_error": "Vollständiger Wiederherstellungsfehler: {{error}} - {{message}}",
+      "complete_restore_error": "Vollständiger Wiederherstellungsfehler: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "Keine vollständige Sicherungsdatei bereitgestellt oder Upload-Fehler.",
       "import_error": "Importfehler: {{error}}",
       "no_notes_file_or_upload": "Keine Notizdatei bereitgestellt oder Upload-Fehler.",
@@ -3312,7 +3319,9 @@
   },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",
-    "description": "Speichern Sie Notiz-Anhänge in einem S3-kompatiblen Objektspeicher (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) statt auf der lokalen Festplatte. Die Einstellung gilt für alle Benutzer dieser Instanz.",
+    "description": "Speichern Sie Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte.",
+    "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz.",
+    "attachments_only_note": "Es sind nur die Anhang-Dateien betroffen.",
     "config_title": "Konfiguration",
     "enable_label": "Anhänge in S3 speichern",
     "enable_description": "Neue Anhänge werden in den Bucket geschrieben. Dateien auf der lokalen Festplatte funktionieren weiterhin und können unten migriert werden.",
@@ -3343,11 +3352,12 @@
     "migration_error": "Migration nach einem Fehler gestoppt: {{error}}",
     "confirm_to_s3": "Alle lokalen Anhang-Dateien (alle Benutzer) in den Bucket verschieben?",
     "confirm_to_local": "Alle Bucket-Anhänge zurück auf die lokale Festplatte laden (alle Benutzer)?",
-    "footer_note": "Anhänge werden unter attachments/{Benutzer-ID}/ im Bucket gespeichert und immer über Poznote ausgeliefert (der Bucket kann privat bleiben). Git-Sync ignoriert Anhänge, solange der S3-Speicher aktiviert ist.",
+    "footer_note": "Anhänge werden unter attachments/{Benutzer-ID}/ im Bucket gespeichert und immer über Poznote ausgeliefert (der Bucket kann privat bleiben).",
     "messages": {
       "saved": "Konfiguration erfolgreich gespeichert.",
       "save_error": "Konfiguration konnte nicht gespeichert werden.",
       "incomplete": "Endpoint, Bucket und Zugangsdaten sind erforderlich, um den S3-Speicher zu aktivieren."
-    }
+    },
+    "git_sync_note": "Git-Sync ignoriert Anhänge, solange der S3-Speicher aktiviert ist."
   }
 }

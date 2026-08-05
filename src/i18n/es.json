@@ -1681,7 +1681,8 @@
       "title": "Copia de seguridad / Exportar"
     },
     "common": {
-      "all_workspaces": "todos los espacios de trabajo"
+      "all_workspaces": "todos los espacios de trabajo",
+      "skip_s3_attachments": "No incluir los adjuntos S3 en el zip (archivo más ligero)"
     },
     "sections": {
       "complete_backup": {
@@ -1702,11 +1703,17 @@
         "warning": "Nota: Este tipo de exportación no está diseñado para una copia de seguridad perfecta de Poznote.",
         "select_workspace": "Seleccionar espacio de trabajo:",
         "loading_workspaces": "Cargando espacios de trabajo..."
+      },
+      "attachments_export": {
+        "title": "Exportación de adjuntos",
+        "description": "Descargue todos los adjuntos de su cuenta en un único archivo ZIP.",
+        "description_s3": "Con el almacenamiento S3 activado, los archivos se obtienen del bucket; use este archivo para añadir los archivos que faltan a una copia de seguridad creada sin los adjuntos S3 antes de restaurarla."
       }
     },
     "buttons": {
       "download_complete_backup": "Descargar copia de seguridad completa (ZIP)",
-      "download_structured_export": "Descargar exportación estructurada (ZIP)"
+      "download_structured_export": "Descargar exportación estructurada (ZIP)",
+      "download_attachments_export": "Descargar adjuntos (ZIP)"
     },
     "spinner": {
       "preparing": "Preparando copia de seguridad...",
@@ -1799,7 +1806,7 @@
       "select_backup_first": "Por favor selecciona un archivo de copia de seguridad primero.",
       "restore_error": "Error de restauración: {{error}}",
       "no_backup_file_or_upload": "No se proporcionó archivo de copia de seguridad o error de subida.",
-      "complete_restore_error": "Error de restauración completa: {{error}} - {{message}}",
+      "complete_restore_error": "Error de restauración completa: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "No se proporcionó archivo de copia de seguridad completa o error de subida.",
       "import_error": "Error de importación: {{error}}",
       "no_notes_file_or_upload": "No se seleccionaron archivos de notas o error de subida.",
@@ -3312,7 +3319,9 @@
   },
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",
-    "description": "Almacene los adjuntos de las notas en un almacenamiento de objetos compatible con S3 (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) en lugar del disco local. El ajuste se aplica a todos los usuarios de esta instancia.",
+    "description": "Almacene los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
+    "description_scope": "El ajuste se aplica a todos los usuarios de esta instancia.",
+    "attachments_only_note": "Solo se ven afectados los archivos adjuntos.",
     "config_title": "Configuración",
     "enable_label": "Almacenar adjuntos en S3",
     "enable_description": "Los nuevos adjuntos se escriben en el bucket. Los archivos que sigan en el disco local continúan funcionando y pueden migrarse más abajo.",
@@ -3343,11 +3352,12 @@
     "migration_error": "Migración detenida tras un error: {{error}}",
     "confirm_to_s3": "¿Mover todos los archivos adjuntos locales (todos los usuarios) al bucket?",
     "confirm_to_local": "¿Descargar todos los adjuntos del bucket al disco local (todos los usuarios)?",
-    "footer_note": "Los adjuntos se almacenan bajo attachments/{id de usuario}/ en el bucket y siempre se sirven a través de Poznote (el bucket puede permanecer privado). La sincronización Git ignora los adjuntos mientras el almacenamiento S3 esté activado.",
+    "footer_note": "Los adjuntos se almacenan bajo attachments/{id de usuario}/ en el bucket y siempre se sirven a través de Poznote (el bucket puede permanecer privado).",
     "messages": {
       "saved": "Configuración guardada correctamente.",
       "save_error": "No se pudo guardar la configuración.",
       "incomplete": "El endpoint, el bucket y las credenciales son necesarios para activar el almacenamiento S3."
-    }
+    },
+    "git_sync_note": "La sincronización Git ignora los adjuntos mientras el almacenamiento S3 esté activado."
   }
 }

@@ -36,7 +36,6 @@ body.git-sync-page {
     max-width: 600px;
     margin: 0 auto;
 }
-
 /* Alerts */
 .alert {
     padding: 12px 16px;
@@ -465,7 +464,6 @@ body.dark-mode .git-sync-section h2 {
 body.dark-mode .git-sync-description {
     color: #aaa;
 }
-
 body.dark-mode .config-item {
     border-color: var(--dm-border);
 }

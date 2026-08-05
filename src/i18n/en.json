@@ -1348,7 +1348,8 @@
       "title": "Backup / Export"
     },
     "common": {
-      "all_workspaces": "all workspaces"
+      "all_workspaces": "all workspaces",
+      "skip_s3_attachments": "Do not include S3 attachments in the zip (lighter archive)"
     },
     "sections": {
       "complete_backup": {
@@ -1369,11 +1370,17 @@
         "warning": "Note: This export type is not designed for a perfect Poznote backup.",
         "select_workspace": "Select workspace:",
         "loading_workspaces": "Loading workspaces..."
+      },
+      "attachments_export": {
+        "title": "Attachments Export",
+        "description": "Download all the attachments of your account in a single ZIP archive.",
+        "description_s3": "With S3 storage enabled, the files are fetched from the bucket; use this archive to add the missing files to a backup made without S3 attachments before restoring it."
       }
     },
     "buttons": {
       "download_complete_backup": "Download complete backup (ZIP)",
-      "download_structured_export": "Download structured export (ZIP)"
+      "download_structured_export": "Download structured export (ZIP)",
+      "download_attachments_export": "Download attachments (ZIP)"
     },
     "spinner": {
       "preparing": "Preparing backup...",
@@ -1466,7 +1473,7 @@
       "select_backup_first": "Please select a backup file first.",
       "restore_error": "Restore error: {{error}}",
       "no_backup_file_or_upload": "No backup file provided or upload error.",
-      "complete_restore_error": "Complete restore error: {{error}} - {{message}}",
+      "complete_restore_error": "Complete restore error: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "No complete backup file provided or upload error.",
       "import_error": "Import error: {{error}}",
       "no_notes_file_or_upload": "No notes file provided or upload error.",
@@ -3009,7 +3016,9 @@
   },
   "s3_settings": {
     "title": "S3 Attachment Storage",
-    "description": "Store note attachments in an S3-compatible object storage (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) instead of the local disk. The setting applies to all users of this instance.",
+    "description": "Store note attachments in an S3-compatible object storage instead of the local disk.",
+    "description_scope": "The setting applies to all users of this instance.",
+    "attachments_only_note": "Only the attachment files are concerned.",
     "config_title": "Configuration",
     "enable_label": "Store attachments in S3",
     "enable_description": "New attachments are written to the bucket. Files still on local disk keep working and can be migrated below.",
@@ -3040,11 +3049,12 @@
     "migration_error": "Migration stopped after an error: {{error}}",
     "confirm_to_s3": "Move all local attachment files (all users) to the bucket?",
     "confirm_to_local": "Download all bucket attachments back to the local disk (all users)?",
-    "footer_note": "Attachments are stored under attachments/{user id}/ in the bucket and are always served through Poznote (the bucket can stay private). Git sync ignores attachments while S3 storage is enabled.",
+    "footer_note": "Attachments are stored under attachments/{user id}/ in the bucket and are always served through Poznote (the bucket can stay private).",
     "messages": {
       "saved": "Configuration saved successfully.",
       "save_error": "Failed to save configuration.",
       "incomplete": "Endpoint, bucket and credentials are required to enable S3 storage."
-    }
+    },
+    "git_sync_note": "Git sync ignores attachments while S3 storage is enabled."
   }
 }

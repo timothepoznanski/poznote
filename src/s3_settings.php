@@ -120,7 +120,10 @@ $s3Enabled = $s3Config['enabled'] === '1';
         </div>
 
         <div class="git-sync-header">
-            <p class="git-sync-description"><?php echo t_h('s3_settings.description', [], 'Store note attachments in an S3-compatible object storage (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) instead of the local disk. The setting applies to all users of this instance.'); ?></p>
+            <p class="git-sync-description"><?php echo t_h('s3_settings.description', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?><br>
+                <?php echo t_h('s3_settings.description_scope', [], 'The setting applies to all users of this instance.'); ?><br>
+                <?php echo t_h('s3_settings.attachments_only_note', [], 'Only the attachment files are concerned.'); ?><br>
+                <?php echo t_h('s3_settings.git_sync_note', [], 'Git sync ignores attachments while S3 storage is enabled.'); ?></p>
         </div>
 
         <?php if ($message): ?>
@@ -248,7 +251,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
         </div>
 
         <div class="git-sync-footer-note">
-            <?php echo t_h('s3_settings.footer_note', [], 'Attachments are stored under attachments/{user id}/ in the bucket and are always served through Poznote (the bucket can stay private). Git sync ignores attachments while S3 storage is enabled.'); ?>
+            <?php echo t_h('s3_settings.footer_note', [], 'Attachments are stored under attachments/{user id}/ in the bucket and are always served through Poznote (the bucket can stay private).'); ?>
         </div>
 
     </div>

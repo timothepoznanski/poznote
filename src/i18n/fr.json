@@ -1733,7 +1733,8 @@
       "individual_export": "Vous pouvez également exporter des notes individuelles dans différents formats (PDF, HTML, Markdown, Texte) en ouvrant une note et en cliquant sur l'icône de téléchargement dans la barre d'outils."
     },
     "common": {
-      "all_workspaces": "tous les espaces de travail"
+      "all_workspaces": "tous les espaces de travail",
+      "skip_s3_attachments": "Ne pas inclure les pièces jointes S3 dans le zip (archive plus légère)"
     },
     "sections": {
       "complete_backup": {
@@ -1754,11 +1755,17 @@
         "warning": "Note : Ce type d'export n'est pas conçu pour une sauvegarde parfaite de Poznote.",
         "select_workspace": "Sélectionner l'espace de travail :",
         "loading_workspaces": "Chargement des espaces de travail..."
+      },
+      "attachments_export": {
+        "title": "Export des pièces jointes",
+        "description": "Téléchargez toutes les pièces jointes de votre compte dans une seule archive ZIP.",
+        "description_s3": "Avec le stockage S3 activé, les fichiers sont récupérés depuis le bucket ; utilisez cette archive pour ajouter les fichiers manquants à un backup créé sans les pièces jointes S3 avant de le restaurer."
       }
     },
     "buttons": {
       "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)",
-      "download_structured_export": "Télécharger l'export structuré (ZIP)"
+      "download_structured_export": "Télécharger l'export structuré (ZIP)",
+      "download_attachments_export": "Télécharger les pièces jointes (ZIP)"
     },
     "spinner": {
       "preparing": "Préparation de la sauvegarde...",
@@ -1851,7 +1858,7 @@
       "select_backup_first": "Veuillez d’abord sélectionner un fichier de sauvegarde.",
       "restore_error": "Erreur de restauration : {{error}}",
       "no_backup_file_or_upload": "Aucun fichier de sauvegarde fourni ou erreur de téléversement.",
-      "complete_restore_error": "Erreur de restauration complète : {{error}} - {{message}}",
+      "complete_restore_error": "Erreur de restauration complète : {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "Aucun fichier de sauvegarde complète fourni ou erreur de téléversement.",
       "import_error": "Erreur d'import : {{error}}",
       "no_notes_file_or_upload": "Aucun fichier de notes fourni ou erreur de téléversement.",
@@ -3502,7 +3509,9 @@
   },
   "s3_settings": {
     "title": "Stockage S3 des pièces jointes",
-    "description": "Stockez les pièces jointes des notes dans un stockage objet compatible S3 (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) au lieu du disque local. Ce réglage s'applique à tous les utilisateurs de l'instance.",
+    "description": "Stockez les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
+    "description_scope": "Ce réglage s'applique à tous les utilisateurs de l'instance.",
+    "attachments_only_note": "Seuls les fichiers de pièces jointes sont concernés.",
     "config_title": "Configuration",
     "enable_label": "Stocker les pièces jointes dans S3",
     "enable_description": "Les nouvelles pièces jointes sont écrites dans le bucket. Les fichiers encore sur le disque local restent accessibles et peuvent être migrés ci-dessous.",
@@ -3533,11 +3542,12 @@
     "migration_error": "Migration arrêtée après une erreur : {{error}}",
     "confirm_to_s3": "Déplacer tous les fichiers locaux de pièces jointes (tous les utilisateurs) vers le bucket ?",
     "confirm_to_local": "Télécharger toutes les pièces jointes du bucket vers le disque local (tous les utilisateurs) ?",
-    "footer_note": "Les pièces jointes sont stockées sous attachments/{id utilisateur}/ dans le bucket et toujours servies via Poznote (le bucket peut rester privé). La synchronisation Git ignore les pièces jointes tant que le stockage S3 est activé.",
+    "footer_note": "Les pièces jointes sont stockées sous attachments/{id utilisateur}/ dans le bucket et toujours servies via Poznote (le bucket peut rester privé).",
     "messages": {
       "saved": "Configuration enregistrée avec succès.",
       "save_error": "Échec de l'enregistrement de la configuration.",
       "incomplete": "Le endpoint, le bucket et les identifiants sont requis pour activer le stockage S3."
-    }
+    },
+    "git_sync_note": "La synchronisation Git ignore les pièces jointes tant que le stockage S3 est activé."
   }
 }

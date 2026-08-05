@@ -44,7 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($result['success']) {
                     $restore_message = t('restore_import.messages.complete_backup_restored', ['message' => $result['message']]);
                 } else {
-                    $restore_error = t('restore_import.errors.complete_restore_error', ['error' => $result['error'], 'message' => $result['message']]);
+                    $restoreErrorDetails = trim((string)($result['message'] ?? ''));
+                    $restore_error = t('restore_import.errors.complete_restore_error', [
+                        'error' => $result['error'],
+                        'message' => $restoreErrorDetails !== '' ? ' - ' . $restoreErrorDetails : ''
+                    ]);
                 }
             } else {
                 $restore_error = t('restore_import.errors.no_complete_backup_file_or_upload');

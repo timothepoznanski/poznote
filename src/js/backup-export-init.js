@@ -21,4 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Attach attachments export button listener
+    var attachmentsExportBtn = document.getElementById('attachmentsExportBtn');
+    if (attachmentsExportBtn) {
+        attachmentsExportBtn.addEventListener('click', function () {
+            if (typeof startAttachmentsDownload === 'function') {
+                startAttachmentsDownload();
+            }
+        });
+    }
 });

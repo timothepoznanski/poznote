@@ -198,6 +198,24 @@ html[data-theme='dark'] .info-box {
     font-size: 14px;
 }
 
+/* Checkbox option shown when S3 attachment storage is enabled */
+.form-group-export.export-checkbox-group {
+    margin: 0 0 22px 0;
+}
+
+.export-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.export-checkbox-label input[type="checkbox"] {
+    margin: 0;
+    flex-shrink: 0;
+}
+
 /* Export select styles */
 .export-select {
     max-width: 350px;

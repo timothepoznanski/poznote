@@ -1684,7 +1684,8 @@
       "title": "Backup / Exportar"
     },
     "common": {
-      "all_workspaces": "todos os espaços de trabalho"
+      "all_workspaces": "todos os espaços de trabalho",
+      "skip_s3_attachments": "Não incluir os anexos S3 no zip (arquivo mais leve)"
     },
     "sections": {
       "complete_backup": {
@@ -1705,11 +1706,17 @@
         "warning": "Nota: Este tipo de exportação não é projetado para um backup perfeito do Poznote.",
         "select_workspace": "Selecionar espaço de trabalho:",
         "loading_workspaces": "Carregando espaços de trabalho..."
+      },
+      "attachments_export": {
+        "title": "Exportação de anexos",
+        "description": "Baixe todos os anexos da sua conta em um único arquivo ZIP.",
+        "description_s3": "Com o armazenamento S3 ativado, os arquivos são obtidos do bucket; use este arquivo para adicionar os arquivos ausentes a um backup criado sem os anexos S3 antes de restaurá-lo."
       }
     },
     "buttons": {
       "download_complete_backup": "Baixar Backup Completo (ZIP)",
-      "download_structured_export": "Baixar Exportação Estruturada (ZIP)"
+      "download_structured_export": "Baixar Exportação Estruturada (ZIP)",
+      "download_attachments_export": "Baixar anexos (ZIP)"
     },
     "spinner": {
       "preparing": "Preparando backup...",
@@ -1802,7 +1809,7 @@
       "select_backup_first": "Por favor, selecione um arquivo de backup primeiro.",
       "restore_error": "Erro de restauração: {{error}}",
       "no_backup_file_or_upload": "Nenhum arquivo de backup fornecido ou erro de upload.",
-      "complete_restore_error": "Erro de restauração completa: {{error}} - {{message}}",
+      "complete_restore_error": "Erro de restauração completa: {{error}}{{message}}",
       "no_complete_backup_file_or_upload": "Nenhum arquivo de backup completo fornecido ou erro de upload.",
       "import_error": "Erro de importação: {{error}}",
       "no_notes_file_or_upload": "Nenhum arquivo de notas fornecido ou erro de upload.",
@@ -3315,7 +3322,9 @@
   },
   "s3_settings": {
     "title": "Armazenamento S3 de anexos",
-    "description": "Armazene os anexos das notas em um armazenamento de objetos compatível com S3 (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...) em vez do disco local. A configuração se aplica a todos os usuários desta instância.",
+    "description": "Armazene os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
+    "description_scope": "A configuração se aplica a todos os usuários desta instância.",
+    "attachments_only_note": "Apenas os arquivos de anexos são afetados.",
     "config_title": "Configuração",
     "enable_label": "Armazenar anexos no S3",
     "enable_description": "Os novos anexos são gravados no bucket. Os arquivos ainda no disco local continuam funcionando e podem ser migrados abaixo.",
@@ -3346,11 +3355,12 @@
     "migration_error": "Migração interrompida após um erro: {{error}}",
     "confirm_to_s3": "Mover todos os arquivos de anexos locais (todos os usuários) para o bucket?",
     "confirm_to_local": "Baixar todos os anexos do bucket de volta ao disco local (todos os usuários)?",
-    "footer_note": "Os anexos são armazenados em attachments/{id do usuário}/ no bucket e sempre servidos pelo Poznote (o bucket pode permanecer privado). A sincronização Git ignora os anexos enquanto o armazenamento S3 estiver ativado.",
+    "footer_note": "Os anexos são armazenados em attachments/{id do usuário}/ no bucket e sempre servidos pelo Poznote (o bucket pode permanecer privado).",
     "messages": {
       "saved": "Configuração salva com sucesso.",
       "save_error": "Falha ao salvar a configuração.",
       "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar o armazenamento S3."
-    }
+    },
+    "git_sync_note": "A sincronização Git ignora os anexos enquanto o armazenamento S3 estiver ativado."
   }
 }

@@ -243,6 +243,16 @@ class AttachmentStorage {
     }
 
     /**
+     * A readable local path only when the file is on disk; bucket-stored
+     * files return null. Backup zips use this so S3 attachments stay out of
+     * the archives (the dedicated attachments export still fetches them).
+     */
+    public function localFileIfOnDisk(string $filename): ?string {
+        $localPath = $this->localDir() . '/' . basename($filename);
+        return (file_exists($localPath) && is_readable($localPath)) ? $localPath : null;
+    }
+
+    /**
      * Stream the attachment body to the output. Returns false when absent.
      * In remote mode a local leftover copy still wins: it serves not-yet
      * migrated files without a network round-trip.

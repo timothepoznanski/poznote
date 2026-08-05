@@ -238,7 +238,13 @@ function poznoteCountDisplayableAttachments($attachments, $content = '') {
     return $count;
 }
 
-function poznoteCountDisplayableAttachmentsFromDatabase($databaseConnection, $existingFilenames = null) {
+/**
+ * Breakdown of how the given attachment files are used by the notes of the
+ * database: shown in the attachments row of a note, or embedded as an image
+ * inside the note content. Trashed notes count too. Returns
+ * ['attached' => n, 'embedded' => n] or null.
+ */
+function poznoteCountAttachmentUsageFromDatabase($databaseConnection, $existingFilenames = null) {
     if (!$databaseConnection instanceof PDO) {
         return null;
     }
@@ -254,9 +260,9 @@ function poznoteCountDisplayableAttachmentsFromDatabase($databaseConnection, $ex
         }
     }
 
-    $query = "SELECT entry, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
+    $query = "SELECT entry, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
     $stmt = $databaseConnection->query($query);
-    $count = 0;
+    $usage = ['attached' => 0, 'embedded' => 0];
 
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $attachments = poznoteDecodeAttachments($row['attachments'] ?? '');
@@ -270,10 +276,19 @@ function poznoteCountDisplayableAttachmentsFromDatabase($databaseConnection, $ex
             }));
         }
 
-        $count += poznoteCountDisplayableAttachments($attachments, $row['entry'] ?? '');
+        foreach ($attachments as $attachment) {
+            if (!is_array($attachment) || empty($attachment['id'])) {
+                continue;
+            }
+            if (poznoteAttachmentIsEmbeddedImageInContent($attachment, $row['entry'] ?? '')) {
+                $usage['embedded']++;
+            } else {
+                $usage['attached']++;
+            }
+        }
     }
 
-    return $count;
+    return $usage;
 }
 
 function poznoteGetActiveDatabasePath() {
@@ -292,7 +307,7 @@ function poznoteGetActiveDatabasePath() {
     return defined('SQLITE_DATABASE') ? SQLITE_DATABASE : '';
 }
 
-function poznoteCountDisplayableAttachmentsInActiveDatabase($existingFilenames = null) {
+function poznoteCountAttachmentUsageInActiveDatabase($existingFilenames = null) {
     $activeDbPath = poznoteGetActiveDatabasePath();
     if ($activeDbPath === '' || !is_file($activeDbPath)) {
         return null;
@@ -301,9 +316,9 @@ function poznoteCountDisplayableAttachmentsInActiveDatabase($existingFilenames =
     try {
         $databaseConnection = new PDO('sqlite:' . $activeDbPath);
         $databaseConnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return poznoteCountDisplayableAttachmentsFromDatabase($databaseConnection, $existingFilenames);
+        return poznoteCountAttachmentUsageFromDatabase($databaseConnection, $existingFilenames);
     } catch (Throwable $e) {
-        error_log('Failed to count restored displayable attachments: ' . $e->getMessage());
+        error_log('Failed to count restored attachment usage: ' . $e->getMessage());
         return null;
     }
 }
@@ -1731,6 +1746,17 @@ function poznoteAttachmentLocalFile($filename): ?string {
     return poznoteAttachmentStorage()->localFile($filename);
 }
 
+/**
+ * Like poznoteAttachmentLocalFile() but never downloads from the bucket:
+ * backup zips skip S3-stored attachments to keep the archives light.
+ */
+function poznoteAttachmentLocalOnlyFile($filename): ?string {
+    if (!is_string($filename) || $filename === '') {
+        return null;
+    }
+    return poznoteAttachmentStorage()->localFileIfOnDisk($filename);
+}
+
 /** Store an on-disk file (uploaded or generated) as an attachment. */
 function poznoteStoreAttachmentFromPath(string $sourcePath, string $filename, string $contentType = 'application/octet-stream', bool $isUploadedFile = false): bool {
     return poznoteAttachmentStorage()->storeFile($sourcePath, $filename, $contentType, $isUploadedFile);
@@ -2812,6 +2838,40 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             ];
         }
 
+        // A backup made with the lighter-zip option references attachments in
+        // its metadata but carries none of the files. Restoring it while S3
+        // storage is active would purge the bucket below and lose every
+        // attachment, so refuse before wiping anything: the zip must be
+        // completed with the files (from the attachments export) first.
+        if (poznoteAttachmentsAreRemote()) {
+            $backupAttachmentsDir = $tempExtractDir . '/attachments';
+            $backupMetadataFile = $backupAttachmentsDir . '/poznote_attachments_metadata.json';
+            if (file_exists($backupMetadataFile)) {
+                $backupMetadata = json_decode((string)file_get_contents($backupMetadataFile), true);
+                if (is_array($backupMetadata) && count($backupMetadata) > 0) {
+                    $hasAttachmentFiles = false;
+                    $backupFiles = new RecursiveIteratorIterator(
+                        new RecursiveDirectoryIterator($backupAttachmentsDir, RecursiveDirectoryIterator::SKIP_DOTS)
+                    );
+                    foreach ($backupFiles as $backupFile) {
+                        if ($backupFile->isFile() && $backupFile->getFilename() !== 'poznote_attachments_metadata.json') {
+                            $hasAttachmentFiles = true;
+                            break;
+                        }
+                    }
+                    if (!$hasAttachmentFiles) {
+                        deleteDirectory($tempExtractDir);
+                        $tempExtractDir = null;
+                        return [
+                            'success' => false,
+                            'error' => 'This backup was created without its S3 attachments, and restoring it would remove every attachment from the bucket. Add the files to the attachments/ folder of the ZIP (from the attachments export) before restoring. Nothing was modified: your notes, your attachments and the bucket content are untouched.',
+                            'message' => ''
+                        ];
+                    }
+                }
+            }
+        }
+
         // CLEAR ENTRIES DIRECTORY BEFORE RESTORATION
         $entriesPath = getEntriesPath();
         if (is_dir($entriesPath)) {
@@ -2868,7 +2928,28 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         
         // Restore database (presence of the SQL file was validated before the wipe)
         $dbResult = restoreDatabaseFromFile($sqlFile);
-        $results[] = 'Database: ' . ($dbResult['success'] ? 'Restored successfully' : 'Failed - ' . $dbResult['error']);
+        if ($dbResult['success']) {
+            $dbLabel = basename(poznoteGetActiveDatabasePath());
+            $dbSummary = '';
+            try {
+                $statsCon = new PDO('sqlite:' . poznoteGetActiveDatabasePath());
+                $statsCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $noteCount = (int)$statsCon->query('SELECT COUNT(*) FROM entries WHERE trash = 0')->fetchColumn();
+                $trashCount = (int)$statsCon->query('SELECT COUNT(*) FROM entries WHERE trash != 0')->fetchColumn();
+                $folderCount = (int)$statsCon->query('SELECT COUNT(*) FROM folders')->fetchColumn();
+                $workspaceCount = (int)$statsCon->query('SELECT COUNT(*) FROM workspaces')->fetchColumn();
+                $dbSummary = ' (' . $noteCount . ' note' . ($noteCount === 1 ? '' : 's')
+                    . ($trashCount > 0 ? ' + ' . $trashCount . ' in trash' : '')
+                    . ', ' . $folderCount . ' folder' . ($folderCount === 1 ? '' : 's')
+                    . ', ' . $workspaceCount . ' workspace' . ($workspaceCount === 1 ? '' : 's') . ')';
+                $statsCon = null;
+            } catch (Throwable $statsError) {
+                $dbSummary = '';
+            }
+            $results[] = 'Database: Restored ' . ($dbLabel !== '' ? $dbLabel : 'successfully') . $dbSummary;
+        } else {
+            $results[] = 'Database: Failed - ' . $dbResult['error'];
+        }
         if (!$dbResult['success']) $hasErrors = true;
         $databaseRestored = $dbResult['success'];
         
@@ -2876,7 +2957,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $entriesDir = $tempExtractDir . '/entries';
         if (is_dir($entriesDir)) {
             $entriesResult = restoreEntriesFromDir($entriesDir);
-            $results[] = 'Notes: ' . ($entriesResult['success'] ? 'Restored ' . $entriesResult['count'] . ' files' : 'Failed - ' . $entriesResult['error']);
+            $results[] = 'Notes: ' . ($entriesResult['success'] ? 'Restored ' . $entriesResult['count'] . ' note files (HTML/Markdown)' : 'Failed - ' . $entriesResult['error']);
             if (!$entriesResult['success']) $hasErrors = true;
         } else {
             $results[] = 'Notes: No entries directory found in backup (entries directory cleared)';
@@ -2888,12 +2969,23 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $attachmentsResult = restoreAttachmentsFromDir($attachmentsDir);
             if ($attachmentsResult['success']) {
                 $skippedAttachments = $attachmentsResult['skipped_files'] ?? [];
-                $displayableAttachmentsCount = $databaseRestored
-                    ? poznoteCountDisplayableAttachmentsInActiveDatabase($attachmentsResult['filenames'] ?? [])
+                $restoredFilesCount = (int)$attachmentsResult['count'];
+                $attachmentUsage = $databaseRestored
+                    ? poznoteCountAttachmentUsageInActiveDatabase($attachmentsResult['filenames'] ?? [])
                     : null;
-                $attachmentsMessage = $displayableAttachmentsCount !== null
-                    ? 'Restored ' . $displayableAttachmentsCount . ' file attachments'
-                    : 'Restored ' . $attachmentsResult['count'] . ' files';
+                $attachmentsMessage = 'Restored ' . $restoredFilesCount . ' file' . ($restoredFilesCount === 1 ? '' : 's');
+                if (is_array($attachmentUsage)) {
+                    $usageParts = [];
+                    $usageParts[] = $attachmentUsage['attached'] . ' attached to notes';
+                    if ($attachmentUsage['embedded'] > 0) {
+                        $usageParts[] = $attachmentUsage['embedded'] . ' embedded in notes as images';
+                    }
+                    $unreferencedCount = $restoredFilesCount - $attachmentUsage['attached'] - $attachmentUsage['embedded'];
+                    if ($unreferencedCount > 0) {
+                        $usageParts[] = $unreferencedCount . ' not linked to any note';
+                    }
+                    $attachmentsMessage .= ' (' . implode(', ', $usageParts) . ')';
+                }
                 if (!empty($attachmentsResult['skipped'])) {
                     $attachmentsMessage .= ', skipped ' . $attachmentsResult['skipped'] . ' blocked files';
                     $skippedDetailsMessage = poznoteFormatSkippedAttachmentDetails($skippedAttachments);
