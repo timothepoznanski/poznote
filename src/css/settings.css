@@ -344,8 +344,9 @@ body.dark-mode .settings-view-toggle:hover {
 
 /* ---------- Pin button ----------
    Added by settings-page.js on every card. Styled exactly like the help icon
-   above (same size, same muted grey) and, like it, always on the card; a
-   pinned card shows it in blue instead (same pattern as the dashboard pin).
+   above (same size, same muted grey) and, like it, revealed on card hover in
+   desktop view (see the media query below); a pinned card shows it in blue
+   instead (same pattern as the dashboard pin).
    Absolutely positioned, so it reserves no space: bottom-right corner in grid
    view, hidden in list view. */
 
@@ -394,9 +395,26 @@ body.dark-mode .settings-view-toggle:hover {
     border-color: rgba(0, 125, 184, 0.45);
 }
 
-/* The help icon and the pin stay on the card at all times, so a card advertises
-   both affordances without having to be hovered first. Their own hover states
-   (see the icon rules above) still give the pointer feedback. */
+/* Desktop (hover-capable) grid view: the help icon and the pin only appear
+   while the card is hovered (or holds keyboard focus), keeping the cards
+   clean at rest. A pinned card keeps its blue pin visible so the pinned
+   state stays readable. Mobile/touch never sees the help icon anyway
+   (hidden in cards.css) and taps the pin without a hover state. */
+@media (min-width: 801px) and (hover: hover) {
+    .home-card .setting-help,
+    .home-card .settings-card-pin {
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+
+    .home-card:hover .setting-help,
+    .home-card:hover .settings-card-pin,
+    .home-card:focus-within .setting-help,
+    .home-card:focus-within .settings-card-pin,
+    .home-card.is-pinned .settings-card-pin {
+        opacity: 1;
+    }
+}
 
 :root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i,
 body.dark-mode .home-card.is-pinned .settings-card-pin i {
