@@ -517,6 +517,7 @@
       "dashboard_filter_bar": "Панель фильтра",
       "view_layout_toggle": "Переключатель сетка / список",
       "index_search_bar": "Панель поиска",
+      "tasklist_progress_bar": "Индикатор выполнения списков задач",
       "share_restrict_users": "Общий доступ: ограничить определёнными пользователями",
       "share_protocol_toggle": "Общий доступ: переключатель HTTPS",
       "share_shared_with_me": "Общий доступ: «Поделились со мной»",

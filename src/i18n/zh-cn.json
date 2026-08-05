@@ -1008,6 +1008,7 @@
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "网格 / 列表切换",
       "index_search_bar": "搜索栏",
+      "tasklist_progress_bar": "任务列表进度条",
       "share_restrict_users": "分享：限制为特定用户",
       "share_protocol_toggle": "分享：HTTPS 开关",
       "share_shared_with_me": "分享：“与我共享”",

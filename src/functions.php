@@ -1237,6 +1237,8 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '#outline-panel { display: none !important; }';
                 $rules[] = '#outlineResizeHandle { display: none !important; }';
                 $rules[] = '#outlineMobileBackdrop { display: none !important; }';
+            } elseif ($id === 'tasklist-progress') {
+                $rules[] = '.tasklist-progress { display: none !important; }';
             }
         } elseif ($type === 'share') {
             // Share dialog blocks are built in JS. The CSS rule covers pages that

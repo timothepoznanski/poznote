@@ -1032,6 +1032,7 @@
       "dashboard_filter_bar": "Barre de filtre",
       "view_layout_toggle": "Bascule grille / liste",
       "index_search_bar": "Barre de recherche",
+      "tasklist_progress_bar": "Barre de progression des listes de tâches",
       "share_restrict_users": "Partage : restreindre à des utilisateurs spécifiques",
       "share_protocol_toggle": "Partage : bascule HTTPS",
       "share_shared_with_me": "Partage : « Partagé avec moi »",

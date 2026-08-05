@@ -524,6 +524,7 @@
       "dashboard_filter_bar": "Filter bar",
       "view_layout_toggle": "Grid / list toggle",
       "index_search_bar": "Search bar",
+      "tasklist_progress_bar": "Task list progress bar",
       "share_restrict_users": "Share: restrict to specific users",
       "share_protocol_toggle": "Share: HTTPS toggle",
       "share_shared_with_me": "Share: \"Shared with me\"",

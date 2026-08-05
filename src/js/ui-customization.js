@@ -389,6 +389,8 @@
                         rules.push('#outline-panel { display: none !important; }');
                         rules.push('#outlineResizeHandle { display: none !important; }');
                         rules.push('#outlineMobileBackdrop { display: none !important; }');
+                    } else if (id === 'tasklist-progress') {
+                        rules.push('.tasklist-progress { display: none !important; }');
                     }
                 }
             });
