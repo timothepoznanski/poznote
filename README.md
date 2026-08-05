@@ -38,6 +38,7 @@ https://poznote.com/index.html#press
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
 - [Git Synchronization](#git-synchronization)
+- [S3 Attachment Storage](#s3-attachment-storage)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
@@ -534,7 +535,9 @@ Poznote supports two primary note formats, each tailored for different workflows
 &nbsp;
 
 *   **Usage:** Manage tasks and projects with interactive checklists.
-*   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list.
+*   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list. A progress bar shows the completion of each list.
+*   **Task Options:** Each task can have a due date with an optional time, a reminder notification that fires at the due time, and an important flag, and can be moved to another list.
+*   **Tasks Page:** A dedicated Tasks page, accessible from the dashboard, gathers every task from all your task lists in one place, with status filters (to do, important, overdue, with due date, completed), a text filter, and a quick "Add task" button.
 *   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
 </details>
 
@@ -641,6 +644,7 @@ Poznote features a multi-user architecture with isolated data spaces for each pr
 - **Owner/admin safeguards**: Opening another user's account does not transfer ownership. Sensitive actions such as password changes, backup/restore, Git Sync configuration, and global admin settings remain restricted to the appropriate owner or administrator.
 - **Read-only sharing**: Notes, folders, and entire workspaces can be shared in **Read-only** mode with other users of the same instance or publicly through dedicated links.
 - **Single-editor locking**: When several users can access the same note, Poznote allows only one active editor at a time. Other users can still open the note in read-only mode, see who currently holds the lock, and take over editing after reopening the note once the lock is released or expires.
+- **Tenant isolation (SaaS mode)**: Administrators can block selected capabilities for non-admin users, such as discovering the other accounts of the instance and sharing with them, or registering personal webhooks. Administrators are never affected. Leave everything unchecked for a family or team instance.
 
 
 ### Architecture & Structure
@@ -695,6 +699,25 @@ When enabled by the user, Poznote will automatically:
 - **Push** on every note create, update, or delete
 
 Manual push/pull is also available from the **Dashboard** via the **Push** and **Pull** cards.
+
+</details>
+
+## S3 Attachment Storage
+
+By default, note attachments are stored on the local disk. Administrators can instead store them in an S3-compatible object storage (AWS S3, MinIO, Garage, Cloudflare R2, Backblaze B2, ...). The setting applies to all users of the instance.
+
+<details>
+<summary><strong>How to configure S3 storage</strong></summary>
+<br>
+
+Configure it in **Settings > S3 Storage** (administrators only).
+
+- **Configuration**: Endpoint URL, region, bucket, access key, secret key, and path-style addressing, with a built-in connection test.
+- **Migration**: Move existing attachment files between the local disk and the bucket, in both directions and for every user. Migration runs in batches and can be safely interrupted and resumed.
+- **Privacy**: Attachments are stored under `attachments/{user id}/` in the bucket and are always served through Poznote, so the bucket can stay private.
+- **Quotas**: A per-user S3 storage quota can be set, and S3 usage appears in the admin storage statistics.
+
+> Git Sync ignores attachments while S3 storage is enabled.
 
 </details>
 
@@ -1053,7 +1076,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 ### Storage
 - **HTML/Markdown files** - Notes are stored as plain HTML or Markdown files in the filesystem
 - **SQLite database** - Metadata, tags, relationships, and user data
-- **File attachments** - Stored directly in the filesystem
+- **File attachments** - Stored on the local filesystem, or optionally in an S3-compatible object storage
 
 ### Infrastructure
 - **Nginx + PHP-FPM** - High-performance web server with FastCGI Process Manager
