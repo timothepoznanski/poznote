@@ -2820,7 +2820,10 @@
       "repeat_days": "day(s)",
       "repeat_weeks": "week(s)",
       "repeat_months": "month(s)",
-      "repeat_years": "year(s)"
+      "repeat_years": "year(s)",
+      "date_placeholder": "Date",
+      "time_placeholder": "Time",
+      "no_date_configured": "No date configured"
     }
   },
   "settings_password": {

@@ -3331,7 +3331,10 @@
       "repeat_days": "jour(s)",
       "repeat_weeks": "semaine(s)",
       "repeat_months": "mois",
-      "repeat_years": "an(s)"
+      "repeat_years": "an(s)",
+      "date_placeholder": "Date",
+      "time_placeholder": "Heure",
+      "no_date_configured": "Pas de date configurée"
     }
   },
   "settings_password": {

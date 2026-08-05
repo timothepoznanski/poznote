@@ -48,15 +48,21 @@ function formatReminderDateTime(date) {
     return date.toLocaleString();
 }
 
+function showReminderEmptyPreview(currentInfo, currentDate) {
+    currentDate.textContent = window.t?.('reminder.modal.no_date_configured') || 'No date configured';
+    currentInfo.classList.add('is-empty');
+    currentInfo.classList.remove('initially-hidden');
+}
+
 function restoreInitialReminderPreview(currentInfo, currentDate) {
     if (reminderHasInitialReminder && reminderInitialDisplayText) {
         currentDate.textContent = reminderInitialDisplayText;
+        currentInfo.classList.remove('is-empty');
         currentInfo.classList.remove('initially-hidden');
         return;
     }
 
-    currentDate.textContent = '';
-    currentInfo.classList.add('initially-hidden');
+    showReminderEmptyPreview(currentInfo, currentDate);
 }
 
 function getReminderEmailControls() {
@@ -183,6 +189,10 @@ function syncReminderPreviewFromInput() {
     const currentDate = document.getElementById('reminderCurrentDate');
     const saveBtn = document.getElementById('reminderSaveBtn');
 
+    if (typeof updateReminderPartButtons === 'function') {
+        updateReminderPartButtons();
+    }
+
     if (!dateInput || !currentInfo || !currentDate || !saveBtn) {
         return false;
     }
@@ -205,6 +215,7 @@ function syncReminderPreviewFromInput() {
     }
 
     currentDate.textContent = formatReminderDateTime(selectedDate);
+    currentInfo.classList.remove('is-empty');
     currentInfo.classList.remove('initially-hidden');
     return canSave;
 }
@@ -252,7 +263,7 @@ function openReminderModal(noteId, currentReminderAt) {
             dateInput.value = reminderInitialInputValue;
         }
     } else {
-        currentInfo.classList.add('initially-hidden');
+        showReminderEmptyPreview(currentInfo, currentDate);
         removeBtn.classList.add('initially-hidden');
     }
 
@@ -416,36 +427,6 @@ function updateReminderButton(noteId, reminderAt) {
     }
 }
 
-/**
- * Handle quick option buttons (30min, 1h, 3h, tomorrow, 1 week)
- */
-function handleQuickReminder(e) {
-    const btn = e.target.closest('.reminder-quick-btn');
-    if (!btn) return;
-
-    const dateInput = document.getElementById('reminderDateInput');
-    if (!dateInput) return;
-
-    const now = new Date();
-    let target = new Date(now);
-
-    if (btn.dataset.minutes) {
-        target.setMinutes(target.getMinutes() + parseInt(btn.dataset.minutes));
-    } else if (btn.dataset.hours) {
-        target.setHours(target.getHours() + parseInt(btn.dataset.hours));
-    } else if (btn.dataset.days) {
-        target.setDate(target.getDate() + parseInt(btn.dataset.days));
-        // For "tomorrow", set to 9:00 AM
-        if (parseInt(btn.dataset.days) === 1) {
-            target.setHours(9, 0, 0, 0);
-        }
-    }
-
-    const localIso = toLocalDateTimeInputValue(target);
-    dateInput.value = localIso;
-    syncReminderPreviewFromInput();
-}
-
 // ============================================================================
 // EVENT HANDLERS (Reminder modal only - notifications are on dashboard.php)
 // ============================================================================
@@ -471,11 +452,6 @@ document.addEventListener('click', function(e) {
             removeReminder();
             break;
     }
-
-    // Quick reminder buttons
-    if (e.target.closest('.reminder-quick-btn')) {
-        handleQuickReminder(e);
-    }
 });
 
 // Close reminder modal on Escape
@@ -497,46 +473,104 @@ if (reminderDateInput) {
     });
 }
 
-// Replace the native datetime-local picker with the shared calendar popup
-// (same date + two-step time selection as task due dates) when available.
-function openReminderDatePicker() {
+// Replace the native datetime-local input with two triggers driven by the
+// shared calendar popup: the date part opens the calendar alone (a day click
+// applies it), the time part opens the hour-then-minutes menu directly.
+function getReminderDateTimeParts() {
     const input = document.getElementById('reminderDateInput');
-    if (!input || typeof window.showSlashDatePicker !== 'function') return;
+    if (input && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(input.value || '')) {
+        return { day: input.value.substring(0, 10), time: input.value.substring(11, 16) };
+    }
+    return { day: '', time: '' };
+}
 
-    let initialDate = null;
-    let initialTime = '';
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(input.value || '')) {
-        initialDate = input.value.substring(0, 10);
-        initialTime = input.value.substring(11, 16);
+function setReminderDateTimeParts(day, time) {
+    const input = document.getElementById('reminderDateInput');
+    if (!input) return;
+    input.value = day + 'T' + time;
+    syncReminderPreviewFromInput();
+}
+
+function updateReminderPartButtons() {
+    const dateLabel = document.getElementById('reminderDateBtnLabel');
+    const timeLabel = document.getElementById('reminderTimeBtnLabel');
+    if (!dateLabel || !timeLabel) return;
+
+    const parts = getReminderDateTimeParts();
+
+    if (parts.day) {
+        const d = new Date(
+            parseInt(parts.day.substring(0, 4), 10),
+            parseInt(parts.day.substring(5, 7), 10) - 1,
+            parseInt(parts.day.substring(8, 10), 10)
+        );
+        dateLabel.textContent = (typeof window.poznoteFormatDateOnly === 'function')
+            ? window.poznoteFormatDateOnly(d)
+            : d.toLocaleDateString();
+    } else {
+        dateLabel.textContent = window.t?.('reminder.modal.date_placeholder') || 'Date';
     }
 
-    window.showSlashDatePicker(input.getBoundingClientRect(), function(date, time) {
+    if (parts.time) {
+        const t = new Date(2000, 0, 1,
+            parseInt(parts.time.substring(0, 2), 10),
+            parseInt(parts.time.substring(3, 5), 10));
+        timeLabel.textContent = (typeof window.poznoteFormatTimeOnly === 'function')
+            ? window.poznoteFormatTimeOnly(t)
+            : t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+        timeLabel.textContent = window.t?.('reminder.modal.time_placeholder') || 'Time';
+    }
+}
+
+function reminderLocalTodayString() {
+    const now = new Date();
+    return now.getFullYear() + '-'
+        + String(now.getMonth() + 1).padStart(2, '0') + '-'
+        + String(now.getDate()).padStart(2, '0');
+}
+
+function openReminderDateOnlyPicker() {
+    const btn = document.getElementById('reminderDateBtn');
+    if (!btn || typeof window.showSlashDatePicker !== 'function') return;
+
+    const parts = getReminderDateTimeParts();
+    window.showSlashDatePicker(btn.getBoundingClientRect(), function(date) {
         const day = date.getFullYear() + '-'
             + String(date.getMonth() + 1).padStart(2, '0') + '-'
             + String(date.getDate()).padStart(2, '0');
-        // A reminder needs a trigger time; default to 09:00 when none chosen
-        input.value = day + 'T' + (time || '09:00');
-        syncReminderPreviewFromInput();
+        // A reminder needs a trigger time; default to 09:00 until one is set
+        setReminderDateTimeParts(day, parts.time || '09:00');
     }, null, {
-        withTime: true,
-        initialDate: initialDate,
-        initialTime: initialTime
+        initialDate: parts.day || null
+    });
+}
+
+function openReminderTimeOnlyPicker() {
+    const btn = document.getElementById('reminderTimeBtn');
+    if (!btn || typeof window.showSlashDatePicker !== 'function') return;
+
+    const parts = getReminderDateTimeParts();
+    window.showSlashDatePicker(btn.getBoundingClientRect(), function(_, time) {
+        setReminderDateTimeParts(parts.day || reminderLocalTodayString(), time);
+    }, null, {
+        timeOnly: true,
+        initialTime: parts.time
     });
 }
 
 if (reminderDateInput && typeof window.showSlashDatePicker === 'function') {
-    reminderDateInput.readOnly = true;
-    reminderDateInput.classList.add('reminder-datetime-input-picker');
-    reminderDateInput.addEventListener('click', function(e) {
-        e.preventDefault();
-        openReminderDatePicker();
-    });
-    reminderDateInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            openReminderDatePicker();
-        }
-    });
+    const reminderDateBtn = document.getElementById('reminderDateBtn');
+    const reminderTimeBtn = document.getElementById('reminderTimeBtn');
+
+    if (reminderDateBtn && reminderTimeBtn) {
+        reminderDateInput.classList.add('initially-hidden');
+        reminderDateBtn.classList.remove('initially-hidden');
+        reminderTimeBtn.classList.remove('initially-hidden');
+
+        reminderDateBtn.addEventListener('click', openReminderDateOnlyPicker);
+        reminderTimeBtn.addEventListener('click', openReminderTimeOnlyPicker);
+    }
 }
 
 const reminderEmailInput = document.getElementById('reminderEmailInput');

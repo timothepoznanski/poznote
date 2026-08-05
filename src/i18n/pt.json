@@ -3144,7 +3144,10 @@
       "repeat_days": "dia(s)",
       "repeat_weeks": "semana(s)",
       "repeat_months": "mês(es)",
-      "repeat_years": "ano(s)"
+      "repeat_years": "ano(s)",
+      "date_placeholder": "Data",
+      "time_placeholder": "Hora",
+      "no_date_configured": "Nenhuma data configurada"
     }
   },
   "settings_password": {

@@ -35,12 +35,14 @@ try {
         <div class="reminder-form">
             <div class="reminder-input-row">
                 <input type="datetime-local" id="reminderDateInput" class="reminder-datetime-input" />
-            </div>
-            <div class="reminder-quick-options">
-                <button type="button" class="reminder-quick-btn" data-minutes="30"><?php echo t_h('reminder.modal.in_30min', [], '30 min'); ?></button>
-                <button type="button" class="reminder-quick-btn" data-hours="1"><?php echo t_h('reminder.modal.in_1h', [], '1 hour'); ?></button>
-                <button type="button" class="reminder-quick-btn" data-days="1"><?php echo t_h('reminder.modal.tomorrow', [], 'Tomorrow'); ?></button>
-                <button type="button" class="reminder-quick-btn" data-days="7"><?php echo t_h('reminder.modal.in_1week', [], '1 week'); ?></button>
+                <button type="button" id="reminderDateBtn" class="reminder-datetime-part initially-hidden">
+                    <i class="lucide lucide-calendar-alt"></i>
+                    <span id="reminderDateBtnLabel"><?php echo t_h('reminder.modal.date_placeholder', [], 'Date'); ?></span>
+                </button>
+                <button type="button" id="reminderTimeBtn" class="reminder-datetime-part initially-hidden">
+                    <i class="lucide lucide-clock"></i>
+                    <span id="reminderTimeBtnLabel"><?php echo t_h('reminder.modal.time_placeholder', [], 'Time'); ?></span>
+                </button>
             </div>
             <div class="reminder-repeat-row">
                 <label class="reminder-repeat-label" for="reminderRepeatSelect">

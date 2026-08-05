@@ -58,6 +58,14 @@
         let timeMenuMode = null; // null | 'hours' | 'minutes'
         let timeMenuHour = null;
 
+        // Time-only mode: open straight on the hour menu; picking the minutes
+        // returns the time and closes (no calendar involved)
+        const timeOnly = !!(options && options.timeOnly);
+        if (timeOnly) {
+            timeMenuMode = 'hours';
+            timeMenuHour = selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : null;
+        }
+
         const picker = document.createElement('div');
         picker.className = 'slash-date-picker';
 
@@ -69,10 +77,21 @@
             return String(value).padStart(2, '0');
         }
 
+        // Display an 'HH:MM' value following the user's date/time format setting
+        function formatTimeLabel(timeStr) {
+            if (!/^\d{2}:\d{2}$/.test(timeStr || '')) return '--:--';
+            if (typeof window.poznoteFormatTimeOnly === 'function') {
+                return window.poznoteFormatTimeOnly(new Date(2000, 0, 1,
+                    parseInt(timeStr.substring(0, 2), 10),
+                    parseInt(timeStr.substring(3, 5), 10)));
+            }
+            return timeStr;
+        }
+
         function renderTimeMenu() {
             const title = timeMenuMode === 'minutes'
                 ? pad2(timeMenuHour) + ':--'
-                : (selectedTime || '--:--');
+                : (selectedTime ? formatTimeLabel(selectedTime) : '--:--');
 
             let html = '<div class="slash-date-picker-header">'
                 + '<button type="button" class="slash-date-picker-nav" data-time-back="1">&#8249;</button>'
@@ -100,7 +119,7 @@
         }
 
         function render() {
-            if (options && options.withTime && timeMenuMode) {
+            if (options && (options.withTime || timeOnly) && timeMenuMode) {
                 renderTimeMenu();
                 return;
             }
@@ -136,7 +155,7 @@
                 // single apply button at the bottom saves and closes.
                 html += '<div class="slash-date-picker-footer">'
                     + '<button type="button" class="slash-date-picker-today-btn" data-today="1">' + esc(t9n.today || 'Today') + '</button>'
-                    + '<button type="button" class="slash-date-picker-time-btn" data-time-menu="1"><i class="lucide lucide-clock"></i>' + esc(selectedTime || '--:--') + '</button>'
+                    + '<button type="button" class="slash-date-picker-time-btn" data-time-menu="1"><i class="lucide lucide-clock"></i>' + esc(selectedTime ? formatTimeLabel(selectedTime) : '--:--') + '</button>'
                     + '</div>'
                     + '<div class="slash-date-picker-actions-row">';
                 if (removable) {
@@ -257,9 +276,17 @@
                 return;
             }
             if (e.target.closest('[data-time-back]')) {
-                // Step back: minutes -> hours -> calendar
-                timeMenuMode = (timeMenuMode === 'minutes') ? 'hours' : null;
-                render();
+                // Step back: minutes -> hours -> calendar (or close in
+                // time-only mode, where there is no calendar behind)
+                if (timeMenuMode === 'minutes') {
+                    timeMenuMode = 'hours';
+                    render();
+                } else if (timeOnly) {
+                    cleanup();
+                } else {
+                    timeMenuMode = null;
+                    render();
+                }
                 return;
             }
             const hourBtn = e.target.closest('[data-hour]');
@@ -273,6 +300,12 @@
             if (minuteBtn) {
                 // Picking the minutes completes the time and closes the menu
                 selectedTime = pad2(timeMenuHour) + ':' + pad2(parseInt(minuteBtn.getAttribute('data-minute'), 10));
+                if (timeOnly) {
+                    picked = true;
+                    cleanup();
+                    onPick(null, selectedTime);
+                    return;
+                }
                 timeMenuMode = null;
                 render();
                 return;

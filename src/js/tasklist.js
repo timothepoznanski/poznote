@@ -220,9 +220,14 @@ function formatTaskDueDate(dueAt) {
         normalized.length > 10 ? parseInt(normalized.substring(11, 13), 10) : 0,
         normalized.length > 10 ? parseInt(normalized.substring(14, 16), 10) : 0
     );
-    const dateText = date.toLocaleDateString();
+    const dateText = (typeof window.poznoteFormatDateOnly === 'function')
+        ? window.poznoteFormatDateOnly(date)
+        : date.toLocaleDateString();
     if (normalized.length > 10) {
-        return dateText + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const timeText = (typeof window.poznoteFormatTimeOnly === 'function')
+            ? window.poznoteFormatTimeOnly(date)
+            : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return dateText + ' ' + timeText;
     }
     return dateText;
 }

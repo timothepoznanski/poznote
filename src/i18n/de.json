@@ -3141,7 +3141,10 @@
       "repeat_days": "Tag(e)",
       "repeat_weeks": "Woche(n)",
       "repeat_months": "Monat(e)",
-      "repeat_years": "Jahr(e)"
+      "repeat_years": "Jahr(e)",
+      "date_placeholder": "Datum",
+      "time_placeholder": "Uhrzeit",
+      "no_date_configured": "Kein Datum festgelegt"
     }
   },
   "settings_password": {

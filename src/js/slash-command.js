@@ -1424,8 +1424,10 @@
                 }
             } catch (e) { }
 
-            // Format the date based on user's locale
-            const formattedDate = date.toLocaleDateString();
+            // Format the date following the user's date/time format setting
+            const formattedDate = (typeof window.poznoteFormatDateOnly === 'function')
+                ? window.poznoteFormatDateOnly(date)
+                : date.toLocaleDateString();
             if (typeof window.insertHTMLAtSelection === 'function') {
                 window.insertHTMLAtSelection(formattedDate);
             } else {
@@ -1454,7 +1456,9 @@
         const insertionContext = captureEditorInsertionContext();
         const anchorRect = getCursorAnchorRect(context.editableElement, insertionContext.savedRange);
         showSlashDatePicker(anchorRect, function (date) {
-            insertMarkdownAtContext(insertionContext, date.toLocaleDateString(), 0);
+            insertMarkdownAtContext(insertionContext, (typeof window.poznoteFormatDateOnly === 'function')
+                ? window.poznoteFormatDateOnly(date)
+                : date.toLocaleDateString(), 0);
         });
     }
 
@@ -1533,7 +1537,9 @@
 
         const inputRect = input.getBoundingClientRect();
         showSlashDatePicker(isUsableAnchorRect(inputRect) ? inputRect : null, function (date) {
-            const formattedDate = date.toLocaleDateString() + ' ';
+            const formattedDate = ((typeof window.poznoteFormatDateOnly === 'function')
+                ? window.poznoteFormatDateOnly(date)
+                : date.toLocaleDateString()) + ' ';
             const text = input.value;
 
             const safeStart = Math.max(0, Math.min(insertionStart, text.length));

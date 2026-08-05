@@ -3263,7 +3263,10 @@
       "repeat_days": "天",
       "repeat_weeks": "周",
       "repeat_months": "个月",
-      "repeat_years": "年"
+      "repeat_years": "年",
+      "date_placeholder": "日期",
+      "time_placeholder": "时间",
+      "no_date_configured": "未设置日期"
     }
   },
   "settings_password": {

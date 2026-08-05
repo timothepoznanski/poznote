@@ -96,7 +96,9 @@
 
 .slash-date-picker {
     position: fixed;
-    z-index: 9999;
+    /* Above modals (.modal is 9999, .modal-content 10000) so the popup works
+       from inside dialogs like the reminder modal */
+    z-index: 10001;
     width: 252px;
     background: #ffffff;
     border: 1px solid #e5e7eb;

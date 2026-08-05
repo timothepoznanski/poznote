@@ -2788,7 +2788,10 @@
       "repeat_days": "дн.",
       "repeat_weeks": "нед.",
       "repeat_months": "мес.",
-      "repeat_years": "лет"
+      "repeat_years": "лет",
+      "date_placeholder": "Дата",
+      "time_placeholder": "Время",
+      "no_date_configured": "Дата не задана"
     }
   },
   "settings_password": {

@@ -70,9 +70,14 @@
             dueAt.length > 10 ? parseInt(dueAt.substring(11, 13), 10) : 0,
             dueAt.length > 10 ? parseInt(dueAt.substring(14, 16), 10) : 0
         );
-        var dateText = date.toLocaleDateString();
+        var dateText = (typeof window.poznoteFormatDateOnly === 'function')
+            ? window.poznoteFormatDateOnly(date)
+            : date.toLocaleDateString();
         if (dueAt.length > 10) {
-            return dateText + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            var timeText = (typeof window.poznoteFormatTimeOnly === 'function')
+                ? window.poznoteFormatTimeOnly(date)
+                : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return dateText + ' ' + timeText;
         }
         return dateText;
     }

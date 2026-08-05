@@ -38,6 +38,7 @@ $currentLang = getUserLanguage();
 </head>
 <body class="tasks-page"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
+      data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
       data-txt-progress="<?php echo t_h('tasks_page.progress', [], '{{completed}} of {{total}} tasks completed'); ?>"
@@ -117,6 +118,7 @@ $currentLang = getUserLanguage();
 	};
 	</script>
 	<script src="js/navigation.js"></script>
+	<script src="js/date-time-format.js"></script>
 	<script src="js/date-picker-popup.js"></script>
 	<script src="js/tasks-page.js"></script>
 </body>
