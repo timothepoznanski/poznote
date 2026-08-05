@@ -10,6 +10,8 @@
             txtProgress: body.getAttribute('data-txt-progress') || '{{completed}} of {{total}} tasks completed',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
             txtEmptyFiltered: body.getAttribute('data-txt-empty-filtered') || 'No tasks match this filter.',
+            txtCollapse: body.getAttribute('data-txt-collapse') || 'Collapse',
+            txtExpand: body.getAttribute('data-txt-expand') || 'Expand',
             txtDue: body.getAttribute('data-txt-due') || 'Due date',
             txtDueRemove: body.getAttribute('data-txt-due-remove') || 'Remove due date',
             txtDueRemoveTime: body.getAttribute('data-txt-due-remove-time') || 'Remove time'
@@ -20,6 +22,30 @@
     var taskNotes = [];
     var filterText = '';
     var filterMode = 'all';
+
+    // Per-note collapsed state, persisted per user across visits
+    var COLLAPSED_KEY = 'poznote-tasks-page-collapsed';
+
+    function getPrefsStorage() {
+        return window.__poznoteUserStorage || window.localStorage;
+    }
+
+    function loadCollapsedNoteIds() {
+        try {
+            var parsed = JSON.parse(getPrefsStorage().getItem(COLLAPSED_KEY) || '[]');
+            return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        } catch (e) {
+            return new Set();
+        }
+    }
+
+    var collapsedNoteIds = loadCollapsedNoteIds();
+
+    function saveCollapsedNoteIds() {
+        try {
+            getPrefsStorage().setItem(COLLAPSED_KEY, JSON.stringify(Array.from(collapsedNoteIds)));
+        } catch (e) { }
+    }
 
     // Same per-tab editor session identity as note-edit-lock.js, so saving
     // from this page cooperates with the note edit-lock system.
@@ -210,12 +236,32 @@
 
         groups.forEach(function (group) {
             var note = group.note;
+            var isCollapsed = collapsedNoteIds.has(String(note.id));
 
             var section = document.createElement('section');
-            section.className = 'tasks-note-group';
+            section.className = 'tasks-note-group' + (isCollapsed ? ' collapsed' : '');
 
             var header = document.createElement('div');
             header.className = 'tasks-note-header';
+
+            var toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'tasks-note-toggle';
+            toggle.title = isCollapsed ? config.txtExpand : config.txtCollapse;
+            toggle.setAttribute('aria-expanded', String(!isCollapsed));
+            toggle.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+            toggle.addEventListener('click', function () {
+                var nowCollapsed = section.classList.toggle('collapsed');
+                if (nowCollapsed) {
+                    collapsedNoteIds.add(String(note.id));
+                } else {
+                    collapsedNoteIds.delete(String(note.id));
+                }
+                toggle.title = nowCollapsed ? config.txtExpand : config.txtCollapse;
+                toggle.setAttribute('aria-expanded', String(!nowCollapsed));
+                saveCollapsedNoteIds();
+            });
+            header.appendChild(toggle);
 
             var link = document.createElement('a');
             link.className = 'note-name';

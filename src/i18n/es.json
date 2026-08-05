@@ -3296,6 +3296,8 @@
     "filter_placeholder": "Filtrar por tarea, título o carpeta...",
     "empty": "Aún no hay tareas. Crea una nota de lista de tareas para empezar.",
     "empty_filtered": "Ninguna tarea coincide con este filtro.",
-    "add_task": "Añadir tarea"
+    "add_task": "Añadir tarea",
+    "collapse": "Contraer",
+    "expand": "Expandir"
   }
 }

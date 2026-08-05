@@ -3418,6 +3418,8 @@
     "filter_placeholder": "按任务、标题或文件夹筛选...",
     "empty": "还没有任务。创建一个任务清单笔记开始吧。",
     "empty_filtered": "没有符合此筛选条件的任务。",
-    "add_task": "添加任务"
+    "add_task": "添加任务",
+    "collapse": "收起",
+    "expand": "展开"
   }
 }

@@ -2993,6 +2993,8 @@
     "filter_placeholder": "Filter by task, title or folder name...",
     "empty": "No tasks yet. Create a task list note to get started.",
     "empty_filtered": "No tasks match this filter.",
-    "add_task": "Add task"
+    "add_task": "Add task",
+    "collapse": "Collapse",
+    "expand": "Expand"
   }
 }

@@ -164,6 +164,38 @@ body.tasks-page {
     border-bottom: 1px solid var(--border-color, #e0e0e0);
 }
 
+.tasks-note-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #888;
+    font-size: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.tasks-note-toggle:hover {
+    color: #007DB8;
+}
+
+.tasks-note-toggle i {
+    transition: transform 0.2s ease;
+}
+
+.tasks-note-group.collapsed .tasks-note-toggle i {
+    transform: rotate(-90deg);
+}
+
+.tasks-note-group.collapsed .tasks-note-list {
+    display: none;
+}
+
 .note-name {
     font-weight: 500;
     font-size: 16px;
@@ -442,6 +474,14 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-note-header {
     border-bottom-color: var(--dm-border);
+}
+
+[data-theme="dark"] .tasks-note-toggle {
+    color: #b0b0b0;
+}
+
+[data-theme="dark"] .tasks-note-toggle:hover {
+    color: #4da3d0;
 }
 
 [data-theme="dark"] .tasks-task-item {
