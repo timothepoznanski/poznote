@@ -353,4 +353,7 @@
 
     window.showSlashDatePicker = showSlashDatePicker;
     window.closeSlashDatePicker = closeSlashDatePicker;
+    window.isSlashDatePickerOpen = function () {
+        return !!slashDatePickerCleanup;
+    };
 })();

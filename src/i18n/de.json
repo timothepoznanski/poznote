@@ -3292,6 +3292,7 @@
     "filter_completed": "Erledigt",
     "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
     "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz, um zu beginnen.",
-    "empty_filtered": "Keine Aufgaben entsprechen diesem Filter."
+    "empty_filtered": "Keine Aufgaben entsprechen diesem Filter.",
+    "add_task": "Aufgabe hinzufügen"
   }
 }

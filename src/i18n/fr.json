@@ -3482,6 +3482,7 @@
     "filter_completed": "Terminées",
     "filter_placeholder": "Filtrer par tâche, titre ou dossier...",
     "empty": "Aucune tâche pour le moment. Créez une note de type liste de tâches pour commencer.",
-    "empty_filtered": "Aucune tâche ne correspond à ce filtre."
+    "empty_filtered": "Aucune tâche ne correspond à ce filtre.",
+    "add_task": "Ajouter une tâche"
   }
 }

@@ -1568,6 +1568,48 @@
         });
     }
 
+    // Insert an internal link to a tasklist note in an HTML editor, at the
+    // position captured when the /task command ran (same link format as the
+    // note-reference feature).
+    function insertTaskListLinkHtml(editable, range, target) {
+        if (!editable || !target) return;
+
+        try {
+            focusEditableElement(editable);
+
+            const sel = window.getSelection();
+            if (range && sel) {
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+
+            const t = window.t || ((key, params, fallback) => fallback);
+            const link = document.createElement('a');
+            link.href = 'index.php?note=' + target.id;
+            link.className = 'note-internal-link';
+            link.setAttribute('data-note-id', target.id);
+            link.setAttribute('data-note-reference', 'true');
+            link.textContent = target.heading || t('note_reference.untitled', null, 'Untitled');
+
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const r = selection.getRangeAt(0);
+                r.deleteContents();
+                r.insertNode(link);
+                r.setStartAfter(link);
+                r.setEndAfter(link);
+                selection.removeAllRanges();
+                selection.addRange(r);
+                document.execCommand('insertText', false, ' ');
+            } else {
+                editable.appendChild(link);
+                editable.appendChild(document.createTextNode(' '));
+            }
+
+            editable.dispatchEvent(new Event('input', { bubbles: true }));
+        } catch (e) { }
+    }
+
     // Return title commands for the slash menu (specific to title field)
     function getTitleSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
@@ -1784,9 +1826,20 @@
                 icon: 'lucide-list-todo',
                 label: t('slash_menu.task', null, 'Add task'),
                 action: function () {
-                    if (typeof window.openQuickTaskModal === 'function') {
-                        window.openQuickTaskModal();
-                    }
+                    if (typeof window.openQuickTaskModal !== 'function') return;
+
+                    // Capture the insertion point now: the slash globals are
+                    // cleared right after the action while the modal is open
+                    const editable = savedEditableElement || window._slashCommandSavedEditableElement;
+                    const range = (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function')
+                        ? window._slashCommandSavedRange.cloneRange()
+                        : null;
+
+                    window.openQuickTaskModal('', {
+                        onAdded: function (target) {
+                            insertTaskListLinkHtml(editable, range, target);
+                        }
+                    });
                 }
             },
             {
@@ -2081,9 +2134,18 @@
                 icon: 'lucide-list-todo',
                 label: t('slash_menu.task', null, 'Add task'),
                 action: function () {
-                    if (typeof window.openQuickTaskModal === 'function') {
-                        window.openQuickTaskModal();
-                    }
+                    if (typeof window.openQuickTaskModal !== 'function') return;
+
+                    // Capture the markdown insertion point before the slash
+                    // globals are cleared while the modal is open
+                    const insertionContext = captureEditorInsertionContext();
+
+                    window.openQuickTaskModal('', {
+                        onAdded: function (target) {
+                            const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
+                            insertMarkdownAtContext(insertionContext, '[' + heading + '](index.php?note=' + target.id + ') ', 0);
+                        }
+                    });
                 }
             },
             {
@@ -3172,7 +3234,7 @@
                 // Re-focus after insertion to avoid caret jumping on focus (skip if
                 // keepSlash, or while the date picker popup is open: refocusing would
                 // reopen the mobile keyboard over it — the pick handler refocuses)
-                if (!shouldKeepSlash && !slashDatePickerCleanup) {
+                if (!shouldKeepSlash && !(typeof window.isSlashDatePickerOpen === 'function' && window.isSlashDatePickerOpen())) {
                     if (savedEditableElement) {
                         focusEditableElement(savedEditableElement);
                     } else if (savedNoteEntry) {

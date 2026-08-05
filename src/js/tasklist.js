@@ -1318,7 +1318,8 @@ async function executeMoveTask() {
 // Quick-capture a task into any tasklist note (opened by the /task slash command)
 let quickTaskState = {
     targetNoteId: null,
-    notes: []
+    notes: [],
+    onAdded: null
 };
 
 const QUICK_TASK_TARGET_KEY = 'poznote-quick-task-target';
@@ -1327,13 +1328,14 @@ function getQuickTaskStorage() {
     return window.__poznoteUserStorage || window.localStorage;
 }
 
-function openQuickTaskModal(prefillText) {
+function openQuickTaskModal(prefillText, options) {
     const modal = document.getElementById('quickTaskModal');
     if (!modal) return;
 
     quickTaskState = {
         targetNoteId: null,
-        notes: []
+        notes: [],
+        onAdded: (options && typeof options.onAdded === 'function') ? options.onAdded : null
     };
 
     attachQuickTaskModalHandlers(modal);
@@ -1572,6 +1574,17 @@ async function executeQuickTaskAdd() {
             const modal = document.getElementById('quickTaskModal');
             if (modal) modal.style.display = 'none';
         }
+
+        const addedTarget = {
+            id: targetNoteId,
+            heading: (noteData.note.heading || '')
+        };
+        if (quickTaskState.onAdded) {
+            try {
+                quickTaskState.onAdded(addedTarget);
+            } catch (e) { }
+        }
+        document.dispatchEvent(new CustomEvent('poznote-quick-task-added', { detail: addedTarget }));
     } catch (e) {
         if (window.modalAlert) {
             window.modalAlert.alert(

@@ -236,6 +236,28 @@ body.tasks-page {
     flex-shrink: 0;
 }
 
+/* Calendar button to add a due date to an undated open task */
+.tasks-task-due-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #999;
+    font-size: 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.tasks-task-due-btn:hover {
+    color: #007DB8;
+    opacity: 1;
+}
+
 /* Due date pill (shared visual language with in-note chips) */
 .task-due-chip {
     display: inline-flex;
@@ -301,6 +323,17 @@ body.tasks-page {
 .btn-secondary {
     background: #6c757d;
     color: white;
+}
+
+.btn-add-task {
+    display: inline-flex;
+    align-items: center;
+    background: #007DB8;
+    color: white;
+}
+
+.btn-add-task:hover {
+    background: #006a9c;
 }
 
 .loading-spinner {
@@ -395,6 +428,14 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .task-due-chip:hover {
     border-color: #4da3d0;
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .tasks-task-due-btn {
+    color: #b0b0b0;
+}
+
+[data-theme="dark"] .tasks-task-due-btn:hover {
     color: #4da3d0;
 }
 

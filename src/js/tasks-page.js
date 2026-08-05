@@ -288,6 +288,16 @@
                 openDueDatePicker(note, task, due, e);
             });
             row.appendChild(due);
+        } else if (!task.completed) {
+            var addDue = document.createElement('button');
+            addDue.type = 'button';
+            addDue.className = 'tasks-task-due-btn';
+            addDue.title = config.txtDue;
+            addDue.innerHTML = '<i class="lucide lucide-calendar-alt"></i>';
+            addDue.addEventListener('click', function (e) {
+                openDueDatePicker(note, task, addDue, e);
+            });
+            row.appendChild(addDue);
         }
 
         return row;
@@ -312,19 +322,23 @@
                 .catch(function () { });
         };
 
+        var pickerOptions = {
+            withTime: true,
+            initialTime: dueTimePart(task.dueAt),
+            initialDate: task.dueAt ? task.dueAt.substring(0, 10) : null,
+            removeTimeLabel: config.txtDueRemoveTime
+        };
+        if (task.dueAt) {
+            pickerOptions.removeLabel = config.txtDueRemove;
+            pickerOptions.onRemove = function () { applyDueAt(null); };
+        }
+
         window.showSlashDatePicker(anchorRect, function (date, time) {
             var day = date.getFullYear() + '-'
                 + String(date.getMonth() + 1).padStart(2, '0') + '-'
                 + String(date.getDate()).padStart(2, '0');
             applyDueAt(time ? (day + 'T' + time) : day);
-        }, null, {
-            withTime: true,
-            initialTime: dueTimePart(task.dueAt),
-            initialDate: task.dueAt ? task.dueAt.substring(0, 10) : null,
-            removeLabel: config.txtDueRemove,
-            removeTimeLabel: config.txtDueRemoveTime,
-            onRemove: function () { applyDueAt(null); }
-        });
+        }, null, pickerOptions);
     }
 
     // Apply a mutation to one task of a note by rewriting the note content
@@ -440,6 +454,30 @@
                 filterInput.focus();
             });
         }
+
+        // Quick-task modal (shared with the /task slash command in notes)
+        var addTaskBtn = document.getElementById('addTaskBtn');
+        if (addTaskBtn) {
+            addTaskBtn.addEventListener('click', function () {
+                if (typeof window.openQuickTaskModal === 'function') {
+                    window.openQuickTaskModal();
+                }
+            });
+        }
+
+        // Minimal close-modal delegation (modals-events.js is not loaded here)
+        document.addEventListener('click', function (e) {
+            var closeBtn = e.target.closest('[data-action="close-modal"]');
+            if (closeBtn) {
+                var modal = document.getElementById(closeBtn.getAttribute('data-modal'));
+                if (modal) modal.style.display = 'none';
+            }
+        });
+
+        // Refresh the list when a task was added through the modal
+        document.addEventListener('poznote-quick-task-added', function () {
+            loadTasks();
+        });
 
         loadTasks();
     });

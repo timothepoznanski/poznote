@@ -3295,6 +3295,7 @@
     "filter_completed": "Concluídas",
     "filter_placeholder": "Filtrar por tarefa, título ou pasta...",
     "empty": "Ainda não há tarefas. Crie uma nota de lista de tarefas para começar.",
-    "empty_filtered": "Nenhuma tarefa corresponde a este filtro."
+    "empty_filtered": "Nenhuma tarefa corresponde a este filtro.",
+    "add_task": "Adicionar tarefa"
   }
 }
