@@ -1273,7 +1273,14 @@
       "empty": "Nenhuma lista de tarefas encontrada.",
       "moving": "Movendo tarefa...",
       "error": "Não foi possível carregar as listas de tarefas.",
-      "confirm": "Mover tarefa"
+      "confirm": "Mover tarefa",
+      "create_new": "Criar lista de tarefas",
+      "create_error": "Não foi possível criar a lista de tarefas"
+    },
+    "tasklist_picker": {
+      "title": "Inserir lista de tarefas",
+      "description": "Escolha a lista de tarefas a exibir nesta nota.",
+      "confirm": "Inserir"
     },
     "note_sort": {
       "title": "Ordem de classificação das notas",
@@ -1379,14 +1386,6 @@
         "user_s3_restore": "Restauração S3 na página de restauração",
         "user_s3_restore_help": "Usuários não administradores deixam de ver a seção Restaurar do S3 da página Restaurar / Importar e não podem restaurar arquivos do bucket."
       }
-    },
-    "quick_task": {
-      "title": "Adicionar tarefa",
-      "text_placeholder": "O que precisa ser feito?",
-      "description": "Escolha a lista de tarefas onde adicionar esta tarefa.",
-      "confirm": "Adicionar",
-      "adding": "Adicionando tarefa...",
-      "error": "Não foi possível adicionar a tarefa"
     }
   },
   "notes_list": {
@@ -1539,7 +1538,7 @@
     "audio_invalid_file": "Por favor, selecione um ficheiro de audio.",
     "audio_upload_failed": "Erro ao enviar: {{error}}",
     "date": "Data",
-    "task": "Adicionar tarefa"
+    "tasklist_embed": "Lista de tarefas"
   },
   "api": {
     "settings": {
@@ -3351,9 +3350,10 @@
     "filter_placeholder": "Filtrar por tarefa, título ou pasta...",
     "empty": "Ainda não há tarefas. Crie uma nota de lista de tarefas para começar.",
     "empty_filtered": "Nenhuma tarefa corresponde a este filtro.",
-    "add_task": "Adicionar tarefa",
     "collapse": "Recolher",
-    "expand": "Expandir"
+    "expand": "Expandir",
+    "collapse_all": "Recolher tudo",
+    "expand_all": "Expandir tudo"
   },
   "s3_settings": {
     "title": "Armazenamento S3 de anexos",
@@ -3448,5 +3448,9 @@
     "users_label": "Usuários a fazer backup",
     "master_label": "Ativar os backups S3",
     "master_description": "Interruptor principal. Quando desativado, os backups automáticos param e as seções de backup e restauração S3 desaparecem para todos os usuários."
+  },
+  "tasklist_embed": {
+    "unavailable": "Esta lista de tarefas não está mais disponível.",
+    "empty": "Ainda não há tarefas nesta lista."
   }
 }

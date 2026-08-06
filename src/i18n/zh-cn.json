@@ -1372,13 +1372,14 @@
         "user_s3_restore_help": "非管理员用户将不再看到恢复 / 导入页面中的从 S3 恢复部分,也无法恢复存储桶归档。"
       }
     },
-    "quick_task": {
-      "title": "添加任务",
-      "text_placeholder": "需要做什么？",
-      "description": "选择要添加此任务的任务清单。",
-      "confirm": "添加",
-      "adding": "正在添加任务...",
-      "error": "无法添加任务"
+    "task_move": {
+      "create_new": "创建任务列表",
+      "create_error": "无法创建任务列表"
+    },
+    "tasklist_picker": {
+      "title": "插入任务列表",
+      "description": "选择要在此笔记中显示的任务列表。",
+      "confirm": "插入"
     }
   },
   "notes_list": {
@@ -1531,7 +1532,7 @@
     "audio_invalid_file": "请选择音频文件。",
     "audio_upload_failed": "上传失败：{{error}}",
     "date": "日期",
-    "task": "添加任务"
+    "tasklist_embed": "任务列表"
   },
   "api": {
     "settings": {
@@ -3470,9 +3471,10 @@
     "filter_placeholder": "按任务、标题或文件夹筛选...",
     "empty": "还没有任务。创建一个任务清单笔记开始吧。",
     "empty_filtered": "没有符合此筛选条件的任务。",
-    "add_task": "添加任务",
     "collapse": "收起",
-    "expand": "展开"
+    "expand": "展开",
+    "collapse_all": "全部折叠",
+    "expand_all": "全部展开"
   },
   "s3_settings": {
     "title": "S3 附件存储",
@@ -3567,5 +3569,9 @@
     "users_label": "要备份的用户",
     "master_label": "启用 S3 备份",
     "master_description": "主开关。禁用后,自动备份停止,所有用户的 S3 备份和恢复部分都会消失。"
+  },
+  "tasklist_embed": {
+    "unavailable": "此任务列表已不可用。",
+    "empty": "此列表中还没有任务。"
   }
 }

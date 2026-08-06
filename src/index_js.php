@@ -83,6 +83,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/index-icon-scale-settings.js',
         'js/background-settings.js',
         'js/tasklist.js',
+        'js/tasklist-embed.js',
         'js/excalidraw.js',
         'js/copy-code-on-focus.js',
         'js/table-context-menu.js',

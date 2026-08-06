@@ -1274,7 +1274,14 @@
       "empty": "Keine Aufgabenlisten gefunden.",
       "moving": "Aufgabe wird verschoben...",
       "error": "Aufgabenlisten konnten nicht geladen werden.",
-      "confirm": "Aufgabe verschieben"
+      "confirm": "Aufgabe verschieben",
+      "create_new": "Aufgabenliste erstellen",
+      "create_error": "Aufgabenliste konnte nicht erstellt werden"
+    },
+    "tasklist_picker": {
+      "title": "Aufgabenliste einfügen",
+      "description": "Wählen Sie die Aufgabenliste, die in dieser Notiz angezeigt werden soll.",
+      "confirm": "Einfügen"
     },
     "note_sort": {
       "title": "Notizen-Sortierreihenfolge",
@@ -1380,14 +1387,6 @@
         "user_s3_restore": "S3-Wiederherstellung auf der Wiederherstellungsseite",
         "user_s3_restore_help": "Nicht-Admin-Benutzer sehen den Abschnitt Aus S3 wiederherstellen der Seite Wiederherstellen / Importieren nicht mehr und können keine Bucket-Archive mehr wiederherstellen."
       }
-    },
-    "quick_task": {
-      "title": "Aufgabe hinzufügen",
-      "text_placeholder": "Was ist zu tun?",
-      "description": "Wählen Sie die Aufgabenliste, zu der diese Aufgabe hinzugefügt werden soll.",
-      "confirm": "Hinzufügen",
-      "adding": "Aufgabe wird hinzugefügt...",
-      "error": "Aufgabe konnte nicht hinzugefügt werden"
     }
   },
   "notes_list": {
@@ -1540,7 +1539,7 @@
     "audio_invalid_file": "Bitte wählen Sie eine Audiodatei aus.",
     "audio_upload_failed": "Upload fehlgeschlagen: {{error}}",
     "date": "Datum",
-    "task": "Aufgabe hinzufügen"
+    "tasklist_embed": "Aufgabenliste"
   },
   "api": {
     "settings": {
@@ -3348,9 +3347,10 @@
     "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
     "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz, um zu beginnen.",
     "empty_filtered": "Keine Aufgaben entsprechen diesem Filter.",
-    "add_task": "Aufgabe hinzufügen",
     "collapse": "Einklappen",
-    "expand": "Ausklappen"
+    "expand": "Ausklappen",
+    "collapse_all": "Alle einklappen",
+    "expand_all": "Alle ausklappen"
   },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",
@@ -3445,5 +3445,9 @@
     "users_label": "Zu sichernde Benutzer",
     "master_label": "S3-Sicherungen aktivieren",
     "master_description": "Hauptschalter. Wenn deaktiviert, stoppen die automatischen Sicherungen und die S3-Sicherungs- und Wiederherstellungsabschnitte verschwinden für alle Benutzer."
+  },
+  "tasklist_embed": {
+    "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",
+    "empty": "Noch keine Aufgaben in dieser Liste."
   }
 }

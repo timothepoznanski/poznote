@@ -3695,7 +3695,7 @@ function sanitizeHtml($html) {
         'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
-        'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'contenteditable'],
+        'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'data-task-embed', 'contenteditable'],
         'span' => ['class'],
         'input' => ['type', 'checked', 'disabled'],
         'time' => ['datetime'],
@@ -3748,6 +3748,16 @@ function sanitizeHtml($html) {
     foreach ($runtimeHeadingAnchors as $anchor) {
         if ($anchor->parentNode) {
             $anchor->parentNode->removeChild($anchor);
+        }
+    }
+
+    // Embedded task-list widgets are runtime UI rebuilt by tasklist-embed.js
+    // from the persisted marker; only the marker div and its fallback link
+    // belong in stored content.
+    $runtimeTaskEmbedWidgets = $xpath->query('//*[contains(concat(" ", normalize-space(@class), " "), " tasklist-embed-widget ")]');
+    foreach ($runtimeTaskEmbedWidgets as $widget) {
+        if ($widget->parentNode) {
+            $widget->parentNode->removeChild($widget);
         }
     }
     

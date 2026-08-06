@@ -174,7 +174,9 @@
         var completed = countCompletedTasks();
         var percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-        section.style.display = 'block';
+        // Let the stylesheet drive the layout (flex row on desktop, block on
+        // mobile) instead of forcing an inline display
+        section.classList.remove('initially-hidden');
         if (label) {
             label.textContent = config.txtProgress
                 .replace('{{completed}}', completed)
@@ -544,14 +546,20 @@
             });
         }
 
-        // Quick-task modal (shared with the /task slash command in notes)
-        var addTaskBtn = document.getElementById('addTaskBtn');
-        if (addTaskBtn) {
-            addTaskBtn.addEventListener('click', function () {
-                if (typeof window.openQuickTaskModal === 'function') {
-                    window.openQuickTaskModal();
-                }
-            });
+        function setAllCollapsed(collapsed) {
+            collapsedNoteIds = new Set(collapsed ? taskNotes.map(function (note) { return String(note.id); }) : []);
+            saveCollapsedNoteIds();
+            render();
+        }
+
+        var collapseAllBtn = document.getElementById('collapseAllBtn');
+        if (collapseAllBtn) {
+            collapseAllBtn.addEventListener('click', function () { setAllCollapsed(true); });
+        }
+
+        var expandAllBtn = document.getElementById('expandAllBtn');
+        if (expandAllBtn) {
+            expandAllBtn.addEventListener('click', function () { setAllCollapsed(false); });
         }
 
         // Minimal close-modal delegation (modals-events.js is not loaded here)
@@ -561,11 +569,6 @@
                 var modal = document.getElementById(closeBtn.getAttribute('data-modal'));
                 if (modal) modal.style.display = 'none';
             }
-        });
-
-        // Refresh the list when a task was added through the modal
-        document.addEventListener('poznote-quick-task-added', function () {
-            loadTasks();
         });
 
         loadTasks();

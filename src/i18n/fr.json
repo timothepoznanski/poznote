@@ -1292,7 +1292,14 @@
       "empty": "Aucune liste de tâches trouvée.",
       "moving": "Déplacement de la tâche...",
       "error": "Impossible de charger les listes de tâches.",
-      "confirm": "Déplacer la tâche"
+      "confirm": "Déplacer la tâche",
+      "create_new": "Créer la liste de tâches",
+      "create_error": "Impossible de créer la liste de tâches"
+    },
+    "tasklist_picker": {
+      "title": "Insérer une liste de tâches",
+      "description": "Choisissez la liste de tâches à afficher dans cette note.",
+      "confirm": "Insérer"
     },
     "convert": {
       "title": "Convertir la note",
@@ -1412,14 +1419,6 @@
         "user_s3_restore": "Restauration S3 sur la page Restauration",
         "user_s3_restore_help": "Les utilisateurs non administrateurs ne voient plus la section Restauration depuis S3 de la page Restauration / Import et ne peuvent plus restaurer d'archives du bucket."
       }
-    },
-    "quick_task": {
-      "title": "Ajouter une tâche",
-      "text_placeholder": "Que faut-il faire ?",
-      "description": "Choisissez la liste de tâches où ajouter cette tâche.",
-      "confirm": "Ajouter",
-      "adding": "Ajout de la tâche...",
-      "error": "Impossible d'ajouter la tâche"
     }
   },
   "notes_list": {
@@ -1588,7 +1587,7 @@
     "audio_invalid_file": "Veuillez sélectionner un fichier audio.",
     "audio_upload_failed": "Échec de l'envoi : {{error}}",
     "date": "Date",
-    "task": "Ajouter une tâche"
+    "tasklist_embed": "Liste de tâches"
   },
   "api": {
     "settings": {
@@ -3538,9 +3537,10 @@
     "filter_placeholder": "Filtrer par tâche, titre ou dossier...",
     "empty": "Aucune tâche pour le moment. Créez une note de type liste de tâches pour commencer.",
     "empty_filtered": "Aucune tâche ne correspond à ce filtre.",
-    "add_task": "Ajouter une tâche",
     "collapse": "Replier",
-    "expand": "Déplier"
+    "expand": "Déplier",
+    "collapse_all": "Tout replier",
+    "expand_all": "Tout déplier"
   },
   "s3_settings": {
     "title": "Stockage S3 des pièces jointes",
@@ -3635,5 +3635,9 @@
     "users_label": "Utilisateurs à sauvegarder",
     "master_label": "Activer les sauvegardes S3",
     "master_description": "Interrupteur principal. Quand il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs."
+  },
+  "tasklist_embed": {
+    "unavailable": "Cette liste de tâches n'est plus disponible.",
+    "empty": "Aucune tâche dans cette liste pour le moment."
   }
 }

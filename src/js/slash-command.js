@@ -1568,10 +1568,10 @@
         });
     }
 
-    // Insert an internal link to a tasklist note in an HTML editor, at the
-    // position captured when the /task command ran (same link format as the
-    // note-reference feature).
-    function insertTaskListLinkHtml(editable, range, target) {
+    // Insert an embedded task-list marker in an HTML editor; tasklist-embed.js
+    // hydrates it into the interactive widget (the fallback link inside is what
+    // public and exported notes show).
+    function insertTaskListEmbedHtml(editable, range, target) {
         if (!editable || !target) return;
 
         try {
@@ -1584,29 +1584,46 @@
             }
 
             const t = window.t || ((key, params, fallback) => fallback);
+            const embed = document.createElement('div');
+            embed.className = 'tasklist-embed';
+            embed.setAttribute('data-task-embed', target.id);
+            embed.setAttribute('contenteditable', 'false');
+
             const link = document.createElement('a');
+            link.className = 'tasklist-embed-link';
             link.href = 'index.php?note=' + target.id;
-            link.className = 'note-internal-link';
-            link.setAttribute('data-note-id', target.id);
-            link.setAttribute('data-note-reference', 'true');
             link.textContent = target.heading || t('note_reference.untitled', null, 'Untitled');
+            embed.appendChild(link);
 
             const selection = window.getSelection();
             if (selection && selection.rangeCount > 0) {
                 const r = selection.getRangeAt(0);
                 r.deleteContents();
-                r.insertNode(link);
-                r.setStartAfter(link);
-                r.setEndAfter(link);
+                r.insertNode(embed);
+
+                // Keep an editable paragraph after the widget so typing can continue
+                const after = document.createElement('p');
+                after.innerHTML = '<br>';
+                if (embed.nextSibling) {
+                    embed.parentNode.insertBefore(after, embed.nextSibling);
+                } else {
+                    embed.parentNode.appendChild(after);
+                }
+
+                const nr = document.createRange();
+                nr.setStart(after, 0);
+                nr.collapse(true);
                 selection.removeAllRanges();
-                selection.addRange(r);
-                document.execCommand('insertText', false, ' ');
+                selection.addRange(nr);
             } else {
-                editable.appendChild(link);
-                editable.appendChild(document.createTextNode(' '));
+                editable.appendChild(embed);
             }
 
             editable.dispatchEvent(new Event('input', { bubbles: true }));
+
+            if (typeof window.initializeTaskListEmbeds === 'function') {
+                window.initializeTaskListEmbeds(editable);
+            }
         } catch (e) { }
     }
 
@@ -1822,11 +1839,11 @@
                 ]
             },
             {
-                id: 'task',
-                icon: 'lucide-list-todo',
-                label: t('slash_menu.task', null, 'Add task'),
+                id: 'tasklist-embed',
+                icon: 'lucide-layout-list',
+                label: t('slash_menu.tasklist_embed', null, 'Task list'),
                 action: function () {
-                    if (typeof window.openQuickTaskModal !== 'function') return;
+                    if (typeof window.openTaskListPickerModal !== 'function') return;
 
                     // Capture the insertion point now: the slash globals are
                     // cleared right after the action while the modal is open
@@ -1835,10 +1852,8 @@
                         ? window._slashCommandSavedRange.cloneRange()
                         : null;
 
-                    window.openQuickTaskModal('', {
-                        onAdded: function (target) {
-                            insertTaskListLinkHtml(editable, range, target);
-                        }
+                    window.openTaskListPickerModal(function (target) {
+                        insertTaskListEmbedHtml(editable, range, target);
                     });
                 }
             },
@@ -2128,25 +2143,6 @@
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
                     { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
                 ]
-            },
-            {
-                id: 'task',
-                icon: 'lucide-list-todo',
-                label: t('slash_menu.task', null, 'Add task'),
-                action: function () {
-                    if (typeof window.openQuickTaskModal !== 'function') return;
-
-                    // Capture the markdown insertion point before the slash
-                    // globals are cleared while the modal is open
-                    const insertionContext = captureEditorInsertionContext();
-
-                    window.openQuickTaskModal('', {
-                        onAdded: function (target) {
-                            const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
-                            insertMarkdownAtContext(insertionContext, '[' + heading + '](index.php?note=' + target.id + ') ', 0);
-                        }
-                    });
-                }
             },
             {
                 id: 'quote',

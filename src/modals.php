@@ -764,8 +764,8 @@ try {
     </div>
 </div>
 
-<!-- Quick Add Task Modal (opened by the /task slash command) -->
-<?php include 'quick_task_modal.php'; ?>
+<!-- Task list picker (opened by the /tasklist embed slash command) -->
+<?php include 'task_list_picker_modal.php'; ?>
 
 <!-- Task Due Date Modal (due date + optional reminder for one task) -->
 <?php include 'task_due_modal.php'; ?>
@@ -1610,7 +1610,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:toggle" checked><span><?php echo t_h('slash_menu.toggle', [], 'Toggle'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:emoji" checked><span><?php echo t_h('slash_menu.emoji', [], 'Emoji'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:date" checked><span><?php echo t_h('slash_menu.date', [], 'Date'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:task" checked><span><?php echo t_h('slash_menu.task', [], 'Add task'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:tasklist-embed" checked><span><?php echo t_h('slash_menu.tasklist_embed', [], 'Task list'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:excalidraw" checked><span>Excalidraw</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>

@@ -1275,7 +1275,14 @@
       "empty": "No se encontraron listas de tareas.",
       "moving": "Moviendo tarea...",
       "error": "No se pudieron cargar las listas de tareas.",
-      "confirm": "Mover tarea"
+      "confirm": "Mover tarea",
+      "create_new": "Crear lista de tareas",
+      "create_error": "No se pudo crear la lista de tareas"
+    },
+    "tasklist_picker": {
+      "title": "Insertar lista de tareas",
+      "description": "Elige la lista de tareas que se mostrará en esta nota.",
+      "confirm": "Insertar"
     },
     "note_sort": {
       "title": "Orden de clasificación de notas",
@@ -1381,14 +1388,6 @@
         "user_s3_restore": "Restauración S3 en la página de restauración",
         "user_s3_restore_help": "Los usuarios no administradores ya no ven la sección Restaurar desde S3 de la página Restaurar / Importar y no pueden restaurar archivos del bucket."
       }
-    },
-    "quick_task": {
-      "title": "Añadir tarea",
-      "text_placeholder": "¿Qué hay que hacer?",
-      "description": "Elige la lista de tareas donde añadir esta tarea.",
-      "confirm": "Añadir",
-      "adding": "Añadiendo tarea...",
-      "error": "No se pudo añadir la tarea"
     }
   },
   "notes_list": {
@@ -1541,7 +1540,7 @@
     "audio_invalid_file": "Por favor, seleccione un archivo de audio.",
     "audio_upload_failed": "Error al subir: {{error}}",
     "date": "Fecha",
-    "task": "Añadir tarea"
+    "tasklist_embed": "Lista de tareas"
   },
   "api": {
     "settings": {
@@ -3348,9 +3347,10 @@
     "filter_placeholder": "Filtrar por tarea, título o carpeta...",
     "empty": "Aún no hay tareas. Crea una nota de lista de tareas para empezar.",
     "empty_filtered": "Ninguna tarea coincide con este filtro.",
-    "add_task": "Añadir tarea",
     "collapse": "Contraer",
-    "expand": "Expandir"
+    "expand": "Expandir",
+    "collapse_all": "Contraer todo",
+    "expand_all": "Expandir todo"
   },
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",
@@ -3445,5 +3445,9 @@
     "users_label": "Usuarios a respaldar",
     "master_label": "Activar las copias de seguridad S3",
     "master_description": "Interruptor principal. Cuando está desactivado, las copias automáticas se detienen y las secciones de copia de seguridad y restauración S3 desaparecen para todos los usuarios."
+  },
+  "tasklist_embed": {
+    "unavailable": "Esta lista de tareas ya no está disponible.",
+    "empty": "Aún no hay tareas en esta lista."
   }
 }
