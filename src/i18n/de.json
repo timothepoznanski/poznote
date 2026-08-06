@@ -3352,6 +3352,7 @@
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",
     "description": "Speichern Sie Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte.",
+    "description_benefit": "Besonders nützlich bei vielen oder großen Anhängen: Die Serverfestplatte bleibt schlank und das komplette Backup-ZIP kann die S3-Anhänge auslassen; bleibt alles auf der lokalen Festplatte, kann der Export sehr groß und langsam werden oder sogar mit einem Timeout fehlschlagen.",
     "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz.",
     "attachments_only_note": "Es sind nur die Anhang-Dateien betroffen.",
     "config_title": "Konfiguration",

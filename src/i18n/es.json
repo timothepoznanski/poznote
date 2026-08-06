@@ -3352,6 +3352,7 @@
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",
     "description": "Almacene los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
+    "description_benefit": "Especialmente útil si tiene muchos adjuntos o adjuntos grandes: el disco del servidor se mantiene ligero y el zip de copia de seguridad completa puede omitir los adjuntos S3; cuando todo permanece en el disco local, la exportación puede volverse muy pesada, lenta o incluso fallar por timeout.",
     "description_scope": "El ajuste se aplica a todos los usuarios de esta instancia.",
     "attachments_only_note": "Solo se ven afectados los archivos adjuntos.",
     "config_title": "Configuración",

@@ -3542,6 +3542,7 @@
   "s3_settings": {
     "title": "Stockage S3 des pièces jointes",
     "description": "Stockez les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
+    "description_benefit": "Particulièrement utile si vous avez beaucoup de pièces jointes ou de grosses pièces jointes : le disque du serveur reste léger et l'export backup zip peut ignorer les pièces jointes S3 ; quand tout reste sur le disque local, l'export peut devenir très lourd, lent, voire échouer en timeout.",
     "description_scope": "Ce réglage s'applique à tous les utilisateurs de l'instance.",
     "attachments_only_note": "Seuls les fichiers de pièces jointes sont concernés.",
     "config_title": "Configuration",

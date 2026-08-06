@@ -3474,6 +3474,7 @@
   "s3_settings": {
     "title": "S3 附件存储",
     "description": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
+    "description_benefit": "如果附件很多或很大,此选项特别有用:服务器磁盘保持轻量,完整备份压缩包可以跳过 S3 附件;如果全部存放在本地磁盘,导出可能变得非常庞大、缓慢,甚至因超时而失败。",
     "description_scope": "该设置对本实例的所有用户生效。",
     "attachments_only_note": "仅涉及附件文件。",
     "config_title": "配置",

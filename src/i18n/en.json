@@ -3049,6 +3049,7 @@
   "s3_settings": {
     "title": "S3 Attachment Storage",
     "description": "Store note attachments in an S3-compatible object storage instead of the local disk.",
+    "description_benefit": "Particularly useful if you have many or large attachments: the server disk stays light, and the complete backup zip can skip the S3 attachments; when everything stays on local disk, the export can become very heavy, slow, or even fail with a timeout.",
     "description_scope": "The setting applies to all users of this instance.",
     "attachments_only_note": "Only the attachment files are concerned.",
     "config_title": "Configuration",
