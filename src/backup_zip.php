@@ -91,6 +91,49 @@ function removeCopyButtonsFromHtml($html) {
 }
 }
 
+if (!function_exists('addDownloadAttributesToAttachmentLinks')) {
+/**
+ * Add a download attribute to <a> tags pointing at exported attachment files so
+ * browsers save the file instead of navigating to it when the export is opened locally.
+ * $downloadNames maps the exported basename (attachment id + extension) to the
+ * original filename used as the suggested download name.
+ */
+function addDownloadAttributesToAttachmentLinks($html, $downloadNames) {
+    if ($html === '' || $html === null) {
+        return $html;
+    }
+
+    return preg_replace_callback(
+        '#<a\b[^>]*href=("|\')(?:\.\./)*attachments/([^"\'?\#]+)(?:[?\#][^"\']*)?\1[^>]*>#i',
+        function ($matches) use ($downloadNames) {
+            $tag = $matches[0];
+
+            // Keep the click-to-view behavior of image preview wrappers; their
+            // caption link is the download entry point
+            if (stripos($tag, 'note-attachment-preview-media') !== false) {
+                return $tag;
+            }
+
+            // Skip tags that already carry a download attribute (compare with
+            // quoted values blanked out so title="Download ..." does not match)
+            $tagWithoutValues = preg_replace('/"[^"]*"|\'[^\']*\'/', '""', $tag);
+            if (preg_match('/\sdownload\b/i', $tagWithoutValues)) {
+                return $tag;
+            }
+
+            $basename = $matches[2];
+            $downloadAttr = ' download';
+            if (isset($downloadNames[$basename]) && $downloadNames[$basename] !== '') {
+                $downloadAttr = ' download="' . htmlspecialchars($downloadNames[$basename], ENT_QUOTES, 'UTF-8') . '"';
+            }
+
+            return '<a' . $downloadAttr . substr($tag, 2);
+        },
+        $html
+    );
+}
+}
+
 /**
  * Convert API URLs to relative paths for offline viewing
  * Converts /api/v1/notes/{noteId}/attachments/{attachmentId} to attachments/{attachmentId}.ext
@@ -210,6 +253,8 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
 
         // First, build a mapping of note IDs to their attachment extensions
         $noteAttachments = [];
+        // Exported basename (id + extension) => original filename, for download attributes
+        $attachmentDownloadNames = [];
         $query = "SELECT id, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
         $attachmentsResult = $tempCon->query($query);
 
@@ -222,6 +267,7 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
                         if (isset($attachment['id']) && isset($attachment['filename'])) {
                             $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
                             $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+                            $attachmentDownloadNames[$attachment['id'] . ($ext ? '.' . $ext : '')] = $attachment['original_filename'] ?? $attachment['filename'];
                         }
                     }
                     $noteAttachments[$row['id']] = $attachmentExtensions;
@@ -255,6 +301,7 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
                             // Convert API URLs to relative paths if this note has attachments
                             if (isset($noteAttachments[$noteId])) {
                                 $content = convertApiUrlsToRelativePaths($content, $noteAttachments[$noteId], $noteId);
+                                $content = addDownloadAttributesToAttachmentLinks($content, $attachmentDownloadNames);
                             }
                         } else if ($extension === 'md') {
                             // Convert Markdown image URLs to relative paths if this note has attachments
@@ -325,9 +372,16 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
             if (is_array($attachments) && !empty($attachments)) {
                 $attachmentLinks = [];
                 foreach ($attachments as $attachment) {
-                    if (isset($attachment['filename'])) {
-                        $filename = htmlspecialchars($attachment['filename']);
-                        $attachmentLinks[] = "<a href='attachments/{$filename}' target='_blank'>{$filename}</a>";
+                    if (isset($attachment['filename']) && isset($attachment['id'])) {
+                        // Files are stored in the ZIP as {id}.{ext}, so the link
+                        // must use that name while showing the real filename
+                        $extension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                        $zipName = $attachment['id'] . ($extension ? '.' . $extension : '');
+                        $displayName = (string)($attachment['original_filename'] ?? $attachment['filename']);
+
+                        $href = htmlspecialchars('attachments/' . rawurlencode($zipName), ENT_QUOTES);
+                        $safeDisplayName = htmlspecialchars($displayName, ENT_QUOTES);
+                        $attachmentLinks[] = "<a href='{$href}' download='{$safeDisplayName}'>{$safeDisplayName}</a>";
                     }
                 }
                     if (!empty($attachmentLinks)) {

@@ -3012,8 +3012,10 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                 $repairCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $repairCon->exec('PRAGMA busy_timeout = 5000');
                 $repairResult = repairDatabaseEntries($repairCon);
+                // Housekeeping the user cannot act on: log it instead of
+                // reporting it as a restore result
                 if ($repairResult['success'] && ($repairResult['folders_fixed'] > 0 || $repairResult['entries_fixed'] > 0)) {
-                    $results[] = "Migration: Fixed {$repairResult['folders_fixed']} folders and {$repairResult['entries_fixed']} entry snippets";
+                    error_log("Post-restore repair: fixed {$repairResult['folders_fixed']} folders and {$repairResult['entries_fixed']} entry snippets");
                 }
                 $repairCon = null;
             } catch (Throwable $e) {

@@ -179,6 +179,9 @@ function removeCopyButtonsFromHtml($html) {
  * browsers save the file instead of navigating to it when the export is opened locally.
  * $downloadNames maps the exported basename (attachment id + extension) to the
  * original filename used as the suggested download name.
+ *
+ * backup_zip.php carries its own copy (it stays standalone to be usable from the
+ * S3 backup worker); keep both in sync.
  */
 function addDownloadAttributesToAttachmentLinks($html, $downloadNames) {
     if ($html === '' || $html === null) {
