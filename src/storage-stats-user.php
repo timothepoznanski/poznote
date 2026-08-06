@@ -52,6 +52,40 @@ try {
     // Leave counts at 0 on error.
 }
 
+// S3 mode: split the attachments column like the admin page. Local is the
+// on-disk directory; S3 is the recorded size of files absent from it (files
+// not yet migrated stay in the local column).
+require_once __DIR__ . '/storage/AttachmentStorage.php';
+$s3ColumnVisible      = AttachmentStorage::isEnabled();
+$attachmentLocalBytes = (int)$sizes['attachments'];
+$attachmentS3Bytes    = 0;
+if ($s3ColumnVisible) {
+    $allRecordedBytes = 0;
+    $attachmentsDir   = $manager->getUserAttachmentsPath();
+    try {
+        $attStmt = $con->query("SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
+        foreach ($attStmt as $attRow) {
+            $list = json_decode($attRow['attachments'] ?? '', true);
+            if (!is_array($list)) {
+                continue;
+            }
+            foreach ($list as $attachment) {
+                $bytes = max(0, (int)($attachment['file_size'] ?? 0));
+                $allRecordedBytes += $bytes;
+                $filename = (string)($attachment['filename'] ?? '');
+                if ($filename !== '' && !file_exists($attachmentsDir . '/' . basename($filename))) {
+                    $attachmentS3Bytes += $bytes;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        // Stats only: keep the zero/combined figures on error.
+    }
+    // getStorageStats() adds every recorded size on top of the directory
+    // size in S3 mode: strip that to get the on-disk figure.
+    $attachmentLocalBytes = max(0, $attachmentLocalBytes - $allRecordedBytes);
+}
+
 // Effective quotas for this account (global settings + per-user overrides).
 // Admins are exempt from quotas.
 $quotaIsAdmin  = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
@@ -145,7 +179,12 @@ if ($quotaIsAdmin) {
                         <th><?php echo t_h('admin_tools.storage_stats.table_trash', [], 'Trash'); ?></th>
                         <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')); ?></th>
                         <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')); ?></th>
-                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')); ?></th>
+                        <?php if ($s3ColumnVisible): ?>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')); ?></th>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')); ?></th>
+                        <?php else: ?>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')); ?></th>
+                        <?php endif; ?>
                         <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
                     </tr>
                 </thead>
@@ -155,12 +194,15 @@ if ($quotaIsAdmin) {
                         <td><?php echo $notesTrash; ?></td>
                         <td><?php echo poznoteFormatMb((int)$sizes['database']); ?></td>
                         <td><?php echo poznoteFormatMb((int)$sizes['entries']); ?></td>
-                        <td><?php echo poznoteFormatMb((int)$sizes['attachments']); ?></td>
+                        <td><?php echo poznoteFormatMb($attachmentLocalBytes); ?></td>
+                        <?php if ($s3ColumnVisible): ?>
+                            <td><?php echo poznoteFormatMb($attachmentS3Bytes); ?></td>
+                        <?php endif; ?>
                         <td><strong><?php
-                            // Sum of the three displayed columns so the row adds up.
+                            // Sum of the displayed columns so the row adds up.
                             // Excludes backups/snapshots/backgrounds, which are not
                             // part of the backup export either.
-                            $displayedTotal = (int)$sizes['database'] + (int)$sizes['entries'] + (int)$sizes['attachments'];
+                            $displayedTotal = (int)$sizes['database'] + (int)$sizes['entries'] + $attachmentLocalBytes + $attachmentS3Bytes;
                             echo poznoteFormatMb($displayedTotal);
                         ?></strong></td>
                     </tr>
