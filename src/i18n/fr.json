@@ -442,7 +442,8 @@
       "api_rest": "Affichez les informations sur l'API REST de Poznote.",
       "website": "Ouvrez le site officiel de Poznote.",
       "support": "Soutenez le développement de Poznote par un don.",
-      "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local."
+      "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
+      "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification."
     },
     "title": "Paramètres",
     "collapse_section": "Réduire la section",
@@ -506,7 +507,8 @@
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
       "ai_assistant": "Assistant IA",
-      "s3_storage": "Stockage S3"
+      "s3_storage": "Pièces jointes S3",
+      "s3_backup": "Sauvegardes S3"
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -1062,7 +1064,8 @@
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
       "badge_hidden_count": "{{count}} masqué(s)",
       "check_all": "Tout cocher",
-      "uncheck_all": "Tout décocher"
+      "uncheck_all": "Tout décocher",
+      "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »"
     },
     "theme": {
       "title": "Sélection du thème",
@@ -1398,7 +1401,11 @@
         "user_sharing": "Découverte et partage entre utilisateurs",
         "user_sharing_help": "L'annuaire des utilisateurs devient réservé aux administrateurs et le partage avec des utilisateurs spécifiques est refusé.",
         "user_webhooks": "Webhooks utilisateur",
-        "user_webhooks_help": "Les utilisateurs non administrateurs ne peuvent plus enregistrer de webhooks envoyant des événements sur leurs notes vers des services externes."
+        "user_webhooks_help": "Les utilisateurs non administrateurs ne peuvent plus enregistrer de webhooks envoyant des événements sur leurs notes vers des services externes.",
+        "user_s3_backups": "Sauvegardes S3 sur la page Sauvegarde",
+        "user_s3_backups_help": "Les utilisateurs non administrateurs ne voient plus la section Sauvegardes S3 de la page Sauvegarde / Export et ne peuvent plus envoyer ni télécharger d'archives du bucket.",
+        "user_s3_restore": "Restauration S3 sur la page Restauration",
+        "user_s3_restore_help": "Les utilisateurs non administrateurs ne voient plus la section Restauration depuis S3 de la page Restauration / Import et ne peuvent plus restaurer d'archives du bucket."
       }
     },
     "quick_task": {
@@ -1760,6 +1767,15 @@
         "title": "Export des pièces jointes",
         "description": "Téléchargez toutes les pièces jointes de votre compte dans une seule archive ZIP.",
         "description_s3": "Avec le stockage S3 activé, les fichiers sont récupérés depuis le bucket ; utilisez cette archive pour ajouter les fichiers manquants à un backup créé sans les pièces jointes S3 avant de le restaurer."
+      },
+      "s3_backup": {
+        "title": "Sauvegardes S3",
+        "description": "Envoie une archive de sauvegarde de votre compte vers le bucket S3 configuré sur cette instance, et télécharge les archives qui y sont déjà stockées.",
+        "backup_now": "Sauvegarder mon compte vers S3",
+        "running": "Envoi de la sauvegarde vers le bucket...",
+        "done": "Sauvegarde envoyée ({{size}}).",
+        "error": "Échec de la sauvegarde : {{error}}",
+        "list_empty": "Aucune sauvegarde de votre compte dans le bucket pour le moment."
       }
     },
     "buttons": {
@@ -1868,7 +1884,10 @@
       "error_uploading_file": "Erreur lors du téléversement du fichier.",
       "cannot_find_entries_directory": "Impossible de trouver le répertoire des entrées.",
       "cannot_open_zip": "Impossible d'ouvrir le fichier ZIP.",
-      "failed_extract_content": "Échec de l'extraction du contenu de {{file}}."
+      "failed_extract_content": "Échec de l'extraction du contenu de {{file}}.",
+      "s3_restore_forbidden": "La restauration depuis S3 n'est pas autorisée sur ce compte.",
+      "s3_restore_invalid_key": "Archive de sauvegarde invalide.",
+      "s3_restore_download_error": "Impossible de récupérer l'archive depuis le bucket : {{error}}"
     },
     "spinner": {
       "processing": "Restauration en cours...",
@@ -1949,6 +1968,13 @@
         "supported_formats": "Formats supportés : .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Importez des fichiers HTML, Markdown, texte ou JSON individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension), sauf si une clé title est définie dans un front matter pour les fichiers MD.<br><br><strong>Tasklists :</strong> Les fichiers .json contenant des tableaux de tâches et les fichiers .md avec syntaxe checkbox (- [ ] ou - [x]) sont automatiquement importés comme listes de tâches.",
         "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt, .json"
+      },
+      "s3_restore": {
+        "title": "Restauration depuis S3",
+        "description": "Restaure votre compte directement depuis l'une des archives de sauvegarde stockées dans le bucket S3 de cette instance.",
+        "loading": "Chargement...",
+        "empty": "Aucune sauvegarde de votre compte dans le bucket pour le moment.",
+        "confirm": "Restaurer votre compte depuis {{filename}} ? Vos notes, pièces jointes et réglages actuels seront remplacés par le contenu de l'archive."
       }
     },
     "buttons": {
@@ -3549,5 +3575,55 @@
       "incomplete": "Le endpoint, le bucket et les identifiants sont requis pour activer le stockage S3."
     },
     "git_sync_note": "La synchronisation Git ignore les pièces jointes tant que le stockage S3 est activé."
+  },
+  "s3_backup": {
+    "title": "Sauvegardes S3",
+    "description": "Envoie des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement « Sauvegarde complète ») vers un bucket compatible S3, manuellement ou automatiquement selon une planification.",
+    "description_scope": "Le réglage s'applique à tous les utilisateurs de cette instance et est indépendant du stockage S3 des pièces jointes.",
+    "config_title": "Configuration",
+    "enable_label": "Sauvegardes automatiques",
+    "enable_description": "Sauvegarde les utilisateurs sélectionnés vers le bucket selon la planification ci-dessous. Les sauvegardes manuelles depuis cette page fonctionnent dès que la connexion est configurée, même si cet interrupteur est désactivé.",
+    "frequency_label": "Fréquence",
+    "frequency_daily": "Quotidienne",
+    "frequency_weekly": "Hebdomadaire",
+    "frequency_monthly": "Mensuelle (tous les 30 jours)",
+    "frequency_description": "La première sauvegarde automatique démarre quelques minutes après l'activation, les suivantes après l'intervalle choisi.",
+    "retention_label": "Sauvegardes à conserver par utilisateur",
+    "retention_description": "Les archives plus anciennes sont supprimées du bucket après chaque sauvegarde. 0 conserve tout.",
+    "skip_s3_label": "Ignorer les pièces jointes déjà stockées dans S3",
+    "skip_s3_description": "Quand les pièces jointes vivent dans un bucket S3 (fonction Stockage S3), elles ne sont pas incluses dans les archives au lieu d'être téléchargées à chaque sauvegarde. Les pièces jointes sur le disque local sont toujours incluses.",
+    "manual_title": "Sauvegarde manuelle",
+    "manual_description": "Sauvegarde immédiatement les utilisateurs sélectionnés vers le bucket, un utilisateur à la fois.",
+    "run_now": "Sauvegarder maintenant",
+    "confirm_run": "Sauvegarder maintenant les utilisateurs sélectionnés vers le bucket ?",
+    "running": "Sauvegarde de {{username}}... ({{done}}/{{total}})",
+    "run_done": "Sauvegarde terminée : {{uploaded}}/{{total}} utilisateur(s) envoyé(s).",
+    "run_error": "Sauvegarde interrompue après une erreur : {{error}}",
+    "user_ok": "{{username}} : envoyé ({{size}})",
+    "user_fail": "{{username}} : échec ({{error}})",
+    "not_configured": "Configurez et enregistrez d'abord la connexion au bucket.",
+    "last_run": "Dernière exécution ({{trigger}}) : {{date}}, {{uploaded}}/{{total}} utilisateur(s) envoyé(s).",
+    "trigger_auto": "automatique",
+    "trigger_manual": "manuelle",
+    "list_title": "Sauvegardes dans le bucket",
+    "list_empty": "Aucune sauvegarde dans le bucket pour le moment.",
+    "list_error": "Impossible de lister le bucket : {{error}}",
+    "list_loading": "Chargement...",
+    "col_user": "Utilisateur",
+    "col_archive": "Archive",
+    "col_size": "Taille",
+    "download": "Télécharger",
+    "delete": "Supprimer",
+    "confirm_delete": "Supprimer la sauvegarde {{filename}} du bucket ?",
+    "footer_note": "Les archives sont stockées sous backups/{id utilisateur}/ dans le bucket et peuvent être restaurées avec la page « Restauration / Import » standard.",
+    "messages": {
+      "incomplete": "L'endpoint, le bucket et les identifiants sont requis pour activer les sauvegardes automatiques.",
+      "saved": "Configuration enregistrée avec succès.",
+      "save_error": "Échec de l'enregistrement de la configuration.",
+      "no_user_selected": "Cochez au moins un utilisateur à sauvegarder."
+    },
+    "users_label": "Utilisateurs à sauvegarder",
+    "master_label": "Activer les sauvegardes S3",
+    "master_description": "Interrupteur principal. Quand il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs."
   }
 }

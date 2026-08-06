@@ -432,7 +432,8 @@
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
       "support": "通过捐赠支持 Poznote 的开发。",
-      "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。"
+      "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
+      "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。"
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
@@ -496,7 +497,8 @@
       "smtp_config": "SMTP / 邮件",
       "webhooks": "Webhook",
       "ai_assistant": "AI 助手",
-      "s3_storage": "S3 存储"
+      "s3_storage": "S3 附件",
+      "s3_backup": "S3 备份"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -1038,7 +1040,8 @@
       "uncheck_all": "取消全选",
       "badge_all_visible": "全部可见",
       "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
-      "badge_hidden_count": "{{count}} 个已隐藏"
+      "badge_hidden_count": "{{count}} 个已隐藏",
+      "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分"
     },
     "theme": {
       "title": "主题选择",
@@ -1357,7 +1360,11 @@
         "user_sharing": "用户发现与共享",
         "user_sharing_help": "用户目录仅限管理员访问，并拒绝与特定用户共享。",
         "user_webhooks": "用户 Webhook",
-        "user_webhooks_help": "非管理员用户无法再注册向外部服务发送笔记事件的 webhook。"
+        "user_webhooks_help": "非管理员用户无法再注册向外部服务发送笔记事件的 webhook。",
+        "user_s3_backups": "备份页面上的 S3 备份",
+        "user_s3_backups_help": "非管理员用户将不再看到备份 / 导出页面中的 S3 备份部分,也无法上传或下载存储桶归档。",
+        "user_s3_restore": "恢复页面上的 S3 恢复",
+        "user_s3_restore_help": "非管理员用户将不再看到恢复 / 导入页面中的从 S3 恢复部分,也无法恢复存储桶归档。"
       }
     },
     "quick_task": {
@@ -1707,6 +1714,15 @@
         "title": "附件导出",
         "description": "将您账户的所有附件下载为一个 ZIP 压缩包。",
         "description_s3": "启用 S3 存储时,文件会从存储桶中获取;恢复前,可用此压缩包为不含 S3 附件的备份补全缺失的文件。"
+      },
+      "s3_backup": {
+        "title": "S3 备份",
+        "description": "将您账户的备份归档上传到此实例配置的 S3 存储桶,并下载已存储在那里的归档。",
+        "backup_now": "将我的账户备份到 S3",
+        "running": "正在将备份上传到存储桶...",
+        "done": "备份已上传({{size}})。",
+        "error": "备份失败:{{error}}",
+        "list_empty": "存储桶中还没有您账户的备份。"
       }
     },
     "buttons": {
@@ -1816,7 +1832,10 @@
       "error_uploading_file": "上传文件出错。",
       "cannot_find_entries_directory": "找不到条目目录。",
       "cannot_open_zip": "无法打开 ZIP 文件。",
-      "failed_extract_content": "无法从 {{file}} 解压内容。"
+      "failed_extract_content": "无法从 {{file}} 解压内容。",
+      "s3_restore_forbidden": "此账户不允许从 S3 恢复。",
+      "s3_restore_invalid_key": "无效的备份归档。",
+      "s3_restore_download_error": "无法从存储桶获取归档:{{error}}"
     },
     "spinner": {
       "processing": "正在处理还原...",
@@ -1897,6 +1916,13 @@
         "supported_formats": "支持：.html, .md, .markdown, .txt, .json, .zip",
         "description_html": "导入个人 HTML、Markdown、文本或 JSON 文件，或包含多个文件的 ZIP 归档。<br><br>标题将根据文件名自动创建（不含扩展名），除非在 MD 文件的前置内容中定义了 title 键。<br><br><strong>任务列表：</strong> 包含任务数组的 .json 文件和带有复选框语法的 .md 文件 (- [ ] 或 - [x]) 将被自动导入为任务列表。",
         "helper": "您可以一次选择多个文件（最多 50 个）。支持格式：.html, .md, .markdown, .txt, .json"
+      },
+      "s3_restore": {
+        "title": "从 S3 恢复",
+        "description": "直接从存储在此实例 S3 存储桶中的备份归档恢复您的账户。",
+        "loading": "加载中...",
+        "empty": "存储桶中还没有您账户的备份。",
+        "confirm": "从 {{filename}} 恢复您的账户?您当前的笔记、附件和设置将被归档内容替换。"
       }
     },
     "buttons": {
@@ -3481,5 +3507,55 @@
       "incomplete": "启用 S3 存储需要填写端点、存储桶和凭据。"
     },
     "git_sync_note": "启用 S3 存储期间,Git 同步会忽略附件。"
+  },
+  "s3_backup": {
+    "title": "S3 备份",
+    "description": "将完整备份归档(每个用户一个 ZIP,与“完整备份”下载内容相同)上传到 S3 兼容的存储桶,可手动或按计划自动执行。",
+    "description_scope": "该设置适用于此实例的所有用户,并且独立于 S3 附件存储。",
+    "config_title": "配置",
+    "enable_label": "自动备份",
+    "enable_description": "按以下计划将选定的用户备份到存储桶。只要连接配置完成,即使此开关关闭,也可以从此页面手动备份。",
+    "frequency_label": "频率",
+    "frequency_daily": "每天",
+    "frequency_weekly": "每周",
+    "frequency_monthly": "每月(每 30 天)",
+    "frequency_description": "首次自动备份在启用后几分钟内运行,之后按所选间隔运行。",
+    "retention_label": "每个用户保留的备份数",
+    "retention_description": "每次备份后,较旧的归档会从存储桶中删除。0 表示全部保留。",
+    "skip_s3_label": "跳过已存储在 S3 中的附件",
+    "skip_s3_description": "当附件位于 S3 存储桶中(S3 存储功能)时,不将其包含在归档中,而不是每次备份都下载。本地磁盘上的附件始终包含。",
+    "manual_title": "手动备份",
+    "manual_description": "立即将选定的用户备份到存储桶,一次一个用户。",
+    "run_now": "立即备份",
+    "confirm_run": "现在将选定的用户备份到存储桶?",
+    "running": "正在备份 {{username}}... ({{done}}/{{total}})",
+    "run_done": "备份完成:已上传 {{uploaded}}/{{total}} 个用户。",
+    "run_error": "备份因错误而停止:{{error}}",
+    "user_ok": "{{username}}:已上传({{size}})",
+    "user_fail": "{{username}}:失败({{error}})",
+    "not_configured": "请先配置并保存存储桶连接。",
+    "last_run": "上次运行({{trigger}}):{{date}},已上传 {{uploaded}}/{{total}} 个用户。",
+    "trigger_auto": "自动",
+    "trigger_manual": "手动",
+    "list_title": "存储桶中的备份",
+    "list_empty": "存储桶中还没有备份。",
+    "list_error": "无法列出存储桶:{{error}}",
+    "list_loading": "加载中...",
+    "col_user": "用户",
+    "col_archive": "归档",
+    "col_size": "大小",
+    "download": "下载",
+    "delete": "删除",
+    "confirm_delete": "从存储桶中删除备份 {{filename}}?",
+    "footer_note": "归档存储在存储桶的 backups/{用户 id}/ 下,可以使用标准的“恢复 / 导入”页面进行恢复。",
+    "messages": {
+      "incomplete": "启用自动备份需要 endpoint、存储桶和凭据。",
+      "saved": "配置保存成功。",
+      "save_error": "保存配置失败。",
+      "no_user_selected": "请至少勾选一个要备份的用户。"
+    },
+    "users_label": "要备份的用户",
+    "master_label": "启用 S3 备份",
+    "master_description": "主开关。禁用后,自动备份停止,所有用户的 S3 备份和恢复部分都会消失。"
   }
 }

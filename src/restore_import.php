@@ -8,9 +8,18 @@ requireSettingsPassword();
 require_once 'db_connect.php';
 require_once 'version_helper.php';
 require_once 'import_helpers.php';
+require_once 'S3BackupService.php';
 
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());
+
+// Restore from S3 section: needs the feature enabled (master switch) with a
+// configured bucket, and can be blocked for non-admin users by the
+// user_s3_restore tenant isolation feature. The POST handler below enforces
+// the same rule, so the feature cannot be triggered through a hand-crafted
+// request either.
+$s3RestoreSectionVisible = S3BackupService::isEnabled()
+    && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true));
 
 // Variables for specific section messages
 $restore_message = '';
@@ -120,15 +129,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $import_individual_notes_error = t('restore_import.errors.no_notes_selected_or_upload');
             }
             break;
+
+        case 'restore_s3_backup':
+            // Server-side enforcement: mirrors the section visibility rule so
+            // the tenant isolation switch really blocks the capability
+            $s3RestoreKey = (string)($_POST['s3_backup_key'] ?? '');
+            $s3RestoreOwnPrefix = S3BackupService::keyPrefixForUser((int)getCurrentUserId());
+            if (!$s3RestoreSectionVisible) {
+                $restore_error = t('restore_import.errors.s3_restore_forbidden', [], 'Restoring from S3 is not allowed on this account.');
+            } elseif (!preg_match('#^backups/\d+/[^/]+\.zip$#', $s3RestoreKey) || strpos($s3RestoreKey, $s3RestoreOwnPrefix) !== 0) {
+                $restore_error = t('restore_import.errors.s3_restore_invalid_key', [], 'Invalid backup archive.');
+            } else {
+                $s3RestoreTemp = tempnam(sys_get_temp_dir(), 'pozs3restore_');
+                try {
+                    S3BackupService::makeClient()->getObjectToFile($s3RestoreKey, $s3RestoreTemp);
+                    $result = restoreCompleteBackup(['tmp_name' => $s3RestoreTemp, 'name' => basename($s3RestoreKey)], true);
+                    if ($result['success']) {
+                        $restore_message = t('restore_import.messages.complete_backup_restored', ['message' => $result['message']]);
+                    } else {
+                        $restoreErrorDetails = trim((string)($result['message'] ?? ''));
+                        $restore_error = t('restore_import.errors.complete_restore_error', [
+                            'error' => $result['error'],
+                            'message' => $restoreErrorDetails !== '' ? ' - ' . $restoreErrorDetails : ''
+                        ]);
+                    }
+                } catch (Exception $e) {
+                    $restore_error = t('restore_import.errors.s3_restore_download_error', ['error' => $e->getMessage()], 'Cannot fetch the archive from the bucket: {{error}}');
+                }
+                @unlink($s3RestoreTemp);
+            }
+            break;
         }
     }
 }
 
 $restoreImportAction = $_POST['action'] ?? '';
 $directCopyRestoreSubmitted = $restoreImportPostAllowed && $restoreImportAction === 'restore_cli_upload';
-$restoreBackupContentOpen = $restoreImportPostAllowed && in_array($restoreImportAction, ['complete_restore', 'check_cli_upload', 'restore_cli_upload'], true);
+$restoreBackupContentOpen = $restoreImportPostAllowed && in_array($restoreImportAction, ['complete_restore', 'check_cli_upload', 'restore_cli_upload', 'restore_s3_backup'], true);
 $standardRestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'complete_restore';
 $directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPostAllowed && $restoreImportAction === 'check_cli_upload');
+$s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'restore_s3_backup';
 ?>
 
 <!DOCTYPE html>
@@ -153,6 +193,7 @@ $directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPo
     <link rel="stylesheet" href="css/modals/share-modal.css">
     <link rel="stylesheet" href="css/modals/alerts-utilities.css">
     <link rel="stylesheet" href="css/modals/responsive.css">
+    <link rel="stylesheet" href="css/modal-alerts.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/layout.css">
     <link rel="stylesheet" href="css/dark-mode/menus.css">
@@ -269,8 +310,10 @@ $directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPo
             </div>
         </div>
 
-        <!-- Direct Copy Restore Section -->
-        <div class="sub-card">
+        <!-- Direct Copy Restore Section (hideable via UI customization, per
+             user or enforced instance-wide by the admin) -->
+        <?php if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')): ?>
+        <div class="sub-card" id="directCopyRestoreCard">
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="directCopyRestoreContent">
                 <h4>
                     <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
@@ -328,7 +371,114 @@ $directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPo
             </form>
             </div>
         </div>
-        
+        <?php endif; ?>
+
+        <?php if ($s3RestoreSectionVisible): ?>
+        <!-- Restore From S3 Section -->
+        <div class="sub-card">
+            <div class="sub-card-header" data-action="toggle-sub-card" data-target="s3RestoreContent">
+                <h4>
+                    <?php echo t_h('restore_import.sections.s3_restore.title', [], 'Restore from S3'); ?>
+                </h4>
+            </div>
+            <div class="sub-card-content<?php echo $s3RestoreContentOpen ? ' open' : ''; ?>" id="s3RestoreContent">
+                <p><?php echo t_h('restore_import.sections.s3_restore.description', [], 'Restore your account directly from one of the backup archives stored in the S3 bucket of this instance.'); ?></p>
+
+                <form method="post" action="#s3RestoreContent" id="s3RestoreForm">
+                    <input type="hidden" name="action" value="restore_s3_backup">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+                    <div class="form-group">
+                        <select id="s3RestoreSelect" name="s3_backup_key" class="form-control form-select-styled" required>
+                            <option value=""><?php echo t_h('restore_import.sections.s3_restore.loading', [], 'Loading...'); ?></option>
+                        </select>
+                    </div>
+                    <button type="button" id="s3RestoreBtn" class="btn btn-primary" disabled>
+                        <?php echo t_h('restore_import.buttons.start_restore'); ?>
+                    </button>
+                    <!-- Spinner shown while the archive is fetched from the bucket and restored -->
+                    <div id="s3RestoreSpinner" class="restore-spinner" style="display: none;" role="status" aria-live="polite" aria-hidden="true">
+                        <div class="restore-spinner-circle" aria-hidden="true"></div>
+                        <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
+                        <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.processing_long'); ?></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var i18n = {
+                empty: <?php echo json_encode(t('restore_import.sections.s3_restore.empty', [], 'No backup of your account in the bucket yet.')); ?>,
+                listError: <?php echo json_encode(t('s3_backup.list_error', [], 'Cannot list the bucket: {{error}}')); ?>,
+                confirm: <?php echo json_encode(t('restore_import.sections.s3_restore.confirm', [], 'Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content.')); ?>,
+                confirmTitle: <?php echo json_encode(t('restore_import.sections.s3_restore.title', [], 'Restore from S3')); ?>
+            };
+
+            var select = document.getElementById('s3RestoreSelect');
+            var btn = document.getElementById('s3RestoreBtn');
+            var form = document.getElementById('s3RestoreForm');
+
+            function formatBytes(bytes) {
+                if (bytes === null || bytes === undefined) return '';
+                var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                var i = 0, v = bytes;
+                while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+                return (i === 0 ? v : v.toFixed(1)) + ' ' + units[i];
+            }
+
+            function setSingleOption(text) {
+                select.innerHTML = '';
+                var option = document.createElement('option');
+                option.value = '';
+                option.textContent = text;
+                select.appendChild(option);
+                btn.disabled = true;
+            }
+
+            fetch('api_s3_backup.php?action=self_status', { credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (!data.success) {
+                        setSingleOption(i18n.listError.replace('{{error}}', data.error || 'unknown'));
+                        return;
+                    }
+                    if (!data.configured || !data.backups.length) {
+                        setSingleOption(i18n.empty);
+                        return;
+                    }
+                    select.innerHTML = '';
+                    data.backups.forEach(function(backup) {
+                        var option = document.createElement('option');
+                        option.value = backup.key;
+                        option.textContent = backup.filename + ' (' + formatBytes(backup.size) + ')';
+                        select.appendChild(option);
+                    });
+                    btn.disabled = false;
+                })
+                .catch(function(e) {
+                    setSingleOption(i18n.listError.replace('{{error}}', e.message));
+                });
+
+            btn.addEventListener('click', function() {
+                if (!select.value) return;
+                var filename = select.options[select.selectedIndex].textContent;
+                var message = i18n.confirm.replace('{{filename}}', filename);
+                var confirmed = window.modalAlert
+                    ? window.modalAlert.confirm(message, i18n.confirmTitle)
+                    : Promise.resolve(window.confirm(message));
+                confirmed.then(function(ok) {
+                    if (!ok) return;
+                    var spinner = document.getElementById('s3RestoreSpinner');
+                    spinner.style.display = 'inline-flex';
+                    spinner.setAttribute('aria-hidden', 'false');
+                    btn.disabled = true;
+                    form.submit();
+                });
+            });
+        });
+        </script>
+        <?php endif; ?>
+
             </div>
         </div>
         

@@ -39,6 +39,7 @@ https://poznote.com/index.html#press
 - [Multi-users](#multi-users)
 - [Git Synchronization](#git-synchronization)
 - [S3 Attachment Storage](#s3-attachment-storage)
+- [S3 Backups](#s3-backups)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
 - [Offline View](#offline-view)
@@ -710,7 +711,7 @@ By default, note attachments are stored on the local disk. Administrators can in
 <summary><strong>How to configure S3 storage</strong></summary>
 <br>
 
-Configure it in **Settings > S3 Storage** (administrators only).
+Configure it in **Settings > S3 Attachments** (administrators only).
 
 - **Configuration**: Endpoint URL, region, bucket, access key, secret key, and path-style addressing, with a built-in connection test.
 - **Migration**: Move existing attachment files between the local disk and the bucket, in both directions and for every user. Migration runs in batches and can be safely interrupted and resumed.
@@ -725,6 +726,31 @@ Restoring a backup that was made without its S3 attachments is refused while S3 
 3. Restore the rebuilt zip normally.
 
 > Git Sync ignores attachments while S3 storage is enabled.
+
+</details>
+
+## S3 Backups
+
+Administrators can send complete backup archives (one ZIP per user, identical to the Complete Backup download) to an S3-compatible bucket, manually or automatically on a schedule. The configuration is independent from the S3 Attachment Storage one, so backups can target a different bucket or provider.
+
+<details>
+<summary><strong>How to configure S3 backups</strong></summary>
+<br>
+
+Configure it in **Settings > S3 Backups** (administrators only).
+
+- **Master switch**: A toggle at the top of the page enables or disables the whole feature. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user (the self-service actions are refused server-side too).
+- **Configuration**: Endpoint URL, region, bucket, access key, secret key, and path-style addressing, with a built-in connection test.
+- **User selection**: Checkboxes choose which users are covered by the backups. Everyone is checked by default, and while everyone is checked, new accounts are included automatically.
+- **Manual backups**: A "Back up now" button uploads a fresh archive for each selected user, one user at a time, with per-user progress. It works as soon as the connection is configured, even when automatic backups are off.
+- **Automatic backups**: When enabled, a background worker backs up the selected users on the chosen frequency (daily, weekly, or monthly). The first run happens within a few minutes of enabling, the next ones after the chosen interval.
+- **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the bucket after each backup (0 keeps everything).
+- **Browsing**: The page lists the archives currently in the bucket, with download and delete actions.
+- **Restore**: Archives are stored under `backups/{user id}/` in the bucket and can be restored with the standard [Restore / Import](#restore--import) page.
+- **Self-service**: Once the bucket is configured, every user gets an "S3 Backups" section on their Backup / Export page to upload a fresh archive of their own account, and to download or delete their existing archives. A "Restore from S3" section on the Restore / Import page restores their account directly from one of those archives.
+- **Tenant isolation**: Two options ("S3 backups on the Backup page" and "S3 restore on the Restore page") disable these self-service sections for non-admin users. They are enforced server-side, so the blocked actions are refused even when called directly.
+
+When attachments are stored in S3 (S3 Attachment Storage), they are included in the archives by default, fetched from the bucket on the fly. An option lets you leave them out of the backups for lighter archives and faster runs.
 
 </details>
 

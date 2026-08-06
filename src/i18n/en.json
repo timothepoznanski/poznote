@@ -166,7 +166,8 @@
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
       "support": "Support the development of Poznote with a donation.",
-      "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk."
+      "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
+      "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -211,7 +212,8 @@
       "smtp_config": "SMTP / Email",
       "webhooks": "Webhooks",
       "ai_assistant": "AI Assistant",
-      "s3_storage": "S3 Storage"
+      "s3_storage": "S3 Attachments",
+      "s3_backup": "S3 Backups"
     },
     "install_app": {
       "launching": "The installation will start. Please wait...",
@@ -554,7 +556,8 @@
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
       "badge_hidden_count": "{{count}} hidden",
       "check_all": "Check all",
-      "uncheck_all": "Uncheck all"
+      "uncheck_all": "Uncheck all",
+      "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section"
     },
     "theme": {
       "title": "Theme Selection",
@@ -921,7 +924,11 @@
         "user_sharing": "User discovery and sharing",
         "user_sharing_help": "The user directory becomes admin-only and sharing with specific users is refused.",
         "user_webhooks": "User webhooks",
-        "user_webhooks_help": "Non-admin users can no longer register webhooks that send events about their notes to external endpoints."
+        "user_webhooks_help": "Non-admin users can no longer register webhooks that send events about their notes to external endpoints.",
+        "user_s3_backups": "S3 backups on the Backup page",
+        "user_s3_backups_help": "Non-admin users no longer see the S3 Backups section of the Backup / Export page and cannot upload or download bucket archives.",
+        "user_s3_restore": "S3 restore on the Restore page",
+        "user_s3_restore_help": "Non-admin users no longer see the Restore from S3 section of the Restore / Import page and cannot restore bucket archives."
       }
     },
     "quick_task": {
@@ -1375,6 +1382,15 @@
         "title": "Attachments Export",
         "description": "Download all the attachments of your account in a single ZIP archive.",
         "description_s3": "With S3 storage enabled, the files are fetched from the bucket; use this archive to add the missing files to a backup made without S3 attachments before restoring it."
+      },
+      "s3_backup": {
+        "title": "S3 Backups",
+        "description": "Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.",
+        "backup_now": "Back up my account to S3",
+        "running": "Uploading the backup to the bucket...",
+        "done": "Backup uploaded ({{size}}).",
+        "error": "Backup failed: {{error}}",
+        "list_empty": "No backup of your account in the bucket yet."
       }
     },
     "buttons": {
@@ -1483,7 +1499,10 @@
       "error_uploading_file": "Error uploading file.",
       "cannot_find_entries_directory": "Cannot find entries directory.",
       "cannot_open_zip": "Cannot open ZIP file.",
-      "failed_extract_content": "Failed to extract content from {{file}}."
+      "failed_extract_content": "Failed to extract content from {{file}}.",
+      "s3_restore_forbidden": "Restoring from S3 is not allowed on this account.",
+      "s3_restore_invalid_key": "Invalid backup archive.",
+      "s3_restore_download_error": "Cannot fetch the archive from the bucket: {{error}}"
     },
     "spinner": {
       "processing": "Processing restoration...",
@@ -1564,6 +1583,13 @@
         "supported_formats": "Supported: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Import individual HTML, Markdown, text or JSON files, or a ZIP archive containing multiple files.<br><br>Title will be automatically created from filename (without extension), unless a title key is defined in a front matter for MD files.<br><br><strong>Tasklists:</strong> .json files containing tasks arrays and .md files with checkbox syntax (- [ ] or - [x]) are automatically imported as tasklists.",
         "helper": "You can select multiple files at once (Maximum 50 files). Supported formats: .html, .md, .markdown, .txt, .json"
+      },
+      "s3_restore": {
+        "title": "Restore from S3",
+        "description": "Restore your account directly from one of the backup archives stored in the S3 bucket of this instance.",
+        "loading": "Loading...",
+        "empty": "No backup of your account in the bucket yet.",
+        "confirm": "Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content."
       }
     },
     "buttons": {
@@ -3056,5 +3082,55 @@
       "incomplete": "Endpoint, bucket and credentials are required to enable S3 storage."
     },
     "git_sync_note": "Git sync ignores attachments while S3 storage is enabled."
+  },
+  "s3_backup": {
+    "title": "S3 Backups",
+    "description": "Upload complete backup archives (one ZIP per user, identical to the Complete Backup download) to an S3-compatible bucket, manually or automatically on a schedule.",
+    "description_scope": "The setting applies to all users of this instance and is independent from the S3 attachment storage.",
+    "config_title": "Configuration",
+    "enable_label": "Automatic backups",
+    "enable_description": "Back up the selected users to the bucket on the schedule below. Manual backups from this page work as soon as the connection is configured, even with this switch off.",
+    "frequency_label": "Frequency",
+    "frequency_daily": "Daily",
+    "frequency_weekly": "Weekly",
+    "frequency_monthly": "Monthly (every 30 days)",
+    "frequency_description": "The first automatic backup runs within a few minutes of enabling, the next ones after the chosen interval.",
+    "retention_label": "Backups to keep per user",
+    "retention_description": "Older archives are deleted from the bucket after each backup. 0 keeps everything.",
+    "skip_s3_label": "Skip attachments already stored in S3",
+    "skip_s3_description": "When attachments live in an S3 bucket (S3 storage feature), leave them out of the archives instead of downloading them for every backup. Attachments on local disk are always included.",
+    "manual_title": "Manual backup",
+    "manual_description": "Back up the selected users to the bucket right now, one user at a time.",
+    "run_now": "Back up now",
+    "confirm_run": "Back up the selected users to the bucket now?",
+    "running": "Backing up {{username}}... ({{done}}/{{total}})",
+    "run_done": "Backup finished: {{uploaded}}/{{total}} user(s) uploaded.",
+    "run_error": "Backup stopped after an error: {{error}}",
+    "user_ok": "{{username}}: uploaded ({{size}})",
+    "user_fail": "{{username}}: failed ({{error}})",
+    "not_configured": "Configure and save the bucket connection first.",
+    "last_run": "Last run ({{trigger}}): {{date}}, {{uploaded}}/{{total}} user(s) uploaded.",
+    "trigger_auto": "automatic",
+    "trigger_manual": "manual",
+    "list_title": "Backups in the bucket",
+    "list_empty": "No backup in the bucket yet.",
+    "list_error": "Cannot list the bucket: {{error}}",
+    "list_loading": "Loading...",
+    "col_user": "User",
+    "col_archive": "Archive",
+    "col_size": "Size",
+    "download": "Download",
+    "delete": "Delete",
+    "confirm_delete": "Delete the backup {{filename}} from the bucket?",
+    "footer_note": "Archives are stored under backups/{user id}/ in the bucket and can be restored with the standard \"Restore / Import\" page.",
+    "messages": {
+      "incomplete": "Endpoint, bucket and credentials are required to enable automatic backups.",
+      "saved": "Configuration saved successfully.",
+      "save_error": "Failed to save configuration.",
+      "no_user_selected": "Select at least one user to back up."
+    },
+    "users_label": "Users to back up",
+    "master_label": "Enable S3 backups",
+    "master_description": "Master switch. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user."
   }
 }

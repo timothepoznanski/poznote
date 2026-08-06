@@ -253,6 +253,20 @@ try {
                     <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_webhooks_help', [], 'Non-admin users can no longer register webhooks that send events about their notes to external endpoints.'); ?></span>
                 </span>
             </label>
+            <label class="tenant-isolation-feature">
+                <input type="checkbox" data-tenant-feature="user_s3_backups">
+                <span class="tenant-isolation-feature-text">
+                    <span class="tenant-isolation-feature-title"><?php echo t_h('modals.tenant_isolation.features.user_s3_backups', [], 'S3 backups on the Backup page'); ?></span>
+                    <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_s3_backups_help', [], 'Non-admin users no longer see the S3 Backups section of the Backup / Export page and cannot upload or download bucket archives.'); ?></span>
+                </span>
+            </label>
+            <label class="tenant-isolation-feature">
+                <input type="checkbox" data-tenant-feature="user_s3_restore">
+                <span class="tenant-isolation-feature-text">
+                    <span class="tenant-isolation-feature-title"><?php echo t_h('modals.tenant_isolation.features.user_s3_restore', [], 'S3 restore on the Restore page'); ?></span>
+                    <span class="tenant-isolation-feature-help"><?php echo t_h('modals.tenant_isolation.features.user_s3_restore_help', [], 'Non-admin users no longer see the Restore from S3 section of the Restore / Import page and cannot restore bucket archives.'); ?></span>
+                </span>
+            </label>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="tenantIsolationModal"><?php echo t_h('common.cancel'); ?></button>
@@ -1623,6 +1637,7 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:directCopyRestoreCard" checked><span><?php echo t_h('modals.ui_customization.direct_copy_restore_section', [], 'Restore page: "Restore when standard restore doesn\'t work" section'); ?></span></label>
                 </div>
                 </div>
 
