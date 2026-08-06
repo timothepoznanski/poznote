@@ -19,7 +19,8 @@ $pageWorkspace = trim(getWorkspaceFilter());
 // the same rule, so the feature cannot be triggered through a hand-crafted
 // request either.
 $s3RestoreSectionVisible = S3BackupService::isEnabled()
-    && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true));
+    && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true))
+    && !poznoteIsUiElementHidden('card:s3RestoreSection');
 
 // Variables for specific section messages
 $restore_message = '';
@@ -375,7 +376,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
 
         <?php if ($s3RestoreSectionVisible): ?>
         <!-- Restore From S3 Section -->
-        <div class="sub-card">
+        <div class="sub-card" id="s3RestoreSection">
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="s3RestoreContent">
                 <h4>
                     <?php echo t_h('restore_import.sections.s3_restore.title', [], 'Restore from S3'); ?>

@@ -22,7 +22,8 @@ $s3StorageEnabled = AttachmentStorage::isEnabled();
 // user_s3_backups tenant isolation feature
 require_once __DIR__ . '/S3BackupService.php';
 $s3BackupSectionVisible = S3BackupService::isEnabled()
-    && (isCurrentUserAdmin() || !in_array('user_s3_backups', TENANT_ISOLATION_FEATURES, true));
+    && (isCurrentUserAdmin() || !in_array('user_s3_backups', TENANT_ISOLATION_FEATURES, true))
+    && !poznoteIsUiElementHidden('card:s3-user-backup-section');
 
 $message = '';
 $error = '';

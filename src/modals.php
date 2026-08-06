@@ -1638,6 +1638,8 @@ try {
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:directCopyRestoreCard" checked><span><?php echo t_h('modals.ui_customization.direct_copy_restore_section', [], 'Restore page: "Restore when standard restore doesn\'t work" section'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-user-backup-section" checked><span><?php echo t_h('modals.ui_customization.s3_backups_section', [], 'Backup page: "S3 Backups" section'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3RestoreSection" checked><span><?php echo t_h('modals.ui_customization.s3_restore_section', [], 'Restore page: "Restore from S3" section'); ?></span></label>
                 </div>
                 </div>
 

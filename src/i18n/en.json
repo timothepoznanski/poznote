@@ -528,6 +528,7 @@
       "title_global": "UI Customization (all users)",
       "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
       "locked_by_admin": "Hidden for all users by the administrator",
+      "locked_by_tenant_isolation": "Hidden automatically while this capability is blocked by Tenant isolation",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
       "dashboard_user": "User",
@@ -559,6 +560,8 @@
       "check_all": "Check all",
       "uncheck_all": "Uncheck all",
       "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section",
+      "s3_backups_section": "Backup page: \"S3 Backups\" section",
+      "s3_restore_section": "Restore page: \"Restore from S3\" section",
       "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?"
     },
     "theme": {

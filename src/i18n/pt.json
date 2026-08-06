@@ -1010,6 +1010,7 @@
       "title_global": "Personalização da interface (todos os usuários)",
       "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
+      "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
       "dashboard_user": "Usuário",
@@ -1041,6 +1042,8 @@
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
       "badge_hidden_count": "{{count}} oculto(s)",
       "direct_copy_restore_section": "Página de restauração: seção «Restaurar quando a restauração padrão não funciona»",
+      "s3_backups_section": "Página de backup: seção «Backups S3»",
+      "s3_restore_section": "Página de restauração: seção «Restaurar do S3»",
       "toggle_all_warning": "Esta ação fará perder todas as suas personalizações existentes. Deseja continuar?"
     },
     "theme": {

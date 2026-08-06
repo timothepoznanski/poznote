@@ -1012,6 +1012,7 @@
       "title_global": "Personalización de interfaz (todos los usuarios)",
       "description_global": "Mostrar u ocultar elementos de la interfaz para todos los usuarios de esta instancia. Los elementos no marcados se ocultarán para todos excepto los administradores.",
       "locked_by_admin": "Oculto para todos los usuarios por el administrador",
+      "locked_by_tenant_isolation": "Oculto automáticamente mientras esta capacidad esté bloqueada por el aislamiento de cuentas",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
       "dashboard_user": "Usuario",
@@ -1043,6 +1044,8 @@
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} por el administrador)",
       "badge_hidden_count": "{{count}} oculto(s)",
       "direct_copy_restore_section": "Página de restauración: sección «Restaurar cuando la restauración estándar no funciona»",
+      "s3_backups_section": "Página de copia de seguridad: sección «Copias de seguridad S3»",
+      "s3_restore_section": "Página de restauración: sección «Restaurar desde S3»",
       "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?"
     },
     "theme": {

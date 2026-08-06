@@ -1036,6 +1036,7 @@
       "title_global": "Personnalisation de l'interface (tous les utilisateurs)",
       "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde, sauf les administrateurs.",
       "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
+      "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
       "dashboard_user": "Utilisateur",
@@ -1067,6 +1068,8 @@
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher",
       "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »",
+      "s3_backups_section": "Page Sauvegarde : section « Sauvegardes S3 »",
+      "s3_restore_section": "Page Restauration : section « Restauration depuis S3 »",
       "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?"
     },
     "theme": {

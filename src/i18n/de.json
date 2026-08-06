@@ -1011,6 +1011,7 @@
       "title_global": "Oberfläche anpassen (alle Benutzer)",
       "description_global": "Oberflächenelemente für alle Benutzer dieser Instanz ein- oder ausblenden. Nicht angehakte Elemente werden für alle außer Administratoren ausgeblendet.",
       "locked_by_admin": "Vom Administrator für alle Benutzer ausgeblendet",
+      "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
       "dashboard_user": "Benutzer",
@@ -1042,6 +1043,8 @@
       "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
       "badge_hidden_count": "{{count}} ausgeblendet",
       "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
+      "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
+      "s3_restore_section": "Wiederherstellungsseite: Abschnitt „Aus S3 wiederherstellen“",
       "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?"
     },
     "theme": {

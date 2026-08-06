@@ -1012,6 +1012,7 @@
       "title_global": "界面自定义（所有用户）",
       "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对除管理员外的所有人隐藏。",
       "locked_by_admin": "已由管理员对所有用户隐藏",
+      "locked_by_tenant_isolation": "该功能已被租户隔离阻止，因此自动隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
       "dashboard_user": "用户",
@@ -1043,6 +1044,8 @@
       "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
       "badge_hidden_count": "{{count}} 个已隐藏",
       "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
+      "s3_backups_section": "备份页面:“S3 备份”部分",
+      "s3_restore_section": "恢复页面:“从 S3 恢复”部分",
       "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?"
     },
     "theme": {
