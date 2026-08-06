@@ -487,7 +487,8 @@
       "install_app": "安装应用",
       "release_notes": "发布日志",
       "orphan_scanner": "孤立附件扫描器",
-      "storage_stats": "存储统计",
+      "storage_stats": "管理员存储统计",
+      "storage_stats_user": "用户存储统计",
       "change_password": "修改密码",
       "delete_account": "删除账户",
       "import_limits": "导入限制",
@@ -495,7 +496,7 @@
       "git_sync_toggle": "Git 同步",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
-      "webhooks": "Webhook",
+      "webhooks": "管理员 Webhook",
       "ai_assistant": "AI 助手",
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份"

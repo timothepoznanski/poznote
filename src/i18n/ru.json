@@ -202,7 +202,8 @@
       "install_app": "Установить приложение",
       "release_notes": "Примечания к выпуску",
       "orphan_scanner": "Сканер потерянных вложений",
-      "storage_stats": "Статистика хранилища",
+      "storage_stats": "Статистика хранилища администратора",
+      "storage_stats_user": "Статистика хранилища пользователя",
       "change_password": "Сменить пароль",
       "delete_account": "Удалить аккаунт",
       "import_limits": "Лимиты импорта",
@@ -210,7 +211,7 @@
       "git_sync_toggle": "Синхронизация Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Почта",
-      "webhooks": "Веб-хуки",
+      "webhooks": "Веб-хуки администратора",
       "ai_assistant": "ИИ-ассистент",
       "s3_storage": "Вложения S3",
       "s3_backup": "Резервные копии S3"

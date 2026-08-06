@@ -516,7 +516,7 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-pie-chart"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span>
                 </div>
             </div>
 
@@ -931,7 +931,7 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-webhook"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Webhooks'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Admin Webhooks'); ?></span>
                     <span class="setting-status <?php echo $active_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
                         <?php echo $active_webhooks_count > 0 ? $active_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
                     </span>
@@ -1107,7 +1107,7 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-pie-chart"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span>
                 </div>
             </div>
 

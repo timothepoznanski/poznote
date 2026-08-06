@@ -497,7 +497,8 @@
       "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
-      "storage_stats": "Statistiques de stockage",
+      "storage_stats": "Statistiques de stockage admin",
+      "storage_stats_user": "Statistiques de stockage utilisateur",
       "change_password": "Changer le mot de passe",
       "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
@@ -505,7 +506,7 @@
       "git_sync_toggle": "Synchronisation Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
-      "webhooks": "Webhooks",
+      "webhooks": "Webhooks admin",
       "ai_assistant": "Assistant IA",
       "s3_storage": "Pièces jointes S3",
       "s3_backup": "Sauvegardes S3"

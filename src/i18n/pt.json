@@ -483,7 +483,8 @@
       "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
       "orphan_scanner": "Scanner de anexos órfãos",
-      "storage_stats": "Estatísticas de armazenamento",
+      "storage_stats": "Estatísticas de armazenamento do administrador",
+      "storage_stats_user": "Estatísticas de armazenamento do usuário",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
       "delete_account": "Eliminar conta",
@@ -492,7 +493,7 @@
       "git_sync_toggle": "Sincronização Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-mail",
-      "webhooks": "Webhooks",
+      "webhooks": "Webhooks de administrador",
       "ai_assistant": "Assistente IA",
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3"
