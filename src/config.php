@@ -34,6 +34,8 @@ function poznoteGetThemeAssetVersion() {
         'js/codemirror-dist/markdown-codemirror.iife.js',
         'js/slash-command.js',
         'js/emoji-autocomplete.js',
+        'js/graph.js',
+        'css/graph.css',
         'css/dark-mode/variables.css',
         'css/dark-mode/layout.css',
         'css/dark-mode/menus.css',

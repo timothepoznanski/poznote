@@ -3443,6 +3443,9 @@
     "show_orphans_hint": "Afficher les notes sans aucun lien",
     "show_labels": "Titres des notes",
     "show_labels_hint": "Afficher les titres des notes sous les points",
+    "reset_layout": "Réinitialiser la disposition",
+    "reset_layout_hint": "Oublier les positions enregistrées et réorganiser le graphe automatiquement",
+    "drag_hint": "Ctrl + glisser déplace un point indépendamment de ses liens",
     "stats": "{{notes}} notes · {{links}} liens",
     "search": {
       "placeholder": "Rechercher une note..."

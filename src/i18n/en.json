@@ -2932,6 +2932,9 @@
     "show_orphans_hint": "Show notes that have no links",
     "show_labels": "Note titles",
     "show_labels_hint": "Show note titles under the dots",
+    "reset_layout": "Reset layout",
+    "reset_layout_hint": "Forget the saved positions and rearrange the graph automatically",
+    "drag_hint": "Ctrl + drag moves a dot independently of its links",
     "stats": "{{notes}} notes · {{links}} links",
     "search": {
       "placeholder": "Find a note..."

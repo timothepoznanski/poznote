@@ -60,6 +60,7 @@
 
     var PREF_SHOW_ORPHANS = 'graph-show-orphans';
     var PREF_SHOW_LABELS = 'graph-show-labels';
+    var PREF_POSITIONS = 'graph-positions';
 
     function prefStorage() {
         return window.__poznoteUserStorage || window.localStorage;
@@ -77,6 +78,49 @@
     function savePref(key, value) {
         try {
             prefStorage().setItem(key, value ? '1' : '0');
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    /* --------------------------------------------------------------------- */
+    /* Saved positions (pinned nodes)                                          */
+    /* --------------------------------------------------------------------- */
+
+    function positionsKey() {
+        var workspace = getPageWorkspace();
+        return PREF_POSITIONS + (workspace ? ':' + workspace : '');
+    }
+
+    function loadSavedPositions() {
+        try {
+            var raw = prefStorage().getItem(positionsKey());
+            var parsed = raw ? JSON.parse(raw) : null;
+            return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function savePinnedPositions() {
+        var positions = {};
+        var any = false;
+        nodes.forEach(function (node) {
+            if (node.pinned) {
+                positions[node.id] = [Math.round(node.x * 10) / 10, Math.round(node.y * 10) / 10];
+                any = true;
+            }
+        });
+        try {
+            if (any) {
+                prefStorage().setItem(positionsKey(), JSON.stringify(positions));
+            } else {
+                prefStorage().removeItem(positionsKey());
+            }
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function clearSavedPositions() {
+        try {
+            prefStorage().removeItem(positionsKey());
         } catch (e) { /* storage unavailable */ }
     }
 
@@ -173,11 +217,72 @@
             node.radius = Math.min(16, 4 + 2.2 * Math.sqrt(node.degree));
         });
 
+        assignComponents();
+        restorePinnedPositions();
+
         renderSvg();
         updateOrphanVisibility();
         fitView();
         initLabelDefault();
         startSimulation(1);
+    }
+
+    // Flood-fill so every node knows its connected component; dragging a
+    // node moves the whole component as one rigid group.
+    function assignComponents() {
+        var next = 0;
+        nodes.forEach(function (node) {
+            if (node.component !== undefined) { return; }
+            var queue = [node];
+            node.component = next;
+            while (queue.length) {
+                var current = queue.pop();
+                Object.keys(neighbors[current.id]).forEach(function (otherId) {
+                    var other = nodeById[otherId];
+                    if (other && other.component === undefined) {
+                        other.component = next;
+                        queue.push(other);
+                    }
+                });
+            }
+            next++;
+        });
+    }
+
+    function componentNodes(node) {
+        return nodes.filter(function (other) { return other.component === node.component; });
+    }
+
+    function restorePinnedPositions() {
+        var saved = loadSavedPositions();
+        nodes.forEach(function (node) {
+            var pos = saved[node.id];
+            if (pos && pos.length === 2 && isFinite(pos[0]) && isFinite(pos[1])) {
+                node.x = pos[0];
+                node.y = pos[1];
+                node.pinned = true;
+            }
+        });
+        updateResetButton();
+    }
+
+    function resetLayout() {
+        clearSavedPositions();
+        nodes.forEach(function (node) {
+            node.pinned = false;
+            node.vx = 0;
+            node.vy = 0;
+        });
+        userInteracted = false;
+        updateResetButton();
+        startSimulation(1);
+    }
+
+    function updateResetButton() {
+        var btn = document.getElementById('graphResetLayout');
+        if (!btn) { return; }
+        var anyPinned = nodes.some(function (node) { return node.pinned; });
+        btn.classList.toggle('initially-hidden', !anyPinned);
     }
 
     /* --------------------------------------------------------------------- */
@@ -383,7 +488,7 @@
             node = nodes[i];
             node.vx += -node.x * GRAVITY * alpha;
             node.vy += -node.y * GRAVITY * alpha;
-            if (node.dragging) {
+            if (node.dragging || node.pinned) {
                 node.vx = 0;
                 node.vy = 0;
                 continue;
@@ -472,7 +577,26 @@
         var panStart = null;     // {x, y, tx, ty}
         var pinchStart = null;   // {dist, scale, cx, cy}
         var dragNode = null;
+        var dragGroup = null;    // [{node, startX, startY}] moved together
+        var dragOrigin = null;   // pointer position in graph coords at drag start
+        var dragStartClient = null;
         var dragMoved = 0;
+
+        function graphCoords(e) {
+            var rect = svg.getBoundingClientRect();
+            return {
+                x: (e.clientX - rect.left - tx) / scale,
+                y: (e.clientY - rect.top - ty) / scale
+            };
+        }
+
+        function releaseDrag() {
+            if (!dragGroup) { return; }
+            dragGroup.forEach(function (entry) { entry.node.dragging = false; });
+            dragNode = null;
+            dragGroup = null;
+            dragOrigin = null;
+        }
 
         svg.addEventListener('pointerdown', function (e) {
             pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
@@ -490,15 +614,27 @@
                     cy: (p1.y + p2.y) / 2
                 };
                 panStart = null;
-                if (dragNode) { dragNode.dragging = false; dragNode = null; }
+                releaseDrag();
                 return;
             }
 
             var nodeEl = e.target.closest('.graph-node');
             if (nodeEl) {
                 dragNode = nodeById[parseInt(nodeEl.getAttribute('data-id'), 10)];
-                dragNode.dragging = true;
+                // Dragging moves the whole connected group; Ctrl/Cmd or Shift
+                // restricts the move to the grabbed node alone.
+                var single = e.ctrlKey || e.metaKey || e.shiftKey;
+                var group = single ? [dragNode] : componentNodes(dragNode);
+                dragGroup = group.map(function (node) {
+                    node.dragging = true;
+                    return { node: node, startX: node.x, startY: node.y };
+                });
+                dragOrigin = graphCoords(e);
+                dragStartClient = { x: e.clientX, y: e.clientY };
                 dragMoved = 0;
+                // Stop auto-fit right away so the drag frame of reference
+                // cannot shift between pointerdown and the first move.
+                userInteracted = true;
             } else {
                 panStart = { x: e.clientX, y: e.clientY, tx: tx, ty: ty };
             }
@@ -527,11 +663,16 @@
                 return;
             }
 
-            if (dragNode) {
-                var rect = svg.getBoundingClientRect();
-                dragNode.x = (e.clientX - rect.left - tx) / scale;
-                dragNode.y = (e.clientY - rect.top - ty) / scale;
-                dragMoved += Math.abs(e.movementX || 0) + Math.abs(e.movementY || 0);
+            if (dragGroup) {
+                var pos = graphCoords(e);
+                var dx = pos.x - dragOrigin.x;
+                var dy = pos.y - dragOrigin.y;
+                dragGroup.forEach(function (entry) {
+                    entry.node.x = entry.startX + dx;
+                    entry.node.y = entry.startY + dy;
+                });
+                dragMoved = Math.max(dragMoved,
+                    Math.abs(e.clientX - dragStartClient.x) + Math.abs(e.clientY - dragStartClient.y));
                 userInteracted = true;
                 startSimulation(0.3);
                 return;
@@ -550,12 +691,20 @@
             if (Object.keys(pointers).length < 2) {
                 pinchStart = null;
             }
-            if (dragNode) {
-                dragNode.dragging = false;
-                if (dragMoved < 5) {
-                    openNote(dragNode);
+            if (dragGroup) {
+                var clicked = dragMoved < 5 ? dragNode : null;
+                if (!clicked) {
+                    // Keep the group exactly where it was dropped: pin every
+                    // moved node and remember the positions for next time.
+                    dragGroup.forEach(function (entry) { entry.node.pinned = true; });
                 }
-                dragNode = null;
+                releaseDrag();
+                if (clicked) {
+                    openNote(clicked);
+                } else {
+                    savePinnedPositions();
+                    updateResetButton();
+                }
             }
             panStart = null;
         }
@@ -709,6 +858,11 @@
                 savePref(PREF_SHOW_ORPHANS, showOrphans);
                 updateOrphanVisibility();
             });
+        }
+
+        var resetLayoutBtn = document.getElementById('graphResetLayout');
+        if (resetLayoutBtn) {
+            resetLayoutBtn.addEventListener('click', resetLayout);
         }
 
         var labelsToggle = document.getElementById('graphShowLabels');

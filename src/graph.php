@@ -64,7 +64,15 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<input type="checkbox" id="graphShowLabels" checked>
 					<span><?php echo t_h('graph.show_labels', [], 'Note titles'); ?></span>
 				</label>
+				<button id="graphResetLayout" class="graph-reset-btn initially-hidden" title="<?php echo t_h('graph.reset_layout_hint', [], 'Forget the saved positions and rearrange the graph automatically'); ?>">
+					<i class="lucide lucide-rotate-ccw"></i>
+					<span><?php echo t_h('graph.reset_layout', [], 'Reset layout'); ?></span>
+				</button>
 				<span class="graph-stats" id="graphStats" data-txt-stats="<?php echo t_h('graph.stats', [], '{{notes}} notes · {{links}} links'); ?>"></span>
+				<span class="graph-hint">
+					<i class="lucide lucide-info"></i>
+					<?php echo t_h('graph.drag_hint', [], 'Ctrl + drag moves a dot independently of its links'); ?>
+				</span>
 			</div>
 		</div>
 		<div class="graph-canvas-wrapper" id="graphCanvasWrapper">

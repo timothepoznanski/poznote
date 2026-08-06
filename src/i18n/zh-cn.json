@@ -3375,6 +3375,9 @@
     "show_orphans_hint": "显示没有链接的笔记",
     "show_labels": "笔记标题",
     "show_labels_hint": "在圆点下方显示笔记标题",
+    "reset_layout": "重置布局",
+    "reset_layout_hint": "忘记已保存的位置并自动重新排列图谱",
+    "drag_hint": "Ctrl + 拖动可独立于链接移动单个点",
     "stats": "{{notes}} 篇笔记 · {{links}} 个链接",
     "search": {
       "placeholder": "查找笔记..."

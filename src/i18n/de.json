@@ -3253,6 +3253,9 @@
     "show_orphans_hint": "Notizen ohne Verknüpfungen anzeigen",
     "show_labels": "Notiztitel",
     "show_labels_hint": "Notiztitel unter den Punkten anzeigen",
+    "reset_layout": "Anordnung zurücksetzen",
+    "reset_layout_hint": "Gespeicherte Positionen verwerfen und den Graphen automatisch neu anordnen",
+    "drag_hint": "Strg + Ziehen bewegt einen Punkt unabhängig von seinen Verknüpfungen",
     "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
     "search": {
       "placeholder": "Notiz suchen..."

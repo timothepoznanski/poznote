@@ -3256,6 +3256,9 @@
     "show_orphans_hint": "Mostrar notas sem links",
     "show_labels": "Títulos das notas",
     "show_labels_hint": "Mostrar os títulos das notas sob os pontos",
+    "reset_layout": "Redefinir disposição",
+    "reset_layout_hint": "Esquecer as posições salvas e reorganizar o grafo automaticamente",
+    "drag_hint": "Ctrl + arrastar move um ponto independentemente dos seus links",
     "stats": "{{notes}} notas · {{links}} links",
     "search": {
       "placeholder": "Procurar uma nota..."
