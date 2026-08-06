@@ -175,6 +175,47 @@ function removeCopyButtonsFromHtml($html) {
 }
 
 /**
+ * Add a download attribute to <a> tags pointing at exported attachment files so
+ * browsers save the file instead of navigating to it when the export is opened locally.
+ * $downloadNames maps the exported basename (attachment id + extension) to the
+ * original filename used as the suggested download name.
+ */
+function addDownloadAttributesToAttachmentLinks($html, $downloadNames) {
+    if ($html === '' || $html === null) {
+        return $html;
+    }
+
+    return preg_replace_callback(
+        '#<a\b[^>]*href=("|\')(?:\.\./)*attachments/([^"\'?\#]+)(?:[?\#][^"\']*)?\1[^>]*>#i',
+        function ($matches) use ($downloadNames) {
+            $tag = $matches[0];
+
+            // Keep the click-to-view behavior of image preview wrappers; their
+            // caption link is the download entry point
+            if (stripos($tag, 'note-attachment-preview-media') !== false) {
+                return $tag;
+            }
+
+            // Skip tags that already carry a download attribute (compare with
+            // quoted values blanked out so title="Download ..." does not match)
+            $tagWithoutValues = preg_replace('/"[^"]*"|\'[^\']*\'/', '""', $tag);
+            if (preg_match('/\sdownload\b/i', $tagWithoutValues)) {
+                return $tag;
+            }
+
+            $basename = $matches[2];
+            $downloadAttr = ' download';
+            if (isset($downloadNames[$basename]) && $downloadNames[$basename] !== '') {
+                $downloadAttr = ' download="' . htmlspecialchars($downloadNames[$basename], ENT_QUOTES, 'UTF-8') . '"';
+            }
+
+            return '<a' . $downloadAttr . substr($tag, 2);
+        },
+        $html
+    );
+}
+
+/**
  * Convert tasklist JSON to Markdown checkbox format
  */
 function convertTasklistToMarkdown($jsonContent) {

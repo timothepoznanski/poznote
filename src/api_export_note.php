@@ -17,14 +17,16 @@
  */
 
 require_once 'auth.php';
+
+// Check authentication (API-friendly) BEFORE db_connect so the connection
+// targets the authenticated user's database, not the fallback (user 1)
+requireApiAuth();
+
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'markdown_parser.php';
 require_once 'export_helpers.php';
-
-// Check authentication (API-friendly)
-requireApiAuth();
 
 // Only accept GET requests
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
@@ -749,13 +751,15 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
     
     // Build a mapping of attachment IDs to their extensions
     $attachmentExtensions = [];
+    $attachmentDownloadNames = [];
     foreach ($attachments as $attachment) {
         if (isset($attachment['id']) && isset($attachment['filename'])) {
             $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
             $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+            $attachmentDownloadNames[$attachment['id'] . ($ext ? '.' . $ext : '')] = $attachment['original_filename'] ?? $attachment['filename'];
         }
     }
-    
+
     // Modify HTML to use local attachments folder with extensions
     $htmlContent = preg_replace_callback(
         '#/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9._-]+)#',
@@ -766,7 +770,8 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
         },
         $htmlContent
     );
-    
+    $htmlContent = addDownloadAttributesToAttachmentLinks($htmlContent, $attachmentDownloadNames);
+
     // Add HTML file to ZIP
     $htmlFilename = sanitizeDownloadFilename($title) . '.html';
     $zip->addFromString($htmlFilename, $htmlContent);

@@ -76,6 +76,8 @@ $zip->addFromString('README.md', $readmeContent);
 
 // Build a mapping of note IDs to their attachment extensions for URL conversion
 $noteAttachments = [];
+// Map exported attachment basenames (id + extension) to original filenames for download attributes
+$attachmentDownloadNames = [];
 $query_attachments = 'SELECT id, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != \'\' AND attachments != \'[]\'';
 $att_params = [];
 if ($workspace !== null) {
@@ -93,6 +95,7 @@ while ($row_att = $stmt_att->fetch(PDO::FETCH_ASSOC)) {
             if (isset($attachment['id']) && isset($attachment['filename'])) {
                 $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
                 $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+                $attachmentDownloadNames[$attachment['id'] . ($ext ? '.' . $ext : '')] = $attachment['original_filename'] ?? $attachment['filename'];
             }
         }
         $noteAttachments[$row_att['id']] = $attachmentExtensions;
@@ -188,9 +191,10 @@ while ($row = $res_notes->fetch(PDO::FETCH_ASSOC)) {
                     },
                     $content
                 );
+                $content = addDownloadAttributesToAttachmentLinks($content, $attachmentDownloadNames);
             }
         }
-        
+
         $zip->addFromString($noteFileName, $content);
         $fileCount++;
         
