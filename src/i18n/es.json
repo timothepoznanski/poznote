@@ -1694,7 +1694,8 @@
     },
     "common": {
       "all_workspaces": "todos los espacios de trabajo",
-      "skip_s3_attachments": "No incluir los adjuntos S3 en el zip (archivo más ligero)"
+      "skip_s3_attachments": "No incluir los adjuntos S3 en el zip (archivo más ligero)",
+      "skip_s3_attachments_help": "Atención: con esta opción, los adjuntos almacenados en S3 NO se incluyen en el zip, por lo que este archivo por sí solo no es una copia de seguridad completa. Recuerde guardar sus adjuntos S3 por separado si los necesita, por ejemplo con la exportación de adjuntos más abajo. Los adjuntos almacenados en el servidor siempre se incluyen."
     },
     "sections": {
       "complete_backup": {

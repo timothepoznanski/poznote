@@ -1693,7 +1693,8 @@
     },
     "common": {
       "all_workspaces": "alle Arbeitsbereiche",
-      "skip_s3_attachments": "S3-Anhänge nicht in das ZIP aufnehmen (leichteres Archiv)"
+      "skip_s3_attachments": "S3-Anhänge nicht in das ZIP aufnehmen (leichteres Archiv)",
+      "skip_s3_attachments_help": "Achtung: Mit dieser Option sind in S3 gespeicherte Anhänge NICHT im ZIP enthalten, dieses Archiv allein ist also kein vollständiges Backup. Denken Sie daran, Ihre S3-Anhänge bei Bedarf separat zu sichern, zum Beispiel mit dem Anhang-Export unten. Auf dem Server gespeicherte Anhänge sind immer enthalten."
     },
     "sections": {
       "complete_backup": {

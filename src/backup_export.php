@@ -195,6 +195,7 @@ function createBackup() {
                             <input type="checkbox" name="skip_s3_attachments" value="1" id="completeBackupSkipS3">
                             <?php echo t_h('backup_export.common.skip_s3_attachments', [], 'Do not include S3 attachments in the zip (lighter archive)'); ?>
                         </label>
+                        <span class="export-help" data-tooltip="<?php echo t_h('backup_export.common.skip_s3_attachments_help', [], 'Warning: with this option, attachments stored in S3 are NOT included in the zip, so this archive alone is not a complete backup. Remember to save your S3 attachments separately if you need them, for example with the attachments export below. Attachments stored on the server are always included.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     </div>
                 <?php endif; ?>
                 <button id="completeBackupBtn" type="submit" class="btn btn-primary">
@@ -233,6 +234,7 @@ function createBackup() {
                         <input type="checkbox" id="structuredExportSkipS3">
                         <?php echo t_h('backup_export.common.skip_s3_attachments', [], 'Do not include S3 attachments in the zip (lighter archive)'); ?>
                     </label>
+                    <span class="export-help" data-tooltip="<?php echo t_h('backup_export.common.skip_s3_attachments_help', [], 'Warning: with this option, attachments stored in S3 are NOT included in the zip, so this archive alone is not a complete backup. Remember to save your S3 attachments separately if you need them, for example with the attachments export below. Attachments stored on the server are always included.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 </div>
             <?php endif; ?>
             <button id="structuredExportBtn" type="button" class="btn btn-primary">

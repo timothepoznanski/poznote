@@ -1361,7 +1361,8 @@
     },
     "common": {
       "all_workspaces": "all workspaces",
-      "skip_s3_attachments": "Do not include S3 attachments in the zip (lighter archive)"
+      "skip_s3_attachments": "Do not include S3 attachments in the zip (lighter archive)",
+      "skip_s3_attachments_help": "Warning: with this option, attachments stored in S3 are NOT included in the zip, so this archive alone is not a complete backup. Remember to save your S3 attachments separately if you need them, for example with the attachments export below. Attachments stored on the server are always included."
     },
     "sections": {
       "complete_backup": {

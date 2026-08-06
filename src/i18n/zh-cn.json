@@ -1693,7 +1693,8 @@
     },
     "common": {
       "all_workspaces": "所有工作区",
-      "skip_s3_attachments": "压缩包中不包含 S3 附件(更轻量的存档)"
+      "skip_s3_attachments": "压缩包中不包含 S3 附件(更轻量的存档)",
+      "skip_s3_attachments_help": "注意:勾选此选项后,存储在 S3 中的附件不会包含在压缩包中,因此仅凭此存档并不是完整备份。如有需要,请记得单独保存您的 S3 附件,例如使用下方的附件导出。存储在服务器上的附件始终会包含在内。"
     },
     "sections": {
       "complete_backup": {

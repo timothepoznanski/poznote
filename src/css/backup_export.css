@@ -201,6 +201,9 @@ html[data-theme='dark'] .info-box {
 /* Checkbox option shown when S3 attachment storage is enabled */
 .form-group-export.export-checkbox-group {
     margin: 0 0 22px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .export-checkbox-label {
@@ -214,6 +217,64 @@ html[data-theme='dark'] .info-box {
 .export-checkbox-label input[type="checkbox"] {
     margin: 0;
     flex-shrink: 0;
+}
+
+/* Hover help bubble next to the S3 checkbox, same pattern as the settings
+   cards (.setting-help in home/cards.css, which this page does not load) */
+.export-help {
+    position: relative;
+    display: inline-flex;
+    cursor: help;
+    line-height: 1;
+}
+
+.export-help .lucide {
+    width: 16px;
+    height: 16px;
+    background-color: #007cba;
+    opacity: 0.85;
+    transition: opacity 0.15s ease;
+}
+
+.export-help:hover .lucide {
+    opacity: 1;
+}
+
+.export-help::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 8px);
+    right: -8px;
+    width: max-content;
+    max-width: 280px;
+    background: #1f2937;
+    color: #f9fafb;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    padding: 8px 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 50;
+}
+
+.export-help:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* No hover on mobile / touch screens: hide the help icon entirely */
+@media (max-width: 800px), (hover: none) {
+    .export-help {
+        display: none;
+    }
 }
 
 /* Export select styles */

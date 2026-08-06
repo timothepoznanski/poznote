@@ -1746,7 +1746,8 @@
     },
     "common": {
       "all_workspaces": "tous les espaces de travail",
-      "skip_s3_attachments": "Ne pas inclure les pièces jointes S3 dans le zip (archive plus légère)"
+      "skip_s3_attachments": "Ne pas inclure les pièces jointes S3 dans le zip (archive plus légère)",
+      "skip_s3_attachments_help": "Attention : avec cette option, les pièces jointes stockées dans S3 ne sont PAS incluses dans le zip, cette archive seule n'est donc pas une sauvegarde complète. Pensez à sauvegarder vos pièces jointes S3 séparément si vous en avez besoin, par exemple avec l'export des pièces jointes ci-dessous. Les pièces jointes stockées sur le serveur sont toujours incluses."
     },
     "sections": {
       "complete_backup": {
