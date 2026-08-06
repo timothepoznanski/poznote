@@ -322,6 +322,31 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         [data-theme='dark'] .user-current {
             color: #4a9eff;
         }
+        /* The wrapper is height-capped by JS to the viewport so the
+           horizontal scrollbar is always on screen; rows scroll vertically
+           inside it instead. Not applied to the ≤768px card view. */
+        @media screen and (min-width: 769px) {
+            .table-responsive {
+                overflow: auto;
+            }
+            /* Collapsed borders make Chromium paint row content over the
+               sticky header; separate borders render identically here (the
+               row separators are td border-bottoms). */
+            .users-table {
+                border-collapse: separate;
+                border-spacing: 0;
+            }
+            /* Keep headers readable while rows scroll under them; the
+               transparent th background would let rows show through, and
+               collapsed-table borders don't stick, hence the box-shadow. */
+            .users-table thead th {
+                position: sticky;
+                top: 0;
+                z-index: 2;
+                background: var(--bg-color, #fff);
+                box-shadow: 0 1px 0 var(--border-color, #eee);
+            }
+        }
     </style>
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
@@ -445,6 +470,23 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     }
 
     document.addEventListener('DOMContentLoaded', initUsersFilter);
+
+    /* Cap the scroll wrapper to the viewport so its horizontal scrollbar
+       never ends up below the fold; rows scroll vertically inside instead.
+       The ≤768px card view has no horizontal scrollbar: leave it uncapped. */
+    function sizeUsersTableScroll() {
+        const scroller = document.querySelector('.table-responsive');
+        if (!scroller) return;
+        if (window.matchMedia('(max-width: 768px)').matches) {
+            scroller.style.maxHeight = '';
+            return;
+        }
+        const top = scroller.getBoundingClientRect().top + window.scrollY;
+        scroller.style.maxHeight = Math.max(240, window.innerHeight - top - 24) + 'px';
+    }
+
+    document.addEventListener('DOMContentLoaded', sizeUsersTableScroll);
+    window.addEventListener('resize', sizeUsersTableScroll);
 
     /**
      * Mobile card view: tapping the user line collapses/expands the card.

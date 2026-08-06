@@ -685,7 +685,64 @@ function importSingleNoteFile($con, $content, $fileName, $fileExtension, $worksp
     return ['success' => true, 'noteId' => (int)$noteId, 'noteType' => $noteType, 'content' => $content, 'title' => $title];
 }
 
-function addImportedPoznoteAttachmentToNote(&$noteAttachments, $imageInfo) {
+/**
+ * Map exported attachment ids to the filename advertised by their link's
+ * download attribute, so an imported note can keep readable filenames.
+ */
+function extractImportedAttachmentDownloadNames($content, array $attachmentIdMap) {
+    if (strpos($content, 'download') === false) {
+        return [];
+    }
+
+    $names = [];
+    if (!preg_match_all('#<a\b[^>]*>#i', $content, $tags)) {
+        return $names;
+    }
+
+    foreach ($tags[0] as $tag) {
+        if (!preg_match('#\shref=("|\')((?:\.\./|\./|/)*attachments/[^"\']+)\1#i', $tag, $hrefMatch)) {
+            continue;
+        }
+        if (!preg_match('#\sdownload=("|\')([^"\']+)\1#i', $tag, $downloadMatch)) {
+            continue;
+        }
+
+        $attachmentId = resolveImportedPoznoteAttachmentId($hrefMatch[2], $attachmentIdMap);
+        if ($attachmentId !== null && $attachmentId !== '' && !isset($names[$attachmentId])) {
+            $names[$attachmentId] = $downloadMatch[2];
+        }
+    }
+
+    return $names;
+}
+
+/**
+ * Sanitize a display filename coming from an imported note's markup.
+ * Returns null when the value is unusable, so callers fall back to a generic name.
+ */
+function poznoteSanitizeImportedAttachmentName($filename) {
+    if (!is_string($filename)) {
+        return null;
+    }
+
+    $filename = html_entity_decode($filename, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    // Never let a path traversal or control character through: this string is
+    // stored and later echoed in a Content-Disposition header
+    $filename = basename(str_replace('\\', '/', $filename));
+    $filename = preg_replace('/[\x00-\x1F\x7F"]/u', '', trim($filename));
+
+    if ($filename === '' || $filename === '.' || $filename === '..' || $filename[0] === '.') {
+        return null;
+    }
+    if (strlen($filename) > 255) {
+        return null;
+    }
+
+    $validation = poznoteValidateAttachmentFilename($filename);
+    return $validation['success'] ? $filename : null;
+}
+
+function addImportedPoznoteAttachmentToNote(&$noteAttachments, $imageInfo, $originalFilename = null) {
     if (empty($imageInfo['unique_filename'])) {
         return null;
     }
@@ -697,11 +754,15 @@ function addImportedPoznoteAttachmentToNote(&$noteAttachments, $imageInfo) {
     }
 
     $extension = pathinfo($imageInfo['unique_filename'], PATHINFO_EXTENSION);
+    // Poznote exports carry the real name in the link's download attribute;
+    // without it the file can only be labelled generically
+    $displayName = poznoteSanitizeImportedAttachmentName($originalFilename)
+        ?? 'attachment' . ($extension ? '.' . $extension : '');
     $attachmentId = uniqid();
     $noteAttachments[] = [
         'id' => $attachmentId,
         'filename' => $imageInfo['unique_filename'],
-        'original_filename' => 'attachment' . ($extension ? '.' . $extension : ''),
+        'original_filename' => $displayName,
         'file_size' => $imageInfo['file_size'] ?? 0,
         'file_type' => $imageInfo['file_type'] ?? 'application/octet-stream',
         'uploaded_at' => date('Y-m-d H:i:s')
@@ -1220,32 +1281,50 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
         
         // Get file extension
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        
-        // Only process image files
-        if (!in_array($fileExtension, $imageExtensions)) {
+
+        // A Poznote export ships every attachment in attachments/, not just
+        // images: PDFs and other documents must be restored too. Outside that
+        // folder only images are relevant (Obsidian-style ![[image.png]] refs).
+        $isPoznoteAttachment = (bool)preg_match('#(?:^|/)attachments/([^/]+)$#', $fileName, $matches);
+        if (!$isPoznoteAttachment && !in_array($fileExtension, $imageExtensions)) {
             continue;
         }
-        
+
         // Extract image content
         $imageContent = $zip->getFromIndex($i);
         if ($imageContent === false) {
             continue;
         }
-        
-        // Check if this is from an attachments/ folder (Poznote export)
-        if (preg_match('#(?:^|/)attachments/([^/]+)$#', $fileName, $matches)) {
-            $attachmentId = preg_replace('/\.' . preg_quote($fileExtension, '/') . '$/i', '', basename($matches[1]));
-            
-            // Generate unique filename for storage
-            $uniqueFilename = uniqid() . '_' . time() . '.' . $fileExtension;
 
-            // Save the image (local disk or S3 bucket)
-            if (poznoteStoreAttachmentContent($imageContent, $uniqueFilename, 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension))) {
+        // Check if this is from an attachments/ folder (Poznote export)
+        if ($isPoznoteAttachment) {
+            // Keep the same blocked-type rules as the dedicated attachments import
+            $validation = poznoteValidateAttachmentFile(basename($fileName), null, $imageContent);
+            if (!$validation['success']) {
+                continue;
+            }
+
+            $attachmentId = $fileExtension !== ''
+                ? preg_replace('/\.' . preg_quote($fileExtension, '/') . '$/i', '', basename($matches[1]))
+                : basename($matches[1]);
+
+            // Generate unique filename for storage
+            $uniqueFilename = uniqid() . '_' . time() . ($fileExtension !== '' ? '.' . $fileExtension : '');
+
+            $mimeType = $validation['mime_type'] ?? null;
+            if ($mimeType === null || $mimeType === '') {
+                $mimeType = in_array($fileExtension, $imageExtensions, true)
+                    ? 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
+                    : 'application/octet-stream';
+            }
+
+            // Save the attachment (local disk or S3 bucket)
+            if (poznoteStoreAttachmentContent($imageContent, $uniqueFilename, $mimeType)) {
                 // Store mapping by attachment ID for Poznote exports
                 $attachmentIdMap[$attachmentId] = [
                     'unique_filename' => $uniqueFilename,
                     'file_size' => strlen($imageContent),
-                    'file_type' => 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
+                    'file_type' => $mimeType
                 ];
                 $importedImagesCount++;
             }
@@ -1489,6 +1568,26 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                         return $matches[0];
                     }, $content);
 
+                    // Plain links, notably the "## Attachments" list appended to
+                    // exported markdown notes: [real name.pdf](attachments/id.pdf)
+                    $content = preg_replace_callback('/(?<!\!)\[([^\]]*)\]\((?:\.\.\/|\.\/|\/)*attachments\/([^\)\s]+)\)/i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                        $label = $matches[1];
+                        $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[2], $attachmentIdMap);
+
+                        if (isset($attachmentIdMap[$oldAttachmentId])) {
+                            $imageInfo = $attachmentIdMap[$oldAttachmentId];
+                            // The link label is the original filename
+                            $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo, $label);
+                            if ($newAttachmentId === null) {
+                                return $matches[0];
+                            }
+
+                            return '[' . $label . '](/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . ')';
+                        }
+
+                        return $matches[0];
+                    }, $content);
+
                     // Markdown notes can contain raw HTML blocks (notably Excalidraw containers).
                     $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
                         $attr = $matches[1];
@@ -1516,24 +1615,32 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     $updateStmt->execute([$attachmentsJson, $noteId]);
                 }
             } else if ($noteType === 'note' && !empty($attachmentIdMap)) {
+                // Exported attachment links carry the real filename in their
+                // download attribute; collect it before rewriting the hrefs
+                $downloadNames = extractImportedAttachmentDownloadNames($content, $attachmentIdMap);
+
                 // For HTML notes, handle Poznote-exported attachments: (../)attachments/{attachmentId}.ext
-                $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments) {
+                $content = preg_replace_callback('#(src|href)=(["\']?)(?:\.\.\/|\.\/|\/)*attachments/([^"\'>\s]+)\2#i', function($matches) use ($noteId, $attachmentIdMap, &$noteAttachments, $downloadNames) {
                     $attr = $matches[1];
                     $quote = $matches[2];
                     $oldAttachmentId = resolveImportedPoznoteAttachmentId($matches[3], $attachmentIdMap);
-                    
+
                     if (isset($attachmentIdMap[$oldAttachmentId])) {
                         $imageInfo = $attachmentIdMap[$oldAttachmentId];
-                        
-                        $newAttachmentId = addImportedPoznoteAttachmentToNote($noteAttachments, $imageInfo);
+
+                        $newAttachmentId = addImportedPoznoteAttachmentToNote(
+                            $noteAttachments,
+                            $imageInfo,
+                            $downloadNames[$oldAttachmentId] ?? null
+                        );
                         if ($newAttachmentId === null) {
                             return $matches[0];
                         }
-                        
+
                         // Return full src/href attribute with API URL
                         return $attr . '=' . $quote . '/api/v1/notes/' . $noteId . '/attachments/' . $newAttachmentId . $quote;
                     }
-                    
+
                     // Attachment not found, keep original
                     return $matches[0];
                 }, $content);

@@ -1853,8 +1853,9 @@
                 checkboxes.forEach(function (cb) {
                     var key = cb.getAttribute('data-ui-key');
                     if (cb.disabled) {
-                        // Admin-locked in user mode: keep the user's own stored
-                        // preference untouched instead of adopting the lock state.
+                        // Locked checkbox (admin-locked in user mode, tenant
+                        // isolation-locked in global mode): keep the stored
+                        // state untouched instead of adopting the lock state.
                         if (uiCustomizationUserHiddenSnapshot.indexOf(key) !== -1) {
                             hidden.push(key);
                         }
@@ -2750,7 +2751,9 @@
     // fails with a 403.
     var TENANT_ISOLATION_FEATURE_HIDDEN_KEYS = {
         'user_sharing': ['share:restrict-users'],
-        'user_webhooks': ['card:user-webhooks-card']
+        'user_webhooks': ['card:user-webhooks-card'],
+        'user_s3_backups': ['card:s3-user-backup-section'],
+        'user_s3_restore': ['card:s3RestoreSection']
     };
 
     // Records which keys the tenant isolation modal added, so unblocking a
@@ -2954,17 +2957,32 @@
         modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
         updateGlobalToggleBtn(modal);
 
+        // Check all / Uncheck all replaces the current selection wholesale, so
+        // ask for confirmation before dropping the existing customizations
+        function confirmToggleAll(done) {
+            var message = tr('modals.ui_customization.toggle_all_warning', {},
+                'This will lose all your existing customizations. Do you want to continue?');
+            if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                window.modalAlert.confirm(message, tr('modals.ui_customization.title', {}, 'UI Customization'))
+                    .then(function (confirmed) { if (confirmed) done(); });
+            } else if (window.confirm(message)) {
+                done();
+            }
+        }
+
         // Click: toggle all checkboxes (globally, or within one section)
         modal.addEventListener('click', function (e) {
             var globalBtn = e.target.closest('#uiCustomizationToggleAll');
             if (globalBtn) {
-                var allCheckboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
-                var everyChecked = allCheckboxes.length > 0
-                    && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
-                allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
-                modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
-                updateGlobalToggleBtn(modal);
-                refreshUiCustomizationFilter();
+                confirmToggleAll(function () {
+                    var allCheckboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
+                    var everyChecked = allCheckboxes.length > 0
+                        && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
+                    allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
+                    modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+                    updateGlobalToggleBtn(modal);
+                    refreshUiCustomizationFilter();
+                });
                 return;
             }
 
@@ -2974,12 +2992,14 @@
             var section = btn.closest('.ui-custom-section');
             if (!section) return;
 
-            var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
-            var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
-            checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
-            updateSectionToggleBtn(section);
-            updateGlobalToggleBtn(modal);
-            refreshUiCustomizationFilter();
+            confirmToggleAll(function () {
+                var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
+                var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+                checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
+                updateSectionToggleBtn(section);
+                updateGlobalToggleBtn(modal);
+                refreshUiCustomizationFilter();
+            });
         });
 
         // Change: keep button labels in sync when individual checkboxes change
@@ -3020,47 +3040,68 @@
             var hidden = parseHiddenUiCustomization(value);
             var globallyHidden = uiCustomizationModalMode === 'user' ? getGloballyHiddenUiKeys() : [];
             var lockedTitle = tr('modals.ui_customization.locked_by_admin', {}, 'Hidden for all users by the administrator');
+            var tenantLockedTitle = tr('modals.ui_customization.locked_by_tenant_isolation', {}, 'Hidden automatically while this capability is blocked by Tenant isolation');
 
-            uiCustomizationUserHiddenSnapshot = uiCustomizationModalMode === 'user' ? hidden : [];
+            // The stored hidden list backs disabled checkboxes on save, so
+            // locked keys keep their stored state in both modes.
+            uiCustomizationUserHiddenSnapshot = hidden;
 
-            // Set checkboxes: checked = visible (not in hidden list). Keys the
-            // admin hides for everyone are locked in user mode.
-            var checkboxes = modal.querySelectorAll('[data-ui-key]');
-            checkboxes.forEach(function (cb) {
-                var key = cb.getAttribute('data-ui-key');
-                var locked = globallyHidden.indexOf(key) !== -1;
-                var globalOnly = uiCustomizationModalMode === 'user' && !!cb.closest('[data-ui-global-only]');
-                var item = cb.closest('.ui-custom-item');
+            var applyState = function (tenantLockedKeys) {
+                // Set checkboxes: checked = visible (not in hidden list). Keys the
+                // admin hides for everyone are locked in user mode; keys managed
+                // by a blocked tenant isolation feature are locked in global mode.
+                var checkboxes = modal.querySelectorAll('[data-ui-key]');
+                checkboxes.forEach(function (cb) {
+                    var key = cb.getAttribute('data-ui-key');
+                    var locked = globallyHidden.indexOf(key) !== -1;
+                    var tenantLocked = tenantLockedKeys.indexOf(key) !== -1;
+                    var globalOnly = uiCustomizationModalMode === 'user' && !!cb.closest('[data-ui-global-only]');
+                    var item = cb.closest('.ui-custom-item');
 
-                cb.disabled = locked || globalOnly;
-                cb.checked = locked ? false : hidden.indexOf(key) === -1;
-                if (item) {
-                    item.classList.toggle('ui-custom-item-locked', locked);
-                    if (locked) {
-                        item.setAttribute('title', lockedTitle);
-                    } else {
-                        item.removeAttribute('title');
+                    cb.disabled = locked || tenantLocked || globalOnly;
+                    cb.checked = (locked || tenantLocked) ? false : hidden.indexOf(key) === -1;
+                    if (item) {
+                        item.classList.toggle('ui-custom-item-locked', locked || tenantLocked);
+                        if (locked) {
+                            item.setAttribute('title', lockedTitle);
+                        } else if (tenantLocked) {
+                            item.setAttribute('title', tenantLockedTitle);
+                        } else {
+                            item.removeAttribute('title');
+                        }
                     }
+                });
+
+                // Update toggle-all buttons to reflect current state
+                modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+                updateGlobalToggleBtn(modal);
+
+                var filterInput = document.getElementById('uiCustomizationFilterInput');
+                if (filterInput) {
+                    filterInput.value = '';
                 }
-            });
 
-            // Update toggle-all buttons to reflect current state
-            modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
-            updateGlobalToggleBtn(modal);
+                var hiddenOnlyToggle = document.getElementById('uiCustomizationHiddenOnly');
+                if (hiddenOnlyToggle) {
+                    hiddenOnlyToggle.checked = false;
+                }
 
-            var filterInput = document.getElementById('uiCustomizationFilterInput');
-            if (filterInput) {
-                filterInput.value = '';
+                applyUiCustomizationFilter(modal, '');
+
+                modal.style.display = 'flex';
+            };
+
+            if (uiCustomizationModalMode === 'global') {
+                getTenantIsolationFeatures(function (features) {
+                    var keys = [];
+                    features.forEach(function (feature) {
+                        keys = keys.concat(TENANT_ISOLATION_FEATURE_HIDDEN_KEYS[feature] || []);
+                    });
+                    applyState(keys);
+                });
+            } else {
+                applyState([]);
             }
-
-            var hiddenOnlyToggle = document.getElementById('uiCustomizationHiddenOnly');
-            if (hiddenOnlyToggle) {
-                hiddenOnlyToggle.checked = false;
-            }
-
-            applyUiCustomizationFilter(modal, '');
-
-            modal.style.display = 'flex';
         });
     }
 

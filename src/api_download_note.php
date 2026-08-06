@@ -15,12 +15,14 @@
  */
 
 require_once 'auth.php';
+
+// Check authentication BEFORE db_connect so the connection targets the
+// authenticated user's database, not the fallback (user 1)
+requireApiAuth();
+
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
-
-// Check authentication
-requireApiAuth();
 
 // Only accept GET requests
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

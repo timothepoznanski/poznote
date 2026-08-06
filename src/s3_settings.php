@@ -120,7 +120,8 @@ $s3Enabled = $s3Config['enabled'] === '1';
         </div>
 
         <div class="git-sync-header">
-            <p class="git-sync-description"><?php echo t_h('s3_settings.description', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?><br>
+            <p class="git-sync-description"><?php echo t_h('s3_settings.description', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?><br><br>
+                <?php echo t_h('s3_settings.description_benefit', [], 'Particularly useful if you have many or large attachments: the server disk stays light, and the complete backup zip can skip the S3 attachments; when everything stays on local disk, the export can become very heavy, slow, or even fail with a timeout.'); ?><br><br>
                 <?php echo t_h('s3_settings.description_scope', [], 'The setting applies to all users of this instance.'); ?><br>
                 <?php echo t_h('s3_settings.attachments_only_note', [], 'Only the attachment files are concerned.'); ?><br>
                 <?php echo t_h('s3_settings.git_sync_note', [], 'Git sync ignores attachments while S3 storage is enabled.'); ?></p>

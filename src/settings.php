@@ -516,7 +516,7 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-pie-chart"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span>
                 </div>
             </div>
 
@@ -931,7 +931,7 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-webhook"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Webhooks'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.webhooks', [], 'Admin Webhooks'); ?></span>
                     <span class="setting-status <?php echo $active_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
                         <?php echo $active_webhooks_count > 0 ? $active_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
                     </span>
@@ -965,13 +965,31 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-cloud"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.s3_storage', [], 'S3 Storage'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span>
                     <?php
                     require_once 'storage/AttachmentStorage.php';
                     $s3StorageEnabledCard = AttachmentStorage::isEnabled();
                     ?>
                     <span class="setting-status <?php echo $s3StorageEnabledCard ? 'enabled' : 'disabled'; ?>">
                         <?php echo $s3StorageEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- S3 Backups (instance-wide configuration) -->
+            <div class="home-card settings-card-clickable" id="s3-backup-card" data-href="s3_backup_settings.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.s3_backup', [], 'Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-archive"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span>
+                    <?php
+                    require_once 'S3BackupService.php';
+                    $s3BackupEnabledCard = S3BackupService::isEnabled();
+                    ?>
+                    <span class="setting-status <?php echo $s3BackupEnabledCard ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $s3BackupEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
                     </span>
                 </div>
             </div>
@@ -1089,7 +1107,7 @@ if ($canUseUserWebhooks) {
                     <i class="lucide lucide-pie-chart"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Storage statistics'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span>
                 </div>
             </div>
 

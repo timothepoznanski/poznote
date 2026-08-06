@@ -34,6 +34,8 @@ function poznoteGetThemeAssetVersion() {
         'js/codemirror-dist/markdown-codemirror.iife.js',
         'js/slash-command.js',
         'js/emoji-autocomplete.js',
+        'js/graph.js',
+        'css/graph.css',
         'css/dark-mode/variables.css',
         'css/dark-mode/layout.css',
         'css/dark-mode/menus.css',
@@ -257,10 +259,14 @@ function poznoteResolveGlobalSetting(string $dbKey, string $envKey, $default = '
 //   - user_sharing: non-admin users cannot discover the other accounts of the
 //     instance (admin-only user directory, no sharing with specific users).
 //   - user_webhooks: non-admin users cannot register personal webhooks.
+//   - user_s3_backups: non-admin users do not see the S3 Backups section of
+//     the Backup/Export page and cannot upload or download bucket archives.
+//   - user_s3_restore: non-admin users do not see the Restore from S3 section
+//     of the Restore/Import page and cannot restore bucket archives.
 // Legacy fallback: instances configured before the feature list existed only
 // had the on/off tenant_isolation flag, which meant user_sharing.
 function poznoteResolveTenantIsolationFeatures(): array {
-    $validFeatures = ['user_sharing', 'user_webhooks'];
+    $validFeatures = ['user_sharing', 'user_webhooks', 'user_s3_backups', 'user_s3_restore'];
 
     $raw = null;
     try {

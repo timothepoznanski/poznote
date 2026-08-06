@@ -238,10 +238,17 @@ foreach ($stats as $r) {
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
     <style>
-    /* The 9-column table is ~1050px wide (nowrap cells), far more than the
-       default 700px admin column: give it room so it can actually center. */
+    /* The table (10 columns in S3 mode, nowrap cells) is far wider than the
+       default 700px admin column: let it use the whole window, keeping the
+       admin-container's 20px padding as the side margins. The table itself
+       shrink-fits and centers, so narrower tables don't stretch. */
+    .admin-container {
+        max-width: none;
+    }
     .dr-page {
-        max-width: 1100px;
+        max-width: none;
+        padding-left: 0;
+        padding-right: 0;
     }
     /* Balance the whitespace around the hero text: users.css puts 45px of
        header margins above it but only 10px sits below. */
@@ -263,9 +270,27 @@ foreach ($stats as $r) {
         margin-right: auto;
     }
     /* Scroll inside the container on windows narrower than the table
-       (admin-tools.css only enables this under 640px). */
+       (admin-tools.css only enables this under 640px). The container is
+       height-capped by JS to the viewport so the horizontal scrollbar is
+       always on screen; rows scroll vertically inside it instead. */
     .table-scroll {
-        overflow-x: auto;
+        overflow: auto;
+        margin-top: 20px;
+    }
+    .results-table {
+        margin-top: 0;
+        /* admin-tools.css uses overflow:hidden for the border-radius, but a
+           hidden ancestor breaks position:sticky; clip crops the same way
+           without becoming the sticky headers' scroll container. */
+        overflow: clip;
+    }
+    /* Keep headers readable while rows scroll under them. The bottom border
+       is a box-shadow because collapsed-table borders don't stick. */
+    .results-table thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        box-shadow: 0 1px 0 var(--border-color, #e5e7eb);
     }
     /* Tighter rows than the 12px 20px admin-tools default, and headers
        centered over their (mostly numeric) columns */
@@ -297,6 +322,8 @@ foreach ($stats as $r) {
     .results-table th {
         font-size: 0.78rem;
         font-weight: 600;
+        /* Long labels scroll with .table-scroll instead of wrapping onto two lines */
+        white-space: nowrap;
     }
     .results-table th.quota-header {
         text-transform: none;
@@ -420,10 +447,21 @@ foreach ($stats as $r) {
         });
     }
 
+    /* Cap the scroll container to the viewport so its horizontal scrollbar
+       never ends up below the fold; rows scroll vertically inside instead. */
+    function sizeStorageTableScroll() {
+        const scroller = document.querySelector('.table-scroll');
+        if (!scroller) return;
+        const top = scroller.getBoundingClientRect().top + window.scrollY;
+        scroller.style.maxHeight = Math.max(240, window.innerHeight - top - 24) + 'px';
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initStorageStatsFilter();
         initStorageStatsSort();
+        sizeStorageTableScroll();
     });
+    window.addEventListener('resize', sizeStorageTableScroll);
     </script>
 </head>
 <body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">

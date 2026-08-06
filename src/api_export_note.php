@@ -17,14 +17,16 @@
  */
 
 require_once 'auth.php';
+
+// Check authentication (API-friendly) BEFORE db_connect so the connection
+// targets the authenticated user's database, not the fallback (user 1)
+requireApiAuth();
+
 require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'markdown_parser.php';
 require_once 'export_helpers.php';
-
-// Check authentication (API-friendly)
-requireApiAuth();
 
 // Only accept GET requests
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
@@ -183,11 +185,17 @@ try {
             $disposition = 'attachment';
         }
 
-        // Generate styled HTML
-        $htmlContent = generateStyledHtml($content, $note['heading'], $noteType, $note['tags']);
-        
         // Export as HTML - create ZIP with attachments if downloading
-        if ($disposition === 'attachment' && $format === 'html') {
+        $isZipExport = ($disposition === 'attachment' && $format === 'html');
+
+        // Attachments are only linkable in the ZIP export, where the files are
+        // actually shipped in an attachments/ folder next to the page
+        $headerAttachments = $isZipExport ? buildExportAttachmentList($note) : [];
+
+        // Generate styled HTML
+        $htmlContent = generateStyledHtml($content, $note['heading'], $noteType, $note['tags'], $headerAttachments);
+
+        if ($isZipExport) {
             exportAsHtmlZip($htmlContent, $note, $con);
         } else {
             exportAsHtml($htmlContent, $note['heading'], $disposition);
@@ -390,7 +398,151 @@ function convertImageToBase64($imagePath) {
 /**
  * Generate styled HTML document
  */
-function generateStyledHtml($content, $title, $noteType, $tags) {
+/**
+ * Drop the header attachments row. Used on the fallback paths where the page
+ * ships without its attachments/ folder, so the links would lead nowhere.
+ */
+function stripExportAttachmentLinks($html) {
+    return preg_replace('#<div class="note-attachments">.*?</div>#s', '', $html, 1);
+}
+
+/**
+ * Build the "Attachments" section appended to an exported Markdown note.
+ * Only files added to the ZIP are listed, and images already embedded in the
+ * body are skipped, mirroring the HTML export header row.
+ */
+function buildExportAttachmentMarkdown($attachments, $addedAttachmentIds, $content) {
+    $lines = [];
+    foreach ($attachments as $attachment) {
+        if (empty($attachment['id']) || empty($attachment['filename'])) {
+            continue;
+        }
+        if (!in_array($attachment['id'], $addedAttachmentIds, true)) {
+            continue;
+        }
+
+        $filename = (string)($attachment['original_filename'] ?? $attachment['filename']);
+        $extension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+        $exportName = $attachment['id'] . ($extension ? '.' . $extension : '');
+
+        // Skip images already embedded in the body
+        if (strpos($content, 'attachments/' . $exportName) !== false) {
+            continue;
+        }
+
+        // Escape the ] and ) that would otherwise break the link syntax
+        $label = str_replace([']', '['], ['\\]', '\\['], $filename);
+        $lines[] = '- [' . $label . '](attachments/' . rawurlencode($exportName) . ')';
+    }
+
+    if (empty($lines)) {
+        return '';
+    }
+
+    return "\n\n## Attachments\n\n" . implode("\n", $lines) . "\n";
+}
+
+/**
+ * Remove header links pointing at attachments that could not be added to the
+ * ZIP (unreadable file, bucket fetch failure), and drop the row if it empties.
+ */
+function pruneExportAttachmentLinks($html, $attachments, $addedAttachmentIds) {
+    $missing = [];
+    foreach ($attachments as $attachment) {
+        if (empty($attachment['id']) || empty($attachment['filename'])) {
+            continue;
+        }
+        if (in_array($attachment['id'], $addedAttachmentIds, true)) {
+            continue;
+        }
+        $extension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+        $missing[] = $attachment['id'] . ($extension ? '.' . $extension : '');
+    }
+
+    foreach ($missing as $exportName) {
+        $html = preg_replace(
+            '#<a href="attachments/' . preg_quote(rawurlencode($exportName), '#') . '"[^>]*>.*?</a>\s*#s',
+            '',
+            $html
+        );
+    }
+
+    // An emptied row would render as a stray blank block
+    return preg_replace('#<div class="note-attachments">\s*</div>#s', '', $html, 1);
+}
+
+/**
+ * Decode a note's attachments and stamp each one with the basename it gets in
+ * the exported ZIP (attachment id + original extension), matching how
+ * exportAsHtmlZip() and exportAsMarkdownZip() name the files they add.
+ */
+function buildExportAttachmentList($note) {
+    $attachments = (!empty($note['attachments'])) ? json_decode($note['attachments'], true) : [];
+    if (!is_array($attachments)) {
+        return [];
+    }
+
+    $list = [];
+    foreach ($attachments as $attachment) {
+        if (empty($attachment['id']) || empty($attachment['filename'])) {
+            continue;
+        }
+        $extension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+        $attachment['export_name'] = $attachment['id'] . ($extension ? '.' . $extension : '');
+        $list[] = $attachment;
+    }
+
+    return $list;
+}
+
+/**
+ * Build the attachments row shown in the exported page header.
+ * Images already rendered inline in the note body are skipped, mirroring the
+ * attachment links row of the app. $attachments must carry the exported ZIP
+ * basename (id + extension) in 'export_name'; returns '' when nothing to list.
+ */
+function buildExportAttachmentLinks($attachments, $content) {
+    if (empty($attachments) || !is_array($attachments)) {
+        return '';
+    }
+
+    $links = [];
+    foreach ($attachments as $attachment) {
+        if (empty($attachment['id']) || empty($attachment['export_name'])) {
+            continue;
+        }
+
+        $filename = (string)($attachment['original_filename'] ?? $attachment['filename'] ?? $attachment['id']);
+
+        $mimeType = (string)($attachment['file_type'] ?? $attachment['mime_type'] ?? '');
+        $isImage = strpos($mimeType, 'image/') === 0;
+        if (!$isImage) {
+            $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $isImage = in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'], true);
+        }
+
+        // An inline image is already visible in the body; listing it again is noise
+        if ($isImage) {
+            $reference = 'attachments/' . $attachment['id'];
+            if (strpos($content, $reference) !== false || strpos($content, urlencode($reference)) !== false) {
+                continue;
+            }
+        }
+
+        $href = 'attachments/' . rawurlencode((string)$attachment['export_name']);
+        $links[] = '<a href="' . htmlspecialchars($href, ENT_QUOTES) . '"'
+            . ' download="' . htmlspecialchars($filename, ENT_QUOTES) . '">'
+            . htmlspecialchars($filename, ENT_QUOTES) . '</a>';
+    }
+
+    if (empty($links)) {
+        return '';
+    }
+
+    return '<div class="note-attachments">' . implode(' ', $links) . '</div>';
+}
+
+function generateStyledHtml($content, $title, $noteType, $tags, $attachments = []) {
     // Parse tags (stored as comma-separated string)
     $tagsList = [];
     if (!empty($tags)) {
@@ -474,7 +626,26 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
             font-size: 13px;
             color: #555;
         }
-        
+
+        .note-attachments {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .note-attachments a {
+            color: #0645ad;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(6, 69, 173, 0.35);
+        }
+
+        .note-attachments a:hover {
+            border-bottom-color: #0645ad;
+        }
+
         .note-content {
             font-size: 16px;
             line-height: 1.2;
@@ -690,7 +861,9 @@ function generateStyledHtml($content, $title, $noteType, $tags) {
         }
         $html .= '</div>';
     }
-    
+
+    $html .= buildExportAttachmentLinks($attachments, $cleanContent);
+
     $html .= '
     </div>
     <div class="note-content">
@@ -723,39 +896,41 @@ function exportAsHtml($htmlContent, $title, $disposition = 'attachment') {
 function exportAsHtmlZip($htmlContent, $note, $con) {
     if (!class_exists('ZipArchive')) {
         // Fallback to simple HTML export if ZipArchive is not available
-        exportAsHtml($htmlContent, $note['heading'], 'attachment');
+        exportAsHtml(stripExportAttachmentLinks($htmlContent), $note['heading'], 'attachment');
         return;
     }
-    
+
     $noteId = $note['id'];
     $title = $note['heading'] ?? 'New note';
     $attachments = (!empty($note['attachments'])) ? json_decode($note['attachments'], true) : [];
-    
+
     // If no attachments, just export HTML without ZIP
     if (empty($attachments) || !is_array($attachments)) {
-        exportAsHtml($htmlContent, $title, 'attachment');
+        exportAsHtml(stripExportAttachmentLinks($htmlContent), $title, 'attachment');
         return;
     }
-    
+
     // Create temporary ZIP file
     $tempZipFile = tempnam(sys_get_temp_dir(), 'poznote_export_');
     $zip = new ZipArchive();
-    
+
     if ($zip->open($tempZipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
         // Fallback if ZIP creation fails
-        exportAsHtml($htmlContent, $title, 'attachment');
+        exportAsHtml(stripExportAttachmentLinks($htmlContent), $title, 'attachment');
         return;
     }
     
     // Build a mapping of attachment IDs to their extensions
     $attachmentExtensions = [];
+    $attachmentDownloadNames = [];
     foreach ($attachments as $attachment) {
         if (isset($attachment['id']) && isset($attachment['filename'])) {
             $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
             $attachmentExtensions[$attachment['id']] = $ext ? '.' . $ext : '';
+            $attachmentDownloadNames[$attachment['id'] . ($ext ? '.' . $ext : '')] = $attachment['original_filename'] ?? $attachment['filename'];
         }
     }
-    
+
     // Modify HTML to use local attachments folder with extensions
     $htmlContent = preg_replace_callback(
         '#/api/v1/notes/' . preg_quote($noteId, '#') . '/attachments/([a-zA-Z0-9._-]+)#',
@@ -766,15 +941,13 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
         },
         $htmlContent
     );
-    
-    // Add HTML file to ZIP
-    $htmlFilename = sanitizeDownloadFilename($title) . '.html';
-    $zip->addFromString($htmlFilename, $htmlContent);
-    
-    // Add attachments to ZIP
+    $htmlContent = addDownloadAttributesToAttachmentLinks($htmlContent, $attachmentDownloadNames);
+
+    // Add attachments to ZIP first: the header links must only mention files
+    // that actually made it into the archive
     $attachmentsPath = getAttachmentsPath();
     $addedAttachments = [];
-    
+
     foreach ($attachments as $attachment) {
         if (isset($attachment['id']) && isset($attachment['filename'])) {
             // Readable local path (fetched from the bucket in S3 mode)
@@ -783,28 +956,35 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
             if ($attachmentFile !== null) {
                 // Use attachment ID as filename in ZIP to match the HTML references
                 $zipAttachmentName = 'attachments/' . $attachment['id'];
-                
+
                 // Determine extension from original filename
                 $ext = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
                 if ($ext) {
                     $zipAttachmentName .= '.' . $ext;
                 }
-                
+
                 $zip->addFile($attachmentFile, $zipAttachmentName);
                 $addedAttachments[] = $attachment['id'];
             }
         }
     }
-    
-    $zip->close();
-    
+
     // If no attachments could be added, delete ZIP and export HTML only
     if (empty($addedAttachments)) {
+        $zip->close();
         @unlink($tempZipFile);
-        exportAsHtml($htmlContent, $title, 'attachment');
+        exportAsHtml(stripExportAttachmentLinks($htmlContent), $title, 'attachment');
         return;
     }
-    
+
+    $htmlContent = pruneExportAttachmentLinks($htmlContent, $attachments, $addedAttachments);
+
+    // Add HTML file to ZIP
+    $htmlFilename = sanitizeDownloadFilename($title) . '.html';
+    $zip->addFromString($htmlFilename, $htmlContent);
+
+    $zip->close();
+
     // Send ZIP file
     $zipFilename = sanitizeDownloadFilename($title) . '.zip';
     $fileSize = filesize($tempZipFile);
@@ -988,14 +1168,11 @@ function exportAsMarkdownZip($content, $note, $con) {
         return;
     }
     
-    // Add markdown file to ZIP
-    $mdFilename = sanitizeDownloadFilename($title) . '.md';
-    $zip->addFromString($mdFilename, $markdownContent);
-    
-    // Add attachments to ZIP
+    // Add attachments to ZIP first: the links appended below must only mention
+    // files that actually made it into the archive
     $attachmentsPath = getAttachmentsPath();
     $addedAttachments = [];
-    
+
     foreach ($attachments as $attachment) {
         if (isset($attachment['id']) && isset($attachment['filename'])) {
             // Readable local path (fetched from the bucket in S3 mode)
@@ -1017,15 +1194,22 @@ function exportAsMarkdownZip($content, $note, $con) {
         }
     }
     
-    $zip->close();
-    
     // If no attachments could be added, export simple markdown
     if (empty($addedAttachments)) {
+        $zip->close();
         @unlink($tempZipFile);
         exportAsMarkdown($content, $note, $con);
         return;
     }
-    
+
+    $markdownContent .= buildExportAttachmentMarkdown($attachments, $addedAttachments, $markdownContent);
+
+    // Add markdown file to ZIP
+    $mdFilename = sanitizeDownloadFilename($title) . '.md';
+    $zip->addFromString($mdFilename, $markdownContent);
+
+    $zip->close();
+
     // Send ZIP file
     $zipFilename = sanitizeDownloadFilename($title) . '.zip';
     $fileSize = filesize($tempZipFile);

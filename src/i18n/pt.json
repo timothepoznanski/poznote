@@ -429,7 +429,8 @@
       "api_rest": "Mostre informações sobre a API REST do Poznote.",
       "website": "Abra o site oficial do Poznote.",
       "support": "Apoie o desenvolvimento do Poznote com uma doação.",
-      "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local."
+      "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
+      "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento."
     },
     "title": "Configurações",
     "collapse_section": "Recolher a seção",
@@ -482,7 +483,8 @@
       "install_app": "Instalar aplicação",
       "release_notes": "Notas de versão",
       "orphan_scanner": "Scanner de anexos órfãos",
-      "storage_stats": "Estatísticas de armazenamento",
+      "storage_stats": "Estatísticas de armazenamento do administrador",
+      "storage_stats_user": "Estatísticas de armazenamento do usuário",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
       "delete_account": "Eliminar conta",
@@ -491,9 +493,10 @@
       "git_sync_toggle": "Sincronização Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-mail",
-      "webhooks": "Webhooks",
+      "webhooks": "Webhooks de administrador",
       "ai_assistant": "Assistente IA",
-      "s3_storage": "Armazenamento S3"
+      "s3_storage": "Anexos S3",
+      "s3_backup": "Backups S3"
     },
     "install_app": {
       "launching": "A instalação vai começar. Por favor, aguarde...",
@@ -1007,6 +1010,7 @@
       "title_global": "Personalização da interface (todos os usuários)",
       "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
+      "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
       "dashboard_user": "Usuário",
@@ -1036,7 +1040,11 @@
       "uncheck_all": "Desmarcar todos",
       "badge_all_visible": "Tudo visível",
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
-      "badge_hidden_count": "{{count}} oculto(s)"
+      "badge_hidden_count": "{{count}} oculto(s)",
+      "direct_copy_restore_section": "Página de restauração: seção «Restaurar quando a restauração padrão não funciona»",
+      "s3_backups_section": "Página de backup: seção «Backups S3»",
+      "s3_restore_section": "Página de restauração: seção «Restaurar do S3»",
+      "toggle_all_warning": "Esta ação fará perder todas as suas personalizações existentes. Deseja continuar?"
     },
     "theme": {
       "title": "Seleção de Tema",
@@ -1365,7 +1373,11 @@
         "user_sharing": "Descoberta e partilha entre utilizadores",
         "user_sharing_help": "O diretório de utilizadores fica reservado aos administradores e a partilha com utilizadores específicos é recusada.",
         "user_webhooks": "Webhooks de usuário",
-        "user_webhooks_help": "Os utilizadores não administradores deixam de poder registar webhooks que enviam eventos sobre as suas notas para serviços externos."
+        "user_webhooks_help": "Os utilizadores não administradores deixam de poder registar webhooks que enviam eventos sobre as suas notas para serviços externos.",
+        "user_s3_backups": "Backups S3 na página de backup",
+        "user_s3_backups_help": "Usuários não administradores deixam de ver a seção Backups S3 da página Backup / Exportar e não podem enviar nem baixar arquivos do bucket.",
+        "user_s3_restore": "Restauração S3 na página de restauração",
+        "user_s3_restore_help": "Usuários não administradores deixam de ver a seção Restaurar do S3 da página Restaurar / Importar e não podem restaurar arquivos do bucket."
       }
     },
     "quick_task": {
@@ -1685,7 +1697,8 @@
     },
     "common": {
       "all_workspaces": "todos os espaços de trabalho",
-      "skip_s3_attachments": "Não incluir os anexos S3 no zip (arquivo mais leve)"
+      "skip_s3_attachments": "Não incluir os anexos S3 no zip (arquivo mais leve)",
+      "skip_s3_attachments_help": "Atenção: com esta opção, os anexos armazenados no S3 NÃO são incluídos no zip, portanto este arquivo sozinho não é um backup completo. Lembre-se de salvar seus anexos S3 separadamente se precisar deles, por exemplo com a exportação de anexos abaixo. Os anexos armazenados no servidor são sempre incluídos."
     },
     "sections": {
       "complete_backup": {
@@ -1711,6 +1724,15 @@
         "title": "Exportação de anexos",
         "description": "Baixe todos os anexos da sua conta em um único arquivo ZIP.",
         "description_s3": "Com o armazenamento S3 ativado, os arquivos são obtidos do bucket; use este arquivo para adicionar os arquivos ausentes a um backup criado sem os anexos S3 antes de restaurá-lo."
+      },
+      "s3_backup": {
+        "title": "Backups S3",
+        "description": "Envia um arquivo de backup da sua conta para o bucket S3 configurado nesta instância e baixa os arquivos já armazenados lá.",
+        "backup_now": "Fazer backup da minha conta para o S3",
+        "running": "Enviando o backup para o bucket...",
+        "done": "Backup enviado ({{size}}).",
+        "error": "Falha no backup: {{error}}",
+        "list_empty": "Ainda não há backup da sua conta no bucket."
       }
     },
     "buttons": {
@@ -1819,7 +1841,10 @@
       "error_uploading_file": "Erro ao enviar arquivo.",
       "cannot_find_entries_directory": "Não é possível encontrar o diretório de entradas.",
       "cannot_open_zip": "Não é possível abrir arquivo ZIP.",
-      "failed_extract_content": "Falha ao extrair conteúdo de {{file}}."
+      "failed_extract_content": "Falha ao extrair conteúdo de {{file}}.",
+      "s3_restore_forbidden": "A restauração do S3 não é permitida nesta conta.",
+      "s3_restore_invalid_key": "Arquivo de backup inválido.",
+      "s3_restore_download_error": "Não é possível obter o arquivo do bucket: {{error}}"
     },
     "spinner": {
       "processing": "Processando restauração...",
@@ -1900,6 +1925,13 @@
         "supported_formats": "Suportados: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Importe arquivos HTML, Markdown, texto ou JSON individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão), a menos que uma chave title seja definida em um front matter para arquivos MD.<br><br><strong>Listas de tarefas:</strong> Arquivos .json contendo arrays de tarefas e arquivos .md com sintaxe de checkbox (- [ ] ou - [x]) são automaticamente importados como listas de tarefas.",
         "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown, .txt, .json"
+      },
+      "s3_restore": {
+        "title": "Restaurar do S3",
+        "description": "Restaura sua conta diretamente de um dos arquivos de backup armazenados no bucket S3 desta instância.",
+        "loading": "Carregando...",
+        "empty": "Ainda não há backup da sua conta no bucket.",
+        "confirm": "Restaurar sua conta a partir de {{filename}}? Suas notas, anexos e configurações atuais serão substituídos pelo conteúdo do arquivo."
       }
     },
     "buttons": {
@@ -3224,6 +3256,9 @@
     "show_orphans_hint": "Mostrar notas sem links",
     "show_labels": "Títulos das notas",
     "show_labels_hint": "Mostrar os títulos das notas sob os pontos",
+    "reset_layout": "Redefinir disposição",
+    "reset_layout_hint": "Esquecer as posições salvas e reorganizar o grafo automaticamente",
+    "drag_hint": "Ctrl + arrastar move um ponto independentemente dos seus links",
     "stats": "{{notes}} notas · {{links}} links",
     "search": {
       "placeholder": "Procurar uma nota..."
@@ -3323,6 +3358,7 @@
   "s3_settings": {
     "title": "Armazenamento S3 de anexos",
     "description": "Armazene os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
+    "description_benefit": "Especialmente útil se você tem muitos anexos ou anexos grandes: o disco do servidor permanece leve e o zip de backup completo pode ignorar os anexos S3; quando tudo fica no disco local, a exportação pode se tornar muito pesada, lenta ou até falhar por timeout.",
     "description_scope": "A configuração se aplica a todos os usuários desta instância.",
     "attachments_only_note": "Apenas os arquivos de anexos são afetados.",
     "config_title": "Configuração",
@@ -3362,5 +3398,55 @@
       "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar o armazenamento S3."
     },
     "git_sync_note": "A sincronização Git ignora os anexos enquanto o armazenamento S3 estiver ativado."
+  },
+  "s3_backup": {
+    "title": "Backups S3",
+    "description": "Envia arquivos de backup completos (um ZIP por usuário, idêntico ao download «Backup completo») para um bucket compatível com S3, manualmente ou automaticamente conforme um agendamento.",
+    "description_scope": "A configuração se aplica a todos os usuários desta instância e é independente do armazenamento S3 de anexos.",
+    "config_title": "Configuração",
+    "enable_label": "Backups automáticos",
+    "enable_description": "Faz backup dos usuários selecionados para o bucket conforme o agendamento abaixo. Backups manuais a partir desta página funcionam assim que a conexão estiver configurada, mesmo com este interruptor desligado.",
+    "frequency_label": "Frequência",
+    "frequency_daily": "Diária",
+    "frequency_weekly": "Semanal",
+    "frequency_monthly": "Mensal (a cada 30 dias)",
+    "frequency_description": "O primeiro backup automático é executado poucos minutos após a ativação, os próximos após o intervalo escolhido.",
+    "retention_label": "Backups a manter por usuário",
+    "retention_description": "Arquivos mais antigos são excluídos do bucket após cada backup. 0 mantém tudo.",
+    "skip_s3_label": "Ignorar anexos já armazenados no S3",
+    "skip_s3_description": "Quando os anexos vivem em um bucket S3 (função de armazenamento S3), eles ficam fora dos arquivos em vez de serem baixados a cada backup. Anexos no disco local são sempre incluídos.",
+    "manual_title": "Backup manual",
+    "manual_description": "Faz backup agora dos usuários selecionados para o bucket, um usuário por vez.",
+    "run_now": "Fazer backup agora",
+    "confirm_run": "Fazer backup agora dos usuários selecionados para o bucket?",
+    "running": "Fazendo backup de {{username}}... ({{done}}/{{total}})",
+    "run_done": "Backup concluído: {{uploaded}}/{{total}} usuário(s) enviado(s).",
+    "run_error": "Backup interrompido após um erro: {{error}}",
+    "user_ok": "{{username}}: enviado ({{size}})",
+    "user_fail": "{{username}}: falhou ({{error}})",
+    "not_configured": "Configure e salve primeiro a conexão com o bucket.",
+    "last_run": "Última execução ({{trigger}}): {{date}}, {{uploaded}}/{{total}} usuário(s) enviado(s).",
+    "trigger_auto": "automática",
+    "trigger_manual": "manual",
+    "list_title": "Backups no bucket",
+    "list_empty": "Ainda não há backup no bucket.",
+    "list_error": "Não é possível listar o bucket: {{error}}",
+    "list_loading": "Carregando...",
+    "col_user": "Usuário",
+    "col_archive": "Arquivo",
+    "col_size": "Tamanho",
+    "download": "Baixar",
+    "delete": "Excluir",
+    "confirm_delete": "Excluir o backup {{filename}} do bucket?",
+    "footer_note": "Os arquivos são armazenados sob backups/{id do usuário}/ no bucket e podem ser restaurados com a página padrão «Restaurar / Importar».",
+    "messages": {
+      "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar os backups automáticos.",
+      "saved": "Configuração salva com sucesso.",
+      "save_error": "Falha ao salvar a configuração.",
+      "no_user_selected": "Marque pelo menos um usuário para backup."
+    },
+    "users_label": "Usuários a fazer backup",
+    "master_label": "Ativar os backups S3",
+    "master_description": "Interruptor principal. Quando desativado, os backups automáticos param e as seções de backup e restauração S3 desaparecem para todos os usuários."
   }
 }

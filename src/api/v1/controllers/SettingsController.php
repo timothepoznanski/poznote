@@ -112,7 +112,7 @@ class SettingsController {
             if (!is_array($decoded)) {
                 throw new InvalidArgumentException('value must be a JSON array of feature keys', 400);
             }
-            $allowedFeatures = ['user_sharing', 'user_webhooks'];
+            $allowedFeatures = ['user_sharing', 'user_webhooks', 'user_s3_backups', 'user_s3_restore'];
             $features = [];
             foreach ($decoded as $feature) {
                 if (!is_string($feature) || !in_array($feature, $allowedFeatures, true)) {
