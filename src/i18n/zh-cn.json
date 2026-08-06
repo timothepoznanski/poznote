@@ -1041,7 +1041,8 @@
       "badge_all_visible": "全部可见",
       "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
       "badge_hidden_count": "{{count}} 个已隐藏",
-      "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分"
+      "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
+      "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?"
     },
     "theme": {
       "title": "主题选择",

@@ -557,7 +557,8 @@
       "badge_hidden_count": "{{count}} hidden",
       "check_all": "Check all",
       "uncheck_all": "Uncheck all",
-      "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section"
+      "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section",
+      "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?"
     },
     "theme": {
       "title": "Theme Selection",

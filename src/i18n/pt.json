@@ -1039,7 +1039,8 @@
       "badge_all_visible": "Tudo visível",
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
       "badge_hidden_count": "{{count}} oculto(s)",
-      "direct_copy_restore_section": "Página de restauração: seção «Restaurar quando a restauração padrão não funciona»"
+      "direct_copy_restore_section": "Página de restauração: seção «Restaurar quando a restauração padrão não funciona»",
+      "toggle_all_warning": "Esta ação fará perder todas as suas personalizações existentes. Deseja continuar?"
     },
     "theme": {
       "title": "Seleção de Tema",

@@ -2954,17 +2954,32 @@
         modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
         updateGlobalToggleBtn(modal);
 
+        // Check all / Uncheck all replaces the current selection wholesale, so
+        // ask for confirmation before dropping the existing customizations
+        function confirmToggleAll(done) {
+            var message = tr('modals.ui_customization.toggle_all_warning', {},
+                'This will lose all your existing customizations. Do you want to continue?');
+            if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                window.modalAlert.confirm(message, tr('modals.ui_customization.title', {}, 'UI Customization'))
+                    .then(function (confirmed) { if (confirmed) done(); });
+            } else if (window.confirm(message)) {
+                done();
+            }
+        }
+
         // Click: toggle all checkboxes (globally, or within one section)
         modal.addEventListener('click', function (e) {
             var globalBtn = e.target.closest('#uiCustomizationToggleAll');
             if (globalBtn) {
-                var allCheckboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
-                var everyChecked = allCheckboxes.length > 0
-                    && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
-                allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
-                modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
-                updateGlobalToggleBtn(modal);
-                refreshUiCustomizationFilter();
+                confirmToggleAll(function () {
+                    var allCheckboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
+                    var everyChecked = allCheckboxes.length > 0
+                        && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
+                    allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
+                    modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+                    updateGlobalToggleBtn(modal);
+                    refreshUiCustomizationFilter();
+                });
                 return;
             }
 
@@ -2974,12 +2989,14 @@
             var section = btn.closest('.ui-custom-section');
             if (!section) return;
 
-            var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
-            var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
-            checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
-            updateSectionToggleBtn(section);
-            updateGlobalToggleBtn(modal);
-            refreshUiCustomizationFilter();
+            confirmToggleAll(function () {
+                var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
+                var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
+                checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
+                updateSectionToggleBtn(section);
+                updateGlobalToggleBtn(modal);
+                refreshUiCustomizationFilter();
+            });
         });
 
         // Change: keep button labels in sync when individual checkboxes change

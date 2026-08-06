@@ -1065,7 +1065,8 @@
       "badge_hidden_count": "{{count}} masqué(s)",
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher",
-      "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »"
+      "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »",
+      "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?"
     },
     "theme": {
       "title": "Sélection du thème",

@@ -1040,7 +1040,8 @@
       "badge_all_visible": "Alle sichtbar",
       "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
       "badge_hidden_count": "{{count}} ausgeblendet",
-      "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“"
+      "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
+      "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?"
     },
     "theme": {
       "title": "Themenauswahl",
