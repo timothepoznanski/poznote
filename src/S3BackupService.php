@@ -264,7 +264,7 @@ class S3BackupService {
     /**
      * Every backup archive in the bucket, newest first, with its owner.
      *
-     * @return array List of ['key', 'size', 'user_id', 'filename']
+     * @return array List of ['key', 'size', 'mtime', 'user_id', 'filename']
      */
     public static function listBackups(S3Client $client): array {
         $backups = [];
@@ -275,6 +275,7 @@ class S3BackupService {
             $backups[] = [
                 'key' => $object['key'],
                 'size' => $object['size'],
+                'mtime' => (int)($object['mtime'] ?? 0),
                 'user_id' => (int)$m[1],
                 'filename' => $m[2],
             ];

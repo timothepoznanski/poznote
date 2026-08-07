@@ -121,16 +121,45 @@ $allBackupUsers = listAllUserProfiles();
     <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
+    /* The page keeps its usual 900px reading width, but widens just enough for
+       the backup table to show every row on one line (JS measures the table's
+       natural width into --s3-backup-width). Never wider than the viewport. */
+    .s3-backup-container { max-width: min(var(--s3-backup-width, 900px), calc(100vw - 40px)); transition: max-width 120ms ease-out; }
+    @media (prefers-reduced-motion: reduce) { .s3-backup-container { transition: none; } }
     #s3-backup-run-log { white-space: pre-line; font-size: 0.85rem; margin-top: 6px; }
-    .s3-backup-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-    .s3-backup-table th, .s3-backup-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid rgba(128,128,128,0.25); }
-    .s3-backup-table td.s3-backup-actions-cell { text-align: right; white-space: nowrap; }
+    .s3-backup-table { min-width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; font-size: 0.9rem; }
+    .s3-backup-table th, .s3-backup-table td { text-align: left; padding: 6px 10px; }
+    /* Sticky header: needs border-collapse:separate (above) and a solid
+       background, otherwise the scrolling rows show through it */
+    .s3-backup-table thead th { position: sticky; top: 0; z-index: 1; background: #fff; }
+    body.dark-mode .s3-backup-table thead th { background: var(--dm-bg); }
+    /* Every cell stays on one line; the wrapper scrolls sideways when the
+       archive names are too long rather than wrapping them over two rows */
+    .s3-backup-table th, .s3-backup-table td { white-space: nowrap; }
+    /* The actions column absorbs the leftover width so the text columns stay
+       snug together instead of being spread across the whole table. It stays
+       pinned to the right edge so Download/Delete remain reachable when long
+       archive names push the table into horizontal scrolling. */
+    .s3-backup-table th:last-child, .s3-backup-table td.s3-backup-actions-cell { text-align: right; position: sticky; right: 0; background: #fff; }
+    body.dark-mode .s3-backup-table th:last-child,
+    body.dark-mode .s3-backup-table td.s3-backup-actions-cell { background: var(--dm-bg); }
+    /* The pinned header corner must outrank both sticky axes */
+    .s3-backup-table thead th:last-child { z-index: 2; }
+    /* Sortable headers, mirroring the .users-sort-link look from users.css
+       (not loaded on this page) */
+    .s3-backup-sort-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; }
+    .s3-backup-sort-btn .s3-backup-sort-icon { width: 12px; height: 12px; opacity: 0.35; }
+    .s3-backup-sort-btn:hover .s3-backup-sort-icon,
+    .s3-backup-sort-btn.s3-backup-sort-active .s3-backup-sort-icon { opacity: 1; }
+    .s3-backup-sort-btn.s3-backup-sort-active { font-weight: 700; }
     .s3-backup-table .btn { display: inline-flex; align-items: center; vertical-align: middle; padding: 3px 10px; font-size: 0.85rem; line-height: 1.4; border: none; margin: 0; box-sizing: border-box; }
     .s3-backup-table a.btn-primary { background-color: #007cba; color: #fff; text-decoration: none; }
     .s3-backup-table a.btn-primary:hover { background-color: #005a8a; }
     .s3-backup-table .btn-danger { background-color: #dc3545; color: #fff; }
     .s3-backup-table .btn-danger:hover { background-color: #b02a37; }
-    .s3-backup-table-wrap { overflow-x: auto; }
+    /* The bucket can hold a lot of archives: keep the list inside a scroller
+       instead of letting it push the rest of the page down */
+    .s3-backup-table-wrap { overflow: auto; max-height: 420px; overscroll-behavior: contain; }
     .s3-backup-users-picker { margin: 6px 0; }
     .s3-backup-users-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
     .s3-backup-users-search { position: relative; flex: 1 1 220px; min-width: 180px; }
@@ -157,7 +186,7 @@ $allBackupUsers = listAllUserProfiles();
     </style>
 </head>
 <body class="home-page git-sync-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
-    <div class="home-container git-sync-container">
+    <div class="home-container git-sync-container s3-backup-container">
 
         <div class="git-sync-nav">
             <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
@@ -384,9 +413,18 @@ $allBackupUsers = listAllUserProfiles();
                 <table class="s3-backup-table" id="s3-backup-table" hidden>
                     <thead>
                         <tr>
-                            <th><?php echo t_h('s3_backup.col_user', [], 'User'); ?></th>
-                            <th><?php echo t_h('s3_backup.col_archive', [], 'Archive'); ?></th>
-                            <th><?php echo t_h('s3_backup.col_size', [], 'Size'); ?></th>
+                            <th data-sort-key="username" data-sort-type="text">
+                                <button type="button" class="s3-backup-sort-btn"><?php echo t_h('s3_backup.col_user', [], 'User'); ?><i class="lucide lucide-chevron-down s3-backup-sort-icon"></i></button>
+                            </th>
+                            <th data-sort-key="filename" data-sort-type="text">
+                                <button type="button" class="s3-backup-sort-btn"><?php echo t_h('s3_backup.col_archive', [], 'Archive'); ?><i class="lucide lucide-chevron-down s3-backup-sort-icon"></i></button>
+                            </th>
+                            <th data-sort-key="mtime" data-sort-type="num">
+                                <button type="button" class="s3-backup-sort-btn"><?php echo t_h('s3_backup.col_date', [], 'Date'); ?><i class="lucide lucide-chevron-down s3-backup-sort-icon"></i></button>
+                            </th>
+                            <th data-sort-key="size" data-sort-type="num">
+                                <button type="button" class="s3-backup-sort-btn"><?php echo t_h('s3_backup.col_size', [], 'Size'); ?><i class="lucide lucide-chevron-down s3-backup-sort-icon"></i></button>
+                            </th>
                             <th></th>
                         </tr>
                     </thead>
@@ -507,6 +545,21 @@ $allBackupUsers = listAllUserProfiles();
             var i = 0, v = bytes;
             while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
             return (i === 0 ? v : v.toFixed(1)) + ' ' + units[i];
+        }
+
+        // Bucket timestamps arrive as UTC epochs; render them in local time.
+        // Kept compact (2-digit fields, no seconds) so the row fits on one line.
+        function formatTimestamp(epoch) {
+            if (!epoch) return '';
+            var d = new Date(epoch * 1000);
+            try {
+                return d.toLocaleString(undefined, {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch (e) {
+                return d.toLocaleString();
+            }
         }
 
         // ---- Connection test ------------------------------------------------
@@ -668,6 +721,46 @@ $allBackupUsers = listAllUserProfiles();
         }
 
         // ---- Bucket listing -------------------------------------------------
+        // The API already returns the archives newest first; clicking a header
+        // re-sorts this cached list rather than refetching the bucket.
+        var backupList = [];
+        var sortKey = null;
+        var sortDir = 'asc';
+
+        function sortedBackups() {
+            if (!sortKey) return backupList.slice();
+            var numeric = sortKey === 'mtime' || sortKey === 'size';
+            return backupList.slice().sort(function(a, b) {
+                var cmp = numeric
+                    ? (Number(a[sortKey] || 0) - Number(b[sortKey] || 0))
+                    : String(a[sortKey] || '').localeCompare(String(b[sortKey] || ''), undefined, { sensitivity: 'base', numeric: true });
+                return sortDir === 'asc' ? cmp : -cmp;
+            });
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('#s3-backup-table thead th[data-sort-key]').forEach(function(th) {
+                var isActive = th.getAttribute('data-sort-key') === sortKey;
+                var btn = th.querySelector('.s3-backup-sort-btn');
+                var icon = th.querySelector('.s3-backup-sort-icon');
+                btn.classList.toggle('s3-backup-sort-active', isActive);
+                icon.classList.toggle('lucide-chevron-up', isActive && sortDir === 'asc');
+                icon.classList.toggle('lucide-chevron-down', !isActive || sortDir === 'desc');
+                th.setAttribute('aria-sort', isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none');
+            });
+        }
+
+        document.querySelectorAll('#s3-backup-table thead th[data-sort-key]').forEach(function(th) {
+            th.querySelector('.s3-backup-sort-btn').addEventListener('click', function() {
+                var key = th.getAttribute('data-sort-key');
+                // Same column toggles direction; a new column starts ascending
+                sortDir = (key === sortKey && sortDir === 'asc') ? 'desc' : 'asc';
+                sortKey = key;
+                updateSortIndicators();
+                renderBackupRows();
+            });
+        });
+
         function refreshList() {
             var statusEl = document.getElementById('s3-backup-list-status');
             var table = document.getElementById('s3-backup-table');
@@ -679,6 +772,7 @@ $allBackupUsers = listAllUserProfiles();
                 .then(function(data) {
                     var tbody = table.querySelector('tbody');
                     tbody.innerHTML = '';
+                    backupList = [];
                     if (!data.success) {
                         table.hidden = true;
                         statusEl.textContent = i18n.listError.replace('{{error}}', data.error || 'unknown');
@@ -692,65 +786,119 @@ $allBackupUsers = listAllUserProfiles();
                     statusEl.textContent = '';
                     statusEl.hidden = true;
                     table.hidden = false;
-                    data.backups.forEach(function(backup) {
-                        var tr = document.createElement('tr');
-
-                        var tdUser = document.createElement('td');
-                        tdUser.textContent = backup.username;
-                        tr.appendChild(tdUser);
-
-                        var tdFile = document.createElement('td');
-                        tdFile.textContent = backup.filename;
-                        tr.appendChild(tdFile);
-
-                        var tdSize = document.createElement('td');
-                        tdSize.textContent = formatBytes(backup.size);
-                        tr.appendChild(tdSize);
-
-                        var tdActions = document.createElement('td');
-                        tdActions.className = 's3-backup-actions-cell';
-
-                        var dlLink = document.createElement('a');
-                        dlLink.className = 'btn btn-primary';
-                        dlLink.href = 'api_s3_backup.php?action=download&key=' + encodeURIComponent(backup.key);
-                        dlLink.textContent = i18n.download;
-                        tdActions.appendChild(dlLink);
-                        tdActions.appendChild(document.createTextNode(' '));
-
-                        var delBtn = document.createElement('button');
-                        delBtn.className = 'btn btn-danger';
-                        delBtn.type = 'button';
-                        delBtn.textContent = i18n.deleteLabel;
-                        delBtn.addEventListener('click', function() {
-                            window.modalAlert.confirm(
-                                i18n.confirmDelete.replace('{{filename}}', backup.filename),
-                                i18n.deleteLabel
-                            ).then(function(confirmed) {
-                                if (!confirmed) return;
-                                var body = new URLSearchParams();
-                                body.append('key', backup.key);
-                                fetch('api_s3_backup.php?action=delete', {
-                                    method: 'POST',
-                                    credentials: 'same-origin',
-                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                    body: body.toString()
-                                })
-                                .then(function(r) { return r.json(); })
-                                .then(function() { refreshList(); })
-                                .catch(function() { refreshList(); });
-                            });
-                        });
-                        tdActions.appendChild(delBtn);
-                        tr.appendChild(tdActions);
-
-                        tbody.appendChild(tr);
-                    });
+                    backupList = data.backups;
+                    renderBackupRows();
                 })
                 .catch(function(e) {
                     table.hidden = true;
                     statusEl.textContent = i18n.listError.replace('{{error}}', e.message);
                 });
         }
+
+        function renderBackupRows() {
+            var table = document.getElementById('s3-backup-table');
+            var tbody = table.querySelector('tbody');
+            tbody.innerHTML = '';
+            sortedBackups().forEach(function(backup) {
+                var tr = document.createElement('tr');
+
+                var tdUser = document.createElement('td');
+                tdUser.textContent = backup.username;
+                tr.appendChild(tdUser);
+
+                var tdFile = document.createElement('td');
+                tdFile.textContent = backup.filename;
+                tr.appendChild(tdFile);
+
+                var tdDate = document.createElement('td');
+                tdDate.className = 's3-backup-date-cell';
+                tdDate.textContent = formatTimestamp(backup.mtime);
+                tr.appendChild(tdDate);
+
+                var tdSize = document.createElement('td');
+                tdSize.textContent = formatBytes(backup.size);
+                tr.appendChild(tdSize);
+
+                var tdActions = document.createElement('td');
+                tdActions.className = 's3-backup-actions-cell';
+
+                var dlLink = document.createElement('a');
+                dlLink.className = 'btn btn-primary';
+                dlLink.href = 'api_s3_backup.php?action=download&key=' + encodeURIComponent(backup.key);
+                dlLink.textContent = i18n.download;
+                tdActions.appendChild(dlLink);
+                tdActions.appendChild(document.createTextNode(' '));
+
+                var delBtn = document.createElement('button');
+                delBtn.className = 'btn btn-danger';
+                delBtn.type = 'button';
+                delBtn.textContent = i18n.deleteLabel;
+                delBtn.addEventListener('click', function() {
+                    window.modalAlert.confirm(
+                        i18n.confirmDelete.replace('{{filename}}', backup.filename),
+                        i18n.deleteLabel
+                    ).then(function(confirmed) {
+                        if (!confirmed) return;
+                        var body = new URLSearchParams();
+                        body.append('key', backup.key);
+                        fetch('api_s3_backup.php?action=delete', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: body.toString()
+                        })
+                        .then(function(r) { return r.json(); })
+                        .then(function() { refreshList(); })
+                        .catch(function() { refreshList(); });
+                    });
+                });
+                tdActions.appendChild(delBtn);
+                tr.appendChild(tdActions);
+
+                tbody.appendChild(tr);
+            });
+
+            fitContainerToTable();
+        }
+
+        /**
+         * Widen the page container just enough for the widest row to fit on a
+         * single line. The table is measured while the container is free to
+         * grow, so we read its natural (unconstrained) width rather than the
+         * width it was already squeezed into.
+         */
+        function fitContainerToTable() {
+            var container = document.querySelector('.s3-backup-container');
+            var wrap = document.querySelector('.s3-backup-table-wrap');
+            var table = document.getElementById('s3-backup-table');
+            if (!container || !wrap || !table || table.hidden) {
+                if (container) container.style.removeProperty('--s3-backup-width');
+                return;
+            }
+
+            // Chrome around the scroller: container padding, section padding
+            // and borders. Independent of how wide the container currently is.
+            var chrome = Math.ceil(container.getBoundingClientRect().width - wrap.clientWidth);
+
+            // Measure the table's intrinsic width. `min-width: 100%` makes it
+            // stretch to whatever the container currently is, so that rule and
+            // the scroller's clamping are both lifted for the measurement --
+            // otherwise each call measures the previous fit and creeps wider.
+            var prevOverflow = wrap.style.overflowX;
+            var prevMinWidth = table.style.minWidth;
+            var prevWidth = table.style.width;
+            wrap.style.overflowX = 'visible';
+            table.style.minWidth = '0';
+            table.style.width = 'max-content';
+            var natural = Math.ceil(table.getBoundingClientRect().width);
+            wrap.style.overflowX = prevOverflow;
+            table.style.minWidth = prevMinWidth;
+            table.style.width = prevWidth;
+
+            container.style.setProperty('--s3-backup-width', (natural + chrome) + 'px');
+        }
+
+        window.addEventListener('resize', fitContainerToTable);
 
         refreshStatus();
         refreshList();

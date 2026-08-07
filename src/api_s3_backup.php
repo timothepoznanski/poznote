@@ -256,6 +256,7 @@ switch ($action) {
                 $backups[] = [
                     'key' => $object['key'],
                     'size' => $object['size'],
+                    'mtime' => (int)($object['mtime'] ?? 0),
                     'filename' => basename($object['key']),
                 ];
             }
