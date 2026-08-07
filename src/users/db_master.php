@@ -1168,7 +1168,7 @@ function listAllUserProfiles(string $sort = 'id_asc'): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login
+            SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login, oidc_subject
             FROM users
             ORDER BY $orderBy
         ");
