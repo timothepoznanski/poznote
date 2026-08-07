@@ -19,6 +19,52 @@ try {
     $reminderEmailAvailable = false;
     $reminderEmailAddress = '';
 }
+
+// Whether a local password is of any use to this user. Hidden in two cases:
+// the instance is SSO-only, so no password would ever be accepted at login; or
+// this profile was provisioned without a credential, so there is no current
+// password to authenticate the change with. Must stay in sync with the
+// matching check that hides the Change Password card in settings.php.
+$modalsPasswordDisabledReason = '';
+try {
+    $modalsOidcPath = __DIR__ . '/oidc.php';
+    if (is_file($modalsOidcPath)) {
+        require_once $modalsOidcPath;
+    }
+    if (!function_exists('hasCustomPassword')) {
+        require_once __DIR__ . '/users/db_master.php';
+    }
+    $modalsSsoOnly = function_exists('oidc_is_enabled')
+        && oidc_is_enabled()
+        && defined('OIDC_DISABLE_NORMAL_LOGIN')
+        && OIDC_DISABLE_NORMAL_LOGIN;
+
+    $modalsNoLocalCredential = false;
+    $modalsUserId = function_exists('getCurrentUserId') ? getCurrentUserId() : null;
+    if ($modalsUserId && function_exists('hasCustomPassword')) {
+        $modalsUserProfile = function_exists('getUserProfileById') ? getUserProfileById((int)$modalsUserId) : null;
+        $modalsNoLocalCredential = !(hasCustomPassword((int)$modalsUserId)
+            || !(is_array($modalsUserProfile) && isPasswordLoginDisabled($modalsUserProfile)));
+    }
+
+    if ($modalsSsoOnly) {
+        $modalsPasswordDisabledReason = 'sso_only';
+    } elseif ($modalsNoLocalCredential) {
+        $modalsPasswordDisabledReason = 'no_local_password';
+    }
+} catch (Throwable $e) {
+    // Never let this check disable a button that should be usable.
+    $modalsPasswordDisabledReason = '';
+}
+$modalsPasswordDisabled = $modalsPasswordDisabledReason !== '';
+// Short one-liner for the info box; the full explanation goes in the button
+// tooltip so the modal stays scannable.
+$modalsPasswordDisabledNote = $modalsPasswordDisabledReason === 'sso_only'
+    ? t_h('settings.card_help.password_note_sso_only', [], 'Password sign-in is disabled on this instance.')
+    : t_h('settings.card_help.password_note_no_local', [], 'Your password is managed by your identity provider.');
+$modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
+    ? t_h('settings.card_help.change_password_sso_only', [], 'This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.')
+    : t_h('settings.card_help.change_password_no_local', [], 'Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.');
 ?>
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
@@ -1402,11 +1448,18 @@ try {
             <h3><?php echo t_h('modals.user_settings_info.title', [], 'Account Settings'); ?></h3>
         </div>
         <div class="modal-body">
-            <p><?php echo t_h('modals.user_settings_info.message', [], 'You can change your username, name and password from Settings.'); ?></p>
+            <p><?php echo $modalsPasswordDisabled
+                ? t_h('modals.user_settings_info.message_sso_only', [], 'You can change your username and name from Settings.')
+                : t_h('modals.user_settings_info.message', [], 'You can change your username, name and password from Settings.'); ?></p>
+            <?php if ($modalsPasswordDisabled): ?>
+            <div class="modal-info-note"><i class="lucide lucide-info"></i><span><?php echo $modalsPasswordDisabledNote; ?></span></div>
+            <?php endif; ?>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=profile#my-profile-card'"><?php echo t_h('modals.user_settings_info.edit_profile_button', [], 'Edit Profile'); ?></button>
-            <button type="button" class="btn-primary" data-action="open-password-settings"><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
+            <button type="button" class="btn-primary"<?php echo $modalsPasswordDisabled
+                ? ' disabled aria-disabled="true" title="' . $modalsPasswordDisabledHelp . '"'
+                : ' data-action="open-password-settings"'; ?>><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
             <button type="button" class="btn-danger" data-action="close-user-settings-info-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>

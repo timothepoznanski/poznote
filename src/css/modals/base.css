@@ -187,6 +187,56 @@
     background-color: #005a8a;
 }
 
+/* Actions kept visible but unavailable (e.g. Change Password on an account
+   that has no local password to change). The hover rule above still matches a
+   disabled button, so the flat colour has to be re-asserted here. */
+.modal-buttons button.btn-primary:disabled,
+.modal-buttons button.btn-primary:disabled:hover {
+    background-color: #eceff3;
+    color: #9aa5b1;
+    border: 1px solid #dfe3e8;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+/* dark-mode/components.css sets .btn-primary colours with !important, so the
+   disabled state has to re-assert them the same way to win. */
+html[data-theme='dark'] .modal-buttons button.btn-primary:disabled,
+html[data-theme='dark'] .modal-buttons button.btn-primary:disabled:hover,
+body.dark-mode .modal-buttons button.btn-primary:disabled,
+body.dark-mode .modal-buttons button.btn-primary:disabled:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    color: #6b7280 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Info box explaining why a disabled action in this modal is unavailable. */
+.modal .modal-info-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 12px 0 0 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #1e40af;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.modal .modal-info-note .lucide {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    margin-top: 2px;
+}
+
+html[data-theme='dark'] .modal .modal-info-note,
+body.dark-mode .modal .modal-info-note {
+    background: rgba(59, 130, 246, 0.14);
+    color: #93c5fd;
+}
+
 .modal-buttons button.btn-cancel {
     background-color: #6c757d;
     color: white;

@@ -372,6 +372,10 @@
       "workspaces": "Organize suas notas em espaços de trabalho separados, cada um com suas pastas e notas.",
       "my_profile": "Veja e edite as informações do seu perfil.",
       "change_password": "Altere a senha usada para entrar.",
+      "password_note_sso_only": "O login com senha esta desativado nesta instancia.",
+      "password_note_no_local": "Sua senha e gerenciada pelo seu provedor de identidade.",
+      "change_password_sso_only": "Esta instancia usa apenas SSO, portanto uma senha local nunca seria aceita no login. As alteracoes de senha estao desativadas.",
+      "change_password_no_local": "Sua conta faz login pelo seu provedor de identidade e nao tem senha local, portanto nao ha senha atual para confirmar uma alteracao. Um administrador pode definir uma em Ferramentas de administracao > Usuarios.",
       "git_sync": "Faça backup das suas notas em um repositório Git e veja o histórico de sincronização.",
       "extension": "Instale a extensão do navegador para salvar páginas web no Poznote.",
       "install_app": "Instale o Poznote como aplicativo no seu dispositivo (PWA).",
@@ -1145,6 +1149,7 @@
     "user_settings_info": {
       "title": "Configurações da conta",
       "message": "Voce pode alterar seu nome de usuario, seu nome e sua senha nas Configuracoes.",
+      "message_sso_only": "Voce pode alterar seu nome de usuario e seu nome nas Configuracoes.",
       "change_password_button": "Alterar senha",
       "edit_profile_button": "Editar perfil"
     },

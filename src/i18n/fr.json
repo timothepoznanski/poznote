@@ -385,6 +385,10 @@
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
+      "password_note_sso_only": "La connexion par mot de passe est désactivée sur cette instance.",
+      "password_note_no_local": "Votre mot de passe est géré par votre fournisseur d'identité.",
+      "change_password_sso_only": "Cette instance utilise uniquement le SSO, donc un mot de passe local ne serait jamais accepté à la connexion. Les changements de mot de passe sont désactivés.",
+      "change_password_no_local": "Votre compte se connecte via votre fournisseur d'identité et n'a pas de mot de passe local, il n'y a donc aucun mot de passe actuel pour confirmer un changement. Un administrateur peut vous en définir un depuis Outils d'administration > Utilisateurs.",
       "git_sync": "Sauvegardez vos notes dans un dépôt Git et consultez l'historique de synchronisation.",
       "extension": "Installez l'extension de navigateur pour enregistrer des pages web dans Poznote.",
       "install_app": "Installez Poznote comme application sur votre appareil (PWA).",
@@ -1177,6 +1181,7 @@
     "user_settings_info": {
       "title": "Paramètres du compte",
       "message": "Vous pouvez changer votre nom d’utilisateur, votre prénom, votre nom et votre mot de passe depuis les paramètres.",
+      "message_sso_only": "Vous pouvez changer votre nom d’utilisateur, votre prénom et votre nom depuis les paramètres.",
       "change_password_button": "Changer le mot de passe",
       "edit_profile_button": "Modifier le profil"
     },

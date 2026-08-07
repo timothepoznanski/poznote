@@ -373,6 +373,10 @@
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
+      "password_note_sso_only": "Die Passwort-Anmeldung ist auf dieser Instanz deaktiviert.",
+      "password_note_no_local": "Ihr Passwort wird von Ihrem Identitaetsanbieter verwaltet.",
+      "change_password_sso_only": "Diese Instanz verwendet ausschliesslich SSO, daher wuerde ein lokales Passwort bei der Anmeldung nie akzeptiert. Passwortaenderungen sind deaktiviert.",
+      "change_password_no_local": "Ihr Konto meldet sich ueber Ihren Identitaetsanbieter an und hat kein lokales Passwort, daher gibt es kein aktuelles Passwort zur Bestaetigung einer Aenderung. Ein Administrator kann eines fuer Sie unter Admin-Tools > Benutzer festlegen.",
       "git_sync": "Sichern Sie Ihre Notizen in einem Git-Repository und sehen Sie den Synchronisationsverlauf.",
       "extension": "Installieren Sie die Browser-Erweiterung, um Webseiten in Poznote zu speichern.",
       "install_app": "Installieren Sie Poznote als Anwendung auf Ihrem Gerät (PWA).",
@@ -1146,6 +1150,7 @@
     "user_settings_info": {
       "title": "Kontoeinstellungen",
       "message": "Sie koennen Ihren Benutzernamen, Ihren Namen und Ihr Passwort in den Einstellungen aendern.",
+      "message_sso_only": "Sie koennen Ihren Benutzernamen und Ihren Namen in den Einstellungen aendern.",
       "change_password_button": "Passwort aendern",
       "edit_profile_button": "Profil bearbeiten"
     },

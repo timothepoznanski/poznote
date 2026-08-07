@@ -375,6 +375,10 @@
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
+      "password_note_sso_only": "此实例已禁用密码登录。",
+      "password_note_no_local": "您的密码由您的身份提供商管理。",
+      "change_password_sso_only": "此实例仅使用 SSO，因此登录时永远不会接受本地密码。密码修改已禁用。",
+      "change_password_no_local": "您的账户通过身份提供商登录且没有本地密码，因此没有当前密码可用于确认更改。管理员可以在管理工具 > 用户中为您设置一个。",
       "git_sync": "将笔记备份到 Git 仓库并查看同步历史。",
       "extension": "安装浏览器扩展，将网页保存到 Poznote。",
       "install_app": "将 Poznote 作为应用安装到您的设备（PWA）。",
@@ -1158,6 +1162,7 @@
     "user_settings_info": {
       "title": "账户设置",
       "message": "您可以在设置中更改用户名、姓名和密码。",
+      "message_sso_only": "您可以在设置中更改用户名和姓名。",
       "change_password_button": "更改密码",
       "edit_profile_button": "编辑资料"
     },

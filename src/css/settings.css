@@ -425,3 +425,16 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
 body.dark-mode .home-card.is-pinned {
     border-color: rgba(74, 168, 216, 0.45);
 }
+
+/* Change Password card when a password change is impossible (SSO-only instance,
+   or a profile with no local credential). The card stays visible so the option
+   does not silently vanish, but reads as unavailable and does not open a modal.
+   Only the icon/content dim: the help tooltip and pin control stay usable. */
+.home-card.home-card-disabled {
+    cursor: default;
+}
+
+.home-card.home-card-disabled .home-card-icon,
+.home-card.home-card-disabled .home-card-title {
+    opacity: 0.55;
+}

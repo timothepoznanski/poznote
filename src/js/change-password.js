@@ -33,9 +33,10 @@
             badge.className = 'setting-status enabled';
         } else if (data && data.password_login_available === false) {
             // Profile with no password set and no default to fall back on:
-            // signing in goes through the identity provider.
+            // signing in goes through the identity provider. Green like the
+            // other cards: nothing is wrong, sign-in is simply handled there.
             badge.textContent = tr('password.status.sso_only', {}, 'SSO only');
-            badge.className = 'setting-status disabled';
+            badge.className = 'setting-status enabled';
         } else {
             badge.textContent = tr('password.status.default', {}, 'Default');
             badge.className = 'setting-status disabled';
@@ -315,11 +316,15 @@
         refreshPasswordStatusBadge();
 
         var card = document.getElementById('change-password-card');
-        if (card) {
+        // The card stays visible when a password change is impossible (SSO-only
+        // instance, or a profile with no local credential) so the option does
+        // not silently vanish, but it must not open the modal.
+        var cardDisabled = !!card && card.classList.contains('home-card-disabled');
+        if (card && !cardDisabled) {
             card.addEventListener('click', showPasswordModal);
         }
 
-        if (card && shouldAutoOpenPasswordModal()) {
+        if (card && !cardDisabled && shouldAutoOpenPasswordModal()) {
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             clearAutoOpenPasswordModalParam();
             showPasswordModal();

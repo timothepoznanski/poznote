@@ -109,6 +109,10 @@
       "workspaces": "Organize your notes into separate workspaces, each with its own folders and notes.",
       "my_profile": "View and edit your profile information.",
       "change_password": "Change the password used to sign in.",
+      "password_note_sso_only": "Password sign-in is disabled on this instance.",
+      "password_note_no_local": "Your password is managed by your identity provider.",
+      "change_password_sso_only": "This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.",
+      "change_password_no_local": "Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.",
       "git_sync": "Back up your notes to a Git repository and view the synchronization history.",
       "extension": "Install the browser extension to save web pages into Poznote.",
       "install_app": "Install Poznote as an application on your device (PWA).",
@@ -712,6 +716,7 @@
     "user_settings_info": {
       "title": "Account Settings",
       "message": "You can change your username, name and password from Settings.",
+      "message_sso_only": "You can change your username and name from Settings.",
       "change_password_button": "Change Password",
       "edit_profile_button": "Edit Profile"
     },
