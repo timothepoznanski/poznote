@@ -327,6 +327,7 @@
     }
   },
   "tasklist": {
+    "open_tasks_page": "View all tasks",
     "input_placeholder": "Write a new task and press Enter to add to list...",
     "drag_to_reorder": "Drag to reorder",
     "add_to_top": "Add new tasks to top",
@@ -1225,8 +1226,8 @@
     }
   },
   "editor": {
-    "markdown_placeholder": "Write your markdown or use / to open the command menu...",
-    "markdown_placeholder_mobile": "Write your markdown here...",
+    "markdown_placeholder": "Write your markdown, use / for command menu, paste images or drop an image at cursor.",
+    "markdown_placeholder_mobile": "Write your markdown or paste images here...",
     "excalidraw": {
       "placeholder_outside": "Write outside the diagram here…"
     },

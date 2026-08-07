@@ -93,14 +93,18 @@
     function renderPanel(backlinks) {
         removePanel();
 
-        if (backlinks.length === 0) {
+        var noteEntry = document.querySelector('.noteentry');
+        if (!noteEntry) return;
+
+        // Tasklist notes always get the row: its first link leads to the
+        // global tasks page where this list's tasks are aggregated
+        var isTasklist = noteEntry.getAttribute('data-note-type') === 'tasklist';
+
+        if (backlinks.length === 0 && !isTasklist) {
             return;
         }
 
         var atBottom = !!(window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.backlinksAtBottom);
-
-        var noteEntry = document.querySelector('.noteentry');
-        if (!noteEntry) return;
 
         /* ── Icon button (mirrors .icon-attachment-btn) ───────────────────── */
         var iconBtn = document.createElement('span');
@@ -110,6 +114,15 @@
         /* ── Links list (mirrors .note-attachments-list) ─────────────────── */
         var list = document.createElement('span');
         list.className = 'backlinks-links-list';
+
+        if (isTasklist) {
+            var workspace = getWorkspaceName();
+            var tasksLink = document.createElement('a');
+            tasksLink.href = 'tasks.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+            tasksLink.className = 'backlink-link backlink-tasks-page';
+            tasksLink.textContent = (window.t ? window.t('tasks_page.title', null, 'Tasks') : 'Tasks');
+            list.appendChild(tasksLink);
+        }
 
         backlinks.forEach(function (link) {
             var ws = (typeof selectedWorkspace !== 'undefined') ? selectedWorkspace : '';

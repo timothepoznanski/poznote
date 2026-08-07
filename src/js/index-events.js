@@ -563,6 +563,11 @@
                 }
                 closeTasklistActionsMenus();
                 break;
+            case 'open-tasks-page': {
+                const workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
+                window.location.href = 'tasks.php' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
+                break;
+            }
             case 'toggle-tasklist-actions':
                 toggleTasklistActionsMenu(noteId, target);
                 break;

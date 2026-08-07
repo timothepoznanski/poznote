@@ -31,6 +31,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/tasks-page.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
@@ -137,6 +138,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	};
 	</script>
 	<script src="js/navigation.js"></script>
+	<script src="js/note-reference.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/task-due-modal.js?v=<?php echo $cache_v; ?>"></script>

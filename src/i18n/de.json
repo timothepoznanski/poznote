@@ -735,6 +735,7 @@
     }
   },
   "tasklist": {
+    "open_tasks_page": "Alle Aufgaben anzeigen",
     "input_placeholder": "Neue Aufgabe schreiben und Enter drücken, um sie zur Liste hinzuzufügen...",
     "drag_to_reorder": "Zum Neuanordnen ziehen",
     "add_to_top": "Neue Aufgaben oben hinzufügen",
@@ -826,8 +827,8 @@
     }
   },
   "editor": {
-    "markdown_placeholder": "Schreiben Sie Ihr Markdown oder verwenden Sie /, um das Befehlsmenü zu öffnen...",
-    "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier...",
+    "markdown_placeholder": "Schreiben Sie Ihr Markdown, verwenden Sie /, um das Befehlsmenü zu öffnen, fügen Sie Bilder ein oder legen Sie ein Bild am Cursor ab.",
+    "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier oder fügen Sie Bilder ein...",
     "excalidraw": {
       "placeholder_outside": "Hier außerhalb des Diagramms schreiben…"
     },

@@ -276,13 +276,16 @@ body.tasks-page {
     white-space: nowrap;
 }
 
-/* Task rows */
+/* Task rows. The whole row (outside links/buttons/checkbox) navigates to the
+   task's note. Top-aligned so the checkbox sits on the first line of
+   multi-line tasks. */
 .tasks-task-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     padding: 8px 4px;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    cursor: pointer;
 }
 
 .tasks-task-checkbox {
@@ -291,6 +294,8 @@ body.tasks-page {
     cursor: pointer;
     accent-color: #007DB8;
     flex-shrink: 0;
+    /* Center on the first text line now that the row is top-aligned */
+    margin-top: 2px;
 }
 
 .tasks-task-text {
@@ -298,6 +303,19 @@ body.tasks-page {
     min-width: 0;
     font-size: 14px;
     overflow-wrap: break-word;
+    /* Keep the line breaks entered in the tasklist note */
+    white-space: pre-wrap;
+}
+
+.tasks-task-text a {
+    color: #007DB8;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.tasks-task-text a:hover {
+    color: #005a8a;
+    text-decoration: underline;
 }
 
 .tasks-task-item.completed .tasks-task-text {
@@ -435,6 +453,7 @@ body.tasks-page {
 
     .tasks-task-item.has-due .tasks-task-checkbox {
         grid-area: check;
+        align-self: start;
     }
 
     .tasks-task-item.has-due .tasks-task-text {
@@ -449,23 +468,51 @@ body.tasks-page {
 
 /* Mobile responsive */
 @media (max-width: 600px) {
+    /* The desktop spacing above the nav buttons stacks three times over
+       (body padding + container padding + button margin); collapse it */
+    body.tasks-page {
+        padding: 10px;
+    }
+
+    .tasks-container {
+        padding: 5px;
+    }
+
+    .tasks-buttons-container {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
     .tasks-title {
         font-size: 20px;
     }
 
-    /* Stacked layout: title and label above the full-width progress bar */
+    /* Stacked layout: title and label above the full-width progress bar.
+       The bottom margin matches the filter input's total bottom spacing
+       (8px bar gap + 6px margin) so the input breathes equally on both sides */
     .tasks-progress-section:not(.initially-hidden) {
         display: block;
+        margin-bottom: 14px;
     }
 
-    /* Stacked layout: filter input below the filter chips */
+    /* Filter input first (full width, right below the progress bar), then
+       one wrapping row where the collapse/expand chevrons flow right after
+       the filter chips (display: contents merges both groups into the bar) */
     .tasks-filter-bar {
-        flex-direction: column;
-        align-items: stretch;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
+    .filter-input-wrapper {
+        order: -1;
+        flex-basis: 100%;
+        /* With the 8px bar gap: 14px below the input, same as above it */
+        margin-bottom: 6px;
+    }
+
+    .tasks-filter-chips,
     .tasks-collapse-actions {
-        justify-content: flex-end;
+        display: contents;
     }
 
     .tasks-progress-header {
@@ -553,6 +600,10 @@ html[data-theme="dark"]:has(body.tasks-page) {
 
 [data-theme="dark"] .tasks-task-item.completed .tasks-task-text {
     color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-task-text a {
+    color: #4da3d0;
 }
 
 [data-theme="dark"] .task-due-chip {

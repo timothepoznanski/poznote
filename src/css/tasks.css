@@ -100,7 +100,9 @@
 
 .task-item {
     display: flex;
-    align-items: center;
+    /* Top-align so the checkbox sits on the first line of multi-line tasks
+       instead of floating vertically centered */
+    align-items: flex-start;
     padding: 6px 12px !important;
     margin-bottom: 8px;
     border: 1px solid #e0e0e0;
@@ -188,6 +190,10 @@
     cursor: pointer;
     accent-color: #007DB8;
     margin-right: 12px;
+    /* Center on the first text line (2px text padding + half of the 21px line
+       box, minus half the 16px checkbox) now that the row is top-aligned */
+    margin-top: 4px;
+    flex-shrink: 0;
 }
 
 .task-text {
@@ -240,25 +246,33 @@
 .task-edit-modal-content {
     width: min(92vw, 720px);
     max-width: 720px;
+    /* Column layout capped to the screen: the textarea auto-grows with its
+       content (JS) and flex shrinking clamps it so the buttons stay visible */
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+}
+
+/* The blanket `.modal-content { margin: 5% auto 0 }` from responsive.css
+   would push the screen-capped modal below the viewport */
+#taskEditModal .modal-content {
+    margin: 0 auto;
 }
 
 .task-edit-modal-body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-}
-
-.task-edit-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: inherit;
+    min-height: 0;
 }
 
 .task-edit-textarea {
     box-sizing: border-box;
     width: 100%;
-    min-height: 240px;
-    max-height: 60vh;
+    /* Height follows the content (set by autoSizeTaskEditTextarea); the flex
+       column clamps it to the screen and overflow-y takes over */
+    min-height: 120px;
+    flex: 0 1 auto;
     padding: 10px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -269,6 +283,9 @@
     outline: none;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    /* The global `textarea { overflow: hidden }` rule from noteentry.css
+       would otherwise make long tasks unscrollable */
+    overflow-y: auto;
 }
 
 .task-edit-textarea:focus {
@@ -292,13 +309,30 @@
 }
 
 @media (max-width: 600px) {
+    /* Fit the modal inside the visual viewport (tracked by
+       events-text-selection.js while the virtual keyboard is open) so a long
+       task scrolls inside the textarea instead of overflowing under the
+       keyboard where nothing scrolls */
+    #taskEditModal.modal {
+        top: var(--mobile-visual-viewport-top, 0px);
+        height: var(--mobile-visual-viewport-height, 100%);
+        padding: 10px;
+    }
+
     .task-edit-modal-content {
         width: 94vw;
         padding: 20px;
     }
 
     .task-edit-textarea {
-        min-height: 45vh;
+        min-height: 80px;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+    }
+
+    /* Keyboard shortcut hint is meaningless on touch devices */
+    #taskEditHint {
+        display: none;
     }
 }
 
@@ -534,6 +568,7 @@
 
     .task-item.has-due .task-checkbox {
         grid-area: check;
+        align-self: start;
     }
 
     .task-item.has-due .task-text {
@@ -992,11 +1027,14 @@ body.dark-mode .toggle-block[open]>summary {
 
 .noteentry .tasklist-embed-task {
     display: flex;
-    align-items: center;
+    /* Top-align so the checkbox follows the first line of multi-line tasks */
+    align-items: flex-start;
     gap: 10px;
     padding: 4px 2px;
     border-radius: 4px;
     min-width: 0;
+    /* The row opens the source tasklist note */
+    cursor: pointer;
 }
 
 .noteentry .tasklist-embed-task:hover {
@@ -1009,7 +1047,8 @@ body.dark-mode .toggle-block[open]>summary {
     cursor: pointer;
     accent-color: #007DB8;
     flex-shrink: 0;
-    margin: 0;
+    /* Center on the first text line of the top-aligned row */
+    margin: 3px 0 0;
 }
 
 .noteentry .tasklist-embed-text {

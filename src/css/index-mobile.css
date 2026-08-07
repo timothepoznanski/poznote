@@ -211,6 +211,8 @@ body.mobile-formatting-toolbar-active #linkedNoteFolderSelectorModal.modal,
 body.mobile-keyboard-open #linkedNoteFolderSelectorModal.modal,
 body.mobile-formatting-toolbar-active #taskEditModal.modal,
 body.mobile-keyboard-open #taskEditModal.modal,
+body.mobile-formatting-toolbar-active #taskListPickerModal.modal,
+body.mobile-keyboard-open #taskListPickerModal.modal,
 body.mobile-formatting-toolbar-active #imageLinkModal.modal,
 body.mobile-keyboard-open #imageLinkModal.modal {
     z-index: 2147483004 !important;
@@ -225,6 +227,8 @@ body.mobile-formatting-toolbar-active #linkedNoteFolderSelectorModal .modal-cont
 body.mobile-keyboard-open #linkedNoteFolderSelectorModal .modal-content,
 body.mobile-formatting-toolbar-active #taskEditModal .modal-content,
 body.mobile-keyboard-open #taskEditModal .modal-content,
+body.mobile-formatting-toolbar-active #taskListPickerModal .modal-content,
+body.mobile-keyboard-open #taskListPickerModal .modal-content,
 body.mobile-formatting-toolbar-active #imageLinkModal .modal-content,
 body.mobile-keyboard-open #imageLinkModal .modal-content {
     z-index: 2147483005 !important;

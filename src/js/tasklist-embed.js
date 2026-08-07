@@ -230,6 +230,22 @@
             + (task.completed ? ' completed' : '')
             + (task.important && !task.completed ? ' important' : '');
 
+        // Clicking the row (outside the checkbox and links) opens the source
+        // tasklist note. stopPropagation keeps the markdown split-mode
+        // click-to-editor-line handler from hijacking the click.
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var url = 'index.php?note=' + noteId
+                + (currentWorkspace() ? '&workspace=' + encodeURIComponent(currentWorkspace()) : '');
+            if (typeof window.navigateToNote === 'function') {
+                window.navigateToNote(noteId);
+            } else {
+                window.location.href = url;
+            }
+        });
+
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'tasklist-embed-checkbox';
@@ -364,7 +380,18 @@
         modal.style.display = 'flex';
         loadPickerTargets('');
 
-        if (searchInput) {
+        // No autofocus on mobile: it would pop the virtual keyboard over the
+        // freshly opened modal. The note editor also keeps focus when opened
+        // from the slash menu, so blur it or the keyboard stays open.
+        if (window.innerWidth <= 800) {
+            setTimeout(function () {
+                var active = document.activeElement;
+                if (active && active !== document.body && !modal.contains(active)
+                    && typeof active.blur === 'function') {
+                    active.blur();
+                }
+            }, 0);
+        } else if (searchInput) {
             setTimeout(function () { searchInput.focus(); }, 0);
         }
     }
