@@ -1651,6 +1651,16 @@ function reinitializeNoteContent(options) {
         console.error('Error while initializing tasklist entries after AJAX load:', e);
     }
 
+    // Hydrate embedded task-list widgets in regular HTML notes. Also runs on
+    // DOM-cache restores (skipStructuralInit): the source list may have
+    // changed since the host note's DOM was cached, and re-rendering the
+    // widget from the API is idempotent.
+    try {
+        if (typeof window.initializeTaskListEmbeds === 'function') {
+            window.initializeTaskListEmbeds();
+        }
+    } catch (e) { }
+
     // If the loaded note(s) include any markdown entries, initialize them so the markdown content
     // is replaced with the interactive markdown editor/preview UI when notes are loaded via AJAX.
     try {

@@ -891,3 +891,168 @@ body.dark-mode .toggle-block {
 body.dark-mode .toggle-block[open]>summary {
     border-bottom-color: #30363d;
 }
+
+/* ============================================
+   Embedded task list in a regular note
+   (marker .tasklist-embed + runtime widget rendered by tasklist-embed.js)
+   ============================================ */
+
+.noteentry .tasklist-embed {
+    margin: 14px 0;
+}
+
+/* In the app the rendered widget replaces the persisted fallback link
+   (which stays visible in public/exported notes where nothing hydrates) */
+.tasklist-embed:has(> .tasklist-embed-widget) > .tasklist-embed-link {
+    display: none;
+}
+
+.noteentry .tasklist-embed-widget {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.noteentry .tasklist-embed-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin-bottom: 8px;
+}
+
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-header {
+    margin-bottom: 0;
+}
+
+/* Collapse/expand chevron (same look as the tasks page group toggle) */
+.noteentry .tasklist-embed-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.noteentry .tasklist-embed-toggle:hover {
+    color: #007DB8;
+}
+
+.noteentry .tasklist-embed-toggle i {
+    transition: transform 0.2s ease;
+}
+
+/* The :is() ID boost outguns the global lucide hover rule from icons.css
+   ([class*="lucide-"]:hover { transform: scale(1.18) }), which would
+   otherwise cancel the rotation while the chevron is hovered */
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-toggle i:is(#pz-specificity-boost, *) {
+    transform: rotate(-90deg);
+}
+
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-list,
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-empty {
+    display: none;
+}
+
+.tasklist-embed-title {
+    font-weight: 600;
+    color: inherit;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tasklist-embed-title:hover {
+    text-decoration: underline;
+}
+
+.noteentry .tasklist-embed-count:is(#pz-specificity-boost, *) {
+    font-size: 12px !important;
+}
+
+.noteentry .tasklist-embed-count {
+    margin-left: auto;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.noteentry .tasklist-embed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.noteentry .tasklist-embed-task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 4px 2px;
+    border-radius: 4px;
+    min-width: 0;
+}
+
+.noteentry .tasklist-embed-task:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.noteentry .tasklist-embed-checkbox {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    accent-color: #007DB8;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.noteentry .tasklist-embed-text {
+    flex: 1;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.noteentry .tasklist-embed-task.completed .tasklist-embed-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+.noteentry .tasklist-embed-star {
+    color: #f39c12;
+    flex-shrink: 0;
+}
+
+.noteentry .tasklist-embed-due:is(#pz-specificity-boost, *) {
+    font-size: 12px !important;
+}
+
+.noteentry .tasklist-embed-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #666;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.noteentry .tasklist-embed-due.overdue {
+    color: #dc3545;
+}
+
+.noteentry .tasklist-embed-empty:is(#pz-specificity-boost, *),
+.noteentry .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
+    font-size: 13px !important;
+}
+
+.noteentry .tasklist-embed-empty,
+.noteentry .tasklist-embed-unavailable {
+    color: #888;
+    font-style: italic;
+    margin-top: 8px;
+}

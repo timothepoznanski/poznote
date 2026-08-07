@@ -774,6 +774,9 @@
         const byId = new Map();
         container.querySelectorAll('a[href], a[data-note-id]').forEach(link => {
             if (link.classList.contains('note-link-broken')) return;
+            // Embedded task-list fallback links have their own unavailable state
+            // rendered by tasklist-embed.js
+            if (link.closest('.tasklist-embed')) return;
             const id = extractInternalNoteId(link);
             if (!id) return;
             if (!byId.has(id)) byId.set(id, []);

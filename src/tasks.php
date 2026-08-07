@@ -66,10 +66,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
 				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
 			</button>
-			<button id="addTaskBtn" class="btn btn-add-task" title="<?php echo t_h('tasks_page.add_task', [], 'Add task'); ?>">
-				<i class="lucide lucide-plus" style="margin-right: 5px;"></i>
-				<?php echo t_h('tasks_page.add_task', [], 'Add task'); ?>
-			</button>
 		</div>
 
 		<div id="tasksProgressSection" class="tasks-progress-section initially-hidden">
@@ -102,6 +98,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
+			<div class="tasks-collapse-actions">
+				<button id="collapseAllBtn" class="tasks-collapse-btn" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
+					<i class="lucide lucide-chevron-up"></i>
+				</button>
+				<button id="expandAllBtn" class="tasks-collapse-btn" title="<?php echo t_h('tasks_page.expand_all', [], 'Expand all'); ?>">
+					<i class="lucide lucide-chevron-down"></i>
+				</button>
+			</div>
 		</div>
 
 		<div class="tasks-content">
@@ -116,27 +120,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 		</div>
 	</div>
 
-	<?php include 'quick_task_modal.php'; ?>
 	<?php include 'task_due_modal.php'; ?>
 
-	<script>
-	// Minimal shims for the quick-task machinery in tasklist.js: translated
-	// dynamic strings and the page workspace
-	window.__pzTasksPageTranslations = {
-		'modals.task_move.loading': <?php echo json_encode(t('modals.task_move.loading', [], 'Loading...')); ?>,
-		'modals.task_move.empty': <?php echo json_encode(t('modals.task_move.empty', [], 'No task lists found.')); ?>,
-		'modals.task_move.error': <?php echo json_encode(t('modals.task_move.error', [], 'Unable to load task lists.')); ?>,
-		'modals.quick_task.adding': <?php echo json_encode(t('modals.quick_task.adding', [], 'Adding task...')); ?>,
-		'modals.quick_task.error': <?php echo json_encode(t('modals.quick_task.error', [], 'Unable to add task')); ?>,
-		'note_reference.untitled': <?php echo json_encode(t('common.untitled', [], 'Untitled')); ?>
-	};
-	window.t = function (key, params, fallback) {
-		return window.__pzTasksPageTranslations[key] || fallback || key;
-	};
-	window.getSelectedWorkspace = function () {
-		return document.body.getAttribute('data-workspace') || '';
-	};
-	</script>
 	<script>
 	window.calendarTranslations = {
 		months: <?php echo json_encode(array_map(static function ($m) {
@@ -155,7 +140,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/task-due-modal.js?v=<?php echo $cache_v; ?>"></script>
-	<script src="js/tasklist.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/tasks-page.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

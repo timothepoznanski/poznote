@@ -338,6 +338,11 @@ body.dark-mode .move-task-item small {
     color: #a8a8a8;
 }
 
+html[data-theme='dark'] .move-task-item.move-task-create,
+body.dark-mode .move-task-item.move-task-create {
+    color: #60a5fa;
+}
+
 /* ============================================
    Move Folder Files Modal
    ============================================ */

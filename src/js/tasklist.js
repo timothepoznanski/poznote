@@ -1397,287 +1397,67 @@ async function executeMoveTask() {
     }
 }
 
-// Quick-capture a task into any tasklist note (opened by the /task slash command)
-let quickTaskState = {
-    targetNoteId: null,
-    notes: [],
-    onAdded: null
-};
+// Offer to create a task list named after the search query when no existing
+// list has that exact name (used by the task-list picker modal)
+function appendCreateTaskListRow(listEl, notes, query, onCreated) {
+    const name = (query || '').trim();
+    if (!name) return;
 
-const QUICK_TASK_TARGET_KEY = 'poznote-quick-task-target';
+    const exists = (notes || []).some(n => (n.heading || '').trim().toLowerCase() === name.toLowerCase());
+    if (exists) return;
 
-function getQuickTaskStorage() {
-    return window.__poznoteUserStorage || window.localStorage;
-}
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'move-task-item move-task-create';
 
-function openQuickTaskModal(prefillText, options) {
-    const modal = document.getElementById('quickTaskModal');
-    if (!modal) return;
+    const icon = document.createElement('i');
+    icon.className = 'lucide lucide-plus';
+    item.appendChild(icon);
 
-    quickTaskState = {
-        targetNoteId: null,
-        notes: [],
-        onAdded: (options && typeof options.onAdded === 'function') ? options.onAdded : null
-    };
+    const label = document.createElement('span');
+    label.textContent = (window.t ? window.t('modals.task_move.create_new', null, 'Create task list') : 'Create task list')
+        + ' "' + name + '"';
+    item.appendChild(label);
 
-    attachQuickTaskModalHandlers(modal);
-
-    const textInput = document.getElementById('quickTaskTextInput');
-    if (textInput) {
-        textInput.value = typeof prefillText === 'string' ? prefillText : '';
-    }
-
-    const searchInput = document.getElementById('quickTaskSearchInput');
-    if (searchInput) searchInput.value = '';
-
-    const list = document.getElementById('quickTaskList');
-    if (list) list.innerHTML = '';
-
-    updateQuickTaskConfirmState();
-
-    modal.style.display = 'flex';
-    loadQuickTaskTargets('');
-
-    if (textInput) {
-        setTimeout(function() { textInput.focus(); }, 0);
-    }
-}
-
-window.openQuickTaskModal = openQuickTaskModal;
-
-function attachQuickTaskModalHandlers(modal) {
-    if (modal.dataset.handlersAttached === 'true') return;
-
-    const searchInput = document.getElementById('quickTaskSearchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            loadQuickTaskTargets(e.target.value || '');
-        });
-    }
-
-    const textInput = document.getElementById('quickTaskTextInput');
-    if (textInput) {
-        textInput.addEventListener('input', updateQuickTaskConfirmState);
-        textInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                executeQuickTaskAdd();
-            }
-        });
-    }
-
-    const confirmBtn = document.getElementById('confirmQuickTaskBtn');
-    if (confirmBtn) {
-        confirmBtn.addEventListener('click', executeQuickTaskAdd);
-    }
-
-    modal.dataset.handlersAttached = 'true';
-}
-
-function updateQuickTaskConfirmState() {
-    const confirmBtn = document.getElementById('confirmQuickTaskBtn');
-    const textInput = document.getElementById('quickTaskTextInput');
-    if (!confirmBtn) return;
-
-    const hasText = !!(textInput && textInput.value.trim());
-    confirmBtn.disabled = !(hasText && quickTaskState.targetNoteId);
-}
-
-async function loadQuickTaskTargets(searchQuery) {
-    const list = document.getElementById('quickTaskList');
-    if (!list) return;
-
-    list.innerHTML = '<div class="move-task-empty">' +
-        (window.t ? window.t('modals.task_move.loading', null, 'Loading...') : 'Loading...') +
-        '</div>';
-
-    try {
-        const workspace = getCurrentWorkspace();
-        const response = await fetch(`/api/v1/notes?workspace=${encodeURIComponent(workspace)}`);
-        const data = await response.json();
-
-        let notes = (data && data.success && Array.isArray(data.notes)) ? data.notes : [];
-
-        notes = notes.filter(n => n.type === 'tasklist');
-
-        if (searchQuery && searchQuery.trim()) {
-            const q = searchQuery.toLowerCase().trim();
-            notes = notes.filter(n => (n.heading || '').toLowerCase().includes(q));
-        }
-
-        quickTaskState.notes = notes;
-
-        // Preselect the last used target when it is still available
-        if (!quickTaskState.targetNoteId) {
-            let lastTarget = null;
-            try {
-                lastTarget = getQuickTaskStorage().getItem(QUICK_TASK_TARGET_KEY);
-            } catch (e) { }
-            if (lastTarget && notes.some(n => String(n.id) === String(lastTarget))) {
-                quickTaskState.targetNoteId = lastTarget;
-            }
-        }
-
-        renderQuickTaskTargets(notes);
-        updateQuickTaskConfirmState();
-    } catch (e) {
-        list.innerHTML = '<div class="move-task-empty">' +
-            (window.t ? window.t('modals.task_move.error', null, 'Unable to load task lists.') : 'Unable to load task lists.') +
-            '</div>';
-    }
-}
-
-function renderQuickTaskTargets(notes) {
-    const list = document.getElementById('quickTaskList');
-    if (!list) return;
-
-    list.innerHTML = '';
-
-    if (!notes || notes.length === 0) {
-        list.innerHTML = '<div class="move-task-empty">' +
-            (window.t ? window.t('modals.task_move.empty', null, 'No task lists found.') : 'No task lists found.') +
-            '</div>';
-        return;
-    }
-
-    notes.forEach(note => {
-        const item = document.createElement('button');
-        item.type = 'button';
-        item.className = 'move-task-item';
-
-        if (String(note.id) === String(quickTaskState.targetNoteId)) {
-            item.classList.add('selected');
-        }
-
-        const title = note.heading || (window.t ? window.t('note_reference.untitled', null, 'Untitled') : 'Untitled');
-
-        const titleSpan = document.createElement('span');
-        titleSpan.textContent = title;
-
-        item.appendChild(titleSpan);
-
-        if (note.folder) {
-            const meta = document.createElement('small');
-            meta.textContent = note.folder;
-            item.appendChild(meta);
-        }
-
-        item.addEventListener('click', function() {
-            quickTaskState.targetNoteId = note.id;
-            const items = list.querySelectorAll('.move-task-item');
-            items.forEach(el => el.classList.remove('selected'));
-            item.classList.add('selected');
-            updateQuickTaskConfirmState();
-        });
-
-        list.appendChild(item);
-    });
-}
-
-async function executeQuickTaskAdd() {
-    const textInput = document.getElementById('quickTaskTextInput');
-    const targetNoteId = quickTaskState.targetNoteId;
-    const taskText = textInput ? textInput.value.trim() : '';
-
-    if (!targetNoteId || !taskText) return;
-
-    const spinner = (window.modalAlert && typeof window.modalAlert.showSpinner === 'function')
-        ? window.modalAlert.showSpinner(
-            window.t ? window.t('modals.quick_task.adding', null, 'Adding task...') : 'Adding task...'
-        )
-        : null;
-
-    try {
-        const workspace = getCurrentWorkspace();
-        const noteResp = await fetch(`/api/v1/notes/${targetNoteId}?workspace=${encodeURIComponent(workspace)}`);
-        const noteData = await noteResp.json();
-
-        if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
-            throw new Error('quick task target unavailable');
-        }
-
-        let targetTasks = [];
+    item.addEventListener('click', async function() {
+        if (item.disabled) return;
+        item.disabled = true;
         try {
-            targetTasks = JSON.parse(noteData.note.content || '[]');
-            if (!Array.isArray(targetTasks)) targetTasks = [];
+            const created = await createNamedTaskListNote(name);
+            onCreated(created);
         } catch (e) {
-            targetTasks = [];
+            item.disabled = false;
+            if (window.modalAlert) {
+                window.modalAlert.alert(
+                    window.t ? window.t('modals.task_move.create_error', null, 'Unable to create task list') : 'Unable to create task list',
+                    'error'
+                );
+            }
         }
+    });
 
-        const newTask = {
-            id: Date.now() + Math.random(),
-            text: taskText,
-            completed: false,
-            noteId: targetNoteId,
-            important: false,
-            dueAt: null
-        };
-
-        const insertOrder = await getTasklistInsertOrder();
-        targetTasks = insertTaskWithOrder(targetTasks, newTask, insertOrder);
-
-        // Pass the tab's editor session id so the save is allowed when this
-        // tab holds (or can acquire) the note's edit lock, like kanban.js does.
-        const editorSessionId = (typeof window.getCurrentEditorSessionId === 'function')
-            ? window.getCurrentEditorSessionId()
-            : '';
-        const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-        const payload = { content: JSON.stringify(targetTasks) };
-        if (editorSessionId) {
-            headers['X-Editor-Session-ID'] = editorSessionId;
-            payload.editor_session_id = editorSessionId;
-        }
-
-        const updateResp = await fetch(`/api/v1/notes/${targetNoteId}`, {
-            method: 'PATCH',
-            headers: headers,
-            credentials: 'same-origin',
-            body: JSON.stringify(payload)
-        });
-
-        const updateData = await updateResp.json();
-        if (!updateData || !updateData.success) {
-            throw new Error('quick task save failed');
-        }
-
-        try {
-            getQuickTaskStorage().setItem(QUICK_TASK_TARGET_KEY, String(targetNoteId));
-        } catch (e) { }
-
-        // If the target note is open in the current view, refresh its list
-        const targetEntry = document.getElementById('entry' + targetNoteId);
-        if (targetEntry && targetEntry.getAttribute('data-note-type') === 'tasklist') {
-            saveAndRenderTasks(targetNoteId, targetTasks);
-        }
-
-        if (typeof closeModal === 'function') {
-            closeModal('quickTaskModal');
-        } else {
-            const modal = document.getElementById('quickTaskModal');
-            if (modal) modal.style.display = 'none';
-        }
-
-        const addedTarget = {
-            id: targetNoteId,
-            heading: (noteData.note.heading || '')
-        };
-        if (quickTaskState.onAdded) {
-            try {
-                quickTaskState.onAdded(addedTarget);
-            } catch (e) { }
-        }
-        document.dispatchEvent(new CustomEvent('poznote-quick-task-added', { detail: addedTarget }));
-    } catch (e) {
-        if (window.modalAlert) {
-            window.modalAlert.alert(
-                window.t ? window.t('modals.quick_task.error', null, 'Unable to add task') : 'Unable to add task',
-                'error'
-            );
-        }
-    } finally {
-        if (spinner && typeof spinner.close === 'function') spinner.close();
-    }
+    listEl.appendChild(item);
 }
+
+// Named to avoid the global createTaskListNote from notes.js/index-events.js
+// (the toolbar action that creates an empty "New note" tasklist and navigates)
+async function createNamedTaskListNote(heading) {
+    const workspace = getCurrentWorkspace();
+    const response = await fetch('/api/v1/notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ heading: heading, type: 'tasklist', content: '[]', workspace: workspace })
+    });
+    const data = await response.json();
+    if (!data || !data.success || !data.note) {
+        throw new Error('create task list failed');
+    }
+    return { id: data.note.id, heading: data.note.heading || heading };
+}
+
+window.poznoteAppendCreateTaskListRow = appendCreateTaskListRow;
+window.poznoteCreateTaskListNote = createNamedTaskListNote;
 
 function insertTaskWithOrder(tasks, task, insertOrder) {
     const { important, normal, completed } = groupTasksByStatus(tasks);

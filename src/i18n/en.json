@@ -840,7 +840,14 @@
       "empty": "No task lists found.",
       "moving": "Moving task...",
       "error": "Could not load task lists.",
-      "confirm": "Move task"
+      "confirm": "Move task",
+      "create_new": "Create task list",
+      "create_error": "Unable to create task list"
+    },
+    "tasklist_picker": {
+      "title": "Insert task list",
+      "description": "Choose the task list to display in this note.",
+      "confirm": "Insert"
     },
     "note_sort": {
       "title": "Note sort order",
@@ -935,14 +942,6 @@
         "user_s3_restore": "S3 restore on the Restore page",
         "user_s3_restore_help": "Non-admin users no longer see the Restore from S3 section of the Restore / Import page and cannot restore bucket archives."
       }
-    },
-    "quick_task": {
-      "title": "Add task",
-      "text_placeholder": "What needs to be done?",
-      "description": "Choose the task list to add this task to.",
-      "confirm": "Add task",
-      "adding": "Adding task...",
-      "error": "Unable to add task"
     }
   },
   "notes_list": {
@@ -1102,7 +1101,7 @@
     "audio_invalid_file": "Please select an audio file.",
     "audio_upload_failed": "Upload failed: {{error}}",
     "date": "Date",
-    "task": "Add task"
+    "tasklist_embed": "Task list"
   },
   "api": {
     "settings": {
@@ -3045,9 +3044,10 @@
     "filter_placeholder": "Filter by task, title or folder name...",
     "empty": "No tasks yet. Create a task list note to get started.",
     "empty_filtered": "No tasks match this filter.",
-    "add_task": "Add task",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "collapse_all": "Collapse all",
+    "expand_all": "Expand all"
   },
   "s3_settings": {
     "title": "S3 Attachment Storage",
@@ -3142,5 +3142,9 @@
     "users_label": "Users to back up",
     "master_label": "Enable S3 backups",
     "master_description": "Master switch. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user."
+  },
+  "tasklist_embed": {
+    "unavailable": "This task list is no longer available.",
+    "empty": "No tasks in this list yet."
   }
 }

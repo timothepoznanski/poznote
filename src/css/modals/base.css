@@ -580,6 +580,23 @@ body.dark-mode .note-palette-remove:hover {
     padding: 8px;
 }
 
+/* "Create task list ..." row appended after the search results */
+.move-task-item.move-task-create {
+    justify-content: flex-start;
+    color: #2563eb;
+}
+
+.move-task-item.move-task-create span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.move-task-item.move-task-create:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
 /* ============================================
    Modal Footer
    ============================================ */

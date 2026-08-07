@@ -944,3 +944,53 @@ html[data-theme='dark'] .toolbar-btn.btn-ai-chat.ai-chat-active i,
 body.dark-mode .toolbar-btn.btn-ai-chat.ai-chat-active i {
     color: var(--dm-accent);
 }
+
+/* ============================================
+   Embedded task list in a regular note (tasklist-embed.js)
+   ============================================ */
+
+html[data-theme='dark'] .tasklist-embed-widget,
+body.dark-mode .tasklist-embed-widget {
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .tasklist-embed-task:hover,
+body.dark-mode .tasklist-embed-task:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+html[data-theme='dark'] .tasklist-embed-toggle,
+body.dark-mode .tasklist-embed-toggle {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .tasklist-embed-toggle:hover,
+body.dark-mode .tasklist-embed-toggle:hover {
+    color: #4da3d0;
+}
+
+/* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
+   blanket from dark-mode/editor.css */
+html[data-theme='dark'] .tasklist-embed-count:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-count:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .tasklist-embed-due:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-due:is(#pz-specificity-boost, *) {
+    color: #a8a8a8 !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-due.overdue:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-due.overdue:is(#pz-specificity-boost, *) {
+    color: #ff6b6b !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-task.completed .tasklist-embed-text:is(#pz-specificity-boost, *) {
+    color: #8a8a8a !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-empty:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-empty:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
+    color: #8a8a8a !important;
+}

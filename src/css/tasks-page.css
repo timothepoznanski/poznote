@@ -22,14 +22,24 @@ body.tasks-page {
     margin-bottom: 30px;
 }
 
-/* Progress section */
+/* Progress section. On desktop the title, progress bar and label share one
+   row (the header wrapper is flattened with display: contents); the mobile
+   media query restores the stacked layout. */
 .tasks-progress-section {
     max-width: 900px;
     margin: 0 auto 25px auto;
+    align-items: center;
+    gap: 16px;
+}
+
+/* :not() keeps the initially-hidden utility (display: none) in charge until
+   the first load reveals the section */
+.tasks-progress-section:not(.initially-hidden) {
+    display: flex;
 }
 
 .tasks-progress-header {
-    display: flex;
+    display: contents;
     flex-direction: column;
     align-items: flex-start;
     gap: 14px;
@@ -43,6 +53,8 @@ body.tasks-page {
     font-size: 24px;
     font-weight: 600;
     margin: 0;
+    order: 1;
+    flex-shrink: 0;
 }
 
 .tasks-title i {
@@ -53,6 +65,8 @@ body.tasks-page {
     font-size: 13px;
     color: #666;
     white-space: nowrap;
+    order: 3;
+    flex-shrink: 0;
 }
 
 .tasks-progress-bar {
@@ -60,6 +74,8 @@ body.tasks-page {
     border-radius: 4px;
     background-color: #e9ecef;
     overflow: hidden;
+    order: 2;
+    flex: 1;
 }
 
 .tasks-progress-fill {
@@ -70,12 +86,13 @@ body.tasks-page {
     transition: width 0.3s ease;
 }
 
-/* Filter bar */
+/* Filter bar. On desktop the filter input sits on the same row, to the right
+   of the filter chips; the mobile media query restores the stacked layout. */
 .tasks-filter-bar {
     max-width: 900px;
     margin: 0 auto 25px auto;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 12px;
 }
 
@@ -83,6 +100,7 @@ body.tasks-page {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .tasks-filter-chip {
@@ -110,16 +128,19 @@ body.tasks-page {
 .filter-input-wrapper {
     position: relative;
     flex: 1;
+    min-width: 180px;
     display: flex;
     align-items: center;
 }
 
 .filter-input {
     width: 100%;
-    padding: 10px 40px 10px 12px;
+    /* Same vertical metrics as the filter chips (6px padding, 13px font) so
+       both end up the same height on the shared row */
+    padding: 6px 36px 6px 12px;
     border: 1px solid var(--border-color, #e0e0e0);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--text-color, #333333);
     background-color: var(--input-bg, #ffffff);
     transition: all 0.2s ease;
@@ -147,6 +168,33 @@ body.tasks-page {
 }
 
 .clear-filter-btn:hover {
+    color: #007DB8;
+}
+
+/* Collapse-all / expand-all chevrons, right of the filter input */
+.tasks-collapse-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.tasks-collapse-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color, #333333);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-collapse-btn:hover {
+    border-color: #007DB8;
     color: #007DB8;
 }
 
@@ -357,17 +405,6 @@ body.tasks-page {
     color: white;
 }
 
-.btn-add-task {
-    display: inline-flex;
-    align-items: center;
-    background: #007DB8;
-    color: white;
-}
-
-.btn-add-task:hover {
-    background: #006a9c;
-}
-
 .loading-spinner {
     text-align: center;
     padding: 40px;
@@ -416,7 +453,23 @@ body.tasks-page {
         font-size: 20px;
     }
 
+    /* Stacked layout: title and label above the full-width progress bar */
+    .tasks-progress-section:not(.initially-hidden) {
+        display: block;
+    }
+
+    /* Stacked layout: filter input below the filter chips */
+    .tasks-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .tasks-collapse-actions {
+        justify-content: flex-end;
+    }
+
     .tasks-progress-header {
+        display: flex;
         gap: 20px;
     }
 
@@ -466,6 +519,16 @@ html[data-theme="dark"]:has(body.tasks-page) {
     background-color: #007DB8;
     border-color: #007DB8;
     color: #ffffff;
+}
+
+[data-theme="dark"] .tasks-collapse-btn {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-collapse-btn:hover {
+    border-color: #007DB8;
+    color: #007DB8;
 }
 
 [data-theme="dark"] .tasks-progress-bar {
