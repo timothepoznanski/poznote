@@ -3423,6 +3423,7 @@
     "skip_s3_description": "Wenn Anhänge in einem S3-Bucket liegen (S3-Speicher-Funktion), werden sie nicht in die Archive aufgenommen, statt sie bei jeder Sicherung herunterzuladen. Anhänge auf der lokalen Festplatte werden immer aufgenommen.",
     "manual_title": "Manuelle Sicherung",
     "manual_description": "Sichert jetzt sofort die ausgewählten Benutzer in den Bucket, einen Benutzer nach dem anderen.",
+    "manual_retention_warning": "Jede Sicherung zählt zur Aufbewahrungsgrenze: Eine automatische Sicherung kann daher ein manuelles Archiv löschen, ebenso wie eine manuelle Sicherung ein automatisches löschen kann. Um ein Archiv dauerhaft zu behalten, laden Sie es herunter.",
     "run_now": "Jetzt sichern",
     "confirm_run": "Jetzt die ausgewählten Benutzer in den Bucket sichern?",
     "running": "Sichere {{username}}... ({{done}}/{{total}})",

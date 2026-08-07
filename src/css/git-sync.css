@@ -36,6 +36,13 @@ body.git-sync-page {
     max-width: 600px;
     margin: 0 auto;
 }
+
+.git-sync-description-left {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+}
 /* Alerts */
 .alert {
     padding: 12px 16px;

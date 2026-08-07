@@ -182,7 +182,11 @@ $allBackupUsers = listAllUserProfiles();
     .s3-backup-user-badge.is-inactive { background: rgba(220,53,69,0.15); color: #dc3545; }
     .s3-backup-users-empty { padding: 12px; font-size: 0.9rem; opacity: 0.7; }
     .s3-backup-users-count { font-size: 0.85rem; opacity: 0.75; margin-top: 6px; }
-    #s3-backup-manual-desc { margin-bottom: 18px; }
+    /* Beat .git-sync-description's centering max-width/auto margins (ID wins) */
+    #s3-backup-manual-desc { margin: 0 0 10px; max-width: none; text-align: left; }
+    .s3-backup-retention-warning { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 18px; text-align: left; font-size: 0.9rem; color: #8a6d3b; }
+    .s3-backup-retention-warning .lucide-alert-triangle { flex: none; margin-top: 2px; color: #f59e0b; background-color: #f59e0b; }
+    body.dark-mode .s3-backup-retention-warning { color: #d9b678; }
     </style>
 </head>
 <body class="home-page git-sync-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -393,7 +397,8 @@ $allBackupUsers = listAllUserProfiles();
 
         <div class="git-sync-section">
             <h2><i class="lucide lucide-upload"></i> <?php echo t_h('s3_backup.manual_title', [], 'Manual backup'); ?></h2>
-            <p class="git-sync-description" id="s3-backup-manual-desc"><?php echo t_h('s3_backup.manual_description', [], 'Back up the selected users to the bucket right now, one user at a time.'); ?></p>
+            <p class="git-sync-description git-sync-description-left" id="s3-backup-manual-desc"><?php echo t_h('s3_backup.manual_description', [], 'Back up the selected users to the bucket right now, one user at a time.'); ?></p>
+            <p class="s3-backup-retention-warning"><i class="lucide lucide-alert-triangle"></i><span><?php echo t_h('s3_backup.manual_retention_warning', [], 'Every backup counts toward the retention limit, so a scheduled run can delete a manual archive just as a manual run can delete a scheduled one. To keep an archive for good, download it.'); ?></span></p>
 
             <div class="git-field-actions">
                 <button type="button" id="s3-backup-run-btn" class="btn btn-primary">

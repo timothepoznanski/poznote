@@ -3547,6 +3547,7 @@
     "skip_s3_description": "当附件位于 S3 存储桶中(S3 存储功能)时,不将其包含在归档中,而不是每次备份都下载。本地磁盘上的附件始终包含。",
     "manual_title": "手动备份",
     "manual_description": "立即将选定的用户备份到存储桶,一次一个用户。",
+    "manual_retention_warning": "每次备份都计入保留数量上限:自动备份可能删除手动归档,手动备份同样可能删除自动归档。如需永久保留某个归档,请将其下载。",
     "run_now": "立即备份",
     "confirm_run": "现在将选定的用户备份到存储桶?",
     "running": "正在备份 {{username}}... ({{done}}/{{total}})",

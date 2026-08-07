@@ -3426,6 +3426,7 @@
     "skip_s3_description": "Quando os anexos vivem em um bucket S3 (função de armazenamento S3), eles ficam fora dos arquivos em vez de serem baixados a cada backup. Anexos no disco local são sempre incluídos.",
     "manual_title": "Backup manual",
     "manual_description": "Faz backup agora dos usuários selecionados para o bucket, um usuário por vez.",
+    "manual_retention_warning": "Cada backup conta para o limite de retenção: um backup automático pode excluir um arquivo manual, assim como um backup manual pode excluir um automático. Para manter um arquivo definitivamente, baixe-o.",
     "run_now": "Fazer backup agora",
     "confirm_run": "Fazer backup agora dos usuários selecionados para o bucket?",
     "running": "Fazendo backup de {{username}}... ({{done}}/{{total}})",

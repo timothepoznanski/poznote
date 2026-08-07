@@ -3423,6 +3423,7 @@
     "skip_s3_description": "Cuando los adjuntos viven en un bucket S3 (función de almacenamiento S3), se dejan fuera de los archivos en lugar de descargarlos en cada copia. Los adjuntos en el disco local siempre se incluyen.",
     "manual_title": "Copia de seguridad manual",
     "manual_description": "Respalda ahora mismo a los usuarios seleccionados en el bucket, un usuario a la vez.",
+    "manual_retention_warning": "Cada copia cuenta para el límite de conservación: una copia automática puede eliminar un archivo manual, igual que una copia manual puede eliminar uno automático. Para conservar un archivo de forma definitiva, descárgalo.",
     "run_now": "Respaldar ahora",
     "confirm_run": "¿Respaldar ahora a los usuarios seleccionados en el bucket?",
     "running": "Respaldando a {{username}}... ({{done}}/{{total}})",

@@ -3120,6 +3120,7 @@
     "skip_s3_description": "When attachments live in an S3 bucket (S3 storage feature), leave them out of the archives instead of downloading them for every backup. Attachments on local disk are always included.",
     "manual_title": "Manual backup",
     "manual_description": "Back up the selected users to the bucket right now, one user at a time.",
+    "manual_retention_warning": "Every backup counts toward the retention limit, so a scheduled run can delete a manual archive just as a manual run can delete a scheduled one. To keep an archive for good, download it.",
     "run_now": "Back up now",
     "confirm_run": "Back up the selected users to the bucket now?",
     "running": "Backing up {{username}}... ({{done}}/{{total}})",
