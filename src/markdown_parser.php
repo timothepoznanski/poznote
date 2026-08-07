@@ -895,6 +895,8 @@ function parseMarkdown($text) {
 
             $previousResult = count($result) > 0 ? $result[count($result) - 1] : '';
             $isPreviousCodeBlockElement = preg_match('/^<pre\b|^<div class="mermaid"\b/', $previousResult) === 1;
+            $isPreviousTaskEmbed = preg_match('/^<div class="tasklist-embed"/', $previousResult) === 1;
+            $isNextTaskEmbed = ($i + 1 < count($lines)) && preg_match('/^\s*\x00PTASKEMBED\d+\x00\s*$/', $lines[$i + 1]) === 1;
             
             // Check if the next non-empty line is a block element (code block, header, list, etc.)
             // If so, don't add blank line placeholders as block elements have their own spacing
@@ -922,14 +924,21 @@ function parseMarkdown($text) {
             // Preserve blank lines based on context:
             // - Before block elements or after code blocks: keep (count - 1) blank lines
             // - Between regular text blocks: keep all blank lines
-            if ($isNextBlockElement || $isPreviousCodeBlockElement) {
-                for ($bl = 0; $bl < ($blankLineCount - 1); $bl++) {
-                    $result[] = '<p class="blank-line">&nbsp;</p>';
-                }
-            } else {
-                for ($bl = 0; $bl < $blankLineCount; $bl++) {
-                    $result[] = '<p class="blank-line">&nbsp;</p>';
-                }
+            $placeholdersToAdd = ($isNextBlockElement || $isPreviousCodeBlockElement)
+                ? max($blankLineCount - 1, 0)
+                : $blankLineCount;
+            // The task-embed protection adds a synthetic newline on each side
+            // of the marker; swallow it plus the single authored blank line so
+            // the widget sits flush against the surrounding text (no spacer
+            // above or below the widget)
+            if ($isNextTaskEmbed) {
+                $placeholdersToAdd = max($blankLineCount - 2, 0);
+            }
+            if ($isPreviousTaskEmbed) {
+                $placeholdersToAdd = max($placeholdersToAdd - 2, 0);
+            }
+            for ($bl = 0; $bl < $placeholdersToAdd; $bl++) {
+                $result[] = '<p class="blank-line">&nbsp;</p>';
             }
             continue;
         }

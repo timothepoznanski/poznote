@@ -3059,6 +3059,8 @@ function parseMarkdown(text) {
 
             let previousResult = result.length > 0 ? result[result.length - 1] : '';
             let isPreviousCodeBlockElement = /^<pre\b/.test(previousResult) || /^<div class="mermaid"\b/.test(previousResult);
+            let isPreviousTaskEmbed = /^<div class="tasklist-embed"/.test(previousResult);
+            let isNextTaskEmbed = (i + 1 < lines.length) && /^\s*\x00PTASKEMBED\d+\x00\s*$/.test(lines[i + 1]);
 
             // Avoid adding a full blank placeholder right before block elements,
             // because those already contribute their own top spacing.
@@ -3086,6 +3088,16 @@ function parseMarkdown(text) {
             // Block elements already contribute their own spacing; regular text keeps
             // authored blank lines visible unless the previous block was a code block.
             let placeholdersToAdd = (isNextBlockElement || isPreviousCodeBlockElement) ? Math.max(blankLineCount - 1, 0) : blankLineCount;
+            // The task-embed protection adds a synthetic newline on each side
+            // of the marker; swallow it plus the single authored blank line so
+            // the widget sits flush against the surrounding text (no spacer
+            // above or below the widget)
+            if (isNextTaskEmbed) {
+                placeholdersToAdd = Math.max(blankLineCount - 2, 0);
+            }
+            if (isPreviousTaskEmbed) {
+                placeholdersToAdd = Math.max(placeholdersToAdd - 2, 0);
+            }
             for (let bl = 0; bl < placeholdersToAdd; bl++) {
                 result.push('<p class="blank-line">&nbsp;</p>');
             }
