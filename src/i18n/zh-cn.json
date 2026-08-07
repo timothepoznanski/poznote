@@ -3569,7 +3569,16 @@
     },
     "users_label": "要备份的用户",
     "master_label": "启用 S3 备份",
-    "master_description": "主开关。禁用后,自动备份停止,所有用户的 S3 备份和恢复部分都会消失。"
+    "master_description": "主开关。禁用后,自动备份停止,所有用户的 S3 备份和恢复部分都会消失。",
+    "users_filter_placeholder": "按姓名、用户名或邮箱筛选...",
+    "users_filter_clear": "清除筛选",
+    "users_select_all": "全选",
+    "users_select_none": "取消全选",
+    "users_no_match": "没有符合此筛选条件的用户。",
+    "users_badge_admin": "管理员",
+    "users_badge_inactive": "已停用",
+    "users_count": "已选择 {{selected}}/{{total}} 位用户",
+    "users_count_filtered": "已选择 {{selected}}/{{total}} 位用户，显示 {{shown}} 位"
   },
   "tasklist_embed": {
     "unavailable": "此任务列表已不可用。",

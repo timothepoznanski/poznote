@@ -3142,7 +3142,16 @@
     },
     "users_label": "Users to back up",
     "master_label": "Enable S3 backups",
-    "master_description": "Master switch. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user."
+    "master_description": "Master switch. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user.",
+    "users_filter_placeholder": "Filter by name, username or email...",
+    "users_filter_clear": "Clear filter",
+    "users_select_all": "Select all",
+    "users_select_none": "Deselect all",
+    "users_no_match": "No user matches this filter.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inactive",
+    "users_count": "{{selected}} of {{total}} user(s) selected",
+    "users_count_filtered": "{{selected}} of {{total}} user(s) selected, {{shown}} shown"
   },
   "tasklist_embed": {
     "unavailable": "This task list is no longer available.",

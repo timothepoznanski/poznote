@@ -3445,7 +3445,16 @@
     },
     "users_label": "Usuarios a respaldar",
     "master_label": "Activar las copias de seguridad S3",
-    "master_description": "Interruptor principal. Cuando está desactivado, las copias automáticas se detienen y las secciones de copia de seguridad y restauración S3 desaparecen para todos los usuarios."
+    "master_description": "Interruptor principal. Cuando está desactivado, las copias automáticas se detienen y las secciones de copia de seguridad y restauración S3 desaparecen para todos los usuarios.",
+    "users_filter_placeholder": "Filtrar por nombre, usuario o correo...",
+    "users_filter_clear": "Borrar el filtro",
+    "users_select_all": "Seleccionar todo",
+    "users_select_none": "Deseleccionar todo",
+    "users_no_match": "Ningún usuario coincide con este filtro.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inactivo",
+    "users_count": "{{selected}} de {{total}} usuario(s) seleccionado(s)",
+    "users_count_filtered": "{{selected}} de {{total}} usuario(s) seleccionado(s), {{shown}} mostrado(s)"
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tareas ya no está disponible.",

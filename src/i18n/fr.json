@@ -3635,7 +3635,16 @@
     },
     "users_label": "Utilisateurs à sauvegarder",
     "master_label": "Activer les sauvegardes S3",
-    "master_description": "Interrupteur principal. Quand il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs."
+    "master_description": "Interrupteur principal. Quand il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs.",
+    "users_filter_placeholder": "Filtrer par nom, identifiant ou e-mail...",
+    "users_filter_clear": "Effacer le filtre",
+    "users_select_all": "Tout sélectionner",
+    "users_select_none": "Tout désélectionner",
+    "users_no_match": "Aucun utilisateur ne correspond à ce filtre.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inactif",
+    "users_count": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}",
+    "users_count_filtered": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}, {{shown}} affiché(s)"
   },
   "tasklist_embed": {
     "unavailable": "Cette liste de tâches n'est plus disponible.",

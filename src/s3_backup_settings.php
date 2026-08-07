@@ -131,9 +131,28 @@ $allBackupUsers = listAllUserProfiles();
     .s3-backup-table .btn-danger { background-color: #dc3545; color: #fff; }
     .s3-backup-table .btn-danger:hover { background-color: #b02a37; }
     .s3-backup-table-wrap { overflow-x: auto; }
-    .s3-backup-users { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 6px 0; }
-    .s3-backup-user-check { display: flex; align-items: center; gap: 6px; font-size: 0.95rem; cursor: pointer; }
-    .s3-backup-user-check input { cursor: pointer; }
+    .s3-backup-users-picker { margin: 6px 0; }
+    .s3-backup-users-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .s3-backup-users-search { position: relative; flex: 1 1 220px; min-width: 180px; }
+    .s3-backup-users-search .lucide-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity: 0.55; pointer-events: none; font-size: 0.95rem; }
+    #s3-backup-user-filter { width: 100%; padding-left: 32px; padding-right: 30px; margin: 0; }
+    .s3-backup-users-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 0.6; color: inherit; line-height: 1; }
+    .s3-backup-users-clear:hover { opacity: 1; }
+    .s3-backup-users-toolbar .btn { padding: 5px 12px; font-size: 0.85rem; margin: 0; }
+    .s3-backup-users-list { max-height: 260px; overflow-y: auto; border: 1px solid rgba(128,128,128,0.35); border-radius: 6px; }
+    #s3-backup-user-filter::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    .s3-backup-user-check { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; cursor: pointer; padding: 7px 12px; margin: 0; border-bottom: 1px solid rgba(128,128,128,0.18); }
+    /* [hidden] must beat the display:flex above, or filtered-out rows stay visible */
+    .s3-backup-user-check[hidden] { display: none; }
+    .s3-backup-user-check.is-last-visible { border-bottom: none; }
+    .s3-backup-user-check:hover { background: rgba(128,128,128,0.10); }
+    .s3-backup-user-check input { cursor: pointer; flex: none; margin: 0; }
+    .s3-backup-user-name { font-weight: 500; }
+    .s3-backup-user-meta { opacity: 0.65; font-size: 0.85rem; }
+    .s3-backup-user-badge { font-size: 0.75rem; padding: 1px 7px; border-radius: 10px; background: rgba(0,124,186,0.15); color: #007cba; white-space: nowrap; }
+    .s3-backup-user-badge.is-inactive { background: rgba(220,53,69,0.15); color: #dc3545; }
+    .s3-backup-users-empty { padding: 12px; font-size: 0.9rem; opacity: 0.7; }
+    .s3-backup-users-count { font-size: 0.85rem; opacity: 0.75; margin-top: 6px; }
     #s3-backup-manual-desc { margin-bottom: 18px; }
     </style>
 </head>
@@ -281,17 +300,50 @@ $allBackupUsers = listAllUserProfiles();
                     </div>
 
                     <div class="git-field-group">
-                        <label class="git-field-label"><?php echo t_h('s3_backup.users_label', [], 'Users to back up'); ?></label>
-                        <div class="s3-backup-users">
-                            <?php foreach ($allBackupUsers as $backupUser):
-                                $backupUserId = (int)$backupUser['id'];
-                                $isSelected = $backupConfig['user_ids'] === null || in_array($backupUserId, $backupConfig['user_ids'], true);
-                            ?>
-                            <label class="s3-backup-user-check">
-                                <input type="checkbox" name="s3_backup_users[]" value="<?php echo $backupUserId; ?>" <?php echo $isSelected ? 'checked' : ''; ?>>
-                                <?php echo htmlspecialchars($backupUser['username']); ?><?php echo !empty($backupUser['is_admin']) ? ' (Admin)' : ''; ?>
-                            </label>
-                            <?php endforeach; ?>
+                        <label class="git-field-label" for="s3-backup-user-filter"><?php echo t_h('s3_backup.users_label', [], 'Users to back up'); ?></label>
+                        <div class="s3-backup-users-picker">
+                            <div class="s3-backup-users-toolbar">
+                                <div class="s3-backup-users-search">
+                                    <i class="lucide lucide-search"></i>
+                                    <input type="search" id="s3-backup-user-filter" class="git-field-input"
+                                           placeholder="<?php echo t_h('s3_backup.users_filter_placeholder', [], 'Filter by name, username or email...'); ?>"
+                                           autocomplete="off">
+                                    <button type="button" class="s3-backup-users-clear" id="s3-backup-user-filter-clear" hidden
+                                            aria-label="<?php echo t_h('s3_backup.users_filter_clear', [], 'Clear filter'); ?>">
+                                        <i class="lucide lucide-x"></i>
+                                    </button>
+                                </div>
+                                <button type="button" class="btn btn-secondary" id="s3-backup-users-select-all"><?php echo t_h('s3_backup.users_select_all', [], 'Select all'); ?></button>
+                                <button type="button" class="btn btn-secondary" id="s3-backup-users-select-none"><?php echo t_h('s3_backup.users_select_none', [], 'Deselect all'); ?></button>
+                            </div>
+
+                            <div class="s3-backup-users-list" id="s3-backup-users-list">
+                                <?php foreach ($allBackupUsers as $backupUser):
+                                    $backupUserId = (int)$backupUser['id'];
+                                    $isSelected = $backupConfig['user_ids'] === null || in_array($backupUserId, $backupConfig['user_ids'], true);
+                                    $fullName = trim(((string)($backupUser['first_name'] ?? '')) . ' ' . ((string)($backupUser['last_name'] ?? '')));
+                                    $email = trim((string)($backupUser['email'] ?? ''));
+                                    $metaParts = array_values(array_filter([$fullName, $email], function ($part) { return $part !== ''; }));
+                                    $searchText = strtolower(trim($backupUser['username'] . ' ' . $fullName . ' ' . $email));
+                                ?>
+                                <label class="s3-backup-user-check" data-search="<?php echo htmlspecialchars($searchText, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <input type="checkbox" name="s3_backup_users[]" value="<?php echo $backupUserId; ?>" <?php echo $isSelected ? 'checked' : ''; ?>>
+                                    <span class="s3-backup-user-name"><?php echo htmlspecialchars($backupUser['username']); ?></span>
+                                    <?php if (!empty($metaParts)): ?>
+                                    <span class="s3-backup-user-meta"><?php echo htmlspecialchars(implode(' · ', $metaParts)); ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($backupUser['is_admin'])): ?>
+                                    <span class="s3-backup-user-badge"><?php echo t_h('s3_backup.users_badge_admin', [], 'Admin'); ?></span>
+                                    <?php endif; ?>
+                                    <?php if (empty($backupUser['active'])): ?>
+                                    <span class="s3-backup-user-badge is-inactive"><?php echo t_h('s3_backup.users_badge_inactive', [], 'Inactive'); ?></span>
+                                    <?php endif; ?>
+                                </label>
+                                <?php endforeach; ?>
+                                <div class="s3-backup-users-empty" id="s3-backup-users-empty" hidden><?php echo t_h('s3_backup.users_no_match', [], 'No user matches this filter.'); ?></div>
+                            </div>
+
+                            <div class="s3-backup-users-count" id="s3-backup-users-count"></div>
                         </div>
                     </div>
 
@@ -378,8 +430,76 @@ $allBackupUsers = listAllUserProfiles();
             download: <?php echo json_encode(t('s3_backup.download', [], 'Download')); ?>,
             deleteLabel: <?php echo json_encode(t('s3_backup.delete', [], 'Delete')); ?>,
             confirmDelete: <?php echo json_encode(t('s3_backup.confirm_delete', [], 'Delete the backup {{filename}} from the bucket?')); ?>,
-            manualTitle: <?php echo json_encode(t('s3_backup.manual_title', [], 'Manual backup')); ?>
+            manualTitle: <?php echo json_encode(t('s3_backup.manual_title', [], 'Manual backup')); ?>,
+            usersCount: <?php echo json_encode(t('s3_backup.users_count', [], '{{selected}} of {{total}} user(s) selected')); ?>,
+            usersCountFiltered: <?php echo json_encode(t('s3_backup.users_count_filtered', [], '{{selected}} of {{total}} user(s) selected, {{shown}} shown')); ?>
         };
+
+        // ---- Users picker (filter + bulk selection) -------------------------
+        (function() {
+            var listEl = document.getElementById('s3-backup-users-list');
+            if (!listEl) return;
+            var filterEl = document.getElementById('s3-backup-user-filter');
+            var clearEl = document.getElementById('s3-backup-user-filter-clear');
+            var emptyEl = document.getElementById('s3-backup-users-empty');
+            var countEl = document.getElementById('s3-backup-users-count');
+            var rows = Array.prototype.slice.call(listEl.querySelectorAll('.s3-backup-user-check'));
+
+            function visibleRows() {
+                return rows.filter(function(row) { return !row.hidden; });
+            }
+
+            function updateCount() {
+                var selected = rows.filter(function(row) { return row.querySelector('input').checked; }).length;
+                var shown = visibleRows().length;
+                var text = shown === rows.length
+                    ? i18n.usersCount
+                    : i18n.usersCountFiltered.replace('{{shown}}', shown);
+                countEl.textContent = text
+                    .replace('{{selected}}', selected)
+                    .replace('{{total}}', rows.length);
+            }
+
+            function applyFilter() {
+                var query = filterEl.value.trim().toLowerCase();
+                clearEl.hidden = query === '';
+                rows.forEach(function(row) {
+                    row.hidden = query !== '' && (row.getAttribute('data-search') || '').indexOf(query) === -1;
+                    row.classList.remove('is-last-visible');
+                });
+                var shown = visibleRows();
+                if (shown.length) shown[shown.length - 1].classList.add('is-last-visible');
+                emptyEl.hidden = shown.length > 0;
+                updateCount();
+            }
+
+            // Bulk actions only touch the rows the filter currently shows
+            function setVisible(checked) {
+                visibleRows().forEach(function(row) { row.querySelector('input').checked = checked; });
+                updateCount();
+            }
+
+            filterEl.addEventListener('input', applyFilter);
+            filterEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && filterEl.value !== '') {
+                    e.preventDefault();
+                    filterEl.value = '';
+                    applyFilter();
+                }
+            });
+            clearEl.addEventListener('click', function() {
+                filterEl.value = '';
+                applyFilter();
+                filterEl.focus();
+            });
+            document.getElementById('s3-backup-users-select-all').addEventListener('click', function() { setVisible(true); });
+            document.getElementById('s3-backup-users-select-none').addEventListener('click', function() { setVisible(false); });
+            listEl.addEventListener('change', function(e) {
+                if (e.target && e.target.type === 'checkbox') updateCount();
+            });
+
+            applyFilter();
+        })();
 
         function formatBytes(bytes) {
             if (bytes === null || bytes === undefined) return '';

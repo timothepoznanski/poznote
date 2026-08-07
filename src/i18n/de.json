@@ -3445,7 +3445,16 @@
     },
     "users_label": "Zu sichernde Benutzer",
     "master_label": "S3-Sicherungen aktivieren",
-    "master_description": "Hauptschalter. Wenn deaktiviert, stoppen die automatischen Sicherungen und die S3-Sicherungs- und Wiederherstellungsabschnitte verschwinden für alle Benutzer."
+    "master_description": "Hauptschalter. Wenn deaktiviert, stoppen die automatischen Sicherungen und die S3-Sicherungs- und Wiederherstellungsabschnitte verschwinden für alle Benutzer.",
+    "users_filter_placeholder": "Nach Name, Benutzername oder E-Mail filtern...",
+    "users_filter_clear": "Filter löschen",
+    "users_select_all": "Alle auswählen",
+    "users_select_none": "Auswahl aufheben",
+    "users_no_match": "Kein Benutzer entspricht diesem Filter.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inaktiv",
+    "users_count": "{{selected}} von {{total}} Benutzer(n) ausgewählt",
+    "users_count_filtered": "{{selected}} von {{total}} Benutzer(n) ausgewählt, {{shown}} angezeigt"
   },
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",

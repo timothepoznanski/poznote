@@ -3448,7 +3448,16 @@
     },
     "users_label": "Usuários a fazer backup",
     "master_label": "Ativar os backups S3",
-    "master_description": "Interruptor principal. Quando desativado, os backups automáticos param e as seções de backup e restauração S3 desaparecem para todos os usuários."
+    "master_description": "Interruptor principal. Quando desativado, os backups automáticos param e as seções de backup e restauração S3 desaparecem para todos os usuários.",
+    "users_filter_placeholder": "Filtrar por nome, utilizador ou e-mail...",
+    "users_filter_clear": "Limpar o filtro",
+    "users_select_all": "Selecionar tudo",
+    "users_select_none": "Desmarcar tudo",
+    "users_no_match": "Nenhum utilizador corresponde a este filtro.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inativo",
+    "users_count": "{{selected}} de {{total}} utilizador(es) selecionado(s)",
+    "users_count_filtered": "{{selected}} de {{total}} utilizador(es) selecionado(s), {{shown}} apresentado(s)"
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tarefas não está mais disponível.",
