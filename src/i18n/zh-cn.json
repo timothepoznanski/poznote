@@ -3044,7 +3044,8 @@
       "username": "用户名",
       "first_name": "名字",
       "last_name": "姓氏",
-      "email_admin_only": "只有管理员才能修改您的电子邮件地址。"
+      "email_admin_only": "只有管理员才能修改您的电子邮件地址。",
+      "your_id": "您的 ID"
     },
     "errors": {
       "username_required": "用户名为必填项",

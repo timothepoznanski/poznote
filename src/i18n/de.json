@@ -2920,7 +2920,8 @@
       "username": "Benutzername",
       "first_name": "Vorname",
       "last_name": "Nachname",
-      "email_admin_only": "Nur ein Administrator kann Ihre E-Mail-Adresse aendern."
+      "email_admin_only": "Nur ein Administrator kann Ihre E-Mail-Adresse aendern.",
+      "your_id": "Ihre ID"
     },
     "errors": {
       "username_required": "Benutzername ist erforderlich",

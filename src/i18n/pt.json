@@ -2923,7 +2923,8 @@
       "username": "Nome de usuario",
       "first_name": "Nome",
       "last_name": "Sobrenome",
-      "email_admin_only": "Apenas um administrador pode alterar seu endereco de email."
+      "email_admin_only": "Apenas um administrador pode alterar seu endereco de email.",
+      "your_id": "Seu ID"
     },
     "errors": {
       "username_required": "O nome de usuario e obrigatorio",

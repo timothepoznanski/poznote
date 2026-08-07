@@ -2920,7 +2920,8 @@
       "username": "Nombre de usuario",
       "first_name": "Nombre",
       "last_name": "Apellidos",
-      "email_admin_only": "Solo un administrador puede cambiar tu dirección de email."
+      "email_admin_only": "Solo un administrador puede cambiar tu dirección de email.",
+      "your_id": "Tu ID"
     },
     "errors": {
       "username_required": "El nombre de usuario es obligatorio",

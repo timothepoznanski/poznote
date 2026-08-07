@@ -3110,7 +3110,8 @@
       "username": "Nom d’utilisateur",
       "first_name": "Prénom",
       "last_name": "Nom",
-      "email_admin_only": "Seul un administrateur peut modifier votre adresse email."
+      "email_admin_only": "Seul un administrateur peut modifier votre adresse email.",
+      "your_id": "Votre ID"
     },
     "errors": {
       "username_required": "Le nom d’utilisateur est requis",

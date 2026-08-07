@@ -2567,7 +2567,8 @@
       "username": "Имя пользователя",
       "first_name": "Имя",
       "last_name": "Фамилия",
-      "email_admin_only": "Изменить адрес email может только администратор."
+      "email_admin_only": "Изменить адрес email может только администратор.",
+      "your_id": "Ваш ID"
     },
     "errors": {
       "username_required": "Требуется имя пользователя",

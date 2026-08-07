@@ -94,6 +94,7 @@ $settingsPageConfig = [
     'settings' => [],
     'passwordStatus' => null,
     'profile' => [
+        'id' => (int)($currentUser['id'] ?? 0),
         'username' => (string)($currentUser['username'] ?? ''),
         'first_name' => (string)($currentUser['first_name'] ?? ''),
         'last_name' => (string)($currentUser['last_name'] ?? ''),

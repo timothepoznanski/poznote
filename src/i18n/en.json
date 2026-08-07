@@ -2599,7 +2599,8 @@
       "username": "Username",
       "first_name": "First name",
       "last_name": "Last name",
-      "email_admin_only": "Only an administrator can change your email address."
+      "email_admin_only": "Only an administrator can change your email address.",
+      "your_id": "Your ID"
     },
     "errors": {
       "username_required": "Username is required",
