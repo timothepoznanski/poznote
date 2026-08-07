@@ -733,6 +733,7 @@
     }
   },
   "tasklist": {
+    "open_tasks_page": "Ver todas as tarefas",
     "input_placeholder": "Escreva uma nova tarefa e pressione enter para adicioná-la à lista...",
     "drag_to_reorder": "Arraste para reordenar",
     "add_to_top": "Adicionar novas tarefas no topo",
@@ -824,8 +825,8 @@
     }
   },
   "editor": {
-    "markdown_placeholder": "Escreva seu markdown ou use / para abrir o menu de comandos aqui...",
-    "markdown_placeholder_mobile": "Escreva seu markdown aqui...",
+    "markdown_placeholder": "Escreva seu markdown, use / para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
+    "markdown_placeholder_mobile": "Escreva seu markdown ou cole imagens aqui...",
     "excalidraw": {
       "placeholder_outside": "Escreva fora do diagrama aqui…"
     },

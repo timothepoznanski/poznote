@@ -626,6 +626,34 @@ function setTaskEditError(message) {
     errorEl.style.display = message ? 'block' : 'none';
 }
 
+// Grow the edit textarea to fit its content; the modal's flex column clamps
+// it to the screen height and the textarea scrolls past that point
+function autoSizeTaskEditTextarea(textarea) {
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    var borders = textarea.offsetHeight - textarea.clientHeight;
+    textarea.style.height = (textarea.scrollHeight + borders) + 'px';
+}
+
+// On mobile the sidebar and the note share one horizontal pane; the virtual
+// keyboard closing while the pane scroll animates can strand the view between
+// the two columns. Re-assert the note column after the modal closes.
+// Instant (no animation): a smooth scroll here reads as the sidebar-to-note
+// transition replaying, and a no-op set is invisible when already in place.
+function snapMobileViewToNoteColumn() {
+    if (window.innerWidth > 800) return;
+    var snap = function () {
+        var left = window.innerWidth;
+        var root = document.scrollingElement || document.documentElement;
+        root.scrollLeft = left;
+        document.body.scrollLeft = left;
+        window.scrollTo({ left: left, behavior: 'auto' });
+    };
+    requestAnimationFrame(snap);
+    // The keyboard collapses asynchronously and can shift the pane again
+    setTimeout(snap, 400);
+}
+
 function closeTaskEditModal() {
     if (typeof closeModal === 'function') {
         closeModal('taskEditModal');
@@ -646,6 +674,8 @@ function closeTaskEditModal() {
     if (lastFocusedElement && document.contains(lastFocusedElement)) {
         lastFocusedElement.focus({ preventScroll: true });
     }
+
+    snapMobileViewToNoteColumn();
 }
 
 function saveTaskEditFromModal() {
@@ -694,6 +724,7 @@ function attachTaskEditModalHandlers(modal) {
 
         textarea.addEventListener('input', function() {
             setTaskEditError('');
+            autoSizeTaskEditTextarea(textarea);
         });
     }
 
@@ -735,6 +766,7 @@ function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement) {
     modal.style.display = 'flex';
 
     requestAnimationFrame(function() {
+        autoSizeTaskEditTextarea(textarea);
         textarea.focus();
         const end = textarea.value.length;
         try {

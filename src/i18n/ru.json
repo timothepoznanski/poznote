@@ -326,6 +326,7 @@
     }
   },
   "tasklist": {
+    "open_tasks_page": "Показать все задачи",
     "input_placeholder": "Напишите новую задачу и нажмите Enter, чтобы добавить в список...",
     "drag_to_reorder": "Перетащите, чтобы изменить порядок",
     "add_to_top": "Добавлять новые задачи в начало",
@@ -1210,8 +1211,8 @@
     }
   },
   "editor": {
-    "markdown_placeholder": "Напишите свой Markdown или используйте /, чтобы открыть меню команд...",
-    "markdown_placeholder_mobile": "Напишите свой Markdown здесь...",
+    "markdown_placeholder": "Пишите свой Markdown, используйте / для вызова меню команд, вставьте изображения или перетащите изображение в место курсора.",
+    "markdown_placeholder_mobile": "Напишите свой Markdown или вставьте изображения здесь...",
     "excalidraw": {
       "placeholder_outside": "Пишите вне диаграммы здесь…"
     },

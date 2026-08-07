@@ -736,6 +736,7 @@
     }
   },
   "tasklist": {
+    "open_tasks_page": "查看所有任务",
     "input_placeholder": "输入新任务并按回车键添加到列表...",
     "drag_to_reorder": "拖动以重新排序",
     "add_to_top": "在顶部添加新任务",
@@ -825,8 +826,8 @@
     }
   },
   "editor": {
-    "markdown_placeholder": "编写您的 Markdown 或在此处使用 / 打开命令菜单...",
-    "markdown_placeholder_mobile": "在此处编写您的 Markdown...",
+    "markdown_placeholder": "编写您的 Markdown，使用 / 打开命令菜单，粘贴图片或在光标处拖放图片。",
+    "markdown_placeholder_mobile": "在此处编写您的 Markdown 或粘贴图片...",
     "excalidraw": {
       "placeholder_outside": "在图形外在此输入…"
     },

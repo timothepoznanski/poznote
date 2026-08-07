@@ -138,16 +138,27 @@
         align-items: stretch !important;
     }
 
-    /* Keep confirm modal buttons side by side */
-    #confirmModal .modal-buttons {
+    /* Keep confirm and task-edit modal buttons side by side (the stacked
+       rules above force display: block, which kills the flex row) */
+    #confirmModal .modal-buttons,
+    #taskEditModal .modal-buttons {
+        display: flex !important;
         flex-direction: row !important;
         gap: 10px !important;
     }
 
-    #confirmModal .modal-buttons button {
+    #confirmModal .modal-buttons button,
+    #taskEditModal .modal-buttons button {
         width: auto !important;
         flex: 1 !important;
         min-width: 120px !important;
+    }
+
+    /* No stray space below the task-edit buttons: the stacked rules above
+       give the row and each button a 10px bottom margin */
+    #taskEditModal .modal-buttons,
+    #taskEditModal .modal-buttons button {
+        margin-bottom: 0 !important;
     }
 
     /* Modal footers: stacked */

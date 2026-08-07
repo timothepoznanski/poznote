@@ -3249,9 +3249,12 @@
                 actionToExecute();
 
                 // Re-focus after insertion to avoid caret jumping on focus (skip if
-                // keepSlash, or while the date picker popup is open: refocusing would
-                // reopen the mobile keyboard over it — the pick handler refocuses)
-                if (!shouldKeepSlash && !(typeof window.isSlashDatePickerOpen === 'function' && window.isSlashDatePickerOpen())) {
+                // keepSlash, or while the date picker popup or the task list picker
+                // modal is open: refocusing would reopen the mobile keyboard over
+                // them — their handlers refocus after the pick)
+                var taskListPickerModal = document.getElementById('taskListPickerModal');
+                var taskListPickerOpen = !!(taskListPickerModal && taskListPickerModal.style.display && taskListPickerModal.style.display !== 'none');
+                if (!shouldKeepSlash && !taskListPickerOpen && !(typeof window.isSlashDatePickerOpen === 'function' && window.isSlashDatePickerOpen())) {
                     if (savedEditableElement) {
                         focusEditableElement(savedEditableElement);
                     } else if (savedNoteEntry) {

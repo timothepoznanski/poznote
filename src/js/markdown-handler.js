@@ -3785,14 +3785,14 @@ function initializeMarkdownNote(noteId) {
     } catch (e) {
         isMobileViewport = false;
     }
-    const mobilePlaceholder = window.t ? window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown here...') : 'Write your markdown here...';
-    const desktopPlaceholder = window.t ? window.t('editor.markdown_placeholder', null, 'Write your markdown or use / to open commands menu here...') : 'Write your markdown or use / to open commands menu here...';
+    const mobilePlaceholder = window.t ? window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown or paste images here...') : 'Write your markdown or paste images here...';
+    const desktopPlaceholder = window.t ? window.t('editor.markdown_placeholder', null, 'Write your markdown, use / for command menu, paste images or drop an image at cursor.') : 'Write your markdown, use / for command menu, paste images or drop an image at cursor.';
     editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePlaceholder : desktopPlaceholder);
 
     // Update placeholder when translations load
     document.addEventListener('poznote:i18n:loaded', function () {
-        const mobilePh = window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown here...');
-        const desktopPh = window.t('editor.markdown_placeholder', null, 'Write your markdown or use / to open commands menu here...');
+        const mobilePh = window.t('editor.markdown_placeholder_mobile', null, 'Write your markdown or paste images here...');
+        const desktopPh = window.t('editor.markdown_placeholder', null, 'Write your markdown, use / for command menu, paste images or drop an image at cursor.');
         editorDiv.setAttribute('data-ph', isMobileViewport ? mobilePh : desktopPh);
 
         var liveContent = normalizeContentEditableText(editorDiv);
@@ -5340,6 +5340,9 @@ function setupPreviewInteractivity(noteId) {
                 // Don't navigate if clicking a link, checkbox, or toggle elements
                 if (e.target.tagName === 'A' || e.target.tagName === 'INPUT') return;
                 if (e.target.closest('summary, details')) return;
+                // Embedded task lists own their clicks (task rows open the
+                // source tasklist note instead of scrolling the editor)
+                if (e.target.closest('.tasklist-embed')) return;
 
                 var lineNumber = parseInt(element.getAttribute('data-line'));
                 navigateToEditorLine(lineNumber, noteEntry);

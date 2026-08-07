@@ -154,6 +154,7 @@
                             echo '<div id="tasklist-actions-menu-' . $row['id'] . '" class="dropdown-menu tasklist-actions-menu" hidden>';
                             echo '<button type="button" class="dropdown-item" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="lucide lucide-trash"></i> ' . t_h('tasklist.clear_completed', [], 'Clear completed tasks') . '</button>';
                             echo '<button type="button" class="dropdown-item" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="lucide lucide-square"></i> ' . t_h('tasklist.uncheck_all', [], 'Uncheck all tasks') . '</button>';
+                            echo '<button type="button" class="dropdown-item" data-action="open-tasks-page"><i class="lucide lucide-list-todo"></i> ' . t_h('tasklist.open_tasks_page', [], 'View all tasks') . '</button>';
                             echo '</div>';
                             echo '</div>';
                         }
@@ -314,6 +315,7 @@
                     if ($note_type === 'tasklist') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="clear-completed-tasks" data-note-id="' . $row['id'] . '"><i class="lucide lucide-check-square"></i> '.t_h('tasklist.clear_completed', [], 'Clear completed tasks').'</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="uncheck-all-tasks" data-note-id="' . $row['id'] . '"><i class="lucide lucide-square"></i> '.t_h('tasklist.uncheck_all', [], 'Uncheck all tasks').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="open-tasks-page"><i class="lucide lucide-list-todo"></i> '.t_h('tasklist.open_tasks_page', [], 'View all tasks').'</button>';
                     }
                     
                     if ($note_type !== 'linked' && !$hasLinkedNote) {

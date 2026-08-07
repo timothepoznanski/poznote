@@ -23,6 +23,65 @@
     var filterText = '';
     var filterMode = 'all';
 
+    // Insert-order preference (same setting as tasklist notes); drives where a
+    // newly completed task lands inside the completed group
+    var tasklistInsertOrder = 'bottom';
+
+    function refreshTasklistInsertOrder() {
+        fetch('api/v1/settings/tasklist_insert_order', { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data && data.success && (data.value === 'top' || data.value === 'bottom')) {
+                    tasklistInsertOrder = data.value;
+                }
+            })
+            .catch(function () { });
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // Convert plain-text URLs into anchors (same behavior as tasklist notes)
+    function linkifyTaskText(text) {
+        if (!text) return '';
+        var urlRegex = /((https?:\/\/)[^\s"'<>]+)|(www\.[^\s"'<>]+)/ig;
+        return escapeHtml(text).replace(urlRegex, function (m) {
+            var href = /^https?:\/\//i.test(m) ? m : 'http://' + m;
+            var displayText = m.length > 50 ? m.substring(0, 47) + '...' : m;
+            return '<a href="' + href + '" target="_blank" rel="noopener noreferrer" title="' + m + '">' + displayText + '</a>';
+        });
+    }
+
+    // Same grouping/order rules as toggleTask in tasklist.js: important
+    // incomplete first, normal incomplete, then completed (a newly completed
+    // task goes to the start of the completed group in bottom-insert mode)
+    function reorderTasksAfterToggle(tasks, toggledTask) {
+        var important = [], normal = [], completed = [];
+        tasks.forEach(function (t) {
+            if (String(t.id) === String(toggledTask.id)) return;
+            if (t.completed) completed.push(t);
+            else if (t.important) important.push(t);
+            else normal.push(t);
+        });
+
+        if (toggledTask.completed) {
+            if (tasklistInsertOrder === 'bottom') completed.unshift(toggledTask);
+            else completed.push(toggledTask);
+        } else if (toggledTask.important) {
+            important.push(toggledTask);
+        } else {
+            normal.push(toggledTask);
+        }
+
+        return [].concat(important, normal, completed);
+    }
+
     // Per-note collapsed state, persisted per user across visits
     var COLLAPSED_KEY = 'poznote-tasks-page-collapsed';
 
@@ -297,6 +356,11 @@
             section.appendChild(list);
             container.appendChild(section);
         });
+
+        // Resolve [[Note Title]] references into clickable links
+        if (typeof window.processNoteReferences === 'function') {
+            window.processNoteReferences(container, config.workspace);
+        }
     }
 
     function renderTaskRow(note, task) {
@@ -317,8 +381,15 @@
 
         var text = document.createElement('span');
         text.className = 'tasks-task-text';
-        text.textContent = task.text || '';
+        text.innerHTML = linkifyTaskText(task.text);
         row.appendChild(text);
+
+        // Clicking the row (outside links, the checkbox and the due-date
+        // controls) opens the task's note
+        row.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input')) return;
+            window.location.href = buildNoteUrl(note.id);
+        });
 
         if (task.important && !task.completed) {
             var star = document.createElement('i');
@@ -419,8 +490,10 @@
 
     // Apply a mutation to one task of a note by rewriting the note content
     // through the notes API (same read-modify-write flow as moving a task
-    // between lists). Returns a promise that resolves when the save succeeded.
-    function mutateTaskInNote(note, task, mutate) {
+    // between lists). The optional transformTasks(tasks, target) hook can
+    // reorder the full array before saving. Returns a promise that resolves
+    // when the save succeeded.
+    function mutateTaskInNote(note, task, mutate, transformTasks) {
         var workspaceParam = 'workspace=' + encodeURIComponent(config.workspace);
 
         return fetch('api/v1/notes/' + note.id + '?' + workspaceParam)
@@ -443,6 +516,9 @@
                     throw new Error(config.txtError);
                 }
                 mutate(target);
+                if (transformTasks) {
+                    tasks = transformTasks(tasks, target);
+                }
 
                 var editorSessionId = getEditorSessionId();
                 var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
@@ -476,9 +552,12 @@
         mutateTaskInNote(note, task, function (target) {
             target.completed = newCompleted;
             if (clearReminder) target.dueReminder = false;
-        })
+        }, reorderTasksAfterToggle)
             .then(function () {
                 task.completed = newCompleted;
+                // Mirror the saved order locally: completed tasks sink to the
+                // bottom of their note group, like in the tasklist note
+                note.tasks = reorderTasksAfterToggle(note.tasks, task);
                 if (clearReminder) {
                     task.dueReminder = false;
                     // Completing a task cancels its pending reminder
@@ -571,6 +650,7 @@
             }
         });
 
+        refreshTasklistInsertOrder();
         loadTasks();
     });
 })();
