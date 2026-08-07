@@ -139,7 +139,7 @@ function createBackup() {
         </div>
         <br>
         <!-- Complete Backup Section -->
-        <div class="backup-section">
+        <div class="backup-section" id="complete-backup-section">
             <h3><?php echo t_h('backup_export.sections.complete_backup.title'); ?></h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
@@ -211,7 +211,7 @@ function createBackup() {
         </div>
         
         <!-- Structured Export Section -->
-        <div class="backup-section">
+        <div class="backup-section" id="structured-export-section">
             <h3><?php echo t_h('backup_export.sections.structured_export.title'); ?></h3>
             <p>
                 <?php echo t_h('backup_export.sections.structured_export.description'); ?>
@@ -243,7 +243,7 @@ function createBackup() {
         </div>
 
         <!-- Attachments Export Section -->
-        <div class="backup-section">
+        <div class="backup-section" id="attachments-export-section">
             <h3><?php echo t_h('backup_export.sections.attachments_export.title', [], 'Attachments Export'); ?></h3>
             <p>
                 <?php echo t_h('backup_export.sections.attachments_export.description', [], 'Download all the attachments of your account in a single ZIP archive.'); ?>
@@ -262,6 +262,7 @@ function createBackup() {
         <div class="backup-section" id="s3-user-backup-section">
             <h3><?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?></h3>
             <p><?php echo t_h('backup_export.sections.s3_backup.description', [], 'Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.'); ?></p>
+            <p id="s3SelfBackupPolicy" class="s3-self-policy" hidden></p>
             <button id="s3SelfBackupBtn" type="button" class="btn btn-primary">
                 <span><?php echo t_h('backup_export.sections.s3_backup.backup_now', [], 'Back up my account to S3'); ?></span>
             </button>
@@ -289,6 +290,13 @@ function createBackup() {
         </div>
         <style>
         #s3-user-backup-section .s3-self-status { margin-top: 12px; font-size: 0.9rem; }
+        /* Backup policy configured by the admin, shown under the description */
+        #s3-user-backup-section .s3-self-policy { font-size: 0.9rem; opacity: 0.85; }
+        #s3-user-backup-section .s3-self-policy[hidden] { display: none; }
+        /* Highlight the values that depend on the admin's configuration
+           (same red as .text-warning-bold used elsewhere on this page) */
+        #s3-user-backup-section .s3-self-policy-value { color: #dc3545; font-weight: 600; }
+        body.dark-mode #s3-user-backup-section .s3-self-policy-value { color: #f87171; }
         /* Successful upload gets a blue info box (same palette as .config-hint
            on the settings pages, which this page does not load) */
         #s3-user-backup-section .s3-self-status.is-success { padding: 12px; border-radius: 8px; background: #f0f7ff; color: #1a56db; }
@@ -324,7 +332,14 @@ function createBackup() {
                 deleteLabel: <?php echo json_encode(t('s3_backup.delete', [], 'Delete')); ?>,
                 confirmDelete: <?php echo json_encode(t('s3_backup.confirm_delete', [], 'Delete the backup {{filename}} from the bucket?')); ?>,
                 confirmRun: <?php echo json_encode(t('backup_export.sections.s3_backup.confirm_run', [], 'Back up your account to the S3 bucket now? The archive can take a while to upload.')); ?>,
-                confirmRunTitle: <?php echo json_encode(t('backup_export.sections.s3_backup.backup_now', [], 'Back up my account to S3')); ?>
+                confirmRunTitle: <?php echo json_encode(t('backup_export.sections.s3_backup.backup_now', [], 'Back up my account to S3')); ?>,
+                policyAuto: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto', [], 'The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user.')); ?>,
+                policyAutoKeepAll: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto_keep_all', [], 'The administrator has set up an automatic backup {{frequency}}; every archive is kept.')); ?>,
+                policyManual: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual', [], 'Automatic backups are disabled; the last {{retention}} archive(s) per user are kept.')); ?>,
+                policyManualKeepAll: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual_keep_all', [], 'Automatic backups are disabled; every archive is kept.')); ?>,
+                freqDaily: <?php echo json_encode(t('s3_backup.frequency_daily_inline', [], 'every day')); ?>,
+                freqWeekly: <?php echo json_encode(t('s3_backup.frequency_weekly_inline', [], 'every week')); ?>,
+                freqMonthly: <?php echo json_encode(t('s3_backup.frequency_monthly_inline', [], 'every 30 days')); ?>
             };
 
             function formatBytes(bytes) {
@@ -353,7 +368,48 @@ function createBackup() {
             var runBtn = document.getElementById('s3SelfBackupBtn');
             var statusEl = document.getElementById('s3SelfBackupStatus');
             var listStatusEl = document.getElementById('s3SelfBackupListStatus');
+            var policyEl = document.getElementById('s3SelfBackupPolicy');
             var table = document.getElementById('s3SelfBackupTable');
+
+            /**
+             * Spell out the backup policy the admin configured for this
+             * instance: how often automatic backups run, and how many archives
+             * are kept per user before the oldest ones are pruned.
+             */
+            function renderPolicy(data) {
+                if (!data.configured) {
+                    policyEl.hidden = true;
+                    return;
+                }
+                var freq = { daily: i18n.freqDaily, weekly: i18n.freqWeekly, monthly: i18n.freqMonthly }[data.frequency]
+                    || i18n.freqDaily;
+                var retention = Number(data.retention || 0);
+                var keepAll = retention <= 0;   // 0 means "keep everything"
+                var template;
+                if (data.auto_enabled) {
+                    template = keepAll ? i18n.policyAutoKeepAll : i18n.policyAuto;
+                } else {
+                    template = keepAll ? i18n.policyManualKeepAll : i18n.policyManual;
+                }
+
+                // Split on the placeholders and rebuild the sentence so the
+                // substituted values can be highlighted; the translated text
+                // itself stays plain text nodes and is never parsed as HTML.
+                var values = { '{{frequency}}': freq, '{{retention}}': String(retention) };
+                policyEl.textContent = '';
+                template.split(/(\{\{frequency\}\}|\{\{retention\}\})/).forEach(function(part) {
+                    if (part === '') return;
+                    if (Object.prototype.hasOwnProperty.call(values, part)) {
+                        var span = document.createElement('span');
+                        span.className = 's3-self-policy-value';
+                        span.textContent = values[part];
+                        policyEl.appendChild(span);
+                    } else {
+                        policyEl.appendChild(document.createTextNode(part));
+                    }
+                });
+                policyEl.hidden = false;
+            }
 
             // The API returns the archives newest first; clicking a header
             // re-sorts this cached list rather than refetching the bucket.
@@ -404,10 +460,12 @@ function createBackup() {
                         backupList = [];
                         if (!data.success) {
                             table.hidden = true;
+                            policyEl.hidden = true;
                             listStatusEl.hidden = false;
                             listStatusEl.textContent = i18n.listError.replace('{{error}}', data.error || 'unknown');
                             return;
                         }
+                        renderPolicy(data);
                         if (!data.configured || !data.backups.length) {
                             table.hidden = true;
                             listStatusEl.hidden = false;
@@ -526,6 +584,94 @@ function createBackup() {
         <!-- Bottom padding for better spacing -->
         <div class="section-bottom-spacer"></div>
     </div>
+
+    <style>
+    /* Collapsible sections: the h3 becomes the clickable header and everything
+       after it is wrapped in .backup-section-body by the script below. */
+    .backup-section-header { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .backup-section-toggle {
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-left: auto; padding: 2px; border: none; background: none;
+        color: inherit; font-size: 1.05rem; cursor: pointer; opacity: 0.7;
+    }
+    .backup-section-header:hover .backup-section-toggle { opacity: 1; }
+    .backup-section-toggle .lucide { transition: transform 0.15s ease; }
+    .backup-section-header.section-collapsed .backup-section-toggle .lucide { transform: rotate(-90deg); }
+    .backup-section-body.section-collapsed { display: none; }
+    /* Collapsed: hide the underline, drop the h3's trailing space and shrink
+       the title so the card hugs it */
+    .backup-section-header.section-collapsed {
+        margin-bottom: 0;
+        border-bottom: none;
+        padding-bottom: 0;
+        font-size: 1rem;
+    }
+    /* Collapsed cards are just a title bar, so tighten their padding and the
+       gap between them */
+    .backup-section.section-collapsed {
+        padding: 10px 20px;
+        margin-bottom: 10px;
+    }
+    </style>
+    <script>
+    (function() {
+        // Chevron on each section header collapses the content below it.
+        // State is per user (same storage wrapper as the settings page) and
+        // keyed by section so the layout survives a reload.
+        var store = window.__poznoteUserStorage || window.localStorage;
+        var STORAGE_KEY = 'backupExportCollapsedSections';
+
+        var collapsed = [];
+        try {
+            collapsed = JSON.parse(store.getItem(STORAGE_KEY) || '[]');
+            if (!Array.isArray(collapsed)) collapsed = [];
+        } catch (e) { /* storage unavailable or corrupt */ }
+
+        document.querySelectorAll('.backup-section').forEach(function(section, index) {
+            var title = section.querySelector(':scope > h3');
+            if (!title) return;
+
+            // Everything after the title becomes the collapsible body
+            var body = document.createElement('div');
+            body.className = 'backup-section-body';
+            while (title.nextSibling) body.appendChild(title.nextSibling);
+            section.appendChild(body);
+
+            // Prefer a stable id over the DOM position, which shifts when the
+            // S3 section is hidden for a user
+            var key = section.id || ('backup-section-' + index);
+            if (!body.id) body.id = key + '-body';
+
+            var toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'backup-section-toggle';
+            toggle.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+            toggle.setAttribute('aria-controls', body.id);
+            title.appendChild(toggle);
+            title.classList.add('backup-section-header');
+
+            function apply(isCollapsed) {
+                title.classList.toggle('section-collapsed', isCollapsed);
+                body.classList.toggle('section-collapsed', isCollapsed);
+                // Also on the card itself, so the tightened spacing works
+                // without relying on :has()
+                section.classList.toggle('section-collapsed', isCollapsed);
+                toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+            }
+            apply(collapsed.indexOf(key) !== -1);
+
+            // The button's click bubbles up here, so one listener covers both
+            title.addEventListener('click', function() {
+                var isCollapsed = !title.classList.contains('section-collapsed');
+                apply(isCollapsed);
+                var idx = collapsed.indexOf(key);
+                if (isCollapsed && idx === -1) collapsed.push(key);
+                if (!isCollapsed && idx !== -1) collapsed.splice(idx, 1);
+                try { store.setItem(STORAGE_KEY, JSON.stringify(collapsed)); } catch (e) {}
+            });
+        });
+    })();
+    </script>
 
     <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
     <script src="js/backup-export-init.js"></script>
