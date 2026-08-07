@@ -312,6 +312,27 @@ function sanitizeMarkdownExcalidrawContainer($html) {
     return '<div' . $divAttrs . '>' . $childHtml . '</div>';
 }
 
+/**
+ * Rebuild an embedded task-list marker from scratch (only the numeric id and
+ * the fallback label are kept), so no attacker-controlled markup from the
+ * markdown source survives.
+ */
+function sanitizeMarkdownTaskListEmbed($html) {
+    if (!preg_match('/\bdata-task-embed\s*=\s*(["\'])(\d+)\1/i', $html, $idMatch)) {
+        return htmlspecialchars($html, ENT_QUOTES, 'UTF-8');
+    }
+    $noteId = $idMatch[2];
+
+    $label = '';
+    if (preg_match('/<a\b[^>]*>(.*?)<\/a>/is', $html, $linkMatch)) {
+        $label = trim(html_entity_decode(strip_tags($linkMatch[1]), ENT_QUOTES, 'UTF-8'));
+    }
+
+    return '<div class="tasklist-embed" data-task-embed="' . $noteId . '" contenteditable="false">'
+        . '<a class="tasklist-embed-link" href="index.php?note=' . $noteId . '">'
+        . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</a></div>';
+}
+
 function normalizeMarkdownImageBorderClass($borderClass) {
     return in_array($borderClass, ['img-with-border', 'img-with-border-no-padding'], true) ? $borderClass : '';
 }
@@ -485,6 +506,15 @@ function parseMarkdown($text) {
     $text = preg_replace_callback('#<div\b(?=[^>]*\bclass\s*=\s*(["\'])[^"\']*\bexcalidraw-container\b[^"\']*\1)[^>]*>[\s\S]*?</div>#i', function($matches) use (&$protectedElements, &$protectedIndex) {
         $placeholder = "\x00PEXCALIDRAW" . $protectedIndex . "\x00";
         $protectedElements[$protectedIndex] = sanitizeMarkdownExcalidrawContainer($matches[0]);
+        $protectedIndex++;
+        return "\n" . $placeholder . "\n";
+    }, $text);
+
+    // Protect embedded task-list markers as safe block HTML (rendered as the
+    // fallback link server-side; the app hydrates them into widgets)
+    $text = preg_replace_callback('#<div\b(?=[^>]*\bdata-task-embed\s*=\s*(["\'])\d+\1)[^>]*>[\s\S]*?</div>#i', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $placeholder = "\x00PTASKEMBED" . $protectedIndex . "\x00";
+        $protectedElements[$protectedIndex] = sanitizeMarkdownTaskListEmbed($matches[0]);
         $protectedIndex++;
         return "\n" . $placeholder . "\n";
     }, $text);
@@ -809,6 +839,13 @@ function parseMarkdown($text) {
             continue;
         }
 
+        if (preg_match('/^\s*\x00PTASKEMBED(\d+)\x00\s*$/', $line, $matches)) {
+            $flushParagraph();
+            $index = (int)$matches[1];
+            $result[] = isset($protectedElements[$index]) ? $protectedElements[$index] : $line;
+            continue;
+        }
+
         // Check for protected HTML block tags (details, summary)
         // This ensures they are treated as block-level elements
         if (preg_match('/^\x00PTAG\d+\x00/', $line)) {
@@ -869,6 +906,7 @@ function parseMarkdown($text) {
                 $isNextBlockElement = (
                     preg_match('/\x00CODEBLOCK\d+\x00/', $nextLine) ||  // Code block
                     preg_match('/^\s*\x00PEXCALIDRAW\d+\x00\s*$/', $nextLine) || // Excalidraw block
+                    preg_match('/^\s*\x00PTASKEMBED\d+\x00\s*$/', $nextLine) || // Task-list embed
                     preg_match('/\x00MATHBLOCK\d+\x00/', $nextLine) ||  // Math block
                     preg_match('/^\x00PTAG\d+\x00/', $nextLine) ||      // HTML tags
                     preg_match('/^#{1,6}\s+/', $nextLine) ||            // Headers

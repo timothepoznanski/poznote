@@ -2366,6 +2366,23 @@ function parseMarkdown(text) {
         return '<div' + divAttrs + '>' + childHtml + '</div>';
     }
 
+    // Rebuild an embedded task-list marker from scratch (only the numeric id
+    // and the fallback label are kept), so no attacker-controlled markup from
+    // the markdown source survives.
+    function sanitizeTaskListEmbedHtml(html) {
+        var template = document.createElement('template');
+        template.innerHTML = String(html || '').trim();
+        var container = template.content.firstElementChild;
+        var embedNoteId = container ? (container.getAttribute('data-task-embed') || '') : '';
+        if (!container || container.tagName !== 'DIV' || !/^\d+$/.test(embedNoteId)) {
+            return escapeHtml(html);
+        }
+        var link = container.querySelector('a');
+        var label = link ? (link.textContent || '') : '';
+        return '<div class="tasklist-embed" data-task-embed="' + embedNoteId + '" contenteditable="false">'
+            + '<a class="tasklist-embed-link" href="index.php?note=' + embedNoteId + '">' + escapeHtml(label) + '</a></div>';
+    }
+
     // Extract and protect fenced code blocks first so they are not processed by other rules
     let protectedFencedCode = [];
     let fencedCodeIndex = 0;
@@ -2502,6 +2519,15 @@ function parseMarkdown(text) {
         excalidrawSourceLines[protectedIndex] = { sourceLine: sourceLine, lineCount: matchLineCount };
         protectedIndex++;
         markdownExcalidrawIndex++;
+        return '\n' + placeholder + '\n';
+    });
+
+    // Protect embedded task-list markers as safe block HTML; tasklist-embed.js
+    // hydrates them into interactive widgets in the preview
+    text = text.replace(/<div\b(?=[^>]*\bdata-task-embed\s*=\s*(["'])\d+\1)[^>]*>[\s\S]*?<\/div>/gi, function (match) {
+        let placeholder = '\x00PTASKEMBED' + protectedIndex + '\x00';
+        protectedElements[protectedIndex] = sanitizeTaskListEmbedHtml(match);
+        protectedIndex++;
         return '\n' + placeholder + '\n';
     });
 
@@ -2981,6 +3007,13 @@ function parseMarkdown(text) {
             continue;
         }
 
+        let taskEmbedMatch = line.match(/^\s*\x00PTASKEMBED(\d+)\x00\s*$/);
+        if (taskEmbedMatch) {
+            flushParagraph();
+            result.push(protectedElements[parseInt(taskEmbedMatch[1], 10)] || line);
+            continue;
+        }
+
         // Check for math block placeholders
         if (line.match(/\x00MATHBLOCK\d+\x00/)) {
             flushParagraph();
@@ -3037,6 +3070,7 @@ function parseMarkdown(text) {
                     /^\s*```/.test(nextLine) ||                      // Code block fence
                     /^(    |\t)/.test(nextLine) ||                   // Indented code block
                     /^\s*\x00PEXCALIDRAW\d+\x00\s*$/.test(nextLine) || // Excalidraw block placeholder
+                    /^\s*\x00PTASKEMBED\d+\x00\s*$/.test(nextLine) || // Task-list embed placeholder
                     /\x00MATHBLOCK\d+\x00/.test(nextLine) ||        // Math block placeholder
                     /^\x00PTAG\d+\x00/.test(nextLine) ||            // Protected HTML tags
                     /^#{1,6}\s+/.test(nextLine) ||                   // Headers
@@ -3534,6 +3568,9 @@ function renderMarkdownPreview(previewDiv, markdownContent, noteId, options) {
         previewDiv.innerHTML = parseMarkdown(markdownContent);
         prioritizeInitialMarkdownPreviewImages(previewDiv);
         previewDiv.classList.remove('empty');
+        if (typeof window.initializeTaskListEmbeds === 'function') {
+            window.initializeTaskListEmbeds(previewDiv);
+        }
         if (postProcess && noteId) {
             setTimeout(function () {
                 initMermaid();

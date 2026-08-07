@@ -2145,6 +2145,27 @@
                 ]
             },
             {
+                id: 'tasklist-embed',
+                icon: 'lucide-layout-list',
+                label: t('slash_menu.tasklist_embed', null, 'Task list'),
+                action: function () {
+                    if (typeof window.openTaskListPickerModal !== 'function') return;
+
+                    // Capture the markdown insertion point before the slash
+                    // globals are cleared while the modal is open
+                    const insertionContext = captureEditorInsertionContext();
+
+                    window.openTaskListPickerModal(function (target) {
+                        const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
+                        const safeHeading = (typeof escapeHtml === 'function') ? escapeHtml(heading) : heading;
+                        const marker = '<div class="tasklist-embed" data-task-embed="' + target.id
+                            + '" contenteditable="false"><a class="tasklist-embed-link" href="index.php?note='
+                            + target.id + '">' + safeHeading + '</a></div>';
+                        insertMarkdownAtContext(insertionContext, '\n' + marker + '\n', 0);
+                    });
+                }
+            },
+            {
                 id: 'quote',
                 icon: 'lucide-info-circle',
                 label: t('slash_menu.quote', null, 'Quote'),
