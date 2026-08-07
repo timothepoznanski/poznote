@@ -959,6 +959,16 @@ body.dark-mode .tasklist-embed-task:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
+html[data-theme='dark'] .tasklist-embed-toggle,
+body.dark-mode .tasklist-embed-toggle {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .tasklist-embed-toggle:hover,
+body.dark-mode .tasklist-embed-toggle:hover {
+    color: #4da3d0;
+}
+
 /* The :is() ID boost + !important outguns the `.noteentry *` --dm-text
    blanket from dark-mode/editor.css */
 html[data-theme='dark'] .tasklist-embed-count:is(#pz-specificity-boost, *),

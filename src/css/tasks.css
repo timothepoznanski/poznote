@@ -921,9 +921,44 @@ body.dark-mode .toggle-block[open]>summary {
     margin-bottom: 8px;
 }
 
-.noteentry .tasklist-embed-header .lucide-list-todo {
-    color: #007DB8;
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-header {
+    margin-bottom: 0;
+}
+
+/* Collapse/expand chevron (same look as the tasks page group toggle) */
+.noteentry .tasklist-embed-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #888;
+    cursor: pointer;
     flex-shrink: 0;
+}
+
+.noteentry .tasklist-embed-toggle:hover {
+    color: #007DB8;
+}
+
+.noteentry .tasklist-embed-toggle i {
+    transition: transform 0.2s ease;
+}
+
+/* The :is() ID boost outguns the global lucide hover rule from icons.css
+   ([class*="lucide-"]:hover { transform: scale(1.18) }), which would
+   otherwise cancel the rotation while the chevron is hovered */
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-toggle i:is(#pz-specificity-boost, *) {
+    transform: rotate(-90deg);
+}
+
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-list,
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-empty {
+    display: none;
 }
 
 .tasklist-embed-title {

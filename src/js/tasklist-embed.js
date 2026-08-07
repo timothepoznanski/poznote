@@ -69,6 +69,29 @@
         return Array.isArray(tasks) ? tasks : [];
     }
 
+    // Per-list collapsed state, persisted per user (same pattern as the
+    // dashboard tasks page)
+    var COLLAPSED_KEY = 'poznote-tasklist-embed-collapsed';
+
+    function getPrefsStorage() {
+        return window.__poznoteUserStorage || window.localStorage;
+    }
+
+    function loadCollapsedListIds() {
+        try {
+            var parsed = JSON.parse(getPrefsStorage().getItem(COLLAPSED_KEY) || '[]');
+            return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        } catch (e) {
+            return new Set();
+        }
+    }
+
+    function saveCollapsedListIds(ids) {
+        try {
+            getPrefsStorage().setItem(COLLAPSED_KEY, JSON.stringify(Array.from(ids)));
+        } catch (e) { }
+    }
+
     // ===== Hydration =====
 
     function initializeTaskListEmbeds(root) {
@@ -139,12 +162,36 @@
         widget.className = 'tasklist-embed-widget';
         widget.setAttribute('contenteditable', 'false');
 
+        var collapsedIds = loadCollapsedListIds();
+        var isCollapsed = collapsedIds.has(String(noteId));
+        if (isCollapsed) widget.classList.add('collapsed');
+
         var header = document.createElement('div');
         header.className = 'tasklist-embed-header';
 
-        var icon = document.createElement('i');
-        icon.className = 'lucide lucide-list-todo';
-        header.appendChild(icon);
+        var toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'tasklist-embed-toggle';
+        toggle.title = isCollapsed
+            ? t('tasks_page.expand', null, 'Expand')
+            : t('tasks_page.collapse', null, 'Collapse');
+        toggle.setAttribute('aria-expanded', String(!isCollapsed));
+        toggle.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+        toggle.addEventListener('click', function () {
+            var nowCollapsed = widget.classList.toggle('collapsed');
+            var ids = loadCollapsedListIds();
+            if (nowCollapsed) {
+                ids.add(String(noteId));
+            } else {
+                ids.delete(String(noteId));
+            }
+            saveCollapsedListIds(ids);
+            toggle.title = nowCollapsed
+                ? t('tasks_page.expand', null, 'Expand')
+                : t('tasks_page.collapse', null, 'Collapse');
+            toggle.setAttribute('aria-expanded', String(!nowCollapsed));
+        });
+        header.appendChild(toggle);
 
         var title = document.createElement('a');
         title.className = 'tasklist-embed-title';
