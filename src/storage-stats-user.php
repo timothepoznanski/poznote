@@ -136,6 +136,20 @@ if ($quotaIsAdmin) {
     .results-table td {
         font-size: 0.85rem;
     }
+    /* Centered over their (mostly numeric) columns, like the admin page. */
+    .results-table th,
+    .results-table td {
+        text-align: center;
+    }
+    /* The S3 build has 7 columns, which need more than the 700px .dr-page
+       wrapper. Widen the page for this table and let it scroll on narrow
+       screens rather than overflowing the viewport. */
+    .dr-page {
+        max-width: 900px;
+    }
+    .results-container {
+        overflow-x: auto;
+    }
     .user-quota-line {
         margin-top: 12px;
         font-size: 0.85rem;
