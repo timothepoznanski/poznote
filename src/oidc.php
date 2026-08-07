@@ -570,6 +570,7 @@ function oidc_parse_and_verify_api_token($jwt) {
     }
 
     if (!oidc_is_user_allowed($claims)) {
+        oidc_log_authorization_rejection($claims);
         throw new Exception('User not authorized to access this application (group or allowlist restriction)');
     }
 
@@ -723,6 +724,39 @@ function oidc_is_user_allowed($claims) {
     }
 
     return true;
+}
+
+/**
+ * Log why oidc_is_user_allowed() rejected these claims, including the values
+ * that were compared, so admins can copy the exact identifier to allow from
+ * the log. Server-side log only: the exception message shown to the browser
+ * must stay generic.
+ */
+function oidc_log_authorization_rejection($claims) {
+    $describe = function ($value) {
+        return (is_string($value) && $value !== '') ? '"' . $value . '"' : '(claim missing)';
+    };
+
+    if (!oidc_user_is_in_allowed_groups($claims)) {
+        $claimName = defined('OIDC_GROUPS_CLAIM') && OIDC_GROUPS_CLAIM !== '' ? OIDC_GROUPS_CLAIM : 'groups';
+        $userGroups = oidc_get_claim_values($claims, $claimName);
+        error_log(sprintf(
+            'OIDC login rejected by the allowed-groups restriction: the "%s" claim of user %s contained %s, which does not match any configured allowed group',
+            $claimName,
+            $describe($claims['email'] ?? ($claims['preferred_username'] ?? ($claims['sub'] ?? null))),
+            empty($userGroups) ? 'no value' : '[' . implode(', ', $userGroups) . ']'
+        ));
+        return;
+    }
+
+    if (!oidc_user_is_in_legacy_allowed_users($claims)) {
+        error_log(sprintf(
+            'OIDC login rejected by the allowed-users restriction: no configured entry matches email %s, preferred_username %s or sub %s',
+            $describe($claims['email'] ?? null),
+            $describe($claims['preferred_username'] ?? null),
+            $describe($claims['sub'] ?? null)
+        ));
+    }
 }
 
 function oidc_is_auto_create_users_enabled() {
@@ -998,6 +1032,7 @@ function oidc_find_or_provision_user($claims) {
 function oidc_finish_login($claims, $tokens) {
     // Check if user is allowed to access the application
     if (!oidc_is_user_allowed($claims)) {
+        oidc_log_authorization_rejection($claims);
         throw new Exception('User not authorized to access this application (group or allowlist restriction)');
     }
 
