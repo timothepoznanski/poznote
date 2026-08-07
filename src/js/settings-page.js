@@ -131,7 +131,7 @@
             keys.push('import_max_individual_files', 'import_max_zip_files');
         }
         if (document.getElementById('user-quotas-card')) {
-            keys.push('user_max_notes', 'user_max_storage_mb', 'user_max_storage_s3_mb');
+            keys.push('user_max_notes', 'user_max_storage_mb', 'user_max_storage_s3_mb', 'user_max_backups_s3_mb');
         }
         if (document.getElementById('git-sync-enabled-card')) {
             keys.push('git_sync_enabled');
@@ -956,49 +956,39 @@
         });
     }
 
+    /**
+     * The card shows the raw quota values only, comma-separated and in the
+     * same order as the fields of the modal behind it (notes, local storage,
+     * S3 attachments, S3 backups). 0 means no limit and renders as "∞".
+     * Badges whose S3 feature is disabled are not in the DOM, so they are
+     * skipped and the list closes up.
+     */
     function refreshUserQuotasBadges() {
-        var notesBadge = document.getElementById('user-quotas-notes-badge');
-        var storageBadge = document.getElementById('user-quotas-storage-badge');
-        if (!notesBadge && !storageBadge) return;
+        var badge = document.getElementById('user-quotas-badge');
+        if (!badge) return;
 
-        getSetting('user_max_notes', function (value) {
-            if (!notesBadge) return;
-            var count = parseInt(value, 10) || 0;
-            if (count > 0) {
-                notesBadge.textContent = tr('modals.user_quotas.notes_badge', { count: String(count) }, 'Notes: ' + count);
-                notesBadge.className = 'setting-status enabled';
-            } else {
-                notesBadge.textContent = tr('modals.user_quotas.notes_badge_unlimited', {}, 'Notes: unlimited');
-                notesBadge.className = 'setting-status disabled';
-            }
-        });
+        var pools = [
+            { key: 'user_max_notes', shown: true },
+            { key: 'user_max_storage_mb', shown: true },
+            { key: 'user_max_storage_s3_mb', shown: !!badge.dataset.s3Attachments },
+            { key: 'user_max_backups_s3_mb', shown: !!badge.dataset.s3Backups }
+        ].filter(function (pool) { return pool.shown; });
 
-        getSetting('user_max_storage_mb', function (value) {
-            if (!storageBadge) return;
-            var count = parseInt(value, 10) || 0;
-            if (count > 0) {
-                storageBadge.textContent = tr('modals.user_quotas.storage_badge', { count: String(count) }, 'Storage: ' + count + ' MB');
-                storageBadge.className = 'setting-status enabled';
-            } else {
-                storageBadge.textContent = tr('modals.user_quotas.storage_badge_unlimited', {}, 'Storage: unlimited');
-                storageBadge.className = 'setting-status disabled';
-            }
-        });
+        var values = new Array(pools.length);
+        var pending = pools.length;
 
-        // Only rendered when S3 attachment storage is enabled on the instance
-        var storageS3Badge = document.getElementById('user-quotas-storage-s3-badge');
-        if (storageS3Badge) {
-            getSetting('user_max_storage_s3_mb', function (value) {
+        pools.forEach(function (pool, index) {
+            getSetting(pool.key, function (value) {
                 var count = parseInt(value, 10) || 0;
-                if (count > 0) {
-                    storageS3Badge.textContent = tr('modals.user_quotas.storage_s3_badge', { count: String(count) }, 'S3: ' + count + ' MB');
-                    storageS3Badge.className = 'setting-status enabled';
-                } else {
-                    storageS3Badge.textContent = tr('modals.user_quotas.storage_s3_badge_unlimited', {}, 'S3: unlimited');
-                    storageS3Badge.className = 'setting-status disabled';
-                }
+                values[index] = count > 0 ? String(count) : '∞';
+                if (--pending > 0) return;
+
+                badge.textContent = values.join(', ');
+                // "Enabled" here means at least one pool is actually capped
+                var anyLimited = values.some(function (v) { return v !== '∞'; });
+                badge.className = 'setting-status ' + (anyLimited ? 'enabled' : 'disabled');
             });
-        }
+        });
     }
 
     function refreshGitSyncEnabledBadge() {
@@ -1190,19 +1180,33 @@
         var notesInput = document.getElementById('userMaxNotesInput');
         var storageInput = document.getElementById('userMaxStorageInput');
         var storageS3Input = document.getElementById('userMaxStorageS3Input');
+        var backupsS3Input = document.getElementById('userMaxBackupsS3Input');
         if (!modal || !notesInput || !storageInput) return;
+
+        // Each optional field is only present when its S3 feature is enabled,
+        // so fill what exists and open once the last one has loaded.
+        function openWithBackups() {
+            if (!backupsS3Input) {
+                modal.style.display = 'flex';
+                return;
+            }
+            getSetting('user_max_backups_s3_mb', function (backupsS3Value) {
+                backupsS3Input.value = String(parseInt(backupsS3Value, 10) || 0);
+                modal.style.display = 'flex';
+            });
+        }
 
         getSetting('user_max_notes', function (notesValue) {
             notesInput.value = String(parseInt(notesValue, 10) || 0);
             getSetting('user_max_storage_mb', function (storageValue) {
                 storageInput.value = String(parseInt(storageValue, 10) || 0);
                 if (!storageS3Input) {
-                    modal.style.display = 'flex';
+                    openWithBackups();
                     return;
                 }
                 getSetting('user_max_storage_s3_mb', function (storageS3Value) {
                     storageS3Input.value = String(parseInt(storageS3Value, 10) || 0);
-                    modal.style.display = 'flex';
+                    openWithBackups();
                 });
             });
         });
@@ -2250,26 +2254,42 @@
                 var notesInput = document.getElementById('userMaxNotesInput');
                 var storageInput = document.getElementById('userMaxStorageInput');
                 var storageS3Input = document.getElementById('userMaxStorageS3Input');
+                var backupsS3Input = document.getElementById('userMaxBackupsS3Input');
                 var notesVal = notesInput ? parseInt(notesInput.value, 10) : 0;
                 var storageVal = storageInput ? parseInt(storageInput.value, 10) : 0;
                 var storageS3Val = storageS3Input ? parseInt(storageS3Input.value, 10) : 0;
+                var backupsS3Val = backupsS3Input ? parseInt(backupsS3Input.value, 10) : 0;
 
                 if (isNaN(notesVal) || notesVal < 0 || notesVal > 100000000 ||
                     isNaN(storageVal) || storageVal < 0 || storageVal > 100000000 ||
-                    isNaN(storageS3Val) || storageS3Val < 0 || storageS3Val > 100000000) {
+                    isNaN(storageS3Val) || storageS3Val < 0 || storageS3Val > 100000000 ||
+                    isNaN(backupsS3Val) || backupsS3Val < 0 || backupsS3Val > 100000000) {
                     alert(tr('common.error', {}, 'Error'));
                     return;
+                }
+
+                // The backups field is absent when S3 backups are off: leave the
+                // stored value alone rather than overwriting it with a 0 the
+                // admin never typed.
+                function saveBackupsQuota(callback) {
+                    if (!backupsS3Input) {
+                        callback(true);
+                        return;
+                    }
+                    setSetting('user_max_backups_s3_mb', String(backupsS3Val), callback);
                 }
 
                 setSetting('user_max_notes', String(notesVal), function (s1) {
                     setSetting('user_max_storage_mb', String(storageVal), function (s2) {
                         setSetting('user_max_storage_s3_mb', String(storageS3Val), function (s3ok) {
-                            if (s1 && s2 && s3ok) {
-                                try { closeModal('userQuotasModal'); } catch (e) { }
-                                refreshUserQuotasBadges();
-                            } else {
-                                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-                            }
+                            saveBackupsQuota(function (s4) {
+                                if (s1 && s2 && s3ok && s4) {
+                                    try { closeModal('userQuotasModal'); } catch (e) { }
+                                    refreshUserQuotasBadges();
+                                } else {
+                                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                                }
+                            });
                         });
                     });
                 });

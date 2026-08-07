@@ -86,23 +86,29 @@ if ($s3ColumnVisible) {
     $attachmentLocalBytes = max(0, $attachmentLocalBytes - $allRecordedBytes);
 }
 
-// Effective quotas for this account (global settings + per-user overrides).
-// Admins are exempt from quotas.
-$quotaIsAdmin  = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
-$quotaLimits   = poznoteGetUserQuotaLimits();
-$quotaNotes    = $quotaLimits['max_notes'];
-$quotaStorage  = (int)round($quotaLimits['max_storage_bytes'] / (1024 * 1024));
+// Backups live in their own bucket, independent from the attachments one:
+// show the column only when that feature is configured. Real usage is read
+// from the bucket, scoped to this account's own prefix.
+require_once __DIR__ . '/S3BackupService.php';
+$backupsColumnVisible = S3BackupService::isEnabled();
+$backupsS3Bytes       = $backupsColumnVisible ? S3BackupService::usageBytesForUser($activeUserId) : 0;
 
-if ($quotaIsAdmin) {
-    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_admin_sentence', [], 'Quotas do not apply to administrator accounts.');
-} elseif ($quotaNotes > 0 && $quotaStorage > 0) {
-    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_both', ['notes' => $quotaNotes, 'storage' => $quotaStorage], 'The administrator has limited this account to ' . $quotaNotes . ' notes and ' . $quotaStorage . ' MB of storage.');
-} elseif ($quotaNotes > 0) {
-    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_notes', ['notes' => $quotaNotes], 'The administrator has limited this account to ' . $quotaNotes . ' notes. Storage is unlimited.');
-} elseif ($quotaStorage > 0) {
-    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_storage', ['storage' => $quotaStorage], 'The administrator has limited this account to ' . $quotaStorage . ' MB of storage. The number of notes is unlimited.');
-} else {
-    $quotaSentence = t_h('admin_tools.storage_stats.user_quota_sentence_none', [], 'No quota is set for this account: notes and storage are unlimited.');
+// Effective quotas for this account (global settings + per-user overrides),
+// shown as a "/ limit" suffix next to the figure each one caps.
+// Admins are exempt, so their quotas all read as unlimited.
+$quotaIsAdmin    = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+$quotaLimits     = poznoteGetUserQuotaLimits();
+$quotaNotes      = $quotaIsAdmin ? 0 : $quotaLimits['max_notes'];
+$quotaStorage    = $quotaIsAdmin ? 0 : (int)round($quotaLimits['max_storage_bytes'] / (1024 * 1024));
+$quotaStorageS3  = $quotaIsAdmin ? 0 : (int)round($quotaLimits['max_storage_s3_bytes'] / (1024 * 1024));
+$quotaBackupsS3  = $quotaIsAdmin ? 0 : (int)round($quotaLimits['max_backups_s3_bytes'] / (1024 * 1024));
+
+/**
+ * The "/ 500" quota suffix appended to a usage figure. Read-only here: unlike
+ * the admin page, a user cannot edit their own limits.
+ */
+function poznoteUserQuotaSuffix(int $value): string {
+    return ' <span class="quota-inline">/&nbsp;' . ($value > 0 ? (string)$value : '∞') . '</span>';
 }
 ?>
 <!DOCTYPE html>
@@ -141,19 +147,33 @@ if ($quotaIsAdmin) {
     .results-table td {
         text-align: center;
     }
-    /* The S3 build has 7 columns, which need more than the 700px .dr-page
-       wrapper. Widen the page for this table and let it scroll on narrow
-       screens rather than overflowing the viewport. */
+    /* With S3 attachments and backups enabled the table reaches 8 columns,
+       far past the 700px .dr-page wrapper. Let the page take the window and
+       the table shrink-fit and centre inside it, so no column is clipped by
+       a fixed guess; narrow screens scroll the container instead. */
     .dr-page {
-        max-width: 900px;
+        max-width: none;
     }
     .results-container {
         overflow-x: auto;
     }
-    .user-quota-line {
-        margin-top: 12px;
-        font-size: 0.85rem;
-        text-align: center;
+    .results-table {
+        width: auto;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    /* Rule separating the column groups: note counts, trash, local storage,
+       S3 attachments, S3 backups. It sits on the column that opens each
+       group, so it lands correctly whichever S3 features are enabled. */
+    .results-table th.col-group-start,
+    .results-table td.col-group-start {
+        border-left: 2px solid var(--border-color, #e5e7eb);
+    }
+    /* "/ 500" suffix appended to the usage figure it limits, in the same
+       colour and weight as that figure so the pair reads as one value. */
+    .quota-inline {
+        font-weight: normal;
+        color: inherit;
     }
     </style>
 </head>
@@ -191,40 +211,53 @@ if ($quotaIsAdmin) {
                     <tr>
                         <th><?php echo t_h('admin_tools.storage_stats.table_notes', [], 'Notes'); ?></th>
                         <th><?php echo t_h('admin_tools.storage_stats.table_trash', [], 'Trash'); ?></th>
-                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')); ?></th>
+                        <?php // The note quota counts active + trashed notes, so its
+                              // total sits after both, carrying the "/ 500" suffix. ?>
+                        <th><?php echo t_h('admin_tools.storage_stats.table_notes_total', [], 'Total notes'); ?></th>
+                        <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')); ?></th>
                         <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')); ?></th>
                         <?php if ($s3ColumnVisible): ?>
                             <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')); ?></th>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')); ?></th>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
+                            <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')); ?></th>
                         <?php else: ?>
                             <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')); ?></th>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
                         <?php endif; ?>
-                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
+                        <?php if ($backupsColumnVisible): ?>
+                            <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_backups_s3', [], 'Backups S3 (MB)')); ?></th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><span class="status-badge status-clean"><?php echo $notesActive; ?></span></td>
+                        <td><?php echo $notesActive; ?></td>
                         <td><?php echo $notesTrash; ?></td>
-                        <td><?php echo poznoteFormatMb((int)$sizes['database']); ?></td>
+                        <?php // Trashed notes count against the quota too: they still
+                              // exist and can be restored. ?>
+                        <td style="white-space: nowrap;"><?php echo ($notesActive + $notesTrash) . poznoteUserQuotaSuffix($quotaNotes); ?></td>
+                        <td class="col-group-start"><?php echo poznoteFormatMb((int)$sizes['database']); ?></td>
                         <td><?php echo poznoteFormatMb((int)$sizes['entries']); ?></td>
                         <td><?php echo poznoteFormatMb($attachmentLocalBytes); ?></td>
-                        <?php if ($s3ColumnVisible): ?>
-                            <td><?php echo poznoteFormatMb($attachmentS3Bytes); ?></td>
-                        <?php endif; ?>
-                        <td><strong><?php
+                        <?php // The local storage quota covers the whole account
+                              // perimeter, which is what Total sums. ?>
+                        <td style="white-space: nowrap;"><strong><?php
                             // Sum of the displayed columns so the row adds up.
                             // Excludes backups/snapshots/backgrounds, which are not
                             // part of the backup export either.
                             $displayedTotal = (int)$sizes['database'] + (int)$sizes['entries'] + $attachmentLocalBytes + $attachmentS3Bytes;
                             echo poznoteFormatMb($displayedTotal);
-                        ?></strong></td>
+                        ?></strong><?php echo poznoteUserQuotaSuffix($quotaStorage); ?></td>
+                        <?php if ($s3ColumnVisible): ?>
+                            <td class="col-group-start" style="white-space: nowrap;"><?php echo poznoteFormatMb($attachmentS3Bytes) . poznoteUserQuotaSuffix($quotaStorageS3); ?></td>
+                        <?php endif; ?>
+                        <?php if ($backupsColumnVisible): ?>
+                            <td class="col-group-start" style="white-space: nowrap;"><?php echo poznoteFormatMb($backupsS3Bytes) . poznoteUserQuotaSuffix($quotaBackupsS3); ?></td>
+                        <?php endif; ?>
                     </tr>
                 </tbody>
             </table>
         </div>
-
-        <p class="user-quota-line"><?php echo $quotaSentence; ?></p>
     </div>
 </div>
 </body>

@@ -1003,13 +1003,8 @@
       "description": "Limita el número de notas y el espacio de almacenamiento de cada usuario. 0 significa ilimitado. Los administradores no están limitados. Puede reemplazar estos límites por usuario desde la página de estadísticas de almacenamiento.",
       "max_notes": "Máx. de notas por usuario",
       "max_storage": "Almacenamiento local máx. por usuario (MB)",
-      "notes_badge": "Notas: {{count}}",
-      "notes_badge_unlimited": "Notas: ilimitado",
-      "storage_badge": "Almacenamiento: {{count}} MB",
-      "storage_badge_unlimited": "Almacenamiento: ilimitado",
-      "max_storage_s3": "Almacenamiento S3 máx. por usuario (MB)",
-      "storage_s3_badge": "S3: {{count}} MB",
-      "storage_s3_badge_unlimited": "S3: ilimitado"
+      "max_storage_s3": "Almacenamiento S3 de adjuntos máx. por usuario (MB)",
+      "max_backups_s3": "Almacenamiento S3 de copias de seguridad máx. por usuario (MB)"
     },
     "ui_customization": {
       "title": "Personalización de interfaz",
@@ -2891,13 +2886,6 @@
       "table_attachments": "Adjuntos (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
-      "table_quota": "Cuota (Cantidad / MB)",
-      "quota_admin_exempt": "Ilimitado por ser admin",
-      "user_quota_admin_sentence": "Las cuotas no se aplican a las cuentas de administrador.",
-      "user_quota_sentence_both": "El administrador ha limitado esta cuenta a {{notes}} notas y {{storage}} MB de almacenamiento.",
-      "user_quota_sentence_notes": "El administrador ha limitado esta cuenta a {{notes}} notas. El almacenamiento es ilimitado.",
-      "user_quota_sentence_storage": "El administrador ha limitado esta cuenta a {{storage}} MB de almacenamiento. El número de notas es ilimitado.",
-      "user_quota_sentence_none": "No hay ninguna cuota definida para esta cuenta: las notas y el almacenamiento son ilimitados.",
       "quota_modal_description": "Deje un campo vacío para usar el ajuste global. 0 significa ilimitado.\nEstos valores reemplazan las cuotas globales de usuario.",
       "quota_max_notes_for": "Máx. de notas para {{user}}",
       "quota_max_storage_for": "Almacenamiento local máx. para {{user}} (MB)",
@@ -2905,8 +2893,12 @@
       "no_accounts": "No se encontraron cuentas.",
       "table_attachments_local": "Adjuntos locales (MB)",
       "table_attachments_s3": "Adjuntos S3 (MB)",
-      "quota_max_storage_s3_for": "Almacenamiento S3 máx. para {{user}} (MB)",
-      "table_quota_s3": "Cuota (Cantidad / MB local / MB S3)"
+      "quota_max_storage_s3_for": "Almacenamiento S3 de adjuntos máx. para {{user}} (MB)",
+      "quota_max_backups_s3_for": "Almacenamiento S3 de copias de seguridad máx. para {{user}} (MB)",
+      "table_backups_s3": "Copias S3 (MB)",
+      "quota_admin_exempt": "Ilimitado por ser administrador",
+      "quota_admin_exempt_message": "Las cuotas no se aplican a las cuentas de administrador: sus notas y su almacenamiento son ilimitados.",
+      "table_notes_total": "Notas totales"
     }
   },
   "backlinks": {

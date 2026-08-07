@@ -1003,13 +1003,8 @@
       "description": "限制每个用户的笔记数量和存储空间。0 表示不限制。管理员不受限制。您可以在存储统计页面中为每个用户单独设置这些限制。",
       "max_notes": "每个用户的最大笔记数",
       "max_storage": "每用户本地存储上限 (MB)",
-      "notes_badge": "笔记：{{count}}",
-      "notes_badge_unlimited": "笔记：不限",
-      "storage_badge": "存储：{{count}} MB",
-      "storage_badge_unlimited": "存储：不限",
-      "max_storage_s3": "每用户 S3 存储上限 (MB)",
-      "storage_s3_badge": "S3:{{count}} MB",
-      "storage_s3_badge_unlimited": "S3:无限制"
+      "max_storage_s3": "每用户 S3 附件存储上限 (MB)",
+      "max_backups_s3": "每用户 S3 备份存储上限 (MB)"
     },
     "ui_customization": {
       "title": "界面自定义",
@@ -3018,13 +3013,6 @@
       "table_attachments": "附件 (MB)",
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
-      "table_quota": "配额（数量 / MB）",
-      "quota_admin_exempt": "管理员，不受限制",
-      "user_quota_admin_sentence": "配额不适用于管理员账户。",
-      "user_quota_sentence_both": "管理员已将此账户限制为 {{notes}} 条笔记和 {{storage}} MB 存储空间。",
-      "user_quota_sentence_notes": "管理员已将此账户限制为 {{notes}} 条笔记。存储空间不限。",
-      "user_quota_sentence_storage": "管理员已将此账户限制为 {{storage}} MB 存储空间。笔记数量不限。",
-      "user_quota_sentence_none": "此账户未设置配额：笔记和存储空间均不限。",
       "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
       "quota_max_notes_for": "{{user}} 的最大笔记数",
       "quota_max_storage_for": "{{user}} 的本地存储上限 (MB)",
@@ -3032,8 +3020,12 @@
       "no_accounts": "未找到账户。",
       "table_attachments_local": "本地附件 (MB)",
       "table_attachments_s3": "S3 附件 (MB)",
-      "quota_max_storage_s3_for": "{{user}} 的 S3 存储上限 (MB)",
-      "table_quota_s3": "配额(数量 / 本地 MB / S3 MB)"
+      "quota_max_storage_s3_for": "{{user}} 的 S3 附件存储上限 (MB)",
+      "quota_max_backups_s3_for": "{{user}} 的 S3 备份存储上限 (MB)",
+      "table_backups_s3": "备份 S3 (MB)",
+      "quota_admin_exempt": "管理员不受限制",
+      "quota_admin_exempt_message": "配额不适用于管理员账户：其笔记和存储空间均无限制。",
+      "table_notes_total": "笔记总数"
     }
   },
   "profile": {

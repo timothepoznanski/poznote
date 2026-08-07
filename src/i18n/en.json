@@ -519,13 +519,8 @@
       "description": "Limit the number of notes and the storage space of each user. 0 means unlimited. Administrators are not limited. You can override these limits per user from the storage statistics page.",
       "max_notes": "Max notes per user",
       "max_storage": "Max local storage per user (MB)",
-      "notes_badge": "Notes: {{count}}",
-      "notes_badge_unlimited": "Notes: unlimited",
-      "storage_badge": "Storage: {{count}} MB",
-      "storage_badge_unlimited": "Storage: unlimited",
-      "max_storage_s3": "Max S3 storage per user (MB)",
-      "storage_s3_badge": "S3: {{count}} MB",
-      "storage_s3_badge_unlimited": "S3: unlimited"
+      "max_storage_s3": "Max S3 attachments storage per user (MB)",
+      "max_backups_s3": "Max S3 backups storage per user (MB)"
     },
     "ui_customization": {
       "title": "UI Customization",
@@ -2490,13 +2485,6 @@
       "table_attachments": "Attachments (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
-      "table_quota": "Quota (Count / MB)",
-      "quota_admin_exempt": "Unlimited because admin",
-      "user_quota_admin_sentence": "Quotas do not apply to administrator accounts.",
-      "user_quota_sentence_both": "The administrator has limited this account to {{notes}} notes and {{storage}} MB of storage.",
-      "user_quota_sentence_notes": "The administrator has limited this account to {{notes}} notes. Storage is unlimited.",
-      "user_quota_sentence_storage": "The administrator has limited this account to {{storage}} MB of storage. The number of notes is unlimited.",
-      "user_quota_sentence_none": "No quota is set for this account: notes and storage are unlimited.",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
       "quota_max_notes_for": "Max notes for {{user}}",
       "quota_max_storage_for": "Max local storage for {{user}} (MB)",
@@ -2504,8 +2492,12 @@
       "no_accounts": "No accounts found.",
       "table_attachments_local": "Attachments local (MB)",
       "table_attachments_s3": "Attachments S3 (MB)",
-      "quota_max_storage_s3_for": "Max S3 storage for {{user}} (MB)",
-      "table_quota_s3": "Quota (Count / local MB / S3 MB)"
+      "quota_max_storage_s3_for": "Max S3 attachments storage for {{user}} (MB)",
+      "quota_max_backups_s3_for": "Max S3 backups storage for {{user}} (MB)",
+      "table_backups_s3": "Backups S3 (MB)",
+      "quota_admin_exempt": "Unlimited because admin",
+      "quota_admin_exempt_message": "Quotas do not apply to administrator accounts: their notes and storage are unlimited.",
+      "table_notes_total": "Total notes"
     }
   },
   "backlinks": {

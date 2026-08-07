@@ -1002,13 +1002,8 @@
       "description": "Anzahl der Notizen und Speicherplatz pro Benutzer begrenzen. 0 bedeutet unbegrenzt. Administratoren sind nicht eingeschränkt. Auf der Seite der Speicherstatistiken können Sie diese Limits pro Benutzer überschreiben.",
       "max_notes": "Max. Notizen pro Benutzer",
       "max_storage": "Max. lokaler Speicher pro Benutzer (MB)",
-      "notes_badge": "Notizen: {{count}}",
-      "notes_badge_unlimited": "Notizen: unbegrenzt",
-      "storage_badge": "Speicher: {{count}} MB",
-      "storage_badge_unlimited": "Speicher: unbegrenzt",
-      "max_storage_s3": "Max. S3-Speicher pro Benutzer (MB)",
-      "storage_s3_badge": "S3: {{count}} MB",
-      "storage_s3_badge_unlimited": "S3: unbegrenzt"
+      "max_storage_s3": "Max. S3-Anhangspeicher pro Benutzer (MB)",
+      "max_backups_s3": "Max. S3-Backup-Speicher pro Benutzer (MB)"
     },
     "ui_customization": {
       "title": "Oberfläche anpassen",
@@ -2891,13 +2886,6 @@
       "table_attachments": "Anhänge (MB)",
       "table_total": "Gesamt (MB)",
       "table_total_row": "Gesamt",
-      "table_quota": "Kontingent (Anzahl / MB)",
-      "quota_admin_exempt": "Unbegrenzt, da Admin",
-      "user_quota_admin_sentence": "Kontingente gelten nicht für Administratorkonten.",
-      "user_quota_sentence_both": "Der Administrator hat dieses Konto auf {{notes}} Notizen und {{storage}} MB Speicher begrenzt.",
-      "user_quota_sentence_notes": "Der Administrator hat dieses Konto auf {{notes}} Notizen begrenzt. Der Speicher ist unbegrenzt.",
-      "user_quota_sentence_storage": "Der Administrator hat dieses Konto auf {{storage}} MB Speicher begrenzt. Die Anzahl der Notizen ist unbegrenzt.",
-      "user_quota_sentence_none": "Für dieses Konto ist kein Kontingent festgelegt: Notizen und Speicher sind unbegrenzt.",
       "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
       "quota_max_notes_for": "Max. Notizen für {{user}}",
       "quota_max_storage_for": "Max. lokaler Speicher für {{user}} (MB)",
@@ -2905,8 +2893,12 @@
       "no_accounts": "Keine Konten gefunden.",
       "table_attachments_local": "Anhänge lokal (MB)",
       "table_attachments_s3": "Anhänge S3 (MB)",
-      "quota_max_storage_s3_for": "Max. S3-Speicher für {{user}} (MB)",
-      "table_quota_s3": "Quota (Anzahl / MB lokal / MB S3)"
+      "quota_max_storage_s3_for": "Max. S3-Anhangspeicher für {{user}} (MB)",
+      "quota_max_backups_s3_for": "Max. S3-Backup-Speicher für {{user}} (MB)",
+      "table_backups_s3": "Backups S3 (MB)",
+      "quota_admin_exempt": "Unbegrenzt, da Administrator",
+      "quota_admin_exempt_message": "Kontingente gelten nicht für Administratorkonten: Ihre Notizen und ihr Speicher sind unbegrenzt.",
+      "table_notes_total": "Notizen gesamt"
     }
   },
   "backlinks": {

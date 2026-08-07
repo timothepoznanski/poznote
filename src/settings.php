@@ -210,6 +210,7 @@ if ($isAdmin) {
             'user_max_notes',
             'user_max_storage_mb',
             'user_max_storage_s3_mb',
+            'user_max_backups_s3_mb',
             'git_sync_enabled',
             'tenant_isolation',
             'tenant_isolation_features',
@@ -1053,14 +1054,15 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span>
                     <div>
-                        <span id="user-quotas-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <span id="user-quotas-storage-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <?php
+                        // The badge lists one value per quota the instance
+                        // actually has; the data-* flags tell the script which
+                        // optional pools are in play.
                         require_once 'storage/AttachmentStorage.php';
-                        if (AttachmentStorage::isEnabled()):
                         ?>
-                            <span id="user-quotas-storage-s3-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <?php endif; ?>
+                        <span id="user-quotas-badge" class="setting-status"
+                            <?php echo AttachmentStorage::isEnabled() ? 'data-s3-attachments="1"' : ''; ?>
+                            <?php echo poznoteS3BackupConfigured() ? 'data-s3-backups="1"' : ''; ?>><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>

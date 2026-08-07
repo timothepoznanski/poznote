@@ -1027,13 +1027,8 @@
       "description": "Limiter le nombre de notes et l'espace de stockage de chaque utilisateur. 0 signifie illimité. Les administrateurs ne sont pas limités. Vous pouvez remplacer ces limites par utilisateur depuis la page des statistiques de stockage.",
       "max_notes": "Nombre max de notes par utilisateur",
       "max_storage": "Stockage local max par utilisateur (Mo)",
-      "notes_badge": "Notes : {{count}}",
-      "notes_badge_unlimited": "Notes : illimité",
-      "storage_badge": "Stockage : {{count}} Mo",
-      "storage_badge_unlimited": "Stockage : illimité",
-      "max_storage_s3": "Stockage S3 max par utilisateur (Mo)",
-      "storage_s3_badge": "S3 : {{count}} Mo",
-      "storage_s3_badge_unlimited": "S3 : illimité"
+      "max_storage_s3": "Stockage S3 pièces jointes max par utilisateur (Mo)",
+      "max_backups_s3": "Stockage S3 sauvegardes max par utilisateur (Mo)"
     },
     "ui_customization": {
       "title": "Personnalisation de l'interface",
@@ -3081,13 +3076,6 @@
       "table_attachments": "Pièces jointes (Mo)",
       "table_total": "Total (Mo)",
       "table_total_row": "Total",
-      "table_quota": "Quota (Nombre / Mo)",
-      "quota_admin_exempt": "Illimité car admin",
-      "user_quota_admin_sentence": "Les quotas ne s'appliquent pas aux comptes administrateurs.",
-      "user_quota_sentence_both": "L'administrateur a limité ce compte à {{notes}} notes et {{storage}} Mo de stockage.",
-      "user_quota_sentence_notes": "L'administrateur a limité ce compte à {{notes}} notes. Le stockage est illimité.",
-      "user_quota_sentence_storage": "L'administrateur a limité ce compte à {{storage}} Mo de stockage. Le nombre de notes est illimité.",
-      "user_quota_sentence_none": "Aucun quota n'est défini pour ce compte : notes et stockage sont illimités.",
       "quota_modal_description": "Laisser un champ vide pour utiliser le réglage global. 0 signifie illimité.\nCes valeurs remplacent les quotas globaux.",
       "quota_max_notes_for": "Nombre max de notes pour {{user}}",
       "quota_max_storage_for": "Stockage local max pour {{user}} (Mo)",
@@ -3095,8 +3083,12 @@
       "no_accounts": "Aucun compte trouvé.",
       "table_attachments_local": "Pièces jointes locales (Mo)",
       "table_attachments_s3": "Pièces jointes S3 (Mo)",
-      "quota_max_storage_s3_for": "Stockage S3 max pour {{user}} (Mo)",
-      "table_quota_s3": "Quota (Nombre / Mo local / Mo S3)"
+      "quota_max_storage_s3_for": "Stockage S3 pièces jointes max pour {{user}} (Mo)",
+      "quota_max_backups_s3_for": "Stockage S3 sauvegardes max pour {{user}} (Mo)",
+      "table_backups_s3": "Sauvegardes S3 (Mo)",
+      "quota_admin_exempt": "Illimité car administrateur",
+      "quota_admin_exempt_message": "Les quotas ne s’appliquent pas aux comptes administrateurs : leurs notes et leur stockage sont illimités.",
+      "table_notes_total": "Total notes"
     }
   },
   "backlinks": {

@@ -1801,7 +1801,8 @@ function poznoteSumDbAttachmentBytes(): int {
  * Per-user quota limits: the administrator's global settings, overridden by
  * the active user's per-user values when set (admin storage-stats page).
  * 0 means no limit.
- * @return array Keys: max_notes (int), max_storage_bytes (int)
+ * @return array Keys: max_notes (int), max_storage_bytes (int),
+ *               max_storage_s3_bytes (int), max_backups_s3_bytes (int)
  */
 function poznoteGetUserQuotaLimits(): array {
     static $limits = null;
@@ -1810,13 +1811,14 @@ function poznoteGetUserQuotaLimits(): array {
     }
 
     global $activeUserId;
-    $limits = ['max_notes' => 0, 'max_storage_bytes' => 0, 'max_storage_s3_bytes' => 0];
+    $limits = ['max_notes' => 0, 'max_storage_bytes' => 0, 'max_storage_s3_bytes' => 0, 'max_backups_s3_bytes' => 0];
     try {
         require_once __DIR__ . '/users/db_master.php';
         if (function_exists('getGlobalSetting')) {
             $limits['max_notes'] = max(0, (int) getGlobalSetting('user_max_notes', '0'));
             $limits['max_storage_bytes'] = max(0, (int) getGlobalSetting('user_max_storage_mb', '0')) * 1024 * 1024;
             $limits['max_storage_s3_bytes'] = max(0, (int) getGlobalSetting('user_max_storage_s3_mb', '0')) * 1024 * 1024;
+            $limits['max_backups_s3_bytes'] = max(0, (int) getGlobalSetting('user_max_backups_s3_mb', '0')) * 1024 * 1024;
         }
 
         $userId = (int) ($_SESSION['user_id'] ?? $activeUserId ?? 0);
@@ -1831,12 +1833,41 @@ function poznoteGetUserQuotaLimits(): array {
             if ($overrides['max_storage_s3_mb'] !== null) {
                 $limits['max_storage_s3_bytes'] = max(0, (int) $overrides['max_storage_s3_mb']) * 1024 * 1024;
             }
+            if ($overrides['max_backups_s3_mb'] !== null) {
+                $limits['max_backups_s3_bytes'] = max(0, (int) $overrides['max_backups_s3_mb']) * 1024 * 1024;
+            }
         }
     } catch (Exception $e) {
         // Master database unavailable: fail open, quotas are an admin comfort
         // feature and must never take the app down.
     }
     return $limits;
+}
+
+/**
+ * True when S3 backups are switched on and their bucket is configured.
+ *
+ * Mirrors S3BackupService::isEnabled() from the global settings alone, for
+ * callers that only need the visibility flag: loading the service pulls in the
+ * complete backup ZIP builder, too heavy for a page that merely shows or hides
+ * a field. Keep both in sync.
+ */
+function poznoteS3BackupConfigured(): bool {
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        if (!function_exists('getGlobalSetting') || getGlobalSetting('s3_backup_enabled', '1') !== '1') {
+            return false;
+        }
+        foreach (['s3_backup_endpoint', 's3_backup_bucket', 's3_backup_access_key', 's3_backup_secret_key'] as $key) {
+            if ((string) getGlobalSetting($key, '') === '') {
+                return false;
+            }
+        }
+        return true;
+    } catch (Exception $e) {
+        // Visibility check only: hide the feature rather than break the page
+        return false;
+    }
 }
 
 /**

@@ -268,9 +268,20 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <input type="number" id="userMaxStorageInput" min="0" max="100000000" step="1" value="0">
             </div>
             <div class="font-size-row">
-                <label for="userMaxStorageS3Input"><?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 storage per user (MB)'); ?></label>
+                <label for="userMaxStorageS3Input"><?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 attachments storage per user (MB)'); ?></label>
                 <input type="number" id="userMaxStorageS3Input" min="0" max="100000000" step="1" value="0">
             </div>
+            <?php
+            // Gate on the backup settings directly: modals.php is included by
+            // every note page and S3BackupService pulls in the whole ZIP
+            // builder, which this one visibility check does not need.
+            if (poznoteS3BackupConfigured()):
+            ?>
+            <div class="font-size-row">
+                <label for="userMaxBackupsS3Input"><?php echo t_h('modals.user_quotas.max_backups_s3', [], 'Max S3 backups storage per user (MB)'); ?></label>
+                <input type="number" id="userMaxBackupsS3Input" min="0" max="100000000" step="1" value="0">
+            </div>
+            <?php endif; ?>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="userQuotasModal"><?php echo t_h('common.cancel'); ?></button>
