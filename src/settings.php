@@ -1113,6 +1113,17 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Activity Log -->
+            <div class="home-card settings-card-clickable" id="activity-log-card" data-href="admin/activity-log.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.activity_log', [], 'Review sensitive operations: account deletions, backups, restores, trash emptying and workspace deletions.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-clipboard-list"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span>
+                </div>
+            </div>
+
             <!-- Storage Statistics -->
             <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats', [], 'See storage usage across all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>

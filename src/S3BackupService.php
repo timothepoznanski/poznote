@@ -125,9 +125,13 @@ class S3BackupService {
     /**
      * Build and upload the backup ZIP of one user, then prune old archives.
      *
+     * $trigger is recorded in the activity log as the entry's source: 'manual'
+     * for an admin or self-service run, 'auto' when runAll() passes its own
+     * scheduled trigger down.
+     *
      * @return array ['success' => bool, 'key' => ?string, 'size' => int, 'error' => ?string]
      */
-    public static function backupUser(int $userId, ?S3Client $client = null, ?array $config = null): array {
+    public static function backupUser(int $userId, ?S3Client $client = null, ?array $config = null, string $trigger = 'manual'): array {
         $config = $config ?? self::getConfig();
         try {
             $client = $client ?? self::makeClient($config);
@@ -165,6 +169,16 @@ class S3BackupService {
             // A failed prune must not fail the backup itself
             $pruneError = $e->getMessage();
         }
+
+        // Every S3 backup (manual, self-service and scheduled) funnels through
+        // this method, so one log call here covers them all. The account is
+        // passed explicitly because scheduled runs have no session.
+        require_once __DIR__ . '/ActivityLog.php';
+        logActivity(ACTIVITY_BACKUP_CREATED, [
+            'filename' => $build['filename'],
+            'size' => $size,
+            'destination' => 's3',
+        ], $trigger, $userId);
 
         return ['success' => true, 'key' => $key, 'size' => $size, 'error' => $pruneError];
     }
@@ -228,7 +242,7 @@ class S3BackupService {
 
         foreach (self::selectedUserProfiles($config) as $user) {
             $summary['users']++;
-            $result = self::backupUser((int)$user['id'], $client, $config);
+            $result = self::backupUser((int)$user['id'], $client, $config, $trigger);
             if ($result['success']) {
                 $summary['uploaded']++;
                 if ($result['error'] !== null) {

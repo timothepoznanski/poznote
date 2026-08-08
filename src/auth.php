@@ -255,6 +255,21 @@ function startAuthenticatedUserSession(array $authUser, ?string $authMethod = nu
 
     setAuthenticatedIdentity($authUser, $authMethod);
 
+    // Single hook for every interactive login: the password form, OIDC and the
+    // remember-me cookie all land here. Logged at this point rather than on
+    // return, because the identity is already established even when the call
+    // ends up returning false for pending multi-account selection. Stateless
+    // API auth (Basic/Bearer) never reaches this function, which keeps
+    // per-request traffic out of the log.
+    require_once __DIR__ . '/ActivityLog.php';
+    logActivity(
+        ACTIVITY_LOGIN,
+        ['method' => $authMethod ?? 'password'],
+        $authMethod === 'oidc' ? 'oidc' : 'web',
+        $authUserId,
+        $authUser['username'] ?? null
+    );
+
     require_once __DIR__ . '/users/db_master.php';
     $accessibleProfiles = getUserAccessibleProfiles($authUserId);
 
@@ -1260,6 +1275,20 @@ function authenticate($username, $password, $rememberMe = false) {
 }
 
 function logout() {
+    // Must run before session_destroy(): the actor is read from the session,
+    // and there is no identity left to record afterwards.
+    $logoutMethod = $_SESSION['auth_method'] ?? 'password';
+    if (!empty($_SESSION['authenticated'])) {
+        require_once __DIR__ . '/ActivityLog.php';
+        logActivity(
+            ACTIVITY_LOGOUT,
+            ['method' => $logoutMethod],
+            $logoutMethod === 'oidc' ? 'oidc' : 'web',
+            isset($_SESSION['login_user_id']) ? (int)$_SESSION['login_user_id'] : null,
+            $_SESSION['login_user']['username'] ?? null
+        );
+    }
+
     $oidcLogoutUrl = null;
     if (isset($_SESSION['auth_method']) && $_SESSION['auth_method'] === 'oidc') {
         $oidcPath = __DIR__ . '/oidc.php';

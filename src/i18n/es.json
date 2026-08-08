@@ -430,6 +430,7 @@
       "disaster_recovery": "Restaura la instancia desde una copia de seguridad en caso de pérdida de datos.",
       "orphan_scanner": "Encuentra y limpia archivos adjuntos que ya no pertenecen a ninguna nota.",
       "storage_stats": "Consulta el uso de almacenamiento de todos los usuarios de esta instancia.",
+      "activity_log": "Consultar operaciones sensibles: eliminaciones de cuenta, copias de seguridad, restauraciones, vaciado de papelera y eliminaciones de espacio de trabajo.",
       "version": "Abre las notas de la versión en GitHub.",
       "github": "Abre el código fuente de Poznote en GitHub.",
       "api_rest": "Muestra información sobre la API REST de Poznote.",
@@ -490,6 +491,7 @@
       "release_notes": "Notas de la versión",
       "orphan_scanner": "Escáner de archivos adjuntos huérfanos",
       "storage_stats": "Estadísticas de almacenamiento del administrador",
+      "activity_log": "Registro de actividad",
       "storage_stats_user": "Estadísticas de almacenamiento del usuario",
       "user_management": "Gestión de usuarios",
       "change_password": "Cambiar contraseña",
@@ -2899,6 +2901,114 @@
       "quota_admin_exempt": "Ilimitado por ser administrador",
       "quota_admin_exempt_message": "Las cuotas no se aplican a las cuentas de administrador: sus notas y su almacenamiento son ilimitados.",
       "table_notes_total": "Notas totales"
+    }
+  },
+  "activity_log": {
+    "title": "Registro de actividad",
+    "description": "Historial de operaciones sensibles realizadas en esta instancia.",
+    "help_intro": "Operaciones registradas:",
+    "filter_placeholder": "Buscar un usuario o un detalle...",
+    "empty": "Todavía no hay ninguna entrada.",
+    "unknown_user": "desconocido",
+    "columns": {
+      "date": "Fecha y hora",
+      "user": "Usuario (ID)",
+      "action": "Acción",
+      "details": "Detalles",
+      "source": "Origen"
+    },
+    "actions": {
+      "user_login": "Inicio de sesión",
+      "user_logout": "Cierre de sesión",
+      "profile_updated": "Perfil modificado",
+      "quota_updated": "Cuota modificada",
+      "account_activated": "Cuenta activada",
+      "account_deactivated": "Cuenta desactivada",
+      "admin_granted": "Rol de administrador concedido",
+      "admin_revoked": "Rol de administrador retirado",
+      "account_deleted": "Cuenta eliminada",
+      "access_granted": "Acceso a la cuenta concedido",
+      "access_revoked": "Acceso a la cuenta revocado",
+      "workspace_created": "Espacio de trabajo creado",
+      "workspace_deleted": "Espacio de trabajo eliminado",
+      "workspace_shared": "Espacio de trabajo compartido",
+      "workspace_unshared": "Espacio de trabajo dejado de compartir",
+      "backup_created": "Copia de seguridad creada",
+      "backup_restored": "Copia de seguridad restaurada",
+      "trash_emptied": "Papelera vaciada",
+      "note_deleted": "Nota eliminada definitivamente"
+    },
+    "filters": {
+      "all_actions": "Todas las acciones",
+      "apply": "Filtrar",
+      "reset": "Restablecer"
+    },
+    "details": {
+      "performed_by": "por {{user}}",
+      "data_deleted": "datos eliminados",
+      "data_kept": "datos conservados",
+      "notes_deleted": "{{count}} notas eliminadas",
+      "notes_moved": "{{count}} notas movidas a {{workspace}}",
+      "in_workspace": "en {{workspace}}",
+      "untitled_note": "nota #{{id}}",
+      "linked_deleted": "+{{count}} notas vinculadas",
+      "share_updated": "ajustes actualizados",
+      "password_protected": "protegido con contraseña",
+      "login_required": "inicio de sesión obligatorio",
+      "allowed_users": "limitado a {{count}} usuarios",
+      "accounts": "cuentas: {{accounts}}",
+      "empty_value": "vacío"
+    },
+    "destinations": {
+      "download": "descarga",
+      "s3": "S3",
+      "server": "servidor"
+    },
+    "sources": {
+      "upload": "subida",
+      "s3": "S3",
+      "server": "servidor"
+    },
+    "pager": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "status": "Página {{page}} de {{pages}}, {{total}} entradas"
+    },
+    "retention": {
+      "label": "Conservar las entradas durante",
+      "days": "{{days}} días",
+      "unlimited": "Ilimitado",
+      "save": "Guardar"
+    },
+    "clear": {
+      "title": "Vaciar el registro de actividad",
+      "button": "Vaciar el registro",
+      "confirm": "¿Eliminar todas las entradas del registro? Esta acción no se puede deshacer.",
+      "warning": "{{count}} entradas se eliminarán definitivamente."
+    },
+    "messages": {
+      "retention_saved": "Retención establecida en {{days}} días. {{removed}} entradas antiguas eliminadas.",
+      "retention_unlimited": "Retención ilimitada. No se eliminará ninguna entrada automáticamente.",
+      "cleared": "{{count}} entradas eliminadas."
+    },
+    "errors": {
+      "invalid_form": "Envío de formulario no válido. Inténtelo de nuevo.",
+      "retention_failed": "No se ha podido guardar el ajuste de retención.",
+      "clear_failed": "No se ha podido vaciar el registro."
+    },
+    "fields": {
+      "username": "Nombre de usuario",
+      "email": "Correo",
+      "first_name": "Nombre",
+      "last_name": "Apellido",
+      "quota_max_notes": "Notas máx.",
+      "quota_max_storage_mb": "Almacenamiento (MB)",
+      "quota_max_storage_s3_mb": "Almacenamiento S3 (MB)",
+      "quota_max_backups_s3_mb": "Copias S3 (MB)"
+    },
+    "methods": {
+      "password": "contraseña",
+      "oidc": "SSO"
     }
   },
   "backlinks": {

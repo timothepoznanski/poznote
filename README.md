@@ -37,6 +37,7 @@ https://poznote.com/index.html#press
 - [Note types](#note-types)
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
+- [Activity Log](#activity-log)
 - [Git Synchronization](#git-synchronization)
 - [S3 Attachment Storage](#s3-attachment-storage)
 - [S3 Backups](#s3-backups)
@@ -663,6 +664,25 @@ data/
     ├── 2/                       # User ID 2
     └── ...
 ```
+
+## Activity Log
+
+Poznote keeps a history of the sensitive operations performed on the instance, so administrators can see what happened, when, and by whom. It is available from **Settings > Admin Tools > Activity log** and is restricted to administrators.
+
+Each entry records the date and time, the account concerned, the action, and a short summary such as the name of the deleted workspace or the number of notes removed. Hover the help icon at the top of the page for the full list of recorded operations, which covers:
+
+- **Sessions**: logins and logouts.
+- **Accounts**: profile changes (username, email, name), quota changes, activation and deactivation, admin role granted or revoked, account deletion, and delegated account access granted or revoked.
+- **Workspaces**: creation, deletion, sharing and unsharing.
+- **Data**: backup creation and restore, trash emptying, and permanent note deletion.
+
+Routine activity is deliberately left out: writing or moving a note to the trash is not recorded, and neither are API calls authenticated on each request, which would otherwise turn the log into a traffic dump.
+
+The log records that an operation happened, not the data it touched. **Note content is never written to it**, and neither are tags, folders, or attachments. A deletion entry identifies the note by its title and workspace so the event can be recognised, nothing more.
+
+> **No password is ever written to the log**, in any form. Where a password is relevant, for example on a protected shared workspace, only the fact that one is set is recorded.
+
+Entries are kept for 90 days by default. The retention period can be changed to 30, 90 or 365 days, or set to unlimited, and the log can be cleared manually from the same page.
 
 ## Git Synchronization
 

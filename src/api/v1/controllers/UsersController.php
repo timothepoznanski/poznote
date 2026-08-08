@@ -372,6 +372,19 @@ class UsersController {
             return ['error' => $result['error']];
         }
 
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+        [, $actingAdminName] = currentActivityActor();
+        logActivity(
+            ACTIVITY_ACCOUNT_DELETED,
+            [
+                'deleted_data' => $deleteData,
+                'performed_by' => $actingAdminName,
+            ],
+            'api',
+            (int)$id,
+            $deletedProfile['username'] ?? null
+        );
+
         // Best-effort: notify outgoing webhooks of the deletion.
         if ($deletedProfile) {
             try {
@@ -574,6 +587,18 @@ class UsersController {
             http_response_code(400);
             return ['error' => $result['error']];
         }
+
+        // Identity comes from $user, captured before the row disappeared; the
+        // session is about to be destroyed so currentActivityActor() cannot
+        // resolve it here.
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+        logActivity(
+            ACTIVITY_ACCOUNT_DELETED,
+            ['deleted_data' => true],
+            'self',
+            (int)$userId,
+            $user['username'] ?? null
+        );
 
         // Best-effort: notify outgoing webhooks of the deletion ($user was
         // loaded above, before the row disappeared).

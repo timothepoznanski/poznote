@@ -72,6 +72,15 @@ function createCompleteBackup($userId = null, $skipS3Attachments = false) {
 
     $zipFileName = $build['zip_path'];
 
+    // Logged before the headers go out: this function ends in exit() after
+    // readfile(), so anything after that point would never run.
+    require_once __DIR__ . '/ActivityLog.php';
+    logActivity(ACTIVITY_BACKUP_CREATED, [
+        'filename' => $build['filename'],
+        'size' => @filesize($zipFileName) ?: null,
+        'destination' => 'download',
+    ], 'web', $userId);
+
     // Send file to browser.
     // If a download token was provided by the client, set a cookie with that token so
     // the page JS can detect when the download starts and hide the spinner.

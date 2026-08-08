@@ -1589,6 +1589,14 @@ class NotesController {
         }
         
         if ($success) {
+            require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+            logActivity(ACTIVITY_NOTE_DELETED, [
+                'note_id' => $noteId,
+                'title' => $note['heading'] ?? null,
+                'workspace' => $workspace,
+                'linked_notes_deleted' => $deletedLinkedCount,
+            ]);
+
             $this->sendSuccess([
                 'message' => 'Note permanently deleted',
                 'note' => [

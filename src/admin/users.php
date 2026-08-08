@@ -136,6 +136,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $result = deleteUserProfile($userId, $deleteData);
 
                 if ($result['success']) {
+                    // Logged with the deleted account as subject, not the admin
+                    // performing it: the log answers "what happened to this
+                    // account", and source='admin' records who acted.
+                    require_once __DIR__ . '/../ActivityLog.php';
+                    [, $actingAdminName] = currentActivityActor();
+                    logActivity(
+                        ACTIVITY_ACCOUNT_DELETED,
+                        [
+                            'deleted_data' => $deleteData,
+                            'performed_by' => $actingAdminName,
+                        ],
+                        'admin',
+                        $userId,
+                        $deletedProfile['username'] ?? null
+                    );
+
                     // Best-effort: notify outgoing webhooks of the deletion.
                     if ($deletedProfile) {
                         try {
@@ -199,9 +215,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $allowedUserIds = [];
                 }
 
+                // setUserAccountAccessTargets replaces the whole grant list, so
+                // the before/after sets have to be diffed here to tell an added
+                // grant from a removed one.
+                $accessBefore = [];
+                try {
+                    $beforeStmt = getMasterConnection()->prepare(
+                        'SELECT target_user_id FROM user_account_access WHERE accessor_user_id = ?'
+                    );
+                    $beforeStmt->execute([$userId]);
+                    $accessBefore = array_map('intval', $beforeStmt->fetchAll(PDO::FETCH_COLUMN));
+                } catch (Throwable $e) {
+                    error_log('Could not read account access before update: ' . $e->getMessage());
+                }
+
                 $result = setUserAccountAccessTargets($userId, $allowedUserIds);
 
                 if ($result['success']) {
+                    require_once __DIR__ . '/../ActivityLog.php';
+                    logAccountAccessChange($userId, $accessBefore);
+
                     header('Location: ' . $_SERVER['PHP_SELF']);
                     exit;
                 } else {

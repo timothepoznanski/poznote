@@ -126,6 +126,9 @@ class WorkspacesController {
             
             $stmt = $this->con->prepare("INSERT INTO workspaces (name) VALUES (?)");
             if ($stmt->execute([$name])) {
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+                logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name], 'api');
+
                 http_response_code(201);
                 echo json_encode(['success' => true, 'name' => $name]);
             } else {
@@ -302,6 +305,7 @@ class WorkspacesController {
             // Move notes from this workspace to another before deleting
             $stmt = $this->con->prepare("UPDATE entries SET workspace = ? WHERE workspace = ?");
             $stmt->execute([$targetWorkspace, $name]);
+            $movedNotes = $stmt->rowCount();
             
             // If the deleted workspace was the default workspace, reset to "last opened"
             if ($currentDefaultWorkspace === $name) {
@@ -325,6 +329,15 @@ class WorkspacesController {
             
             $stmt = $this->con->prepare("DELETE FROM workspaces WHERE name = ?");
             if ($stmt->execute([$name])) {
+                // notes_moved, not notes_deleted: this endpoint reassigns the
+                // notes to $targetWorkspace instead of destroying them.
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+                logActivity(ACTIVITY_WORKSPACE_DELETED, [
+                    'workspace' => $name,
+                    'notes_moved' => $movedNotes,
+                    'moved_to' => $targetWorkspace,
+                ], 'api');
+
                 echo json_encode(['success' => true]);
             } else {
                 http_response_code(500);

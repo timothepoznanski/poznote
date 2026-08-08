@@ -179,6 +179,13 @@ class BackupController {
         $zip->close();
         
         if (file_exists($zipFilePath) && filesize($zipFilePath) > 0) {
+            require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+            logActivity(ACTIVITY_BACKUP_CREATED, [
+                'filename' => $zipFileName,
+                'size' => filesize($zipFilePath),
+                'destination' => 'server',
+            ], 'api');
+
             http_response_code(201);
             return [
                 'success' => true,
@@ -354,6 +361,12 @@ class BackupController {
             $result = restoreCompleteBackup($fileInfo, true);
             
             if ($result['success']) {
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+                logActivity(ACTIVITY_BACKUP_RESTORED, [
+                    'filename' => $filename,
+                    'source' => 'server',
+                ], 'api');
+
                 return [
                     'success' => true,
                     'message' => $result['message'] ?? 'Backup restored successfully',

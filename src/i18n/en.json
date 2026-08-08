@@ -165,6 +165,7 @@
       "disaster_recovery": "Restore the instance from a backup in case of data loss.",
       "orphan_scanner": "Find and clean up attachment files that no longer belong to any note.",
       "storage_stats": "See storage usage across all users of this instance.",
+      "activity_log": "Review sensitive operations: account deletions, backups, restores, trash emptying and workspace deletions.",
       "version": "Open the release notes of this version on GitHub.",
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
@@ -207,6 +208,7 @@
       "release_notes": "Release Notes",
       "orphan_scanner": "Orphan attachments scanner",
       "storage_stats": "Admin storage statistics",
+      "activity_log": "Activity log",
       "storage_stats_user": "User Storage statistics",
       "change_password": "Change Password",
       "delete_account": "Delete Account",
@@ -2498,6 +2500,114 @@
       "quota_admin_exempt": "Unlimited because admin",
       "quota_admin_exempt_message": "Quotas do not apply to administrator accounts: their notes and storage are unlimited.",
       "table_notes_total": "Total notes"
+    }
+  },
+  "activity_log": {
+    "title": "Activity log",
+    "description": "History of sensitive operations performed on this instance.",
+    "help_intro": "Operations recorded:",
+    "filter_placeholder": "Search a user or a detail...",
+    "empty": "No entry recorded yet.",
+    "unknown_user": "unknown",
+    "columns": {
+      "date": "Date and time",
+      "user": "User (ID)",
+      "action": "Action",
+      "details": "Details",
+      "source": "Source"
+    },
+    "actions": {
+      "user_login": "Login",
+      "user_logout": "Logout",
+      "profile_updated": "Profile updated",
+      "quota_updated": "Quota updated",
+      "account_activated": "Account activated",
+      "account_deactivated": "Account deactivated",
+      "admin_granted": "Admin role granted",
+      "admin_revoked": "Admin role revoked",
+      "account_deleted": "Account deleted",
+      "access_granted": "Account access granted",
+      "access_revoked": "Account access revoked",
+      "workspace_created": "Workspace created",
+      "workspace_deleted": "Workspace deleted",
+      "workspace_shared": "Workspace shared",
+      "workspace_unshared": "Workspace unshared",
+      "backup_created": "Backup created",
+      "backup_restored": "Backup restored",
+      "trash_emptied": "Trash emptied",
+      "note_deleted": "Note permanently deleted"
+    },
+    "filters": {
+      "all_actions": "All actions",
+      "apply": "Filter",
+      "reset": "Reset"
+    },
+    "details": {
+      "performed_by": "by {{user}}",
+      "data_deleted": "data deleted",
+      "data_kept": "data kept",
+      "notes_deleted": "{{count}} notes deleted",
+      "notes_moved": "{{count}} notes moved to {{workspace}}",
+      "in_workspace": "in {{workspace}}",
+      "untitled_note": "note #{{id}}",
+      "linked_deleted": "+{{count}} linked notes",
+      "share_updated": "settings updated",
+      "password_protected": "password protected",
+      "login_required": "login required",
+      "allowed_users": "restricted to {{count}} users",
+      "accounts": "accounts: {{accounts}}",
+      "empty_value": "empty"
+    },
+    "destinations": {
+      "download": "download",
+      "s3": "S3",
+      "server": "server"
+    },
+    "sources": {
+      "upload": "upload",
+      "s3": "S3",
+      "server": "server"
+    },
+    "pager": {
+      "previous": "Previous",
+      "next": "Next",
+      "status": "Page {{page}} of {{pages}}, {{total}} entries"
+    },
+    "retention": {
+      "label": "Keep entries for",
+      "days": "{{days}} days",
+      "unlimited": "Unlimited",
+      "save": "Save"
+    },
+    "clear": {
+      "title": "Clear the activity log",
+      "button": "Clear the log",
+      "confirm": "Delete every entry in the log? This cannot be undone.",
+      "warning": "{{count}} entries will be permanently deleted."
+    },
+    "messages": {
+      "retention_saved": "Retention set to {{days}} days. {{removed}} old entries removed.",
+      "retention_unlimited": "Retention set to unlimited. No entry will be removed automatically.",
+      "cleared": "{{count}} entries deleted."
+    },
+    "errors": {
+      "invalid_form": "Invalid form submission. Please try again.",
+      "retention_failed": "Could not save the retention setting.",
+      "clear_failed": "Could not clear the log."
+    },
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "quota_max_notes": "Max notes",
+      "quota_max_storage_mb": "Storage (MB)",
+      "quota_max_storage_s3_mb": "S3 storage (MB)",
+      "quota_max_backups_s3_mb": "S3 backups (MB)"
+    },
+    "methods": {
+      "password": "password",
+      "oidc": "SSO"
     }
   },
   "backlinks": {

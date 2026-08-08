@@ -429,6 +429,7 @@
       "disaster_recovery": "Stellen Sie die Instanz nach einem Datenverlust aus einer Sicherung wieder her.",
       "orphan_scanner": "Finden und bereinigen Sie Anhangsdateien, die zu keiner Notiz mehr gehören.",
       "storage_stats": "Sehen Sie die Speichernutzung aller Benutzer dieser Instanz.",
+      "activity_log": "Sensible Vorgänge einsehen: Kontolöschungen, Backups, Wiederherstellungen, Papierkorb leeren und Arbeitsbereich-Löschungen.",
       "version": "Öffnen Sie die Versionshinweise auf GitHub.",
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
@@ -489,6 +490,7 @@
       "release_notes": "Versionshinweise",
       "orphan_scanner": "Verwaiste Anhänge-Scanner",
       "storage_stats": "Admin-Speicherstatistik",
+      "activity_log": "Aktivitätsprotokoll",
       "storage_stats_user": "Benutzer-Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
@@ -2899,6 +2901,114 @@
       "quota_admin_exempt": "Unbegrenzt, da Administrator",
       "quota_admin_exempt_message": "Kontingente gelten nicht für Administratorkonten: Ihre Notizen und ihr Speicher sind unbegrenzt.",
       "table_notes_total": "Notizen gesamt"
+    }
+  },
+  "activity_log": {
+    "title": "Aktivitätsprotokoll",
+    "description": "Verlauf sensibler Vorgänge auf dieser Instanz.",
+    "help_intro": "Protokollierte Vorgänge:",
+    "filter_placeholder": "Benutzer oder Detail suchen...",
+    "empty": "Noch keine Einträge vorhanden.",
+    "unknown_user": "unbekannt",
+    "columns": {
+      "date": "Datum und Uhrzeit",
+      "user": "Benutzer (ID)",
+      "action": "Aktion",
+      "details": "Details",
+      "source": "Quelle"
+    },
+    "actions": {
+      "user_login": "Anmeldung",
+      "user_logout": "Abmeldung",
+      "profile_updated": "Profil geändert",
+      "quota_updated": "Kontingent geändert",
+      "account_activated": "Konto aktiviert",
+      "account_deactivated": "Konto deaktiviert",
+      "admin_granted": "Administratorrolle vergeben",
+      "admin_revoked": "Administratorrolle entzogen",
+      "account_deleted": "Konto gelöscht",
+      "access_granted": "Kontozugriff gewährt",
+      "access_revoked": "Kontozugriff entzogen",
+      "workspace_created": "Arbeitsbereich erstellt",
+      "workspace_deleted": "Arbeitsbereich gelöscht",
+      "workspace_shared": "Arbeitsbereich geteilt",
+      "workspace_unshared": "Arbeitsbereich-Freigabe aufgehoben",
+      "backup_created": "Backup erstellt",
+      "backup_restored": "Backup wiederhergestellt",
+      "trash_emptied": "Papierkorb geleert",
+      "note_deleted": "Notiz endgültig gelöscht"
+    },
+    "filters": {
+      "all_actions": "Alle Aktionen",
+      "apply": "Filtern",
+      "reset": "Zurücksetzen"
+    },
+    "details": {
+      "performed_by": "von {{user}}",
+      "data_deleted": "Daten gelöscht",
+      "data_kept": "Daten behalten",
+      "notes_deleted": "{{count}} Notizen gelöscht",
+      "notes_moved": "{{count}} Notizen verschoben nach {{workspace}}",
+      "in_workspace": "in {{workspace}}",
+      "untitled_note": "Notiz #{{id}}",
+      "linked_deleted": "+{{count}} verknüpfte Notizen",
+      "share_updated": "Einstellungen aktualisiert",
+      "password_protected": "passwortgeschützt",
+      "login_required": "Anmeldung erforderlich",
+      "allowed_users": "auf {{count}} Benutzer beschränkt",
+      "accounts": "Konten: {{accounts}}",
+      "empty_value": "leer"
+    },
+    "destinations": {
+      "download": "Download",
+      "s3": "S3",
+      "server": "Server"
+    },
+    "sources": {
+      "upload": "Upload",
+      "s3": "S3",
+      "server": "Server"
+    },
+    "pager": {
+      "previous": "Zurück",
+      "next": "Weiter",
+      "status": "Seite {{page}} von {{pages}}, {{total}} Einträge"
+    },
+    "retention": {
+      "label": "Einträge aufbewahren für",
+      "days": "{{days}} Tage",
+      "unlimited": "Unbegrenzt",
+      "save": "Speichern"
+    },
+    "clear": {
+      "title": "Aktivitätsprotokoll leeren",
+      "button": "Protokoll leeren",
+      "confirm": "Alle Einträge im Protokoll löschen? Dies kann nicht rückgängig gemacht werden.",
+      "warning": "{{count}} Einträge werden endgültig gelöscht."
+    },
+    "messages": {
+      "retention_saved": "Aufbewahrung auf {{days}} Tage gesetzt. {{removed}} alte Einträge entfernt.",
+      "retention_unlimited": "Aufbewahrung unbegrenzt. Es wird kein Eintrag automatisch entfernt.",
+      "cleared": "{{count}} Einträge gelöscht."
+    },
+    "errors": {
+      "invalid_form": "Ungültige Formularübermittlung. Bitte erneut versuchen.",
+      "retention_failed": "Aufbewahrungseinstellung konnte nicht gespeichert werden.",
+      "clear_failed": "Protokoll konnte nicht geleert werden."
+    },
+    "fields": {
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "quota_max_notes": "Max. Notizen",
+      "quota_max_storage_mb": "Speicher (MB)",
+      "quota_max_storage_s3_mb": "S3-Speicher (MB)",
+      "quota_max_backups_s3_mb": "S3-Backups (MB)"
+    },
+    "methods": {
+      "password": "Passwort",
+      "oidc": "SSO"
     }
   },
   "backlinks": {

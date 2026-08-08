@@ -52,6 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_FILES['complete_backup_file']) && $_FILES['complete_backup_file']['error'] === UPLOAD_ERR_OK) {
                 $result = restoreCompleteBackup($_FILES['complete_backup_file']);
                 if ($result['success']) {
+                    require_once __DIR__ . '/ActivityLog.php';
+                    logActivity(ACTIVITY_BACKUP_RESTORED, [
+                        'filename' => $_FILES['complete_backup_file']['name'] ?? null,
+                        'source' => 'upload',
+                    ]);
+
                     $restore_message = t('restore_import.messages.complete_backup_restored', ['message' => $result['message']]);
                 } else {
                     $restoreErrorDetails = trim((string)($result['message'] ?? ''));
@@ -146,6 +152,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     S3BackupService::makeClient()->getObjectToFile($s3RestoreKey, $s3RestoreTemp);
                     $result = restoreCompleteBackup(['tmp_name' => $s3RestoreTemp, 'name' => basename($s3RestoreKey)], true);
                     if ($result['success']) {
+                        require_once __DIR__ . '/ActivityLog.php';
+                        logActivity(ACTIVITY_BACKUP_RESTORED, [
+                            'filename' => basename($s3RestoreKey),
+                            'source' => 's3',
+                        ]);
+
                         $restore_message = t('restore_import.messages.complete_backup_restored', ['message' => $result['message']]);
                     } else {
                         $restoreErrorDetails = trim((string)($result['message'] ?? ''));

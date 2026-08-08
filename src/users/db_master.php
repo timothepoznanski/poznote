@@ -1021,7 +1021,14 @@ function updateUserProfile(int $id, array $data): array {
         $sql = "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ?";
         $stmt = $masterCon->prepare($sql);
         $stmt->execute($params);
-        
+
+        // Every profile and quota write funnels through here, so logging at
+        // this single point covers the self-service API, the admin API, both
+        // admin forms and the OIDC email sync. $currentUser holds the row as it
+        // was before the UPDATE, which is what makes "X -> Y" possible.
+        require_once __DIR__ . '/../ActivityLog.php';
+        logProfileUpdate($id, $currentUser, $data);
+
         // If updating the current active account or authenticated identity, refresh the session data
         $isCurrentUser = (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $id);
         $isAuthenticatedUser = (isset($_SESSION['login_user_id']) && (int)$_SESSION['login_user_id'] === $id);

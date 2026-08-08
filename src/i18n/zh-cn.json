@@ -431,6 +431,7 @@
       "disaster_recovery": "在数据丢失时从备份恢复实例。",
       "orphan_scanner": "查找并清理不再属于任何笔记的附件文件。",
       "storage_stats": "查看此实例所有用户的存储使用情况。",
+      "activity_log": "查看敏感操作：账户删除、备份、恢复、清空回收站和工作区删除。",
       "version": "在 GitHub 上打开此版本的更新说明。",
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
@@ -492,6 +493,7 @@
       "release_notes": "发布日志",
       "orphan_scanner": "孤立附件扫描器",
       "storage_stats": "管理员存储统计",
+      "activity_log": "活动日志",
       "storage_stats_user": "用户存储统计",
       "change_password": "修改密码",
       "delete_account": "删除账户",
@@ -3026,6 +3028,114 @@
       "quota_admin_exempt": "管理员不受限制",
       "quota_admin_exempt_message": "配额不适用于管理员账户：其笔记和存储空间均无限制。",
       "table_notes_total": "笔记总数"
+    }
+  },
+  "activity_log": {
+    "title": "活动日志",
+    "description": "本实例上敏感操作的历史记录。",
+    "help_intro": "记录的操作：",
+    "filter_placeholder": "搜索用户或详情...",
+    "empty": "暂无记录。",
+    "unknown_user": "未知",
+    "columns": {
+      "date": "日期和时间",
+      "user": "用户 (ID)",
+      "action": "操作",
+      "details": "详情",
+      "source": "来源"
+    },
+    "actions": {
+      "user_login": "登录",
+      "user_logout": "登出",
+      "profile_updated": "资料已修改",
+      "quota_updated": "配额已修改",
+      "account_activated": "账户已启用",
+      "account_deactivated": "账户已停用",
+      "admin_granted": "已授予管理员角色",
+      "admin_revoked": "已撤销管理员角色",
+      "account_deleted": "账户已删除",
+      "access_granted": "已授予账户访问权限",
+      "access_revoked": "已撤销账户访问权限",
+      "workspace_created": "工作区已创建",
+      "workspace_deleted": "工作区已删除",
+      "workspace_shared": "工作区已共享",
+      "workspace_unshared": "已取消工作区共享",
+      "backup_created": "已创建备份",
+      "backup_restored": "已恢复备份",
+      "trash_emptied": "已清空回收站",
+      "note_deleted": "笔记已永久删除"
+    },
+    "filters": {
+      "all_actions": "所有操作",
+      "apply": "筛选",
+      "reset": "重置"
+    },
+    "details": {
+      "performed_by": "由 {{user}}",
+      "data_deleted": "数据已删除",
+      "data_kept": "数据已保留",
+      "notes_deleted": "已删除 {{count}} 条笔记",
+      "notes_moved": "已将 {{count}} 条笔记移至 {{workspace}}",
+      "in_workspace": "在 {{workspace}}",
+      "untitled_note": "笔记 #{{id}}",
+      "linked_deleted": "+{{count}} 条关联笔记",
+      "share_updated": "设置已更新",
+      "password_protected": "受密码保护",
+      "login_required": "需要登录",
+      "allowed_users": "限 {{count}} 位用户",
+      "accounts": "账户：{{accounts}}",
+      "empty_value": "空"
+    },
+    "destinations": {
+      "download": "下载",
+      "s3": "S3",
+      "server": "服务器"
+    },
+    "sources": {
+      "upload": "上传",
+      "s3": "S3",
+      "server": "服务器"
+    },
+    "pager": {
+      "previous": "上一页",
+      "next": "下一页",
+      "status": "第 {{page}} / {{pages}} 页，共 {{total}} 条"
+    },
+    "retention": {
+      "label": "记录保留时长",
+      "days": "{{days}} 天",
+      "unlimited": "不限",
+      "save": "保存"
+    },
+    "clear": {
+      "title": "清空活动日志",
+      "button": "清空日志",
+      "confirm": "删除日志中的所有记录？此操作无法撤销。",
+      "warning": "将永久删除 {{count}} 条记录。"
+    },
+    "messages": {
+      "retention_saved": "保留期已设为 {{days}} 天。已移除 {{removed}} 条旧记录。",
+      "retention_unlimited": "保留期设为不限。不会自动移除任何记录。",
+      "cleared": "已删除 {{count}} 条记录。"
+    },
+    "errors": {
+      "invalid_form": "表单提交无效，请重试。",
+      "retention_failed": "无法保存保留期设置。",
+      "clear_failed": "无法清空日志。"
+    },
+    "fields": {
+      "username": "用户名",
+      "email": "邮箱",
+      "first_name": "名",
+      "last_name": "姓",
+      "quota_max_notes": "最大笔记数",
+      "quota_max_storage_mb": "存储 (MB)",
+      "quota_max_storage_s3_mb": "S3 存储 (MB)",
+      "quota_max_backups_s3_mb": "S3 备份 (MB)"
+    },
+    "methods": {
+      "password": "密码",
+      "oidc": "SSO"
     }
   },
   "profile": {

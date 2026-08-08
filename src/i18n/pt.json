@@ -428,6 +428,7 @@
       "disaster_recovery": "Restaure a instância a partir de um backup em caso de perda de dados.",
       "orphan_scanner": "Encontre e limpe arquivos de anexos que não pertencem mais a nenhuma nota.",
       "storage_stats": "Veja o uso de armazenamento de todos os usuários desta instância.",
+      "activity_log": "Consultar operações sensíveis: eliminações de conta, backups, restauros, esvaziamento do lixo e eliminações de área de trabalho.",
       "version": "Abra as notas da versão no GitHub.",
       "github": "Abra o código-fonte do Poznote no GitHub.",
       "api_rest": "Mostre informações sobre a API REST do Poznote.",
@@ -488,6 +489,7 @@
       "release_notes": "Notas de versão",
       "orphan_scanner": "Scanner de anexos órfãos",
       "storage_stats": "Estatísticas de armazenamento do administrador",
+      "activity_log": "Registo de atividade",
       "storage_stats_user": "Estatísticas de armazenamento do usuário",
       "user_management": "Gestão de utilizadores",
       "change_password": "Mudar palavra-passe",
@@ -2902,6 +2904,114 @@
       "quota_admin_exempt": "Ilimitado por ser administrador",
       "quota_admin_exempt_message": "As cotas não se aplicam às contas de administrador: suas notas e seu armazenamento são ilimitados.",
       "table_notes_total": "Total de notas"
+    }
+  },
+  "activity_log": {
+    "title": "Registo de atividade",
+    "description": "Histórico de operações sensíveis realizadas nesta instância.",
+    "help_intro": "Operações registadas:",
+    "filter_placeholder": "Procurar um utilizador ou um detalhe...",
+    "empty": "Ainda não existe nenhuma entrada.",
+    "unknown_user": "desconhecido",
+    "columns": {
+      "date": "Data e hora",
+      "user": "Utilizador (ID)",
+      "action": "Ação",
+      "details": "Detalhes",
+      "source": "Origem"
+    },
+    "actions": {
+      "user_login": "Início de sessão",
+      "user_logout": "Fim de sessão",
+      "profile_updated": "Perfil alterado",
+      "quota_updated": "Quota alterada",
+      "account_activated": "Conta ativada",
+      "account_deactivated": "Conta desativada",
+      "admin_granted": "Função de administrador concedida",
+      "admin_revoked": "Função de administrador removida",
+      "account_deleted": "Conta eliminada",
+      "access_granted": "Acesso à conta concedido",
+      "access_revoked": "Acesso à conta revogado",
+      "workspace_created": "Área de trabalho criada",
+      "workspace_deleted": "Área de trabalho eliminada",
+      "workspace_shared": "Área de trabalho partilhada",
+      "workspace_unshared": "Partilha de área de trabalho removida",
+      "backup_created": "Backup criado",
+      "backup_restored": "Backup restaurado",
+      "trash_emptied": "Lixo esvaziado",
+      "note_deleted": "Nota eliminada definitivamente"
+    },
+    "filters": {
+      "all_actions": "Todas as ações",
+      "apply": "Filtrar",
+      "reset": "Repor"
+    },
+    "details": {
+      "performed_by": "por {{user}}",
+      "data_deleted": "dados eliminados",
+      "data_kept": "dados mantidos",
+      "notes_deleted": "{{count}} notas eliminadas",
+      "notes_moved": "{{count}} notas movidas para {{workspace}}",
+      "in_workspace": "em {{workspace}}",
+      "untitled_note": "nota #{{id}}",
+      "linked_deleted": "+{{count}} notas ligadas",
+      "share_updated": "definições atualizadas",
+      "password_protected": "protegido por palavra-passe",
+      "login_required": "início de sessão obrigatório",
+      "allowed_users": "limitado a {{count}} utilizadores",
+      "accounts": "contas: {{accounts}}",
+      "empty_value": "vazio"
+    },
+    "destinations": {
+      "download": "transferência",
+      "s3": "S3",
+      "server": "servidor"
+    },
+    "sources": {
+      "upload": "carregamento",
+      "s3": "S3",
+      "server": "servidor"
+    },
+    "pager": {
+      "previous": "Anterior",
+      "next": "Seguinte",
+      "status": "Página {{page}} de {{pages}}, {{total}} entradas"
+    },
+    "retention": {
+      "label": "Manter as entradas durante",
+      "days": "{{days}} días",
+      "unlimited": "Ilimitado",
+      "save": "Guardar"
+    },
+    "clear": {
+      "title": "Limpar o registo de atividade",
+      "button": "Limpar o registo",
+      "confirm": "Eliminar todas as entradas do registo? Esta ação não pode ser anulada.",
+      "warning": "{{count}} entradas serão eliminadas definitivamente."
+    },
+    "messages": {
+      "retention_saved": "Retenção definida para {{days}} dias. {{removed}} entradas antigas removidas.",
+      "retention_unlimited": "Retenção ilimitada. Nenhuma entrada será removida automaticamente.",
+      "cleared": "{{count}} entradas eliminadas."
+    },
+    "errors": {
+      "invalid_form": "Submissão de formulário inválida. Tente novamente.",
+      "retention_failed": "Não foi possível guardar a definição de retenção.",
+      "clear_failed": "Não foi possível limpar o registo."
+    },
+    "fields": {
+      "username": "Nome de utilizador",
+      "email": "E-mail",
+      "first_name": "Nome",
+      "last_name": "Apelido",
+      "quota_max_notes": "Notas máx.",
+      "quota_max_storage_mb": "Armazenamento (MB)",
+      "quota_max_storage_s3_mb": "Armazenamento S3 (MB)",
+      "quota_max_backups_s3_mb": "Backups S3 (MB)"
+    },
+    "methods": {
+      "password": "palavra-passe",
+      "oidc": "SSO"
     }
   },
   "backlinks": {
