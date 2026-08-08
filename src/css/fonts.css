@@ -1,0 +1,26 @@
+/**
+ * Shared application webfont.
+ *
+ * modals/base.css (and others) ask for 'Inter' without declaring it; pages
+ * that load no declaration silently fall back to the system sans-serif.
+ * Link this file from any page whose stylesheets do not already declare the
+ * font, instead of pasting another @font-face copy (a dozen page stylesheets
+ * historically carry their own; new pages should use this one).
+ *
+ * Only these two weights ship; browsers synthesise the rest.
+ */
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('../webfonts/Inter/static/Inter_24pt-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}

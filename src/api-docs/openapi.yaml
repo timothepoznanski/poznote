@@ -3371,21 +3371,24 @@ paths:
       tags: [Users]
       summary: Delete a user profile (admin only)
       description: |
-        Delete a user profile. Optionally delete all user data.
+        Delete a user profile and everything it owns: its local data (notes,
+        folders, tags, attachments) and its objects in the S3 buckets
+        (attachments and backup archives). The former delete_data parameter is
+        gone; deletion always removes all data.
+
         Cannot delete your own profile or the last admin.
         Requires admin privileges. Does NOT require X-User-ID header.
+
+        This is immediate and irreversible, so download a complete backup ZIP
+        first if the data still matters. The response reports
+        s3_objects_deleted, plus s3_error when a bucket could not be reached
+        (the account is deleted regardless).
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: integer
-        - name: delete_data
-          in: query
-          schema:
-            type: boolean
-            default: false
-          description: If true, also delete all user data (notes, attachments, etc.)
       responses:
         '200':
           description: User deleted successfully

@@ -329,6 +329,35 @@ class S3BackupService {
     }
 
     /**
+     * Remove every backup archive of one user from the bucket.
+     *
+     * Used on every account deletion: without it the archives would stay in
+     * the bucket forever, since nothing else references a deleted user's
+     * prefix.
+     *
+     * Ignores the 'enabled' master switch on purpose: archives uploaded while
+     * the feature was on must still be removable after it has been turned off.
+     * Only the credentials are required.
+     *
+     * @return array ['deleted' => int, 'error' => ?string]
+     */
+    public static function deleteAllUserBackups(int $userId, ?array $config = null): array {
+        $config = $config ?? self::getConfig();
+        if (!self::isConfigured($config)) {
+            return ['deleted' => 0, 'error' => null];
+        }
+
+        $deleted = 0;
+        try {
+            self::makeClient($config)->deletePrefix(self::keyPrefixForUser($userId), $deleted);
+        } catch (Exception $e) {
+            error_log('S3 backup purge failed for user ' . $userId . ': ' . $e->getMessage());
+            return ['deleted' => $deleted, 'error' => $e->getMessage()];
+        }
+        return ['deleted' => $deleted, 'error' => null];
+    }
+
+    /**
      * Every backup archive in the bucket, newest first, with its owner.
      *
      * @return array List of ['key', 'size', 'mtime', 'user_id', 'filename']

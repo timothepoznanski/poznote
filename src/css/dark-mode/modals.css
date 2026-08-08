@@ -554,6 +554,16 @@ body.dark-mode #deleteModal .modal-content p {
     color: #c8c8c8;
 }
 
+/* Irreversible-deletion warning headline (base styles in settings.css):
+   the blanket p-recolor above would grey it out, and its id gives it the
+   weight to do so, hence the matching :is() id boost. #dc3545 is too dim on
+   the dark panel, so a lighter red. #deleteAccountModal is the self-service
+   twin built by js/delete-account.js on the settings page. */
+html[data-theme='dark'] :is(#deleteModal, #deleteAccountModal) .delete-warning-box .delete-warning,
+body.dark-mode :is(#deleteModal, #deleteAccountModal) .delete-warning-box .delete-warning {
+    color: #ff6b7a;
+}
+
 html[data-theme='dark'] #deleteModal input,
 body.dark-mode #deleteModal input {
     background-color: var(--dm-surface);

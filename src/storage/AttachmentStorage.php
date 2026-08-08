@@ -46,10 +46,19 @@ class AttachmentStorage {
         return self::$config;
     }
 
-    public static function isEnabled(): bool {
+    /**
+     * Bucket credentials are present. Unlike isEnabled() this ignores the
+     * master switch: objects uploaded while the feature was on must remain
+     * reachable for cleanup after it has been turned off.
+     */
+    public static function isConfigured(): bool {
         $config = self::getConfig();
-        return $config['enabled'] && $config['endpoint'] !== '' && $config['bucket'] !== ''
+        return $config['endpoint'] !== '' && $config['bucket'] !== ''
             && $config['access_key'] !== '' && $config['secret_key'] !== '';
+    }
+
+    public static function isEnabled(): bool {
+        return self::getConfig()['enabled'] && self::isConfigured();
     }
 
     /**
@@ -304,16 +313,33 @@ class AttachmentStorage {
         if (!$this->isRemote()) {
             return 0;
         }
+        return self::purgeUserObjects((int)$this->userId)['deleted'];
+    }
+
+    /**
+     * Remove every remote attachment of one user, reporting failures.
+     *
+     * Used on every account deletion: the caller shows the outcome to a
+     * human, so a bucket error must surface instead of being logged and
+     * swallowed. Gated on isConfigured() only, not isEnabled(): objects
+     * uploaded while S3 storage was on must still be removable after the
+     * instance has been switched back to local storage.
+     *
+     * @return array ['deleted' => int, 'error' => ?string]
+     */
+    public static function purgeUserObjects(int $userId): array {
+        if (!self::isConfigured()) {
+            return ['deleted' => 0, 'error' => null];
+        }
+
         $deleted = 0;
         try {
-            foreach ($this->client()->listObjects(self::keyPrefixForUser((int)$this->userId)) as $object) {
-                $this->client()->deleteObject($object['key']);
-                $deleted++;
-            }
+            self::makeClient(self::getConfig())->deletePrefix(self::keyPrefixForUser($userId), $deleted);
         } catch (Exception $e) {
-            error_log('S3 attachment purge failed: ' . $e->getMessage());
+            error_log('S3 attachment purge failed for user ' . $userId . ': ' . $e->getMessage());
+            return ['deleted' => $deleted, 'error' => $e->getMessage()];
         }
-        return $deleted;
+        return ['deleted' => $deleted, 'error' => null];
     }
 
     /**

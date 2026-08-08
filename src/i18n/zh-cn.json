@@ -2731,8 +2731,10 @@
         "username_taken": "用户名已被占用",
         "email_taken": "邮箱已被使用",
         "cannot_delete_self": "您无法删除自己的资料",
+        "s3_cleanup_failed": "账户已删除，但其文件无法从 S3 存储桶中删除：{{error}}。请手动删除它们。",
         "cannot_demote_self": "您无法移除自己的管理员权限",
-        "cannot_change_self": "您无法更改自己的状态/角色"
+        "cannot_change_self": "您无法更改自己的状态/角色",
+        "confirm_username_mismatch": "您输入的用户名与要删除的账户不匹配。未删除任何内容。"
       },
       "stats": {
         "title": "系统统计",
@@ -2757,7 +2759,6 @@
       "network_error": "网络错误：",
       "click_to_rename": "点击重命名",
       "rename_user": "重命名用户",
-      "delete_warning_all_data": "所有用户数据（笔记、附件等）都将被永久删除。",
       "access_denied_admin": "拒绝访问。需要管理员权限。",
       "confirm_admin": {
         "title": "确认提升为管理员",
@@ -2767,7 +2768,13 @@
         "privilege_passwords": "更改所有其他用户的密码",
         "privilege_admin_panel": "访问此用户管理面板",
         "confirm_button": "确认管理员晋升"
-      }
+      },
+      "delete_warning_everything": "属于该账户的所有内容都将被立即永久删除。",
+      "delete_warning_item_data": "其笔记、文件夹、标签和附件",
+      "delete_warning_item_s3": "其存储在 S3 存储桶中的附件和备份归档",
+      "delete_warning_no_recovery": "无法恢复：不会保留任何内容，也不会事先创建备份。如果这些数据仍然重要，请在删除前下载完整的备份 ZIP 文件。",
+      "delete_confirm_label": "输入“{{username}}”以确认：",
+      "delete_confirm_placeholder": "输入用户名以确认"
     },
     "profile": {
       "title": "我的资料",
@@ -3084,7 +3091,9 @@
       "login_required": "需要登录",
       "allowed_users": "限 {{count}} 位用户",
       "accounts": "账户：{{accounts}}",
-      "empty_value": "空"
+      "empty_value": "空",
+      "s3_objects_deleted": "已删除 {{count}} 个 S3 对象",
+      "s3_cleanup_failed": "S3 清理失败"
     },
     "destinations": {
       "download": "下载",
@@ -3185,10 +3194,14 @@
   "delete_account": {
     "modal": {
       "title": "删除账户",
-      "description": "您的账户 \"{{username}}\" 及其所有数据（笔记、文件、附件）将被永久删除。此操作无法撤销。",
+      "description": "您即将删除您的账户“{{username}}”。",
       "confirm_placeholder": "输入您的用户名以确认",
       "password_placeholder": "当前密码",
-      "button": "删除我的账户"
+      "button": "删除我的账户",
+      "warning_everything": "属于您账户的所有内容都将被立即永久删除。",
+      "warning_item_data": "您的笔记、文件夹、标签和附件",
+      "warning_item_s3": "您存储在 S3 存储桶中的附件和备份归档",
+      "warning_no_recovery": "无法恢复：不会保留任何内容，也不会事先创建备份。如果这些数据仍然重要，请在删除前下载完整的备份 ZIP 文件。"
     },
     "errors": {
       "confirm_mismatch": "用户名不匹配",

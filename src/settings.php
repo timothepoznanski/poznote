@@ -293,6 +293,7 @@ if ($canUseUserWebhooks) {
     <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="pwa/pwa.js?v=<?php echo $cache_v; ?>" defer></script>
+    <link rel="stylesheet" href="css/fonts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>">
@@ -534,7 +535,7 @@ if ($canUseUserWebhooks) {
 
             <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
             <!-- Delete Account -->
-            <div class="home-card" id="delete-account-card">
+            <div class="home-card home-card-red" id="delete-account-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.delete_account', [], 'Permanently delete your account and all its data.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-trash-2"></i>

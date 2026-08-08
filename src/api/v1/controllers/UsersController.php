@@ -360,12 +360,15 @@ class UsersController {
             return ['error' => 'Cannot delete your own profile'];
         }
         
-        $deleteData = isset($params['delete_data']) && filter_var($params['delete_data'], FILTER_VALIDATE_BOOL);
-
         // Captured before deletion: the profile row is gone afterwards.
         $deletedProfile = getUserProfileById((int)$id);
 
-        $result = deleteUserProfile((int)$id, $deleteData);
+        // Deleting an account removes everything it owns: local data and the
+        // S3 objects (attachments, backup archives). The former delete_data
+        // flag is gone because keeping the local notes while the S3 purge
+        // destroys the only copy of their attachments produced a "preserved"
+        // data set with every attachment missing.
+        $result = deleteUserProfile((int)$id, true);
 
         if (!$result['success']) {
             http_response_code(400);
@@ -374,12 +377,19 @@ class UsersController {
 
         require_once dirname(__DIR__, 3) . '/ActivityLog.php';
         [, $actingAdminName] = currentActivityActor();
+        // s3_error is recorded on partial failure so the audit trail never
+        // claims a cleanup that did not complete.
+        $deletionLogDetails = [
+            'deleted_data' => true,
+            's3_objects_deleted' => (int)($result['s3_deleted'] ?? 0),
+            'performed_by' => $actingAdminName,
+        ];
+        if (!empty($result['s3_error'])) {
+            $deletionLogDetails['s3_error'] = $result['s3_error'];
+        }
         logActivity(
             ACTIVITY_ACCOUNT_DELETED,
-            [
-                'deleted_data' => $deleteData,
-                'performed_by' => $actingAdminName,
-            ],
+            $deletionLogDetails,
             'api',
             (int)$id,
             $deletedProfile['username'] ?? null
@@ -395,7 +405,16 @@ class UsersController {
             }
         }
 
-        return ['message' => 'User profile deleted successfully'];
+        $response = [
+            'message' => 'User profile deleted successfully',
+            's3_objects_deleted' => (int)($result['s3_deleted'] ?? 0),
+        ];
+        // The account is deleted either way; a bucket error only means some
+        // objects are still there and need manual cleanup.
+        if (!empty($result['s3_error'])) {
+            $response['s3_error'] = $result['s3_error'];
+        }
+        return $response;
     }
     
     /**
@@ -559,8 +578,10 @@ class UsersController {
             $data = [];
         }
 
+        // Trimmed on both sides so accounts created before usernames were
+        // normalized (stray whitespace) can still self-delete.
         $confirmUsername = trim((string)($data['confirm_username'] ?? ''));
-        if ($confirmUsername !== (string)$user['username']) {
+        if ($confirmUsername !== trim((string)$user['username'])) {
             http_response_code(400);
             return ['error' => 'Username confirmation does not match'];
         }
@@ -581,7 +602,8 @@ class UsersController {
             }
         }
 
-        // deleteUserProfile refuses user ID 1 and the last active admin.
+        // deleteUserProfile refuses user ID 1 and the last active admin, and
+        // purges the account's S3 objects along with its local data.
         $result = deleteUserProfile((int)$userId, true);
         if (!$result['success']) {
             http_response_code(400);
@@ -592,9 +614,19 @@ class UsersController {
         // session is about to be destroyed so currentActivityActor() cannot
         // resolve it here.
         require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+        // s3_error must land in the log: after a self-deletion there is no
+        // user left to warn, so the activity log is the only place an admin
+        // can learn that bucket objects were left behind.
+        $deletionLogDetails = [
+            'deleted_data' => true,
+            's3_objects_deleted' => (int)($result['s3_deleted'] ?? 0),
+        ];
+        if (!empty($result['s3_error'])) {
+            $deletionLogDetails['s3_error'] = $result['s3_error'];
+        }
         logActivity(
             ACTIVITY_ACCOUNT_DELETED,
-            ['deleted_data' => true],
+            $deletionLogDetails,
             'self',
             (int)$userId,
             $user['username'] ?? null

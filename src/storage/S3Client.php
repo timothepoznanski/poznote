@@ -142,6 +142,26 @@ class S3Client {
     }
 
     /**
+     * Delete every object under a prefix. Returns the number of objects
+     * removed; throws on the first list or delete failure. Objects already
+     * deleted stay deleted, so $progress keeps counting through a failure
+     * and lets callers report the partial total alongside the error.
+     *
+     * Deletes are sequential, one request per object: the purge of a large
+     * account can outlive PHP's default max_execution_time, so the limit is
+     * lifted for the duration (same precedent as api_s3_backup.php).
+     */
+    public function deletePrefix(string $prefix, ?int &$progress = null): int {
+        @set_time_limit(0);
+        $progress = 0;
+        foreach ($this->listObjects($prefix) as $object) {
+            $this->deleteObject($object['key']);
+            $progress++;
+        }
+        return $progress;
+    }
+
+    /**
      * @return array|null ['size' => int, 'mtime' => int] or null when the object is absent
      */
     public function headObject(string $key): ?array {

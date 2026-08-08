@@ -209,6 +209,14 @@ function activityDetailsText(string $action, ?string $json): string {
                     ? t('activity_log.details.data_deleted', [], 'data deleted')
                     : t('activity_log.details.data_kept', [], 'data kept');
             }
+            if (!empty($d['s3_objects_deleted'])) {
+                $parts[] = t('activity_log.details.s3_objects_deleted', ['count' => (int)$d['s3_objects_deleted']], '{{count}} S3 objects deleted');
+            }
+            // Written only when the bucket cleanup failed: the flagged entry
+            // is what tells a later audit that objects were left behind.
+            if (!empty($d['s3_error'])) {
+                $parts[] = t('activity_log.details.s3_cleanup_failed', [], 'S3 cleanup failed');
+            }
             return implode(' · ', $parts);
 
         case ACTIVITY_BACKUP_CREATED:
