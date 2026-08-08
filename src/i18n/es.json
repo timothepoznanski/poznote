@@ -2698,8 +2698,16 @@
       "errors": {
         "cannot_delete_self": "No puedes borrar tu propio perfil",
         "cannot_change_self": "No puedes cambiar tu propio estado/rol",
-        "username_required": "El nombre de usuario es obligatorio"
-      }
+        "username_required": "El nombre de usuario es obligatorio",
+        "s3_cleanup_failed": "La cuenta se eliminó, pero sus archivos no se pudieron eliminar de los buckets S3: {{error}}. Elimínelos manualmente.",
+        "confirm_username_mismatch": "El nombre de usuario que escribió no coincide con la cuenta que se va a eliminar. No se eliminó nada."
+      },
+      "delete_warning_everything": "Todo lo que pertenece a esta cuenta se eliminará de forma inmediata y permanente.",
+      "delete_warning_item_data": "Sus notas, carpetas, etiquetas y archivos adjuntos",
+      "delete_warning_item_s3": "Sus archivos adjuntos y sus copias de seguridad almacenadas en los buckets S3",
+      "delete_warning_no_recovery": "No hay recuperación posible: no se conserva nada y no se crea ninguna copia de seguridad previa. Si estos datos aún importan, descargue una copia de seguridad completa en ZIP antes de eliminar.",
+      "delete_confirm_label": "Escriba «{{username}}» para confirmar:",
+      "delete_confirm_placeholder": "Escriba el nombre de usuario para confirmar"
     }
   },
   "git_sync": {
@@ -2957,7 +2965,9 @@
       "login_required": "inicio de sesión obligatorio",
       "allowed_users": "limitado a {{count}} usuarios",
       "accounts": "cuentas: {{accounts}}",
-      "empty_value": "vacío"
+      "empty_value": "vacío",
+      "s3_objects_deleted": "{{count}} objetos S3 eliminados",
+      "s3_cleanup_failed": "falló la limpieza de S3"
     },
     "destinations": {
       "download": "descarga",
@@ -3061,10 +3071,14 @@
   "delete_account": {
     "modal": {
       "title": "Eliminar cuenta",
-      "description": "Tu cuenta \"{{username}}\" y todos sus datos (notas, archivos, adjuntos) se eliminarán de forma permanente. Esta acción no se puede deshacer.",
+      "description": "Está a punto de eliminar su cuenta \"{{username}}\".",
       "confirm_placeholder": "Escribe tu nombre de usuario para confirmar",
       "password_placeholder": "Contraseña actual",
-      "button": "Eliminar mi cuenta"
+      "button": "Eliminar mi cuenta",
+      "warning_everything": "Todo lo que pertenece a su cuenta se eliminará de forma inmediata y permanente.",
+      "warning_item_data": "Sus notas, carpetas, etiquetas y archivos adjuntos",
+      "warning_item_s3": "Sus archivos adjuntos y sus copias de seguridad almacenadas en los buckets S3",
+      "warning_no_recovery": "No hay recuperación posible: no se conserva nada y no se crea ninguna copia de seguridad previa. Si estos datos aún importan, descargue una copia de seguridad completa en ZIP antes de eliminar."
     },
     "errors": {
       "confirm_mismatch": "El nombre de usuario no coincide",

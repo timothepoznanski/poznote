@@ -2556,7 +2556,9 @@
       "login_required": "login required",
       "allowed_users": "restricted to {{count}} users",
       "accounts": "accounts: {{accounts}}",
-      "empty_value": "empty"
+      "empty_value": "empty",
+      "s3_objects_deleted": "{{count}} S3 objects deleted",
+      "s3_cleanup_failed": "S3 cleanup failed"
     },
     "destinations": {
       "download": "download",
@@ -2689,8 +2691,16 @@
       "errors": {
         "cannot_delete_self": "You cannot delete your own profile",
         "cannot_change_self": "You cannot change your own status/role",
-        "username_required": "Username is required"
-      }
+        "username_required": "Username is required",
+        "s3_cleanup_failed": "The account was deleted, but its files could not be removed from the S3 buckets: {{error}}. Delete them manually.",
+        "confirm_username_mismatch": "The username you typed does not match the account to delete. Nothing was deleted."
+      },
+      "delete_warning_everything": "Everything belonging to this account will be deleted immediately and permanently.",
+      "delete_warning_item_data": "Its notes, folders, tags and attachments",
+      "delete_warning_item_s3": "Its attachments and backup archives stored in the S3 buckets",
+      "delete_warning_no_recovery": "There is no recovery: nothing is kept, and no backup is created beforehand. If this data still matters, download a complete backup ZIP before deleting.",
+      "delete_confirm_label": "Type \"{{username}}\" to confirm:",
+      "delete_confirm_placeholder": "Type the username to confirm"
     }
   },
   "profile": {
@@ -2740,10 +2750,14 @@
   "delete_account": {
     "modal": {
       "title": "Delete Account",
-      "description": "This will permanently delete your account \"{{username}}\" and all of its data (notes, files, attachments). This action cannot be undone.",
+      "description": "You are about to delete your account \"{{username}}\".",
       "confirm_placeholder": "Type your username to confirm",
       "password_placeholder": "Current password",
-      "button": "Delete my account"
+      "button": "Delete my account",
+      "warning_everything": "Everything belonging to your account will be deleted immediately and permanently.",
+      "warning_item_data": "Your notes, folders, tags and attachments",
+      "warning_item_s3": "Your attachments and backup archives stored in the S3 buckets",
+      "warning_no_recovery": "There is no recovery: nothing is kept, and no backup is created beforehand. If this data still matters, download a complete backup ZIP before deleting."
     },
     "errors": {
       "confirm_mismatch": "Username confirmation does not match",

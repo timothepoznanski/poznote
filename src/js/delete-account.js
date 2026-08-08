@@ -43,7 +43,22 @@
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('delete_account.modal.title', {}, 'Delete Account') + '</h3>' +
-                '<p class="text-danger delete-account-description">' + tr('delete_account.modal.description', { username: escapeHtml(username) }, 'This will permanently delete your account "{{username}}" and all of its data (notes, files, attachments). This action cannot be undone.') + '</p>' +
+                '<p class="delete-account-description">' + tr('delete_account.modal.description', { username: escapeHtml(username) }, 'You are about to delete your account "{{username}}".') + '</p>' +
+                // Same breakdown as the admin delete modal: what goes, and the
+                // fact that nothing is kept anywhere afterwards.
+                '<div class="delete-warning-box">' +
+                    '<p class="delete-warning">' +
+                        '<i class="lucide-alert-triangle"></i> ' +
+                        tr('delete_account.modal.warning_everything', {}, 'Everything belonging to your account will be deleted immediately and permanently.') +
+                    '</p>' +
+                    '<ul class="delete-warning-list">' +
+                        '<li>' + tr('delete_account.modal.warning_item_data', {}, 'Your notes, folders, tags and attachments') + '</li>' +
+                        '<li>' + tr('delete_account.modal.warning_item_s3', {}, 'Your attachments and backup archives stored in the S3 buckets') + '</li>' +
+                    '</ul>' +
+                    '<p class="delete-warning-recovery">' +
+                        tr('delete_account.modal.warning_no_recovery', {}, 'There is no recovery: nothing is kept, and no backup is created beforehand. If this data still matters, download a complete backup ZIP before deleting.') +
+                    '</p>' +
+                '</div>' +
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<input type="text" id="daConfirmUsername" autocomplete="off" placeholder="' + tr('delete_account.modal.confirm_placeholder', {}, 'Type your username to confirm') + '" style="width:100%;box-sizing:border-box;">' +
                 '</div>' +

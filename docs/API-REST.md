@@ -2275,25 +2275,27 @@ curl -X PATCH -u 'username:password' \
 DELETE /admin/users/{id}
 ```
 
-Delete a user profile.
+Delete a user profile and everything it owns: its notes, folders, tags and
+attachments on disk, and its attachments and backup archives in the S3
+buckets. Nothing references a deleted user's data anymore, so anything left
+behind would be orphaned forever.
 
-**Query Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `delete_data` | boolean | If `true`, also delete all user data |
-
-Delete profile only:
 ```bash
 curl -X DELETE -u 'username:password' \
   http://YOUR_SERVER/api/v1/admin/users/2
 ```
 
-Delete profile and all data:
-```bash
-curl -X DELETE -u 'username:password' \
-  "http://YOUR_SERVER/api/v1/admin/users/2?delete_data=true"
-```
+This is immediate and irreversible. Nothing is kept and no backup is created
+beforehand, so download a complete backup ZIP first if the data still matters.
+
+The former `delete_data` query parameter is gone: deletion always removes all
+data. Keeping the local notes while the S3 purge destroyed the only copy of
+their attachments produced a "preserved" data set with every attachment
+missing, so the partial mode was dropped.
+
+The response reports `s3_objects_deleted`, and `s3_error` when a bucket could not
+be reached. A bucket error never blocks the deletion, so the account is removed
+either way and the leftover objects have to be cleaned up manually.
 
 ### Reset User Password
 

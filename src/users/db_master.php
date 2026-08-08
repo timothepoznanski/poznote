@@ -824,6 +824,13 @@ function createUserProfile(string $username, ?string $email = null, ?int $maxUse
     try {
         $con = getMasterConnection();
 
+        // Same normalization as updateUserProfile: a username stored with
+        // stray whitespace could never match a typed delete confirmation.
+        $username = trim($username);
+        if ($username === '') {
+            return ['success' => false, 'error' => 'Username is required'];
+        }
+
         // Reject purely numeric usernames — they would be ambiguous with user IDs
         // in the Basic Auth lookup (which accepts both usernames and numeric IDs).
         if (ctype_digit($username)) {
@@ -1089,6 +1096,17 @@ function updateUserProfile(int $id, array $data): array {
 
 /**
  * Delete a user profile
+ *
+ * Deleting an account also removes its objects from the S3 buckets (its
+ * attachments and its backup archives). This is not optional: nothing
+ * references a deleted user's prefix anymore, so anything left behind would be
+ * orphaned in the bucket forever.
+ *
+ * The result carries 's3_deleted' (objects removed) and, when a bucket could
+ * not be reached, 's3_error' — on failure too, since the purge runs before the
+ * row deletions and cannot be rolled back. A bucket failure never blocks the
+ * deletion: the account and its local data are still removed, and the leftover
+ * objects are reported so an admin can clean them up.
  */
 function deleteUserProfile(int $id, bool $deleteData = false): array {
     try {
@@ -1130,6 +1148,27 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
             }
         }
         
+        // Remove the account's objects from the S3 buckets. Done after the
+        // local data (a failure there aborts and keeps the account) but before
+        // the rows are dropped, so a bucket error is still reported against an
+        // account the admin can retry on.
+        $s3Deleted = 0;
+        $s3Errors = [];
+
+        require_once __DIR__ . '/../storage/AttachmentStorage.php';
+        $attachments = AttachmentStorage::purgeUserObjects($id);
+        $s3Deleted += $attachments['deleted'];
+        if ($attachments['error'] !== null) {
+            $s3Errors[] = 'attachments: ' . $attachments['error'];
+        }
+
+        require_once __DIR__ . '/../S3BackupService.php';
+        $backups = S3BackupService::deleteAllUserBackups($id);
+        $s3Deleted += $backups['deleted'];
+        if ($backups['error'] !== null) {
+            $s3Errors[] = 'backups: ' . $backups['error'];
+        }
+
         // Delete user's shared links from global registry
         $stmt = $con->prepare("DELETE FROM shared_links WHERE user_id = ?");
         $stmt->execute([$id]);
@@ -1140,10 +1179,22 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
         
         $stmt = $con->prepare("DELETE FROM users WHERE id = ?");
         $stmt->execute([$id]);
-        
-        return ['success' => true];
+
+        return [
+            'success' => true,
+            's3_deleted' => $s3Deleted,
+            's3_error' => $s3Errors ? implode('; ', $s3Errors) : null,
+        ];
     } catch (Exception $e) {
-        return ['success' => false, 'error' => $e->getMessage()];
+        // The S3 purge runs before the row deletions and is irreversible: if
+        // the failure happened after it, the caller must still learn that
+        // objects are already gone even though the account was kept.
+        return [
+            'success' => false,
+            'error' => $e->getMessage(),
+            's3_deleted' => $s3Deleted ?? 0,
+            's3_error' => !empty($s3Errors) ? implode('; ', $s3Errors) : null,
+        ];
     }
 }
 

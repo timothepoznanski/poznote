@@ -2776,8 +2776,10 @@
         "username_taken": "Ce nom d'utilisateur est déjà pris",
         "email_taken": "Cet email est déjà utilisé",
         "cannot_delete_self": "Vous ne pouvez pas supprimer votre propre profil",
+        "s3_cleanup_failed": "Le compte a été supprimé, mais ses fichiers n'ont pas pu être supprimés des buckets S3 : {{error}}. Supprimez-les manuellement.",
         "cannot_demote_self": "Vous ne pouvez pas retirer vos propres privilèges administrateur",
-        "cannot_change_self": "Vous ne pouvez pas modifier votre propre statut ou rôle"
+        "cannot_change_self": "Vous ne pouvez pas modifier votre propre statut ou rôle",
+        "confirm_username_mismatch": "Le nom d'utilisateur saisi ne correspond pas au compte à supprimer. Rien n'a été supprimé."
       },
       "stats": {
         "title": "Statistiques système",
@@ -2805,7 +2807,6 @@
       "network_error": "Erreur réseau :",
       "click_to_rename": "Cliquer pour renommer",
       "rename_user": "Renommer l'utilisateur",
-      "delete_warning_all_data": "Toutes les données de l'utilisateur (notes, pièces jointes, etc.) seront définitivement supprimées.",
       "access_denied_admin": "Accès refusé. Privilèges administrateur requis.",
       "toggle_admin": "Accorder ou révoquer les privilèges d'administrateur",
       "click_to_deactivate": "Cliquer pour désactiver",
@@ -2820,7 +2821,13 @@
         "confirm_button": "Confirmer le passage admin"
       },
       "id": "ID",
-      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1"
+      "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1",
+      "delete_warning_everything": "Tout ce qui appartient à ce compte sera supprimé immédiatement et définitivement.",
+      "delete_warning_item_data": "Ses notes, dossiers, étiquettes et pièces jointes",
+      "delete_warning_item_s3": "Ses pièces jointes et ses archives de sauvegarde stockées dans les buckets S3",
+      "delete_warning_no_recovery": "Aucune récupération n'est possible : rien n'est conservé et aucune sauvegarde n'est créée au préalable. Si ces données comptent encore, téléchargez une sauvegarde complète au format ZIP avant de supprimer.",
+      "delete_confirm_label": "Saisissez « {{username}} » pour confirmer :",
+      "delete_confirm_placeholder": "Saisissez le nom d'utilisateur pour confirmer"
     },
     "profile": {
       "title": "Mon profil",
@@ -3147,7 +3154,9 @@
       "login_required": "connexion requise",
       "allowed_users": "limité à {{count}} utilisateurs",
       "accounts": "comptes : {{accounts}}",
-      "empty_value": "vide"
+      "empty_value": "vide",
+      "s3_objects_deleted": "{{count}} objets S3 supprimés",
+      "s3_cleanup_failed": "échec du nettoyage S3"
     },
     "destinations": {
       "download": "téléchargement",
@@ -3251,10 +3260,14 @@
   "delete_account": {
     "modal": {
       "title": "Supprimer le compte",
-      "description": "Votre compte \"{{username}}\" et toutes ses données (notes, fichiers, pièces jointes) seront définitivement supprimés. Cette action est irréversible.",
+      "description": "Vous êtes sur le point de supprimer votre compte \"{{username}}\".",
       "confirm_placeholder": "Saisissez votre nom d'utilisateur pour confirmer",
       "password_placeholder": "Mot de passe actuel",
-      "button": "Supprimer mon compte"
+      "button": "Supprimer mon compte",
+      "warning_everything": "Tout ce qui appartient à votre compte sera supprimé immédiatement et définitivement.",
+      "warning_item_data": "Vos notes, dossiers, étiquettes et pièces jointes",
+      "warning_item_s3": "Vos pièces jointes et vos archives de sauvegarde stockées dans les buckets S3",
+      "warning_no_recovery": "Aucune récupération n'est possible : rien n'est conservé et aucune sauvegarde n'est créée au préalable. Si ces données comptent encore, téléchargez une sauvegarde complète au format ZIP avant de supprimer."
     },
     "errors": {
       "confirm_mismatch": "Le nom d'utilisateur ne correspond pas",

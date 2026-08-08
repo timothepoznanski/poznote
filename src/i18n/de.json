@@ -2697,8 +2697,16 @@
       "errors": {
         "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
         "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
-        "username_required": "Benutzername ist erforderlich"
-      }
+        "username_required": "Benutzername ist erforderlich",
+        "s3_cleanup_failed": "Das Konto wurde gelöscht, aber seine Dateien konnten nicht aus den S3-Buckets entfernt werden: {{error}}. Bitte löschen Sie sie manuell.",
+        "confirm_username_mismatch": "Der eingegebene Benutzername stimmt nicht mit dem zu löschenden Konto überein. Es wurde nichts gelöscht."
+      },
+      "delete_warning_everything": "Alles, was zu diesem Konto gehört, wird sofort und dauerhaft gelöscht.",
+      "delete_warning_item_data": "Seine Notizen, Ordner, Tags und Anhänge",
+      "delete_warning_item_s3": "Seine Anhänge und Backup-Archive in den S3-Buckets",
+      "delete_warning_no_recovery": "Eine Wiederherstellung ist nicht möglich: Nichts wird aufbewahrt und vorher wird kein Backup erstellt. Wenn diese Daten noch wichtig sind, laden Sie vor dem Löschen ein vollständiges Backup-ZIP herunter.",
+      "delete_confirm_label": "Geben Sie „{{username}}“ ein, um zu bestätigen:",
+      "delete_confirm_placeholder": "Benutzernamen zur Bestätigung eingeben"
     }
   },
   "git_sync": {
@@ -2957,7 +2965,9 @@
       "login_required": "Anmeldung erforderlich",
       "allowed_users": "auf {{count}} Benutzer beschränkt",
       "accounts": "Konten: {{accounts}}",
-      "empty_value": "leer"
+      "empty_value": "leer",
+      "s3_objects_deleted": "{{count}} S3-Objekte gelöscht",
+      "s3_cleanup_failed": "S3-Bereinigung fehlgeschlagen"
     },
     "destinations": {
       "download": "Download",
@@ -3061,10 +3071,14 @@
   "delete_account": {
     "modal": {
       "title": "Konto löschen",
-      "description": "Ihr Konto \"{{username}}\" und alle zugehörigen Daten (Notizen, Dateien, Anhänge) werden dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "description": "Sie sind dabei, Ihr Konto \"{{username}}\" zu löschen.",
       "confirm_placeholder": "Geben Sie Ihren Benutzernamen zur Bestätigung ein",
       "password_placeholder": "Aktuelles Passwort",
-      "button": "Mein Konto löschen"
+      "button": "Mein Konto löschen",
+      "warning_everything": "Alles, was zu Ihrem Konto gehört, wird sofort und dauerhaft gelöscht.",
+      "warning_item_data": "Ihre Notizen, Ordner, Tags und Anhänge",
+      "warning_item_s3": "Ihre Anhänge und Backup-Archive in den S3-Buckets",
+      "warning_no_recovery": "Eine Wiederherstellung ist nicht möglich: Nichts wird aufbewahrt und vorher wird kein Backup erstellt. Wenn diese Daten noch wichtig sind, laden Sie vor dem Löschen ein vollständiges Backup-ZIP herunter."
     },
     "errors": {
       "confirm_mismatch": "Der Benutzername stimmt nicht überein",

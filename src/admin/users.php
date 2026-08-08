@@ -32,6 +32,13 @@ $pageWorkspace = trim(getWorkspaceFilter());
 $currentAuthUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? 0);
 $error = '';
 
+// Flash left by a POST that had to redirect (post/redirect/get) but still has
+// something to report, e.g. an account deleted with a failed S3 cleanup.
+if (!empty($_SESSION['admin_users_flash_error'])) {
+    $error = (string)$_SESSION['admin_users_flash_error'];
+    unset($_SESSION['admin_users_flash_error']);
+}
+
 if (empty($_SESSION['admin_users_csrf_token'])) {
     $_SESSION['admin_users_csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -133,6 +140,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Captured before deletion: the profile row is gone afterwards.
                 $deletedProfile = getUserProfileById($userId);
 
+                // The typed confirmation is re-checked here: the disabled
+                // button only guards the UI, and this POST can be forged.
+                // Both sides are trimmed so accounts created before usernames
+                // were normalized (stray whitespace) stay deletable.
+                $confirmUsername = trim((string)($_POST['confirm_username'] ?? ''));
+                if (!$deletedProfile || $confirmUsername !== trim((string)$deletedProfile['username'])) {
+                    $error = t(
+                        'multiuser.admin.errors.confirm_username_mismatch',
+                        [],
+                        'The username you typed does not match the account to delete. Nothing was deleted.'
+                    );
+                    break;
+                }
+
+                // Deleting an account always wipes everything it owns,
+                // S3 attachments and backup archives included.
                 $result = deleteUserProfile($userId, $deleteData);
 
                 if ($result['success']) {
@@ -141,12 +164,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // account", and source='admin' records who acted.
                     require_once __DIR__ . '/../ActivityLog.php';
                     [, $actingAdminName] = currentActivityActor();
+                    // s3_objects_deleted records what actually happened;
+                    // s3_error is written on partial failure so the audit
+                    // trail never claims a cleanup that did not complete.
+                    $deletionLogDetails = [
+                        'deleted_data' => $deleteData,
+                        's3_objects_deleted' => (int)($result['s3_deleted'] ?? 0),
+                        'performed_by' => $actingAdminName,
+                    ];
+                    if (!empty($result['s3_error'])) {
+                        $deletionLogDetails['s3_error'] = $result['s3_error'];
+                    }
                     logActivity(
                         ACTIVITY_ACCOUNT_DELETED,
-                        [
-                            'deleted_data' => $deleteData,
-                            'performed_by' => $actingAdminName,
-                        ],
+                        $deletionLogDetails,
                         'admin',
                         $userId,
                         $deletedProfile['username'] ?? null
@@ -160,6 +191,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         } catch (Throwable $e) {
                             error_log('Webhook dispatch failed after admin user deletion: ' . $e->getMessage());
                         }
+                    }
+
+                    // The account is gone either way, but objects left behind
+                    // in a bucket need a human: carry the warning through the
+                    // redirect (a flash rendered on the next GET) instead of
+                    // skipping the redirect — the account no longer exists, so
+                    // an F5 re-POST would only produce a misleading error.
+                    if (!empty($result['s3_error'])) {
+                        $_SESSION['admin_users_flash_error'] = t(
+                            'multiuser.admin.errors.s3_cleanup_failed',
+                            ['error' => $result['s3_error']],
+                            'The account was deleted, but its files could not be removed from the S3 buckets: {{error}}. Delete them manually.'
+                        );
                     }
 
                     // Redirect to refresh the page
@@ -901,14 +945,30 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($adminUsersCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
                 <input type="hidden" name="user_id" id="delete_user_id">
 
-                <p class="delete-warning">
-                    <i class="lucide-alert-triangle"></i>
-                    <?php echo t_h('multiuser.admin.delete_warning_all_data', [], 'All user data (notes, attachments, etc.) will be permanently deleted.'); ?>
-                </p>
+                <div class="delete-warning-box">
+                    <p class="delete-warning">
+                        <i class="lucide-alert-triangle"></i>
+                        <?php echo t_h('multiuser.admin.delete_warning_everything', [], 'Everything belonging to this account will be deleted immediately and permanently.'); ?>
+                    </p>
+                    <ul class="delete-warning-list">
+                        <li><?php echo t_h('multiuser.admin.delete_warning_item_data', [], 'Its notes, folders, tags and attachments'); ?></li>
+                        <li><?php echo t_h('multiuser.admin.delete_warning_item_s3', [], 'Its attachments and backup archives stored in the S3 buckets'); ?></li>
+                    </ul>
+                    <p class="delete-warning-recovery">
+                        <?php echo t_h('multiuser.admin.delete_warning_no_recovery', [], 'There is no recovery: nothing is kept, and no backup is created beforehand. If this data still matters, download a complete backup ZIP before deleting.'); ?>
+                    </p>
+                </div>
+
+                <div class="form-group delete-confirm-group">
+                    <label for="delete_confirm_username" id="delete_confirm_label"></label>
+                    <input type="text" id="delete_confirm_username" name="confirm_username"
+                           autocomplete="off" spellcheck="false" autocapitalize="none"
+                           placeholder="<?php echo t_h('multiuser.admin.delete_confirm_placeholder', [], 'Type the username to confirm'); ?>">
+                </div>
 
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('deleteModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
-                    <button type="submit" class="btn btn-danger"><?php echo t_h('common.delete', [], 'Delete'); ?></button>
+                    <button type="submit" class="btn btn-danger" id="delete_submit_btn" disabled><?php echo t_h('common.delete', [], 'Delete'); ?></button>
                 </div>
             </form>
         </div>
@@ -983,14 +1043,68 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         }
 
         /**
+         * Username the delete form is currently armed for. The modal is shared
+         * by every row, so this is re-set on each open and the typed
+         * confirmation is checked against it.
+         */
+        let deleteExpectedUsername = '';
+
+        /**
+         * Enable the delete button only once the exact username is typed.
+         */
+        function refreshDeleteConfirmState() {
+            const input = document.getElementById('delete_confirm_username');
+            const button = document.getElementById('delete_submit_btn');
+            if (!input || !button) return;
+            button.disabled = input.value.trim() !== deleteExpectedUsername;
+        }
+
+        /**
          * Open the delete user confirmation modal
          */
         function openDeleteModal(userId, username) {
+            // Trimmed on both sides (with the server check) so accounts
+            // created before usernames were normalized stay deletable.
+            deleteExpectedUsername = String(username).trim();
+
             document.getElementById('delete_user_id').value = userId;
+            // Function replacement: a plain string would let $-sequences in
+            // the username ($&, $$) expand as replacement patterns.
             const messageTemplate = <?php echo json_encode(t('multiuser.admin.confirm_delete', ['username' => 'NAME_HOLDER'], 'Are you sure you want to delete user "NAME_HOLDER"?')); ?>;
-            document.getElementById('delete_message').textContent = messageTemplate.replace('NAME_HOLDER', username);
+            document.getElementById('delete_message').textContent = messageTemplate.replace('NAME_HOLDER', function () { return username; });
+
+            const labelTemplate = <?php echo json_encode(t('multiuser.admin.delete_confirm_label', ['username' => 'NAME_HOLDER'], 'Type "NAME_HOLDER" to confirm:')); ?>;
+            document.getElementById('delete_confirm_label').textContent = labelTemplate.replace('NAME_HOLDER', function () { return username; });
+
+            // Never carry a previous confirmation over to the next account.
+            const input = document.getElementById('delete_confirm_username');
+            input.value = '';
+            refreshDeleteConfirmState();
+
             document.getElementById('deleteModal').classList.add('active');
+            input.focus();
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('delete_confirm_username');
+            if (!input) return;
+
+            input.addEventListener('input', refreshDeleteConfirmState);
+
+            // No Enter handler on purpose: the browser's implicit submission
+            // already routes through the default submit button and does
+            // nothing while that button is disabled, i.e. exactly the gating
+            // wanted here (and requestSubmit is missing on older WebKit).
+
+            // Last line of defence: a re-enabled button in devtools must not be
+            // enough to delete an account without typing its name.
+            input.form.addEventListener('submit', function (e) {
+                if (input.value.trim() !== deleteExpectedUsername) {
+                    e.preventDefault();
+                    refreshDeleteConfirmState();
+                }
+            });
+        });
 
         /**
          * Close a modal by ID

@@ -438,3 +438,43 @@ body.dark-mode .home-card.is-pinned {
 .home-card.home-card-disabled .home-card-title {
     opacity: 0.55;
 }
+
+/* ==========================================================================
+   Irreversible-deletion warning box
+   Shared by the admin delete-user modal (admin/users.php) and the
+   self-service delete-account modal (js/delete-account.js); settings.css is
+   loaded by both pages. Dark-mode recolors live in css/dark-mode/modals.css.
+   ========================================================================== */
+.delete-warning-box {
+    margin-top: 15px;
+    padding: 12px 14px;
+    border: 1px solid rgba(220, 53, 69, 0.35);
+    border-left: 3px solid #dc3545;
+    border-radius: 6px;
+    background: rgba(220, 53, 69, 0.06);
+    text-align: left;
+}
+
+.delete-warning-box .delete-warning {
+    margin: 0 0 8px;
+    color: #dc3545;
+    font-weight: 500;
+}
+
+/* The dark-mode recolor of .delete-warning lives with its peers in
+   css/dark-mode/modals.css, which both pages also load. */
+
+.delete-warning-list {
+    margin: 0 0 8px;
+    padding-left: 22px;
+}
+
+.delete-warning-list li {
+    margin-bottom: 3px;
+}
+
+.delete-warning-recovery {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}

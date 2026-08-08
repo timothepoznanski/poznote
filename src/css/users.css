@@ -125,6 +125,14 @@ body.dark-mode {
     background: #c82333;
 }
 
+/* Delete stays visibly locked until the username is typed */
+.btn-danger:disabled,
+.btn-danger:disabled:hover {
+    background: #dc3545;
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
 .btn-secondary {
     background: #6c757d;
     color: white !important;
@@ -766,6 +774,21 @@ html[data-theme='dark'] .account-access-own-label {
     color: #dc3545;
     font-weight: 500;
     margin-top: 15px;
+}
+
+/* The .delete-warning-box block lives in settings.css: it is shared by the
+   admin delete-user modal and the self-service delete-account modal, and
+   settings.css is the only stylesheet both pages load. */
+
+/* Username confirmation in the delete-user modal */
+.delete-confirm-group {
+    margin-top: 15px;
+}
+
+.delete-confirm-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
 }
 
 /* Back Link */
