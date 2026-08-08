@@ -3201,7 +3201,9 @@
     "card": "Benutzer-Webhooks",
     "card_help": "Ereignisse Ihrer eigenen Notizen (Erinnerung ausgelöst, Notiz erstellt oder geteilt) per Webhook an externe Dienste wie ntfy oder n8n senden.",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpoint, wenn eine Ihrer Notizen ein abonniertes Ereignis auslöst: eine fällige Erinnerung, eine erstellte oder öffentlich geteilte Notiz. Betroffen sind nur Ihre eigenen Notizen. Ist ein Secret gesetzt, wird der Payload mit HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
-    "access_denied": "Zugriff verweigert. Benutzer-Webhooks sind auf dieser Instanz deaktiviert."
+    "access_denied": "Zugriff verweigert. Benutzer-Webhooks sind auf dieser Instanz deaktiviert.",
+    "app_url_unset": "Es ist keine Instanz-URL konfiguriert, daher enthalten die Payloads keinen direkten Notiz-Link (data.note.url ist null). Bitten Sie einen Administrator, sie auf der Admin-Seite Webhooks zu setzen.",
+    "app_url_unset_admin": "Es ist keine Instanz-URL konfiguriert, daher enthalten die Payloads keinen direkten Notiz-Link (data.note.url ist null). Setzen Sie sie auf der Admin-Seite Webhooks."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3226,10 +3228,13 @@
     "fields": {
       "url": "Endpunkt-URL",
       "secret": "Secret (optional)",
-      "events": "Ereignisse"
+      "events": "Ereignisse",
+      "app_url": "Instanz-URL"
     },
     "hints": {
-      "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt."
+      "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt.",
+      "app_url_env": "Derzeit durch die Umgebungsvariable POZNOTE_APP_URL bereitgestellt: {{url}}. Ein hier gespeicherter Wert ueberschreibt sie.",
+      "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null)."
     },
     "status": {
       "none": "Keine"
@@ -3252,7 +3257,12 @@
     "error_invalid_url": "Die Webhook-URL muss mit http:// oder https:// beginnen.",
     "error_no_events": "Wählen Sie mindestens ein Ereignis aus.",
     "error_saving": "Fehler beim Speichern des Webhooks.",
-    "error_not_found": "Webhook nicht gefunden."
+    "error_not_found": "Webhook nicht gefunden.",
+    "section_app_url": "Instanz-URL",
+    "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden.",
+    "app_url_saved": "Instanz-URL gespeichert.",
+    "app_url_cleared": "Instanz-URL geleert. Payloads enthalten keinen direkten Notiz-Link mehr.",
+    "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen."
   },
   "reminder": {
     "toolbar_button": "Erinnerung setzen",

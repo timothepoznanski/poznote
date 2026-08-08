@@ -3325,7 +3325,9 @@
     "card": "用户 Webhook",
     "card_help": "通过 webhook 将您自己笔记的事件（提醒触发、笔记创建或分享）发送到 ntfy、n8n 等外部服务。",
     "description": "当您的笔记触发已订阅的事件时（提醒到期、笔记被创建或公开分享），Poznote 会向每个已注册的端点发送带有 JSON payload 的 HTTP POST 请求。仅涉及您自己的笔记。如果设置了密钥，payload 会通过 HMAC-SHA256 签名并放在 X-Poznote-Signature-256 请求头中。",
-    "access_denied": "访问被拒绝。此实例已禁用用户 webhook。"
+    "access_denied": "访问被拒绝。此实例已禁用用户 webhook。",
+    "app_url_unset": "未配置实例 URL，因此负载不包含笔记直达链接（data.note.url 为 null）。请管理员在后台 Webhooks 页面设置。",
+    "app_url_unset_admin": "未配置实例 URL，因此负载不包含笔记直达链接（data.note.url 为 null）。请在后台 Webhooks 页面设置。"
   },
   "webhooks_admin": {
     "event_help": {
@@ -3350,10 +3352,13 @@
     "fields": {
       "url": "端点 URL",
       "secret": "密钥（可选）",
-      "events": "事件"
+      "events": "事件",
+      "app_url": "实例 URL"
     },
     "hints": {
-      "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。"
+      "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。",
+      "app_url_env": "当前由环境变量 POZNOTE_APP_URL 提供：{{url}}。在此保存的值将覆盖它。",
+      "app_url_unset": "未设置：负载当前不包含笔记链接（data.note.url 为 null）。"
     },
     "status": {
       "none": "无"
@@ -3376,7 +3381,12 @@
     "error_invalid_url": "Webhook URL 必须以 http:// 或 https:// 开头。",
     "error_no_events": "请至少选择一个事件。",
     "error_saving": "保存 Webhook 时出错。",
-    "error_not_found": "未找到该 Webhook。"
+    "error_not_found": "未找到该 Webhook。",
+    "section_app_url": "实例 URL",
+    "app_url_description": "此 Poznote 实例的公开 URL，用于生成负载中的笔记直达链接（data.note.url）。留空则不发送链接。这与提醒邮件使用的实例 URL 相同。",
+    "app_url_saved": "实例 URL 已保存。",
+    "app_url_cleared": "实例 URL 已清除。负载将不再包含笔记直达链接。",
+    "error_invalid_app_url": "实例 URL 必须以 http:// 或 https:// 开头。"
   },
   "reminder": {
     "toolbar_button": "设置提醒",

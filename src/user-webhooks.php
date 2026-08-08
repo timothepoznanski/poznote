@@ -125,6 +125,15 @@ $_SESSION['user_webhooks_csrf_token'] = bin2hex(random_bytes(32));
 // the admin page.
 $webhooks = listWebhooksForUser($currentWebhookUserId);
 
+// The instance URL behind data.note.url is a global setting, so it is only
+// surfaced here: shown so a user whose payloads carry no link knows why, and
+// editable from the admin webhooks page only.
+$effectiveAppUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+if ($effectiveAppUrl === '' && function_exists('_env')) {
+    $effectiveAppUrl = rtrim(trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))), '/');
+}
+$canEditAppUrl = isCurrentUserAdmin();
+
 // Hover help for each event, same bubble pattern as the settings cards.
 // i18n keys replace the dots of the event name with underscores.
 $eventHelpDefaults = [
@@ -188,6 +197,15 @@ foreach ($eventHelpDefaults as $eventName => $default) {
         <p class="webhooks-section-hint">
             <?php echo t_h('webhooks_user.description', [], 'Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.'); ?>
         </p>
+        <?php if ($effectiveAppUrl === ''): ?>
+            <p class="webhooks-section-hint">
+                <?php if ($canEditAppUrl): ?>
+                    <?php echo t_h('webhooks_user.app_url_unset_admin', [], 'No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Set it on the admin Webhooks page.'); ?>
+                <?php else: ?>
+                    <?php echo t_h('webhooks_user.app_url_unset', [], 'No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Ask an administrator to set it on the admin Webhooks page.'); ?>
+                <?php endif; ?>
+            </p>
+        <?php endif; ?>
         <form method="POST" action="">
             <input type="hidden" name="csrf_token" value="<?php echo user_webhooks_h($_SESSION['user_webhooks_csrf_token']); ?>">
             <input type="hidden" name="action" value="add">

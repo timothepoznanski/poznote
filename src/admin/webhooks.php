@@ -38,6 +38,20 @@ function webhooks_is_valid_url(string $url): bool {
         && preg_match('#^https?://#i', $url) === 1;
 }
 
+/**
+ * Instance URL used to build the direct note links carried by the payloads
+ * (data.note.url). Stored in the shared smtp_app_url setting: the reminder
+ * email channel and the webhooks both link to the same instance, so there is
+ * one value rather than two that could drift apart.
+ */
+function webhooks_app_url(): string {
+    $url = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+    if ($url === '' && function_exists('_env')) {
+        $url = rtrim(trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))), '/');
+    }
+    return $url;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
     if (!isset($_SESSION['webhooks_csrf_token']) || !hash_equals($_SESSION['webhooks_csrf_token'], $token)) {
@@ -45,7 +59,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $action = $_POST['action'] ?? '';
 
-        if ($action === 'add') {
+        if ($action === 'save_app_url') {
+            // Same normalisation and validation as the settings API so both
+            // entry points can never store a value the dispatcher rejects.
+            $appUrl = rtrim(trim((string)($_POST['app_url'] ?? '')), '/');
+            if ($appUrl !== '' && !webhooks_is_valid_url($appUrl)) {
+                $error = t('webhooks_admin.error_invalid_app_url', [], 'The instance URL must start with http:// or https://.');
+            } elseif (setGlobalSetting('smtp_app_url', $appUrl)) {
+                $success = $appUrl === ''
+                    ? t('webhooks_admin.app_url_cleared', [], 'Instance URL cleared. Payloads will no longer carry a direct note link.')
+                    : t('webhooks_admin.app_url_saved', [], 'Instance URL saved.');
+            } else {
+                $error = t('webhooks_admin.error_saving', [], 'Error saving the webhook.');
+            }
+        } elseif ($action === 'add') {
             $url = trim((string)($_POST['webhook_url'] ?? ''));
             $secret = trim((string)($_POST['webhook_secret'] ?? ''));
             $events = $_POST['webhook_events'] ?? [];
@@ -116,6 +143,12 @@ $_SESSION['webhooks_csrf_token'] = bin2hex(random_bytes(32));
 // Reminder-only webhooks are managed from the primary account's settings page
 $webhooks = array_values(array_filter(listWebhooks(), 'isInstanceWebhook'));
 
+// Read back after the POST so the field shows what was just saved. The stored
+// setting is shown on its own: an env-provided fallback is not editable here,
+// so the placeholder tells the admin what is in effect instead.
+$storedAppUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+$effectiveAppUrl = webhooks_app_url();
+
 // Hover help for each event, same bubble pattern as the settings cards.
 // i18n keys replace the dots of the event name with underscores.
 $eventHelpDefaults = [
@@ -176,6 +209,33 @@ foreach ($eventHelpDefaults as $eventName => $default) {
             <?php echo webhooks_h($success ?: ($warning ?: $error)); ?>
         </div>
     <?php endif; ?>
+
+    <div class="settings-section webhooks-section">
+        <h2><?php echo t_h('webhooks_admin.section_app_url', [], 'Instance URL'); ?></h2>
+        <p class="webhooks-section-hint">
+            <?php echo t_h('webhooks_admin.app_url_description', [], 'Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails.'); ?>
+        </p>
+        <form method="POST" action="">
+            <input type="hidden" name="csrf_token" value="<?php echo webhooks_h($_SESSION['webhooks_csrf_token']); ?>">
+            <input type="hidden" name="action" value="save_app_url">
+            <div class="webhooks-field">
+                <label for="app_url"><?php echo t_h('webhooks_admin.fields.app_url', [], 'Instance URL'); ?></label>
+                <input type="url" id="app_url" name="app_url" value="<?php echo webhooks_h($storedAppUrl); ?>" placeholder="https://poznote.example.com">
+                <?php if ($storedAppUrl === '' && $effectiveAppUrl !== ''): ?>
+                    <span class="webhooks-hint">
+                        <?php echo t_h('webhooks_admin.hints.app_url_env', ['url' => $effectiveAppUrl], 'Currently provided by the POZNOTE_APP_URL environment variable: {{url}}. Saving a value here overrides it.'); ?>
+                    </span>
+                <?php elseif ($effectiveAppUrl === ''): ?>
+                    <span class="webhooks-hint">
+                        <?php echo t_h('webhooks_admin.hints.app_url_unset', [], 'Not set: the payloads currently carry no note link (data.note.url is null).'); ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+            <div class="webhooks-add-actions">
+                <button type="submit" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
+            </div>
+        </form>
+    </div>
 
     <div class="settings-section webhooks-section">
         <h2><?php echo t_h('webhooks_admin.section_add', [], 'Add a webhook'); ?></h2>

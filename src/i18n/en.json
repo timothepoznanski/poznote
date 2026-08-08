@@ -2880,7 +2880,9 @@
     "card": "User Webhooks",
     "card_help": "Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
-    "access_denied": "Access denied. User webhooks are disabled on this instance."
+    "access_denied": "Access denied. User webhooks are disabled on this instance.",
+    "app_url_unset": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Ask an administrator to set it on the admin Webhooks page.",
+    "app_url_unset_admin": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Set it on the admin Webhooks page."
   },
   "webhooks_admin": {
     "event_help": {
@@ -2905,10 +2907,13 @@
     "fields": {
       "url": "Endpoint URL",
       "secret": "Secret (optional)",
-      "events": "Events"
+      "events": "Events",
+      "app_url": "Instance URL"
     },
     "hints": {
-      "secret": "Used to sign the payload so the receiver can verify it comes from this instance."
+      "secret": "Used to sign the payload so the receiver can verify it comes from this instance.",
+      "app_url_env": "Currently provided by the POZNOTE_APP_URL environment variable: {{url}}. Saving a value here overrides it.",
+      "app_url_unset": "Not set: the payloads currently carry no note link (data.note.url is null)."
     },
     "status": {
       "none": "None"
@@ -2931,7 +2936,12 @@
     "error_invalid_url": "The webhook URL must start with http:// or https://.",
     "error_no_events": "Select at least one event.",
     "error_saving": "Error saving the webhook.",
-    "error_not_found": "Webhook not found."
+    "error_not_found": "Webhook not found.",
+    "section_app_url": "Instance URL",
+    "app_url_description": "Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails.",
+    "app_url_saved": "Instance URL saved.",
+    "app_url_cleared": "Instance URL cleared. Payloads will no longer carry a direct note link.",
+    "error_invalid_app_url": "The instance URL must start with http:// or https://."
   },
   "reminder": {
     "toolbar_button": "Set reminder",

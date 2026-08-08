@@ -3204,7 +3204,9 @@
     "card": "Webhooks de usuário",
     "card_help": "Envie eventos das suas próprias notas (lembrete disparado, nota criada ou compartilhada) para serviços externos como ntfy ou n8n via webhooks.",
     "description": "O Poznote envia uma solicitação HTTP POST com um payload JSON para cada endpoint registrado quando uma das suas notas dispara um evento assinado: um lembrete vencendo, uma nota criada ou compartilhada publicamente. Apenas suas próprias notas são afetadas. Se um segredo for definido, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",
-    "access_denied": "Acesso negado. Os webhooks de usuário estão desativados nesta instância."
+    "access_denied": "Acesso negado. Os webhooks de usuário estão desativados nesta instância.",
+    "app_url_unset": "Nenhuma URL de instancia esta configurada, portanto os payloads nao incluem link direto para a nota (data.note.url e null). Peca a um administrador para defini-la na pagina Webhooks da administracao.",
+    "app_url_unset_admin": "Nenhuma URL de instancia esta configurada, portanto os payloads nao incluem link direto para a nota (data.note.url e null). Defina-a na pagina Webhooks da administracao."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3229,10 +3231,13 @@
     "fields": {
       "url": "URL do endpoint",
       "secret": "Segredo (opcional)",
-      "events": "Eventos"
+      "events": "Eventos",
+      "app_url": "URL da instancia"
     },
     "hints": {
-      "secret": "Serve para assinar o payload de modo que o recetor possa verificar que provém desta instância."
+      "secret": "Serve para assinar o payload de modo que o recetor possa verificar que provém desta instância.",
+      "app_url_env": "Atualmente fornecida pela variavel de ambiente POZNOTE_APP_URL: {{url}}. Salvar um valor aqui a substitui.",
+      "app_url_unset": "Nao definida: os payloads no momento nao incluem link para a nota (data.note.url e null)."
     },
     "status": {
       "none": "Nenhum"
@@ -3255,7 +3260,12 @@
     "error_invalid_url": "O URL do webhook deve começar por http:// ou https://.",
     "error_no_events": "Selecione pelo menos um evento.",
     "error_saving": "Erro ao guardar o webhook.",
-    "error_not_found": "Webhook não encontrado."
+    "error_not_found": "Webhook não encontrado.",
+    "section_app_url": "URL da instancia",
+    "app_url_description": "URL publica desta instancia do Poznote, usada para construir o link direto para a nota enviado nos payloads (data.note.url). Deixe vazio para nao enviar nenhum link. E a mesma URL de instancia usada pelos e-mails de lembrete.",
+    "app_url_saved": "URL da instancia salva.",
+    "app_url_cleared": "URL da instancia removida. Os payloads nao incluirao mais um link direto para a nota.",
+    "error_invalid_app_url": "A URL da instancia deve comecar com http:// ou https://."
   },
   "reminder": {
     "toolbar_button": "Definir lembrete",
