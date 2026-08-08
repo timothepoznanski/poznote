@@ -67,10 +67,12 @@ function poznoteGlueUnit(string $label): string {
 
 /**
  * Render a sortable column header button for the stats table.
- * Expects an already HTML-safe label.
+ * Expects an already HTML-safe label. $extraClass is a space-separated list
+ * of the table's own classes ("hide-mobile", "col-group-start").
  */
 function poznoteSortHeader(string $escapedLabel, string $type, string $extraClass = ''): string {
-    $class = 'hide-mobile' === $extraClass ? ' class="hide-mobile"' : '';
+    $allowed = array_intersect(preg_split('/\s+/', trim($extraClass), -1, PREG_SPLIT_NO_EMPTY) ?: [], ['hide-mobile', 'col-group-start']);
+    $class = $allowed ? ' class="' . implode(' ', $allowed) . '"' : '';
     return '<th data-sort-type="' . $type . '"' . $class . '>'
         . '<button type="button" class="users-sort-link storage-sort-btn">'
         . $escapedLabel
@@ -89,13 +91,18 @@ function collectStorageStats(): array {
     // Map user id => profile (username, admin flag, per-user quota overrides).
     $profiles = [];
     try {
-        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb FROM users");
+        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb, quota_max_backups_s3_mb FROM users");
         foreach ($stmt as $profile) {
             $profiles[(int)$profile['id']] = $profile;
         }
     } catch (Exception $e) {
         // Profiles stay empty; rows render with an em dash for the name.
     }
+
+    // Real backup usage read from the backup bucket, in one ListObjects call
+    // for the whole instance. Empty when S3 backups are off or unreachable.
+    require_once __DIR__ . '/../S3BackupService.php';
+    $backupUsage = S3BackupService::usageBytesByUser();
 
     $rows = [];
     if (!is_dir($usersDir)) {
@@ -120,12 +127,14 @@ function collectStorageStats(): array {
             'quota_max_notes'  => ($profile && $profile['quota_max_notes'] !== null) ? (int)$profile['quota_max_notes'] : null,
             'quota_max_storage_mb' => ($profile && $profile['quota_max_storage_mb'] !== null) ? (int)$profile['quota_max_storage_mb'] : null,
             'quota_max_storage_s3_mb' => ($profile && $profile['quota_max_storage_s3_mb'] !== null) ? (int)$profile['quota_max_storage_s3_mb'] : null,
+            'quota_max_backups_s3_mb' => ($profile && $profile['quota_max_backups_s3_mb'] !== null) ? (int)$profile['quota_max_backups_s3_mb'] : null,
             'notes_active'     => 0,
             'notes_trash'      => 0,
             'db_bytes'         => 0,
             'entries_bytes'    => 0,
             'attachments_bytes'=> 0,
             'attachments_s3_bytes' => 0,
+            'backups_s3_bytes' => $backupUsage[(int)$userId] ?? 0,
             'total_bytes'      => 0,
             'error'            => null,
         ];
@@ -185,6 +194,7 @@ $stats = collectStorageStats();
 $globalMaxNotes     = max(0, (int)getGlobalSetting('user_max_notes', '0'));
 $globalMaxStorageMb = max(0, (int)getGlobalSetting('user_max_storage_mb', '0'));
 $globalMaxStorageS3Mb = max(0, (int)getGlobalSetting('user_max_storage_s3_mb', '0'));
+$globalMaxBackupsS3Mb = max(0, (int)getGlobalSetting('user_max_backups_s3_mb', '0'));
 
 /**
  * Format a quota value for display: 0 (unlimited) renders as the infinity sign.
@@ -193,9 +203,44 @@ function poznoteFormatQuotaValue(int $value): string {
     return $value > 0 ? (string)$value : '∞';
 }
 
+/**
+ * The "/ 500" quota suffix shown next to a usage figure: the limit that
+ * applies to this pool for this user, as a button opening the quota modal.
+ *
+ * Admins are exempt from quotas, so their suffix is a plain "/ ∞" that
+ * explains the exemption when clicked instead of opening the editor: their
+ * limits are not editable, but the marker keeps every row visually aligned.
+ * $override is that user's per-user value, or null when they inherit the
+ * global one; both render the same way.
+ */
+function poznoteQuotaSuffix(array $row, ?int $override, int $globalValue, bool $isAdmin): string {
+    if ($isAdmin) {
+        return '<button type="button" class="quota-inline quota-admin-exempt"'
+            . ' title="' . t_h('admin_tools.storage_stats.quota_admin_exempt', [], 'Unlimited because admin') . '"'
+            . ' data-username="' . htmlspecialchars($row['username'] ?? ('#' . $row['user_id']), ENT_QUOTES) . '"'
+            . '>/&nbsp;∞</button>';
+    }
+
+    $effective = $override ?? $globalValue;
+
+    return '<button type="button" class="quota-inline"'
+        . ' title="' . t_h('modals.user_quotas.title', [], 'User quotas') . '"'
+        . ' data-user-id="' . (int)$row['user_id'] . '"'
+        . ' data-username="' . htmlspecialchars($row['username'] ?? ('#' . $row['user_id']), ENT_QUOTES) . '"'
+        . ' data-quota-notes="' . ($row['quota_max_notes'] !== null ? (int)$row['quota_max_notes'] : '') . '"'
+        . ' data-quota-storage="' . ($row['quota_max_storage_mb'] !== null ? (int)$row['quota_max_storage_mb'] : '') . '"'
+        . ' data-quota-storage-s3="' . ($row['quota_max_storage_s3_mb'] !== null ? (int)$row['quota_max_storage_s3_mb'] : '') . '"'
+        . ' data-quota-backups-s3="' . ($row['quota_max_backups_s3_mb'] !== null ? (int)$row['quota_max_backups_s3_mb'] : '') . '"'
+        . '>/&nbsp;' . poznoteFormatQuotaValue($effective) . '</button>';
+}
+
 // Show a dedicated S3 column when attachments are stored in a bucket
 require_once __DIR__ . '/../storage/AttachmentStorage.php';
 $s3ColumnVisible = AttachmentStorage::isEnabled();
+
+// Same for backups, which target their own (independent) bucket
+require_once __DIR__ . '/../S3BackupService.php';
+$backupsColumnVisible = S3BackupService::isEnabled();
 
 $totNotesActive        = 0;
 $totNotesTrash         = 0;
@@ -203,6 +248,7 @@ $totDbBytes            = 0;
 $totEntriesBytes       = 0;
 $totAttachmentBytes    = 0;
 $totAttachmentS3Bytes  = 0;
+$totBackupsS3Bytes     = 0;
 $totBytes              = 0;
 foreach ($stats as $r) {
     $totNotesActive        += $r['notes_active'];
@@ -211,6 +257,7 @@ foreach ($stats as $r) {
     $totEntriesBytes       += $r['entries_bytes'];
     $totAttachmentBytes    += $r['attachments_bytes'];
     $totAttachmentS3Bytes  += $r['attachments_s3_bytes'];
+    $totBackupsS3Bytes     += $r['backups_s3_bytes'];
     $totBytes              += $r['total_bytes'];
 }
 ?>
@@ -276,6 +323,14 @@ foreach ($stats as $r) {
     .table-scroll {
         overflow: auto;
         margin-top: 20px;
+        /* Keep the rounding, drop the frame: the container cuts mid-row once
+           the row cap kicks in, so the corners still need clipping. */
+        border-radius: 12px;
+    }
+    /* No outer frame on this table; admin-tools.css draws one by default. */
+    .table-scroll .results-table {
+        border: none;
+        border-radius: 0;
     }
     .results-table {
         margin-top: 0;
@@ -298,6 +353,13 @@ foreach ($stats as $r) {
     .results-table td {
         padding: 7px 16px;
         text-align: center;
+    }
+    /* Rule separating the column groups: note counts, trash, local storage,
+       S3 attachments, S3 backups. It sits on the column that opens each
+       group, so it lands correctly whichever S3 features are enabled. */
+    .results-table th.col-group-start,
+    .results-table td.col-group-start {
+        border-left: 2px solid var(--border-color, #e5e7eb);
     }
     .results-table th .storage-sort-btn {
         background: none;
@@ -325,31 +387,23 @@ foreach ($stats as $r) {
         /* Long labels scroll with .table-scroll instead of wrapping onto two lines */
         white-space: nowrap;
     }
-    .results-table th.quota-header {
-        text-transform: none;
-        letter-spacing: normal;
-    }
     .results-table td {
         font-size: 0.85rem;
     }
-    .quota-edit-btn {
+    /* "/ 500" suffix appended to the usage figure it limits: reads as part of
+       the value, but is a real button opening the quota modal. Per-user
+       overrides and inherited global values render identically. */
+    .quota-inline {
         background: none;
         border: none;
-        padding: 0 0 0 6px;
+        padding: 0 0 0 2px;
+        font: inherit;
         color: inherit;
         cursor: pointer;
-        vertical-align: middle;
+        vertical-align: baseline;
     }
-    .quota-edit-btn .lucide {
-        font-size: 13px;
-    }
-    .quota-override {
-        font-weight: 600;
-    }
-    .quota-inherited {
-        color: var(--text-muted, #999);
-    }
-    #quotaModal .modal-title {
+    #quotaModal .modal-title,
+    #quotaAdminModal .modal-title {
         margin-bottom: 18px;
     }
     .quota-modal-description {
@@ -447,13 +501,29 @@ foreach ($stats as $r) {
         });
     }
 
-    /* Cap the scroll container to the viewport so its horizontal scrollbar
-       never ends up below the fold; rows scroll vertically inside instead. */
+    /* Show about ten rows at a time; the rest scroll inside the container.
+       The height is measured from a real row rather than hardcoded so it
+       follows the font size and theme. Still capped to the viewport, so the
+       horizontal scrollbar never ends up below the fold on short windows. */
+    const STORAGE_TABLE_VISIBLE_ROWS = 10;
+
     function sizeStorageTableScroll() {
         const scroller = document.querySelector('.table-scroll');
         if (!scroller) return;
+
         const top = scroller.getBoundingClientRect().top + window.scrollY;
-        scroller.style.maxHeight = Math.max(240, window.innerHeight - top - 24) + 'px';
+        const viewportCap = Math.max(240, window.innerHeight - top - 24);
+
+        const head = scroller.querySelector('thead');
+        const row = scroller.querySelector('tbody tr');
+        let rowsCap = viewportCap;
+        if (head && row) {
+            // +8px so the 11th row is clipped mid-height, which reads as
+            // "there is more below" instead of looking like a clean end.
+            rowsCap = head.offsetHeight + row.offsetHeight * STORAGE_TABLE_VISIBLE_ROWS + 8;
+        }
+
+        scroller.style.maxHeight = Math.min(viewportCap, rowsCap) + 'px';
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -497,81 +567,82 @@ foreach ($stats as $r) {
                 <thead>
                     <tr>
                         <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_id', [], 'ID'), 'num'); ?>
-                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_account', [], 'Account'), 'text'); ?>
-                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_notes', [], 'Notes'), 'num'); ?>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_account', [], 'Account'), 'text', 'col-group-start'); ?>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_notes', [], 'Notes'), 'num', 'col-group-start'); ?>
                         <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_trash', [], 'Trash'), 'num', 'hide-mobile'); ?>
-                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')), 'num', 'hide-mobile'); ?>
+                        <?php // The note quota counts active + trashed notes, so its
+                              // total sits after both, carrying the "/ 500" suffix. ?>
+                        <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_notes_total', [], 'Total notes'), 'num'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')), 'num', 'hide-mobile col-group-start'); ?>
                         <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')), 'num', 'hide-mobile'); ?>
                         <?php if ($s3ColumnVisible): ?>
                             <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')), 'num', 'hide-mobile'); ?>
-                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')), 'num', 'hide-mobile'); ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'num'); ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')), 'num', 'hide-mobile col-group-start'); ?>
                         <?php else: ?>
                             <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')), 'num', 'hide-mobile'); ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'num'); ?>
                         <?php endif; ?>
-                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'num'); ?>
-                        <th class="quota-header"><?php echo poznoteGlueUnit($s3ColumnVisible
-                            ? t_h('admin_tools.storage_stats.table_quota_s3', [], 'Quota (Count / local MB / S3 MB)')
-                            : t_h('admin_tools.storage_stats.table_quota', [], 'Quota (Count / MB)')); ?></th>
+                        <?php if ($backupsColumnVisible): ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_backups_s3', [], 'Backups S3 (MB)')), 'num', 'hide-mobile col-group-start'); ?>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($stats as $row): ?>
                         <tr>
                             <td data-sort="<?php echo $row['user_id']; ?>"><?php echo $row['user_id']; ?></td>
-                            <td style="white-space: nowrap;" data-sort="<?php echo htmlspecialchars(mb_strtolower($row['username'] ?? ''), ENT_QUOTES); ?>">
+                            <td class="col-group-start" style="white-space: nowrap;" data-sort="<?php echo htmlspecialchars(mb_strtolower($row['username'] ?? ''), ENT_QUOTES); ?>">
                                 <?php if ($row['username'] !== null): ?>
                                     <?php echo htmlspecialchars($row['username'], ENT_QUOTES); ?>
                                 <?php else: ?>
                                     <span style="color: var(--text-muted, #999);">—</span>
                                 <?php endif; ?>
                             </td>
-                            <td data-sort="<?php echo $row['error'] ? -1 : $row['notes_active']; ?>">
+                            <td class="col-group-start" data-sort="<?php echo $row['error'] ? -1 : $row['notes_active']; ?>">
                                 <?php if ($row['error']): ?>
                                     <span style="color:red" title="<?php echo htmlspecialchars($row['error'], ENT_QUOTES); ?>">—</span>
                                 <?php else: ?>
-                                    <span class="status-badge status-clean"><?php echo $row['notes_active']; ?></span>
+                                    <?php echo $row['notes_active']; ?>
                                 <?php endif; ?>
                             </td>
                             <td class="hide-mobile" data-sort="<?php echo $row['notes_trash']; ?>"><?php echo $row['notes_trash']; ?></td>
-                            <td class="hide-mobile" data-sort="<?php echo $row['db_bytes']; ?>"><?php echo poznoteFormatMb($row['db_bytes']); ?></td>
-                            <td class="hide-mobile" data-sort="<?php echo $row['entries_bytes']; ?>"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
-                            <td class="hide-mobile" data-sort="<?php echo $row['attachments_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
-                            <?php if ($s3ColumnVisible): ?>
-                                <td class="hide-mobile" data-sort="<?php echo $row['attachments_s3_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_s3_bytes']); ?></td>
-                            <?php endif; ?>
-                            <td data-sort="<?php echo $row['total_bytes']; ?>"><?php echo poznoteFormatMb($row['total_bytes']); ?></td>
-                            <td style="white-space: nowrap;">
-                                <?php if ($row['is_admin']): ?>
-                                    <span style="color: var(--text-muted, #999);"><?php echo t_h('admin_tools.storage_stats.quota_admin_exempt', [], 'Unlimited because admin'); ?></span>
+                            <?php // Trashed notes count against the quota too: they still
+                                  // exist and can be restored. ?>
+                            <td style="white-space: nowrap;" data-sort="<?php echo $row['error'] ? -1 : ($row['notes_active'] + $row['notes_trash']); ?>">
+                                <?php if ($row['error']): ?>
+                                    <span style="color:red">—</span>
                                 <?php else: ?>
-                                    <?php
-                                    $effectiveNotes   = $row['quota_max_notes'] ?? $globalMaxNotes;
-                                    $effectiveStorage = $row['quota_max_storage_mb'] ?? $globalMaxStorageMb;
-                                    $effectiveStorageS3 = $row['quota_max_storage_s3_mb'] ?? $globalMaxStorageS3Mb;
-                                    $hasOverride      = $row['quota_max_notes'] !== null || $row['quota_max_storage_mb'] !== null
-                                        || ($s3ColumnVisible && $row['quota_max_storage_s3_mb'] !== null);
-                                    $quotaDisplay = poznoteFormatQuotaValue($effectiveNotes) . ' / ' . poznoteFormatQuotaValue($effectiveStorage);
-                                    if ($s3ColumnVisible) {
-                                        $quotaDisplay .= ' / ' . poznoteFormatQuotaValue($effectiveStorageS3);
-                                    }
-                                    ?>
-                                    <span class="<?php echo $hasOverride ? 'quota-override' : 'quota-inherited'; ?>"><?php echo $quotaDisplay; ?></span>
-                                    <button type="button" class="quota-edit-btn"
-                                        title="<?php echo t_h('modals.user_quotas.title', [], 'User quotas'); ?>"
-                                        data-user-id="<?php echo $row['user_id']; ?>"
-                                        data-username="<?php echo htmlspecialchars($row['username'] ?? ('#' . $row['user_id']), ENT_QUOTES); ?>"
-                                        data-quota-notes="<?php echo $row['quota_max_notes'] !== null ? $row['quota_max_notes'] : ''; ?>"
-                                        data-quota-storage="<?php echo $row['quota_max_storage_mb'] !== null ? $row['quota_max_storage_mb'] : ''; ?>"
-                                        data-quota-storage-s3="<?php echo $row['quota_max_storage_s3_mb'] !== null ? $row['quota_max_storage_s3_mb'] : ''; ?>">
-                                        <i class="lucide lucide-pencil"></i>
-                                    </button>
+                                    <?php echo $row['notes_active'] + $row['notes_trash']; ?>
+                                    <?php echo poznoteQuotaSuffix($row, $row['quota_max_notes'], $globalMaxNotes, $row['is_admin']); ?>
                                 <?php endif; ?>
                             </td>
+                            <td class="hide-mobile col-group-start" data-sort="<?php echo $row['db_bytes']; ?>"><?php echo poznoteFormatMb($row['db_bytes']); ?></td>
+                            <td class="hide-mobile" data-sort="<?php echo $row['entries_bytes']; ?>"><?php echo poznoteFormatMb($row['entries_bytes']); ?></td>
+                            <td class="hide-mobile" data-sort="<?php echo $row['attachments_bytes']; ?>"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
+                            <?php // The local storage quota covers the whole account perimeter
+                                  // (database + files + attachments), which is what Total sums. ?>
+                            <td style="white-space: nowrap;" data-sort="<?php echo $row['total_bytes']; ?>">
+                                <?php echo poznoteFormatMb($row['total_bytes']); ?>
+                                <?php echo poznoteQuotaSuffix($row, $row['quota_max_storage_mb'], $globalMaxStorageMb, $row['is_admin']); ?>
+                            </td>
+                            <?php if ($s3ColumnVisible): ?>
+                                <td class="hide-mobile col-group-start" style="white-space: nowrap;" data-sort="<?php echo $row['attachments_s3_bytes']; ?>">
+                                    <?php echo poznoteFormatMb($row['attachments_s3_bytes']); ?>
+                                    <?php echo poznoteQuotaSuffix($row, $row['quota_max_storage_s3_mb'], $globalMaxStorageS3Mb, $row['is_admin']); ?>
+                                </td>
+                            <?php endif; ?>
+                            <?php if ($backupsColumnVisible): ?>
+                                <td class="hide-mobile col-group-start" style="white-space: nowrap;" data-sort="<?php echo $row['backups_s3_bytes']; ?>">
+                                    <?php echo poznoteFormatMb($row['backups_s3_bytes']); ?>
+                                    <?php echo poznoteQuotaSuffix($row, $row['quota_max_backups_s3_mb'], $globalMaxBackupsS3Mb, $row['is_admin']); ?>
+                                </td>
+                            <?php endif; ?>
                         </tr>
                     <?php endforeach; ?>
                     <?php if (empty($stats)): ?>
                         <tr>
-                            <td colspan="<?php echo $s3ColumnVisible ? 10 : 9; ?>" style="text-align:center;color:var(--text-muted,#999);">
+                            <td colspan="<?php echo 9 + ($s3ColumnVisible ? 1 : 0) + ($backupsColumnVisible ? 1 : 0); ?>" style="text-align:center;color:var(--text-muted,#999);">
                                 <?php echo t_h('admin_tools.storage_stats.no_accounts', [], 'No accounts found.'); ?>
                             </td>
                         </tr>
@@ -580,17 +651,23 @@ foreach ($stats as $r) {
                 <?php if (!empty($stats)): ?>
                 <tfoot>
                     <tr>
-                        <td colspan="2"><strong><?php echo t_h('admin_tools.storage_stats.table_total_row', [], 'Total'); ?></strong></td>
-                        <td><strong><?php echo $totNotesActive; ?></strong></td>
+                        <?php // Centred in the Account column rather than spanning
+                              // ID+Account, so it lines up with the names above it. ?>
+                        <td></td>
+                        <td class="col-group-start"><strong><?php echo t_h('admin_tools.storage_stats.table_total_row', [], 'Total'); ?></strong></td>
+                        <td class="col-group-start"><strong><?php echo $totNotesActive; ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo $totNotesTrash; ?></strong></td>
-                        <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totDbBytes); ?></strong></td>
+                        <td><strong><?php echo $totNotesActive + $totNotesTrash; ?></strong></td>
+                        <td class="hide-mobile col-group-start"><strong><?php echo poznoteFormatMb($totDbBytes); ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totEntriesBytes); ?></strong></td>
                         <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totAttachmentBytes); ?></strong></td>
-                        <?php if ($s3ColumnVisible): ?>
-                            <td class="hide-mobile"><strong><?php echo poznoteFormatMb($totAttachmentS3Bytes); ?></strong></td>
-                        <?php endif; ?>
                         <td><strong><?php echo poznoteFormatMb($totBytes); ?></strong></td>
-                        <td></td>
+                        <?php if ($s3ColumnVisible): ?>
+                            <td class="hide-mobile col-group-start"><strong><?php echo poznoteFormatMb($totAttachmentS3Bytes); ?></strong></td>
+                        <?php endif; ?>
+                        <?php if ($backupsColumnVisible): ?>
+                            <td class="hide-mobile col-group-start"><strong><?php echo poznoteFormatMb($totBackupsS3Bytes); ?></strong></td>
+                        <?php endif; ?>
                     </tr>
                 </tfoot>
                 <?php endif; ?>
@@ -615,8 +692,14 @@ foreach ($stats as $r) {
         </div>
         <?php if ($s3ColumnVisible): ?>
         <div class="form-group">
-            <label for="quota_max_storage_s3" id="quota_max_storage_s3_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_s3_for', [], 'Max S3 storage for {{user}} (MB)'); ?>"></label>
+            <label for="quota_max_storage_s3" id="quota_max_storage_s3_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_s3_for', [], 'Max S3 attachments storage for {{user}} (MB)'); ?>"></label>
             <input type="number" id="quota_max_storage_s3" min="0" max="100000000" step="1" placeholder="0">
+        </div>
+        <?php endif; ?>
+        <?php if ($backupsColumnVisible): ?>
+        <div class="form-group">
+            <label for="quota_max_backups_s3" id="quota_max_backups_s3_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_backups_s3_for', [], 'Max S3 backups storage for {{user}} (MB)'); ?>"></label>
+            <input type="number" id="quota_max_backups_s3" min="0" max="100000000" step="1" placeholder="0">
         </div>
         <?php endif; ?>
         <div class="form-actions">
@@ -626,11 +709,31 @@ foreach ($stats as $r) {
     </div>
 </div>
 
+<!-- Admin rows have no editable quota: explain the exemption instead -->
+<div class="modal" id="quotaAdminModal">
+    <div class="modal-content">
+        <h2 class="modal-title"><?php echo t_h('modals.user_quotas.title', [], 'User quotas'); ?>&nbsp;: <span id="quota_admin_user"></span></h2>
+        <p class="quota-modal-description"><?php echo t_h('admin_tools.storage_stats.quota_admin_exempt_message', [], 'Quotas do not apply to administrator accounts: their notes and storage are unlimited.'); ?></p>
+        <div class="form-actions">
+            <button type="button" class="btn btn-primary" onclick="closeQuotaAdminModal()"><?php echo t_h('common.close', [], 'Close'); ?></button>
+        </div>
+    </div>
+</div>
+
 <script>
+function openQuotaAdminModal(btn) {
+    document.getElementById('quota_admin_user').textContent = btn.dataset.username || '';
+    document.getElementById('quotaAdminModal').classList.add('active');
+}
+
+function closeQuotaAdminModal() {
+    document.getElementById('quotaAdminModal').classList.remove('active');
+}
+
 function openQuotaModal(btn) {
     document.getElementById('quota_user_id').value = btn.dataset.userId;
     document.getElementById('quota_title_user').textContent = btn.dataset.username;
-    ['quota_max_notes_label', 'quota_max_storage_label', 'quota_max_storage_s3_label'].forEach(function (id) {
+    ['quota_max_notes_label', 'quota_max_storage_label', 'quota_max_storage_s3_label', 'quota_max_backups_s3_label'].forEach(function (id) {
         var label = document.getElementById(id);
         if (label) label.textContent = label.dataset.template.replace('{{user}}', btn.dataset.username);
     });
@@ -638,6 +741,8 @@ function openQuotaModal(btn) {
     document.getElementById('quota_max_storage').value = btn.dataset.quotaStorage || '';
     var s3Input = document.getElementById('quota_max_storage_s3');
     if (s3Input) s3Input.value = btn.dataset.quotaStorageS3 || '';
+    var backupsInput = document.getElementById('quota_max_backups_s3');
+    if (backupsInput) backupsInput.value = btn.dataset.quotaBackupsS3 || '';
     document.getElementById('quotaModal').classList.add('active');
 }
 
@@ -662,14 +767,17 @@ function saveQuota() {
     var storage = readQuotaInput('quota_max_storage');
     var hasS3Input = !!document.getElementById('quota_max_storage_s3');
     var storageS3 = hasS3Input ? readQuotaInput('quota_max_storage_s3') : null;
+    var hasBackupsInput = !!document.getElementById('quota_max_backups_s3');
+    var backupsS3 = hasBackupsInput ? readQuotaInput('quota_max_backups_s3') : null;
 
-    if (notes === false || storage === false || storageS3 === false) {
+    if (notes === false || storage === false || storageS3 === false || backupsS3 === false) {
         alert(<?php echo json_encode(t('common.error', [], 'Error')); ?>);
         return;
     }
 
     var payload = { quota_max_notes: notes, quota_max_storage_mb: storage };
     if (hasS3Input) payload.quota_max_storage_s3_mb = storageS3;
+    if (hasBackupsInput) payload.quota_max_backups_s3_mb = backupsS3;
 
     fetch('/api/v1/admin/users/' + encodeURIComponent(userId), {
         method: 'PATCH',
@@ -691,8 +799,16 @@ function saveQuota() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.quota-edit-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () { openQuotaModal(btn); });
+    document.querySelectorAll('.quota-inline').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            // Admin rows have nothing to edit: say why rather than opening an
+            // editor whose values would never apply.
+            if (btn.classList.contains('quota-admin-exempt')) {
+                openQuotaAdminModal(btn);
+                return;
+            }
+            openQuotaModal(btn);
+        });
     });
 });
 </script>

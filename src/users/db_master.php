@@ -125,6 +125,10 @@ function initializeMasterDatabase(PDO $con): void {
         if (!in_array('quota_max_storage_s3_mb', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN quota_max_storage_s3_mb INTEGER");
         }
+
+        if (!in_array('quota_max_backups_s3_mb', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN quota_max_backups_s3_mb INTEGER");
+        }
     } catch (Exception $e) {
         error_log("Failed to add columns: " . $e->getMessage());
     }
@@ -907,7 +911,7 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb', 'quota_max_backups_s3_mb'];
         $updates = [];
         $params = [];
 
@@ -958,7 +962,7 @@ function updateUserProfile(int $id, array $data): array {
 
         // Per-user quota overrides: null or '' clears the override (inherit the
         // global setting), 0 means unlimited, a positive value is the limit.
-        foreach (['quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb'] as $quotaField) {
+        foreach (['quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb', 'quota_max_backups_s3_mb'] as $quotaField) {
             if (array_key_exists($quotaField, $data)) {
                 $rawQuota = $data[$quotaField];
                 if ($rawQuota === null || trim((string)$rawQuota) === '') {
@@ -1017,7 +1021,14 @@ function updateUserProfile(int $id, array $data): array {
         $sql = "UPDATE users SET " . implode(', ', $updates) . " WHERE id = ?";
         $stmt = $masterCon->prepare($sql);
         $stmt->execute($params);
-        
+
+        // Every profile and quota write funnels through here, so logging at
+        // this single point covers the self-service API, the admin API, both
+        // admin forms and the OIDC email sync. $currentUser holds the row as it
+        // was before the UPDATE, which is what makes "X -> Y" possible.
+        require_once __DIR__ . '/../ActivityLog.php';
+        logProfileUpdate($id, $currentUser, $data);
+
         // If updating the current active account or authenticated identity, refresh the session data
         $isCurrentUser = (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $id);
         $isAuthenticatedUser = (isset($_SESSION['login_user_id']) && (int)$_SESSION['login_user_id'] === $id);
@@ -1168,7 +1179,7 @@ function listAllUserProfiles(string $sort = 'id_asc'): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->query("
-            SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login
+            SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login, oidc_subject
             FROM users
             ORDER BY $orderBy
         ");
@@ -1455,12 +1466,13 @@ function setGlobalSetting(string $key, $value): bool {
 /**
  * Per-user quota overrides. NULL means the user inherits the global setting,
  * 0 means unlimited, any other value is that user's limit.
- * @return array Keys: max_notes (int|null), max_storage_mb (int|null)
+ * @return array Keys: max_notes (int|null), max_storage_mb (int|null),
+ *               max_storage_s3_mb (int|null), max_backups_s3_mb (int|null)
  */
 function getUserQuotaOverrides(int $userId): array {
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("SELECT quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb FROM users WHERE id = ?");
+        $stmt = $con->prepare("SELECT quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb, quota_max_backups_s3_mb FROM users WHERE id = ?");
         $stmt->execute([$userId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($row) {
@@ -1468,12 +1480,13 @@ function getUserQuotaOverrides(int $userId): array {
                 'max_notes' => $row['quota_max_notes'] !== null ? (int)$row['quota_max_notes'] : null,
                 'max_storage_mb' => $row['quota_max_storage_mb'] !== null ? (int)$row['quota_max_storage_mb'] : null,
                 'max_storage_s3_mb' => $row['quota_max_storage_s3_mb'] !== null ? (int)$row['quota_max_storage_s3_mb'] : null,
+                'max_backups_s3_mb' => $row['quota_max_backups_s3_mb'] !== null ? (int)$row['quota_max_backups_s3_mb'] : null,
             ];
         }
     } catch (Exception $e) {
         // Fall through to "no overrides"
     }
-    return ['max_notes' => null, 'max_storage_mb' => null, 'max_storage_s3_mb' => null];
+    return ['max_notes' => null, 'max_storage_mb' => null, 'max_storage_s3_mb' => null, 'max_backups_s3_mb' => null];
 }
 
 /**

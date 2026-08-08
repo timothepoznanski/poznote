@@ -256,6 +256,7 @@ switch ($action) {
                 $backups[] = [
                     'key' => $object['key'],
                     'size' => $object['size'],
+                    'mtime' => (int)($object['mtime'] ?? 0),
                     'filename' => basename($object['key']),
                 ];
             }
@@ -267,6 +268,7 @@ switch ($action) {
                 'configured' => true,
                 'auto_enabled' => $config['auto_enabled'],
                 'frequency' => $config['frequency'],
+                'retention' => $config['retention'],
                 'included' => $config['user_ids'] === null || in_array($userId, $config['user_ids'], true),
                 'backups' => $backups,
             ]);

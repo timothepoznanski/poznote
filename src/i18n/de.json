@@ -373,6 +373,10 @@
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
+      "password_note_sso_only": "Die Passwort-Anmeldung ist auf dieser Instanz deaktiviert.",
+      "password_note_no_local": "Ihr Passwort wird von Ihrem Identitaetsanbieter verwaltet.",
+      "change_password_sso_only": "Diese Instanz verwendet ausschliesslich SSO, daher wuerde ein lokales Passwort bei der Anmeldung nie akzeptiert. Passwortaenderungen sind deaktiviert.",
+      "change_password_no_local": "Ihr Konto meldet sich ueber Ihren Identitaetsanbieter an und hat kein lokales Passwort, daher gibt es kein aktuelles Passwort zur Bestaetigung einer Aenderung. Ein Administrator kann eines fuer Sie unter Admin-Tools > Benutzer festlegen.",
       "git_sync": "Sichern Sie Ihre Notizen in einem Git-Repository und sehen Sie den Synchronisationsverlauf.",
       "extension": "Installieren Sie die Browser-Erweiterung, um Webseiten in Poznote zu speichern.",
       "install_app": "Installieren Sie Poznote als Anwendung auf Ihrem Gerät (PWA).",
@@ -425,6 +429,7 @@
       "disaster_recovery": "Stellen Sie die Instanz nach einem Datenverlust aus einer Sicherung wieder her.",
       "orphan_scanner": "Finden und bereinigen Sie Anhangsdateien, die zu keiner Notiz mehr gehören.",
       "storage_stats": "Sehen Sie die Speichernutzung aller Benutzer dieser Instanz.",
+      "activity_log": "Sensible Vorgänge einsehen: Kontolöschungen, Backups, Wiederherstellungen, Papierkorb leeren und Arbeitsbereich-Löschungen.",
       "version": "Öffnen Sie die Versionshinweise auf GitHub.",
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
@@ -485,6 +490,7 @@
       "release_notes": "Versionshinweise",
       "orphan_scanner": "Verwaiste Anhänge-Scanner",
       "storage_stats": "Admin-Speicherstatistik",
+      "activity_log": "Aktivitätsprotokoll",
       "storage_stats_user": "Benutzer-Speicherstatistik",
       "user_management": "Benutzerverwaltung",
       "change_password": "Passwort ändern",
@@ -998,13 +1004,8 @@
       "description": "Anzahl der Notizen und Speicherplatz pro Benutzer begrenzen. 0 bedeutet unbegrenzt. Administratoren sind nicht eingeschränkt. Auf der Seite der Speicherstatistiken können Sie diese Limits pro Benutzer überschreiben.",
       "max_notes": "Max. Notizen pro Benutzer",
       "max_storage": "Max. lokaler Speicher pro Benutzer (MB)",
-      "notes_badge": "Notizen: {{count}}",
-      "notes_badge_unlimited": "Notizen: unbegrenzt",
-      "storage_badge": "Speicher: {{count}} MB",
-      "storage_badge_unlimited": "Speicher: unbegrenzt",
-      "max_storage_s3": "Max. S3-Speicher pro Benutzer (MB)",
-      "storage_s3_badge": "S3: {{count}} MB",
-      "storage_s3_badge_unlimited": "S3: unbegrenzt"
+      "max_storage_s3": "Max. S3-Anhangspeicher pro Benutzer (MB)",
+      "max_backups_s3": "Max. S3-Backup-Speicher pro Benutzer (MB)"
     },
     "ui_customization": {
       "title": "Oberfläche anpassen",
@@ -1146,6 +1147,7 @@
     "user_settings_info": {
       "title": "Kontoeinstellungen",
       "message": "Sie koennen Ihren Benutzernamen, Ihren Namen und Ihr Passwort in den Einstellungen aendern.",
+      "message_sso_only": "Sie koennen Ihren Benutzernamen und Ihren Namen in den Einstellungen aendern.",
       "change_password_button": "Passwort aendern",
       "edit_profile_button": "Profil bearbeiten"
     },
@@ -1725,6 +1727,11 @@
         "title": "S3-Sicherungen",
         "description": "Lädt ein Sicherungsarchiv Ihres Kontos in den auf dieser Instanz konfigurierten S3-Bucket hoch und lädt die dort bereits gespeicherten Archive herunter.",
         "backup_now": "Mein Konto nach S3 sichern",
+        "confirm_run": "Ihr Konto jetzt in den S3-Bucket sichern? Das Hochladen des Archivs kann eine Weile dauern.",
+        "policy_auto": "Der Administrator hat eine automatische Sicherung {{frequency}} eingerichtet und bewahrt die letzten {{retention}} Archive pro Benutzer auf.",
+        "policy_auto_keep_all": "Der Administrator hat eine automatische Sicherung {{frequency}} eingerichtet; alle Archive werden aufbewahrt.",
+        "policy_manual": "Automatische Sicherungen sind deaktiviert; die letzten {{retention}} Archive pro Benutzer werden aufbewahrt.",
+        "policy_manual_keep_all": "Automatische Sicherungen sind deaktiviert; alle Archive werden aufbewahrt.",
         "running": "Sicherung wird in den Bucket hochgeladen...",
         "done": "Sicherung hochgeladen ({{size}}).",
         "error": "Sicherung fehlgeschlagen: {{error}}",
@@ -2881,13 +2888,6 @@
       "table_attachments": "Anhänge (MB)",
       "table_total": "Gesamt (MB)",
       "table_total_row": "Gesamt",
-      "table_quota": "Kontingent (Anzahl / MB)",
-      "quota_admin_exempt": "Unbegrenzt, da Admin",
-      "user_quota_admin_sentence": "Kontingente gelten nicht für Administratorkonten.",
-      "user_quota_sentence_both": "Der Administrator hat dieses Konto auf {{notes}} Notizen und {{storage}} MB Speicher begrenzt.",
-      "user_quota_sentence_notes": "Der Administrator hat dieses Konto auf {{notes}} Notizen begrenzt. Der Speicher ist unbegrenzt.",
-      "user_quota_sentence_storage": "Der Administrator hat dieses Konto auf {{storage}} MB Speicher begrenzt. Die Anzahl der Notizen ist unbegrenzt.",
-      "user_quota_sentence_none": "Für dieses Konto ist kein Kontingent festgelegt: Notizen und Speicher sind unbegrenzt.",
       "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
       "quota_max_notes_for": "Max. Notizen für {{user}}",
       "quota_max_storage_for": "Max. lokaler Speicher für {{user}} (MB)",
@@ -2895,8 +2895,120 @@
       "no_accounts": "Keine Konten gefunden.",
       "table_attachments_local": "Anhänge lokal (MB)",
       "table_attachments_s3": "Anhänge S3 (MB)",
-      "quota_max_storage_s3_for": "Max. S3-Speicher für {{user}} (MB)",
-      "table_quota_s3": "Quota (Anzahl / MB lokal / MB S3)"
+      "quota_max_storage_s3_for": "Max. S3-Anhangspeicher für {{user}} (MB)",
+      "quota_max_backups_s3_for": "Max. S3-Backup-Speicher für {{user}} (MB)",
+      "table_backups_s3": "Backups S3 (MB)",
+      "quota_admin_exempt": "Unbegrenzt, da Administrator",
+      "quota_admin_exempt_message": "Kontingente gelten nicht für Administratorkonten: Ihre Notizen und ihr Speicher sind unbegrenzt.",
+      "table_notes_total": "Notizen gesamt"
+    }
+  },
+  "activity_log": {
+    "title": "Aktivitätsprotokoll",
+    "description": "Verlauf sensibler Vorgänge auf dieser Instanz.",
+    "help_intro": "Protokollierte Vorgänge:",
+    "filter_placeholder": "Benutzer oder Detail suchen...",
+    "empty": "Noch keine Einträge vorhanden.",
+    "unknown_user": "unbekannt",
+    "columns": {
+      "date": "Datum und Uhrzeit",
+      "user": "Benutzer (ID)",
+      "action": "Aktion",
+      "details": "Details",
+      "source": "Quelle"
+    },
+    "actions": {
+      "user_login": "Anmeldung",
+      "user_logout": "Abmeldung",
+      "profile_updated": "Profil geändert",
+      "quota_updated": "Kontingent geändert",
+      "account_activated": "Konto aktiviert",
+      "account_deactivated": "Konto deaktiviert",
+      "admin_granted": "Administratorrolle vergeben",
+      "admin_revoked": "Administratorrolle entzogen",
+      "account_deleted": "Konto gelöscht",
+      "access_granted": "Kontozugriff gewährt",
+      "access_revoked": "Kontozugriff entzogen",
+      "workspace_created": "Arbeitsbereich erstellt",
+      "workspace_deleted": "Arbeitsbereich gelöscht",
+      "workspace_shared": "Arbeitsbereich geteilt",
+      "workspace_unshared": "Arbeitsbereich-Freigabe aufgehoben",
+      "backup_created": "Backup erstellt",
+      "backup_restored": "Backup wiederhergestellt",
+      "trash_emptied": "Papierkorb geleert",
+      "note_deleted": "Notiz endgültig gelöscht"
+    },
+    "filters": {
+      "all_actions": "Alle Aktionen",
+      "apply": "Filtern",
+      "reset": "Zurücksetzen"
+    },
+    "details": {
+      "performed_by": "von {{user}}",
+      "data_deleted": "Daten gelöscht",
+      "data_kept": "Daten behalten",
+      "notes_deleted": "{{count}} Notizen gelöscht",
+      "notes_moved": "{{count}} Notizen verschoben nach {{workspace}}",
+      "in_workspace": "in {{workspace}}",
+      "untitled_note": "Notiz #{{id}}",
+      "linked_deleted": "+{{count}} verknüpfte Notizen",
+      "share_updated": "Einstellungen aktualisiert",
+      "password_protected": "passwortgeschützt",
+      "login_required": "Anmeldung erforderlich",
+      "allowed_users": "auf {{count}} Benutzer beschränkt",
+      "accounts": "Konten: {{accounts}}",
+      "empty_value": "leer"
+    },
+    "destinations": {
+      "download": "Download",
+      "s3": "S3",
+      "server": "Server"
+    },
+    "sources": {
+      "upload": "Upload",
+      "s3": "S3",
+      "server": "Server"
+    },
+    "pager": {
+      "previous": "Zurück",
+      "next": "Weiter",
+      "status": "Seite {{page}} von {{pages}}, {{total}} Einträge"
+    },
+    "retention": {
+      "label": "Einträge aufbewahren für",
+      "days": "{{days}} Tage",
+      "unlimited": "Unbegrenzt",
+      "save": "Speichern"
+    },
+    "clear": {
+      "title": "Aktivitätsprotokoll leeren",
+      "button": "Protokoll leeren",
+      "confirm": "Alle Einträge im Protokoll löschen? Dies kann nicht rückgängig gemacht werden.",
+      "warning": "{{count}} Einträge werden endgültig gelöscht."
+    },
+    "messages": {
+      "retention_saved": "Aufbewahrung auf {{days}} Tage gesetzt. {{removed}} alte Einträge entfernt.",
+      "retention_unlimited": "Aufbewahrung unbegrenzt. Es wird kein Eintrag automatisch entfernt.",
+      "cleared": "{{count}} Einträge gelöscht."
+    },
+    "errors": {
+      "invalid_form": "Ungültige Formularübermittlung. Bitte erneut versuchen.",
+      "retention_failed": "Aufbewahrungseinstellung konnte nicht gespeichert werden.",
+      "clear_failed": "Protokoll konnte nicht geleert werden."
+    },
+    "fields": {
+      "username": "Benutzername",
+      "email": "E-Mail",
+      "first_name": "Vorname",
+      "last_name": "Nachname",
+      "quota_max_notes": "Max. Notizen",
+      "quota_max_storage_mb": "Speicher (MB)",
+      "quota_max_storage_s3_mb": "S3-Speicher (MB)",
+      "quota_max_backups_s3_mb": "S3-Backups (MB)"
+    },
+    "methods": {
+      "password": "Passwort",
+      "oidc": "SSO"
     }
   },
   "backlinks": {
@@ -2910,7 +3022,8 @@
       "username": "Benutzername",
       "first_name": "Vorname",
       "last_name": "Nachname",
-      "email_admin_only": "Nur ein Administrator kann Ihre E-Mail-Adresse aendern."
+      "email_admin_only": "Nur ein Administrator kann Ihre E-Mail-Adresse aendern.",
+      "your_id": "Ihre ID"
     },
     "errors": {
       "username_required": "Benutzername ist erforderlich",
@@ -3088,7 +3201,9 @@
     "card": "Benutzer-Webhooks",
     "card_help": "Ereignisse Ihrer eigenen Notizen (Erinnerung ausgelöst, Notiz erstellt oder geteilt) per Webhook an externe Dienste wie ntfy oder n8n senden.",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpoint, wenn eine Ihrer Notizen ein abonniertes Ereignis auslöst: eine fällige Erinnerung, eine erstellte oder öffentlich geteilte Notiz. Betroffen sind nur Ihre eigenen Notizen. Ist ein Secret gesetzt, wird der Payload mit HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
-    "access_denied": "Zugriff verweigert. Benutzer-Webhooks sind auf dieser Instanz deaktiviert."
+    "access_denied": "Zugriff verweigert. Benutzer-Webhooks sind auf dieser Instanz deaktiviert.",
+    "app_url_unset": "Es ist keine Instanz-URL konfiguriert, daher enthalten die Payloads keinen direkten Notiz-Link (data.note.url ist null). Bitten Sie einen Administrator, sie auf der Admin-Seite Webhooks zu setzen.",
+    "app_url_unset_admin": "Es ist keine Instanz-URL konfiguriert, daher enthalten die Payloads keinen direkten Notiz-Link (data.note.url ist null). Setzen Sie sie auf der Admin-Seite Webhooks."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3113,10 +3228,13 @@
     "fields": {
       "url": "Endpunkt-URL",
       "secret": "Secret (optional)",
-      "events": "Ereignisse"
+      "events": "Ereignisse",
+      "app_url": "Instanz-URL"
     },
     "hints": {
-      "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt."
+      "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt.",
+      "app_url_env": "Derzeit durch die Umgebungsvariable POZNOTE_APP_URL bereitgestellt: {{url}}. Ein hier gespeicherter Wert ueberschreibt sie.",
+      "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null)."
     },
     "status": {
       "none": "Keine"
@@ -3139,7 +3257,12 @@
     "error_invalid_url": "Die Webhook-URL muss mit http:// oder https:// beginnen.",
     "error_no_events": "Wählen Sie mindestens ein Ereignis aus.",
     "error_saving": "Fehler beim Speichern des Webhooks.",
-    "error_not_found": "Webhook nicht gefunden."
+    "error_not_found": "Webhook nicht gefunden.",
+    "section_app_url": "Instanz-URL",
+    "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden.",
+    "app_url_saved": "Instanz-URL gespeichert.",
+    "app_url_cleared": "Instanz-URL geleert. Payloads enthalten keinen direkten Notiz-Link mehr.",
+    "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen."
   },
   "reminder": {
     "toolbar_button": "Erinnerung setzen",
@@ -3408,6 +3531,9 @@
     "frequency_daily": "Täglich",
     "frequency_weekly": "Wöchentlich",
     "frequency_monthly": "Monatlich (alle 30 Tage)",
+    "frequency_daily_inline": "täglich",
+    "frequency_weekly_inline": "wöchentlich",
+    "frequency_monthly_inline": "alle 30 Tage",
     "frequency_description": "Die erste automatische Sicherung startet wenige Minuten nach der Aktivierung, die nächsten nach dem gewählten Intervall.",
     "retention_label": "Aufzubewahrende Sicherungen pro Benutzer",
     "retention_description": "Ältere Archive werden nach jeder Sicherung aus dem Bucket gelöscht. 0 behält alles.",
@@ -3415,6 +3541,7 @@
     "skip_s3_description": "Wenn Anhänge in einem S3-Bucket liegen (S3-Speicher-Funktion), werden sie nicht in die Archive aufgenommen, statt sie bei jeder Sicherung herunterzuladen. Anhänge auf der lokalen Festplatte werden immer aufgenommen.",
     "manual_title": "Manuelle Sicherung",
     "manual_description": "Sichert jetzt sofort die ausgewählten Benutzer in den Bucket, einen Benutzer nach dem anderen.",
+    "manual_retention_warning": "Jede Sicherung zählt zur Aufbewahrungsgrenze: Eine automatische Sicherung kann daher ein manuelles Archiv löschen, ebenso wie eine manuelle Sicherung ein automatisches löschen kann. Um ein Archiv dauerhaft zu behalten, laden Sie es herunter.",
     "run_now": "Jetzt sichern",
     "confirm_run": "Jetzt die ausgewählten Benutzer in den Bucket sichern?",
     "running": "Sichere {{username}}... ({{done}}/{{total}})",
@@ -3432,6 +3559,7 @@
     "list_loading": "Wird geladen...",
     "col_user": "Benutzer",
     "col_archive": "Archiv",
+    "col_date": "Datum",
     "col_size": "Größe",
     "download": "Herunterladen",
     "delete": "Löschen",
@@ -3445,7 +3573,16 @@
     },
     "users_label": "Zu sichernde Benutzer",
     "master_label": "S3-Sicherungen aktivieren",
-    "master_description": "Hauptschalter. Wenn deaktiviert, stoppen die automatischen Sicherungen und die S3-Sicherungs- und Wiederherstellungsabschnitte verschwinden für alle Benutzer."
+    "master_description": "Hauptschalter. Wenn deaktiviert, stoppen die automatischen Sicherungen und die S3-Sicherungs- und Wiederherstellungsabschnitte verschwinden für alle Benutzer.",
+    "users_filter_placeholder": "Nach Name, Benutzername oder E-Mail filtern...",
+    "users_filter_clear": "Filter löschen",
+    "users_select_all": "Alle auswählen",
+    "users_select_none": "Auswahl aufheben",
+    "users_no_match": "Kein Benutzer entspricht diesem Filter.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inaktiv",
+    "users_count": "{{selected}} von {{total}} Benutzer(n) ausgewählt",
+    "users_count_filtered": "{{selected}} von {{total}} Benutzer(n) ausgewählt, {{shown}} angezeigt"
   },
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",

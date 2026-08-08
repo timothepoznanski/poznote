@@ -38,7 +38,10 @@
         modal.innerHTML =
             '<div class="modal-content">' +
                 '<h3>' + tr('profile.modal.title', {}, 'My Profile') + '</h3>' +
-                '<p class="text-small-muted edit-profile-description">' + tr('profile.modal.description', {}, 'Update your personal information.') + '</p>' +
+                '<p class="text-small-muted edit-profile-description">' +
+                    '<span class="edit-profile-description-text">' + tr('profile.modal.description', {}, 'Update your personal information.') + '</span>' +
+                    '<span class="edit-profile-user-id" style="margin-left:6px;white-space:nowrap;"></span>' +
+                '</p>' +
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<label for="epUsername" class="text-small-muted">' + tr('profile.modal.username', {}, 'Username') + '</label>' +
                     '<input type="text" id="epUsername" autocomplete="username" maxlength="60" placeholder="' + tr('profile.modal.username', {}, 'Username') + '" style="width:100%;box-sizing:border-box;">' +
@@ -76,8 +79,14 @@
         var title = modal.querySelector('h3');
         if (title) title.textContent = tr('profile.modal.title', {}, 'My Profile');
 
-        var description = modal.querySelector('.edit-profile-description');
+        // Only the text span: the sibling span holds the user id.
+        var description = modal.querySelector('.edit-profile-description-text');
         if (description) description.textContent = tr('profile.modal.description', {}, 'Update your personal information.');
+
+        var userId = modal.querySelector('.edit-profile-user-id');
+        if (userId && userId.textContent.trim() !== '' && profileCache && profileCache.id) {
+            userId.textContent = tr('profile.modal.your_id', {}, 'Your ID') + ' : ' + profileCache.id;
+        }
 
         var fields = [
             { id: 'epUsername', key: 'profile.modal.username', fallback: 'Username' },
@@ -109,6 +118,14 @@
         document.getElementById('epFirstName').value = (profile && profile.first_name) || '';
         document.getElementById('epLastName').value = (profile && profile.last_name) || '';
         document.getElementById('epEmail').value = (profile && profile.email) || '';
+
+        // Shown next to the description line; hidden when the id is unknown.
+        var userId = document.querySelector('#editProfileModal .edit-profile-user-id');
+        if (userId) {
+            userId.textContent = (profile && profile.id)
+                ? (tr('profile.modal.your_id', {}, 'Your ID') + ' : ' + profile.id)
+                : '';
+        }
 
         // Email is admin-managed: the field stays locked for regular users
         // (the API rejects self-service email changes too).

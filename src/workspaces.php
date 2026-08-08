@@ -76,7 +76,14 @@ if ($_POST) {
             if (!preg_match('/^[\p{L}0-9 _-]+$/u', $name)) throw new Exception(t('workspaces.errors.invalid_name', [], 'Invalid workspace name. Letters, numbers, spaces, dash and underscore are allowed.', $currentLang));
             $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
             $stmt->execute([$name]);
-            
+
+            // OR IGNORE makes a duplicate name a silent no-op, so only log when
+            // a row was actually inserted.
+            if ($stmt->rowCount() > 0) {
+                require_once __DIR__ . '/ActivityLog.php';
+                logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name]);
+            }
+
             $message = t('workspaces.messages.created', [], 'Workspace created', $currentLang);
             
             // If this was an AJAX create, return JSON response immediately
@@ -279,6 +286,14 @@ if ($_POST) {
             // Finally remove workspace record
             $stmt = $con->prepare('DELETE FROM workspaces WHERE name = ?');
             $stmt->execute([$name]);
+
+            // notes_deleted, not notes_moved: this path destroys the notes,
+            // unlike the REST endpoint which reassigns them.
+            require_once __DIR__ . '/ActivityLog.php';
+            logActivity(ACTIVITY_WORKSPACE_DELETED, [
+                'workspace' => $name,
+                'notes_deleted' => count($entries),
+            ]);
 
             $message = t('workspaces.messages.deleted_all', [], 'Workspace deleted and all associated notes, folders and attachments removed', $currentLang);
             // If this was an AJAX delete, return JSON response immediately
@@ -596,6 +611,18 @@ if ($_POST) {
             }
 
             $publicUrl = buildWorkspaceSharePublicUrl($name);
+
+            // Never record the share password, in cleartext or encrypted; the
+            // log only notes whether one is set.
+            require_once __DIR__ . '/ActivityLog.php';
+            logActivity(ACTIVITY_WORKSPACE_SHARED, [
+                'workspace' => $name,
+                'updated' => (bool)$existingShare,
+                'password_protected' => !empty($hashedPassword),
+                'login_required' => (bool)$loginRequired,
+                'allowed_users' => count($allowedUserIds),
+            ]);
+
             $message = t('workspaces.share.messages.enabled', [], 'Read-only workspace link enabled', $currentLang);
 
             if (!empty($isAjax)) {
@@ -629,6 +656,13 @@ if ($_POST) {
 
             $deleteShare = $con->prepare('DELETE FROM shared_workspaces WHERE workspace_name = ?');
             $deleteShare->execute([$name]);
+
+            // Only log when a share actually existed: the UI can post this for
+            // an already-unshared workspace.
+            if ($deleteShare->rowCount() > 0) {
+                require_once __DIR__ . '/ActivityLog.php';
+                logActivity(ACTIVITY_WORKSPACE_UNSHARED, ['workspace' => $name]);
+            }
 
             $message = t('workspaces.share.messages.disabled', [], 'Read-only workspace link disabled', $currentLang);
 

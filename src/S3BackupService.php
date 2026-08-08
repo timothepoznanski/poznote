@@ -125,9 +125,13 @@ class S3BackupService {
     /**
      * Build and upload the backup ZIP of one user, then prune old archives.
      *
+     * $trigger is recorded in the activity log as the entry's source: 'manual'
+     * for an admin or self-service run, 'auto' when runAll() passes its own
+     * scheduled trigger down.
+     *
      * @return array ['success' => bool, 'key' => ?string, 'size' => int, 'error' => ?string]
      */
-    public static function backupUser(int $userId, ?S3Client $client = null, ?array $config = null): array {
+    public static function backupUser(int $userId, ?S3Client $client = null, ?array $config = null, string $trigger = 'manual'): array {
         $config = $config ?? self::getConfig();
         try {
             $client = $client ?? self::makeClient($config);
@@ -165,6 +169,16 @@ class S3BackupService {
             // A failed prune must not fail the backup itself
             $pruneError = $e->getMessage();
         }
+
+        // Every S3 backup (manual, self-service and scheduled) funnels through
+        // this method, so one log call here covers them all. The account is
+        // passed explicitly because scheduled runs have no session.
+        require_once __DIR__ . '/ActivityLog.php';
+        logActivity(ACTIVITY_BACKUP_CREATED, [
+            'filename' => $build['filename'],
+            'size' => $size,
+            'destination' => 's3',
+        ], $trigger, $userId);
 
         return ['success' => true, 'key' => $key, 'size' => $size, 'error' => $pruneError];
     }
@@ -228,7 +242,7 @@ class S3BackupService {
 
         foreach (self::selectedUserProfiles($config) as $user) {
             $summary['users']++;
-            $result = self::backupUser((int)$user['id'], $client, $config);
+            $result = self::backupUser((int)$user['id'], $client, $config, $trigger);
             if ($result['success']) {
                 $summary['uploaded']++;
                 if ($result['error'] !== null) {
@@ -262,9 +276,62 @@ class S3BackupService {
     }
 
     /**
+     * Bytes of backup archives stored in the bucket, per user id.
+     *
+     * One ListObjects call over the whole backups/ prefix: callers needing the
+     * usage of several users (the admin storage-stats page) must not issue one
+     * request per account. Returns an empty map when the feature is off or the
+     * bucket is unreachable, so a broken backup target never breaks the caller.
+     *
+     * @return array Map of user id => bytes
+     */
+    public static function usageBytesByUser(?array $config = null): array {
+        $config = $config ?? self::getConfig();
+        if (!self::isEnabled($config)) {
+            return [];
+        }
+
+        $usage = [];
+        try {
+            foreach (self::listBackups(self::makeClient($config)) as $backup) {
+                $userId = (int)$backup['user_id'];
+                $usage[$userId] = ($usage[$userId] ?? 0) + max(0, (int)$backup['size']);
+            }
+        } catch (Exception $e) {
+            // Stats input only: an unreachable bucket shows as no usage
+            return [];
+        }
+        return $usage;
+    }
+
+    /**
+     * Bytes of backup archives stored in the bucket for one user.
+     *
+     * Scoped to that user's prefix, so the user-facing storage page never
+     * lists other accounts' archives. Returns 0 when the feature is off or
+     * the bucket is unreachable, so a broken target never breaks the page.
+     */
+    public static function usageBytesForUser(int $userId, ?array $config = null): int {
+        $config = $config ?? self::getConfig();
+        if (!self::isEnabled($config)) {
+            return 0;
+        }
+
+        $bytes = 0;
+        try {
+            foreach (self::makeClient($config)->listObjects(self::keyPrefixForUser($userId)) as $object) {
+                $bytes += max(0, (int)$object['size']);
+            }
+        } catch (Exception $e) {
+            return 0;
+        }
+        return $bytes;
+    }
+
+    /**
      * Every backup archive in the bucket, newest first, with its owner.
      *
-     * @return array List of ['key', 'size', 'user_id', 'filename']
+     * @return array List of ['key', 'size', 'mtime', 'user_id', 'filename']
      */
     public static function listBackups(S3Client $client): array {
         $backups = [];
@@ -275,6 +342,7 @@ class S3BackupService {
             $backups[] = [
                 'key' => $object['key'],
                 'size' => $object['size'],
+                'mtime' => (int)($object['mtime'] ?? 0),
                 'user_id' => (int)$m[1],
                 'filename' => $m[2],
             ];

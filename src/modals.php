@@ -19,6 +19,52 @@ try {
     $reminderEmailAvailable = false;
     $reminderEmailAddress = '';
 }
+
+// Whether a local password is of any use to this user. Hidden in two cases:
+// the instance is SSO-only, so no password would ever be accepted at login; or
+// this profile was provisioned without a credential, so there is no current
+// password to authenticate the change with. Must stay in sync with the
+// matching check that hides the Change Password card in settings.php.
+$modalsPasswordDisabledReason = '';
+try {
+    $modalsOidcPath = __DIR__ . '/oidc.php';
+    if (is_file($modalsOidcPath)) {
+        require_once $modalsOidcPath;
+    }
+    if (!function_exists('hasCustomPassword')) {
+        require_once __DIR__ . '/users/db_master.php';
+    }
+    $modalsSsoOnly = function_exists('oidc_is_enabled')
+        && oidc_is_enabled()
+        && defined('OIDC_DISABLE_NORMAL_LOGIN')
+        && OIDC_DISABLE_NORMAL_LOGIN;
+
+    $modalsNoLocalCredential = false;
+    $modalsUserId = function_exists('getCurrentUserId') ? getCurrentUserId() : null;
+    if ($modalsUserId && function_exists('hasCustomPassword')) {
+        $modalsUserProfile = function_exists('getUserProfileById') ? getUserProfileById((int)$modalsUserId) : null;
+        $modalsNoLocalCredential = !(hasCustomPassword((int)$modalsUserId)
+            || !(is_array($modalsUserProfile) && isPasswordLoginDisabled($modalsUserProfile)));
+    }
+
+    if ($modalsSsoOnly) {
+        $modalsPasswordDisabledReason = 'sso_only';
+    } elseif ($modalsNoLocalCredential) {
+        $modalsPasswordDisabledReason = 'no_local_password';
+    }
+} catch (Throwable $e) {
+    // Never let this check disable a button that should be usable.
+    $modalsPasswordDisabledReason = '';
+}
+$modalsPasswordDisabled = $modalsPasswordDisabledReason !== '';
+// Short one-liner for the info box; the full explanation goes in the button
+// tooltip so the modal stays scannable.
+$modalsPasswordDisabledNote = $modalsPasswordDisabledReason === 'sso_only'
+    ? t_h('settings.card_help.password_note_sso_only', [], 'Password sign-in is disabled on this instance.')
+    : t_h('settings.card_help.password_note_no_local', [], 'Your password is managed by your identity provider.');
+$modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
+    ? t_h('settings.card_help.change_password_sso_only', [], 'This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.')
+    : t_h('settings.card_help.change_password_no_local', [], 'Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.');
 ?>
 <!-- Notification popup -->
 <div id="notificationOverlay" class="notification-overlay"></div>
@@ -222,9 +268,20 @@ try {
                 <input type="number" id="userMaxStorageInput" min="0" max="100000000" step="1" value="0">
             </div>
             <div class="font-size-row">
-                <label for="userMaxStorageS3Input"><?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 storage per user (MB)'); ?></label>
+                <label for="userMaxStorageS3Input"><?php echo t_h('modals.user_quotas.max_storage_s3', [], 'Max S3 attachments storage per user (MB)'); ?></label>
                 <input type="number" id="userMaxStorageS3Input" min="0" max="100000000" step="1" value="0">
             </div>
+            <?php
+            // Gate on the backup settings directly: modals.php is included by
+            // every note page and S3BackupService pulls in the whole ZIP
+            // builder, which this one visibility check does not need.
+            if (poznoteS3BackupConfigured()):
+            ?>
+            <div class="font-size-row">
+                <label for="userMaxBackupsS3Input"><?php echo t_h('modals.user_quotas.max_backups_s3', [], 'Max S3 backups storage per user (MB)'); ?></label>
+                <input type="number" id="userMaxBackupsS3Input" min="0" max="100000000" step="1" value="0">
+            </div>
+            <?php endif; ?>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="userQuotasModal"><?php echo t_h('common.cancel'); ?></button>
@@ -1402,11 +1459,18 @@ try {
             <h3><?php echo t_h('modals.user_settings_info.title', [], 'Account Settings'); ?></h3>
         </div>
         <div class="modal-body">
-            <p><?php echo t_h('modals.user_settings_info.message', [], 'You can change your username, name and password from Settings.'); ?></p>
+            <p><?php echo $modalsPasswordDisabled
+                ? t_h('modals.user_settings_info.message_sso_only', [], 'You can change your username and name from Settings.')
+                : t_h('modals.user_settings_info.message', [], 'You can change your username, name and password from Settings.'); ?></p>
+            <?php if ($modalsPasswordDisabled): ?>
+            <div class="modal-info-note"><i class="lucide lucide-info"></i><span><?php echo $modalsPasswordDisabledNote; ?></span></div>
+            <?php endif; ?>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-primary" onclick="window.location.href='settings.php?open=profile#my-profile-card'"><?php echo t_h('modals.user_settings_info.edit_profile_button', [], 'Edit Profile'); ?></button>
-            <button type="button" class="btn-primary" data-action="open-password-settings"><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
+            <button type="button" class="btn-primary"<?php echo $modalsPasswordDisabled
+                ? ' disabled aria-disabled="true" title="' . $modalsPasswordDisabledHelp . '"'
+                : ' data-action="open-password-settings"'; ?>><?php echo t_h('modals.user_settings_info.change_password_button', [], 'Change Password'); ?></button>
             <button type="button" class="btn-danger" data-action="close-user-settings-info-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
@@ -1533,6 +1597,8 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:webhooks-card" checked><span><?php echo t_h('settings.cards.webhooks', [], 'Admin Webhooks'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-webhooks-card" checked><span><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ai-assistant-card" checked><span><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-storage-card" checked><span><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
@@ -1540,6 +1606,7 @@ try {
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:activity-log-card" checked><span><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:version-card" checked><span><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>

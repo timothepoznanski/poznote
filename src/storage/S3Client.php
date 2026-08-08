@@ -162,7 +162,7 @@ class S3Client {
 
     /**
      * List every object under a prefix (paginates through ListObjectsV2).
-     * @return array List of ['key' => string, 'size' => int]
+     * @return array List of ['key' => string, 'size' => int, 'mtime' => int]
      */
     public function listObjects(string $prefix, int $maxTotal = 0): array {
         $objects = [];
@@ -181,7 +181,12 @@ class S3Client {
             }
 
             foreach ($xml->Contents as $item) {
-                $objects[] = ['key' => (string)$item->Key, 'size' => (int)$item->Size];
+                $lastModified = (string)$item->LastModified;
+                $objects[] = [
+                    'key' => (string)$item->Key,
+                    'size' => (int)$item->Size,
+                    'mtime' => $lastModified !== '' ? (strtotime($lastModified) ?: 0) : 0,
+                ];
                 if ($maxTotal > 0 && count($objects) >= $maxTotal) {
                     return $objects;
                 }

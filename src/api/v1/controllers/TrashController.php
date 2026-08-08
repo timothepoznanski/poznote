@@ -187,6 +187,12 @@ class TrashController {
             }
             
             if ($success) {
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+                logActivity(ACTIVITY_TRASH_EMPTIED, [
+                    'deleted_count' => $deletedCount,
+                    'workspace' => $workspace,
+                ]);
+
                 $this->sendJson([
                     'success' => true,
                     'message' => 'Trash emptied successfully',
@@ -212,10 +218,10 @@ class TrashController {
             
             // Get note data before deletion
             if ($workspace) {
-                $stmt = $this->db->prepare("SELECT id, attachments, type, trash FROM entries WHERE id = ? AND workspace = ?");
+                $stmt = $this->db->prepare("SELECT id, heading, workspace, attachments, type, trash FROM entries WHERE id = ? AND workspace = ?");
                 $stmt->execute([$noteId, $workspace]);
             } else {
-                $stmt = $this->db->prepare("SELECT id, attachments, type, trash FROM entries WHERE id = ?");
+                $stmt = $this->db->prepare("SELECT id, heading, workspace, attachments, type, trash FROM entries WHERE id = ?");
                 $stmt->execute([$noteId]);
             }
             
@@ -262,6 +268,13 @@ class TrashController {
             }
             
             if ($success) {
+                require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+                logActivity(ACTIVITY_NOTE_DELETED, [
+                    'note_id' => $noteId,
+                    'title' => $note['heading'] ?? null,
+                    'workspace' => $note['workspace'] ?? $workspace,
+                ]);
+
                 $this->sendJson([
                     'success' => true,
                     'message' => 'Note permanently deleted'

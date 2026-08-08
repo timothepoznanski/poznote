@@ -375,6 +375,10 @@
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
+      "password_note_sso_only": "此实例已禁用密码登录。",
+      "password_note_no_local": "您的密码由您的身份提供商管理。",
+      "change_password_sso_only": "此实例仅使用 SSO，因此登录时永远不会接受本地密码。密码修改已禁用。",
+      "change_password_no_local": "您的账户通过身份提供商登录且没有本地密码，因此没有当前密码可用于确认更改。管理员可以在管理工具 > 用户中为您设置一个。",
       "git_sync": "将笔记备份到 Git 仓库并查看同步历史。",
       "extension": "安装浏览器扩展，将网页保存到 Poznote。",
       "install_app": "将 Poznote 作为应用安装到您的设备（PWA）。",
@@ -427,6 +431,7 @@
       "disaster_recovery": "在数据丢失时从备份恢复实例。",
       "orphan_scanner": "查找并清理不再属于任何笔记的附件文件。",
       "storage_stats": "查看此实例所有用户的存储使用情况。",
+      "activity_log": "查看敏感操作：账户删除、备份、恢复、清空回收站和工作区删除。",
       "version": "在 GitHub 上打开此版本的更新说明。",
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
@@ -488,6 +493,7 @@
       "release_notes": "发布日志",
       "orphan_scanner": "孤立附件扫描器",
       "storage_stats": "管理员存储统计",
+      "activity_log": "活动日志",
       "storage_stats_user": "用户存储统计",
       "change_password": "修改密码",
       "delete_account": "删除账户",
@@ -999,13 +1005,8 @@
       "description": "限制每个用户的笔记数量和存储空间。0 表示不限制。管理员不受限制。您可以在存储统计页面中为每个用户单独设置这些限制。",
       "max_notes": "每个用户的最大笔记数",
       "max_storage": "每用户本地存储上限 (MB)",
-      "notes_badge": "笔记：{{count}}",
-      "notes_badge_unlimited": "笔记：不限",
-      "storage_badge": "存储：{{count}} MB",
-      "storage_badge_unlimited": "存储：不限",
-      "max_storage_s3": "每用户 S3 存储上限 (MB)",
-      "storage_s3_badge": "S3:{{count}} MB",
-      "storage_s3_badge_unlimited": "S3:无限制"
+      "max_storage_s3": "每用户 S3 附件存储上限 (MB)",
+      "max_backups_s3": "每用户 S3 备份存储上限 (MB)"
     },
     "ui_customization": {
       "title": "界面自定义",
@@ -1158,6 +1159,7 @@
     "user_settings_info": {
       "title": "账户设置",
       "message": "您可以在设置中更改用户名、姓名和密码。",
+      "message_sso_only": "您可以在设置中更改用户名和姓名。",
       "change_password_button": "更改密码",
       "edit_profile_button": "编辑资料"
     },
@@ -1727,6 +1729,11 @@
         "title": "S3 备份",
         "description": "将您账户的备份归档上传到此实例配置的 S3 存储桶,并下载已存储在那里的归档。",
         "backup_now": "将我的账户备份到 S3",
+        "confirm_run": "现在将您的账户备份到 S3 存储桶？归档上传可能需要一些时间。",
+        "policy_auto": "管理员已设置{{frequency}}自动备份，每位用户保留最近 {{retention}} 个归档。",
+        "policy_auto_keep_all": "管理员已设置{{frequency}}自动备份；所有归档都会保留。",
+        "policy_manual": "自动备份已禁用；每位用户保留最近 {{retention}} 个归档。",
+        "policy_manual_keep_all": "自动备份已禁用；所有归档都会保留。",
         "running": "正在将备份上传到存储桶...",
         "done": "备份已上传({{size}})。",
         "error": "备份失败:{{error}}",
@@ -3008,13 +3015,6 @@
       "table_attachments": "附件 (MB)",
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
-      "table_quota": "配额（数量 / MB）",
-      "quota_admin_exempt": "管理员，不受限制",
-      "user_quota_admin_sentence": "配额不适用于管理员账户。",
-      "user_quota_sentence_both": "管理员已将此账户限制为 {{notes}} 条笔记和 {{storage}} MB 存储空间。",
-      "user_quota_sentence_notes": "管理员已将此账户限制为 {{notes}} 条笔记。存储空间不限。",
-      "user_quota_sentence_storage": "管理员已将此账户限制为 {{storage}} MB 存储空间。笔记数量不限。",
-      "user_quota_sentence_none": "此账户未设置配额：笔记和存储空间均不限。",
       "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
       "quota_max_notes_for": "{{user}} 的最大笔记数",
       "quota_max_storage_for": "{{user}} 的本地存储上限 (MB)",
@@ -3022,8 +3022,120 @@
       "no_accounts": "未找到账户。",
       "table_attachments_local": "本地附件 (MB)",
       "table_attachments_s3": "S3 附件 (MB)",
-      "quota_max_storage_s3_for": "{{user}} 的 S3 存储上限 (MB)",
-      "table_quota_s3": "配额(数量 / 本地 MB / S3 MB)"
+      "quota_max_storage_s3_for": "{{user}} 的 S3 附件存储上限 (MB)",
+      "quota_max_backups_s3_for": "{{user}} 的 S3 备份存储上限 (MB)",
+      "table_backups_s3": "备份 S3 (MB)",
+      "quota_admin_exempt": "管理员不受限制",
+      "quota_admin_exempt_message": "配额不适用于管理员账户：其笔记和存储空间均无限制。",
+      "table_notes_total": "笔记总数"
+    }
+  },
+  "activity_log": {
+    "title": "活动日志",
+    "description": "本实例上敏感操作的历史记录。",
+    "help_intro": "记录的操作：",
+    "filter_placeholder": "搜索用户或详情...",
+    "empty": "暂无记录。",
+    "unknown_user": "未知",
+    "columns": {
+      "date": "日期和时间",
+      "user": "用户 (ID)",
+      "action": "操作",
+      "details": "详情",
+      "source": "来源"
+    },
+    "actions": {
+      "user_login": "登录",
+      "user_logout": "登出",
+      "profile_updated": "资料已修改",
+      "quota_updated": "配额已修改",
+      "account_activated": "账户已启用",
+      "account_deactivated": "账户已停用",
+      "admin_granted": "已授予管理员角色",
+      "admin_revoked": "已撤销管理员角色",
+      "account_deleted": "账户已删除",
+      "access_granted": "已授予账户访问权限",
+      "access_revoked": "已撤销账户访问权限",
+      "workspace_created": "工作区已创建",
+      "workspace_deleted": "工作区已删除",
+      "workspace_shared": "工作区已共享",
+      "workspace_unshared": "已取消工作区共享",
+      "backup_created": "已创建备份",
+      "backup_restored": "已恢复备份",
+      "trash_emptied": "已清空回收站",
+      "note_deleted": "笔记已永久删除"
+    },
+    "filters": {
+      "all_actions": "所有操作",
+      "apply": "筛选",
+      "reset": "重置"
+    },
+    "details": {
+      "performed_by": "由 {{user}}",
+      "data_deleted": "数据已删除",
+      "data_kept": "数据已保留",
+      "notes_deleted": "已删除 {{count}} 条笔记",
+      "notes_moved": "已将 {{count}} 条笔记移至 {{workspace}}",
+      "in_workspace": "在 {{workspace}}",
+      "untitled_note": "笔记 #{{id}}",
+      "linked_deleted": "+{{count}} 条关联笔记",
+      "share_updated": "设置已更新",
+      "password_protected": "受密码保护",
+      "login_required": "需要登录",
+      "allowed_users": "限 {{count}} 位用户",
+      "accounts": "账户：{{accounts}}",
+      "empty_value": "空"
+    },
+    "destinations": {
+      "download": "下载",
+      "s3": "S3",
+      "server": "服务器"
+    },
+    "sources": {
+      "upload": "上传",
+      "s3": "S3",
+      "server": "服务器"
+    },
+    "pager": {
+      "previous": "上一页",
+      "next": "下一页",
+      "status": "第 {{page}} / {{pages}} 页，共 {{total}} 条"
+    },
+    "retention": {
+      "label": "记录保留时长",
+      "days": "{{days}} 天",
+      "unlimited": "不限",
+      "save": "保存"
+    },
+    "clear": {
+      "title": "清空活动日志",
+      "button": "清空日志",
+      "confirm": "删除日志中的所有记录？此操作无法撤销。",
+      "warning": "将永久删除 {{count}} 条记录。"
+    },
+    "messages": {
+      "retention_saved": "保留期已设为 {{days}} 天。已移除 {{removed}} 条旧记录。",
+      "retention_unlimited": "保留期设为不限。不会自动移除任何记录。",
+      "cleared": "已删除 {{count}} 条记录。"
+    },
+    "errors": {
+      "invalid_form": "表单提交无效，请重试。",
+      "retention_failed": "无法保存保留期设置。",
+      "clear_failed": "无法清空日志。"
+    },
+    "fields": {
+      "username": "用户名",
+      "email": "邮箱",
+      "first_name": "名",
+      "last_name": "姓",
+      "quota_max_notes": "最大笔记数",
+      "quota_max_storage_mb": "存储 (MB)",
+      "quota_max_storage_s3_mb": "S3 存储 (MB)",
+      "quota_max_backups_s3_mb": "S3 备份 (MB)"
+    },
+    "methods": {
+      "password": "密码",
+      "oidc": "SSO"
     }
   },
   "profile": {
@@ -3034,7 +3146,8 @@
       "username": "用户名",
       "first_name": "名字",
       "last_name": "姓氏",
-      "email_admin_only": "只有管理员才能修改您的电子邮件地址。"
+      "email_admin_only": "只有管理员才能修改您的电子邮件地址。",
+      "your_id": "您的 ID"
     },
     "errors": {
       "username_required": "用户名为必填项",
@@ -3212,7 +3325,9 @@
     "card": "用户 Webhook",
     "card_help": "通过 webhook 将您自己笔记的事件（提醒触发、笔记创建或分享）发送到 ntfy、n8n 等外部服务。",
     "description": "当您的笔记触发已订阅的事件时（提醒到期、笔记被创建或公开分享），Poznote 会向每个已注册的端点发送带有 JSON payload 的 HTTP POST 请求。仅涉及您自己的笔记。如果设置了密钥，payload 会通过 HMAC-SHA256 签名并放在 X-Poznote-Signature-256 请求头中。",
-    "access_denied": "访问被拒绝。此实例已禁用用户 webhook。"
+    "access_denied": "访问被拒绝。此实例已禁用用户 webhook。",
+    "app_url_unset": "未配置实例 URL，因此负载不包含笔记直达链接（data.note.url 为 null）。请管理员在后台 Webhooks 页面设置。",
+    "app_url_unset_admin": "未配置实例 URL，因此负载不包含笔记直达链接（data.note.url 为 null）。请在后台 Webhooks 页面设置。"
   },
   "webhooks_admin": {
     "event_help": {
@@ -3237,10 +3352,13 @@
     "fields": {
       "url": "端点 URL",
       "secret": "密钥（可选）",
-      "events": "事件"
+      "events": "事件",
+      "app_url": "实例 URL"
     },
     "hints": {
-      "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。"
+      "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。",
+      "app_url_env": "当前由环境变量 POZNOTE_APP_URL 提供：{{url}}。在此保存的值将覆盖它。",
+      "app_url_unset": "未设置：负载当前不包含笔记链接（data.note.url 为 null）。"
     },
     "status": {
       "none": "无"
@@ -3263,7 +3381,12 @@
     "error_invalid_url": "Webhook URL 必须以 http:// 或 https:// 开头。",
     "error_no_events": "请至少选择一个事件。",
     "error_saving": "保存 Webhook 时出错。",
-    "error_not_found": "未找到该 Webhook。"
+    "error_not_found": "未找到该 Webhook。",
+    "section_app_url": "实例 URL",
+    "app_url_description": "此 Poznote 实例的公开 URL，用于生成负载中的笔记直达链接（data.note.url）。留空则不发送链接。这与提醒邮件使用的实例 URL 相同。",
+    "app_url_saved": "实例 URL 已保存。",
+    "app_url_cleared": "实例 URL 已清除。负载将不再包含笔记直达链接。",
+    "error_invalid_app_url": "实例 URL 必须以 http:// 或 https:// 开头。"
   },
   "reminder": {
     "toolbar_button": "设置提醒",
@@ -3532,6 +3655,9 @@
     "frequency_daily": "每天",
     "frequency_weekly": "每周",
     "frequency_monthly": "每月(每 30 天)",
+    "frequency_daily_inline": "每天",
+    "frequency_weekly_inline": "每周",
+    "frequency_monthly_inline": "每 30 天",
     "frequency_description": "首次自动备份在启用后几分钟内运行,之后按所选间隔运行。",
     "retention_label": "每个用户保留的备份数",
     "retention_description": "每次备份后,较旧的归档会从存储桶中删除。0 表示全部保留。",
@@ -3539,6 +3665,7 @@
     "skip_s3_description": "当附件位于 S3 存储桶中(S3 存储功能)时,不将其包含在归档中,而不是每次备份都下载。本地磁盘上的附件始终包含。",
     "manual_title": "手动备份",
     "manual_description": "立即将选定的用户备份到存储桶,一次一个用户。",
+    "manual_retention_warning": "每次备份都计入保留数量上限:自动备份可能删除手动归档,手动备份同样可能删除自动归档。如需永久保留某个归档,请将其下载。",
     "run_now": "立即备份",
     "confirm_run": "现在将选定的用户备份到存储桶?",
     "running": "正在备份 {{username}}... ({{done}}/{{total}})",
@@ -3556,6 +3683,7 @@
     "list_loading": "加载中...",
     "col_user": "用户",
     "col_archive": "归档",
+    "col_date": "日期",
     "col_size": "大小",
     "download": "下载",
     "delete": "删除",
@@ -3569,7 +3697,16 @@
     },
     "users_label": "要备份的用户",
     "master_label": "启用 S3 备份",
-    "master_description": "主开关。禁用后,自动备份停止,所有用户的 S3 备份和恢复部分都会消失。"
+    "master_description": "主开关。禁用后,自动备份停止,所有用户的 S3 备份和恢复部分都会消失。",
+    "users_filter_placeholder": "按姓名、用户名或邮箱筛选...",
+    "users_filter_clear": "清除筛选",
+    "users_select_all": "全选",
+    "users_select_none": "取消全选",
+    "users_no_match": "没有符合此筛选条件的用户。",
+    "users_badge_admin": "管理员",
+    "users_badge_inactive": "已停用",
+    "users_count": "已选择 {{selected}}/{{total}} 位用户",
+    "users_count_filtered": "已选择 {{selected}}/{{total}} 位用户，显示 {{shown}} 位"
   },
   "tasklist_embed": {
     "unavailable": "此任务列表已不可用。",

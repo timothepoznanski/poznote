@@ -385,6 +385,10 @@
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
+      "password_note_sso_only": "La connexion par mot de passe est désactivée sur cette instance.",
+      "password_note_no_local": "Votre mot de passe est géré par votre fournisseur d'identité.",
+      "change_password_sso_only": "Cette instance utilise uniquement le SSO, donc un mot de passe local ne serait jamais accepté à la connexion. Les changements de mot de passe sont désactivés.",
+      "change_password_no_local": "Votre compte se connecte via votre fournisseur d'identité et n'a pas de mot de passe local, il n'y a donc aucun mot de passe actuel pour confirmer un changement. Un administrateur peut vous en définir un depuis Outils d'administration > Utilisateurs.",
       "git_sync": "Sauvegardez vos notes dans un dépôt Git et consultez l'historique de synchronisation.",
       "extension": "Installez l'extension de navigateur pour enregistrer des pages web dans Poznote.",
       "install_app": "Installez Poznote comme application sur votre appareil (PWA).",
@@ -437,6 +441,7 @@
       "disaster_recovery": "Restaurez l'instance depuis une sauvegarde en cas de perte de données.",
       "orphan_scanner": "Trouvez et nettoyez les fichiers de pièces jointes qui n'appartiennent plus à aucune note.",
       "storage_stats": "Consultez l'utilisation du stockage pour tous les utilisateurs de l'instance.",
+      "activity_log": "Consulter les opérations sensibles : suppressions de compte, sauvegardes, restaurations, vidage de la corbeille et suppressions d'espace de travail.",
       "version": "Ouvrez les notes de version sur GitHub.",
       "github": "Ouvrez le code source de Poznote sur GitHub.",
       "api_rest": "Affichez les informations sur l'API REST de Poznote.",
@@ -498,6 +503,7 @@
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
       "storage_stats": "Statistiques de stockage admin",
+      "activity_log": "Journal d'activité",
       "storage_stats_user": "Statistiques de stockage utilisateur",
       "change_password": "Changer le mot de passe",
       "delete_account": "Supprimer le compte",
@@ -1023,13 +1029,8 @@
       "description": "Limiter le nombre de notes et l'espace de stockage de chaque utilisateur. 0 signifie illimité. Les administrateurs ne sont pas limités. Vous pouvez remplacer ces limites par utilisateur depuis la page des statistiques de stockage.",
       "max_notes": "Nombre max de notes par utilisateur",
       "max_storage": "Stockage local max par utilisateur (Mo)",
-      "notes_badge": "Notes : {{count}}",
-      "notes_badge_unlimited": "Notes : illimité",
-      "storage_badge": "Stockage : {{count}} Mo",
-      "storage_badge_unlimited": "Stockage : illimité",
-      "max_storage_s3": "Stockage S3 max par utilisateur (Mo)",
-      "storage_s3_badge": "S3 : {{count}} Mo",
-      "storage_s3_badge_unlimited": "S3 : illimité"
+      "max_storage_s3": "Stockage S3 pièces jointes max par utilisateur (Mo)",
+      "max_backups_s3": "Stockage S3 sauvegardes max par utilisateur (Mo)"
     },
     "ui_customization": {
       "title": "Personnalisation de l'interface",
@@ -1177,6 +1178,7 @@
     "user_settings_info": {
       "title": "Paramètres du compte",
       "message": "Vous pouvez changer votre nom d’utilisateur, votre prénom, votre nom et votre mot de passe depuis les paramètres.",
+      "message_sso_only": "Vous pouvez changer votre nom d’utilisateur, votre prénom et votre nom depuis les paramètres.",
       "change_password_button": "Changer le mot de passe",
       "edit_profile_button": "Modifier le profil"
     },
@@ -1778,6 +1780,11 @@
         "title": "Sauvegardes S3",
         "description": "Envoie une archive de sauvegarde de votre compte vers le bucket S3 configuré sur cette instance, et télécharge les archives qui y sont déjà stockées.",
         "backup_now": "Sauvegarder mon compte vers S3",
+        "confirm_run": "Sauvegarder votre compte vers le bucket S3 maintenant ? L'archive peut mettre un certain temps à être envoyée.",
+        "policy_auto": "L'administrateur a configuré une sauvegarde automatique {{frequency}}, en conservant les {{retention}} dernières archives par utilisateur.",
+        "policy_auto_keep_all": "L'administrateur a configuré une sauvegarde automatique {{frequency}} ; toutes les archives sont conservées.",
+        "policy_manual": "Les sauvegardes automatiques sont désactivées ; les {{retention}} dernières archives par utilisateur sont conservées.",
+        "policy_manual_keep_all": "Les sauvegardes automatiques sont désactivées ; toutes les archives sont conservées.",
         "running": "Envoi de la sauvegarde vers le bucket...",
         "done": "Sauvegarde envoyée ({{size}}).",
         "error": "Échec de la sauvegarde : {{error}}",
@@ -3071,13 +3078,6 @@
       "table_attachments": "Pièces jointes (Mo)",
       "table_total": "Total (Mo)",
       "table_total_row": "Total",
-      "table_quota": "Quota (Nombre / Mo)",
-      "quota_admin_exempt": "Illimité car admin",
-      "user_quota_admin_sentence": "Les quotas ne s'appliquent pas aux comptes administrateurs.",
-      "user_quota_sentence_both": "L'administrateur a limité ce compte à {{notes}} notes et {{storage}} Mo de stockage.",
-      "user_quota_sentence_notes": "L'administrateur a limité ce compte à {{notes}} notes. Le stockage est illimité.",
-      "user_quota_sentence_storage": "L'administrateur a limité ce compte à {{storage}} Mo de stockage. Le nombre de notes est illimité.",
-      "user_quota_sentence_none": "Aucun quota n'est défini pour ce compte : notes et stockage sont illimités.",
       "quota_modal_description": "Laisser un champ vide pour utiliser le réglage global. 0 signifie illimité.\nCes valeurs remplacent les quotas globaux.",
       "quota_max_notes_for": "Nombre max de notes pour {{user}}",
       "quota_max_storage_for": "Stockage local max pour {{user}} (Mo)",
@@ -3085,8 +3085,120 @@
       "no_accounts": "Aucun compte trouvé.",
       "table_attachments_local": "Pièces jointes locales (Mo)",
       "table_attachments_s3": "Pièces jointes S3 (Mo)",
-      "quota_max_storage_s3_for": "Stockage S3 max pour {{user}} (Mo)",
-      "table_quota_s3": "Quota (Nombre / Mo local / Mo S3)"
+      "quota_max_storage_s3_for": "Stockage S3 pièces jointes max pour {{user}} (Mo)",
+      "quota_max_backups_s3_for": "Stockage S3 sauvegardes max pour {{user}} (Mo)",
+      "table_backups_s3": "Sauvegardes S3 (Mo)",
+      "quota_admin_exempt": "Illimité car administrateur",
+      "quota_admin_exempt_message": "Les quotas ne s’appliquent pas aux comptes administrateurs : leurs notes et leur stockage sont illimités.",
+      "table_notes_total": "Total notes"
+    }
+  },
+  "activity_log": {
+    "title": "Journal d'activité",
+    "description": "Historique des opérations sensibles effectuées sur cette instance.",
+    "help_intro": "Opérations journalisées :",
+    "filter_placeholder": "Rechercher un utilisateur ou un détail...",
+    "empty": "Aucune entrée enregistrée pour le moment.",
+    "unknown_user": "inconnu",
+    "columns": {
+      "date": "Date et heure",
+      "user": "Utilisateur (ID)",
+      "action": "Action",
+      "details": "Détails",
+      "source": "Source"
+    },
+    "actions": {
+      "user_login": "Connexion",
+      "user_logout": "Déconnexion",
+      "profile_updated": "Profil modifié",
+      "quota_updated": "Quota modifié",
+      "account_activated": "Compte activé",
+      "account_deactivated": "Compte désactivé",
+      "admin_granted": "Rôle admin accordé",
+      "admin_revoked": "Rôle admin retiré",
+      "account_deleted": "Compte supprimé",
+      "access_granted": "Accès au compte accordé",
+      "access_revoked": "Accès au compte révoqué",
+      "workspace_created": "Espace de travail créé",
+      "workspace_deleted": "Espace de travail supprimé",
+      "workspace_shared": "Espace de travail partagé",
+      "workspace_unshared": "Partage d’espace de travail supprimé",
+      "backup_created": "Sauvegarde créée",
+      "backup_restored": "Sauvegarde restaurée",
+      "trash_emptied": "Corbeille vidée",
+      "note_deleted": "Note supprimée définitivement"
+    },
+    "filters": {
+      "all_actions": "Toutes les actions",
+      "apply": "Filtrer",
+      "reset": "Réinitialiser"
+    },
+    "details": {
+      "performed_by": "par {{user}}",
+      "data_deleted": "données supprimées",
+      "data_kept": "données conservées",
+      "notes_deleted": "{{count}} notes supprimées",
+      "notes_moved": "{{count}} notes déplacées vers {{workspace}}",
+      "in_workspace": "dans {{workspace}}",
+      "untitled_note": "note #{{id}}",
+      "linked_deleted": "+{{count}} notes liées",
+      "share_updated": "paramètres mis à jour",
+      "password_protected": "protégé par mot de passe",
+      "login_required": "connexion requise",
+      "allowed_users": "limité à {{count}} utilisateurs",
+      "accounts": "comptes : {{accounts}}",
+      "empty_value": "vide"
+    },
+    "destinations": {
+      "download": "téléchargement",
+      "s3": "S3",
+      "server": "serveur"
+    },
+    "sources": {
+      "upload": "téléversement",
+      "s3": "S3",
+      "server": "serveur"
+    },
+    "pager": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "status": "Page {{page}} sur {{pages}}, {{total}} entrées"
+    },
+    "retention": {
+      "label": "Conserver les entrées pendant",
+      "days": "{{days}} jours",
+      "unlimited": "Illimité",
+      "save": "Enregistrer"
+    },
+    "clear": {
+      "title": "Vider le journal d'activité",
+      "button": "Vider le journal",
+      "confirm": "Supprimer toutes les entrées du journal ? Cette action est irréversible.",
+      "warning": "{{count}} entrées seront définitivement supprimées."
+    },
+    "messages": {
+      "retention_saved": "Rétention définie à {{days}} jours. {{removed}} anciennes entrées supprimées.",
+      "retention_unlimited": "Rétention illimitée. Aucune entrée ne sera supprimée automatiquement.",
+      "cleared": "{{count}} entrées supprimées."
+    },
+    "errors": {
+      "invalid_form": "Soumission de formulaire invalide. Veuillez réessayer.",
+      "retention_failed": "Impossible d’enregistrer le paramètre de rétention.",
+      "clear_failed": "Impossible de vider le journal."
+    },
+    "fields": {
+      "username": "Nom d'utilisateur",
+      "email": "E-mail",
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "quota_max_notes": "Notes max",
+      "quota_max_storage_mb": "Stockage (Mo)",
+      "quota_max_storage_s3_mb": "Stockage S3 (Mo)",
+      "quota_max_backups_s3_mb": "Sauvegardes S3 (Mo)"
+    },
+    "methods": {
+      "password": "mot de passe",
+      "oidc": "SSO"
     }
   },
   "backlinks": {
@@ -3100,7 +3212,8 @@
       "username": "Nom d’utilisateur",
       "first_name": "Prénom",
       "last_name": "Nom",
-      "email_admin_only": "Seul un administrateur peut modifier votre adresse email."
+      "email_admin_only": "Seul un administrateur peut modifier votre adresse email.",
+      "your_id": "Votre ID"
     },
     "errors": {
       "username_required": "Le nom d’utilisateur est requis",
@@ -3278,7 +3391,9 @@
     "card": "Webhooks utilisateur",
     "card_help": "Envoyer les événements de vos propres notes (rappel déclenché, note créée ou partagée) vers des services externes comme ntfy ou n8n via des webhooks.",
     "description": "Poznote envoie une requête HTTP POST avec un payload JSON à chaque endpoint enregistré quand une de vos notes déclenche un événement auquel vous êtes abonné : un rappel qui arrive à échéance, une note créée ou partagée publiquement. Seules vos propres notes sont concernées. Si un secret est défini, le payload est signé en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",
-    "access_denied": "Accès refusé. Les webhooks utilisateur sont désactivés sur cette instance."
+    "access_denied": "Accès refusé. Les webhooks utilisateur sont désactivés sur cette instance.",
+    "app_url_unset": "Aucune URL d'instance n'est configuree, les payloads ne contiennent donc aucun lien direct vers la note (data.note.url vaut null). Demandez a un administrateur de la definir sur la page Webhooks de l'administration.",
+    "app_url_unset_admin": "Aucune URL d'instance n'est configuree, les payloads ne contiennent donc aucun lien direct vers la note (data.note.url vaut null). Definissez-la sur la page Webhooks de l'administration."
   },
   "webhooks_admin": {
     "event_help": {
@@ -3303,10 +3418,13 @@
     "fields": {
       "url": "URL de l'endpoint",
       "secret": "Secret (optionnel)",
-      "events": "Événements"
+      "events": "Événements",
+      "app_url": "URL de l'instance"
     },
     "hints": {
-      "secret": "Sert à signer la charge pour que le récepteur puisse vérifier qu'elle provient bien de cette instance."
+      "secret": "Sert à signer la charge pour que le récepteur puisse vérifier qu'elle provient bien de cette instance.",
+      "app_url_env": "Actuellement fournie par la variable d'environnement POZNOTE_APP_URL : {{url}}. Enregistrer une valeur ici la remplace.",
+      "app_url_unset": "Non definie : les payloads ne contiennent actuellement aucun lien vers la note (data.note.url vaut null)."
     },
     "status": {
       "none": "Aucun"
@@ -3329,7 +3447,12 @@
     "error_invalid_url": "L'URL du webhook doit commencer par http:// ou https://.",
     "error_no_events": "Sélectionnez au moins un événement.",
     "error_saving": "Erreur lors de l'enregistrement du webhook.",
-    "error_not_found": "Webhook introuvable."
+    "error_not_found": "Webhook introuvable.",
+    "section_app_url": "URL de l'instance",
+    "app_url_description": "URL publique de cette instance Poznote, utilisee pour construire le lien direct vers la note envoye dans les payloads (data.note.url). Laissez vide pour n'envoyer aucun lien. Il s'agit de la meme URL d'instance que celle utilisee par les e-mails de rappel.",
+    "app_url_saved": "URL de l'instance enregistree.",
+    "app_url_cleared": "URL de l'instance effacee. Les payloads ne contiendront plus de lien direct vers la note.",
+    "error_invalid_app_url": "L'URL de l'instance doit commencer par http:// ou https://."
   },
   "reminder": {
     "toolbar_button": "Définir un rappel",
@@ -3598,6 +3721,9 @@
     "frequency_daily": "Quotidienne",
     "frequency_weekly": "Hebdomadaire",
     "frequency_monthly": "Mensuelle (tous les 30 jours)",
+    "frequency_daily_inline": "tous les jours",
+    "frequency_weekly_inline": "toutes les semaines",
+    "frequency_monthly_inline": "tous les 30 jours",
     "frequency_description": "La première sauvegarde automatique démarre quelques minutes après l'activation, les suivantes après l'intervalle choisi.",
     "retention_label": "Sauvegardes à conserver par utilisateur",
     "retention_description": "Les archives plus anciennes sont supprimées du bucket après chaque sauvegarde. 0 conserve tout.",
@@ -3605,6 +3731,7 @@
     "skip_s3_description": "Quand les pièces jointes vivent dans un bucket S3 (fonction Stockage S3), elles ne sont pas incluses dans les archives au lieu d'être téléchargées à chaque sauvegarde. Les pièces jointes sur le disque local sont toujours incluses.",
     "manual_title": "Sauvegarde manuelle",
     "manual_description": "Sauvegarde immédiatement les utilisateurs sélectionnés vers le bucket, un utilisateur à la fois.",
+    "manual_retention_warning": "Chaque sauvegarde compte dans la limite de conservation : une sauvegarde automatique peut donc supprimer une archive manuelle, tout comme une sauvegarde manuelle peut supprimer une archive automatique. Pour conserver une archive définitivement, téléchargez-la.",
     "run_now": "Sauvegarder maintenant",
     "confirm_run": "Sauvegarder maintenant les utilisateurs sélectionnés vers le bucket ?",
     "running": "Sauvegarde de {{username}}... ({{done}}/{{total}})",
@@ -3622,6 +3749,7 @@
     "list_loading": "Chargement...",
     "col_user": "Utilisateur",
     "col_archive": "Archive",
+    "col_date": "Date",
     "col_size": "Taille",
     "download": "Télécharger",
     "delete": "Supprimer",
@@ -3635,7 +3763,16 @@
     },
     "users_label": "Utilisateurs à sauvegarder",
     "master_label": "Activer les sauvegardes S3",
-    "master_description": "Interrupteur principal. Quand il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs."
+    "master_description": "Interrupteur principal. Quand il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs.",
+    "users_filter_placeholder": "Filtrer par nom, identifiant ou e-mail...",
+    "users_filter_clear": "Effacer le filtre",
+    "users_select_all": "Tout sélectionner",
+    "users_select_none": "Tout désélectionner",
+    "users_no_match": "Aucun utilisateur ne correspond à ce filtre.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inactif",
+    "users_count": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}",
+    "users_count_filtered": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}, {{shown}} affiché(s)"
   },
   "tasklist_embed": {
     "unavailable": "Cette liste de tâches n'est plus disponible.",

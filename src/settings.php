@@ -94,6 +94,7 @@ $settingsPageConfig = [
     'settings' => [],
     'passwordStatus' => null,
     'profile' => [
+        'id' => (int)($currentUser['id'] ?? 0),
         'username' => (string)($currentUser['username'] ?? ''),
         'first_name' => (string)($currentUser['first_name'] ?? ''),
         'last_name' => (string)($currentUser['last_name'] ?? ''),
@@ -164,12 +165,12 @@ try {
     $settingsPageConfig['passwordStatus'] = null;
 }
 
-// Whether a local password is of any use to this user. Hidden in two cases:
+// Whether a local password is of any use to this user. Unusable in two cases:
 // the instance is SSO-only, so no password would ever be accepted at login;
 // or this profile was provisioned without a credential, so there is no current
-// password to authenticate the change with. Either way the card would only
-// lead to a dead end.
-$settingsShowChangePassword = true;
+// password to authenticate the change with. The card stays visible either way,
+// greyed out and explaining itself, so the option does not just vanish.
+$settingsChangePasswordDisabledReason = '';
 try {
     $oidcPath = __DIR__ . '/oidc.php';
     if (is_file($oidcPath)) {
@@ -181,11 +182,21 @@ try {
         && OIDC_DISABLE_NORMAL_LOGIN;
     $settingsNoLocalCredential = isset($settingsPageConfig['passwordStatus']['password_login_available'])
         && $settingsPageConfig['passwordStatus']['password_login_available'] === false;
-    $settingsShowChangePassword = !$settingsSsoOnly && !$settingsNoLocalCredential;
+    if ($settingsSsoOnly) {
+        $settingsChangePasswordDisabledReason = 'sso_only';
+    } elseif ($settingsNoLocalCredential) {
+        $settingsChangePasswordDisabledReason = 'no_local_password';
+    }
 } catch (Throwable $e) {
-    // Never let this check hide a card that should be reachable.
-    $settingsShowChangePassword = true;
+    // Never let this check disable a card that should be usable.
+    $settingsChangePasswordDisabledReason = '';
 }
+$settingsChangePasswordDisabled = $settingsChangePasswordDisabledReason !== '';
+// The card shows only the greyed title and its badge; the full explanation
+// lives in the help tooltip so the card keeps its compact row layout.
+$settingsChangePasswordDisabledHelp = $settingsChangePasswordDisabledReason === 'sso_only'
+    ? t_h('settings.card_help.change_password_sso_only', [], 'This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.')
+    : t_h('settings.card_help.change_password_no_local', [], 'Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.');
 
 if ($isAdmin) {
     try {
@@ -199,6 +210,7 @@ if ($isAdmin) {
             'user_max_notes',
             'user_max_storage_mb',
             'user_max_storage_s3_mb',
+            'user_max_backups_s3_mb',
             'git_sync_enabled',
             'tenant_isolation',
             'tenant_isolation_features',
@@ -390,10 +402,11 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Change Password (hidden when sign-in never uses a local password) -->
-            <?php if ($settingsShowChangePassword): ?>
-            <div class="home-card" id="change-password-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.change_password', [], 'Change the password used to sign in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <!-- Change Password (greyed out when sign-in never uses a local password) -->
+            <div class="home-card<?php echo $settingsChangePasswordDisabled ? ' home-card-disabled' : ''; ?>" id="change-password-card"<?php echo $settingsChangePasswordDisabled ? ' aria-disabled="true"' : ''; ?>>
+                <span class="setting-help" data-tooltip="<?php echo $settingsChangePasswordDisabled
+                    ? $settingsChangePasswordDisabledHelp
+                    : t_h('settings.card_help.change_password', [], 'Change the password used to sign in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-key"></i>
                 </div>
@@ -402,7 +415,6 @@ if ($canUseUserWebhooks) {
                     <span id="password-status-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
-            <?php endif; ?>
 
             <!-- Git Sync (available to all users) -->
             <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
@@ -1042,14 +1054,15 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span>
                     <div>
-                        <span id="user-quotas-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <span id="user-quotas-storage-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                         <?php
+                        // The badge lists one value per quota the instance
+                        // actually has; the data-* flags tell the script which
+                        // optional pools are in play.
                         require_once 'storage/AttachmentStorage.php';
-                        if (AttachmentStorage::isEnabled()):
                         ?>
-                            <span id="user-quotas-storage-s3-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                        <?php endif; ?>
+                        <span id="user-quotas-badge" class="setting-status"
+                            <?php echo AttachmentStorage::isEnabled() ? 'data-s3-attachments="1"' : ''; ?>
+                            <?php echo poznoteS3BackupConfigured() ? 'data-s3-backups="1"' : ''; ?>><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
@@ -1097,6 +1110,17 @@ if ($canUseUserWebhooks) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span>
+                </div>
+            </div>
+
+            <!-- Activity Log -->
+            <div class="home-card settings-card-clickable" id="activity-log-card" data-href="admin/activity-log.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.activity_log', [], 'Review sensitive operations: account deletions, backups, restores, trash emptying and workspace deletions.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-clipboard-list"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span>
                 </div>
             </div>
 

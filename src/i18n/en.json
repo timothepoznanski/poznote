@@ -109,6 +109,10 @@
       "workspaces": "Organize your notes into separate workspaces, each with its own folders and notes.",
       "my_profile": "View and edit your profile information.",
       "change_password": "Change the password used to sign in.",
+      "password_note_sso_only": "Password sign-in is disabled on this instance.",
+      "password_note_no_local": "Your password is managed by your identity provider.",
+      "change_password_sso_only": "This instance uses SSO only, so a local password would never be accepted at sign-in. Password changes are disabled.",
+      "change_password_no_local": "Your account signs in through your identity provider and has no local password, so there is no current password to confirm a change with. An administrator can set one for you from Admin Tools > Users.",
       "git_sync": "Back up your notes to a Git repository and view the synchronization history.",
       "extension": "Install the browser extension to save web pages into Poznote.",
       "install_app": "Install Poznote as an application on your device (PWA).",
@@ -161,6 +165,7 @@
       "disaster_recovery": "Restore the instance from a backup in case of data loss.",
       "orphan_scanner": "Find and clean up attachment files that no longer belong to any note.",
       "storage_stats": "See storage usage across all users of this instance.",
+      "activity_log": "Review sensitive operations: account deletions, backups, restores, trash emptying and workspace deletions.",
       "version": "Open the release notes of this version on GitHub.",
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
@@ -203,6 +208,7 @@
       "release_notes": "Release Notes",
       "orphan_scanner": "Orphan attachments scanner",
       "storage_stats": "Admin storage statistics",
+      "activity_log": "Activity log",
       "storage_stats_user": "User Storage statistics",
       "change_password": "Change Password",
       "delete_account": "Delete Account",
@@ -515,13 +521,8 @@
       "description": "Limit the number of notes and the storage space of each user. 0 means unlimited. Administrators are not limited. You can override these limits per user from the storage statistics page.",
       "max_notes": "Max notes per user",
       "max_storage": "Max local storage per user (MB)",
-      "notes_badge": "Notes: {{count}}",
-      "notes_badge_unlimited": "Notes: unlimited",
-      "storage_badge": "Storage: {{count}} MB",
-      "storage_badge_unlimited": "Storage: unlimited",
-      "max_storage_s3": "Max S3 storage per user (MB)",
-      "storage_s3_badge": "S3: {{count}} MB",
-      "storage_s3_badge_unlimited": "S3: unlimited"
+      "max_storage_s3": "Max S3 attachments storage per user (MB)",
+      "max_backups_s3": "Max S3 backups storage per user (MB)"
     },
     "ui_customization": {
       "title": "UI Customization",
@@ -712,6 +713,7 @@
     "user_settings_info": {
       "title": "Account Settings",
       "message": "You can change your username, name and password from Settings.",
+      "message_sso_only": "You can change your username and name from Settings.",
       "change_password_button": "Change Password",
       "edit_profile_button": "Edit Profile"
     },
@@ -1393,6 +1395,11 @@
         "title": "S3 Backups",
         "description": "Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.",
         "backup_now": "Back up my account to S3",
+        "confirm_run": "Back up your account to the S3 bucket now? The archive can take a while to upload.",
+        "policy_auto": "The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user.",
+        "policy_auto_keep_all": "The administrator has set up an automatic backup {{frequency}}; every archive is kept.",
+        "policy_manual": "Automatic backups are disabled; the last {{retention}} archive(s) per user are kept.",
+        "policy_manual_keep_all": "Automatic backups are disabled; every archive is kept.",
         "running": "Uploading the backup to the bucket...",
         "done": "Backup uploaded ({{size}}).",
         "error": "Backup failed: {{error}}",
@@ -2480,13 +2487,6 @@
       "table_attachments": "Attachments (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
-      "table_quota": "Quota (Count / MB)",
-      "quota_admin_exempt": "Unlimited because admin",
-      "user_quota_admin_sentence": "Quotas do not apply to administrator accounts.",
-      "user_quota_sentence_both": "The administrator has limited this account to {{notes}} notes and {{storage}} MB of storage.",
-      "user_quota_sentence_notes": "The administrator has limited this account to {{notes}} notes. Storage is unlimited.",
-      "user_quota_sentence_storage": "The administrator has limited this account to {{storage}} MB of storage. The number of notes is unlimited.",
-      "user_quota_sentence_none": "No quota is set for this account: notes and storage are unlimited.",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
       "quota_max_notes_for": "Max notes for {{user}}",
       "quota_max_storage_for": "Max local storage for {{user}} (MB)",
@@ -2494,8 +2494,120 @@
       "no_accounts": "No accounts found.",
       "table_attachments_local": "Attachments local (MB)",
       "table_attachments_s3": "Attachments S3 (MB)",
-      "quota_max_storage_s3_for": "Max S3 storage for {{user}} (MB)",
-      "table_quota_s3": "Quota (Count / local MB / S3 MB)"
+      "quota_max_storage_s3_for": "Max S3 attachments storage for {{user}} (MB)",
+      "quota_max_backups_s3_for": "Max S3 backups storage for {{user}} (MB)",
+      "table_backups_s3": "Backups S3 (MB)",
+      "quota_admin_exempt": "Unlimited because admin",
+      "quota_admin_exempt_message": "Quotas do not apply to administrator accounts: their notes and storage are unlimited.",
+      "table_notes_total": "Total notes"
+    }
+  },
+  "activity_log": {
+    "title": "Activity log",
+    "description": "History of sensitive operations performed on this instance.",
+    "help_intro": "Operations recorded:",
+    "filter_placeholder": "Search a user or a detail...",
+    "empty": "No entry recorded yet.",
+    "unknown_user": "unknown",
+    "columns": {
+      "date": "Date and time",
+      "user": "User (ID)",
+      "action": "Action",
+      "details": "Details",
+      "source": "Source"
+    },
+    "actions": {
+      "user_login": "Login",
+      "user_logout": "Logout",
+      "profile_updated": "Profile updated",
+      "quota_updated": "Quota updated",
+      "account_activated": "Account activated",
+      "account_deactivated": "Account deactivated",
+      "admin_granted": "Admin role granted",
+      "admin_revoked": "Admin role revoked",
+      "account_deleted": "Account deleted",
+      "access_granted": "Account access granted",
+      "access_revoked": "Account access revoked",
+      "workspace_created": "Workspace created",
+      "workspace_deleted": "Workspace deleted",
+      "workspace_shared": "Workspace shared",
+      "workspace_unshared": "Workspace unshared",
+      "backup_created": "Backup created",
+      "backup_restored": "Backup restored",
+      "trash_emptied": "Trash emptied",
+      "note_deleted": "Note permanently deleted"
+    },
+    "filters": {
+      "all_actions": "All actions",
+      "apply": "Filter",
+      "reset": "Reset"
+    },
+    "details": {
+      "performed_by": "by {{user}}",
+      "data_deleted": "data deleted",
+      "data_kept": "data kept",
+      "notes_deleted": "{{count}} notes deleted",
+      "notes_moved": "{{count}} notes moved to {{workspace}}",
+      "in_workspace": "in {{workspace}}",
+      "untitled_note": "note #{{id}}",
+      "linked_deleted": "+{{count}} linked notes",
+      "share_updated": "settings updated",
+      "password_protected": "password protected",
+      "login_required": "login required",
+      "allowed_users": "restricted to {{count}} users",
+      "accounts": "accounts: {{accounts}}",
+      "empty_value": "empty"
+    },
+    "destinations": {
+      "download": "download",
+      "s3": "S3",
+      "server": "server"
+    },
+    "sources": {
+      "upload": "upload",
+      "s3": "S3",
+      "server": "server"
+    },
+    "pager": {
+      "previous": "Previous",
+      "next": "Next",
+      "status": "Page {{page}} of {{pages}}, {{total}} entries"
+    },
+    "retention": {
+      "label": "Keep entries for",
+      "days": "{{days}} days",
+      "unlimited": "Unlimited",
+      "save": "Save"
+    },
+    "clear": {
+      "title": "Clear the activity log",
+      "button": "Clear the log",
+      "confirm": "Delete every entry in the log? This cannot be undone.",
+      "warning": "{{count}} entries will be permanently deleted."
+    },
+    "messages": {
+      "retention_saved": "Retention set to {{days}} days. {{removed}} old entries removed.",
+      "retention_unlimited": "Retention set to unlimited. No entry will be removed automatically.",
+      "cleared": "{{count}} entries deleted."
+    },
+    "errors": {
+      "invalid_form": "Invalid form submission. Please try again.",
+      "retention_failed": "Could not save the retention setting.",
+      "clear_failed": "Could not clear the log."
+    },
+    "fields": {
+      "username": "Username",
+      "email": "Email",
+      "first_name": "First name",
+      "last_name": "Last name",
+      "quota_max_notes": "Max notes",
+      "quota_max_storage_mb": "Storage (MB)",
+      "quota_max_storage_s3_mb": "S3 storage (MB)",
+      "quota_max_backups_s3_mb": "S3 backups (MB)"
+    },
+    "methods": {
+      "password": "password",
+      "oidc": "SSO"
     }
   },
   "backlinks": {
@@ -2589,7 +2701,8 @@
       "username": "Username",
       "first_name": "First name",
       "last_name": "Last name",
-      "email_admin_only": "Only an administrator can change your email address."
+      "email_admin_only": "Only an administrator can change your email address.",
+      "your_id": "Your ID"
     },
     "errors": {
       "username_required": "Username is required",
@@ -2767,7 +2880,9 @@
     "card": "User Webhooks",
     "card_help": "Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
-    "access_denied": "Access denied. User webhooks are disabled on this instance."
+    "access_denied": "Access denied. User webhooks are disabled on this instance.",
+    "app_url_unset": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Ask an administrator to set it on the admin Webhooks page.",
+    "app_url_unset_admin": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Set it on the admin Webhooks page."
   },
   "webhooks_admin": {
     "event_help": {
@@ -2792,10 +2907,13 @@
     "fields": {
       "url": "Endpoint URL",
       "secret": "Secret (optional)",
-      "events": "Events"
+      "events": "Events",
+      "app_url": "Instance URL"
     },
     "hints": {
-      "secret": "Used to sign the payload so the receiver can verify it comes from this instance."
+      "secret": "Used to sign the payload so the receiver can verify it comes from this instance.",
+      "app_url_env": "Currently provided by the POZNOTE_APP_URL environment variable: {{url}}. Saving a value here overrides it.",
+      "app_url_unset": "Not set: the payloads currently carry no note link (data.note.url is null)."
     },
     "status": {
       "none": "None"
@@ -2818,7 +2936,12 @@
     "error_invalid_url": "The webhook URL must start with http:// or https://.",
     "error_no_events": "Select at least one event.",
     "error_saving": "Error saving the webhook.",
-    "error_not_found": "Webhook not found."
+    "error_not_found": "Webhook not found.",
+    "section_app_url": "Instance URL",
+    "app_url_description": "Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails.",
+    "app_url_saved": "Instance URL saved.",
+    "app_url_cleared": "Instance URL cleared. Payloads will no longer carry a direct note link.",
+    "error_invalid_app_url": "The instance URL must start with http:// or https://."
   },
   "reminder": {
     "toolbar_button": "Set reminder",
@@ -3105,6 +3228,9 @@
     "frequency_daily": "Daily",
     "frequency_weekly": "Weekly",
     "frequency_monthly": "Monthly (every 30 days)",
+    "frequency_daily_inline": "every day",
+    "frequency_weekly_inline": "every week",
+    "frequency_monthly_inline": "every 30 days",
     "frequency_description": "The first automatic backup runs within a few minutes of enabling, the next ones after the chosen interval.",
     "retention_label": "Backups to keep per user",
     "retention_description": "Older archives are deleted from the bucket after each backup. 0 keeps everything.",
@@ -3112,6 +3238,7 @@
     "skip_s3_description": "When attachments live in an S3 bucket (S3 storage feature), leave them out of the archives instead of downloading them for every backup. Attachments on local disk are always included.",
     "manual_title": "Manual backup",
     "manual_description": "Back up the selected users to the bucket right now, one user at a time.",
+    "manual_retention_warning": "Every backup counts toward the retention limit, so a scheduled run can delete a manual archive just as a manual run can delete a scheduled one. To keep an archive for good, download it.",
     "run_now": "Back up now",
     "confirm_run": "Back up the selected users to the bucket now?",
     "running": "Backing up {{username}}... ({{done}}/{{total}})",
@@ -3129,6 +3256,7 @@
     "list_loading": "Loading...",
     "col_user": "User",
     "col_archive": "Archive",
+    "col_date": "Date",
     "col_size": "Size",
     "download": "Download",
     "delete": "Delete",
@@ -3142,7 +3270,16 @@
     },
     "users_label": "Users to back up",
     "master_label": "Enable S3 backups",
-    "master_description": "Master switch. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user."
+    "master_description": "Master switch. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user.",
+    "users_filter_placeholder": "Filter by name, username or email...",
+    "users_filter_clear": "Clear filter",
+    "users_select_all": "Select all",
+    "users_select_none": "Deselect all",
+    "users_no_match": "No user matches this filter.",
+    "users_badge_admin": "Admin",
+    "users_badge_inactive": "Inactive",
+    "users_count": "{{selected}} of {{total}} user(s) selected",
+    "users_count_filtered": "{{selected}} of {{total}} user(s) selected, {{shown}} shown"
   },
   "tasklist_embed": {
     "unavailable": "This task list is no longer available.",
