@@ -38,6 +38,7 @@ https://poznote.com/index.html#press
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
 - [Activity Log](#activity-log)
+- [Webhooks](#webhooks)
 - [Git Synchronization](#git-synchronization)
 - [S3 Attachment Storage](#s3-attachment-storage)
 - [S3 Backups](#s3-backups)
@@ -683,6 +684,56 @@ The log records that an operation happened, not the data it touched. **Note cont
 > **No password is ever written to the log**, in any form. Where a password is relevant, for example on a protected shared workspace, only the fact that one is set is recorded.
 
 Entries are kept for 90 days by default. The retention period can be changed to 30, 90 or 365 days, or set to unlimited, and the log can be cleared manually from the same page.
+
+## Webhooks
+
+Poznote can notify external services when something happens on the instance, by sending outgoing webhooks (HTTP POST requests with a JSON payload) to the endpoints you register. This makes it easy to plug Poznote into automation tools such as n8n, Zapier, or your own scripts. Poznote only emits webhooks: what the receiving endpoint does with them (send an email, trigger a workflow, ...) is up to you.
+
+There are two levels of webhooks:
+
+- **Admin Webhooks** (**Settings > Admin Tools > Admin Webhooks**, administrators only): instance events such as `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `signup.cap_reached`, `quota.notes_reached`, and `quota.storage_reached`.
+- **User Webhooks** (**Settings > User Webhooks**): each account can register its own endpoints for events about its own content: `note.created`, `note.shared`, and reminder events. These events are only ever delivered to the endpoints registered by the account that produced them, never to another user's.
+
+<details>
+<summary><strong>How webhooks work</strong></summary>
+<br>
+
+**Registering an endpoint**
+
+From the webhook page, register an endpoint URL, an optional secret, and the events it subscribes to. Each webhook can be enabled, disabled, tested (a test ping is sent to the endpoint), or deleted, and the page shows the status of the last delivery.
+
+**Payload and signature**
+
+Each delivery is a JSON POST request:
+
+```json
+{
+  "event": "note.created",
+  "delivery_id": "a1b2c3...",
+  "created_at": "2026-01-01T12:00:00+00:00",
+  "data": { "note": { "id": 42, "heading": "My note", "url": "..." }, "source": "ui" }
+}
+```
+
+The request carries `X-Poznote-Event` and `X-Poznote-Delivery` headers. When the webhook has a secret, the body is signed with HMAC-SHA256 and the signature is sent in the `X-Poznote-Signature-256` header (`sha256=...`), so receivers can authenticate the sender, the same scheme as GitHub webhooks.
+
+**Delivery**
+
+Delivery is best-effort with a short timeout and no retry: a slow or failing endpoint never breaks the action (a signup, a note creation) that produced the event.
+
+**Privacy**
+
+Note content is never sent: payloads carry only metadata such as the note id, title, workspace, and folder. Reminder events come in three variants so you choose how much leaves the instance: `reminder.due` (title and reminder message), `reminder.due_title` (title and link, no message), and `reminder.due_minimal` (identifiers and trigger time only, a receiver can then fetch details through the REST API).
+
+**Instance URL**
+
+To include a direct link to the note in the payloads (`data.note.url`), set the public URL of your instance in the **Instance URL** section of the admin Webhooks page. It is the same instance URL as the one used by the reminder emails. When it is not set, payloads carry no link.
+
+**Tenant isolation**
+
+Administrators can block the User Webhooks feature for non-admin users with the "User webhooks" tenant isolation option (see [Multi-users](#multi-users)).
+
+</details>
 
 ## Git Synchronization
 
