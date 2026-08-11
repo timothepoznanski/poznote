@@ -244,8 +244,7 @@ $active_webhooks_count = 0;
 if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
-        $users = listAllUserProfiles();
-        $users_count = count($users);
+        $users_count = countUserProfiles() ?? 0;
         $smtp_from_email = trim((string)getGlobalSetting('smtp_from_email', ''));
         $smtp_configured = trim((string)getGlobalSetting('smtp_host', '')) !== ''
             && filter_var($smtp_from_email, FILTER_VALIDATE_EMAIL);

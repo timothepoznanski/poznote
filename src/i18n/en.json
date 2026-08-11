@@ -49,7 +49,9 @@
       "unavailable_tasklist": "Outline is not available for task lists"
     },
     "link_copied": "Link copied",
-    "print": "Print"
+    "print": "Print",
+    "yes": "Yes",
+    "no": "No"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -2487,10 +2489,19 @@
       "table_attachments": "Attachments (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "table_total_row_hint": "Across all accounts, not just this page",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
       "quota_max_notes_for": "Max notes for {{user}}",
       "quota_max_storage_for": "Max local storage for {{user}} (MB)",
       "filter_placeholder": "Filter accounts...",
+      "export_csv": "Export CSV",
+      "pager": {
+        "previous": "Previous",
+        "next": "Next",
+        "status": "Page {{page}} of {{pages}}, {{total}} accounts",
+        "per_page": "Per page",
+        "all": "All"
+      },
       "no_accounts": "No accounts found.",
       "table_attachments_local": "Attachments local (MB)",
       "table_attachments_s3": "Attachments S3 (MB)",
@@ -2641,8 +2652,16 @@
       "inactive": "Inactive",
       "not_defined": "not defined",
       "create_user": "Create Profile",
+      "export_csv": "Export CSV",
       "edit_user": "Edit User",
       "filter_placeholder": "Filter users...",
+      "pager": {
+        "previous": "Previous",
+        "next": "Next",
+        "status": "Page {{page}} of {{pages}}, {{total}} users",
+        "per_page": "Per page",
+        "all": "All"
+      },
       "first_name": "First name",
       "last_name": "Last name",
       "click_to_activate": "Click to activate",

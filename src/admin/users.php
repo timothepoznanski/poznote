@@ -39,6 +39,24 @@ if (!empty($_SESSION['admin_users_flash_error'])) {
     unset($_SESSION['admin_users_flash_error']);
 }
 
+/**
+ * Where POST actions redirect back to: the same page slice (page + search)
+ * the admin acted from, so acting from page 3 does not snap back to page 1.
+ * Forms post to the current URL, so those GET params are still present here.
+ */
+function adminUsersSelfUrl(): string {
+    $params = [];
+    $searchParam = trim((string)($_GET['q'] ?? ''));
+    if ($searchParam !== '') {
+        $params['q'] = $searchParam;
+    }
+    $pageParam = (int)($_GET['page'] ?? 1);
+    if ($pageParam > 1) {
+        $params['page'] = $pageParam;
+    }
+    return $_SERVER['PHP_SELF'] . ($params ? ('?' . http_build_query($params)) : '');
+}
+
 if (empty($_SESSION['admin_users_csrf_token'])) {
     $_SESSION['admin_users_csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -76,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // Redirect to refresh the page and show the new user
-                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    header('Location: ' . adminUsersSelfUrl());
                     exit;
                 } else {
                     $error = $result['error'];
@@ -119,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // Redirect to refresh the page
-                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    header('Location: ' . adminUsersSelfUrl());
                     exit;
                 } else {
                     $error = $result['error'];
@@ -207,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
 
                     // Redirect to refresh the page
-                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    header('Location: ' . adminUsersSelfUrl());
                     exit;
                 } else {
                     $error = $result['error'];
@@ -243,7 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
 
                         // Redirect to refresh the page
-                        header('Location: ' . $_SERVER['PHP_SELF']);
+                        header('Location: ' . adminUsersSelfUrl());
                         exit;
                     } else {
                         $error = $result['error'];
@@ -279,7 +297,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     require_once __DIR__ . '/../ActivityLog.php';
                     logAccountAccessChange($userId, $accessBefore);
 
-                    header('Location: ' . $_SERVER['PHP_SELF']);
+                    header('Location: ' . adminUsersSelfUrl());
                     exit;
                 } else {
                     $error = $result['error'];
@@ -290,8 +308,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // === Users Table Sort (persisted in the settings table) ===
-// 'access' is computed from the account-access map, so it is sorted in PHP below;
-// every other column is sorted in SQL by listAllUserProfiles().
+// Every column, 'access' included, is sorted in SQL by listAllUserProfiles():
+// the sort has to happen before LIMIT/OFFSET for pagination to slice correctly.
 $sortableUsersColumns = ['id', 'status', 'username', 'admin', 'first_name', 'last_name', 'email', 'access', 'created', 'last_login'];
 $allowedUsersSorts = [];
 foreach ($sortableUsersColumns as $sortableColumn) {
@@ -322,31 +340,147 @@ function renderUsersSortHeader(string $column, string $escapedLabel, string $cur
     $isActive = $column === $currentColumn;
     $nextSort = $column . '_' . (($isActive && $currentDir === 'asc') ? 'desc' : 'asc');
     $icon = ($isActive && $currentDir === 'asc') ? 'lucide-chevron-up' : 'lucide-chevron-down';
-    return '<a class="users-sort-link' . ($isActive ? ' users-sort-active' : '') . '" href="?sort=' . $nextSort . '">'
+    // Keep the active search when re-sorting; changing the sort drops any
+    // 'page' param on purpose (the old offset is meaningless in a new order).
+    $searchParam = trim((string)($_GET['q'] ?? ''));
+    $href = '?sort=' . $nextSort . ($searchParam !== '' ? '&q=' . urlencode($searchParam) : '');
+    return '<a class="users-sort-link' . ($isActive ? ' users-sort-active' : '') . '" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">'
         . $escapedLabel
         . '<i class="lucide ' . $icon . ' users-sort-icon"></i></a>';
 }
 
-// === Get User List ===
-$users = listAllUserProfiles($usersSort);
+// === Page size (persisted in the settings table, like the sort) ===
+// 0 means "all rows on one page": it disables paging entirely rather than
+// standing for an empty page.
+$usersPageSizeOptions = [25, 50, 100, 250, 0];
+$requestedUsersPageSize = $_GET['per_page'] ?? null;
+if ($requestedUsersPageSize !== null && ctype_digit((string)$requestedUsersPageSize)
+    && in_array((int)$requestedUsersPageSize, $usersPageSizeOptions, true)) {
+    $usersPageSize = (int)$requestedUsersPageSize;
+    try {
+        $sizeStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $sizeStmt->execute(['admin_users_per_page', (string)$usersPageSize]);
+    } catch (Exception $e) {
+        // Non-fatal: the requested size still applies for this request.
+    }
+} else {
+    $storedUsersPageSize = getSetting('admin_users_per_page');
+    $usersPageSize = ($storedUsersPageSize !== null && ctype_digit((string)$storedUsersPageSize)
+        && in_array((int)$storedUsersPageSize, $usersPageSizeOptions, true))
+        ? (int)$storedUsersPageSize
+        : 50;
+}
+
+/**
+ * Label for a page-size option; 0 is "All".
+ */
+function usersPageSizeLabel(int $size): string {
+    return $size === 0
+        ? t('multiuser.admin.pager.all', [], 'All')
+        : (string)$size;
+}
+
+// === Get User List (paginated) ===
+// The table only ever loads one page of full profile rows; everything that
+// needs the complete user set (access modal, username lookups) uses the
+// lightweight listUserProfileNames() instead, so it stays correct and cheap
+// with hundreds of accounts.
+$usersSearch = trim((string)($_GET['q'] ?? ''));
+$usersTotal = countUserProfiles($usersSearch) ?? 0;
+if ($usersPageSize === 0) {
+    $usersTotalPages = 1;
+    $usersPage = 1;
+    $users = listAllUserProfiles($usersSort, $usersSearch);
+} else {
+    $usersTotalPages = max(1, (int)ceil($usersTotal / $usersPageSize));
+    $usersPage = min(max(1, (int)($_GET['page'] ?? 1)), $usersTotalPages);
+    $users = listAllUserProfiles($usersSort, $usersSearch, $usersPageSize, ($usersPage - 1) * $usersPageSize);
+}
 $accountAccessMap = getUserAccountAccessMap();
 
-// "Note access" is derived from the access map, so it cannot be sorted in SQL:
-// order by how many extra accounts the user can open, then by username.
-if ($usersSortColumn === 'access') {
-    usort($users, function ($a, $b) use ($accountAccessMap, $usersSortDir) {
-        $countA = count($accountAccessMap[(int)$a['id']] ?? []);
-        $countB = count($accountAccessMap[(int)$b['id']] ?? []);
-        $cmp = $countA <=> $countB;
-        if ($cmp === 0) {
-            return strcasecmp((string)$a['username'], (string)$b['username']);
-        }
-        return $usersSortDir === 'desc' ? -$cmp : $cmp;
-    });
-}
+// Full id/username/active list: feeds the access modal (granting access must
+// offer every account, not just the current page) and the access summary
+// column (a grant can target an account on another page).
+$allUserNames = listUserProfileNames();
 $userNamesById = [];
-foreach ($users as $listedUser) {
+foreach ($allUserNames as $listedUser) {
     $userNamesById[(int)$listedUser['id']] = (string)$listedUser['username'];
+}
+
+// === CSV export ===
+// Re-queries without a limit rather than exporting $users: that variable holds
+// one page, and an export that silently stopped at the visible page would be
+// mistaken for the full list. The active search and sort still apply, so the
+// file matches what the admin is looking at, just without the paging.
+if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    $exportUsers = listAllUserProfiles($usersSort, $usersSearch);
+
+    $filename = 'poznote-users-' . date('Y-m-d') . '.csv';
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: no-store');
+
+    $out = fopen('php://output', 'w');
+    // UTF-8 BOM: without it Excel reads accented names as mojibake.
+    fwrite($out, "\xEF\xBB\xBF");
+
+    fputcsv($out, [
+        t('multiuser.admin.id', [], 'ID'),
+        t('multiuser.admin.username', [], 'User'),
+        t('multiuser.admin.status', [], 'Status'),
+        t('multiuser.admin.administrator_short', [], 'Admin'),
+        t('multiuser.admin.first_name', [], 'First name'),
+        t('multiuser.admin.last_name', [], 'Last name'),
+        t('multiuser.admin.email', [], 'Email'),
+        t('multiuser.admin.account_access.column', [], 'Note access'),
+        t('multiuser.admin.created_at', [], 'Created'),
+        t('multiuser.admin.last_login', [], 'Last login'),
+    ]);
+
+    foreach ($exportUsers as $exportUser) {
+        // The access column is a list of usernames, same as on screen; joined
+        // with "; " so a spreadsheet keeps it in a single cell.
+        $exportAccessNames = [];
+        foreach ($accountAccessMap[(int)$exportUser['id']] ?? [] as $accessId) {
+            if (isset($userNamesById[(int)$accessId])) {
+                $exportAccessNames[] = $userNamesById[(int)$accessId];
+            }
+        }
+
+        fputcsv($out, [
+            $exportUser['id'],
+            $exportUser['username'],
+            $exportUser['active']
+                ? t('multiuser.admin.active', [], 'Active')
+                : t('multiuser.admin.inactive', [], 'Inactive'),
+            $exportUser['is_admin']
+                ? t('common.yes', [], 'Yes')
+                : t('common.no', [], 'No'),
+            (string)($exportUser['first_name'] ?? ''),
+            (string)($exportUser['last_name'] ?? ''),
+            (string)($exportUser['email'] ?? ''),
+            $exportAccessNames
+                ? implode('; ', $exportAccessNames)
+                : t('multiuser.admin.account_access.own_only', [], 'Own account only'),
+            // Dates in the admin's timezone, matching the table.
+            formatUtcDateTimeForDisplay((string)($exportUser['created_at'] ?? ''), 'Y-m-d H:i'),
+            formatUtcDateTimeForDisplay((string)($exportUser['last_login'] ?? ''), 'Y-m-d H:i'),
+        ]);
+    }
+
+    fclose($out);
+    exit;
+}
+
+/**
+ * Pager link keeping the current search; the sort is stored server-side.
+ */
+function usersPageUrl(int $page, string $search): string {
+    $params = ['page' => $page];
+    if ($search !== '') {
+        $params['q'] = $search;
+    }
+    return '?' . http_build_query($params);
 }
 
 ?>
@@ -398,6 +532,47 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
         }
         [data-theme='dark'] .user-current {
             color: #4a9eff;
+        }
+        /* Same look as the activity log pager. */
+        .users-pager {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted, #777);
+            flex-wrap: wrap;
+        }
+        /* Page-size selector, sitting at the end of the pager row. */
+        .users-pager-size {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+        .users-pager-size select {
+            font: inherit;
+            color: #222;
+            background: #fff;
+            border: 1px solid var(--border-color, #d5d5d5);
+            border-radius: 6px;
+            padding: 3px 6px;
+            cursor: pointer;
+        }
+        /* Dark mode uses its own --dm-* palette; without this the select stays
+           white-on-white. The option list is painted by the OS, hence styling
+           both the control and its options. */
+        :root[data-theme='dark'] .users-pager-size select,
+        body.dark-mode .users-pager-size select {
+            color: var(--dm-text);
+            background: var(--dm-surface);
+            border-color: var(--dm-border);
+        }
+        :root[data-theme='dark'] .users-pager-size select option,
+        body.dark-mode .users-pager-size select option {
+            color: var(--dm-text);
+            background: var(--dm-surface);
         }
         /* The wrapper is height-capped by JS to the viewport so the
            horizontal scrollbar is always on screen; rows scroll vertically
@@ -523,25 +698,41 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     }
 
     /**
-     * Filter the users table rows against the search input value
+     * Filter the users table against the search input value.
+     *
+     * Two modes, because the table is paginated server-side:
+     * - Everything fits on one unfiltered page: filter the rows live in the
+     *   DOM, exactly the pre-pagination behavior.
+     * - Several pages (or a server search already active): live-filtering
+     *   would only search the visible page and silently miss users on the
+     *   others, so rows are left alone and Enter submits the surrounding GET
+     *   form, which searches all users server-side.
      */
+    const USERS_LIVE_FILTER = <?php echo json_encode($usersTotalPages <= 1 && $usersSearch === ''); ?>;
+
     function initUsersFilter() {
         const input = document.getElementById('users-filter-input');
         if (!input) return;
 
-        input.addEventListener('input', function () {
-            const query = this.value.trim().toLowerCase();
-            document.querySelectorAll('.users-table tbody tr').forEach(function (row) {
-                // A class (not inline style) so it also wins over the mobile
-                // card view's "display: flex !important" row rule.
-                row.classList.toggle('filter-hidden', query !== '' && !row.textContent.toLowerCase().includes(query));
+        if (USERS_LIVE_FILTER) {
+            input.addEventListener('input', function () {
+                const query = this.value.trim().toLowerCase();
+                document.querySelectorAll('.users-table tbody tr').forEach(function (row) {
+                    // A class (not inline style) so it also wins over the mobile
+                    // card view's "display: flex !important" row rule.
+                    row.classList.toggle('filter-hidden', query !== '' && !row.textContent.toLowerCase().includes(query));
+                });
             });
-        });
+        }
 
         input.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && this.value !== '') {
+            if (e.key !== 'Escape') return;
+            if (this.value !== '') {
                 this.value = '';
                 this.dispatchEvent(new Event('input'));
+            } else if (!USERS_LIVE_FILTER) {
+                // Empty input but a server-side search is active: leave it.
+                window.location.href = '<?php echo htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8'); ?>';
             }
         });
     }
@@ -558,8 +749,18 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             scroller.style.maxHeight = '';
             return;
         }
+
+        // Measure what actually sits below the table (pager, container padding,
+        // body margin) instead of guessing a fixed gap: a guess that falls
+        // short leaves the page itself scrollable by a few pixels, which shows
+        // up as a stray scrollbar on a large screen.
+        scroller.style.maxHeight = '';
         const top = scroller.getBoundingClientRect().top + window.scrollY;
-        scroller.style.maxHeight = Math.max(240, window.innerHeight - top - 24) + 'px';
+        const scrollerBottom = scroller.getBoundingClientRect().bottom + window.scrollY;
+        const pageBottom = document.documentElement.scrollHeight;
+        const below = Math.max(0, pageBottom - scrollerBottom);
+
+        scroller.style.maxHeight = Math.max(240, window.innerHeight - top - below) + 'px';
     }
 
     document.addEventListener('DOMContentLoaded', sizeUsersTableScroll);
@@ -641,6 +842,12 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                         <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
                         <?php echo t_h('common.back_to_settings'); ?>
                     </a>
+                    <?php // Exports every matching user, not just the visible
+                          // page. The current search is carried over so the
+                          // file matches what is on screen. ?>
+                    <a href="?export=csv<?php echo $usersSearch !== '' ? ('&q=' . urlencode($usersSearch)) : ''; ?>" class="btn btn-primary btn-margin-right">
+                        <i class="lucide lucide-download" style="margin-right: 5px;"></i><?php echo t_h('multiuser.admin.export_csv', [], 'Export CSV'); ?>
+                    </a>
                     <button class="btn btn-primary" onclick="openCreateModal()">
                         <i class="lucide lucide-plus" style="margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
                     </button>
@@ -653,13 +860,16 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             <div class="message message-error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
-        <!-- Filter Bar -->
-        <div class="home-search-container">
+        <!-- Filter Bar: a GET form so Enter searches every user server-side.
+             On a single unfiltered page the JS below also filters rows live,
+             which keeps the pre-pagination instant behavior for small
+             instances. -->
+        <form class="home-search-container" method="get" action="">
             <div class="home-search-wrapper">
                 <i class="lucide lucide-search home-search-icon"></i>
-                <input type="text" id="users-filter-input" class="home-search-input" placeholder="<?php echo t_h('multiuser.admin.filter_placeholder', [], 'Filter users...'); ?>" autocomplete="off">
+                <input type="text" id="users-filter-input" name="q" value="<?php echo htmlspecialchars($usersSearch, ENT_QUOTES, 'UTF-8'); ?>" class="home-search-input" placeholder="<?php echo t_h('multiuser.admin.filter_placeholder', [], 'Filter users...'); ?>" autocomplete="off">
             </div>
-        </div>
+        </form>
 
         <!-- Users Table -->
         <div class="table-responsive">
@@ -842,6 +1052,42 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 </tbody>
             </table>
         </div>
+
+        <?php // The pager always renders: even on a single page it carries the
+              // page-size selector, which is the only way back to a smaller
+              // size once "All" has been picked. ?>
+        <div class="users-pager">
+            <?php if ($usersPage > 1): ?>
+                <a href="<?php echo htmlspecialchars(usersPageUrl($usersPage - 1, $usersSearch), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary">
+                    <?php echo t_h('multiuser.admin.pager.previous', [], 'Previous'); ?>
+                </a>
+            <?php endif; ?>
+            <span><?php echo t_h('multiuser.admin.pager.status', ['page' => $usersPage, 'pages' => $usersTotalPages, 'total' => $usersTotal], 'Page {{page}} of {{pages}}, {{total}} users'); ?></span>
+            <?php if ($usersPage < $usersTotalPages): ?>
+                <a href="<?php echo htmlspecialchars(usersPageUrl($usersPage + 1, $usersSearch), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary">
+                    <?php echo t_h('multiuser.admin.pager.next', [], 'Next'); ?>
+                </a>
+            <?php endif; ?>
+
+            <?php // A GET form so the choice works without JavaScript; the
+                  // onchange below just saves the extra click on OK. Changing
+                  // the size drops 'page' on purpose: the old page number
+                  // points nowhere in a re-sliced list. ?>
+            <form method="get" action="" class="users-pager-size">
+                <?php if ($usersSearch !== ''): ?>
+                    <input type="hidden" name="q" value="<?php echo htmlspecialchars($usersSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                <?php endif; ?>
+                <label for="users-per-page"><?php echo t_h('multiuser.admin.pager.per_page', [], 'Per page'); ?></label>
+                <select id="users-per-page" name="per_page" onchange="this.form.submit()">
+                    <?php foreach ($usersPageSizeOptions as $sizeOption): ?>
+                        <option value="<?php echo $sizeOption; ?>"<?php echo $sizeOption === $usersPageSize ? ' selected' : ''; ?>>
+                            <?php echo htmlspecialchars(usersPageSizeLabel($sizeOption), ENT_QUOTES, 'UTF-8'); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <noscript><button type="submit" class="btn btn-secondary"><?php echo t_h('common.ok', [], 'OK'); ?></button></noscript>
+            </form>
+        </div>
     </div>
 
     <!-- ========================================
@@ -915,7 +1161,11 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <input type="hidden" name="user_id" id="access_user_id">
 
                 <div class="account-access-list">
-                    <?php foreach ($users as $accessUser): ?>
+                    <?php // Full list on purpose: the table is paginated, but a
+                          // grant can target any account. Saving replaces the
+                          // whole grant list, so a partial list would silently
+                          // revoke access to accounts it does not show. ?>
+                    <?php foreach ($allUserNames as $accessUser): ?>
                         <label class="account-access-option">
                             <input type="checkbox" name="allowed_user_ids[]" value="<?php echo (int)$accessUser['id']; ?>" data-active="<?php echo !empty($accessUser['active']) ? '1' : '0'; ?>">
                             <span class="account-access-name"><?php echo htmlspecialchars($accessUser['username'], ENT_QUOTES, 'UTF-8'); ?></span>

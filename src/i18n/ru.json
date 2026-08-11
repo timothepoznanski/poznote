@@ -49,7 +49,9 @@
       "unavailable_tasklist": "Оглавление недоступно для списков задач"
     },
     "link_copied": "Ссылка скопирована",
-    "print": "Печать"
+    "print": "Печать",
+    "yes": "Да",
+    "no": "Нет"
   },
   "snapshot": {
     "menu_item": "Снимки",
@@ -2458,10 +2460,19 @@
       "table_attachments": "Вложения (МБ)",
       "table_total": "Всего (МБ)",
       "table_total_row": "Всего",
+      "table_total_row_hint": "По всем аккаунтам, а не только на этой странице",
       "quota_modal_description": "Оставьте поле пустым, чтобы использовать глобальную настройку. 0 означает без ограничений.\nЭти значения переопределяют глобальные квоты пользователей.",
       "quota_max_notes_for": "Макс. заметок для {{user}}",
       "quota_max_storage_for": "Макс. локальное хранилище для {{user}} (МБ)",
       "filter_placeholder": "Фильтровать учётные записи...",
+      "export_csv": "Экспорт в CSV",
+      "pager": {
+        "previous": "Назад",
+        "next": "Вперёд",
+        "status": "Страница {{page}} из {{pages}}, аккаунтов: {{total}}",
+        "per_page": "На странице",
+        "all": "Все"
+      },
       "no_accounts": "Учётные записи не найдены.",
       "table_attachments_local": "Вложения локально (МБ)",
       "table_attachments_s3": "Вложения S3 (МБ)",
@@ -2648,8 +2659,16 @@
       "inactive": "Неактивен",
       "not_defined": "не определено",
       "create_user": "Создать профиль",
+      "export_csv": "Экспорт в CSV",
       "edit_user": "Редактировать пользователя",
       "filter_placeholder": "Фильтровать пользователей...",
+      "pager": {
+        "previous": "Назад",
+        "next": "Вперёд",
+        "status": "Страница {{page}} из {{pages}}, пользователей: {{total}}",
+        "per_page": "На странице",
+        "all": "Все"
+      },
       "first_name": "Имя",
       "last_name": "Фамилия",
       "click_to_activate": "Нажмите, чтобы активировать",

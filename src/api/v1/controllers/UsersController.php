@@ -220,15 +220,54 @@ class UsersController {
     
     /**
      * GET /api/v1/admin/users - List all user profiles
+     *
+     * Optional query params (the storage figures below are computed per user
+     * by walking its data directory, which gets expensive with many
+     * accounts, so large instances should page):
+     * - limit:  page size, clamped to 1-200. OMITTED = every user, no paging.
+     * - offset: number of users to skip, clamped to >= 0 (default 0)
+     * - q:      filter on username, email, first or last name
+     *
+     * There is deliberately NO default page size: a reconciliation client
+     * that lists every account must keep seeing every account after an
+     * upgrade. Silently capping an unparameterized call would make such a
+     * client skip accounts with no error at all, so paging only ever engages
+     * when the caller explicitly asks for a limit.
+     *
+     * The response echoes the limit and offset actually applied, so a client
+     * asking for limit=1000 can see it was clamped to 200 and keep paging
+     * rather than assume it received everything. With no limit, both are null,
+     * which marks the response as complete-by-construction.
+     *
+     * Paging is only coherent because listAllUserProfiles() orders rows
+     * explicitly ('id_asc' here, and every sort it accepts ends with a
+     * tie-breaking "id ASC"). Without a deterministic order, SQLite could
+     * return rows in a different sequence between two calls and the same
+     * account could land on two pages while another is skipped entirely.
      */
     public function list($params = []) {
         if ($err = $this->requireAdmin()) return $err;
-        
+
         require_once dirname(__DIR__, 3) . '/users/db_master.php';
         require_once dirname(__DIR__, 3) . '/users/UserDataManager.php';
-        
-        $users = listAllUserProfiles();
-        
+
+        $search = trim((string)($params['q'] ?? ''));
+
+        // Only a limit that is actually present turns paging on. A blank or
+        // non-numeric limit is treated as absent rather than as 1, so a
+        // malformed client parameter cannot silently truncate the list.
+        $limit = null;
+        if (isset($params['limit']) && is_numeric($params['limit'])) {
+            $limit = max(1, min(200, (int)$params['limit']));
+        }
+        // Offset without a limit has nothing to page through: keep it null so
+        // the response reports "no paging applied" instead of a phantom 0.
+        $offset = $limit === null ? null : max(0, (int)($params['offset'] ?? 0));
+
+        $users = listAllUserProfiles('id_asc', $search, $limit, $offset ?? 0);
+        // The full matching count, not the page size, so clients can page.
+        $total = countUserProfiles($search) ?? count($users);
+
         // Add storage info for each user
         foreach ($users as &$user) {
             $dataManager = new UserDataManager($user['id']);
@@ -238,10 +277,12 @@ class UsersController {
             $user['attachments_count'] = $dataManager->getAttachmentsCount();
         }
         unset($user);
-        
+
         return [
             'users' => $users,
-            'total' => count($users)
+            'total' => $total,
+            'limit' => $limit,
+            'offset' => $offset
         ];
     }
     
