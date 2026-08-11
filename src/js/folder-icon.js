@@ -404,6 +404,24 @@ const FOLDER_ICONS = [
 
 const DEFAULT_NOTE_ICON = 'lucide-file-text';
 
+// Every default icon a note can fall back to, so the reset path can strip
+// whichever one is currently applied before adding the new class.
+const DEFAULT_NOTE_ICONS = ['lucide-file-text', 'lucide-list-todo', 'lucide-file-code'];
+
+/**
+ * Default icon of a note that has no custom icon.
+ *
+ * The server stamps the resolved default on the icon element (it depends on the
+ * note type and on the 'type_based_note_icons' setting), so read it from there
+ * and only fall back to the generic file icon when the attribute is missing.
+ */
+function getDefaultNoteIcon(noteIconElement) {
+    const stamped = noteIconElement && noteIconElement.getAttribute
+        ? noteIconElement.getAttribute('data-default-icon')
+        : '';
+    return stamped || DEFAULT_NOTE_ICON;
+}
+
 // Recently used icons (per-user storage, most recent first)
 const RECENT_ICONS_KEY = 'recent_icons';
 const RECENT_ICONS_MAX = 12;
@@ -613,7 +631,7 @@ function showChangeIconModal(targetType, targetId, targetName) {
 
     const defaultIcon = document.createElement('i');
     // Use the same base class style as existing UI (no need to add "fas")
-    defaultIcon.className = currentIconTargetType === 'note' ? DEFAULT_NOTE_ICON : 'lucide-folder';
+    defaultIcon.className = currentIconTargetType === 'note' ? getDefaultNoteIcon(folderElement) : 'lucide-folder';
     defaultIconItem.appendChild(defaultIcon);
 
     defaultIconItem.addEventListener('click', function () {
@@ -1015,12 +1033,12 @@ function updateNoteIconInUI(noteId, iconClass, iconColor) {
     }
 
     noteIcons.forEach(noteIconElement => {
-        const allIconsToRemove = [...FOLDER_ICONS, DEFAULT_NOTE_ICON, 'lucide-file-text'];
+        const allIconsToRemove = [...FOLDER_ICONS, ...DEFAULT_NOTE_ICONS];
         allIconsToRemove.forEach(icon => {
             noteIconElement.classList.remove(icon);
         });
 
-        noteIconElement.classList.add(iconClass || DEFAULT_NOTE_ICON);
+        noteIconElement.classList.add(iconClass || getDefaultNoteIcon(noteIconElement));
         noteIconElement.setAttribute('data-custom-icon', iconClass ? 'true' : 'false');
 
         if (iconColor) {

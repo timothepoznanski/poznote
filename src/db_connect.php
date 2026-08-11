@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 23; // 23: notifications.task_id (per-task due-date reminders)
+    $CURRENT_SCHEMA_VERSION = 24; // 24: type_based_note_icons setting (default icon per note type)
     $currentVersion = 0;
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
@@ -532,6 +532,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('type_based_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");

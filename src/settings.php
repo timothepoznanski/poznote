@@ -109,6 +109,7 @@ $settingsPageUserKeys = [
     'language',
     'show_note_created',
     'show_note_icons',
+    'type_based_note_icons',
     'note_color_palette',
     'hide_folder_counts',
     'hide_folder_actions',
@@ -718,6 +719,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span>
                     <span id="note-icons-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Type-based Default Note Icons -->
+            <div class="home-card" id="type-note-icons-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.type_based_note_icons', [], 'Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-list-todo"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span>
+                    <span id="type-note-icons-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 

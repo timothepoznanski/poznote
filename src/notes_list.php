@@ -94,15 +94,16 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
     $noteTitle = translateDefaultNoteTitle($noteTitle);
 
+    $noteType = $row1['type'] ?? 'note';
+
     $noteIcon = '';
     if (!empty($show_note_icons_setting)) {
         $noteIconRaw = !empty($row1['icon']) ? $row1['icon'] : '';
         $noteIconColor = !empty($row1['icon_color']) ? (string)$row1['icon_color'] : '';
-        $noteIcon = renderEditableNoteIcon($noteDbId, $noteTitle, $noteIconRaw, $noteIconColor, 'note-list-click-action') . ' ';
+        $noteIcon = renderEditableNoteIcon($noteDbId, $noteTitle, $noteIconRaw, $noteIconColor, 'note-list-click-action', $noteType) . ' ';
     }
 
     $noteTypeIcon = '';
-    $noteType = $row1['type'] ?? 'note';
     $linkedNoteIdAttr = '';
     if ($noteType === 'linked') {
         $noteTypeIcon = '<i class="lucide lucide-link note-type-icon-inline"></i> ';
