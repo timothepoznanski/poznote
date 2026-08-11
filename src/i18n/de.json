@@ -3260,12 +3260,14 @@
       "url": "Endpunkt-URL",
       "secret": "Secret (optional)",
       "events": "Ereignisse",
-      "app_url": "Instanz-URL"
+      "app_url": "Instanz-URL",
+      "description": "Beschreibung (optional)"
     },
     "hints": {
       "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt.",
       "app_url_env": "Derzeit durch die Umgebungsvariable POZNOTE_APP_URL bereitgestellt: {{url}}. Ein hier gespeicherter Wert ueberschreibt sie.",
-      "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null)."
+      "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null).",
+      "description": "Wird in der Liste unten angezeigt, um Ihre Endpunkte zu unterscheiden. Sie wird nie an den Endpunkt gesendet."
     },
     "status": {
       "none": "Keine"
@@ -3293,7 +3295,15 @@
     "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden.",
     "app_url_saved": "Instanz-URL gespeichert.",
     "app_url_cleared": "Instanz-URL geleert. Payloads enthalten keinen direkten Notiz-Link mehr.",
-    "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen."
+    "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen.",
+    "placeholders": {
+      "description": "Wofür dieser Webhook verwendet wird"
+    },
+    "edit_button": "Bearbeiten",
+    "actions_menu": "Aktionen",
+    "updated": "Webhook aktualisiert.",
+    "delete_confirm": "Diesen Webhook löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_title": "Webhook löschen"
   },
   "reminder": {
     "toolbar_button": "Erinnerung setzen",

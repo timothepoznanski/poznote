@@ -221,7 +221,8 @@ function initializeMasterDatabase(PDO $con): void {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_status TEXT,
             last_delivery_at DATETIME,
-            user_id INTEGER
+            user_id INTEGER,
+            description TEXT
         )
     ");
 
@@ -230,7 +231,8 @@ function initializeMasterDatabase(PDO $con): void {
     // working now that every account can register its own.
     try {
         $cols = $con->query("PRAGMA table_info(webhooks)")->fetchAll(PDO::FETCH_ASSOC);
-        if (!in_array('user_id', array_column($cols, 'name'))) {
+        $webhookColumns = array_column($cols, 'name');
+        if (!in_array('user_id', $webhookColumns)) {
             $con->exec("ALTER TABLE webhooks ADD COLUMN user_id INTEGER");
             $con->exec("
                 UPDATE webhooks
@@ -240,8 +242,13 @@ function initializeMasterDatabase(PDO $con): void {
                        OR events LIKE 'note.%' OR events LIKE '%,note.%')
             ");
         }
+        // Free-text label so a list of endpoints stays readable, e.g.
+        // "n8n workflow that files new notes into Notion".
+        if (!in_array('description', $webhookColumns)) {
+            $con->exec("ALTER TABLE webhooks ADD COLUMN description TEXT");
+        }
     } catch (Exception $e) {
-        error_log("Failed to add webhooks.user_id column: " . $e->getMessage());
+        error_log("Failed to add webhooks columns: " . $e->getMessage());
     }
 
     // Create indexes
@@ -1462,13 +1469,41 @@ function getWebhookById(int $id): ?array {
  * $userId is the owning account for a user webhook; null registers an
  * instance webhook (admin page).
  */
-function createWebhook(string $url, string $secret, array $events, ?int $userId = null): bool {
+function createWebhook(string $url, string $secret, array $events, ?int $userId = null, string $description = ''): bool {
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active, user_id) VALUES (?, ?, ?, 1, ?)");
-        return $stmt->execute([$url, $secret !== '' ? $secret : null, implode(',', $events), $userId]);
+        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active, user_id, description) VALUES (?, ?, ?, 1, ?, ?)");
+        return $stmt->execute([
+            $url,
+            $secret !== '' ? $secret : null,
+            implode(',', $events),
+            $userId,
+            $description !== '' ? $description : null,
+        ]);
     } catch (Exception $e) {
         error_log("Failed to create webhook: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Update an existing webhook's endpoint, secret, events and description.
+ * The owner (user_id) and the enabled state are never changed here: ownership
+ * is fixed at creation and the enabled state has its own toggle.
+ */
+function updateWebhook(int $id, string $url, string $secret, array $events, string $description = ''): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE webhooks SET url = ?, secret = ?, events = ?, description = ? WHERE id = ?");
+        return $stmt->execute([
+            $url,
+            $secret !== '' ? $secret : null,
+            implode(',', $events),
+            $description !== '' ? $description : null,
+            $id,
+        ]);
+    } catch (Exception $e) {
+        error_log("Failed to update webhook: " . $e->getMessage());
         return false;
     }
 }

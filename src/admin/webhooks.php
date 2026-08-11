@@ -75,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($action === 'add') {
             $url = trim((string)($_POST['webhook_url'] ?? ''));
             $secret = trim((string)($_POST['webhook_secret'] ?? ''));
+            $description = mb_substr(trim((string)($_POST['webhook_description'] ?? '')), 0, 500);
             $events = $_POST['webhook_events'] ?? [];
             if (!is_array($events)) {
                 $events = [];
@@ -93,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = t('webhooks_admin.error_invalid_url', [], 'The webhook URL must start with http:// or https://.');
             } elseif (empty($events)) {
                 $error = t('webhooks_admin.error_no_events', [], 'Select at least one event.');
-            } elseif (createWebhook($url, $secret, $events)) {
+            } elseif (createWebhook($url, $secret, $events, null, $description)) {
                 if ($urlAlreadyRegistered) {
                     $warning = t('webhooks_admin.added_duplicate', [], 'Webhook added, but this URL was already registered: each entry will receive its own delivery for every event.');
                 } else {
@@ -102,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $error = t('webhooks_admin.error_saving', [], 'Error saving the webhook.');
             }
-        } elseif (in_array($action, ['delete', 'enable', 'disable', 'test'], true)) {
+        } elseif (in_array($action, ['delete', 'enable', 'disable', 'test', 'edit'], true)) {
             $id = (int)($_POST['webhook_id'] ?? 0);
             $webhook = $id > 0 ? getWebhookById($id) : null;
             if ($webhook && !isInstanceWebhook($webhook)) {
@@ -111,6 +112,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             if (!$webhook) {
                 $error = t('webhooks_admin.error_not_found', [], 'Webhook not found.');
+            } elseif ($action === 'edit') {
+                $url = trim((string)($_POST['webhook_url'] ?? ''));
+                $secret = trim((string)($_POST['webhook_secret'] ?? ''));
+                $description = mb_substr(trim((string)($_POST['webhook_description'] ?? '')), 0, 500);
+                $events = $_POST['webhook_events'] ?? [];
+                if (!is_array($events)) {
+                    $events = [];
+                }
+                $events = array_values(array_intersect(WebhookDispatcher::INSTANCE_EVENTS, array_map('strval', $events)));
+
+                if (!webhooks_is_valid_url($url)) {
+                    $error = t('webhooks_admin.error_invalid_url', [], 'The webhook URL must start with http:// or https://.');
+                } elseif (empty($events)) {
+                    $error = t('webhooks_admin.error_no_events', [], 'Select at least one event.');
+                } elseif (updateWebhook($id, $url, $secret, $events, $description)) {
+                    $success = t('webhooks_admin.updated', [], 'Webhook updated.');
+                } else {
+                    $error = t('webhooks_admin.error_saving', [], 'Error saving the webhook.');
+                }
             } elseif ($action === 'delete') {
                 if (deleteWebhook($id)) {
                     $success = t('webhooks_admin.deleted', [], 'Webhook deleted.');
@@ -179,6 +199,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
     <link rel="stylesheet" href="../css/users.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/workspaces.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/modal-alerts.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/variables.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/layout.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/menus.css?v=<?php echo $v; ?>">
@@ -250,6 +271,11 @@ foreach ($eventHelpDefaults as $eventName => $default) {
                 <input type="url" id="webhook_url" name="webhook_url" placeholder="https://example.com/webhook" required>
             </div>
             <div class="webhooks-field">
+                <label for="webhook_description"><?php echo t_h('webhooks_admin.fields.description', [], 'Description (optional)'); ?></label>
+                <input type="text" id="webhook_description" name="webhook_description" maxlength="500" autocomplete="off" placeholder="<?php echo t_h('webhooks_admin.placeholders.description', [], 'What this webhook is used for'); ?>">
+                <span class="webhooks-hint"><?php echo t_h('webhooks_admin.hints.description', [], 'Shown in the list below to tell your endpoints apart. Never sent to the endpoint.'); ?></span>
+            </div>
+            <div class="webhooks-field">
                 <label for="webhook_secret"><?php echo t_h('webhooks_admin.fields.secret', [], 'Secret (optional)'); ?></label>
                 <input type="text" id="webhook_secret" name="webhook_secret" autocomplete="off">
                 <span class="webhooks-hint"><?php echo t_h('webhooks_admin.hints.secret', [], 'Used to sign the payload so the receiver can verify it comes from this instance.'); ?></span>
@@ -288,15 +314,24 @@ foreach ($eventHelpDefaults as $eventName => $default) {
                         $isActive = !empty($webhook['active']);
                         $lastStatus = trim((string)($webhook['last_status'] ?? ''));
                         $lastAt = trim((string)($webhook['last_delivery_at'] ?? ''));
+                        $description = trim((string)($webhook['description'] ?? ''));
+                        $webhookEvents = array_values(array_filter(array_map('trim', explode(',', (string)$webhook['events'])), 'strlen'));
                     ?>
-                    <div class="webhooks-item">
+                    <div class="webhooks-item" data-webhook-id="<?php echo $webhookId; ?>">
                         <div class="webhooks-item-info">
                             <span class="webhooks-item-url"><?php echo webhooks_h($webhook['url']); ?></span>
+                            <?php if ($description !== ''): ?>
+                                <span class="webhooks-item-description"><?php echo webhooks_h($description); ?></span>
+                            <?php endif; ?>
+                            <span class="webhooks-item-events">
+                                <?php foreach ($webhookEvents as $webhookEvent): ?>
+                                    <code class="webhooks-item-event"><?php echo webhooks_h($webhookEvent); ?></code>
+                                <?php endforeach; ?>
+                            </span>
                             <span class="webhooks-item-meta">
                                 <span class="webhooks-state <?php echo $isActive ? 'is-enabled' : 'is-disabled'; ?>">
                                     <?php echo $isActive ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
                                 </span>
-                                <span><code><?php echo webhooks_h($webhook['events']); ?></code></span>
                                 <?php if (!empty($webhook['secret'])): ?>
                                     <span><?php echo t_h('webhooks_admin.signed', [], 'Signed'); ?></span>
                                 <?php endif; ?>
@@ -306,14 +341,69 @@ foreach ($eventHelpDefaults as $eventName => $default) {
                             </span>
                         </div>
                         <div class="webhooks-item-actions">
+                            <div class="webhooks-actions-dropdown">
+                                <button type="button" class="btn btn-secondary webhooks-actions-toggle" data-webhook-menu-toggle="<?php echo $webhookId; ?>" aria-haspopup="true" aria-expanded="false" aria-label="<?php echo t_h('webhooks_admin.actions_menu', [], 'Actions'); ?>">
+                                    <i class="lucide lucide-more-horizontal"></i>
+                                </button>
+                                <div class="webhooks-actions-menu" id="webhooks-actions-menu-<?php echo $webhookId; ?>" hidden>
+                                    <button type="button" class="webhooks-actions-item" data-webhook-edit="<?php echo $webhookId; ?>">
+                                        <i class="lucide lucide-pencil"></i><?php echo t_h('webhooks_admin.edit_button', [], 'Edit'); ?>
+                                    </button>
+                                    <form method="POST" action="">
+                                        <input type="hidden" name="csrf_token" value="<?php echo webhooks_h($_SESSION['webhooks_csrf_token']); ?>">
+                                        <input type="hidden" name="webhook_id" value="<?php echo $webhookId; ?>">
+                                        <button type="submit" name="action" value="test" class="webhooks-actions-item">
+                                            <i class="lucide lucide-zap"></i><?php echo t_h('webhooks_admin.test_button', [], 'Send test'); ?>
+                                        </button>
+                                        <button type="submit" name="action" value="<?php echo $isActive ? 'disable' : 'enable'; ?>" class="webhooks-actions-item">
+                                            <i class="lucide <?php echo $isActive ? 'lucide-pause' : 'lucide-play'; ?>"></i><?php echo $isActive ? t_h('webhooks_admin.disable_button', [], 'Disable') : t_h('webhooks_admin.enable_button', [], 'Enable'); ?>
+                                        </button>
+                                        <button type="submit" name="action" value="delete" class="webhooks-actions-item is-danger" data-webhook-delete-confirm="<?php echo t_h('webhooks_admin.delete_confirm', [], 'Delete this webhook? This cannot be undone.'); ?>" data-webhook-delete-title="<?php echo t_h('webhooks_admin.delete_title', [], 'Delete webhook'); ?>" data-webhook-delete-label="<?php echo t_h('common.delete', [], 'Delete'); ?>">
+                                            <i class="lucide lucide-trash-2"></i><?php echo t_h('common.delete', [], 'Delete'); ?>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="webhooks-edit" id="webhooks-edit-<?php echo $webhookId; ?>" hidden>
                             <form method="POST" action="">
                                 <input type="hidden" name="csrf_token" value="<?php echo webhooks_h($_SESSION['webhooks_csrf_token']); ?>">
+                                <input type="hidden" name="action" value="edit">
                                 <input type="hidden" name="webhook_id" value="<?php echo $webhookId; ?>">
-                                <button type="submit" name="action" value="test" class="btn btn-secondary"><?php echo t_h('webhooks_admin.test_button', [], 'Send test'); ?></button>
-                                <button type="submit" name="action" value="<?php echo $isActive ? 'disable' : 'enable'; ?>" class="btn btn-secondary">
-                                    <?php echo $isActive ? t_h('webhooks_admin.disable_button', [], 'Disable') : t_h('webhooks_admin.enable_button', [], 'Enable'); ?>
-                                </button>
-                                <button type="submit" name="action" value="delete" class="btn btn-danger"><?php echo t_h('common.delete', [], 'Delete'); ?></button>
+                                <div class="webhooks-field">
+                                    <label for="webhook_url_<?php echo $webhookId; ?>"><?php echo t_h('webhooks_admin.fields.url', [], 'Endpoint URL'); ?></label>
+                                    <input type="url" id="webhook_url_<?php echo $webhookId; ?>" name="webhook_url" value="<?php echo webhooks_h($webhook['url']); ?>" required>
+                                </div>
+                                <div class="webhooks-field">
+                                    <label for="webhook_description_<?php echo $webhookId; ?>"><?php echo t_h('webhooks_admin.fields.description', [], 'Description (optional)'); ?></label>
+                                    <input type="text" id="webhook_description_<?php echo $webhookId; ?>" name="webhook_description" maxlength="500" autocomplete="off" value="<?php echo webhooks_h($description); ?>" placeholder="<?php echo t_h('webhooks_admin.placeholders.description', [], 'What this webhook is used for'); ?>">
+                                </div>
+                                <div class="webhooks-field">
+                                    <label for="webhook_secret_<?php echo $webhookId; ?>"><?php echo t_h('webhooks_admin.fields.secret', [], 'Secret (optional)'); ?></label>
+                                    <input type="text" id="webhook_secret_<?php echo $webhookId; ?>" name="webhook_secret" autocomplete="off" value="<?php echo webhooks_h((string)($webhook['secret'] ?? '')); ?>">
+                                    <span class="webhooks-hint"><?php echo t_h('webhooks_admin.hints.secret', [], 'Used to sign the payload so the receiver can verify it comes from this instance.'); ?></span>
+                                </div>
+                                <div class="webhooks-field">
+                                    <label><?php echo t_h('webhooks_admin.fields.events', [], 'Events'); ?></label>
+                                    <div class="webhooks-events">
+                                        <?php foreach (WebhookDispatcher::INSTANCE_EVENTS as $eventName): ?>
+                                            <span class="webhooks-event">
+                                                <label class="webhooks-event-label">
+                                                    <input type="checkbox" name="webhook_events[]" value="<?php echo webhooks_h($eventName); ?>" <?php echo in_array($eventName, $webhookEvents, true) ? 'checked' : ''; ?>>
+                                                    <code><?php echo webhooks_h($eventName); ?></code>
+                                                </label>
+                                                <?php if (!empty($eventHelp[$eventName])): ?>
+                                                    <span class="webhooks-event-help" data-tooltip="<?php echo webhooks_h($eventHelp[$eventName]); ?>"><i class="lucide lucide-help-circle"></i></span>
+                                                <?php endif; ?>
+                                            </span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                                <div class="webhooks-edit-actions">
+                                    <button type="button" class="btn btn-secondary" data-webhook-edit-cancel="<?php echo $webhookId; ?>"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                                    <button type="submit" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -322,5 +412,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
         <?php endif; ?>
     </div>
 </div>
+<script src="../js/modal-alerts.js?v=<?php echo $v; ?>"></script>
+<script src="../js/webhooks-page.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

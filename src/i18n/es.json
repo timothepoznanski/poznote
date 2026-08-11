@@ -3260,12 +3260,14 @@
       "url": "URL del endpoint",
       "secret": "Secreto (opcional)",
       "events": "Eventos",
-      "app_url": "URL de la instancia"
+      "app_url": "URL de la instancia",
+      "description": "Descripción (opcional)"
     },
     "hints": {
       "secret": "Sirve para firmar la carga de modo que el receptor pueda verificar que proviene de esta instancia.",
       "app_url_env": "Actualmente proporcionada por la variable de entorno POZNOTE_APP_URL: {{url}}. Guardar un valor aqui la sustituye.",
-      "app_url_unset": "Sin definir: los payloads no incluyen actualmente ningun enlace a la nota (data.note.url es null)."
+      "app_url_unset": "Sin definir: los payloads no incluyen actualmente ningun enlace a la nota (data.note.url es null).",
+      "description": "Se muestra en la lista siguiente para distinguir sus puntos de conexión. Nunca se envía al punto de conexión."
     },
     "status": {
       "none": "Ninguno"
@@ -3293,7 +3295,15 @@
     "app_url_description": "URL publica de esta instancia de Poznote, usada para construir el enlace directo a la nota enviado en los payloads (data.note.url). Dejalo vacio para no enviar ningun enlace. Es la misma URL de instancia que usan los correos de recordatorio.",
     "app_url_saved": "URL de la instancia guardada.",
     "app_url_cleared": "URL de la instancia borrada. Los payloads ya no incluiran un enlace directo a la nota.",
-    "error_invalid_app_url": "La URL de la instancia debe empezar por http:// o https://."
+    "error_invalid_app_url": "La URL de la instancia debe empezar por http:// o https://.",
+    "placeholders": {
+      "description": "Para qué sirve este webhook"
+    },
+    "edit_button": "Editar",
+    "actions_menu": "Acciones",
+    "updated": "Webhook actualizado.",
+    "delete_confirm": "¿Eliminar este webhook? Esta acción no se puede deshacer.",
+    "delete_title": "Eliminar webhook"
   },
   "reminder": {
     "toolbar_button": "Establecer recordatorio",

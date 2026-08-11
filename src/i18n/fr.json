@@ -3449,12 +3449,14 @@
       "url": "URL de l'endpoint",
       "secret": "Secret (optionnel)",
       "events": "Événements",
-      "app_url": "URL de l'instance"
+      "app_url": "URL de l'instance",
+      "description": "Description (facultatif)"
     },
     "hints": {
       "secret": "Sert à signer la charge pour que le récepteur puisse vérifier qu'elle provient bien de cette instance.",
       "app_url_env": "Actuellement fournie par la variable d'environnement POZNOTE_APP_URL : {{url}}. Enregistrer une valeur ici la remplace.",
-      "app_url_unset": "Non definie : les payloads ne contiennent actuellement aucun lien vers la note (data.note.url vaut null)."
+      "app_url_unset": "Non definie : les payloads ne contiennent actuellement aucun lien vers la note (data.note.url vaut null).",
+      "description": "Affichée dans la liste ci-dessous pour distinguer vos points de terminaison. Elle n'est jamais envoyée au point de terminaison."
     },
     "status": {
       "none": "Aucun"
@@ -3482,7 +3484,15 @@
     "app_url_description": "URL publique de cette instance Poznote, utilisee pour construire le lien direct vers la note envoye dans les payloads (data.note.url). Laissez vide pour n'envoyer aucun lien. Il s'agit de la meme URL d'instance que celle utilisee par les e-mails de rappel.",
     "app_url_saved": "URL de l'instance enregistree.",
     "app_url_cleared": "URL de l'instance effacee. Les payloads ne contiendront plus de lien direct vers la note.",
-    "error_invalid_app_url": "L'URL de l'instance doit commencer par http:// ou https://."
+    "error_invalid_app_url": "L'URL de l'instance doit commencer par http:// ou https://.",
+    "placeholders": {
+      "description": "À quoi sert ce webhook"
+    },
+    "edit_button": "Modifier",
+    "actions_menu": "Actions",
+    "updated": "Webhook modifié.",
+    "delete_confirm": "Supprimer ce webhook ? Cette action est irréversible.",
+    "delete_title": "Supprimer le webhook"
   },
   "reminder": {
     "toolbar_button": "Définir un rappel",

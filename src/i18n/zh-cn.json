@@ -3383,12 +3383,14 @@
       "url": "端点 URL",
       "secret": "密钥（可选）",
       "events": "事件",
-      "app_url": "实例 URL"
+      "app_url": "实例 URL",
+      "description": "描述（可选）"
     },
     "hints": {
       "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。",
       "app_url_env": "当前由环境变量 POZNOTE_APP_URL 提供：{{url}}。在此保存的值将覆盖它。",
-      "app_url_unset": "未设置：负载当前不包含笔记链接（data.note.url 为 null）。"
+      "app_url_unset": "未设置：负载当前不包含笔记链接（data.note.url 为 null）。",
+      "description": "显示在下方列表中，用于区分各个端点。绝不会发送给端点。"
     },
     "status": {
       "none": "无"
@@ -3416,7 +3418,15 @@
     "app_url_description": "此 Poznote 实例的公开 URL，用于生成负载中的笔记直达链接（data.note.url）。留空则不发送链接。这与提醒邮件使用的实例 URL 相同。",
     "app_url_saved": "实例 URL 已保存。",
     "app_url_cleared": "实例 URL 已清除。负载将不再包含笔记直达链接。",
-    "error_invalid_app_url": "实例 URL 必须以 http:// 或 https:// 开头。"
+    "error_invalid_app_url": "实例 URL 必须以 http:// 或 https:// 开头。",
+    "placeholders": {
+      "description": "此 Webhook 的用途"
+    },
+    "edit_button": "编辑",
+    "actions_menu": "操作",
+    "updated": "Webhook 已更新。",
+    "delete_confirm": "删除此 Webhook？此操作无法撤销。",
+    "delete_title": "删除 Webhook"
   },
   "reminder": {
     "toolbar_button": "设置提醒",

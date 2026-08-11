@@ -185,6 +185,16 @@ body.dark-mode .note-creation-loading-content {
     background: #c43b3b;
 }
 
+/* Destructive confirmation (confirmButtonClass: 'danger'): the confirm button
+   carries the warning colour rather than the default primary blue. */
+.alert-modal-button.primary.danger {
+    background: #dc3545;
+}
+
+.alert-modal-button.primary.danger:hover {
+    background: #b62b39;
+}
+
 /* Dark mode support */
 html[data-theme='dark'] .alert-modal,
 .dark-mode .alert-modal {
@@ -228,6 +238,19 @@ html[data-theme='dark'] .alert-modal-button.primary,
 html[data-theme='dark'] .alert-modal-button.primary:hover,
 .dark-mode .alert-modal-button.primary:hover {
     background-color: var(--primary-color-dark, #005a8a);
+}
+
+/* Placed after the .primary rule above, which sets background-color and would
+   otherwise win over the light-mode danger shorthand. */
+html[data-theme='dark'] .alert-modal-button.primary.danger,
+.dark-mode .alert-modal-button.primary.danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+html[data-theme='dark'] .alert-modal-button.primary.danger:hover,
+.dark-mode .alert-modal-button.primary.danger:hover {
+    background-color: #b62b39;
 }
 
 html[data-theme='dark'] .alert-modal-button.secondary,

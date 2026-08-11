@@ -40,10 +40,18 @@ The isolation rule is strict: a user event is only ever delivered to the endpoin
 From the webhook page (admin or user), each webhook is defined by:
 
 - **Endpoint URL**: must start with `http://` or `https://`.
+- **Description** (optional): a short note about what the endpoint is for, for example "n8n workflow that files new notes into Notion". It is shown in the list to tell several endpoints apart and is never sent to the endpoint.
 - **Secret** (optional): when set, every delivery is signed with HMAC-SHA256 so the receiver can authenticate the sender. See [Verifying the signature](#verifying-the-signature).
 - **Events**: the subset of events this endpoint subscribes to.
 
-Each webhook can then be **enabled**, **disabled**, **tested** (sends a [ping](#test-ping) event immediately and shows the HTTP result), or **deleted**. The page also shows the outcome of the last delivery for each webhook (HTTP status code, or the error when the endpoint could not be reached) and its timestamp.
+Each registered webhook has an actions menu (the **...** button on its row) offering:
+
+- **Edit**: change the endpoint URL, description, secret and subscribed events. The form opens inline under the webhook, prefilled with the current values.
+- **Send test**: sends a [ping](#test-ping) event immediately and shows the HTTP result.
+- **Disable** / **Enable**: stop or resume deliveries without deleting the registration.
+- **Delete**: remove the webhook, after a confirmation.
+
+The page also shows the outcome of the last delivery for each webhook (HTTP status code, or the error when the endpoint could not be reached) and its timestamp.
 
 Registering the same URL twice is allowed but each entry receives its own delivery for every event it subscribes to, so the endpoint will see duplicates.
 
