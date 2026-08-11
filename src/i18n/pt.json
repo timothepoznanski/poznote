@@ -399,6 +399,7 @@
       "diary_note_type": "Escolha o formato de nota usado para novas entradas de diário.",
       "show_created": "Mostre a data de criação no cabeçalho da nota.",
       "note_icons": "Mostre ícones personalizados ao lado dos títulos na lista de notas.",
+      "type_based_note_icons": "Use um ícone padrão específico para listas de tarefas e notas markdown para distingui-las na lista de notas.",
       "note_color_palette": "Personalize a paleta de cores disponível para as notas.",
       "folder_counts": "Mostre o número de notas ao lado de cada pasta.",
       "notes_without_folders": "Mostre as notas sem pasta depois da lista de pastas em vez de antes.",
@@ -433,6 +434,7 @@
       "github": "Abra o código-fonte do Poznote no GitHub.",
       "api_rest": "Mostre informações sobre a API REST do Poznote.",
       "website": "Abra o site oficial do Poznote.",
+      "cloud": "Descubra a oferta hospedada Poznote Cloud.",
       "support": "Apoie o desenvolvimento do Poznote com uma doação.",
       "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento."
@@ -478,6 +480,7 @@
       "documentation": "Documentation GitHub",
       "news": "Blog do Poznote",
       "website": "Site do Poznote",
+      "cloud": "Poznote Cloud",
       "github_star": "Dar uma estrela no GitHub",
       "guestbook": "Livro de visitas do Poznote",
       "support": "Apoiar Poznote",
@@ -645,6 +648,7 @@
       "timezone": "Fuso Horário",
       "date_time_format": "Formato de data e hora",
       "show_note_created": "Mostrar Data de Criação da Nota",
+      "type_based_note_icons": "Ícones por tipo de nota",
       "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
       "notes_without_folders_after": "Mostrar notas após as pastas",
       "show_folder_actions": "Mostrar Ações da Pasta",
@@ -2660,8 +2664,16 @@
       "inactive": "Inactivo",
       "not_defined": "não definido",
       "create_user": "Criar perfil",
+      "export_csv": "Exportar CSV",
       "edit_user": "Editar usuário",
       "filter_placeholder": "Filtrar usuarios...",
+      "pager": {
+        "previous": "Anterior",
+        "next": "Seguinte",
+        "status": "Página {{page}} de {{pages}}, {{total}} usuários",
+        "per_page": "Por página",
+        "all": "Tudo"
+      },
       "first_name": "Nome",
       "last_name": "Sobrenome",
       "click_to_activate": "Clique para ativar",
@@ -2899,10 +2911,19 @@
       "table_attachments": "Anexos (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "table_total_row_hint": "De todas as contas, não apenas desta página",
       "quota_modal_description": "Deixe um campo vazio para usar a configuração global. 0 significa ilimitado.\nEsses valores substituem as cotas globais de usuário.",
       "quota_max_notes_for": "Máx. de notas para {{user}}",
       "quota_max_storage_for": "Armazenamento local máx. para {{user}} (MB)",
       "filter_placeholder": "Filtrar contas...",
+      "export_csv": "Exportar CSV",
+      "pager": {
+        "previous": "Anterior",
+        "next": "Seguinte",
+        "status": "Página {{page}} de {{pages}}, {{total}} contas",
+        "per_page": "Por página",
+        "all": "Tudo"
+      },
       "no_accounts": "Nenhuma conta encontrada.",
       "table_attachments_local": "Anexos locais (MB)",
       "table_attachments_s3": "Anexos S3 (MB)",
@@ -2919,6 +2940,7 @@
     "description": "Histórico de operações sensíveis realizadas nesta instância.",
     "help_intro": "Operações registadas:",
     "filter_placeholder": "Procurar um utilizador ou um detalhe...",
+    "export_csv": "Exportar CSV",
     "empty": "Ainda não existe nenhuma entrada.",
     "unknown_user": "desconhecido",
     "columns": {
@@ -2985,7 +3007,9 @@
     "pager": {
       "previous": "Anterior",
       "next": "Seguinte",
-      "status": "Página {{page}} de {{pages}}, {{total}} entradas"
+      "status": "Página {{page}} de {{pages}}, {{total}} entradas",
+      "per_page": "Por página",
+      "all": "Tudo"
     },
     "retention": {
       "label": "Manter as entradas durante",
@@ -3246,12 +3270,14 @@
       "url": "URL do endpoint",
       "secret": "Segredo (opcional)",
       "events": "Eventos",
-      "app_url": "URL da instancia"
+      "app_url": "URL da instancia",
+      "description": "Descrição (opcional)"
     },
     "hints": {
       "secret": "Serve para assinar o payload de modo que o recetor possa verificar que provém desta instância.",
       "app_url_env": "Atualmente fornecida pela variavel de ambiente POZNOTE_APP_URL: {{url}}. Salvar um valor aqui a substitui.",
-      "app_url_unset": "Nao definida: os payloads no momento nao incluem link para a nota (data.note.url e null)."
+      "app_url_unset": "Nao definida: os payloads no momento nao incluem link para a nota (data.note.url e null).",
+      "description": "Exibida na lista abaixo para diferenciar os seus endpoints. Nunca é enviada ao endpoint."
     },
     "status": {
       "none": "Nenhum"
@@ -3279,7 +3305,15 @@
     "app_url_description": "URL publica desta instancia do Poznote, usada para construir o link direto para a nota enviado nos payloads (data.note.url). Deixe vazio para nao enviar nenhum link. E a mesma URL de instancia usada pelos e-mails de lembrete.",
     "app_url_saved": "URL da instancia salva.",
     "app_url_cleared": "URL da instancia removida. Os payloads nao incluirao mais um link direto para a nota.",
-    "error_invalid_app_url": "A URL da instancia deve comecar com http:// ou https://."
+    "error_invalid_app_url": "A URL da instancia deve comecar com http:// ou https://.",
+    "placeholders": {
+      "description": "Para que serve este webhook"
+    },
+    "edit_button": "Editar",
+    "actions_menu": "Ações",
+    "updated": "Webhook atualizado.",
+    "delete_confirm": "Excluir este webhook? Esta ação não pode ser desfeita.",
+    "delete_title": "Excluir webhook"
   },
   "reminder": {
     "toolbar_button": "Definir lembrete",

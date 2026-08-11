@@ -221,7 +221,8 @@ function initializeMasterDatabase(PDO $con): void {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_status TEXT,
             last_delivery_at DATETIME,
-            user_id INTEGER
+            user_id INTEGER,
+            description TEXT
         )
     ");
 
@@ -230,7 +231,8 @@ function initializeMasterDatabase(PDO $con): void {
     // working now that every account can register its own.
     try {
         $cols = $con->query("PRAGMA table_info(webhooks)")->fetchAll(PDO::FETCH_ASSOC);
-        if (!in_array('user_id', array_column($cols, 'name'))) {
+        $webhookColumns = array_column($cols, 'name');
+        if (!in_array('user_id', $webhookColumns)) {
             $con->exec("ALTER TABLE webhooks ADD COLUMN user_id INTEGER");
             $con->exec("
                 UPDATE webhooks
@@ -240,8 +242,13 @@ function initializeMasterDatabase(PDO $con): void {
                        OR events LIKE 'note.%' OR events LIKE '%,note.%')
             ");
         }
+        // Free-text label so a list of endpoints stays readable, e.g.
+        // "n8n workflow that files new notes into Notion".
+        if (!in_array('description', $webhookColumns)) {
+            $con->exec("ALTER TABLE webhooks ADD COLUMN description TEXT");
+        }
     } catch (Exception $e) {
-        error_log("Failed to add webhooks.user_id column: " . $e->getMessage());
+        error_log("Failed to add webhooks columns: " . $e->getMessage());
     }
 
     // Create indexes
@@ -689,13 +696,16 @@ function withComputedDisplayName(?array $user): ?array {
 }
 
 /**
- * Count user profiles. Returns null when the count cannot be established, so
- * callers enforcing a cap can fail closed instead of reading a failure as 0.
+ * Count user profiles, optionally restricted to a search term (same matching
+ * as listAllUserProfiles). Returns null when the count cannot be established,
+ * so callers enforcing a cap can fail closed instead of reading a failure as 0.
  */
-function countUserProfiles(): ?int {
+function countUserProfiles(?string $search = null): ?int {
+    [$where, $params] = buildUserProfilesSearchClause($search);
     try {
         $con = getMasterConnection();
-        $stmt = $con->query("SELECT COUNT(*) FROM users");
+        $stmt = $con->prepare("SELECT COUNT(*) FROM users" . $where);
+        $stmt->execute($params);
         $count = $stmt->fetchColumn();
         return $count === false ? null : (int)$count;
     } catch (Exception $e) {
@@ -1202,9 +1212,51 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
  * List all user profiles (for admin)
  * $sort must be one of the whitelisted keys below; anything else falls back to id_asc.
  */
-function listAllUserProfiles(string $sort = 'id_asc'): array {
+/**
+ * WHERE fragment + bound values for a free-text user search across the
+ * columns shown in the admin table. Shared by listAllUserProfiles() and
+ * countUserProfiles() so the page slice and the total can never disagree.
+ */
+function buildUserProfilesSearchClause(?string $search): array {
+    $search = trim((string)$search);
+    if ($search === '') {
+        return ['', []];
+    }
+    // LIKE wildcards in the typed text are data, not patterns.
+    $pattern = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search) . '%';
+    $where = " WHERE (username LIKE ? ESCAPE '\\'"
+        . " OR email LIKE ? ESCAPE '\\'"
+        . " OR first_name LIKE ? ESCAPE '\\'"
+        . " OR last_name LIKE ? ESCAPE '\\')";
+    return [$where, [$pattern, $pattern, $pattern, $pattern]];
+}
+
+/**
+ * Lightweight id/username/active list of every profile, for places that need
+ * the full user set without paying for the whole profile row (the admin
+ * page's access modal and username lookups stay complete even when the
+ * table itself is paginated).
+ */
+function listUserProfileNames(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT id, username, active
+            FROM users
+            ORDER BY username COLLATE NOCASE ASC, id ASC
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?int $limit = null, int $offset = 0): array {
     // Text columns push empty values last in both directions; NULL dates sort
     // as "least recent" (SQLite treats NULL as smallest, so DESC puts them last).
+    // The "note access" count lives in user_account_access, hence the scalar
+    // subquery: keeping it in SQL is what lets LIMIT/OFFSET paginate that sort.
+    $accessCount = '(SELECT COUNT(*) FROM user_account_access aa WHERE aa.accessor_user_id = users.id)';
     $orderClauses = [
         'id_asc' => 'id ASC',
         'id_desc' => 'id DESC',
@@ -1224,16 +1276,36 @@ function listAllUserProfiles(string $sort = 'id_asc'): array {
         'created_desc' => 'created_at DESC',
         'last_login_asc' => 'last_login ASC',
         'last_login_desc' => 'last_login DESC',
+        'access_asc' => "$accessCount ASC, username COLLATE NOCASE ASC",
+        'access_desc' => "$accessCount DESC, username COLLATE NOCASE ASC",
     ];
+    // Every clause is suffixed with "id ASC" so the order is total, never just
+    // partial. This is what makes LIMIT/OFFSET paging safe: on ties (same
+    // username, same created_at, equal access counts) SQLite is free to return
+    // rows in any order between two queries, which would let one account show
+    // up on two consecutive pages while another is skipped entirely.
     $orderBy = ($orderClauses[$sort] ?? $orderClauses['id_asc']) . ', id ASC';
+
+    [$where, $params] = buildUserProfilesSearchClause($search);
+
+    // Interpolated rather than bound: SQLite rejects placeholders in
+    // LIMIT/OFFSET on some builds. Both are cast to int by the signature and
+    // floored here, so no caller-controlled string reaches the SQL.
+    $limitSql = '';
+    if ($limit !== null) {
+        $limitSql = ' LIMIT ' . max(0, (int)$limit) . ' OFFSET ' . max(0, (int)$offset);
+    }
 
     try {
         $con = getMasterConnection();
-        $stmt = $con->query("
+        $stmt = $con->prepare("
             SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login, oidc_subject
             FROM users
+            $where
             ORDER BY $orderBy
+            $limitSql
         ");
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         return [];
@@ -1397,13 +1469,41 @@ function getWebhookById(int $id): ?array {
  * $userId is the owning account for a user webhook; null registers an
  * instance webhook (admin page).
  */
-function createWebhook(string $url, string $secret, array $events, ?int $userId = null): bool {
+function createWebhook(string $url, string $secret, array $events, ?int $userId = null, string $description = ''): bool {
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active, user_id) VALUES (?, ?, ?, 1, ?)");
-        return $stmt->execute([$url, $secret !== '' ? $secret : null, implode(',', $events), $userId]);
+        $stmt = $con->prepare("INSERT INTO webhooks (url, secret, events, active, user_id, description) VALUES (?, ?, ?, 1, ?, ?)");
+        return $stmt->execute([
+            $url,
+            $secret !== '' ? $secret : null,
+            implode(',', $events),
+            $userId,
+            $description !== '' ? $description : null,
+        ]);
     } catch (Exception $e) {
         error_log("Failed to create webhook: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Update an existing webhook's endpoint, secret, events and description.
+ * The owner (user_id) and the enabled state are never changed here: ownership
+ * is fixed at creation and the enabled state has its own toggle.
+ */
+function updateWebhook(int $id, string $url, string $secret, array $events, string $description = ''): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("UPDATE webhooks SET url = ?, secret = ?, events = ?, description = ? WHERE id = ?");
+        return $stmt->execute([
+            $url,
+            $secret !== '' ? $secret : null,
+            implode(',', $events),
+            $description !== '' ? $description : null,
+            $id,
+        ]);
+    } catch (Exception $e) {
+        error_log("Failed to update webhook: " . $e->getMessage());
         return false;
     }
 }

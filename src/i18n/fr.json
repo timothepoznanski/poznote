@@ -412,6 +412,7 @@
       "diary_note_type": "Choisissez le format de note utilisé pour les nouvelles entrées de journal.",
       "show_created": "Affichez la date de création dans l'en-tête de la note.",
       "note_icons": "Affichez des icônes personnalisées à côté des titres dans la liste des notes.",
+      "type_based_note_icons": "Utilisez une icône par défaut spécifique pour les listes de tâches et les notes markdown afin de les distinguer dans la liste des notes.",
       "note_color_palette": "Personnalisez la palette de couleurs disponible pour les notes.",
       "folder_counts": "Affichez le nombre de notes à côté de chaque dossier.",
       "notes_without_folders": "Affichez les notes sans dossier après la liste des dossiers plutôt qu'avant.",
@@ -446,6 +447,7 @@
       "github": "Ouvrez le code source de Poznote sur GitHub.",
       "api_rest": "Affichez les informations sur l'API REST de Poznote.",
       "website": "Ouvrez le site officiel de Poznote.",
+      "cloud": "Découvrez l'offre hébergée Poznote Cloud.",
       "support": "Soutenez le développement de Poznote par un don.",
       "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification."
@@ -492,6 +494,7 @@
       "documentation": "Documentation GitHub",
       "news": "Blog Poznote",
       "website": "Site Poznote",
+      "cloud": "Poznote Cloud",
       "github_star": "Mettre une étoile sur GitHub",
       "guestbook": "Livre d'or Poznote",
       "support": "Soutenir Poznote",
@@ -661,6 +664,7 @@
       "date_time_format": "Format date et heure",
       "show_note_created": "Afficher la date de création",
       "show_note_icons": "Afficher les icônes des notes",
+      "type_based_note_icons": "Icônes par type de note",
       "note_color_palette": "Couleurs des notes",
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
@@ -2701,8 +2705,16 @@
       "subtitle": "Gérer les utilisateurs et leurs accès",
       "users_list": "Liste des utilisateurs",
       "create_user": "Créer un utilisateur",
+      "export_csv": "Exporter en CSV",
       "edit_user": "Modifier l'utilisateur",
       "filter_placeholder": "Filtrer les utilisateurs...",
+      "pager": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "status": "Page {{page}} sur {{pages}}, {{total}} utilisateurs",
+        "per_page": "Par page",
+        "all": "Tout"
+      },
       "first_name": "Prénom",
       "last_name": "Nom",
       "delete_user": "Supprimer l'utilisateur",
@@ -3085,10 +3097,19 @@
       "table_attachments": "Pièces jointes (Mo)",
       "table_total": "Total (Mo)",
       "table_total_row": "Total",
+      "table_total_row_hint": "Sur tous les comptes, pas seulement cette page",
       "quota_modal_description": "Laisser un champ vide pour utiliser le réglage global. 0 signifie illimité.\nCes valeurs remplacent les quotas globaux.",
       "quota_max_notes_for": "Nombre max de notes pour {{user}}",
       "quota_max_storage_for": "Stockage local max pour {{user}} (Mo)",
       "filter_placeholder": "Filtrer les comptes...",
+      "export_csv": "Exporter en CSV",
+      "pager": {
+        "previous": "Précédent",
+        "next": "Suivant",
+        "status": "Page {{page}} sur {{pages}}, {{total}} comptes",
+        "per_page": "Par page",
+        "all": "Tout"
+      },
       "no_accounts": "Aucun compte trouvé.",
       "table_attachments_local": "Pièces jointes locales (Mo)",
       "table_attachments_s3": "Pièces jointes S3 (Mo)",
@@ -3105,6 +3126,7 @@
     "description": "Historique des opérations sensibles effectuées sur cette instance.",
     "help_intro": "Opérations journalisées :",
     "filter_placeholder": "Rechercher un utilisateur ou un détail...",
+    "export_csv": "Exporter en CSV",
     "empty": "Aucune entrée enregistrée pour le moment.",
     "unknown_user": "inconnu",
     "columns": {
@@ -3171,7 +3193,9 @@
     "pager": {
       "previous": "Précédent",
       "next": "Suivant",
-      "status": "Page {{page}} sur {{pages}}, {{total}} entrées"
+      "status": "Page {{page}} sur {{pages}}, {{total}} entrées",
+      "per_page": "Par page",
+      "all": "Tout"
     },
     "retention": {
       "label": "Conserver les entrées pendant",
@@ -3432,12 +3456,14 @@
       "url": "URL de l'endpoint",
       "secret": "Secret (optionnel)",
       "events": "Événements",
-      "app_url": "URL de l'instance"
+      "app_url": "URL de l'instance",
+      "description": "Description (facultatif)"
     },
     "hints": {
       "secret": "Sert à signer la charge pour que le récepteur puisse vérifier qu'elle provient bien de cette instance.",
       "app_url_env": "Actuellement fournie par la variable d'environnement POZNOTE_APP_URL : {{url}}. Enregistrer une valeur ici la remplace.",
-      "app_url_unset": "Non definie : les payloads ne contiennent actuellement aucun lien vers la note (data.note.url vaut null)."
+      "app_url_unset": "Non definie : les payloads ne contiennent actuellement aucun lien vers la note (data.note.url vaut null).",
+      "description": "Affichée dans la liste ci-dessous pour distinguer vos points de terminaison. Elle n'est jamais envoyée au point de terminaison."
     },
     "status": {
       "none": "Aucun"
@@ -3465,7 +3491,15 @@
     "app_url_description": "URL publique de cette instance Poznote, utilisee pour construire le lien direct vers la note envoye dans les payloads (data.note.url). Laissez vide pour n'envoyer aucun lien. Il s'agit de la meme URL d'instance que celle utilisee par les e-mails de rappel.",
     "app_url_saved": "URL de l'instance enregistree.",
     "app_url_cleared": "URL de l'instance effacee. Les payloads ne contiendront plus de lien direct vers la note.",
-    "error_invalid_app_url": "L'URL de l'instance doit commencer par http:// ou https://."
+    "error_invalid_app_url": "L'URL de l'instance doit commencer par http:// ou https://.",
+    "placeholders": {
+      "description": "À quoi sert ce webhook"
+    },
+    "edit_button": "Modifier",
+    "actions_menu": "Actions",
+    "updated": "Webhook modifié.",
+    "delete_confirm": "Supprimer ce webhook ? Cette action est irréversible.",
+    "delete_title": "Supprimer le webhook"
   },
   "reminder": {
     "toolbar_button": "Définir un rappel",

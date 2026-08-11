@@ -401,6 +401,7 @@
       "diary_note_type": "Elige el formato de nota para las nuevas entradas de diario.",
       "show_created": "Muestra la fecha de creación en el encabezado de la nota.",
       "note_icons": "Muestra iconos personalizados junto a los títulos en la lista de notas.",
+      "type_based_note_icons": "Usa un icono predeterminado específico para las listas de tareas y las notas markdown para distinguirlas en la lista de notas.",
       "note_color_palette": "Personaliza la paleta de colores disponible para las notas.",
       "folder_counts": "Muestra el número de notas junto a cada carpeta.",
       "notes_without_folders": "Muestra las notas sin carpeta después de la lista de carpetas en lugar de antes.",
@@ -435,6 +436,7 @@
       "github": "Abre el código fuente de Poznote en GitHub.",
       "api_rest": "Muestra información sobre la API REST de Poznote.",
       "website": "Abre el sitio web oficial de Poznote.",
+      "cloud": "Descubre la oferta alojada Poznote Cloud.",
       "support": "Apoya el desarrollo de Poznote con una donación.",
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
       "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación."
@@ -480,6 +482,7 @@
       "documentation": "Documentation GitHub",
       "news": "Blog de Poznote",
       "website": "Sitio web de Poznote",
+      "cloud": "Poznote Cloud",
       "github_star": "Dar una estrella en GitHub",
       "guestbook": "Libro de visitas de Poznote",
       "support": "Apoyar Poznote",
@@ -648,6 +651,7 @@
       "timezone": "Zona horaria",
       "date_time_format": "Formato de fecha y hora",
       "show_note_created": "Mostrar fecha de creación de la nota",
+      "type_based_note_icons": "Iconos por tipo de nota",
       "show_folder_counts": "Mostrar conteo de notas de carpetas",
       "notes_without_folders_after": "Mostrar notas después de las carpetas",
       "show_folder_actions": "Mostrar acciones de carpeta",
@@ -2657,8 +2661,16 @@
       "inactive": "Inactivo",
       "not_defined": "no definido",
       "create_user": "Crear perfil",
+      "export_csv": "Exportar CSV",
       "edit_user": "Editar usuario",
       "filter_placeholder": "Filtrar usuarios...",
+      "pager": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "status": "Página {{page}} de {{pages}}, {{total}} usuarios",
+        "per_page": "Por página",
+        "all": "Todo"
+      },
       "first_name": "Nombre",
       "last_name": "Apellidos",
       "click_to_activate": "Haga clic para activar",
@@ -2896,10 +2908,19 @@
       "table_attachments": "Adjuntos (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "table_total_row_hint": "De todas las cuentas, no solo de esta página",
       "quota_modal_description": "Deje un campo vacío para usar el ajuste global. 0 significa ilimitado.\nEstos valores reemplazan las cuotas globales de usuario.",
       "quota_max_notes_for": "Máx. de notas para {{user}}",
       "quota_max_storage_for": "Almacenamiento local máx. para {{user}} (MB)",
       "filter_placeholder": "Filtrar cuentas...",
+      "export_csv": "Exportar CSV",
+      "pager": {
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "status": "Página {{page}} de {{pages}}, {{total}} cuentas",
+        "per_page": "Por página",
+        "all": "Todo"
+      },
       "no_accounts": "No se encontraron cuentas.",
       "table_attachments_local": "Adjuntos locales (MB)",
       "table_attachments_s3": "Adjuntos S3 (MB)",
@@ -2916,6 +2937,7 @@
     "description": "Historial de operaciones sensibles realizadas en esta instancia.",
     "help_intro": "Operaciones registradas:",
     "filter_placeholder": "Buscar un usuario o un detalle...",
+    "export_csv": "Exportar CSV",
     "empty": "Todavía no hay ninguna entrada.",
     "unknown_user": "desconocido",
     "columns": {
@@ -2982,7 +3004,9 @@
     "pager": {
       "previous": "Anterior",
       "next": "Siguiente",
-      "status": "Página {{page}} de {{pages}}, {{total}} entradas"
+      "status": "Página {{page}} de {{pages}}, {{total}} entradas",
+      "per_page": "Por página",
+      "all": "Todo"
     },
     "retention": {
       "label": "Conservar las entradas durante",
@@ -3243,12 +3267,14 @@
       "url": "URL del endpoint",
       "secret": "Secreto (opcional)",
       "events": "Eventos",
-      "app_url": "URL de la instancia"
+      "app_url": "URL de la instancia",
+      "description": "Descripción (opcional)"
     },
     "hints": {
       "secret": "Sirve para firmar la carga de modo que el receptor pueda verificar que proviene de esta instancia.",
       "app_url_env": "Actualmente proporcionada por la variable de entorno POZNOTE_APP_URL: {{url}}. Guardar un valor aqui la sustituye.",
-      "app_url_unset": "Sin definir: los payloads no incluyen actualmente ningun enlace a la nota (data.note.url es null)."
+      "app_url_unset": "Sin definir: los payloads no incluyen actualmente ningun enlace a la nota (data.note.url es null).",
+      "description": "Se muestra en la lista siguiente para distinguir sus puntos de conexión. Nunca se envía al punto de conexión."
     },
     "status": {
       "none": "Ninguno"
@@ -3276,7 +3302,15 @@
     "app_url_description": "URL publica de esta instancia de Poznote, usada para construir el enlace directo a la nota enviado en los payloads (data.note.url). Dejalo vacio para no enviar ningun enlace. Es la misma URL de instancia que usan los correos de recordatorio.",
     "app_url_saved": "URL de la instancia guardada.",
     "app_url_cleared": "URL de la instancia borrada. Los payloads ya no incluiran un enlace directo a la nota.",
-    "error_invalid_app_url": "La URL de la instancia debe empezar por http:// o https://."
+    "error_invalid_app_url": "La URL de la instancia debe empezar por http:// o https://.",
+    "placeholders": {
+      "description": "Para qué sirve este webhook"
+    },
+    "edit_button": "Editar",
+    "actions_menu": "Acciones",
+    "updated": "Webhook actualizado.",
+    "delete_confirm": "¿Eliminar este webhook? Esta acción no se puede deshacer.",
+    "delete_title": "Eliminar webhook"
   },
   "reminder": {
     "toolbar_button": "Establecer recordatorio",

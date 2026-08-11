@@ -49,7 +49,9 @@
       "unavailable_tasklist": "Outline is not available for task lists"
     },
     "link_copied": "Link copied",
-    "print": "Print"
+    "print": "Print",
+    "yes": "Yes",
+    "no": "No"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -136,6 +138,7 @@
       "diary_note_type": "Choose the note format used for new diary entries.",
       "show_created": "Show the creation date in the note header.",
       "note_icons": "Show custom icons next to note titles in the list.",
+      "type_based_note_icons": "Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.",
       "note_color_palette": "Customize the color palette available for notes.",
       "folder_counts": "Show the number of notes next to each folder.",
       "notes_without_folders": "Show notes without a folder after the folder list instead of before.",
@@ -170,6 +173,7 @@
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
+      "cloud": "Open the hosted Poznote Cloud offer.",
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule."
@@ -197,6 +201,7 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
       "website": "Poznote Website",
+      "cloud": "Poznote Cloud",
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
       "support": "Support Poznote",
@@ -301,6 +306,7 @@
       "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",
       "show_note_icons": "Show note icons",
+      "type_based_note_icons": "Icons by note type",
       "note_color_palette": "Note colors",
       "show_folder_counts": "Show folder note counts",
       "notes_without_folders_after": "Show notes after folders",
@@ -2487,10 +2493,19 @@
       "table_attachments": "Attachments (MB)",
       "table_total": "Total (MB)",
       "table_total_row": "Total",
+      "table_total_row_hint": "Across all accounts, not just this page",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
       "quota_max_notes_for": "Max notes for {{user}}",
       "quota_max_storage_for": "Max local storage for {{user}} (MB)",
       "filter_placeholder": "Filter accounts...",
+      "export_csv": "Export CSV",
+      "pager": {
+        "previous": "Previous",
+        "next": "Next",
+        "status": "Page {{page}} of {{pages}}, {{total}} accounts",
+        "per_page": "Per page",
+        "all": "All"
+      },
       "no_accounts": "No accounts found.",
       "table_attachments_local": "Attachments local (MB)",
       "table_attachments_s3": "Attachments S3 (MB)",
@@ -2507,6 +2522,7 @@
     "description": "History of sensitive operations performed on this instance.",
     "help_intro": "Operations recorded:",
     "filter_placeholder": "Search a user or a detail...",
+    "export_csv": "Export CSV",
     "empty": "No entry recorded yet.",
     "unknown_user": "unknown",
     "columns": {
@@ -2573,7 +2589,9 @@
     "pager": {
       "previous": "Previous",
       "next": "Next",
-      "status": "Page {{page}} of {{pages}}, {{total}} entries"
+      "status": "Page {{page}} of {{pages}}, {{total}} entries",
+      "per_page": "Per page",
+      "all": "All"
     },
     "retention": {
       "label": "Keep entries for",
@@ -2641,8 +2659,16 @@
       "inactive": "Inactive",
       "not_defined": "not defined",
       "create_user": "Create Profile",
+      "export_csv": "Export CSV",
       "edit_user": "Edit User",
       "filter_placeholder": "Filter users...",
+      "pager": {
+        "previous": "Previous",
+        "next": "Next",
+        "status": "Page {{page}} of {{pages}}, {{total}} users",
+        "per_page": "Per page",
+        "all": "All"
+      },
       "first_name": "First name",
       "last_name": "Last name",
       "click_to_activate": "Click to activate",
@@ -2922,12 +2948,14 @@
       "url": "Endpoint URL",
       "secret": "Secret (optional)",
       "events": "Events",
-      "app_url": "Instance URL"
+      "app_url": "Instance URL",
+      "description": "Description (optional)"
     },
     "hints": {
       "secret": "Used to sign the payload so the receiver can verify it comes from this instance.",
       "app_url_env": "Currently provided by the POZNOTE_APP_URL environment variable: {{url}}. Saving a value here overrides it.",
-      "app_url_unset": "Not set: the payloads currently carry no note link (data.note.url is null)."
+      "app_url_unset": "Not set: the payloads currently carry no note link (data.note.url is null).",
+      "description": "Shown in the list below to tell your endpoints apart. Never sent to the endpoint."
     },
     "status": {
       "none": "None"
@@ -2955,7 +2983,15 @@
     "app_url_description": "Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails.",
     "app_url_saved": "Instance URL saved.",
     "app_url_cleared": "Instance URL cleared. Payloads will no longer carry a direct note link.",
-    "error_invalid_app_url": "The instance URL must start with http:// or https://."
+    "error_invalid_app_url": "The instance URL must start with http:// or https://.",
+    "placeholders": {
+      "description": "What this webhook is used for"
+    },
+    "edit_button": "Edit",
+    "actions_menu": "Actions",
+    "updated": "Webhook updated.",
+    "delete_confirm": "Delete this webhook? This cannot be undone.",
+    "delete_title": "Delete webhook"
   },
   "reminder": {
     "toolbar_button": "Set reminder",

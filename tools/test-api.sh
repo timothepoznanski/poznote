@@ -108,7 +108,54 @@ expect_2xx() {
 
 skip_test() { echo -e "  ${YELLOW}SKIP${RESET}        $1"; (( SKIP++ )) || true; }
 
+# expect_equal LABEL ACTUAL EXPECTED  (plain value comparison, no HTTP call)
+expect_equal() {
+  local label="$1" actual="$2" expected="$3"
+  if [[ "$actual" == "$expected" ]]; then
+    echo -e "  ${GREEN}PASS${RESET}        ${label}"
+    (( PASS++ )) || true
+    $VERBOSE && echo "         got: ${actual}"
+    return 0
+  else
+    echo -e "  ${RED}FAIL${RESET}        ${label}  (expected '${expected}', got '${actual}')"
+    (( FAIL++ )) || true
+    return 1
+  fi
+}
+
+# expect_true LABEL CONDITION-RESULT  ("true"/"false" string)
+expect_true() {
+  local label="$1" ok="$2" detail="${3:-}"
+  if [[ "$ok" == "true" ]]; then
+    echo -e "  ${GREEN}PASS${RESET}        ${label}"
+    (( PASS++ )) || true
+    $VERBOSE && [[ -n "$detail" ]] && echo "         ${detail}"
+    return 0
+  else
+    echo -e "  ${RED}FAIL${RESET}        ${label}${detail:+  (${detail})}"
+    (( FAIL++ )) || true
+    return 1
+  fi
+}
+
 json_field() { printf '%s' "$2" | grep -oP "\"$1\"\s*:\s*\K[^\s,\}\]]+" | head -1 | tr -d '"'; }
+
+# Comma-separated list of every "id" inside the "users" array, in order.
+# Stops at the "total" key so the top-level fields are never picked up.
+json_user_ids() {
+  printf '%s' "$1" \
+    | grep -oP '"users"\s*:\s*\[\K.*?(?=\]\s*,\s*"total")' \
+    | grep -oP '"id"\s*:\s*\K[0-9]+' \
+    | paste -sd, -
+}
+
+# Number of elements in the "users" array.
+json_user_count() {
+  local ids
+  ids=$(json_user_ids "$1")
+  [[ -z "$ids" ]] && { echo 0; return; }
+  awk -F, '{print NF}' <<< "$ids"
+}
 
 reset_counters() {
   PASS=0
@@ -559,6 +606,85 @@ if [[ "$AUTH_MODE" == "bearer" && "$IS_ADMIN_AUTH" != "true" ]]; then
   skip_test "Admin endpoints — skipped for non-admin Bearer token"
 else
   expect_status "GET /admin/users" "200" "${AUTH[@]}" "${API}/admin/users" || true
+
+  # ── Pagination of GET /admin/users ──────────────────────────────────────
+  # The unparameterized call must keep returning every account: reconciliation
+  # clients rely on it, and a silent default page size would make them skip
+  # accounts with no error at all. Everything below is asserted against that
+  # full list.
+  ALL_BODY="$LAST_BODY"
+  ALL_IDS=$(json_user_ids "$ALL_BODY")
+  ALL_COUNT=$(json_user_count "$ALL_BODY")
+  ALL_TOTAL=$(json_field "total" "$ALL_BODY")
+
+  expect_equal "GET /admin/users (no params) returns every user" \
+    "$ALL_COUNT" "$ALL_TOTAL" || true
+  expect_equal "GET /admin/users (no params) reports limit: null" \
+    "$(json_field 'limit' "$ALL_BODY")" "null" || true
+  expect_equal "GET /admin/users (no params) reports offset: null" \
+    "$(json_field 'offset' "$ALL_BODY")" "null" || true
+
+  if [[ "$ALL_COUNT" -ge 3 ]]; then
+    # Page 1 and page 2 of size 2, compared against the full list.
+    expect_status "GET /admin/users?limit=2" "200" \
+      "${AUTH[@]}" "${API}/admin/users?limit=2" || true
+    P1_BODY="$LAST_BODY"
+    P1_IDS=$(json_user_ids "$P1_BODY")
+
+    expect_status "GET /admin/users?limit=2&offset=2" "200" \
+      "${AUTH[@]}" "${API}/admin/users?limit=2&offset=2" || true
+    P2_BODY="$LAST_BODY"
+    P2_IDS=$(json_user_ids "$P2_BODY")
+
+    expect_equal "limit=2 returns 2 users" \
+      "$(json_user_count "$P1_BODY")" "2" || true
+    expect_equal "limit=2 echoes the applied limit" \
+      "$(json_field 'limit' "$P1_BODY")" "2" || true
+    expect_equal "limit=2 echoes offset 0 by default" \
+      "$(json_field 'offset' "$P1_BODY")" "0" || true
+
+    # total must stay the global count, not the page size
+    expect_equal "limit=2 keeps total global" \
+      "$(json_field 'total' "$P1_BODY")" "$ALL_TOTAL" || true
+
+    # offset actually shifts the window
+    expect_true "offset=2 shifts the result window" \
+      "$([[ "$P1_IDS" != "$P2_IDS" ]] && echo true || echo false)" \
+      "page1=[${P1_IDS}] page2=[${P2_IDS}]" || true
+    expect_equal "offset=2 echoes the applied offset" \
+      "$(json_field 'offset' "$P2_BODY")" "2" || true
+
+    # consecutive pages must not overlap
+    OVERLAP=$(comm -12 \
+      <(tr ',' '\n' <<< "$P1_IDS" | sort) \
+      <(tr ',' '\n' <<< "$P2_IDS" | sort) | paste -sd, -)
+    expect_equal "consecutive pages do not overlap" "$OVERLAP" "" || true
+
+    # page1 + page2 must be exactly the first 4 ids of the full list
+    EXPECTED_FIRST4=$(tr ',' '\n' <<< "$ALL_IDS" | head -4 | paste -sd, -)
+    GOT_FIRST4=$(printf '%s,%s' "$P1_IDS" "$P2_IDS")
+    expect_equal "paging reproduces the full list order" \
+      "$GOT_FIRST4" "$EXPECTED_FIRST4" || true
+  else
+    skip_test "GET /admin/users pagination — needs at least 3 accounts"
+  fi
+
+  # An over-large limit is clamped, and the response says so rather than
+  # letting the client believe it received a full page of 1000.
+  expect_status "GET /admin/users?limit=1000 (clamped)" "200" \
+    "${AUTH[@]}" "${API}/admin/users?limit=1000" || true
+  expect_equal "limit=1000 is clamped to 200 in the response" \
+    "$(json_field 'limit' "$LAST_BODY")" "200" || true
+
+  # A bare offset with no limit must not engage paging: the caller still gets
+  # the whole list, and the response reports no paging.
+  expect_status "GET /admin/users?offset=2 (no limit)" "200" \
+    "${AUTH[@]}" "${API}/admin/users?offset=2" || true
+  expect_equal "offset without limit still returns every user" \
+    "$(json_user_count "$LAST_BODY")" "$ALL_COUNT" || true
+  expect_equal "offset without limit reports limit: null" \
+    "$(json_field 'limit' "$LAST_BODY")" "null" || true
+
   expect_status "GET /admin/users/{id}" "200" \
     "${AUTH[@]}" "${API}/admin/users/${USER_ID}" || true
   expect_status "GET /admin/users/{id}/password-status" "200" \

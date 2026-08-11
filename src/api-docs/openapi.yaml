@@ -3205,9 +3205,51 @@ paths:
       description: |
         Get detailed list of all user profiles with storage statistics.
         Requires admin privileges. Does NOT require X-User-ID header.
+        Storage statistics are computed per user, so on instances with many
+        users prefer paging with limit/offset.
+
+        There is no default page size: omitting `limit` returns every user,
+        as it always has. Clients that reconcile the full account list can
+        therefore keep calling this endpoint with no parameters and be sure
+        they see every account. Paging engages only when `limit` is passed.
+
+        Rows are ordered by `id` ascending, so `offset` is stable across
+        calls and consecutive pages never overlap or skip an account.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+          description: >-
+            Page size, clamped to 1-200. Omit to return every user (no paging).
+            A value above 200 is clamped; check the `limit` field in the
+            response to detect it.
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: >-
+            Number of users to skip, clamped to >= 0. Ignored unless `limit`
+            is also passed.
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter on username, email, first or last name.
       responses:
         '200':
-          description: List of users with statistics
+          description: >-
+            List of users with statistics. `total` is the full matching count,
+            not the page size. `limit` and `offset` echo the values actually
+            applied after clamping, and are both null when no paging was
+            requested (the response then contains every user).
           content:
             application/json:
               schema:
@@ -3241,6 +3283,15 @@ paths:
                           type: integer
                   total:
                     type: integer
+                    description: Total users matching the query, ignoring paging.
+                  limit:
+                    type: integer
+                    nullable: true
+                    description: Page size actually applied, or null when no paging was requested.
+                  offset:
+                    type: integer
+                    nullable: true
+                    description: Offset actually applied, or null when no paging was requested.
         '403':
           description: Admin access required
     post:

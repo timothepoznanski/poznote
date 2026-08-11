@@ -479,7 +479,7 @@
                     if (!empty($show_note_icons_setting)) {
                         $noteIconRaw = !empty($row['icon']) ? $row['icon'] : '';
                         $noteIconColor = !empty($row['icon_color']) ? (string)$row['icon_color'] : '';
-                        $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon');
+                        $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon', $note_type);
                     }
                     echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
                     // Subline: creation date and location (visible when enabled in settings)

@@ -812,16 +812,45 @@ function buildNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
     return implode(' ', array_unique(array_filter($classes)));
 }
 
-function renderEditableNoteIcon($noteId, $noteTitle, $iconClass = '', $iconColor = '', $extraClasses = '') {
+/**
+ * Default icon for a note that has no custom icon of its own.
+ *
+ * Task lists and markdown notes get a type-specific icon so they can be told
+ * apart from plain HTML notes at a glance in the notes list. Gated by the
+ * 'type_based_note_icons' setting (enabled by default); when it is off, every
+ * note falls back to the generic file icon as before.
+ *
+ * Mirrors getNoteTypeIcon() in js/notes-manager.js and js/folder-icon.js.
+ */
+function defaultNoteIconForType($noteType) {
+    $setting = getSetting('type_based_note_icons', '1');
+    if ($setting === '0' || $setting === 'false') {
+        return 'lucide-file-text';
+    }
+
+    switch (strtolower((string)($noteType ?: 'note'))) {
+        case 'tasklist':
+            return 'lucide-list-todo';
+        case 'markdown':
+            return 'lucide-file-code';
+        default:
+            return 'lucide-file-text';
+    }
+}
+
+function renderEditableNoteIcon($noteId, $noteTitle, $iconClass = '', $iconColor = '', $extraClasses = '', $noteType = 'note') {
     $hasCustomNoteIcon = !empty($iconClass);
-    $noteIconClass = buildNoteIconClass($hasCustomNoteIcon ? $iconClass : 'lucide-file-text');
+    $defaultIcon = defaultNoteIconForType($noteType);
+    $noteIconClass = buildNoteIconClass($hasCustomNoteIcon ? $iconClass : $defaultIcon, $defaultIcon);
     $noteIconColor = !empty($iconColor) ? (string)$iconColor : '';
     $classes = trim($noteIconClass . ' note-icon ' . (string)$extraClasses);
     $iconStyle = $noteIconColor ? " style='color: " . htmlspecialchars($noteIconColor, ENT_QUOTES) . " !important;'" : "";
     $iconColorAttr = $noteIconColor ? " data-icon-color='" . htmlspecialchars($noteIconColor, ENT_QUOTES) . "'" : "";
     $changeIconTitle = t_h('notes_list.folder_actions.change_note_icon', [], 'Change note icon');
+    // Exposed so the icon picker can restore the right default when the user resets the icon.
+    $defaultIconAttr = " data-default-icon='" . htmlspecialchars($defaultIcon, ENT_QUOTES) . "'";
 
-    return "<i class='" . htmlspecialchars($classes, ENT_QUOTES) . "' data-custom-icon='" . ($hasCustomNoteIcon ? 'true' : 'false') . "' data-action='open-note-icon-picker' data-note-id='" . htmlspecialchars((string)$noteId, ENT_QUOTES) . "' data-note-title='" . htmlspecialchars((string)$noteTitle, ENT_QUOTES) . "'$iconColorAttr title='" . $changeIconTitle . "' aria-label='" . $changeIconTitle . "'$iconStyle></i>";
+    return "<i class='" . htmlspecialchars($classes, ENT_QUOTES) . "' data-custom-icon='" . ($hasCustomNoteIcon ? 'true' : 'false') . "' data-action='open-note-icon-picker' data-note-id='" . htmlspecialchars((string)$noteId, ENT_QUOTES) . "' data-note-title='" . htmlspecialchars((string)$noteTitle, ENT_QUOTES) . "'$iconColorAttr$defaultIconAttr title='" . $changeIconTitle . "' aria-label='" . $changeIconTitle . "'$iconStyle></i>";
 }
 
 /* ---------------------------------------------------------------------------

@@ -109,6 +109,7 @@ $settingsPageUserKeys = [
     'language',
     'show_note_created',
     'show_note_icons',
+    'type_based_note_icons',
     'note_color_palette',
     'hide_folder_counts',
     'hide_folder_actions',
@@ -244,8 +245,7 @@ $active_webhooks_count = 0;
 if ($isAdmin) {
     try {
         require_once 'users/db_master.php';
-        $users = listAllUserProfiles();
-        $users_count = count($users);
+        $users_count = countUserProfiles() ?? 0;
         $smtp_from_email = trim((string)getGlobalSetting('smtp_from_email', ''));
         $smtp_configured = trim((string)getGlobalSetting('smtp_host', '')) !== ''
             && filter_var($smtp_from_email, FILTER_VALIDATE_EMAIL);
@@ -722,6 +722,16 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Type-based Default Note Icons -->
+            <div class="home-card" id="type-note-icons-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.type_based_note_icons', [], 'Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-list-todo"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span>
+                    <span id="type-note-icons-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
             <!-- Note Color Palette -->
             <div class="home-card" id="note-color-palette-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_color_palette', [], 'Customize the color palette available for notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1187,6 +1197,17 @@ if ($canUseUserWebhooks) {
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span>
+                </div>
+            </a>
+
+            <!-- Poznote Cloud -->
+            <a href="https://poznote.com/index.html#cloud" target="_blank" rel="noopener noreferrer" class="home-card" id="cloud-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.cloud', [], 'Open the hosted Poznote Cloud offer.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-cloud"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.cloud', [], 'Poznote Cloud'); ?></span>
                 </div>
             </a>
 

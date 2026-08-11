@@ -34,7 +34,10 @@ $pageWorkspace = trim(getWorkspaceFilter());
 
 // Rows per page. The log grows slowly (only rare events are recorded), so a
 // simple offset pager is enough and avoids loading the whole table.
-const ACTIVITY_LOG_PAGE_SIZE = 100;
+// The size is admin-selectable and persisted, like the users and storage
+// tables; 0 means "all rows on one page" rather than an empty page.
+const ACTIVITY_LOG_PAGE_SIZES = [50, 100, 250, 500, 0];
+const ACTIVITY_LOG_PAGE_SIZE_DEFAULT = 100;
 
 $notice      = null;
 $noticeError = false;
@@ -95,13 +98,113 @@ if ($filterSearch !== '') {
     $filters['search'] = $filterSearch;
 }
 
+// === Page size (persisted in the settings table, like the other admin tables) ===
+$requestedPageSize = $_GET['per_page'] ?? null;
+if ($requestedPageSize !== null && ctype_digit((string)$requestedPageSize)
+    && in_array((int)$requestedPageSize, ACTIVITY_LOG_PAGE_SIZES, true)) {
+    $pageSize = (int)$requestedPageSize;
+    global $con;
+    try {
+        $sizeStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $sizeStmt->execute(['admin_activity_log_per_page', (string)$pageSize]);
+    } catch (Exception $e) {
+        // Non-fatal: the requested size still applies for this request.
+    }
+} else {
+    $storedPageSize = getSetting('admin_activity_log_per_page');
+    $pageSize = ($storedPageSize !== null && ctype_digit((string)$storedPageSize)
+        && in_array((int)$storedPageSize, ACTIVITY_LOG_PAGE_SIZES, true))
+        ? (int)$storedPageSize
+        : ACTIVITY_LOG_PAGE_SIZE_DEFAULT;
+}
+
 $totalEntries = countActivityLogEntries($filters);
 // Clearing wipes the whole table, not the current filter, so the confirmation
 // modal has to count every row rather than reuse the filtered total.
 $totalStored  = $filters ? countActivityLogEntries() : $totalEntries;
-$totalPages   = max(1, (int)ceil($totalEntries / ACTIVITY_LOG_PAGE_SIZE));
-$page         = min($page, $totalPages);
-$entries      = getActivityLogEntries($filters, ACTIVITY_LOG_PAGE_SIZE, ($page - 1) * ACTIVITY_LOG_PAGE_SIZE);
+if ($pageSize === 0) {
+    // "All": one page holding every matching entry. getActivityLogEntries()
+    // always applies a LIMIT (floored at 1), so pass the total rather than 0.
+    $totalPages = 1;
+    $page       = 1;
+    $entries    = getActivityLogEntries($filters, max(1, $totalEntries), 0);
+} else {
+    $totalPages = max(1, (int)ceil($totalEntries / $pageSize));
+    $page       = min($page, $totalPages);
+    $entries    = getActivityLogEntries($filters, $pageSize, ($page - 1) * $pageSize);
+}
+
+/**
+ * Label for a page-size option; 0 is "All".
+ */
+function activityPageSizeLabel(int $size): string {
+    return $size === 0
+        ? t('activity_log.pager.all', [], 'All')
+        : (string)$size;
+}
+
+// Timestamps are stored as UTC by SQLite's CURRENT_TIMESTAMP; render them in
+// the viewing admin's timezone so they line up with what users report.
+// Resolved here rather than further down because the CSV export below formats
+// the same timestamps.
+$displayTz = new DateTimeZone(getUserTimezone());
+
+// === CSV export ===
+// Re-queries without the page slice: an export that silently stopped at the
+// visible page would be mistaken for the whole log. The active filters still
+// apply, so the file matches what the admin is looking at.
+if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+    $exportEntries = getActivityLogEntries($filters, max(1, $totalEntries), 0);
+
+    $filename = 'poznote-activity-log-' . date('Y-m-d') . '.csv';
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: no-store');
+
+    $out = fopen('php://output', 'w');
+    // UTF-8 BOM: without it Excel reads accented names and details as mojibake.
+    fwrite($out, "\xEF\xBB\xBF");
+
+    fputcsv($out, [
+        t('activity_log.columns.date', [], 'Date and time'),
+        t('activity_log.columns.user', [], 'User (ID)'),
+        t('activity_log.columns.action', [], 'Action'),
+        t('activity_log.columns.details', [], 'Details'),
+        t('activity_log.columns.source', [], 'Source'),
+    ]);
+
+    foreach ($exportEntries as $exportRow) {
+        try {
+            $exportDt = new DateTime($exportRow['created_at'] . ' UTC');
+            $exportDt->setTimezone($displayTz);
+            $exportWhen = $exportDt->format('Y-m-d H:i:s');
+        } catch (Exception $e) {
+            $exportWhen = (string)$exportRow['created_at'];
+        }
+
+        $exportAction = (string)$exportRow['action'];
+        $exportUsername = (string)($exportRow['username'] ?? '');
+        if ($exportUsername === '') {
+            $exportUsername = t('activity_log.unknown_user', [], 'unknown');
+        }
+        // ID in its own column would be cleaner, but the table shows
+        // "name (id)" as one column and the export mirrors the table.
+        if ($exportRow['user_id'] !== null) {
+            $exportUsername .= ' (' . (int)$exportRow['user_id'] . ')';
+        }
+
+        fputcsv($out, [
+            $exportWhen,
+            $exportUsername,
+            t(activityActionKey($exportAction), [], $exportAction),
+            activityDetailsText($exportAction, $exportRow['details']),
+            (string)($exportRow['source'] ?? ''),
+        ]);
+    }
+
+    fclose($out);
+    exit;
+}
 
 $retentionDays = getActivityLogRetentionDays();
 
@@ -112,10 +215,6 @@ $loggedOperationsTooltip = t('activity_log.help_intro', [], 'Operations recorded
     . implode("\n", array_map(function (string $action): string {
         return '• ' . t(activityActionKey($action), [], $action);
     }, activityLogActions()));
-
-// Timestamps are stored as UTC by SQLite's CURRENT_TIMESTAMP; render them in
-// the viewing admin's timezone so they line up with what users report.
-$displayTz = new DateTimeZone(getUserTimezone());
 
 /**
  * i18n key suffix for an action.
@@ -368,6 +467,21 @@ function activityPageUrl(int $page, string $action, string $search): string {
     }
     return '?' . http_build_query($params);
 }
+
+/**
+ * CSV export link: same filters as the view, no page (the export ignores the
+ * page slice on purpose).
+ */
+function activityExportUrl(string $action, string $search): string {
+    $params = ['export' => 'csv'];
+    if ($action !== '') {
+        $params['action_filter'] = $action;
+    }
+    if ($search !== '') {
+        $params['q'] = $search;
+    }
+    return '?' . http_build_query($params);
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
@@ -448,10 +562,27 @@ function activityPageUrl(int $page, string $action, string $search): string {
         position: sticky;
         top: 0;
         z-index: 2;
+        /* Opaque on purpose: a transparent header would let rows scroll
+           through it once the wrapper is height-capped. */
+        background: var(--bg-secondary, #f9f9f9);
         box-shadow: 0 1px 0 var(--border-color, #e5e7eb);
         font-size: 0.78rem;
         font-weight: 600;
         white-space: nowrap;
+    }
+    /* The dark palette is --dm-*; without this the sticky header keeps the
+       light background and rows would scroll under a white band. */
+    :root[data-theme='dark'] .results-table thead th,
+    body.dark-mode .results-table thead th {
+        background: var(--dm-content-bg);
+        box-shadow: 0 1px 0 var(--dm-border);
+    }
+    /* admin-tools.css collapses the borders, which makes Chromium paint row
+       content over the sticky header. Separate borders render identically
+       here (the separators are td borders). */
+    .results-table {
+        border-collapse: separate;
+        border-spacing: 0;
     }
     .results-table th, .results-table td { padding: 7px 16px; }
     .results-table td { font-size: 0.85rem; vertical-align: middle; }
@@ -512,6 +643,37 @@ function activityPageUrl(int $page, string $action, string $search): string {
         margin-top: 16px;
         font-size: 0.85rem;
         color: var(--text-muted, #777);
+        flex-wrap: wrap;
+    }
+    /* Page-size selector, sitting at the end of the pager row. */
+    .activity-pager-size {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
+    }
+    .activity-pager-size select {
+        font: inherit;
+        color: #222;
+        background: #fff;
+        border: 1px solid var(--border-color, #d5d5d5);
+        border-radius: 6px;
+        padding: 3px 6px;
+        cursor: pointer;
+    }
+    /* Dark mode uses its own --dm-* palette; without this the select stays
+       white-on-white. The option list is painted by the OS, hence styling
+       both the control and its options. */
+    :root[data-theme='dark'] .activity-pager-size select,
+    body.dark-mode .activity-pager-size select {
+        color: var(--dm-text);
+        background: var(--dm-surface);
+        border-color: var(--dm-border);
+    }
+    :root[data-theme='dark'] .activity-pager-size select option,
+    body.dark-mode .activity-pager-size select option {
+        color: var(--dm-text);
+        background: var(--dm-surface);
     }
 
     /* Hover help listing every logged operation, replacing the long intro
@@ -618,6 +780,14 @@ function activityPageUrl(int $page, string $action, string $search): string {
             <a href="../settings.php" class="btn btn-secondary">
                 <i class="lucide lucide-settings" style="margin-right:5px;"></i><?php echo t_h('settings.title', [], 'Settings'); ?>
             </a>
+            <?php // Exports every matching entry, not just the visible page.
+                  // The current filters are carried over so the file matches
+                  // what is on screen. Nothing to export on an empty log. ?>
+            <?php if ($totalEntries > 0): ?>
+                <a href="<?php echo htmlspecialchars(activityExportUrl($filterAction, $filterSearch), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-primary">
+                    <i class="lucide lucide-download" style="margin-right:5px;"></i><?php echo t_h('activity_log.export_csv', [], 'Export CSV'); ?>
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -722,6 +892,9 @@ function activityPageUrl(int $page, string $action, string $search): string {
                 </table>
             </div>
 
+            <?php // The pager always renders: even on a single page it carries
+                  // the page-size selector, which is the only way back to a
+                  // smaller size once "All" has been picked. ?>
             <div class="activity-pager">
                 <?php if ($page > 1): ?>
                     <a href="<?php echo htmlspecialchars(activityPageUrl($page - 1, $filterAction, $filterSearch), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary">
@@ -734,6 +907,28 @@ function activityPageUrl(int $page, string $action, string $search): string {
                         <?php echo t_h('activity_log.pager.next', [], 'Next'); ?>
                     </a>
                 <?php endif; ?>
+
+                <?php // A GET form so the choice works without JavaScript; the
+                      // onchange just saves the extra click. Changing the size
+                      // drops 'page' on purpose: the old page number points
+                      // nowhere in a re-sliced list. ?>
+                <form method="get" action="" class="activity-pager-size">
+                    <?php if ($filterAction !== ''): ?>
+                        <input type="hidden" name="action_filter" value="<?php echo htmlspecialchars($filterAction, ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php endif; ?>
+                    <?php if ($filterSearch !== ''): ?>
+                        <input type="hidden" name="q" value="<?php echo htmlspecialchars($filterSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php endif; ?>
+                    <label for="activity-per-page"><?php echo t_h('activity_log.pager.per_page', [], 'Per page'); ?></label>
+                    <select id="activity-per-page" name="per_page" onchange="this.form.submit()">
+                        <?php foreach (ACTIVITY_LOG_PAGE_SIZES as $sizeOption): ?>
+                            <option value="<?php echo $sizeOption; ?>"<?php echo $sizeOption === $pageSize ? ' selected' : ''; ?>>
+                                <?php echo htmlspecialchars(activityPageSizeLabel($sizeOption), ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <noscript><button type="submit" class="btn btn-secondary"><?php echo t_h('common.ok', [], 'OK'); ?></button></noscript>
+                </form>
             </div>
         <?php endif; ?>
 
@@ -787,6 +982,35 @@ function activityPageUrl(int $page, string $action, string $search): string {
 </div>
 
 <script>
+/* Cap the scroll wrapper to the viewport so its horizontal scrollbar never
+   ends up below the fold; rows scroll vertically inside instead, under the
+   sticky headers. Mirrors sizeUsersTableScroll() in admin/users.php.
+   Below 769px admin-tools.css switches to its own narrow layout: leave the
+   wrapper uncapped there so the page scrolls normally on a phone. */
+function sizeActivityTableScroll() {
+    const scroller = document.querySelector('.table-scroll');
+    if (!scroller) return;
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        scroller.style.maxHeight = '';
+        return;
+    }
+
+    // Measure what actually sits below the table (pager, retention controls,
+    // container padding, body margin) instead of guessing a fixed gap: a guess
+    // that falls short leaves the page itself scrollable by a few pixels,
+    // which shows up as a stray scrollbar on a large screen.
+    scroller.style.maxHeight = '';
+    const top = scroller.getBoundingClientRect().top + window.scrollY;
+    const scrollerBottom = scroller.getBoundingClientRect().bottom + window.scrollY;
+    const pageBottom = document.documentElement.scrollHeight;
+    const below = Math.max(0, pageBottom - scrollerBottom);
+
+    scroller.style.maxHeight = Math.max(240, window.innerHeight - top - below) + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', sizeActivityTableScroll);
+window.addEventListener('resize', sizeActivityTableScroll);
+
 (function () {
     var modal = document.getElementById('clearLogModal');
     var openBtn = document.getElementById('clearLogBtn');

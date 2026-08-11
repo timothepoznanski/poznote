@@ -146,27 +146,54 @@ body.dark-mode .webhooks-page .alert-warning {
     flex-direction: column;
     gap: 12px;
 }
+/* Two columns: the info column takes the free space and the actions column is
+   sized to the menu button. A long event list wraps inside its own column
+   instead of flowing underneath the actions. */
 .webhooks-item {
     border: 1px solid var(--border-color, #ddd);
     border-radius: 8px;
     padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 8px 16px;
 }
 .webhooks-item-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
     min-width: 0;
-    flex: 1 1 320px;
 }
 .webhooks-item-url {
     font-weight: 600;
     font-size: 0.95rem;
     word-break: break-all;
+}
+.webhooks-item-description {
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: var(--text-secondary, #666);
+    overflow-wrap: anywhere;
+}
+/* Events as their own wrapping row of pills: the previous single-line code
+   block overflowed the card once a webhook subscribed to many events. */
+.webhooks-item-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+}
+.webhooks-item-event {
+    display: inline-block;
+    max-width: 100%;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: rgba(0, 124, 186, 0.08);
+    border: 1px solid rgba(0, 124, 186, 0.18);
+    color: var(--text-secondary, #4a5568);
+    font-size: 0.76rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 .webhooks-item-meta {
     font-size: 0.82rem;
@@ -184,15 +211,93 @@ body.dark-mode .webhooks-page .alert-warning {
 }
 .webhooks-state.is-enabled { color: #1f8f4e; }
 .webhooks-state.is-disabled { color: #b54747; }
-.webhooks-item-actions,
-.webhooks-item-actions form {
+.webhooks-item-actions {
     display: flex;
+    justify-content: flex-end;
+}
+
+/* Per-row actions dropdown (edit / test / enable-disable / delete) */
+.webhooks-actions-dropdown {
+    position: relative;
+    display: inline-block;
+}
+.webhooks-item-actions .btn.webhooks-actions-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+    width: auto;
+    min-width: 0;
+    font-size: 0.85rem;
+}
+.webhooks-actions-toggle .lucide {
+    width: 18px;
+    height: 18px;
+}
+.webhooks-actions-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 60;
+    min-width: 190px;
+    background: #fff;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    padding: 6px 0;
+    overflow: hidden;
+}
+.webhooks-actions-menu[hidden] { display: none; }
+.webhooks-actions-menu form {
+    display: flex;
+    flex-direction: column;
+}
+.webhooks-actions-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 14px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    text-align: left;
+    font-family: inherit;
+    font-size: 0.88rem;
+    color: var(--text-primary, #333);
+    cursor: pointer;
+}
+.webhooks-actions-item:hover {
+    background: #f2f6f9;
+    color: #007cba;
+}
+.webhooks-actions-item .lucide {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    background-color: #007cba;
+}
+.webhooks-actions-item.is-danger { color: #c0392b; }
+.webhooks-actions-item.is-danger:hover {
+    background: rgba(192, 57, 43, 0.08);
+    color: #c0392b;
+}
+.webhooks-actions-item.is-danger .lucide { background-color: #c0392b; }
+
+/* Inline edit form, spans both columns under the row it belongs to */
+.webhooks-edit {
+    grid-column: 1 / -1;
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color, #eee);
+}
+.webhooks-edit[hidden] { display: none; }
+.webhooks-edit .webhooks-field:last-of-type { margin-bottom: 8px; }
+.webhooks-edit-actions {
+    display: flex;
+    justify-content: flex-end;
     gap: 8px;
     flex-wrap: wrap;
-}
-.webhooks-item-actions .btn {
-    padding: 7px 12px;
-    font-size: 0.85rem;
 }
 html[data-theme='dark'] .webhooks-section h2,
 body.dark-mode .webhooks-section h2 {
@@ -211,12 +316,48 @@ body.dark-mode .webhooks-field input {
     border-color: var(--border-color, #444);
     color: var(--text-primary, #e0e0e0);
 }
+html[data-theme='dark'] .webhooks-item-description,
+body.dark-mode .webhooks-item-description {
+    color: rgba(255, 255, 255, 0.62);
+}
+html[data-theme='dark'] .webhooks-item-event,
+body.dark-mode .webhooks-item-event {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.75);
+}
+html[data-theme='dark'] .webhooks-actions-menu,
+body.dark-mode .webhooks-actions-menu {
+    background: var(--dm-surface, #2a2a2a);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+html[data-theme='dark'] .webhooks-actions-item,
+body.dark-mode .webhooks-actions-item {
+    color: var(--dm-text, #e0e0e0);
+}
+html[data-theme='dark'] .webhooks-actions-item:hover,
+body.dark-mode .webhooks-actions-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+html[data-theme='dark'] .webhooks-actions-item.is-danger,
+body.dark-mode .webhooks-actions-item.is-danger {
+    color: #ff6b6b;
+}
+html[data-theme='dark'] .webhooks-actions-item.is-danger .lucide,
+body.dark-mode .webhooks-actions-item.is-danger .lucide {
+    background-color: #ff6b6b;
+}
+html[data-theme='dark'] .webhooks-edit,
+body.dark-mode .webhooks-edit {
+    border-top-color: rgba(255, 255, 255, 0.12);
+}
 @media (max-width: 768px) {
-    /* users.css forces .btn to width:100% on mobile; stack them cleanly */
-    .webhooks-item-actions,
-    .webhooks-item-actions form {
+    /* users.css forces .btn to width:100% on mobile; keep the menu toggle
+       compact so it stays beside the endpoint instead of spanning the card. */
+    .webhooks-edit-actions .btn {
         width: 100%;
-        flex-direction: column;
+        max-width: none;
     }
 }
 @media (max-width: 800px) {

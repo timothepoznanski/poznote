@@ -402,6 +402,7 @@
       "diary_note_type": "选择新日记条目使用的笔记格式。",
       "show_created": "在笔记标题栏显示创建日期。",
       "note_icons": "在笔记列表的标题旁显示自定义图标。",
+      "type_based_note_icons": "为任务列表和 Markdown 笔记使用专属的默认图标，以便在笔记列表中区分它们。",
       "note_color_palette": "自定义笔记可用的颜色调色板。",
       "folder_counts": "在每个文件夹旁显示笔记数量。",
       "notes_without_folders": "将没有文件夹的笔记显示在文件夹列表之后而不是之前。",
@@ -436,6 +437,7 @@
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
+      "cloud": "了解 Poznote Cloud 托管服务。",
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。"
@@ -482,6 +484,7 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote 博客",
       "website": "Poznote 网站",
+      "cloud": "Poznote Cloud",
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "ui_customization_global": "元素可见性（所有用户）",
@@ -648,6 +651,7 @@
       "timezone": "时区",
       "date_time_format": "日期和时间格式",
       "show_note_created": "显示笔记创建日期",
+      "type_based_note_icons": "按笔记类型显示图标",
       "show_folder_counts": "显示文件夹笔记数量",
       "notes_without_folders_after": "在文件夹后显示笔记",
       "show_folder_actions": "显示文件夹操作",
@@ -2649,8 +2653,16 @@
       "subtitle": "管理用户及其访问权限",
       "users_list": "用户列表",
       "create_user": "创建用户",
+      "export_csv": "导出 CSV",
       "edit_user": "编辑用户",
       "filter_placeholder": "筛选用户...",
+      "pager": {
+        "previous": "上一页",
+        "next": "下一页",
+        "status": "第 {{page}} / {{pages}} 页，共 {{total}} 个用户",
+        "per_page": "每页",
+        "all": "全部"
+      },
       "first_name": "名字",
       "last_name": "姓氏",
       "delete_user": "删除用户",
@@ -3022,10 +3034,19 @@
       "table_attachments": "附件 (MB)",
       "table_total": "合计 (MB)",
       "table_total_row": "合计",
+      "table_total_row_hint": "统计所有账户，而非仅当前页",
       "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
       "quota_max_notes_for": "{{user}} 的最大笔记数",
       "quota_max_storage_for": "{{user}} 的本地存储上限 (MB)",
       "filter_placeholder": "筛选账户...",
+      "export_csv": "导出 CSV",
+      "pager": {
+        "previous": "上一页",
+        "next": "下一页",
+        "status": "第 {{page}} / {{pages}} 页，共 {{total}} 个账户",
+        "per_page": "每页",
+        "all": "全部"
+      },
       "no_accounts": "未找到账户。",
       "table_attachments_local": "本地附件 (MB)",
       "table_attachments_s3": "S3 附件 (MB)",
@@ -3042,6 +3063,7 @@
     "description": "本实例上敏感操作的历史记录。",
     "help_intro": "记录的操作：",
     "filter_placeholder": "搜索用户或详情...",
+    "export_csv": "导出 CSV",
     "empty": "暂无记录。",
     "unknown_user": "未知",
     "columns": {
@@ -3108,7 +3130,9 @@
     "pager": {
       "previous": "上一页",
       "next": "下一页",
-      "status": "第 {{page}} / {{pages}} 页，共 {{total}} 条"
+      "status": "第 {{page}} / {{pages}} 页，共 {{total}} 条",
+      "per_page": "每页",
+      "all": "全部"
     },
     "retention": {
       "label": "记录保留时长",
@@ -3366,12 +3390,14 @@
       "url": "端点 URL",
       "secret": "密钥（可选）",
       "events": "事件",
-      "app_url": "实例 URL"
+      "app_url": "实例 URL",
+      "description": "描述（可选）"
     },
     "hints": {
       "secret": "用于对数据签名，以便接收方验证请求确实来自本实例。",
       "app_url_env": "当前由环境变量 POZNOTE_APP_URL 提供：{{url}}。在此保存的值将覆盖它。",
-      "app_url_unset": "未设置：负载当前不包含笔记链接（data.note.url 为 null）。"
+      "app_url_unset": "未设置：负载当前不包含笔记链接（data.note.url 为 null）。",
+      "description": "显示在下方列表中，用于区分各个端点。绝不会发送给端点。"
     },
     "status": {
       "none": "无"
@@ -3399,7 +3425,15 @@
     "app_url_description": "此 Poznote 实例的公开 URL，用于生成负载中的笔记直达链接（data.note.url）。留空则不发送链接。这与提醒邮件使用的实例 URL 相同。",
     "app_url_saved": "实例 URL 已保存。",
     "app_url_cleared": "实例 URL 已清除。负载将不再包含笔记直达链接。",
-    "error_invalid_app_url": "实例 URL 必须以 http:// 或 https:// 开头。"
+    "error_invalid_app_url": "实例 URL 必须以 http:// 或 https:// 开头。",
+    "placeholders": {
+      "description": "此 Webhook 的用途"
+    },
+    "edit_button": "编辑",
+    "actions_menu": "操作",
+    "updated": "Webhook 已更新。",
+    "delete_confirm": "删除此 Webhook？此操作无法撤销。",
+    "delete_title": "删除 Webhook"
   },
   "reminder": {
     "toolbar_button": "设置提醒",

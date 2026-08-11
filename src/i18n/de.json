@@ -400,6 +400,7 @@
       "diary_note_type": "Wählen Sie das Notizformat für neue Tagebucheinträge.",
       "show_created": "Zeigen Sie das Erstellungsdatum im Notizkopf an.",
       "note_icons": "Zeigen Sie eigene Symbole neben den Notiztiteln in der Liste an.",
+      "type_based_note_icons": "Verwenden Sie ein eigenes Standardsymbol für Aufgabenlisten und Markdown-Notizen, damit sie in der Notizliste unterscheidbar sind.",
       "note_color_palette": "Passen Sie die Farbpalette für Notizen an.",
       "folder_counts": "Zeigen Sie die Anzahl der Notizen neben jedem Ordner an.",
       "notes_without_folders": "Zeigen Sie Notizen ohne Ordner nach der Ordnerliste statt davor an.",
@@ -434,6 +435,7 @@
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
       "website": "Öffnen Sie die offizielle Poznote-Website.",
+      "cloud": "Entdecken Sie das gehostete Angebot Poznote Cloud.",
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan."
@@ -479,6 +481,7 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote-Blog",
       "website": "Poznote-Website",
+      "cloud": "Poznote Cloud",
       "github_star": "Auf GitHub einen Stern vergeben",
       "guestbook": "Poznote Gästebuch",
       "support": "Poznote unterstützen",
@@ -647,6 +650,7 @@
       "timezone": "Zeitzone",
       "date_time_format": "Datums- und Uhrzeitformat",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
+      "type_based_note_icons": "Symbole nach Notiztyp",
       "show_folder_counts": "Ordner-Notizzähler anzeigen",
       "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
       "show_folder_actions": "Ordner-Aktionen anzeigen",
@@ -2656,8 +2660,16 @@
       "inactive": "Inaktiv",
       "not_defined": "nicht festgelegt",
       "create_user": "Profil erstellen",
+      "export_csv": "CSV exportieren",
       "edit_user": "Benutzer bearbeiten",
       "filter_placeholder": "Benutzer filtern...",
+      "pager": {
+        "previous": "Zurück",
+        "next": "Weiter",
+        "status": "Seite {{page}} von {{pages}}, {{total}} Benutzer",
+        "per_page": "Pro Seite",
+        "all": "Alle"
+      },
       "first_name": "Vorname",
       "last_name": "Nachname",
       "click_to_activate": "Zum Aktivieren klicken",
@@ -2896,10 +2908,19 @@
       "table_attachments": "Anhänge (MB)",
       "table_total": "Gesamt (MB)",
       "table_total_row": "Gesamt",
+      "table_total_row_hint": "Über alle Konten, nicht nur diese Seite",
       "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
       "quota_max_notes_for": "Max. Notizen für {{user}}",
       "quota_max_storage_for": "Max. lokaler Speicher für {{user}} (MB)",
       "filter_placeholder": "Konten filtern...",
+      "export_csv": "CSV exportieren",
+      "pager": {
+        "previous": "Zurück",
+        "next": "Weiter",
+        "status": "Seite {{page}} von {{pages}}, {{total}} Konten",
+        "per_page": "Pro Seite",
+        "all": "Alle"
+      },
       "no_accounts": "Keine Konten gefunden.",
       "table_attachments_local": "Anhänge lokal (MB)",
       "table_attachments_s3": "Anhänge S3 (MB)",
@@ -2916,6 +2937,7 @@
     "description": "Verlauf sensibler Vorgänge auf dieser Instanz.",
     "help_intro": "Protokollierte Vorgänge:",
     "filter_placeholder": "Benutzer oder Detail suchen...",
+    "export_csv": "CSV exportieren",
     "empty": "Noch keine Einträge vorhanden.",
     "unknown_user": "unbekannt",
     "columns": {
@@ -2982,7 +3004,9 @@
     "pager": {
       "previous": "Zurück",
       "next": "Weiter",
-      "status": "Seite {{page}} von {{pages}}, {{total}} Einträge"
+      "status": "Seite {{page}} von {{pages}}, {{total}} Einträge",
+      "per_page": "Pro Seite",
+      "all": "Alle"
     },
     "retention": {
       "label": "Einträge aufbewahren für",
@@ -3243,12 +3267,14 @@
       "url": "Endpunkt-URL",
       "secret": "Secret (optional)",
       "events": "Ereignisse",
-      "app_url": "Instanz-URL"
+      "app_url": "Instanz-URL",
+      "description": "Beschreibung (optional)"
     },
     "hints": {
       "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt.",
       "app_url_env": "Derzeit durch die Umgebungsvariable POZNOTE_APP_URL bereitgestellt: {{url}}. Ein hier gespeicherter Wert ueberschreibt sie.",
-      "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null)."
+      "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null).",
+      "description": "Wird in der Liste unten angezeigt, um Ihre Endpunkte zu unterscheiden. Sie wird nie an den Endpunkt gesendet."
     },
     "status": {
       "none": "Keine"
@@ -3276,7 +3302,15 @@
     "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden.",
     "app_url_saved": "Instanz-URL gespeichert.",
     "app_url_cleared": "Instanz-URL geleert. Payloads enthalten keinen direkten Notiz-Link mehr.",
-    "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen."
+    "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen.",
+    "placeholders": {
+      "description": "Wofür dieser Webhook verwendet wird"
+    },
+    "edit_button": "Bearbeiten",
+    "actions_menu": "Aktionen",
+    "updated": "Webhook aktualisiert.",
+    "delete_confirm": "Diesen Webhook löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_title": "Webhook löschen"
   },
   "reminder": {
     "toolbar_button": "Erinnerung setzen",
