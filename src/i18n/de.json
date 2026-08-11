@@ -2933,6 +2933,7 @@
     "description": "Verlauf sensibler Vorgänge auf dieser Instanz.",
     "help_intro": "Protokollierte Vorgänge:",
     "filter_placeholder": "Benutzer oder Detail suchen...",
+    "export_csv": "CSV exportieren",
     "empty": "Noch keine Einträge vorhanden.",
     "unknown_user": "unbekannt",
     "columns": {
@@ -2999,7 +3000,9 @@
     "pager": {
       "previous": "Zurück",
       "next": "Weiter",
-      "status": "Seite {{page}} von {{pages}}, {{total}} Einträge"
+      "status": "Seite {{page}} von {{pages}}, {{total}} Einträge",
+      "per_page": "Pro Seite",
+      "all": "Alle"
     },
     "retention": {
       "label": "Einträge aufbewahren für",

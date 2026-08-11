@@ -2518,6 +2518,7 @@
     "description": "History of sensitive operations performed on this instance.",
     "help_intro": "Operations recorded:",
     "filter_placeholder": "Search a user or a detail...",
+    "export_csv": "Export CSV",
     "empty": "No entry recorded yet.",
     "unknown_user": "unknown",
     "columns": {
@@ -2584,7 +2585,9 @@
     "pager": {
       "previous": "Previous",
       "next": "Next",
-      "status": "Page {{page}} of {{pages}}, {{total}} entries"
+      "status": "Page {{page}} of {{pages}}, {{total}} entries",
+      "per_page": "Per page",
+      "all": "All"
     },
     "retention": {
       "label": "Keep entries for",

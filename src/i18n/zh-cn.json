@@ -3059,6 +3059,7 @@
     "description": "本实例上敏感操作的历史记录。",
     "help_intro": "记录的操作：",
     "filter_placeholder": "搜索用户或详情...",
+    "export_csv": "导出 CSV",
     "empty": "暂无记录。",
     "unknown_user": "未知",
     "columns": {
@@ -3125,7 +3126,9 @@
     "pager": {
       "previous": "上一页",
       "next": "下一页",
-      "status": "第 {{page}} / {{pages}} 页，共 {{total}} 条"
+      "status": "第 {{page}} / {{pages}} 页，共 {{total}} 条",
+      "per_page": "每页",
+      "all": "全部"
     },
     "retention": {
       "label": "记录保留时长",

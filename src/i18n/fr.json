@@ -3122,6 +3122,7 @@
     "description": "Historique des opérations sensibles effectuées sur cette instance.",
     "help_intro": "Opérations journalisées :",
     "filter_placeholder": "Rechercher un utilisateur ou un détail...",
+    "export_csv": "Exporter en CSV",
     "empty": "Aucune entrée enregistrée pour le moment.",
     "unknown_user": "inconnu",
     "columns": {
@@ -3188,7 +3189,9 @@
     "pager": {
       "previous": "Précédent",
       "next": "Suivant",
-      "status": "Page {{page}} sur {{pages}}, {{total}} entrées"
+      "status": "Page {{page}} sur {{pages}}, {{total}} entrées",
+      "per_page": "Par page",
+      "all": "Tout"
     },
     "retention": {
       "label": "Conserver les entrées pendant",

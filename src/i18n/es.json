@@ -2933,6 +2933,7 @@
     "description": "Historial de operaciones sensibles realizadas en esta instancia.",
     "help_intro": "Operaciones registradas:",
     "filter_placeholder": "Buscar un usuario o un detalle...",
+    "export_csv": "Exportar CSV",
     "empty": "Todavía no hay ninguna entrada.",
     "unknown_user": "desconocido",
     "columns": {
@@ -2999,7 +3000,9 @@
     "pager": {
       "previous": "Anterior",
       "next": "Siguiente",
-      "status": "Página {{page}} de {{pages}}, {{total}} entradas"
+      "status": "Página {{page}} de {{pages}}, {{total}} entradas",
+      "per_page": "Por página",
+      "all": "Todo"
     },
     "retention": {
       "label": "Conservar las entradas durante",
