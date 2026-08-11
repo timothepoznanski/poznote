@@ -172,6 +172,7 @@
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
+      "cloud": "Open the hosted Poznote Cloud offer.",
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule."
@@ -199,6 +200,7 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
       "website": "Poznote Website",
+      "cloud": "Poznote Cloud",
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
       "support": "Support Poznote",

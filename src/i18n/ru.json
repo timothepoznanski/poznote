@@ -172,6 +172,7 @@
       "github": "Открыть исходный код Poznote на GitHub.",
       "api_rest": "Показать информацию о REST API Poznote.",
       "website": "Открыть официальный сайт Poznote.",
+      "cloud": "Откройте облачный сервис Poznote Cloud.",
       "support": "Поддержите разработку Poznote пожертвованием.",
       "s3_storage": "Хранить вложения заметок в S3-совместимом объектном хранилище вместо локального диска.",
       "s3_backup": "Загружает полные архивы резервных копий в S3-совместимый bucket, вручную или по расписанию."
@@ -201,6 +202,7 @@
       "documentation": "Documentation GitHub",
       "news": "Блог Poznote",
       "website": "Сайт Poznote",
+      "cloud": "Poznote Cloud",
       "github_star": "Поставить звезду на GitHub",
       "guestbook": "Гостевая книга Poznote",
       "support": "Поддержать Poznote",

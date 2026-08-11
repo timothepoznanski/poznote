@@ -436,6 +436,7 @@
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
+      "cloud": "了解 Poznote Cloud 托管服务。",
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。"
@@ -482,6 +483,7 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote 博客",
       "website": "Poznote 网站",
+      "cloud": "Poznote Cloud",
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "ui_customization_global": "元素可见性（所有用户）",
