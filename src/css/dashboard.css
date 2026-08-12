@@ -606,22 +606,25 @@ body.dark-mode .dash-section-title {
     height: 16px;
 }
 
-/* The layout toggle shows the layout a click switches TO:
-   list icon in grid mode, grid icon in list mode */
-.board-view-layout-toggle .lucide-grid {
+/* The view toggle shows the current view: grid icon + size letter in grid
+   layout, list icon alone in list layout */
+.board-view-layout-toggle {
+    width: auto;
+    min-width: 36px;
+    padding: 0 9px;
+    gap: 4px;
+}
+
+.board-view-layout-toggle .lucide-layout-list {
     display: none;
 }
 
 .board-view-controls.is-list .board-view-layout-toggle .lucide-layout-list {
-    display: none;
-}
-
-.board-view-controls.is-list .board-view-layout-toggle .lucide-grid {
     display: inline-block;
 }
 
-/* Card size has no effect in list layout: hide its button */
-.board-view-controls.is-list .board-view-size-btn {
+.board-view-controls.is-list .board-view-layout-toggle .lucide-grid,
+.board-view-controls.is-list .board-view-layout-toggle .board-view-size-letter {
     display: none;
 }
 

@@ -31,7 +31,7 @@ There are two independent levels of webhooks:
 | Level | Managed from | Who | Events |
 |---|---|---|---|
 | **Admin Webhooks** | **Settings > Admin Tools > Admin Webhooks** | Administrators only | Instance events: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
-| **User Webhooks** | **Settings > User Webhooks** | Every account (unless blocked by tenant isolation) | Events about the account's own content: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
+| **User Webhooks** | **Settings > User Webhooks** | Every account (unless blocked by tenant isolation) | Events about the account's own content: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal`, `settings.language_changed` |
 
 The isolation rule is strict: a user event is only ever delivered to the endpoints registered by the account that produced it. One user's notes and reminders never reach another user's endpoints. Instance events go to every subscribed admin webhook.
 
@@ -120,7 +120,7 @@ Requests without a valid signature should be rejected: anyone who discovers the 
 
 - Delivery is **best-effort and synchronous**, with a 5 second connection and response timeout. A slow or failing endpoint never breaks the action (a signup, a note creation) that produced the event.
 - A delivery is considered successful on any **2xx** response. Redirects are **not followed**.
-- Failed deliveries of instance events, `note.created` and `note.shared` are **not retried**.
+- Failed deliveries of instance events, `note.created`, `note.shared` and `settings.language_changed` are **not retried**.
 - **Reminder events are the exception**: they are delivered *at least once*. A reminder is marked as sent only when every subscribed endpoint accepted it; otherwise the whole event is retried by the background worker (up to 5 attempts, 5 minutes apart). Healthy endpoints may therefore see duplicates of a reminder event and should deduplicate on `data.reminder.id`.
 - Reminders that were already due before the account registered its first reminder webhook are skipped, so enabling webhooks does not flood the endpoint with the whole backlog.
 
@@ -381,6 +381,26 @@ A public share link was published for one of the account's notes.
 | `data.share.url` | Public share URL |
 | `data.share.has_password` | Whether the link is password protected |
 | `data.share.updated` | `false` for a newly shared note, `true` when the note was already shared and the link was regenerated |
+
+#### settings.language_changed
+
+The account's interface language was explicitly changed in the settings (or through the REST API `PUT /api/v1/settings/language`). The browser-driven language adoption at login does not emit this event, only a deliberate choice does, and nothing is emitted when the selected language is the one already in use.
+
+```json
+{
+  "data": {
+    "language": "fr",
+    "previous_language": "en",
+    "source": "ui"
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `data.language` | The new interface language code (`en`, `fr`, `de`, `es`, `pt`, `ru`, `zh-cn`, ...) |
+| `data.previous_language` | The language before the change, `null` when the account had none stored yet |
+| `data.source` | `ui` (web interface) or `api` (REST API client authenticated with Basic or Bearer credentials) |
 
 #### reminder.due / reminder.due_title / reminder.due_minimal
 

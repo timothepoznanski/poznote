@@ -1178,28 +1178,101 @@ function scrollToElement(element) {
         return;
     }
 
+    smoothScrollOutlineContainerToElement(scrollContainer, element);
+    highlightOutlineTarget(element);
+}
+
+let outlineScrollSequence = 0;
+
+function computeOutlineTargetScrollTop(scrollContainer, element) {
+    const elementTop = element.getBoundingClientRect().top;
+
     if (isDocumentScrollContainer(scrollContainer)) {
-        window.scrollTo({
-            top: Math.max(0, window.scrollY + element.getBoundingClientRect().top - OUTLINE_PAGE_SCROLL_TOP_OFFSET),
-            behavior: 'smooth'
-        });
-        highlightOutlineTarget(element);
-        return;
+        return Math.max(0, window.scrollY + elementTop - OUTLINE_PAGE_SCROLL_TOP_OFFSET);
     }
 
-    // Calculate position relative to scroll container
     const containerRect = scrollContainer.getBoundingClientRect();
-    const elementRect = element.getBoundingClientRect();
-    const scrollTop = scrollContainer.scrollTop;
-    const offset = elementRect.top - containerRect.top + scrollTop - OUTLINE_PAGE_SCROLL_TOP_OFFSET;
+    return Math.max(0, scrollContainer.scrollTop + elementTop - containerRect.top - OUTLINE_PAGE_SCROLL_TOP_OFFSET);
+}
 
-    // Smooth scroll
-    scrollContainer.scrollTo({
-        top: offset,
-        behavior: 'smooth'
-    });
+// Lazy-loaded images between the current position and the target load while the
+// smooth scroll is running, pushing the content down, so a target offset computed
+// once lands short on long notes. Re-measure once the scroll settles and keep
+// nudging until the heading is actually in place (unless the user takes over).
+function smoothScrollOutlineContainerToElement(scrollContainer, element) {
+    const sequence = ++outlineScrollSequence;
+    const isDoc = isDocumentScrollContainer(scrollContainer);
+    const scrollTarget = isDoc ? window : scrollContainer;
+    const readScrollTop = () => (isDoc ? window.scrollY : scrollContainer.scrollTop);
 
-    highlightOutlineTarget(element);
+    let cancelled = false;
+    const cancelEvents = ['wheel', 'touchstart', 'keydown'];
+    const cancel = () => {
+        cancelled = true;
+        cancelEvents.forEach(evt => scrollTarget.removeEventListener(evt, cancel));
+    };
+    cancelEvents.forEach(evt => scrollTarget.addEventListener(evt, cancel, { passive: true }));
+
+    const isActive = () => !cancelled && sequence === outlineScrollSequence && element.isConnected;
+
+    let attempts = 0;
+    const step = () => {
+        if (!isActive()) {
+            cancel();
+            return;
+        }
+
+        scrollTarget.scrollTo({
+            top: computeOutlineTargetScrollTop(scrollContainer, element),
+            behavior: 'smooth'
+        });
+
+        waitForOutlineScrollToSettle(readScrollTop, () => {
+            if (!isActive()) {
+                cancel();
+                return;
+            }
+
+            const residual = computeOutlineTargetScrollTop(scrollContainer, element) - readScrollTop();
+            if (Math.abs(residual) > 2 && attempts < 10) {
+                attempts++;
+                step();
+            } else {
+                cancel();
+            }
+        });
+    };
+
+    step();
+}
+
+function waitForOutlineScrollToSettle(readScrollTop, callback) {
+    let lastTop = readScrollTop();
+    let stableFrames = 0;
+    let totalFrames = 0;
+
+    const tick = () => {
+        totalFrames++;
+        const top = readScrollTop();
+
+        if (Math.abs(top - lastTop) < 1) {
+            stableFrames++;
+        } else {
+            stableFrames = 0;
+            lastTop = top;
+        }
+
+        // ~100ms without movement means the smooth scroll is done; the frame
+        // cap keeps the loop from running forever if scrolling never settles.
+        if (stableFrames >= 6 || totalFrames > 300) {
+            callback();
+            return;
+        }
+
+        requestAnimationFrame(tick);
+    };
+
+    requestAnimationFrame(tick);
 }
 
 function highlightOutlineTarget(element) {

@@ -40,6 +40,7 @@ class WebhookDispatcher {
         'reminder.due_minimal',
         'note.created',
         'note.shared',
+        'settings.language_changed',
     ];
 
     // Reminder subset of USER_EVENTS; the worker skips its scan entirely when
@@ -62,6 +63,7 @@ class WebhookDispatcher {
         'reminder.due_minimal',
         'note.created',
         'note.shared',
+        'settings.language_changed',
     ];
 
     private const TIMEOUT_SECONDS = 5;
@@ -347,6 +349,30 @@ class WebhookDispatcher {
                 'has_password' => !empty($share['has_password']),
                 'updated' => $updated,
             ],
+        ], $userId);
+    }
+
+    /**
+     * Emitted when an account explicitly changes its interface language from
+     * the settings. The browser-driven language adoption at login never emits
+     * it: only a deliberate choice does. Like the other user events, delivery
+     * is scoped to the account's own webhooks, so the payload carries no user
+     * block.
+     *
+     * @param string $previous language code before the change, '' when the
+     *        account had none stored yet
+     * @param string $source how the change was made: 'ui' or 'api'
+     * @return array{delivered:int,failed:int}
+     */
+    public function dispatchLanguageChanged(int $userId, string $previous, string $language, string $source): array {
+        if (!self::userWebhooksAllowedFor($userId)) {
+            return ['delivered' => 0, 'failed' => 0];
+        }
+
+        return $this->dispatch('settings.language_changed', [
+            'language' => $language,
+            'previous_language' => $previous !== '' ? $previous : null,
+            'source' => $source,
         ], $userId);
     }
 

@@ -541,7 +541,7 @@
       "reminder_bell": "Bell icon (reminder)",
       "dashboard_user": "User",
       "dashboard_filter_bar": "Filter bar",
-      "view_layout_toggle": "Grid / list toggle",
+      "view_layout_toggle": "View toggle (grid / list, card size)",
       "index_search_bar": "Search bar",
       "tasklist_progress_bar": "Task list progress bar",
       "share_restrict_users": "Share: restrict to specific users",
@@ -912,6 +912,24 @@
         "days": "days"
       }
     },
+    "welcome_setup": {
+      "title": "Welcome to Poznote!",
+      "subtitle": "Let's set up a few preferences to get you started. You can change them at any time.",
+      "language_label": "Language",
+      "theme_label": "Theme",
+      "theme_options": {
+        "system": "Same as system",
+        "light": "Light",
+        "dark": "Dark",
+        "black": "Black"
+      },
+      "date_format_label": "Date & time format",
+      "timezone_label": "Timezone",
+      "settings_tip": "Many more options (fonts, backups, AI and more) are waiting for you in the Poznote settings.",
+      "dashboard_tip": "The dashboard gives you an overview of your notes and your account.",
+      "skip": "Skip",
+      "start": "Get started"
+    },
     "timezone": {
       "title": "Timezone",
       "description": "Select your timezone:",
@@ -969,6 +987,8 @@
       "remove_from_folder": "Drop here to remove from folder"
     },
     "folder_actions": {
+      "add_favorite": "Add to favorites",
+      "remove_favorite": "Remove from favorites",
       "menu": "Actions",
       "create": "Create",
       "kanban_view": "Kanban view",
@@ -2938,7 +2958,8 @@
       "reminder_due_title": "Same trigger as reminder.due but without the reminder message: identifiers plus the note title and direct link.",
       "reminder_due_minimal": "Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.",
       "note_created": "A note was created in your account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
-      "note_shared": "A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected."
+      "note_shared": "A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected.",
+      "settings_language_changed": "You changed the interface language in the settings. Payload: the new language code, the previous one, and whether the change came from the interface or the REST API."
     },
     "title": "Webhooks",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
@@ -3108,6 +3129,8 @@
     "reset_layout": "Reset layout",
     "reset_layout_hint": "Forget the saved positions and rearrange the graph automatically",
     "drag_hint": "Ctrl + drag moves a dot independently of its links",
+    "folder_filter_all": "All folders",
+    "folder_filter_hint": "Show only the notes of one folder",
     "stats": "{{notes}} notes · {{links}} links",
     "search": {
       "placeholder": "Find a note..."
@@ -3334,5 +3357,14 @@
   "tasklist_embed": {
     "unavailable": "This task list is no longer available.",
     "empty": "No tasks in this list yet."
+  },
+  "trash": {
+    "count_one": "1 note in trash",
+    "count_other": "{{count}} notes in trash",
+    "showing_limit": "Only the {{count}} most recently modified notes are shown",
+    "note": {
+      "show_more": "Show more",
+      "show_less": "Show less"
+    }
   }
 }

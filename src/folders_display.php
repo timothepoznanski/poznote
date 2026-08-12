@@ -42,7 +42,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order, favorite FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -57,7 +57,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             'icon_color' => $folder_row['icon_color'] ?? null,
             'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0),
             'sort_setting' => $folder_row['sort_setting'] ?? null,
-            'display_order' => (int)($folder_row['display_order'] ?? 0)
+            'display_order' => (int)($folder_row['display_order'] ?? 0),
+            'favorite' => (int)($folder_row['favorite'] ?? 0)
         ];
     }
     
@@ -77,7 +78,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
         $kanbanEnabled = 0;
         $sortSetting = null;
         $displayOrder = 0;
-        
+        $isFavorite = 0;
+
         if (isset($folders_cache[$folderId])) {
             $folderName = $folders_cache[$folderId]['name'];
             $folderIcon = $folders_cache[$folderId]['icon'];
@@ -85,6 +87,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             $kanbanEnabled = $folders_cache[$folderId]['kanban_enabled'];
             $sortSetting = $folders_cache[$folderId]['sort_setting'];
             $displayOrder = $folders_cache[$folderId]['display_order'];
+            $isFavorite = $folders_cache[$folderId]['favorite'];
         }
 
         if (!isset($folders[$folderId])) {
@@ -96,6 +99,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
                 'kanban_enabled' => $kanbanEnabled,
                 'sort_setting' => $sortSetting,
                 'display_order' => $displayOrder,
+                'favorite' => $isFavorite,
                 'notes' => []
             ];
         }
@@ -172,7 +176,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
  * @return array Updated folders array including empty folders
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, sort_setting, display_order, favorite FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
@@ -190,6 +194,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $kanbanEnabled = (int)($folder_row['kanban_enabled'] ?? 0);
         $sortSetting = $folder_row['sort_setting'] ?? null;
         $displayOrder = (int)($folder_row['display_order'] ?? 0);
+        $isFavorite = (int)($folder_row['favorite'] ?? 0);
 
         if (!isset($folders[$folderId])) {
             $folders[$folderId] = [
@@ -200,6 +205,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'kanban_enabled' => $kanbanEnabled,
                 'sort_setting' => $sortSetting,
                 'display_order' => $displayOrder,
+                'favorite' => $isFavorite,
                 'notes' => []
             ];
         } else {
@@ -209,6 +215,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
             $folders[$folderId]['kanban_enabled'] = $kanbanEnabled;
             $folders[$folderId]['sort_setting'] = $sortSetting;
             $folders[$folderId]['display_order'] = $displayOrder;
+            $folders[$folderId]['favorite'] = $isFavorite;
         }
     }
 
@@ -233,9 +240,12 @@ function ensureFavoritesFolder($folders) {
     
     // Add empty Favorites folder if it doesn't exist
     if (!$hasFavorites) {
-        // Use 'favorites' as special key (lowercase) to distinguish from regular folders
+        // Use 'favorites' as special key (lowercase) to distinguish from regular
+        // folders. The same value is used as pseudo-id (matching
+        // handleFavorites()); a null id would make shouldFolderBeOpen() bail
+        // out and render the always-open Favorites section collapsed.
         $folders['favorites'] = [
-            'id' => null,  // No real DB ID for Favorites pseudo-folder
+            'id' => 'favorites',
             'name' => FAVORITES_FOLDER_NAME,
             'display_order' => 0,
             'notes' => []
@@ -347,9 +357,10 @@ function shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_re
  * @param string|null $workspace_filter Workspace filter
  * @param int $noteCount Number of notes in folder
  * @param string|null $currentSort Current sort setting
+ * @param bool $isFavorite Whether the folder is marked as favorite
  * @return string HTML for folder actions
  */
-function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $currentSort = null) {
+function generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount = 0, $currentSort = null, $isFavorite = false) {
     static $sharedFoldersCache = null;
 
     if ($folderName === FAVORITES_FOLDER_NAME) {
@@ -376,7 +387,7 @@ function generateFolderActions($folderId, $folderName, $con, $workspace_filter, 
     return "<div class='folder-actions-toggle' data-action='toggle-folder-actions-menu'"
         . " data-folder-id='$folderId' data-folder-name='$htmlEscapedFolderName'"
         . " data-note-count='" . (int)$noteCount . "' data-shared='" . ($isShared ? '1' : '0') . "'"
-        . " data-current-sort='$htmlCurrentSort'"
+        . " data-current-sort='$htmlCurrentSort' data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.folder_actions.menu', [], 'Actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
         . "</div>";
@@ -440,6 +451,17 @@ function renderFolderActionsMenu() {
     $menu .= "<div class='folder-actions-menu-item share-state-not-shared' data-action='share-folder'>";
     $menu .= "<i class='lucide lucide-share-2'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.share_folder', [], 'Make public') . "</span>";
+    $menu .= "</div>";
+
+    // Favorite folder action: two variants, the client shows the one matching
+    // the folder's favorite state (data-favorite on the toggle)
+    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite' data-action='favorite-folder'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item favorite-state-not-favorite' data-action='favorite-folder'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
     $menu .= "</div>";
 
     // Rename folder action

@@ -100,7 +100,63 @@ $currentLang = getUserLanguage();
 </head>
 <body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">
     <div class="trash-container">
-        
+
+        <?php
+        // Build search condition supporting multiple terms (AND) with accent-insensitive search
+        $search_params = [];
+        $search_condition = '';
+
+        if ($search) {
+            $terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
+
+            if (count($terms) <= 1) {
+                $search_condition = " AND (remove_accents(heading) LIKE remove_accents(?) OR remove_accents(entry) LIKE remove_accents(?))";
+                $search_params[] = "%{$search}%";
+                $search_params[] = "%{$search}%";
+            } else {
+                $parts = [];
+                foreach ($terms as $term) {
+                    $parts[] = "(remove_accents(heading) LIKE remove_accents(?) OR remove_accents(entry) LIKE remove_accents(?))";
+                    $search_params[] = "%{$term}%";
+                    $search_params[] = "%{$term}%";
+                }
+                $search_condition = " AND (" . implode(" AND ", $parts) . ")";
+            }
+        }
+
+        $workspace_condition = $pageWorkspace ? " AND workspace = ?" : '';
+
+        // Build parameters array
+        $params = $search_params;
+        if ($pageWorkspace) {
+            $params[] = $pageWorkspace;
+        }
+
+        // Total count for the header (the list below is capped at 50)
+        $countSql = "SELECT COUNT(*) FROM entries WHERE trash = 1" . $search_condition . $workspace_condition;
+        if (!empty($params)) {
+            $countStmt = $con->prepare($countSql);
+            $countStmt->execute($params);
+        } else {
+            $countStmt = $con->query($countSql);
+        }
+        $totalCount = (int)$countStmt->fetchColumn();
+
+        if ($totalCount === 1) {
+            $countLabel = t_h('trash.count_one', [], '1 note in trash');
+        } else {
+            $countLabel = t_h('trash.count_other', ['count' => $totalCount], '{{count}} notes in trash');
+        }
+        ?>
+
+        <div class="trash-page-header">
+            <h1 class="trash-page-title">
+                <span class="trash-page-title-icon"><i class="lucide lucide-trash"></i></span>
+                <?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>
+            </h1>
+            <div class="trash-page-count"><?php echo $countLabel; ?></div>
+        </div>
+
         <?php if (!empty($search)): ?>
             <div class="trash-search-notice">
                 <?php echo t_h('trash.search.results_for', ['term' => htmlspecialchars($search, ENT_QUOTES)], 'Results for "{{term}}"'); ?>
@@ -147,37 +203,8 @@ $currentLang = getUserLanguage();
         
         <div class="trash-content">
             <?php
-            // Build search condition supporting multiple terms (AND) with accent-insensitive search
-            $search_params = [];
-            $search_condition = '';
-            
-            if ($search) {
-                $terms = array_filter(array_map('trim', preg_split('/\s+/', $search)));
-                
-                if (count($terms) <= 1) {
-                    $search_condition = " AND (remove_accents(heading) LIKE remove_accents(?) OR remove_accents(entry) LIKE remove_accents(?))";
-                    $search_params[] = "%{$search}%";
-                    $search_params[] = "%{$search}%";
-                } else {
-                    $parts = [];
-                    foreach ($terms as $term) {
-                        $parts[] = "(remove_accents(heading) LIKE remove_accents(?) OR remove_accents(entry) LIKE remove_accents(?))";
-                        $search_params[] = "%{$term}%";
-                        $search_params[] = "%{$term}%";
-                    }
-                    $search_condition = " AND (" . implode(" AND ", $parts) . ")";
-                }
-            }
-            
-            $workspace_condition = $pageWorkspace ? " AND workspace = ?" : '';
             $sql = "SELECT * FROM entries WHERE trash = 1" . $search_condition . $workspace_condition . " ORDER BY updated DESC LIMIT 50";
-            
-            // Build parameters array
-            $params = $search_params;
-            if ($pageWorkspace) {
-                $params[] = $pageWorkspace;
-            }
-            
+
             // Execute query
             if (!empty($params)) {
                 $stmt = $con->prepare($sql);
@@ -185,7 +212,7 @@ $currentLang = getUserLanguage();
             } else {
                 $stmt = $con->query($sql);
             }
-            
+
             // Display notes
             $hasNotes = false;
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -196,7 +223,7 @@ $currentLang = getUserLanguage();
                 $heading = $row['heading'];
                 $updated = formatDateTime(strtotime($row['updated']));
                 $lastModifiedLabel = t_h('trash.note.last_modified_on', ['date' => $updated], 'Last modified on {{date}}');
-                
+
                 // Handle tasklist type notes
                 $displayContent = $entryfinal;
                 if (isset($row['type']) && $row['type'] === 'tasklist') {
@@ -208,22 +235,41 @@ $currentLang = getUserLanguage();
                         $displayContent = htmlspecialchars($entryfinal, ENT_QUOTES);
                     }
                 }
-                
+
                 echo '<div id="note' . $id . '" class="trash-notecard">'
                     . '<div class="trash-innernote">'
-                    . '<div class="trash-action-icons">'
-                    . '<i title="' . t_h('trash.actions.restore_note_tooltip', [], 'Restore this note') . '" class="lucide lucide-undo-2" data-noteid="' . $id . '"></i>'
-                    . '<i title="' . t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently') . '" class="lucide lucide-trash-2" data-noteid="' . $id . '"></i>'
-                    . '</div>'
-                    . '<div class="lastupdated">' . $lastModifiedLabel . '</div>'
+                    . '<div class="trash-note-header">'
+                    . '<div class="trash-note-titleblock">'
                     . '<h3 class="css-title">' . htmlspecialchars($heading, ENT_QUOTES) . '</h3>'
-                    . '<hr>'
+                    . '<div class="lastupdated">' . $lastModifiedLabel . '</div>'
+                    . '</div>'
+                    . '<div class="trash-action-icons">'
+                    . '<button type="button" class="trash-action-btn trash-restore-btn" title="' . t_h('trash.actions.restore_note_tooltip', [], 'Restore this note') . '" data-noteid="' . $id . '">'
+                    . '<i class="lucide lucide-undo-2"></i>'
+                    . '</button>'
+                    . '<button type="button" class="trash-action-btn trash-delete-btn" title="' . t_h('trash.actions.delete_permanently_tooltip', [], 'Delete permanently') . '" data-noteid="' . $id . '">'
+                    . '<i class="lucide lucide-trash-2"></i>'
+                    . '</button>'
+                    . '</div>'
+                    . '</div>'
+                    . '<div class="trash-note-preview">'
                     . '<div class="noteentry">' . $displayContent . '</div>'
+                    . '<div class="trash-preview-fade"></div>'
+                    . '</div>'
+                    . '<button type="button" class="trash-expand-btn" hidden>'
+                    . '<span class="trash-expand-more"><i class="lucide lucide-chevron-down"></i> ' . t_h('trash.note.show_more', [], 'Show more') . '</span>'
+                    . '<span class="trash-expand-less"><i class="lucide lucide-chevron-up"></i> ' . t_h('trash.note.show_less', [], 'Show less') . '</span>'
+                    . '</button>'
                     . '</div></div>';
             }
-            
+
             if (!$hasNotes) {
-                echo '<div class="trash-no-notes">' . t_h('trash.empty', [], 'No notes in trash.') . '</div>';
+                echo '<div class="trash-no-notes">'
+                    . '<div class="trash-no-notes-icon"><i class="lucide lucide-trash"></i></div>'
+                    . '<div class="trash-no-notes-text">' . t_h('trash.empty', [], 'No notes in trash.') . '</div>'
+                    . '</div>';
+            } elseif ($totalCount > 50) {
+                echo '<div class="trash-limit-notice">' . t_h('trash.showing_limit', ['count' => 50], 'Only the {{count}} most recently modified notes are shown') . '</div>';
             }
             ?>
         </div>

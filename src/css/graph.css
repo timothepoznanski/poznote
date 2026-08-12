@@ -62,6 +62,22 @@ body.graph-page {
     border-color: #007DB8;
 }
 
+.graph-folder-select {
+    max-width: 220px;
+    padding: 7px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    background: #ffffff;
+    color: #4b5563;
+    cursor: pointer;
+}
+
+.graph-folder-select:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
 .graph-options {
     display: flex;
     align-items: center;
@@ -105,13 +121,25 @@ body.graph-page {
     background: #f3f4f6;
 }
 
+/* Floating hint at the top of the canvas (not in the toolbar) */
 .graph-hint {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
     display: flex;
     align-items: center;
     gap: 5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.85);
     font-size: 12px;
     color: #9ca3af;
     white-space: nowrap;
+    max-width: calc(100% - 24px);
+    overflow: hidden;
+    pointer-events: none;
 }
 
 .graph-hint .lucide {
@@ -286,7 +314,17 @@ html[data-theme="dark"] .graph-search-input:focus {
 
 html[data-theme="dark"] .graph-hint {
     color: var(--dm-text-muted, #8a8a8a);
-    opacity: 0.75;
+    background: rgba(37, 37, 38, 0.85);
+}
+
+html[data-theme="dark"] .graph-folder-select {
+    background: var(--dm-content-bg, #252526);
+    border-color: var(--dm-border, #404040);
+    color: var(--dm-text-muted, #c5c5c5);
+}
+
+html[data-theme="dark"] .graph-folder-select:focus {
+    border-color: var(--dm-accent, #4a9eff);
 }
 
 html[data-theme="dark"] .graph-orphans-toggle,

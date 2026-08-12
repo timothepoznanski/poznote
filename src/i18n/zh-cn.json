@@ -806,7 +806,9 @@
       "delete_permanently_tooltip": "永久删除"
     },
     "note": {
-      "last_modified_on": "最后修改于 {{date}}"
+      "last_modified_on": "最后修改于 {{date}}",
+      "show_more": "显示更多",
+      "show_less": "收起"
     },
     "empty": "回收站中没有笔记。",
     "modals": {
@@ -833,7 +835,10 @@
       "empty_error_title": "清空回收站出错",
       "empty_error_prefix": "清空回收站时出错: ",
       "empty_error_generic": "清空回收站时出错"
-    }
+    },
+    "count_one": "回收站中有 1 条笔记",
+    "count_other": "回收站中有 {{count}} 条笔记",
+    "showing_limit": "仅显示最近修改的 {{count}} 条笔记"
   },
   "editor": {
     "markdown_placeholder": "编写您的 Markdown，使用 / 打开命令菜单，粘贴图片或在光标处拖放图片。",
@@ -1023,7 +1028,7 @@
       "reminder_bell": "铃铛图标（提醒）",
       "dashboard_user": "用户",
       "dashboard_filter_bar": "筛选栏",
-      "view_layout_toggle": "网格 / 列表切换",
+      "view_layout_toggle": "视图切换（网格 / 列表、卡片大小）",
       "index_search_bar": "搜索栏",
       "tasklist_progress_bar": "任务列表进度条",
       "share_restrict_users": "分享：限制为特定用户",
@@ -1339,6 +1344,24 @@
         "days": "天"
       }
     },
+    "welcome_setup": {
+      "title": "欢迎使用 Poznote！",
+      "subtitle": "让我们先设置几个偏好，帮助您快速上手。您随时可以更改这些设置。",
+      "language_label": "语言",
+      "theme_label": "主题",
+      "theme_options": {
+        "system": "跟随系统",
+        "light": "浅色",
+        "dark": "深色",
+        "black": "纯黑"
+      },
+      "date_format_label": "日期和时间格式",
+      "timezone_label": "时区",
+      "settings_tip": "更多选项（字体、备份、AI 等）等您在 Poznote 设置中探索。",
+      "dashboard_tip": "仪表盘可让您总览笔记和账户。",
+      "skip": "跳过",
+      "start": "开始使用"
+    },
     "timezone": {
       "title": "时区",
       "description": "选择您的时区：",
@@ -1405,6 +1428,8 @@
       "remove_from_folder": "拖放到此处从文件夹中移除"
     },
     "folder_actions": {
+      "add_favorite": "添加到收藏",
+      "remove_favorite": "从收藏中移除",
       "menu": "操作",
       "create": "创建",
       "kanban_view": "看板视图",
@@ -3380,7 +3405,8 @@
       "reminder_due_title": "与 reminder.due 相同的触发，但不含提醒消息：标识符加上笔记标题和直达链接。",
       "reminder_due_minimal": "与 reminder.due 相同的触发，但仅含标识符（笔记 id、提醒 id、触发时间）：笔记内容不会离开实例。详情可通过 REST API 获取。",
       "note_created": "您的账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
-      "note_shared": "为您的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。"
+      "note_shared": "为您的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。",
+      "settings_language_changed": "您在设置中更改了界面语言。Payload：新的语言代码、之前的代码，以及更改来自界面还是 REST API。"
     },
     "title": "Webhook",
     "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",
@@ -3550,6 +3576,8 @@
     "reset_layout": "重置布局",
     "reset_layout_hint": "忘记已保存的位置并自动重新排列图谱",
     "drag_hint": "Ctrl + 拖动可独立于链接移动单个点",
+    "folder_filter_all": "所有文件夹",
+    "folder_filter_hint": "仅显示某个文件夹中的笔记",
     "stats": "{{notes}} 篇笔记 · {{links}} 个链接",
     "search": {
       "placeholder": "查找笔记..."

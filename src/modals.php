@@ -1166,6 +1166,78 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<?php if (!empty($showWelcomeSetupModal)): ?>
+<!-- First-run welcome setup wizard. Rendered only while the 'welcome_setup'
+     setting is 'pending' (seeded at account creation); js/welcome-setup.js
+     opens it, pre-fills the selects and flips the flag to 'done'. -->
+<div id="welcomeSetupModal" class="modal">
+    <div class="modal-content welcome-setup-content">
+        <div class="welcome-setup-hero">
+            <img src="pwa/poznote.png" alt="Poznote" class="welcome-setup-logo">
+            <h3><?php echo t_h('modals.welcome_setup.title', [], 'Welcome to Poznote!'); ?></h3>
+            <p class="welcome-setup-subtitle"><?php echo t_h('modals.welcome_setup.subtitle', [], 'Let\'s set up a few preferences to get you started. You can change them at any time.'); ?></p>
+        </div>
+        <div class="modal-body">
+            <div class="welcome-setup-grid">
+                <div class="welcome-setup-field">
+                    <label for="welcomeLanguageSelect"><i class="lucide lucide-globe"></i> <?php echo t_h('modals.welcome_setup.language_label', [], 'Language'); ?></label>
+                    <select id="welcomeLanguageSelect">
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="de">Deutsch</option>
+                        <option value="es">Español</option>
+                        <option value="pt">Português</option>
+                        <option value="ru">Русский</option>
+                        <option value="zh-cn">简体中文</option>
+                    </select>
+                </div>
+                <div class="welcome-setup-field">
+                    <label for="welcomeThemeSelect"><i class="lucide lucide-moon"></i> <?php echo t_h('modals.welcome_setup.theme_label', [], 'Theme'); ?></label>
+                    <select id="welcomeThemeSelect">
+                        <option value="system"><?php echo t_h('modals.welcome_setup.theme_options.system', [], 'Same as system'); ?></option>
+                        <option value="light"><?php echo t_h('modals.welcome_setup.theme_options.light', [], 'Light'); ?></option>
+                        <option value="dark"><?php echo t_h('modals.welcome_setup.theme_options.dark', [], 'Dark'); ?></option>
+                        <option value="black"><?php echo t_h('modals.welcome_setup.theme_options.black', [], 'Black'); ?></option>
+                    </select>
+                </div>
+                <div class="welcome-setup-field">
+                    <label for="welcomeDateFormatSelect"><i class="lucide lucide-calendar"></i> <?php echo t_h('modals.welcome_setup.date_format_label', [], 'Date & time format'); ?></label>
+                    <select id="welcomeDateFormatSelect">
+                        <option value="default"><?php echo t_h('modals.date_time_format.options.default', [], 'YYYY-MM-DD HH:mm'); ?></option>
+                        <option value="ymd_his"><?php echo t_h('modals.date_time_format.options.ymd_his', [], 'YYYY-MM-DD HH:mm:ss'); ?></option>
+                        <option value="dmy_hi"><?php echo t_h('modals.date_time_format.options.dmy_hi', [], 'DD/MM/YYYY HH:mm'); ?></option>
+                        <option value="mdy_hia"><?php echo t_h('modals.date_time_format.options.mdy_hia', [], 'MM/DD/YYYY hh:mm AM/PM'); ?></option>
+                    </select>
+                </div>
+                <div class="welcome-setup-field">
+                    <label for="welcomeTimezoneSelect"><i class="lucide lucide-clock"></i> <?php echo t_h('modals.welcome_setup.timezone_label', [], 'Timezone'); ?></label>
+                    <!-- Options are copied from #timezoneSelect by js/welcome-setup.js -->
+                    <select id="welcomeTimezoneSelect">
+                        <option value="UTC">UTC</option>
+                    </select>
+                </div>
+            </div>
+            <div class="welcome-setup-tips">
+                <a href="settings.php" class="welcome-setup-tip">
+                    <i class="lucide lucide-settings"></i>
+                    <span><?php echo t_h('modals.welcome_setup.settings_tip', [], 'Many more options (fonts, backups, AI and more) are waiting for you in the Poznote settings.'); ?></span>
+                    <i class="lucide lucide-chevron-right welcome-setup-tip-arrow"></i>
+                </a>
+                <a href="dashboard.php" class="welcome-setup-tip">
+                    <i class="lucide lucide-layout-dashboard"></i>
+                    <span><?php echo t_h('modals.welcome_setup.dashboard_tip', [], 'The dashboard gives you an overview of your notes and your account.'); ?></span>
+                    <i class="lucide lucide-chevron-right welcome-setup-tip-arrow"></i>
+                </a>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="welcomeSetupSkipBtn"><?php echo t_h('modals.welcome_setup.skip', [], 'Skip'); ?></button>
+            <button type="button" class="btn-primary" id="welcomeSetupSaveBtn"><?php echo t_h('modals.welcome_setup.start', [], 'Get started'); ?></button>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Note Reference Modal -->
 <div id="attachmentPickerModal" class="modal">
     <div class="modal-content note-reference-modal-content">
@@ -1740,8 +1812,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardSettingsBtn" checked><span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'Grid / list toggle'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewSizeBtn" checked><span><?php echo t_h('dashboard.view.size', [], 'Card size'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardColorFilterBtn" checked><span><?php echo t_h('note_color.filter', [], 'Filter by color'); ?></span></label>
                 </div>

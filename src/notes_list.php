@@ -25,6 +25,25 @@ try {
     $favorites_count = 0;
 }
 
+// Favorite folders for the current workspace, listed in the Favorites section
+$favorite_folders = [];
+try {
+    if (isset($con)) {
+        $query = "SELECT id, name, icon, icon_color FROM folders WHERE favorite = 1";
+        $params = [];
+        if (!empty($workspace_filter)) {
+            $query .= " AND workspace = ?";
+            $params[] = $workspace_filter;
+        }
+        $query .= " ORDER BY name COLLATE NOCASE";
+        $stmtFavoriteFolders = $con->prepare($query);
+        $stmtFavoriteFolders->execute($params);
+        $favorite_folders = $stmtFavoriteFolders->fetchAll(PDO::FETCH_ASSOC);
+    }
+} catch (Exception $e) {
+    $favorite_folders = [];
+}
+
 $selected_linked_note_id = isset($_GET['select_linked_note']) ? intval($_GET['select_linked_note']) : 0;
 $has_created_date_filter = !empty($created_from) || !empty($created_to);
 
@@ -126,11 +145,37 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<div id=pxbetweennotes></div>";
 }
 
+// Render favorite folders as shortcut links inside the Favorites section.
+// Clicking one opens the folder-filtered view (same as filtering by folder).
+function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
+    foreach ($favorite_folders as $favFolder) {
+        $favName = $favFolder['name'];
+        $link = 'index.php?folder=' . urlencode($favName);
+        if (!empty($workspace_filter)) {
+            $link .= '&workspace=' . urlencode($workspace_filter);
+        }
+
+        $customIcon = !empty($favFolder['icon']) ? convertFontAwesomeToLucide($favFolder['icon']) : 'lucide lucide-folder';
+        $iconStyle = !empty($favFolder['icon_color']) ? " style='color: " . htmlspecialchars($favFolder['icon_color'], ENT_QUOTES) . " !important;'" : "";
+
+        echo "<div class='note-list-item favorite-folder-item'>";
+        echo "<a class='links_arbo_left note-in-folder favorite-folder-link' href='" . htmlspecialchars($link, ENT_QUOTES) . "' data-folder-id='" . (int)$favFolder['id'] . "' data-folder='" . htmlspecialchars($favName, ENT_QUOTES) . "'>";
+        echo "<span class='note-title'><i class='$customIcon favorite-folder-icon'$iconStyle></i>" . htmlspecialchars($favName, ENT_QUOTES) . "</span>";
+        echo "</a>";
+        echo "</div>";
+        echo "<div id=pxbetweennotes></div>";
+    }
+}
+
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true, $created_from = '', $created_to = '') {
-    global $selected_linked_note_id;
+    global $selected_linked_note_id, $favorite_folders;
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
-    
+
+    // Favorite folder shortcuts only make sense in the normal browsing view
+    $isFavoritesSection = ($folderName === 'Favorites' && $depth === 0);
+    $hasFavoriteFolders = $isFavoritesSection && !empty($favorite_folders) && empty($folder_filter) && !$is_search_mode;
+
     // In search mode, don't display empty folders (unless they have children with results)
     if ($is_search_mode && countNotesRecursively($folderData) === 0) {
         return;
@@ -205,13 +250,18 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<span class='folder-actions'>";
         
         // Generate folder actions
-        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, $currentSort);
+        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, $currentSort, !empty($folderData['favorite']));
         
         echo "</span>";
         echo "</div>";
         echo "<div class='folder-content' id='$folderDomId' style='display: $folder_display;'>";
+
+        // Favorite folders are listed first inside the Favorites section
+        if ($hasFavoriteFolders) {
+            renderFavoriteFolderItems($favorite_folders, $workspace_filter);
+        }
     }
-    
+
     // Display notes in folder (before subfolders if displayUncategorizedFirst is true)
     if ($displayUncategorizedFirst) {
         foreach($notes as $row1) {
@@ -281,7 +331,7 @@ foreach($hierarchicalFolders as $folderId => $folderData) {
 }
 
 // Display Favorites folder after Dashboard
-if ($favoritesFolder && $favorites_count > 0) {
+if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !$is_search_mode))) {
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
     }

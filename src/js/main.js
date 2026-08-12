@@ -245,6 +245,7 @@ window.newnote = createNewNote;
 window.saveNoteImmediately = saveNoteToServer;
 window.deleteNote = deleteNote;
 window.toggleFavorite = toggleFavorite;
+window.toggleFolderFavorite = toggleFolderFavorite;
 window.duplicateNote = duplicateNote;
 window.showNoteInfo = showNoteInfo;
 window.toggleNoteMenu = toggleNoteMenu;

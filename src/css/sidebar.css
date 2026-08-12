@@ -477,6 +477,13 @@
     opacity: 0.8;
 }
 
+/* Favorite folder shortcuts inside the Favorites section */
+.favorite-folder-item .favorite-folder-icon {
+    font-size: 0.95em;
+    margin-right: 5px;
+    vertical-align: -0.1em;
+}
+
 .note-icon {
     cursor: pointer;
     font-size: 1em;

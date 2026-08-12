@@ -807,7 +807,9 @@
       "delete_permanently_tooltip": "Endgültig löschen"
     },
     "note": {
-      "last_modified_on": "Zuletzt geändert am {{date}}"
+      "last_modified_on": "Zuletzt geändert am {{date}}",
+      "show_more": "Mehr anzeigen",
+      "show_less": "Weniger anzeigen"
     },
     "empty": "Keine Notizen im Papierkorb.",
     "modals": {
@@ -834,7 +836,10 @@
       "empty_error_title": "Papierkorb-leeren-Fehler",
       "empty_error_prefix": "Fehler beim Leeren des Papierkorbs: ",
       "empty_error_generic": "Fehler beim Leeren des Papierkorbs"
-    }
+    },
+    "count_one": "1 Notiz im Papierkorb",
+    "count_other": "{{count}} Notizen im Papierkorb",
+    "showing_limit": "Es werden nur die {{count}} zuletzt geänderten Notizen angezeigt"
   },
   "editor": {
     "markdown_placeholder": "Schreiben Sie Ihr Markdown, verwenden Sie /, um das Befehlsmenü zu öffnen, fügen Sie Bilder ein oder legen Sie ein Bild am Cursor ab.",
@@ -1022,7 +1027,7 @@
       "reminder_bell": "Glockensymbol (Erinnerung)",
       "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
-      "view_layout_toggle": "Umschalter Raster / Liste",
+      "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
       "index_search_bar": "Suchleiste",
       "tasklist_progress_bar": "Fortschrittsbalken der Aufgabenlisten",
       "share_restrict_users": "Teilen: auf bestimmte Benutzer beschränken",
@@ -1344,6 +1349,24 @@
         "days": "Tage"
       }
     },
+    "welcome_setup": {
+      "title": "Willkommen bei Poznote!",
+      "subtitle": "Legen wir ein paar Einstellungen für den Start fest. Sie können sie jederzeit ändern.",
+      "language_label": "Sprache",
+      "theme_label": "Thema",
+      "theme_options": {
+        "system": "Wie das System",
+        "light": "Hell",
+        "dark": "Dunkel",
+        "black": "Schwarz"
+      },
+      "date_format_label": "Datums- und Uhrzeitformat",
+      "timezone_label": "Zeitzone",
+      "settings_tip": "Viele weitere Optionen (Schriftarten, Backups, KI und mehr) warten in den Poznote-Einstellungen auf Sie.",
+      "dashboard_tip": "Das Dashboard gibt Ihnen einen Überblick über Ihre Notizen und Ihr Konto.",
+      "skip": "Überspringen",
+      "start": "Los geht's"
+    },
     "timezone": {
       "title": "Zeitzone",
       "description": "Wählen Sie Ihre Zeitzone:",
@@ -1412,6 +1435,8 @@
       "remove_from_folder": "Hier ablegen, um aus Ordner zu entfernen"
     },
     "folder_actions": {
+      "add_favorite": "Zu Favoriten hinzufügen",
+      "remove_favorite": "Aus Favoriten entfernen",
       "menu": "Aktionen",
       "create": "Erstellen",
       "kanban_view": "Kanban-Ansicht",
@@ -3257,7 +3282,8 @@
       "reminder_due_title": "Gleicher Auslöser wie reminder.due, aber ohne die Erinnerungsnachricht: die IDs plus Titel und Direktlink der Notiz.",
       "reminder_due_minimal": "Gleicher Auslöser wie reminder.due, aber nur IDs (Notiz-ID, Erinnerungs-ID, Auslösezeit): kein Notizinhalt verlässt die Instanz. Details können über die REST-API abgerufen werden.",
       "note_created": "In Ihrem Konto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
-      "note_shared": "Für eine Ihrer Notizen wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist."
+      "note_shared": "Für eine Ihrer Notizen wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist.",
+      "settings_language_changed": "Sie haben die Sprache der Oberfläche in den Einstellungen geändert. Payload: der neue Sprachcode, der vorherige und ob die Änderung über die Oberfläche oder die REST-API erfolgte."
     },
     "title": "Webhooks",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpunkt, wenn ein abonniertes Ereignis eintritt. Ist ein Secret gesetzt, wird die Payload per HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",
@@ -3427,6 +3453,8 @@
     "reset_layout": "Anordnung zurücksetzen",
     "reset_layout_hint": "Gespeicherte Positionen verwerfen und den Graphen automatisch neu anordnen",
     "drag_hint": "Strg + Ziehen bewegt einen Punkt unabhängig von seinen Verknüpfungen",
+    "folder_filter_all": "Alle Ordner",
+    "folder_filter_hint": "Nur die Notizen eines Ordners anzeigen",
     "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
     "search": {
       "placeholder": "Notiz suchen..."

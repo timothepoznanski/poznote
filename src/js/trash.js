@@ -73,22 +73,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Management of restore and permanent delete buttons
     document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('lucide-undo-2')) {
+        const restoreBtn = e.target.closest('.trash-restore-btn');
+        if (restoreBtn) {
             e.preventDefault();
-            const noteid = e.target.getAttribute('data-noteid');
+            const noteid = restoreBtn.getAttribute('data-noteid');
             if (noteid) {
                 showRestoreConfirmModal(noteid);
             }
+            return;
         }
 
-        if (e.target.classList.contains('lucide-trash-2')) {
+        const deleteBtn = e.target.closest('.trash-delete-btn');
+        if (deleteBtn) {
             e.preventDefault();
-            const noteid = e.target.getAttribute('data-noteid');
+            const noteid = deleteBtn.getAttribute('data-noteid');
             if (noteid) {
                 showDeleteConfirmModal(noteid);
             }
         }
     });
+
+    // Collapse long note previews, with a show more/less toggle
+    initTrashPreviews();
 
     // Management of "Empty trash" button
     const emptyTrashBtn = document.getElementById('emptyTrashBtn');
@@ -136,6 +142,25 @@ document.addEventListener('DOMContentLoaded', function () {
         deleteConfirmBtn.addEventListener('click', executePermanentDelete);
     }
 });
+
+// Collapsed preview height must match .trash-note-preview.is-collapsed max-height in trash.css
+const TRASH_PREVIEW_MAX_HEIGHT = 190;
+
+function initTrashPreviews() {
+    document.querySelectorAll('.trash-notecard').forEach(card => {
+        const preview = card.querySelector('.trash-note-preview');
+        const toggleBtn = card.querySelector('.trash-expand-btn');
+        if (!preview || !toggleBtn) return;
+
+        if (preview.scrollHeight > TRASH_PREVIEW_MAX_HEIGHT + 40) {
+            preview.classList.add('is-collapsed');
+            toggleBtn.hidden = false;
+            toggleBtn.addEventListener('click', function () {
+                preview.classList.toggle('is-collapsed');
+            });
+        }
+    });
+}
 
 function updateSearchResults(count, searchTerm) {
     let resultsDiv = document.getElementById('searchResults');

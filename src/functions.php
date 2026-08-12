@@ -820,7 +820,9 @@ function buildNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
  * 'type_based_note_icons' setting (enabled by default); when it is off, every
  * note falls back to the generic file icon as before.
  *
- * Mirrors getNoteTypeIcon() in js/notes-manager.js and js/folder-icon.js.
+ * Mirrors getNoteTypeIcon() in js/notes-manager.js; js/folder-icon.js does not
+ * duplicate the mapping, it reads the resolved default from the
+ * data-default-icon attribute stamped by renderEditableNoteIcon() below.
  */
 function defaultNoteIconForType($noteType) {
     $setting = getSetting('type_based_note_icons', '1');
@@ -1059,6 +1061,31 @@ function poznoteNormalizeHiddenUiKey($key) {
 }
 
 /**
+ * Interface languages this instance ships a dictionary for (src/i18n/*.json).
+ *
+ * Single source of truth: the login page, the settings API validation and the
+ * login-time language sync must agree, otherwise a code accepted in one place
+ * renders as raw translation keys in another.
+ */
+function poznoteSupportedLanguages(): array {
+    return ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn'];
+}
+
+/**
+ * Normalize a language code to one this instance actually supports.
+ *
+ * Returns null when the value matches nothing, so callers can decide between
+ * keeping their current value and falling back to English.
+ */
+function poznoteNormalizeLanguageCode($lang): ?string {
+    $lang = strtolower(trim((string)$lang));
+    if ($lang === '') {
+        return null;
+    }
+    return in_array($lang, poznoteSupportedLanguages(), true) ? $lang : null;
+}
+
+/**
  * Pick the best supported language from an Accept-Language header.
  *
  * Used on pre-auth pages (the login page), where no user preference exists yet.
@@ -1127,6 +1154,61 @@ function poznoteDetectBrowserLanguage(string $header, array $allowedLangs): ?str
     }
 
     return null;
+}
+
+/**
+ * Reconcile the active user's interface language at the start of a session.
+ *
+ * Two things happen here:
+ *  - As long as the user has never picked a language in the settings
+ *    (settings.language_source is not 'user'), the browser's Accept-Language
+ *    header drives the interface, so a brand new account opens in the visitor's
+ *    own language instead of English. The moment the language is changed in the
+ *    settings the source flips to 'user' and the browser stops overriding it.
+ *  - The resulting language is mirrored into master.users.language, so
+ *    consumers that never open the per-user database (mailing tools, admin
+ *    exports) can read it from the profile.
+ *
+ * Called from db_connect.php before anything reads getSetting(), so the value
+ * written here is the one the request's static settings cache picks up.
+ */
+function poznoteSyncUserLanguage(PDO $con, int $userId): void {
+    if ($userId <= 0) {
+        return;
+    }
+
+    try {
+        $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('language', 'language_source')");
+        $rows = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[$row['key']] = $row['value'];
+        }
+
+        $language = poznoteNormalizeLanguageCode($rows['language'] ?? '');
+        $source = (string)($rows['language_source'] ?? '');
+
+        if ($source !== 'user') {
+            $detected = poznoteDetectBrowserLanguage(
+                $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
+                poznoteSupportedLanguages()
+            );
+            if ($detected !== null && $detected !== $language) {
+                $update = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                $update->execute(['language', $detected]);
+                $language = $detected;
+            }
+        }
+
+        if ($language === null) {
+            $language = 'en';
+        }
+
+        require_once __DIR__ . '/users/db_master.php';
+        setUserProfileLanguage($userId, $language);
+    } catch (Exception $e) {
+        // Never let a language sync failure break page rendering.
+        error_log('Poznote: user language sync failed: ' . $e->getMessage());
+    }
 }
 
 function poznoteGetGlobalHiddenUiElements() {
@@ -4102,26 +4184,23 @@ function buildNoteCardPreview($noteId, $type) {
 }
 
 /**
- * Render the view controls (layout toggle + card size cycle) used by the
- * dashboard and diary boards, next to the filter bar. $prefix namespaces the
- * localStorage keys so each page remembers its own settings. The layout
- * button toggles grid/list; the size button cycles small/medium/large and is
- * hidden in list layout (board-view-menu.js drives both).
+ * Render the view controls used by the dashboard and diary boards, next to
+ * the filter bar. $prefix namespaces the localStorage keys so each page
+ * remembers its own settings. A single toggle cycles through the views
+ * (grid small/medium/large, then list); the columns button caps the grid
+ * width and is hidden in list layout (board-view-menu.js drives both).
  */
 function renderBoardViewMenu(string $prefix) {
     $idPrefix = htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8');
     echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '">' .
         '<button type="button" id="' . $idPrefix . 'ViewLayoutBtn" class="board-view-btn board-view-layout-toggle"' .
             ' data-label-grid="' . t_h('dashboard.view.layout_grid', [], 'Grid') . '"' .
-            ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '">' .
-            '<i class="lucide lucide-layout-list"></i>' .
-            '<i class="lucide lucide-grid"></i>' .
-        '</button>' .
-        '<button type="button" id="' . $idPrefix . 'ViewSizeBtn" class="board-view-btn board-view-size-btn"' .
+            ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '"' .
             ' data-label-small="' . t_h('dashboard.view.size_small', [], 'Small') . '"' .
             ' data-label-medium="' . t_h('dashboard.view.size_medium', [], 'Medium') . '"' .
-            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '"' .
-            ' title="' . t_h('dashboard.view.size', [], 'Card size') . '">' .
+            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '">' .
+            '<i class="lucide lucide-grid"></i>' .
+            '<i class="lucide lucide-layout-list"></i>' .
             '<span class="board-view-size-letter"></span>' .
         '</button>' .
         '<button type="button" id="' . $idPrefix . 'ViewColumnsBtn" class="board-view-btn board-view-columns-btn"' .

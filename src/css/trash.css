@@ -81,6 +81,46 @@ body.trash-page {
     margin-bottom: 20px;
 }
 
+/* Page header (title + count) */
+.trash-page-header {
+    text-align: center;
+    margin-top: 32px;
+    margin-bottom: 4px;
+}
+
+.trash-page-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 6px 0;
+}
+
+.trash-page-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #fdecec;
+}
+
+.trash-page-title-icon .lucide {
+    width: 20px;
+    height: 20px;
+    color: #e04b4b;
+    background-color: #e04b4b;
+}
+
+.trash-page-count {
+    font-size: 13px;
+    color: #888;
+}
+
 .trash-search-results {
     font-size: 13px;
     color: #666;
@@ -218,42 +258,211 @@ body.trash-page {
 }
 
 .trash-notecard {
+    position: relative;
     border: 1px solid #ddd;
     margin-bottom: 15px;
-    border-radius: 8px;
+    border-radius: 10px;
     background: white;
     font-family: 'Inter', sans-serif;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.15s ease;
+}
+
+.trash-notecard:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .trash-innernote {
-    padding: 2% 2% 5px 2%;
+    padding: 16px 20px 12px 20px;
     font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
 }
 
+/* Card header: title + meta on the left, actions on the right */
+.trash-note-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 12px;
+}
+
+.trash-note-titleblock {
+    min-width: 0;
+}
+
+.trash-note-header .css-title {
+    margin: 0 0 4px 0;
+    font-size: 17px;
+    overflow-wrap: anywhere;
+}
+
+.trash-note-header .lastupdated {
+    font-size: 12.5px;
+    color: #888;
+}
+
 .trash-action-icons {
-    position: absolute;
-    top: 10px;
-    right: 15px;
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
     align-items: center;
-    gap: 12px;
-    margin-top: 7px;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
-.trash-notecard {
+.trash-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.trash-action-btn .lucide {
+    width: 17px;
+    height: 17px;
+    color: #666;
+    background-color: #666;
+    pointer-events: none;
+}
+
+.trash-restore-btn:hover {
+    background: #e8f8ee;
+    border-color: #bbe8cc;
+}
+
+.trash-restore-btn:hover .lucide {
+    color: #16a34a;
+    background-color: #16a34a;
+}
+
+.trash-delete-btn:hover {
+    background: #fdecec;
+    border-color: #f5c6c6;
+}
+
+.trash-delete-btn:hover .lucide {
+    color: #dc2626;
+    background-color: #dc2626;
+}
+
+/* Collapsed content preview with fade-out */
+.trash-note-preview {
     position: relative;
+    overflow: hidden;
 }
 
+.trash-note-preview.is-collapsed {
+    max-height: 190px;
+}
+
+.trash-preview-fade {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 60px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
+    pointer-events: none;
+}
+
+.trash-note-preview.is-collapsed .trash-preview-fade {
+    display: block;
+}
+
+.trash-expand-btn {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    margin-top: 6px;
+    padding: 5px 14px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #007DB8;
+    font-size: 12.5px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+}
+
+.trash-expand-btn[hidden] {
+    display: none;
+}
+
+.trash-expand-btn:hover {
+    background: #f0f7ff;
+}
+
+.trash-expand-btn .lucide {
+    width: 13px;
+    height: 13px;
+    color: #007DB8;
+    background-color: #007DB8;
+    vertical-align: -2px;
+    margin-right: 4px;
+}
+
+.trash-expand-btn .trash-expand-more,
+.trash-expand-btn .trash-expand-less {
+    display: none;
+    align-items: center;
+    gap: 4px;
+}
+
+.trash-note-preview.is-collapsed ~ .trash-expand-btn .trash-expand-more {
+    display: inline-flex;
+}
+
+.trash-note-preview:not(.is-collapsed) ~ .trash-expand-btn .trash-expand-less {
+    display: inline-flex;
+}
+
+/* Empty state */
 .trash-no-notes {
     text-align: center;
     color: #666;
-    margin-top: 50px;
-    font-size: 1.1em;
+    margin-top: 60px;
+    font-size: 1.05em;
     padding-bottom: 100px;
+}
+
+.trash-no-notes-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #f3f4f6;
+    margin-bottom: 16px;
+}
+
+.trash-no-notes-icon .lucide {
+    width: 32px;
+    height: 32px;
+    color: #9ca3af;
+    background-color: #9ca3af;
+}
+
+.trash-no-notes-text {
+    color: #666;
+}
+
+.trash-limit-notice {
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+    margin: 10px 0 30px 0;
 }
 
 .trash-close-search {
@@ -301,30 +510,10 @@ body.trash-page {
     color: #d32f2f;
 }
 
-.lucide-trash-2,
-.lucide-undo-2,
 .lucide-x {
     line-height: 1;
     cursor: pointer;
     vertical-align: middle;
-}
-
-.lucide-trash-2 {
-    transition: color 0.1s ease;
-    font-size: 0.95em;
-}
-
-.lucide-trash-2:hover {
-    color: #ff0000 !important;
-}
-
-.lucide-undo-2 {
-    transition: color 0.2s ease;
-    font-size: 0.95em;
-}
-
-.lucide-undo-2:hover {
-    color: #22c55e !important;
 }
 
 /* Styles mobiles pour la page trash */
@@ -465,23 +654,27 @@ body.trash-page {
         line-height: 1.4;
     }
 
-    .trash-action-icons {
-        position: static;
-        justify-content: flex-end;
-        margin-bottom: 10px;
-        gap: 15px;
+    /* Larger touch targets on mobile */
+    .trash-action-btn {
+        width: 40px;
+        height: 40px;
     }
 
-    /* Larger trash action icons on mobile for better touch targets */
-    .lucide-trash-2,
-    .lucide-undo-2 {
-        width: 1.5em !important;
-        height: 1.5em !important;
+    .trash-action-btn .lucide {
+        width: 20px;
+        height: 20px;
+    }
+
+    .trash-page-header {
+        margin-top: 20px;
+    }
+
+    .trash-page-title {
+        font-size: 1.3em;
     }
 
     .css-title {
         font-size: 18px !important;
-        margin-bottom: 15px;
     }
 
     .lastupdated {
@@ -568,4 +761,88 @@ body.dark-mode .lastupdated {
 html[data-theme='dark'] .noteentry,
 body.dark-mode .noteentry {
     color: #ccc;
+}
+
+html[data-theme='dark'] .trash-page-title,
+body.dark-mode .trash-page-title {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .trash-page-title-icon,
+body.dark-mode .trash-page-title-icon {
+    background: rgba(224, 75, 75, 0.15);
+}
+
+html[data-theme='dark'] .trash-page-count,
+html[data-theme='dark'] .trash-limit-notice,
+body.dark-mode .trash-page-count,
+body.dark-mode .trash-limit-notice {
+    color: #888;
+}
+
+html[data-theme='dark'] .trash-notecard,
+body.dark-mode .trash-notecard {
+    box-shadow: none;
+}
+
+html[data-theme='dark'] .trash-note-header,
+body.dark-mode .trash-note-header {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .trash-action-btn .lucide,
+body.dark-mode .trash-action-btn .lucide {
+    color: #aaa;
+    background-color: #aaa;
+}
+
+html[data-theme='dark'] .trash-restore-btn:hover,
+body.dark-mode .trash-restore-btn:hover {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+html[data-theme='dark'] .trash-restore-btn:hover .lucide,
+body.dark-mode .trash-restore-btn:hover .lucide {
+    color: #4ade80;
+    background-color: #4ade80;
+}
+
+html[data-theme='dark'] .trash-delete-btn:hover,
+body.dark-mode .trash-delete-btn:hover {
+    background: rgba(220, 38, 38, 0.12);
+    border-color: rgba(220, 38, 38, 0.3);
+}
+
+html[data-theme='dark'] .trash-delete-btn:hover .lucide,
+body.dark-mode .trash-delete-btn:hover .lucide {
+    color: #f87171;
+    background-color: #f87171;
+}
+
+/* The card's inner surface is --dm-content-bg (see dark-mode/pages.css .trash-innernote) */
+html[data-theme='dark'] .trash-preview-fade,
+body.dark-mode .trash-preview-fade {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), var(--dm-content-bg));
+}
+
+html[data-theme='dark'] .trash-expand-btn:hover,
+body.dark-mode .trash-expand-btn:hover {
+    background: rgba(74, 158, 255, 0.1);
+}
+
+html[data-theme='dark'] .trash-expand-btn,
+body.dark-mode .trash-expand-btn {
+    color: #4a9eff;
+}
+
+html[data-theme='dark'] .trash-expand-btn .lucide,
+body.dark-mode .trash-expand-btn .lucide {
+    color: #4a9eff;
+    background-color: #4a9eff;
+}
+
+html[data-theme='dark'] .trash-no-notes-icon,
+body.dark-mode .trash-no-notes-icon {
+    background: var(--dm-surface);
 }
