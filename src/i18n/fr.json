@@ -384,6 +384,7 @@
       "tenant_isolation": "Mode SaaS : choisissez les fonctionnalités bloquées pour les utilisateurs non administrateurs, comme la découverte des autres comptes de l'instance ou l'enregistrement de webhooks personnels. Laissez tout décoché pour une instance familiale ou d'équipe.",
       "workspaces": "Organisez vos notes dans des espaces de travail séparés, chacun avec ses dossiers et ses notes.",
       "my_profile": "Consultez et modifiez les informations de votre profil.",
+      "welcome_setup": "Revoyez l’assistant de démarrage et mettez à jour vos préférences de base.",
       "change_password": "Changez le mot de passe utilisé pour vous connecter.",
       "password_note_sso_only": "La connexion par mot de passe est désactivée sur cette instance.",
       "password_note_no_local": "Votre mot de passe est géré par votre fournisseur d'identité.",
@@ -512,6 +513,7 @@
       "delete_account": "Supprimer le compte",
       "import_limits": "Limites d'import",
       "user_quotas": "Quotas utilisateurs",
+      "welcome_setup": "Assistant de démarrage",
       "git_sync_toggle": "Synchronisation Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
@@ -519,6 +521,10 @@
       "ai_assistant": "Assistant IA",
       "s3_storage": "Pièces jointes S3",
       "s3_backup": "Sauvegardes S3"
+    },
+    "welcome_setup": {
+      "relaunch": "Revoir",
+      "restart_failed": "Impossible de relancer l’assistant de démarrage. Veuillez réessayer."
     },
     "install_app": {
       "launching": "L’installation va se lancer. Veuillez patienter...",
@@ -3472,7 +3478,7 @@
       "reminder_due_minimal": "Même déclenchement que reminder.due mais identifiants seulement (id de note, id de rappel, date d'échéance) : aucun contenu de note ne quitte l'instance. Les détails peuvent être récupérés via l'API REST.",
       "note_created": "Une note a été créée dans votre compte, depuis l'interface ou l'API REST. Payload : métadonnées seulement (id de note, titre, type, workspace, dossier, lien direct), jamais le contenu de la note.",
       "note_shared": "Un lien de partage public a été publié pour une de vos notes. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe.",
-      "settings_language_changed": "Vous avez changé la langue de l'interface dans les paramètres. Payload : le nouveau code langue, l'ancien, et si le changement vient de l'interface ou de l'API REST."
+      "settings_language_changed": "Un utilisateur a changé la langue de l'interface dans les paramètres. Payload : le profil utilisateur, le nouveau code langue, l'ancien, et si le changement vient de l'interface ou de l'API REST."
     },
     "title": "Webhooks",
     "description": "Poznote envoie une requête HTTP POST avec une charge JSON à chaque endpoint enregistré lorsqu'un événement souscrit se produit. Si un secret est défini, la charge est signée en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",

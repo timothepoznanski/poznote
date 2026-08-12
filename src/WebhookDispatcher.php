@@ -28,6 +28,7 @@ class WebhookDispatcher {
         'signup.cap_reached',
         'quota.notes_reached',
         'quota.storage_reached',
+        'settings.language_changed',
     ];
 
     // Events about an account's own content, managed from that account's
@@ -40,7 +41,6 @@ class WebhookDispatcher {
         'reminder.due_minimal',
         'note.created',
         'note.shared',
-        'settings.language_changed',
     ];
 
     // Reminder subset of USER_EVENTS; the worker skips its scan entirely when
@@ -58,12 +58,12 @@ class WebhookDispatcher {
         'signup.cap_reached',
         'quota.notes_reached',
         'quota.storage_reached',
+        'settings.language_changed',
         'reminder.due',
         'reminder.due_title',
         'reminder.due_minimal',
         'note.created',
         'note.shared',
-        'settings.language_changed',
     ];
 
     private const TIMEOUT_SECONDS = 5;
@@ -91,7 +91,8 @@ class WebhookDispatcher {
      * Send an event to every active webhook subscribed to it.
      *
      * $forUserId scopes delivery to one account's webhooks; user events must
-     * always pass it, instance events never.
+     * always pass it, instance events never. Instance events are delivered
+     * only to admin-registered (user_id NULL) webhooks.
      *
      * @return array{delivered:int,failed:int}
      */
@@ -99,7 +100,10 @@ class WebhookDispatcher {
         $result = ['delivered' => 0, 'failed' => 0];
 
         try {
-            foreach (listActiveWebhooksForEvent($event, $forUserId) as $webhook) {
+            $webhooks = $forUserId === null
+                ? listActiveInstanceWebhooksForEvent($event)
+                : listActiveWebhooksForEvent($event, $forUserId);
+            foreach ($webhooks as $webhook) {
                 if ($this->deliver($webhook, $event, $data)['success']) {
                     $result['delivered']++;
                 } else {
@@ -355,9 +359,8 @@ class WebhookDispatcher {
     /**
      * Emitted when an account explicitly changes its interface language from
      * the settings. The browser-driven language adoption at login never emits
-     * it: only a deliberate choice does. Like the other user events, delivery
-     * is scoped to the account's own webhooks, so the payload carries no user
-     * block.
+     * it: only a deliberate choice does. This is an instance event, so it is
+     * delivered to admin webhooks and identifies the account in the payload.
      *
      * @param string $previous language code before the change, '' when the
      *        account had none stored yet
@@ -365,15 +368,17 @@ class WebhookDispatcher {
      * @return array{delivered:int,failed:int}
      */
     public function dispatchLanguageChanged(int $userId, string $previous, string $language, string $source): array {
-        if (!self::userWebhooksAllowedFor($userId)) {
+        $user = getUserProfileById($userId);
+        if (!$user) {
             return ['delivered' => 0, 'failed' => 0];
         }
 
         return $this->dispatch('settings.language_changed', [
+            'user' => $this->userPayload($user, null),
             'language' => $language,
             'previous_language' => $previous !== '' ? $previous : null,
             'source' => $source,
-        ], $userId);
+        ]);
     }
 
     /**

@@ -180,6 +180,7 @@ $eventHelpDefaults = [
     'signup.cap_reached' => 'An SSO signup was refused because the instance reached its maximum number of users. Payload: the cap and the attempted username and email.',
     'quota.notes_reached' => 'A user action was blocked because their notes quota is reached. Payload: the user, the limit and the current count.',
     'quota.storage_reached' => 'A user action was blocked because their storage quota is reached. Payload: the user, the limit and the current usage.',
+    'settings.language_changed' => 'A user changed the interface language in the settings. Payload: the user profile, the new language code, the previous one, and whether the change came from the interface or the REST API.',
 ];
 $eventHelp = [];
 foreach ($eventHelpDefaults as $eventName => $default) {

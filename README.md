@@ -691,7 +691,7 @@ Poznote can notify external services when something happens on the instance, by 
 
 There are two levels of webhooks:
 
-- **Admin Webhooks** (**Settings > Admin Tools > Admin Webhooks**, administrators only): instance events such as `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `signup.cap_reached`, `quota.notes_reached`, and `quota.storage_reached`.
+- **Admin Webhooks** (**Settings > Admin Tools > Admin Webhooks**, administrators only): instance events such as `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, and `quota.storage_reached`.
 - **User Webhooks** (**Settings > User Webhooks**): each account can register its own endpoints for events about its own content: `note.created`, `note.shared`, and reminder events. These events are only ever delivered to the endpoints registered by the account that produced them, never to another user's.
 
 Deliveries are JSON POST requests signed with HMAC-SHA256 when the webhook has a secret (same scheme as GitHub webhooks). Note content is never sent, payloads carry only metadata, and reminder events come in three variants so you choose how much data leaves the instance.
@@ -1151,4 +1151,3 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Docker** - Containerization for easy deployment and portability
 - **Python 3.12 (Alpine)** - MCP server runtime with httpx, uvicorn, fastmcp, and mcp libraries for AI assistant integration
 </details>
-

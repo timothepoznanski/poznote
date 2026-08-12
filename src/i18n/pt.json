@@ -371,6 +371,7 @@
       "tenant_isolation": "Modo SaaS: escolha quais funcionalidades são bloqueadas para os utilizadores não administradores, como descobrir as outras contas da instância ou registar webhooks pessoais. Deixe tudo desmarcado numa instância familiar ou de equipa.",
       "workspaces": "Organize suas notas em espaços de trabalho separados, cada um com suas pastas e notas.",
       "my_profile": "Veja e edite as informações do seu perfil.",
+      "welcome_setup": "Reveja o assistente de início e atualize as suas preferências básicas.",
       "change_password": "Altere a senha usada para entrar.",
       "password_note_sso_only": "O login com senha esta desativado nesta instancia.",
       "password_note_no_local": "Sua senha e gerenciada pelo seu provedor de identidade.",
@@ -499,6 +500,7 @@
       "delete_account": "Eliminar conta",
       "import_limits": "Limites de importação",
       "user_quotas": "Cotas de usuário",
+      "welcome_setup": "Assistente de início",
       "git_sync_toggle": "Sincronização Git",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-mail",
@@ -506,6 +508,10 @@
       "ai_assistant": "Assistente IA",
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3"
+    },
+    "welcome_setup": {
+      "relaunch": "Rever",
+      "restart_failed": "Não foi possível reabrir o assistente de início. Tente novamente."
     },
     "install_app": {
       "launching": "A instalação vai começar. Por favor, aguarde...",
@@ -3286,7 +3292,7 @@
       "reminder_due_minimal": "Mesmo disparo que reminder.due, mas apenas identificadores (id da nota, id do lembrete, horário de disparo): nenhum conteúdo da nota sai da instância. Os detalhes podem ser obtidos pela API REST.",
       "note_created": "Uma nota foi criada na sua conta, pela interface ou pela API REST. Payload: apenas metadados (id da nota, título, tipo, workspace, pasta, link direto), nunca o conteúdo da nota.",
       "note_shared": "Um link público de compartilhamento foi publicado para uma das suas notas. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha.",
-      "settings_language_changed": "Você alterou o idioma da interface nas configurações. Payload: o novo código de idioma, o anterior e se a alteração veio da interface ou da API REST."
+      "settings_language_changed": "Um usuário alterou o idioma da interface nas configurações. Payload: o perfil do usuário, o novo código de idioma, o anterior e se a alteração veio da interface ou da API REST."
     },
     "title": "Webhooks",
     "description": "O Poznote envia um pedido HTTP POST com um payload JSON a cada endpoint registado quando ocorre um evento subscrito. Se for definido um segredo, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",

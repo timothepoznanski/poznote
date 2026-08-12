@@ -1623,6 +1623,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspaces-card" checked><span><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:welcome-setup-card" checked><span><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:delete-account-card" checked><span><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>

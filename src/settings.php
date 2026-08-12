@@ -403,6 +403,18 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Welcome setup wizard -->
+            <div class="home-card settings-card-clickable" id="welcome-setup-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.welcome_setup', [], 'Review the startup guide and update your basic preferences.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-sparkles"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span>
+                    <span class="setting-status enabled"><?php echo t_h('settings.welcome_setup.relaunch', [], 'Review'); ?></span>
+                </div>
+            </div>
+
             <!-- Change Password (greyed out when sign-in never uses a local password) -->
             <div class="home-card<?php echo $settingsChangePasswordDisabled ? ' home-card-disabled' : ''; ?>" id="change-password-card"<?php echo $settingsChangePasswordDisabled ? ' aria-disabled="true"' : ''; ?>>
                 <span class="setting-help" data-tooltip="<?php echo $settingsChangePasswordDisabled
