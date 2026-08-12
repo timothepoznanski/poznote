@@ -310,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // === Users Table Sort (persisted in the settings table) ===
 // Every column, 'access' included, is sorted in SQL by listAllUserProfiles():
 // the sort has to happen before LIMIT/OFFSET for pagination to slice correctly.
-$sortableUsersColumns = ['id', 'status', 'username', 'admin', 'first_name', 'last_name', 'email', 'access', 'created', 'last_login'];
+$sortableUsersColumns = ['id', 'status', 'username', 'admin', 'first_name', 'last_name', 'email', 'language', 'access', 'created', 'last_login'];
 $allowedUsersSorts = [];
 foreach ($sortableUsersColumns as $sortableColumn) {
     $allowedUsersSorts[] = $sortableColumn . '_asc';
@@ -369,6 +369,38 @@ if ($requestedUsersPageSize !== null && ctype_digit((string)$requestedUsersPageS
         && in_array((int)$storedUsersPageSize, $usersPageSizeOptions, true))
         ? (int)$storedUsersPageSize
         : 50;
+}
+
+/**
+ * Interface language code shown for a profile.
+ *
+ * The stored value is mirrored from the user's own settings at each login, so
+ * it can be missing (a profile that has never opened the app) or hold a code
+ * this instance no longer ships a dictionary for. Both cases render as 'en',
+ * which is exactly what the interface would fall back to.
+ */
+function usersLanguageCode($storedLanguage): string {
+    return poznoteNormalizeLanguageCode($storedLanguage) ?? 'en';
+}
+
+/**
+ * Full language name for a code, reusing the settings modal's translations
+ * rather than introducing a second set of language labels.
+ */
+function usersLanguageName(string $code): string {
+    $names = [
+        'en' => ['settings.language.english', 'English'],
+        'fr' => ['settings.language.french', 'French'],
+        'es' => ['settings.language.spanish', 'Spanish'],
+        'de' => ['settings.language.german', 'German'],
+        'pt' => ['settings.language.portuguese', 'Portuguese'],
+        'ru' => ['settings.language.russian', 'Russian'],
+        'zh-cn' => ['settings.language.chinese_simplified', 'Chinese Simplified'],
+    ];
+    if (!isset($names[$code])) {
+        return $code;
+    }
+    return t($names[$code][0], [], $names[$code][1]);
 }
 
 /**
@@ -432,6 +464,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         t('multiuser.admin.first_name', [], 'First name'),
         t('multiuser.admin.last_name', [], 'Last name'),
         t('multiuser.admin.email', [], 'Email'),
+        t('settings.language.label', [], 'Language'),
         t('multiuser.admin.account_access.column', [], 'Note access'),
         t('multiuser.admin.created_at', [], 'Created'),
         t('multiuser.admin.last_login', [], 'Last login'),
@@ -459,6 +492,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             (string)($exportUser['first_name'] ?? ''),
             (string)($exportUser['last_name'] ?? ''),
             (string)($exportUser['email'] ?? ''),
+            usersLanguageCode($exportUser['language'] ?? null),
             $exportAccessNames
                 ? implode('; ', $exportAccessNames)
                 : t('multiuser.admin.account_access.own_only', [], 'Own account only'),
@@ -511,7 +545,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <style>
-        /* The 11-column table needs ~1660px, more than the shared 1400px
+        /* The 12-column table needs ~1740px, more than the shared 1400px
            admin cap: size the container to its content so wide screens
            show the whole table instead of empty side margins + a scrollbar. */
         .admin-container {
@@ -597,6 +631,59 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 z-index: 2;
                 background: var(--bg-color, #fff);
                 box-shadow: 0 1px 0 var(--border-color, #eee);
+            }
+        }
+        /* Phones get the storage stats table's display format: the real columns
+           are kept and the table scrolls sideways inside a framed wrapper,
+           rather than collapsing into one card per row. These rules live here
+           rather than in users.css because the desktop padding above is set on
+           the same selector, and a media query adds no specificity: only a
+           later rule wins. */
+        @media screen and (max-width: 768px) {
+            /* fit-content would size the container to the table's own width and
+               make the whole page scroll sideways instead of just the table. */
+            .admin-container {
+                max-width: 100%;
+            }
+            /* The frame marks the scrollable region, the same way admin-tools.css
+               frames the storage stats table. It sits on the wrapper, not the
+               table, because the table is what moves inside it. */
+            .table-responsive {
+                border: 1.5px solid var(--border-color, #e5e7eb);
+                border-radius: 12px;
+                padding-bottom: 0;
+            }
+            /* Wide enough that the columns keep their content on one line and
+               the wrapper actually scrolls, instead of cramming 12 columns
+               into the viewport. */
+            .users-table {
+                min-width: 900px;
+            }
+            .users-table th,
+            .users-table td {
+                padding: 7px 16px;
+                font-size: 0.8rem;
+            }
+            /* Same header treatment as .results-table in admin-tools.css. */
+            .users-table thead th {
+                background: var(--bg-secondary, #f9f9f9);
+                border-top: none;
+                font-size: 0.7rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: var(--text-muted, #888);
+            }
+            :root[data-theme='dark'] .users-table thead th,
+            body.dark-mode .users-table thead th {
+                background: var(--dm-content-bg);
+            }
+            /* The oversized monospace ID would set the row height on its own. */
+            .users-table td.user-id-cell {
+                font-size: 0.8rem;
+            }
+            .users-table tr:last-child td {
+                border-bottom: none;
             }
         }
     </style>
@@ -767,22 +854,6 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     window.addEventListener('resize', sizeUsersTableScroll);
 
     /**
-     * Mobile card view: tapping the user line collapses/expands the card.
-     * On desktop the class has no effect (the CSS lives in the mobile media query).
-     */
-    function initMobileUserCards() {
-        const mobileView = window.matchMedia('(max-width: 768px)');
-        document.querySelectorAll('.users-table tbody td.user-username-cell').forEach(function (cell) {
-            cell.addEventListener('click', function () {
-                if (!mobileView.matches) return;
-                cell.closest('tr').classList.toggle('user-card-expanded');
-            });
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', initMobileUserCards);
-
-    /**
      * Bold every value in the sorted column, not just its header. The sort is
      * server-side, so the active header (rendered with .users-sort-active) is
      * what tells us which column index to mark.
@@ -893,6 +964,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 </span>
                             </span>
                         </th>
+                        <th class="text-center"><?php echo renderUsersSortHeader('language', t_h('settings.language.label', [], 'Language'), $usersSortColumn, $usersSortDir); ?></th>
                         <th><?php echo renderUsersSortHeader('access', t_h('multiuser.admin.account_access.column', [], 'Note access'), $usersSortColumn, $usersSortDir); ?></th>
                         <th class="text-center"><?php echo renderUsersSortHeader('created', t_h('multiuser.admin.created_at', [], 'Created'), $usersSortColumn, $usersSortDir); ?></th>
                         <th class="text-center"><?php echo renderUsersSortHeader('last_login', t_h('multiuser.admin.last_login', [], 'Last login'), $usersSortColumn, $usersSortDir); ?></th>
@@ -902,11 +974,11 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <tbody>
                     <?php foreach ($users as $user): ?>
                         <tr class="<?php echo ($user['id'] === getCurrentUserId()) ? 'user-current' : ''; ?>">
-                            <td class="text-center user-id-cell" data-label="<?php echo t_h('multiuser.admin.id', [], 'ID'); ?>">
+                            <td class="text-center user-id-cell">
                                 <?php echo $user['id']; ?>
                             </td>
 
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.status', [], 'Status'); ?>">
+                            <td class="text-center">
                                 <?php if ($user['id'] === $currentAuthUserId): ?>
                                     <span class="badge badge-active badge-not-allowed" title="<?php echo t_h('multiuser.admin.errors.cannot_change_self', [], 'You cannot change your own status/role'); ?>">
                                         <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
@@ -928,7 +1000,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 <?php endif; ?>
                             </td>
 
-                            <td data-label="<?php echo t_h('multiuser.admin.username', [], 'User'); ?>" class="user-username-cell">
+                            <td>
                                 <div class="user-info">
                                     <div class="user-username">
                                         <?php echo htmlspecialchars($user['username']); ?>
@@ -936,7 +1008,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 </div>
                             </td>
 
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.administrator_short', [], 'Admin'); ?>">
+                            <td class="text-center">
                                 <input
                                     type="checkbox"
                                     <?php echo $user['is_admin'] ? 'checked' : ''; ?>
@@ -956,19 +1028,24 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 $userFirstName = trim((string)($user['first_name'] ?? ''));
                                 $userLastName = trim((string)($user['last_name'] ?? ''));
                             ?>
-                            <td data-label="<?php echo t_h('multiuser.admin.first_name', [], 'First name'); ?>" class="<?php echo $userFirstName === '' ? 'user-name-empty' : ''; ?>">
+                            <td>
                                 <div class="user-name-value"><?php echo htmlspecialchars($userFirstName); ?></div>
                             </td>
-                            <td data-label="<?php echo t_h('multiuser.admin.last_name', [], 'Last name'); ?>" class="<?php echo $userLastName === '' ? 'user-name-empty' : ''; ?>">
+                            <td>
                                 <div class="user-name-value"><?php echo htmlspecialchars($userLastName); ?></div>
                             </td>
-                            <td data-label="<?php echo t_h('multiuser.admin.email', [], 'Email'); ?>">
+                            <td>
                                 <div class="user-email <?php echo empty($user['email']) ? 'user-email-empty' : ''; ?>">
                                     <?php echo !empty($user['email']) ? htmlspecialchars($user['email']) : '<em>' . t_h('multiuser.admin.not_defined', [], 'not defined') . '</em>'; ?>
                                 </div>
                             </td>
 
-                            <td data-label="<?php echo t_h('multiuser.admin.account_access.column', [], 'Note access'); ?>">
+                            <?php $userLanguageCode = usersLanguageCode($user['language'] ?? null); ?>
+                            <td class="text-center user-language-cell" title="<?php echo htmlspecialchars(usersLanguageName($userLanguageCode), ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars($userLanguageCode, ENT_QUOTES, 'UTF-8'); ?>
+                            </td>
+
+                            <td>
                                 <?php
                                     $accessIds = $accountAccessMap[(int)$user['id']] ?? [];
                                     $accessNames = [];
@@ -991,7 +1068,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 </div>
                             </td>
 
-                            <td class="text-center user-created-cell" data-label="<?php echo t_h('multiuser.admin.created_at', [], 'Created'); ?>">
+                            <td class="text-center user-created-cell">
                                 <?php
                                     $userCreatedDate = convertUtcToUserTimezone((string)($user['created_at'] ?? ''), 'Y-m-d');
                                     $userCreatedFull = formatUtcDateTimeForDisplay((string)($user['created_at'] ?? ''), 'Y-m-d H:i');
@@ -1003,7 +1080,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 <?php endif; ?>
                             </td>
 
-                            <td class="text-center user-created-cell" data-label="<?php echo t_h('multiuser.admin.last_login', [], 'Last login'); ?>">
+                            <td class="text-center user-created-cell">
                                 <?php
                                     $userLastLoginDate = convertUtcToUserTimezone((string)($user['last_login'] ?? ''), 'Y-m-d');
                                     $userLastLoginFull = formatUtcDateTimeForDisplay((string)($user['last_login'] ?? ''), 'Y-m-d H:i');
@@ -1015,7 +1092,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                 <?php endif; ?>
                             </td>
 
-                            <td class="text-center" data-label="<?php echo t_h('multiuser.admin.actions', [], 'Actions'); ?>">
+                            <td class="text-center">
                                 <div class="actions actions-center">
                                         <button class="btn btn-secondary btn-small" title="<?php echo t_h('multiuser.admin.account_access.manage', [], 'Manage note access'); ?>"
                                             onclick="openAccessModal(<?php echo (int)$user['id']; ?>, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>, <?php echo htmlspecialchars(json_encode($accessIds), ENT_QUOTES); ?>)">

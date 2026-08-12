@@ -64,6 +64,7 @@ function initializeMasterDatabase(PDO $con): void {
             active INTEGER DEFAULT 1,
             is_admin INTEGER DEFAULT 0,
             notify_new_user INTEGER DEFAULT 0,
+            language TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_login DATETIME
@@ -110,6 +111,15 @@ function initializeMasterDatabase(PDO $con): void {
 
         if (!in_array('notify_new_user', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN notify_new_user INTEGER DEFAULT 0");
+        }
+
+        // Interface language, mirrored from the per-user settings table on every
+        // login. The authoritative value for the UI stays in the user database;
+        // this copy exists so tools that only reach the master database (mailing
+        // lists, admin exports) can address a user in their own language.
+        // NULL means the profile has not opened the app since the column landed.
+        if (!in_array('language', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN language TEXT");
         }
 
         // Per-user quota overrides: NULL inherits the global setting, 0 means
@@ -807,6 +817,39 @@ function updateUserLastLogin(int $userId): void {
 }
 
 /**
+ * Mirror the user's interface language into the master profile.
+ *
+ * The per-user settings table stays authoritative for the UI; this copy is what
+ * master-database-only consumers (mailing tools, admin exports) read. Writes are
+ * skipped when nothing changed, so the per-session sync costs a single SELECT
+ * on an unchanged profile.
+ */
+function setUserProfileLanguage(int $userId, string $language): void {
+    // Only codes this instance ships a dictionary for are stored, so the column
+    // holds either a supported code or NULL. listAllUserProfiles() relies on
+    // that to sort the column on the value the admin actually sees.
+    $language = poznoteNormalizeLanguageCode($language) ?? '';
+    if ($userId <= 0 || $language === '') {
+        return;
+    }
+
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT language FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $stored = $stmt->fetchColumn();
+        if ($stored === false || $stored === $language) {
+            return;
+        }
+
+        $stmt = $con->prepare("UPDATE users SET language = ? WHERE id = ?");
+        $stmt->execute([$language, $userId]);
+    } catch (Exception $e) {
+        error_log("Failed to update language for user $userId: " . $e->getMessage());
+    }
+}
+
+/**
  * Update user OIDC subject
  */
 function updateUserOidcSubject(int $userId, string $oidcSubject): void {
@@ -1272,6 +1315,10 @@ function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?i
         'last_name_desc' => "(last_name IS NULL OR last_name = '') ASC, last_name COLLATE NOCASE DESC",
         'email_asc' => "(email IS NULL OR email = '') ASC, email COLLATE NOCASE ASC",
         'email_desc' => "(email IS NULL OR email = '') ASC, email COLLATE NOCASE DESC",
+        // Sorted on the code the admin actually sees: a profile that never
+        // opened the app stores NULL but reads as 'en' in the table.
+        'language_asc' => "COALESCE(NULLIF(language, ''), 'en') COLLATE NOCASE ASC, username COLLATE NOCASE ASC",
+        'language_desc' => "COALESCE(NULLIF(language, ''), 'en') COLLATE NOCASE DESC, username COLLATE NOCASE ASC",
         'created_asc' => 'created_at ASC',
         'created_desc' => 'created_at DESC',
         'last_login_asc' => 'last_login ASC',
@@ -1299,7 +1346,7 @@ function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?i
     try {
         $con = getMasterConnection();
         $stmt = $con->prepare("
-            SELECT id, username, email, email_verified, first_name, last_name, is_admin, notify_new_user, active, created_at, last_login, oidc_subject
+            SELECT id, username, email, email_verified, first_name, last_name, language, is_admin, notify_new_user, active, created_at, last_login, oidc_subject
             FROM users
             $where
             ORDER BY $orderBy

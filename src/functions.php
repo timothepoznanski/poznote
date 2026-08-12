@@ -1059,6 +1059,31 @@ function poznoteNormalizeHiddenUiKey($key) {
 }
 
 /**
+ * Interface languages this instance ships a dictionary for (src/i18n/*.json).
+ *
+ * Single source of truth: the login page, the settings API validation and the
+ * login-time language sync must agree, otherwise a code accepted in one place
+ * renders as raw translation keys in another.
+ */
+function poznoteSupportedLanguages(): array {
+    return ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn'];
+}
+
+/**
+ * Normalize a language code to one this instance actually supports.
+ *
+ * Returns null when the value matches nothing, so callers can decide between
+ * keeping their current value and falling back to English.
+ */
+function poznoteNormalizeLanguageCode($lang): ?string {
+    $lang = strtolower(trim((string)$lang));
+    if ($lang === '') {
+        return null;
+    }
+    return in_array($lang, poznoteSupportedLanguages(), true) ? $lang : null;
+}
+
+/**
  * Pick the best supported language from an Accept-Language header.
  *
  * Used on pre-auth pages (the login page), where no user preference exists yet.
@@ -1127,6 +1152,61 @@ function poznoteDetectBrowserLanguage(string $header, array $allowedLangs): ?str
     }
 
     return null;
+}
+
+/**
+ * Reconcile the active user's interface language at the start of a session.
+ *
+ * Two things happen here:
+ *  - As long as the user has never picked a language in the settings
+ *    (settings.language_source is not 'user'), the browser's Accept-Language
+ *    header drives the interface, so a brand new account opens in the visitor's
+ *    own language instead of English. The moment the language is changed in the
+ *    settings the source flips to 'user' and the browser stops overriding it.
+ *  - The resulting language is mirrored into master.users.language, so
+ *    consumers that never open the per-user database (mailing tools, admin
+ *    exports) can read it from the profile.
+ *
+ * Called from db_connect.php before anything reads getSetting(), so the value
+ * written here is the one the request's static settings cache picks up.
+ */
+function poznoteSyncUserLanguage(PDO $con, int $userId): void {
+    if ($userId <= 0) {
+        return;
+    }
+
+    try {
+        $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('language', 'language_source')");
+        $rows = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[$row['key']] = $row['value'];
+        }
+
+        $language = poznoteNormalizeLanguageCode($rows['language'] ?? '');
+        $source = (string)($rows['language_source'] ?? '');
+
+        if ($source !== 'user') {
+            $detected = poznoteDetectBrowserLanguage(
+                $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '',
+                poznoteSupportedLanguages()
+            );
+            if ($detected !== null && $detected !== $language) {
+                $update = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                $update->execute(['language', $detected]);
+                $language = $detected;
+            }
+        }
+
+        if ($language === null) {
+            $language = 'en';
+        }
+
+        require_once __DIR__ . '/users/db_master.php';
+        setUserProfileLanguage($userId, $language);
+    } catch (Exception $e) {
+        // Never let a language sync failure break page rendering.
+        error_log('Poznote: user language sync failed: ' . $e->getMessage());
+    }
 }
 
 function poznoteGetGlobalHiddenUiElements() {

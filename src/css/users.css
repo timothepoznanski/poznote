@@ -309,6 +309,12 @@ body.dark-mode .users-header-help:focus-visible {
     white-space: nowrap;
 }
 
+/* Language codes are short and never wrap ("zh-cn" would otherwise break
+   across two lines in the narrow column). */
+.users-table td.user-language-cell {
+    white-space: nowrap;
+}
+
 /* Bold every value in the sorted column (the header itself is handled by
    .users-sort-active above). Declared after .user-id-cell so it still wins
    when the table is sorted on the ID column. */
@@ -948,115 +954,14 @@ input.admin-toggle:disabled:checked+.slider {
         margin-bottom: 0px;
     }
 
-    /* Hide table wrapper overflow on mobile to allow cards */
+    /* Mobile keeps the real table and scrolls it sideways inside the wrapper,
+       the same model as the storage stats table, instead of collapsing each
+       row into a card. The page-level stylesheet in admin/users.php sets the
+       compact padding and the min-width that forces the scroll. */
     .table-responsive {
-        overflow-x: visible;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         padding-bottom: 10px;
-    }
-
-    /* Card Layout */
-    .users-table,
-    .users-table thead,
-    .users-table tbody,
-    .users-table th,
-    .users-table td,
-    .users-table tr {
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box;
-    }
-
-    .users-table thead {
-        display: none !important;
-    }
-
-    .users-table tbody {
-        display: block !important;
-    }
-
-    .users-table tr {
-        margin-bottom: 8px;
-        border: 1px solid rgba(120, 120, 120, 0.28) !important;
-        border-radius: 8px;
-        background: var(--bg-color, #fff);
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
-        overflow: hidden;
-    }
-
-    html[data-theme='dark'] .users-table tr,
-    body.dark-mode .users-table tr {
-        border-color: rgba(255, 255, 255, 0.18) !important;
-        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) !important;
-    }
-
-    .users-table td {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 8px 12px !important;
-        border-bottom: 1px solid var(--border-color, #eee) !important;
-        text-align: left !important;
-        min-height: 0;
-    }
-
-    .users-table td:last-child {
-        border-bottom: none !important;
-        padding: 8px 12px !important;
-        justify-content: center !important;
-        background: var(--bg-secondary, #f8f8f8);
-    }
-
-    /* Hide empty first/last name rows in the mobile card view */
-    .users-table td.user-name-empty {
-        display: none !important;
-    }
-
-    /* Card view: let the username wrap on narrow screens instead of overflowing */
-    .user-username {
-        white-space: normal;
-    }
-
-    /* Card view has one field per row, so let the access list wrap normally */
-    .account-access-summary {
-        white-space: normal;
-        overflow: visible;
-        text-overflow: clip;
-        overflow-wrap: anywhere;
-        text-align: right;
-    }
-
-    /* Unified Label Styling */
-    .users-table td::before {
-        content: attr(data-label);
-        font-weight: 600 !important;
-        color: var(--text-muted, #666) !important;
-        font-size: 12px !important;
-        /* Uniform size */
-        text-transform: uppercase !important;
-        letter-spacing: 0.5px;
-        flex-shrink: 0;
-        min-width: 96px !important;
-        text-align: left !important;
-    }
-
-    /* Force ID value to match table value style */
-    .users-table td.user-id-cell {
-        font-family: inherit !important;
-        font-size: 1rem !important;
-        font-weight: 500 !important;
-        color: var(--text-color, #333) !important;
-        text-align: right !important;
-    }
-
-    .users-table td.user-id-cell::before {
-        min-width: 96px !important;
-        /* Ensure same width as others */
-    }
-
-    /* Align Username Info */
-    .user-info {
-        justify-content: flex-end;
-        flex: 1;
     }
 
     /* Compact Delete Button */
@@ -1072,18 +977,11 @@ input.admin-toggle:disabled:checked+.slider {
     }
 
     .actions-center {
-        width: 100%;
-        justify-content: flex-end;
         gap: 10px;
     }
 
     .actions-center .btn i {
         font-size: 15px;
-    }
-
-    html[data-theme='dark'] .users-table td:last-child,
-    body.dark-mode .users-table td:last-child {
-        background: #303033;
     }
 
     html[data-theme='dark'] .actions-center .btn,
@@ -1146,44 +1044,6 @@ input.admin-toggle:disabled:checked+.slider {
         gap: 12px;
     }
 
-    /* Collapsible cards: only the user line is visible until tapped */
-    .users-table tbody tr:not(.user-card-expanded) td:not(.user-username-cell) {
-        display: none !important;
-    }
-
-    /* Keep the user line on top of the expanded card (it is the toggle handle) */
-    .users-table tbody tr {
-        display: flex !important;
-        flex-direction: column;
-    }
-
-    .users-table td.user-username-cell {
-        order: -1;
-    }
-
-    .users-table tbody tr:not(.user-card-expanded) td.user-username-cell {
-        border-bottom: none !important;
-    }
-
-    .users-table td.user-username-cell {
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        user-select: none;
-        /* The card header is the tap target, so keep it comfortably tappable
-           even though the other rows are now compact. */
-        min-height: 40px;
-    }
-
-    .users-table td.user-username-cell::after {
-        content: '\25B8'; /* ▸ */
-        color: var(--text-muted, #666);
-        margin-left: 10px;
-        flex-shrink: 0;
-    }
-
-    .users-table tr.user-card-expanded td.user-username-cell::after {
-        content: '\25BE'; /* ▾ */
-    }
 }
 
 @media screen and (max-width: 480px) {
@@ -1194,11 +1054,5 @@ input.admin-toggle:disabled:checked+.slider {
 
     .maintenance-title {
         font-size: 1.2rem;
-    }
-
-    .users-table td::before,
-    .users-table td.user-id-cell::before {
-        min-width: 84px !important;
-        /* Slightly smaller for very small screens */
     }
 }

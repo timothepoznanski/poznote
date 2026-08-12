@@ -62,6 +62,7 @@ class UsersController {
             'first_name' => $user['first_name'] ?? null,
             'last_name' => $user['last_name'] ?? null,
             'display_name' => $user['display_name'] ?? $user['username'],
+            'language' => $user['language'] ?? null,
             'is_admin' => (bool)$user['is_admin'],
             'active' => (bool)$user['active']
         ];

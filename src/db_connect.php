@@ -180,8 +180,24 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 24; // 24: type_based_note_icons setting (default icon per note type)
+    $CURRENT_SCHEMA_VERSION = 25; // 25: language_source setting (browser-detected vs user-chosen language)
     $currentVersion = 0;
+
+    // Whether this database is being created right now, as opposed to an
+    // existing one being migrated. Only the language_source default depends on
+    // it: an existing database already carries a language the user lived with,
+    // so it must be treated as a deliberate choice and never overridden by the
+    // browser, while a fresh one starts out following the browser.
+    $isFreshDatabase = false;
+    try {
+        $existingTables = (int)$con->query(
+            "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('entries', 'settings')"
+        )->fetchColumn();
+        $isFreshDatabase = ($existingTables === 0);
+    } catch (Exception $e) {
+        $isFreshDatabase = true;
+    }
+
     try {
         $svStmt = $con->query("SELECT value FROM settings WHERE key = 'schema_version'");
         $svResult = $svStmt->fetchColumn();
@@ -530,6 +546,10 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_font_size', '15')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('emoji_icons_enabled', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language', 'en')");
+        // 'browser': the language still follows the Accept-Language header at each
+        // login. 'user': it was picked in the settings and is never overridden again.
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('language_source', '"
+            . ($isFreshDatabase ? 'browser' : 'user') . "')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_created', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('show_note_icons', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('type_based_note_icons', '1')");
@@ -643,6 +663,20 @@ try {
         $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('schema_version', '" . $CURRENT_SCHEMA_VERSION . "')");
     }
     // --- End schema versioning ---
+
+    // Adopt the browser language for users who never picked one, and mirror the
+    // result into the master profile. Runs once per session, before anything in
+    // the request has populated the static settings cache, so the interface
+    // already renders in the new language on the very first page after login.
+    // Keyed by user id rather than a boolean so switching to another accessible
+    // account re-syncs instead of leaving that account on a stale language.
+    if ($activeUserId
+        && session_status() === PHP_SESSION_ACTIVE
+        && (int)($_SESSION['user_id'] ?? 0) === $activeUserId
+        && (int)($_SESSION['language_synced_user_id'] ?? 0) !== $activeUserId) {
+        poznoteSyncUserLanguage($con, $activeUserId);
+        $_SESSION['language_synced_user_id'] = $activeUserId;
+    }
 
 } catch(PDOException $e) {
     error_log("Poznote: database connection failed: " . $e->getMessage());

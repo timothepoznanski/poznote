@@ -59,8 +59,10 @@ if ($redirectAfter !== null) {
 // The login page is pre-auth, so there is no user preference to read yet: pick
 // the language from the browser's Accept-Language header, falling back to the
 // instance language configured in the settings.
-$allowedLangs = ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn'];
-$browserLang = poznoteDetectBrowserLanguage($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '', $allowedLangs);
+// The same detection runs again once the session is open (poznoteSyncUserLanguage
+// in db_connect.php), which is what carries this language into the interface for
+// users who never chose one in their settings.
+$browserLang = poznoteDetectBrowserLanguage($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '', poznoteSupportedLanguages());
 if ($browserLang !== null) {
     $currentLang = $browserLang;
 }

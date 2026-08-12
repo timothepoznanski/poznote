@@ -139,6 +139,14 @@ class SettingsController {
             return json_encode($palette, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
+        if ($key === 'language') {
+            $normalized = poznoteNormalizeLanguageCode($value);
+            if ($normalized === null) {
+                throw new InvalidArgumentException('unsupported language', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'markdown_colored') {
             $normalized = trim((string) $value);
             if ($normalized === '' || $normalized === '0' || $normalized === 'false') {
@@ -537,8 +545,20 @@ class SettingsController {
                 // For user settings, use the user database
                 $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 $stmt->execute([$key, $value]);
+
+                if ($key === 'language') {
+                    // An explicit choice ends the browser-driven language: from now
+                    // on logging in from a differently-configured browser leaves the
+                    // interface alone.
+                    $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                    $stmt->execute(['language_source', 'user']);
+
+                    require_once dirname(__DIR__, 3) . '/users/db_master.php';
+                    $languageUserId = function_exists('getCurrentUserId') ? (int) getCurrentUserId() : 0;
+                    setUserProfileLanguage($languageUserId, $value);
+                }
             }
-            
+
             echo json_encode(['success' => true, 'key' => $key, 'value' => $value]);
             
         } catch (Exception $e) {
