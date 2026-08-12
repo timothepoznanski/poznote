@@ -820,7 +820,9 @@ function buildNoteIconClass($iconClass, $defaultIcon = 'lucide-file-text') {
  * 'type_based_note_icons' setting (enabled by default); when it is off, every
  * note falls back to the generic file icon as before.
  *
- * Mirrors getNoteTypeIcon() in js/notes-manager.js and js/folder-icon.js.
+ * Mirrors getNoteTypeIcon() in js/notes-manager.js; js/folder-icon.js does not
+ * duplicate the mapping, it reads the resolved default from the
+ * data-default-icon attribute stamped by renderEditableNoteIcon() below.
  */
 function defaultNoteIconForType($noteType) {
     $setting = getSetting('type_based_note_icons', '1');
