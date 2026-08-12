@@ -415,6 +415,7 @@ class WebhookDispatcher {
             'email' => $email !== '' ? $email : null,
             'first_name' => (string)($user['first_name'] ?? ''),
             'last_name' => (string)($user['last_name'] ?? ''),
+            'language' => (($language = trim((string)($user['language'] ?? ''))) !== '') ? $language : 'en',
         ];
         if ($source !== null) {
             $payload['source'] = $source;

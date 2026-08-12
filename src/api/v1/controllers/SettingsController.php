@@ -551,13 +551,21 @@ class SettingsController {
                 setGlobalSetting($key, $value);
             } else {
                 $previousLanguage = null;
+                $languageConfirmedInStartupGuide = false;
                 if ($key === 'language') {
-                    // Captured before the write so the webhook below can tell
-                    // whether the language actually changed, and from what.
-                    $stmt = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
-                    $stmt->execute(['language']);
-                    $stored = $stmt->fetchColumn();
-                    $previousLanguage = $stored !== false ? (string) $stored : '';
+                    // Capture both values before the write. The startup guide
+                    // explicitly validates the browser-detected language even
+                    // when it is unchanged, so that confirmation must still
+                    // produce the language webhook.
+                    $stmt = $this->con->query("SELECT key, value FROM settings WHERE key IN ('language', 'welcome_setup')");
+                    $storedSettings = [];
+                    while ($storedSetting = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                        $storedSettings[$storedSetting['key']] = $storedSetting['value'];
+                    }
+                    $previousLanguage = isset($storedSettings['language'])
+                        ? (string) $storedSettings['language']
+                        : '';
+                    $languageConfirmedInStartupGuide = ($storedSettings['welcome_setup'] ?? '') === 'pending';
                 }
 
                 // For user settings, use the user database
@@ -575,7 +583,7 @@ class SettingsController {
                     $languageUserId = function_exists('getCurrentUserId') ? (int) getCurrentUserId() : 0;
                     setUserProfileLanguage($languageUserId, $value);
 
-                    if ($previousLanguage !== $value) {
+                    if ($previousLanguage !== $value || $languageConfirmedInStartupGuide) {
                         $this->dispatchLanguageChangedWebhook($languageUserId, $previousLanguage, $value);
                     }
                 }

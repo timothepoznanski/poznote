@@ -204,6 +204,7 @@ A user account was created: by an administrator, through the REST API, or by an 
       "email": "nina@example.com",
       "first_name": "Nina",
       "last_name": "Martin",
+      "language": "fr",
       "source": "oidc"
     }
   }
@@ -211,6 +212,9 @@ A user account was created: by an administrator, through the REST API, or by an 
 ```
 
 `data.user.source` is `admin`, `api`, or `oidc`.
+
+`data.user.language` is the account's stored interface language code, defaulting
+to `en` when the account has not yet established a language preference.
 
 #### user.updated
 
@@ -234,7 +238,7 @@ A user profile changed: username, email, first name, last name, or admin role. N
 
 #### settings.language_changed
 
-A user's interface language was explicitly changed in the settings (or through the REST API `PUT /api/v1/settings/language`). The browser-driven language adoption at login does not emit this event, only a deliberate choice does, and nothing is emitted when the selected language is the one already in use. The event is delivered to every subscribed admin webhook.
+A user's interface language was explicitly changed in the settings (or through the REST API `PUT /api/v1/settings/language`). The browser-driven language adoption at login does not emit this event by itself, but confirming that detected language in the startup guide does. Outside the startup guide, nothing is emitted when the selected language is the one already in use. The event is delivered to every subscribed admin webhook.
 
 ```json
 {
