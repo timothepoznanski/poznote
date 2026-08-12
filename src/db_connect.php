@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 25; // 25: language_source setting (browser-detected vs user-chosen language)
+    $CURRENT_SCHEMA_VERSION = 26; // 26: folders.favorite column (favorite folders)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -248,6 +248,7 @@ try {
             parent_id INTEGER DEFAULT NULL,
             display_order INTEGER DEFAULT 0,
             pinned INTEGER DEFAULT 0,
+            favorite INTEGER DEFAULT 0,
             created DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (parent_id) REFERENCES folders(id) ON DELETE CASCADE
         )');
@@ -394,6 +395,9 @@ try {
             }
             if (!in_array('pinned', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN pinned INTEGER DEFAULT 0");
+            }
+            if (!in_array('favorite', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN favorite INTEGER DEFAULT 0");
             }
             // Root folders flagged as diaries (multi-diary support); existing
             // name-matched diary roots are flagged lazily by getDiaryRoots().
@@ -647,6 +651,11 @@ try {
                 $welcomeFile = $entriesDir . '/' . $welcomeNoteId . '.html';
                 file_put_contents($welcomeFile, $welcomeContent);
                 setFilePermissions($welcomeFile, 0644);
+
+                // Arm the first-run welcome wizard: index.php shows it while
+                // this key is 'pending'; js/welcome-setup.js flips it to
+                // 'done' once the user finishes or skips it.
+                $con->exec("INSERT OR REPLACE INTO settings (key, value) VALUES ('welcome_setup', 'pending')");
             }
             // Legacy migration: ensure folder_id is populated and entry snippets exist.
             // Only runs on schema-version changes (and after backup restores, which

@@ -805,7 +805,9 @@
       "delete_permanently_tooltip": "Excluir permanentemente"
     },
     "note": {
-      "last_modified_on": "Última modificação em {{date}}"
+      "last_modified_on": "Última modificação em {{date}}",
+      "show_more": "Mostrar mais",
+      "show_less": "Mostrar menos"
     },
     "empty": "Nenhuma nota na lixeira.",
     "modals": {
@@ -832,7 +834,10 @@
       "empty_error_title": "Erro ao Esvaziar Lixeira",
       "empty_error_prefix": "Erro ao esvaziar lixeira: ",
       "empty_error_generic": "Erro ao esvaziar lixeira"
-    }
+    },
+    "count_one": "1 nota na lixeira",
+    "count_other": "{{count}} notas na lixeira",
+    "showing_limit": "Apenas as {{count}} notas modificadas mais recentemente são exibidas"
   },
   "editor": {
     "markdown_placeholder": "Escreva seu markdown, use / para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
@@ -1021,7 +1026,7 @@
       "reminder_bell": "Ícone de sino (lembrete)",
       "dashboard_user": "Usuário",
       "dashboard_filter_bar": "Barra de filtro",
-      "view_layout_toggle": "Alternar grade / lista",
+      "view_layout_toggle": "Alternar vista (grade / lista, tamanho dos cartões)",
       "index_search_bar": "Barra de pesquisa",
       "tasklist_progress_bar": "Barra de progresso das listas de tarefas",
       "share_restrict_users": "Partilha: restringir a utilizadores específicos",
@@ -1343,6 +1348,24 @@
         "days": "dias"
       }
     },
+    "welcome_setup": {
+      "title": "Bem-vindo ao Poznote!",
+      "subtitle": "Vamos definir algumas preferências para começar. Você pode alterá-las a qualquer momento.",
+      "language_label": "Idioma",
+      "theme_label": "Tema",
+      "theme_options": {
+        "system": "Como o sistema",
+        "light": "Claro",
+        "dark": "Escuro",
+        "black": "Preto"
+      },
+      "date_format_label": "Formato de data e hora",
+      "timezone_label": "Fuso Horário",
+      "settings_tip": "Muitas outras opções (fontes, backups, IA e mais) esperam por você nas configurações do Poznote.",
+      "dashboard_tip": "O painel oferece uma visão geral das suas notas e da sua conta.",
+      "skip": "Pular",
+      "start": "Começar"
+    },
     "timezone": {
       "title": "Fuso Horário",
       "description": "Selecione seu fuso horário:",
@@ -1411,6 +1434,8 @@
       "remove_from_folder": "Solte aqui para remover da pasta"
     },
     "folder_actions": {
+      "add_favorite": "Adicionar aos favoritos",
+      "remove_favorite": "Remover dos favoritos",
       "menu": "Ações",
       "create": "Criar",
       "kanban_view": "Visualização Kanban",
@@ -3260,7 +3285,8 @@
       "reminder_due_title": "Mesmo disparo que reminder.due, mas sem a mensagem do lembrete: os identificadores mais o título da nota e o link direto.",
       "reminder_due_minimal": "Mesmo disparo que reminder.due, mas apenas identificadores (id da nota, id do lembrete, horário de disparo): nenhum conteúdo da nota sai da instância. Os detalhes podem ser obtidos pela API REST.",
       "note_created": "Uma nota foi criada na sua conta, pela interface ou pela API REST. Payload: apenas metadados (id da nota, título, tipo, workspace, pasta, link direto), nunca o conteúdo da nota.",
-      "note_shared": "Um link público de compartilhamento foi publicado para uma das suas notas. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha."
+      "note_shared": "Um link público de compartilhamento foi publicado para uma das suas notas. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha.",
+      "settings_language_changed": "Você alterou o idioma da interface nas configurações. Payload: o novo código de idioma, o anterior e se a alteração veio da interface ou da API REST."
     },
     "title": "Webhooks",
     "description": "O Poznote envia um pedido HTTP POST com um payload JSON a cada endpoint registado quando ocorre um evento subscrito. Se for definido um segredo, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",
@@ -3430,6 +3456,8 @@
     "reset_layout": "Redefinir disposição",
     "reset_layout_hint": "Esquecer as posições salvas e reorganizar o grafo automaticamente",
     "drag_hint": "Ctrl + arrastar move um ponto independentemente dos seus links",
+    "folder_filter_all": "Todas as pastas",
+    "folder_filter_hint": "Mostrar apenas as notas de uma pasta",
     "stats": "{{notes}} notas · {{links}} links",
     "search": {
       "placeholder": "Procurar uma nota..."

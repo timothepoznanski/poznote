@@ -471,6 +471,35 @@ function performFavoriteToggle(noteId) {
         });
 }
 
+// Mark/unmark a folder as favorite. The desired state is derived from the
+// folder's three-dot toggle (data-favorite) and sent explicitly, matching the
+// PUT /folders/{id}/favorite contract.
+function toggleFolderFavorite(folderId) {
+    var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+    var isFavorite = toggle && toggle.getAttribute('data-favorite') === '1';
+
+    fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/favorite', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ favorite: !isFavorite })
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup('Error updating favorites', 'error');
+            console.error('Folder favorite toggle error:', error);
+        });
+}
+
 function duplicateNote(noteId) {
     fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
         method: 'POST',
@@ -2984,6 +3013,7 @@ function populateFolderActionsMenu(menu, toggle) {
     var noteCount = parseInt(toggle.getAttribute('data-note-count'), 10) || 0;
     var isShared = toggle.getAttribute('data-shared') === '1';
     var currentSort = toggle.getAttribute('data-current-sort') || '';
+    var isFavorite = toggle.getAttribute('data-favorite') === '1';
 
     menu.setAttribute('data-folder-id', folderId);
 
@@ -3004,6 +3034,14 @@ function populateFolderActionsMenu(menu, toggle) {
     });
     menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
         item.style.display = isShared ? 'none' : '';
+    });
+
+    // Favorite item: show the variant matching the folder's favorite state
+    menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? '' : 'none';
+    });
+    menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? 'none' : '';
     });
 
     // Sort options: highlight the active one and reflect it in the header label

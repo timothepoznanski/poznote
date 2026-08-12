@@ -825,7 +825,9 @@
       "delete_permanently_tooltip": "Supprimer définitivement"
     },
     "note": {
-      "last_modified_on": "Dernière modification le {{date}}"
+      "last_modified_on": "Dernière modification le {{date}}",
+      "show_more": "Afficher plus",
+      "show_less": "Afficher moins"
     },
     "empty": "Aucune note dans la corbeille.",
     "modals": {
@@ -852,7 +854,10 @@
       "empty_error_title": "Erreur de vidage de la corbeille",
       "empty_error_prefix": "Erreur lors du vidage de la corbeille : ",
       "empty_error_generic": "Erreur lors du vidage de la corbeille"
-    }
+    },
+    "count_one": "1 note dans la corbeille",
+    "count_other": "{{count}} notes dans la corbeille",
+    "showing_limit": "Seules les {{count}} notes modifiées le plus récemment sont affichées"
   },
   "editor": {
     "markdown_placeholder": "Écrivez votre markdown, utilisez / pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
@@ -1047,7 +1052,7 @@
       "reminder_bell": "Icône cloche (rappel)",
       "dashboard_user": "Utilisateur",
       "dashboard_filter_bar": "Barre de filtre",
-      "view_layout_toggle": "Bascule grille / liste",
+      "view_layout_toggle": "Bascule de vue (grille / liste, taille des cartes)",
       "index_search_bar": "Barre de recherche",
       "tasklist_progress_bar": "Barre de progression des listes de tâches",
       "share_restrict_users": "Partage : restreindre à des utilisateurs spécifiques",
@@ -1376,6 +1381,24 @@
         "days": "jours"
       }
     },
+    "welcome_setup": {
+      "title": "Bienvenue sur Poznote !",
+      "subtitle": "Configurons quelques préférences pour bien démarrer. Vous pourrez les modifier à tout moment.",
+      "language_label": "Langue",
+      "theme_label": "Thème",
+      "theme_options": {
+        "system": "Comme le système",
+        "light": "Clair",
+        "dark": "Sombre",
+        "black": "Noir"
+      },
+      "date_format_label": "Format date et heure",
+      "timezone_label": "Fuseau horaire",
+      "settings_tip": "Bien d'autres options (polices, sauvegardes, IA et plus encore) vous attendent dans les paramètres de Poznote.",
+      "dashboard_tip": "Le tableau de bord vous offre une vue d'ensemble de vos notes et de votre compte.",
+      "skip": "Passer",
+      "start": "C'est parti !"
+    },
     "timezone": {
       "title": "Fuseau horaire",
       "description": "Sélectionnez votre fuseau horaire :",
@@ -1444,6 +1467,8 @@
       "remove_from_folder": "Déposez ici pour retirer du dossier"
     },
     "folder_actions": {
+      "add_favorite": "Ajouter aux favoris",
+      "remove_favorite": "Retirer des favoris",
       "menu": "Actions",
       "create": "Créer",
       "kanban_view": "Vue Kanban",
@@ -3446,7 +3471,8 @@
       "reminder_due_title": "Même déclenchement que reminder.due mais sans le message du rappel : les identifiants plus le titre de la note et le lien direct.",
       "reminder_due_minimal": "Même déclenchement que reminder.due mais identifiants seulement (id de note, id de rappel, date d'échéance) : aucun contenu de note ne quitte l'instance. Les détails peuvent être récupérés via l'API REST.",
       "note_created": "Une note a été créée dans votre compte, depuis l'interface ou l'API REST. Payload : métadonnées seulement (id de note, titre, type, workspace, dossier, lien direct), jamais le contenu de la note.",
-      "note_shared": "Un lien de partage public a été publié pour une de vos notes. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe."
+      "note_shared": "Un lien de partage public a été publié pour une de vos notes. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe.",
+      "settings_language_changed": "Vous avez changé la langue de l'interface dans les paramètres. Payload : le nouveau code langue, l'ancien, et si le changement vient de l'interface ou de l'API REST."
     },
     "title": "Webhooks",
     "description": "Poznote envoie une requête HTTP POST avec une charge JSON à chaque endpoint enregistré lorsqu'un événement souscrit se produit. Si un secret est défini, la charge est signée en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",
@@ -3616,6 +3642,8 @@
     "reset_layout": "Réinitialiser la disposition",
     "reset_layout_hint": "Oublier les positions enregistrées et réorganiser le graphe automatiquement",
     "drag_hint": "Ctrl + glisser déplace un point indépendamment de ses liens",
+    "folder_filter_all": "Tous les dossiers",
+    "folder_filter_hint": "Afficher uniquement les notes d'un dossier",
     "stats": "{{notes}} notes · {{links}} liens",
     "search": {
       "placeholder": "Rechercher une note..."

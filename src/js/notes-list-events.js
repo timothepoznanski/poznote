@@ -321,6 +321,11 @@
                 if (typeof window.openPublicFolderShareModal === 'function') {
                     window.openPublicFolderShareModal(folderData.id);
                 }
+            },
+            'favorite-folder': function () {
+                if (typeof window.toggleFolderFavorite === 'function') {
+                    window.toggleFolderFavorite(folderData.id);
+                }
             }
         };
 
@@ -590,7 +595,7 @@
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
             'download-folder', 'rename-folder', 'delete-folder',
-            'change-folder-icon', 'share-folder'
+            'change-folder-icon', 'share-folder', 'favorite-folder'
         ];
         if (folderMenuActions.indexOf(action) !== -1) {
             handleFolderMenuAction(event, action, actionElement);

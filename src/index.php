@@ -420,7 +420,13 @@ if ($isPublicWorkspaceReadonly) {
     <script type="application/json" id="workspace-last-opened-flag">true</script>
     <?php endif; ?>
 
-    <?php include 'modals.php'; ?>
+    <?php
+    // First-run welcome wizard: the key is seeded 'pending' when the account
+    // database is created; js/welcome-setup.js flips it to 'done' once the
+    // user finishes or skips the wizard.
+    $showWelcomeSetupModal = !$isPublicWorkspaceReadonly && getSetting('welcome_setup', '') === 'pending';
+    include 'modals.php';
+    ?>
     
     <!-- LEFT COLUMN -->	
     <div id="left_col">

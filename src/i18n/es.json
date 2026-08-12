@@ -808,7 +808,9 @@
       "delete_permanently_tooltip": "Eliminar permanentemente"
     },
     "note": {
-      "last_modified_on": "Última modificación el {{date}}"
+      "last_modified_on": "Última modificación el {{date}}",
+      "show_more": "Mostrar más",
+      "show_less": "Mostrar menos"
     },
     "empty": "No hay notas en la papelera.",
     "modals": {
@@ -835,7 +837,10 @@
       "empty_error_title": "Error al vaciar papelera",
       "empty_error_prefix": "Error al vaciar papelera: ",
       "empty_error_generic": "Error al vaciar papelera"
-    }
+    },
+    "count_one": "1 nota en la papelera",
+    "count_other": "{{count}} notas en la papelera",
+    "showing_limit": "Solo se muestran las {{count}} notas modificadas más recientemente"
   },
   "editor": {
     "markdown_placeholder": "Escribe tu markdown, usa / para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
@@ -1023,7 +1028,7 @@
       "reminder_bell": "Icono de campana (recordatorio)",
       "dashboard_user": "Usuario",
       "dashboard_filter_bar": "Barra de filtro",
-      "view_layout_toggle": "Alternar cuadrícula / lista",
+      "view_layout_toggle": "Alternar vista (cuadrícula / lista, tamaño de tarjetas)",
       "index_search_bar": "Barra de búsqueda",
       "tasklist_progress_bar": "Barra de progreso de las listas de tareas",
       "share_restrict_users": "Compartir: restringir a usuarios específicos",
@@ -1345,6 +1350,24 @@
         "days": "días"
       }
     },
+    "welcome_setup": {
+      "title": "¡Bienvenido a Poznote!",
+      "subtitle": "Configuremos algunas preferencias para empezar. Podrás cambiarlas en cualquier momento.",
+      "language_label": "Idioma",
+      "theme_label": "Tema",
+      "theme_options": {
+        "system": "Como el sistema",
+        "light": "Claro",
+        "dark": "Oscuro",
+        "black": "Negro"
+      },
+      "date_format_label": "Formato de fecha y hora",
+      "timezone_label": "Zona horaria",
+      "settings_tip": "Muchas más opciones (fuentes, copias de seguridad, IA y más) te esperan en la configuración de Poznote.",
+      "dashboard_tip": "El panel te ofrece una vista general de tus notas y tu cuenta.",
+      "skip": "Omitir",
+      "start": "Empezar"
+    },
     "timezone": {
       "title": "Zona horaria",
       "description": "Selecciona tu zona horaria:",
@@ -1413,6 +1436,8 @@
       "remove_from_folder": "Suelta aquí para eliminar de la carpeta"
     },
     "folder_actions": {
+      "add_favorite": "Añadir a favoritos",
+      "remove_favorite": "Quitar de favoritos",
       "menu": "Acciones",
       "create": "Crear",
       "kanban_view": "Vista Kanban",
@@ -3257,7 +3282,8 @@
       "reminder_due_title": "Mismo disparador que reminder.due pero sin el mensaje del recordatorio: los identificadores más el título de la nota y el enlace directo.",
       "reminder_due_minimal": "Mismo disparador que reminder.due pero solo identificadores (id de nota, id de recordatorio, hora de activación): ningún contenido de la nota sale de la instancia. Los detalles pueden obtenerse a través de la API REST.",
       "note_created": "Se creó una nota en su cuenta, desde la interfaz o la API REST. Payload: solo metadatos (id de nota, título, tipo, workspace, carpeta, enlace directo), nunca el contenido de la nota.",
-      "note_shared": "Se publicó un enlace público para una de sus notas. Payload: la nota (id, título, workspace, enlace directo), el token público y su URL, y si el enlace está protegido con contraseña."
+      "note_shared": "Se publicó un enlace público para una de sus notas. Payload: la nota (id, título, workspace, enlace directo), el token público y su URL, y si el enlace está protegido con contraseña.",
+      "settings_language_changed": "Cambió el idioma de la interfaz en la configuración. Payload: el nuevo código de idioma, el anterior y si el cambio se hizo desde la interfaz o la API REST."
     },
     "title": "Webhooks",
     "description": "Poznote envía una solicitud HTTP POST con una carga JSON a cada endpoint registrado cuando ocurre un evento suscrito. Si se define un secreto, la carga se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",
@@ -3427,6 +3453,8 @@
     "reset_layout": "Restablecer disposición",
     "reset_layout_hint": "Olvidar las posiciones guardadas y reorganizar el grafo automáticamente",
     "drag_hint": "Ctrl + arrastrar mueve un punto independientemente de sus enlaces",
+    "folder_filter_all": "Todas las carpetas",
+    "folder_filter_hint": "Mostrar solo las notas de una carpeta",
     "stats": "{{notes}} notas · {{links}} enlaces",
     "search": {
       "placeholder": "Buscar una nota..."

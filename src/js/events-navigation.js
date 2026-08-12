@@ -75,6 +75,9 @@ function setupBrowserNavigationHandler() {
 function isInternalNoteNavigationLink(link) {
     if (!link) return false;
     if (link.matches('a[data-task-url="true"]')) return false;
+    // Favorite folder shortcuts share the sidebar link styling but navigate
+    // to a folder view, not a note
+    if (link.matches('a.favorite-folder-link')) return false;
 
     if (link.matches('a.links_arbo_left, a[data-action="load-note"]')) {
         return true;

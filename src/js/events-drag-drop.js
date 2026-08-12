@@ -943,6 +943,13 @@ function handleFolderDragOverEnhanced(e) {
 
     // If dragging a folder
     if (dragData && dragData.type === 'folder') {
+        // Dropping a folder on Favorites toggles its favorite state
+        if (targetFolder === 'Favorites') {
+            e.dataTransfer.dropEffect = 'move';
+            folderHeader.classList.add('drag-over');
+            return;
+        }
+
         if (!canDropFolderOnHeader(dragData, folderHeader, targetFolderId)) {
             e.dataTransfer.dropEffect = 'none';
             clearFolderDropIndicator(folderHeader);
@@ -1029,6 +1036,14 @@ function handleFolderDropEnhanced(e) {
                 header.style.border = '';
                 header.style.transform = '';
             });
+
+            // Special handling for Favorites folder: toggle favorite state
+            if (targetFolder === 'Favorites') {
+                if (typeof toggleFolderFavorite === 'function') {
+                    toggleFolderFavorite(data.folderId);
+                }
+                return;
+            }
 
             if (!canDropFolderOnHeader(data, folderHeader, targetFolderId)) {
                 return;

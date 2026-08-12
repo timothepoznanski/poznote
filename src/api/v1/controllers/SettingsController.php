@@ -202,6 +202,14 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
+        if ($key === 'welcome_setup') {
+            $normalized = trim((string) $value);
+            if (!in_array($normalized, ['pending', 'done'], true)) {
+                throw new InvalidArgumentException('invalid welcome setup value', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'import_max_individual_files' || $key === 'import_max_zip_files') {
             $intVal = (int) $value;
             if ($intVal < 1 || $intVal > 100000) {
@@ -542,6 +550,16 @@ class SettingsController {
                 require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 setGlobalSetting($key, $value);
             } else {
+                $previousLanguage = null;
+                if ($key === 'language') {
+                    // Captured before the write so the webhook below can tell
+                    // whether the language actually changed, and from what.
+                    $stmt = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
+                    $stmt->execute(['language']);
+                    $stored = $stmt->fetchColumn();
+                    $previousLanguage = $stored !== false ? (string) $stored : '';
+                }
+
                 // For user settings, use the user database
                 $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 $stmt->execute([$key, $value]);
@@ -556,11 +574,15 @@ class SettingsController {
                     require_once dirname(__DIR__, 3) . '/users/db_master.php';
                     $languageUserId = function_exists('getCurrentUserId') ? (int) getCurrentUserId() : 0;
                     setUserProfileLanguage($languageUserId, $value);
+
+                    if ($previousLanguage !== $value) {
+                        $this->dispatchLanguageChangedWebhook($languageUserId, $previousLanguage, $value);
+                    }
                 }
             }
 
             echo json_encode(['success' => true, 'key' => $key, 'value' => $value]);
-            
+
         } catch (Exception $e) {
             $statusCode = (int) $e->getCode();
             if ($statusCode < 400 || $statusCode > 599) {
@@ -568,6 +590,22 @@ class SettingsController {
             }
             http_response_code($statusCode);
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Best-effort settings.language_changed webhook: never let a webhook
+     * failure break the settings update that already succeeded.
+     */
+    private function dispatchLanguageChangedWebhook(int $userId, string $previous, string $language): void {
+        try {
+            require_once dirname(__DIR__, 3) . '/WebhookDispatcher.php';
+            // Bearer/Basic credentials mean an external API client; the web UI
+            // reaches the same endpoint through its session cookie.
+            $source = (function_exists('hasApiAuthCredentials') && hasApiAuthCredentials()) ? 'api' : 'ui';
+            (new WebhookDispatcher())->dispatchLanguageChanged($userId, $previous, $language, $source);
+        } catch (Throwable $e) {
+            error_log('settings.language_changed webhook failed: ' . $e->getMessage());
         }
     }
 }

@@ -32,8 +32,8 @@
     /* State                                                                   */
     /* --------------------------------------------------------------------- */
 
-    var nodes = [];            // {id, title, folder, folderSlot, degree, x, y, vx, vy, el, labelEl, circleEl, orphan}
-    var edges = [];            // {source: node, target: node, el}
+    var nodes = [];            // {id, title, folder, folderSlot, degree, x, y, vx, vy, el, labelEl, circleEl, visible}
+    var edges = [];            // {source: node, target: node, el, visible}
     var nodeById = {};
     var neighbors = {};        // id -> {otherId: true}
 
@@ -56,6 +56,7 @@
     var showOrphans = true;
     var showLabels = true;
     var searchTerm = '';
+    var folderFilter = '';     // '' = all folders
     var hoveredNode = null;
 
     var PREF_SHOW_ORPHANS = 'graph-show-orphans';
@@ -213,18 +214,37 @@
         });
 
         nodes.forEach(function (node) {
-            node.orphan = node.degree === 0;
             node.radius = Math.min(16, 4 + 2.2 * Math.sqrt(node.degree));
         });
 
         assignComponents();
         restorePinnedPositions();
 
+        populateFolderFilter(sortedFolders);
         renderSvg();
-        updateOrphanVisibility();
+        updateVisibility();
         fitView();
         initLabelDefault();
         startSimulation(1);
+    }
+
+    function populateFolderFilter(folderNames) {
+        var select = document.getElementById('graphFolderFilter');
+        if (!select || folderNames.length === 0) { return; }
+        folderNames.forEach(function (name) {
+            var option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+        });
+        select.classList.remove('initially-hidden');
+        select.addEventListener('change', function () {
+            folderFilter = select.value;
+            updateVisibility();
+            // Refit so the filtered subgraph fills the canvas
+            userInteracted = false;
+            fitView();
+        });
     }
 
     // Flood-fill so every node knows its connected component; dragging a
@@ -320,7 +340,7 @@
 
         updateLabelTransforms();
         updateLabelVisibility();
-        updateOrphanVisibility();
+        updateVisibility();
     }
 
     function recolorNodes() {
@@ -340,7 +360,7 @@
         var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         var visible = 0;
         nodes.forEach(function (node) {
-            if (node.orphan && !showOrphans) { return; }
+            if (!node.visible) { return; }
             visible++;
             if (node.x < minX) { minX = node.x; }
             if (node.x > maxX) { maxX = node.x; }
@@ -360,10 +380,26 @@
         updateLabelVisibility();
     }
 
-    function updateOrphanVisibility() {
+    function nodeMatchesFolder(node) {
+        return folderFilter === '' || node.folder === folderFilter;
+    }
+
+    function updateVisibility() {
+        // An edge survives the folder filter only when both endpoints do; a
+        // node whose visible links all disappear counts as unlinked for the
+        // orphans toggle.
+        var visibleDegree = {};
+        edges.forEach(function (edge) {
+            edge.visible = nodeMatchesFolder(edge.source) && nodeMatchesFolder(edge.target);
+            edge.el.classList.toggle('initially-hidden', !edge.visible);
+            if (edge.visible) {
+                visibleDegree[edge.source.id] = (visibleDegree[edge.source.id] || 0) + 1;
+                visibleDegree[edge.target.id] = (visibleDegree[edge.target.id] || 0) + 1;
+            }
+        });
         nodes.forEach(function (node) {
-            var hidden = node.orphan && !showOrphans;
-            node.el.classList.toggle('initially-hidden', hidden);
+            node.visible = nodeMatchesFolder(node) && (showOrphans || (visibleDegree[node.id] || 0) > 0);
+            node.el.classList.toggle('initially-hidden', !node.visible);
         });
         updateLabelVisibility();
         updateStats();
@@ -372,10 +408,11 @@
     function updateStats() {
         var statsEl = document.getElementById('graphStats');
         var template = statsEl.getAttribute('data-txt-stats') || '{{notes}} · {{links}}';
-        var visibleNodes = showOrphans ? nodes.length : nodes.filter(function (n) { return !n.orphan; }).length;
+        var visibleNodes = nodes.filter(function (n) { return n.visible; }).length;
+        var visibleEdges = edges.filter(function (e) { return e.visible; }).length;
         statsEl.textContent = template
             .replace('{{notes}}', String(visibleNodes))
-            .replace('{{links}}', String(edges.length));
+            .replace('{{links}}', String(visibleEdges));
     }
 
     /* --------------------------------------------------------------------- */
@@ -539,7 +576,7 @@
         if (nodes.length === 0) { return; }
         var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         nodes.forEach(function (node) {
-            if (node.orphan && !showOrphans) { return; }
+            if (!node.visible) { return; }
             if (node.x < minX) { minX = node.x; }
             if (node.x > maxX) { maxX = node.x; }
             if (node.y < minY) { minY = node.y; }
@@ -856,7 +893,7 @@
             orphansToggle.addEventListener('change', function () {
                 showOrphans = orphansToggle.checked;
                 savePref(PREF_SHOW_ORPHANS, showOrphans);
-                updateOrphanVisibility();
+                updateVisibility();
             });
         }
 

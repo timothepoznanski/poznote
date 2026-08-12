@@ -599,6 +599,11 @@ $router->put('/folders/{id}/pinned', function($params) use ($foldersController) 
     $foldersController->updatePinned($params['id']);
 });
 
+// Mark/unmark a folder as favorite (listed in the Favorites section)
+$router->put('/folders/{id}/favorite', function($params) use ($foldersController) {
+    $foldersController->updateFavorite($params['id']);
+});
+
 // Get note count in folder
 $router->get('/folders/{id}/notes', function($params) use ($foldersController) {
     $foldersController->noteCount($params['id']);

@@ -4184,26 +4184,23 @@ function buildNoteCardPreview($noteId, $type) {
 }
 
 /**
- * Render the view controls (layout toggle + card size cycle) used by the
- * dashboard and diary boards, next to the filter bar. $prefix namespaces the
- * localStorage keys so each page remembers its own settings. The layout
- * button toggles grid/list; the size button cycles small/medium/large and is
- * hidden in list layout (board-view-menu.js drives both).
+ * Render the view controls used by the dashboard and diary boards, next to
+ * the filter bar. $prefix namespaces the localStorage keys so each page
+ * remembers its own settings. A single toggle cycles through the views
+ * (grid small/medium/large, then list); the columns button caps the grid
+ * width and is hidden in list layout (board-view-menu.js drives both).
  */
 function renderBoardViewMenu(string $prefix) {
     $idPrefix = htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8');
     echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '">' .
         '<button type="button" id="' . $idPrefix . 'ViewLayoutBtn" class="board-view-btn board-view-layout-toggle"' .
             ' data-label-grid="' . t_h('dashboard.view.layout_grid', [], 'Grid') . '"' .
-            ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '">' .
-            '<i class="lucide lucide-layout-list"></i>' .
-            '<i class="lucide lucide-grid"></i>' .
-        '</button>' .
-        '<button type="button" id="' . $idPrefix . 'ViewSizeBtn" class="board-view-btn board-view-size-btn"' .
+            ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '"' .
             ' data-label-small="' . t_h('dashboard.view.size_small', [], 'Small') . '"' .
             ' data-label-medium="' . t_h('dashboard.view.size_medium', [], 'Medium') . '"' .
-            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '"' .
-            ' title="' . t_h('dashboard.view.size', [], 'Card size') . '">' .
+            ' data-label-large="' . t_h('dashboard.view.size_large', [], 'Large') . '">' .
+            '<i class="lucide lucide-grid"></i>' .
+            '<i class="lucide lucide-layout-list"></i>' .
             '<span class="board-view-size-letter"></span>' .
         '</button>' .
         '<button type="button" id="' . $idPrefix . 'ViewColumnsBtn" class="board-view-btn board-view-columns-btn"' .

@@ -97,6 +97,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/backlinks.js',
         'js/snapshots.js',
         'js/ui-customization.js',
+        'js/welcome-setup.js',
     ],
     ];
 }

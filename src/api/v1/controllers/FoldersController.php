@@ -1277,6 +1277,56 @@ class FoldersController {
     }
 
     /**
+     * PUT /api/v1/folders/{id}/favorite
+     * Mark or unmark a folder as favorite. Favorite folders are listed in the
+     * Favorites section at the top of the notes list.
+     *
+     * Body: { "favorite": true|false }
+     *
+     * The caller sends the desired state rather than toggling, so two clients
+     * open at once cannot flip each other's result.
+     * Like pinning, this is presentation state and is not pushed to Git.
+     */
+    public function updateFavorite(string $id): void {
+        $folderId = (int)$id;
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+
+        $data = $this->getInputData();
+        if (!array_key_exists('favorite', $data)) {
+            $this->sendError('Invalid JSON in request body: expected a "favorite" boolean', 400);
+            return;
+        }
+
+        $favorite = filter_var($data['favorite'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($favorite === null) {
+            $this->sendError('Invalid value for "favorite": expected a boolean', 400);
+            return;
+        }
+
+        $existsStmt = $this->db->prepare("SELECT id FROM folders WHERE id = ?");
+        $existsStmt->execute([$folderId]);
+        if (!$existsStmt->fetchColumn()) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+
+        $stmt = $this->db->prepare("UPDATE folders SET favorite = ? WHERE id = ?");
+        if (!$stmt->execute([$favorite ? 1 : 0, $folderId])) {
+            $this->sendError('Database error while updating favorite state', 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success'  => true,
+            'message'  => 'Folder favorite state updated successfully',
+            'favorite' => $favorite
+        ]);
+    }
+
+    /**
      * GET /api/v1/folders/{id}/notes - Get note count in folder
      */
     public function noteCount(string $id): void {
