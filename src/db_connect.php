@@ -569,6 +569,17 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('attachments_at_bottom', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('backlinks_at_bottom', '0')");
 
+        // The welcome note is created during the first database bootstrap. Sync
+        // the browser language before generating it, otherwise a fresh account
+        // would always receive the English note on its first request.
+        if ($activeUserId
+            && session_status() === PHP_SESSION_ACTIVE
+            && (int)($_SESSION['user_id'] ?? 0) === $activeUserId
+            && (int)($_SESSION['language_synced_user_id'] ?? 0) !== $activeUserId) {
+            poznoteSyncUserLanguage($con, $activeUserId);
+            $_SESSION['language_synced_user_id'] = $activeUserId;
+        }
+
         // Ensure reminder email delivery columns exist for databases created before SMTP reminders.
         try {
             $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
@@ -628,9 +639,16 @@ try {
                 $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
                 $folderId = $folderData ? (int)$folderData['id'] : null;
 
-                // Create welcome note content (kept in a separate template file)
-                $welcomeTemplateFile = __DIR__ . '/welcome_note.html';
-                $welcomeContent = @file_get_contents($welcomeTemplateFile);
+                // Create the welcome note in the user's active interface language.
+                $welcomeTitle = t('welcome_note.title', [], 'Welcome to Poznote');
+                $welcomeContent = t('welcome_note.content', [], '');
+
+                // Keep the template as a fallback for installations that have
+                // an incomplete/custom dictionary.
+                if (trim($welcomeContent) === '') {
+                    $welcomeTemplateFile = __DIR__ . '/welcome_note.html';
+                    $welcomeContent = @file_get_contents($welcomeTemplateFile);
+                }
 
                 // Fallback in case the template file is missing
                 if ($welcomeContent === false || trim($welcomeContent) === '') {
@@ -640,7 +658,7 @@ try {
                 // Insert the welcome note
                 $now_utc = gmdate('Y-m-d H:i:s', time());
                 $stmt = $con->prepare("INSERT INTO entries (heading, entry, folder, folder_id, workspace, type, created, updated, created_by_user_id, updated_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute(['Welcome to Poznote', '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc, $activeUserId, $activeUserId]);
+                $stmt->execute([$welcomeTitle, '', 'Getting Started', $folderId, 'Poznote', 'note', $now_utc, $now_utc, $activeUserId, $activeUserId]);
 
                 $welcomeNoteId = $con->lastInsertId();
 

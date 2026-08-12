@@ -965,6 +965,16 @@ function oidc_find_or_provision_user($claims) {
             ]);
         }
 
+        // The first authenticated page normally detects the browser language
+        // in db_connect.php. OIDC provisioning happens one request earlier,
+        // so persist that same detected language now, before user.created is
+        // dispatched. The startup guide/settings can still override it later.
+        $initialLanguage = poznoteDetectBrowserLanguage(
+            (string)($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''),
+            poznoteSupportedLanguages()
+        ) ?? 'en';
+        setUserProfileLanguage((int)$creation['user_id'], $initialLanguage);
+
         $user = getUserProfileById((int)$creation['user_id']);
         if (!$user) {
             throw new Exception('Failed to load auto-created user profile');

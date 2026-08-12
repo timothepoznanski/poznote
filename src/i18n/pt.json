@@ -2,6 +2,10 @@
   "app": {
     "name": "Poznote"
   },
+  "welcome_note": {
+    "title": "Bem-vindo ao Poznote",
+    "content": "<p>O Poznote é uma plataforma pessoal para fazer anotações e documentação.</p>\n<br><br>\nDescubra <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todos os recursos</a> incluídos no Poznote.\n<br><br>\nClique no botão <code>+</code> para criar sua primeira nota.\n<br><br>\nDentro de uma nota, digite <code>/</code> para abrir o menu de comandos.\n<br><br>\nEspero que goste de usar o Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+  },
   "markdown_syntax": {
     "menu_item": "Sintaxe Markdown",
     "page_title": "Sintaxe Markdown",

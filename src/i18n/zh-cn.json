@@ -2,6 +2,10 @@
   "app": {
     "name": "Poznote"
   },
+  "welcome_note": {
+    "title": "欢迎使用 Poznote",
+    "content": "<p>Poznote 是一个用于个人笔记和文档管理的平台。</p>\n<br><br>\n了解 Poznote 提供的<a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">所有功能</a>。\n<br><br>\n点击 <code>+</code> 按钮创建第一篇笔记。\n<br><br>\n在笔记中输入 <code>/</code> 以打开命令菜单。\n<br><br>\n希望您喜欢使用 Poznote！✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+  },
   "markdown_syntax": {
     "menu_item": "Markdown 语法",
     "page_title": "Markdown 语法",
