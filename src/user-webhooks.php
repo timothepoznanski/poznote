@@ -162,7 +162,6 @@ $eventHelpDefaults = [
     'reminder.due_minimal' => 'Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.',
     'note.created' => 'A note was created in your account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.',
     'note.shared' => 'A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected.',
-    'settings.language_changed' => 'You changed the interface language in the settings. Payload: the new language code, the previous one, and whether the change came from the interface or the REST API.',
 ];
 $eventHelp = [];
 foreach ($eventHelpDefaults as $eventName => $default) {

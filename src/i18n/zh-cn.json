@@ -374,6 +374,7 @@
       "tenant_isolation": "SaaS 模式：选择对非管理员用户屏蔽哪些功能，例如发现实例中的其他账户或注册个人 webhook。家庭或团队实例请保持全部不勾选。",
       "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
+      "welcome_setup": "重新查看启动向导并更新基本偏好设置。",
       "change_password": "更改用于登录的密码。",
       "password_note_sso_only": "此实例已禁用密码登录。",
       "password_note_no_local": "您的密码由您的身份提供商管理。",
@@ -502,6 +503,7 @@
       "delete_account": "删除账户",
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
+      "welcome_setup": "启动向导",
       "git_sync_toggle": "Git 同步",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
@@ -509,6 +511,10 @@
       "ai_assistant": "AI 助手",
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份"
+    },
+    "welcome_setup": {
+      "relaunch": "重新查看",
+      "restart_failed": "无法重新打开启动向导。请重试。"
     },
     "install_app": {
       "launching": "安装即将开始，请稍候...",
@@ -3406,7 +3412,7 @@
       "reminder_due_minimal": "与 reminder.due 相同的触发，但仅含标识符（笔记 id、提醒 id、触发时间）：笔记内容不会离开实例。详情可通过 REST API 获取。",
       "note_created": "您的账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
       "note_shared": "为您的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。",
-      "settings_language_changed": "您在设置中更改了界面语言。Payload：新的语言代码、之前的代码，以及更改来自界面还是 REST API。"
+      "settings_language_changed": "用户在设置中更改了界面语言。Payload：用户资料、新的语言代码、之前的代码，以及更改来自界面还是 REST API。"
     },
     "title": "Webhook",
     "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",

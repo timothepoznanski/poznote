@@ -372,6 +372,7 @@
       "tenant_isolation": "SaaS-Modus: Wählen Sie, welche Funktionen für Benutzer ohne Administratorrechte blockiert werden, etwa das Entdecken der anderen Konten der Instanz oder das Registrieren persönlicher Webhooks. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
       "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
+      "welcome_setup": "Startassistenten erneut öffnen und grundlegende Einstellungen aktualisieren.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
       "password_note_sso_only": "Die Passwort-Anmeldung ist auf dieser Instanz deaktiviert.",
       "password_note_no_local": "Ihr Passwort wird von Ihrem Identitaetsanbieter verwaltet.",
@@ -500,6 +501,7 @@
       "delete_account": "Konto löschen",
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
+      "welcome_setup": "Startassistent",
       "git_sync_toggle": "Git-Synchronisierung",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
@@ -507,6 +509,10 @@
       "ai_assistant": "KI-Assistent",
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen"
+    },
+    "welcome_setup": {
+      "relaunch": "Erneut öffnen",
+      "restart_failed": "Der Startassistent konnte nicht erneut geöffnet werden. Bitte versuchen Sie es erneut."
     },
     "install_app": {
       "launching": "Die Installation wird gestartet. Bitte warten Sie...",
@@ -3283,7 +3289,7 @@
       "reminder_due_minimal": "Gleicher Auslöser wie reminder.due, aber nur IDs (Notiz-ID, Erinnerungs-ID, Auslösezeit): kein Notizinhalt verlässt die Instanz. Details können über die REST-API abgerufen werden.",
       "note_created": "In Ihrem Konto wurde eine Notiz erstellt, über die Oberfläche oder die REST-API. Payload: nur Metadaten (Notiz-ID, Titel, Typ, Workspace, Ordner, Direktlink), niemals der Notizinhalt.",
       "note_shared": "Für eine Ihrer Notizen wurde ein öffentlicher Freigabelink veröffentlicht. Payload: die Notiz (ID, Titel, Workspace, Direktlink), das öffentliche Token samt URL und ob der Link passwortgeschützt ist.",
-      "settings_language_changed": "Sie haben die Sprache der Oberfläche in den Einstellungen geändert. Payload: der neue Sprachcode, der vorherige und ob die Änderung über die Oberfläche oder die REST-API erfolgte."
+      "settings_language_changed": "Ein Benutzer hat die Sprache der Oberfläche in den Einstellungen geändert. Payload: das Benutzerprofil, der neue Sprachcode, der vorherige und ob die Änderung über die Oberfläche oder die REST-API erfolgte."
     },
     "title": "Webhooks",
     "description": "Poznote sendet eine HTTP-POST-Anfrage mit JSON-Payload an jeden registrierten Endpunkt, wenn ein abonniertes Ereignis eintritt. Ist ein Secret gesetzt, wird die Payload per HMAC-SHA256 im Header X-Poznote-Signature-256 signiert.",

@@ -1423,7 +1423,8 @@ function listWebhooks(): array {
  *
  * $userId scopes the lookup to one account's webhooks: user events must only
  * ever reach the endpoints registered by the account that produced them.
- * Leave it null for instance events, which go to every subscribed webhook.
+ * When null, matching webhooks are returned regardless of owner; use
+ * listActiveInstanceWebhooksForEvent() when dispatching an instance event.
  */
 function listActiveWebhooksForEvent(string $event, ?int $userId = null): array {
     $matching = [];
@@ -1440,6 +1441,17 @@ function listActiveWebhooksForEvent(string $event, ?int $userId = null): array {
         }
     }
     return $matching;
+}
+
+/**
+ * List active instance/admin webhooks subscribed to an event.
+ * Instance webhooks are the rows without a user owner; user webhooks may
+ * contain legacy instance event names but must never receive instance events.
+ */
+function listActiveInstanceWebhooksForEvent(string $event): array {
+    return array_values(array_filter(listActiveWebhooksForEvent($event), static function ($webhook) {
+        return ($webhook['user_id'] ?? null) === null;
+    }));
 }
 
 /**

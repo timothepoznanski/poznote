@@ -32,8 +32,8 @@
     /* State                                                                   */
     /* --------------------------------------------------------------------- */
 
-    var nodes = [];            // {id, title, folder, folderSlot, degree, x, y, vx, vy, el, labelEl, circleEl, visible}
-    var edges = [];            // {source: node, target: node, el, visible}
+    var nodes = [];            // {id, title, folder, folderSlot, degree, x, y, vx, vy, el, labelEl, circleEl, orphan}
+    var edges = [];            // {source: node, target: node, el}
     var nodeById = {};
     var neighbors = {};        // id -> {otherId: true}
 
@@ -214,6 +214,7 @@
         });
 
         nodes.forEach(function (node) {
+            node.orphan = node.degree === 0;
             node.radius = Math.min(16, 4 + 2.2 * Math.sqrt(node.degree));
         });
 
@@ -222,7 +223,6 @@
 
         populateFolderFilter(sortedFolders);
         renderSvg();
-        updateVisibility();
         fitView();
         initLabelDefault();
         startSimulation(1);
@@ -241,7 +241,7 @@
         select.addEventListener('change', function () {
             folderFilter = select.value;
             updateVisibility();
-            // Refit so the filtered subgraph fills the canvas
+            // Refit so the filtered subgraph fills the canvas.
             userInteracted = false;
             fitView();
         });
@@ -385,9 +385,9 @@
     }
 
     function updateVisibility() {
-        // An edge survives the folder filter only when both endpoints do; a
-        // node whose visible links all disappear counts as unlinked for the
-        // orphans toggle.
+        // An edge remains visible only when both endpoints belong to the
+        // selected folder. Nodes without visible links follow the orphan
+        // toggle, just as they do without a folder filter.
         var visibleDegree = {};
         edges.forEach(function (edge) {
             edge.visible = nodeMatchesFolder(edge.source) && nodeMatchesFolder(edge.target);

@@ -1470,6 +1470,39 @@
             }
         });
 
+        // Re-arm the first-run welcome setup wizard for the current account,
+        // then return to the notes page where the wizard is rendered.
+        var welcomeSetupCard = document.getElementById('welcome-setup-card');
+        if (welcomeSetupCard) {
+            welcomeSetupCard.addEventListener('click', function () {
+                if (welcomeSetupCard.getAttribute('aria-busy') === 'true') return;
+
+                welcomeSetupCard.setAttribute('aria-busy', 'true');
+                welcomeSetupCard.style.pointerEvents = 'none';
+
+                setSetting('welcome_setup', 'pending', function (success) {
+                    if (success) {
+                        window.location.href = 'index.php';
+                        return;
+                    }
+
+                    welcomeSetupCard.removeAttribute('aria-busy');
+                    welcomeSetupCard.style.pointerEvents = '';
+                    var message = tr(
+                        'settings.welcome_setup.restart_failed',
+                        {},
+                        'The startup guide could not be relaunched. Please try again.'
+                    );
+                    var title = tr('settings.cards.welcome_setup', {}, 'Startup guide');
+                    if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+                        window.modalAlert.alert(message, 'error', title);
+                    } else {
+                        window.alert(message);
+                    }
+                });
+            });
+        }
+
         // Generic clickable cards with data-href attribute (excluding already handled cards)
         var clickableCards = document.querySelectorAll('.settings-card-clickable[data-href]');
         clickableCards.forEach(function (card) {
