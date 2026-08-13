@@ -81,44 +81,12 @@ body.trash-page {
     margin-bottom: 20px;
 }
 
-/* Page header (title + count) */
-.trash-page-header {
-    text-align: center;
-    margin-top: 32px;
-    margin-bottom: 4px;
-}
-
-.trash-page-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-size: 1.5em;
-    font-weight: 600;
-    color: #333;
-    margin: 0 0 6px 0;
-}
-
-.trash-page-title-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    background: #fdecec;
-}
-
-.trash-page-title-icon .lucide {
-    width: 20px;
-    height: 20px;
-    color: #e04b4b;
-    background-color: #e04b4b;
-}
-
 .trash-page-count {
     font-size: 13px;
     color: #888;
+    text-align: center;
+    width: 100%;
+    margin-top: 10px;
 }
 
 .trash-search-results {
@@ -135,10 +103,15 @@ body.trash-page {
 /* Filter Bar */
 .trash-filter-bar {
     max-width: 900px;
-    margin: 0 auto 30px auto;
+    margin: 32px auto 30px auto;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 15px;
+}
+
+.trash-filter-bar .filter-input-wrapper {
+    flex: 1;
 }
 
 .filter-input-wrapper {
@@ -665,14 +638,6 @@ body.trash-page {
         height: 20px;
     }
 
-    .trash-page-header {
-        margin-top: 20px;
-    }
-
-    .trash-page-title {
-        font-size: 1.3em;
-    }
-
     .css-title {
         font-size: 18px !important;
     }
@@ -761,16 +726,6 @@ body.dark-mode .lastupdated {
 html[data-theme='dark'] .noteentry,
 body.dark-mode .noteentry {
     color: #ccc;
-}
-
-html[data-theme='dark'] .trash-page-title,
-body.dark-mode .trash-page-title {
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .trash-page-title-icon,
-body.dark-mode .trash-page-title-icon {
-    background: rgba(224, 75, 75, 0.15);
 }
 
 html[data-theme='dark'] .trash-page-count,

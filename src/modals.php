@@ -1792,6 +1792,28 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 </div>
                 </div>
 
+                <!-- Notes Page Icon Sidebar Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar (notes page)'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon_sidebar" checked><span><?php echo t_h('modals.ui_customization.icon_sidebar_entire', [], 'Entire icon sidebar'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFavoritesBtn" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTasksBtn" checked><span><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
+                </div>
+                </div>
+
                 <!-- Dashboard Toolbar Section -->
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.dashboard_toolbar', [], 'Dashboard'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
@@ -1842,6 +1864,24 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="uiCustomizationModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveUiCustomizationBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications Modal (same markup as dashboard.php, driven by js/notifications-modal.js) -->
+<div id="notificationsModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></h3>
+        <div class="notifications-modal-body" style="max-height: 60vh; overflow-y: auto; margin: 15px 0;">
+            <div class="notifications-empty" id="notificationsEmpty">
+                <i class="lucide lucide-inbox"></i>
+                <p><?php echo t_h('reminder.no_notifications', [], 'No notifications'); ?></p>
+            </div>
+            <div class="notifications-list" id="notificationsList"></div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-danger initially-hidden" id="dismissAllBtn" data-action="dismiss-all-notifications"><?php echo t_h('reminder.dismiss_all', [], 'Delete all'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-notifications-modal"><?php echo t_h('common.close'); ?></button>
         </div>
     </div>
 </div>

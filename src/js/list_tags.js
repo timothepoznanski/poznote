@@ -84,6 +84,16 @@ function showTagContextMenu(x, y, tagItem) {
         handleRenameTag(tagItem);
     });
 
+    const colorBtn = document.createElement('button');
+    colorBtn.className = 'tag-context-menu-item';
+    colorBtn.innerHTML = '<i class="lucide lucide-palette"></i> ' +
+        (window.t ? window.t('tags.action.color', {}, 'Color') : 'Color');
+    colorBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeTagContextMenu();
+        showTagColorModal(tagItem);
+    });
+
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'tag-context-menu-item danger';
     deleteBtn.innerHTML = '<i class="lucide lucide-trash-2"></i> ' +
@@ -95,12 +105,13 @@ function showTagContextMenu(x, y, tagItem) {
     });
 
     menu.appendChild(renameBtn);
+    menu.appendChild(colorBtn);
     menu.appendChild(deleteBtn);
     document.body.appendChild(menu);
 
     // Position so the menu stays on screen
     const menuWidth = 160;
-    const menuHeight = 80;
+    const menuHeight = 120;
     const left = (x + menuWidth > window.innerWidth) ? x - menuWidth : x;
     const top  = (y + menuHeight > window.innerHeight) ? y - menuHeight : y;
     menu.style.left = left + 'px';
@@ -155,6 +166,17 @@ function renameTagRequest(tagItem, oldName, newName) {
                 nameEl.textContent = newName;
                 if (countEl) nameEl.appendChild(countEl);
             }
+
+            // Carry the tag color over to the new name
+            const colorMap = getTagColorsMap();
+            const oldKey = String(oldName).trim().toLowerCase();
+            const newKey = String(newName).trim().toLowerCase();
+            if (oldKey !== newKey && Object.prototype.hasOwnProperty.call(colorMap, oldKey)) {
+                colorMap[newKey] = colorMap[oldKey];
+                delete colorMap[oldKey];
+                saveTagColors();
+            }
+            updateTagItemDot(tagItem);
 
             // Re-sort the grid
             resortTagGrid();
@@ -218,6 +240,14 @@ function deleteTagRequest(tagItem, tagName) {
             tagItem.remove();
             // Update count display
             updateTagCount();
+
+            // Drop the deleted tag's color mapping
+            const colorMap = getTagColorsMap();
+            const key = String(tagName).trim().toLowerCase();
+            if (Object.prototype.hasOwnProperty.call(colorMap, key)) {
+                delete colorMap[key];
+                saveTagColors();
+            }
         } else {
             if (window.modalAlert) {
                 window.modalAlert.alert(
@@ -235,6 +265,187 @@ function deleteTagRequest(tagItem, tagName) {
             );
         }
     });
+}
+
+// ─── Tag colors ────────────────────────────────────────────────────────────────
+// window.TAG_COLORS maps a lowercased tag name to a palette id or '#rrggbb'
+// (same semantics as note colors). Persisted in the 'tag_colors' setting.
+
+function getTagColorsMap() {
+    if (!window.TAG_COLORS || typeof window.TAG_COLORS !== 'object') {
+        window.TAG_COLORS = {};
+    }
+    return window.TAG_COLORS;
+}
+
+function getTagColorPalette() {
+    return Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
+}
+
+function resolveTagColorValueHex(value) {
+    if (typeof value !== 'string' || value === '') return '';
+    if (value.charAt(0) === '#') return value;
+    const entry = getTagColorPalette().find(function(c) { return c.id === value.toLowerCase(); });
+    return entry ? entry.hex : '';
+}
+
+function resolveTagHex(tagName) {
+    const value = getTagColorsMap()[String(tagName || '').trim().toLowerCase()];
+    return resolveTagColorValueHex(value);
+}
+
+function saveTagColors(callback) {
+    fetch('/api/v1/settings/tag_colors', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ value: JSON.stringify(getTagColorsMap()) })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) { if (callback) callback(!!(data && data.success)); })
+    .catch(function() { if (callback) callback(false); });
+}
+
+function setTagColor(tagName, colorValue, callback) {
+    const key = String(tagName || '').trim().toLowerCase();
+    if (!key) return;
+    const map = getTagColorsMap();
+    if (colorValue) {
+        map[key] = colorValue;
+    } else {
+        delete map[key];
+    }
+    saveTagColors(callback);
+}
+
+function updateTagItemDot(tagItem) {
+    const nameEl = tagItem.querySelector('.tag-name');
+    if (!nameEl) return;
+    let dot = nameEl.querySelector('.tag-color-dot');
+    const hex = resolveTagHex(tagItem.dataset.tag);
+    if (!hex) {
+        if (dot) dot.remove();
+        return;
+    }
+    if (!dot) {
+        dot = document.createElement('span');
+        dot.className = 'tag-color-dot';
+        nameEl.insertBefore(dot, nameEl.firstChild);
+    }
+    dot.style.background = hex;
+}
+
+function showTagColorModal(tagItem) {
+    const tagName = tagItem.dataset.tag;
+    const currentValue = getTagColorsMap()[String(tagName).trim().toLowerCase()] || '';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'alert-modal-overlay';
+    overlay.style.zIndex = '10000';
+
+    const modal = document.createElement('div');
+    modal.className = 'alert-modal';
+
+    const header = document.createElement('div');
+    header.className = 'alert-modal-header';
+    const titleEl = document.createElement('h3');
+    titleEl.className = 'alert-modal-title';
+    titleEl.textContent = (window.t ? window.t('tags.color.modal_title', {}, 'Tag color') : 'Tag color') + ' — ' + tagName;
+    header.appendChild(titleEl);
+
+    const body = document.createElement('div');
+    body.className = 'alert-modal-body';
+
+    let selectedValue = currentValue;
+
+    const grid = document.createElement('div');
+    grid.className = 'tag-color-grid';
+
+    function refreshSelection() {
+        grid.querySelectorAll('.tag-color-swatch').forEach(function(swatch) {
+            swatch.classList.toggle('selected', swatch.dataset.value === selectedValue);
+        });
+        customInput.classList.toggle('selected', !!selectedValue && selectedValue.charAt(0) === '#');
+    }
+
+    getTagColorPalette().forEach(function(color) {
+        const swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'tag-color-swatch';
+        swatch.dataset.value = color.id;
+        swatch.style.background = color.hex;
+        swatch.title = color.name || color.id;
+        swatch.addEventListener('click', function() {
+            selectedValue = (selectedValue === color.id) ? '' : color.id;
+            refreshSelection();
+        });
+        grid.appendChild(swatch);
+    });
+
+    // Custom hex color, mirroring the note color picker's custom option
+    const customInput = document.createElement('input');
+    customInput.type = 'color';
+    customInput.className = 'tag-color-swatch tag-color-custom';
+    customInput.title = window.t ? window.t('note_color.custom', {}, 'Custom color') : 'Custom color';
+    customInput.value = (currentValue && currentValue.charAt(0) === '#') ? currentValue : '#3b82f6';
+    customInput.addEventListener('input', function() {
+        selectedValue = customInput.value;
+        refreshSelection();
+    });
+    grid.appendChild(customInput);
+
+    body.appendChild(grid);
+
+    const footer = document.createElement('div');
+    footer.className = 'alert-modal-footer';
+
+    function closeColorModal(cb) {
+        overlay.classList.remove('show');
+        setTimeout(function() { overlay.remove(); if (cb) cb(); }, 300);
+    }
+
+    function persist(value) {
+        closeColorModal(function() {
+            setTagColor(tagName, value, function(success) {
+                if (success) {
+                    updateTagItemDot(tagItem);
+                } else if (window.modalAlert) {
+                    window.modalAlert.alert(
+                        window.t ? window.t('tags.color.apply_error', {}, 'Could not update the tag color.') : 'Could not update the tag color.',
+                        'error'
+                    );
+                }
+            });
+        });
+    }
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'alert-modal-button secondary';
+    removeBtn.textContent = window.t ? window.t('note_color.remove', {}, 'Remove color') : 'Remove color';
+    removeBtn.addEventListener('click', function() { persist(''); });
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'alert-modal-button secondary';
+    cancelBtn.textContent = window.t ? window.t('common.cancel', {}, 'Cancel') : 'Cancel';
+    cancelBtn.addEventListener('click', function() { closeColorModal(); });
+
+    const applyBtn = document.createElement('button');
+    applyBtn.className = 'alert-modal-button primary';
+    applyBtn.textContent = window.t ? window.t('common.apply', {}, 'Apply') : 'Apply';
+    applyBtn.addEventListener('click', function() { persist(selectedValue); });
+
+    footer.appendChild(removeBtn);
+    footer.appendChild(cancelBtn);
+    footer.appendChild(applyBtn);
+
+    modal.appendChild(header);
+    modal.appendChild(body);
+    modal.appendChild(footer);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    refreshSelection();
+    requestAnimationFrame(function() { overlay.classList.add('show'); });
 }
 
 // ─── Input Modal (inline — no server round-trip for the prompt) ────────────────

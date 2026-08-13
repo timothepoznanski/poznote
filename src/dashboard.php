@@ -671,14 +671,16 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 						<i class="lucide lucide-list-todo"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span>
 					</a>
-					<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="push" title="Push" aria-label="Push">
+					<?php if ($dashboardGitEnabled): ?>
+					<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn" data-dashboard-git-action="push" title="Push" aria-label="Push">
 						<i class="lucide lucide-upload"></i>
 						<span class="dashboard-topbar-count">Push</span>
 					</button>
-					<button type="button" id="dashboardGitPullBtn" class="dashboard-topbar-btn<?php echo !$dashboardGitEnabled ? ' initially-hidden' : ''; ?>" data-dashboard-git-action="pull" title="Pull" aria-label="Pull">
+					<button type="button" id="dashboardGitPullBtn" class="dashboard-topbar-btn" data-dashboard-git-action="pull" title="Pull" aria-label="Pull">
 						<i class="lucide lucide-download"></i>
 						<span class="dashboard-topbar-count">Pull</span>
 					</button>
+					<?php endif; ?>
 					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('graph.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardGraphBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.graph', [], 'Graph'); ?>" aria-label="<?php echo t_h('home.graph', [], 'Graph'); ?>">
 						<i class="lucide lucide-network"></i>
 						<span class="dashboard-topbar-count"><?php echo t_h('home.graph', [], 'Graph'); ?></span>
@@ -905,6 +907,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 
 		<script>
 		window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+		window.TAG_COLORS = <?php echo json_encode(getTagColorsMap(), JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;
 		window.NOTE_COLOR_TXT = {
 			applyError: <?php echo json_encode(t('note_color.apply_error', [], 'Could not update the note color.')); ?>,
 			modalTitle: <?php echo json_encode(t('note_color.modal_title', [], 'Note color')); ?>,

@@ -153,7 +153,12 @@
       "mark_completed": "Als erledigt markieren",
       "mark_active": "Als nicht erledigt markieren",
       "error": "Die Karte konnte nicht aktualisiert werden"
-    }
+    },
+    "due": {
+      "label": "Fälligkeitsdatum",
+      "overdue": "Überfällig"
+    },
+    "card_size": "Kartengröße"
   },
   "folders": {
     "delete": {
@@ -719,7 +724,8 @@
     "create": "Erstellen",
     "expand_all_folders": "Alle Ordner aufklappen",
     "collapse_all_folders": "Alle Ordner zuklappen",
-    "toggle": "Linke Spalte ein-/ausblenden"
+    "toggle": "Linke Spalte ein-/ausblenden",
+    "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden"
   },
   "home": {
     "title": "Dashboard",
@@ -809,7 +815,14 @@
       "one": "Es gibt insgesamt {{count}} Tag",
       "other": "Es gibt insgesamt {{count}} Tags"
     },
-    "empty": "Keine Tags gefunden."
+    "empty": "Keine Tags gefunden.",
+    "action": {
+      "color": "Farbe"
+    },
+    "color": {
+      "modal_title": "Tag-Farbe",
+      "apply_error": "Die Tag-Farbe konnte nicht aktualisiert werden."
+    }
   },
   "trash": {
     "search": {
@@ -1044,6 +1057,7 @@
       "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
+      "icon_sidebar_entire": "Gesamte Icon-Seitenleiste",
       "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
       "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
@@ -1064,6 +1078,7 @@
         "slash_menu": "Slash-Menü",
         "panels": "Sonstiges",
         "dashboard_toolbar": "Dashboard",
+        "icon_sidebar": "Icon-Seitenleiste (Notizenseite)",
         "folder_actions": "Ordneraktionen",
         "workspace_menu": "Workspace-Menü"
       },

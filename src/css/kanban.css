@@ -50,9 +50,9 @@
 /* ===== Kanban Column ===== */
 .kanban-column {
     box-sizing: border-box;
-    flex: 0 0 320px;
-    width: 320px;
-    max-width: 320px;
+    flex: 0 0 var(--kanban-col-width, 290px);
+    width: var(--kanban-col-width, 290px);
+    max-width: var(--kanban-col-width, 290px);
     min-width: 0;
     max-height: calc(100vh - 140px);
     display: flex;
@@ -515,6 +515,43 @@
     border: 1px solid #e2e8f0;
 }
 
+/* Per-tag color (--tag-color set inline from the tag_colors setting) */
+.kanban-tag-colored {
+    background: color-mix(in srgb, var(--tag-color) 15%, #ffffff);
+    border-color: color-mix(in srgb, var(--tag-color) 45%, #ffffff);
+    color: color-mix(in srgb, var(--tag-color) 72%, #1e293b);
+}
+
+/* ===== Due date badge ===== */
+.kanban-card-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    flex: 0 0 auto;
+    padding: 1px 6px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.kanban-card-due i {
+    font-size: 0.7rem;
+}
+
+.kanban-card-due.overdue {
+    background: #fdf2f2;
+    border-color: #f1b8b8;
+    color: #c62828;
+}
+
+.kanban-card-completed .kanban-card-due {
+    opacity: 0.55;
+}
+
 .kanban-card {
     position: relative;
 }
@@ -566,9 +603,9 @@
     }
 
     .kanban-column {
-        flex: 0 0 280px;
-        width: 280px;
-        max-width: 280px;
+        flex: 0 0 var(--kanban-col-width-mobile, 260px);
+        width: var(--kanban-col-width-mobile, 260px);
+        max-width: var(--kanban-col-width-mobile, 260px);
     }
 
     .kanban-column-header {
@@ -842,4 +879,82 @@ body.dark-mode .kanban-inline-header .kanban-title {
     .kanban-inline-view .kanban-board {
         padding: 12px;
     }
+}
+
+/* ===== Card size toggle (S/M/L) =====
+   The kanban-size-* class is set on #kanban-view-container by kanban.js from
+   the per-user preference; medium is the default and matches the base rules
+   (290px columns), so it needs no overrides. Column widths flow through the
+   --kanban-col-width variables. */
+
+.kanban-size-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 6px 10px;
+    background: var(--bg-secondary, #f1f5f9);
+    color: var(--text-secondary, #64748b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.kanban-size-toggle:hover {
+    background: var(--bg-tertiary, #e2e8f0);
+    border-color: var(--text-secondary, #64748b);
+    transform: translateY(-1px);
+}
+
+.kanban-size-small {
+    --kanban-col-width: 220px;
+    --kanban-col-width-mobile: 200px;
+}
+
+.kanban-size-large {
+    --kanban-col-width: 360px;
+    --kanban-col-width-mobile: 300px;
+}
+
+.kanban-size-small .kanban-card {
+    padding: 10px 12px;
+    padding-right: 36px;
+}
+
+.kanban-size-small .kanban-card-title {
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+}
+
+.kanban-size-small .kanban-card-topline,
+.kanban-size-small .kanban-card-meta {
+    margin-bottom: 6px;
+}
+
+.kanban-size-small .kanban-card-snippet {
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+}
+
+.kanban-size-large .kanban-card {
+    padding: 18px 20px;
+    padding-right: 46px;
+}
+
+.kanban-size-large .kanban-card-title {
+    font-size: 1.05rem;
+}
+
+.kanban-size-large .kanban-card-snippet {
+    font-size: 0.9rem;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+/* Large cards show more of a tasklist before scrolling (5 rows vs 3) */
+.kanban-size-large .kanban-tasklist-preview {
+    max-height: 116px;
 }

@@ -154,7 +154,12 @@
       "mark_completed": "标记为已完成",
       "mark_active": "标记为未完成",
       "error": "无法更新卡片"
-    }
+    },
+    "due": {
+      "label": "截止日期",
+      "overdue": "已逾期"
+    },
+    "card_size": "卡片大小"
   },
   "folders": {
     "delete": {
@@ -720,7 +725,8 @@
     "create": "创建",
     "expand_all_folders": "展开所有文件夹",
     "collapse_all_folders": "折叠所有文件夹",
-    "toggle": "显示/隐藏左侧边栏"
+    "toggle": "显示/隐藏左侧边栏",
+    "toggle_icon_sidebar": "显示/隐藏图标侧边栏"
   },
   "home": {
     "title": "仪表盘",
@@ -808,7 +814,14 @@
       "one": "总共有 {{count}} 个标签",
       "other": "总共有 {{count}} 个标签"
     },
-    "empty": "未找到标签。"
+    "empty": "未找到标签。",
+    "action": {
+      "color": "颜色"
+    },
+    "color": {
+      "modal_title": "标签颜色",
+      "apply_error": "无法更新标签颜色。"
+    }
   },
   "trash": {
     "search": {
@@ -1045,6 +1058,7 @@
       "locked_by_tenant_isolation": "该功能已被租户隔离阻止，因此自动隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
       "reminder_bell": "铃铛图标（提醒）",
+      "icon_sidebar_entire": "整个图标侧边栏",
       "dashboard_user": "用户",
       "dashboard_filter_bar": "筛选栏",
       "view_layout_toggle": "视图切换（网格 / 列表、卡片大小）",
@@ -1065,6 +1079,7 @@
         "slash_menu": "斜杠菜单",
         "panels": "其他",
         "dashboard_toolbar": "仪表盘",
+        "icon_sidebar": "图标侧边栏（笔记页面）",
         "folder_actions": "文件夹操作",
         "workspace_menu": "工作区菜单"
       },

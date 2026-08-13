@@ -81,6 +81,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 		</div>
 
 		<div class="tasks-filter-bar">
+			<div class="tasks-view-toggle" id="tasksViewToggle" role="group">
+				<button type="button" class="tasks-view-btn active" data-view="list" title="<?php echo t_h('tasks_page.view_list', [], 'List view'); ?>">
+					<i class="lucide lucide-layout-list"></i>
+				</button>
+				<button type="button" class="tasks-view-btn" data-view="calendar" title="<?php echo t_h('tasks_page.view_calendar', [], 'Calendar view'); ?>">
+					<i class="lucide lucide-calendar"></i>
+				</button>
+			</div>
 			<div class="tasks-filter-chips" id="tasksFilterChips">
 				<button type="button" class="tasks-filter-chip active" data-filter="all"><?php echo t_h('tasks_page.filter_all', [], 'All'); ?></button>
 				<button type="button" class="tasks-filter-chip" data-filter="open"><?php echo t_h('tasks_page.filter_open', [], 'To do'); ?></button>
@@ -98,14 +106,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 				/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="lucide lucide-x"></i>
-				</button>
-			</div>
-			<div class="tasks-view-toggle" id="tasksViewToggle" role="group">
-				<button type="button" class="tasks-view-btn active" data-view="list" title="<?php echo t_h('tasks_page.view_list', [], 'List view'); ?>">
-					<i class="lucide lucide-layout-list"></i>
-				</button>
-				<button type="button" class="tasks-view-btn" data-view="calendar" title="<?php echo t_h('tasks_page.view_calendar', [], 'Calendar view'); ?>">
-					<i class="lucide lucide-calendar"></i>
 				</button>
 			</div>
 			<div class="tasks-collapse-actions">

@@ -130,10 +130,15 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		if (empty($tags_list)) {
 			echo '<div class="no-tags">' . t_h('tags.empty', [], 'No tags found.') . '</div>';
 		} else {
+			$tagColorsMap = getTagColorsMap();
 			foreach($tags_list as $tag => $count) {
 				if (!empty(trim($tag))) {
+					$tagHex = resolveTagColorHex($tag, $tagColorsMap);
+					$dot = $tagHex !== ''
+						? '<span class="tag-color-dot" style="background: ' . htmlspecialchars($tagHex, ENT_QUOTES) . ';"></span>'
+						: '';
 					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag, ENT_QUOTES) . '" data-count="' . $count . '">
-						<div class="tag-name">'.htmlspecialchars($tag).'<span class="tag-note-count">('.$count.')</span></div>
+						<div class="tag-name">' . $dot . htmlspecialchars($tag).'<span class="tag-note-count">('.$count.')</span></div>
 					</div>';
 				}
 			}
@@ -142,6 +147,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		</div>
 	</div>
 	
+	<script>
+	window.TAG_COLORS = <?php echo json_encode(getTagColorsMap(), JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;
+	window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+	</script>
 	<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>

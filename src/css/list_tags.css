@@ -139,6 +139,68 @@ html.tags-page {
     color: #888;
 }
 
+/* Colored dot shown on tags that have an assigned color */
+.tag-color-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 7px;
+    vertical-align: baseline;
+    flex: 0 0 auto;
+}
+
+/* Color picker grid inside the tag color modal */
+.tag-color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.tag-color-swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.tag-color-swatch:hover {
+    transform: scale(1.12);
+}
+
+.tag-color-swatch.selected {
+    border-color: #1e293b;
+    transform: scale(1.12);
+}
+
+/* The custom color input renders as one more round swatch */
+input[type="color"].tag-color-custom {
+    appearance: none;
+    -webkit-appearance: none;
+    background: conic-gradient(#ef4444, #eab308, #22c55e, #3b82f6, #a855f7, #ef4444);
+    overflow: hidden;
+}
+
+input[type="color"].tag-color-custom::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"].tag-color-custom::-webkit-color-swatch {
+    border: none;
+    opacity: 0;
+}
+
+html[data-theme='dark'] .tag-color-swatch.selected,
+body.dark-mode .tag-color-swatch.selected {
+    border-color: #ffffff;
+}
+
 .no-tags {
     text-align: center;
     color: #666;

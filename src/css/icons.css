@@ -92,7 +92,8 @@
 .sidebar-folder-toggle [class*="lucide-"],
 .sidebar-home [class*="lucide-"],
 .sidebar-settings [class*="lucide-"],
-.sidebar-plus [class*="lucide-"] {
+.sidebar-plus [class*="lucide-"],
+.icon-sidebar-btn [class*="lucide-"] {
     filter: none !important;
     color: inherit;
     font-size: inherit;
@@ -101,6 +102,13 @@
 [class*="lucide-"]:not(.folder-icon[data-icon-color]):not(.note-icon[data-icon-color]):not(.shared-password-icon):hover {
     transform: scale(1.18);
     filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
+}
+
+/* The icon rail colours its icons via currentColor, not the global filter */
+#icon_sidebar .icon-sidebar-btn [class*="lucide-"],
+#icon_sidebar .icon-sidebar-btn [class*="lucide-"]:hover {
+    transform: none;
+    filter: none !important;
 }
 
 /* Ensure search type button icons are not recolored by the global fa filter */

@@ -30,3 +30,13 @@ body.dark-mode .sidebar-folder-toggle [class*="lucide-"] {
     color: inherit;
     filter: none !important;
 }
+
+/* Icon rail: colours come from currentColor, never the global filter */
+html[data-theme='dark'] .icon-sidebar-btn [class*="lucide-"],
+html[data-theme='dark'] .icon-sidebar-btn [class*="lucide-"]:hover,
+body.dark-mode .icon-sidebar-btn [class*="lucide-"],
+body.dark-mode .icon-sidebar-btn [class*="lucide-"]:hover {
+    color: inherit;
+    filter: none !important;
+    transform: none;
+}

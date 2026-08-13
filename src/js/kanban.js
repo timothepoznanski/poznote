@@ -358,6 +358,16 @@
             if (card) toggleKanbanCardCompleted(card);
         });
 
+        // Cycle the card size (small -> medium -> large)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="cycle-kanban-card-size"]');
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+            cycleKanbanCardSize();
+        });
+
         // Expand / collapse a column's completed section
         document.addEventListener('click', (e) => {
             const toggle = e.target.closest('[data-action="toggle-kanban-completed-section"]');
@@ -664,6 +674,136 @@
         preview.scrollTop = previousScrollTop;
     }
 
+    // ===== Card size toggle =====
+    // The preference persists per user (S/M/L) and is applied as a
+    // kanban-size-* class on the board container; the visual differences
+    // live in kanban.css. Medium is the historical default.
+
+    const KANBAN_SIZES = ['small', 'medium', 'large'];
+    const KANBAN_SIZE_KEY = 'kanbanCardSize';
+
+    function getKanbanCardSize() {
+        let stored = null;
+        try {
+            stored = (window.__poznoteUserStorage || window.localStorage).getItem(KANBAN_SIZE_KEY);
+        } catch (e) { /* storage unavailable */ }
+        return KANBAN_SIZES.includes(stored) ? stored : 'medium';
+    }
+
+    function setKanbanCardSize(size) {
+        try {
+            (window.__poznoteUserStorage || window.localStorage).setItem(KANBAN_SIZE_KEY, size);
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function applyKanbanCardSize() {
+        const container = document.getElementById('kanban-view-container');
+        if (!container) return;
+
+        const size = getKanbanCardSize();
+        KANBAN_SIZES.forEach((s) => container.classList.toggle('kanban-size-' + s, s === size));
+
+        const btn = container.querySelector('.kanban-size-toggle');
+        if (!btn) return;
+        const sizeLabel = btn.getAttribute('data-label-' + size) || size;
+        const letter = btn.querySelector('.kanban-size-letter');
+        if (letter) letter.textContent = sizeLabel.charAt(0).toUpperCase();
+        const title = (btn.getAttribute('data-label') || 'Card size') + ': ' + sizeLabel;
+        btn.title = title;
+        btn.setAttribute('aria-label', title);
+    }
+
+    function cycleKanbanCardSize() {
+        const current = getKanbanCardSize();
+        const next = KANBAN_SIZES[(KANBAN_SIZES.indexOf(current) + 1) % KANBAN_SIZES.length];
+        setKanbanCardSize(next);
+        applyKanbanCardSize();
+    }
+
+    // ===== Due date badge (mirrors the server-side rendering in kanban_content.php) =====
+
+    function normalizeKanbanDueAt(value) {
+        if (typeof window.normalizeTaskDueAt === 'function') {
+            return window.normalizeTaskDueAt(value) || '';
+        }
+        if (typeof value !== 'string') return '';
+        const match = value.match(/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?/);
+        if (!match) return '';
+        return value.slice(0, match[1] ? 16 : 10);
+    }
+
+    function isKanbanDueOverdue(due) {
+        if (!due) return false;
+        if (typeof window.isTaskDueOverdue === 'function') {
+            return window.isTaskDueOverdue(due);
+        }
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const nowStr = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate())
+            + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+        return due.length > 10 ? due < nowStr : due < nowStr.slice(0, 10);
+    }
+
+    function formatKanbanDueLabel(due) {
+        if (!due) return '';
+        let label = due.slice(8, 10) + '/' + due.slice(5, 7);
+        if (due.length > 10) {
+            label += ' ' + due.slice(11, 16);
+        }
+        return label;
+    }
+
+    function getKanbanNextTaskDue(tasks) {
+        let next = '';
+        (Array.isArray(tasks) ? tasks : []).forEach((task) => {
+            const taskObject = task && typeof task === 'object' ? task : {};
+            if (taskObject.completed || taskObject.checked || taskObject.done) return;
+            const due = normalizeKanbanDueAt(taskObject.dueAt);
+            if (due && (!next || due < next)) {
+                next = due;
+            }
+        });
+        return next;
+    }
+
+    /**
+     * Recompute a card's due badge after its tasks changed. Falls back to the
+     * note reminder (data-reminder-due) when no task due date remains.
+     */
+    function updateKanbanCardDueBadge(card, tasks) {
+        if (!card) return;
+
+        const taskDue = getKanbanNextTaskDue(tasks);
+        const reminderDue = card.dataset.reminderDue || '';
+        const dueValue = taskDue || reminderDue;
+        const existing = card.querySelector('.kanban-card-due');
+
+        if (!dueValue) {
+            if (existing) existing.remove();
+            return;
+        }
+
+        const source = taskDue ? 'task' : 'reminder';
+        const overdue = isKanbanDueOverdue(dueValue);
+        const title = overdue
+            ? (window.t ? window.t('kanban.due.overdue', {}, 'Overdue') : 'Overdue')
+            : (window.t ? window.t('kanban.due.label', {}, 'Due date') : 'Due date');
+
+        let badge = existing;
+        if (!badge) {
+            const topline = card.querySelector('.kanban-card-topline');
+            if (!topline) return;
+            badge = document.createElement('span');
+            topline.insertBefore(badge, topline.firstChild);
+        }
+
+        badge.className = 'kanban-card-due' + (overdue ? ' overdue' : '');
+        badge.dataset.dueSource = source;
+        badge.title = title;
+        badge.innerHTML = '<i class="lucide ' + (source === 'task' ? 'lucide-alarm-clock' : 'lucide-bell') + '"></i>'
+            + '<span class="kanban-card-due-text">' + escapeKanbanHtml(formatKanbanDueLabel(dueValue)) + '</span>';
+    }
+
     function getKanbanEditorSessionId() {
         return (typeof window.getCurrentEditorSessionId === 'function')
             ? window.getCurrentEditorSessionId()
@@ -779,6 +919,7 @@
             }
 
             renderKanbanTaskPreview(preview, tasks);
+            updateKanbanCardDueBadge(card, tasks);
             if (preview) preview.classList.remove('is-saving');
         } catch (error) {
             console.error('Kanban task toggle error:', error);
@@ -1021,6 +1162,7 @@
     window.bindKanbanScrollButtons = bindKanbanScrollButtons;
     window.syncKanbanScrollButtons = syncKanbanScrollButtons;
     window.restoreKanbanCompletedSections = restoreCompletedSectionStates;
+    window.applyKanbanCardSize = applyKanbanCardSize;
 
     // Auto-init on load
     if (document.readyState === 'loading') {

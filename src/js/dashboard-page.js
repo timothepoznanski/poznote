@@ -185,7 +185,12 @@
         if (tags.length > 0 || note.updated) {
             footer = '<div class="board-card-footer">';
             tags.slice(0, 3).forEach(function (tag) {
-                footer += '<span class="board-card-tag">' + esc(tag) + '</span>';
+                var tagHex = resolveDashboardTagColorHex(tag);
+                if (tagHex) {
+                    footer += '<span class="board-card-tag board-card-tag-colored" style="--tag-color:' + esc(tagHex) + '">' + esc(tag) + '</span>';
+                } else {
+                    footer += '<span class="board-card-tag">' + esc(tag) + '</span>';
+                }
             });
             if (note.updated) {
                 footer += '<span class="board-card-date">' + esc(note.updated) + '</span>';
@@ -513,6 +518,21 @@
 
     function getPalette() {
         return Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
+    }
+
+    // Tag colors share the note color semantics: window.TAG_COLORS maps a
+    // lowercased tag name to a palette id or a literal '#rrggbb'.
+    function resolveDashboardTagColorHex(tag) {
+        var map = window.TAG_COLORS;
+        if (!map || typeof map !== 'object') return '';
+        var value = map[String(tag || '').trim().toLowerCase()];
+        if (typeof value !== 'string' || value === '') return '';
+        if (value.charAt(0) === '#') return value;
+        var palette = getPalette();
+        for (var i = 0; i < palette.length; i++) {
+            if (palette[i].id === value.toLowerCase()) return palette[i].hex;
+        }
+        return '';
     }
 
     function findNoteById(noteId) {

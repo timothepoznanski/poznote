@@ -414,6 +414,7 @@ if ($isPublicWorkspaceReadonly) {
     <script type="application/json" id="poznote-config"><?php
         echo json_encode([
             'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
+            'gitProvider' => $gitProvider,
             'dateTimeFormat' => getUserDateTimeFormat(),
             'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
             'attachmentsAtBottom' => $attachments_at_bottom_setting,
@@ -439,8 +440,82 @@ if ($isPublicWorkspaceReadonly) {
     $showWelcomeSetupModal = !$isPublicWorkspaceReadonly && getSetting('welcome_setup', '') === 'pending';
     include 'modals.php';
     ?>
-    
-    <!-- LEFT COLUMN -->	
+
+    <?php
+    // AI assistant availability (instance-wide config, used for the icon
+    // sidebar button and the chat panel below)
+    require_once 'users/db_master.php';
+    $aiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
+        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
+        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
+
+    // Icon-only left rail mirroring the dashboard topbar actions
+    // (see .dashboard-topbar-actions in dashboard.php)
+    $iconSidebarWorkspace = ($workspace_filter !== '' && $workspace_filter !== '__last_opened__') ? $workspace_filter : '';
+    $iconSidebarUrl = static function (string $page, array $extra = []) use ($iconSidebarWorkspace): string {
+        if ($iconSidebarWorkspace !== '') {
+            $extra['workspace'] = $iconSidebarWorkspace;
+        }
+        return $page . ($extra ? '?' . http_build_query($extra) : '');
+    };
+    $iconSidebarItems = [
+        ['id' => 'iconSidebarNotesBtn', 'url' => $iconSidebarUrl('notes_manager.php'), 'icon' => 'lucide-sticky-note', 'label' => t('common.notes', [], 'Notes')],
+        ['id' => 'iconSidebarFavoritesBtn', 'url' => $iconSidebarUrl('dashboard.php', ['favorites' => '1']), 'icon' => 'lucide-star', 'label' => t('notes_list.system_folders.favorites', [], 'Favorites')],
+        ['id' => 'iconSidebarNotificationsBtn', 'action' => 'open-notifications-modal', 'icon' => 'lucide-bell', 'label' => t('reminder.notifications', [], 'Notifications')],
+        ['id' => 'iconSidebarTagsBtn', 'url' => $iconSidebarUrl('list_tags.php'), 'icon' => 'lucide-tags', 'label' => t('notes_list.system_folders.tags', [], 'Tags')],
+        ['id' => 'iconSidebarFoldersBtn', 'url' => $iconSidebarUrl('list_folders.php'), 'icon' => 'lucide-folder-open', 'label' => t('home.folders', [], 'Folders')],
+        ['id' => 'iconSidebarSharesBtn', 'url' => $iconSidebarUrl('shared.php'), 'icon' => 'lucide-share-2', 'label' => t('home.shares', [], 'Shares')],
+        ['id' => 'iconSidebarAttachmentsBtn', 'url' => $iconSidebarUrl('attachments_list.php'), 'icon' => 'lucide-paperclip', 'label' => t('notes_list.system_folders.attachments', [], 'Attachments')],
+        ['id' => 'iconSidebarTrashBtn', 'url' => $iconSidebarUrl('trash.php'), 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
+        ['id' => 'iconSidebarDiaryBtn', 'url' => $iconSidebarUrl('diary.php'), 'icon' => 'lucide-book-open', 'label' => t('diary.title', [], 'Diary')],
+        ['id' => 'iconSidebarTasksBtn', 'url' => $iconSidebarUrl('tasks.php'), 'icon' => 'lucide-list-todo', 'label' => t('tasks_page.title', [], 'Tasks')],
+        ['id' => 'iconSidebarGraphBtn', 'url' => $iconSidebarUrl('graph.php'), 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
+    ];
+    if ($showGitSync) {
+        $iconSidebarItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push'];
+        $iconSidebarItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull'];
+    }
+    if ($aiChatEnabled) {
+        $iconSidebarItems[] = ['id' => 'iconSidebarAiChatBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
+    }
+    ?>
+    <!-- ICON SIDEBAR (dashboard topbar actions, icons only) -->
+    <script>
+    // Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
+    // (deferred bundle) owns it afterwards.
+    try {
+        if (localStorage.getItem('iconSidebarCollapsed') === 'true') {
+            document.body.classList.add('icon-sidebar-collapsed');
+        }
+    } catch (e) {}
+    </script>
+    <nav id="icon_sidebar">
+        <?php foreach ($iconSidebarItems as $iconSidebarItem): ?>
+        <?php $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+        <?php if (isset($iconSidebarItem['gitAction'])): ?>
+        <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="icon-sidebar-btn" data-icon-sidebar-git-action="<?php echo $iconSidebarItem['gitAction']; ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
+            <i class="lucide <?php echo htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
+        </button>
+        <?php elseif (isset($iconSidebarItem['action'])): ?>
+        <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="icon-sidebar-btn" data-action="<?php echo $iconSidebarItem['action']; ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
+            <i class="lucide <?php echo htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
+        </button>
+        <?php else: ?>
+        <a href="<?php echo htmlspecialchars($iconSidebarItem['url'], ENT_QUOTES, 'UTF-8'); ?>" id="<?php echo $iconSidebarItem['id']; ?>" class="icon-sidebar-btn" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
+            <i class="lucide <?php echo htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
+        </a>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </nav>
+    <?php
+    // Sits outside #icon_sidebar so it stays clickable once the rail is hidden.
+    $iconSidebarToggleLabel = t_h('sidebar.toggle_icon_sidebar', [], 'Hide/Show icon sidebar');
+    ?>
+    <button type="button" id="iconSidebarToggle" title="<?php echo $iconSidebarToggleLabel; ?>" aria-label="<?php echo $iconSidebarToggleLabel; ?>" aria-expanded="true" aria-controls="icon_sidebar">
+        <i class="lucide lucide-chevron-left"></i>
+    </button>
+
+    <!-- LEFT COLUMN -->
     <div id="left_col">
         
     <?php
@@ -453,13 +528,6 @@ if ($isPublicWorkspaceReadonly) {
     // Secure prepared queries
     $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, icon, icon_color FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
-
-    // AI assistant availability (instance-wide config, used for the sidebar
-    // button and the chat panel below)
-    require_once 'users/db_master.php';
-    $aiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
-        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
-        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
     ?>
 
         
@@ -691,6 +759,11 @@ window.calendarTranslations = {
         diary_create: <?php echo json_encode(t('calendar.modal.diary_create', [], 'Create diary entry')); ?>,
         diary_error: <?php echo json_encode(t('diary.create_error', [], 'Could not create the diary entry.')); ?>
     }
+};
+window.NOTIFICATIONS_TXT = {
+    dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,
+    justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>,
+    repeats: <?php echo json_encode(t('reminder.repeats', [], 'Repeats')); ?>
 };
 </script>
 <script defer src="index_js.php?group=app&v=<?php echo $v; ?>"></script>

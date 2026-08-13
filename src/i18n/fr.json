@@ -164,7 +164,12 @@
       "mark_completed": "Marquer comme terminée",
       "mark_active": "Marquer comme non terminée",
       "error": "Impossible de mettre à jour la carte"
-    }
+    },
+    "due": {
+      "label": "Échéance",
+      "overdue": "En retard"
+    },
+    "card_size": "Taille des cartes"
   },
   "folders": {
     "delete": {
@@ -736,7 +741,8 @@
     "create": "Créer",
     "expand_all_folders": "Tout déplier",
     "collapse_all_folders": "Tout replier",
-    "toggle": "Cacher/Afficher la colonne de gauche"
+    "toggle": "Cacher/Afficher la colonne de gauche",
+    "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes"
   },
   "home": {
     "title": "Tableau de bord",
@@ -827,7 +833,26 @@
       "one": "Il y a {{count}} tag au total",
       "other": "Il y a {{count}} tags au total"
     },
-    "empty": "Aucun tag trouvé."
+    "empty": "Aucun tag trouvé.",
+    "action": {
+      "rename": "Renommer",
+      "delete": "Supprimer",
+      "color": "Couleur"
+    },
+    "rename": {
+      "title": "Renommer le tag",
+      "label": "Nouveau nom",
+      "error": "Échec du renommage"
+    },
+    "delete": {
+      "title": "Supprimer le tag",
+      "confirm": "Supprimer le tag \"{{tag}}\" de toutes les notes ?",
+      "error": "Échec de la suppression"
+    },
+    "color": {
+      "modal_title": "Couleur du tag",
+      "apply_error": "Impossible de mettre à jour la couleur du tag."
+    }
   },
   "trash": {
     "search": {
@@ -1069,6 +1094,7 @@
       "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
       "reminder_bell": "Icône cloche (rappel)",
+      "icon_sidebar_entire": "Toute la barre d'icônes",
       "dashboard_user": "Utilisateur",
       "dashboard_filter_bar": "Barre de filtre",
       "view_layout_toggle": "Bascule de vue (grille / liste, taille des cartes)",
@@ -1089,6 +1115,7 @@
         "slash_menu": "Menu slash",
         "panels": "Autre",
         "dashboard_toolbar": "Tableau de bord",
+        "icon_sidebar": "Barre d'icônes (page des notes)",
         "folder_actions": "Actions des dossiers",
         "workspace_menu": "Menu du workspace"
       },

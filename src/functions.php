@@ -1012,6 +1012,78 @@ function normalizeStoredNoteColor($value, $palette = null) {
     return null;
 }
 
+/* ---------------------------------------------------------------------------
+ * Tag colors
+ *
+ * The 'tag_colors' setting stores a JSON object mapping a lowercased tag name
+ * to a color value with the same semantics as entries.color: a palette id
+ * ('blue', ...) resolved through the user palette, or a literal '#rrggbb'.
+ * Tags without an entry render with the neutral default chip style.
+ * ------------------------------------------------------------------------- */
+
+define('TAG_COLORS_SETTING', 'tag_colors');
+
+/**
+ * Validate and clean a tag => color map coming from user input or storage.
+ * Returns [lowercased tag => palette id or '#rrggbb'], dropping invalid rows.
+ */
+function sanitizeTagColorsMap($value, $palette = null) {
+    if (is_string($value)) {
+        $value = json_decode($value, true);
+    }
+    if (!is_array($value)) {
+        return [];
+    }
+
+    $clean = [];
+    foreach ($value as $tag => $color) {
+        $tag = mb_strtolower(trim((string)$tag));
+        if ($tag === '' || mb_strlen($tag) > 100) {
+            continue;
+        }
+        $stored = normalizeStoredNoteColor($color, $palette);
+        if ($stored === null) {
+            continue;
+        }
+        $clean[$tag] = $stored;
+        if (count($clean) >= 500) {
+            break;
+        }
+    }
+
+    return $clean;
+}
+
+/**
+ * The tag => color map in effect for the current user.
+ */
+function getTagColorsMap() {
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+
+    $cached = sanitizeTagColorsMap(getSetting(TAG_COLORS_SETTING, ''));
+    return $cached;
+}
+
+/**
+ * Resolve a tag name to a concrete hex color, or '' when the tag has no
+ * color (or its palette id no longer exists).
+ */
+function resolveTagColorHex($tag, $map = null, $palette = null) {
+    $tag = mb_strtolower(trim((string)$tag));
+    if ($tag === '') {
+        return '';
+    }
+
+    $map = $map ?? getTagColorsMap();
+    if (!isset($map[$tag])) {
+        return '';
+    }
+    return resolveNoteColorHex($map[$tag], $palette);
+}
+
 /**
  * Global settings cache - loads all settings in one query and caches them
  * This dramatically reduces database queries when settings are accessed multiple times

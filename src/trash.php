@@ -149,14 +149,6 @@ $currentLang = getUserLanguage();
         }
         ?>
 
-        <div class="trash-page-header">
-            <h1 class="trash-page-title">
-                <span class="trash-page-title-icon"><i class="lucide lucide-trash"></i></span>
-                <?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>
-            </h1>
-            <div class="trash-page-count"><?php echo $countLabel; ?></div>
-        </div>
-
         <?php if (!empty($search)): ?>
             <div class="trash-search-notice">
                 <?php echo t_h('trash.search.results_for', ['term' => htmlspecialchars($search, ENT_QUOTES)], 'Results for "{{term}}"'); ?>
@@ -199,8 +191,9 @@ $currentLang = getUserLanguage();
                     </button>
                 <?php endif; ?>
             </div>
+            <div class="trash-page-count"><?php echo $countLabel; ?></div>
         </div>
-        
+
         <div class="trash-content">
             <?php
             $sql = "SELECT * FROM entries WHERE trash = 1" . $search_condition . $workspace_condition . " ORDER BY updated DESC LIMIT 50";

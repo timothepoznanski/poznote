@@ -152,7 +152,12 @@
       "mark_completed": "Marcar como concluída",
       "mark_active": "Marcar como não concluída",
       "error": "Não foi possível atualizar o cartão"
-    }
+    },
+    "due": {
+      "label": "Data de vencimento",
+      "overdue": "Atrasado"
+    },
+    "card_size": "Tamanho dos cartões"
   },
   "folders": {
     "delete": {
@@ -717,7 +722,8 @@
     "create": "Criar",
     "expand_all_folders": "Expandir todas as pastas",
     "collapse_all_folders": "Recolher todas as pastas",
-    "toggle": "Mostrar/Ocultar a coluna esquerda"
+    "toggle": "Mostrar/Ocultar a coluna esquerda",
+    "toggle_icon_sidebar": "Mostrar/Ocultar a barra de ícones"
   },
   "home": {
     "title": "Painel",
@@ -807,7 +813,14 @@
       "one": "Há {{count}} etiqueta no total",
       "other": "Há {{count}} etiquetas no total"
     },
-    "empty": "Nenhuma etiqueta encontrada."
+    "empty": "Nenhuma etiqueta encontrada.",
+    "action": {
+      "color": "Cor"
+    },
+    "color": {
+      "modal_title": "Cor da tag",
+      "apply_error": "Não foi possível atualizar a cor da tag."
+    }
   },
   "trash": {
     "search": {
@@ -1043,6 +1056,7 @@
       "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
       "reminder_bell": "Ícone de sino (lembrete)",
+      "icon_sidebar_entire": "Toda a barra de ícones",
       "dashboard_user": "Usuário",
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar vista (grade / lista, tamanho dos cartões)",
@@ -1063,6 +1077,7 @@
         "slash_menu": "Menu slash",
         "panels": "Outros",
         "dashboard_toolbar": "Painel",
+        "icon_sidebar": "Barra de ícones (página de notas)",
         "folder_actions": "Ações de pasta",
         "workspace_menu": "Menu do espaço de trabalho"
       },
