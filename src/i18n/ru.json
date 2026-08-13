@@ -3236,7 +3236,10 @@
     "collapse": "Свернуть",
     "expand": "Развернуть",
     "collapse_all": "Свернуть все",
-    "expand_all": "Развернуть все"
+    "expand_all": "Развернуть все",
+    "view_list": "Список",
+    "view_calendar": "Календарь",
+    "calendar_no_tasks": "В этот день задач нет."
   },
   "s3_settings": {
     "title": "Хранилище вложений S3",

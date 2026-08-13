@@ -13,6 +13,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [Notes](#notes)
 - [Note Locks](#note-locks)
 - [Snapshots](#snapshots)
+- [Tasks](#tasks)
 - [Reminders](#reminders)
 - [Note Sharing](#note-sharing)
 - [Folder Sharing](#folder-sharing)
@@ -703,6 +704,66 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 
 ---
 
+## Tasks
+
+Task list notes (`type: tasklist`) store their content as a JSON array of task objects. The array is the note's `content`: reading a tasklist note through `GET /notes/{id}` returns it as a JSON string, and updating tasks means sending the full modified array back through `PATCH /notes/{id}`.
+
+**Task object schema:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | number | Unique task identifier inside the note |
+| `text` | string | Task text |
+| `completed` | boolean | Whether the task is done |
+| `important` | boolean | Important flag, sorts the task to the top of its list |
+| `dueAt` | string or null | Due date as `YYYY-MM-DD`, or `YYYY-MM-DDTHH:MM` when a time is set (local time, no timezone) |
+| `dueReminder` | boolean | Whether a reminder is scheduled for the due date |
+| `dueReminderEmail` | boolean | Whether that reminder also sends an email. Only present once configured; defaults to enabled otherwise |
+| `dueRecurrence` | string | Repeat interval of the reminder as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w` weekly). Only present when set. Dismissing the notification schedules the next one and advances `dueAt` by the same interval |
+
+### List All Tasks
+
+```
+GET /tasks
+```
+
+Aggregate the tasks of every non-trashed tasklist note, used by the tasks page (list and calendar views).
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Filter by workspace |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "notes": [
+    {
+      "id": 123,
+      "heading": "Groceries",
+      "folder": "Home",
+      "folder_id": 4,
+      "workspace": "Poznote",
+      "updated": "2026-08-10 09:12:00",
+      "favorite": false,
+      "tasks": [
+        { "id": 1754820000123, "text": "Buy milk", "completed": false, "important": false, "dueAt": "2026-08-15", "dueReminder": false }
+      ]
+    }
+  ]
+}
+```
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/tasks?workspace=Poznote"
+```
+
+---
+
 ## Reminders
 
 Reminders schedule notifications for notes. Triggered reminders appear as notifications that can be read or dismissed.
@@ -755,6 +816,46 @@ Remove the reminder from a note.
 ```bash
 curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/reminder
+```
+
+### Set Task Reminder
+
+```
+POST /notes/{id}/task-reminder
+```
+
+Set (or replace) the reminder of one task inside a tasklist note. This materializes the task's `dueReminder` flag as a scheduled notification; the task's `dueAt`/`dueReminder` fields themselves live in the note content (see [Tasks](#tasks)).
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `task_id` | string | Yes | The `id` of the task inside the note's task JSON |
+| `reminder_at` | datetime | Yes | When to trigger the reminder (ISO 8601, converted to UTC) |
+| `message` | string | No | Notification text, typically the task text (defaults to the note heading) |
+| `email_enabled` | boolean | No | Also send an email (if email is configured) |
+| `recurrence` | string | No | Repeat interval as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y`, like note reminders. Dismissing the triggered notification schedules the next occurrence and advances the task's `dueAt` by the same interval (a completed or deleted task ends the recurrence) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"task_id": "1754820000123", "reminder_at": "2026-08-15T09:00:00Z", "message": "Buy milk"}' \
+  http://YOUR_SERVER/api/v1/notes/123/task-reminder
+```
+
+### Remove Task Reminder
+
+```
+DELETE /notes/{id}/task-reminder
+```
+
+Remove the pending reminder of one task. `task_id` can be sent in the JSON body or as a query parameter.
+
+```bash
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"task_id": "1754820000123"}' \
+  http://YOUR_SERVER/api/v1/notes/123/task-reminder
 ```
 
 ### List Notifications
@@ -2525,12 +2626,19 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/notes/{id}/snapshot` | Get snapshot |
 | `POST` | `/notes/{id}/snapshot/restore` | Restore snapshot |
 
+### Tasks
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/tasks` | List all tasks |
+
 ### Reminders
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/notes/{id}/reminder` | Get note reminder |
 | `POST` | `/notes/{id}/reminder` | Set note reminder |
 | `DELETE` | `/notes/{id}/reminder` | Remove note reminder |
+| `POST` | `/notes/{id}/task-reminder` | Set task reminder |
+| `DELETE` | `/notes/{id}/task-reminder` | Remove task reminder |
 | `GET` | `/reminders` | List notifications |
 | `GET` | `/reminders/count` | Notification count |
 | `POST` | `/reminders/{id}/read` | Mark as read |

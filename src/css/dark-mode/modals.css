@@ -116,12 +116,12 @@ body.dark-mode #reminderModal .reminder-datetime-part:hover {
     border-color: var(--dm-accent);
 }
 
-html[data-theme='dark'] #reminderModal .reminder-repeat-select,
-html[data-theme='dark'] #reminderModal .reminder-repeat-unit,
-html[data-theme='dark'] #reminderModal .reminder-repeat-interval,
-body.dark-mode #reminderModal .reminder-repeat-select,
-body.dark-mode #reminderModal .reminder-repeat-unit,
-body.dark-mode #reminderModal .reminder-repeat-interval {
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-select,
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit,
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-select,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-unit,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval {
     background: #313338;
     border-color: #464b53;
     color: #eef2f7;
@@ -129,18 +129,18 @@ body.dark-mode #reminderModal .reminder-repeat-interval {
     color-scheme: dark;
 }
 
-html[data-theme='dark'] #reminderModal .reminder-repeat-select:focus,
-html[data-theme='dark'] #reminderModal .reminder-repeat-unit:focus,
-html[data-theme='dark'] #reminderModal .reminder-repeat-interval:focus,
-body.dark-mode #reminderModal .reminder-repeat-select:focus,
-body.dark-mode #reminderModal .reminder-repeat-unit:focus,
-body.dark-mode #reminderModal .reminder-repeat-interval:focus {
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-select:focus,
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit:focus,
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-select:focus,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-unit:focus,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus {
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18);
 }
 
-html[data-theme='dark'] #reminderModal .reminder-repeat-label i,
-body.dark-mode #reminderModal .reminder-repeat-label i {
+html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-label i,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-label i {
     color: #7ab8ff;
 }
 

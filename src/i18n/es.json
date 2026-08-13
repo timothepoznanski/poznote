@@ -3574,7 +3574,10 @@
     "collapse": "Contraer",
     "expand": "Expandir",
     "collapse_all": "Contraer todo",
-    "expand_all": "Expandir todo"
+    "expand_all": "Expandir todo",
+    "view_list": "Vista de lista",
+    "view_calendar": "Vista de calendario",
+    "calendar_no_tasks": "No hay tareas en este día."
   },
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",

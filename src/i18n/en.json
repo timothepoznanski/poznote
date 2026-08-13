@@ -3268,7 +3268,10 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "collapse_all": "Collapse all",
-    "expand_all": "Expand all"
+    "expand_all": "Expand all",
+    "view_list": "List view",
+    "view_calendar": "Calendar view",
+    "calendar_no_tasks": "No tasks on this day."
   },
   "s3_settings": {
     "title": "S3 Attachment Storage",

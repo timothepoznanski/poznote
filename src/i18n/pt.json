@@ -3577,7 +3577,10 @@
     "collapse": "Recolher",
     "expand": "Expandir",
     "collapse_all": "Recolher tudo",
-    "expand_all": "Expandir tudo"
+    "expand_all": "Expandir tudo",
+    "view_list": "Visualização em lista",
+    "view_calendar": "Visualização em calendário",
+    "calendar_no_tasks": "Não há tarefas neste dia."
   },
   "s3_settings": {
     "title": "Armazenamento S3 de anexos",

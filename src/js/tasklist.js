@@ -1011,6 +1011,7 @@ function openTaskDueDatePicker(taskId, noteId, event, anchorRectOverride) {
                 task.dueAt = payload.dueAt;
                 task.dueReminder = payload.dueReminder;
                 task.dueReminderEmail = payload.dueReminderEmail;
+                task.dueRecurrence = payload.dueRecurrence;
                 saveAndRenderTasks(noteId, tasks);
                 markTaskListAsModified(noteId);
             }

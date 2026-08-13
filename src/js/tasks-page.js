@@ -14,7 +14,8 @@
             txtExpand: body.getAttribute('data-txt-expand') || 'Expand',
             txtDue: body.getAttribute('data-txt-due') || 'Due date',
             txtDueRemove: body.getAttribute('data-txt-due-remove') || 'Remove due date',
-            txtDueRemoveTime: body.getAttribute('data-txt-due-remove-time') || 'Remove time'
+            txtDueRemoveTime: body.getAttribute('data-txt-due-remove-time') || 'Remove time',
+            txtCalNoTasks: body.getAttribute('data-txt-cal-no-tasks') || 'No tasks on this day.'
         };
     }
 
@@ -22,6 +23,15 @@
     var taskNotes = [];
     var filterText = '';
     var filterMode = 'all';
+
+    // View mode ('list' or 'calendar'), persisted per user across visits
+    var VIEW_KEY = 'poznote-tasks-page-view';
+
+    // Calendar view state: displayed month and the day whose tasks are
+    // listed in the day modal
+    var calYear = null;
+    var calMonth = null;
+    var selectedDay = null;
 
     // Insert-order preference (same setting as tasklist notes); drives where a
     // newly completed task lands inside the completed group
@@ -103,6 +113,23 @@
     function saveCollapsedNoteIds() {
         try {
             getPrefsStorage().setItem(COLLAPSED_KEY, JSON.stringify(Array.from(collapsedNoteIds)));
+        } catch (e) { }
+    }
+
+    function loadViewMode() {
+        try {
+            var stored = getPrefsStorage().getItem(VIEW_KEY);
+            return stored === 'calendar' ? 'calendar' : 'list';
+        } catch (e) {
+            return 'list';
+        }
+    }
+
+    var viewMode = loadViewMode();
+
+    function saveViewMode() {
+        try {
+            getPrefsStorage().setItem(VIEW_KEY, viewMode);
         } catch (e) { }
     }
 
@@ -279,13 +306,38 @@
             + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
     }
 
+    function syncViewUi() {
+        var toggle = document.getElementById('tasksViewToggle');
+        if (toggle) {
+            toggle.querySelectorAll('.tasks-view-btn').forEach(function (btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-view') === viewMode);
+            });
+        }
+        var container = document.querySelector('.tasks-container');
+        if (container) container.classList.toggle('view-calendar', viewMode === 'calendar');
+    }
+
     function render() {
         updateProgress();
+        syncViewUi();
 
         var container = document.getElementById('tasksNotesContainer');
         if (!container) return;
         container.innerHTML = '';
 
+        if (viewMode === 'calendar') {
+            renderCalendarView(container);
+        } else {
+            renderListView(container);
+        }
+
+        // Resolve [[Note Title]] references into clickable links
+        if (typeof window.processNoteReferences === 'function') {
+            window.processNoteReferences(container, config.workspace);
+        }
+    }
+
+    function renderListView(container) {
         var groups = getFilteredNotes();
 
         if (groups.length === 0) {
@@ -356,14 +408,9 @@
             section.appendChild(list);
             container.appendChild(section);
         });
-
-        // Resolve [[Note Title]] references into clickable links
-        if (typeof window.processNoteReferences === 'function') {
-            window.processNoteReferences(container, config.workspace);
-        }
     }
 
-    function renderTaskRow(note, task) {
+    function renderTaskRow(note, task, opts) {
         var row = document.createElement('div');
         row.className = 'tasks-task-item'
             + (task.completed ? ' completed' : '')
@@ -391,6 +438,15 @@
             window.location.href = buildNoteUrl(note.id);
         });
 
+        // Agenda rows mix tasks from several notes; show which note each
+        // task belongs to (the row click still opens that note)
+        if (opts && opts.showNote) {
+            var noteBadge = document.createElement('span');
+            noteBadge.className = 'tasks-task-note-badge';
+            noteBadge.textContent = note.heading || config.txtUntitled;
+            row.appendChild(noteBadge);
+        }
+
         if (task.important && !task.completed) {
             var star = document.createElement('i');
             star.className = 'lucide lucide-star tasks-task-star';
@@ -402,8 +458,12 @@
             due.type = 'button';
             due.className = 'task-due-chip' + (isOverdue(task) ? ' overdue' : '');
             due.title = config.txtDue;
-            due.innerHTML = '<i class="lucide lucide-calendar-alt"></i>';
-            due.appendChild(document.createTextNode(formatDueDate(task.dueAt)));
+            // Day-modal rows drop the date (it is already the modal title):
+            // show the time alone, or just an icon for all-day tasks
+            var timeOnly = opts && opts.dueTimeOnly;
+            var dueLabel = timeOnly ? formatDueTime(task.dueAt) : formatDueDate(task.dueAt);
+            due.innerHTML = '<i class="lucide ' + (timeOnly && dueLabel ? 'lucide-clock' : 'lucide-calendar-alt') + '"></i>';
+            if (dueLabel) due.appendChild(document.createTextNode(dueLabel));
             if (task.dueReminder) {
                 var bell = document.createElement('i');
                 bell.className = 'lucide lucide-bell';
@@ -428,6 +488,329 @@
         return row;
     }
 
+    /* ------------------------------------------------------------------ */
+    /* Calendar view: month grid of dated tasks. Clicking a day (chips    */
+    /* included) opens a modal listing that day's tasks; chips can be     */
+    /* dragged to another day to reschedule.                              */
+    /* ------------------------------------------------------------------ */
+
+    function pad2(n) {
+        return String(n).padStart(2, '0');
+    }
+
+    function formatDueTime(dueAt) {
+        if (!dueAt || dueAt.length <= 10) return '';
+        var date = new Date(2000, 0, 1, parseInt(dueAt.substring(11, 13), 10), parseInt(dueAt.substring(14, 16), 10));
+        return (typeof window.poznoteFormatTimeOnly === 'function')
+            ? window.poznoteFormatTimeOnly(date)
+            : dueAt.substring(11, 16);
+    }
+
+    // Dated tasks of the filtered notes bucketed by 'YYYY-MM-DD' day,
+    // all-day tasks first, then by time
+    function getTasksByDay() {
+        var byDay = {};
+        getFilteredNotes().forEach(function (group) {
+            group.tasks.forEach(function (task) {
+                if (!task.dueAt) return;
+                var key = task.dueAt.substring(0, 10);
+                (byDay[key] = byDay[key] || []).push({ note: group.note, task: task });
+            });
+        });
+        Object.keys(byDay).forEach(function (key) {
+            byDay[key].sort(function (a, b) {
+                return dueTimePart(a.task.dueAt).localeCompare(dueTimePart(b.task.dueAt));
+            });
+        });
+        return byDay;
+    }
+
+    function ensureCalendarDate() {
+        if (calYear !== null) return;
+        var now = new Date();
+        calYear = now.getFullYear();
+        calMonth = now.getMonth();
+        selectedDay = localDateStringToday();
+    }
+
+    function shiftCalendarMonth(delta) {
+        var d = new Date(calYear, calMonth + delta, 1);
+        calYear = d.getFullYear();
+        calMonth = d.getMonth();
+        render();
+    }
+
+    // Task currently dragged from one day cell towards another
+    var dragEntry = null;
+
+    // A due date moved from the calendar keeps its pending reminder in sync
+    // (same materialization as the due-date modal)
+    function rematerializeReminder(note, task) {
+        if (!task.dueReminder || !task.dueAt) return;
+        var day = task.dueAt.substring(0, 10);
+        var time = task.dueAt.length > 10 ? task.dueAt.substring(11, 16) : '09:00';
+        var trigger = new Date(
+            parseInt(day.substring(0, 4), 10),
+            parseInt(day.substring(5, 7), 10) - 1,
+            parseInt(day.substring(8, 10), 10),
+            parseInt(time.substring(0, 2), 10),
+            parseInt(time.substring(3, 5), 10)
+        ).toISOString();
+        fetch('api/v1/notes/' + note.id + '/task-reminder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                task_id: String(task.id),
+                reminder_at: trigger,
+                message: task.text,
+                email_enabled: task.dueReminderEmail !== undefined ? !!task.dueReminderEmail : true,
+                recurrence: task.dueRecurrence || null
+            })
+        }).catch(function () { });
+    }
+
+    function attachDropTarget(cell) {
+        cell.addEventListener('dragover', function (e) {
+            if (!dragEntry) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            cell.classList.add('drag-over');
+        });
+        cell.addEventListener('dragleave', function () {
+            cell.classList.remove('drag-over');
+        });
+        cell.addEventListener('drop', function (e) {
+            cell.classList.remove('drag-over');
+            if (!dragEntry) return;
+            e.preventDefault();
+            var entry = dragEntry;
+            dragEntry = null;
+            var day = cell.getAttribute('data-day');
+            if (!day || !entry.task.dueAt || entry.task.dueAt.substring(0, 10) === day) return;
+            var time = dueTimePart(entry.task.dueAt);
+            var newDueAt = time ? day + 'T' + time : day;
+            mutateTaskInNote(entry.note, entry.task, function (target) { target.dueAt = newDueAt; })
+                .then(function () {
+                    entry.task.dueAt = newDueAt;
+                    rematerializeReminder(entry.note, entry.task);
+                    render();
+                })
+                .catch(function () { });
+        });
+    }
+
+    function renderCalendarChip(note, task) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'tasks-cal-chip'
+            + (task.completed ? ' completed' : '')
+            + (task.important && !task.completed ? ' important' : '')
+            + (isOverdue(task) ? ' overdue' : '');
+        chip.title = (task.text || '') + ' · ' + (note.heading || config.txtUntitled);
+
+        var time = formatDueTime(task.dueAt);
+        if (time) {
+            var timeEl = document.createElement('span');
+            timeEl.className = 'tasks-cal-chip-time';
+            timeEl.textContent = time;
+            chip.appendChild(timeEl);
+        }
+
+        var textEl = document.createElement('span');
+        textEl.className = 'tasks-cal-chip-text';
+        textEl.textContent = task.text;
+        chip.appendChild(textEl);
+
+        chip.draggable = true;
+        chip.addEventListener('dragstart', function (e) {
+            dragEntry = { note: note, task: task };
+            chip.classList.add('dragging');
+            try {
+                e.dataTransfer.setData('text/plain', task.text || '');
+                e.dataTransfer.effectAllowed = 'move';
+            } catch (err) { }
+        });
+        chip.addEventListener('dragend', function () {
+            dragEntry = null;
+            chip.classList.remove('dragging');
+        });
+
+        return chip;
+    }
+
+    function isDayModalOpen() {
+        var modal = document.getElementById('calDayModal');
+        return !!modal && modal.style.display === 'flex';
+    }
+
+    // Human-friendly localized title for the day modal ("jeudi 13 août 2026"),
+    // same Intl pattern as the notes calendar modal
+    function formatDayModalTitle(day) {
+        var date = new Date(
+            parseInt(day.substring(0, 4), 10),
+            parseInt(day.substring(5, 7), 10) - 1,
+            parseInt(day.substring(8, 10), 10)
+        );
+        var text;
+        try {
+            text = new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            }).format(date);
+        } catch (e) {
+            return formatDueDate(day);
+        }
+        return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    // Fill the day modal with the selected day's tasks (rows behave like the
+    // list view: checkbox toggles, due chip opens the due-date modal)
+    function fillDayModal(byDay) {
+        if (!selectedDay) return;
+
+        var title = document.getElementById('calDayModalTitle');
+        if (title) title.textContent = formatDayModalTitle(selectedDay);
+
+        var list = document.getElementById('calDayModalList');
+        if (!list) return;
+        list.innerHTML = '';
+
+        var entries = byDay[selectedDay] || [];
+        if (entries.length === 0) {
+            var msg = document.createElement('p');
+            msg.className = 'tasks-cal-modal-empty';
+            msg.textContent = config.txtCalNoTasks;
+            list.appendChild(msg);
+            return;
+        }
+
+        var rows = document.createElement('div');
+        rows.className = 'tasks-note-list';
+        entries.forEach(function (entry) {
+            rows.appendChild(renderTaskRow(entry.note, entry.task, { showNote: true, dueTimeOnly: true }));
+        });
+        list.appendChild(rows);
+
+        // Resolve [[Note Title]] references (the modal lives outside the
+        // container processed by render())
+        if (typeof window.processNoteReferences === 'function') {
+            window.processNoteReferences(list, config.workspace);
+        }
+    }
+
+    function openDayModal(day) {
+        var modal = document.getElementById('calDayModal');
+        if (!modal) return;
+        selectedDay = day;
+        render();
+        fillDayModal(getTasksByDay());
+        modal.style.display = 'flex';
+    }
+
+    function renderCalendarView(container) {
+        ensureCalendarDate();
+        var t9n = window.calendarTranslations || {};
+        var months = t9n.months || [];
+        var weekdays = t9n.weekdays || ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+        var byDay = getTasksByDay();
+        var todayKey = localDateStringToday();
+
+        var cal = document.createElement('div');
+        cal.className = 'tasks-calendar';
+
+        var header = document.createElement('div');
+        header.className = 'tasks-cal-header';
+
+        var prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'tasks-cal-nav';
+        prevBtn.title = t9n.previousMonth || 'Previous month';
+        prevBtn.innerHTML = '<i class="lucide lucide-chevron-left"></i>';
+        prevBtn.addEventListener('click', function () { shiftCalendarMonth(-1); });
+        header.appendChild(prevBtn);
+
+        var title = document.createElement('span');
+        title.className = 'tasks-cal-title';
+        title.textContent = (months[calMonth] || '') + ' ' + calYear;
+        header.appendChild(title);
+
+        var nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'tasks-cal-nav';
+        nextBtn.title = t9n.nextMonth || 'Next month';
+        nextBtn.innerHTML = '<i class="lucide lucide-chevron-right"></i>';
+        nextBtn.addEventListener('click', function () { shiftCalendarMonth(1); });
+        header.appendChild(nextBtn);
+
+        var todayBtn = document.createElement('button');
+        todayBtn.type = 'button';
+        todayBtn.className = 'tasks-cal-today-btn';
+        todayBtn.textContent = t9n.today || 'Today';
+        todayBtn.addEventListener('click', function () {
+            var now = new Date();
+            calYear = now.getFullYear();
+            calMonth = now.getMonth();
+            selectedDay = localDateStringToday();
+            render();
+        });
+        header.appendChild(todayBtn);
+
+        cal.appendChild(header);
+
+        var grid = document.createElement('div');
+        grid.className = 'tasks-cal-grid';
+
+        weekdays.forEach(function (label) {
+            var wd = document.createElement('span');
+            wd.className = 'tasks-cal-weekday';
+            wd.textContent = label;
+            grid.appendChild(wd);
+        });
+
+        // Full weeks, Monday-first (same convention as the date picker):
+        // leading and trailing other-month days stay visible but muted
+        var lead = (new Date(calYear, calMonth, 1).getDay() + 6) % 7;
+        var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+        var totalCells = Math.ceil((lead + daysInMonth) / 7) * 7;
+
+        for (var i = 0; i < totalCells; i++) {
+            var date = new Date(calYear, calMonth, 1 - lead + i);
+            var key = date.getFullYear() + '-' + pad2(date.getMonth() + 1) + '-' + pad2(date.getDate());
+
+            var cell = document.createElement('div');
+            cell.className = 'tasks-cal-day'
+                + (date.getMonth() !== calMonth ? ' other-month' : '')
+                + (key === todayKey ? ' today' : '')
+                + (key === selectedDay ? ' selected' : '');
+            cell.setAttribute('data-day', key);
+
+            var num = document.createElement('span');
+            num.className = 'tasks-cal-day-num';
+            num.textContent = date.getDate();
+            cell.appendChild(num);
+
+            (byDay[key] || []).forEach(function (entry) {
+                cell.appendChild(renderCalendarChip(entry.note, entry.task));
+            });
+
+            // Chip clicks bubble here too: clicking a task opens its day's
+            // modal (due-date edits happen from the modal's rows)
+            cell.addEventListener('click', function (e) {
+                if (e.target.closest('a')) return;
+                openDayModal(this.getAttribute('data-day'));
+            });
+            attachDropTarget(cell);
+            grid.appendChild(cell);
+        }
+
+        cal.appendChild(grid);
+        container.appendChild(cal);
+
+        // A mutation done from inside the open modal (toggle, due change)
+        // re-renders the page; keep the modal's list in sync
+        if (isDayModalOpen()) fillDayModal(byDay);
+    }
+
     // Open the shared calendar popup to change or remove a task's due date
     function openDueDatePicker(note, task, anchorEl, event) {
         if (event) {
@@ -446,9 +829,12 @@
                         target.dueAt = payload.dueAt;
                         target.dueReminder = payload.dueReminder;
                         target.dueReminderEmail = payload.dueReminderEmail;
+                        target.dueRecurrence = payload.dueRecurrence;
                     }).then(function () {
                         task.dueAt = payload.dueAt;
                         task.dueReminder = payload.dueReminder;
+                        task.dueReminderEmail = payload.dueReminderEmail;
+                        task.dueRecurrence = payload.dueRecurrence;
                         render();
                     });
                 }
@@ -641,6 +1027,22 @@
             expandAllBtn.addEventListener('click', function () { setAllCollapsed(false); });
         }
 
+        var viewToggle = document.getElementById('tasksViewToggle');
+        if (viewToggle) {
+            viewToggle.addEventListener('click', function (e) {
+                var btn = e.target.closest('.tasks-view-btn');
+                if (!btn) return;
+                var mode = btn.getAttribute('data-view') === 'calendar' ? 'calendar' : 'list';
+                if (mode === viewMode) return;
+                viewMode = mode;
+                saveViewMode();
+                render();
+            });
+        }
+
+        // Reflect the persisted view mode before the first load finishes
+        syncViewUi();
+
         // Minimal close-modal delegation (modals-events.js is not loaded here)
         document.addEventListener('click', function (e) {
             var closeBtn = e.target.closest('[data-action="close-modal"]');
@@ -649,6 +1051,24 @@
                 if (modal) modal.style.display = 'none';
             }
         });
+
+        // The day modal also closes on backdrop click or Escape
+        var calDayModal = document.getElementById('calDayModal');
+        if (calDayModal) {
+            calDayModal.addEventListener('click', function (e) {
+                if (e.target === calDayModal) calDayModal.style.display = 'none';
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape' || calDayModal.style.display !== 'flex') return;
+                // The due modal may be stacked on top; close that one first
+                var dueModal = document.getElementById('taskDueModal');
+                if (dueModal && dueModal.style.display === 'flex') {
+                    dueModal.style.display = 'none';
+                    return;
+                }
+                calDayModal.style.display = 'none';
+            });
+        }
 
         refreshTasklistInsertOrder();
         loadTasks();

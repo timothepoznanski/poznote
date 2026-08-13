@@ -3761,7 +3761,10 @@
     "collapse": "Replier",
     "expand": "Déplier",
     "collapse_all": "Tout replier",
-    "expand_all": "Tout déplier"
+    "expand_all": "Tout déplier",
+    "view_list": "Vue liste",
+    "view_calendar": "Vue calendrier",
+    "calendar_no_tasks": "Aucune tâche ce jour-là."
   },
   "s3_settings": {
     "title": "Stockage S3 des pièces jointes",

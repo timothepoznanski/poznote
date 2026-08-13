@@ -3574,7 +3574,10 @@
     "collapse": "Einklappen",
     "expand": "Ausklappen",
     "collapse_all": "Alle einklappen",
-    "expand_all": "Alle ausklappen"
+    "expand_all": "Alle ausklappen",
+    "view_list": "Listenansicht",
+    "view_calendar": "Kalenderansicht",
+    "calendar_no_tasks": "Keine Aufgaben an diesem Tag."
   },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",

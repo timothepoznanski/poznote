@@ -509,11 +509,16 @@ try {
         }
 
         // Add task_id column to notifications (per-task due-date reminders)
+        // and recurrence (repeating task reminders; note-level recurrence
+        // lives in entries.reminder_recurrence instead)
         try {
             $cols = $con->query("PRAGMA table_info(notifications)")->fetchAll(PDO::FETCH_ASSOC);
             $existingColumns = array_column($cols, 'name');
             if (!in_array('task_id', $existingColumns)) {
                 $con->exec("ALTER TABLE notifications ADD COLUMN task_id TEXT");
+            }
+            if (!in_array('recurrence', $existingColumns)) {
+                $con->exec("ALTER TABLE notifications ADD COLUMN recurrence TEXT");
             }
         } catch (Exception $e) {
             error_log('Could not add task_id column to notifications: ' . $e->getMessage());

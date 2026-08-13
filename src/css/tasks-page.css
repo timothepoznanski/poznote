@@ -18,7 +18,6 @@ body.tasks-page {
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-top: 20px;
     margin-bottom: 30px;
 }
 
@@ -393,6 +392,313 @@ body.tasks-page {
     opacity: 0.6;
 }
 
+/* View toggle (list / calendar), a small segmented control */
+.tasks-view-toggle {
+    display: flex;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.tasks-view-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 27px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text-color, #333333);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-view-btn:hover {
+    color: #007DB8;
+}
+
+.tasks-view-btn.active {
+    background-color: #007DB8;
+    color: #ffffff;
+}
+
+/* Collapse/expand only makes sense for the note groups of the list view */
+.tasks-container.view-calendar .tasks-collapse-actions {
+    display: none;
+}
+
+/* Calendar view: month grid. It spans the full viewport width; the body and
+   container paddings keep the side margins, and the container's usual width
+   cap is lifted while the calendar is shown. */
+.tasks-container.view-calendar {
+    max-width: none;
+}
+
+.tasks-calendar {
+    margin: 0 0 25px 0;
+}
+
+.tasks-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tasks-cal-nav,
+.tasks-cal-today-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-color, #333333);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tasks-cal-nav {
+    width: 28px;
+    padding: 0;
+}
+
+.tasks-cal-today-btn {
+    padding: 0 12px;
+    font-size: 13px;
+    margin-left: 8px;
+}
+
+.tasks-cal-nav:hover,
+.tasks-cal-today-btn:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+}
+
+.tasks-cal-title {
+    font-size: 16px;
+    font-weight: 600;
+    min-width: 160px;
+    text-align: center;
+}
+
+/* The 1px gap over the grid's own background draws the cell separators
+   (a shade darker than the usual --border-color so the grid reads clearly) */
+.tasks-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    border: 1px solid #c6ccd2;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #c6ccd2;
+}
+
+.tasks-cal-weekday {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    padding: 6px 0;
+    background: var(--bg-color, #ffffff);
+}
+
+.tasks-cal-day {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 92px;
+    min-width: 0;
+    padding: 4px;
+    background: var(--bg-color, #ffffff);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.tasks-cal-day:hover {
+    background-color: rgba(0, 125, 184, 0.05);
+}
+
+.tasks-cal-day.selected {
+    box-shadow: inset 0 0 0 2px #007DB8;
+}
+
+.tasks-cal-day.drag-over {
+    box-shadow: inset 0 0 0 2px #007DB8;
+    background-color: rgba(0, 125, 184, 0.08);
+}
+
+.tasks-cal-day-num {
+    align-self: flex-end;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 12px;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.tasks-cal-day.today .tasks-cal-day-num {
+    background-color: #007DB8;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.tasks-cal-day.other-month .tasks-cal-day-num {
+    color: #bbb;
+}
+
+.tasks-cal-day.other-month .tasks-cal-chip {
+    opacity: 0.55;
+}
+
+/* Task chips inside day cells */
+.tasks-cal-chip {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    width: 100%;
+    padding: 2px 6px;
+    border: none;
+    border-left: 3px solid #007DB8;
+    border-radius: 4px;
+    background: rgba(0, 125, 184, 0.1);
+    color: var(--text-color, #333333);
+    font-size: 11px;
+    font-family: inherit;
+    line-height: 1.5;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.tasks-cal-chip-time {
+    font-weight: 600;
+    color: #007DB8;
+    flex-shrink: 0;
+}
+
+.tasks-cal-chip-text {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tasks-cal-chip.important {
+    border-left-color: #c62828;
+    background: rgba(198, 40, 40, 0.08);
+}
+
+.tasks-cal-chip.important .tasks-cal-chip-text {
+    color: #c62828;
+    font-weight: 600;
+}
+
+.tasks-cal-chip.overdue {
+    border-left-color: #c62828;
+    background: #fdf2f2;
+}
+
+.tasks-cal-chip.completed {
+    opacity: 0.55;
+}
+
+.tasks-cal-chip.completed .tasks-cal-chip-text {
+    text-decoration: line-through;
+}
+
+.tasks-cal-chip.dragging {
+    opacity: 0.4;
+}
+
+/* Day modal: the clicked day's tasks */
+#calDayModal .modal-content {
+    max-width: 600px;
+}
+
+#calDayModalList {
+    margin-bottom: 16px;
+}
+
+/* Modal rows are short one-liners: center the checkbox, text, note badge
+   and time chip on one axis (the list view stays top-aligned for
+   multi-line tasks) */
+#calDayModalList .tasks-task-item {
+    align-items: center;
+    padding: 10px 4px;
+}
+
+/* margin: 0 also cancels the .modal-content input bottom margin that would
+   push the checkbox off-center */
+#calDayModalList .tasks-task-checkbox {
+    margin: 0;
+}
+
+.tasks-cal-modal-empty {
+    color: #666;
+    font-size: 13px;
+    margin: 0 0 10px 0;
+}
+
+.tasks-task-note-badge {
+    font-size: 11px;
+    color: #666;
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+
+/* Mobile: day cells are too narrow for text, so chips collapse into small
+   colored bars; tapping the day opens the modal listing its tasks */
+@media (max-width: 768px) {
+    .tasks-cal-day {
+        min-height: 56px;
+        padding: 2px;
+    }
+
+    .tasks-cal-day-num {
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        font-size: 11px;
+    }
+
+    .tasks-cal-chip {
+        height: 5px;
+        padding: 0;
+        border-left: none;
+        border-radius: 2px;
+        background: #007DB8;
+    }
+
+    .tasks-cal-chip .tasks-cal-chip-time,
+    .tasks-cal-chip .tasks-cal-chip-text {
+        display: none;
+    }
+
+    .tasks-cal-chip.important,
+    .tasks-cal-chip.overdue {
+        background: #c62828;
+    }
+
+    .tasks-cal-chip.completed {
+        background: #9ca3af;
+    }
+}
+
 .empty-message {
     text-align: center;
     margin-top: 50px;
@@ -468,8 +774,8 @@ body.tasks-page {
 
 /* Mobile responsive */
 @media (max-width: 600px) {
-    /* The desktop spacing above the nav buttons stacks three times over
-       (body padding + container padding + button margin); collapse it */
+    /* The desktop spacing above the nav buttons stacks twice over
+       (body padding + container padding); collapse it */
     body.tasks-page {
         padding: 10px;
     }
@@ -479,7 +785,6 @@ body.tasks-page {
     }
 
     .tasks-buttons-container {
-        margin-top: 0;
         margin-bottom: 20px;
     }
 
@@ -629,4 +934,110 @@ html[data-theme="dark"]:has(body.tasks-page) {
     background-color: #3b1d1d;
     border-color: #7f1d1d;
     color: #fca5a5;
+}
+
+[data-theme="dark"] .tasks-view-toggle {
+    border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .tasks-view-btn {
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-view-btn.active {
+    background-color: #007DB8;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .tasks-cal-nav,
+[data-theme="dark"] .tasks-cal-today-btn {
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-cal-nav:hover,
+[data-theme="dark"] .tasks-cal-today-btn:hover {
+    border-color: #4da3d0;
+    color: #4da3d0;
+}
+
+/* Translucent white separators stay visible over both dark palettes */
+[data-theme="dark"] .tasks-cal-grid {
+    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .tasks-cal-weekday,
+[data-theme="dark"] .tasks-cal-day {
+    background: var(--dm-content-bg);
+}
+
+[data-theme="dark"] .tasks-cal-weekday {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-cal-day:hover {
+    background-color: rgba(14, 165, 233, 0.08);
+}
+
+[data-theme="dark"] .tasks-cal-day-num {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-cal-day.today .tasks-cal-day-num {
+    background-color: #007DB8;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .tasks-cal-day.other-month .tasks-cal-day-num {
+    color: #4b5563;
+}
+
+[data-theme="dark"] .tasks-cal-chip {
+    background: rgba(14, 165, 233, 0.15);
+    border-left-color: #0ea5e9;
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .tasks-cal-chip-time {
+    color: #4da3d0;
+}
+
+[data-theme="dark"] .tasks-cal-chip.important {
+    border-left-color: #7f1d1d;
+    background: rgba(198, 40, 40, 0.18);
+}
+
+[data-theme="dark"] .tasks-cal-chip.important .tasks-cal-chip-text {
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .tasks-cal-chip.overdue {
+    border-left-color: #7f1d1d;
+    background: #3b1d1d;
+}
+
+[data-theme="dark"] .tasks-cal-modal-empty {
+    color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .tasks-task-note-badge {
+    background-color: var(--dm-surface);
+    color: var(--dm-text-muted);
+}
+
+/* Mobile bars again, with enough specificity to beat the dark chip rules */
+@media (max-width: 768px) {
+    [data-theme="dark"] .tasks-cal-chip {
+        background: #0ea5e9;
+    }
+
+    [data-theme="dark"] .tasks-cal-chip.important,
+    [data-theme="dark"] .tasks-cal-chip.overdue {
+        background: #dc2626;
+    }
+
+    [data-theme="dark"] .tasks-cal-chip.completed {
+        background: #4b5563;
+    }
 }
