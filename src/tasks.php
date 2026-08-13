@@ -56,7 +56,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
       data-txt-expand="<?php echo t_h('tasks_page.expand', [], 'Expand'); ?>"
       data-txt-due="<?php echo t_h('tasklist.due_date', [], 'Due date'); ?>"
       data-txt-due-remove="<?php echo t_h('tasklist.due_remove', [], 'Remove due date'); ?>"
-      data-txt-due-remove-time="<?php echo t_h('tasklist.due_remove_time', [], 'Remove time'); ?>">
+      data-txt-due-remove-time="<?php echo t_h('tasklist.due_remove_time', [], 'Remove time'); ?>"
+      data-txt-cal-no-tasks="<?php echo t_h('tasks_page.calendar_no_tasks', [], 'No tasks on this day.'); ?>">
 	<div class="tasks-container">
 		<div class="tasks-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
@@ -80,6 +81,14 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 		</div>
 
 		<div class="tasks-filter-bar">
+			<div class="tasks-view-toggle" id="tasksViewToggle" role="group">
+				<button type="button" class="tasks-view-btn active" data-view="list" title="<?php echo t_h('tasks_page.view_list', [], 'List view'); ?>">
+					<i class="lucide lucide-layout-list"></i>
+				</button>
+				<button type="button" class="tasks-view-btn" data-view="calendar" title="<?php echo t_h('tasks_page.view_calendar', [], 'Calendar view'); ?>">
+					<i class="lucide lucide-calendar"></i>
+				</button>
+			</div>
 			<div class="tasks-filter-chips" id="tasksFilterChips">
 				<button type="button" class="tasks-filter-chip active" data-filter="all"><?php echo t_h('tasks_page.filter_all', [], 'All'); ?></button>
 				<button type="button" class="tasks-filter-chip" data-filter="open"><?php echo t_h('tasks_page.filter_open', [], 'To do'); ?></button>
@@ -122,6 +131,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	</div>
 
 	<?php include 'task_due_modal.php'; ?>
+
+	<!-- Calendar view: modal listing the clicked day's tasks -->
+	<div id="calDayModal" class="modal">
+		<div class="modal-content">
+			<h3 id="calDayModalTitle"></h3>
+			<div id="calDayModalList"></div>
+			<div class="modal-buttons">
+				<button type="button" class="btn-cancel" data-action="close-modal" data-modal="calDayModal"><?php echo t_h('common.close', [], 'Close'); ?></button>
+			</div>
+		</div>
+	</div>
 
 	<script>
 	window.calendarTranslations = {

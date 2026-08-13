@@ -21,6 +21,7 @@ $groups = [
         'css/base.css',
         'css/utilities.css',
         'css/layout.css',
+        'css/icon-sidebar.css',
         'css/sidebar.css',
         'css/outline.css',
         'css/toolbar.css',

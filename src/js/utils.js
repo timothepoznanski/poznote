@@ -3451,6 +3451,10 @@ function loadKanbanViewInline(folderId, folderName, options) {
                 window.restoreKanbanCompletedSections();
             }
 
+            if (typeof window.applyKanbanCardSize === 'function') {
+                window.applyKanbanCardSize();
+            }
+
             activateKanbanViewState(folderId);
 
             // Remove selection from any notes in the sidebar

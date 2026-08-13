@@ -72,13 +72,13 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<span><?php echo t_h('graph.reset_layout', [], 'Reset layout'); ?></span>
 				</button>
 				<span class="graph-stats" id="graphStats" data-txt-stats="<?php echo t_h('graph.stats', [], '{{notes}} notes · {{links}} links'); ?>"></span>
-				<span class="graph-hint">
-					<i class="lucide lucide-info"></i>
-					<?php echo t_h('graph.drag_hint', [], 'Ctrl + drag moves a dot independently of its links'); ?>
-				</span>
 			</div>
 		</div>
 		<div class="graph-canvas-wrapper" id="graphCanvasWrapper">
+			<span class="graph-hint">
+				<i class="lucide lucide-info"></i>
+				<?php echo t_h('graph.drag_hint', [], 'Ctrl + drag moves a dot independently of its links'); ?>
+			</span>
 			<div class="graph-loading" id="graphLoading">
 				<i class="lucide lucide-network"></i>
 				<span><?php echo t_h('graph.loading', [], 'Building graph...'); ?></span>

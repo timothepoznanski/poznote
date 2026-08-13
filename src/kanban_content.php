@@ -54,7 +54,7 @@ try {
     // Get notes directly in parent folder (using 'entries' table and 'trash' column)
     // Completed cards are ordered by completion date so the newest finished card
     // sits at the top of the "completed" section.
-    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
+    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
     $stmt->execute([$folder_id]);
     $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -68,7 +68,7 @@ try {
 
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
-            $targetStmt = $con->prepare("SELECT type, tags FROM entries WHERE id = ? AND trash = 0");
+            $targetStmt = $con->prepare("SELECT type, tags, reminder_at FROM entries WHERE id = ? AND trash = 0");
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
             $contentType = $targetNote['type'] ?? 'note';
@@ -76,6 +76,9 @@ try {
             $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $contentType) : '';
             if ($targetNote && trim((string) ($note['tags'] ?? '')) === '' && trim((string) ($targetNote['tags'] ?? '')) !== '') {
                 $note['tags'] = $targetNote['tags'];
+            }
+            if ($targetNote && trim((string) ($note['reminder_at'] ?? '')) === '' && trim((string) ($targetNote['reminder_at'] ?? '')) !== '') {
+                $note['reminder_at'] = $targetNote['reminder_at'];
             }
         } else {
             $filename = getEntryFilename($note['id'], $note['type'] ?? 'note');
@@ -105,7 +108,7 @@ try {
     // Get notes for each subfolder
     $subfolderNotes = [];
     foreach ($subfolders as $subfolder) {
-        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
+        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
         $stmt->execute([$subfolder['id']]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -132,6 +135,107 @@ try {
         } catch (Exception $e) {
             return '';
         }
+    }
+
+    /**
+     * Normalize a task due date ('Y-m-d' or 'Y-m-dTH:i', local time) or return ''.
+     */
+    function normalizeKanbanDueAt($value) {
+        if (!is_string($value) || !preg_match('/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?/', $value, $m)) {
+            return '';
+        }
+        return substr($value, 0, empty($m[1]) ? 10 : 16);
+    }
+
+    /**
+     * Current date/time in the user's timezone as 'Y-m-d\TH:i', for
+     * lexicographic comparison with task due dates (which are stored local).
+     */
+    function kanbanNowLocalString() {
+        static $now = null;
+        if ($now === null) {
+            try {
+                $date = new DateTime('now', new DateTimeZone(getUserTimezone()));
+            } catch (Exception $e) {
+                $date = new DateTime('now');
+            }
+            $now = $date->format('Y-m-d\TH:i');
+        }
+        return $now;
+    }
+
+    /**
+     * True when a normalized local due date is in the past.
+     * Date-only values are overdue starting the next day.
+     */
+    function isKanbanDueOverdue($due) {
+        if ($due === '') {
+            return false;
+        }
+        if (strlen($due) > 10) {
+            return $due < kanbanNowLocalString();
+        }
+        return $due < substr(kanbanNowLocalString(), 0, 10);
+    }
+
+    /**
+     * Compact label for a due date badge: 'd/m' or 'd/m H:i'.
+     */
+    function formatKanbanDueLabel($due) {
+        if ($due === '') {
+            return '';
+        }
+        $day = (int) substr($due, 8, 2);
+        $month = (int) substr($due, 5, 2);
+        $label = sprintf('%02d/%02d', $day, $month);
+        if (strlen($due) > 10) {
+            $label .= ' ' . substr($due, 11, 5);
+        }
+        return $label;
+    }
+
+    /**
+     * Convert a note reminder (entries.reminder_at, stored UTC) to a local
+     * 'Y-m-d\TH:i' string comparable with task due dates. Returns ''.
+     */
+    function kanbanReminderToLocalDue($reminderAt) {
+        $reminderAt = trim((string) ($reminderAt ?? ''));
+        if ($reminderAt === '') {
+            return '';
+        }
+        try {
+            $date = new DateTime($reminderAt, new DateTimeZone('UTC'));
+            $date->setTimezone(new DateTimeZone(getUserTimezone()));
+            return $date->format('Y-m-d\TH:i');
+        } catch (Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Earliest due date among the uncompleted tasks of a tasklist note.
+     */
+    function getKanbanNextTaskDue($content) {
+        $tasks = getKanbanTasklistPreviewTasks($content);
+        if ($tasks === null) {
+            return '';
+        }
+
+        $next = '';
+        foreach ($tasks as $task) {
+            $completed = !empty($task['completed']) || !empty($task['checked']) || !empty($task['done']);
+            if ($completed) {
+                continue;
+            }
+            $due = normalizeKanbanDueAt($task['dueAt'] ?? null);
+            if ($due === '') {
+                continue;
+            }
+            if ($next === '' || $due < $next) {
+                $next = $due;
+            }
+        }
+        return $next;
     }
 
     /**
@@ -218,11 +322,20 @@ try {
         $toggleLabel = $isCompleted
             ? t_h('kanban.completed.mark_active', [], 'Mark as not completed')
             : t_h('kanban.completed.mark_completed', [], 'Mark as completed');
+
+        // Due date badge: a tasklist card shows its next upcoming task due date,
+        // any other card shows the note reminder (bell icon) when one is set.
+        $reminderDue = kanbanReminderToLocalDue($note['reminder_at'] ?? '');
+        $taskDue = $isTasklistPreview ? getKanbanNextTaskDue($note['entry'] ?? '') : '';
+        $dueValue = $taskDue !== '' ? $taskDue : $reminderDue;
+        $dueSource = $taskDue !== '' ? 'task' : 'reminder';
+        $dueOverdue = isKanbanDueOverdue($dueValue);
         ?>
         <div class="kanban-card<?php echo $isCompleted ? ' kanban-card-completed' : ''; ?>"
              data-note-id="<?php echo $note['id']; ?>"
              data-folder-id="<?php echo $folderId; ?>"
              data-completed="<?php echo $isCompleted ? '1' : '0'; ?>"
+             data-reminder-due="<?php echo htmlspecialchars($reminderDue, ENT_QUOTES); ?>"
              draggable="true">
             <button type="button"
                     class="kanban-card-complete-btn"
@@ -233,21 +346,31 @@ try {
                     aria-pressed="<?php echo $isCompleted ? 'true' : 'false'; ?>">
                 <i class="lucide lucide-check"></i>
             </button>
-            <?php if ($kanbanDate !== '' || !empty($kanbanTags)): ?>
+            <?php if ($kanbanDate !== '' || $dueValue !== ''): ?>
             <div class="kanban-card-topline">
+                <?php if ($dueValue !== ''): ?>
+                <span class="kanban-card-due<?php echo $dueOverdue ? ' overdue' : ''; ?>"
+                      data-due-source="<?php echo $dueSource; ?>"
+                      title="<?php echo $dueOverdue ? t_h('kanban.due.overdue', [], 'Overdue') : t_h('kanban.due.label', [], 'Due date'); ?>">
+                    <i class="lucide <?php echo $dueSource === 'task' ? 'lucide-alarm-clock' : 'lucide-bell'; ?>"></i><span class="kanban-card-due-text"><?php echo htmlspecialchars(formatKanbanDueLabel($dueValue), ENT_QUOTES); ?></span>
+                </span>
+                <?php endif; ?>
+
                 <?php if ($kanbanDate !== ''): ?>
                 <span class="kanban-card-date">
                     <?php echo htmlspecialchars($kanbanDate, ENT_QUOTES); ?>
                 </span>
                 <?php endif; ?>
 
-                <?php if (!empty($kanbanTags)): ?>
-                <div class="kanban-card-tags">
-                    <?php foreach ($kanbanTags as $tag): ?>
-                        <span class="kanban-tag"><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!empty($kanbanTags)): ?>
+            <div class="kanban-card-tags">
+                <?php foreach ($kanbanTags as $tag): ?>
+                    <?php $tagHex = resolveTagColorHex($tag); ?>
+                    <span class="kanban-tag<?php echo $tagHex !== '' ? ' kanban-tag-colored' : ''; ?>"<?php echo $tagHex !== '' ? ' style="--tag-color: ' . htmlspecialchars($tagHex, ENT_QUOTES) . ';"' : ''; ?>><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                <?php endforeach; ?>
             </div>
             <?php endif; ?>
 
@@ -353,9 +476,18 @@ try {
                 <button class="kanban-scroll-btn-header right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
                     <i class="lucide lucide-chevron-right"></i>
                 </button>
-                <button class="kanban-add-column-btn" 
-                        data-action="create-kanban-column" 
-                        data-parent-id="<?php echo $folder_id; ?>" 
+                <button class="kanban-size-toggle"
+                        data-action="cycle-kanban-card-size"
+                        data-label="<?php echo t_h('kanban.card_size', [], 'Card size'); ?>"
+                        data-label-small="<?php echo t_h('dashboard.view.size_small', [], 'Small'); ?>"
+                        data-label-medium="<?php echo t_h('dashboard.view.size_medium', [], 'Medium'); ?>"
+                        data-label-large="<?php echo t_h('dashboard.view.size_large', [], 'Large'); ?>"
+                        title="<?php echo t_h('kanban.card_size', [], 'Card size'); ?>">
+                    <span class="kanban-size-letter">M</span>
+                </button>
+                <button class="kanban-add-column-btn"
+                        data-action="create-kanban-column"
+                        data-parent-id="<?php echo $folder_id; ?>"
                         title="<?php echo t_h('kanban.add_column', [], 'Add column'); ?>">
                     <i class="lucide lucide-plus-circle"></i>
                 </button>

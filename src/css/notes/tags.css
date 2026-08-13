@@ -175,6 +175,20 @@
     color: #005a8a;
 }
 
+/* Color dot for tags that have a color set (see js/clickable-tags.js).
+   Mirrors .tag-color-dot in css/list_tags.css, which the notes page does not load. */
+.clickable-tag .tag-color-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+    flex: 0 0 auto;
+}
+
 /* Tag Delete Button */
 .tag-delete-button {
     color: #94a3b8;
@@ -256,6 +270,17 @@
     background: #f8fafc;
     border-radius: 6px;
     border: 1px solid #e2e8f0;
+}
+
+/* Colored-tag dot in the manage-tags modal (see js/tags-modal.js). It is a
+   sibling of the editable name so renaming never picks the span up. */
+.tags-modal-item .tag-color-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex: 0 0 auto;
 }
 
 .tags-modal-item-name {

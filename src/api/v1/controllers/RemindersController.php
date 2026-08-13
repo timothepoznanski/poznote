@@ -35,7 +35,10 @@ class RemindersController {
 
             $stmt = $this->con->prepare("
                 SELECT n.id, n.note_id, n.type, n.message, n.is_read, n.created, n.trigger_at,
-                       e.heading AS note_heading, e.reminder_recurrence AS recurrence
+                       e.heading AS note_heading,
+                       CASE WHEN n.task_id IS NOT NULL AND n.task_id != ''
+                            THEN n.recurrence
+                            ELSE e.reminder_recurrence END AS recurrence
                 FROM notifications n
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
                 WHERE n.dismissed = 0
@@ -240,6 +243,9 @@ class RemindersController {
      *   - reminder_at: ISO datetime string (required)
      *   - message: notification text, typically the task text (optional)
      *   - email_enabled: whether to send an email (optional)
+     *   - recurrence: repeat interval as "<count><unit>" with unit i/h/d/w/m/y
+     *     (optional; dismissing the notification schedules the next occurrence
+     *     and advances the task's due date)
      */
     public function setTaskReminder(string $id): void {
         if (!is_numeric($id)) {
@@ -261,6 +267,11 @@ class RemindersController {
         $reminderAt = $input['reminder_at'] ?? null;
         $message = isset($input['message']) ? trim((string)$input['message']) : '';
         $emailEnabled = !empty($input['email_enabled']) && $this->isReminderEmailAvailable();
+        $recurrence = $this->normalizeRecurrence($input['recurrence'] ?? null);
+        if ($recurrence === false) {
+            $this->sendError(400, 'Invalid recurrence format (expected e.g. "30i", "1h", "1d", "2w", "3m", "1y")');
+            return;
+        }
 
         if ($taskId === '') {
             $this->sendError(400, 'task_id is required');
@@ -295,16 +306,17 @@ class RemindersController {
 
             $notifMessage = $message !== '' ? $message : (string)$note['heading'];
             $stmt = $this->con->prepare("
-                INSERT INTO notifications (note_id, task_id, type, message, trigger_at, email_enabled, created)
-                VALUES (?, ?, 'reminder', ?, ?, ?, datetime('now'))
+                INSERT INTO notifications (note_id, task_id, type, message, trigger_at, email_enabled, recurrence, created)
+                VALUES (?, ?, 'reminder', ?, ?, ?, ?, datetime('now'))
             ");
-            $stmt->execute([$noteId, $taskId, $notifMessage, $reminderAtUtc, $emailEnabled ? 1 : 0]);
+            $stmt->execute([$noteId, $taskId, $notifMessage, $reminderAtUtc, $emailEnabled ? 1 : 0, $recurrence]);
 
             $this->sendSuccess([
                 'note_id' => $noteId,
                 'task_id' => $taskId,
                 'reminder_at' => $reminderAtUtc,
-                'email_enabled' => $emailEnabled
+                'email_enabled' => $emailEnabled,
+                'recurrence' => $recurrence
             ]);
         } catch (Exception $e) {
             error_log('RemindersController::setTaskReminder error: ' . $e->getMessage());
@@ -427,7 +439,7 @@ class RemindersController {
             // For recurring reminders, schedule the next occurrence; otherwise clear the reminder
             $infoStmt = $this->con->prepare("
                 SELECT n.note_id, n.task_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
-                       n.trigger_at, e.reminder_at, e.reminder_recurrence
+                       n.trigger_at, n.recurrence AS task_recurrence, e.reminder_at, e.reminder_recurrence
                 FROM notifications n
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
                 WHERE n.id = ?
@@ -436,13 +448,16 @@ class RemindersController {
             $info = $infoStmt->fetch(PDO::FETCH_ASSOC);
 
             $nextReminderAt = null;
-            // Task-level reminders are one-shot and independent of the note's
-            // reminder: never reschedule nor clear entries.reminder_at for them
+            // Task-level reminders are independent of the note's reminder:
+            // never reschedule nor clear entries.reminder_at for them. Their
+            // own recurrence (notifications.recurrence) is handled separately.
             if ($info && !empty($info['note_id']) && empty($info['task_id'])) {
                 $nextReminderAt = $this->scheduleNextOccurrence($info);
                 if ($nextReminderAt === null) {
                     $this->con->prepare("UPDATE entries SET reminder_at = NULL WHERE id = ?")->execute([$info['note_id']]);
                 }
+            } elseif ($info && !empty($info['note_id']) && !empty($info['task_id'])) {
+                $nextReminderAt = $this->scheduleNextTaskOccurrence($info);
             }
 
             $this->sendSuccess(['id' => (int)$id, 'next_reminder_at' => $nextReminderAt]);
@@ -466,10 +481,23 @@ class RemindersController {
                 FROM notifications n
                 JOIN entries e ON e.id = n.note_id AND e.trash = 0
                 WHERE n.dismissed = 0 AND n.trigger_at <= ?
+                  AND (n.task_id IS NULL OR n.task_id = '')
                   AND e.reminder_recurrence IS NOT NULL AND e.reminder_recurrence != ''
             ");
             $recurringStmt->execute([$now]);
             $recurring = $recurringStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Same collection for due recurring task reminders
+            $recurringTasksStmt = $this->con->prepare("
+                SELECT n.note_id, n.task_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
+                       n.trigger_at, n.recurrence AS task_recurrence
+                FROM notifications n
+                WHERE n.dismissed = 0 AND n.trigger_at <= ?
+                  AND n.task_id IS NOT NULL AND n.task_id != ''
+                  AND n.recurrence IS NOT NULL AND n.recurrence != ''
+            ");
+            $recurringTasksStmt->execute([$now]);
+            $recurringTasks = $recurringTasksStmt->fetchAll(PDO::FETCH_ASSOC);
 
             $this->con->prepare("
                 UPDATE notifications SET dismissed = 1
@@ -479,6 +507,9 @@ class RemindersController {
             // Schedule the next occurrence of each recurring reminder
             foreach ($recurring as $info) {
                 $this->scheduleNextOccurrence($info);
+            }
+            foreach ($recurringTasks as $info) {
+                $this->scheduleNextTaskOccurrence($info);
             }
 
             // Clear reminder_at on all notes whose reminder was not rolled forward
@@ -580,7 +611,85 @@ class RemindersController {
 
         return $next;
     }
-    
+
+    /**
+     * Re-arm a recurring task reminder from a dismissed notification's data
+     * and advance the task's due date inside the note content by the same
+     * interval, so the tasks page and calendar stay in sync.
+     * Expects keys: note_id, task_id, message, email_enabled, trigger_at, task_recurrence.
+     * Returns the next trigger datetime (UTC) or null when the reminder does not recur.
+     */
+    private function scheduleNextTaskOccurrence(array $info): ?string {
+        $recurrence = trim((string)($info['task_recurrence'] ?? ''));
+        if ($recurrence === '' || empty($info['note_id']) || empty($info['task_id']) || empty($info['trigger_at'])) {
+            return null;
+        }
+
+        $noteId = (int)$info['note_id'];
+        $taskId = (string)$info['task_id'];
+
+        // A trashed note, a deleted task or a completed task ends the recurrence
+        $stmt = $this->con->prepare("SELECT entry FROM entries WHERE id = ? AND trash = 0 AND type = 'tasklist'");
+        $stmt->execute([$noteId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return null;
+        }
+
+        $filename = getEntryFilename($noteId, 'tasklist');
+        $fileContent = is_file($filename) ? (string)@file_get_contents($filename) : '';
+        $tasks = json_decode(resolveTasklistStoredContent($fileContent, (string)($row['entry'] ?? '')), true);
+        if (!is_array($tasks)) {
+            return null;
+        }
+        if (isset($tasks['tasks']) && is_array($tasks['tasks'])) {
+            $tasks = $tasks['tasks'];
+        }
+
+        $targetIdx = null;
+        foreach ($tasks as $i => $t) {
+            if (is_array($t) && isset($t['id']) && (string)$t['id'] === $taskId) {
+                $targetIdx = $i;
+                break;
+            }
+        }
+        if ($targetIdx === null || !empty($tasks[$targetIdx]['completed'])) {
+            return null;
+        }
+
+        $next = $this->nextOccurrenceUtc((string)$info['trigger_at'], $recurrence);
+        if ($next === null) {
+            return null;
+        }
+
+        // Advance dueAt (naive local, 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM') by
+        // the same amount the UTC trigger moved, preserving its wall time
+        $dueAt = $tasks[$targetIdx]['dueAt'] ?? null;
+        if (is_string($dueAt) && preg_match('/^\d{4}-\d{2}-\d{2}/', $dueAt)) {
+            $hasTime = strlen($dueAt) > 10;
+            $naiveTs = strtotime(substr($dueAt, 0, $hasTime ? 16 : 10) . ($hasTime ? ':00' : 'T09:00:00') . ' UTC');
+            $triggerTs = strtotime((string)$info['trigger_at'] . ' UTC');
+            $nextTs = strtotime($next . ' UTC');
+            if ($naiveTs !== false && $triggerTs !== false && $nextTs !== false) {
+                $nextNaiveTs = $nextTs + ($naiveTs - $triggerTs);
+                $tasks[$targetIdx]['dueAt'] = $hasTime ? gmdate('Y-m-d\TH:i', $nextNaiveTs) : gmdate('Y-m-d', $nextNaiveTs);
+                $newContent = json_encode($tasks, JSON_UNESCAPED_UNICODE);
+                if ($newContent !== false) {
+                    @file_put_contents($filename, $newContent);
+                    $this->con->prepare('UPDATE entries SET entry = ?, updated = datetime(\'now\') WHERE id = ?')
+                        ->execute([$newContent, $noteId]);
+                }
+            }
+        }
+
+        $this->con->prepare("
+            INSERT INTO notifications (note_id, task_id, type, message, trigger_at, email_enabled, recurrence, created)
+            VALUES (?, ?, 'reminder', ?, ?, ?, ?, datetime('now'))
+        ")->execute([$noteId, $taskId, (string)$info['message'], $next, (int)$info['email_enabled'], $recurrence]);
+
+        return $next;
+    }
+
     private function isReminderEmailAvailable(): bool {
         if (!function_exists('getGlobalSetting')) {
             require_once dirname(__DIR__, 3) . '/users/db_master.php';

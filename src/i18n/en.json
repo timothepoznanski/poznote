@@ -379,7 +379,43 @@
     "add_multiple": "Add tags...",
     "list_all": "List all tags",
     "manage_note_tags": "Manage note tags",
-    "modal_title": "Manage tags"
+    "modal_title": "Manage tags",
+    "action": {
+      "color": "Color",
+      "rename": "Rename",
+      "delete": "Delete"
+    },
+    "color": {
+      "modal_title": "Tag color",
+      "apply_error": "Could not update the tag color."
+    },
+    "color_filter": {
+      "label": "Filter by color",
+      "none": "No color",
+      "clear": "Clear color filter",
+      "results_one": "1 tag matches the selected colors",
+      "results_other": "{{count}} tags match the selected colors"
+    },
+    "empty": "No tags found.",
+    "count": {
+      "one": "There is {{count}} tag total",
+      "other": "There are {{count}} tags total"
+    },
+    "search": {
+      "placeholder": "Filter tags...",
+      "results_one": "1 tag found for \"{{term}}\"",
+      "results_other": "{{count}} tags found for \"{{term}}\""
+    },
+    "rename": {
+      "title": "Rename tag",
+      "label": "New name",
+      "error": "Rename failed"
+    },
+    "delete": {
+      "title": "Delete tag",
+      "confirm": "Delete tag \"{{tag}}\" from all notes?",
+      "error": "Delete failed"
+    }
   },
   "download": "Download",
   "convert": "Convert",
@@ -551,6 +587,7 @@
       "locked_by_tenant_isolation": "Hidden automatically while this capability is blocked by Tenant isolation",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",
       "reminder_bell": "Bell icon (reminder)",
+      "icon_sidebar_entire": "Entire icon sidebar",
       "dashboard_user": "User",
       "dashboard_filter_bar": "Filter bar",
       "view_layout_toggle": "View toggle (grid / list, card size)",
@@ -571,6 +608,7 @@
         "slash_menu": "Slash Menu",
         "panels": "Other",
         "dashboard_toolbar": "Dashboard",
+        "icon_sidebar": "Icon sidebar (notes page)",
         "folder_actions": "Folder Actions",
         "workspace_menu": "Workspace Menu"
       },
@@ -1017,7 +1055,11 @@
       "tabs_not_available": "Tabs are not available on mobile devices",
       "no_notes_title": "No notes",
       "no_notes_in_folder": "This folder contains no notes",
-      "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
+      "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser.",
+      "show_only": "Show only this folder"
+    },
+    "folder_filter": {
+      "exit": "Exit folder view"
     }
   },
   "note_color": {
@@ -1939,7 +1981,12 @@
       "mark_completed": "Mark as completed",
       "mark_active": "Mark as not completed",
       "error": "Failed to update the card"
-    }
+    },
+    "due": {
+      "label": "Due date",
+      "overdue": "Overdue"
+    },
+    "card_size": "Card size"
   },
   "sidebar": {
     "display": "Display",
@@ -1948,7 +1995,8 @@
     "create": "Create",
     "expand_all_folders": "Expand all folders",
     "collapse_all_folders": "Collapse all folders",
-    "toggle": "Hide/Show left column"
+    "toggle": "Hide/Show left column",
+    "toggle_icon_sidebar": "Hide/Show icon sidebar"
   },
   "home": {
     "title": "Dashboard",
@@ -3268,7 +3316,10 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "collapse_all": "Collapse all",
-    "expand_all": "Expand all"
+    "expand_all": "Expand all",
+    "view_list": "List view",
+    "view_calendar": "Calendar view",
+    "calendar_no_tasks": "No tasks on this day."
   },
   "s3_settings": {
     "title": "S3 Attachment Storage",

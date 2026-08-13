@@ -139,6 +139,24 @@ class SettingsController {
             return json_encode($palette, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }
 
+        if ($key === 'tag_colors') {
+            // Stored as JSON: {"work":"blue","urgent":"#ef4444", ...}
+            // An empty value clears all tag colors.
+            $raw = is_string($value) ? trim($value) : $value;
+            if ($raw === '' || $raw === null || $raw === '{}' || $raw === '[]') {
+                return '';
+            }
+            $decoded = is_string($raw) ? json_decode($raw, true) : $raw;
+            if (!is_array($decoded)) {
+                throw new InvalidArgumentException('value must be a JSON object of tag colors', 400);
+            }
+            $map = sanitizeTagColorsMap($decoded);
+            if (empty($map)) {
+                return '';
+            }
+            return json_encode($map, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
         if ($key === 'language') {
             $normalized = poznoteNormalizeLanguageCode($value);
             if ($normalized === null) {

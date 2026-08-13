@@ -129,7 +129,7 @@ class TasksController
                 $dueAt = substr($dueAt, 0, empty($dueMatch[1]) ? 10 : 16);
             }
 
-            $clean[] = [
+            $cleanTask = [
                 'id'          => is_scalar($task['id'] ?? null) ? $task['id'] : null,
                 'text'        => is_scalar($text) ? (string) $text : '',
                 'completed'   => !empty($task['completed']),
@@ -137,6 +137,16 @@ class TasksController
                 'dueAt'       => $dueAt,
                 'dueReminder' => !empty($task['dueReminder']),
             ];
+            // Only expose the email opt-in when it was actually stored; the
+            // due-date modal defaults it to true for never-configured tasks
+            if (array_key_exists('dueReminderEmail', $task)) {
+                $cleanTask['dueReminderEmail'] = !empty($task['dueReminderEmail']);
+            }
+            $dueRecurrence = $task['dueRecurrence'] ?? null;
+            if (is_string($dueRecurrence) && preg_match('/^[1-9]\d{0,2}[ihdwmy]$/', $dueRecurrence)) {
+                $cleanTask['dueRecurrence'] = $dueRecurrence;
+            }
+            $clean[] = $cleanTask;
         }
 
         return $clean;

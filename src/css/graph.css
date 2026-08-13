@@ -121,19 +121,6 @@ body.graph-page {
     background: #f3f4f6;
 }
 
-.graph-hint {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: #9ca3af;
-    white-space: nowrap;
-}
-
-.graph-hint .lucide {
-    font-size: 13px;
-}
-
 /* Canvas --------------------------------------------------------------- */
 
 .graph-canvas-wrapper {
@@ -141,6 +128,25 @@ body.graph-page {
     flex: 1;
     min-height: 0;
     overflow: hidden;
+}
+
+.graph-hint {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #9ca3af;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.graph-hint .lucide {
+    font-size: 13px;
 }
 
 #graphSvg {
@@ -312,7 +318,7 @@ html[data-theme="dark"] .graph-folder-select:focus {
 
 html[data-theme="dark"] .graph-hint {
     color: var(--dm-text-muted, #8a8a8a);
-    opacity: 0.75;
+    opacity: 0.9;
 }
 
 html[data-theme="dark"] .graph-orphans-toggle,

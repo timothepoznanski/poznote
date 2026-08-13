@@ -154,7 +154,12 @@
       "mark_completed": "Marcar como completada",
       "mark_active": "Marcar como no completada",
       "error": "No se pudo actualizar la tarjeta"
-    }
+    },
+    "due": {
+      "label": "Fecha límite",
+      "overdue": "Atrasado"
+    },
+    "card_size": "Tamaño de las tarjetas"
   },
   "folders": {
     "delete": {
@@ -720,7 +725,8 @@
     "create": "Crear",
     "expand_all_folders": "Expandir todas las carpetas",
     "collapse_all_folders": "Contraer todas las carpetas",
-    "toggle": "Mostrar/Ocultar la columna izquierda"
+    "toggle": "Mostrar/Ocultar la columna izquierda",
+    "toggle_icon_sidebar": "Mostrar/Ocultar la barra de iconos"
   },
   "home": {
     "title": "Panel",
@@ -810,7 +816,33 @@
       "one": "Hay {{count}} etiqueta en total",
       "other": "Hay {{count}} etiquetas en total"
     },
-    "empty": "No se encontraron etiquetas."
+    "empty": "No se encontraron etiquetas.",
+    "action": {
+      "color": "Color",
+      "rename": "Renombrar",
+      "delete": "Eliminar"
+    },
+    "color": {
+      "modal_title": "Color de la etiqueta",
+      "apply_error": "No se pudo actualizar el color de la etiqueta."
+    },
+    "color_filter": {
+      "label": "Filtrar por color",
+      "none": "Sin color",
+      "clear": "Borrar el filtro de color",
+      "results_one": "1 etiqueta coincide con los colores seleccionados",
+      "results_other": "{{count}} etiquetas coinciden con los colores seleccionados"
+    },
+    "rename": {
+      "title": "Renombrar etiqueta",
+      "label": "Nuevo nombre",
+      "error": "Error al renombrar"
+    },
+    "delete": {
+      "title": "Eliminar etiqueta",
+      "confirm": "¿Eliminar la etiqueta \"{{tag}}\" de todas las notas?",
+      "error": "Error al eliminar"
+    }
   },
   "trash": {
     "search": {
@@ -1045,6 +1077,7 @@
       "locked_by_tenant_isolation": "Oculto automáticamente mientras esta capacidad esté bloqueada por el aislamiento de cuentas",
       "toolbar_hint": "Los botones de formato (negrita, listas, código…) solo aparecen mientras hay texto seleccionado en una nota. Las demás acciones están agrupadas en el menú ⋮.",
       "reminder_bell": "Icono de campana (recordatorio)",
+      "icon_sidebar_entire": "Toda la barra de iconos",
       "dashboard_user": "Usuario",
       "dashboard_filter_bar": "Barra de filtro",
       "view_layout_toggle": "Alternar vista (cuadrícula / lista, tamaño de tarjetas)",
@@ -1065,6 +1098,7 @@
         "slash_menu": "Menú slash",
         "panels": "Otros",
         "dashboard_toolbar": "Panel",
+        "icon_sidebar": "Barra de iconos (página de notas)",
         "folder_actions": "Acciones de carpeta",
         "workspace_menu": "Menú del espacio de trabajo"
       },
@@ -1472,7 +1506,11 @@
       "tabs_not_available": "Las pestañas no están disponibles en dispositivos móviles",
       "no_notes_title": "Sin notas",
       "no_notes_in_folder": "Esta carpeta no contiene notas",
-      "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
+      "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador.",
+      "show_only": "Mostrar solo esta carpeta"
+    },
+    "folder_filter": {
+      "exit": "Salir de la vista de la carpeta"
     }
   },
   "note_color": {
@@ -3574,7 +3612,10 @@
     "collapse": "Contraer",
     "expand": "Expandir",
     "collapse_all": "Contraer todo",
-    "expand_all": "Expandir todo"
+    "expand_all": "Expandir todo",
+    "view_list": "Vista de lista",
+    "view_calendar": "Vista de calendario",
+    "calendar_no_tasks": "No hay tareas en este día."
   },
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",

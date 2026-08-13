@@ -45,6 +45,36 @@ try {
                     <span id="taskDueTimeBtnLabel"><?php echo t_h('reminder.modal.time_placeholder', [], 'Time'); ?></span>
                 </button>
             </div>
+            <div class="reminder-repeat-row" id="taskDueRepeatRow">
+                <label class="reminder-repeat-label" for="taskDueRepeatSelect">
+                    <i class="lucide lucide-repeat"></i>
+                    <?php echo t_h('reminder.modal.repeat_label', [], 'Repeat'); ?>
+                </label>
+                <select id="taskDueRepeatSelect" class="reminder-repeat-select">
+                    <option value=""><?php echo t_h('reminder.modal.repeat_none', [], 'Does not repeat'); ?></option>
+                    <option value="1h"><?php echo t_h('reminder.modal.repeat_hourly', [], 'Hourly'); ?></option>
+                    <option value="1d"><?php echo t_h('reminder.modal.repeat_daily', [], 'Daily'); ?></option>
+                    <option value="1w"><?php echo t_h('reminder.modal.repeat_weekly', [], 'Weekly'); ?></option>
+                    <option value="1m"><?php echo t_h('reminder.modal.repeat_monthly', [], 'Monthly'); ?></option>
+                    <option value="1y"><?php echo t_h('reminder.modal.repeat_yearly', [], 'Yearly'); ?></option>
+                    <option value="custom"><?php echo t_h('reminder.modal.repeat_custom', [], 'Custom...'); ?></option>
+                </select>
+            </div>
+            <div class="reminder-repeat-custom initially-hidden" id="taskDueRepeatCustom">
+                <span class="reminder-repeat-every"><?php echo t_h('reminder.modal.repeat_every', [], 'Every'); ?></span>
+                <input type="number" id="taskDueRepeatInterval" class="reminder-repeat-interval" min="1" max="999" value="1">
+                <select id="taskDueRepeatUnit" class="reminder-repeat-unit">
+                    <option value="i"><?php echo t_h('reminder.modal.repeat_minutes', [], 'minute(s)'); ?></option>
+                    <option value="h"><?php echo t_h('reminder.modal.repeat_hours', [], 'hour(s)'); ?></option>
+                    <option value="d"><?php echo t_h('reminder.modal.repeat_days', [], 'day(s)'); ?></option>
+                    <option value="w"><?php echo t_h('reminder.modal.repeat_weeks', [], 'week(s)'); ?></option>
+                    <option value="m"><?php echo t_h('reminder.modal.repeat_months', [], 'month(s)'); ?></option>
+                    <option value="y"><?php echo t_h('reminder.modal.repeat_years', [], 'year(s)'); ?></option>
+                </select>
+            </div>
+            <div class="reminder-repeat-hint initially-hidden" id="taskDueRepeatHint">
+                <?php echo t_h('reminder.modal.repeat_hint', [], 'The next reminder is scheduled when you dismiss the notification.'); ?>
+            </div>
             <div class="reminder-email-option" id="taskDueRemindOption">
                 <label class="reminder-email-label" for="taskDueRemindInput">
                     <span class="reminder-email-copy">

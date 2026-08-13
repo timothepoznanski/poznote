@@ -1406,6 +1406,12 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
     text-overflow: ellipsis;
 }
 
+/* Per-tag color (--tag-color set inline from the tag_colors setting) */
+.board-card-tag-colored {
+    background: color-mix(in srgb, var(--tag-color) 16%, #ffffff);
+    color: color-mix(in srgb, var(--tag-color) 72%, #1f2937);
+}
+
 .board-card-date {
     margin-left: auto;
     font-size: 10.5px;
@@ -1663,6 +1669,12 @@ body.dark-mode .board-view-btn:hover {
 body.dark-mode .board-card-tag {
     color: var(--dm-text-muted);
     background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .board-card-tag-colored,
+body.dark-mode .board-card-tag-colored {
+    background: color-mix(in srgb, var(--tag-color) 26%, var(--dm-surface));
+    color: color-mix(in srgb, var(--tag-color) 70%, #ffffff);
 }
 
 :root[data-theme='dark'] .board-card-date,

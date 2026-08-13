@@ -119,7 +119,10 @@
    (.modal-content select { font-size:16px/padding:12px !important } in responsive.css) */
 #reminderModal .reminder-repeat-select,
 #reminderModal .reminder-repeat-unit,
-#reminderModal .reminder-repeat-interval {
+#reminderModal .reminder-repeat-interval,
+#taskDueModal .reminder-repeat-select,
+#taskDueModal .reminder-repeat-unit,
+#taskDueModal .reminder-repeat-interval {
     padding: 4px 8px !important;
     margin: 0;
     border: 1px solid var(--border-color, #ddd);
@@ -134,7 +137,10 @@
 @media (pointer: coarse) {
     #reminderModal .reminder-repeat-select,
     #reminderModal .reminder-repeat-unit,
-    #reminderModal .reminder-repeat-interval {
+    #reminderModal .reminder-repeat-interval,
+    #taskDueModal .reminder-repeat-select,
+    #taskDueModal .reminder-repeat-unit,
+    #taskDueModal .reminder-repeat-interval {
         padding: 8px 10px !important;
         font-size: 16px !important;
     }
@@ -254,15 +260,36 @@
     flex-shrink: 0;
 }
 
+/* Three localized action buttons ("Supprimer la date", "Annuler",
+   "Enregistrer") need more room than the 420px modal default */
+#reminderModal .modal-content,
+#taskDueModal .modal-content {
+    max-width: 500px;
+}
+
+/* The due modal can be opened from inside the tasks-page day modal; it must
+   stack above it (both share the .modal 9999 base) */
+#taskDueModal.modal {
+    z-index: 10001 !important;
+}
+
+#taskDueModal .modal-content {
+    z-index: 10002 !important;
+}
+
+/* Long localized labels must never clip: buttons keep at least their natural
+   width (beats the .modal-buttons button min-width: 0) and the row wraps
+   when the modal is too narrow */
 .reminder-modal-actions {
     display: flex;
     gap: 8px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
 }
 
-.reminder-modal-action {
-    flex: 1;
+.reminder-modal-actions .reminder-modal-action {
+    flex: 1 1 auto;
     white-space: nowrap;
+    min-width: fit-content;
     min-height: 34px;
     padding: 10px 14px !important;
     border-radius: 10px;

@@ -58,6 +58,50 @@
         return !!(modal && modal.dataset.emailAvailable === '1');
     }
 
+    // Recurrence select handling, mirroring the note reminder modal
+    // (canonical value: "<count><unit>" with unit i/h/d/w/m/y)
+    function getTaskDueRecurrence() {
+        const select = el('taskDueRepeatSelect');
+        if (!select) return '';
+        if (select.value !== 'custom') return select.value;
+
+        const interval = parseInt(el('taskDueRepeatInterval')?.value, 10);
+        const unit = el('taskDueRepeatUnit')?.value || 'd';
+        if (!interval || interval < 1) return '';
+        return Math.min(interval, 999) + unit;
+    }
+
+    function setTaskDueRecurrence(recurrence) {
+        const select = el('taskDueRepeatSelect');
+        if (!select) return;
+
+        const value = String(recurrence || '');
+        const match = value.match(/^([1-9]\d{0,2})([ihdwmy])$/);
+        const presets = ['1h', '1d', '1w', '1m', '1y'];
+
+        if (!match) {
+            select.value = '';
+        } else if (presets.indexOf(value) !== -1) {
+            select.value = value;
+        } else {
+            select.value = 'custom';
+            const intervalInput = el('taskDueRepeatInterval');
+            const unitSelect = el('taskDueRepeatUnit');
+            if (intervalInput) intervalInput.value = match[1];
+            if (unitSelect) unitSelect.value = match[2];
+        }
+    }
+
+    // The repeat row stays visible like in the note reminder modal; only the
+    // custom interval editor and the dismissal hint follow the selection
+    function syncRepeatUi() {
+        const select = el('taskDueRepeatSelect');
+        const customRow = el('taskDueRepeatCustom');
+        const hint = el('taskDueRepeatHint');
+        if (customRow) customRow.classList.toggle('initially-hidden', !select || select.value !== 'custom');
+        if (hint) hint.classList.toggle('initially-hidden', !select || select.value === '');
+    }
+
     function syncUi() {
         const modal = modalEl();
         if (!modal || !state) return;
@@ -81,6 +125,8 @@
         }
         const emailInput = el('taskDueEmailInput');
         if (emailInput) emailInput.checked = state.email;
+
+        syncRepeatUi();
 
         const currentInfo = el('taskDueCurrentInfo');
         const currentDate = el('taskDueCurrentDate');
@@ -124,7 +170,8 @@
                     task_id: taskId,
                     reminder_at: triggerUtc,
                     message: state.taskText,
-                    email_enabled: payload.dueReminderEmail
+                    email_enabled: payload.dueReminderEmail,
+                    recurrence: payload.dueRecurrence
                 })
             });
         }
@@ -148,16 +195,18 @@
     function handleSave() {
         if (!state) return;
         const dueAt = state.day ? (state.day + (state.time ? 'T' + state.time : '')) : null;
+        const remind = !!(state.remind && dueAt);
         applyAndClose({
             dueAt: dueAt,
-            dueReminder: !!(state.remind && dueAt),
-            dueReminderEmail: !!(state.remind && state.email && emailAvailable())
+            dueReminder: remind,
+            dueReminderEmail: !!(state.remind && state.email && emailAvailable()),
+            dueRecurrence: (remind && getTaskDueRecurrence()) || null
         });
     }
 
     function handleRemove() {
         if (!state) return;
-        applyAndClose({ dueAt: null, dueReminder: false, dueReminderEmail: false });
+        applyAndClose({ dueAt: null, dueReminder: false, dueReminderEmail: false, dueRecurrence: null });
     }
 
     function openDatePicker() {
@@ -204,6 +253,9 @@
             remindInput.addEventListener('change', function () {
                 if (state) {
                     state.remind = remindInput.checked;
+                    // The repeat is driven by dismissing the notification, so
+                    // it cannot survive without the reminder
+                    if (!state.remind) setTaskDueRecurrence('');
                     syncUi();
                 }
             });
@@ -213,6 +265,18 @@
         if (emailInput) {
             emailInput.addEventListener('change', function () {
                 if (state) state.email = emailInput.checked;
+            });
+        }
+
+        const repeatSelect = el('taskDueRepeatSelect');
+        if (repeatSelect) {
+            repeatSelect.addEventListener('change', function () {
+                // A repeating due date advances through its notification, so
+                // choosing a repeat implies the reminder
+                if (state && repeatSelect.value !== '' && !state.remind) {
+                    state.remind = true;
+                }
+                syncUi();
             });
         }
 
@@ -230,8 +294,9 @@
      *
      * opts: {
      *   noteId, taskId,
-     *   task: { text, dueAt, dueReminder, dueReminderEmail },
-     *   onSave(payload) -> optional Promise, payload = { dueAt, dueReminder, dueReminderEmail }
+     *   task: { text, dueAt, dueReminder, dueReminderEmail, dueRecurrence },
+     *   onSave(payload) -> optional Promise,
+     *   payload = { dueAt, dueReminder, dueReminderEmail, dueRecurrence }
      * }
      */
     window.openTaskDueModal = function (opts) {
@@ -252,6 +317,7 @@
         };
 
         attachHandlers(modal);
+        setTaskDueRecurrence(opts.task.dueRecurrence);
         syncUi();
         modal.style.display = 'flex';
     };

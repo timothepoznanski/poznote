@@ -118,6 +118,18 @@ body.dark-mode .search-date-filter {
     border-color: var(--dm-border);
 }
 
+html[data-theme='dark'] .folder-filter-banner,
+body.dark-mode .folder-filter-banner {
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .folder-filter-banner-name i,
+body.dark-mode .folder-filter-banner-name i {
+    color: var(--dm-text-muted);
+    background-color: var(--dm-text-muted);
+}
+
 html[data-theme='dark'] .search-date-field label,
 body.dark-mode .search-date-field label {
     color: var(--dm-text-muted);
@@ -397,6 +409,53 @@ body.dark-mode .toggle-sidebar-btn {
 
 html[data-theme='dark'] .toggle-sidebar-btn:hover,
 body.dark-mode .toggle-sidebar-btn:hover {
+    background: var(--dm-surface-hover);
+    color: var(--dm-accent);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   Icon Sidebar (index.php)
+   ============================================ */
+
+html[data-theme='dark'] #icon_sidebar,
+body.dark-mode #icon_sidebar {
+    background-color: var(--dm-sidebar-bg);
+    border-right: 1px solid var(--dm-border);
+}
+
+html[data-theme='dark'] .icon-sidebar-btn,
+body.dark-mode .icon-sidebar-btn {
+    color: var(--dm-text-muted);
+    opacity: 0.4;
+}
+
+html[data-theme='dark'] .icon-sidebar-btn:hover,
+html[data-theme='dark'] .icon-sidebar-btn:focus-visible,
+html[data-theme='dark'] .icon-sidebar-btn.has-notifications,
+body.dark-mode .icon-sidebar-btn:hover,
+body.dark-mode .icon-sidebar-btn:focus-visible,
+body.dark-mode .icon-sidebar-btn.has-notifications {
+    opacity: 1;
+}
+
+html[data-theme='dark'] .icon-sidebar-btn:hover,
+html[data-theme='dark'] .icon-sidebar-btn:focus-visible,
+body.dark-mode .icon-sidebar-btn:hover,
+body.dark-mode .icon-sidebar-btn:focus-visible {
+    color: var(--dm-accent);
+    background: var(--dm-surface-hover);
+}
+
+html[data-theme='dark'] #iconSidebarToggle,
+body.dark-mode #iconSidebarToggle {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] #iconSidebarToggle:hover,
+body.dark-mode #iconSidebarToggle:hover {
     background: var(--dm-surface-hover);
     color: var(--dm-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);

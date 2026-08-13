@@ -62,11 +62,73 @@ function parseSearchTerms($search) {
 }
 
 /**
+ * Collect a folder's id plus the ids of all its descendants.
+ *
+ * Used by the folder filter so that browsing a single folder also shows the
+ * notes of its subfolders. Walks the parent_id chain level by level; the
+ * $seen guard keeps a corrupted parent cycle from looping forever.
+ *
+ * @param PDO $con Database connection
+ * @param string $folderName Name of the root folder to resolve
+ * @param string|null $workspace_filter Workspace filter
+ * @return int[] Folder ids, empty if the folder name is unknown
+ */
+function collectFolderSubtreeIds($con, $folderName, $workspace_filter = null) {
+    try {
+        $query = "SELECT id, parent_id FROM folders";
+        $params = [];
+        if (!empty($workspace_filter)) {
+            $query .= " WHERE workspace = ?";
+            $params[] = $workspace_filter;
+        }
+        $stmt = $con->prepare($query);
+        $stmt->execute($params);
+        $childrenByParent = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $parentId = $row['parent_id'] !== null ? (int)$row['parent_id'] : 0;
+            $childrenByParent[$parentId][] = (int)$row['id'];
+        }
+
+        // Resolve the starting folder(s) by name: duplicates can legitimately
+        // exist in separate branches, so every match seeds the walk.
+        $rootQuery = "SELECT id FROM folders WHERE name = ?";
+        $rootParams = [$folderName];
+        if (!empty($workspace_filter)) {
+            $rootQuery .= " AND workspace = ?";
+            $rootParams[] = $workspace_filter;
+        }
+        $rootStmt = $con->prepare($rootQuery);
+        $rootStmt->execute($rootParams);
+        $queue = array_map('intval', $rootStmt->fetchAll(PDO::FETCH_COLUMN));
+
+        $ids = [];
+        $seen = [];
+        while ($queue) {
+            $current = array_shift($queue);
+            if (isset($seen[$current])) continue;
+            $seen[$current] = true;
+            $ids[] = $current;
+            if (!empty($childrenByParent[$current])) {
+                foreach ($childrenByParent[$current] as $childId) {
+                    $queue[] = $childId;
+                }
+            }
+        }
+        return $ids;
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
  * Build secure search conditions
  *
  * $created_from and $created_to are user-local dates in YYYY-MM-DD format.
+ *
+ * When $con is provided, a folder filter also matches the folder's subfolders
+ * so the filtered view keeps the folder's tree instead of a single level.
  */
-function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $combined_mode = false, $created_from = '', $created_to = '') {
+function buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $combined_mode = false, $created_from = '', $created_to = '', $con = null) {
     $where_conditions = ["trash = 0"];
     $search_params = [];
     
@@ -156,8 +218,17 @@ function buildSearchConditions($search, $tags_search, $folder_filter, $workspace
                 $where_conditions[] = "folder_id = ?";
                 $search_params[] = intval($folder_filter);
             } else {
-                $where_conditions[] = "folder = ?";
-                $search_params[] = $folder_filter;
+                // With a connection available, match the folder and everything
+                // below it so subfolders stay visible in the filtered view.
+                $subtreeIds = $con ? collectFolderSubtreeIds($con, $folder_filter, $workspace_filter) : [];
+                if (count($subtreeIds) > 1) {
+                    $placeholders = implode(',', array_fill(0, count($subtreeIds), '?'));
+                    $where_conditions[] = "folder_id IN ($placeholders)";
+                    $search_params = array_merge($search_params, $subtreeIds);
+                } else {
+                    $where_conditions[] = "folder = ?";
+                    $search_params[] = $folder_filter;
+                }
             }
         }
     }

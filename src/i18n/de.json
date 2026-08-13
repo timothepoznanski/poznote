@@ -153,7 +153,12 @@
       "mark_completed": "Als erledigt markieren",
       "mark_active": "Als nicht erledigt markieren",
       "error": "Die Karte konnte nicht aktualisiert werden"
-    }
+    },
+    "due": {
+      "label": "Fälligkeitsdatum",
+      "overdue": "Überfällig"
+    },
+    "card_size": "Kartengröße"
   },
   "folders": {
     "delete": {
@@ -719,7 +724,8 @@
     "create": "Erstellen",
     "expand_all_folders": "Alle Ordner aufklappen",
     "collapse_all_folders": "Alle Ordner zuklappen",
-    "toggle": "Linke Spalte ein-/ausblenden"
+    "toggle": "Linke Spalte ein-/ausblenden",
+    "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden"
   },
   "home": {
     "title": "Dashboard",
@@ -809,7 +815,33 @@
       "one": "Es gibt insgesamt {{count}} Tag",
       "other": "Es gibt insgesamt {{count}} Tags"
     },
-    "empty": "Keine Tags gefunden."
+    "empty": "Keine Tags gefunden.",
+    "action": {
+      "color": "Farbe",
+      "rename": "Umbenennen",
+      "delete": "Löschen"
+    },
+    "color": {
+      "modal_title": "Tag-Farbe",
+      "apply_error": "Die Tag-Farbe konnte nicht aktualisiert werden."
+    },
+    "color_filter": {
+      "label": "Nach Farbe filtern",
+      "none": "Keine Farbe",
+      "clear": "Farbfilter zurücksetzen",
+      "results_one": "1 Tag entspricht den ausgewählten Farben",
+      "results_other": "{{count}} Tags entsprechen den ausgewählten Farben"
+    },
+    "rename": {
+      "title": "Tag umbenennen",
+      "label": "Neuer Name",
+      "error": "Umbenennen fehlgeschlagen"
+    },
+    "delete": {
+      "title": "Tag löschen",
+      "confirm": "Tag \"{{tag}}\" aus allen Notizen löschen?",
+      "error": "Löschen fehlgeschlagen"
+    }
   },
   "trash": {
     "search": {
@@ -1044,6 +1076,7 @@
       "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",
       "reminder_bell": "Glockensymbol (Erinnerung)",
+      "icon_sidebar_entire": "Gesamte Icon-Seitenleiste",
       "dashboard_user": "Benutzer",
       "dashboard_filter_bar": "Filterleiste",
       "view_layout_toggle": "Ansichtsumschalter (Raster / Liste, Kartengröße)",
@@ -1064,6 +1097,7 @@
         "slash_menu": "Slash-Menü",
         "panels": "Sonstiges",
         "dashboard_toolbar": "Dashboard",
+        "icon_sidebar": "Icon-Seitenleiste (Notizenseite)",
         "folder_actions": "Ordneraktionen",
         "workspace_menu": "Workspace-Menü"
       },
@@ -1471,7 +1505,11 @@
       "tabs_not_available": "Tabs sind auf Mobilgeräten nicht verfügbar",
       "no_notes_title": "Keine Notizen",
       "no_notes_in_folder": "Dieser Ordner enthält keine Notizen",
-      "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
+      "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten.",
+      "show_only": "Nur diesen Ordner anzeigen"
+    },
+    "folder_filter": {
+      "exit": "Ordneransicht verlassen"
     }
   },
   "note_color": {
@@ -3574,7 +3612,10 @@
     "collapse": "Einklappen",
     "expand": "Ausklappen",
     "collapse_all": "Alle einklappen",
-    "expand_all": "Alle ausklappen"
+    "expand_all": "Alle ausklappen",
+    "view_list": "Listenansicht",
+    "view_calendar": "Kalenderansicht",
+    "calendar_no_tasks": "Keine Aufgaben an diesem Tag."
   },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",

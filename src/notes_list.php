@@ -102,6 +102,22 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
     </form>
 </div>
 
+<?php if (!empty($folder_filter)): ?>
+<?php
+    $exit_folder_filter_link = 'index.php';
+    if (!empty($workspace_filter)) {
+        $exit_folder_filter_link .= '?workspace=' . urlencode($workspace_filter);
+    }
+?>
+<div class="folder-filter-banner" id="folder-filter-banner">
+    <span class="folder-filter-banner-name">
+        <i class="lucide lucide-folder"></i>
+        <span><?php echo htmlspecialchars($folder_filter, ENT_QUOTES); ?></span>
+    </span>
+    <a class="folder-filter-banner-clear" href="<?php echo htmlspecialchars($exit_folder_filter_link, ENT_QUOTES); ?>" title="<?php echo t_h('notes_list.folder_filter.exit', [], 'Exit folder view'); ?>" aria-label="<?php echo t_h('notes_list.folder_filter.exit', [], 'Exit folder view'); ?>"><span class="clear-icon">×</span></a>
+</div>
+<?php endif; ?>
+
 <div class="notes-list-scrollable-content">
 
 <?php
@@ -181,8 +197,10 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         return;
     }
     
-    // Show folder header only if not filtering by folder
-    if (empty($folder_filter)) {
+    // Show folder header when browsing normally. Under a folder filter the root
+    // folder is already named by the banner, so only its subfolders get one.
+    $showFolderHeader = empty($folder_filter) || $depth > 0;
+    if ($showFolderHeader) {
         $folderClass = 'folder-header';
         if ($depth > 0) $folderClass .= ' subfolder subfolder-level-' . $depth;
         $folderDomId = 'folder-' . $folderId;
@@ -270,7 +288,9 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             // Generate note link
             $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
             
-            $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
+            // Indent notes that sit under a folder header; under a folder filter
+            // the root folder has no header, so its own notes stay flush left.
+            $noteClass = $showFolderHeader ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
             renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName);
         }
@@ -291,13 +311,15 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             // Generate note link
             $link = generateNoteLink($search, $tags_search, $folder_filter, $workspace_filter, $preserve_notes, $preserve_tags, $row1["id"], $search_combined, $created_from, $created_to);
             
-            $noteClass = empty($folder_filter) ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
+            // Indent notes that sit under a folder header; under a folder filter
+            // the root folder has no header, so its own notes stay flush left.
+            $noteClass = $showFolderHeader ? 'links_arbo_left note-in-folder' : 'links_arbo_left';
             if ($depth > 0) $noteClass .= ' note-in-subfolder';
             renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName);
         }
     }
     
-    if (empty($folder_filter)) {
+    if ($showFolderHeader) {
         echo "</div>"; // Close folder-content
         echo "</div>"; // Close folder-header
     }
@@ -308,6 +330,24 @@ $folders = enrichFoldersWithParentId($folders, $con, $workspace_filter);
 
 // Build hierarchical structure
 $hierarchicalFolders = buildFolderHierarchy($folders);
+
+// When browsing a single folder, keep only that folder's subtree so the
+// filtered view is a pruned version of the normal tree rather than a flat list.
+// addEmptyFolders() re-injected every folder of the workspace, so prune here.
+if (!empty($folder_filter) && $folder_filter !== 'Favorites') {
+    $filteredRoots = [];
+    $findFolderByName = function ($nodes) use (&$findFolderByName, $folder_filter, &$filteredRoots) {
+        foreach ($nodes as $nodeId => $nodeData) {
+            if ($nodeData['name'] === $folder_filter) {
+                $filteredRoots[$nodeId] = $nodeData;
+            } elseif (!empty($nodeData['children'])) {
+                $findFolderByName($nodeData['children']);
+            }
+        }
+    };
+    $findFolderByName($hierarchicalFolders);
+    $hierarchicalFolders = $filteredRoots;
+}
 
 // Determine if we should display uncategorized notes first (after Favorites, before other folders)
 // Reuses the setting already loaded by index.php (also used there for the SQL

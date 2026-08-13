@@ -338,7 +338,7 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
 
     fetchAllTags(workspace).then(allTags => {
         // Exclude tags already present
-        const existing = Array.from(container.querySelectorAll('.clickable-tag')).map(t => t.textContent.toLowerCase());
+        const existing = Array.from(container.querySelectorAll('.clickable-tag')).map(t => (t.getAttribute('data-tag') || t.textContent).trim().toLowerCase());
         const matches = allTags.filter(t => t.toLowerCase().includes(value) && !existing.includes(t.toLowerCase()));
 
         dd.innerHTML = '';
@@ -430,6 +430,26 @@ document.addEventListener('click', function (e) {
 // ============================================
 
 /**
+ * Resolve a tag's color to a hex value, mirroring resolveTagHex() in
+ * js/list_tags.js: window.TAG_COLORS maps a lowercased tag name to either a
+ * note palette id or a literal '#rrggbb'. Returns '' when the tag has no color.
+ * @param {string} tagName - The tag to look up
+ * @returns {string} A hex color, or '' when the tag is uncolored
+ */
+function resolveNoteTagHex(tagName) {
+    const map = window.TAG_COLORS;
+    if (!map || typeof map !== 'object') return '';
+
+    const value = map[String(tagName || '').trim().toLowerCase()];
+    if (typeof value !== 'string' || value === '') return '';
+    if (value.charAt(0) === '#') return value;
+
+    const palette = Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
+    const entry = palette.find(color => color.id === value.toLowerCase());
+    return entry ? entry.hex : '';
+}
+
+/**
  * Add a tag element to the container
  * @param {HTMLElement} container - The container to add the tag to
  * @param {string} tagText - The text of the tag
@@ -443,6 +463,15 @@ function addTagElement(container, tagText, noteId) {
     tagElement.className = 'clickable-tag';
     tagElement.textContent = tagText;
     tagElement.setAttribute('data-tag', tagText);
+
+    const tagHex = resolveNoteTagHex(tagText);
+    if (tagHex) {
+        const dot = document.createElement('span');
+        dot.className = 'tag-color-dot';
+        dot.style.background = tagHex;
+        tagElement.insertBefore(dot, tagElement.firstChild);
+    }
+
     tagElement.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -487,7 +516,7 @@ function removeTagElement(tagWrapper, noteId) {
 function tagExistsInContainer(container, tagText) {
     const existingTags = container.querySelectorAll('.clickable-tag');
     return Array.from(existingTags).some(tag =>
-        tag.textContent.toLowerCase() === tagText.toLowerCase()
+        (tag.getAttribute('data-tag') || tag.textContent).trim().toLowerCase() === tagText.trim().toLowerCase()
     );
 }
 
@@ -636,7 +665,8 @@ function updateTagsInput(noteId, container) {
     if (!tagsInput) return;
 
     const tagElements = container.querySelectorAll('.clickable-tag');
-    const tags = Array.from(tagElements).map(tag => tag.textContent);
+    // data-tag, not textContent: a colored tag also carries an empty dot span.
+    const tags = Array.from(tagElements).map(tag => tag.getAttribute('data-tag') || tag.textContent.trim());
 
     tagsInput.value = tags.join(' ');
 

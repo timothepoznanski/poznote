@@ -589,3 +589,9 @@ div[contentEditable=true][data-ph-mobile]:empty:before {
 .system-folder [class*="lucide-"].folder-icon {
     font-size: 1em !important;
 }
+
+/* Icon sidebar is desktop-only */
+#icon_sidebar,
+#iconSidebarToggle {
+    display: none !important;
+}

@@ -326,6 +326,15 @@
                 if (typeof window.toggleFolderFavorite === 'function') {
                     window.toggleFolderFavorite(folderData.id);
                 }
+            },
+            'show-only-folder': function () {
+                if (!folderData.name) return;
+                var url = 'index.php?folder=' + encodeURIComponent(folderData.name);
+                var workspace = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '';
+                if (workspace) {
+                    url += '&workspace=' + encodeURIComponent(workspace);
+                }
+                window.location.href = url;
             }
         };
 
@@ -595,7 +604,8 @@
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
             'download-folder', 'rename-folder', 'delete-folder',
-            'change-folder-icon', 'share-folder', 'favorite-folder'
+            'change-folder-icon', 'share-folder', 'favorite-folder',
+            'show-only-folder'
         ];
         if (folderMenuActions.indexOf(action) !== -1) {
             handleFolderMenuAction(event, action, actionElement);

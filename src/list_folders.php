@@ -110,7 +110,7 @@ $currentLang = getUserLanguage();
 				padding: 10px !important;
 			}
 			.folder-item {
-				padding: 12px 15px !important;
+				padding: 8px 15px !important;
 				box-shadow: none !important;
 				border-radius: 0 !important;
 				border: none !important;
@@ -184,7 +184,7 @@ $currentLang = getUserLanguage();
 				
 				$kanban_url = 'index.php?kanban=' . $folder_id . '&workspace=' . urlencode($workspace);
 				
-				echo '<div class="shared-note-item folder-item" onclick="window.location.href=\'' . $kanban_url . '\'" data-folder-name="' . $folder_name . '" style="cursor: pointer; padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
+				echo '<div class="shared-note-item folder-item" onclick="window.location.href=\'' . $kanban_url . '\'" data-folder-name="' . $folder_name . '" style="cursor: pointer; padding: 8px 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; box-shadow: none !important;">';
 				
 				echo '<div class="note-name-container" style="display: flex; align-items: center; gap: 12px; flex: 1;">';
 				$icon_style = 'style="' . ($icon_color ? 'color: ' . $icon_color . ' !important; ' : '') . 'filter: none !important;"';

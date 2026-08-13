@@ -1,0 +1,118 @@
+/**
+ * Icon Sidebar (index.php)
+ *
+ * Narrow icon-only rail on the far left of the notes page, mirroring
+ * the dashboard topbar actions (.dashboard-topbar-actions in dashboard.php).
+ */
+
+:root {
+    --icon-sidebar-width: 52px;
+}
+
+#icon_sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: var(--icon-sidebar-width);
+    height: 100vh;
+    padding: 10px 5px;
+    box-sizing: border-box;
+    background: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+#icon_sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+.icon-sidebar-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 8px;
+    color: #9aa1ab;
+    background: transparent;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    appearance: none;
+    -webkit-appearance: none;
+    flex-shrink: 0;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.icon-sidebar-btn:hover,
+.icon-sidebar-btn:focus-visible {
+    color: #007DB8;
+    background: rgba(0, 125, 184, 0.08);
+}
+
+.icon-sidebar-btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-sidebar-btn.has-notifications .lucide-bell {
+    color: #f59e0b;
+}
+
+/* Collapse toggle: sits at the very bottom, just right of the rail's divider
+   (level with the mini calendar). Stays put when the rail is hidden. */
+#iconSidebarToggle {
+    position: fixed;
+    bottom: 0;
+    left: var(--icon-sidebar-width);
+    z-index: 11;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 25px;
+    padding: 0;
+    border: 1px solid #ccc;
+    border-radius: 0 4px 4px 0;
+    background: #fff;
+    color: #6c757d;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: left 0.3s ease, background 0.2s ease, color 0.2s ease;
+}
+
+#iconSidebarToggle:hover {
+    background: #f8f9fa;
+    color: #007DB8;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#iconSidebarToggle .lucide {
+    width: 12px;
+    height: 12px;
+    background-color: currentColor;
+    filter: none !important;
+    transition: transform 0.3s ease;
+}
+
+body.icon-sidebar-collapsed #icon_sidebar {
+    display: none;
+}
+
+body.icon-sidebar-collapsed #iconSidebarToggle {
+    left: 0;
+}
+
+body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
+    transform: rotate(180deg);
+}
