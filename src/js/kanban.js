@@ -779,7 +779,12 @@
         const existing = card.querySelector('.kanban-card-due');
 
         if (!dueValue) {
-            if (existing) existing.remove();
+            if (existing) {
+                const topline = existing.closest('.kanban-card-topline');
+                existing.remove();
+                // An emptied topline would still take up its bottom margin.
+                if (topline && !topline.children.length) topline.remove();
+            }
             return;
         }
 
@@ -791,8 +796,16 @@
 
         let badge = existing;
         if (!badge) {
-            const topline = card.querySelector('.kanban-card-topline');
-            if (!topline) return;
+            // Cards without a date render no topline at all, so build one and
+            // place it where the server would have: before the tags row.
+            let topline = card.querySelector('.kanban-card-topline');
+            if (!topline) {
+                topline = document.createElement('div');
+                topline.className = 'kanban-card-topline';
+                const anchor = card.querySelector('.kanban-card-tags') || card.querySelector('.kanban-card-title');
+                if (!anchor) return;
+                card.insertBefore(topline, anchor);
+            }
             badge = document.createElement('span');
             topline.insertBefore(badge, topline.firstChild);
         }

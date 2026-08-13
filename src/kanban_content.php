@@ -346,7 +346,7 @@ try {
                     aria-pressed="<?php echo $isCompleted ? 'true' : 'false'; ?>">
                 <i class="lucide lucide-check"></i>
             </button>
-            <?php if ($kanbanDate !== '' || $dueValue !== '' || !empty($kanbanTags)): ?>
+            <?php if ($kanbanDate !== '' || $dueValue !== ''): ?>
             <div class="kanban-card-topline">
                 <?php if ($dueValue !== ''): ?>
                 <span class="kanban-card-due<?php echo $dueOverdue ? ' overdue' : ''; ?>"
@@ -362,14 +362,15 @@ try {
                 </span>
                 <?php endif; ?>
 
-                <?php if (!empty($kanbanTags)): ?>
-                <div class="kanban-card-tags">
-                    <?php foreach ($kanbanTags as $tag): ?>
-                        <?php $tagHex = resolveTagColorHex($tag); ?>
-                        <span class="kanban-tag<?php echo $tagHex !== '' ? ' kanban-tag-colored' : ''; ?>"<?php echo $tagHex !== '' ? ' style="--tag-color: ' . htmlspecialchars($tagHex, ENT_QUOTES) . ';"' : ''; ?>><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
+            <?php if (!empty($kanbanTags)): ?>
+            <div class="kanban-card-tags">
+                <?php foreach ($kanbanTags as $tag): ?>
+                    <?php $tagHex = resolveTagColorHex($tag); ?>
+                    <span class="kanban-tag<?php echo $tagHex !== '' ? ' kanban-tag-colored' : ''; ?>"<?php echo $tagHex !== '' ? ' style="--tag-color: ' . htmlspecialchars($tagHex, ENT_QUOTES) . ';"' : ''; ?>><?php echo htmlspecialchars($tag, ENT_QUOTES); ?></span>
+                <?php endforeach; ?>
             </div>
             <?php endif; ?>
 

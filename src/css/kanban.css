@@ -487,15 +487,14 @@
     font-weight: 600;
 }
 
+/* Own row, directly above the card title. */
 .kanban-card-tags {
     display: flex;
-    flex: 1 1 auto;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: 4px;
     max-width: 100%;
     min-width: 0;
-    margin-bottom: 0;
-    overflow: hidden;
+    margin-bottom: 6px;
 }
 
 .kanban-tag {
