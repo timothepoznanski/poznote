@@ -17,7 +17,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [Reminders](#reminders)
 - [Note Sharing](#note-sharing)
 - [Folder Sharing](#folder-sharing)
-- [Backlinks](#backlinks)
+- [Backlinks & Graph](#backlinks--graph)
 - [Folders](#folders)
 - [Trash](#trash)
 - [Workspaces](#workspaces)
@@ -487,6 +487,58 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/color
 ```
 
+### Set Note Pinned State
+
+```
+PUT /notes/{id}/pinned
+```
+
+Pin or unpin a note, which keeps it at the top of the note list.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `pinned` | boolean | Yes | `true` to pin the note, `false` to unpin it |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Note pinned state updated successfully",
+  "pinned": true
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"pinned": true}' \
+  http://YOUR_SERVER/api/v1/notes/123/pinned
+```
+
+### Set Kanban Completed State
+
+```
+POST /notes/{id}/kanban-completed
+```
+
+Mark a note as completed on the kanban board, or clear that state. Only the completion flag changes: the note's content and its `updated` timestamp are left untouched.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `completed` | boolean | Yes | `true` to mark the note completed, `false` to reopen it |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"completed": true}' \
+  http://YOUR_SERVER/api/v1/notes/123/kanban-completed
+```
+
 ### Toggle Favorite
 
 ```
@@ -706,7 +758,9 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 
 ## Tasks
 
-Task list notes (`type: tasklist`) store their content as a JSON array of task objects. The array is the note's `content`: reading a tasklist note through `GET /notes/{id}` returns it as a JSON string, and updating tasks means sending the full modified array back through `PATCH /notes/{id}`.
+Task list notes (`type: tasklist`) store their content as a JSON array of task objects. The array is the note's `content`: reading a tasklist note through `GET /notes/{id}` returns it as a JSON string, and rewriting the whole list means sending the full modified array back through `PATCH /notes/{id}`.
+
+To manage a single task without rewriting the array, use the per-task endpoints below (`GET`/`POST /notes/{id}/tasks`, `PATCH`/`DELETE /notes/{id}/tasks/{taskId}`). They take due dates, reminders and flags as typed parameters, keep the notification scheduled for a task in sync automatically, and preserve the ordering the interface uses (important first, then normal, completed last).
 
 **Task object schema:**
 
@@ -760,6 +814,123 @@ Aggregate the tasks of every non-trashed tasklist note, used by the tasks page (
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/tasks?workspace=Poznote"
+```
+
+### List Tasks Of A Note
+
+```
+GET /notes/{id}/tasks
+```
+
+List the tasks of one tasklist note. Use it to get a task's `id` before updating or deleting it.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "note_id": 123,
+  "heading": "Groceries",
+  "tasks": [
+    { "id": 1754820000123.45, "text": "Buy milk", "completed": false, "important": false, "dueAt": "2026-08-15", "dueReminder": false }
+  ]
+}
+```
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/tasks
+```
+
+### Add A Task
+
+```
+POST /notes/{id}/tasks
+```
+
+Append a task to a tasklist note. When `reminder` is enabled, the matching notification is scheduled automatically from `due_at`.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `text` | string | Yes | Task text |
+| `due_at` | string | No | Due date as `YYYY-MM-DD`, or `YYYY-MM-DDTHH:MM` with a time. Local wall-clock time in the user's configured timezone, no offset |
+| `reminder` | boolean | No | Whether the due date raises a notification. Requires `due_at`. A date without a time reminds at 09:00 |
+| `reminder_email` | boolean | No | Whether that reminder also sends an email. Ignored when SMTP is not configured |
+| `recurrence` | string | No | Repeat interval as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w`) |
+| `important` | boolean | No | Important flag, sorts the task to the top |
+| `completed` | boolean | No | Whether the task starts out done |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "note_id": 123,
+  "task": {
+    "id": 1754820000123.45,
+    "text": "Buy milk",
+    "noteId": 123,
+    "completed": false,
+    "important": false,
+    "dueAt": "2026-09-01T18:30",
+    "dueReminder": true,
+    "dueRecurrence": "1w"
+  }
+}
+```
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Buy milk",
+    "due_at": "2026-09-01T18:30",
+    "reminder": true,
+    "recurrence": "1w"
+  }' \
+  http://YOUR_SERVER/api/v1/notes/123/tasks
+```
+
+### Update A Task
+
+```
+PATCH /notes/{id}/tasks/{taskId}
+```
+
+Update one task. Only the provided fields change. Completing a task clears its pending reminder, and setting `due_at` to `null` clears the due date and its reminder.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `text` | string | No | New task text |
+| `completed` | boolean | No | Whether the task is done |
+| `important` | boolean | No | Important flag |
+| `due_at` | string or null | No | New due date, or `null` to clear it |
+| `reminder` | boolean | No | Whether the due date raises a notification |
+| `reminder_email` | boolean | No | Whether that reminder also sends an email |
+| `recurrence` | string or null | No | Repeat interval, or `null` for a one-off reminder |
+
+```bash
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"completed": true}' \
+  http://YOUR_SERVER/api/v1/notes/123/tasks/1754820000123.45
+```
+
+### Delete A Task
+
+```
+DELETE /notes/{id}/tasks/{taskId}
+```
+
+Remove one task from a tasklist note, along with its pending reminder.
+
+```bash
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/tasks/1754820000123.45
 ```
 
 ---
@@ -1141,7 +1312,7 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 
 ---
 
-## Backlinks
+## Backlinks & Graph
 
 ### Get Backlinks
 
@@ -1154,6 +1325,39 @@ Get all notes that link to this note. Supports HTML links, URL parameters, and w
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/backlinks
+```
+
+### Get Note Graph
+
+```
+GET /graph
+```
+
+Return the note-link graph used by the graph view: one node per non-trashed note (`note`, `markdown` and `tasklist` types), and one edge per link between two notes.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Filter by workspace |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "nodes": [
+    { "id": 123, "title": "Project plan", "folder": "Work", "type": "note", "favorite": false }
+  ],
+  "edges": [
+    { "source": 123, "target": 456 }
+  ]
+}
+```
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/graph?workspace=Personal"
 ```
 
 ---
@@ -1468,6 +1672,68 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"color": "purple"}' \
   http://YOUR_SERVER/api/v1/folders/12/color
+```
+
+### Set Folder Pinned State
+
+```
+PUT /folders/{id}/pinned
+```
+
+Pin or unpin a folder, which keeps it at the top of the folder list.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `pinned` | boolean | Yes | `true` to pin the folder, `false` to unpin it |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Folder pinned state updated successfully",
+  "pinned": true
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"pinned": true}' \
+  http://YOUR_SERVER/api/v1/folders/12/pinned
+```
+
+### Set Folder Favorite State
+
+```
+PUT /folders/{id}/favorite
+```
+
+Mark a folder as a favorite, or remove it from the favorites. Unlike `POST /notes/{id}/favorite`, this sets the state explicitly instead of toggling it.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `favorite` | boolean | Yes | `true` to mark the folder as a favorite, `false` to remove it |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Folder favorite state updated successfully",
+  "favorite": true
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"favorite": true}' \
+  http://YOUR_SERVER/api/v1/folders/12/favorite
 ```
 
 ### Empty Folder
@@ -2229,6 +2495,44 @@ curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/users/me
 ```
 
+### Update Current User
+
+```
+PATCH /users/me
+```
+
+Update the current user's own profile. Only the provided fields change.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `username` | string | No | Letters, digits, dots, underscores and dashes only (max. 60 characters). Cannot be purely numeric |
+| `first_name` | string | No | Max. 100 characters |
+| `last_name` | string | No | Max. 100 characters |
+| `email` | string | No | Administrators only. A regular user changing their own email gets a 403 |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "id": 2,
+  "username": "alice",
+  "email": "alice@example.com",
+  "first_name": "Alice",
+  "last_name": "Martin",
+  "display_name": "Alice Martin"
+}
+```
+
+```bash
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"first_name": "Alice", "last_name": "Martin"}' \
+  http://YOUR_SERVER/api/v1/users/me
+```
+
 ### Change Password
 
 ```
@@ -2606,6 +2910,9 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/beacon` | Emergency save |
 | `PUT` | `/notes/{id}/tags` | Update tags |
 | `PUT` | `/notes/{id}/icon` | Update note icon |
+| `PUT` | `/notes/{id}/color` | Update card color |
+| `PUT` | `/notes/{id}/pinned` | Pin or unpin a note |
+| `POST` | `/notes/{id}/kanban-completed` | Set Kanban completed state |
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
@@ -2630,6 +2937,10 @@ curl http://YOUR_SERVER/api_health.php
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/tasks` | List all tasks |
+| `GET` | `/notes/{id}/tasks` | List the tasks of one note |
+| `POST` | `/notes/{id}/tasks` | Add a task to a note |
+| `PATCH` | `/notes/{id}/tasks/{taskId}` | Update a task |
+| `DELETE` | `/notes/{id}/tasks/{taskId}` | Delete a task |
 
 ### Reminders
 | Method | Endpoint | Description |
@@ -2655,10 +2966,11 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/shared` | List shared notes |
 | `GET` | `/shared/with-me` | Shared with me |
 
-### Backlinks
+### Backlinks & Graph
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/notes/{id}/backlinks` | Get backlinks |
+| `GET` | `/graph` | Get the note-link graph |
 
 ### Folders
 | Method | Endpoint | Description |
@@ -2676,6 +2988,8 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/folders/{id}/empty` | Empty folder |
 | `PUT` | `/folders/{id}/icon` | Update icon |
 | `PUT` | `/folders/{id}/color` | Update card color |
+| `PUT` | `/folders/{id}/pinned` | Pin or unpin a folder |
+| `PUT` | `/folders/{id}/favorite` | Set favorite state |
 | `POST` | `/folders/move-files` | Move files |
 | `POST` | `/folders/reorder` | Reorder folders |
 | `POST` | `/folders/kanban-structure` | Create Kanban |
@@ -2715,8 +3029,8 @@ curl http://YOUR_SERVER/api_health.php
 |--------|----------|-------------|
 | `GET` | `/notes/{noteId}/attachments` | List attachments |
 | `POST` | `/notes/{noteId}/attachments` | Upload attachment |
-| `GET` | `/notes/{noteId}/attachments/{id}` | Download attachment |
-| `DELETE` | `/notes/{noteId}/attachments/{id}` | Delete attachment |
+| `GET` | `/notes/{noteId}/attachments/{attachmentId}` | Download attachment |
+| `DELETE` | `/notes/{noteId}/attachments/{attachmentId}` | Delete attachment |
 
 ### Backups
 | Method | Endpoint | Description |
@@ -2757,6 +3071,7 @@ curl http://YOUR_SERVER/api_health.php
 |--------|----------|-------------|
 | `GET` | `/users/profiles` | List profiles (public) |
 | `GET` | `/users/me` | Current user |
+| `PATCH` | `/users/me` | Update own profile |
 | `POST` | `/users/me/password` | Change password |
 | `GET` | `/users/me/password-status` | Password status |
 | `DELETE` | `/users/me` | Delete own account |

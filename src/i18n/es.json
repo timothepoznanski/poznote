@@ -894,6 +894,14 @@
     "showing_limit": "Solo se muestran las {{count}} notas modificadas más recientemente"
   },
   "editor": {
+    "code_block_language": {
+      "title": "Lenguaje del bloque de código",
+      "filter": "Filtrar lenguajes...",
+      "remove_tag": "Quitar etiqueta",
+      "button": "Cambiar el lenguaje de este bloque de código",
+      "plain_code": "Código (sin resaltado)",
+      "no_match": "Ningún lenguaje coincide"
+    },
     "markdown_placeholder": "Escribe tu markdown, usa / para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
     "markdown_placeholder_mobile": "Escribe tu markdown o pega imágenes aquí...",
     "excalidraw": {
@@ -917,6 +925,10 @@
       "title": "Eliminar bloque de código",
       "confirm_title": "Eliminar bloque de código",
       "confirm_message": "¿Deseas eliminar este bloque de código?"
+    },
+    "code_block_line_numbers": {
+      "show": "Mostrar números de línea",
+      "hide": "Ocultar números de línea"
     },
     "colors": {
       "black": "Negro",
@@ -1024,6 +1036,18 @@
     "errors": []
   },
   "modals": {
+    "paste_markdown": {
+      "title": "Pegar como Markdown",
+      "menu_item": "Pegar como Markdown",
+      "hint": "Pega tu contenido a continuación. El formato se convertirá a Markdown.",
+      "placeholder": "Pega aquí (Ctrl+V)",
+      "preview_label": "Vista previa de Markdown",
+      "insert": "Insertar",
+      "converting": "Convirtiendo...",
+      "error": "La conversión falló. Inténtalo de nuevo.",
+      "no_note": "No hay ninguna nota abierta.",
+      "empty": "El portapapeles está vacío."
+    },
     "update": {
       "title": "📱 Versión de la aplicación",
       "backup_warning": "Haz una copia de seguridad de tus datos.",
@@ -1568,6 +1592,8 @@
     "error_loading_version": "Error al cargar versión"
   },
   "slash_menu": {
+    "plain_block": "Bloque simple",
+    "block_languages": "Lenguajes de bloque",
     "back_to_normal": "Volver a texto normal",
     "title": "Título",
     "heading_1": "Encabezado 1",

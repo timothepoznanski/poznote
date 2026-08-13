@@ -11,6 +11,14 @@ require_once __DIR__ . '/../../../users/db_master.php';
 class NotesController {
     private PDO $con;
     private const DEFAULT_NOTE_ICON = 'lucide-file-text';
+
+    /**
+     * Inline tags kept when reducing a list item to text during HTML->Markdown
+     * conversion. List rules run before the inline rules, so these have to
+     * survive that step to become **bold**, *italic*, `code` and links; the
+     * whitelist matches the one the inline rules use among themselves.
+     */
+    private const LIST_ITEM_INLINE_TAGS = '<strong><b><em><i><code><a><del><s><strike><u><mark><span>';
     
     public function __construct(PDO $con) {
         $this->con = $con;
@@ -2383,6 +2391,38 @@ class NotesController {
     }
     
     /**
+     * Convert an HTML fragment to Markdown without touching any note.
+     *
+     * Backs the "Paste as Markdown" modal: the browser can only read the
+     * clipboard's text/html flavour during a real paste event, so the editor
+     * sends that markup here and inserts the Markdown that comes back. Reusing
+     * htmlToMarkdown() keeps a single converter for both this and whole-note
+     * conversion, so the two can never drift apart.
+     */
+    public function convertHtml(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $html = isset($input['html']) ? (string) $input['html'] : '';
+
+        if (trim($html) === '') {
+            $this->sendError(400, 'Missing "html" field');
+            return;
+        }
+
+        // Bounded so a runaway paste cannot tie up the regex pipeline.
+        if (strlen($html) > 2000000) {
+            $this->sendError(413, 'HTML content too large');
+            return;
+        }
+
+        try {
+            $this->sendSuccess(['markdown' => $this->htmlToMarkdown($html)]);
+        } catch (Exception $e) {
+            error_log('convertHtml error: ' . $e->getMessage());
+            $this->sendError(500, 'Conversion failed');
+        }
+    }
+
+    /**
      * Convert HTML to Markdown
      * Handles: headers, bold, italic, strikethrough, links, images, line breaks,
      * paragraphs, lists (ordered/unordered/checklists), code blocks, inline code,
@@ -2475,25 +2515,55 @@ class NotesController {
         }, $md);
         
         // ---- Checklists / Task lists ----
-        $md = preg_replace_callback('/<li[^>]*class="[^"]*task-item[^"]*"[^>]*>.*?<input[^>]*type=["\']checkbox["\'][^>]*(checked)?[^>]*\/?>\s*(.*?)<\/li>/is', function($matches) {
-            $checked = !empty($matches[1]);
-            $text = strip_tags(trim($matches[2]));
-            return ($checked ? "- [x] " : "- [ ] ") . $text . "\n";
+        // Consume the whole <ul>/<ol> so the generic list handlers below cannot
+        // re-scan the leftover wrapper and drop the already-converted items.
+        $md = preg_replace_callback('/<(ul|ol)[^>]*>(.*?)<\/\1>/is', function($matches) {
+            $listHtml = $matches[2];
+
+            // Only treat this list as a checklist if it actually contains checkboxes
+            if (!preg_match('/<input[^>]*type=["\']checkbox["\']/i', $listHtml)) {
+                return $matches[0];
+            }
+
+            preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $listHtml, $liMatches);
+            $items = [];
+            foreach ($liMatches[1] as $liContent) {
+                if (!preg_match('/<input[^>]*type=["\']checkbox["\'][^>]*>/i', $liContent, $inputMatch)) {
+                    // Plain item inside a checklist: keep it as a normal bullet.
+                    // Inline tags survive so the rules further down turn them
+                    // into **bold**, *italic*, `code` and links; stripping them
+                    // here would flatten the item to plain text.
+                    $text = trim(strip_tags($liContent, self::LIST_ITEM_INLINE_TAGS));
+                    if ($text !== '') $items[] = "- " . $text;
+                    continue;
+                }
+
+                // Search the input tag itself, otherwise [^>]* swallows "checked".
+                // Match only a real attribute: "checklist-checkbox" as a class value
+                // must not count, and data-checked="0" means unchecked.
+                $inputTag = $inputMatch[0];
+                if (preg_match('/\sdata-checked=["\']?([01])/i', $inputTag, $dataChecked)) {
+                    $checked = $dataChecked[1] === '1';
+                } else {
+                    $checked = (bool)preg_match('/\schecked(?=[\s>=\/])/i', $inputTag);
+                }
+
+                $text = trim(strip_tags(str_replace($inputMatch[0], '', $liContent), self::LIST_ITEM_INLINE_TAGS));
+                $text = str_replace("\xE2\x80\x8B", '', $text); // zero-width space in empty items
+                $items[] = ($checked ? "- [x] " : "- [ ] ") . $text;
+            }
+
+            if (empty($items)) return $matches[0];
+            return "\n\n" . implode("\n", $items) . "\n\n";
         }, $md);
-        
-        $md = preg_replace_callback('/<li[^>]*>\s*<input[^>]*type=["\']checkbox["\'][^>]*(checked)?[^>]*\/?>\s*(.*?)<\/li>/is', function($matches) {
-            $checked = !empty($matches[1]);
-            $text = strip_tags(trim($matches[2]));
-            return ($checked ? "- [x] " : "- [ ] ") . $text . "\n";
-        }, $md);
-        
+
         // ---- Ordered lists ----
         $md = preg_replace_callback('/<ol[^>]*>(.*?)<\/ol>/is', function($matches) {
             $items = [];
             preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $matches[1], $liMatches);
             $i = 1;
             foreach ($liMatches[1] as $liContent) {
-                $items[] = $i . ". " . strip_tags(trim($liContent));
+                $items[] = $i . ". " . strip_tags(trim($liContent), self::LIST_ITEM_INLINE_TAGS);
                 $i++;
             }
             return "\n\n" . implode("\n", $items) . "\n\n";
@@ -2504,12 +2574,32 @@ class NotesController {
             $items = [];
             preg_match_all('/<li[^>]*>(.*?)<\/li>/is', $matches[1], $liMatches);
             foreach ($liMatches[1] as $liContent) {
-                $text = strip_tags(trim($liContent));
+                $text = strip_tags(trim($liContent), self::LIST_ITEM_INLINE_TAGS);
                 if (!empty($text)) $items[] = "- " . $text;
             }
             return "\n\n" . implode("\n", $items) . "\n\n";
         }, $md);
         
+        // ---- Orphan checklist items ----
+        // Pasted fragments often carry <li> items with no enclosing list, or a
+        // wrapper that is never closed; the handlers above all require a closed
+        // <ul>/<ol> pair, so without this pass the checkbox state would be lost.
+        $md = preg_replace_callback('/<li[^>]*>(.*?)<\/li>/is', function($matches) {
+            $liContent = $matches[1];
+            if (!preg_match('/<input[^>]*type=["\']checkbox["\'][^>]*>/i', $liContent, $inputMatch)) {
+                return $matches[0];
+            }
+            $inputTag = $inputMatch[0];
+            if (preg_match('/\sdata-checked=["\']?([01])/i', $inputTag, $dataChecked)) {
+                $checked = $dataChecked[1] === '1';
+            } else {
+                $checked = (bool)preg_match('/\schecked(?=[\s>=\/])/i', $inputTag);
+            }
+            $text = trim(strip_tags(str_replace($inputTag, '', $liContent), self::LIST_ITEM_INLINE_TAGS));
+            $text = str_replace("\xE2\x80\x8B", '', $text);
+            return "\n" . ($checked ? "- [x] " : "- [ ] ") . $text . "\n";
+        }, $md);
+
         // ---- Headers ----
         $md = preg_replace('/<h1[^>]*>(.*?)<\/h1>/is', "\n\n# $1\n\n", $md);
         $md = preg_replace('/<h2[^>]*>(.*?)<\/h2>/is', "\n\n## $1\n\n", $md);
@@ -2622,16 +2712,54 @@ class NotesController {
         
         // ---- Cleanup ----
         
-        // Remove span tags WITHOUT style attribute (keep those with style)
-        $md = preg_replace_callback('/<span([^>]*)>(.*?)<\/span>/is', function($matches) {
-            $attrs = $matches[1];
-            $inner = $matches[2];
-            if (stripos($attrs, 'style=') !== false) {
-                return '<span' . $attrs . '>' . $inner . '</span>';
+        // Keep only spans the Markdown renderer actually understands, i.e. a
+        // lone style attribute (used for colors and highlights). Pasted web
+        // content carries spans with extra attributes (Wikipedia ships
+        // data-mw-comment-end, ids, classes); the renderer does not match those,
+        // so keeping them would print the raw tag as text in the note.
+        //
+        // Innermost-first: the inner pattern forbids nested span tags, so
+        // repeating it unwraps one level per pass and never leaves the stray
+        // </span> that a single non-greedy pass produces on nested spans.
+        $previous = null;
+        $passes = 0;
+        while ($previous !== $md && $passes < 20) {
+            $previous = $md;
+            $md = preg_replace_callback('/<span([^>]*)>((?:(?!<\/?span\b).)*)<\/span>/is', function($matches) {
+                $attrs = trim($matches[1]);
+                $inner = $matches[2];
+                // Only a color/background span carries meaning the Markdown
+                // renderer reproduces. Layout styles such as Wikipedia's
+                // "display: inline-block" render as a literal tag in the note.
+                if (preg_match('/^style=(["\'])([^"\']*(?:color|background)[^"\']*)\1$/i', $attrs)) {
+                    return '<span ' . $attrs . '>' . $inner . '</span>';
+                }
+                return $inner;
+            }, $md);
+            $passes++;
+        }
+
+        // Unpaired tags can remain when the source markup is malformed (a
+        // <span> that is never closed). Drop opening tags the loop did not
+        // keep, plus any closing tag with no matching opener, so neither can
+        // reach the note as literal text.
+        $openStyledSpans = 0;
+        $md = preg_replace_callback('/<span([^>]*)>|<\/span>/i', function($matches) use (&$openStyledSpans) {
+            if ($matches[0][1] === '/') {
+                if ($openStyledSpans > 0) {
+                    $openStyledSpans--;
+                    return '</span>';
+                }
+                return '';
             }
-            return $inner;
+            $attrs = trim($matches[1]);
+            if (preg_match('/^style=(["\'])([^"\']*(?:color|background)[^"\']*)\1$/i', $attrs)) {
+                $openStyledSpans++;
+                return '<span ' . $attrs . '>';
+            }
+            return '';
         }, $md);
-        
+
         // Remove remaining HTML tags (keep details/summary/u/span)
         $md = strip_tags($md, '<details><summary><u><span>');
         

@@ -788,6 +788,28 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Paste as Markdown Modal -->
+<div id="pasteMarkdownModal" class="modal">
+    <div class="modal-content paste-markdown-modal-content">
+        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Paste as Markdown'); ?></h3>
+        <div class="modal-body">
+            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste your content below. Formatting will be converted to Markdown.'); ?></p>
+            <!-- contenteditable, not a textarea: only a rich-text target receives
+                 the clipboard's text/html flavour that carries the formatting. -->
+            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Paste as Markdown'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
+            <div id="pasteMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">
+                <label class="paste-markdown-preview-label" for="pasteMarkdownPreview"><?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?></label>
+                <textarea id="pasteMarkdownPreview" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?>"></textarea>
+            </div>
+            <p id="pasteMarkdownError" class="paste-markdown-error" role="alert"></p>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="pasteMarkdownModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="pasteMarkdownInsertBtn" disabled><?php echo t_h('modals.paste_markdown.insert', [], 'Insert'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Edit Task Modal -->
 <div id="taskEditModal" class="modal">
     <div class="modal-content task-edit-modal-content">
@@ -1942,6 +1964,25 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Code Block Language Modal: edit or remove the language tag of a code block -->
+<div id="codeBlockLanguageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('editor.code_block_language.title', [], 'Code block language'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="codeBlockLanguageFilter" class="code-block-language-filter" autocomplete="off" placeholder="<?php echo t_h('editor.code_block_language.filter', [], 'Filter languages...'); ?>" />
+            <div id="codeBlockLanguageList" class="code-block-language-list">
+                <!-- Languages are rendered here by js/code-block-language.js -->
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="codeBlockLanguageModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-danger" data-action="remove-code-block-language"><?php echo t_h('editor.code_block_language.remove_tag', [], 'Remove tag'); ?></button>
         </div>
     </div>
 </div>

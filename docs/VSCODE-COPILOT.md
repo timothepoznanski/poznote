@@ -120,7 +120,39 @@ Once configured, you can interact with your Poznote instance directly from VS Co
 
 @poznote Update note 456 with new content about the deployment process
 
+@poznote Delete note 456 (moves it to the trash)
+
+@poznote Create a note "Renew passport" in workspace "Perso" and remind me on September 1st at 9am
+
 @poznote Create a folder called "Projects"
+```
+
+### Reminders
+
+```
+@poznote Remind me about note 123 next Monday at 8am
+
+@poznote Set a weekly reminder on note 123, every Monday at 9am
+
+@poznote Does note 123 have a reminder?
+
+@poznote Remove the reminder from note 123
+```
+
+### Task Lists
+
+```
+@poznote Show me the tasks of note 123
+
+@poznote Add a task "Buy milk" due tomorrow at 6:30pm with a reminder to note 123
+
+@poznote Add a task "Weekly report" to note 123, due every Friday
+
+@poznote Mark the task "Buy milk" in note 123 as done
+
+@poznote Move the due date of task "Buy milk" in note 123 to next Monday
+
+@poznote Delete the task "Buy milk" from note 123
 ```
 
 ### Advanced Operations
@@ -132,9 +164,65 @@ Once configured, you can interact with your Poznote instance directly from VS Co
 
 @poznote Move note 456 to folder "Projects"
 
+@poznote Convert note 123 to Markdown
+
+@poznote Which notes link to note 123?
+
 @poznote Enable public sharing for note 123
 
+@poznote List all my publicly shared notes and folders
+
 @poznote What version of Poznote am I running?
+```
+
+### Folders and Workspaces
+
+```
+@poznote Rename folder 12 to "Archive"
+
+@poznote Delete folder 12 and move its notes to trash
+
+@poznote Create a workspace called "Work"
+
+@poznote Rename the workspace "Work" to "Job"
+
+@poznote Delete the workspace "Job"
+```
+
+### Trash and Restore
+
+```
+@poznote Show me all notes in the trash
+
+@poznote Restore note 123 from the trash
+
+@poznote Empty the trash
+```
+
+### Git Synchronization
+
+```
+@poznote What's the status of Git sync?
+
+@poznote Push my notes to Git
+
+@poznote Pull notes from Git
+```
+
+### Backups and Settings
+
+```
+@poznote List all backups
+
+@poznote Create a backup of my data
+
+@poznote Restore the backup poznote_backup_2026-02-02_15-30-00.zip
+
+@poznote Delete the backup poznote_backup_2026-02-02_15-30-00.zip
+
+@poznote What is the "timezone" setting?
+
+@poznote Set the "timezone" setting to "Europe/Paris"
 ```
 
 ### Working with Content
@@ -217,15 +305,34 @@ The Poznote MCP server provides the following tools that VS Code Copilot can use
 - `get_note` - Get a specific note by ID
 - `list_notes` - List all notes
 - `search_notes` - Search notes by text query, with optional creation date range
-- `create_note` - Create a new note
-- `update_note` - Update an existing note
+- `create_note` - Create a new note, optionally with a due date/reminder
+- `update_note` - Update an existing note, and/or set its due date/reminder
 - `delete_note` - Delete a note
 - `duplicate_note` - Duplicate a note
+- `convert_note` - Convert a note between HTML and Markdown
+- `get_backlinks` - Get the notes linking to a note
+
+### Reminders
+- `get_reminder` - Get the reminder set on a note
+- `set_reminder` - Set or replace a note's reminder, with an optional repeat interval
+- `remove_reminder` - Remove the reminder from a note
+
+### Tasks
+- `list_tasks` - List the tasks of a tasklist note, with their IDs and due dates
+- `add_task` - Add a single task, with an optional due date and reminder
+- `update_task` - Update one task (text, due date, reminder, important flag)
+- `complete_task` - Mark a task as done, or reopen it
+- `delete_task` - Delete one task from a tasklist note
 
 ### Organization
 - `create_folder` - Create a new folder
 - `list_folders` - List all folders
+- `rename_folder` - Rename a folder
+- `delete_folder` - Delete a folder and move its notes to trash
 - `list_workspaces` - List all workspaces
+- `create_workspace` - Create a new workspace
+- `rename_workspace` - Rename a workspace
+- `delete_workspace` - Delete a workspace (cannot delete the last one)
 - `list_tags` - List all tags
 - `move_note_to_folder` - Move note to folder
 - `remove_note_from_folder` - Remove note from folder
@@ -240,6 +347,7 @@ The Poznote MCP server provides the following tools that VS Code Copilot can use
 - `share_note` - Enable public sharing
 - `unshare_note` - Disable public sharing
 - `get_note_share_status` - Get sharing status
+- `list_shared` - List all publicly shared notes and folders
 
 ### Attachments
 - `list_attachments` - List note attachments
@@ -253,11 +361,14 @@ The Poznote MCP server provides the following tools that VS Code Copilot can use
 - `get_system_info` - Get Poznote version info
 - `list_backups` - List system backups
 - `create_backup` - Create a backup
+- `restore_backup` - Restore a backup (replaces current user data)
+- `delete_backup` - Delete a backup file
 - `get_app_setting` - Get application setting
+- `update_app_setting` - Update application setting
 
 ### Multi-User Support
 
-Most tools accept an optional `user_id` parameter to target specific user profiles. You can specify this in your prompts:
+Most tools accept an optional `user_id` parameter to target specific user profiles. The exceptions are the system-level tools `get_system_info`, `list_backups`, `create_backup` and `delete_backup`, which do not take `user_id`. You can specify this in your prompts:
 
 ```
 @poznote List notes for user 2

@@ -893,6 +893,14 @@
     "showing_limit": "Es werden nur die {{count}} zuletzt geänderten Notizen angezeigt"
   },
   "editor": {
+    "code_block_language": {
+      "title": "Sprache des Codeblocks",
+      "filter": "Sprachen filtern...",
+      "remove_tag": "Markierung entfernen",
+      "button": "Die Sprache dieses Codeblocks ändern",
+      "plain_code": "Code (ohne Hervorhebung)",
+      "no_match": "Keine passende Sprache"
+    },
     "markdown_placeholder": "Schreiben Sie Ihr Markdown, verwenden Sie /, um das Befehlsmenü zu öffnen, fügen Sie Bilder ein oder legen Sie ein Bild am Cursor ab.",
     "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier oder fügen Sie Bilder ein...",
     "excalidraw": {
@@ -916,6 +924,10 @@
       "title": "Codeblock löschen",
       "confirm_title": "Codeblock löschen",
       "confirm_message": "Möchten Sie diesen Codeblock löschen?"
+    },
+    "code_block_line_numbers": {
+      "show": "Zeilennummern anzeigen",
+      "hide": "Zeilennummern ausblenden"
     },
     "colors": {
       "black": "Schwarz",
@@ -1023,6 +1035,18 @@
     "errors": []
   },
   "modals": {
+    "paste_markdown": {
+      "title": "Als Markdown einfügen",
+      "menu_item": "Als Markdown einfügen",
+      "hint": "Fügen Sie Ihren Inhalt unten ein. Die Formatierung wird in Markdown umgewandelt.",
+      "placeholder": "Hier einfügen (Strg+V)",
+      "preview_label": "Markdown-Vorschau",
+      "insert": "Einfügen",
+      "converting": "Wird umgewandelt...",
+      "error": "Die Umwandlung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "no_note": "Es ist keine Notiz geöffnet.",
+      "empty": "Die Zwischenablage ist leer."
+    },
     "update": {
       "title": "📱 Anwendungsversion",
       "backup_warning": "Erstellen Sie ein Backup Ihrer Daten.",
@@ -1567,6 +1591,8 @@
     "error_loading_version": "Fehler beim Laden der Version"
   },
   "slash_menu": {
+    "plain_block": "Einfacher Block",
+    "block_languages": "Block-Sprachen",
     "back_to_normal": "Zurück zu normalem Text",
     "title": "Titel",
     "heading_1": "Überschrift 1",

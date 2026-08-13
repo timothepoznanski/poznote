@@ -640,7 +640,7 @@ function stripSearchHighlights(element) {
 
     normalizeCodeBlocksForStorage(clonedElement);
 
-    var codeBlockButtons = clonedElement.querySelectorAll('.code-block-copy-btn, .code-block-delete-btn');
+    var codeBlockButtons = clonedElement.querySelectorAll('.code-block-copy-btn, .code-block-delete-btn, .code-block-lang-btn, .code-block-line-numbers-btn');
     for (var b = 0; b < codeBlockButtons.length; b++) {
         codeBlockButtons[b].remove();
     }
@@ -691,7 +691,9 @@ function getTextWithCodeLineBreaks(node) {
 
     if (node.classList && (
         node.classList.contains('code-block-copy-btn') ||
-        node.classList.contains('code-block-delete-btn')
+        node.classList.contains('code-block-delete-btn') ||
+        node.classList.contains('code-block-lang-btn') ||
+        node.classList.contains('code-block-line-numbers-btn')
     )) {
         return '';
     }

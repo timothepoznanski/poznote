@@ -892,6 +892,14 @@
     "showing_limit": "仅显示最近修改的 {{count}} 条笔记"
   },
   "editor": {
+    "code_block_language": {
+      "title": "代码块语言",
+      "filter": "筛选语言...",
+      "remove_tag": "移除标记",
+      "button": "更改此代码块的语言",
+      "plain_code": "代码（不高亮）",
+      "no_match": "没有匹配的语言"
+    },
     "markdown_placeholder": "编写您的 Markdown，使用 / 打开命令菜单，粘贴图片或在光标处拖放图片。",
     "markdown_placeholder_mobile": "在此处编写您的 Markdown 或粘贴图片...",
     "excalidraw": {
@@ -915,6 +923,10 @@
       "title": "删除代码块",
       "confirm_title": "删除代码块",
       "confirm_message": "是否删除此代码块？"
+    },
+    "code_block_line_numbers": {
+      "show": "显示行号",
+      "hide": "隐藏行号"
     },
     "colors": {
       "black": "黑色",
@@ -1024,6 +1036,18 @@
     "errors": []
   },
   "modals": {
+    "paste_markdown": {
+      "title": "粘贴为 Markdown",
+      "menu_item": "粘贴为 Markdown",
+      "hint": "请在下方粘贴内容。格式将被转换为 Markdown。",
+      "placeholder": "在此粘贴（Ctrl+V）",
+      "preview_label": "Markdown 预览",
+      "insert": "插入",
+      "converting": "正在转换...",
+      "error": "转换失败，请重试。",
+      "no_note": "没有打开的笔记。",
+      "empty": "剪贴板为空。"
+    },
     "update": {
       "title": "📱 应用程序版本",
       "backup_warning": "请备份您的数据。",
@@ -1560,6 +1584,8 @@
     "error_loading_version": "加载版本信息出错"
   },
   "slash_menu": {
+    "plain_block": "普通块",
+    "block_languages": "块语言",
     "back_to_normal": "返回普通文本",
     "title": "标题",
     "heading_1": "一级标题",

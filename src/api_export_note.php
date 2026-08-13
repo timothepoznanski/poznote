@@ -557,8 +557,9 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
     libxml_clear_errors();
     
     $xpath = new DOMXPath($dom);
-    $copyButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn')]");
-    foreach ($copyButtons as $button) {
+    // Code block UI affordances (copy / delete / language badge / line numbers)
+    $actionButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn') or contains(@class, 'code-block-delete-btn') or contains(@class, 'code-block-lang-btn') or contains(@class, 'code-block-line-numbers-btn')]");
+    foreach ($actionButtons as $button) {
         $button->parentNode->removeChild($button);
     }
     

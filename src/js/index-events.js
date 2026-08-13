@@ -705,6 +705,18 @@
                     showConvertNoteModal(noteId, convertTo);
                 }
                 break;
+            case 'show-paste-markdown-modal': {
+                // Close the dropdown first, or it stays open behind the modal.
+                var toolbarElForPaste = target.closest('.note-edit-toolbar');
+                if (toolbarElForPaste) {
+                    var menuElForPaste = toolbarElForPaste.querySelector('.mobile-toolbar-menu');
+                    if (menuElForPaste) menuElForPaste.hidden = true;
+                }
+                if (typeof window.showPasteMarkdownModal === 'function') {
+                    window.showPasteMarkdownModal(noteId);
+                }
+                break;
+            }
             case 'delete-note':
                 if (noteId && typeof deleteNote === 'function') {
                     deleteNote(noteId);

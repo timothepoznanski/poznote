@@ -891,6 +891,14 @@
     "showing_limit": "Apenas as {{count}} notas modificadas mais recentemente são exibidas"
   },
   "editor": {
+    "code_block_language": {
+      "title": "Linguagem do bloco de código",
+      "filter": "Filtrar linguagens...",
+      "remove_tag": "Remover etiqueta",
+      "button": "Alterar a linguagem deste bloco de código",
+      "plain_code": "Código (sem realce)",
+      "no_match": "Nenhuma linguagem correspondente"
+    },
     "markdown_placeholder": "Escreva seu markdown, use / para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",
     "markdown_placeholder_mobile": "Escreva seu markdown ou cole imagens aqui...",
     "excalidraw": {
@@ -914,6 +922,10 @@
       "title": "Eliminar bloco de código",
       "confirm_title": "Eliminar bloco de código",
       "confirm_message": "Deseja eliminar este bloco de código?"
+    },
+    "code_block_line_numbers": {
+      "show": "Mostrar números de linha",
+      "hide": "Ocultar números de linha"
     },
     "colors": {
       "black": "Preto",
@@ -1022,6 +1034,18 @@
     "errors": []
   },
   "modals": {
+    "paste_markdown": {
+      "title": "Colar como Markdown",
+      "menu_item": "Colar como Markdown",
+      "hint": "Cole o seu conteúdo abaixo. A formatação será convertida para Markdown.",
+      "placeholder": "Cole aqui (Ctrl+V)",
+      "preview_label": "Pré-visualização de Markdown",
+      "insert": "Inserir",
+      "converting": "A converter...",
+      "error": "A conversão falhou. Tente novamente.",
+      "no_note": "Nenhuma nota aberta.",
+      "empty": "A área de transferência está vazia."
+    },
     "update": {
       "title": "📱 Versão da Aplicação",
       "backup_warning": "Faça um backup dos seus dados.",
@@ -1566,6 +1590,8 @@
     "error_loading_version": "Erro ao carregar versão"
   },
   "slash_menu": {
+    "plain_block": "Bloco simples",
+    "block_languages": "Linguagens de bloco",
     "back_to_normal": "Voltar para texto normal",
     "title": "Título",
     "heading_1": "Cabeçalho 1",

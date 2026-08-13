@@ -91,7 +91,10 @@ pre.code-block .code-block-copy-btn,
 .noteentry pre .code-block-copy-btn,
 .code-block-delete-btn,
 pre.code-block .code-block-delete-btn,
-.noteentry pre .code-block-delete-btn {
+.noteentry pre .code-block-delete-btn,
+.code-block-line-numbers-btn,
+pre.code-block .code-block-line-numbers-btn,
+.noteentry pre .code-block-line-numbers-btn {
     position: absolute;
     top: 2px;
     width: 28px;
@@ -117,6 +120,13 @@ pre.code-block .code-block-copy-btn,
     right: 40px;
 }
 
+/* Sits left of the copy button */
+.code-block-line-numbers-btn,
+pre.code-block .code-block-line-numbers-btn,
+.noteentry pre .code-block-line-numbers-btn {
+    right: 72px;
+}
+
 .code-block-delete-btn,
 pre.code-block .code-block-delete-btn,
 .noteentry pre .code-block-delete-btn {
@@ -125,9 +135,38 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-copy-btn:hover,
-.code-block-delete-btn:hover {
+.code-block-delete-btn:hover,
+.code-block-line-numbers-btn:hover {
     opacity: 1;
     transform: scale(1.05);
+}
+
+/* Clickable overlay on the language badge (js/code-block-language.js).
+   The badge is a ::before pseudo-element and cannot be clicked, so this
+   transparent button is laid on top of it. */
+.code-block-lang-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 22px;
+    min-width: 2ch;
+    padding: 2px 8px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0 0 4px 0;
+    box-sizing: content-box;
+    cursor: pointer;
+    z-index: 11;
+}
+
+.code-block-lang-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.code-block-lang-btn:focus-visible {
+    outline: 2px solid #0d6efd;
+    outline-offset: -2px;
 }
 
 .code-block-copy-btn:hover {
@@ -139,7 +178,8 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-copy-btn:active,
-.code-block-delete-btn:active {
+.code-block-delete-btn:active,
+.code-block-line-numbers-btn:active {
     transform: scale(0.95);
 }
 
@@ -151,13 +191,15 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-copy-btn svg,
-.code-block-delete-btn svg {
+.code-block-delete-btn svg,
+.code-block-line-numbers-btn svg {
     width: 14px;
     height: 14px;
 }
 
 .code-block-actions-host > .code-block-copy-btn,
-.code-block-actions-host > .code-block-delete-btn {
+.code-block-actions-host > .code-block-delete-btn,
+.code-block-actions-host > .code-block-line-numbers-btn {
     width: 28px;
     height: 28px;
     padding: 0 !important;
@@ -172,11 +214,13 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-actions-host > .code-block-copy-btn:hover,
-.code-block-actions-host > .code-block-delete-btn:hover {
+.code-block-actions-host > .code-block-delete-btn:hover,
+.code-block-actions-host > .code-block-line-numbers-btn:hover {
     opacity: 1 !important;
 }
 
-.code-block-actions-host > .code-block-copy-btn:hover {
+.code-block-actions-host > .code-block-copy-btn:hover,
+.code-block-actions-host > .code-block-line-numbers-btn:hover {
     color: #24292e !important;
 }
 
@@ -185,7 +229,8 @@ pre.code-block .code-block-delete-btn,
 }
 
 .code-block-actions-host > .code-block-copy-btn svg,
-.code-block-actions-host > .code-block-delete-btn svg {
+.code-block-actions-host > .code-block-delete-btn svg,
+.code-block-actions-host > .code-block-line-numbers-btn svg {
     width: 14px;
     height: 14px;
 }
@@ -197,8 +242,12 @@ pre.code-block .code-block-delete-btn,
     .code-block-delete-btn,
     pre.code-block .code-block-delete-btn,
     .noteentry pre .code-block-delete-btn,
+    .code-block-line-numbers-btn,
+    pre.code-block .code-block-line-numbers-btn,
+    .noteentry pre .code-block-line-numbers-btn,
     .code-block-actions-host > .code-block-copy-btn,
-    .code-block-actions-host > .code-block-delete-btn {
+    .code-block-actions-host > .code-block-delete-btn,
+    .code-block-actions-host > .code-block-line-numbers-btn {
         top: 2px;
     }
 }
@@ -209,6 +258,13 @@ pre.code-block,
 .code-block {
     padding: 30px !important;
     padding-bottom: 20px !important;
+}
+
+/* Without a language badge the top padding holds nothing, so the text sits
+   too low: match it to the bottom padding to center the content vertically. */
+.noteentry pre.plain-block,
+.noteentry pre:not([data-language]):not(.code-block):not(.indented-pre):not(:has(code[data-language])) {
+    padding-top: 20px !important;
 }
 
 

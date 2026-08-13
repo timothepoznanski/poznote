@@ -8,8 +8,70 @@
     var CHECK_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
     var DELETE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
 
+    // Gutter toggle: a "list with numbers" glyph, shown struck through when the
+    // block currently hides its line numbers.
+    var LINE_NUMBERS_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path></svg>';
+    var LINE_NUMBERS_OFF_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="10" y1="6" x2="21" y2="6"></line><line x1="10" y1="12" x2="21" y2="12"></line><line x1="10" y1="18" x2="21" y2="18"></line><path d="M4 6h1v4"></path><path d="M4 10h2"></path><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"></path><line x1="2" y1="22" x2="22" y2="2"></line></svg>';
+
     function tl(key, fallback) {
         return window.t ? window.t(key, {}, fallback) : fallback;
+    }
+
+    function getPreForBlock(block) {
+        if (!block) return null;
+        if (block.tagName === 'PRE') return block;
+        return block.closest ? block.closest('pre') : null;
+    }
+
+    /**
+     * Current gutter state for a block: the per-block data-line-numbers
+     * override when present, otherwise the global code_block_line_numbers
+     * setting carried by the body class.
+     */
+    function areLineNumbersVisible(block) {
+        var pre = getPreForBlock(block);
+        if (pre && pre.hasAttribute('data-line-numbers')) {
+            return pre.getAttribute('data-line-numbers') === '1';
+        }
+        return !!(document.body && document.body.classList.contains('code-block-line-numbers'));
+    }
+
+    function setLineNumbersButtonState(btn, visible) {
+        var label = visible
+            ? tl('editor.code_block_line_numbers.hide', 'Hide line numbers')
+            : tl('editor.code_block_line_numbers.show', 'Show line numbers');
+        btn.innerHTML = visible ? LINE_NUMBERS_ICON_SVG : LINE_NUMBERS_OFF_ICON_SVG;
+        btn.setAttribute('aria-label', label);
+        btn.setAttribute('title', label);
+        btn.setAttribute('aria-pressed', visible ? 'true' : 'false');
+    }
+
+    /**
+     * Write the per-block override and redraw the gutter. The attribute is
+     * always written explicitly (never removed) so the choice survives a
+     * change to the global setting.
+     */
+    function toggleLineNumbers(block) {
+        var pre = getPreForBlock(block);
+        if (!pre) return;
+
+        var next = !areLineNumbersVisible(pre);
+        pre.setAttribute('data-line-numbers', next ? '1' : '0');
+
+        var noteentry = pre.closest ? pre.closest('.noteentry') : null;
+
+        if (typeof window.applyCodeLineNumbers === 'function') {
+            window.applyCodeLineNumbers(noteentry || pre.parentElement || pre);
+        }
+
+        if (!noteentry) return;
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+        // Autosave listens for input on the note body; without this the new
+        // attribute stays in the DOM and is never persisted.
+        noteentry.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     function setCopyIcon(btn) {
@@ -223,7 +285,10 @@
 
     function isActionButtonNode(node) {
         return !!(node && node.nodeType === 1 && node.classList &&
-            (node.classList.contains('code-block-copy-btn') || node.classList.contains('code-block-delete-btn')));
+            (node.classList.contains('code-block-copy-btn') ||
+             node.classList.contains('code-block-delete-btn') ||
+             node.classList.contains('code-block-lang-btn') ||
+             node.classList.contains('code-block-line-numbers-btn')));
     }
 
     function isDisposableActionHost(host) {
@@ -263,6 +328,8 @@
 
         removeNode(copyButton || findActionButton(targetBlock, actionHost, 'code-block-copy-btn'));
         removeNode(deleteButton || findActionButton(targetBlock, actionHost, 'code-block-delete-btn'));
+        removeNode(findActionButton(targetBlock, actionHost, 'code-block-lang-btn'));
+        removeNode(findActionButton(targetBlock, actionHost, 'code-block-line-numbers-btn'));
         removeNode(targetBlock);
 
         if (isDisposableActionHost(actionHost)) {
@@ -395,8 +462,10 @@
             // Check if button already exists
             var existingBtn = findActionButton(block, actionHost, 'code-block-copy-btn');
             var existingDelBtn = findActionButton(block, actionHost, 'code-block-delete-btn');
+            var existingLineBtn = findActionButton(block, actionHost, 'code-block-line-numbers-btn');
             var btn;
             var delBtn;
+            var lineBtn;
             
             if (existingBtn) {
                 btn = existingBtn;
@@ -425,6 +494,34 @@
                 }
                 actionHost.appendChild(btn);
             }
+
+            // Line-numbers toggle, sitting left of the copy button
+            if (existingLineBtn) {
+                lineBtn = existingLineBtn;
+                var newLineBtn = lineBtn.cloneNode(false);
+                lineBtn.parentNode.replaceChild(newLineBtn, lineBtn);
+                lineBtn = newLineBtn;
+            } else {
+                lineBtn = document.createElement('button');
+                lineBtn.className = 'code-block-line-numbers-btn';
+                lineBtn.setAttribute('type', 'button');
+                lineBtn.setAttribute('contenteditable', 'false');
+            }
+            setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
+
+            if (lineBtn.parentNode !== actionHost) {
+                if (lineBtn.parentNode) {
+                    lineBtn.parentNode.removeChild(lineBtn);
+                }
+                actionHost.appendChild(lineBtn);
+            }
+
+            lineBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleLineNumbers(block);
+                setLineNumbersButtonState(lineBtn, areLineNumbersVisible(block));
+            });
 
             if (!allowDelete) {
                 if (existingDelBtn && existingDelBtn.parentNode) {
@@ -530,6 +627,8 @@
                 }
             });
         });
+
+        refreshLanguageButtons();
     }
 
     // Detect horizontal overflow on code blocks and toggle 'has-x-overflow' class
@@ -556,6 +655,14 @@
         addCopyButtonToCodeBlocks();
         updateCodeBlockOverflow();
     };
+
+    // The clickable language badge lives in the same action host, so it is
+    // (re)built whenever the copy/delete buttons are (js/code-block-language.js)
+    function refreshLanguageButtons() {
+        if (typeof window.refreshCodeBlockLanguageButtons === 'function') {
+            window.refreshCodeBlockLanguageButtons(document);
+        }
+    }
 
     // Watch for dynamically added code blocks
     function observeCodeBlocks() {

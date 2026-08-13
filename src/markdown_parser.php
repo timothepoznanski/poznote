@@ -521,14 +521,38 @@ function parseMarkdown($text) {
     
     // Protect inline span tags with style attributes (for colors, backgrounds, etc.)
     // Match: <span style="...">content</span>
-    $text = preg_replace_callback('/<span\s+style="([^"]+)">([^<]*)<\/span>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
-        $styleAttr = $matches[1];
+    // Only the opening/closing tags are protected: the inner content is left in the
+    // stream so nested markdown (links, bold, ...) still gets parsed. Escaping the
+    // content here would emit already-protected placeholders (PLNK0) as literal text.
+    $text = preg_replace_callback('/<span\s+style="([^"]+)">((?:(?!<\/?span\b).)*)<\/span>/is', function($matches) use (&$protectedElements, &$protectedIndex) {
+        $openTag = '<span style="' . htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8') . '">';
         $content = $matches[2];
-        $placeholder = "\x00PSPAN" . $protectedIndex . "\x00";
-        $spanTag = '<span style="' . htmlspecialchars($styleAttr, ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars($content, ENT_QUOTES, 'UTF-8') . '</span>';
-        $protectedElements[$protectedIndex] = $spanTag;
-        $protectedIndex++;
-        return $placeholder;
+
+        $protect = function($html) use (&$protectedElements, &$protectedIndex) {
+            $placeholder = "\x00PSPAN" . $protectedIndex . "\x00";
+            $protectedElements[$protectedIndex] = $html;
+            $protectedIndex++;
+            return $placeholder;
+        };
+
+        // A span whose content spans several markdown blocks must be closed and
+        // reopened around each blank line, otherwise the paragraph builder emits
+        // the opening and closing tags in different <p> elements and the browser
+        // auto-closes the span at the first block boundary.
+        $blocks = preg_split('/(\R[ \t]*\R)/', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $result = '';
+        foreach ($blocks as $i => $block) {
+            if ($i % 2 === 1) {
+                $result .= $block; // the blank-line separator itself
+                continue;
+            }
+            if ($block === '') {
+                continue;
+            }
+            $result .= $protect($openTag) . $block . $protect('</span>');
+        }
+
+        return $result;
     }, $text);
 
     // Protect details, summary, br, and underline tags

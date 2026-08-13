@@ -83,6 +83,14 @@ TOOL_CALLS = [
     ("delete_workspace", {"name": "Test"}),
     ("delete_backup", {"filename": "backup.zip"}),
     ("list_shared", {}),
+    ("get_reminder", {"note_id": 1}),
+    ("set_reminder", {"note_id": 1, "reminder_at": "2026-09-01T09:00:00+02:00"}),
+    ("remove_reminder", {"note_id": 1}),
+    ("list_tasks", {"note_id": 1}),
+    ("add_task", {"note_id": 1, "text": "Buy milk"}),
+    ("update_task", {"note_id": 1, "task_id": "1.5", "text": "Buy oat milk"}),
+    ("complete_task", {"note_id": 1, "task_id": "1.5"}),
+    ("delete_task", {"note_id": 1, "task_id": "1.5"}),
 ]
 
 # Exception types to test
@@ -122,6 +130,8 @@ class TestToolErrorHandling:
                 "rename_folder", "delete_folder",
                 "create_workspace", "rename_workspace", "delete_workspace",
                 "delete_backup", "list_shared",
+                "get_reminder", "set_reminder", "remove_reminder",
+                "list_tasks", "add_task", "update_task", "delete_task",
             ]
         })
 

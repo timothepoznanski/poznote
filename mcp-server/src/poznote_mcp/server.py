@@ -251,8 +251,9 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
         "updatedAt": note.get("updated"),
         "createdAt": note.get("created"),
         "version": note.get("version"),
+        "reminderAt": note.get("reminder_at"),
     }
-    
+
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
@@ -372,6 +373,34 @@ def _normalize_content(content, note_type=None):
     return json.dumps(content, ensure_ascii=False)
 
 
+def _reminder_result(client, note_id: int, reminder_at, recurrence, message, email_enabled, user_id):
+    """Set the note reminder after a create/update, returning a summary dict.
+
+    Errors are reported alongside the note instead of raised, so a successful
+    write is never reported as a failure just because the reminder call failed.
+    """
+    try:
+        result = client.set_reminder(
+            note_id=note_id,
+            reminder_at=reminder_at,
+            message=message,
+            email_enabled=email_enabled,
+            recurrence=recurrence,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return {"error": "Note was saved but the reminder failed", "detail": json.loads(_api_error_json(exc))}
+
+    if not result:
+        return {"error": "Note was saved but the reminder could not be set"}
+
+    return {
+        "reminder_at": result.get("reminder_at"),
+        "recurrence": result.get("recurrence"),
+        "email_enabled": result.get("email_enabled"),
+    }
+
+
 @mcp.tool()
 def create_note(
     title: str,
@@ -381,6 +410,10 @@ def create_note(
     folder: Optional[str] = None,
     note_type: str = "note",
     user_id: Optional[int] = None,
+    reminder_at: Optional[str] = None,
+    reminder_recurrence: Optional[str] = None,
+    reminder_message: Optional[str] = None,
+    reminder_email: Optional[bool] = None,
 ) -> str:
     """Create a new note in Poznote
 
@@ -393,6 +426,14 @@ def create_note(
         folder: Folder name to place the note in
         note_type: Note type/format. Supported: 'note' (HTML, default), 'markdown', 'tasklist'.
         user_id: User profile ID to access (optional, overrides default)
+        reminder_at: Due date/reminder for the note as an ISO datetime
+            (e.g. '2026-09-01T09:00:00+02:00'). Sets the same reminder the bell
+            icon sets in the UI. Include an offset, or it is read as UTC.
+        reminder_recurrence: Repeat interval as '<count><unit>' with unit
+            i/h/d/w/m/y (minute/hour/day/week/month/year), e.g. '30i', '1h',
+            '1d', '2w', '1y'. Omit for a one-off reminder.
+        reminder_message: Notification text (optional, defaults to the note title)
+        reminder_email: Whether the reminder also sends an email (optional)
     """
     client, err = _get_client_or_error()
     if err:
@@ -430,14 +471,26 @@ def create_note(
     except Exception as exc:
         return _api_error_json(exc)
     
-    if result:
-        return json.dumps({
-            "success": True,
-            "message": f"Note '{title}' created successfully",
-            "note": result,
-        }, indent=2, ensure_ascii=False)
-    else:
+    if not result:
         return json.dumps({"error": "Failed to create note"}, ensure_ascii=False)
+
+    payload = {
+        "success": True,
+        "message": f"Note '{title}' created successfully",
+        "note": result,
+    }
+
+    if reminder_at:
+        note_id = result.get("id")
+        if note_id is None:
+            payload["reminder"] = {"error": "Note was created but its ID is unknown, so no reminder was set"}
+        else:
+            payload["reminder"] = _reminder_result(
+                client, int(note_id), reminder_at, reminder_recurrence,
+                reminder_message, reminder_email, user_id,
+            )
+
+    return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
@@ -449,6 +502,10 @@ def update_note(
     tags: Optional[str] = None,
     user_id: Optional[int] = None,
     if_version: Optional[str] = None,
+    reminder_at: Optional[str] = None,
+    reminder_recurrence: Optional[str] = None,
+    reminder_message: Optional[str] = None,
+    reminder_email: Optional[bool] = None,
 ) -> str:
     """Update an existing note. Only provided fields will be updated.
 
@@ -465,45 +522,85 @@ def update_note(
             version; the result then includes the current content and version so
             you can merge and retry. Recommended whenever you rewrite content
             you read earlier.
+        reminder_at: Due date/reminder for the note as an ISO datetime
+            (e.g. '2026-09-01T09:00:00+02:00'), the same reminder the bell icon
+            sets in the UI. Include an offset, or it is read as UTC. Pass
+            'none' to remove the reminder. Can be set on its own, without
+            touching the note's content.
+        reminder_recurrence: Repeat interval as '<count><unit>' with unit
+            i/h/d/w/m/y (minute/hour/day/week/month/year), e.g. '30i', '1h',
+            '1d', '2w', '1y'. Omit for a one-off reminder.
+        reminder_message: Notification text (optional, defaults to the note title)
+        reminder_email: Whether the reminder also sends an email (optional)
     """
     if content is not None:
         content = _normalize_content(content)
     client, err = _get_client_or_error()
     if err:
         return err
-    try:
-        result = client.update_note(
-            note_id=id,
-            content=content,
-            title=title,
-            tags=tags,
-            workspace=workspace,
-            user_id=user_id,
-            if_version=if_version,
+
+    has_note_fields = any(v is not None for v in (content, title, tags))
+    result = None
+
+    if has_note_fields:
+        try:
+            result = client.update_note(
+                note_id=id,
+                content=content,
+                title=title,
+                tags=tags,
+                workspace=workspace,
+                user_id=user_id,
+                if_version=if_version,
+            )
+        except Exception as exc:
+            return _api_error_json(exc)
+
+        if result and result.get("code") == "version_conflict":
+            return json.dumps({
+                "success": False,
+                "error": "version_conflict",
+                "message": (
+                    f"Note {id} was modified since the version you read. "
+                    "Merge your change into the current content below, then retry "
+                    "with the new version token."
+                ),
+                "current": result.get("current"),
+            }, indent=2, ensure_ascii=False)
+
+        if not result:
+            return json.dumps({"error": f"Note {id} not found or update failed"}, ensure_ascii=False)
+
+    if not has_note_fields and reminder_at is None:
+        return json.dumps(
+            {"error": "Nothing to update. Provide content, title, tags or reminder_at."},
+            ensure_ascii=False,
         )
-    except Exception as exc:
-        return _api_error_json(exc)
 
-    if result and result.get("code") == "version_conflict":
-        return json.dumps({
-            "success": False,
-            "error": "version_conflict",
-            "message": (
-                f"Note {id} was modified since the version you read. "
-                "Merge your change into the current content below, then retry "
-                "with the new version token."
-            ),
-            "current": result.get("current"),
-        }, indent=2, ensure_ascii=False)
-
+    payload = {
+        "success": True,
+        "message": f"Note {id} updated successfully",
+    }
     if result:
-        return json.dumps({
-            "success": True,
-            "message": f"Note {id} updated successfully",
-            "note": result,
-        }, indent=2, ensure_ascii=False)
-    else:
-        return json.dumps({"error": f"Note {id} not found or update failed"}, ensure_ascii=False)
+        payload["note"] = result
+
+    if reminder_at is not None:
+        if str(reminder_at).strip().lower() in {"none", ""}:
+            try:
+                removed = client.remove_reminder(id, user_id=user_id)
+            except Exception as exc:
+                payload["reminder"] = {"error": "Failed to remove the reminder", "detail": json.loads(_api_error_json(exc))}
+            else:
+                payload["reminder"] = (
+                    {"removed": True} if removed else {"error": f"Note {id} not found or reminder removal failed"}
+                )
+        else:
+            payload["reminder"] = _reminder_result(
+                client, id, reminder_at, reminder_recurrence,
+                reminder_message, reminder_email, user_id,
+            )
+
+    return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
@@ -530,6 +627,325 @@ def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int]
         }, indent=2, ensure_ascii=False)
     else:
         return json.dumps({"error": f"Note {id} not found or deletion failed"}, ensure_ascii=False)
+
+
+# =============================================================================
+# REMINDERS
+# =============================================================================
+
+@mcp.tool()
+def get_reminder(note_id: int, user_id: Optional[int] = None) -> str:
+    """Get the reminder currently set on a note
+
+    Args:
+        note_id: ID of the note
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        reminder = client.get_reminder(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if reminder is None:
+        return json.dumps({"error": f"Note {note_id} not found"}, ensure_ascii=False)
+
+    return json.dumps({
+        "note_id": note_id,
+        "reminder_at": reminder.get("reminder_at"),
+        "recurrence": reminder.get("recurrence"),
+        "email_enabled": reminder.get("email_enabled"),
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def set_reminder(
+    note_id: int,
+    reminder_at: str,
+    recurrence: Optional[str] = None,
+    message: Optional[str] = None,
+    email_enabled: Optional[bool] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Set (or replace) the reminder on a note, as the bell icon does in the UI
+
+    Args:
+        note_id: ID of the note
+        reminder_at: When to fire, as an ISO datetime
+            (e.g. '2026-09-01T09:00:00+02:00'). Include an offset, or the time
+            is read as UTC.
+        recurrence: Repeat interval as '<count><unit>' with unit i/h/d/w/m/y
+            (minute/hour/day/week/month/year), e.g. '30i', '1h', '1d', '2w',
+            '1y'. Omit for a one-off reminder.
+        message: Notification text (optional, defaults to the note title)
+        email_enabled: Whether the reminder also sends an email (optional).
+            Ignored when SMTP is not configured.
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.set_reminder(
+            note_id=note_id,
+            reminder_at=reminder_at,
+            message=message,
+            email_enabled=email_enabled,
+            recurrence=recurrence,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result:
+        return json.dumps({"error": f"Note {note_id} not found or reminder failed"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Reminder set on note {note_id}",
+        "note_id": note_id,
+        "reminder_at": result.get("reminder_at"),
+        "recurrence": result.get("recurrence"),
+        "email_enabled": result.get("email_enabled"),
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def remove_reminder(note_id: int, user_id: Optional[int] = None) -> str:
+    """Remove the reminder from a note
+
+    Args:
+        note_id: ID of the note
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        success = client.remove_reminder(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    return json.dumps({
+        "success": success,
+        "message": f"Reminder removed from note {note_id}" if success else f"Note {note_id} not found or removal failed",
+    }, ensure_ascii=False)
+
+
+# =============================================================================
+# TASKS - Individual items inside a tasklist note
+# =============================================================================
+
+@mcp.tool()
+def list_tasks(note_id: int, user_id: Optional[int] = None) -> str:
+    """List the tasks of a tasklist note, with their IDs, due dates and flags
+
+    Use this to get a task's ID before calling update_task, complete_task or
+    delete_task.
+
+    Args:
+        note_id: ID of the tasklist note
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.list_tasks(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if result is None:
+        return json.dumps({"error": f"Note {note_id} not found"}, ensure_ascii=False)
+
+    tasks = result.get("tasks", [])
+    return json.dumps({
+        "note_id": note_id,
+        "title": result.get("heading"),
+        "count": len(tasks),
+        "tasks": tasks,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def add_task(
+    note_id: int,
+    text: str,
+    due_at: Optional[str] = None,
+    reminder: Optional[bool] = None,
+    recurrence: Optional[str] = None,
+    important: Optional[bool] = None,
+    reminder_email: Optional[bool] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Add a single task to a tasklist note, without rewriting the whole list
+
+    Args:
+        note_id: ID of the tasklist note
+        text: Task text
+        due_at: Due date as 'YYYY-MM-DD', or 'YYYY-MM-DDTHH:MM' to set a time.
+            This is local wall-clock time in the user's configured timezone,
+            with no offset. A date without a time reminds at 09:00.
+        reminder: Whether the due date raises a notification. Requires due_at.
+        recurrence: Repeat interval of the reminder as '<count><unit>' with unit
+            i/h/d/w/m/y (minute/hour/day/week/month/year), e.g. '1d', '2w', '1y'.
+        important: Mark the task as important (sorts it to the top)
+        reminder_email: Whether the reminder also sends an email (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not text or not str(text).strip():
+        return json.dumps({"error": "text is required"}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        task = client.add_task(
+            note_id=note_id,
+            text=str(text).strip(),
+            due_at=due_at,
+            reminder=reminder,
+            reminder_email=reminder_email,
+            recurrence=recurrence,
+            important=important,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not task:
+        return json.dumps({"error": f"Note {note_id} not found or task creation failed"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Task added to note {note_id}",
+        "note_id": note_id,
+        "task": task,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def update_task(
+    note_id: int,
+    task_id: str,
+    text: Optional[str] = None,
+    completed: Optional[bool] = None,
+    important: Optional[bool] = None,
+    due_at: Optional[str] = None,
+    reminder: Optional[bool] = None,
+    recurrence: Optional[str] = None,
+    reminder_email: Optional[bool] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Update one task of a tasklist note. Only provided fields change.
+
+    Args:
+        note_id: ID of the tasklist note
+        task_id: ID of the task (from list_tasks)
+        text: New task text
+        completed: Whether the task is done. Completing it clears its reminder.
+        important: Important flag
+        due_at: Due date as 'YYYY-MM-DD', or 'YYYY-MM-DDTHH:MM' to set a time.
+            This is local wall-clock time in the user's configured timezone,
+            with no offset. A date without a time reminds at 09:00. Pass 'none'
+            to clear the due date and its reminder.
+        reminder: Whether the due date raises a notification
+        recurrence: Repeat interval of the reminder as '<count><unit>' with unit
+            i/h/d/w/m/y (minute/hour/day/week/month/year), e.g. '1d', '2w', '1y'.
+        reminder_email: Whether the reminder also sends an email (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    fields: dict = {}
+    for key, value in (
+        ("text", text),
+        ("completed", completed),
+        ("important", important),
+        ("reminder", reminder),
+        ("recurrence", recurrence),
+        ("reminder_email", reminder_email),
+    ):
+        if value is not None:
+            fields[key] = value
+
+    if due_at is not None:
+        # 'none' is how a caller asks to clear the date, since omitting the
+        # argument has to mean "leave it alone".
+        fields["due_at"] = None if str(due_at).strip().lower() in {"none", ""} else due_at
+
+    if not fields:
+        return json.dumps({"error": "Nothing to update. Provide at least one field."}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        task = client.update_task(note_id, str(task_id), fields, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not task:
+        return json.dumps({"error": f"Task {task_id} not found in note {note_id}"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Task {task_id} updated",
+        "note_id": note_id,
+        "task": task,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def complete_task(note_id: int, task_id: str, completed: bool = True, user_id: Optional[int] = None) -> str:
+    """Mark a task of a tasklist note as done (or undone)
+
+    Args:
+        note_id: ID of the tasklist note
+        task_id: ID of the task (from list_tasks)
+        completed: True to complete the task (default), False to reopen it
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        task = client.update_task(note_id, str(task_id), {"completed": bool(completed)}, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not task:
+        return json.dumps({"error": f"Task {task_id} not found in note {note_id}"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Task {task_id} marked as {'completed' if completed else 'not completed'}",
+        "note_id": note_id,
+        "task": task,
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> str:
+    """Delete one task from a tasklist note
+
+    Args:
+        note_id: ID of the tasklist note
+        task_id: ID of the task (from list_tasks)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        success = client.delete_task(note_id, str(task_id), user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    return json.dumps({
+        "success": success,
+        "message": f"Task {task_id} deleted" if success else f"Task {task_id} not found in note {note_id}",
+    }, ensure_ascii=False)
 
 
 @mcp.tool()

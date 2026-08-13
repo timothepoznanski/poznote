@@ -170,6 +170,11 @@ function removeCopyButtonsFromHtml($html) {
         $button->parentNode->removeChild($button);
     }
 
+    $lineNumberButtons = $xpath->query("//*[contains(@class, 'code-block-line-numbers-btn')]");
+    foreach ($lineNumberButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+
     // Strip the xml processing instruction added above for UTF-8 handling
     return preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
 }

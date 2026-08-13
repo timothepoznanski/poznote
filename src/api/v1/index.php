@@ -312,6 +312,23 @@ $router->get('/tasks', function($params) use ($tasksController) {
     $tasksController->index();
 });
 
+// Per-task management inside a tasklist note (must come before /notes/{id})
+$router->get('/notes/{id}/tasks', function($params) use ($tasksController) {
+    $tasksController->listForNote($params['id']);
+});
+
+$router->post('/notes/{id}/tasks', function($params) use ($tasksController) {
+    $tasksController->createForNote($params['id']);
+});
+
+$router->patch('/notes/{id}/tasks/{taskId}', function($params) use ($tasksController) {
+    $tasksController->updateForNote($params['id'], $params['taskId']);
+});
+
+$router->delete('/notes/{id}/tasks/{taskId}', function($params) use ($tasksController) {
+    $tasksController->deleteForNote($params['id'], $params['taskId']);
+});
+
 // List notes with attachments
 $router->get('/notes/with-attachments', function($params) use ($notesController) {
     $notesController->listWithAttachments();
@@ -412,6 +429,11 @@ $router->post('/notes/{id}/create-template', function($params) use ($notesContro
 // Convert note type (markdown <-> html)
 $router->post('/notes/{id}/convert', function($params) use ($notesController) {
     $notesController->convert($params['id']);
+});
+
+// Convert an HTML fragment to Markdown (used by the "Paste as Markdown" modal)
+$router->post('/convert-html', function($params) use ($notesController) {
+    $notesController->convertHtml();
 });
 
 // ======================

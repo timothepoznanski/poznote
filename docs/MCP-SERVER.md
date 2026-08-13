@@ -43,9 +43,17 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `get_note` — Get a specific note by ID with full content
 - `list_notes` — List all notes from a workspace
 - `search_notes` — Search notes by text query, with optional creation date range
-- `create_note` — Create a new note (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
-- `update_note` — Update an existing note
+- `create_note` — Create a new note, optionally with a due date/reminder (⚠️ if no workspace is specified in the prompt, the note is created in the user's default workspace; always specify the target workspace)
+- `update_note` — Update an existing note, and/or set its due date/reminder
 - `delete_note` — Delete a note by ID
+- `get_reminder` — Get the reminder currently set on a note
+- `set_reminder` — Set or replace a note's reminder, with an optional repeat interval
+- `remove_reminder` — Remove the reminder from a note
+- `list_tasks` — List the tasks of a tasklist note, with their IDs, due dates and flags
+- `add_task` — Add a single task to a tasklist note, with an optional due date and reminder
+- `update_task` — Update one task (text, due date, reminder, important flag)
+- `complete_task` — Mark a task as done, or reopen it
+- `delete_task` — Delete one task from a tasklist note
 - `create_folder` — Create a new folder
 - `list_folders` — List all folders from a workspace
 - `list_workspaces` — List all available workspaces
@@ -80,7 +88,11 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `get_app_setting` — Get the value of a specific application setting
 - `update_app_setting` — Update the value of a specific application setting
 
-Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, and `create_backup`, which do not take `user_id`.
+**Reminders and tasks.** `reminder_at` (on `create_note`/`update_note` and `set_reminder`) is an ISO datetime such as `2026-09-01T09:00:00+02:00`; include an offset, or the time is read as UTC. Task due dates (`due_at`) are different: they are local wall-clock values, `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` with no offset, resolved through the user's configured timezone, and a date without a time reminds at 09:00. Repeat intervals use `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y`, for example `30i`, `1d` or `2w`.
+
+The task tools operate on one task at a time, so there is no need to read and rewrite a tasklist's whole content array: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder.
+
+Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, `create_backup` and `delete_backup`, which do not take `user_id`.
 
 ---
 
