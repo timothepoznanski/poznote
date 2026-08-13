@@ -889,15 +889,18 @@ function createUploadPlaceholderId(prefix) {
     return (prefix || 'upload') + '-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
 }
 
-function handleImageFilesAndInsert(files, dropTarget) {
+// dropPoint is an optional {x, y} in viewport coordinates (the drop
+// location); when present the image is inserted there instead of at the
+// current cursor position.
+function handleImageFilesAndInsert(files, dropTarget, dropPoint) {
     if (!files || files.length === 0) return;
 
     for (var i = 0; i < files.length; i++) {
-        handleSingleImageFile(files[i], dropTarget);
+        handleSingleImageFile(files[i], dropTarget, dropPoint);
     }
 }
 
-function handleSingleImageFile(file, dropTarget) {
+function handleSingleImageFile(file, dropTarget, dropPoint) {
     if (!file.type || !file.type.startsWith('image/')) return;
 
     // Check if it's a markdown note
@@ -906,10 +909,28 @@ function handleSingleImageFile(file, dropTarget) {
         noteEntry.getAttribute('data-note-type') === 'markdown';
 
     if (isMarkdown) {
-        handleMarkdownImageUpload(file, dropTarget, noteEntry);
+        handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint);
     } else {
-        handleHTMLImageInsert(file, dropTarget);
+        handleHTMLImageInsert(file, dropTarget, dropPoint);
     }
+}
+
+// Collapsed range at viewport coordinates (cross-browser).
+function caretRangeAtPoint(x, y) {
+    try {
+        if (document.caretRangeFromPoint) {
+            return document.caretRangeFromPoint(x, y);
+        }
+        if (document.caretPositionFromPoint) {
+            var pos = document.caretPositionFromPoint(x, y);
+            if (!pos || !pos.offsetNode) return null;
+            var range = document.createRange();
+            range.setStart(pos.offsetNode, pos.offset);
+            range.collapse(true);
+            return range;
+        }
+    } catch (e) { }
+    return null;
 }
 
 function _getCmApi() {
@@ -921,7 +942,7 @@ function _isCmEditor(editor) {
     return !!(api && editor && typeof api.isCodeMirrorEditor === 'function' && api.isCodeMirrorEditor(editor));
 }
 
-function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
+function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
     var noteId = noteEntry.id.replace('entry', '');
 
     var editor = dropTarget ? dropTarget.querySelector('.markdown-editor') : null;
@@ -931,8 +952,16 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     // ── CodeMirror path ──────────────────────────────────────────────
     if (isCm && cmApi && typeof cmApi.replaceRange === 'function' && typeof cmApi.getSelectionOffsets === 'function') {
         var safeName = String(file.name || 'image').replace(/[\r\n\t]+/g, ' ').trim().replace(/[\\\[\]]/g, '\\$&') || 'image';
-        var offsets = cmApi.getSelectionOffsets(editor);
-        var insertPos = offsets ? offsets.end : 0;
+        // Insert at the drop location when we have one; the cursor may be
+        // anywhere else (or the editor unfocused) during a drag-and-drop.
+        var insertPos = null;
+        if (dropPoint && typeof cmApi.getPosAtCoords === 'function') {
+            insertPos = cmApi.getPosAtCoords(editor, dropPoint.x, dropPoint.y);
+        }
+        if (insertPos === null || insertPos === undefined) {
+            var offsets = cmApi.getSelectionOffsets(editor);
+            insertPos = offsets ? offsets.end : 0;
+        }
         var loadingText = '![Uploading ' + safeName + '...]()';
         var uniqueToken = '![Uploading_' + safeName + '_' + Date.now() + '...]()';
 
@@ -1030,7 +1059,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
     // ── Legacy contenteditable path ───────────────────────────────────
     // Show loading indicator
     var loadingText = '![Uploading ' + file.name + '...]()';
-    var loadingTextNode = insertMarkdownAtCursor(loadingText, dropTarget);
+    var loadingTextNode = insertMarkdownAtCursor(loadingText, dropTarget, dropPoint);
 
     // Trigger initial save for loading text
     if (typeof window.markNoteAsModified === 'function') {
@@ -1106,7 +1135,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry) {
         });
 }
 
-function insertMarkdownAtCursor(text, dropTarget) {
+function insertMarkdownAtCursor(text, dropTarget, dropPoint) {
     // Check if cursor is in an editable area for manual insertions
     // (dropTarget indicates a drag-and-drop, so we don't check)
     if (!dropTarget && !isCursorInEditableNote()) {
@@ -1128,6 +1157,16 @@ function insertMarkdownAtCursor(text, dropTarget) {
     }
 
     if (editor) {
+        // A drop lands at the pointed position, not at the previous cursor
+        if (dropPoint) {
+            var pointRange = caretRangeAtPoint(dropPoint.x, dropPoint.y);
+            if (pointRange && editor.contains(pointRange.startContainer)) {
+                var pointSel = window.getSelection();
+                pointSel.removeAllRanges();
+                pointSel.addRange(pointRange);
+            }
+        }
+
         var sel = window.getSelection();
         if (sel.rangeCount) {
             var range = sel.getRangeAt(0);
@@ -1238,7 +1277,7 @@ function replaceLoadingText(oldText, newText, dropTarget, textNodeHint) {
     }
 }
 
-function handleHTMLImageInsert(file, dropTarget) {
+function handleHTMLImageInsert(file, dropTarget, dropPoint) {
     // Get the note ID from the drop target
     var noteId = dropTarget.id.replace('entry', '');
 
@@ -1252,6 +1291,16 @@ function handleHTMLImageInsert(file, dropTarget) {
     // Insert a placeholder while uploading
     var placeholderId = createUploadPlaceholderId('image-upload');
     var placeholderHtml = '<img src="" alt="' + tr('attachments.upload.uploading', {}, 'Uploading...') + '" class="image-uploading-placeholder" data-upload-placeholder-id="' + placeholderId + '" style="opacity: 0.5; min-width: 100px; min-height: 100px; background: #f0f0f0; border: 2px dashed #ccc;" />';
+
+    // A drop lands at the pointed position, not at the previous cursor
+    if (dropPoint) {
+        var pointRange = caretRangeAtPoint(dropPoint.x, dropPoint.y);
+        if (pointRange && dropTarget.contains(pointRange.startContainer)) {
+            var pointSel = window.getSelection();
+            pointSel.removeAllRanges();
+            pointSel.addRange(pointRange);
+        }
+    }
 
     var sel = window.getSelection();
     var inserted = false;

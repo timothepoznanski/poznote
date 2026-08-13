@@ -671,6 +671,10 @@ function stripSearchHighlights(element) {
 function isCodeLineBlockElement(node) {
     if (!node || node.nodeType !== 1) return false;
 
+    // Line-number wrappers (js/syntax-highlight.js) render one logical line
+    // each, so they end a line just like editable block elements do.
+    if (node.classList && node.classList.contains('code-line')) return true;
+
     return ['DIV', 'P', 'LI'].indexOf(node.tagName) !== -1;
 }
 
@@ -728,6 +732,15 @@ window.getCodeBlockSourceText = window.getCodeBlockSourceText || getCodeBlockSou
 
 function normalizeCodeBlocksForStorage(root) {
     if (!root || !root.querySelectorAll) return;
+
+    // Line-number wrappers (code_block_line_numbers setting) are a display
+    // decoration; strip them so stored note HTML stays clean.
+    if (typeof window.unwrapCodeLineNumbers === 'function') {
+        var numberedBlocks = root.querySelectorAll('pre code.code-line-numbers');
+        for (var n = 0; n < numberedBlocks.length; n++) {
+            window.unwrapCodeLineNumbers(numberedBlocks[n]);
+        }
+    }
 
     var codeBlocks = root.querySelectorAll('pre code');
     for (var i = 0; i < codeBlocks.length; i++) {

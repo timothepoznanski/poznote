@@ -3447,6 +3447,10 @@ function loadKanbanViewInline(folderId, folderName, options) {
                 window.bindKanbanScrollButtons();
             }
 
+            if (typeof window.restoreKanbanCompletedSections === 'function') {
+                window.restoreKanbanCompletedSections();
+            }
+
             activateKanbanViewState(folderId);
 
             // Remove selection from any notes in the sidebar

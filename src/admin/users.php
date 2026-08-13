@@ -40,6 +40,31 @@ if (!empty($_SESSION['admin_users_flash_error'])) {
 }
 
 /**
+ * Users-table writes can still fail on a UNIQUE constraint despite the
+ * pre-checks: fresh installs enforce email uniqueness at the column level
+ * (two profiles without an email collide there), oidc_subject has no
+ * pre-check, and concurrent submissions can race. db_master maps those to
+ * stable English sentences; translate them here, and never let a raw
+ * SQLSTATE reach the page for whatever slips through.
+ */
+function adminUsersFriendlyError(string $error): string {
+    $known = [
+        'Username already exists' => ['multiuser.admin.errors.username_taken', 'This username is already taken'],
+        'Email already exists' => ['multiuser.admin.errors.email_taken', 'This email address is already used by another profile'],
+        'Another profile without an email address already exists' => ['multiuser.admin.errors.no_email_profile_exists', 'Another profile without an email address already exists. Enter an email address for this profile.'],
+        'OIDC subject already exists' => ['multiuser.admin.errors.oidc_subject_taken', 'This OIDC subject is already linked to another profile'],
+    ];
+    if (isset($known[$error])) {
+        return t($known[$error][0], [], $known[$error][1]);
+    }
+    if (strpos($error, 'SQLSTATE') === 0) {
+        error_log('Admin users page database error: ' . $error);
+        return t('multiuser.admin.errors.database_error', [], 'A database error occurred. Check the server logs for details.');
+    }
+    return $error;
+}
+
+/**
  * Where POST actions redirect back to: the same page slice (page + search)
  * the admin acted from, so acting from page 3 does not snap back to page 1.
  * Forms post to the current URL, so those GET params are still present here.
@@ -928,7 +953,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
         <!-- Error Messages -->
         <?php if ($error): ?>
-            <div class="message message-error"><?php echo htmlspecialchars($error); ?></div>
+            <div class="message message-error"><?php echo htmlspecialchars(adminUsersFriendlyError($error)); ?></div>
         <?php endif; ?>
 
         <!-- Filter Bar: a GET form so Enter searches every user server-side.

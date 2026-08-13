@@ -186,6 +186,7 @@
 /* ===== Kanban Cards ===== */
 .kanban-card {
     box-sizing: border-box;
+    position: relative;
     flex: 0 0 auto;
     align-self: stretch;
     width: 100%;
@@ -196,6 +197,8 @@
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     padding: 14px 16px;
+    /* Room for the completion button in the top-right corner */
+    padding-right: 42px;
     cursor: grab;
     transition: all 0.2s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -215,6 +218,158 @@
     opacity: 0.5;
     transform: rotate(3deg);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Card completion button ===== */
+.kanban-card-complete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #94a3b8;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.kanban-card:hover .kanban-card-complete-btn,
+.kanban-card-complete-btn:focus-visible {
+    opacity: 1;
+}
+
+.kanban-card-complete-btn:hover {
+    border-color: #16a34a;
+    color: #16a34a;
+    background: #f0fdf4;
+}
+
+.kanban-card-complete-btn:focus-visible {
+    outline: 2px solid #007DB8;
+    outline-offset: 2px;
+}
+
+.kanban-card-complete-btn i {
+    font-size: 0.85rem;
+    line-height: 1;
+}
+
+/* Opt out of the global grey icon filter (icons.css): these icons must follow
+   the button/toggle currentColor, and must not scale on hover. */
+.kanban-card-complete-btn [class*="lucide-"],
+.kanban-completed-toggle [class*="lucide-"] {
+    filter: none !important;
+    transform: none !important;
+}
+
+.kanban-completed-section.is-expanded .kanban-completed-chevron {
+    transform: rotate(90deg) !important;
+}
+
+/* Completed cards keep the button visible as a status marker */
+.kanban-card-completed .kanban-card-complete-btn {
+    opacity: 1;
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #ffffff;
+}
+
+/* ===== Completed cards ===== */
+.kanban-card-completed {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    box-shadow: none;
+}
+
+.kanban-card-completed .kanban-card-title {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.kanban-card-completed .kanban-card-snippet,
+.kanban-card-completed .kanban-card-date {
+    color: #a8b3c2;
+}
+
+/* ===== Completed section ===== */
+.kanban-completed-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* Cancel the column's own gap so the divider hugs the section */
+    margin-top: 2px;
+}
+
+.kanban-completed-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px 6px;
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 0;
+    transition: color 0.15s ease;
+}
+
+.kanban-completed-toggle:hover {
+    color: #334155;
+}
+
+.kanban-completed-toggle:focus-visible {
+    outline: 2px solid #007DB8;
+    outline-offset: -2px;
+}
+
+.kanban-completed-chevron {
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.kanban-completed-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kanban-completed-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 11px;
+}
+
+.kanban-completed-content {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.kanban-completed-section.is-expanded .kanban-completed-content {
+    display: flex;
 }
 
 .kanban-card-title {

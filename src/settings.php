@@ -118,6 +118,7 @@ $settingsPageUserKeys = [
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
+    'code_block_line_numbers',
     'attachment_previews_in_note',
     'attachments_at_bottom',
     'backlinks_at_bottom',
@@ -811,6 +812,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
                     <span id="code-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Code Block Line Numbers -->
+            <div class="home-card" id="code-line-numbers-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
+                    <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

@@ -863,6 +863,38 @@ function updateUserOidcSubject(int $userId, string $oidcSubject): void {
 }
 
 /**
+ * Map a raw SQLite UNIQUE violation on the users table to the same
+ * human-readable messages the pre-checks return, so callers never surface a
+ * raw "SQLSTATE[23000] ..." string in the UI or the API.
+ *
+ * The duplicate pre-checks cannot make this dead code: they skip empty
+ * emails (fresh installs enforce email uniqueness at the column level,
+ * where two empty-string emails also collide), oidc_subject has no
+ * pre-check at all, and concurrent submissions can race any of them.
+ *
+ * @return string|null A friendly message, or null when the exception is not
+ *         a users-table UNIQUE violation (caller falls back to the raw message).
+ */
+function usersUniqueConstraintError(Exception $e, ?string $attemptedEmail = null): ?string {
+    $msg = $e->getMessage();
+    if (strpos($msg, 'UNIQUE constraint failed') === false) {
+        return null;
+    }
+    if (strpos($msg, 'users.email') !== false) {
+        return ($attemptedEmail === null || trim($attemptedEmail) === '')
+            ? 'Another profile without an email address already exists'
+            : 'Email already exists';
+    }
+    if (strpos($msg, 'users.username') !== false) {
+        return 'Username already exists';
+    }
+    if (strpos($msg, 'users.oidc_subject') !== false) {
+        return 'OIDC subject already exists';
+    }
+    return null;
+}
+
+/**
  * Create a new user profile
  */
 
@@ -952,7 +984,7 @@ function createUserProfile(string $username, ?string $email = null, ?int $maxUse
         if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
             $con->rollBack();
         }
-        return ['success' => false, 'error' => $e->getMessage()];
+        return ['success' => false, 'error' => usersUniqueConstraintError($e, $email) ?? $e->getMessage()];
     }
 }
 
@@ -1143,7 +1175,8 @@ function updateUserProfile(int $id, array $data): array {
         
         return ['success' => true];
     } catch (Exception $e) {
-        return ['success' => false, 'error' => $e->getMessage()];
+        $attemptedEmail = array_key_exists('email', $data) ? (string)$data['email'] : null;
+        return ['success' => false, 'error' => usersUniqueConstraintError($e, $attemptedEmail) ?? $e->getMessage()];
     }
 }
 

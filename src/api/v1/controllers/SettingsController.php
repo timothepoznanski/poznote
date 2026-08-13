@@ -583,6 +583,11 @@ class SettingsController {
                     $languageUserId = function_exists('getCurrentUserId') ? (int) getCurrentUserId() : 0;
                     setUserProfileLanguage($languageUserId, $value);
 
+                    // The welcome note was generated in the language active at
+                    // account bootstrap; follow the new choice while the user
+                    // has not edited it (first-run wizard, settings page).
+                    poznoteRelocalizeWelcomeNote($this->con, $value);
+
                     if ($previousLanguage !== $value || $languageConfirmedInStartupGuide) {
                         $this->dispatchLanguageChangedWebhook($languageUserId, $previousLanguage, $value);
                     }

@@ -239,6 +239,19 @@
         triggerSave(note || (selectionTable ? selectionTable.closest('.noteentry') : null));
     }
 
+    /**
+     * True when a native selection is anchored outside the table holding the
+     * highlighted cells. The highlight survives mouseup (it is only cleared on
+     * the next mousedown), so a keyboard-made text selection elsewhere means
+     * the user has moved on and the cell selection is stale.
+     */
+    function isNativeSelectionOutsideTable() {
+        var sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || !sel.anchorNode) return false;
+        var el = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+        return !!(el && selectionTable && !selectionTable.contains(el));
+    }
+
     document.addEventListener('copy', function (e) {
         if (!e.clipboardData) return;
         // Ctrl/Cmd+C and cut set pendingClipboard just before execCommand.
@@ -247,6 +260,11 @@
         var payload = pendingClipboard;
         if (!payload && selectionActive && selectedCells.length > 0 &&
             anchorCell && focusCell && selectionTable) {
+            if (isNativeSelectionOutsideTable()) {
+                // Stale highlight: let the copy proceed on the real selection
+                clearSelection();
+                return;
+            }
             payload = buildClipboardPayload();
         }
         if (!payload) return;
@@ -281,6 +299,13 @@
 
     document.addEventListener('keydown', function (e) {
         if (!selectionActive || selectedCells.length === 0) return;
+        // A text selection made elsewhere after the drag means the cell
+        // highlight is stale: drop it and let the keystroke act natively
+        // (Ctrl+C must copy that text, not the old cells)
+        if (isNativeSelectionOutsideTable()) {
+            clearSelection();
+            return;
+        }
         var key = e.key ? e.key.toLowerCase() : '';
         var mod = e.ctrlKey || e.metaKey;
 

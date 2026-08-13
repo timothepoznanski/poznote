@@ -741,6 +741,16 @@
                 _saveToStorage();
                 render();
             }
+            if (existingTab.id === activeTabId) {
+                // The tab is already active (page-reload restore): switchToTab
+                // would no-op, so check the board is really in the right column
+                // and not the server-rendered note.
+                var boardContainer = document.getElementById('kanban-view-container');
+                if (!boardContainer || String(boardContainer.dataset.folderId) !== folderId) {
+                    _loadKanbanTab(existingTab);
+                }
+                return;
+            }
             switchToTab(existingTab.id);
             return;
         }

@@ -4,7 +4,7 @@
 </p>
 
 <h3 align="center">
-Poznote is a note-taking and documentation platform.
+Your note-taking and documentation platform.
 </h3>
 
 <br>

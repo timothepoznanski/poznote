@@ -105,7 +105,15 @@ $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
 // Load note-related data (res_right, default/current note folders)
 // Ensure these variables exist for included templates
-$note_load_result = loadNoteData($con, $note, $workspace_filter);
+// When the URL targets a Kanban board (?kanban=<id>) without an explicit
+// note, skip the latest-note fallback: the board is fetched client-side and
+// the note would otherwise stay visible in the right column after a reload.
+$kanban_restore_id = intval($_GET['kanban'] ?? 0);
+if ($kanban_restore_id > 0 && empty($note)) {
+    $note_load_result = [];
+} else {
+    $note_load_result = loadNoteData($con, $note, $workspace_filter);
+}
 $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;
 $res_right = $note_load_result['res_right'] ?? null;
@@ -148,6 +156,7 @@ $settings = [
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
     'code_block_word_wrap' => '1',
+    'code_block_line_numbers' => '0',
     'markdown_split_card_view' => '1',
     'markdown_colored' => '0',
     'markdown_colored_custom' => '',
@@ -159,7 +168,7 @@ $settings = [
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -290,6 +299,9 @@ if ($center_note_content_enabled) {
 }
 if (!poznoteSettingEnabled($settings['code_block_word_wrap'], true)) {
     $extra_body_classes .= ' code-block-no-wrap';
+}
+if (poznoteSettingEnabled($settings['code_block_line_numbers'], false)) {
+    $extra_body_classes .= ' code-block-line-numbers';
 }
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';

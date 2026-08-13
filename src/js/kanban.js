@@ -33,6 +33,7 @@
     function init() {
         syncKanbanCardDragState();
         bindKanbanScrollButtons();
+        restoreCompletedSectionStates();
 
         // Document-level delegation ensures listeners work even when content is replaced
         if (window._kanbanInitialized) {
@@ -62,7 +63,11 @@
                 return;
             }
 
-            if (pointerStartedInTaskPreview || e.target.closest('.kanban-tasklist-preview')) {
+            // Text-selection drags fire dragstart with a text node target
+            const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
+            if (!targetEl) return;
+
+            if (pointerStartedInTaskPreview || targetEl.closest('.kanban-tasklist-preview')) {
                 e.preventDefault();
                 draggedCard = null;
                 draggedFromFolderId = null;
@@ -70,7 +75,7 @@
                 return;
             }
 
-            const card = e.target.closest('.kanban-card');
+            const card = targetEl.closest('.kanban-card');
             if (!card) return;
 
             draggedCard = card;
@@ -95,7 +100,9 @@
                 return;
             }
 
-            const card = e.target.closest('.kanban-card');
+            // Text-selection drags fire dragend with a text node target
+            const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
+            const card = targetEl && targetEl.closest('.kanban-card');
             if (!card) return;
 
             card.classList.remove('dragging');
@@ -190,11 +197,34 @@
 
             // Move the card visually immediately for best UX
             const originalParent = draggedCard.parentNode;
+            const originalSibling = draggedCard.nextElementSibling;
             const oldFolderId = draggedFromFolderId;
 
-            columnContent.appendChild(draggedCard);
+            // A dragged card always lands in the active area, above the
+            // completed section of the target column.
+            const targetCompletedSection = columnContent.querySelector(':scope > .kanban-completed-section');
+            if (targetCompletedSection) {
+                columnContent.insertBefore(draggedCard, targetCompletedSection);
+            } else {
+                columnContent.appendChild(draggedCard);
+            }
             draggedCard.dataset.folderId = targetFolderId;
             draggedCard.classList.add('kanban-card-dropped');
+
+            // Dragging a completed card into another column puts it back into
+            // active work, so its completed state is cleared.
+            const wasCompleted = draggedCard.dataset.completed === '1';
+            if (wasCompleted) {
+                draggedCard.classList.remove('kanban-card-completed');
+                draggedCard.dataset.completed = '0';
+                const completeBtn = draggedCard.querySelector('.kanban-card-complete-btn');
+                if (completeBtn) {
+                    const label = kanbanT('kanban.completed.mark_completed', 'Mark as completed');
+                    completeBtn.setAttribute('aria-pressed', 'false');
+                    completeBtn.setAttribute('aria-label', label);
+                    completeBtn.title = label;
+                }
+            }
 
             // Remove animation class after it completes
             setTimeout(() => {
@@ -211,11 +241,22 @@
                 if (!success) {
                     console.error("Kanban: API move failed, reverting UI...");
                     // Revert the visual change if API call failed
-                    if (originalParent) originalParent.appendChild(draggedCard);
+                    if (originalParent) originalParent.insertBefore(draggedCard, originalSibling);
                     draggedCard.dataset.folderId = oldFolderId;
+                    if (wasCompleted) {
+                        draggedCard.classList.add('kanban-card-completed');
+                        draggedCard.dataset.completed = '1';
+                    }
                     updateColumnCounts();
                     showError('Failed to move note');
                 } else {
+                    if (wasCompleted) {
+                        // Best-effort: the move already succeeded, so a failure
+                        // here only leaves a stale completed flag in the DB.
+                        setKanbanCompleted(noteId, false).catch((err) => {
+                            console.error('Kanban: could not clear completed flag after move:', err);
+                        });
+                    }
                     // Mark note for auto-push since we moved a note (if auto-push enabled)
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                         window.setNeedsAutoPush(true);
@@ -230,8 +271,12 @@
                 console.error('Kanban: Error during persistence:', error);
                 // Revert on error
                 if (draggedCard && originalParent) {
-                    originalParent.appendChild(draggedCard);
+                    originalParent.insertBefore(draggedCard, originalSibling);
                     draggedCard.dataset.folderId = oldFolderId;
+                    if (wasCompleted) {
+                        draggedCard.classList.add('kanban-card-completed');
+                        draggedCard.dataset.completed = '1';
+                    }
                 }
                 updateColumnCounts();
                 showError('Error moving note');
@@ -297,6 +342,36 @@
                 if (workspace) url += '&workspace=' + encodeURIComponent(workspace);
                 window.location.href = url;
             }
+        });
+
+        // Completed toggle on a card
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="toggle-kanban-completed"]');
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (isPublicWorkspaceReadOnly()) return;
+
+            const card = btn.closest('.kanban-card');
+            if (card) toggleKanbanCardCompleted(card);
+        });
+
+        // Expand / collapse a column's completed section
+        document.addEventListener('click', (e) => {
+            const toggle = e.target.closest('[data-action="toggle-kanban-completed-section"]');
+            if (!toggle) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const section = toggle.closest('.kanban-completed-section');
+            if (!section) return;
+
+            const expanded = !section.classList.contains('is-expanded');
+            applyCompletedSectionState(section, expanded);
+            storeCompletedSectionState(section.dataset.folderId, expanded);
         });
 
         // Kanban Scroll Buttons
@@ -715,17 +790,221 @@
     }
 
     /**
-     * Update column note counts
+     * Update column note counts. Completed cards live in the collapsible
+     * completed section and are excluded from the column badge, which tracks
+     * remaining work only.
      */
     function updateColumnCounts() {
         document.querySelectorAll('.kanban-column').forEach(column => {
             const content = column.querySelector('.kanban-column-content');
             const countBadge = column.querySelector('.kanban-column-count');
             if (content && countBadge) {
-                const cardCount = content.querySelectorAll('.kanban-card').length;
+                const cardCount = content.querySelectorAll(':scope > .kanban-card').length;
                 countBadge.textContent = cardCount;
             }
+
+            const completedSection = column.querySelector('.kanban-completed-section');
+            if (completedSection) {
+                const completedBadge = completedSection.querySelector('.kanban-completed-count');
+                const completedCards = completedSection.querySelectorAll('.kanban-card').length;
+                if (completedBadge) {
+                    completedBadge.textContent = completedCards;
+                }
+                // Drop the section once its last completed card leaves.
+                if (completedCards === 0) {
+                    completedSection.remove();
+                }
+            }
         });
+    }
+
+    /**
+     * Translate with a safe fallback when i18n is not loaded yet.
+     */
+    function kanbanT(key, fallback) {
+        if (typeof window.t === 'function') {
+            return window.t(key, null, fallback);
+        }
+        return fallback;
+    }
+
+    /**
+     * localStorage key holding the expanded state of a column's completed section.
+     */
+    function completedSectionStateKey(folderId) {
+        return 'kanban_completed_open_' + folderId;
+    }
+
+    function isCompletedSectionExpanded(folderId) {
+        try {
+            return localStorage.getItem(completedSectionStateKey(folderId)) === 'open';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function storeCompletedSectionState(folderId, expanded) {
+        try {
+            localStorage.setItem(completedSectionStateKey(folderId), expanded ? 'open' : 'closed');
+        } catch (e) {
+            /* localStorage unavailable (private mode): collapse state is simply not persisted */
+        }
+    }
+
+    /**
+     * Apply the expanded/collapsed state to one completed section.
+     */
+    function applyCompletedSectionState(section, expanded) {
+        const toggle = section.querySelector('.kanban-completed-toggle');
+        const label = section.querySelector('.kanban-completed-label');
+
+        section.classList.toggle('is-expanded', expanded);
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        }
+        if (label) {
+            label.textContent = expanded
+                ? kanbanT('kanban.completed.hide', 'Hide completed')
+                : kanbanT('kanban.completed.show', 'Show completed');
+        }
+    }
+
+    /**
+     * Restore every completed section's collapse state. Called after each board
+     * render because refreshKanbanView() replaces the whole DOM.
+     */
+    function restoreCompletedSectionStates() {
+        document.querySelectorAll('.kanban-completed-section').forEach((section) => {
+            applyCompletedSectionState(section, isCompletedSectionExpanded(section.dataset.folderId));
+        });
+    }
+
+    /**
+     * Get (or build) the completed section of a column.
+     */
+    function ensureCompletedSection(columnContent) {
+        let section = columnContent.querySelector(':scope > .kanban-completed-section');
+        if (section) {
+            return section;
+        }
+
+        const folderId = columnContent.dataset.folderId;
+        section = document.createElement('div');
+        section.className = 'kanban-completed-section';
+        section.dataset.folderId = folderId;
+        section.innerHTML =
+            '<button type="button" class="kanban-completed-toggle" data-action="toggle-kanban-completed-section"' +
+            ' data-folder-id="' + folderId + '" aria-expanded="false">' +
+            '<i class="lucide lucide-chevron-right kanban-completed-chevron"></i>' +
+            '<span class="kanban-completed-label"></span>' +
+            '<span class="kanban-completed-count">0</span>' +
+            '</button>' +
+            '<div class="kanban-completed-content"></div>';
+
+        columnContent.appendChild(section);
+        applyCompletedSectionState(section, isCompletedSectionExpanded(folderId));
+        return section;
+    }
+
+    /**
+     * Persist a card's completed state.
+     */
+    async function setKanbanCompleted(noteId, completed) {
+        const response = await fetch('api/v1/notes/' + noteId + '/kanban-completed', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ completed: completed }),
+            credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+            return false;
+        }
+
+        const data = await response.json();
+        return data.success === true;
+    }
+
+    /**
+     * Move a card between the active area and the completed section, updating
+     * its visual state. Returns a callback that restores the previous position.
+     */
+    function moveCardToCompletionArea(card, completed) {
+        const columnContent = card.closest('.kanban-column-content');
+        const previousSibling = card.nextElementSibling;
+        const previousParent = card.parentNode;
+
+        if (completed) {
+            const section = ensureCompletedSection(columnContent);
+            section.querySelector('.kanban-completed-content').prepend(card);
+        } else {
+            // Active cards go back above the completed section.
+            const section = columnContent.querySelector(':scope > .kanban-completed-section');
+            if (section) {
+                columnContent.insertBefore(card, section);
+            } else {
+                columnContent.appendChild(card);
+            }
+        }
+
+        card.classList.toggle('kanban-card-completed', completed);
+        card.dataset.completed = completed ? '1' : '0';
+
+        const btn = card.querySelector('.kanban-card-complete-btn');
+        if (btn) {
+            const label = completed
+                ? kanbanT('kanban.completed.mark_active', 'Mark as not completed')
+                : kanbanT('kanban.completed.mark_completed', 'Mark as completed');
+            btn.setAttribute('aria-pressed', completed ? 'true' : 'false');
+            btn.setAttribute('aria-label', label);
+            btn.title = label;
+        }
+
+        updateColumnCounts();
+
+        return function revert() {
+            if (previousParent) {
+                previousParent.insertBefore(card, previousSibling);
+            }
+            card.classList.toggle('kanban-card-completed', !completed);
+            card.dataset.completed = completed ? '0' : '1';
+            if (btn) {
+                const revertLabel = !completed
+                    ? kanbanT('kanban.completed.mark_active', 'Mark as not completed')
+                    : kanbanT('kanban.completed.mark_completed', 'Mark as completed');
+                btn.setAttribute('aria-pressed', completed ? 'false' : 'true');
+                btn.setAttribute('aria-label', revertLabel);
+                btn.title = revertLabel;
+            }
+            updateColumnCounts();
+        };
+    }
+
+    /**
+     * Toggle a card's completed state, optimistically then persisted.
+     */
+    async function toggleKanbanCardCompleted(card) {
+        const noteId = card.dataset.noteId;
+        if (!noteId) return;
+
+        const completed = card.dataset.completed !== '1';
+        const revert = moveCardToCompletionArea(card, completed);
+
+        try {
+            const success = await setKanbanCompleted(noteId, completed);
+            if (!success) {
+                revert();
+                showError(kanbanT('kanban.completed.error', 'Failed to update the card'));
+            }
+        } catch (error) {
+            console.error('Kanban: Error updating completed state:', error);
+            revert();
+            showError(kanbanT('kanban.completed.error', 'Failed to update the card'));
+        }
     }
 
     /**
@@ -741,6 +1020,7 @@
 
     window.bindKanbanScrollButtons = bindKanbanScrollButtons;
     window.syncKanbanScrollButtons = syncKanbanScrollButtons;
+    window.restoreKanbanCompletedSections = restoreCompletedSectionStates;
 
     // Auto-init on load
     if (document.readyState === 'loading') {

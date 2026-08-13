@@ -67,8 +67,20 @@
     color: #007DB8;
 }
 
-.welcome-setup-field select {
+/* Compact sizing must out-rank the global iOS-zoom rule
+   (.modal-content select { font-size:16px/padding:12px !important } in responsive.css) */
+#welcomeSetupModal .welcome-setup-field select {
     width: 100%;
+    padding: 7px 10px !important;
+    font-size: 13px !important;
+}
+
+/* Touch devices keep 16px to avoid iOS focus zoom */
+@media (pointer: coarse) {
+    #welcomeSetupModal .welcome-setup-field select {
+        padding: 10px 12px !important;
+        font-size: 16px !important;
+    }
 }
 
 .welcome-setup-tips {

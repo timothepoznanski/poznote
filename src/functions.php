@@ -1195,6 +1195,10 @@ function poznoteSyncUserLanguage(PDO $con, int $userId): void {
             if ($detected !== null && $detected !== $language) {
                 $update = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 $update->execute(['language', $detected]);
+                // The generated welcome note follows the browser-driven
+                // language too (no-op once the user edited the note, and on
+                // the very first bootstrap where no note exists yet).
+                poznoteRelocalizeWelcomeNote($con, $detected);
                 $language = $detected;
             }
         }
@@ -1552,6 +1556,107 @@ function t($key, $vars = [], $default = null, $lang = null) {
 
 function t_h($key, $vars = [], $default = null, $lang = null) {
     return htmlspecialchars(t($key, $vars, $default, $lang), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}
+
+/**
+ * Localized content of the generated welcome note, with the same fallback
+ * chain as the first-run creation in db_connect.php: dictionary entry first,
+ * then the static welcome_note.html template (incomplete/custom dictionary),
+ * then a minimal hardcoded paragraph (template missing too).
+ */
+function poznoteWelcomeNoteContent(string $lang): string {
+    $content = t('welcome_note.content', [], '', $lang);
+    if (trim($content) === '') {
+        $content = (string)@file_get_contents(__DIR__ . '/welcome_note.html');
+    }
+    if (trim($content) === '') {
+        $content = '<p>Welcome to Poznote.</p>';
+    }
+    return $content;
+}
+
+/**
+ * Rewrite the generated welcome note in $newLang when the user has not
+ * touched it, so the note follows the interface language instead of staying
+ * frozen in whatever language was active when the account was bootstrapped
+ * (the first-run wizard lets the user pick a different language seconds
+ * after the note is created).
+ *
+ * The note carries no marker of its own, so it is recognized by fingerprint:
+ * heading and file content must both still match what the bootstrap would
+ * generate for one of the supported languages. An edited, renamed or deleted
+ * welcome note never matches and is left alone.
+ */
+function poznoteRelocalizeWelcomeNote(PDO $con, string $newLang): void {
+    $newLang = strtolower(trim($newLang));
+    if (!in_array($newLang, poznoteSupportedLanguages(), true)) {
+        return;
+    }
+
+    try {
+        $titles = [];
+        foreach (poznoteSupportedLanguages() as $lang) {
+            $titles[$lang] = t('welcome_note.title', [], 'Welcome to Poznote', $lang);
+        }
+
+        $placeholders = implode(',', array_fill(0, count($titles), '?'));
+        $stmt = $con->prepare("SELECT id, heading FROM entries WHERE trash = 0 AND type = 'note' AND heading IN ($placeholders)");
+        $stmt->execute(array_values($titles));
+        $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if (!$candidates) {
+            return;
+        }
+
+        $template = trim((string)@file_get_contents(__DIR__ . '/welcome_note.html'));
+
+        foreach ($candidates as $row) {
+            $file = getEntryFilename($row['id'], 'note');
+            $current = @file_get_contents($file);
+            if ($current === false) {
+                continue;
+            }
+            $current = trim($current);
+
+            foreach ($titles as $lang => $title) {
+                if ($row['heading'] !== $title) {
+                    continue;
+                }
+
+                // Everything the bootstrap could have written for $lang.
+                $pristine = [trim(poznoteWelcomeNoteContent($lang)), '<p>Welcome to Poznote.</p>'];
+                if ($template !== '') {
+                    $pristine[] = $template;
+                }
+                if (!in_array($current, $pristine, true)) {
+                    continue;
+                }
+
+                if ($lang === $newLang) {
+                    return;
+                }
+
+                $content = poznoteWelcomeNoteContent($newLang);
+                if (file_put_contents($file, $content) === false) {
+                    return;
+                }
+                setFilePermissions($file, 0644);
+
+                // Same search snippet shape as repairDatabaseEntries().
+                $snippet = mb_substr(strip_tags(cleanContentForSearch($content)), 0, 500);
+                $update = $con->prepare('UPDATE entries SET heading = ?, entry = ?, updated = ? WHERE id = ?');
+                $update->execute([
+                    t('welcome_note.title', [], 'Welcome to Poznote', $newLang),
+                    $snippet,
+                    gmdate('Y-m-d H:i:s'),
+                    $row['id'],
+                ]);
+                return;
+            }
+        }
+    } catch (Exception $e) {
+        // Cosmetic best-effort operation: never let it break a language change.
+        error_log('Poznote: welcome note relocalization failed: ' . $e->getMessage());
+    }
 }
 
 function normalizeDateOnlyFilter($value) {

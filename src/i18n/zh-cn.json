@@ -147,6 +147,13 @@
     "notifications": {
       "activated_title": "看板视图已启用",
       "activated_message": "此文件夹现在处于看板模式。点击其图标打开看板。"
+    },
+    "completed": {
+      "show": "显示已完成",
+      "hide": "隐藏已完成",
+      "mark_completed": "标记为已完成",
+      "mark_active": "标记为未完成",
+      "error": "无法更新卡片"
     }
   },
   "folders": {
@@ -415,6 +422,7 @@
       "markdown_split_card_view": "以带边框的分栏视图（编辑器和预览）显示 Markdown 笔记。",
       "markdown_colored": "为 Markdown 笔记上色：为每级标题、行内代码、代码块背景、引用、表格表头和分隔线分别选择颜色。",
       "code_wrap": "代码块中的长行自动换行，而不是水平滚动。",
+      "code_line_numbers": "在 markdown 预览的代码块中显示行号。",
       "attachment_previews": "在笔记中显示附件预览。",
       "attachments_at_bottom": "将附件区域显示在笔记底部而不是顶部。",
       "backlinks_at_bottom": "将反向链接区域显示在笔记底部而不是顶部。",
@@ -671,6 +679,7 @@
       "markdown_split_card_view": "带边框的 Markdown",
       "markdown_colored": "彩色 Markdown",
       "code_block_word_wrap": "代码块自动换行",
+      "code_block_line_numbers": "代码块行号",
       "attachment_previews_in_note": "附件预览",
       "attachments_at_bottom": "附件显示在底部",
       "backlinks_at_bottom": "Backlinks 显示在底部",
@@ -2781,7 +2790,10 @@
         "s3_cleanup_failed": "账户已删除，但其文件无法从 S3 存储桶中删除：{{error}}。请手动删除它们。",
         "cannot_demote_self": "您无法移除自己的管理员权限",
         "cannot_change_self": "您无法更改自己的状态/角色",
-        "confirm_username_mismatch": "您输入的用户名与要删除的账户不匹配。未删除任何内容。"
+        "confirm_username_mismatch": "您输入的用户名与要删除的账户不匹配。未删除任何内容。",
+        "no_email_profile_exists": "已存在另一个没有邮箱地址的用户资料。请为该用户填写邮箱地址。",
+        "oidc_subject_taken": "该 OIDC 主题已关联到其他用户资料",
+        "database_error": "发生数据库错误，请查看服务器日志了解详情。"
       },
       "stats": {
         "title": "系统统计",
@@ -3766,6 +3778,10 @@
     "list_empty": "存储桶中还没有备份。",
     "list_error": "无法列出存储桶:{{error}}",
     "list_loading": "加载中...",
+    "list_filter_placeholder": "按用户或归档名称筛选...",
+    "list_count": "共 {{total}} 个备份",
+    "list_count_filtered": "显示 {{shown}}/{{total}} 个备份",
+    "list_no_match": "没有符合此筛选条件的备份。",
     "col_user": "用户",
     "col_archive": "归档",
     "col_date": "日期",
