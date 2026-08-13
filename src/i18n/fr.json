@@ -1538,7 +1538,11 @@
       "tabs_not_available": "Les onglets ne sont pas disponibles sur les appareils mobiles",
       "no_notes_title": "Aucune note",
       "no_notes_in_folder": "Ce dossier ne contient aucune note",
-      "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur."
+      "too_many_notes": "Ce dossier contient {{count}} notes. Seules les {{max}} premières seront ouvertes pour ne pas surcharger votre navigateur.",
+      "show_only": "Afficher seulement ce dossier"
+    },
+    "folder_filter": {
+      "exit": "Quitter la vue du dossier"
     }
   },
   "note_color": {

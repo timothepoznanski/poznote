@@ -1055,7 +1055,11 @@
       "tabs_not_available": "Tabs are not available on mobile devices",
       "no_notes_title": "No notes",
       "no_notes_in_folder": "This folder contains no notes",
-      "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser."
+      "too_many_notes": "This folder contains {{count}} notes. Only the first {{max}} will be opened to avoid overwhelming your browser.",
+      "show_only": "Show only this folder"
+    },
+    "folder_filter": {
+      "exit": "Exit folder view"
     }
   },
   "note_color": {

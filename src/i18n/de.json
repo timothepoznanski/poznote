@@ -1505,7 +1505,11 @@
       "tabs_not_available": "Tabs sind auf Mobilgeräten nicht verfügbar",
       "no_notes_title": "Keine Notizen",
       "no_notes_in_folder": "Dieser Ordner enthält keine Notizen",
-      "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten."
+      "too_many_notes": "Dieser Ordner enthält {{count}} Notizen. Nur die ersten {{max}} werden geöffnet, um Ihren Browser nicht zu überlasten.",
+      "show_only": "Nur diesen Ordner anzeigen"
+    },
+    "folder_filter": {
+      "exit": "Ordneransicht verlassen"
     }
   },
   "note_color": {

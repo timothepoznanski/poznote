@@ -1504,7 +1504,11 @@
       "tabs_not_available": "As abas não estão disponíveis em dispositivos móveis",
       "no_notes_title": "Sem notas",
       "no_notes_in_folder": "Esta pasta não contém notas",
-      "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador."
+      "too_many_notes": "Esta pasta contém {{count}} notas. Apenas as primeiras {{max}} serão abertas para não sobrecarregar seu navegador.",
+      "show_only": "Mostrar apenas esta pasta"
+    },
+    "folder_filter": {
+      "exit": "Sair da vista da pasta"
     }
   },
   "note_color": {

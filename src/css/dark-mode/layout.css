@@ -118,6 +118,18 @@ body.dark-mode .search-date-filter {
     border-color: var(--dm-border);
 }
 
+html[data-theme='dark'] .folder-filter-banner,
+body.dark-mode .folder-filter-banner {
+    border-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .folder-filter-banner-name i,
+body.dark-mode .folder-filter-banner-name i {
+    color: var(--dm-text-muted);
+    background-color: var(--dm-text-muted);
+}
+
 html[data-theme='dark'] .search-date-field label,
 body.dark-mode .search-date-field label {
     color: var(--dm-text-muted);

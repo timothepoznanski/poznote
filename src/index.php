@@ -520,7 +520,7 @@ if ($isPublicWorkspaceReadonly) {
         
     <?php
     // Construction des conditions de recherche sécurisées
-    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined, $created_from, $created_to);
+    $search_conditions = buildSearchConditions($search, $tags_search, $folder_filter, $workspace_filter, $search_combined, $created_from, $created_to, $con);
     $where_clause = $search_conditions['where_clause'];
     $sql_params = $search_conditions['search_params'];
     appendNoteAgeFilter($where_clause, $sql_params, getNoteAgeFilterDays($con));

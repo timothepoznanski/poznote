@@ -1506,7 +1506,11 @@
       "tabs_not_available": "Las pestañas no están disponibles en dispositivos móviles",
       "no_notes_title": "Sin notas",
       "no_notes_in_folder": "Esta carpeta no contiene notas",
-      "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador."
+      "too_many_notes": "Esta carpeta contiene {{count}} notas. Solo se abrirán las primeras {{max}} para no sobrecargar su navegador.",
+      "show_only": "Mostrar solo esta carpeta"
+    },
+    "folder_filter": {
+      "exit": "Salir de la vista de la carpeta"
     }
   },
   "note_color": {

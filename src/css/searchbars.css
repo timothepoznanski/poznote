@@ -297,6 +297,64 @@
     line-height: 1;
 }
 
+/* Banner shown at the top of the notes list when browsing a single folder
+   (e.g. after clicking a favorite folder shortcut). The cross exits the view. */
+.folder-filter-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 6px 0;
+    padding: 3px 3px 3px 8px;
+    border: 1px solid #e4e7ea;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7379;
+}
+
+.folder-filter-banner-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    font-size: 13px;
+    text-align: left;
+}
+
+.folder-filter-banner-name > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.folder-filter-banner-name i {
+    flex: 0 0 auto;
+    /* Lucide icons are CSS masks: background-color is what actually paints them */
+    color: #8a9299;
+    background-color: #8a9299;
+    font-size: 13px;
+}
+
+.folder-filter-banner-clear {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    width: 22px;
+    border-radius: 50%;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.folder-filter-banner-clear .clear-icon {
+    color: #d32f2f;
+    font-size: 14px;
+    line-height: 1;
+}
+
 .search-date-filter {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

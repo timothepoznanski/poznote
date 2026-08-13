@@ -424,6 +424,13 @@ function renderFolderActionsMenu() {
     $menu .= "<span>" . t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes') . "</span>";
     $menu .= "</div>";
 
+    // Show only this folder: opens the folder-filtered view, same as clicking a
+    // favorite folder shortcut. The banner at the top of the list exits it.
+    $menu .= "<div class='folder-actions-menu-item' data-action='show-only-folder'>";
+    $menu .= "<i class='lucide lucide-filter'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.show_only', [], 'Show only this folder') . "</span>";
+    $menu .= "</div>";
+
     // Move all files action (shown only if folder has notes)
     $menu .= "<div class='folder-actions-menu-item requires-notes' data-action='move-folder-files'>";
     $menu .= "<i class='lucide lucide-folder-open'></i>";
