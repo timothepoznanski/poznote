@@ -534,6 +534,18 @@
     }
   },
   "modals": {
+    "paste_markdown": {
+      "title": "Paste as Markdown",
+      "menu_item": "Paste as Markdown",
+      "hint": "Paste your content below. Formatting will be converted to Markdown.",
+      "placeholder": "Paste here (Ctrl+V)",
+      "preview_label": "Markdown preview",
+      "insert": "Insert",
+      "converting": "Converting...",
+      "error": "Conversion failed. Please try again.",
+      "no_note": "No note is open.",
+      "empty": "The clipboard is empty."
+    },
     "update": {
       "title": "📱 Application Version",
       "backup_warning": "Make a backup of your data.",
@@ -1123,6 +1135,8 @@
     "error_loading_version": "Error loading version"
   },
   "slash_menu": {
+    "plain_block": "Plain block",
+    "block_languages": "Block Languages",
     "back_to_normal": "Back to normal text",
     "title": "Title",
     "heading_1": "Heading 1",
@@ -1308,6 +1322,14 @@
     }
   },
   "editor": {
+    "code_block_language": {
+      "title": "Code block language",
+      "filter": "Filter languages...",
+      "remove_tag": "Remove tag",
+      "button": "Change the language of this code block",
+      "plain_code": "Code (no highlighting)",
+      "no_match": "No matching language"
+    },
     "markdown_placeholder": "Write your markdown, use / for command menu, paste images or drop an image at cursor.",
     "markdown_placeholder_mobile": "Write your markdown or paste images here...",
     "excalidraw": {
@@ -1331,6 +1353,10 @@
       "title": "Delete code block",
       "confirm_title": "Delete code block",
       "confirm_message": "Do you want to delete this code block?"
+    },
+    "code_block_line_numbers": {
+      "show": "Show line numbers",
+      "hide": "Hide line numbers"
     },
     "colors": {
       "black": "Black",

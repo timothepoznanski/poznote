@@ -14,6 +14,8 @@ tags:
     description: Note snapshots (daily versions)
   - name: Reminders
     description: Note reminders and notifications
+  - name: Tasks
+    description: Tasks inside task list notes
   - name: Folders
     description: Folders management
   - name: Trash
@@ -275,6 +277,46 @@ components:
           type: string
           nullable: true
           description: Recurrence of the linked note's reminder, null when it does not repeat.
+          example: "1w"
+
+    Task:
+      type: object
+      description: >
+        One task of a task list note. Tasks are stored as a JSON array in the
+        note content; these are the normalized fields the API returns.
+      properties:
+        id:
+          type: number
+          description: Task identifier, unique inside the note.
+          example: 1754820000123.45
+        text:
+          type: string
+          example: Buy milk
+        completed:
+          type: boolean
+        important:
+          type: boolean
+          description: Sorts the task to the top of its list.
+        dueAt:
+          type: string
+          nullable: true
+          description: >
+            Local wall-clock due date, "YYYY-MM-DD", or "YYYY-MM-DDTHH:MM" when
+            a time is set. No timezone offset.
+          example: "2026-09-01T18:30"
+        dueReminder:
+          type: boolean
+          description: Whether a notification is scheduled for the due date.
+        dueReminderEmail:
+          type: boolean
+          description: >
+            Whether that reminder also sends an email. Only present once
+            configured; defaults to enabled otherwise.
+        dueRecurrence:
+          type: string
+          description: >
+            Repeat interval of the reminder, "<count><unit>" with unit
+            i/h/d/w/m/y. Only present when set.
           example: "1w"
 
     Error:
@@ -807,6 +849,58 @@ paths:
         '200':
           description: Note saved
 
+  /graph:
+    get:
+      tags: [Notes]
+      summary: Get the note-link graph
+      description: >
+        Returns the graph used by the graph view: one node per non-trashed note
+        (note, markdown and tasklist types) and one edge per link between two
+        notes.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          required: false
+          description: Restrict the graph to one workspace.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Nodes and edges of the note graph
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  nodes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        title:
+                          type: string
+                        folder:
+                          type: string
+                        type:
+                          type: string
+                        favorite:
+                          type: boolean
+                  edges:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        source:
+                          type: integer
+                        target:
+                          type: integer
+
   /notes/{id}/backlinks:
     get:
       tags: [Notes]
@@ -851,6 +945,99 @@ paths:
       responses:
         '200':
           description: Icon updated
+
+  /notes/{id}/pinned:
+    put:
+      tags: [Notes]
+      summary: Pin or unpin a note
+      description: Pins a note so it stays at the top of the note list, or unpins it.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pinned]
+              properties:
+                pinned:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Pinned state updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                  pinned:
+                    type: boolean
+        '400':
+          description: Invalid note ID, or missing/invalid "pinned" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notes/{id}/kanban-completed:
+    post:
+      tags: [Notes]
+      summary: Set the Kanban completed state of a note
+      description: >
+        Marks a note as completed on the kanban board, or reopens it. Only the
+        completion flag changes: the note content and its updated timestamp are
+        left untouched.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [completed]
+              properties:
+                completed:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Kanban completed state updated
+        '400':
+          description: Missing or non-boolean "completed" field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /notes/{id}/color:
     put:
@@ -1120,6 +1307,302 @@ paths:
   # ==================
   # Reminders Endpoints
   # ==================
+  /tasks:
+    get:
+      tags: [Tasks]
+      summary: List the tasks of every task list note
+      description: >
+        Aggregates the tasks of all non-trashed tasklist notes, as used by the
+        tasks page (list and calendar views).
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          required: false
+          description: Restrict the result to one workspace.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task list notes with their decoded tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  notes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        heading:
+                          type: string
+                        folder:
+                          type: string
+                        folder_id:
+                          type: integer
+                          nullable: true
+                        workspace:
+                          type: string
+                        updated:
+                          type: string
+                        favorite:
+                          type: boolean
+                        tasks:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Task'
+
+  /notes/{id}/tasks:
+    get:
+      tags: [Tasks]
+      summary: List the tasks of one note
+      description: >
+        Returns the tasks of a single task list note. Use it to obtain a task
+        id before updating or deleting that task.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The note's tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                    example: 42
+                  heading:
+                    type: string
+                    example: Groceries
+                  tasks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid note ID, or the note is not a task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Tasks]
+      summary: Add a task to a note
+      description: >
+        Appends one task to a task list note, without rewriting the note's
+        whole content array. When reminder is true, the matching notification
+        is scheduled from due_at automatically.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  example: Buy milk
+                due_at:
+                  type: string
+                  nullable: true
+                  description: >
+                    Local wall-clock due date, "YYYY-MM-DD" or
+                    "YYYY-MM-DDTHH:MM". Resolved through the user's timezone.
+                  example: "2026-09-01T18:30"
+                reminder:
+                  type: boolean
+                  description: >
+                    Raise a notification on the due date. Requires due_at.
+                    A date without a time reminds at 09:00.
+                reminder_email:
+                  type: boolean
+                  description: Also send an email. Ignored when SMTP is not configured.
+                recurrence:
+                  type: string
+                  nullable: true
+                  description: Repeat interval, "<count><unit>" with unit i/h/d/w/m/y.
+                  example: "1w"
+                important:
+                  type: boolean
+                completed:
+                  type: boolean
+      responses:
+        '200':
+          description: The created task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                  task:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Missing text, invalid due_at/recurrence, or not a task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Storage quota exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notes/{id}/tasks/{taskId}:
+    patch:
+      tags: [Tasks]
+      summary: Update one task
+      description: >
+        Updates a single task; only the provided fields change. Completing a
+        task clears its pending reminder, and setting due_at to null clears the
+        due date and its reminder.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Task id as it appears in the note content, e.g. "1754820000123.45".
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                completed:
+                  type: boolean
+                important:
+                  type: boolean
+                due_at:
+                  type: string
+                  nullable: true
+                  description: New due date, or null to clear it.
+                reminder:
+                  type: boolean
+                reminder_email:
+                  type: boolean
+                recurrence:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: The updated task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                  task:
+                    $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid body, due_at or recurrence, or not a task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note or task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Tasks]
+      summary: Delete one task
+      description: Removes a task from a task list note, along with its pending reminder.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Task id as it appears in the note content.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                  task_id:
+                    type: string
+        '404':
+          description: Note or task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /notes/{id}/reminder:
     get:
       tags: [Reminders]
@@ -1302,6 +1785,147 @@ paths:
                     example: 42
         '400':
           description: Invalid note ID (not numeric)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notes/{id}/task-reminder:
+    post:
+      tags: [Reminders]
+      summary: Set a reminder on one task of a task list
+      description: >
+        Sets or replaces the reminder of a single task inside a tasklist note.
+        Any existing non-dismissed reminder for that task is removed first.
+        This materializes the task's dueReminder flag as a scheduled
+        notification; the task's own dueAt/dueReminder fields live in the note
+        content. Task-level reminders are independent of the note-level
+        reminder and are never cleared by it.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [task_id, reminder_at]
+              properties:
+                task_id:
+                  type: string
+                  description: Task id as it appears in the note content.
+                  example: "1754820000123.45"
+                reminder_at:
+                  type: string
+                  description: ISO datetime. Without an offset it is read as UTC.
+                  example: "2026-09-01T16:30:00Z"
+                message:
+                  type: string
+                  description: Notification text. Defaults to the note heading when empty.
+                  example: Buy milk
+                email_enabled:
+                  type: boolean
+                  description: Also send an email. Ignored when SMTP is not configured.
+                recurrence:
+                  type: string
+                  nullable: true
+                  description: >
+                    Repeat interval, "<count><unit>" with unit i/h/d/w/m/y.
+                    Dismissing the notification schedules the next occurrence
+                    and advances the task's due date by the same interval.
+                  example: "1w"
+      responses:
+        '200':
+          description: Task reminder scheduled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                    example: 42
+                  task_id:
+                    type: string
+                    example: "1754820000123.45"
+                  reminder_at:
+                    type: string
+                    description: UTC, "YYYY-MM-DD HH:MM:SS".
+                    example: "2026-09-01 16:30:00"
+                  email_enabled:
+                    type: boolean
+                  recurrence:
+                    type: string
+                    nullable: true
+                    example: "1w"
+        '400':
+          description: Missing task_id/reminder_at, or invalid datetime or recurrence
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note not found or in trash
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Reminders]
+      summary: Remove the reminder of one task
+      description: >
+        Removes the pending reminder of a single task. task_id can be sent in
+        the JSON body or as a query parameter.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+        - name: task_id
+          in: query
+          required: false
+          description: Task id, when not sent in the body.
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_id:
+                  type: string
+                  example: "1754820000123.45"
+      responses:
+        '200':
+          description: Task reminder removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                  task_id:
+                    type: string
+        '400':
+          description: Invalid note ID, or missing task_id
           content:
             application/json:
               schema:
@@ -1628,13 +2252,13 @@ paths:
         '200':
           description: Notes and folders shared with the current user
 
-  /folders/{folderId}/share:
+  /folders/{id}/share:
     get:
       tags: [Share]
       summary: Get folder share status
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
-        - name: folderId
+        - name: id
           in: path
           required: true
           schema:
@@ -1662,7 +2286,7 @@ paths:
       summary: Create or renew folder share link
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
-        - name: folderId
+        - name: id
           in: path
           required: true
           schema:
@@ -1690,7 +2314,7 @@ paths:
       summary: Update folder share settings
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
-        - name: folderId
+        - name: id
           in: path
           required: true
           schema:
@@ -1721,7 +2345,7 @@ paths:
       summary: Revoke folder share link
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
-        - name: folderId
+        - name: id
           in: path
           required: true
           schema:
@@ -2123,6 +2747,85 @@ paths:
       responses:
         '200':
           description: Icon updated
+
+  /folders/{id}/pinned:
+    put:
+      tags: [Folders]
+      summary: Pin or unpin a folder
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pinned]
+              properties:
+                pinned:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Pinned state updated
+        '400':
+          description: Invalid folder ID, or missing/invalid "pinned" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /folders/{id}/favorite:
+    put:
+      tags: [Folders]
+      summary: Set the favorite state of a folder
+      description: >
+        Sets the folder favorite state explicitly, unlike the note favorite
+        endpoint which toggles it.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [favorite]
+              properties:
+                favorite:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Favorite state updated
+        '400':
+          description: Invalid folder ID, or missing/invalid "favorite" boolean
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Folder not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /folders/{id}/color:
     put:

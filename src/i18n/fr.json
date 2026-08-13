@@ -911,6 +911,14 @@
     "showing_limit": "Seules les {{count}} notes modifiées le plus récemment sont affichées"
   },
   "editor": {
+    "code_block_language": {
+      "title": "Langage du bloc de code",
+      "filter": "Filtrer les langages...",
+      "remove_tag": "Supprimer l’étiquette",
+      "button": "Changer le langage de ce bloc de code",
+      "plain_code": "Code (sans coloration)",
+      "no_match": "Aucun langage correspondant"
+    },
     "markdown_placeholder": "Écrivez votre markdown, utilisez / pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
     "markdown_placeholder_mobile": "Écrivez votre markdown ou collez des images ici...",
     "excalidraw": {
@@ -1004,6 +1012,10 @@
       "confirm_title": "Supprimer le bloc de code",
       "confirm_message": "Voulez-vous supprimer ce bloc de code ?"
     },
+    "code_block_line_numbers": {
+      "show": "Afficher les numéros de ligne",
+      "hide": "Masquer les numéros de ligne"
+    },
     "highlights": {
       "yellow": "Jaune",
       "red": "Rouge",
@@ -1048,6 +1060,18 @@
     "errors": []
   },
   "modals": {
+    "paste_markdown": {
+      "title": "Coller en Markdown",
+      "menu_item": "Coller en Markdown",
+      "hint": "Collez votre contenu ci-dessous. La mise en forme sera convertie en Markdown.",
+      "placeholder": "Collez ici (Ctrl+V)",
+      "preview_label": "Aperçu Markdown",
+      "insert": "Insérer",
+      "converting": "Conversion en cours...",
+      "error": "La conversion a échoué. Veuillez réessayer.",
+      "no_note": "Aucune note ouverte.",
+      "empty": "Le presse-papiers est vide."
+    },
     "update": {
       "title": "📱 Version de l’application",
       "backup_warning": "Faites une sauvegarde de vos données.",
@@ -1606,6 +1630,8 @@
     "error_loading_version": "Erreur lors du chargement de la version"
   },
   "slash_menu": {
+    "plain_block": "Bloc simple",
+    "block_languages": "Langages de bloc",
     "back_to_normal": "Retour au texte normal",
     "title": "Titre",
     "heading_1": "Titre 1",

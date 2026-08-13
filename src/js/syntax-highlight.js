@@ -57,7 +57,9 @@
 
         if (node.classList && (
             node.classList.contains('code-block-copy-btn') ||
-            node.classList.contains('code-block-delete-btn')
+            node.classList.contains('code-block-delete-btn') ||
+            node.classList.contains('code-block-lang-btn') ||
+            node.classList.contains('code-block-line-numbers-btn')
         )) {
             return '';
         }
@@ -102,6 +104,17 @@
             (preElement && preElement.getAttribute ? preElement.getAttribute('data-language') : '');
 
         return String(dataLanguage || '').trim().toLowerCase() === 'code';
+    }
+
+    /**
+     * The "Plain block" inserted from the slash menu: no language badge, no
+     * syntax highlighting, no line numbers. Marked by .plain-block on the PRE
+     * so it survives save/reload as a plain pre > code.
+     */
+    function isPlainBlockElement(el) {
+        if (!el || !el.closest) return false;
+        var preElement = el.tagName === 'PRE' ? el : el.closest('pre');
+        return !!(preElement && preElement.classList.contains('plain-block'));
     }
 
     /**
@@ -166,6 +179,64 @@
         return lines;
     }
 
+    /**
+     * True when a code block carries no language tag at all: a plain block
+     * inserted from the slash menu, or a markdown fence (```) opened without a
+     * language. Those blocks hold text that is not code, so they get no
+     * line-number gutter. The tagged "CODE" block keeps its numbering.
+     * A language added afterwards by hljs auto-detection does not count as a
+     * tag, hence the data-auto-language marker set by applyAutoHighlighting().
+     */
+    function isUntaggedCodeBlock(codeEl) {
+        if (!codeEl) return true;
+
+        if (isPlainBlockElement(codeEl)) return true;
+
+        var preElement = codeEl.closest ? codeEl.closest('pre') : null;
+        var dataLanguage = (codeEl.getAttribute('data-language') ||
+            (preElement ? preElement.getAttribute('data-language') : '') || '').trim();
+        if (dataLanguage) return false;
+
+        // Toolbar-inserted blocks (js/toolbar.js) carry the tag as a class:
+        // the CSS draws a "CODE" badge for pre.code-block:not([data-language]).
+        if (preElement && preElement.classList.contains('code-block')) return false;
+
+        if (codeEl.hasAttribute('data-auto-language')) return true;
+
+        return !/(?:^|\s)(?:language|lang)-\S+/.test(codeEl.className || '');
+    }
+
+    /**
+     * Per-block override written by the gutter toggle in js/copy-code-on-focus.js:
+     * data-line-numbers="1"/"0" on the PRE wins over the global
+     * code_block_line_numbers setting. Returns true/false for an explicit
+     * override, or null when the block follows the global setting.
+     */
+    function getCodeLineNumbersOverride(codeEl) {
+        if (!codeEl) return null;
+        var preElement = codeEl.tagName === 'PRE' ? codeEl :
+            (codeEl.closest ? codeEl.closest('pre') : null);
+        if (!preElement || !preElement.hasAttribute('data-line-numbers')) return null;
+
+        var value = (preElement.getAttribute('data-line-numbers') || '').trim();
+        if (value === '1') return true;
+        if (value === '0') return false;
+        return null;
+    }
+
+    function isGlobalLineNumbersEnabled() {
+        return !!(document.body && document.body.classList.contains('code-block-line-numbers'));
+    }
+
+    /**
+     * Whether this block should currently draw a gutter, combining the
+     * per-block override with the global setting.
+     */
+    function shouldNumberCodeBlock(codeEl) {
+        var override = getCodeLineNumbersOverride(codeEl);
+        return override === null ? isGlobalLineNumbersEnabled() : override;
+    }
+
     function isCodeLineNumberCandidate(codeEl) {
         if (!codeEl || codeEl.classList.contains('language-mermaid') ||
             codeEl.classList.contains('lang-mermaid')) {
@@ -175,6 +246,17 @@
         var preElement = codeEl.parentElement;
         if (!preElement || preElement.tagName !== 'PRE' ||
             preElement.classList.contains('indented-pre')) {
+            return false;
+        }
+
+        // An explicit per-block choice also covers untagged blocks, which the
+        // global setting deliberately skips.
+        var override = getCodeLineNumbersOverride(codeEl);
+        if (override !== null) {
+            return override;
+        }
+
+        if (isUntaggedCodeBlock(codeEl)) {
             return false;
         }
 
@@ -386,7 +468,20 @@
      * normalizeCodeBlocksForStorage() in js/notes.js.
      */
     function applyCodeLineNumbersToElement(codeEl) {
-        if (!isCodeLineNumberCandidate(codeEl)) return;
+        if (!isCodeLineNumberCandidate(codeEl)) {
+            // A block can stop being a candidate after it was numbered (its
+            // language tag was removed, or content saved by an older version),
+            // so drop any gutter it still carries.
+            if (codeEl && (codeEl.classList.contains('code-line-numbers') ||
+                codeEl.querySelector('.code-line'))) {
+                var strippedCaret = codeEl.isContentEditable ? computeCaretTextOffset(codeEl) : null;
+                unwrapCodeLineNumbers(codeEl);
+                if (strippedCaret !== null) {
+                    restoreCaretAtTextOffset(codeEl, strippedCaret);
+                }
+            }
+            return;
+        }
 
         var alreadyNumbered = codeEl.classList.contains('code-line-numbers');
         if (alreadyNumbered && !isCodeLineStructureDesynced(codeEl)) return;
@@ -440,12 +535,19 @@
     }
 
     function applyCodeLineNumbers(container) {
-        if (!document.body || !document.body.classList.contains('code-block-line-numbers')) {
-            return;
-        }
-
         var root = (container && container.querySelectorAll) ? container : document;
-        root.querySelectorAll('.noteentry pre > code').forEach(applyCodeLineNumbersToElement);
+
+        root.querySelectorAll('.noteentry pre > code').forEach(function(codeEl) {
+            if (shouldNumberCodeBlock(codeEl)) {
+                applyCodeLineNumbersToElement(codeEl);
+            } else if (codeEl.classList.contains('code-line-numbers') ||
+                codeEl.querySelector('.code-line')) {
+                // Turned off (globally or per block) while a gutter was drawn
+                var caret = codeEl.isContentEditable ? computeCaretTextOffset(codeEl) : null;
+                unwrapCodeLineNumbers(codeEl);
+                if (caret !== null) restoreCaretAtTextOffset(codeEl, caret);
+            }
+        });
     }
 
     // Editable HTML-note blocks drift out of sync while typing (Shift+Enter
@@ -453,10 +555,8 @@
     // merges lines), so re-sync shortly after the last input.
     var editableRefreshTimer = null;
     document.addEventListener('input', function(e) {
-        if (!document.body || !document.body.classList.contains('code-block-line-numbers')) {
-            return;
-        }
-
+        // Blocks with a per-block override need re-syncing even when the
+        // global setting is off, so this is no longer gated on the body class.
         var host = e.target && e.target.closest ? e.target.closest('.noteentry') : null;
         if (!host || !host.isContentEditable) return;
 
@@ -557,7 +657,7 @@
         var highlightedAnyBlock = false;
         
         codeBlocks.forEach(function(codeBlock) {
-            if (isExplicitPlainCodeBlock(codeBlock)) {
+            if (isExplicitPlainCodeBlock(codeBlock) || isPlainBlockElement(codeBlock)) {
                 return;
             }
 
@@ -580,6 +680,9 @@
                     codeBlock.innerHTML = result.value;
                     codeBlock.classList.add('hljs');
                     codeBlock.classList.add('language-' + result.language);
+                    // Auto-detected, not tagged by the user: keep the block out
+                    // of the line-number gutter (see isUntaggedCodeBlock).
+                    codeBlock.setAttribute('data-auto-language', result.language);
                     highlightedAnyBlock = true;
                 }
             } catch (e) {

@@ -146,12 +146,18 @@ html[data-theme='dark'] .noteentry pre .code-block-copy-btn,
 html[data-theme='dark'] .public-note .content pre .code-block-copy-btn,
 html[data-theme='dark'] .code-block-actions-host > .code-block-copy-btn,
 html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn,
+html[data-theme='dark'] .code-block-line-numbers-btn,
+html[data-theme='dark'] .noteentry pre .code-block-line-numbers-btn,
+html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn,
 body.dark-mode .code-block-copy-btn,
 body.dark-mode pre.code-block .code-block-copy-btn,
 body.dark-mode .noteentry pre .code-block-copy-btn,
 body.dark-mode .public-note .content pre .code-block-copy-btn,
 body.dark-mode .code-block-actions-host > .code-block-copy-btn,
-body.dark-mode .code-block-actions-host > .code-block-delete-btn {
+body.dark-mode .code-block-actions-host > .code-block-delete-btn,
+body.dark-mode .code-block-line-numbers-btn,
+body.dark-mode .noteentry pre .code-block-line-numbers-btn,
+body.dark-mode .code-block-actions-host > .code-block-line-numbers-btn {
     background: transparent !important;
     border: none !important;
     color: #aaaaaa !important;
@@ -160,8 +166,10 @@ body.dark-mode .code-block-actions-host > .code-block-delete-btn {
 
 html[data-theme='dark'] .code-block-copy-btn svg,
 html[data-theme='dark'] .code-block-delete-btn svg,
+html[data-theme='dark'] .code-block-line-numbers-btn svg,
 body.dark-mode .code-block-copy-btn svg,
-body.dark-mode .code-block-delete-btn svg {
+body.dark-mode .code-block-delete-btn svg,
+body.dark-mode .code-block-line-numbers-btn svg {
     stroke: currentColor !important;
 }
 
@@ -184,12 +192,16 @@ html[data-theme='dark'] .noteentry pre .code-block-copy-btn:hover,
 html[data-theme='dark'] .public-note .content pre .code-block-copy-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-copy-btn:hover,
 html[data-theme='dark'] .code-block-actions-host > .code-block-delete-btn:hover,
+html[data-theme='dark'] .code-block-line-numbers-btn:hover,
+html[data-theme='dark'] .code-block-actions-host > .code-block-line-numbers-btn:hover,
 body.dark-mode .code-block-copy-btn:hover,
 body.dark-mode pre.code-block .code-block-copy-btn:hover,
 body.dark-mode .noteentry pre .code-block-copy-btn:hover,
 body.dark-mode .public-note .content pre .code-block-copy-btn:hover,
 body.dark-mode .code-block-actions-host > .code-block-copy-btn:hover,
-body.dark-mode .code-block-actions-host > .code-block-delete-btn:hover {
+body.dark-mode .code-block-actions-host > .code-block-delete-btn:hover,
+body.dark-mode .code-block-line-numbers-btn:hover,
+body.dark-mode .code-block-actions-host > .code-block-line-numbers-btn:hover {
     background: transparent !important;
     color: #ffffff !important;
     opacity: 1 !important;

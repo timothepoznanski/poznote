@@ -50,6 +50,9 @@
         { id: 'code-markdown', icon: 'lucide-file-code', iconColor: '#083fa1', label: 'Markdown', lang: 'markdown' }
     ];
 
+    // Shared with the code block language modal (js/code-block-language.js)
+    window.CODE_BLOCK_LANGUAGES = CODE_BLOCK_LANGUAGES;
+
     function isSyntaxHighlightLanguage(language) {
         var normalizedLanguage = String(language || '').trim().toLowerCase();
         return !!(normalizedLanguage && typeof hljs !== 'undefined' && hljs && typeof hljs.getLanguage === 'function' && hljs.getLanguage(normalizedLanguage));
@@ -731,7 +734,9 @@
         insertInlineElement('span', color !== 'black' ? { color: color } : undefined);
     }
 
-    // Insert a code block, optionally without syntax highlighting
+    // Insert a code block, optionally without syntax highlighting.
+    // With no language at all, a plain block is inserted: no language badge,
+    // no syntax highlighting and no line numbers (see .plain-block).
     function insertCodeBlock(language, disableHighlight) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -741,6 +746,10 @@
         // Create code block (pre > code structure)
         const pre = document.createElement('pre');
         const code = document.createElement('code');
+
+        if (!language) {
+            pre.classList.add('plain-block');
+        }
 
         // Add a badge for the selected mode and only attach a highlight.js class when needed
         if (language) {
@@ -1795,6 +1804,14 @@
                 label: t('slash_menu.code', null, 'Code'),
                 submenu: [
                     { id: 'inline-code', icon: 'lucide-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => insertCode() },
+                    {
+                        id: 'plain-block',
+                        icon: 'lucide-file-text',
+                        label: t('slash_menu.plain_block', null, 'Plain block'),
+                        action: function () {
+                            insertCodeBlock('', true);
+                        }
+                    },
                     {
                         id: 'code-normal',
                         icon: 'lucide-file-code',

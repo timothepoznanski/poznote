@@ -89,6 +89,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/tasklist-embed.js',
         'js/excalidraw.js',
         'js/copy-code-on-focus.js',
+        'js/code-block-language.js',
         'js/table-context-menu.js',
         'js/table-cell-selection.js',
         'js/system-menu.js',
@@ -101,6 +102,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/snapshots.js',
         'js/ui-customization.js',
         'js/welcome-setup.js',
+        'js/paste-markdown-modal.js',
     ],
     ];
 }

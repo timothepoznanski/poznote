@@ -2533,12 +2533,37 @@ function parseMarkdown(text) {
 
     // Protect inline span tags with style attributes (for colors, backgrounds, etc.)
     // Match: <span style="...">content</span>
-    text = text.replace(/<span\s+style="([^"]+)">([^<]*)<\/span>/gi, function (match, styleAttr, content) {
-        let placeholder = '\x00PSPAN' + protectedIndex + '\x00';
-        let spanTag = '<span style="' + styleAttr + '">' + content + '</span>';
-        protectedElements[protectedIndex] = spanTag;
-        protectedIndex++;
-        return placeholder;
+    // Only the opening/closing tags are protected: the inner content is left in the
+    // stream so nested markdown (links, bold, ...) still gets parsed. Protecting the
+    // whole span would emit already-protected placeholders (PLNK0) as literal text.
+    text = text.replace(/<span\s+style="([^"]+)">((?:(?!<\/?span\b)[\s\S])*)<\/span>/gi, function (match, styleAttr, content) {
+        let openTag = '<span style="' + styleAttr + '">';
+
+        function protect(html) {
+            let placeholder = '\x00PSPAN' + protectedIndex + '\x00';
+            protectedElements[protectedIndex] = html;
+            protectedIndex++;
+            return placeholder;
+        }
+
+        // A span whose content spans several markdown blocks must be closed and
+        // reopened around each blank line, otherwise the paragraph builder emits
+        // the opening and closing tags in different <p> elements and the browser
+        // auto-closes the span at the first block boundary.
+        let blocks = content.split(/(\r?\n[ \t]*\r?\n)/);
+        let result = '';
+        blocks.forEach(function (block, i) {
+            if (i % 2 === 1) {
+                result += block; // the blank-line separator itself
+                return;
+            }
+            if (block === '') {
+                return;
+            }
+            result += protect(openTag) + block + protect('</span>');
+        });
+
+        return result;
     });
 
     // Protect details, summary, br, and underline tags

@@ -595,6 +595,149 @@ class PoznoteClient:
         data = response.json()
         return data.get("success", False)
 
+    # ------------------------------------------------------------------
+    # Reminders
+    # ------------------------------------------------------------------
+
+    def get_reminder(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """Get the reminder currently set on a note"""
+        response = self.client.get(f"/notes/{note_id}/reminder", headers=self._headers_for_user(user_id))
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def set_reminder(
+        self,
+        note_id: int,
+        reminder_at: str,
+        message: str | None = None,
+        email_enabled: bool | None = None,
+        recurrence: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Set (or replace) the reminder of a note"""
+        payload: dict = {"reminder_at": reminder_at}
+        if message is not None:
+            payload["message"] = message
+        if email_enabled is not None:
+            payload["email_enabled"] = email_enabled
+        if recurrence is not None:
+            payload["recurrence"] = recurrence
+
+        response = self.client.post(
+            f"/notes/{note_id}/reminder",
+            json=payload,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def remove_reminder(self, note_id: int, user_id: str | int | None = None) -> bool:
+        """Remove the reminder of a note"""
+        response = self.client.delete(f"/notes/{note_id}/reminder", headers=self._headers_for_user(user_id))
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
+        return response.json().get("success", False)
+
+    # ------------------------------------------------------------------
+    # Tasks (inside a tasklist note)
+    # ------------------------------------------------------------------
+
+    def list_tasks(self, note_id: int, user_id: str | int | None = None) -> dict | None:
+        """List the tasks of one tasklist note"""
+        response = self.client.get(f"/notes/{note_id}/tasks", headers=self._headers_for_user(user_id))
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def add_task(
+        self,
+        note_id: int,
+        text: str,
+        due_at: str | None = None,
+        reminder: bool | None = None,
+        reminder_email: bool | None = None,
+        recurrence: str | None = None,
+        important: bool | None = None,
+        completed: bool | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Append a task to a tasklist note"""
+        payload: dict = {"text": text}
+        for key, value in (
+            ("due_at", due_at),
+            ("reminder", reminder),
+            ("reminder_email", reminder_email),
+            ("recurrence", recurrence),
+            ("important", important),
+            ("completed", completed),
+        ):
+            if value is not None:
+                payload[key] = value
+
+        response = self.client.post(
+            f"/notes/{note_id}/tasks",
+            json=payload,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("task")
+        return None
+
+    def update_task(
+        self,
+        note_id: int,
+        task_id: str,
+        fields: dict,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Update one task of a tasklist note.
+
+        ``fields`` is passed through as-is so callers can explicitly send
+        ``due_at: None`` to clear a due date (a value distinct from omitting it).
+        """
+        response = self.client.patch(
+            f"/notes/{note_id}/tasks/{task_id}",
+            json=fields,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data.get("task")
+        return None
+
+    def delete_task(self, note_id: int, task_id: str, user_id: str | int | None = None) -> bool:
+        """Delete one task of a tasklist note"""
+        response = self.client.delete(
+            f"/notes/{note_id}/tasks/{task_id}",
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return False
+        response.raise_for_status()
+        return response.json().get("success", False)
+
     def list_shared(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
         """List all shared notes and folders"""
         params = {}
