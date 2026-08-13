@@ -20,6 +20,7 @@
  *   GET    /api/v1/folders/suggested    - Get suggested folders
  *   POST   /api/v1/folders/move-files   - Move all files from one folder to another
  *   POST   /api/v1/notes/{id}/folder    - Move note to folder (in NotesController)
+ *   POST   /api/v1/notes/{id}/kanban-completed - Mark a Kanban card completed/active
  */
 
 require_once __DIR__ . '/../../../note_loader.php';
@@ -1750,7 +1751,52 @@ class FoldersController {
             $this->sendError('Database error', 500);
         }
     }
-    
+
+    /**
+     * POST /api/v1/notes/{id}/kanban-completed - Mark a Kanban card completed or active
+     *
+     * Body: { "completed": true|false }
+     * Completed cards keep their folder (column) and are grouped into the
+     * collapsible "completed" section of that column.
+     */
+    public function setNoteKanbanCompleted(string $noteId): void {
+        $data = $this->getInputData();
+
+        if (!array_key_exists('completed', $data)) {
+            $this->sendError('Missing "completed" field', 400);
+            return;
+        }
+
+        $completed = filter_var($data['completed'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($completed === null) {
+            $this->sendError('Field "completed" must be a boolean', 400);
+            return;
+        }
+
+        $checkStmt = $this->db->prepare("SELECT id FROM entries WHERE id = ? AND trash = 0");
+        $checkStmt->execute([$noteId]);
+        if (!$checkStmt->fetch(PDO::FETCH_ASSOC)) {
+            $this->sendError('Note not found', 404);
+            return;
+        }
+
+        // Only kanban_completed changes: toggling completion is not a content
+        // edit, so 'updated' is left alone to preserve card ordering.
+        $stmt = $this->db->prepare("UPDATE entries SET kanban_completed = ? WHERE id = ?");
+        $success = $stmt->execute([$completed ? date('Y-m-d H:i:s') : null, $noteId]);
+
+        if (!$success) {
+            $this->sendError('Database error', 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'note_id' => (int) $noteId,
+            'completed' => $completed
+        ]);
+    }
+
     /**
      * POST /api/v1/notes/{id}/remove-folder - Remove note from folder (move to root)
      */

@@ -428,19 +428,29 @@
         var charCount = 0;
         var startLine = 0;
         var endLine = 0;
-        
+
         for (var i = 0; i < lines.length; i++) {
             var lineLength = lines[i].length + 1; // +1 for newline
-            
+
             if (charCount <= startOffset && startOffset < charCount + lineLength) {
                 startLine = i;
             }
             if (charCount <= endOffset && endOffset <= charCount + lineLength) {
                 endLine = i;
             }
-            
+
             charCount += lineLength;
         }
+
+        // Snapshot the affected block before the lines are rewritten, so the
+        // replacement can be scoped to these lines and the selection remapped
+        // (replacing the whole document would send the caret to the end of it).
+        var oldBlockLines = lines.slice(startLine, endLine + 1);
+        var blockStart = 0;
+        for (var b = 0; b < startLine; b++) {
+            blockStart += lines[b].length + 1;
+        }
+        var blockEnd = blockStart + oldBlockLines.join('\n').length;
 
         var modified = false;
 
@@ -513,8 +523,44 @@
         }
 
         if (modified) {
-            // Replace editor content
-            replaceMarkdownRangeByOffsets(editor, 0, textContent.length, lines.join('\n'));
+            var newBlockLines = lines.slice(startLine, endLine + 1);
+            var newBlock = newBlockLines.join('\n');
+            var blockDelta = newBlock.length - (blockEnd - blockStart);
+
+            // Map an offset of the original document to the rewritten one.
+            // Markers are added/removed at the start of each line, so within a
+            // line the column shifts by that line's length delta (clamped).
+            var remapOffset = function (offset) {
+                if (offset <= blockStart) return offset;
+                if (offset >= blockEnd) return offset + blockDelta;
+
+                var oldLineStart = blockStart;
+                var newLineStart = blockStart;
+                for (var k = 0; k < oldBlockLines.length; k++) {
+                    var oldLen = oldBlockLines[k].length;
+                    if (offset <= oldLineStart + oldLen) {
+                        var column = offset - oldLineStart;
+                        var newLen = newBlockLines[k].length;
+                        var newColumn = Math.max(0, Math.min(column + (newLen - oldLen), newLen));
+                        return newLineStart + newColumn;
+                    }
+                    oldLineStart += oldLen + 1;
+                    newLineStart += newBlockLines[k].length + 1;
+                }
+                return newLineStart;
+            };
+
+            // Replace only the affected lines and restore the (remapped)
+            // selection instead of rewriting the whole document, which would
+            // jump the caret and the scroll position to the end of the note.
+            replaceMarkdownRangeAndSelect(
+                editor,
+                blockStart,
+                blockEnd,
+                newBlock,
+                remapOffset(startOffset),
+                remapOffset(endOffset)
+            );
         }
     }
 

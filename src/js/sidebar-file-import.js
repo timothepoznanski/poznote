@@ -37,6 +37,9 @@
         if (!e.dataTransfer) return false;
         // An in-app note/folder drag sets window.currentDragData; never treat it as a file drop.
         if (window.currentDragData) return false;
+        // An image dragged from inside a note advertises 'Files' in Chrome;
+        // importing it here would create a duplicate note from the image.
+        if (window.internalDragActive) return false;
         var types = e.dataTransfer.types;
         if (!types) return false;
         return Array.prototype.indexOf.call(types, 'Files') !== -1;

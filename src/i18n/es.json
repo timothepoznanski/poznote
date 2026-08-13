@@ -147,6 +147,13 @@
     "notifications": {
       "activated_title": "Vista Kanban activada",
       "activated_message": "Esta carpeta está ahora en modo Kanban. Haz clic en su icono para abrir el tablero."
+    },
+    "completed": {
+      "show": "Mostrar completadas",
+      "hide": "Ocultar completadas",
+      "mark_completed": "Marcar como completada",
+      "mark_active": "Marcar como no completada",
+      "error": "No se pudo actualizar la tarjeta"
     }
   },
   "folders": {
@@ -414,6 +421,7 @@
       "markdown_split_card_view": "Muestra las notas markdown en una vista dividida enmarcada con editor y vista previa.",
       "markdown_colored": "Colorea las notas markdown: elige un color para cada nivel de título, el código en línea, el fondo de los bloques de código, las citas, los encabezados de tabla y los separadores.",
       "code_wrap": "Ajusta las líneas largas en los bloques de código en lugar de desplazarse horizontalmente.",
+      "code_line_numbers": "Muestra los números de línea en los bloques de código de la vista previa de markdown.",
       "attachment_previews": "Muestra vistas previas de los adjuntos dentro de las notas.",
       "attachments_at_bottom": "Muestra la sección de adjuntos en la parte inferior de las notas en lugar de arriba.",
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
@@ -671,6 +679,7 @@
       "markdown_split_card_view": "Markdown con marco",
       "markdown_colored": "Markdown a color",
       "code_block_word_wrap": "Ajuste de línea en bloques de código",
+      "code_block_line_numbers": "Números de línea en bloques de código",
       "attachment_previews_in_note": "Vistas previas de adjuntos",
       "attachments_at_bottom": "Adjuntos al final",
       "backlinks_at_bottom": "Backlinks al final",
@@ -2747,7 +2756,12 @@
         "cannot_change_self": "No puedes cambiar tu propio estado/rol",
         "username_required": "El nombre de usuario es obligatorio",
         "s3_cleanup_failed": "La cuenta se eliminó, pero sus archivos no se pudieron eliminar de los buckets S3: {{error}}. Elimínelos manualmente.",
-        "confirm_username_mismatch": "El nombre de usuario que escribió no coincide con la cuenta que se va a eliminar. No se eliminó nada."
+        "confirm_username_mismatch": "El nombre de usuario que escribió no coincide con la cuenta que se va a eliminar. No se eliminó nada.",
+        "username_taken": "Este nombre de usuario ya está en uso",
+        "email_taken": "Esta dirección de correo electrónico ya está en uso por otro perfil",
+        "no_email_profile_exists": "Ya existe otro perfil sin dirección de correo electrónico. Introduzca una dirección de correo electrónico para este perfil.",
+        "oidc_subject_taken": "Este sujeto OIDC ya está vinculado a otro perfil",
+        "database_error": "Se ha producido un error de base de datos. Consulte los registros del servidor para más detalles."
       },
       "delete_warning_everything": "Todo lo que pertenece a esta cuenta se eliminará de forma inmediata y permanente.",
       "delete_warning_item_data": "Sus notas, carpetas, etiquetas y archivos adjuntos",
@@ -3643,6 +3657,10 @@
     "list_empty": "Aún no hay copias en el bucket.",
     "list_error": "No se puede listar el bucket: {{error}}",
     "list_loading": "Cargando...",
+    "list_filter_placeholder": "Filtrar por usuario o nombre de archivo...",
+    "list_count": "{{total}} copia(s)",
+    "list_count_filtered": "{{shown}} de {{total}} copia(s) mostrada(s)",
+    "list_no_match": "Ninguna copia coincide con este filtro.",
     "col_user": "Usuario",
     "col_archive": "Archivo",
     "col_date": "Fecha",

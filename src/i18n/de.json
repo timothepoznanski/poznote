@@ -146,6 +146,13 @@
     "notifications": {
       "activated_title": "Kanban-Ansicht aktiviert",
       "activated_message": "Dieser Ordner ist jetzt im Kanban-Modus. Klicken Sie auf sein Symbol, um das Board zu öffnen."
+    },
+    "completed": {
+      "show": "Erledigte anzeigen",
+      "hide": "Erledigte ausblenden",
+      "mark_completed": "Als erledigt markieren",
+      "mark_active": "Als nicht erledigt markieren",
+      "error": "Die Karte konnte nicht aktualisiert werden"
     }
   },
   "folders": {
@@ -413,6 +420,7 @@
       "markdown_split_card_view": "Zeigen Sie Markdown-Notizen in einer gerahmten geteilten Ansicht mit Editor und Vorschau an.",
       "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für jede Überschriftenebene, Inline-Code, Codeblock-Hintergrund, Zitate, Tabellenköpfe und Trennlinien.",
       "code_wrap": "Lange Zeilen in Codeblöcken umbrechen statt horizontal zu scrollen.",
+      "code_line_numbers": "Zeilennummern in Codeblöcken in der Markdown-Vorschau anzeigen.",
       "attachment_previews": "Zeigen Sie Vorschauen von Anhängen in Notizen an.",
       "attachments_at_bottom": "Zeigen Sie den Anhangsbereich unten statt oben in Notizen an.",
       "backlinks_at_bottom": "Zeigen Sie den Backlink-Bereich unten statt oben in Notizen an.",
@@ -670,6 +678,7 @@
       "markdown_split_card_view": "Markdown mit Rahmen",
       "markdown_colored": "Farbiges Markdown",
       "code_block_word_wrap": "Codeblock-Zeilenumbruch",
+      "code_block_line_numbers": "Codeblock-Zeilennummern",
       "attachment_previews_in_note": "Anhangsvorschauen",
       "attachments_at_bottom": "Anhänge unten",
       "backlinks_at_bottom": "Backlinks unten",
@@ -2746,7 +2755,12 @@
         "cannot_change_self": "Sie können Ihren eigenen Status/Rolle nicht ändern",
         "username_required": "Benutzername ist erforderlich",
         "s3_cleanup_failed": "Das Konto wurde gelöscht, aber seine Dateien konnten nicht aus den S3-Buckets entfernt werden: {{error}}. Bitte löschen Sie sie manuell.",
-        "confirm_username_mismatch": "Der eingegebene Benutzername stimmt nicht mit dem zu löschenden Konto überein. Es wurde nichts gelöscht."
+        "confirm_username_mismatch": "Der eingegebene Benutzername stimmt nicht mit dem zu löschenden Konto überein. Es wurde nichts gelöscht.",
+        "username_taken": "Dieser Benutzername ist bereits vergeben",
+        "email_taken": "Diese E-Mail-Adresse wird bereits von einem anderen Profil verwendet",
+        "no_email_profile_exists": "Es existiert bereits ein anderes Profil ohne E-Mail-Adresse. Geben Sie für dieses Profil eine E-Mail-Adresse an.",
+        "oidc_subject_taken": "Dieses OIDC-Subjekt ist bereits mit einem anderen Profil verknüpft",
+        "database_error": "Ein Datenbankfehler ist aufgetreten. Prüfen Sie die Serverprotokolle für Details."
       },
       "delete_warning_everything": "Alles, was zu diesem Konto gehört, wird sofort und dauerhaft gelöscht.",
       "delete_warning_item_data": "Seine Notizen, Ordner, Tags und Anhänge",
@@ -3643,6 +3657,10 @@
     "list_empty": "Noch keine Sicherung im Bucket.",
     "list_error": "Bucket kann nicht aufgelistet werden: {{error}}",
     "list_loading": "Wird geladen...",
+    "list_filter_placeholder": "Nach Benutzer oder Archivnamen filtern...",
+    "list_count": "{{total}} Sicherung(en)",
+    "list_count_filtered": "{{shown}} von {{total}} Sicherung(en) angezeigt",
+    "list_no_match": "Keine Sicherung entspricht diesem Filter.",
     "col_user": "Benutzer",
     "col_archive": "Archiv",
     "col_date": "Datum",

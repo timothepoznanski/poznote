@@ -3,7 +3,27 @@
 
 // Setup drag-and-drop handlers for file uploads
 function setupDragDropEvents() {
+    // Track drags that originate inside the page. Chrome exposes a dragged
+    // <img> (e.g. an image already in a note) through dataTransfer.files, so
+    // without this flag the file-upload drop handlers below would re-import
+    // it as a new attachment and duplicate the image. OS file drags never
+    // fire dragstart in-page, so the flag stays false for real imports.
+    window.internalDragActive = false;
+    document.addEventListener('dragstart', function () {
+        window.internalDragActive = true;
+    }, true);
+    document.addEventListener('dragend', function () {
+        window.internalDragActive = false;
+    }, true);
+    document.addEventListener('drop', function () {
+        // Bubble handlers of this same drop still see the flag; clear after.
+        setTimeout(function () {
+            window.internalDragActive = false;
+        }, 0);
+    }, true);
+
     document.body.addEventListener('dragenter', function (e) {
+        if (window.internalDragActive) return;
         try {
             var el = document.elementFromPoint(e.clientX, e.clientY);
             var potential = el && el.closest ? el.closest('.noteentry') : null;
@@ -16,6 +36,7 @@ function setupDragDropEvents() {
     });
 
     document.body.addEventListener('dragover', function (e) {
+        if (window.internalDragActive) return;
         try {
             var el = document.elementFromPoint(e.clientX, e.clientY);
             var potential = el && el.closest ? el.closest('.noteentry') : null;
@@ -42,6 +63,7 @@ function setupDragDropEvents() {
     });
 
     document.body.addEventListener('drop', function (e) {
+        if (window.internalDragActive) return;
         try {
             var el = document.elementFromPoint(e.clientX, e.clientY);
             var note = el && el.closest ? el.closest('.noteentry') : null;
@@ -62,7 +84,7 @@ function setupDragDropEvents() {
             if (!dt) return;
 
             if (dt.files && dt.files.length > 0) {
-                handleImageFilesAndInsert(dt.files, note);
+                handleImageFilesAndInsert(dt.files, note, { x: e.clientX, y: e.clientY });
             }
         } catch (err) {
         }
@@ -78,6 +100,9 @@ function isPublicWorkspaceReadOnly() {
 // js/sidebar-file-import.js, so the folder handlers must ignore them.
 function isExternalFileDrag(e) {
     if (window.currentDragData) return false;
+    // Dragging an image already displayed in a note also advertises 'Files';
+    // only drags that never fired an in-page dragstart are real OS file drags.
+    if (window.internalDragActive) return false;
     if (!e.dataTransfer || !e.dataTransfer.types) return false;
     return Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') !== -1;
 }

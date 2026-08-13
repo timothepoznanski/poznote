@@ -52,7 +52,9 @@ try {
     $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Get notes directly in parent folder (using 'entries' table and 'trash' column)
-    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+    // Completed cards are ordered by completion date so the newest finished card
+    // sits at the top of the "completed" section.
+    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
     $stmt->execute([$folder_id]);
     $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -103,7 +105,7 @@ try {
     // Get notes for each subfolder
     $subfolderNotes = [];
     foreach ($subfolders as $subfolder) {
-        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.updated DESC");
+        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
         $stmt->execute([$subfolder['id']]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
@@ -212,11 +214,25 @@ try {
         $isTasklistPreview = (($note['kanban_preview_type'] ?? ($note['type'] ?? 'note')) === 'tasklist');
         $kanbanTags = getKanbanTags($note['tags'] ?? '');
         $kanbanDate = formatKanbanDate($note['updated'] ?? '');
+        $isCompleted = !empty($note['kanban_completed']);
+        $toggleLabel = $isCompleted
+            ? t_h('kanban.completed.mark_active', [], 'Mark as not completed')
+            : t_h('kanban.completed.mark_completed', [], 'Mark as completed');
         ?>
-        <div class="kanban-card" 
-             data-note-id="<?php echo $note['id']; ?>" 
+        <div class="kanban-card<?php echo $isCompleted ? ' kanban-card-completed' : ''; ?>"
+             data-note-id="<?php echo $note['id']; ?>"
              data-folder-id="<?php echo $folderId; ?>"
+             data-completed="<?php echo $isCompleted ? '1' : '0'; ?>"
              draggable="true">
+            <button type="button"
+                    class="kanban-card-complete-btn"
+                    data-action="toggle-kanban-completed"
+                    data-note-id="<?php echo $note['id']; ?>"
+                    title="<?php echo $toggleLabel; ?>"
+                    aria-label="<?php echo $toggleLabel; ?>"
+                    aria-pressed="<?php echo $isCompleted ? 'true' : 'false'; ?>">
+                <i class="lucide lucide-check"></i>
+            </button>
             <?php if ($kanbanDate !== '' || !empty($kanbanTags)): ?>
             <div class="kanban-card-topline">
                 <?php if ($kanbanDate !== ''): ?>
@@ -250,6 +266,58 @@ try {
                     echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
                 }
                 ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Split a column's notes into active cards and completed cards.
+     */
+    function splitKanbanNotesByCompletion($notes) {
+        $active = [];
+        $completed = [];
+        foreach ($notes as $note) {
+            if (!empty($note['kanban_completed'])) {
+                $completed[] = $note;
+            } else {
+                $active[] = $note;
+            }
+        }
+        return [$active, $completed];
+    }
+
+    /**
+     * Render the cards of a single column: active cards first, then a
+     * collapsible "completed" section holding the finished cards.
+     */
+    function renderKanbanColumnCards($notes, $folderId) {
+        [$activeNotes, $completedNotes] = splitKanbanNotesByCompletion($notes);
+
+        foreach ($activeNotes as $note) {
+            renderKanbanCard($note, $folderId);
+        }
+
+        if (empty($completedNotes)) {
+            return;
+        }
+
+        $completedCount = count($completedNotes);
+        ?>
+        <div class="kanban-completed-section" data-folder-id="<?php echo $folderId; ?>">
+            <button type="button"
+                    class="kanban-completed-toggle"
+                    data-action="toggle-kanban-completed-section"
+                    data-folder-id="<?php echo $folderId; ?>"
+                    aria-expanded="false">
+                <i class="lucide lucide-chevron-right kanban-completed-chevron"></i>
+                <span class="kanban-completed-label"><?php echo t_h('kanban.completed.show', [], 'Show completed'); ?></span>
+                <span class="kanban-completed-count"><?php echo $completedCount; ?></span>
+            </button>
+            <div class="kanban-completed-content">
+                <?php foreach ($completedNotes as $note): ?>
+                <?php renderKanbanCard($note, $folderId); ?>
+                <?php endforeach; ?>
             </div>
         </div>
         <?php
@@ -314,13 +382,11 @@ try {
                                 title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
                             <i class="lucide lucide-plus-circle"></i>
                         </button>
-                        <span class="kanban-column-count"><?php echo count($parentNotes); ?></span>
+                        <span class="kanban-column-count"><?php echo count(splitKanbanNotesByCompletion($parentNotes)[0]); ?></span>
                     </div>
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $folder_id; ?>">
-                    <?php foreach ($parentNotes as $note): ?>
-                    <?php renderKanbanCard($note, $folder_id); ?>
-                    <?php endforeach; ?>
+                    <?php renderKanbanColumnCards($parentNotes, $folder_id); ?>
                 </div>
             </div>
             <?php endif; ?>
@@ -355,13 +421,11 @@ try {
                                 title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
                             <i class="lucide lucide-plus-circle"></i>
                         </button>
-                        <span class="kanban-column-count"><?php echo count($subfolderNotes[$subfolder['id']] ?? []); ?></span>
+                        <span class="kanban-column-count"><?php echo count(splitKanbanNotesByCompletion($subfolderNotes[$subfolder['id']] ?? [])[0]); ?></span>
                     </div>
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $subfolder['id']; ?>">
-                    <?php foreach ($subfolderNotes[$subfolder['id']] ?? [] as $note): ?>
-                    <?php renderKanbanCard($note, $subfolder['id']); ?>
-                    <?php endforeach; ?>
+                    <?php renderKanbanColumnCards($subfolderNotes[$subfolder['id']] ?? [], $subfolder['id']); ?>
                 </div>
             </div>
             <?php endforeach; ?>

@@ -57,6 +57,34 @@ pre.code-block::-webkit-scrollbar-thumb:horizontal:active,
     cursor: grabbing;
 }
 
+/* Line numbers in rendered code blocks (code_block_line_numbers setting).
+   The .code-line spans are added by applyCodeLineNumbers() in
+   js/syntax-highlight.js; numbers are drawn with CSS counters in ::before so
+   they are never part of the selected or copied text. */
+.noteentry pre code.code-line-numbers {
+    display: block;
+    counter-reset: poznote-code-line;
+}
+
+.noteentry pre code.code-line-numbers .code-line {
+    display: block;
+    position: relative;
+    counter-increment: poznote-code-line;
+    padding-left: calc(var(--code-line-number-digits, 2ch) + 1.4em);
+}
+
+.noteentry pre code.code-line-numbers .code-line::before {
+    content: counter(poznote-code-line);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--code-line-number-digits, 2ch);
+    text-align: right;
+    color: #9aa3af;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
 /* Copy & Delete icon for code blocks */
 .code-block-copy-btn,
 pre.code-block .code-block-copy-btn,

@@ -164,12 +164,19 @@ $allBackupUsers = listAllUserProfiles();
     .s3-backup-users-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
     .s3-backup-users-search { position: relative; flex: 1 1 220px; min-width: 180px; }
     .s3-backup-users-search .lucide-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity: 0.55; pointer-events: none; font-size: 0.95rem; }
-    #s3-backup-user-filter { width: 100%; padding-left: 32px; padding-right: 30px; margin: 0; }
+    #s3-backup-user-filter, #s3-backup-list-filter { width: 100%; padding-left: 32px; padding-right: 30px; margin: 0; }
     .s3-backup-users-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 0.6; color: inherit; line-height: 1; }
     .s3-backup-users-clear:hover { opacity: 1; }
     .s3-backup-users-toolbar .btn { padding: 5px 12px; font-size: 0.85rem; margin: 0; }
     .s3-backup-users-list { max-height: 260px; overflow-y: auto; border: 1px solid rgba(128,128,128,0.35); border-radius: 6px; }
-    #s3-backup-user-filter::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    #s3-backup-user-filter::-webkit-search-cancel-button,
+    #s3-backup-list-filter::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    /* Backup list filter reuses the users-toolbar look; [hidden] must beat its
+       display:flex (same trap as the user rows above) */
+    .s3-backup-list-toolbar { margin: 10px 0 0; }
+    .s3-backup-list-toolbar[hidden] { display: none; }
+    .s3-backup-list-count { margin: 0; white-space: nowrap; }
+    .s3-backup-list-empty { padding: 12px; font-size: 0.9rem; opacity: 0.7; }
     .s3-backup-user-check { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; cursor: pointer; padding: 7px 12px; margin: 0; border-bottom: 1px solid rgba(128,128,128,0.18); }
     /* [hidden] must beat the display:flex above, or filtered-out rows stay visible */
     .s3-backup-user-check[hidden] { display: none; }
@@ -414,6 +421,19 @@ $allBackupUsers = listAllUserProfiles();
         <div class="git-sync-section">
             <h2><i class="lucide lucide-archive"></i> <?php echo t_h('s3_backup.list_title', [], 'Backups in the bucket'); ?></h2>
             <div class="config-hint" id="s3-backup-list-status" hidden></div>
+            <div class="s3-backup-users-toolbar s3-backup-list-toolbar" id="s3-backup-list-toolbar" hidden>
+                <div class="s3-backup-users-search">
+                    <i class="lucide lucide-search"></i>
+                    <input type="search" id="s3-backup-list-filter" class="git-field-input"
+                           placeholder="<?php echo t_h('s3_backup.list_filter_placeholder', [], 'Filter by user or archive name...'); ?>"
+                           autocomplete="off">
+                    <button type="button" class="s3-backup-users-clear" id="s3-backup-list-filter-clear" hidden
+                            aria-label="<?php echo t_h('s3_backup.users_filter_clear', [], 'Clear filter'); ?>">
+                        <i class="lucide lucide-x"></i>
+                    </button>
+                </div>
+                <span class="s3-backup-users-count s3-backup-list-count" id="s3-backup-list-count"></span>
+            </div>
             <div class="s3-backup-table-wrap">
                 <table class="s3-backup-table" id="s3-backup-table" hidden>
                     <thead>
@@ -435,6 +455,7 @@ $allBackupUsers = listAllUserProfiles();
                     </thead>
                     <tbody></tbody>
                 </table>
+                <div class="s3-backup-list-empty" id="s3-backup-list-no-match" hidden><?php echo t_h('s3_backup.list_no_match', [], 'No backup matches this filter.'); ?></div>
             </div>
         </div>
 
@@ -468,6 +489,8 @@ $allBackupUsers = listAllUserProfiles();
             triggerAuto: <?php echo json_encode(t('s3_backup.trigger_auto', [], 'automatic')); ?>,
             triggerManual: <?php echo json_encode(t('s3_backup.trigger_manual', [], 'manual')); ?>,
             listEmpty: <?php echo json_encode(t('s3_backup.list_empty', [], 'No backup in the bucket yet.')); ?>,
+            listCount: <?php echo json_encode(t('s3_backup.list_count', [], '{{total}} backup(s)')); ?>,
+            listCountFiltered: <?php echo json_encode(t('s3_backup.list_count_filtered', [], '{{shown}} of {{total}} backup(s) shown')); ?>,
             listError: <?php echo json_encode(t('s3_backup.list_error', [], 'Cannot list the bucket: {{error}}')); ?>,
             listLoading: <?php echo json_encode(t('s3_backup.list_loading', [], 'Loading...')); ?>,
             download: <?php echo json_encode(t('s3_backup.download', [], 'Download')); ?>,
@@ -731,6 +754,43 @@ $allBackupUsers = listAllUserProfiles();
         var backupList = [];
         var sortKey = null;
         var sortDir = 'asc';
+        var listFilterQuery = '';
+
+        // Filter on what the user actually sees in the row: username, archive
+        // name and the locally-formatted date
+        function filteredBackups() {
+            var list = sortedBackups();
+            if (listFilterQuery === '') return list;
+            return list.filter(function(backup) {
+                var haystack = (backup.username + ' ' + backup.filename + ' ' + formatTimestamp(backup.mtime)).toLowerCase();
+                return haystack.indexOf(listFilterQuery) !== -1;
+            });
+        }
+
+        (function() {
+            var filterEl = document.getElementById('s3-backup-list-filter');
+            var clearEl = document.getElementById('s3-backup-list-filter-clear');
+
+            function apply() {
+                listFilterQuery = filterEl.value.trim().toLowerCase();
+                clearEl.hidden = filterEl.value === '';
+                renderBackupRows();
+            }
+
+            filterEl.addEventListener('input', apply);
+            filterEl.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && filterEl.value !== '') {
+                    e.preventDefault();
+                    filterEl.value = '';
+                    apply();
+                }
+            });
+            clearEl.addEventListener('click', function() {
+                filterEl.value = '';
+                apply();
+                filterEl.focus();
+            });
+        })();
 
         function sortedBackups() {
             if (!sortKey) return backupList.slice();
@@ -769,6 +829,8 @@ $allBackupUsers = listAllUserProfiles();
         function refreshList() {
             var statusEl = document.getElementById('s3-backup-list-status');
             var table = document.getElementById('s3-backup-table');
+            var toolbar = document.getElementById('s3-backup-list-toolbar');
+            var noMatchEl = document.getElementById('s3-backup-list-no-match');
             statusEl.hidden = false;
             statusEl.textContent = i18n.listLoading;
 
@@ -780,22 +842,29 @@ $allBackupUsers = listAllUserProfiles();
                     backupList = [];
                     if (!data.success) {
                         table.hidden = true;
+                        toolbar.hidden = true;
+                        noMatchEl.hidden = true;
                         statusEl.textContent = i18n.listError.replace('{{error}}', data.error || 'unknown');
                         return;
                     }
                     if (!data.backups.length) {
                         table.hidden = true;
+                        toolbar.hidden = true;
+                        noMatchEl.hidden = true;
                         statusEl.textContent = i18n.listEmpty;
                         return;
                     }
                     statusEl.textContent = '';
                     statusEl.hidden = true;
                     table.hidden = false;
+                    toolbar.hidden = false;
                     backupList = data.backups;
                     renderBackupRows();
                 })
                 .catch(function(e) {
                     table.hidden = true;
+                    toolbar.hidden = true;
+                    noMatchEl.hidden = true;
                     statusEl.textContent = i18n.listError.replace('{{error}}', e.message);
                 });
         }
@@ -804,7 +873,15 @@ $allBackupUsers = listAllUserProfiles();
             var table = document.getElementById('s3-backup-table');
             var tbody = table.querySelector('tbody');
             tbody.innerHTML = '';
-            sortedBackups().forEach(function(backup) {
+            var shown = filteredBackups();
+
+            var countEl = document.getElementById('s3-backup-list-count');
+            countEl.textContent = listFilterQuery === ''
+                ? i18n.listCount.replace('{{total}}', backupList.length)
+                : i18n.listCountFiltered.replace('{{shown}}', shown.length).replace('{{total}}', backupList.length);
+            document.getElementById('s3-backup-list-no-match').hidden = shown.length > 0 || backupList.length === 0;
+
+            shown.forEach(function(backup) {
                 var tr = document.createElement('tr');
 
                 var tdUser = document.createElement('td');

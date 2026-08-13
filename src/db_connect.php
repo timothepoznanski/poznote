@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 26; // 26: folders.favorite column (favorite folders)
+    $CURRENT_SCHEMA_VERSION = 27; // 27: entries.kanban_completed column (Kanban completed section)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -237,7 +237,8 @@ try {
             icon_color TEXT,
             color TEXT,
             created_by_user_id INTEGER,
-            updated_by_user_id INTEGER
+            updated_by_user_id INTEGER,
+            kanban_completed DATETIME
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -615,6 +616,19 @@ try {
             error_log('Could not add linked_note_id column: ' . $e->getMessage());
         }
 
+        // Ensure kanban_completed column exists (Kanban "completed" section).
+        // Stores the completion timestamp so completed cards can be ordered by
+        // when they were finished; NULL means the card is still active.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('kanban_completed', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN kanban_completed DATETIME");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add kanban_completed column: ' . $e->getMessage());
+        }
+
         // === DATA DIRECTORIES ===
         // $dbDir points to data/users/{id}/database, so we go up one level to get data/users/{id}/
         $dataDir = dirname($dbDir);
@@ -639,21 +653,11 @@ try {
                 $folderData = $folderStmt->fetch(PDO::FETCH_ASSOC);
                 $folderId = $folderData ? (int)$folderData['id'] : null;
 
-                // Create the welcome note in the user's active interface language.
+                // Create the welcome note in the user's active interface
+                // language (poznoteWelcomeNoteContent carries the template
+                // and hardcoded fallbacks for incomplete dictionaries).
                 $welcomeTitle = t('welcome_note.title', [], 'Welcome to Poznote');
-                $welcomeContent = t('welcome_note.content', [], '');
-
-                // Keep the template as a fallback for installations that have
-                // an incomplete/custom dictionary.
-                if (trim($welcomeContent) === '') {
-                    $welcomeTemplateFile = __DIR__ . '/welcome_note.html';
-                    $welcomeContent = @file_get_contents($welcomeTemplateFile);
-                }
-
-                // Fallback in case the template file is missing
-                if ($welcomeContent === false || trim($welcomeContent) === '') {
-                    $welcomeContent = '<p>Welcome to Poznote.</p>';
-                }
+                $welcomeContent = poznoteWelcomeNoteContent(getUserLanguage());
 
                 // Insert the welcome note
                 $now_utc = gmdate('Y-m-d H:i:s', time());

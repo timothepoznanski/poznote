@@ -157,6 +157,13 @@
       "filter_placeholder": "Filtrer par nom de tableau...",
       "no_boards": "Aucun tableau Kanban pour le moment.",
       "hint": "Activez la vue Kanban sur un dossier pour le voir apparaître ici."
+    },
+    "completed": {
+      "show": "Afficher les terminées",
+      "hide": "Masquer les terminées",
+      "mark_completed": "Marquer comme terminée",
+      "mark_active": "Marquer comme non terminée",
+      "error": "Impossible de mettre à jour la carte"
     }
   },
   "folders": {
@@ -425,6 +432,7 @@
       "markdown_split_card_view": "Affichez les notes markdown dans une vue scindée encadrée avec éditeur et aperçu.",
       "markdown_colored": "Colorez les notes markdown : choisissez une couleur pour chaque niveau de titre, le code en ligne, le fond des blocs de code, les citations, les en-têtes de tableaux et les séparateurs.",
       "code_wrap": "Renvoyez à la ligne les longues lignes des blocs de code au lieu de défiler horizontalement.",
+      "code_line_numbers": "Affichez les numéros de ligne dans les blocs de code de l'aperçu markdown.",
       "attachment_previews": "Affichez un aperçu des pièces jointes dans les notes.",
       "attachments_at_bottom": "Affichez la section des pièces jointes en bas des notes plutôt qu'en haut.",
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
@@ -685,6 +693,7 @@
       "markdown_split_card_view": "Markdown encadré",
       "markdown_colored": "Markdown coloré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
+      "code_block_line_numbers": "Numéros de ligne des blocs de code",
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "attachments_at_bottom": "Pièces jointes en bas",
       "backlinks_at_bottom": "Backlinks en bas",
@@ -2826,7 +2835,10 @@
         "s3_cleanup_failed": "Le compte a été supprimé, mais ses fichiers n'ont pas pu être supprimés des buckets S3 : {{error}}. Supprimez-les manuellement.",
         "cannot_demote_self": "Vous ne pouvez pas retirer vos propres privilèges administrateur",
         "cannot_change_self": "Vous ne pouvez pas modifier votre propre statut ou rôle",
-        "confirm_username_mismatch": "Le nom d'utilisateur saisi ne correspond pas au compte à supprimer. Rien n'a été supprimé."
+        "confirm_username_mismatch": "Le nom d'utilisateur saisi ne correspond pas au compte à supprimer. Rien n'a été supprimé.",
+        "no_email_profile_exists": "Un autre profil sans adresse email existe déjà. Renseignez une adresse email pour ce profil.",
+        "oidc_subject_taken": "Ce sujet OIDC est déjà associé à un autre profil",
+        "database_error": "Une erreur de base de données est survenue. Consultez les journaux du serveur pour plus de détails."
       },
       "stats": {
         "title": "Statistiques système",
@@ -3832,6 +3844,10 @@
     "list_empty": "Aucune sauvegarde dans le bucket pour le moment.",
     "list_error": "Impossible de lister le bucket : {{error}}",
     "list_loading": "Chargement...",
+    "list_filter_placeholder": "Filtrer par utilisateur ou nom d'archive...",
+    "list_count": "{{total}} sauvegarde(s)",
+    "list_count_filtered": "{{shown}} sauvegarde(s) affichée(s) sur {{total}}",
+    "list_no_match": "Aucune sauvegarde ne correspond à ce filtre.",
     "col_user": "Utilisateur",
     "col_archive": "Archive",
     "col_date": "Date",

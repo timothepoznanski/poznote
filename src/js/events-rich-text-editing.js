@@ -116,6 +116,30 @@ function setupNoteEditingEvents() {
 // ============================================================================
 
 /**
+ * Build a checklist item (li > label > input + span) with the given text.
+ * DOM construction keeps user text as text: injecting it through innerHTML
+ * would parse characters like < and & as markup and mangle the content.
+ * @param {string} text - The item text
+ * @returns {HTMLElement} The new li.checklist-item element
+ */
+function buildChecklistItem(text) {
+    var item = document.createElement('li');
+    item.className = 'checklist-item';
+
+    var label = document.createElement('label');
+    var checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    var span = document.createElement('span');
+    span.className = 'checklist-text';
+    span.textContent = text || '';
+
+    label.appendChild(checkbox);
+    label.appendChild(span);
+    item.appendChild(label);
+    return item;
+}
+
+/**
  * Handle Enter key in checklist - create new item or exit checklist
  * @param {Event} e - The keyboard event
  * @param {HTMLElement} listItem - The current checklist item
@@ -160,9 +184,7 @@ function handleChecklistEnter(e, listItem, textSpan) {
 
         textSpan.textContent = textBefore;
 
-        var newItem = document.createElement('li');
-        newItem.className = 'checklist-item';
-        newItem.innerHTML = '<label><input type="checkbox"><span class="checklist-text">' + textAfter + '</span></label>';
+        var newItem = buildChecklistItem(textAfter);
 
         listItem.parentElement.insertBefore(newItem, listItem.nextSibling);
 
@@ -175,9 +197,7 @@ function handleChecklistEnter(e, listItem, textSpan) {
     }
 
     // Create new empty checklist item
-    var newItem = document.createElement('li');
-    newItem.className = 'checklist-item';
-    newItem.innerHTML = '<label><input type="checkbox"><span class="checklist-text"></span></label>';
+    var newItem = buildChecklistItem('');
 
     listItem.parentElement.insertBefore(newItem, listItem.nextSibling);
 
@@ -256,6 +276,11 @@ function navigateChecklistItems(e, listItem, direction) {
  */
 function handleChecklistKeydown(e) {
     var target = e.target;
+
+    // checklist.js handles these keys first (capture phase) and calls
+    // preventDefault when it does; running this fallback on top of it would
+    // process the same keystroke twice (e.g. two new items on one Enter)
+    if (e.defaultPrevented) return;
 
     if (!target.closest || !target.closest('li.checklist-item')) return;
 
@@ -1438,12 +1463,16 @@ function handleRichTextPaste(htmlData) {
             }
         }
 
-        // Remove legacy attributes
+        // Remove legacy attributes. Keep width/height on media elements:
+        // stripping them made pasted images lose their dimensions.
         el.removeAttribute('bgcolor');
         el.removeAttribute('color');
         el.removeAttribute('face');
-        el.removeAttribute('width');
-        el.removeAttribute('height');
+        var isMediaElement = el.tagName === 'IMG' || el.tagName === 'VIDEO' || el.tagName === 'IFRAME';
+        if (!isMediaElement) {
+            el.removeAttribute('width');
+            el.removeAttribute('height');
+        }
     }
 
     var cleanHtml = doc.body.innerHTML;
@@ -1456,35 +1485,151 @@ function handleRichTextPaste(htmlData) {
 }
 
 /**
+ * Rebuild the ancestor context that Range.cloneContents() drops.
+ *
+ * cloneContents() never includes the ancestors of the range boundaries, so a
+ * selection living entirely inside one block loses that block: two <li> of the
+ * same list come out without their <ul> (pasting then produces orphan <li>),
+ * a fully selected heading comes out as bare text, and text inside a styled
+ * <span> loses its color. The native copy the handler below replaces rebuilds
+ * this context; do the same by wrapping the fragment in shallow clones of the
+ * relevant ancestors, from the range's common ancestor up to the note root.
+ *
+ * @param {DocumentFragment} fragment - The cloned selection contents
+ * @param {Range} range - The selection range the fragment came from
+ * @param {HTMLElement} note - The .noteentry containing the selection
+ * @returns {DocumentFragment} The fragment, wrapped as needed
+ */
+function wrapCopiedFragmentWithAncestors(fragment, range, note) {
+    // Inline formatting ancestors are always kept (they carry the visible style)
+    var inlineTags = {
+        B: 1, STRONG: 1, I: 1, EM: 1, U: 1, S: 1, STRIKE: 1, DEL: 1,
+        CODE: 1, A: 1, MARK: 1, FONT: 1, SUB: 1, SUP: 1, KBD: 1
+    };
+    // Block ancestors kept only when the selection spans their entire text
+    var fullTextBlockTags = {
+        LI: 1, H1: 1, H2: 1, H3: 1, H4: 1, H5: 1, H6: 1,
+        BLOCKQUOTE: 1, PRE: 1, DETAILS: 1
+    };
+
+    function fragmentHasTopLevel(tags) {
+        for (var child = fragment.firstChild; child; child = child.nextSibling) {
+            if (child.nodeType === 1 && tags[child.tagName]) return true;
+        }
+        return false;
+    }
+
+    function isChecklistNode(el) {
+        return !!(el.classList && (
+            el.classList.contains('checklist-item') || el.classList.contains('task-list-item') ||
+            el.classList.contains('checklist') || el.classList.contains('task-list')));
+    }
+
+    function wrapIn(el) {
+        var wrapper = el.cloneNode(false);
+        wrapper.appendChild(fragment);
+        fragment = document.createDocumentFragment();
+        fragment.appendChild(wrapper);
+    }
+
+    var selectionText = range.toString();
+    var node = range.commonAncestorContainer;
+    if (node.nodeType === 3) node = node.parentNode;
+
+    while (node && node !== note && note.contains(node) && node.tagName) {
+        var tag = node.tagName;
+
+        // Checklist items need their <label><input> structure; wrapping the
+        // bare text in their li/ul clones would produce a malformed checklist
+        if (isChecklistNode(node)) {
+            node = node.parentNode;
+            continue;
+        }
+
+        if (inlineTags[tag]) {
+            wrapIn(node);
+        } else if (tag === 'SPAN' && node.getAttribute('style')) {
+            // Plain spans are structural noise, styled spans carry formatting
+            wrapIn(node);
+        } else if (tag === 'UL' || tag === 'OL') {
+            if (fragmentHasTopLevel({ LI: 1 })) wrapIn(node);
+        } else if (tag === 'TR') {
+            if (fragmentHasTopLevel({ TD: 1, TH: 1 })) wrapIn(node);
+        } else if (tag === 'THEAD' || tag === 'TBODY' || tag === 'TFOOT' || tag === 'TABLE') {
+            if (fragmentHasTopLevel({ TR: 1, THEAD: 1, TBODY: 1, TFOOT: 1 })) wrapIn(node);
+        } else if (fullTextBlockTags[tag]) {
+            // Keep the block (bullet, heading level, quote...) when the whole
+            // line was selected; a partial selection pastes as inline text
+            if (node.textContent === selectionText) wrapIn(node);
+        }
+
+        node = node.parentNode;
+    }
+
+    return fragment;
+}
+
+/**
+ * Serialise the current note selection to the clipboard with the
+ * Poznote-internal marker, so the paste handler can preserve all styles.
+ * Shared by the copy and cut handlers.
+ *
+ * @param {ClipboardEvent} e - The copy or cut event
+ * @returns {boolean} True when the clipboard was written (default prevented)
+ */
+function writeNoteSelectionToClipboard(e) {
+    var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
+    if (!note) return false;
+
+    var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
+    if (isMarkdownNote) return false;
+
+    var selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return false;
+
+    // Serialise the selection into HTML, restoring the block/inline
+    // ancestors that cloneContents() drops (list wrapper, heading tag,
+    // styled spans...) so pasting reproduces the copied structure
+    var range = selection.getRangeAt(0);
+    var fragment = wrapCopiedFragmentWithAncestors(range.cloneContents(), range, note);
+    var tempDiv = document.createElement('div');
+    tempDiv.appendChild(fragment);
+    var htmlContent = tempDiv.innerHTML;
+    if (!htmlContent) return false;
+
+    // Prepend the marker so the paste handler knows this came from Poznote
+    e.clipboardData.setData('text/html', '<!-- poznote-internal -->' + htmlContent);
+    e.clipboardData.setData('text/plain', selection.toString());
+    e.preventDefault();
+    return true;
+}
+
+/**
  * Setup paste event handling for rich text and images
  */
 function setupPasteHandling() {
-    // Mark copied HTML as Poznote-internal so the paste handler can preserve all styles
     document.body.addEventListener('copy', function (e) {
         try {
-            var note = (e.target && e.target.closest) ? e.target.closest('.noteentry') : null;
-            if (!note) return;
-
-            var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
-            if (isMarkdownNote) return;
-
-            var selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0) return;
-
-            // Serialise the selection into HTML
-            var range = selection.getRangeAt(0);
-            var fragment = range.cloneContents();
-            var tempDiv = document.createElement('div');
-            tempDiv.appendChild(fragment);
-            var htmlContent = tempDiv.innerHTML;
-            if (!htmlContent) return;
-
-            // Prepend the marker so the paste handler knows this came from Poznote
-            e.clipboardData.setData('text/html', '<!-- poznote-internal -->' + htmlContent);
-            e.clipboardData.setData('text/plain', selection.toString());
-            e.preventDefault();
+            writeNoteSelectionToClipboard(e);
         } catch (err) {
             console.error('Copy handling error:', err);
+        }
+    });
+
+    // Cut must go through the same serialisation as copy: the browser's
+    // native cut has no Poznote-internal marker, so pasting the cut content
+    // back fell into the external-paste cleanup that strips colors,
+    // highlights and font sizes (moving text lost its formatting).
+    document.body.addEventListener('cut', function (e) {
+        try {
+            if (writeNoteSelectionToClipboard(e)) {
+                // preventDefault suppressed the native deletion as well;
+                // execCommand keeps the removal on the undo stack
+                document.execCommand('delete');
+                triggerNoteSave();
+            }
+        } catch (err) {
+            console.error('Cut handling error:', err);
         }
     });
 

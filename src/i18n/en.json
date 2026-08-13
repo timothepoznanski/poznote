@@ -151,6 +151,7 @@
       "markdown_split_card_view": "Display markdown notes in a framed split view with editor and preview.",
       "markdown_colored": "Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.",
       "code_wrap": "Wrap long lines in code blocks instead of scrolling horizontally.",
+      "code_line_numbers": "Show line numbers in code blocks in the markdown preview.",
       "attachment_previews": "Show previews of attachments inside notes.",
       "attachments_at_bottom": "Show the attachments section at the bottom of notes instead of the top.",
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
@@ -327,6 +328,7 @@
       "markdown_split_card_view": "Framed markdown",
       "markdown_colored": "Colored markdown",
       "code_block_word_wrap": "Code block word wrap",
+      "code_block_line_numbers": "Code block line numbers",
       "attachment_previews_in_note": "Attachment previews",
       "attachments_at_bottom": "Attachments at bottom",
       "backlinks_at_bottom": "Backlinks at bottom",
@@ -1930,6 +1932,13 @@
       "filter_placeholder": "Filter by board name...",
       "no_boards": "No Kanban boards yet.",
       "hint": "Enable Kanban view on a folder to see it here."
+    },
+    "completed": {
+      "show": "Show completed",
+      "hide": "Hide completed",
+      "mark_completed": "Mark as completed",
+      "mark_active": "Mark as not completed",
+      "error": "Failed to update the card"
     }
   },
   "sidebar": {
@@ -2749,7 +2758,12 @@
         "cannot_change_self": "You cannot change your own status/role",
         "username_required": "Username is required",
         "s3_cleanup_failed": "The account was deleted, but its files could not be removed from the S3 buckets: {{error}}. Delete them manually.",
-        "confirm_username_mismatch": "The username you typed does not match the account to delete. Nothing was deleted."
+        "confirm_username_mismatch": "The username you typed does not match the account to delete. Nothing was deleted.",
+        "username_taken": "This username is already taken",
+        "email_taken": "This email address is already used by another profile",
+        "no_email_profile_exists": "Another profile without an email address already exists. Enter an email address for this profile.",
+        "oidc_subject_taken": "This OIDC subject is already linked to another profile",
+        "database_error": "A database error occurred. Check the server logs for details."
       },
       "delete_warning_everything": "Everything belonging to this account will be deleted immediately and permanently.",
       "delete_warning_item_data": "Its notes, folders, tags and attachments",
@@ -3337,6 +3351,10 @@
     "list_empty": "No backup in the bucket yet.",
     "list_error": "Cannot list the bucket: {{error}}",
     "list_loading": "Loading...",
+    "list_filter_placeholder": "Filter by user or archive name...",
+    "list_count": "{{total}} backup(s)",
+    "list_count_filtered": "{{shown}} of {{total}} backup(s) shown",
+    "list_no_match": "No backup matches this filter.",
     "col_user": "User",
     "col_archive": "Archive",
     "col_date": "Date",

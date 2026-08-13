@@ -60,8 +60,8 @@ body.dark-mode .note-scroll-edge-btn:focus {
 }
 
 /* Readable text colors: preserve inline color styles, links, and syntax highlighting */
-html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *),
-body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *) {
+html[data-theme='dark'] .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *),
+body.dark-mode .noteentry *:not([style*="color"]):not(a):not([class*="hljs"]):not(code[class*="language-"]):not(.code-line):not(.search-highlight):not(.search-highlight-active):not([class^="md-"]):not([class*=" md-"]):not(.markdown-codemirror-host *) {
     color: var(--dm-text) !important;
 }
 
@@ -85,6 +85,13 @@ body.dark-mode pre.code-block {
     background-color: var(--dm-code-bg) !important;
     border-color: var(--dm-border) !important;
     color: var(--dm-text-muted) !important;
+}
+
+/* Line-number gutter (code_block_line_numbers setting) */
+html[data-theme='dark'] .noteentry pre code.code-line-numbers .code-line::before,
+body.dark-mode .noteentry pre code.code-line-numbers .code-line::before {
+    color: var(--dm-text-muted);
+    opacity: 0.55;
 }
 
 /* Highlighter inside code blocks: preserve dark background with readable highlight */

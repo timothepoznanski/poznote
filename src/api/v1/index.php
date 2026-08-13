@@ -520,6 +520,11 @@ $router->post('/notes/{id}/remove-folder', function($params) use ($foldersContro
     $foldersController->removeNoteFromFolder($params['id']);
 });
 
+// Mark a note completed / active on the Kanban board
+$router->post('/notes/{id}/kanban-completed', function($params) use ($foldersController) {
+    $foldersController->setNoteKanbanCompleted($params['id']);
+});
+
 // ======================
 // Folders Routes
 // ======================

@@ -156,3 +156,63 @@ body.dark-mode .kanban-column-content.drag-over {
     background: var(--dm-surface);
     border-color: #6366f1;
 }
+
+/* ===== Card completion button ===== */
+html[data-theme='dark'] .kanban-card-complete-btn,
+body.dark-mode .kanban-card-complete-btn {
+    background: var(--dm-surface);
+    border-color: var(--dm-border-light);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-card-complete-btn:hover,
+body.dark-mode .kanban-card-complete-btn:hover {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: #22c55e;
+    color: #22c55e;
+}
+
+html[data-theme='dark'] .kanban-card-completed .kanban-card-complete-btn,
+body.dark-mode .kanban-card-completed .kanban-card-complete-btn {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #ffffff;
+}
+
+/* ===== Completed cards ===== */
+html[data-theme='dark'] .kanban-card-completed,
+body.dark-mode .kanban-card-completed {
+    background: var(--dm-bg);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-card-completed .kanban-card-title,
+body.dark-mode .kanban-card-completed .kanban-card-title {
+    color: #808080;
+    text-decoration: line-through;
+}
+
+html[data-theme='dark'] .kanban-card-completed .kanban-card-snippet,
+body.dark-mode .kanban-card-completed .kanban-card-snippet,
+html[data-theme='dark'] .kanban-card-completed .kanban-card-date,
+body.dark-mode .kanban-card-completed .kanban-card-date {
+    color: #6b7280;
+}
+
+/* ===== Completed section ===== */
+html[data-theme='dark'] .kanban-completed-toggle,
+body.dark-mode .kanban-completed-toggle {
+    border-top-color: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-completed-toggle:hover,
+body.dark-mode .kanban-completed-toggle:hover {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .kanban-completed-count,
+body.dark-mode .kanban-completed-count {
+    background: var(--dm-border);
+    color: var(--dm-text-muted);
+}

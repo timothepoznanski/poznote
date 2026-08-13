@@ -371,13 +371,37 @@ function markdownCompletionSource(context) {
 
 function wrapSelection(prefix, suffix) {
   return function run(view) {
-    const ranges = view.state.selection.ranges
-    if (!ranges.some(range => !range.empty)) {
-      return false
-    }
-
     view.dispatch(view.state.changeByRange(range => {
+      // Caret only: insert the marker pair and place the caret between,
+      // like the HTML notes' shortcuts do
+      if (range.empty) {
+        return {
+          changes: { from: range.from, insert: prefix + suffix },
+          range: EditorSelection.cursor(range.from + prefix.length)
+        }
+      }
+
       const selected = view.state.sliceDoc(range.from, range.to)
+
+      // Toggle off when the selection is already wrapped, whether the
+      // markers sit inside the selection or just around it
+      if (selected.length >= prefix.length + suffix.length &&
+          selected.startsWith(prefix) && selected.endsWith(suffix)) {
+        const inner = selected.slice(prefix.length, selected.length - suffix.length)
+        return {
+          changes: { from: range.from, to: range.to, insert: inner },
+          range: EditorSelectionRange(range.from, range.from + inner.length)
+        }
+      }
+      const before = view.state.sliceDoc(Math.max(0, range.from - prefix.length), range.from)
+      const after = view.state.sliceDoc(range.to, Math.min(view.state.doc.length, range.to + suffix.length))
+      if (before === prefix && after === suffix) {
+        return {
+          changes: { from: range.from - prefix.length, to: range.to + suffix.length, insert: selected },
+          range: EditorSelectionRange(range.from - prefix.length, range.from - prefix.length + selected.length)
+        }
+      }
+
       const insert = prefix + selected + suffix
       return {
         changes: { from: range.from, to: range.to, insert },
@@ -386,6 +410,16 @@ function wrapSelection(prefix, suffix) {
     }))
     return true
   }
+}
+
+// Ctrl/Cmd+K opens Poznote's link modal, which knows how to build a safe
+// markdown link from the current selection (same flow as the toolbar button)
+function openLinkModal() {
+  if (typeof window.addLinkToNote === 'function') {
+    window.addLinkToNote()
+    return true
+  }
+  return false
 }
 
 function EditorSelectionRange(anchor, head) {
@@ -632,6 +666,15 @@ function getCoordsAtPos(host, position, side = 1) {
   return instance.view.coordsAtPos(pos, side)
 }
 
+// Document position closest to viewport coordinates (e.g. a drop point).
+// Returns null when the editor is not mounted or not visible.
+function getPosAtCoords(host, x, y) {
+  const instance = getInstance(host)
+  if (!instance) return null
+  const pos = instance.view.posAtCoords({ x, y }, false)
+  return typeof pos === 'number' ? pos : null
+}
+
 function scrollToPos(host, position, y = 'nearest') {
   const instance = getInstance(host)
   if (!instance) return false
@@ -840,6 +883,9 @@ function createEditor(host, options = {}) {
         ...closeBracketsKeymap,
         ...completionKeymap,
         { key: 'Mod-i', run: wrapSelection('*', '*') },
+        { key: 'Mod-u', run: wrapSelection('<u>', '</u>') },
+        { key: 'Mod-Shift-s', run: wrapSelection('~~', '~~') },
+        { key: 'Mod-k', run: openLinkModal },
         {
           key: 'Tab',
           run: runMarkdownOrderedListTab(host),
@@ -918,6 +964,7 @@ window.PoznoteMarkdownCodeMirror = {
   replaceRange,
   replaceRangeKeepSelection,
   getCoordsAtPos,
+  getPosAtCoords,
   scrollToPos,
   revealPos,
   findMatches,
