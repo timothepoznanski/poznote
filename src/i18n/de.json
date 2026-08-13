@@ -817,11 +817,30 @@
     },
     "empty": "Keine Tags gefunden.",
     "action": {
-      "color": "Farbe"
+      "color": "Farbe",
+      "rename": "Umbenennen",
+      "delete": "Löschen"
     },
     "color": {
       "modal_title": "Tag-Farbe",
       "apply_error": "Die Tag-Farbe konnte nicht aktualisiert werden."
+    },
+    "color_filter": {
+      "label": "Nach Farbe filtern",
+      "none": "Keine Farbe",
+      "clear": "Farbfilter zurücksetzen",
+      "results_one": "1 Tag entspricht den ausgewählten Farben",
+      "results_other": "{{count}} Tags entsprechen den ausgewählten Farben"
+    },
+    "rename": {
+      "title": "Tag umbenennen",
+      "label": "Neuer Name",
+      "error": "Umbenennen fehlgeschlagen"
+    },
+    "delete": {
+      "title": "Tag löschen",
+      "confirm": "Tag \"{{tag}}\" aus allen Notizen löschen?",
+      "error": "Löschen fehlgeschlagen"
     }
   },
   "trash": {

@@ -110,7 +110,16 @@ function renderTagsList(noteId, tagsValue) {
         delBtn.onclick = function() {
             removeTagFromModal(noteId, tag);
         };
-        
+
+        // The dot sits outside the editable name so renaming never picks it up.
+        const dotHex = typeof resolveNoteTagHex === 'function' ? resolveNoteTagHex(tag) : '';
+        if (dotHex) {
+            const dot = document.createElement('span');
+            dot.className = 'tag-color-dot';
+            dot.style.background = dotHex;
+            item.appendChild(dot);
+        }
+
         item.appendChild(name);
         item.appendChild(delBtn);
         container.appendChild(item);

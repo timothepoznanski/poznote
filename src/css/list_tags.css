@@ -150,6 +150,93 @@ html.tags-page {
     flex: 0 0 auto;
 }
 
+/* ===== Filter-by-color bar (above the tags grid) ===== */
+
+.tags-color-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 auto 14px;
+    max-width: 900px;
+}
+
+/* .initially-hidden is a low-specificity utility; re-assert it against the
+   display:flex above so the bar really hides when no tag has a color. */
+.tags-color-filter.initially-hidden {
+    display: none;
+}
+
+.tag-color-filter-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    background: var(--filter-color, transparent);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s, border-color 0.15s;
+}
+
+.tag-color-filter-swatch:hover {
+    transform: scale(1.15);
+}
+
+.tag-color-filter-swatch.active {
+    border-color: #1e293b;
+    transform: scale(1.15);
+}
+
+/* "No color": a hollow circle, so it reads as the absence of a color */
+.tag-color-filter-none {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px #cbd5e1;
+    position: relative;
+    overflow: hidden;
+}
+
+.tag-color-filter-none::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
+    background: #cbd5e1;
+    transform: rotate(45deg);
+}
+
+.tag-color-filter-clear {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 0.85rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    text-decoration: underline;
+}
+
+.tag-color-filter-clear:hover {
+    color: #1e293b;
+}
+
+html[data-theme='dark'] .tag-color-filter-swatch.active,
+body.dark-mode .tag-color-filter-swatch.active {
+    border-color: #e2e8f0;
+}
+
+html[data-theme='dark'] .tag-color-filter-clear,
+body.dark-mode .tag-color-filter-clear {
+    color: #94a3b8;
+}
+
+html[data-theme='dark'] .tag-color-filter-clear:hover,
+body.dark-mode .tag-color-filter-clear:hover {
+    color: #e2e8f0;
+}
+
 /* Color picker grid inside the tag color modal */
 .tag-color-grid {
     display: flex;

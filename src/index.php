@@ -717,6 +717,11 @@ if ($isPublicWorkspaceReadonly) {
      index_js.php). Inline scripts below (DEFAULT_NOTE_TITLES, calendar
      translations) execute during parsing, i.e. before the deferred bundle. -->
 <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
+<!-- Tag colors, so note tags can show the same dot as the tags list -->
+<script>
+window.TAG_COLORS = <?php echo json_encode(getTagColorsMap(), JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;
+window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+</script>
 <!-- Calendar translations -->
 <script>
 window.calendarTranslations = {

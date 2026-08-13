@@ -115,6 +115,51 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			</div>
 		</div>
 		
+		<?php
+		// Resolve every tag's color up front: the grid needs it for the dots, and
+		// the color filter bar only offers colors that are actually in use.
+		$tagColorsMap = getTagColorsMap();
+		$tagHexes = [];
+		$hasUncoloredTag = false;
+		foreach ($tags_list as $tag => $count) {
+			if (trim((string)$tag) === '') {
+				continue;
+			}
+			// Lowercased so the swatch values and the grid's data-color, which the
+			// JS filter compares directly, always agree.
+			$hex = strtolower(resolveTagColorHex($tag, $tagColorsMap));
+			$tagHexes[$tag] = $hex;
+			if ($hex === '') {
+				$hasUncoloredTag = true;
+			}
+		}
+		$usedHexes = array_values(array_unique(array_filter($tagHexes, static function ($hex) {
+			return $hex !== '';
+		})));
+		sort($usedHexes);
+		?>
+		<?php // Always rendered (hidden while empty) so JS can repopulate it after a recolor. ?>
+		<div class="tags-color-filter<?php echo empty($usedHexes) ? ' initially-hidden' : ''; ?>" id="tagsColorFilter" role="group" aria-label="<?php echo t_h('tags.color_filter.label', [], 'Filter by color'); ?>">
+			<?php foreach ($usedHexes as $hex): ?>
+			<button type="button"
+					class="tag-color-filter-swatch"
+					data-color-filter="<?php echo htmlspecialchars($hex, ENT_QUOTES); ?>"
+					style="--filter-color: <?php echo htmlspecialchars($hex, ENT_QUOTES); ?>;"
+					aria-pressed="false"
+					title="<?php echo htmlspecialchars($hex, ENT_QUOTES); ?>"></button>
+			<?php endforeach; ?>
+			<?php if ($hasUncoloredTag): ?>
+			<button type="button"
+					class="tag-color-filter-swatch tag-color-filter-none"
+					data-color-filter="__none__"
+					aria-pressed="false"
+					title="<?php echo t_h('tags.color_filter.none', [], 'No color'); ?>"></button>
+			<?php endif; ?>
+			<button type="button" class="tag-color-filter-clear initially-hidden" id="tagsColorFilterClear">
+				<?php echo t_h('tags.color_filter.clear', [], 'Clear color filter'); ?>
+			</button>
+		</div>
+
 		<div class="tags-info">
 			<?php
 				if ($count_tags === 1) {
@@ -124,20 +169,19 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				}
 			?>
 		</div>
-		
+
 		<div class="tags-grid" id="tagsList">
 		<?php
 		if (empty($tags_list)) {
 			echo '<div class="no-tags">' . t_h('tags.empty', [], 'No tags found.') . '</div>';
 		} else {
-			$tagColorsMap = getTagColorsMap();
 			foreach($tags_list as $tag => $count) {
 				if (!empty(trim($tag))) {
-					$tagHex = resolveTagColorHex($tag, $tagColorsMap);
+					$tagHex = $tagHexes[$tag] ?? '';
 					$dot = $tagHex !== ''
 						? '<span class="tag-color-dot" style="background: ' . htmlspecialchars($tagHex, ENT_QUOTES) . ';"></span>'
 						: '';
-					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag, ENT_QUOTES) . '" data-count="' . $count . '">
+					echo '<div class="tag-item" data-tag="' . htmlspecialchars($tag, ENT_QUOTES) . '" data-color="' . htmlspecialchars($tagHex, ENT_QUOTES) . '" data-count="' . $count . '">
 						<div class="tag-name">' . $dot . htmlspecialchars($tag).'<span class="tag-note-count">('.$count.')</span></div>
 					</div>';
 				}

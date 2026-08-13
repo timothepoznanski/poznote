@@ -815,11 +815,30 @@
     },
     "empty": "Nenhuma etiqueta encontrada.",
     "action": {
-      "color": "Cor"
+      "color": "Cor",
+      "rename": "Renomear",
+      "delete": "Excluir"
     },
     "color": {
       "modal_title": "Cor da tag",
       "apply_error": "Não foi possível atualizar a cor da tag."
+    },
+    "color_filter": {
+      "label": "Filtrar por cor",
+      "none": "Sem cor",
+      "clear": "Limpar o filtro de cor",
+      "results_one": "1 etiqueta corresponde às cores selecionadas",
+      "results_other": "{{count}} etiquetas correspondem às cores selecionadas"
+    },
+    "rename": {
+      "title": "Renomear etiqueta",
+      "label": "Novo nome",
+      "error": "Falha ao renomear"
+    },
+    "delete": {
+      "title": "Excluir etiqueta",
+      "confirm": "Excluir a etiqueta \"{{tag}}\" de todas as notas?",
+      "error": "Falha ao excluir"
     }
   },
   "trash": {

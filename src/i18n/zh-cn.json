@@ -816,11 +816,30 @@
     },
     "empty": "未找到标签。",
     "action": {
-      "color": "颜色"
+      "color": "颜色",
+      "rename": "重命名",
+      "delete": "删除"
     },
     "color": {
       "modal_title": "标签颜色",
       "apply_error": "无法更新标签颜色。"
+    },
+    "color_filter": {
+      "label": "按颜色筛选",
+      "none": "无颜色",
+      "clear": "清除颜色筛选",
+      "results_one": "1 个标签符合所选颜色",
+      "results_other": "{{count}} 个标签符合所选颜色"
+    },
+    "rename": {
+      "title": "重命名标签",
+      "label": "新名称",
+      "error": "重命名失败"
+    },
+    "delete": {
+      "title": "删除标签",
+      "confirm": "要从所有笔记中删除标签“{{tag}}”吗？",
+      "error": "删除失败"
     }
   },
   "trash": {

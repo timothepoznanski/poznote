@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    initTagsColorFilter();
+
     // Attach back button event listener
     const backBtn = document.getElementById('backToNotesBtn');
     if (backBtn) {
@@ -192,7 +194,7 @@ function renameTagRequest(tagItem, oldName, newName) {
     .catch(function() {
         if (window.modalAlert) {
             window.modalAlert.alert(
-                window.t ? window.t('common.error.network', {}, 'Network error') : 'Network error',
+                window.t ? window.t('ui.alerts.network_error', {}, 'Network error') : 'Network error',
                 'error'
             );
         }
@@ -248,6 +250,9 @@ function deleteTagRequest(tagItem, tagName) {
                 delete colorMap[key];
                 saveTagColors();
             }
+
+            // The removed tag may have been the last one wearing its color.
+            refreshTagsColorFilterBar();
         } else {
             if (window.modalAlert) {
                 window.modalAlert.alert(
@@ -260,7 +265,7 @@ function deleteTagRequest(tagItem, tagName) {
     .catch(function() {
         if (window.modalAlert) {
             window.modalAlert.alert(
-                window.t ? window.t('common.error.network', {}, 'Network error') : 'Network error',
+                window.t ? window.t('ui.alerts.network_error', {}, 'Network error') : 'Network error',
                 'error'
             );
         }
@@ -323,8 +328,11 @@ function updateTagItemDot(tagItem) {
     if (!nameEl) return;
     let dot = nameEl.querySelector('.tag-color-dot');
     const hex = resolveTagHex(tagItem.dataset.tag);
+    // data-color backs the color filter, so it has to track the dot.
+    tagItem.dataset.color = hex ? hex.toLowerCase() : '';
     if (!hex) {
         if (dot) dot.remove();
+        refreshTagsColorFilterBar();
         return;
     }
     if (!dot) {
@@ -333,6 +341,7 @@ function updateTagItemDot(tagItem) {
         nameEl.insertBefore(dot, nameEl.firstChild);
     }
     dot.style.background = hex;
+    refreshTagsColorFilterBar();
 }
 
 function showTagColorModal(tagItem) {
@@ -561,11 +570,24 @@ function updateTagCount() {
 
 // ─── Filter ────────────────────────────────────────────────────────────────────
 
+// Active color filters, as lowercased hex values. '__none__' matches the
+// uncolored tags. Empty means "no color filter", i.e. every color passes.
+const activeColorFilters = new Set();
+
+function tagMatchesColorFilter(tagItem) {
+    if (activeColorFilters.size === 0) return true;
+
+    const color = (tagItem.dataset.color || '').toLowerCase();
+    return activeColorFilters.has(color === '' ? '__none__' : color);
+}
+
 function filterTags() {
     const input = document.getElementById('tagsSearchInput');
+    const tagsList = document.getElementById('tagsList');
+    if (!input || !tagsList) return;
+
     const searchTerm = input.value;
     const filter = searchTerm.toUpperCase();
-    const tagsList = document.getElementById('tagsList');
     const tagItems = tagsList.getElementsByClassName('tag-item');
 
     let visibleCount = 0;
@@ -573,7 +595,8 @@ function filterTags() {
     for (let i = 0; i < tagItems.length; i++) {
         const txtValue = tagItems[i].dataset.tag || '';
         if (tagItems[i].querySelector('.tag-name')) {
-            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            const matchesText = txtValue.toUpperCase().indexOf(filter) > -1;
+            if (matchesText && tagMatchesColorFilter(tagItems[i])) {
                 tagItems[i].classList.remove('hidden');
                 visibleCount++;
             } else {
@@ -584,6 +607,117 @@ function filterTags() {
 
     // Update results counter
     updateSearchResults(visibleCount, searchTerm);
+}
+
+// ─── Color filter ──────────────────────────────────────────────────────────────
+
+/**
+ * Rebuild the swatch bar from the colors the grid actually uses, so recoloring
+ * a tag adds or drops swatches instead of leaving stale ones behind. Filters on
+ * a color that disappeared are dropped, and the bar hides when nothing is
+ * colored at all.
+ */
+function refreshTagsColorFilterBar() {
+    const bar = document.getElementById('tagsColorFilter');
+    if (!bar) return;
+
+    const items = Array.from(document.querySelectorAll('#tagsList .tag-item'));
+    const used = [];
+    let hasUncolored = false;
+    items.forEach(function (item) {
+        const color = (item.dataset.color || '').toLowerCase();
+        if (color === '') {
+            hasUncolored = true;
+        } else if (used.indexOf(color) === -1) {
+            used.push(color);
+        }
+    });
+    used.sort();
+
+    // Drop filters whose color is no longer present, so nothing filters on a
+    // swatch the user can no longer see (and untoggle).
+    Array.from(activeColorFilters).forEach(function (value) {
+        const stillThere = value === '__none__' ? hasUncolored : used.indexOf(value) !== -1;
+        if (!stillThere) activeColorFilters.delete(value);
+    });
+
+    const clearBtn = document.getElementById('tagsColorFilterClear');
+    bar.querySelectorAll('.tag-color-filter-swatch').forEach(function (s) { s.remove(); });
+
+    used.forEach(function (hex) {
+        const swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'tag-color-filter-swatch';
+        swatch.dataset.colorFilter = hex;
+        swatch.style.setProperty('--filter-color', hex);
+        swatch.title = hex;
+        bar.insertBefore(swatch, clearBtn);
+    });
+
+    if (hasUncolored) {
+        const swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'tag-color-filter-swatch tag-color-filter-none';
+        swatch.dataset.colorFilter = '__none__';
+        swatch.title = window.t ? window.t('tags.color_filter.none', {}, 'No color') : 'No color';
+        bar.insertBefore(swatch, clearBtn);
+    }
+
+    bar.classList.toggle('initially-hidden', used.length === 0);
+    syncTagsColorFilterUi();
+
+    // Dropping a stale filter changes what should be visible, and a recolored
+    // tag may no longer match the filters still active.
+    filterTags();
+}
+
+/** Reflect the active filters on the swatches and the clear button. */
+function syncTagsColorFilterUi() {
+    const bar = document.getElementById('tagsColorFilter');
+    if (!bar) return;
+
+    bar.querySelectorAll('.tag-color-filter-swatch').forEach(function (swatch) {
+        const active = activeColorFilters.has(swatch.dataset.colorFilter);
+        swatch.classList.toggle('active', active);
+        swatch.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    const clearBtn = document.getElementById('tagsColorFilterClear');
+    if (clearBtn) {
+        clearBtn.classList.toggle('initially-hidden', activeColorFilters.size === 0);
+    }
+}
+
+/**
+ * Wire the color swatch bar: each swatch toggles one color, and several can be
+ * active at once. Runs on top of the text filter rather than replacing it.
+ */
+function initTagsColorFilter() {
+    const bar = document.getElementById('tagsColorFilter');
+    if (!bar) return;
+
+    bar.addEventListener('click', function (e) {
+        const swatch = e.target.closest('.tag-color-filter-swatch');
+        if (swatch) {
+            const value = swatch.dataset.colorFilter;
+            if (activeColorFilters.has(value)) {
+                activeColorFilters.delete(value);
+            } else {
+                activeColorFilters.add(value);
+            }
+            syncTagsColorFilterUi();
+            filterTags();
+            return;
+        }
+
+        if (e.target.closest('.tag-color-filter-clear')) {
+            activeColorFilters.clear();
+            syncTagsColorFilterUi();
+            filterTags();
+        }
+    });
+
+    syncTagsColorFilterUi();
 }
 
 function updateSearchResults(count, searchTerm) {
@@ -602,7 +736,16 @@ function updateSearchResults(count, searchTerm) {
     }
 
     if (searchTerm.trim() === '') {
-        resultsDiv.style.display = 'none';
+        // No search term, but a color filter still narrows the grid, so report
+        // the count rather than leaving the "N tags total" line contradicting it.
+        if (activeColorFilters.size > 0) {
+            resultsDiv.style.display = 'block';
+            resultsDiv.textContent = count === 1
+                ? (window.t ? window.t('tags.color_filter.results_one', { count }, '1 tag matches the selected colors') : '1 tag matches the selected colors')
+                : (window.t ? window.t('tags.color_filter.results_other', { count }, '{{count}} tags match the selected colors') : count + ' tags match the selected colors');
+        } else {
+            resultsDiv.style.display = 'none';
+        }
     } else {
         resultsDiv.style.display = 'block';
         const term = String(searchTerm).trim();

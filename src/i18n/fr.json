@@ -852,6 +852,13 @@
     "color": {
       "modal_title": "Couleur du tag",
       "apply_error": "Impossible de mettre à jour la couleur du tag."
+    },
+    "color_filter": {
+      "label": "Filtrer par couleur",
+      "none": "Sans couleur",
+      "clear": "Effacer le filtre de couleur",
+      "results_one": "1 tag correspond aux couleurs sélectionnées",
+      "results_other": "{{count}} tags correspondent aux couleurs sélectionnées"
     }
   },
   "trash": {

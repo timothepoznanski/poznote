@@ -381,11 +381,40 @@
     "manage_note_tags": "Manage note tags",
     "modal_title": "Manage tags",
     "action": {
-      "color": "Color"
+      "color": "Color",
+      "rename": "Rename",
+      "delete": "Delete"
     },
     "color": {
       "modal_title": "Tag color",
       "apply_error": "Could not update the tag color."
+    },
+    "color_filter": {
+      "label": "Filter by color",
+      "none": "No color",
+      "clear": "Clear color filter",
+      "results_one": "1 tag matches the selected colors",
+      "results_other": "{{count}} tags match the selected colors"
+    },
+    "empty": "No tags found.",
+    "count": {
+      "one": "There is {{count}} tag total",
+      "other": "There are {{count}} tags total"
+    },
+    "search": {
+      "placeholder": "Filter tags...",
+      "results_one": "1 tag found for \"{{term}}\"",
+      "results_other": "{{count}} tags found for \"{{term}}\""
+    },
+    "rename": {
+      "title": "Rename tag",
+      "label": "New name",
+      "error": "Rename failed"
+    },
+    "delete": {
+      "title": "Delete tag",
+      "confirm": "Delete tag \"{{tag}}\" from all notes?",
+      "error": "Delete failed"
     }
   },
   "download": "Download",
