@@ -334,6 +334,10 @@
                 if (workspace) {
                     url += '&workspace=' + encodeURIComponent(workspace);
                 }
+                // Open the folder's Kanban board alongside the filtered list
+                if (folderData.id) {
+                    url += '&kanban=' + encodeURIComponent(folderData.id);
+                }
                 window.location.href = url;
             }
         };

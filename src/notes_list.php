@@ -108,10 +108,39 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
     if (!empty($workspace_filter)) {
         $exit_folder_filter_link .= '?workspace=' . urlencode($workspace_filter);
     }
+
+    // Resolve the filtered folder's id so the banner icon can open its Kanban
+    // board, the same way the folder icons in the tree below do.
+    $banner_folder_id = null;
+    if ($folder_filter !== 'Favorites') {
+        try {
+            if (isset($con)) {
+                $bannerQuery = "SELECT id FROM folders WHERE name = ?";
+                $bannerParams = [$folder_filter];
+                if (!empty($workspace_filter)) {
+                    $bannerQuery .= " AND workspace = ?";
+                    $bannerParams[] = $workspace_filter;
+                }
+                $stmtBannerFolder = $con->prepare($bannerQuery);
+                $stmtBannerFolder->execute($bannerParams);
+                $bannerFolderRow = $stmtBannerFolder->fetchColumn();
+                if ($bannerFolderRow !== false) {
+                    $banner_folder_id = (int)$bannerFolderRow;
+                }
+            }
+        } catch (Exception $e) {
+            $banner_folder_id = null;
+        }
+    }
+    $banner_kanban_title = t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view');
 ?>
 <div class="folder-filter-banner" id="folder-filter-banner">
     <span class="folder-filter-banner-name">
+        <?php if ($banner_folder_id !== null): ?>
+        <i class="lucide lucide-folder folder-filter-banner-icon" data-action="open-kanban-view" data-folder-id="<?php echo $banner_folder_id; ?>" data-folder-name="<?php echo htmlspecialchars($folder_filter, ENT_QUOTES); ?>" title="<?php echo $banner_kanban_title; ?>" role="button" tabindex="0" aria-label="<?php echo $banner_kanban_title; ?>"></i>
+        <?php else: ?>
         <i class="lucide lucide-folder"></i>
+        <?php endif; ?>
         <span><?php echo htmlspecialchars($folder_filter, ENT_QUOTES); ?></span>
     </span>
     <a class="folder-filter-banner-clear" href="<?php echo htmlspecialchars($exit_folder_filter_link, ENT_QUOTES); ?>" title="<?php echo t_h('notes_list.folder_filter.exit', [], 'Exit folder view'); ?>" aria-label="<?php echo t_h('notes_list.folder_filter.exit', [], 'Exit folder view'); ?>"><span class="clear-icon">×</span></a>
