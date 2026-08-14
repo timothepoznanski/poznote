@@ -254,7 +254,7 @@ try {
     $storedPassword = $sharedNote['password'];
     $sharedTheme = $sharedNote['theme'] ?? '';
     $taskAccessMode = $sharedNote['access_mode'] ?? 'full';
-    if (!in_array($taskAccessMode, ['read_only', 'check_only', 'full'], true)) {
+    if (!in_array($taskAccessMode, ['read_only', 'check_only', 'full', 'edit'], true)) {
         $taskAccessMode = 'full';
     }
 
@@ -538,6 +538,10 @@ if (($note['type'] ?? 'note') === 'tasklist') {
     $content = resolveTasklistStoredContent($content, $note['entry'] ?? '');
 }
 
+// Raw stored content, captured before any display transformation. Used as the
+// editable source when the share allows public editing of markdown notes.
+$rawStoredContent = $content;
+
 // Public pages do not need the editor-only iframe workaround for audio embeds.
 // Convert saved audio iframes to native audio tags so shared links can stream them.
 $content = replacePublicAudioEmbedIframes($content);
@@ -550,8 +554,15 @@ $contentForAttachmentDetection = $content;
 
 $noteType = $note['type'] ?? 'note';
 
-// Markdown with tasklist: add task input
-if ($noteType === 'markdown' && strpos($content, 'class="task-list"') !== false) {
+// Public text editing is only offered on directly shared HTML/markdown notes
+// whose share explicitly allows it. Notes reached through a shared folder are
+// always read-only (their synthesized access_mode is 'read_only').
+$noteBodyEditable = $taskAccessMode === 'edit'
+    && in_array($noteType, ['note', 'markdown'], true)
+    && !$isFolderShared;
+
+// Markdown with tasklist: add task input (only when the share allows task editing)
+if ($noteType === 'markdown' && in_array($taskAccessMode, ['full', 'edit'], true) && strpos($content, 'class="task-list"') !== false) {
     $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
     $addTaskHtml .= '<form class="task-input-form" action="javascript:void(0);">';
     $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" autocomplete="off" enterkeyhint="go" />';
@@ -692,6 +703,16 @@ if (is_array($attachmentsData)) {
 
 $content = sanitizePublicNoteHtml($content);
 
+// Editable source handed to the public editor (edit shares only).
+// - markdown: the raw stored source (edited as plain text in a textarea).
+// - note (HTML): the sanitized display HTML; it is re-sanitized server-side on
+//   save, and the API strips the share-token query params the URL rewriting
+//   above added to attachment URLs.
+$publicEditableContent = null;
+if ($noteBodyEditable) {
+    $publicEditableContent = $noteType === 'markdown' ? $rawStoredContent : $content;
+}
+
 // ============================================================================
 // THEME DETERMINATION
 // ============================================================================
@@ -723,13 +744,17 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <title><?php echo htmlspecialchars($note['heading'] ?: t('untitled', [], 'Untitled', $currentLang)); ?></title>
     <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <!-- CSP-compliant theme initialization -->
-    <script type="application/json" id="public-note-config"><?php 
+    <script type="application/json" id="public-note-config"><?php
         $apiBaseUrl = $scriptDir . '/api/v1';
+        // JSON_HEX_TAG is required: the config may embed note content, and an
+        // unescaped "</script>" inside it would break out of this script tag.
         echo json_encode([
-            'serverTheme' => $theme, 
-            'token' => $token, 
+            'serverTheme' => $theme,
+            'token' => $token,
             'noteType' => $noteType,
             'taskAccessMode' => $taskAccessMode,
+            'noteEditable' => $noteBodyEditable,
+            'editableContent' => $publicEditableContent,
             'apiBaseUrl' => $apiBaseUrl,
             'i18n' => [
                 'addTask' => t('tasklist.input_placeholder', [], 'Add a task...'),
@@ -741,9 +766,12 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                 'confirm' => t('common.confirm', [], 'Confirm'),
                 'cancel' => t('common.cancel', [], 'Cancel'),
                 'save' => t('common.save', [], 'Save'),
-                'ok' => t('common.ok', [], 'OK')
+                'ok' => t('common.ok', [], 'OK'),
+                'editNote' => t('public.edit.button', [], 'Edit'),
+                'saveFailed' => t('public.edit.save_failed', [], 'Failed to save changes'),
+                'discardConfirm' => t('public.edit.discard_confirm', [], 'Discard your changes?')
             ]
-        ]); 
+        ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     ?></script>
     <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
         // Simple window.t for modal-alerts.js compatibility (used by window.confirm)
@@ -848,9 +876,22 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                         <?php endif; ?>
                         <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>
                     </h1>
-                    <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
-                        <i class="lucide lucide-moon"></i>
-                    </button>
+                    <div class="public-note-header-actions">
+                        <?php if ($noteBodyEditable): ?>
+                        <button id="publicEditCancel" class="theme-toggle-btn public-edit-cancel-btn" title="<?php echo t_h('common.cancel', [], 'Cancel', $currentLang); ?>" hidden>
+                            <i class="lucide lucide-x"></i>
+                        </button>
+                        <button id="publicEditSave" class="theme-toggle-btn public-edit-save-btn" title="<?php echo t_h('common.save', [], 'Save', $currentLang); ?>" hidden>
+                            <i class="lucide lucide-check"></i>
+                        </button>
+                        <button id="publicEditToggle" class="theme-toggle-btn public-edit-btn" title="<?php echo t_h('public.edit.button', [], 'Edit', $currentLang); ?>">
+                            <i class="lucide lucide-pencil"></i>
+                        </button>
+                        <?php endif; ?>
+                        <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
+                            <i class="lucide lucide-moon"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="content<?php echo $noteType === 'markdown' ? ' public-note-markdown' : ''; ?>"><?php echo $content; ?></div>
             </div>
@@ -889,4 +930,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 <script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
 <script src="js/outline-panel.js?v=<?php echo filemtime(__DIR__ . '/js/outline-panel.js'); ?>"></script>
 <script src="js/public-note.js?v=<?php echo filemtime(__DIR__ . '/js/public-note.js'); ?>"></script>
+<?php if ($noteBodyEditable): ?>
+<script src="js/public-note-edit.js?v=<?php echo file_exists(__DIR__ . '/js/public-note-edit.js') ? filemtime(__DIR__ . '/js/public-note-edit.js') : '1'; ?>"></script>
+<?php endif; ?>
 </html>

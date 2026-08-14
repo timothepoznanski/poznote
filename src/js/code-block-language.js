@@ -1,16 +1,22 @@
 /**
  * Code block language modal.
  *
- * Clicking the language badge of a code block in an HTML note opens a modal
- * that lets the user switch the block to another language or drop the tag
- * entirely (which turns it into a plain block: no badge, no highlighting and
- * no line numbers).
+ * Clicking the language badge of a code block opens a modal that lets the user
+ * switch the block to another language or drop the tag entirely (which turns it
+ * into a plain block: no badge, no highlighting and no line numbers).
  *
  * The badge itself is a CSS ::before pseudo-element and cannot receive clicks,
  * so a transparent button is overlaid on it, hosted in the same
  * .code-block-actions-host wrapper as the copy/delete buttons
  * (js/copy-code-on-focus.js). Like those buttons it is pure decoration and is
  * stripped before the note is stored (stripSearchHighlights in js/notes.js).
+ *
+ * Both note types are supported, but they are edited very differently:
+ *  - HTML notes: the rendered block IS the stored content, so the language is
+ *    applied to the DOM directly.
+ *  - Markdown notes: the block is generated from the ``` fence in the source,
+ *    so the fence line is rewritten and the preview re-rendered from it
+ *    (same approach as the code block delete button in js/copy-code-on-focus.js).
  */
 (function () {
     'use strict';
@@ -55,10 +61,6 @@
         return lang;
     }
 
-    /**
-     * Only editable HTML notes get the button: markdown blocks are generated
-     * from their source, so the language must be edited in the markdown itself.
-     */
     function isEditableHtmlCodeBlock(block) {
         var pre = getPreElement(block);
         if (!pre) return false;
@@ -66,6 +68,156 @@
 
         var noteentry = pre.closest('.noteentry');
         return !!(noteentry && noteentry.isContentEditable);
+    }
+
+    /* ---------------------------------------------------------------- *
+     * Markdown blocks
+     *
+     * A markdown block is rendered from a ``` fence, so retagging it means
+     * rewriting that fence line in the source and re-rendering. The rendered
+     * <pre> carries a data-line attribute pointing at its own fence line
+     * (js/markdown-handler.js), which is used to locate it in the source.
+     * ---------------------------------------------------------------- */
+
+    function getMarkdownPreview(block) {
+        var pre = getPreElement(block);
+        return pre && pre.closest ? pre.closest('.markdown-preview') : null;
+    }
+
+    /**
+     * Editable markdown blocks are the ones in a note whose source can still be
+     * changed. Indented (4-space) blocks have no fence to retag, and mermaid
+     * blocks are diagrams rather than code, so both are left alone.
+     */
+    function isEditableMarkdownCodeBlock(block) {
+        var pre = getPreElement(block);
+        if (!pre || !getMarkdownPreview(pre)) return false;
+        if (pre.classList.contains('indented-pre') || pre.classList.contains('mermaid')) return false;
+
+        var noteentry = pre.closest('.noteentry');
+        if (!noteentry) return false;
+        if (!noteentry.querySelector('.markdown-editor')) return false;
+
+        if (typeof window.isMarkdownEntryReadOnly === 'function') {
+            return !window.isMarkdownEntryReadOnly(noteentry);
+        }
+        return true;
+    }
+
+    function getMarkdownSource(noteentry) {
+        var noteId = (noteentry.id || '').replace('entry', '');
+        if (noteId && typeof window.getMarkdownContent === 'function') {
+            return window.getMarkdownContent(noteId);
+        }
+
+        var editor = noteentry.querySelector('.markdown-editor');
+        if (editor) return editor.textContent || '';
+        return noteentry.getAttribute('data-markdown-content') || '';
+    }
+
+    /**
+     * Index of the opening fence line for a block, or -1.
+     *
+     * data-line is the authoritative pointer, but it is only trusted when the
+     * line it names really is a fence: the source can have moved on since the
+     * preview was rendered. Otherwise the block is located by counting fences,
+     * matching how the delete button resolves its target.
+     */
+    function findMarkdownFenceLine(pre, lines) {
+        var declared = parseInt(pre.getAttribute('data-line'), 10);
+        if (!isNaN(declared) && declared >= 0 && declared < lines.length &&
+            /^\s*```/.test(lines[declared])) {
+            return declared;
+        }
+
+        var preview = getMarkdownPreview(pre);
+        if (!preview) return -1;
+
+        var blocks = Array.prototype.slice.call(
+            preview.querySelectorAll('pre:not(.indented-pre):not(.mermaid)'));
+        var target = blocks.indexOf(pre);
+        if (target === -1) return -1;
+
+        var index = -1;
+        var inBlock = false;
+        for (var i = 0; i < lines.length; i++) {
+            if (!/^\s*```/.test(lines[i])) continue;
+
+            if (!inBlock) {
+                index++;
+                inBlock = true;
+                if (index === target) return i;
+            } else {
+                inBlock = false;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * The language written on the fence, which is what the modal has to
+     * preselect: the badge is not a reliable source since markdown renders
+     * several plain languages (text, plaintext, an unknown tag) as "CODE".
+     */
+    function getMarkdownBlockLanguage(block) {
+        var pre = getPreElement(block);
+        if (!pre) return '';
+
+        var noteentry = pre.closest('.noteentry');
+        if (!noteentry) return '';
+
+        var lines = getMarkdownSource(noteentry).split('\n');
+        var fenceLine = findMarkdownFenceLine(pre, lines);
+        if (fenceLine === -1) return getBlockLanguage(pre);
+
+        return lines[fenceLine].replace(/^\s*```/, '').trim();
+    }
+
+    /**
+     * Rewrite the fence's info string and re-render. An empty language leaves a
+     * bare ``` fence, which markdown renders as an untagged (plain) block.
+     */
+    function applyMarkdownLanguage(block, lang) {
+        var pre = getPreElement(block);
+        if (!pre) return false;
+
+        var noteentry = pre.closest('.noteentry');
+        var editor = noteentry ? noteentry.querySelector('.markdown-editor') : null;
+        if (!noteentry || !editor) return false;
+
+        var content = getMarkdownSource(noteentry);
+        var lines = content.split('\n');
+        var fenceLine = findMarkdownFenceLine(pre, lines);
+        if (fenceLine === -1) return false;
+
+        var normalized = String(lang || '').trim();
+        // 'code' is the modal's plain-block entry, not a markdown language
+        if (normalized.toLowerCase() === 'code') normalized = '';
+
+        var indent = (lines[fenceLine].match(/^\s*/) || [''])[0];
+        var fence = (lines[fenceLine].match(/```+/) || ['```'])[0];
+        lines[fenceLine] = indent + fence + normalized;
+
+        var newContent = lines.join('\n');
+        if (typeof window.renderMarkdownEditorContent === 'function') {
+            window.renderMarkdownEditorContent(editor, newContent);
+        } else {
+            editor.textContent = newContent;
+        }
+        noteentry.setAttribute('data-markdown-content', newContent);
+
+        if (typeof window.markNoteAsModified === 'function') {
+            window.markNoteAsModified();
+        }
+
+        var noteId = (noteentry.id || '').replace('entry', '');
+        if (noteentry.classList.contains('markdown-split-mode')) {
+            editor.dispatchEvent(new Event('input', { bubbles: true }));
+        } else if (typeof window.switchToPreviewMode === 'function') {
+            window.switchToPreviewMode(noteId);
+        }
+
+        return true;
     }
 
     /**
@@ -129,6 +281,11 @@
     function applyLanguage(block, lang) {
         var pre = getPreElement(block);
         if (!pre) return;
+
+        if (getMarkdownPreview(pre)) {
+            applyMarkdownLanguage(pre, lang);
+            return;
+        }
 
         var code = pre.querySelector('code');
         if (!code) return;
@@ -203,7 +360,11 @@
         }
 
         var lang = getBlockLanguage(pre);
-        if (!lang || !isEditableHtmlCodeBlock(pre)) {
+        var editable = getMarkdownPreview(pre)
+            ? isEditableMarkdownCodeBlock(pre)
+            : isEditableHtmlCodeBlock(pre);
+
+        if (!lang || !editable) {
             removeLanguageButton(host);
             return;
         }
@@ -326,6 +487,17 @@
         }
     }
 
+    /**
+     * The language to preselect in the modal. Markdown reads it from the fence
+     * rather than the badge, which shows "CODE" for every plain language.
+     */
+    function getSelectedLanguage(block) {
+        if (!block) return '';
+        return getMarkdownPreview(block)
+            ? getMarkdownBlockLanguage(block)
+            : getBlockLanguage(block);
+    }
+
     function openModal(block) {
         var modal = document.getElementById(MODAL_ID);
         if (!modal) return;
@@ -335,7 +507,7 @@
         var filterInput = document.getElementById('codeBlockLanguageFilter');
         if (filterInput) filterInput.value = '';
 
-        renderLanguageList(getBlockLanguage(block), '');
+        renderLanguageList(getSelectedLanguage(block), '');
         modal.style.display = 'flex';
 
         if (filterInput) {
@@ -359,19 +531,22 @@
      * Wiring
      * ---------------------------------------------------------------- */
 
+    // Capture phase: inside a markdown preview, a bubbling click switches the
+    // note to edit mode and replaces the entry element, which would both hide
+    // the badge and detach the block before the modal could act on it.
     document.addEventListener('click', function (e) {
-        // Open the modal from the badge overlay
         var langBtn = e.target.closest ? e.target.closest('.' + LANG_BTN_CLASS) : null;
-        if (langBtn) {
-            e.preventDefault();
-            e.stopPropagation();
+        if (!langBtn) return;
 
-            var host = langBtn.closest('.code-block-actions-host');
-            var pre = host ? host.querySelector('pre') : null;
-            if (pre) openModal(pre);
-            return;
-        }
+        e.preventDefault();
+        e.stopPropagation();
 
+        var host = langBtn.closest('.code-block-actions-host');
+        var pre = host ? host.querySelector('pre') : null;
+        if (pre) openModal(pre);
+    }, true);
+
+    document.addEventListener('click', function (e) {
         // Pick a language
         var item = e.target.closest ? e.target.closest('.code-block-language-item') : null;
         if (item) {
@@ -394,7 +569,7 @@
 
     document.addEventListener('input', function (e) {
         if (!e.target || e.target.id !== 'codeBlockLanguageFilter') return;
-        renderLanguageList(getBlockLanguage(activeBlock), e.target.value);
+        renderLanguageList(getSelectedLanguage(activeBlock), e.target.value);
     });
 
     document.addEventListener('keydown', function (e) {

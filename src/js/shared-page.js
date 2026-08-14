@@ -36,6 +36,7 @@
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
             txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
             txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
+            txtNoteEditable: body.getAttribute('data-txt-note-editable') || 'Allow text editing',
 
             txtNoteSharedThroughFolder: body.getAttribute('data-txt-note-shared-through-folder') || 'Note shared through folder',
             txtFolderSharedThroughParent: body.getAttribute('data-txt-folder-shared-through-parent') || 'Folder shared through parent folder',
@@ -1309,7 +1310,24 @@
         content.appendChild(passwordRow);
 
         var permissionsSelect = null;
+        var permissionOptions = null;
         if (options.itemType === 'note' && options.noteType === 'tasklist') {
+            permissionOptions = [
+                { value: 'read_only', label: config.txtTaskReadOnly },
+                { value: 'check_only', label: config.txtTaskCheckOnly },
+                { value: 'full', label: config.txtTaskFull }
+            ];
+            options.accessMode = options.accessMode || 'full';
+        } else if (options.itemType === 'note' && (options.noteType === 'markdown' || options.noteType === 'note' || !options.noteType)) {
+            // HTML/markdown notes: read-only by default, or public text editing.
+            permissionOptions = [
+                { value: 'read_only', label: config.txtTaskReadOnly },
+                { value: 'edit', label: config.txtNoteEditable }
+            ];
+            options.accessMode = options.accessMode === 'edit' ? 'edit' : 'read_only';
+        }
+
+        if (permissionOptions) {
             var permissionsRow = document.createElement('div');
             permissionsRow.className = 'shared-edit-token-field-row';
 
@@ -1330,18 +1348,14 @@
             permissionsSelect.style.boxSizing = 'border-box';
             permissionsSelect.style.margin = '0';
 
-            [
-                { value: 'read_only', label: config.txtTaskReadOnly },
-                { value: 'check_only', label: config.txtTaskCheckOnly },
-                { value: 'full', label: config.txtTaskFull }
-            ].forEach(function(option) {
+            permissionOptions.forEach(function(option) {
                 var selectOption = document.createElement('option');
                 selectOption.value = option.value;
                 selectOption.textContent = option.label;
                 permissionsSelect.appendChild(selectOption);
             });
 
-            permissionsSelect.value = options.accessMode || 'full';
+            permissionsSelect.value = options.accessMode;
             permissionsValue.appendChild(permissionsSelect);
             permissionsRow.appendChild(permissionsValue);
             content.appendChild(permissionsRow);

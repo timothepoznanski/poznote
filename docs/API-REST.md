@@ -1139,7 +1139,7 @@ Create a public share link for a note.
 | `indexable` | boolean | Allow search engine indexing |
 | `password` | string | Optional password protection |
 | `custom_token` | string | Custom URL token (slug) |
-| `access_mode` | string | Access mode: `read_only`, `check_only`, `full` (tasklists only) |
+| `access_mode` | string | Access mode. Tasklists: `read_only`, `check_only`, `full` (default `full`). HTML/markdown notes: `read_only`, `edit` (default `read_only`; `edit` lets visitors modify the note text) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -1167,7 +1167,7 @@ Update share settings on an existing share.
 | `indexable` | boolean | Allow indexing |
 | `password` | string | Password protection (empty to remove) |
 | `custom_token` | string | Custom URL token |
-| `access_mode` | string | Access mode: `read_only`, `check_only`, `full` (tasklists only) |
+| `access_mode` | string | Access mode. Tasklists: `read_only`, `check_only`, `full` (default `full`). HTML/markdown notes: `read_only`, `edit` (default `read_only`; `edit` lets visitors modify the note text) |
 | `allowed_users` | array | User IDs with access |
 
 ```bash
@@ -2865,6 +2865,32 @@ curl -X DELETE \
   "http://YOUR_SERVER/api/v1/public/tasks/0?token=abc123"
 ```
 
+### Update Note Content
+
+```
+PATCH /public/notes/content
+```
+
+Replace the text content of a publicly shared HTML or markdown note. Only allowed when the share's `access_mode` is `edit`. The submitted content is sanitized server-side, and the write is subject to the owner's storage quota, the share password (if any) and the share's allowed users restriction (if any).
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `token` | string | Public share token |
+
+**Request Body (JSON):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `content` | string | New note content (HTML for notes, raw source for markdown) |
+
+```bash
+curl -X PATCH -H "Content-Type: application/json" \
+  -d '{"content": "<p>Updated text</p>"}' \
+  "http://YOUR_SERVER/api/v1/public/notes/content?token=abc123"
+```
+
 ---
 
 ## Health Check
@@ -3090,9 +3116,10 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/admin/stats` | System stats |
 | `POST` | `/admin/repair` | Repair database |
 
-### Public Tasks
+### Public Shares
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `PATCH` | `/public/tasks/{id}` | Update task |
 | `POST` | `/public/tasks` | Add task |
 | `DELETE` | `/public/tasks/{id}` | Delete task |
+| `PATCH` | `/public/notes/content` | Update shared note content (edit shares) |

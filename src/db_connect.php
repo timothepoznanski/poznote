@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 27; // 27: entries.kanban_completed column (Kanban completed section)
+    $CURRENT_SCHEMA_VERSION = 28; // 28: shared_notes.access_mode normalized for non-tasklist notes (read_only/edit)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -431,6 +431,14 @@ try {
             if (!in_array('allowed_users', $existingColumns)) {
                 $con->exec("ALTER TABLE shared_notes ADD COLUMN allowed_users TEXT");
             }
+
+            // Non-tasklist shares only support 'read_only' and 'edit'. Legacy rows
+            // were stored as 'full' (the historical default); they must stay
+            // read-only, otherwise introducing the 'edit' mode would silently turn
+            // old shares editable. Idempotent: matches nothing once normalized.
+            $con->exec("UPDATE shared_notes SET access_mode = 'read_only'
+                WHERE access_mode IN ('full', 'check_only')
+                  AND note_id IN (SELECT id FROM entries WHERE COALESCE(type, 'note') != 'tasklist')");
         } catch (Exception $e) {
             error_log('Could not add missing columns to shared_notes: ' . $e->getMessage());
         }

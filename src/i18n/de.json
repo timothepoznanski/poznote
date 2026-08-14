@@ -1766,6 +1766,9 @@
       "check_only": "Nur abhaken oder Häkchen entfernen",
       "full": "Vollständige Bearbeitung"
     },
+    "note_permissions": {
+      "editable": "Textbearbeitung erlauben"
+    },
     "note": {
       "new_note": "Neue Notiz",
       "new_note_numbered": "Neue Notiz ({{number}})",
@@ -2309,6 +2312,11 @@
       "folder_not_found": "Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "note_not_found": "Notiz nicht gefunden",
       "server_error": "Serverfehler"
+    },
+    "edit": {
+      "button": "Bearbeiten",
+      "save_failed": "Änderungen konnten nicht gespeichert werden",
+      "discard_confirm": "Änderungen verwerfen?"
     }
   },
   "public_folder": {

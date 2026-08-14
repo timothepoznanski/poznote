@@ -1311,6 +1311,9 @@
       "check_only": "Check or uncheck only",
       "full": "Full edit"
     },
+    "note_permissions": {
+      "editable": "Allow text editing"
+    },
     "note": {
       "new_note": "New note",
       "new_note_numbered": "New note ({{number}})",
@@ -1974,6 +1977,11 @@
       "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "note_not_found": "Note not found",
       "server_error": "Server error"
+    },
+    "edit": {
+      "button": "Edit",
+      "save_failed": "Failed to save changes",
+      "discard_confirm": "Discard your changes?"
     }
   },
   "public_folder": {

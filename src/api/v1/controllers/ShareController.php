@@ -416,17 +416,20 @@ class ShareController {
     }
 
     private function sanitizeAccessMode($accessMode, string $noteType): string {
-        $allowedModes = ['read_only', 'check_only', 'full'];
         $normalizedMode = is_string($accessMode) ? trim($accessMode) : '';
 
-        if (!in_array($normalizedMode, $allowedModes, true)) {
-            $normalizedMode = 'full';
+        if ($noteType === 'tasklist') {
+            $allowedModes = ['read_only', 'check_only', 'full'];
+            return in_array($normalizedMode, $allowedModes, true) ? $normalizedMode : 'full';
         }
 
-        if ($noteType !== 'tasklist') {
-            return 'full';
+        // HTML and markdown notes: read-only by default, 'edit' lets public
+        // visitors change the note text. Other types (linked, ...) never
+        // accept 'edit' and always fall back to read-only.
+        if (in_array($noteType, ['note', 'markdown'], true)) {
+            return $normalizedMode === 'edit' ? 'edit' : 'read_only';
         }
 
-        return $normalizedMode;
+        return 'read_only';
     }
 }

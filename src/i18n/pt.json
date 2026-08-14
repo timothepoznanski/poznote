@@ -1770,6 +1770,9 @@
       "check_only": "Apenas marcar ou desmarcar",
       "full": "Edição completa"
     },
+    "note_permissions": {
+      "editable": "Permitir edição do texto"
+    },
     "note": {
       "new_note": "Nova nota",
       "new_note_numbered": "Nova nota ({{number}})",
@@ -2313,6 +2316,11 @@
       "folder_not_found": "Pasta não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "note_not_found": "Nota não encontrada",
       "server_error": "Erro do servidor"
+    },
+    "edit": {
+      "button": "Editar",
+      "save_failed": "Não foi possível salvar as alterações",
+      "discard_confirm": "Descartar as alterações?"
     }
   },
   "public_folder": {

@@ -1767,6 +1767,9 @@
       "check_only": "Solo marcar o desmarcar",
       "full": "Edición completa"
     },
+    "note_permissions": {
+      "editable": "Permitir edición del texto"
+    },
     "note": {
       "new_note": "Nueva nota",
       "new_note_numbered": "Nueva nota ({{number}})",
@@ -2310,6 +2313,11 @@
       "folder_not_found": "Carpeta no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "note_not_found": "Nota no encontrada",
       "server_error": "Error del servidor"
+    },
+    "edit": {
+      "button": "Editar",
+      "save_failed": "No se pudieron guardar los cambios",
+      "discard_confirm": "¿Descartar los cambios?"
     }
   },
   "public_folder": {

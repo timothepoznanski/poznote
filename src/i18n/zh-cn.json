@@ -1765,6 +1765,9 @@
       "check_only": "仅勾选或取消勾选",
       "full": "完全编辑"
     },
+    "note_permissions": {
+      "editable": "允许编辑文本"
+    },
     "note": {
       "new_note": "新笔记",
       "new_note_numbered": "新笔记 ({{number}})",
@@ -2312,6 +2315,11 @@
       "folder_not_found": "未找到文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "note_not_found": "未找到笔记",
       "server_error": "服务器错误"
+    },
+    "edit": {
+      "button": "编辑",
+      "save_failed": "保存更改失败",
+      "discard_confirm": "放弃更改？"
     }
   },
   "public_folder": {

@@ -159,6 +159,7 @@ usort($shared_folders, function($a, $b) {
 	data-txt-task-read-only="<?php echo t_h('index.task_permissions.read_only', [], 'Read only'); ?>"
 	data-txt-task-check-only="<?php echo t_h('index.task_permissions.check_only', [], 'Check or uncheck only'); ?>"
 	data-txt-task-full="<?php echo t_h('index.task_permissions.full', [], 'Full edit'); ?>"
+	data-txt-note-editable="<?php echo t_h('index.note_permissions.editable', [], 'Allow text editing'); ?>"
 	data-txt-note-shared-through-folder="<?php echo t_h('public.note_shared_through_folder', [], 'Note shared through folder'); ?>"
 	data-txt-folder-shared-through-parent="<?php echo t_h('public.folder_shared_through_parent', [], 'Folder shared through parent folder'); ?>"
       data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
