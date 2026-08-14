@@ -1816,6 +1816,9 @@
       "check_only": "Cocher ou décocher uniquement",
       "full": "Modification complète"
     },
+    "note_permissions": {
+      "editable": "Autoriser la modification du texte"
+    },
     "note": {
       "new_note": "Nouvelle note",
       "new_note_numbered": "Nouvelle note ({{number}})",
@@ -2365,6 +2368,11 @@
       "folder_not_found": "Dossier introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "note_not_found": "Note introuvable",
       "server_error": "Erreur serveur"
+    },
+    "edit": {
+      "button": "Modifier",
+      "save_failed": "Échec de l'enregistrement des modifications",
+      "discard_confirm": "Abandonner vos modifications ?"
     }
   },
   "public_folder": {

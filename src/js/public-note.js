@@ -317,15 +317,15 @@
     function getTaskAccessMode() {
         const config = getPublicConfig();
         const accessMode = config && typeof config.taskAccessMode === 'string' ? config.taskAccessMode : 'full';
-        return ['read_only', 'check_only', 'full'].includes(accessMode) ? accessMode : 'full';
+        return ['read_only', 'check_only', 'full', 'edit'].includes(accessMode) ? accessMode : 'full';
     }
 
     function canToggleTasks() {
-        return ['check_only', 'full'].includes(getTaskAccessMode());
+        return ['check_only', 'full', 'edit'].includes(getTaskAccessMode());
     }
 
     function canFullyEditTasks() {
-        return getTaskAccessMode() === 'full';
+        return ['full', 'edit'].includes(getTaskAccessMode());
     }
 
     // Task list interaction (Checkboxes)

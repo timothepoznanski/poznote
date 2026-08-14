@@ -988,5 +988,9 @@ $router->delete('/public/tasks/{id}', function($params) use ($publicController) 
     $publicController->deleteTask($params['id']);
 });
 
+$router->patch('/public/notes/content', function($params) use ($publicController) {
+    $publicController->updateNoteContent();
+});
+
 // Dispatch the request
 $router->dispatch();

@@ -885,3 +885,86 @@ html[data-theme='dark'] .public-task-edit-cancel:hover {
 html[data-theme='dark'] .public-note .content .heading-anchor {
     color: #e5e7eb;
 }
+
+/* ============================================================================
+   Public note editing (shares with access_mode 'edit')
+   ============================================================================ */
+
+.public-note-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+/* .theme-toggle-btn forces display:flex, which would defeat the hidden
+   attribute used to swap the edit/save/cancel buttons. */
+.public-note-header-actions .theme-toggle-btn[hidden] {
+    display: none;
+}
+
+.public-note-editor {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.public-note-editor-markdown {
+    min-height: 60vh;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+}
+
+.public-note-editor-markdown:focus {
+    outline: none;
+    border-color: #999;
+}
+
+.public-note-editor-html {
+    min-height: 40vh;
+    padding: 12px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+}
+
+.public-note-editor-html:focus {
+    outline: none;
+    border-color: #999;
+}
+
+.public-edit-save-btn {
+    color: #16a34a;
+}
+
+.public-edit-cancel-btn {
+    color: #dc2626;
+}
+
+.public-edit-save-btn.is-saving {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+html[data-theme='dark'] .public-note-editor-markdown {
+    background: var(--dm-surface, #1e293b);
+    color: var(--dm-text, #e0e0e0);
+    border-color: var(--dm-border, #475569);
+}
+
+html[data-theme='dark'] .public-note-editor-html {
+    border-color: var(--dm-border, #475569);
+}
+
+html[data-theme='dark'] .public-edit-save-btn {
+    color: #4ade80;
+}
+
+html[data-theme='dark'] .public-edit-cancel-btn {
+    color: #f87171;
+}

@@ -209,12 +209,129 @@ class PublicController {
         }
     }
 
+    /**
+     * PATCH /api/v1/public/notes/content
+     * Replaces the text content of a publicly shared HTML or markdown note.
+     * Only allowed when the share's access_mode is 'edit'.
+     * Query Params:
+     *   - token: The shared note token
+     * Body (JSON):
+     *   - content: The new note content (HTML for 'note', raw source for 'markdown')
+     */
+    public function updateNoteContent(): void {
+        $token = $_GET['token'] ?? null;
+        if (!$token) {
+            $this->sendError(400, 'Token missing');
+            return;
+        }
+
+        $sharedNote = $this->validateTokenAndGetNote($token);
+        if (!$sharedNote) return;
+
+        if (($sharedNote['access_mode'] ?? '') !== 'edit') {
+            $this->sendError(403, 'This shared note is read-only');
+            return;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($input) || !array_key_exists('content', $input) || !is_string($input['content'])) {
+            $this->sendError(400, 'Content is required');
+            return;
+        }
+        $content = $input['content'];
+
+        $noteId = (int)$sharedNote['note_id'];
+        $note = $this->getNote($noteId);
+        if (!$note) return;
+
+        $type = $note['type'] ?? 'note';
+        if ($type !== 'note' && $type !== 'markdown') {
+            $this->sendError(400, 'This note type does not support public text editing');
+            return;
+        }
+
+        // Same server-side sanitization as authenticated saves: never trust
+        // the submitted markup, whoever holds the link.
+        if ($type === 'note') {
+            $content = $this->stripPublicUrlBase($content);
+            $content = $this->stripShareTokensFromAttachmentUrls($content);
+            $content = sanitizeHtml($content);
+        } else {
+            $content = sanitizeMarkdownContent($content);
+        }
+
+        $filename = getEntryFilename($noteId, $type);
+        // Only the growth of the note file counts against the storage quota,
+        // matching NotesController::update().
+        $existingEntryBytes = is_file($filename) ? (int)filesize($filename) : 0;
+        $quotaError = poznoteCheckStorageQuota(strlen($content) - $existingEntryBytes);
+        if ($quotaError !== null) {
+            $this->sendError(403, $quotaError);
+            return;
+        }
+
+        // Best-effort daily snapshot of the pre-edit content (same protection
+        // the app applies on authenticated edits), so a public editor cannot
+        // silently destroy the owner's text.
+        try {
+            require_once __DIR__ . '/SnapshotsController.php';
+            (new SnapshotsController($this->con))->createSnapshotForNote($noteId, false);
+        } catch (Throwable $e) {
+            error_log('Public edit snapshot failed: ' . $e->getMessage());
+        }
+
+        $this->saveNote($noteId, $type, $content);
+        $this->sendSuccess(['success' => true]);
+    }
+
+    /**
+     * public_note.php rewrites attachment URLs to absolute protocol-relative
+     * form for display. Reverse that before saving so the stored note keeps
+     * the same relative URLs the in-app editor produces.
+     */
+    private function stripPublicUrlBase(string $content): string {
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        if ($host === '') {
+            return $content;
+        }
+        $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
+        $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
+        $base = preg_quote($host . $scriptDir, '#');
+        return preg_replace(
+            '#(src|href)=(["\']?)(?:https?:)?//' . $base . '(/(?:api/v1/notes/\d+/attachments/|data/(?:users/\d+/)?attachments/))#i',
+            '$1=$2$3',
+            $content
+        );
+    }
+
+    /**
+     * Attachment URLs displayed on the public page carry the share token as a
+     * query parameter. Never persist it into the note: the owner may renew the
+     * token, and the stored note must keep working inside the app.
+     */
+    private function stripShareTokensFromAttachmentUrls(string $content): string {
+        return preg_replace_callback(
+            '#(src|href)=(["\']?)([^"\'\s>]*api/v1/notes/\d+/attachments/[^"\'\s>]*)#i',
+            function ($m) {
+                $url = preg_replace('/([?&])(?:token|folder_token)=[^&#"\'\s>]*/i', '$1', $m[3]);
+                $url = str_replace('?&', '?', $url);
+                $url = preg_replace('/&{2,}/', '&', $url);
+                $url = rtrim($url, '?&');
+                return $m[1] . '=' . $m[2] . $url;
+            },
+            $content
+        );
+    }
+
     private function validateTokenAndGetNote(string $token): ?array {
-        $stmt = $this->con->prepare('SELECT note_id, password, access_mode FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
+        $stmt = $this->con->prepare('SELECT note_id, password, access_mode, allowed_users FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedNote) {
             $this->sendError(404, 'Shared note not found');
+            return null;
+        }
+        if (!$this->passesUserRestriction($sharedNote['allowed_users'] ?? null)) {
             return null;
         }
         if (!empty($sharedNote['password'])) {
@@ -228,20 +345,55 @@ class PublicController {
         return $sharedNote;
     }
 
+    /**
+     * Mirror public_note.php's allowed_users gate for the write API: when the
+     * share is restricted to specific users, the requester must be logged in
+     * as the share owner or one of the listed users. The owner is the account
+     * the token routed us to ($activeUserId in db_connect.php), never the
+     * session user, because public token routing overrides the session.
+     */
+    private function passesUserRestriction($allowedUsersRaw): bool {
+        if (empty($allowedUsersRaw)) {
+            return true;
+        }
+        $allowedUserIds = is_array($allowedUsersRaw) ? $allowedUsersRaw : json_decode($allowedUsersRaw, true);
+        if (!is_array($allowedUserIds) || empty($allowedUserIds)) {
+            return true;
+        }
+
+        $currentUserId = $_SESSION['user_id'] ?? null;
+        if ($currentUserId === null) {
+            $this->sendError(401, 'Login required to access this shared note');
+            return false;
+        }
+
+        $ownerId = $GLOBALS['activeUserId'] ?? null;
+        if ($ownerId !== null && (int)$currentUserId === (int)$ownerId) {
+            return true;
+        }
+
+        if (!in_array((int)$currentUserId, array_map('intval', $allowedUserIds), true)) {
+            $this->sendError(403, 'You do not have permission to access this shared note');
+            return false;
+        }
+
+        return true;
+    }
+
     private function normalizeAccessMode(string $accessMode): string {
-        return in_array($accessMode, ['read_only', 'check_only', 'full'], true) ? $accessMode : 'full';
+        return in_array($accessMode, ['read_only', 'check_only', 'full', 'edit'], true) ? $accessMode : 'full';
     }
 
     private function canToggleTasks(string $accessMode): bool {
-        return in_array($this->normalizeAccessMode($accessMode), ['check_only', 'full'], true);
+        return in_array($this->normalizeAccessMode($accessMode), ['check_only', 'full', 'edit'], true);
     }
 
     private function canEditTaskText(string $accessMode): bool {
-        return $this->normalizeAccessMode($accessMode) === 'full';
+        return in_array($this->normalizeAccessMode($accessMode), ['full', 'edit'], true);
     }
 
     private function canFullyEditTasks(string $accessMode): bool {
-        return $this->normalizeAccessMode($accessMode) === 'full';
+        return in_array($this->normalizeAccessMode($accessMode), ['full', 'edit'], true);
     }
 
     private function getNote(int $noteId): ?array {
