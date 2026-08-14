@@ -14,7 +14,7 @@ Your note-taking and documentation platform.
 
 ### Features
 
-Discover all the features [here](https://poznote.com/index.html#features).
+Discover all the features [here](https://poznote.com/selfhosting.html).
 
 ### Demo
 
