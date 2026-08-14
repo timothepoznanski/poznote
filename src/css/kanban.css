@@ -198,7 +198,7 @@
     border-radius: 12px;
     padding: 14px 16px;
     /* Room for the completion button in the top-right corner */
-    padding-right: 42px;
+    padding-right: 36px;
     cursor: grab;
     transition: all 0.2s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -228,20 +228,22 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     padding: 0;
     border: 1px solid #cbd5e1;
     border-radius: 50%;
     background: #ffffff;
     color: #94a3b8;
     cursor: pointer;
-    opacity: 0;
+    /* Always visible so the action is discoverable without hovering */
+    opacity: 0.65;
     transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .kanban-card:hover .kanban-card-complete-btn,
-.kanban-card-complete-btn:focus-visible {
+.kanban-card-complete-btn:focus-visible,
+.kanban-card-complete-btn:hover {
     opacity: 1;
 }
 
@@ -257,7 +259,7 @@
 }
 
 .kanban-card-complete-btn i {
-    font-size: 0.85rem;
+    font-size: 0.65rem;
     line-height: 1;
 }
 
