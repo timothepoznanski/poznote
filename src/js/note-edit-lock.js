@@ -467,6 +467,14 @@
             entry.querySelectorAll('[data-note-lock-managed]').forEach(function (element) {
                 setTemporarilyDisabled(element, false);
             });
+
+            // The code block language badge overlay is only built for editable
+            // notes (js/code-block-language.js), so it is dropped whenever the
+            // lock check makes the entry read-only. Rebuild it now that the
+            // note is editable again.
+            if (typeof window.refreshCodeBlockLanguageButtons === 'function') {
+                window.refreshCodeBlockLanguageButtons(entry);
+            }
         }
     }
 
