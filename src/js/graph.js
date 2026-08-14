@@ -635,7 +635,13 @@
             dragOrigin = null;
         }
 
+        // Chrome starts its own HTML5 drag on the SVG text/shapes, which
+        // cancels our pointer capture mid-drag and leaves a "no-drop" cursor.
+        svg.addEventListener('dragstart', function (e) { e.preventDefault(); });
+
         svg.addEventListener('pointerdown', function (e) {
+            // Suppress the native drag and the text selection it grows from.
+            e.preventDefault();
             pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
             var pointerCount = Object.keys(pointers).length;
 
@@ -723,13 +729,14 @@
             }
         });
 
-        function endPointer(e) {
+        function endPointer(e, cancelled) {
             delete pointers[e.pointerId];
             if (Object.keys(pointers).length < 2) {
                 pinchStart = null;
             }
             if (dragGroup) {
-                var clicked = dragMoved < 5 ? dragNode : null;
+                // An aborted gesture is never a click: don't open the note.
+                var clicked = (!cancelled && dragMoved < 5) ? dragNode : null;
                 if (!clicked) {
                     // Keep the group exactly where it was dropped: pin every
                     // moved node and remember the positions for next time.
@@ -745,8 +752,8 @@
             }
             panStart = null;
         }
-        svg.addEventListener('pointerup', endPointer);
-        svg.addEventListener('pointercancel', endPointer);
+        svg.addEventListener('pointerup', function (e) { endPointer(e, false); });
+        svg.addEventListener('pointercancel', function (e) { endPointer(e, true); });
     }
 
     /* --------------------------------------------------------------------- */

@@ -69,6 +69,9 @@ function dashboardBuildNotePreview($noteId, $type) {
 }
 
 function dashboardFolderHasNotes(int $id, array &$folders): bool {
+    // A folder marked as favorite is a favorite in its own right, so it stays
+    // on the board even when the favorites filter emptied it of notes.
+    if (!empty($folders[$id]['favorite'])) return true;
     if (!empty($folders[$id]['notes'])) return true;
     foreach ($folders[$id]['children'] as $childId) {
         if (dashboardFolderHasNotes($childId, $folders)) return true;
@@ -253,6 +256,18 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
         $stmt = $con->prepare($query);
         $stmt->execute($params);
         $counts['favorites'] = (int)$stmt->fetchColumn();
+
+        // Favorite folders are board items too, so the badge counts them
+        // alongside favorite notes.
+        $query = "SELECT COUNT(*) FROM folders WHERE favorite = 1";
+        $params = [];
+        if ($pageWorkspace !== '') {
+            $query .= " AND workspace = ?";
+            $params[] = $pageWorkspace;
+        }
+        $stmt = $con->prepare($query);
+        $stmt->execute($params);
+        $counts['favorites'] += (int)$stmt->fetchColumn();
     } catch (Exception $e) {}
 
     try {
@@ -429,7 +444,7 @@ try {
     if (isset($con)) {
         $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
         $stmtF = $con->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned FROM folders" . $folderWhere .
+            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned, favorite FROM folders" . $folderWhere .
             " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
         );
         $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
@@ -450,6 +465,9 @@ try {
                 'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
                 'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
                 'pinned'   => !empty($f['pinned']),
+                // Only meaningful in favorites mode: keeps the folder on the
+                // board even when none of its notes are favorites.
+                'favorite' => $favoritesOnly && !empty($f['favorite']),
                 'notes'    => [],
                 'children' => [],
             ];
@@ -466,7 +484,16 @@ try {
         $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned FROM entries WHERE trash = 0";
         $params = [];
         if ($favoritesOnly) {
-            $query .= " AND favorite = 1";
+            // A favorite note qualifies on its own; a note also qualifies when it
+            // lives in a favorite folder, so that folder's card is not empty.
+            $favoriteFolderIds = array_keys(array_filter($folders, fn($fd) => !empty($fd['favorite'])));
+            if (!empty($favoriteFolderIds)) {
+                $placeholders = implode(',', array_fill(0, count($favoriteFolderIds), '?'));
+                $query .= " AND (favorite = 1 OR folder_id IN ($placeholders))";
+                $params = array_merge($params, $favoriteFolderIds);
+            } else {
+                $query .= " AND favorite = 1";
+            }
         }
         if (!empty($pageWorkspace)) {
             $query .= " AND workspace = ?";

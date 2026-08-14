@@ -130,6 +130,14 @@ body.dark-mode .folder-filter-banner-name i {
     background-color: var(--dm-text-muted);
 }
 
+html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:hover,
+html[data-theme='dark'] .folder-filter-banner-name i.folder-filter-banner-icon:focus-visible,
+body.dark-mode .folder-filter-banner-name i.folder-filter-banner-icon:hover,
+body.dark-mode .folder-filter-banner-name i.folder-filter-banner-icon:focus-visible {
+    color: var(--dm-accent, #4dabf7);
+    background-color: var(--dm-accent, #4dabf7);
+}
+
 html[data-theme='dark'] .search-date-field label,
 body.dark-mode .search-date-field label {
     color: var(--dm-text-muted);

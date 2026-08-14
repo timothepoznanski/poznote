@@ -337,6 +337,18 @@
     font-size: 13px;
 }
 
+/* Clickable folder icon in the banner: opens the folder's Kanban board */
+.folder-filter-banner-icon {
+    cursor: pointer;
+}
+
+.folder-filter-banner-icon:hover,
+.folder-filter-banner-icon:focus-visible {
+    /* Lucide icons are CSS masks: recolor needs background-color too */
+    color: #0d6efd;
+    background-color: #0d6efd;
+}
+
 .folder-filter-banner-clear {
     flex: 0 0 auto;
     display: flex;

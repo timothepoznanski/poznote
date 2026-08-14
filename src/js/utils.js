@@ -3376,6 +3376,11 @@ function buildKanbanUrl(folderId, workspace) {
     if (workspace) {
         newUrl += '&workspace=' + encodeURIComponent(workspace);
     }
+    // Keep the sidebar folder filter ("Show only this folder") across reloads
+    var currentFolder = new URLSearchParams(window.location.search).get('folder');
+    if (currentFolder) {
+        newUrl += '&folder=' + encodeURIComponent(currentFolder);
+    }
     return newUrl;
 }
 
