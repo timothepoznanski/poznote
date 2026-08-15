@@ -37,10 +37,13 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
+	<link rel="stylesheet" href="css/icon-sidebar.css">
+	<link rel="stylesheet" href="css/icon-sidebar-page.css">
+	<link rel="stylesheet" href="css/icon-sidebar-mobile.css">
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="favorites-page"
+<body class="favorites-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
@@ -49,17 +52,8 @@ $currentLang = getUserLanguage();
       data-txt-today="<?php echo t_h('common.date.today', [], 'Today'); ?>"
       data-txt-yesterday="<?php echo t_h('common.date.yesterday', [], 'Yesterday'); ?>"
       data-txt-days-ago="<?php echo t_h('common.date.days_ago', [], 'days ago'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
 	<div class="favorites-container">
-		<div class="favorites-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-			</button>
-		</div>
 		
 		<div class="favorites-filter-bar">
 			<div class="filter-input-wrapper">
@@ -90,5 +84,6 @@ $currentLang = getUserLanguage();
 	
 	<script src="js/navigation.js"></script>
 	<script src="js/favorites-page.js"></script>
+    <script src="js/icon-sidebar-toggle.js"></script>
 </body>
 </html>

@@ -96,6 +96,9 @@ $s3Enabled = $s3Config['enabled'] === '1';
     <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
     .s3-status-grid { display: flex; gap: 24px; flex-wrap: wrap; margin: 10px 0; justify-content: center; }
@@ -105,19 +108,12 @@ $s3Enabled = $s3Config['enabled'] === '1';
     #s3-migration-log { white-space: pre-line; font-size: 0.85rem; margin-top: 6px; }
     </style>
 </head>
-<body class="home-page git-sync-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container git-sync-container">
+    <h1 class="poznote-page-title"><i class="lucide lucide-cloud"></i> <?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></h1>
 
-        <div class="git-sync-nav">
-            <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Notes', $currentLang); ?>
-            </a>
-            <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings', [], 'Settings', $currentLang); ?>
-            </a>
-        </div>
+
 
         <div class="git-sync-header">
             <p class="git-sync-description"><?php echo t_h('s3_settings.description', [], 'Store note attachments in an S3-compatible object storage instead of the local disk.'); ?><br><br>
@@ -398,5 +394,6 @@ $s3Enabled = $s3Config['enabled'] === '1';
         });
     });
     </script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

@@ -131,22 +131,17 @@ function createBackup() {
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
     <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
     <div class="backup-container">
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-            <a id="backToNotesLink" href="index.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes'); ?>
-            </a>
-            <a href="settings.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings'); ?>
-            </a>
-        </div>
-        <br>
+    <h1 class="poznote-page-title"><i class="lucide lucide-upload"></i> <?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></h1>
+
         <!-- Complete Backup Section -->
         <div class="backup-section" id="complete-backup-section">
             <h3><?php echo t_h('backup_export.sections.complete_backup.title'); ?></h3>
@@ -684,5 +679,6 @@ function createBackup() {
 
     <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
     <script src="js/backup-export-init.js"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

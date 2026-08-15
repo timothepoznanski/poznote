@@ -160,18 +160,18 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="css/icon-sidebar.css">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
-<body data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+<body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
     
     <div class="info-page">
-        <div class="info-buttons-back-container">
-            <button id="backToNoteBtn" class="btn btn-secondary go-to-nav-btn" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-            </button>
-        </div>
-        
+
+        <h1 class="poznote-page-title"><i class="lucide lucide-info"></i> <?php echo t_h('info.page_title', [], 'Note Information'); ?></h1>
+
         <div class="info-content">
             <div class="info-row">
                 <div class="info-label"><?php echo t_h('info.labels.note_title', [], 'Note title:'); ?></div>
@@ -253,5 +253,6 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <script src="js/modal-alerts.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/info-page.js"></script>
+    <script src="js/icon-sidebar-toggle.js"></script>
 </body>
 </html>

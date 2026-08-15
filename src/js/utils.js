@@ -1899,26 +1899,31 @@ function getShouldExpandAllFolders() {
 }
 
 function updateToggleAllFoldersButton() {
-    var button = document.querySelector('[data-action="toggle-all-folders"]');
-    if (!button) return;
+    // Two buttons share this action: the one in the sidebar header and the one
+    // in the icon rail, so every match has to be kept in sync, not just the first.
+    var buttons = document.querySelectorAll('[data-action="toggle-all-folders"]');
+    if (!buttons.length) return;
 
     var folderContents = getFolderContentElements();
     var hasFolders = folderContents.length > 0;
     var shouldExpand = !hasFolders || getShouldExpandAllFolders();
-    var icon = button.querySelector('.lucide');
     var title = shouldExpand
         ? (window.t ? window.t('sidebar.expand_all_folders', null, 'Expand all folders') : 'Expand all folders')
         : (window.t ? window.t('sidebar.collapse_all_folders', null, 'Collapse all folders') : 'Collapse all folders');
 
-    button.disabled = !hasFolders;
-    button.title = title;
-    button.setAttribute('aria-label', title);
-    button.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
+    buttons.forEach(function (button) {
+        var icon = button.querySelector('.lucide');
 
-    if (icon) {
-        icon.classList.toggle('lucide-chevron-down', shouldExpand);
-        icon.classList.toggle('lucide-chevron-up', !shouldExpand);
-    }
+        button.disabled = !hasFolders;
+        button.title = title;
+        button.setAttribute('aria-label', title);
+        button.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
+
+        if (icon) {
+            icon.classList.toggle('lucide-chevron-down', shouldExpand);
+            icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+        }
+    });
 }
 
 function toggleAllFolders() {

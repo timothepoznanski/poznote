@@ -43,6 +43,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
@@ -62,20 +63,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
       data-txt-cal-no-tasks="<?php echo t_h('tasks_page.calendar_no_tasks', [], 'No tasks on this day.'); ?>">
 	<?php include 'icon_sidebar.php'; ?>
 	<div class="tasks-container">
-		<div class="tasks-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-			</button>
-		</div>
+
+		<h1 class="poznote-page-title"><i class="lucide lucide-list-todo"></i> <?php echo t_h('tasks_page.title', [], 'Tasks'); ?></h1>
 
 		<div id="tasksProgressSection" class="tasks-progress-section initially-hidden">
 			<div class="tasks-progress-header">
-				<h1 class="tasks-title"><i class="lucide lucide-list-todo"></i> <?php echo t_h('tasks_page.title', [], 'Tasks'); ?></h1>
 				<span id="tasksProgressLabel" class="tasks-progress-label"></span>
 			</div>
 			<div class="tasks-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="tasksProgressBar">

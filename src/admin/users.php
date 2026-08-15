@@ -569,6 +569,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <link rel="stylesheet" href="../css/dark-mode/markdown.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/kanban.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <style>
         /* The 12-column table needs ~1740px, more than the shared 1400px
            admin cap: size the container to its content so wide screens
@@ -920,24 +923,18 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     }
     </script>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
+<body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-csrf-token="<?php echo htmlspecialchars($adminUsersCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
     <!-- ========================================
          ADMIN CONTAINER - User Management
          ======================================== -->
     <div class="admin-container">
+        <h1 class="poznote-page-title"><i class="lucide lucide-users-cog"></i> <?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></h1>
         <!-- Header with navigation and actions -->
         <div class="admin-header">
             <div>
                 <div class="admin-nav" style="justify-content: center;">
-                    <a id="backToNotesLink" href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary btn-margin-right">
-                        <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                        <?php echo t_h('common.back_to_notes'); ?>
-                    </a>
-                    <a href="../settings.php" class="btn btn-secondary btn-margin-right">
-                        <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                        <?php echo t_h('common.back_to_settings'); ?>
-                    </a>
                     <?php // Exports every matching user, not just the visible
                           // page. The current search is carried over so the
                           // file matches what is on screen. ?>
@@ -1635,5 +1632,6 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             }
         });
     </script>
+    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

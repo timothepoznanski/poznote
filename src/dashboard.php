@@ -9,7 +9,6 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
-require_once 'GitSync.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -438,7 +437,6 @@ $favoritesOnly = isset($_GET['favorites']) && $_GET['favorites'] === '1';
 $dashboardData = ['folders' => [], 'notes' => []];
 $isEmpty = true;
 $dashboardTopbarCounts = [];
-$notificationsUnreadCount = 0;
 
 try {
     if (isset($con)) {
@@ -539,59 +537,6 @@ try {
 }
 
 $dashboardTopbarCounts = dashboardGetTopbarCounts($con ?? null, $pageWorkspace);
-$notificationsUnreadCount = (int)($dashboardTopbarCounts['notifications_unread'] ?? 0);
-$notificationsActiveCount = (int)($dashboardTopbarCounts['notifications'] ?? 0);
-
-$dashboardGitSync = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
-$dashboardGitProviderRaw = $dashboardGitSync->getProvider();
-$dashboardGitProviderName = getGitProviderName($dashboardGitProviderRaw);
-$dashboardGitProviderParams = ['provider' => $dashboardGitProviderName];
-$dashboardGitEnabled = GitSync::isEnabled() && $dashboardGitSync->isConfigured();
-$dashboardGitConfigUrl = dashboardBuildPageUrl('git_sync.php', $pageWorkspace);
-$dashboardLastSyncInfo = $dashboardGitSync->getLastSyncInfo();
-
-// Result of the last Git sync (stored in session by GitSyncController after a push/pull).
-// The page is reloaded by the sync JS once it completes, so we surface the outcome banner
-// and the detailed action log (with copy button) here.
-$dashboardSyncMessage = '';
-$dashboardSyncWarning = '';
-$dashboardSyncError = '';
-$dashboardSyncResult = null;
-if (isset($_SESSION['last_sync_result'])) {
-    $lastSync = $_SESSION['last_sync_result'];
-    $syncAction = $lastSync['action'] ?? '';
-    $dashboardSyncResult = $lastSync['result'] ?? null;
-    unset($_SESSION['last_sync_result']);
-
-    if (is_array($dashboardSyncResult)) {
-        $syncErrorCount = count($dashboardSyncResult['errors'] ?? []);
-        if (!empty($dashboardSyncResult['success'])) {
-            if ($syncAction === 'push') {
-                $dashboardSyncMessage = t('git_sync.messages.push_success', array_merge($dashboardGitProviderParams, [
-                    'count' => $dashboardSyncResult['pushed'] ?? 0,
-                    'attachments' => $dashboardSyncResult['attachments_pushed'] ?? 0,
-                    'deleted' => $dashboardSyncResult['deleted'] ?? 0,
-                    'errors' => $syncErrorCount,
-                ]));
-            } else {
-                $dashboardSyncMessage = t('git_sync.messages.pull_success', array_merge($dashboardGitProviderParams, [
-                    'pulled' => $dashboardSyncResult['pulled'] ?? 0,
-                    'updated' => $dashboardSyncResult['updated'] ?? 0,
-                    'deleted' => $dashboardSyncResult['deleted'] ?? 0,
-                    'errors' => $syncErrorCount,
-                ]));
-            }
-            if ($syncErrorCount > 0) {
-                $dashboardSyncWarning = $dashboardSyncMessage;
-                $dashboardSyncMessage = '';
-            }
-        } else {
-            $dashboardSyncError = t('git_sync.messages.' . $syncAction . '_error', array_merge($dashboardGitProviderParams, [
-                'error' => $dashboardSyncResult['errors'][0]['error'] ?? 'Unknown error',
-            ]));
-        }
-    }
-}
 
 $rawVersion = @file_get_contents('version.txt');
 if ($rawVersion === false) $rawVersion = '0.0.0';
@@ -621,18 +566,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
-	<link type="text/css" rel="stylesheet" href="css/ai-chat.css?v=<?php echo $cache_v; ?>"/>
+	<link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+	<link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+	<link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
 </head>
-<body class="favorites-page dashboard-page"
+<body class="favorites-page dashboard-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
 
 		<div class="favorites-container dashboard-container">
 			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
 			<div class="dashboard-top-info">
-				<a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="dashboard-top-info-item dashboard-mobile-back" title="<?php echo t_h('common.back_to_notes'); ?>">
-					<i class="lucide lucide-home"></i>
-					<span><?php echo t_h('common.back_to_notes'); ?></span>
-				</a>
 				<?php foreach ($dashboardContextItems as $item): ?>
 					<?php if ($item['icon'] === 'lucide-layers'): ?>
 					<button type="button" id="dashboardWorkspaceBtn" class="dashboard-top-info-item dashboard-workspace-trigger" title="<?php echo htmlspecialchars($item['label'] . ': ' . $item['value'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" data-action="open-workspace-switcher-modal">
@@ -651,80 +595,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</div>
 					<?php endif; ?>
 				<?php endforeach; ?>
-				<a href="settings.php" id="dashboardSettingsBtn" class="dashboard-top-info-item dashboard-top-info-link" title="<?php echo t_h('common.back_to_settings', [], 'Settings'); ?>">
-					<i class="lucide lucide-settings" aria-hidden="true"></i>
-					<span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span>
-				</a>
 							</div>
+			<h1 class="poznote-page-title"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></h1>
+
 			<header class="dashboard-topbar">
-				<nav class="dashboard-topbar-actions">
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('notes_manager.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardNotesBtn" class="dashboard-topbar-btn" title="<?php echo t_h('common.notes', [], 'Notes'); ?>" aria-label="<?php echo t_h('common.notes', [], 'Notes'); ?>">
-						<i class="lucide lucide-sticky-note"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['notes'] ?? 0); ?></span>
-					</a>
-					<button type="button" id="dashboardToggleFavorites" class="dashboard-topbar-btn<?php echo $favoritesOnly ? ' active' : ''; ?>" title="<?php echo $favoritesOnly ? t_h('dashboard.toggle_all', [], 'Show all notes') : t_h('dashboard.toggle_favorites', [], 'Show favorites only'); ?>">
-						<i class="lucide lucide-star"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['favorites'] ?? 0); ?></span>
-					</button>
-					<button type="button" id="dashboardNotificationsBtn" class="dashboard-topbar-btn dashboard-notifications-btn<?php echo $notificationsActiveCount > 0 ? ' has-notifications' : ''; ?>" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>">
-						<i class="lucide lucide-bell"></i>
-						<span class="dashboard-topbar-count" id="dashboardNotificationsCount"><?php echo (int)($dashboardTopbarCounts['notifications'] ?? 0); ?></span>
-					</button>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_tags.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTagsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?>">
-						<i class="lucide lucide-tags"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['tags'] ?? 0); ?></span>
-					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('list_folders.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardFoldersBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.folders', [], 'Folders'); ?>" aria-label="<?php echo t_h('home.folders', [], 'Folders'); ?>">
-						<i class="lucide lucide-folder-open"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['folders'] ?? 0); ?></span>
-					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('shared.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardSharesBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.shares', [], 'Shares'); ?>" aria-label="<?php echo t_h('home.shares', [], 'Shares'); ?>">
-						<i class="lucide lucide-share-2"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['shares'] ?? 0); ?></span>
-					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('attachments_list.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardAttachmentsBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?>">
-						<i class="lucide lucide-paperclip"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['attachments'] ?? 0); ?></span>
-					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('trash.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTrashBtn" class="dashboard-topbar-btn" title="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>" aria-label="<?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?>">
-						<i class="lucide lucide-trash-2"></i>
-						<span class="dashboard-topbar-count"><?php echo (int)($dashboardTopbarCounts['trash'] ?? 0); ?></span>
-					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('diary.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardDiaryBtn" class="dashboard-topbar-btn" title="<?php echo t_h('diary.title', [], 'Diary'); ?>" aria-label="<?php echo t_h('diary.title', [], 'Diary'); ?>">
-						<i class="lucide lucide-book-open"></i>
-						<span class="dashboard-topbar-count"><?php echo t_h('diary.title', [], 'Diary'); ?></span>
-					</a>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('tasks.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardTasksBtn" class="dashboard-topbar-btn" title="<?php echo t_h('tasks_page.title', [], 'Tasks'); ?>" aria-label="<?php echo t_h('tasks_page.title', [], 'Tasks'); ?>">
-						<i class="lucide lucide-list-todo"></i>
-						<span class="dashboard-topbar-count"><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span>
-					</a>
-					<?php if ($dashboardGitEnabled): ?>
-					<button type="button" id="dashboardGitPushBtn" class="dashboard-topbar-btn" data-dashboard-git-action="push" title="Push" aria-label="Push">
-						<i class="lucide lucide-upload"></i>
-						<span class="dashboard-topbar-count">Push</span>
-					</button>
-					<button type="button" id="dashboardGitPullBtn" class="dashboard-topbar-btn" data-dashboard-git-action="pull" title="Pull" aria-label="Pull">
-						<i class="lucide lucide-download"></i>
-						<span class="dashboard-topbar-count">Pull</span>
-					</button>
-					<?php endif; ?>
-					<a href="<?php echo htmlspecialchars(dashboardBuildPageUrl('graph.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" id="dashboardGraphBtn" class="dashboard-topbar-btn" title="<?php echo t_h('home.graph', [], 'Graph'); ?>" aria-label="<?php echo t_h('home.graph', [], 'Graph'); ?>">
-						<i class="lucide lucide-network"></i>
-						<span class="dashboard-topbar-count"><?php echo t_h('home.graph', [], 'Graph'); ?></span>
-					</a>
-					<?php
-					require_once 'users/db_master.php';
-					$dashAiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
-						&& trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
-						&& trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
-					if ($dashAiChatEnabled):
-					?>
-					<button type="button" id="dashboardAiChatBtn" class="dashboard-topbar-btn" data-action="toggle-ai-chat" title="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>" aria-label="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>">
-						<i class="lucide lucide-bot"></i>
-						<span class="dashboard-topbar-count">AI</span>
-					</button>
-					<?php endif; ?>
-				</nav>
 				<div class="board-filter-row">
 				<?php renderBoardViewMenu('dashboard'); ?>
 				<div class="dashboard-color-filter-wrap">
@@ -749,112 +623,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 				</div>
 			</header>
 
-		<?php if ($dashboardSyncMessage || $dashboardSyncWarning || $dashboardSyncError || ($dashboardSyncResult && !empty($dashboardSyncResult['debug']))): ?>
-		<div class="dashboard-sync-feedback" style="display: flex; flex-direction: column; gap: 10px; margin: 0 0 16px;">
-			<?php if ($dashboardSyncMessage): ?>
-			<div class="alert alert-success">
-				<i class="lucide lucide-check-circle"></i> <?php echo htmlspecialchars($dashboardSyncMessage); ?>
-			</div>
-			<?php endif; ?>
-			<?php if ($dashboardSyncWarning): ?>
-			<div class="alert alert-warning">
-				<i class="lucide lucide-alert-triangle"></i> <?php echo htmlspecialchars($dashboardSyncWarning); ?>
-			</div>
-			<?php endif; ?>
-			<?php if ($dashboardSyncError): ?>
-			<div class="alert alert-error">
-				<i class="lucide lucide-alert-circle"></i> <?php echo htmlspecialchars($dashboardSyncError); ?>
-			</div>
-			<?php endif; ?>
-
-			<?php if ($dashboardSyncResult && !empty($dashboardSyncResult['debug'])): ?>
-			<div class="dashboard-sync-debug">
-				<div class="dashboard-debug-controls">
-					<button type="button" id="dashboardDebugToggleBtn" class="btn btn-secondary dashboard-debug-btn">
-						<i class="lucide lucide-bug"></i> <span id="dashboardDebugToggleText"><?php echo t_h('git_sync.debug.show'); ?></span>
-					</button>
-					<button type="button" id="dashboardDebugChangesBtn" class="btn btn-secondary dashboard-debug-btn" aria-pressed="false" hidden>
-						<i class="lucide lucide-filter"></i> <span id="dashboardDebugChangesText"><?php echo t_h('git_sync.debug.show_changes', [], 'Only changes'); ?></span>
-					</button>
-					<button type="button" id="dashboardDebugCopyBtn" class="btn btn-secondary dashboard-debug-btn" hidden>
-						<i class="lucide lucide-copy"></i> <?php echo t_h('git_sync.debug.copy'); ?>
-					</button>
-				</div>
-				<div id="dashboardDebugInfo" class="debug-info dashboard-debug-info" hidden>
-					<h4><?php echo t_h('git_sync.debug.title', [], 'Debug Info'); ?></h4>
-					<pre id="dashboardDebugOutput"><?php echo htmlspecialchars(implode("\n", $dashboardSyncResult['debug'])); ?></pre>
-				</div>
-				<script>
-				(function() {
-					const debugLines = <?php echo json_encode($dashboardSyncResult['debug'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-					const debugContent = debugLines.join("\n");
-					const debugChangesContent = debugLines.filter(function(line) {
-						const normalized = line.trim();
-						if (!normalized) return false;
-						if (/→\s*unchanged\b|->\s*unchanged\b/i.test(normalized)) return false;
-						if (/^Attachment unchanged:/i.test(normalized)) return false;
-						if (/^Loaded metadata\.json/i.test(normalized)) return false;
-						if (/^Skipped /i.test(normalized)) return false;
-						return /→|->|Attachment saved:|Trashed local note|ERROR|WARNING|failed/i.test(normalized);
-					}).join("\n");
-					const debugNoChangesText = <?php echo json_encode(t('git_sync.debug.no_changes', [], 'No changes found in debug.'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-					const toggleBtn = document.getElementById('dashboardDebugToggleBtn');
-					const debugDiv = document.getElementById('dashboardDebugInfo');
-					const debugOutput = document.getElementById('dashboardDebugOutput');
-					const toggleText = document.getElementById('dashboardDebugToggleText');
-					const copyBtn = document.getElementById('dashboardDebugCopyBtn');
-					const changesBtn = document.getElementById('dashboardDebugChangesBtn');
-					const changesText = document.getElementById('dashboardDebugChangesText');
-					let debugChangesOnly = false;
-
-					function updateDebugOutput() {
-						if (!debugOutput) return;
-						debugOutput.textContent = debugChangesOnly
-							? (debugChangesContent || debugNoChangesText)
-							: debugContent;
-						if (changesBtn) changesBtn.setAttribute('aria-pressed', debugChangesOnly ? 'true' : 'false');
-						if (changesText) {
-							changesText.textContent = debugChangesOnly
-								? <?php echo json_encode(t('git_sync.debug.show_all', [], 'Show all'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>
-								: <?php echo json_encode(t('git_sync.debug.show_changes', [], 'Only changes'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-						}
-					}
-
-					toggleBtn?.addEventListener('click', function() {
-						if (debugDiv.hidden) {
-							debugDiv.hidden = false;
-							if (changesBtn) changesBtn.hidden = false;
-							if (copyBtn) copyBtn.hidden = false;
-							updateDebugOutput();
-							toggleText.textContent = <?php echo json_encode(t('git_sync.debug.hide'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-						} else {
-							debugDiv.hidden = true;
-							if (changesBtn) changesBtn.hidden = true;
-							if (copyBtn) copyBtn.hidden = true;
-							toggleText.textContent = <?php echo json_encode(t('git_sync.debug.show'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-						}
-					});
-
-					changesBtn?.addEventListener('click', function() {
-						debugChangesOnly = !debugChangesOnly;
-						updateDebugOutput();
-					});
-
-					copyBtn?.addEventListener('click', function() {
-						navigator.clipboard.writeText(debugOutput ? debugOutput.textContent : debugContent).then(function() {
-							const originalHTML = copyBtn.innerHTML;
-							copyBtn.innerHTML = '<i class="lucide lucide-check"></i> ' + <?php echo json_encode(t('git_sync.debug.copied'), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-							setTimeout(function() {
-								copyBtn.innerHTML = originalHTML;
-							}, 2000);
-						});
-					});
-				})();
-				</script>
-			</div>
-			<?php endif; ?>
-		</div>
-		<?php endif; ?>
 
 		<?php if ($isEmpty): ?>
 			<div class="dashboard-empty">
@@ -870,22 +638,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		<?php endif; ?>
 	</div>
 
-		<div id="notificationsModal" class="modal">
-			<div class="modal-content">
-				<h3><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></h3>
-				<div class="notifications-modal-body" style="max-height: 60vh; overflow-y: auto; margin: 15px 0;">
-					<div class="notifications-empty" id="notificationsEmpty">
-						<i class="lucide lucide-inbox"></i>
-						<p><?php echo t_h('reminder.no_notifications', [], 'No notifications'); ?></p>
-					</div>
-					<div class="notifications-list" id="notificationsList"></div>
-				</div>
-				<div class="modal-buttons">
-					<button type="button" class="btn-danger initially-hidden" id="dismissAllBtn" data-action="dismiss-all-notifications"><?php echo t_h('reminder.dismiss_all', [], 'Delete all'); ?></button>
-					<button type="button" class="btn-cancel" data-action="close-notifications-modal"><?php echo t_h('common.close'); ?></button>
-				</div>
-			</div>
-		</div>
 
 		<div id="workspaceSwitcherModal" class="modal">
 			<div class="modal-content">
@@ -958,28 +710,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>,
 			repeats: <?php echo json_encode(t('reminder.repeats', [], 'Repeats')); ?>
 		};
-		window.DASHBOARD_GIT = {
-			provider: <?php echo json_encode($dashboardGitProviderName); ?>,
-			configUrl: <?php echo json_encode($dashboardGitConfigUrl); ?>,
-			confirmPush: <?php echo json_encode(t('git_sync.confirm_push', $dashboardGitProviderParams, 'Push all notes to Git?')); ?>,
-			confirmPull: <?php echo json_encode(t('git_sync.confirm_pull', $dashboardGitProviderParams, 'Pull all notes from Git? This may overwrite local changes.')); ?>,
-			starting: <?php echo json_encode(t('git_sync.starting', [], 'Syncing...')); ?>,
-			completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>,
-			connectionError: <?php echo json_encode(t('git_sync.messages.connection_error', ['error' => ''], 'Connection error: ')); ?>,
-			lastSyncTimestamp: <?php echo json_encode(is_array($dashboardLastSyncInfo) ? ($dashboardLastSyncInfo['timestamp'] ?? '') : ''); ?>
-		};
 		</script>
 		<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/navigation.js"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
-		<script src="js/notifications-modal.js?v=<?php echo file_exists(__DIR__ . '/js/notifications-modal.js') ? filemtime(__DIR__ . '/js/notifications-modal.js') : $cache_v; ?>"></script>
 		<script src="js/dashboard-page.js?v=<?php echo file_exists(__DIR__ . '/js/dashboard-page.js') ? filemtime(__DIR__ . '/js/dashboard-page.js') : $cache_v; ?>"></script>
 		<script src="js/board-view-menu.js?v=<?php echo file_exists(__DIR__ . '/js/board-view-menu.js') ? filemtime(__DIR__ . '/js/board-view-menu.js') : $cache_v; ?>"></script>
-		<?php if (!empty($dashAiChatEnabled)): ?>
-		<?php include 'ai_chat_panel.php'; ?>
-		<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-		<script src="js/markdown-handler.js?v=<?php echo $cache_v; ?>"></script>
-		<script src="js/ai-chat.js?v=<?php echo file_exists(__DIR__ . '/js/ai-chat.js') ? filemtime(__DIR__ . '/js/ai-chat.js') : $cache_v; ?>"></script>
-		<?php endif; ?>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

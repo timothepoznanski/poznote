@@ -325,36 +325,22 @@ if ($canUseUserWebhooks) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="home-page"
+<body class="home-page has-icon-sidebar"
       data-txt-enabled="<?php echo t_h('common.enabled'); ?>"
       data-txt-disabled="<?php echo t_h('common.disabled'); ?>"
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
       data-txt-saved="<?php echo t_h('common.saved'); ?>"
       data-txt-error="<?php echo t_h('common.error'); ?>"
     data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container">
 
-        <?php 
-            // Build basic URL - workspace will be handled by JavaScript
-            $back_params = [];
-            if ($note_id) {
-                $back_params[] = 'note=' . intval($note_id);
-            }
-            $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
-        ?>
-
-        <div style="display: flex; justify-content: center; gap: 10px;">
-            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes'); ?>
-            </a>
-            <a id="backToHomeLink" href="dashboard.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn dashboard-nav-btn">
-    				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
-            </a>
-        </div>
+        <h1 class="poznote-page-title"><i class="lucide lucide-settings"></i> <?php echo t_h('settings.title', [], 'Settings'); ?></h1>
 
         <div class="home-search-container settings-filter-row">
             <button type="button" id="settingsViewToggle" class="settings-view-toggle"
@@ -1267,6 +1253,7 @@ if ($canUseUserWebhooks) {
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     ?></script>
     <script src="js/modal-alerts.js"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js"></script>

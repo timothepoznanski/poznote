@@ -111,17 +111,10 @@
         var countEl = document.getElementById('homeNotificationsCount');
         if (countEl) countEl.textContent = totalCount;
 
-        var dashboardCountEl = document.getElementById('dashboardNotificationsCount');
-        if (dashboardCountEl) dashboardCountEl.textContent = totalCount;
-
         var triggers = document.querySelectorAll('[data-action="open-notifications-modal"]');
         triggers.forEach(function (trigger) {
-            var shouldHighlight = trigger.id === 'dashboardNotificationsBtn' ? totalCount > 0 : unreadCount > 0;
-            trigger.classList.toggle('has-notifications', shouldHighlight);
+            trigger.classList.toggle('has-notifications', unreadCount > 0);
         });
-
-        var homeBtn = document.querySelector('[data-action="navigate-to-home"]');
-        if (homeBtn) homeBtn.classList.toggle('has-notifications-dot', totalCount > 0);
     }
 
     function pollCount() {

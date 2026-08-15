@@ -9,6 +9,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -29,8 +30,9 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/favorites.css"/>
 	<link type="text/css" rel="stylesheet" href="css/notes-manager.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
@@ -89,17 +91,7 @@ $currentLang = getUserLanguage();
 
 	<div class="notes-manager-container">
 
-		<!-- Navigation buttons -->
-		<div class="favorites-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-			</button>
-		</div>
+		<h1 class="poznote-page-title"><i class="lucide lucide-sticky-note"></i> <?php echo t_h('common.back_to_notes', [], 'Notes'); ?></h1>
 
 		<!-- Filter bar -->
 		<div class="nm-filter-bar">
@@ -237,7 +229,7 @@ $currentLang = getUserLanguage();
 	</div>
 
 	<script src="js/navigation.js"></script>
-	<script src="js/icon-sidebar-toggle.js"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/date-time-format.js"></script>
 	<script src="js/notes-manager.js"></script>
 </body>

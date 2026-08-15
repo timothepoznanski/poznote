@@ -75,6 +75,9 @@ if (!$note) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <style>
         .file-icon-placeholder {
@@ -123,7 +126,7 @@ if (!$note) {
         }
     </style>
 </head>
-<body data-note-id="<?php echo $note_id; ?>"
+<body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>"
       data-note-type="<?php echo htmlspecialchars($note['type'] ?? 'note', ENT_QUOTES); ?>"
       data-workspace="<?php echo $workspace ? htmlspecialchars($workspace, ENT_QUOTES) : ''; ?>"
       data-txt-uploading="<?php echo t_h('attachments.upload.button_uploading', [], 'Uploading...'); ?>"
@@ -155,6 +158,7 @@ if (!$note) {
           t('attachments.size.units.mb', [], 'MB'),
           t('attachments.size.units.gb', [], 'GB'),
       ]), ENT_QUOTES); ?>">
+    <?php include 'icon_sidebar.php'; ?>
     
     <!-- Global configuration (CSP compliant) -->
     <script type="application/json" id="poznote-config"><?php
@@ -166,23 +170,6 @@ if (!$note) {
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
     
     <div class="settings-container">
-        <?php 
-            $back_params = [];
-            if ($workspace) $back_params[] = 'workspace=' . urlencode($workspace);
-            if ($note_id) {
-                $back_params[] = 'note=' . intval($note_id);
-            }
-            $back_href = 'index.php' . (!empty($back_params) ? '?' . implode('&', $back_params) : '');
-        ?>
-        <div style="display: flex; justify-content: center; gap: 10px;">
-            <a id="backToNotesLink" href="<?php echo $back_href; ?>" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes'); ?>
-            </a>
-        </div>
-
-        <br>
-
         <!-- Upload Section -->
         <div class="settings-section">
             <h3><?php echo t_h('attachments.page.upload_section_title'); ?></h3>
@@ -239,5 +226,6 @@ if (!$note) {
             </div>
         </div>
     </div>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

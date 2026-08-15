@@ -1953,7 +1953,9 @@ body.dark-mode .dashboard-version-badge {
    matching the icon bar below it */
 @media (max-width: 800px) {
     .dashboard-top-info {
-        justify-content: flex-start;
+        /* "safe" centres while the items fit and falls back to flex-start once
+           they overflow, so the first one stays reachable when scrolling. */
+        justify-content: safe center;
         flex-wrap: nowrap;
         gap: 20px;
         overflow-x: auto;

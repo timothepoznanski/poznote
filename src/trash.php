@@ -95,14 +95,17 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-    <link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
-    <link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
+    <link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+    <link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="trash-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">
     <?php include 'icon_sidebar.php'; ?>
     <div class="trash-container">
+    	<h1 class="poznote-page-title"><i class="lucide lucide-trash-2"></i> <?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></h1>
+
 
         <?php
         // Build search condition supporting multiple terms (AND) with accent-insensitive search
@@ -162,14 +165,6 @@ $currentLang = getUserLanguage();
         <?php endif; ?>
         
         <div class="trash-buttons-container">
-            <button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-                    <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes'); ?>
-            </button>
-            <button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-                    <i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-            </button>
             <button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
                 <?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>
             </button>
@@ -333,7 +328,7 @@ $currentLang = getUserLanguage();
     <script src="js/bulletlist.js"></script>
     <script src="js/main.js"></script>
     <script src="js/navigation.js"></script>
-    <script src="js/icon-sidebar-toggle.js"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/trash.js"></script>
 </body>
 </html>

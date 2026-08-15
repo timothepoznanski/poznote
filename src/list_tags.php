@@ -69,6 +69,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>"/>
@@ -97,18 +98,8 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	include 'icon_sidebar.php';
 	?>
 	<div class="tags-container">
-		<div class="tags-buttons-container">
-			<div class="tags-actions">
-				<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-					<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-					<?php echo t_h('common.back_to_notes'); ?>
-				</button>
-				<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-					<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-					<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-				</button>
-			</div>
-		</div>
+		<h1 class="poznote-page-title"><i class="lucide lucide-tags"></i> <?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></h1>
+
 		
 		
 		<div class="home-search-container">

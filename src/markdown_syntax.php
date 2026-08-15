@@ -399,16 +399,14 @@ $examples = [
     <link rel="stylesheet" href="css/markdown-syntax.css">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
     <link rel="stylesheet" href="css/dark-mode/pages.css">
+    <link rel="stylesheet" href="css/icon-sidebar.css">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
-<body>
+<body class="has-icon-sidebar">
+    <?php include 'icon_sidebar.php'; ?>
     <div class="info-page markdown-syntax-page">
-        <div class="info-buttons-back-container">
-            <a class="btn btn-secondary go-to-nav-btn" href="<?php echo htmlspecialchars($backUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>" title="<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-            </a>
-        </div>
 
         <div class="info-content markdown-syntax-content">
             <p class="markdown-syntax-intro"><?php echo htmlspecialchars($copy['intro'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></p>
@@ -522,5 +520,6 @@ $examples = [
         applyFilter();
     })();
     </script>
+    <script src="js/icon-sidebar-toggle.js"></script>
 </body>
 </html>

@@ -1127,6 +1127,9 @@ function poznoteGetNonHideableUiKeys() {
 function poznoteNormalizeHiddenUiKey($key) {
     static $renamed = [
         'toolbar:btn-share' => 'toolbar:btn-publish',
+        // Notifications and AI chat moved from the icon rail to the sidebar header.
+        'card:iconSidebarNotificationsBtn' => 'card:sidebarNotificationsBtn',
+        'card:iconSidebarAiChatBtn' => 'card:sidebarAiChatBtn',
     ];
 
     return $renamed[$key] ?? $key;
@@ -1404,11 +1407,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             }
 
             $rules[] = '#' . $id . ' { display: none !important; }';
-            if ($id === 'sidebarDashboardBtn') {
-                // Hiding the Dashboard entry hides every button that navigates
-                // to the dashboard, on all pages.
-                $rules[] = '.dashboard-nav-btn { display: none !important; }';
-            }
             if ($id === 'icon_sidebar') {
                 // The collapse chevron lives outside #icon_sidebar (so it stays
                 // clickable once the rail is collapsed), so hiding the rail has

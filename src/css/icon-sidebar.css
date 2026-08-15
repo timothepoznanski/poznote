@@ -60,6 +60,57 @@
     background: rgba(0, 125, 184, 0.08);
 }
 
+/* Current page. Lives here rather than in css/icon-sidebar-page.css so that
+   index.php, which loads only this file, highlights its Home entry too. */
+.icon-sidebar-btn-active {
+    color: #007DB8;
+    background: rgba(0, 125, 184, 0.12);
+}
+
+/* Favorites view active: amber rather than the usual blue, matching the star.
+   The icons are CSS masks, so background-color is what actually tints them;
+   :hover must be included or it would revert to blue on pointer-over. */
+.icon-sidebar-btn-active-favorite,
+.icon-sidebar-btn-active-favorite:hover,
+.icon-sidebar-btn-active-favorite:focus-visible {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.14);
+}
+
+.icon-sidebar-btn-active-favorite .lucide {
+    background-color: #f59e0b;
+}
+
+/* Update badge on the Settings entry (admins only). css/settings.css owns the
+   dot itself but is not loaded on every page, so the rules it needs are
+   restated here; js/utils.js drops .update-badge-hidden when a release is out. */
+.icon-sidebar-btn {
+    position: relative;
+}
+
+.icon-sidebar-btn .update-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    display: block;
+    pointer-events: none;
+}
+
+.icon-sidebar-btn .update-badge.update-badge-hidden {
+    display: none;
+}
+
+/* Account actions sit flush against the bottom: the auto margin eats the free
+   space above them. When the rail is too short for every icon it collapses to
+   zero and the group simply follows the list, which then scrolls. */
+.icon-sidebar-btn-bottom-start {
+    margin-top: auto;
+}
+
 .icon-sidebar-btn .lucide {
     width: 16px;
     height: 16px;
@@ -115,4 +166,108 @@ body.icon-sidebar-collapsed #iconSidebarToggle {
 
 body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     transform: rotate(180deg);
+}
+
+/* Page title used by the pages whose Notes / Dashboard buttons were replaced by
+   the rail (settings.php, notes_manager.php, ...). Lives here rather than in
+   css/settings.css because that file is not loaded on every such page. */
+.poznote-page-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 20px 0;
+}
+
+.poznote-page-title i {
+    color: #007DB8;
+}
+
+/* The book glyph's ink sits high in its box, so a box-centred icon still reads
+   as raised next to the text. Nudge it down to line up optically. */
+.poznote-page-title .lucide-book-open {
+    position: relative;
+    top: 2px;
+}
+
+/* trash.php, diary.php and graph.php give their container no top padding, so
+   the title would sit flush against the top edge. The other hosts pad by 20px. */
+.trash-container > .poznote-page-title,
+.dashboard-container > .poznote-page-title,
+.graph-container > .poznote-page-title {
+    padding-top: 20px;
+}
+
+/* graph.php is a full-height flex column whose canvas takes the leftover space;
+   the title must not stretch or shrink. */
+.graph-container > .poznote-page-title {
+    flex: 0 0 auto;
+}
+
+/* These containers pad by 20px already, which sat the title lower than on the
+   other pages; pull it back up to match. */
+.tags-container > .poznote-page-title {
+    margin-top: -12px;
+}
+
+/* list_folders.php, shared.php and attachments_list.php all use
+   .shared-container; tasks.php pads by 40px like settings.php. */
+.shared-container > .poznote-page-title {
+    margin-top: -20px;
+}
+
+.tasks-container > .poznote-page-title {
+    margin-top: -20px;
+}
+
+/* .home-container pads by 40px, twice what the other hosts use. */
+.home-container > .poznote-page-title {
+    margin-top: -14px;
+}
+
+/* Mobile drops these containers to 10px of padding (css/shared/responsive.css),
+   which the pull-up above would swallow whole, leaving no gap at all. */
+@media (max-width: 800px) {
+    .shared-container > .poznote-page-title,
+    .tags-container > .poznote-page-title,
+    .tasks-container > .poznote-page-title {
+        margin-top: 0;
+    }
+}
+
+/* .home-container halves its padding to 20px at 600px (css/home/responsive.css),
+   so the -14px pull-up leaves almost no gap. Same breakpoint, not 800px. */
+@media (max-width: 600px) {
+    .home-container > .poznote-page-title {
+        margin-top: 0;
+    }
+}
+
+/* Both pages stack their own controls right under the title, so the shared
+   20px gap below is too much. diary.php sits tighter than dashboard.php. */
+.dashboard-container > .poznote-page-title {
+    margin-bottom: 4px;
+}
+
+/* dashboard.php only: sit the title a little higher, trading space above for
+   space below. diary.php keeps the 20px/4px pairing set above. */
+body:not(.diary-page) .dashboard-container > .poznote-page-title {
+    padding-top: 12px;
+    margin-bottom: 22px;
+}
+
+/* Both put their controls inside .dashboard-topbar, which adds its own top
+   padding plus the filter row's 20px top margin on top of that margin. */
+.dashboard-container > .poznote-page-title + .dashboard-topbar {
+    padding-top: 0;
+}
+
+/* Only on dashboard.php, where the filter row sits directly under the title.
+   diary.php has its action buttons in between and needs the row's own margin
+   to keep them apart. */
+body:not(.diary-page) .dashboard-container > .poznote-page-title + .dashboard-topbar > .board-filter-row {
+    margin-top: 0;
 }

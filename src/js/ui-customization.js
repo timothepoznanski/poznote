@@ -71,7 +71,10 @@
     // Keys renamed after release, so preferences saved under the old name keep
     // working. See poznoteNormalizeHiddenUiKey() in functions.php.
     var RENAMED_UI_KEYS = {
-        'toolbar:btn-share': 'toolbar:btn-publish'
+        'toolbar:btn-share': 'toolbar:btn-publish',
+        // Notifications and AI chat moved from the icon rail to the sidebar header.
+        'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
+        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -351,12 +354,6 @@
                 if (type === 'card') {
                     if (id === 'ui-customization-card') return;
                     rules.push('#' + id + ' { display: none !important; }');
-
-                    if (id === 'sidebarDashboardBtn') {
-                        // Hiding the Dashboard entry hides every button that
-                        // navigates to the dashboard, on all pages.
-                        rules.push('.dashboard-nav-btn { display: none !important; }');
-                    }
 
                     if (id === 'icon_sidebar') {
                         // The collapse chevron lives outside #icon_sidebar (so it

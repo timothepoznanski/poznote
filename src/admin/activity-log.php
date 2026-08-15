@@ -506,6 +506,9 @@ function activityExportUrl(string $action, string $search): string {
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <style>
     /* Same full-width treatment as storage-stats: the log table is wider than
        the default 700px admin column. */
@@ -770,16 +773,13 @@ function activityExportUrl(string $action, string $search): string {
     :root[data-theme="light"] .act-muted  { background: rgba(107, 114, 128, 0.14); color: #4b5563; }
     </style>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="admin-container">
+<h1 class="poznote-page-title"><i class="lucide lucide-clipboard-list"></i> <?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></h1>
+
     <div class="admin-header">
         <div class="admin-nav" style="justify-content:center;">
-            <a href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary">
-                <i class="lucide lucide-sticky-note" style="margin-right:5px;"></i><?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-            </a>
-            <a href="../settings.php" class="btn btn-secondary">
-                <i class="lucide lucide-settings" style="margin-right:5px;"></i><?php echo t_h('settings.title', [], 'Settings'); ?>
-            </a>
             <?php // Exports every matching entry, not just the visible page.
                   // The current filters are carried over so the file matches
                   // what is on screen. Nothing to export on an empty log. ?>
@@ -1032,5 +1032,6 @@ window.addEventListener('resize', sizeActivityTableScroll);
     });
 })();
 </script>
+    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

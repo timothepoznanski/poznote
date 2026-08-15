@@ -112,10 +112,6 @@ function applyIndexIconScale(scale) {
         .sidebar-howto [class*="lucide-"],
         .sidebar-folder-toggle i,
         .sidebar-folder-toggle [class*="lucide-"],
-        .sidebar-home i,
-        .sidebar-home [class*="lucide-"],
-        .sidebar-settings i,
-        .sidebar-settings [class*="lucide-"],
         .sidebar-plus i,
         .sidebar-plus [class*="lucide-"],
         .sidebar-plus .lucide-plus-circle {

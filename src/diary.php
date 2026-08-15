@@ -162,6 +162,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
@@ -171,16 +172,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="favorites-container dashboard-container">
+		<h1 class="poznote-page-title"><i class="lucide lucide-book-open"></i> <?php echo t_h('diary.title', [], 'Diary'); ?></h1>
+
 		<header class="dashboard-topbar">
 			<div class="diary-actions">
-				<a href="<?php echo htmlspecialchars(diaryBuildPageUrl('index.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary">
-					<i class="lucide lucide-sticky-note"></i>
-					<?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-				</a>
-				<a href="<?php echo htmlspecialchars(diaryBuildPageUrl('dashboard.php', $pageWorkspace), ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-secondary dashboard-nav-btn">
-					<i class="lucide lucide-layout-dashboard"></i>
-					<?php echo t_h('home.dashboard', [], 'Dashboard'); ?>
-				</a>
 				<button type="button" id="diaryNewBtn" class="btn btn-primary" title="<?php echo t_h('diary.new_modal_title', [], 'Create a new diary'); ?>">
 					<i class="lucide lucide-plus"></i>
 					<?php echo t_h('diary.new_button', [], 'New diary'); ?>

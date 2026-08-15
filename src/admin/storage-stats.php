@@ -490,6 +490,9 @@ foreach ($stats as $r) {
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <style>
     /* The table (10 columns in S3 mode, nowrap cells) is far wider than the
        default 700px admin column: let it use the whole window, keeping the
@@ -796,16 +799,13 @@ foreach ($stats as $r) {
     window.addEventListener('resize', sizeStorageTableScroll);
 </script>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="admin-container">
+<h1 class="poznote-page-title"><i class="lucide lucide-pie-chart"></i> <?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></h1>
+
     <div class="admin-header">
         <div class="admin-nav" style="justify-content:center;">
-            <a href="../index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary">
-                <i class="lucide lucide-sticky-note" style="margin-right:5px;"></i><?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-            </a>
-            <a href="../settings.php" class="btn btn-secondary">
-                <i class="lucide lucide-settings" style="margin-right:5px;"></i><?php echo t_h('settings.title', [], 'Settings'); ?>
-            </a>
             <?php // Exports every matching account, not just the visible page.
                   // The current search is carried over so the file matches
                   // what is on screen. ?>
@@ -1121,5 +1121,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

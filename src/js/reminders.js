@@ -14,7 +14,6 @@ let reminderHasInitialReminder = false;
 let reminderInitialEmailEnabled = false;
 let reminderEmailAvailable = false;
 let reminderInitialRecurrence = '';
-const REMINDER_NOTIFICATION_POLL_INTERVAL = 45000;
 
 function parseReminderDate(value) {
     if (!value) return null;
@@ -133,33 +132,6 @@ function setReminderRecurrenceValue(recurrence) {
     }
 
     syncReminderRepeatCustomVisibility();
-}
-
-function updateNotificationIndicators(count) {
-    const hasUnreadNotifications = count > 0;
-    document.querySelectorAll('.sidebar-home').forEach(function(button) {
-        button.classList.toggle('has-notifications-dot', hasUnreadNotifications);
-    });
-}
-
-function pollNotificationIndicators() {
-    if (!document.querySelector('.sidebar-home')) {
-        return;
-    }
-
-    var workspace = document.body ? document.body.getAttribute('data-workspace') || '' : '';
-    var url = '/api/v1/reminders/count' + (workspace ? '?workspace=' + encodeURIComponent(workspace) : '');
-    fetch(url, {
-        headers: { 'Accept': 'application/json' },
-        credentials: 'same-origin'
-    })
-    .then(function(response) { return response.json(); })
-    .then(function(data) {
-        if (data.success) {
-            updateNotificationIndicators(data.unread_count || 0);
-        }
-    })
-    .catch(function() {});
 }
 
 // ============================================================================
@@ -600,5 +572,5 @@ if (reminderRepeatSelect) {
     }
 });
 
-pollNotificationIndicators();
-setInterval(pollNotificationIndicators, REMINDER_NOTIFICATION_POLL_INTERVAL);
+// The unread-reminder indicator now lives on the icon rail's notifications
+// button, polled by js/notifications-modal.js.

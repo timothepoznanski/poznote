@@ -345,16 +345,6 @@
                     toggleWorkspaceMenu(e);
                 }
                 break;
-            case 'navigate-to-home':
-                if (typeof navigateToDisplayOrSettings === 'function') {
-                    navigateToDisplayOrSettings('dashboard.php');
-                }
-                break;
-            case 'navigate-to-settings':
-                if (typeof navigateToDisplayOrSettings === 'function') {
-                    navigateToDisplayOrSettings('settings.php');
-                }
-                break;
             case 'toggle-all-folders':
                 e.preventDefault();
                 e.stopImmediatePropagation();
@@ -1356,6 +1346,36 @@
         return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     }
 
+    /**
+     * Keep .note-open in step with the column actually on screen.
+     *
+     * The class is otherwise only set/cleared programmatically, so swiping
+     * between the list and the note by hand left it stale, and the icon rail
+     * (hidden under .note-open by css/icon-sidebar-mobile.css) stayed hidden
+     * after swiping back to the list.
+     */
+    function syncNoteOpenToScroll() {
+        if (window.innerWidth > 800) return;
+        // On mobile css/index-mobile.css makes <body> itself the horizontal
+        // scroller (position: fixed + overflow-x: auto), so the offset lives on
+        // body.scrollLeft, not on document.scrollingElement.
+        const left = document.body.scrollLeft
+            || (document.scrollingElement ? document.scrollingElement.scrollLeft : 0);
+        // Past the halfway point the note pane is the one being read.
+        document.body.classList.toggle('note-open', left > window.innerWidth / 2);
+    }
+
+    var noteOpenSyncFrame = null;
+    function scheduleNoteOpenSync() {
+        if (noteOpenSyncFrame) return;
+        noteOpenSyncFrame = requestAnimationFrame(function () {
+            noteOpenSyncFrame = null;
+            syncNoteOpenToScroll();
+        });
+    }
+    document.body.addEventListener('scroll', scheduleNoteOpenSync, { passive: true });
+    window.addEventListener('scroll', scheduleNoteOpenSync, { passive: true });
+
     function setHorizontalScroll(left) {
         const scrollRoot = document.scrollingElement || document.documentElement;
         scrollRoot.scrollLeft = left;
@@ -1480,6 +1500,9 @@
      */
     function performScroll() {
         if (window.innerWidth <= 800) {
+            // Back to the list: drop .note-open so the icon rail comes back
+            // (css/icon-sidebar-mobile.css hides it while a note is showing).
+            document.body.classList.remove('note-open');
             const duration = isReducedMotionPreferred() ? 0 : 260;
             animateHorizontalScroll(0, duration);
         } else {

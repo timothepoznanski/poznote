@@ -6,6 +6,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -27,8 +28,9 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
 	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/attachments_list.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
@@ -45,16 +47,8 @@ $currentLang = getUserLanguage();
 <body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>" data-txt-no-results="<?php echo t_h('attachments.list.no_filter_results', [], 'No results.'); ?>" data-txt-all-file-types="<?php echo t_h('attachments.list.all_file_types', [], 'All types'); ?>">
 	<?php include 'icon_sidebar.php'; ?>
 	<div class="shared-container">
-		<div class="shared-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary">
-				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-			</button>
-		</div>
+		<h1 class="poznote-page-title"><i class="lucide lucide-paperclip"></i> <?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></h1>
+
 
 		
 		<div class="shared-filter-bar attachments-filter-bar">
@@ -86,7 +80,7 @@ $currentLang = getUserLanguage();
 	</div>
 	
 	<script src="js/navigation.js"></script>
-	<script src="js/icon-sidebar-toggle.js"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/attachments-list.js"></script>
 </body>
 </html>

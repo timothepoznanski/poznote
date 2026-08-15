@@ -30,22 +30,18 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/graph.css?v=<?php echo $cache_v; ?>"/>
+	<link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+	<link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+	<link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="graph-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="graph-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
 	<div class="graph-container">
+		<h1 class="poznote-page-title"><i class="lucide lucide-network"></i> <?php echo t_h('home.graph', [], 'Graph'); ?></h1>
+
 		<div class="graph-toolbar">
-			<div class="graph-actions">
-				<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-					<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-					<?php echo t_h('common.back_to_notes'); ?>
-				</button>
-				<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-					<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-					<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-				</button>
-			</div>
 			<div class="graph-search-wrapper">
 				<input
 					type="text"
@@ -96,5 +92,6 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/graph.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

@@ -450,70 +450,20 @@ if ($isPublicWorkspaceReadonly) {
         && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
 
     // Icon-only left rail mirroring the dashboard topbar actions
-    // (see .dashboard-topbar-actions in dashboard.php)
+    // (see .dashboard-topbar-actions in dashboard.php). The navigation entries
+    // live in icon_sidebar.php so every page shows the same list; the buttons
+    // below are appended here because their handlers only exist on this page.
     $iconSidebarWorkspace = ($workspace_filter !== '' && $workspace_filter !== '__last_opened__') ? $workspace_filter : '';
-    $iconSidebarUrl = static function (string $page, array $extra = []) use ($iconSidebarWorkspace): string {
-        if ($iconSidebarWorkspace !== '') {
-            $extra['workspace'] = $iconSidebarWorkspace;
-        }
-        return $page . ($extra ? '?' . http_build_query($extra) : '');
-    };
-    $iconSidebarItems = [
-        ['id' => 'iconSidebarNotesBtn', 'url' => $iconSidebarUrl('notes_manager.php'), 'icon' => 'lucide-sticky-note', 'label' => t('common.notes', [], 'Notes')],
-        ['id' => 'iconSidebarFavoritesBtn', 'url' => $iconSidebarUrl('dashboard.php', ['favorites' => '1']), 'icon' => 'lucide-star', 'label' => t('notes_list.system_folders.favorites', [], 'Favorites')],
-        ['id' => 'iconSidebarNotificationsBtn', 'action' => 'open-notifications-modal', 'icon' => 'lucide-bell', 'label' => t('reminder.notifications', [], 'Notifications')],
-        ['id' => 'iconSidebarTagsBtn', 'url' => $iconSidebarUrl('list_tags.php'), 'icon' => 'lucide-tags', 'label' => t('notes_list.system_folders.tags', [], 'Tags')],
-        ['id' => 'iconSidebarFoldersBtn', 'url' => $iconSidebarUrl('list_folders.php'), 'icon' => 'lucide-folder-open', 'label' => t('home.folders', [], 'Folders')],
-        ['id' => 'iconSidebarSharesBtn', 'url' => $iconSidebarUrl('shared.php'), 'icon' => 'lucide-share-2', 'label' => t('home.shares', [], 'Shares')],
-        ['id' => 'iconSidebarAttachmentsBtn', 'url' => $iconSidebarUrl('attachments_list.php'), 'icon' => 'lucide-paperclip', 'label' => t('notes_list.system_folders.attachments', [], 'Attachments')],
-        ['id' => 'iconSidebarTrashBtn', 'url' => $iconSidebarUrl('trash.php'), 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
-        ['id' => 'iconSidebarDiaryBtn', 'url' => $iconSidebarUrl('diary.php'), 'icon' => 'lucide-book-open', 'label' => t('diary.title', [], 'Diary')],
-        ['id' => 'iconSidebarTasksBtn', 'url' => $iconSidebarUrl('tasks.php'), 'icon' => 'lucide-list-todo', 'label' => t('tasks_page.title', [], 'Tasks')],
-        ['id' => 'iconSidebarGraphBtn', 'url' => $iconSidebarUrl('graph.php'), 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
-    ];
+    // Notifications and AI chat live in the sidebar header instead (next to the
+    // create button); only the git buttons remain rail-side.
+    $iconSidebarExtraItems = [];
     if ($showGitSync) {
-        $iconSidebarItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push'];
-        $iconSidebarItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull'];
-    }
-    if ($aiChatEnabled) {
-        $iconSidebarItems[] = ['id' => 'iconSidebarAiChatBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
+        $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push'];
+        $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull'];
     }
     ?>
     <!-- ICON SIDEBAR (dashboard topbar actions, icons only) -->
-    <script>
-    // Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
-    // (deferred bundle) owns it afterwards.
-    try {
-        if (localStorage.getItem('iconSidebarCollapsed') === 'true') {
-            document.body.classList.add('icon-sidebar-collapsed');
-        }
-    } catch (e) {}
-    </script>
-    <nav id="icon_sidebar">
-        <?php foreach ($iconSidebarItems as $iconSidebarItem): ?>
-        <?php $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
-        <?php if (isset($iconSidebarItem['gitAction'])): ?>
-        <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="icon-sidebar-btn" data-icon-sidebar-git-action="<?php echo $iconSidebarItem['gitAction']; ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
-            <i class="lucide <?php echo htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
-        </button>
-        <?php elseif (isset($iconSidebarItem['action'])): ?>
-        <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="icon-sidebar-btn" data-action="<?php echo $iconSidebarItem['action']; ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
-            <i class="lucide <?php echo htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
-        </button>
-        <?php else: ?>
-        <a href="<?php echo htmlspecialchars($iconSidebarItem['url'], ENT_QUOTES, 'UTF-8'); ?>" id="<?php echo $iconSidebarItem['id']; ?>" class="icon-sidebar-btn" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
-            <i class="lucide <?php echo htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
-        </a>
-        <?php endif; ?>
-        <?php endforeach; ?>
-    </nav>
-    <?php
-    // Sits outside #icon_sidebar so it stays clickable once the rail is hidden.
-    $iconSidebarToggleLabel = t_h('sidebar.toggle_icon_sidebar', [], 'Hide/Show icon sidebar');
-    ?>
-    <button type="button" id="iconSidebarToggle" title="<?php echo $iconSidebarToggleLabel; ?>" aria-label="<?php echo $iconSidebarToggleLabel; ?>" aria-expanded="true" aria-controls="icon_sidebar">
-        <i class="lucide lucide-chevron-left"></i>
-    </button>
+    <?php include 'icon_sidebar.php'; ?>
 
     <!-- LEFT COLUMN -->
     <div id="left_col">
@@ -544,14 +494,14 @@ if ($isPublicWorkspaceReadonly) {
                     <button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>" aria-label="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>">
                         <i class="lucide lucide-chevron-down"></i>
                     </button>
-                    <button class="sidebar-home<?php echo $notifications_count > 0 ? ' has-notifications-dot' : ''; ?>" id="sidebarDashboardBtn" data-action="navigate-to-home" title="<?php echo t_h('sidebar.home', [], 'Dashboard'); ?>">
-                        <i class="lucide lucide-layout-dashboard"></i>
-                        <span class="sidebar-notifications-dot" aria-hidden="true"></span>
+                    <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>">
+                        <i class="lucide lucide-bell"></i>
                     </button>
-                    <button class="sidebar-settings" data-action="navigate-to-settings" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
-                        <i class="lucide lucide-settings"></i>
-                        <span class="update-badge update-badge-hidden"></span>
+                    <?php if ($aiChatEnabled): ?>
+                    <button class="sidebar-folder-toggle" id="sidebarAiChatBtn" data-action="toggle-ai-chat" title="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>" aria-label="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>">
+                        <i class="lucide lucide-bot"></i>
                     </button>
+                    <?php endif; ?>
                     <button class="sidebar-plus" id="sidebarCreateBtn" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
                         <i class="lucide lucide-plus-circle"></i>
                     </button>

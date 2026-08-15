@@ -217,21 +217,17 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
     <link rel="stylesheet" href="css/dark-mode/markdown.css">
     <link rel="stylesheet" href="css/dark-mode/kanban.css">
     <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
     <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
     <div class="backup-container">
-        <div class="navigation-buttons" style="justify-content: center;">
-            <a id="backToNotesLink" href="index.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes'); ?>
-            </a>
-            <a href="settings.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings'); ?>
-            </a>
-        </div>
+    <h1 class="poznote-page-title"><i class="lucide lucide-download"></i> <?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></h1>
+
         
         <!-- Global Messages Section - Always visible at the top -->
         <?php if ($restore_message): ?>
@@ -707,5 +703,6 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         ]);
     ?></script>
     <script src="js/restore-import.js?v=<?php echo file_exists(__DIR__ . '/js/restore-import.js') ? filemtime(__DIR__ . '/js/restore-import.js') : getAppVersion(); ?>"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

@@ -32,8 +32,9 @@ body.graph-page {
     flex-wrap: wrap;
     gap: 12px;
     padding: 10px 14px;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    /* Transparent so the page background shows through, matching the filter
+       rows on the other pages now that the title sits above it. */
+    background: transparent;
 }
 
 .graph-actions {
@@ -294,8 +295,7 @@ html[data-theme="dark"] body.graph-page {
 }
 
 html[data-theme="dark"] .graph-toolbar {
-    background: var(--dm-surface, #333333);
-    border-bottom-color: var(--dm-border, #404040);
+    background: transparent;
 }
 
 html[data-theme="dark"] .graph-search-input {

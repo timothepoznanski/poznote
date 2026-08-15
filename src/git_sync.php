@@ -218,20 +218,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
-<body class="home-page git-sync-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container git-sync-container">
+    <h1 class="poznote-page-title"><i class="lucide lucide-git-branch"></i> <?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></h1>
+
 
         <div class="git-sync-nav">
-            <a id="backToNotesLink" href="index.php<?php echo $pageWorkspace !== '' ? ('?workspace=' . urlencode($pageWorkspace)) : ''; ?>" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Notes', $currentLang); ?>
-            </a>
-            <a id="backToSettingsLink" href="settings.php" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_settings', [], 'Settings', $currentLang); ?>
-            </a>
             <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
             <form method="post" class="sync-form">
                 <input type="hidden" name="action" value="test">
@@ -491,9 +489,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <div class="alert alert-warning" style="justify-content: center; text-align: center; margin-top: 20px;">
             <span>
                 <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from Dashboard.', $currentLang); ?></strong>
-                <a href="dashboard.php" style="margin-left: 8px; font-weight: 600; text-decoration: underline; color: inherit;">
-                    <?php echo t_h('common.back_to_home', [], 'Dashboard', $currentLang); ?>
-                </a>
             </span>
         </div>
         <?php endif; ?>
@@ -652,5 +647,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
     });
     </script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

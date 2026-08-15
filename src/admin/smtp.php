@@ -253,6 +253,9 @@ $notifyCandidates = listNewUserNotificationCandidates();
     <link rel="stylesheet" href="../css/dark-mode/pages.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="../css/workspaces-inline.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
@@ -572,17 +575,12 @@ $notifyCandidates = listNewUserNotificationCandidates();
         }
     </style>
 </head>
-<body data-workspace="<?php echo smtp_h($pageWorkspace); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo smtp_h($pageWorkspace); ?>">
+    <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="settings-container smtp-page">
+<h1 class="poznote-page-title"><i class="lucide lucide-mail"></i> <?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></h1>
+
     <div class="workspaces-nav">
-        <a href="../index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary">
-            <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-            <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-        </a>
-        <a href="../settings.php" class="btn btn-secondary">
-            <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-            <?php echo t_h('common.back_to_settings', [], 'Settings'); ?>
-        </a>
         <button type="submit" form="smtp-config-form" name="action" value="test" class="btn btn-primary smtp-test-button">
             <i class="lucide lucide-mail" style="margin-right: 5px;"></i>
             <?php echo t_h('smtp_admin.test.button', [], 'Send test email'); ?>
@@ -766,5 +764,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
+    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

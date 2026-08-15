@@ -67,19 +67,25 @@ body.dark-mode .modal-buttons button:first-child:hover {
    ============================================ */
 
 html[data-theme='dark'] #reminderModal .modal-content,
-body.dark-mode #reminderModal .modal-content {
+html[data-theme='dark'] #taskDueModal .modal-content,
+body.dark-mode #reminderModal .modal-content,
+body.dark-mode #taskDueModal .modal-content {
     background: linear-gradient(180deg, #26282d 0%, #202226 100%);
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.38);
 }
 
 html[data-theme='dark'] #reminderModal .modal-content h3,
-body.dark-mode #reminderModal .modal-content h3 {
+html[data-theme='dark'] #taskDueModal .modal-content h3,
+body.dark-mode #reminderModal .modal-content h3,
+body.dark-mode #taskDueModal .modal-content h3 {
     color: #f2f5f8;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input,
-body.dark-mode #reminderModal .reminder-datetime-input {
+html[data-theme='dark'] #taskDueModal .reminder-datetime-input,
+body.dark-mode #reminderModal .reminder-datetime-input,
+body.dark-mode #taskDueModal .reminder-datetime-input {
     background: #313338;
     border-color: #464b53;
     color: #eef2f7;
@@ -88,40 +94,56 @@ body.dark-mode #reminderModal .reminder-datetime-input {
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input:focus,
-body.dark-mode #reminderModal .reminder-datetime-input:focus {
+html[data-theme='dark'] #taskDueModal .reminder-datetime-input:focus,
+body.dark-mode #reminderModal .reminder-datetime-input:focus,
+body.dark-mode #taskDueModal .reminder-datetime-input:focus {
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator,
-body.dark-mode #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator {
+html[data-theme='dark'] #taskDueModal .reminder-datetime-input::-webkit-calendar-picker-indicator,
+body.dark-mode #reminderModal .reminder-datetime-input::-webkit-calendar-picker-indicator,
+body.dark-mode #taskDueModal .reminder-datetime-input::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(1.15);
     opacity: 0.88;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part,
-body.dark-mode #reminderModal .reminder-datetime-part {
+html[data-theme='dark'] #taskDueModal .reminder-datetime-part,
+body.dark-mode #reminderModal .reminder-datetime-part,
+body.dark-mode #taskDueModal .reminder-datetime-part {
     background: #313338;
     border-color: #464b53;
     color: #eef2f7;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part i,
-body.dark-mode #reminderModal .reminder-datetime-part i {
+html[data-theme='dark'] #taskDueModal .reminder-datetime-part i,
+body.dark-mode #reminderModal .reminder-datetime-part i,
+body.dark-mode #taskDueModal .reminder-datetime-part i {
     color: #b0b0b0;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-datetime-part:hover,
-body.dark-mode #reminderModal .reminder-datetime-part:hover {
+html[data-theme='dark'] #taskDueModal .reminder-datetime-part:hover,
+body.dark-mode #reminderModal .reminder-datetime-part:hover,
+body.dark-mode #taskDueModal .reminder-datetime-part:hover {
     border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-select,
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-select,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit,
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval,
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval,
 body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-select,
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-select,
 body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-unit,
-body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval {
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval,
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval {
     background: #313338;
     border-color: #464b53;
     color: #eef2f7;
@@ -130,97 +152,135 @@ body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval {
 }
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-select:focus,
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-select:focus,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-unit:focus,
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit:focus,
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus,
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval:focus,
 body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-select:focus,
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-select:focus,
 body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-unit:focus,
-body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus {
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-unit:focus,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-interval:focus,
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-interval:focus {
     border-color: var(--dm-accent);
     box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.18);
 }
 
 html[data-theme='dark'] :is(#reminderModal, #taskDueModal) .reminder-repeat-label i,
-body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-label i {
+html[data-theme='dark'] :is(#taskDueModal, #taskDueModal) .reminder-repeat-label i,
+body.dark-mode :is(#reminderModal, #taskDueModal) .reminder-repeat-label i,
+body.dark-mode :is(#taskDueModal, #taskDueModal) .reminder-repeat-label i {
     color: #7ab8ff;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-option,
-body.dark-mode #reminderModal .reminder-email-option {
+html[data-theme='dark'] #taskDueModal .reminder-email-option,
+body.dark-mode #reminderModal .reminder-email-option,
+body.dark-mode #taskDueModal .reminder-email-option {
     background: #2b2f35;
     border-color: rgba(255, 255, 255, 0.08);
     color: #edf2f7;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-option:hover,
+html[data-theme='dark'] #taskDueModal .reminder-email-option:hover,
 html[data-theme='dark'] #reminderModal .reminder-email-option:focus-within,
+html[data-theme='dark'] #taskDueModal .reminder-email-option:focus-within,
 body.dark-mode #reminderModal .reminder-email-option:hover,
-body.dark-mode #reminderModal .reminder-email-option:focus-within {
+body.dark-mode #taskDueModal .reminder-email-option:hover,
+body.dark-mode #reminderModal .reminder-email-option:focus-within,
+body.dark-mode #taskDueModal .reminder-email-option:focus-within {
     background: #31363d;
     border-color: rgba(74, 158, 255, 0.24);
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-title,
-body.dark-mode #reminderModal .reminder-email-title {
+html[data-theme='dark'] #taskDueModal .reminder-email-title,
+body.dark-mode #reminderModal .reminder-email-title,
+body.dark-mode #taskDueModal .reminder-email-title {
     color: #edf2f7;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-title i,
-body.dark-mode #reminderModal .reminder-email-title i {
+html[data-theme='dark'] #taskDueModal .reminder-email-title i,
+body.dark-mode #reminderModal .reminder-email-title i,
+body.dark-mode #taskDueModal .reminder-email-title i {
     color: #7ab8ff;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-email-hint,
-body.dark-mode #reminderModal .reminder-email-hint {
+html[data-theme='dark'] #taskDueModal .reminder-email-hint,
+body.dark-mode #reminderModal .reminder-email-hint,
+body.dark-mode #taskDueModal .reminder-email-hint {
     color: #b8c2cf;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-repeat-hint,
-body.dark-mode #reminderModal .reminder-repeat-hint {
+html[data-theme='dark'] #taskDueModal .reminder-repeat-hint,
+body.dark-mode #reminderModal .reminder-repeat-hint,
+body.dark-mode #taskDueModal .reminder-repeat-hint {
     color: #9aa5b1;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-current-info,
-body.dark-mode #reminderModal .reminder-current-info {
+html[data-theme='dark'] #taskDueModal .reminder-current-info,
+body.dark-mode #reminderModal .reminder-current-info,
+body.dark-mode #taskDueModal .reminder-current-info {
     background: rgba(74, 158, 255, 0.11);
     border: 1px solid rgba(74, 158, 255, 0.18);
     color: #78b6ff;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-action,
-body.dark-mode #reminderModal .reminder-modal-action {
+html[data-theme='dark'] #taskDueModal .reminder-modal-action,
+body.dark-mode #reminderModal .reminder-modal-action,
+body.dark-mode #taskDueModal .reminder-modal-action {
     border-radius: 12px;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel,
-body.dark-mode #reminderModal .reminder-modal-actions .btn-cancel {
+html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-cancel,
+body.dark-mode #taskDueModal .reminder-modal-actions .btn-cancel {
     background: #4c5057;
     border-color: #4c5057;
     color: #f4f6f8;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-cancel:hover,
-body.dark-mode #reminderModal .reminder-modal-actions .btn-cancel:hover {
+html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-cancel:hover,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-cancel:hover,
+body.dark-mode #taskDueModal .reminder-modal-actions .btn-cancel:hover {
     background: #595e67;
     border-color: #595e67;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary,
-body.dark-mode #reminderModal .reminder-modal-actions .btn-primary {
+html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-primary,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-primary,
+body.dark-mode #taskDueModal .reminder-modal-actions .btn-primary {
     background: #0e87cb;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-primary:hover,
-body.dark-mode #reminderModal .reminder-modal-actions .btn-primary:hover {
+html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-primary:hover,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-primary:hover,
+body.dark-mode #taskDueModal .reminder-modal-actions .btn-primary:hover {
     background: #0b74ae;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger,
-body.dark-mode #reminderModal .reminder-modal-actions .btn-danger {
+html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-danger,
+body.dark-mode #taskDueModal .reminder-modal-actions .btn-danger {
     background: #df3b4c !important;
 }
 
 html[data-theme='dark'] #reminderModal .reminder-modal-actions .btn-danger:hover,
-body.dark-mode #reminderModal .reminder-modal-actions .btn-danger:hover {
+html[data-theme='dark'] #taskDueModal .reminder-modal-actions .btn-danger:hover,
+body.dark-mode #reminderModal .reminder-modal-actions .btn-danger:hover,
+body.dark-mode #taskDueModal .reminder-modal-actions .btn-danger:hover {
     background: #c93242 !important;
 }
 
