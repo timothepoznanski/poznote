@@ -769,7 +769,9 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                 'ok' => t('common.ok', [], 'OK'),
                 'editNote' => t('public.edit.button', [], 'Edit'),
                 'saveFailed' => t('public.edit.save_failed', [], 'Failed to save changes'),
-                'discardConfirm' => t('public.edit.discard_confirm', [], 'Discard your changes?')
+                'discardConfirm' => t('public.edit.discard_confirm', [], 'Discard your changes?'),
+                'editLocked' => t('public.edit.locked', [], 'Someone else is currently editing this note. Please try again later.'),
+                'lockLost' => t('public.edit.lock_lost', [], 'Someone else is now editing this note. Your latest changes cannot be saved.')
             ]
         ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     ?></script>

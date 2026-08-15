@@ -2372,7 +2372,9 @@
     "edit": {
       "button": "Modifier",
       "save_failed": "Échec de l'enregistrement des modifications",
-      "discard_confirm": "Abandonner vos modifications ?"
+      "discard_confirm": "Abandonner vos modifications ?",
+      "locked": "Quelqu'un d'autre est en train de modifier cette note. Réessayez plus tard.",
+      "lock_lost": "Quelqu'un d'autre modifie maintenant cette note. Vos dernières modifications ne peuvent pas être enregistrées."
     }
   },
   "public_folder": {
@@ -3698,7 +3700,8 @@
     "another_user": "un autre utilisateur",
     "popup_title": "Attention",
     "lost_to_other_tab": "Vous n'avez plus le verrou d'édition sur cette note. Elle est maintenant modifiée dans un autre onglet.",
-    "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant."
+    "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant.",
+    "public_visitor": "un visiteur du lien de partage public"
   },
   "dashboard": {
     "title": "Tableau de notes",

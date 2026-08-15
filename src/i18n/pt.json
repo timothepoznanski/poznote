@@ -2320,7 +2320,9 @@
     "edit": {
       "button": "Editar",
       "save_failed": "Não foi possível salvar as alterações",
-      "discard_confirm": "Descartar as alterações?"
+      "discard_confirm": "Descartar as alterações?",
+      "locked": "Outra pessoa está editando esta nota no momento. Tente novamente mais tarde.",
+      "lock_lost": "Outra pessoa está editando esta nota agora. Suas últimas alterações não podem ser salvas."
     }
   },
   "public_folder": {
@@ -3514,7 +3516,8 @@
     "another_user": "outro usuário",
     "popup_title": "Atenção",
     "lost_to_other_tab": "Você não tem mais o bloqueio de edição desta nota. Ela agora está sendo editada em outra aba.",
-    "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora."
+    "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora.",
+    "public_visitor": "um visitante do link de compartilhamento público"
   },
   "dashboard": {
     "title": "Quadro de notas",

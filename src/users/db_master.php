@@ -202,13 +202,18 @@ function initializeMasterDatabase(PDO $con): void {
         )
     ");
 
-    // Transient edit locks for notes shared across users.
+    // Transient edit locks for notes shared across users. holder_kind
+    // distinguishes an in-app account holder ('user') from an anonymous
+    // editor on a public share link ('public'); public locks store the share
+    // owner's id as holder_login_user_id (the FK needs a real user) and are
+    // identified by their holder_session_id instead.
     $con->exec("
         CREATE TABLE IF NOT EXISTS note_edit_locks (
             target_user_id INTEGER NOT NULL,
             note_id INTEGER NOT NULL,
             holder_login_user_id INTEGER NOT NULL,
             holder_session_id TEXT NOT NULL,
+            holder_kind TEXT NOT NULL DEFAULT 'user',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             expires_at DATETIME NOT NULL,
@@ -217,6 +222,17 @@ function initializeMasterDatabase(PDO $con): void {
             FOREIGN KEY (holder_login_user_id) REFERENCES users(id) ON DELETE CASCADE
         )
     ");
+
+    // Migration: holder_kind was added when public share editing gained the
+    // same concurrent-edit protection as account sharing.
+    try {
+        $lockCols = $con->query("PRAGMA table_info(note_edit_locks)")->fetchAll(PDO::FETCH_ASSOC);
+        if (!in_array('holder_kind', array_column($lockCols, 'name'))) {
+            $con->exec("ALTER TABLE note_edit_locks ADD COLUMN holder_kind TEXT NOT NULL DEFAULT 'user'");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to add note_edit_locks.holder_kind column: " . $e->getMessage());
+    }
     
     // Outgoing webhooks. Instance webhooks (user_id NULL) are registered by
     // admins and notified of instance events; user webhooks belong to a single
@@ -502,6 +518,7 @@ function normalizeNoteEditLockRow(array $row): array {
         'note_id' => (int)($row['note_id'] ?? 0),
         'holder_login_user_id' => (int)($row['holder_login_user_id'] ?? 0),
         'holder_session_id' => (string)($row['holder_session_id'] ?? ''),
+        'holder_kind' => ($row['holder_kind'] ?? 'user') === 'public' ? 'public' : 'user',
         'holder_username' => (string)($row['holder_username'] ?? ''),
         'created_at' => (string)($row['created_at'] ?? ''),
         'last_seen_at' => (string)($row['last_seen_at'] ?? ''),
@@ -523,6 +540,7 @@ function getNoteEditLock(int $targetUserId, int $noteId): ?array {
                    l.note_id,
                    l.holder_login_user_id,
                    l.holder_session_id,
+                   l.holder_kind,
                    l.created_at,
                    l.last_seen_at,
                    l.expires_at,
@@ -542,7 +560,7 @@ function getNoteEditLock(int $targetUserId, int $noteId): ?array {
     }
 }
 
-function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90): array {
+function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90, string $holderKind = 'user'): array {
     if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
         return ['success' => false, 'error' => 'Invalid note edit lock parameters'];
     }
@@ -552,6 +570,7 @@ function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
         return ['success' => false, 'error' => 'Missing editor session'];
     }
 
+    $holderKind = $holderKind === 'public' ? 'public' : 'user';
     $ttlSeconds = max(15, min(300, $ttlSeconds));
     $now = gmdate('Y-m-d H:i:s');
     $expiresAt = gmdate('Y-m-d H:i:s', time() + $ttlSeconds);
@@ -563,7 +582,7 @@ function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
         $con->beginTransaction();
 
         $stmt = $con->prepare("
-            SELECT target_user_id, note_id, holder_login_user_id, holder_session_id, created_at, last_seen_at, expires_at
+            SELECT target_user_id, note_id, holder_login_user_id, holder_session_id, holder_kind, created_at, last_seen_at, expires_at
             FROM note_edit_locks
             WHERE target_user_id = ? AND note_id = ?
             LIMIT 1
@@ -578,18 +597,30 @@ function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
                     note_id,
                     holder_login_user_id,
                     holder_session_id,
+                    holder_kind,
                     created_at,
                     last_seen_at,
                     expires_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $insert->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $now, $now, $expiresAt]);
+            $insert->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $holderKind, $now, $now, $expiresAt]);
             $con->commit();
 
             return ['success' => true, 'lock' => getNoteEditLock($targetUserId, $noteId)];
         }
 
-        if ((int)$existing['holder_login_user_id'] === $holderLoginUserId) {
+        // A logged-in user may take the lock over from their own other tabs
+        // or devices (same account, any session). Public holders are anonymous
+        // so the only identity we have is the editor session id: a different
+        // session is a different person and never a takeover.
+        $existingKind = ($existing['holder_kind'] ?? 'user') === 'public' ? 'public' : 'user';
+        $sameHolder = $existingKind === $holderKind && (
+            $holderKind === 'public'
+                ? (string)$existing['holder_session_id'] === $holderSessionId
+                : (int)$existing['holder_login_user_id'] === $holderLoginUserId
+        );
+
+        if ($sameHolder) {
             $update = $con->prepare("
                 UPDATE note_edit_locks
                 SET holder_session_id = ?, last_seen_at = ?, expires_at = ?
@@ -616,11 +647,11 @@ function acquireNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
     }
 }
 
-function refreshNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90): array {
-    return acquireNoteEditLock($targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $ttlSeconds);
+function refreshNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, int $ttlSeconds = 90, string $holderKind = 'user'): array {
+    return acquireNoteEditLock($targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $ttlSeconds, $holderKind);
 }
 
-function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId): bool {
+function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, string $holderKind = 'user'): bool {
     if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
         return false;
     }
@@ -629,6 +660,8 @@ function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
     if ($holderSessionId === '') {
         return false;
     }
+
+    $holderKind = $holderKind === 'public' ? 'public' : 'user';
 
     try {
         $con = getMasterConnection();
@@ -640,8 +673,9 @@ function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
               AND note_id = ?
               AND holder_login_user_id = ?
               AND holder_session_id = ?
+              AND holder_kind = ?
         ");
-        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId]);
+        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId, $holderSessionId, $holderKind]);
 
         return true;
     } catch (Exception $e) {
@@ -650,7 +684,7 @@ function releaseNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUse
     }
 }
 
-function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId): bool {
+function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginUserId, string $holderSessionId, string $holderKind = 'user'): bool {
     if ($targetUserId <= 0 || $noteId <= 0 || $holderLoginUserId <= 0) {
         return false;
     }
@@ -660,18 +694,35 @@ function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginU
         return false;
     }
 
+    $holderKind = $holderKind === 'public' ? 'public' : 'user';
+
     try {
         $con = getMasterConnection();
         pruneExpiredNoteEditLocks($con);
 
-        $stmt = $con->prepare("
-            SELECT COUNT(*)
-            FROM note_edit_locks
-            WHERE target_user_id = ?
-              AND note_id = ?
-              AND holder_login_user_id = ?
-        ");
-        $stmt->execute([$targetUserId, $noteId, $holderLoginUserId]);
+        // Account holders own the lock across all their sessions; anonymous
+        // public holders are only identified by their editor session id.
+        if ($holderKind === 'public') {
+            $stmt = $con->prepare("
+                SELECT COUNT(*)
+                FROM note_edit_locks
+                WHERE target_user_id = ?
+                  AND note_id = ?
+                  AND holder_kind = 'public'
+                  AND holder_session_id = ?
+            ");
+            $stmt->execute([$targetUserId, $noteId, $holderSessionId]);
+        } else {
+            $stmt = $con->prepare("
+                SELECT COUNT(*)
+                FROM note_edit_locks
+                WHERE target_user_id = ?
+                  AND note_id = ?
+                  AND holder_login_user_id = ?
+                  AND holder_kind = 'user'
+            ");
+            $stmt->execute([$targetUserId, $noteId, $holderLoginUserId]);
+        }
 
         return (int)$stmt->fetchColumn() > 0;
     } catch (Exception $e) {

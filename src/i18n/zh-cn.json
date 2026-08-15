@@ -2319,7 +2319,9 @@
     "edit": {
       "button": "编辑",
       "save_failed": "保存更改失败",
-      "discard_confirm": "放弃更改？"
+      "discard_confirm": "放弃更改？",
+      "locked": "其他人正在编辑此笔记，请稍后再试。",
+      "lock_lost": "其他人正在编辑此笔记，您的最新更改无法保存。"
     }
   },
   "public_folder": {
@@ -3632,7 +3634,8 @@
     "another_user": "另一位用户",
     "popup_title": "注意",
     "lost_to_other_tab": "您已不再持有这条笔记的编辑锁。现在它正在另一个标签页中被编辑。",
-    "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。"
+    "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。",
+    "public_visitor": "公开分享链接的访客"
   },
   "dashboard": {
     "title": "笔记看板",

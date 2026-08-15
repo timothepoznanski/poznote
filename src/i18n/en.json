@@ -1981,7 +1981,9 @@
     "edit": {
       "button": "Edit",
       "save_failed": "Failed to save changes",
-      "discard_confirm": "Discard your changes?"
+      "discard_confirm": "Discard your changes?",
+      "locked": "Someone else is currently editing this note. Please try again later.",
+      "lock_lost": "Someone else is now editing this note. Your latest changes cannot be saved."
     }
   },
   "public_folder": {
@@ -3197,7 +3199,8 @@
     "another_user": "another user",
     "popup_title": "Attention",
     "lost_to_other_tab": "You no longer hold the edit lock for this note. It is now being edited in another tab.",
-    "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it."
+    "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it.",
+    "public_visitor": "a visitor on the public share link"
   },
   "dashboard": {
     "title": "Notes board",

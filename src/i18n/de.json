@@ -2316,7 +2316,9 @@
     "edit": {
       "button": "Bearbeiten",
       "save_failed": "Änderungen konnten nicht gespeichert werden",
-      "discard_confirm": "Änderungen verwerfen?"
+      "discard_confirm": "Änderungen verwerfen?",
+      "locked": "Jemand anderes bearbeitet diese Notiz gerade. Bitte versuchen Sie es später erneut.",
+      "lock_lost": "Jemand anderes bearbeitet diese Notiz jetzt. Ihre letzten Änderungen können nicht gespeichert werden."
     }
   },
   "public_folder": {
@@ -3511,7 +3513,8 @@
     "another_user": "ein anderer Benutzer",
     "popup_title": "Achtung",
     "lost_to_other_tab": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. Sie wird jetzt in einem anderen Tab bearbeitet.",
-    "lost_to_user": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. {{user}} bearbeitet sie jetzt."
+    "lost_to_user": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. {{user}} bearbeitet sie jetzt.",
+    "public_visitor": "ein Besucher über den öffentlichen Freigabelink"
   },
   "dashboard": {
     "title": "Notiz-Board",

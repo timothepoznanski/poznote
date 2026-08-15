@@ -243,13 +243,20 @@
         });
     }
 
+    function getLockHolderName(lock) {
+        if (lock && lock.holder_is_public) {
+            return t('note_lock.public_visitor', {}, 'a visitor on the public share link');
+        }
+
+        return (lock && lock.holder_username) ? lock.holder_username : t('note_lock.another_user', {}, 'another user');
+    }
+
     function getLockBannerMessage(lock) {
         if (lock && lock.holder_is_current_user) {
             return t('note_lock.current_user_other_tab', {}, 'Read only: this note is already being edited in another tab or on another device by the same user.');
         }
 
-        var holder = (lock && lock.holder_username) ? lock.holder_username : t('note_lock.another_user', {}, 'another user');
-        return t('note_lock.banner', { user: holder }, 'Read only: {{user}} is currently editing this note.');
+        return t('note_lock.banner', { user: getLockHolderName(lock) }, 'Read only: {{user}} is currently editing this note.');
     }
 
     function getLockCheckingMessage() {
@@ -270,8 +277,7 @@
         }
 
         if (lock) {
-            var holder = lock.holder_username ? lock.holder_username : t('note_lock.another_user', {}, 'another user');
-            return t('note_lock.lost_to_user', { user: holder }, 'You no longer hold the edit lock for this note. {{user}} is now editing it.');
+            return t('note_lock.lost_to_user', { user: getLockHolderName(lock) }, 'You no longer hold the edit lock for this note. {{user}} is now editing it.');
         }
 
         return fallbackMessage;
@@ -692,7 +698,10 @@
     }
 
     function handleCurrentNoteLoaded(noteId) {
-        noteId = normalizeNoteId(noteId || window.noteid || getCurrentDomNoteId());
+        // Normalize each candidate separately: on a full page load
+        // window.noteid still holds its -1 initial value, which is truthy and
+        // would otherwise mask the note actually rendered in the DOM.
+        noteId = normalizeNoteId(noteId) || normalizeNoteId(window.noteid) || getCurrentDomNoteId();
         if (!noteId) {
             releaseCurrentLock();
             return;

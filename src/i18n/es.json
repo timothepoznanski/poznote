@@ -2317,7 +2317,9 @@
     "edit": {
       "button": "Editar",
       "save_failed": "No se pudieron guardar los cambios",
-      "discard_confirm": "¿Descartar los cambios?"
+      "discard_confirm": "¿Descartar los cambios?",
+      "locked": "Otra persona está editando esta nota en este momento. Inténtalo de nuevo más tarde.",
+      "lock_lost": "Otra persona está editando esta nota ahora. Tus últimos cambios no se pueden guardar."
     }
   },
   "public_folder": {
@@ -3511,7 +3513,8 @@
     "another_user": "otro usuario",
     "popup_title": "Atención",
     "lost_to_other_tab": "Ya no tiene el bloqueo de edición de esta nota. Ahora se está editando en otra pestaña.",
-    "lost_to_user": "Ya no tiene el bloqueo de edición de esta nota. {{user}} la está editando ahora."
+    "lost_to_user": "Ya no tiene el bloqueo de edición de esta nota. {{user}} la está editando ahora.",
+    "public_visitor": "un visitante del enlace público"
   },
   "dashboard": {
     "title": "Tablero de notas",
