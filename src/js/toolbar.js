@@ -591,14 +591,20 @@ function changeFontSize() {
 
   popup.innerHTML = popupHTML;
 
-  // Append popup to body and compute coordinates so it doesn't get clipped
+  // Append popup to body and compute coordinates so it doesn't get clipped.
+  // position: fixed, not absolute: on mobile <body> is itself the horizontal
+  // scroller (css/index-mobile.css), so while a note is open body.scrollLeft is
+  // one viewport wide and an absolutely-positioned popup lands off-screen.
   document.body.appendChild(popup);
-  popup.style.position = 'absolute';
+  popup.style.position = 'fixed';
   popup.style.minWidth = '180px';
 
-  // Position near the button, clamp to viewport
+  // Position near the button, clamp to viewport. Right-align the popup on the
+  // button, but never past the left edge: a fixed -220px offset put it fully
+  // off-screen on narrow (mobile) viewports, where the button sits near x=220.
   const btnRect = fontSizeButton.getBoundingClientRect();
-  popup.style.left = (btnRect.right - 220) + 'px';
+  const popupWidth = popup.offsetWidth || 220;
+  popup.style.left = Math.max(8, btnRect.right - popupWidth) + 'px';
   popup.style.top = (btnRect.bottom + 8) + 'px';
   clampToViewport(popup, 8);
 

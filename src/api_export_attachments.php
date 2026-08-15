@@ -68,9 +68,6 @@ if (!$hasAttachments) {
             </div>
             
             <div class="action-buttons">
-                <a id="backToNotesLink" href="index.php" class="btn btn-primary">
-                    Notes
-                </a>
                 <a href="backup_export.php" class="btn btn-secondary">
                     <i class="lucide lucide-download"></i> Other export options
                 </a>

@@ -10,6 +10,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 require_once 'share_passwords.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
@@ -132,8 +133,9 @@ usort($shared_folders, function($a, $b) {
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
@@ -204,16 +206,8 @@ usort($shared_folders, function($a, $b) {
 	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="shared-container">
-		<div class="shared-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-			</button>
-		</div>
+		<h1 class="poznote-page-title"><i class="lucide lucide-share-2"></i> <?php echo t_h('home.shares', [], 'Shares'); ?></h1>
+
 		
 		<div class="shared-filter-bar">
 			<div class="filter-type-buttons">
@@ -274,7 +268,7 @@ usort($shared_folders, function($a, $b) {
 	</div>
 	
 	<script src="js/navigation.js"></script>
-	<script src="js/icon-sidebar-toggle.js"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/pwa-helpers.js"></script>
 	<script src="js/shared-page.js?v=<?php echo @filemtime('js/shared-page.js') ?: time(); ?>"></script>
 </body>

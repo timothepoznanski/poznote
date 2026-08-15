@@ -27,12 +27,6 @@ body.has-icon-sidebar.icon-sidebar-collapsed {
     margin-left: 0;
 }
 
-/* Current page highlight */
-body.has-icon-sidebar .icon-sidebar-btn-active {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.12);
-}
-
 /* Desktop-only, mirroring css/index-mobile.css */
 @media (max-width: 800px) {
     body.has-icon-sidebar #icon_sidebar,

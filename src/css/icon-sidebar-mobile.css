@@ -1,0 +1,77 @@
+/**
+ * Icon Sidebar on mobile (<= 800px)
+ *
+ * The rail is otherwise desktop-only: css/index-mobile.css hides it on
+ * index.php and css/icon-sidebar-page.css hides it on the secondary pages,
+ * both with !important, hence the !important here.
+ *
+ * It is pinned to the left edge and the page content is inset by its width,
+ * the same arrangement css/icon-sidebar-page.css uses on desktop.
+ */
+
+@media (max-width: 800px) {
+    /* Both hiding rules are !important, so these have to outrank them on
+       specificity: css/icon-sidebar-page.css uses `body.has-icon-sidebar
+       #icon_sidebar` (0,2,1) and css/index-mobile.css a bare `#icon_sidebar`
+       (0,1,0) from a sheet that loads after the bundle. `:is(#icon_sidebar)`
+       adds an ID's worth of weight (0,2,1 -> beats the first outright at
+       0,2,2), and the html prefix keeps it ahead on element count.
+       It also overrides a stale .icon-sidebar-collapsed left from desktop,
+       which matters because the collapse chevron is hidden at this width. */
+    html body :is(#icon_sidebar)#icon_sidebar {
+        display: flex !important;
+    }
+
+    /* The secondary pages scroll the body, so the rail is pinned and the
+       content is inset, exactly as css/icon-sidebar-page.css does on desktop. */
+    body.has-icon-sidebar #icon_sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        height: 100%;
+    }
+
+    body.has-icon-sidebar,
+    body.has-icon-sidebar.icon-sidebar-collapsed {
+        margin-left: var(--icon-sidebar-width);
+    }
+
+    /* index.php slides between its two columns by scrolling <body> sideways
+       (window.scrollToRightColumn in js/index-events.js scrolls by exactly one
+       viewport width), so the columns must keep their full width and the row
+       must stay wider than the screen. The rail is therefore pinned on top and
+       the row is pushed clear of it, rather than shrunk to fit. */
+    body:not(.has-icon-sidebar) #icon_sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        height: 100%;
+    }
+
+    /* The rail is pinned over the left edge, so the notes list has to give up
+       that width rather than be pushed right: a margin alone would shift its
+       full-viewport width off-screen and crop the search bar and create button.
+       #right_pane keeps its full width so the note still fills the screen. */
+    body:not(.has-icon-sidebar) #left_col {
+        margin-left: var(--icon-sidebar-width);
+        width: calc(100% - var(--icon-sidebar-width)) !important;
+        min-width: 0 !important;
+    }
+
+    /* Reading a note on mobile: the note takes the whole screen. js/note-loader-common.js
+       puts .note-open on <body> while the note pane is showing. */
+    html body.note-open :is(#icon_sidebar)#icon_sidebar {
+        display: none !important;
+    }
+
+    body.note-open:not(.has-icon-sidebar) #left_col {
+        margin-left: 0;
+    }
+
+    /* The collapse chevron sits over the content at this width. */
+    #iconSidebarToggle {
+        display: none !important;
+    }
+}

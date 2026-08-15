@@ -74,7 +74,6 @@
 }
 
 /* Update badge hidden in sidebar */
-.sidebar-settings .update-badge.update-badge-hidden,
 .update-badge.update-badge-hidden {
     display: none !important;
 }

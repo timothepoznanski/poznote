@@ -1521,6 +1521,9 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 data-description-global-highlight="<?php echo t_h('modals.ui_customization.description_global_highlight', [], 'except administrators'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
             <div class="ui-custom-filter">
                 <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
+                <button type="button" id="uiCustomizationCollapseAll" class="ui-custom-collapse-all"
+                    data-label-collapse="<?php echo t_h('modals.ui_customization.collapse_all', [], 'Collapse all'); ?>"
+                    data-label-expand="<?php echo t_h('modals.ui_customization.expand_all', [], 'Expand all'); ?>"><i class="lucide lucide-chevron-down"></i></button>
                 <input
                     type="search"
                     id="uiCustomizationFilterInput"
@@ -1709,9 +1712,10 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarDashboardBtn" checked><span><?php echo t_h('sidebar.home', [], 'Dashboard'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarCreateBtn" checked><span><?php echo t_h('sidebar.create', [], 'Create'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>
@@ -1731,12 +1735,12 @@ include __DIR__ . '/modals/folder_icon_modal.php';
 
                 <!-- Notes Page Icon Sidebar Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar (notes page)'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
-                <div class="ui-custom-items" data-ui-parent-key="card:icon_sidebar">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon_sidebar" data-ui-parent checked><span><?php echo t_h('modals.ui_customization.icon_sidebar_entire', [], 'Entire icon sidebar'); ?></span></label>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <div class="ui-custom-items">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarHomeBtn" checked><span><?php echo t_h('common.home', [], 'Home'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDashboardBtn" checked><span><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFavoritesBtn" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
@@ -1747,7 +1751,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarLogoutBtn" checked><span><?php echo t_h('workspace_menu.logout', [], 'Logout'); ?></span></label>
                 </div>
                 </div>
 
@@ -1757,21 +1761,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardWorkspaceBtn" checked><span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardUserBtn" checked><span><?php echo t_h('modals.ui_customization.dashboard_user', [], 'User'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardToggleFavorites" checked><span><?php echo t_h('dashboard.toggle_favorites', [], 'Show favorites only'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardFoldersBtn" checked><span><?php echo t_h('home.folders', [], 'Folders'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardSharesBtn" checked><span><?php echo t_h('home.shares', [], 'Shares'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardAttachmentsBtn" checked><span><?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTasksBtn" checked><span><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGitPushBtn" checked><span>Push</span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGitPullBtn" checked><span>Pull</span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardSettingsBtn" checked><span><?php echo t_h('common.back_to_settings', [], 'Settings'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>

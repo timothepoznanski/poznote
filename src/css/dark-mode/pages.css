@@ -20,6 +20,11 @@ body.dark-mode .settings-category-title {
     border-bottom-color: var(--dm-border);
 }
 
+html[data-theme='dark'] .poznote-page-title,
+body.dark-mode .poznote-page-title {
+    color: var(--dm-text);
+}
+
 html[data-theme='dark'] .settings-container h1,
 body.dark-mode .settings-container h1 {
     color: var(--dm-text);

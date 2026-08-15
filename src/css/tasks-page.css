@@ -45,21 +45,6 @@ body.tasks-page {
     margin-bottom: 10px;
 }
 
-.tasks-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0;
-    order: 1;
-    flex-shrink: 0;
-}
-
-.tasks-title i {
-    color: #007DB8;
-}
-
 .tasks-progress-label {
     font-size: 13px;
     color: #666;
@@ -786,10 +771,6 @@ body.tasks-page {
 
     .tasks-buttons-container {
         margin-bottom: 20px;
-    }
-
-    .tasks-title {
-        font-size: 20px;
     }
 
     /* Stacked layout: title and label above the full-width progress bar.

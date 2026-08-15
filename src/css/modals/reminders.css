@@ -482,28 +482,6 @@
     color: #6b7280;
 }
 
-.sidebar-home.has-notifications-dot {
-    position: relative;
-    overflow: visible;
-}
-
-.sidebar-notifications-dot {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: #f59e0b;
-    display: none;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.sidebar-home.has-notifications-dot .sidebar-notifications-dot {
-    display: block;
-}
-
 #notificationsModal .modal-content {
     position: relative;
 }

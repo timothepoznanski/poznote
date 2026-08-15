@@ -54,23 +54,17 @@ $pageWorkspace = trim(getWorkspaceFilter());
     <link rel="icon" href="../favicon.ico" type="image/x-icon">
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="../css/admin-tools.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="../css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <script src="../js/globals.js?v=<?php echo $v; ?>"></script>
 </head>
-<body data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="admin-container">
 
     <!-- Nav -->
     <div class="admin-header">
-        <div class="admin-nav" style="justify-content:center;">
-            <a href="../index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary btn-margin-right">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-            </a>
-            <a href="../settings.php" class="btn btn-secondary">
-                <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-                <?php echo t_h('settings.title', [], 'Settings'); ?>
-            </a>
-        </div>
     </div>
 
     <div class="dr-page">
@@ -104,5 +98,6 @@ $pageWorkspace = trim(getWorkspaceFilter());
 </div>
 
 <script src="../js/disaster-recovery.js?v=<?php echo $v; ?>"></script>
+    <script src="../js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

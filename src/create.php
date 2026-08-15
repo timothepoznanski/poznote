@@ -58,18 +58,18 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>
-<body class="home-page" 
+<body class="home-page has-icon-sidebar" 
     data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
     <div class="home-container">
-        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-            <a href="index.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="btn btn-secondary go-to-nav-btn">
-                <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-                <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-            </a>
-        </div>
+
+        <h1 class="poznote-page-title"><i class="lucide lucide-plus-circle"></i> <?php echo t_h('sidebar.create', [], 'Create'); ?></h1>
 
         <div class="home-grid">
 
@@ -222,5 +222,6 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
         });
     });
     </script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

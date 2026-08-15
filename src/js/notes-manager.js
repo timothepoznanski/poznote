@@ -835,14 +835,6 @@
         });
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────────
-    document.getElementById('backToNotesBtn').addEventListener('click', function () {
-        window.location.href = 'index.php' + (cfg.workspace ? '?workspace=' + encodeURIComponent(cfg.workspace) : '');
-    });
-    document.getElementById('backToHomeBtn').addEventListener('click', function () {
-        window.location.href = 'dashboard.php' + (cfg.workspace ? '?workspace=' + encodeURIComponent(cfg.workspace) : '');
-    });
-
     // ── Filter events ─────────────────────────────────────────────────────────
     nmFilterInput.addEventListener('input', function () {
         filterText = this.value.trim().toLowerCase();

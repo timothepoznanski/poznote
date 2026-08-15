@@ -1787,8 +1787,10 @@ function setupAutoFocusEmpty() {
         var rightCol = e.target.closest('#right_col');
         if (!rightCol) return;
 
-        // Ignore clicks on interactive elements
-        if (e.target.closest('button, a, input, select, textarea, [role="button"]')) {
+        // Ignore clicks on interactive elements. [data-action] covers the
+        // delegated controls (e.g. the folder breadcrumb in the note header),
+        // which must not pull focus into the note and open the mobile keyboard.
+        if (e.target.closest('button, a, input, select, textarea, [role="button"], [data-action]')) {
             return;
         }
 

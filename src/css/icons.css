@@ -90,8 +90,6 @@
 /* Keep sidebar icons crisp (avoid thick-looking filter) */
 .sidebar-howto [class*="lucide-"],
 .sidebar-folder-toggle [class*="lucide-"],
-.sidebar-home [class*="lucide-"],
-.sidebar-settings [class*="lucide-"],
 .sidebar-plus [class*="lucide-"],
 .icon-sidebar-btn [class*="lucide-"] {
     filter: none !important;

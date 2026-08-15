@@ -455,6 +455,23 @@ body.dark-mode .icon-sidebar-btn:focus-visible {
     background: var(--dm-surface-hover);
 }
 
+/* Current page. The light 12%-opacity blue washes out on a dark background, so
+   the selected icon gets a brighter tint and full opacity to stand out from
+   the merely-hovered state above. */
+html[data-theme='dark'] .icon-sidebar-btn-active,
+html[data-theme='dark'] .icon-sidebar-btn-active:hover,
+body.dark-mode .icon-sidebar-btn-active,
+body.dark-mode .icon-sidebar-btn-active:hover {
+    color: var(--dm-accent);
+    background: rgba(0, 125, 184, 0.30);
+    opacity: 1;
+}
+
+html[data-theme='dark'] .icon-sidebar-btn-active .lucide,
+body.dark-mode .icon-sidebar-btn-active .lucide {
+    background-color: var(--dm-accent);
+}
+
 html[data-theme='dark'] #iconSidebarToggle,
 body.dark-mode #iconSidebarToggle {
     background: var(--dm-surface);

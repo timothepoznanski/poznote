@@ -191,21 +191,17 @@ foreach ($eventHelpDefaults as $eventName => $default) {
     <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/workspaces-inline.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/webhooks.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <script src="js/theme-manager.js?v=<?php echo $v; ?>"></script>
 </head>
-<body data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">
+<body class="has-icon-sidebar" data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">
+    <?php include 'icon_sidebar.php'; ?>
 <div class="settings-container webhooks-page">
-    <div class="workspaces-nav">
-        <a href="index.php<?php echo $pageWorkspace !== '' ? '?workspace=' . urlencode($pageWorkspace) : ''; ?>" class="btn btn-secondary">
-            <i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-            <?php echo t_h('common.back_to_notes', [], 'Notes'); ?>
-        </a>
-        <a href="settings.php" class="btn btn-secondary">
-            <i class="lucide lucide-settings" style="margin-right: 5px;"></i>
-            <?php echo t_h('common.back_to_settings', [], 'Settings'); ?>
-        </a>
-    </div>
+<h1 class="poznote-page-title"><i class="lucide lucide-webhook"></i> <?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></h1>
+
 
     <?php if ($success || $warning || $error): ?>
         <div class="alert-with-margin alert <?php echo $success ? 'alert-success' : ($warning ? 'alert-warning' : 'alert-danger'); ?>">
@@ -378,5 +374,6 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 </div>
 <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
 <script src="js/webhooks-page.js?v=<?php echo $v; ?>"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

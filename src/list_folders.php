@@ -265,8 +265,9 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
 	<style>
 		.shared-container {
 			background: transparent !important;
@@ -564,16 +565,8 @@ $currentLang = getUserLanguage();
 <body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php $iconSidebarWorkspace = $workspace; include 'icon_sidebar.php'; ?>
 	<div class="shared-container">
-		<div class="shared-buttons-container">
-			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
-				<i class="lucide lucide-sticky-note" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_notes'); ?>
-			</button>
-			<button id="backToHomeBtn" class="btn btn-secondary dashboard-nav-btn" title="<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>">
-				<i class="lucide lucide-layout-dashboard" style="margin-right: 5px;"></i>
-				<?php echo t_h('common.back_to_home', [], 'Dashboard'); ?>
-			</button>
-		</div>
+		<h1 class="poznote-page-title"><i class="lucide lucide-folder-open"></i> <?php echo t_h('home.folders', [], 'Folders'); ?></h1>
+
 		
 		<div class="shared-filter-bar">
 			<div class="filter-input-wrapper">
