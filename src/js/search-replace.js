@@ -60,6 +60,70 @@
         return null;
     }
 
+    /**
+     * Text currently selected inside the note, or '' when the selection is empty,
+     * multi-line or sits outside the note content.
+     */
+    function getSelectedNoteText(noteId) {
+        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi && typeof cmApi.getSelectionOffsets === 'function' && typeof cmApi.getValue === 'function') {
+            const offsets = cmApi.getSelectionOffsets(cmEditor);
+            if (!offsets) return '';
+            const start = Math.min(offsets.start, offsets.end);
+            const end = Math.max(offsets.start, offsets.end);
+            if (start === end) return '';
+            return sanitizeSelectedText(String(cmApi.getValue(cmEditor) || '').slice(start, end));
+        }
+
+        const selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return '';
+
+        // Accept the rendered markdown preview too: opening the bar switches the note
+        // back to edit mode, where the same text is searched in the source.
+        const noteEntry = getNoteEntry(noteId);
+        const searchRoot = getSearchContentRoot(noteId);
+        const roots = [searchRoot, noteEntry ? noteEntry.querySelector('.markdown-preview') : null];
+
+        // Only prefill from a selection that belongs to this note's content
+        const range = selection.getRangeAt(0);
+        const anchor = range.commonAncestorContainer;
+        const anchorEl = anchor && anchor.nodeType === 3 ? anchor.parentElement : anchor;
+        if (!anchorEl) return '';
+        if (!roots.some(root => root && root.contains(anchorEl))) return '';
+
+        return sanitizeSelectedText(selection.toString());
+    }
+
+    /**
+     * Matching is line-scoped, so a multi-line selection could never match.
+     * Keep only a single-line selection and drop the surrounding whitespace.
+     */
+    function sanitizeSelectedText(text) {
+        const value = String(text || '');
+        if (/[\r\n]/.test(value)) return '';
+        return value.trim();
+    }
+
+    // The click on the toolbar button moves focus and drops the selection, so remember
+    // the selected text while it is still live (mousedown fires before the blur).
+    const pendingSelectionByNote = new Map();
+
+    document.addEventListener('mousedown', captureSelectionForSearchButton, true);
+    document.addEventListener('touchstart', captureSelectionForSearchButton, true);
+
+    function captureSelectionForSearchButton(e) {
+        const button = e.target && e.target.closest
+            ? e.target.closest('[data-action="open-search-replace-modal"]')
+            : null;
+        if (!button) return;
+
+        const noteId = button.getAttribute('data-note-id');
+        if (!noteId) return;
+
+        pendingSelectionByNote.set(String(noteId), getSelectedNoteText(noteId));
+    }
+
     function isMarkdownEditorVisible(noteId) {
         const noteEntry = getNoteEntry(noteId);
         const editor = getMarkdownEditorElement(noteId);
@@ -91,6 +155,13 @@
      */
     window.openSearchReplaceModal = function(noteId) {
         const bar = getSearchBar(noteId);
+        // Consume the selection captured on mousedown even on the early returns below,
+        // otherwise a stale value would prefill the next opening.
+        const capturedKey = String(noteId);
+        const hadCapture = pendingSelectionByNote.has(capturedKey);
+        const capturedSelection = hadCapture ? pendingSelectionByNote.get(capturedKey) : '';
+        pendingSelectionByNote.delete(capturedKey);
+
         if (!bar) return;
 
         const isOpen = window.getComputedStyle(bar).display !== 'none';
@@ -98,6 +169,9 @@
             closeSearchBar(noteId);
             return;
         }
+
+        // Prefer the live selection when the caller did not go through the toolbar button
+        const initialSearchText = hadCapture ? capturedSelection : getSelectedNoteText(noteId);
 
         // Make sure listeners are initialized
         initNoteListeners(noteId);
@@ -119,7 +193,7 @@
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
         const countEl = document.getElementById('searchCount' + noteId);
 
-        if (searchInput) searchInput.value = '';
+        if (searchInput) searchInput.value = initialSearchText;
         if (replaceInput) replaceInput.value = '';
         if (replaceRow) replaceRow.style.display = 'none';
         if (countEl) countEl.textContent = '';
@@ -146,7 +220,13 @@
 
         // Focus search input
         setTimeout(() => {
-            if (searchInput) searchInput.focus();
+            if (!searchInput) return;
+            searchInput.focus();
+            if (initialSearchText) {
+                // Keep the prefilled term selected so typing replaces it straight away
+                searchInput.select();
+                findMatches(noteId);
+            }
         }, 100);
     };
 

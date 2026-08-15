@@ -379,6 +379,9 @@
                         rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
                     } else if (id === 'btn-split-view') {
                         rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
+                    } else if (id === 'btn-search-replace') {
+                        // The selection formatting toolbar has its own copy of the button
+                        rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');
                     } else if (id === 'btn-tasklist-actions') {
                         rules.push('.tasklist-actions-dropdown { display: none !important; }');
                     } else if (id === 'btn-audio') {

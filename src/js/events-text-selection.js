@@ -184,6 +184,9 @@ function initTextSelectionHandlers() {
     function isListSelectionAllowedButton(button, selectionType) {
         if (!button || !button.classList) return false;
 
+        // Search and replace acts on the whole note, keep it available everywhere
+        if (button.classList.contains('btn-search-replace-format')) return true;
+
         if (button.classList.contains('btn-task-remove')) {
             return selectionType === 'task';
         }
