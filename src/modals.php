@@ -1521,6 +1521,9 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 data-description-global-highlight="<?php echo t_h('modals.ui_customization.description_global_highlight', [], 'except administrators'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
             <div class="ui-custom-filter">
                 <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
+                <button type="button" id="uiCustomizationCollapseAll" class="ui-custom-collapse-all"
+                    data-label-collapse="<?php echo t_h('modals.ui_customization.collapse_all', [], 'Collapse all'); ?>"
+                    data-label-expand="<?php echo t_h('modals.ui_customization.expand_all', [], 'Expand all'); ?>"><i class="lucide lucide-chevron-down"></i></button>
                 <input
                     type="search"
                     id="uiCustomizationFilterInput"
@@ -1732,9 +1735,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
 
                 <!-- Notes Page Icon Sidebar Section -->
                 <div class="ui-custom-section">
-                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar (notes page)'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
-                <div class="ui-custom-items" data-ui-parent-key="card:icon_sidebar">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon_sidebar" data-ui-parent checked><span><?php echo t_h('modals.ui_customization.icon_sidebar_entire', [], 'Entire icon sidebar'); ?></span></label>
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <div class="ui-custom-items">
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarHomeBtn" checked><span><?php echo t_h('common.home', [], 'Home'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDashboardBtn" checked><span><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
@@ -1749,7 +1751,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSettingsBtn" checked><span><?php echo t_h('sidebar.settings', [], 'Settings'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarLogoutBtn" checked><span><?php echo t_h('workspace_menu.logout', [], 'Logout'); ?></span></label>
                 </div>
                 </div>

@@ -1880,6 +1880,7 @@
         var uiCustomModal = document.getElementById('uiCustomizationModal');
         if (uiCustomModal) {
             initSectionToggleButtons(uiCustomModal);
+            initSectionCollapseButtons(uiCustomModal);
         }
 
         // Save UI Customization modal button
@@ -3005,56 +3006,6 @@
         element.appendChild(document.createTextNode(text.slice(index + highlight.length)));
     }
 
-    // A section may declare a master checkbox (data-ui-parent) that governs the
-    // rest of its items: the "Entire icon sidebar" entry hides the whole rail, so
-    // the per-icon checkboxes below it become meaningless once it is unchecked.
-    function getSectionParentGroup(section) {
-        if (!section) return null;
-
-        var group = section.querySelector('[data-ui-parent-key]');
-        if (!group) return null;
-
-        var parent = group.querySelector('[data-ui-parent]');
-        if (!parent) return null;
-
-        return {
-            parent: parent,
-            children: Array.prototype.filter.call(
-                group.querySelectorAll('[data-ui-key]'),
-                function (cb) { return cb !== parent; }
-            )
-        };
-    }
-
-    // Toggling the master checkbox drives every item of its section: unchecking
-    // it unchecks them all, re-checking it checks them all back, regardless of
-    // what they were set to beforehand.
-    function applySectionParentToggle(section) {
-        var group = getSectionParentGroup(section);
-        if (!group) return;
-
-        group.children.forEach(function (cb) {
-            if (!cb.disabled) cb.checked = group.parent.checked;
-        });
-    }
-
-    // Dim the items while the master is off; they follow it anyway.
-    function syncSectionParentCheckbox(section) {
-        var group = getSectionParentGroup(section);
-        if (!group) return;
-
-        group.children.forEach(function (cb) {
-            var item = cb.closest('.ui-custom-item');
-            if (!item) return;
-
-            item.classList.toggle('ui-custom-item-parent-off', !group.parent.checked);
-        });
-    }
-
-    function syncAllSectionParentCheckboxes(modal) {
-        modal.querySelectorAll('.ui-custom-section').forEach(syncSectionParentCheckbox);
-    }
-
     function updateSectionToggleBtn(section) {
         var btn = section.querySelector('.ui-custom-toggle-all');
         if (!btn) return;
@@ -3078,6 +3029,92 @@
         btn.textContent = allChecked
             ? (btn.getAttribute('data-label-uncheck') || 'Uncheck all')
             : (btn.getAttribute('data-label-check') || 'Check all');
+    }
+
+    function isUiCustomizationSectionCollapsed(section) {
+        var title = section.querySelector('.ui-custom-section-title');
+        return !!(title && title.classList.contains('ui-custom-section-collapsed'));
+    }
+
+    function setUiCustomizationSectionCollapsed(section, collapsed) {
+        var title = section.querySelector('.ui-custom-section-title');
+        if (!title) return;
+
+        section.classList.toggle('ui-custom-section-collapsed', collapsed);
+        title.classList.toggle('ui-custom-section-collapsed', collapsed);
+
+        var toggleBtn = title.querySelector('.ui-custom-section-toggle');
+        if (toggleBtn) {
+            var label = collapsed
+                ? tr('settings.expand_section', {}, 'Expand section')
+                : tr('settings.collapse_section', {}, 'Collapse section');
+            toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+            toggleBtn.setAttribute('aria-label', label);
+            toggleBtn.title = label;
+        }
+    }
+
+    // The collapse-all button mirrors the state of the sections: while at least
+    // one is open it collapses everything, once all are closed it reopens them.
+    function updateCollapseAllBtn(modal) {
+        var btn = modal.querySelector('#uiCustomizationCollapseAll');
+        if (!btn) return;
+
+        var sections = modal.querySelectorAll('.ui-custom-section');
+        var allCollapsed = sections.length > 0
+            && Array.prototype.every.call(sections, isUiCustomizationSectionCollapsed);
+
+        btn.classList.toggle('ui-custom-collapsed', allCollapsed);
+
+        var label = allCollapsed
+            ? (btn.getAttribute('data-label-expand') || 'Expand all')
+            : (btn.getAttribute('data-label-collapse') || 'Collapse all');
+        btn.setAttribute('aria-expanded', allCollapsed ? 'false' : 'true');
+        btn.setAttribute('aria-label', label);
+        btn.title = label;
+    }
+
+    function initSectionCollapseButtons(modal) {
+        modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
+            var title = section.querySelector('.ui-custom-section-title');
+            if (!title || title.querySelector('.ui-custom-section-toggle')) return;
+
+            var toggleBtn = document.createElement('button');
+            toggleBtn.type = 'button';
+            toggleBtn.className = 'ui-custom-section-toggle';
+            toggleBtn.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+            title.appendChild(toggleBtn);
+
+            setUiCustomizationSectionCollapsed(section, false);
+        });
+
+        updateCollapseAllBtn(modal);
+
+        modal.addEventListener('click', function (e) {
+            var collapseAllBtn = e.target.closest('#uiCustomizationCollapseAll');
+            if (collapseAllBtn) {
+                var sections = modal.querySelectorAll('.ui-custom-section');
+                var collapse = !Array.prototype.every.call(sections, isUiCustomizationSectionCollapsed);
+                sections.forEach(function (section) {
+                    setUiCustomizationSectionCollapsed(section, collapse);
+                });
+                updateCollapseAllBtn(modal);
+                return;
+            }
+
+            // The check/uncheck-all button lives inside the title and has its
+            // own handler, so a click on it must not collapse the section.
+            if (e.target.closest('.ui-custom-toggle-all')) return;
+
+            var title = e.target.closest('.ui-custom-section-title');
+            if (!title) return;
+
+            var section = title.closest('.ui-custom-section');
+            if (!section) return;
+
+            setUiCustomizationSectionCollapsed(section, !isUiCustomizationSectionCollapsed(section));
+            updateCollapseAllBtn(modal);
+        });
     }
 
     function initSectionToggleButtons(modal) {
@@ -3107,7 +3144,6 @@
                     var everyChecked = allCheckboxes.length > 0
                         && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
                     allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
-                    syncAllSectionParentCheckboxes(modal);
                     modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
                     updateGlobalToggleBtn(modal);
                     refreshUiCustomizationFilter();
@@ -3125,7 +3161,6 @@
                 var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
                 var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
                 checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
-                syncSectionParentCheckbox(section);
                 updateSectionToggleBtn(section);
                 updateGlobalToggleBtn(modal);
                 refreshUiCustomizationFilter();
@@ -3138,12 +3173,6 @@
 
             var section = e.target.closest('.ui-custom-section');
             if (section) {
-                // Only the master drives its section; the items below it are
-                // free to be toggled individually while it stays checked.
-                if (e.target.hasAttribute('data-ui-parent')) {
-                    applySectionParentToggle(section);
-                }
-                syncSectionParentCheckbox(section);
                 updateSectionToggleBtn(section);
             }
             updateGlobalToggleBtn(modal);
@@ -3215,9 +3244,6 @@
                     }
                 });
 
-                // Reflect a stored "whole section off" state on its child items
-                syncAllSectionParentCheckboxes(modal);
-
                 // Update toggle-all buttons to reflect current state
                 modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
                 updateGlobalToggleBtn(modal);
@@ -3231,6 +3257,12 @@
                 if (hiddenOnlyToggle) {
                     hiddenOnlyToggle.checked = false;
                 }
+
+                // Every section opens again on each visit, like the filter
+                modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
+                    setUiCustomizationSectionCollapsed(section, false);
+                });
+                updateCollapseAllBtn(modal);
 
                 applyUiCustomizationFilter(modal, '');
 

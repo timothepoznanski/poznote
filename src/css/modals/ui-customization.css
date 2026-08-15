@@ -47,6 +47,36 @@
     margin: 0;
 }
 
+/* Collapse / expand every section at once. Sized like the check/uncheck-all
+   button so the filter row keeps a single baseline. */
+.ui-custom-collapse-all {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.ui-custom-collapse-all:hover {
+    background: rgba(128, 128, 128, 0.12);
+}
+
+.ui-custom-collapse-all .lucide {
+    transition: transform 0.15s ease;
+}
+
+/* Everything collapsed: the chevron points right, like a closed section */
+.ui-custom-collapse-all.ui-custom-collapsed .lucide {
+    transform: rotate(-90deg);
+}
+
 .ui-custom-hidden-only {
     display: flex;
     align-items: center;
@@ -130,15 +160,62 @@
     gap: 6px 12px;
 }
 
+/* Collapsible sections: the whole title toggles, the chevron shows state.
+   Row order: title text, check/uncheck-all pushed right, then the chevron. */
 .ui-custom-section-title {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     font-size: 0.95em;
     font-weight: 600;
     margin: 0 0 10px 0;
     padding-bottom: 6px;
     border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    cursor: pointer;
+    user-select: none;
+}
+
+.ui-custom-section-title .ui-custom-toggle-all {
+    margin-left: auto;
+}
+
+.ui-custom-section-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 2px;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: 1.05rem;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.ui-custom-section-title:hover .ui-custom-section-toggle {
+    opacity: 1;
+}
+
+.ui-custom-section-toggle .lucide {
+    transition: transform 0.15s ease;
+}
+
+.ui-custom-section-title.ui-custom-section-collapsed .ui-custom-section-toggle .lucide {
+    transform: rotate(-90deg);
+}
+
+/* An active filter overrides collapse so matching items stay visible
+   (settings-page.js toggles .ui-custom-filtering on the modal) */
+#uiCustomizationModal:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed .ui-custom-items,
+#uiCustomizationModal:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed .ui-custom-section-hint {
+    display: none;
+}
+
+/* Collapsed sections read as a list of headings, so they lose the gap that
+   separates a title from its items. */
+#uiCustomizationModal:not(.ui-custom-filtering) .ui-custom-section.ui-custom-section-collapsed {
+    margin-bottom: 8px;
 }
 
 .ui-custom-section-hint {
@@ -286,18 +363,6 @@
 }
 
 .ui-custom-item-locked:hover {
-    background: transparent;
-}
-
-/* Items governed by a section master checkbox (data-ui-parent), e.g. the
-   per-icon entries under "Entire icon sidebar": dimmed and inert while the
-   master is unchecked, since the whole section is hidden anyway. */
-.ui-custom-item-parent-off {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-.ui-custom-item-parent-off:hover {
     background: transparent;
 }
 

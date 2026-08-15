@@ -1113,6 +1113,11 @@ function getSetting($key, $default = null) {
 function poznoteGetNonHideableUiKeys() {
     return [
         'card:home-support-card' => true,
+        // Dropped from the UI Customization modal: hiding the whole icon rail or
+        // its Settings icon left no way back into the settings page. Listed here
+        // so preferences saved before the removal stop applying.
+        'card:icon_sidebar' => true,
+        'card:iconSidebarSettingsBtn' => true,
     ];
 }
 
@@ -1407,15 +1412,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             }
 
             $rules[] = '#' . $id . ' { display: none !important; }';
-            if ($id === 'icon_sidebar') {
-                // The collapse chevron lives outside #icon_sidebar (so it stays
-                // clickable once the rail is collapsed), so hiding the rail has
-                // to hide it explicitly. On the secondary pages the rail is
-                // fixed-positioned and the body is inset by its width, so that
-                // inset has to be dropped as well (see css/icon-sidebar-page.css).
-                $rules[] = '#iconSidebarToggle { display: none !important; }';
-                $rules[] = 'body.has-icon-sidebar { margin-left: 0 !important; }';
-            }
             if (isset($createModalOptionSelectors[$key])) {
                 $rules[] = '#createModal ' . $createModalOptionSelectors[$key] . ' { display: none !important; }';
             }
