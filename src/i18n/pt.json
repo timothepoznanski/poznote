@@ -1035,9 +1035,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Colar como Markdown",
-      "menu_item": "Colar como Markdown",
-      "hint": "Cole o seu conteúdo abaixo. A formatação será convertida para Markdown.",
+      "title": "Inserir HTML",
+      "menu_item": "Inserir HTML",
+      "hint": "Cole conteúdo formatado (uma página web, Word, um e-mail) no campo abaixo. O seu HTML, títulos, ligações, listas e tabelas, é convertido em Markdown que pode rever, editar e depois inserir na sua nota.",
       "placeholder": "Cole aqui (Ctrl+V)",
       "preview_label": "Pré-visualização de Markdown",
       "insert": "Inserir",

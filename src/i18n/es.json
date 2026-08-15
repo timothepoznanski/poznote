@@ -1037,9 +1037,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Pegar como Markdown",
-      "menu_item": "Pegar como Markdown",
-      "hint": "Pega tu contenido a continuación. El formato se convertirá a Markdown.",
+      "title": "Insertar HTML",
+      "menu_item": "Insertar HTML",
+      "hint": "Pega contenido con formato (una página web, Word, un correo) en el campo de abajo. Su HTML, títulos, enlaces, listas y tablas, se convierte a Markdown que puedes revisar, editar e insertar en tu nota.",
       "placeholder": "Pega aquí (Ctrl+V)",
       "preview_label": "Vista previa de Markdown",
       "insert": "Insertar",

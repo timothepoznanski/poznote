@@ -1061,9 +1061,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Coller en Markdown",
-      "menu_item": "Coller en Markdown",
-      "hint": "Collez votre contenu ci-dessous. La mise en forme sera convertie en Markdown.",
+      "title": "Insérer du HTML",
+      "menu_item": "Insérer du HTML",
+      "hint": "Collez du contenu mis en forme (page web, Word, e-mail) dans le champ ci-dessous. Son HTML, titres, liens, listes et tableaux, est converti en Markdown que vous pouvez relire, modifier, puis insérer dans votre note.",
       "placeholder": "Collez ici (Ctrl+V)",
       "preview_label": "Aperçu Markdown",
       "insert": "Insérer",

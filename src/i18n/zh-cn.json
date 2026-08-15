@@ -1037,9 +1037,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "粘贴为 Markdown",
-      "menu_item": "粘贴为 Markdown",
-      "hint": "请在下方粘贴内容。格式将被转换为 Markdown。",
+      "title": "插入 HTML",
+      "menu_item": "插入 HTML",
+      "hint": "请将带格式的内容（网页、Word、电子邮件）粘贴到下方的框中。其中的 HTML，包括标题、链接、列表和表格，将被转换为 Markdown，你可以检查、编辑后再插入笔记。",
       "placeholder": "在此粘贴（Ctrl+V）",
       "preview_label": "Markdown 预览",
       "insert": "插入",

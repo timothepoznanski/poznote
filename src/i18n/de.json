@@ -1036,9 +1036,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Als Markdown einfügen",
-      "menu_item": "Als Markdown einfügen",
-      "hint": "Fügen Sie Ihren Inhalt unten ein. Die Formatierung wird in Markdown umgewandelt.",
+      "title": "HTML einfügen",
+      "menu_item": "HTML einfügen",
+      "hint": "Fügen Sie formatierten Inhalt (Webseite, Word, E-Mail) in das Feld unten ein. Das HTML, Überschriften, Links, Listen und Tabellen, wird in Markdown umgewandelt, das Sie prüfen, bearbeiten und dann in Ihre Notiz einfügen können.",
       "placeholder": "Hier einfügen (Strg+V)",
       "preview_label": "Markdown-Vorschau",
       "insert": "Einfügen",

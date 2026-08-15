@@ -304,7 +304,7 @@
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="open-markdown-syntax"><i class="lucide lucide-book-open"></i> '.t_h('markdown_syntax.menu_item', [], 'Markdown syntax').'</button>';
                         if (!$isPublicWorkspaceReadonly) {
-                            echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Paste as Markdown').'</button>';
+                            echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Insert HTML').'</button>';
                         }
                     }
 

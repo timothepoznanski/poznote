@@ -535,9 +535,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Paste as Markdown",
-      "menu_item": "Paste as Markdown",
-      "hint": "Paste your content below. Formatting will be converted to Markdown.",
+      "title": "Insert HTML",
+      "menu_item": "Insert HTML",
+      "hint": "Paste formatted content (a web page, Word, an email) into the box below. Its HTML, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.",
       "placeholder": "Paste here (Ctrl+V)",
       "preview_label": "Markdown preview",
       "insert": "Insert",

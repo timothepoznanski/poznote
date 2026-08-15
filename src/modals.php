@@ -791,12 +791,12 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 <!-- Paste as Markdown Modal -->
 <div id="pasteMarkdownModal" class="modal">
     <div class="modal-content paste-markdown-modal-content">
-        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Paste as Markdown'); ?></h3>
+        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Insert HTML'); ?></h3>
         <div class="modal-body">
-            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste your content below. Formatting will be converted to Markdown.'); ?></p>
+            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste formatted content (a web page, Word, an email) into the box below. Its HTML, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.'); ?></p>
             <!-- contenteditable, not a textarea: only a rich-text target receives
                  the clipboard's text/html flavour that carries the formatting. -->
-            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Paste as Markdown'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
+            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Insert HTML'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
             <div id="pasteMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">
                 <label class="paste-markdown-preview-label" for="pasteMarkdownPreview"><?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?></label>
                 <textarea id="pasteMarkdownPreview" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?>"></textarea>
