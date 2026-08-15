@@ -2984,6 +2984,77 @@
         });
     }
 
+    // Renders the modal description, emphasising one phrase of it ("except
+    // administrators" in the all-users mode). Built from text nodes rather than
+    // innerHTML so a translation can never inject markup.
+    function setUiCustomizationDescription(element, text, highlight) {
+        element.textContent = '';
+
+        var index = highlight ? text.indexOf(highlight) : -1;
+        if (index === -1) {
+            element.textContent = text;
+            return;
+        }
+
+        var strong = document.createElement('span');
+        strong.className = 'ui-custom-description-highlight';
+        strong.textContent = highlight;
+
+        element.appendChild(document.createTextNode(text.slice(0, index)));
+        element.appendChild(strong);
+        element.appendChild(document.createTextNode(text.slice(index + highlight.length)));
+    }
+
+    // A section may declare a master checkbox (data-ui-parent) that governs the
+    // rest of its items: the "Entire icon sidebar" entry hides the whole rail, so
+    // the per-icon checkboxes below it become meaningless once it is unchecked.
+    function getSectionParentGroup(section) {
+        if (!section) return null;
+
+        var group = section.querySelector('[data-ui-parent-key]');
+        if (!group) return null;
+
+        var parent = group.querySelector('[data-ui-parent]');
+        if (!parent) return null;
+
+        return {
+            parent: parent,
+            children: Array.prototype.filter.call(
+                group.querySelectorAll('[data-ui-key]'),
+                function (cb) { return cb !== parent; }
+            )
+        };
+    }
+
+    // Toggling the master checkbox drives every item of its section: unchecking
+    // it unchecks them all, re-checking it checks them all back, regardless of
+    // what they were set to beforehand.
+    function applySectionParentToggle(section) {
+        var group = getSectionParentGroup(section);
+        if (!group) return;
+
+        group.children.forEach(function (cb) {
+            if (!cb.disabled) cb.checked = group.parent.checked;
+        });
+    }
+
+    // Dim the items while the master is off; they follow it anyway.
+    function syncSectionParentCheckbox(section) {
+        var group = getSectionParentGroup(section);
+        if (!group) return;
+
+        group.children.forEach(function (cb) {
+            var item = cb.closest('.ui-custom-item');
+            if (!item) return;
+
+            item.classList.toggle('ui-custom-item-parent-off', !group.parent.checked);
+        });
+    }
+
+    function syncAllSectionParentCheckboxes(modal) {
+        modal.querySelectorAll('.ui-custom-section').forEach(syncSectionParentCheckbox);
+    }
+
     function updateSectionToggleBtn(section) {
         var btn = section.querySelector('.ui-custom-toggle-all');
         if (!btn) return;
@@ -3036,6 +3107,7 @@
                     var everyChecked = allCheckboxes.length > 0
                         && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
                     allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
+                    syncAllSectionParentCheckboxes(modal);
                     modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
                     updateGlobalToggleBtn(modal);
                     refreshUiCustomizationFilter();
@@ -3053,6 +3125,7 @@
                 var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
                 var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
                 checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
+                syncSectionParentCheckbox(section);
                 updateSectionToggleBtn(section);
                 updateGlobalToggleBtn(modal);
                 refreshUiCustomizationFilter();
@@ -3064,7 +3137,15 @@
             if (!e.target || !e.target.getAttribute('data-ui-key')) return;
 
             var section = e.target.closest('.ui-custom-section');
-            if (section) updateSectionToggleBtn(section);
+            if (section) {
+                // Only the master drives its section; the items below it are
+                // free to be toggled individually while it stays checked.
+                if (e.target.hasAttribute('data-ui-parent')) {
+                    applySectionParentToggle(section);
+                }
+                syncSectionParentCheckbox(section);
+                updateSectionToggleBtn(section);
+            }
             updateGlobalToggleBtn(modal);
 
             // "Show only unchecked" is live: a newly checked item leaves the list.
@@ -3090,7 +3171,12 @@
         }
         var description = document.getElementById('uiCustomizationModalDescription');
         if (description) {
-            description.textContent = description.getAttribute(uiCustomizationModalMode === 'global' ? 'data-description-global' : 'data-description-user') || description.textContent;
+            var descriptionText = description.getAttribute(uiCustomizationModalMode === 'global' ? 'data-description-global' : 'data-description-user');
+            if (descriptionText) {
+                setUiCustomizationDescription(description, descriptionText, uiCustomizationModalMode === 'global'
+                    ? description.getAttribute('data-description-global-highlight')
+                    : '');
+            }
         }
 
         getSetting(getUiCustomizationSettingKey(uiCustomizationModalMode), function (value) {
@@ -3128,6 +3214,9 @@
                         }
                     }
                 });
+
+                // Reflect a stored "whole section off" state on its child items
+                syncAllSectionParentCheckboxes(modal);
 
                 // Update toggle-all buttons to reflect current state
                 modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);

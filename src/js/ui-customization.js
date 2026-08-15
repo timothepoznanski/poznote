@@ -358,6 +358,15 @@
                         rules.push('.dashboard-nav-btn { display: none !important; }');
                     }
 
+                    if (id === 'icon_sidebar') {
+                        // The collapse chevron lives outside #icon_sidebar (so it
+                        // stays clickable once the rail is collapsed), so hiding
+                        // the rail has to hide it explicitly, and the page must
+                        // reclaim the space the rail occupied.
+                        rules.push('#iconSidebarToggle { display: none !important; }');
+                        rules.push('body.has-icon-sidebar { margin-left: 0 !important; }');
+                    }
+
                     if (CREATE_MODAL_OPTION_SELECTORS[key]) {
                         rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
                     }

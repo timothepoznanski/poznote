@@ -1093,8 +1093,9 @@
     "ui_customization": {
       "title": "Personalização da interface",
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
-      "title_global": "Personalização da interface (todos os usuários)",
+      "title_global": "Personalização da interface (todos os usuários exceto administradores)",
       "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
+      "description_global_highlight": "exceto administradores",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
       "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",

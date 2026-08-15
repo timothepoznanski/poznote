@@ -1409,6 +1409,15 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // to the dashboard, on all pages.
                 $rules[] = '.dashboard-nav-btn { display: none !important; }';
             }
+            if ($id === 'icon_sidebar') {
+                // The collapse chevron lives outside #icon_sidebar (so it stays
+                // clickable once the rail is collapsed), so hiding the rail has
+                // to hide it explicitly. On the secondary pages the rail is
+                // fixed-positioned and the body is inset by its width, so that
+                // inset has to be dropped as well (see css/icon-sidebar-page.css).
+                $rules[] = '#iconSidebarToggle { display: none !important; }';
+                $rules[] = 'body.has-icon-sidebar { margin-left: 0 !important; }';
+            }
             if (isset($createModalOptionSelectors[$key])) {
                 $rules[] = '#createModal ' . $createModalOptionSelectors[$key] . ' { display: none !important; }';
             }

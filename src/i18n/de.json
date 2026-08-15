@@ -1094,8 +1094,9 @@
     "ui_customization": {
       "title": "Oberfläche anpassen",
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
-      "title_global": "Oberfläche anpassen (alle Benutzer)",
+      "title_global": "Oberfläche anpassen (alle Benutzer außer Administratoren)",
       "description_global": "Oberflächenelemente für alle Benutzer dieser Instanz ein- oder ausblenden. Nicht angehakte Elemente werden für alle außer Administratoren ausgeblendet.",
+      "description_global_highlight": "außer Administratoren",
       "locked_by_admin": "Vom Administrator für alle Benutzer ausgeblendet",
       "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
       "toolbar_hint": "Formatierungsschaltflächen (Fett, Listen, Code…) erscheinen nur, wenn Text in einer Notiz markiert ist. Weitere Aktionen befinden sich im ⋮-Menü.",

@@ -593,8 +593,9 @@
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
-      "title_global": "UI Customization (all users)",
+      "title_global": "UI Customization (all users except for administrators)",
       "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
+      "description_global_highlight": "except administrators",
       "locked_by_admin": "Hidden for all users by the administrator",
       "locked_by_tenant_isolation": "Hidden automatically while this capability is blocked by Tenant isolation",
       "toolbar_hint": "Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.",

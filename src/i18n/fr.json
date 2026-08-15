@@ -1119,8 +1119,9 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
-      "title_global": "Personnalisation de l'interface (tous les utilisateurs)",
+      "title_global": "Personnalisation de l'interface (tous les utilisateurs sauf les administrateurs)",
       "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde, sauf les administrateurs.",
+      "description_global_highlight": "sauf les administrateurs",
       "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
       "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
