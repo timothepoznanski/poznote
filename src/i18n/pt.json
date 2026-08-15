@@ -1035,9 +1035,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Colar como Markdown",
-      "menu_item": "Colar como Markdown",
-      "hint": "Cole o seu conteúdo abaixo. A formatação será convertida para Markdown.",
+      "title": "Inserir HTML",
+      "menu_item": "Inserir HTML",
+      "hint": "Cole conteúdo formatado (uma página web, Word, um e-mail) no campo abaixo. O seu HTML, títulos, ligações, listas e tabelas, é convertido em Markdown que pode rever, editar e depois inserir na sua nota.",
       "placeholder": "Cole aqui (Ctrl+V)",
       "preview_label": "Pré-visualização de Markdown",
       "insert": "Inserir",
@@ -1093,8 +1093,9 @@
     "ui_customization": {
       "title": "Personalização da interface",
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
-      "title_global": "Personalização da interface (todos os usuários)",
+      "title_global": "Personalização da interface (todos os usuários exceto administradores)",
       "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
+      "description_global_highlight": "exceto administradores",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
       "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
       "toolbar_hint": "Os botões de formatação (negrito, listas, código…) só aparecem enquanto há texto selecionado em uma nota. As outras ações estão agrupadas no menu ⋮.",
@@ -2320,7 +2321,9 @@
     "edit": {
       "button": "Editar",
       "save_failed": "Não foi possível salvar as alterações",
-      "discard_confirm": "Descartar as alterações?"
+      "discard_confirm": "Descartar as alterações?",
+      "locked": "Outra pessoa está editando esta nota no momento. Tente novamente mais tarde.",
+      "lock_lost": "Outra pessoa está editando esta nota agora. Suas últimas alterações não podem ser salvas."
     }
   },
   "public_folder": {
@@ -3514,7 +3517,8 @@
     "another_user": "outro usuário",
     "popup_title": "Atenção",
     "lost_to_other_tab": "Você não tem mais o bloqueio de edição desta nota. Ela agora está sendo editada em outra aba.",
-    "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora."
+    "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora.",
+    "public_visitor": "um visitante do link de compartilhamento público"
   },
   "dashboard": {
     "title": "Quadro de notas",

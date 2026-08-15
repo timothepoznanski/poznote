@@ -132,10 +132,12 @@ usort($shared_folders, function($a, $b) {
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page"
+<body class="shared-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-current-user-id="<?php echo (int)$_SESSION['user_id']; ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
@@ -198,6 +200,8 @@ usort($shared_folders, function($a, $b) {
 	<script>
 		window.__sharedFoldersData = <?php echo json_encode($shared_folders, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 	</script>
+
+	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="shared-container">
 		<div class="shared-buttons-container">
@@ -270,6 +274,7 @@ usort($shared_folders, function($a, $b) {
 	</div>
 	
 	<script src="js/navigation.js"></script>
+	<script src="js/icon-sidebar-toggle.js"></script>
 	<script src="js/pwa-helpers.js"></script>
 	<script src="js/shared-page.js?v=<?php echo @filemtime('js/shared-page.js') ?: time(); ?>"></script>
 </body>

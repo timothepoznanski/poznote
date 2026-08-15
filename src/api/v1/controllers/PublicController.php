@@ -1,9 +1,11 @@
 <?php
 /**
  * Public Controller for Poznote REST API v1
- * 
+ *
  * Handles public interactions with shared notes (like checking tasks).
  */
+
+require_once __DIR__ . '/../../../users/db_master.php';
 
 class PublicController {
     private PDO $con;
@@ -250,6 +252,14 @@ class PublicController {
             return;
         }
 
+        // Concurrent-edit guard: refuse the save while someone else (another
+        // public visitor, or an account user inside the app) holds the note's
+        // edit lock. Requests without an editor_session_id (one-shot API
+        // clients) are still allowed when nobody is editing.
+        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId($input))) {
+            return;
+        }
+
         // Same server-side sanitization as authenticated saves: never trust
         // the submitted markup, whoever holds the link.
         if ($type === 'note') {
@@ -282,6 +292,151 @@ class PublicController {
 
         $this->saveNote($noteId, $type, $content);
         $this->sendSuccess(['success' => true]);
+    }
+
+    /**
+     * POST /api/v1/public/notes/lock
+     * Acquires (or refreshes) the exclusive edit lock for a publicly shared
+     * note on behalf of an anonymous visitor. Only allowed on 'edit' shares.
+     * Query Params:
+     *   - token: The shared note token
+     * Body (JSON):
+     *   - editor_session_id: Opaque per-tab editor session identifier
+     */
+    public function acquireEditLock(): void {
+        $context = $this->resolveEditLockContext();
+        if ($context === null) return;
+
+        $result = acquireNoteEditLock(
+            $context['owner_id'],
+            $context['note_id'],
+            $context['owner_id'],
+            $context['editor_session_id'],
+            90,
+            'public'
+        );
+
+        if (!empty($result['success'])) {
+            $this->sendSuccess(['success' => true]);
+            return;
+        }
+
+        $this->sendError(423, 'This note is currently being edited by someone else');
+    }
+
+    /**
+     * POST /api/v1/public/notes/lock/heartbeat
+     * Keeps an acquired public edit lock alive (same semantics as acquire).
+     */
+    public function heartbeatEditLock(): void {
+        $this->acquireEditLock();
+    }
+
+    /**
+     * POST /api/v1/public/notes/lock/release
+     * Releases the public edit lock held by this editor session.
+     */
+    public function releaseEditLock(): void {
+        $context = $this->resolveEditLockContext();
+        if ($context === null) return;
+
+        releaseNoteEditLock(
+            $context['owner_id'],
+            $context['note_id'],
+            $context['owner_id'],
+            $context['editor_session_id'],
+            'public'
+        );
+
+        $this->sendSuccess(['success' => true]);
+    }
+
+    /**
+     * Shared validation for the public edit lock endpoints: the token must
+     * resolve to an 'edit' share (password and allowed_users checks included)
+     * and the request must carry an editor session id. Sends the error
+     * response and returns null when any check fails.
+     */
+    private function resolveEditLockContext(): ?array {
+        $token = $_GET['token'] ?? null;
+        if (!$token) {
+            $this->sendError(400, 'Token missing');
+            return null;
+        }
+
+        $sharedNote = $this->validateTokenAndGetNote($token);
+        if (!$sharedNote) return null;
+
+        if (($sharedNote['access_mode'] ?? '') !== 'edit') {
+            $this->sendError(403, 'This shared note is read-only');
+            return null;
+        }
+
+        $ownerId = $this->getShareOwnerUserId();
+        if ($ownerId <= 0) {
+            $this->sendError(500, 'Unable to resolve the share owner');
+            return null;
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        $editorSessionId = $this->getEditorSessionId(is_array($input) ? $input : null);
+        if ($editorSessionId === '') {
+            $this->sendError(400, 'editor_session_id is required');
+            return null;
+        }
+
+        return [
+            'note_id' => (int)$sharedNote['note_id'],
+            'owner_id' => $ownerId,
+            'editor_session_id' => $editorSessionId,
+        ];
+    }
+
+    /**
+     * The account whose note space the share token routed us to; edit locks
+     * live in the master database keyed by this owner id, which makes them
+     * shared with the in-app editor of the same note.
+     */
+    private function getShareOwnerUserId(): int {
+        return (int)($GLOBALS['activeUserId'] ?? 0);
+    }
+
+    private function getEditorSessionId(?array $input): string {
+        if (is_array($input) && isset($input['editor_session_id'])) {
+            return trim((string)$input['editor_session_id']);
+        }
+
+        if (isset($_SERVER['HTTP_X_EDITOR_SESSION_ID'])) {
+            return trim((string)$_SERVER['HTTP_X_EDITOR_SESSION_ID']);
+        }
+
+        return '';
+    }
+
+    /**
+     * True when no other editor holds the note's edit lock. On conflict the
+     * 423 error response is sent here.
+     */
+    private function currentRequestMayWriteNote(int $noteId, string $editorSessionId): bool {
+        $ownerId = $this->getShareOwnerUserId();
+        if ($ownerId <= 0) {
+            return true;
+        }
+
+        $lock = getNoteEditLock($ownerId, $noteId);
+        if (!$lock) {
+            return true;
+        }
+
+        $holdsLock = ($lock['holder_kind'] ?? 'user') === 'public'
+            && $editorSessionId !== ''
+            && (string)$lock['holder_session_id'] === $editorSessionId;
+        if ($holdsLock) {
+            return true;
+        }
+
+        $this->sendError(423, 'This note is currently being edited by someone else');
+        return false;
     }
 
     /**

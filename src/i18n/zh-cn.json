@@ -1037,9 +1037,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "粘贴为 Markdown",
-      "menu_item": "粘贴为 Markdown",
-      "hint": "请在下方粘贴内容。格式将被转换为 Markdown。",
+      "title": "插入 HTML",
+      "menu_item": "插入 HTML",
+      "hint": "请将带格式的内容（网页、Word、电子邮件）粘贴到下方的框中。其中的 HTML，包括标题、链接、列表和表格，将被转换为 Markdown，你可以检查、编辑后再插入笔记。",
       "placeholder": "在此粘贴（Ctrl+V）",
       "preview_label": "Markdown 预览",
       "insert": "插入",
@@ -1095,8 +1095,9 @@
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
-      "title_global": "界面自定义（所有用户）",
+      "title_global": "界面自定义（除管理员外的所有用户）",
       "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对除管理员外的所有人隐藏。",
+      "description_global_highlight": "除管理员外",
       "locked_by_admin": "已由管理员对所有用户隐藏",
       "locked_by_tenant_isolation": "该功能已被租户隔离阻止，因此自动隐藏",
       "toolbar_hint": "格式按钮（加粗、列表、代码等）仅在笔记中选中文本时显示。其他操作在 ⋮ 菜单中。",
@@ -2319,7 +2320,9 @@
     "edit": {
       "button": "编辑",
       "save_failed": "保存更改失败",
-      "discard_confirm": "放弃更改？"
+      "discard_confirm": "放弃更改？",
+      "locked": "其他人正在编辑此笔记，请稍后再试。",
+      "lock_lost": "其他人正在编辑此笔记，您的最新更改无法保存。"
     }
   },
   "public_folder": {
@@ -3632,7 +3635,8 @@
     "another_user": "另一位用户",
     "popup_title": "注意",
     "lost_to_other_tab": "您已不再持有这条笔记的编辑锁。现在它正在另一个标签页中被编辑。",
-    "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。"
+    "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。",
+    "public_visitor": "公开分享链接的访客"
   },
   "dashboard": {
     "title": "笔记看板",

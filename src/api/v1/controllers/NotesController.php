@@ -177,13 +177,21 @@ class NotesController {
             ? trim($editorSessionId)
             : $this->getEditorSessionId();
 
+        // Public-share locks store the share owner's id as holder, but the
+        // actual editor is an anonymous visitor: never present them as the
+        // current (or any known) user.
+        $holderIsPublic = (($lock['holder_kind'] ?? 'user') === 'public');
+
         return [
             'target_user_id' => (int) ($lock['target_user_id'] ?? 0),
             'note_id' => (int) ($lock['note_id'] ?? 0),
-            'holder_login_user_id' => (int) ($lock['holder_login_user_id'] ?? 0),
-            'holder_username' => (string) ($lock['holder_username'] ?? ''),
-            'holder_is_current_user' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId,
-            'holder_is_current_editor_session' => (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId
+            'holder_login_user_id' => $holderIsPublic ? 0 : (int) ($lock['holder_login_user_id'] ?? 0),
+            'holder_username' => $holderIsPublic ? '' : (string) ($lock['holder_username'] ?? ''),
+            'holder_is_public' => $holderIsPublic,
+            'holder_is_current_user' => !$holderIsPublic
+                && (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId,
+            'holder_is_current_editor_session' => !$holderIsPublic
+                && (int) ($lock['holder_login_user_id'] ?? 0) === $currentHolderUserId
                 && $currentEditorSessionId !== ''
                 && (string) ($lock['holder_session_id'] ?? '') === $currentEditorSessionId,
             'expires_at' => (string) ($lock['expires_at'] ?? ''),

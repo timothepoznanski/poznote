@@ -159,11 +159,16 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="favorites-page dashboard-page diary-page"
+<body class="favorites-page dashboard-page diary-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+
+	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="favorites-container dashboard-container">
 		<header class="dashboard-topbar">
@@ -251,6 +256,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	</script>
 	<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/diary-page.js?v=<?php echo file_exists(__DIR__ . '/js/diary-page.js') ? filemtime(__DIR__ . '/js/diary-page.js') : $cache_v; ?>"></script>
 	<script src="js/board-view-menu.js?v=<?php echo file_exists(__DIR__ . '/js/board-view-menu.js') ? filemtime(__DIR__ . '/js/board-view-menu.js') : $cache_v; ?>"></script>

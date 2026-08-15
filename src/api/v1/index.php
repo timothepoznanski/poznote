@@ -992,5 +992,18 @@ $router->patch('/public/notes/content', function($params) use ($publicController
     $publicController->updateNoteContent();
 });
 
+// Exclusive edit lock for publicly shared notes ('edit' shares only)
+$router->post('/public/notes/lock', function($params) use ($publicController) {
+    $publicController->acquireEditLock();
+});
+
+$router->post('/public/notes/lock/heartbeat', function($params) use ($publicController) {
+    $publicController->heartbeatEditLock();
+});
+
+$router->post('/public/notes/lock/release', function($params) use ($publicController) {
+    $publicController->releaseEditLock();
+});
+
 // Dispatch the request
 $router->dispatch();

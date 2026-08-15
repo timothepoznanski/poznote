@@ -147,6 +147,10 @@
                         if ($note_type !== 'markdown') {
                             echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" data-action="exec-remove-format"><i class="lucide lucide-eraser"></i></button>';
                         }
+                        // Search and replace: kept last in the selection formatting toolbar
+                        if ($note_type === 'note' || $note_type === 'markdown') {
+                            echo '<button type="button" class="toolbar-btn btn-search-replace-format text-format-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
+                        }
 
                         if ($note_type === 'tasklist') {
                             echo '<div class="tasklist-actions-dropdown">';
@@ -304,7 +308,7 @@
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="open-markdown-syntax"><i class="lucide lucide-book-open"></i> '.t_h('markdown_syntax.menu_item', [], 'Markdown syntax').'</button>';
                         if (!$isPublicWorkspaceReadonly) {
-                            echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Paste as Markdown').'</button>';
+                            echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Insert HTML').'</button>';
                         }
                     }
 

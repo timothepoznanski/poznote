@@ -1061,9 +1061,9 @@
   },
   "modals": {
     "paste_markdown": {
-      "title": "Coller en Markdown",
-      "menu_item": "Coller en Markdown",
-      "hint": "Collez votre contenu ci-dessous. La mise en forme sera convertie en Markdown.",
+      "title": "Insérer du HTML",
+      "menu_item": "Insérer du HTML",
+      "hint": "Collez du contenu mis en forme (page web, Word, e-mail) dans le champ ci-dessous. Son HTML, titres, liens, listes et tableaux, est converti en Markdown que vous pouvez relire, modifier, puis insérer dans votre note.",
       "placeholder": "Collez ici (Ctrl+V)",
       "preview_label": "Aperçu Markdown",
       "insert": "Insérer",
@@ -1119,8 +1119,9 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
-      "title_global": "Personnalisation de l'interface (tous les utilisateurs)",
+      "title_global": "Personnalisation de l'interface (tous les utilisateurs sauf les administrateurs)",
       "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde, sauf les administrateurs.",
+      "description_global_highlight": "sauf les administrateurs",
       "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
       "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
       "toolbar_hint": "Les boutons de mise en forme (gras, listes, code…) n'apparaissent que lorsque du texte est sélectionné dans une note. Les autres actions sont regroupées dans le menu ⋮.",
@@ -2372,7 +2373,9 @@
     "edit": {
       "button": "Modifier",
       "save_failed": "Échec de l'enregistrement des modifications",
-      "discard_confirm": "Abandonner vos modifications ?"
+      "discard_confirm": "Abandonner vos modifications ?",
+      "locked": "Quelqu'un d'autre est en train de modifier cette note. Réessayez plus tard.",
+      "lock_lost": "Quelqu'un d'autre modifie maintenant cette note. Vos dernières modifications ne peuvent pas être enregistrées."
     }
   },
   "public_folder": {
@@ -3698,7 +3701,8 @@
     "another_user": "un autre utilisateur",
     "popup_title": "Attention",
     "lost_to_other_tab": "Vous n'avez plus le verrou d'édition sur cette note. Elle est maintenant modifiée dans un autre onglet.",
-    "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant."
+    "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant.",
+    "public_visitor": "un visiteur du lien de partage public"
   },
   "dashboard": {
     "title": "Tableau de notes",

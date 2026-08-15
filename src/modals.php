@@ -791,12 +791,12 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 <!-- Paste as Markdown Modal -->
 <div id="pasteMarkdownModal" class="modal">
     <div class="modal-content paste-markdown-modal-content">
-        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Paste as Markdown'); ?></h3>
+        <h3><?php echo t_h('modals.paste_markdown.title', [], 'Insert HTML'); ?></h3>
         <div class="modal-body">
-            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste your content below. Formatting will be converted to Markdown.'); ?></p>
+            <p class="paste-markdown-hint"><?php echo t_h('modals.paste_markdown.hint', [], 'Paste formatted content (a web page, Word, an email) into the box below. Its HTML, headings, links, lists and tables, is converted to Markdown that you can review, edit, then insert into your note.'); ?></p>
             <!-- contenteditable, not a textarea: only a rich-text target receives
                  the clipboard's text/html flavour that carries the formatting. -->
-            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Paste as Markdown'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
+            <div id="pasteMarkdownDropzone" class="paste-markdown-dropzone" contenteditable="true" role="textbox" aria-multiline="true" aria-label="<?php echo t_h('modals.paste_markdown.title', [], 'Insert HTML'); ?>" data-placeholder="<?php echo t_h('modals.paste_markdown.placeholder', [], 'Paste here (Ctrl+V)'); ?>"></div>
             <div id="pasteMarkdownPreviewWrapper" class="paste-markdown-preview-wrapper is-hidden">
                 <label class="paste-markdown-preview-label" for="pasteMarkdownPreview"><?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?></label>
                 <textarea id="pasteMarkdownPreview" class="paste-markdown-preview" spellcheck="false" aria-label="<?php echo t_h('modals.paste_markdown.preview_label', [], 'Markdown preview'); ?>"></textarea>
@@ -1517,7 +1517,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
         <div class="modal-body">
             <p class="ui-custom-description" id="uiCustomizationModalDescription"
                 data-description-user="<?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?>"
-                data-description-global="<?php echo t_h('modals.ui_customization.description_global', [], 'Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
+                data-description-global="<?php echo t_h('modals.ui_customization.description_global', [], 'Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.'); ?>"
+                data-description-global-highlight="<?php echo t_h('modals.ui_customization.description_global_highlight', [], 'except administrators'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
             <div class="ui-custom-filter">
                 <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
                 <input
@@ -1731,8 +1732,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <!-- Notes Page Icon Sidebar Section -->
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar (notes page)'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
-                <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon_sidebar" checked><span><?php echo t_h('modals.ui_customization.icon_sidebar_entire', [], 'Entire icon sidebar'); ?></span></label>
+                <div class="ui-custom-items" data-ui-parent-key="card:icon_sidebar">
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon_sidebar" data-ui-parent checked><span><?php echo t_h('modals.ui_customization.icon_sidebar_entire', [], 'Entire icon sidebar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFavoritesBtn" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>

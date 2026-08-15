@@ -24,6 +24,13 @@
     font-size: 0.9em;
 }
 
+/* "except administrators": the all-users modal does not apply to admins, which
+   is easy to miss in the middle of the sentence. */
+.ui-custom-description-highlight {
+    color: #dc2626;
+    font-weight: 600;
+}
+
 .ui-custom-filter {
     display: flex;
     align-items: stretch;
@@ -230,6 +237,11 @@
     color: #9ca3af;
 }
 
+[data-theme="dark"] .ui-custom-description-highlight,
+.dark-mode .ui-custom-description-highlight {
+    color: #f87171;
+}
+
 [data-theme="dark"] .ui-custom-filter,
 .dark-mode .ui-custom-filter {
     background: transparent;
@@ -274,6 +286,18 @@
 }
 
 .ui-custom-item-locked:hover {
+    background: transparent;
+}
+
+/* Items governed by a section master checkbox (data-ui-parent), e.g. the
+   per-icon entries under "Entire icon sidebar": dimmed and inert while the
+   master is unchecked, since the whole section is hidden anyway. */
+.ui-custom-item-parent-off {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.ui-custom-item-parent-off:hover {
     background: transparent;
 }
 

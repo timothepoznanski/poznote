@@ -358,6 +358,15 @@
                         rules.push('.dashboard-nav-btn { display: none !important; }');
                     }
 
+                    if (id === 'icon_sidebar') {
+                        // The collapse chevron lives outside #icon_sidebar (so it
+                        // stays clickable once the rail is collapsed), so hiding
+                        // the rail has to hide it explicitly, and the page must
+                        // reclaim the space the rail occupied.
+                        rules.push('#iconSidebarToggle { display: none !important; }');
+                        rules.push('body.has-icon-sidebar { margin-left: 0 !important; }');
+                    }
+
                     if (CREATE_MODAL_OPTION_SELECTORS[key]) {
                         rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
                     }
@@ -370,6 +379,9 @@
                         rules.push('.mobile-toolbar-menu [data-action="show-snapshot"] { display: none !important; }');
                     } else if (id === 'btn-split-view') {
                         rules.push('.note-edit-toolbar .markdown-split-btn, .note-edit-toolbar .markdown-split-btn:not(.hide-on-selection) { display: none !important; }');
+                    } else if (id === 'btn-search-replace') {
+                        // The selection formatting toolbar has its own copy of the button
+                        rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');
                     } else if (id === 'btn-tasklist-actions') {
                         rules.push('.tasklist-actions-dropdown { display: none !important; }');
                     } else if (id === 'btn-audio') {

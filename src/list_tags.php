@@ -67,6 +67,8 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/list_tags.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/base.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $cache_v; ?>"/>
@@ -87,7 +89,13 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="tags-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="tags-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+	<?php
+	// $workspace only reflects an explicit ?workspace= (it scopes the tag query);
+	// the rail links should carry the effective workspace like the other pages.
+	$iconSidebarWorkspace = $workspace !== '' ? $workspace : trim((string)getWorkspaceFilter());
+	include 'icon_sidebar.php';
+	?>
 	<div class="tags-container">
 		<div class="tags-buttons-container">
 			<div class="tags-actions">
@@ -197,6 +205,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	</script>
 	<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/list_tags.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/clickable-tags.js?v=<?php echo $cache_v; ?>"></script>

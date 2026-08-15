@@ -2884,12 +2884,47 @@ Replace the text content of a publicly shared HTML or markdown note. Only allowe
 | Field | Type | Description |
 |-------|------|-------------|
 | `content` | string | New note content (HTML for notes, raw source for markdown) |
+| `editor_session_id` | string | Optional editor session identifier (see edit locks below) |
 
 ```bash
 curl -X PATCH -H "Content-Type: application/json" \
   -d '{"content": "<p>Updated text</p>"}' \
   "http://YOUR_SERVER/api/v1/public/notes/content?token=abc123"
 ```
+
+The write is rejected with `423 Locked` while another editor (a visitor on the public page, or an account user editing the note inside the app) holds the note's edit lock. Requests without an `editor_session_id` are accepted whenever nobody is editing.
+
+### Public Note Edit Lock
+
+```
+POST /public/notes/lock
+POST /public/notes/lock/heartbeat
+POST /public/notes/lock/release
+```
+
+Exclusive edit lock for publicly shared notes, so two people cannot edit the same note at the same time. The lock is shared with the in-app editor: while an account user has the note open in the app, public visitors cannot enter edit mode, and vice versa. Only allowed when the share's `access_mode` is `edit`; the share password (if any) and allowed users restriction (if any) apply.
+
+The lock expires 90 seconds after the last acquire/heartbeat, so a heartbeat should be sent every 20-30 seconds while editing.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `token` | string | Public share token |
+
+**Request Body (JSON):**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `editor_session_id` | string | Opaque identifier of this editor (one per tab/client) |
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"editor_session_id": "my-client-1"}' \
+  "http://YOUR_SERVER/api/v1/public/notes/lock?token=abc123"
+```
+
+Acquire and heartbeat answer `423 Locked` when another editor currently holds the lock.
 
 ---
 
@@ -3123,3 +3158,6 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/public/tasks` | Add task |
 | `DELETE` | `/public/tasks/{id}` | Delete task |
 | `PATCH` | `/public/notes/content` | Update shared note content (edit shares) |
+| `POST` | `/public/notes/lock` | Acquire the edit lock on a shared note (edit shares) |
+| `POST` | `/public/notes/lock/heartbeat` | Keep the edit lock alive |
+| `POST` | `/public/notes/lock/release` | Release the edit lock |

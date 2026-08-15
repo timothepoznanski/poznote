@@ -265,6 +265,8 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
 	<style>
 		.shared-container {
 			background: transparent !important;
@@ -559,7 +561,8 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="shared-page" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+	<?php $iconSidebarWorkspace = $workspace; include 'icon_sidebar.php'; ?>
 	<div class="shared-container">
 		<div class="shared-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
@@ -753,6 +756,7 @@ $currentLang = getUserLanguage();
 
 	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/navigation.js"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/ui.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/utils.js?v=<?php echo file_exists(__DIR__ . '/js/utils.js') ? filemtime(__DIR__ . '/js/utils.js') : getAppVersion(); ?>"></script>
