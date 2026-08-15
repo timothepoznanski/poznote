@@ -1968,16 +1968,54 @@ function revealFolderInTree(folderId) {
         node = node.parentElement ? node.parentElement.closest('.folder-content') : null;
     }
 
-    // On mobile the note view hides the list: switch back to the left column first
-    if (window.innerWidth <= 800 && typeof window.scrollToLeftColumn === 'function') {
-        window.scrollToLeftColumn();
+    var isMobile = window.innerWidth <= 800;
+
+    if (isMobile) {
+        // Close the keyboard if the editor was focused: we are leaving the note.
+        var active = document.activeElement;
+        if (active && typeof active.blur === 'function' && active.closest && active.closest('#right_col')) {
+            active.blur();
+        }
+        // On mobile the note view hides the list: switch back to the left column first.
+        if (typeof window.scrollToLeftColumn === 'function') {
+            window.scrollToLeftColumn();
+        }
+        // scrollIntoView() would walk up to <body>, which is the horizontal
+        // scroller on mobile (css/index-mobile.css), and fight the sideways
+        // animation back to the list, landing on the note again. Scroll the
+        // list's own vertical scroller instead, once that animation is done.
+        setTimeout(function () {
+            scrollFolderHeaderIntoLeftColumn(header);
+        }, 320);
+    } else {
+        header.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     }
 
-    header.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
     header.classList.add('folder-reveal-highlight');
     setTimeout(function () {
         header.classList.remove('folder-reveal-highlight');
     }, 1600);
+}
+
+/**
+ * Scroll a folder header into view inside the left column only, without
+ * touching the horizontal (body) scroll used by the mobile two-pane layout.
+ * @param {HTMLElement} header - The .folder-header element to center
+ */
+function scrollFolderHeaderIntoLeftColumn(header) {
+    var leftCol = document.getElementById('left_col');
+    if (!leftCol || !header) return;
+
+    var headerRect = header.getBoundingClientRect();
+    var colRect = leftCol.getBoundingClientRect();
+    var offset = (headerRect.top - colRect.top) - (leftCol.clientHeight - headerRect.height) / 2;
+    var target = Math.max(0, Math.min(leftCol.scrollTop + offset, leftCol.scrollHeight - leftCol.clientHeight));
+
+    if (typeof leftCol.scrollTo === 'function') {
+        leftCol.scrollTo({ top: target, behavior: 'smooth' });
+    } else {
+        leftCol.scrollTop = target;
+    }
 }
 
 /**

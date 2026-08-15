@@ -472,10 +472,9 @@ function loadNoteCommon(url, noteId, options) {
         updateSelectedNote(options.clickedLink);
     }
 
-    // On mobile, add note-open class
-    if (isMobileDevice()) {
-        document.body.classList.add('note-open');
-    }
+    // On mobile .note-open is NOT added here: it resizes the columns (the
+    // icon rail hides), which reads as a first jerky animation at tap time.
+    // window.scrollToRightColumn applies it once the slide has finished.
 
     if (restoreNoteDomFromCache(url, noteId, options)) {
         return;
@@ -1732,13 +1731,12 @@ function reinitializeNoteContent(options) {
         const createdToParam = urlParams.get('created_to');
         const isInSearchMode = searchParam || tagsSearchParam || unifiedSearchParam || createdFromParam || createdToParam;
 
-        // If a specific note is selected, open the note pane on mobile.
-        // Previously this avoided opening during search mode; that prevented selecting notes while searching.
+        // If a specific note is selected, make sure the note pane is visible.
+        // .note-open is NOT added here: this runs right before the slide to
+        // the note, and the class resizes the columns (icon rail), which
+        // showed as a jerky pre-animation. window.scrollToRightColumn applies
+        // it once the slide is over.
         if (noteParam) {
-            if (!document.body.classList.contains('note-open')) {
-                document.body.classList.add('note-open');
-            }
-            // Ensure right column is visible
             const rightColumn = document.getElementById('right_col');
             if (rightColumn) {
                 rightColumn.style.display = 'block';

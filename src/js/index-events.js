@@ -656,6 +656,11 @@
                 }
                 break;
             case 'reveal-folder-in-tree':
+                // Keep the click inside the breadcrumb: on mobile anything that
+                // reacts to a tap on the note pane would scroll straight back to
+                // the note we are navigating away from.
+                e.preventDefault();
+                e.stopPropagation();
                 if (typeof revealFolderInTree === 'function') {
                     revealFolderInTree(target.dataset.folderId);
                 }
@@ -1356,6 +1361,11 @@
      */
     function syncNoteOpenToScroll() {
         if (window.innerWidth > 800) return;
+        // Hands off during a programmatic column change: flipping .note-open
+        // mid-slide resizes the columns (icon rail) and makes the animation
+        // stutter. The programmatic flows set the class themselves, at the
+        // point of the transition where the resize is invisible.
+        if (horizontalScrollPinTarget !== null) return;
         // On mobile css/index-mobile.css makes <body> itself the horizontal
         // scroller (position: fixed + overflow-x: auto), so the offset lives on
         // body.scrollLeft, not on document.scrollingElement.
@@ -1386,25 +1396,119 @@
         });
     }
 
-    function animateHorizontalScroll(targetLeft, durationMs) {
-        const scrollRoot = document.scrollingElement || document.documentElement;
-        const startLeft = scrollRoot.scrollLeft;
-        const delta = targetLeft - startLeft;
+    /**
+     * Re-assert the final horizontal position for a while after an animation
+     * ends. Toggling .note-open resizes the columns (the icon rail
+     * appears/disappears, #left_col gains/loses its margin), and the browser
+     * reacts to that layout change with its own scroll adjustment on <body>
+     * that lands the view partway back on the note pane — sometimes well
+     * after the animation is over. The pin is dropped as soon as the user
+     * touches the screen so it never fights a real swipe.
+     */
+    var horizontalScrollPinTarget = null;
+    var horizontalScrollPinCancel = null;
 
-        if (durationMs <= 0 || delta === 0) {
-            setHorizontalScroll(targetLeft);
+    /**
+     * Pin the horizontal scroll to targetLeft. The pin target takes effect for
+     * syncNoteOpenToScroll immediately; the corrective re-asserts only run once
+     * startCorrecting() is called (right away for instant moves, at the end of
+     * the animation otherwise), so they never fight the animation frames.
+     */
+    function pinHorizontalScroll(targetLeft, correctImmediately) {
+        if (horizontalScrollPinCancel) horizontalScrollPinCancel();
+
+        let active = true;
+        let correcting = !!correctImmediately;
+        let deadline = performance.now() + 700;
+
+        function stop() {
+            if (!active) return;
+            active = false;
+            horizontalScrollPinTarget = null;
+            horizontalScrollPinCancel = null;
+            window.removeEventListener('touchstart', stop);
+            window.removeEventListener('wheel', stop);
+        }
+
+        horizontalScrollPinTarget = targetLeft;
+        horizontalScrollPinCancel = stop;
+        window.addEventListener('touchstart', stop, { passive: true });
+        window.addEventListener('wheel', stop, { passive: true });
+
+        function tick(now) {
+            if (!active) return;
+            if (now >= deadline) { stop(); return; }
+            if (correcting) {
+                const scrollRoot = document.scrollingElement || document.documentElement;
+                const current = scrollRoot.scrollLeft || document.body.scrollLeft;
+                const max = Math.max(0, document.body.scrollWidth - window.innerWidth);
+                const target = Math.max(0, Math.min(targetLeft, max));
+                if (Math.abs(current - target) > 1) {
+                    setHorizontalScroll(target);
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        requestAnimationFrame(tick);
+
+        return {
+            stop: stop,
+            startCorrecting: function () {
+                if (!active) return;
+                correcting = true;
+                deadline = performance.now() + 700;
+            }
+        };
+    }
+
+    function animateHorizontalScroll(targetLeft, durationMs, onDone) {
+        const scrollRoot = document.scrollingElement || document.documentElement;
+
+        // The requested target may exceed the real range (e.g. one full
+        // viewport width while the icon rail layout leaves less to scroll).
+        function clampedTarget() {
+            const max = Math.max(0, document.body.scrollWidth - window.innerWidth);
+            return Math.max(0, Math.min(targetLeft, max));
+        }
+
+        const startLeft = scrollRoot.scrollLeft || document.body.scrollLeft;
+
+        if (durationMs <= 0 || clampedTarget() === startLeft) {
+            setHorizontalScroll(clampedTarget());
+            pinHorizontalScroll(targetLeft, true);
+            if (onDone) onDone();
             return;
         }
 
+        // Pin the target right away so syncNoteOpenToScroll judges by where we
+        // are going, not by the browser's mid-transition adjustments.
+        const pin = pinHorizontalScroll(targetLeft, false);
         const startTime = performance.now();
+        let lastEased = 0;
 
         function step(now) {
             const progress = Math.min(1, (now - startTime) / durationMs);
             const eased = 1 - Math.pow(1 - progress, 3);
-            setHorizontalScroll(startLeft + delta * eased);
+
+            // Re-anchor on the live position each frame instead of easing from
+            // a fixed start: toggling .note-open mid-scroll resizes the columns
+            // (icon rail) and triggers the browser's own scroll adjustment, and
+            // absolute values would visibly stall and restart fighting it.
+            const current = scrollRoot.scrollLeft || document.body.scrollLeft;
+            const remaining = 1 - lastEased;
+            const share = remaining > 0 ? (eased - lastEased) / remaining : 1;
+            lastEased = eased;
+            const next = progress >= 1
+                ? clampedTarget()
+                : current + (clampedTarget() - current) * share;
+            setHorizontalScroll(next);
 
             if (progress < 1) {
                 requestAnimationFrame(step);
+            } else {
+                pin.startCorrecting();
+                if (onDone) onDone();
             }
         }
 
@@ -1420,7 +1524,13 @@
         if (window.innerWidth <= 800) {
             const scrollAmount = window.innerWidth;
             const duration = isReducedMotionPreferred() ? 0 : 260;
-            animateHorizontalScroll(scrollAmount, duration);
+            // .note-open is applied only once the slide is over: it hides the
+            // icon rail and resizes the columns, which is invisible while the
+            // note fills the viewport but reads as a jerky extra animation if
+            // it happens at tap time or mid-slide.
+            animateHorizontalScroll(scrollAmount, duration, function () {
+                document.body.classList.add('note-open');
+            });
         } else {
             const rightCol = document.getElementById('right_col');
             if (rightCol) {
