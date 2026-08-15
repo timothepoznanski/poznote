@@ -95,10 +95,13 @@ $currentLang = getUserLanguage();
     <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
+    <link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
+    <link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="trash-page" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">
+<body class="trash-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">
+    <?php include 'icon_sidebar.php'; ?>
     <div class="trash-container">
 
         <?php
@@ -330,6 +333,7 @@ $currentLang = getUserLanguage();
     <script src="js/bulletlist.js"></script>
     <script src="js/main.js"></script>
     <script src="js/navigation.js"></script>
+    <script src="js/icon-sidebar-toggle.js"></script>
     <script src="js/trash.js"></script>
 </body>
 </html>

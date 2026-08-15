@@ -29,6 +29,8 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
 	<link type="text/css" rel="stylesheet" href="css/favorites.css"/>
 	<link type="text/css" rel="stylesheet" href="css/notes-manager.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
@@ -42,7 +44,7 @@ $currentLang = getUserLanguage();
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="notes-manager-page"
+<body class="notes-manager-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
@@ -82,6 +84,8 @@ $currentLang = getUserLanguage();
           '730' => t('modals.note_age_filter.options.last_2_years', [], 'Last 2 years'),
       ]), ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-age-custom="<?php echo t_h('modals.note_age_filter.options.custom_days', ['days' => '{days}'], 'Last {days} days'); ?>">
+
+	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="notes-manager-container">
 
@@ -233,6 +237,7 @@ $currentLang = getUserLanguage();
 	</div>
 
 	<script src="js/navigation.js"></script>
+	<script src="js/icon-sidebar-toggle.js"></script>
 	<script src="js/date-time-format.js"></script>
 	<script src="js/notes-manager.js"></script>
 </body>

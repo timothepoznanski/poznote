@@ -41,10 +41,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="tasks-page"
+<body class="tasks-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
@@ -58,6 +60,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
       data-txt-due-remove="<?php echo t_h('tasklist.due_remove', [], 'Remove due date'); ?>"
       data-txt-due-remove-time="<?php echo t_h('tasklist.due_remove_time', [], 'Remove time'); ?>"
       data-txt-cal-no-tasks="<?php echo t_h('tasks_page.calendar_no_tasks', [], 'No tasks on this day.'); ?>">
+	<?php include 'icon_sidebar.php'; ?>
 	<div class="tasks-container">
 		<div class="tasks-buttons-container">
 			<button id="backToNotesBtn" class="btn btn-secondary" title="<?php echo t_h('common.back_to_notes'); ?>">
@@ -158,6 +161,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	};
 	</script>
 	<script src="js/navigation.js"></script>
+	<script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/note-reference.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>

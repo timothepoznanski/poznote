@@ -1,0 +1,47 @@
+/**
+ * Icon Sidebar on secondary pages (icon_sidebar.php)
+ *
+ * index.php lays the rail out as a flex child of <body>. The secondary pages
+ * (notes_manager, list_tags, list_folders, shared, attachments_list, trash,
+ * diary, tasks) are normal document-flow pages that scroll the body, so the
+ * rail is pinned instead and the page content is inset by the same width.
+ * Loaded on top of css/icon-sidebar.css.
+ */
+
+body.has-icon-sidebar #icon_sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+/* Inset the page content clear of the pinned rail. margin-left is used rather
+   than padding-left so it stacks with whatever padding each page already sets
+   (20px on most, 0 on trash.php). */
+body.has-icon-sidebar {
+    margin-left: var(--icon-sidebar-width);
+    transition: margin-left 0.3s ease;
+}
+
+body.has-icon-sidebar.icon-sidebar-collapsed {
+    margin-left: 0;
+}
+
+/* Current page highlight */
+body.has-icon-sidebar .icon-sidebar-btn-active {
+    color: #007DB8;
+    background: rgba(0, 125, 184, 0.12);
+}
+
+/* Desktop-only, mirroring css/index-mobile.css */
+@media (max-width: 800px) {
+    body.has-icon-sidebar #icon_sidebar,
+    body.has-icon-sidebar #iconSidebarToggle {
+        display: none !important;
+    }
+
+    body.has-icon-sidebar,
+    body.has-icon-sidebar.icon-sidebar-collapsed {
+        margin-left: 0;
+    }
+}
