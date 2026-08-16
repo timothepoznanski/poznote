@@ -559,7 +559,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/favorites.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dashboard.css?v=<?php echo file_exists(__DIR__ . '/css/dashboard.css') ? filemtime(__DIR__ . '/css/dashboard.css') : $cache_v; ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dashboard.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $cache_v; ?>"/>
@@ -713,10 +713,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		};
 		</script>
 		<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
-		<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
-		<script src="js/dashboard-page.js?v=<?php echo file_exists(__DIR__ . '/js/dashboard-page.js') ? filemtime(__DIR__ . '/js/dashboard-page.js') : $cache_v; ?>"></script>
-		<script src="js/board-view-menu.js?v=<?php echo file_exists(__DIR__ . '/js/board-view-menu.js') ? filemtime(__DIR__ . '/js/board-view-menu.js') : $cache_v; ?>"></script>
+		<script src="<?php echo poznoteAsset('js/dashboard-page.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

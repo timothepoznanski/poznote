@@ -112,29 +112,29 @@ function createBackup() {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css">
-    <link rel="stylesheet" href="css/backup_export.css">
-    <link rel="stylesheet" href="css/modals/base.css">
-    <link rel="stylesheet" href="css/modals/specific-modals.css">
-    <link rel="stylesheet" href="css/modals/attachments.css">
-    <link rel="stylesheet" href="css/modals/share-modal.css">
-    <link rel="stylesheet" href="css/modals/alerts-utilities.css">
-    <link rel="stylesheet" href="css/modals/responsive.css">
-    <link rel="stylesheet" href="css/modal-alerts.css">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/backup_export.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/base.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css">
-    <link rel="stylesheet" href="css/dark-mode/menus.css">
-    <link rel="stylesheet" href="css/dark-mode/editor.css">
-    <link rel="stylesheet" href="css/dark-mode/modals.css">
-    <link rel="stylesheet" href="css/dark-mode/components.css">
-    <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css">
-    <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>">
-    <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>">
+    <script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -323,7 +323,7 @@ function createBackup() {
         #s3-user-backup-section .s3-self-table .btn-danger { background-color: #dc3545; color: #fff; border: none; }
         #s3-user-backup-section .s3-self-table .btn-danger:hover { background-color: #b02a37; }
         </style>
-        <script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
+        <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             var i18n = {
@@ -677,8 +677,8 @@ function createBackup() {
     })();
     </script>
 
-    <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
-    <script src="js/backup-export-init.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/backup-export.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/backup-export-init.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

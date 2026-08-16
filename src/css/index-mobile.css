@@ -368,6 +368,10 @@ pre code.hljs,
     display: inline-block !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    /* .hide-folder-counts parks the count at translateY(-2px) and only restores
+       it on hover/focus-within. Touch devices never hover, so without this the
+       count stays 2px above the folder name. */
+    transform: none !important;
 }
 
 /* Push actions to the far right */

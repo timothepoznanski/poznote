@@ -155,7 +155,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     ?>
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
-    <link rel="stylesheet" href="css/info.css?v=<?php echo filemtime(__DIR__ . '/css/info.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/info.css'); ?>">
     <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">

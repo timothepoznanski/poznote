@@ -149,21 +149,21 @@ if ($note_id > 0) {
     <!-- Theme initialization - CSP compliant -->
     <script src="js/excalidraw-theme-init.js?v=<?php echo $themeAssetVersion; ?>"></script>
     
-    <link rel="stylesheet" href="css/modal-alerts.css">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>">
     <link rel="stylesheet" href="css/excalidraw.css?v=<?php echo $themeAssetVersion; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $themeAssetVersion; ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css">
-    <link rel="stylesheet" href="css/dark-mode/menus.css">
-    <link rel="stylesheet" href="css/dark-mode/editor.css">
-    <link rel="stylesheet" href="css/dark-mode/modals.css">
-    <link rel="stylesheet" href="css/dark-mode/components.css">
-    <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css">
-    <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>">
     
     <!-- Modal alerts system -->
-    <script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
     <script>
         window.EXCALIDRAW_ASSET_PATH = window.EXCALIDRAW_ASSET_PATH || 'js/excalidraw-dist/';
     </script>

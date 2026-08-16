@@ -42,12 +42,12 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <link type="text/css" rel="stylesheet" href="css/home/base.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/search.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/alerts.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/home/cards.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/home/cards.css') ?: time(); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/home/cards.css'); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/buttons.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/lucide.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/dark-mode.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/home/responsive.css?v=<?php echo $cache_v; ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/css/modal-alerts.css') ?: time(); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $cache_v; ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $cache_v; ?>"/>
@@ -176,16 +176,16 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <?php include 'modals.php'; ?>
     
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
-    <script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/utils.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/utils.js') ?: time(); ?>"></script>
-    <script src="js/template-selector.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/template-selector.js') ?: time(); ?>"></script>
-    <script src="js/linked-note-selector.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/linked-note-selector.js') ?: time(); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/template-selector.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/linked-note-selector.js'); ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
-    <script src="js/notes.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/notes.js'); ?>"></script>
     <script src="js/folder-hierarchy.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
 

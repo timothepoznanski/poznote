@@ -37,14 +37,14 @@ if (!$hasAttachments) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Poznote - Attachments Export</title>
-        <link rel="stylesheet" href="css/lucide.css">
-        <link href="css/modals/base.css" rel="stylesheet">
-        <link href="css/modals/specific-modals.css" rel="stylesheet">
-        <link href="css/modals/attachments.css" rel="stylesheet">
-        <link href="css/modals/share-modal.css" rel="stylesheet">
-        <link href="css/modals/alerts-utilities.css" rel="stylesheet">
-        <link href="css/modals/responsive.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/export-attachments.css">
+        <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
+        <link href="<?php echo poznoteAsset('css/modals/base.css'); ?>" rel="stylesheet">
+        <link href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>" rel="stylesheet">
+        <link href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>" rel="stylesheet">
+        <link href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>" rel="stylesheet">
+        <link href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>" rel="stylesheet">
+        <link href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>" rel="stylesheet">
+        <link rel="stylesheet" href="<?php echo poznoteAsset('css/export-attachments.css'); ?>">
     </head>
     <body class="ai-page">
         <div class="summary-page">
@@ -75,7 +75,7 @@ if (!$hasAttachments) {
             </div>
         </div>
         
-        <script src="js/export-attachments.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+        <script src="<?php echo poznoteAsset('js/export-attachments.js'); ?>"></script>
     </body>
     </html>
     <?php

@@ -794,7 +794,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
             }
         })();
     </script>
-    <script src="js/public-note-theme-init.js?v=<?php echo file_exists(__DIR__ . '/js/public-note-theme-init.js') ? filemtime(__DIR__ . '/js/public-note-theme-init.js') : '1'; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/public-note-theme-init.js'); ?>"></script>
     <script nonce="<?php echo htmlspecialchars($cspNonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
         (function () {
             try {
@@ -810,31 +810,31 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
             }
         })();
     </script>
-    <link rel="stylesheet" href="css/lucide.css">
-    <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/variables.css') ? filemtime(__DIR__ . '/css/dark-mode/variables.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/layout.css') ? filemtime(__DIR__ . '/css/dark-mode/layout.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/menus.css') ? filemtime(__DIR__ . '/css/dark-mode/menus.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/editor.css') ? filemtime(__DIR__ . '/css/dark-mode/editor.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/modals.css') ? filemtime(__DIR__ . '/css/dark-mode/modals.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/components.css') ? filemtime(__DIR__ . '/css/dark-mode/components.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/pages.css') ? filemtime(__DIR__ . '/css/dark-mode/pages.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/markdown.css') ? filemtime(__DIR__ . '/css/dark-mode/markdown.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/kanban.css') ? filemtime(__DIR__ . '/css/dark-mode/kanban.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo file_exists(__DIR__ . '/css/dark-mode/icons.css') ? filemtime(__DIR__ . '/css/dark-mode/icons.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/notes/attachments-row.css?v=<?php echo filemtime(__DIR__ . '/css/notes/attachments-row.css'); ?>">
-    <link rel="stylesheet" href="css/public_note.css?v=<?php echo filemtime(__DIR__ . '/css/public_note.css'); ?>">
-    <link rel="stylesheet" href="css/outline.css?v=<?php echo filemtime(__DIR__ . '/css/outline.css'); ?>">
-    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo file_exists(__DIR__ . '/css/modal-alerts.css') ? filemtime(__DIR__ . '/css/modal-alerts.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/tasks.css?v=<?php echo file_exists(__DIR__ . '/css/tasks.css') ? filemtime(__DIR__ . '/css/tasks.css') : '1'; ?>">
-    <link rel="stylesheet" href="css/markdown.css?v=<?php echo filemtime(__DIR__ . '/css/markdown.css'); ?>">
-    <link rel="stylesheet" href="css/syntax-highlight.css?v=<?php echo file_exists(__DIR__ . '/css/syntax-highlight.css') ? filemtime(__DIR__ . '/css/syntax-highlight.css') : '1'; ?>">
-    <link rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo filemtime(__DIR__ . '/js/katex/katex.min.css'); ?>">
-    <script src="js/mermaid/mermaid.min.js?v=<?php echo filemtime(__DIR__ . '/js/mermaid/mermaid.min.js'); ?>"></script>
-    <script src="js/katex/katex.min.js?v=<?php echo filemtime(__DIR__ . '/js/katex/katex.min.js'); ?>"></script>
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/variables.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/notes/attachments-row.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/public_note.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/outline.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/tasks.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/markdown.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/syntax-highlight.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('js/katex/katex.min.css'); ?>">
+    <script src="<?php echo poznoteAsset('js/mermaid/mermaid.min.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/katex/katex.min.js'); ?>"></script>
     <!-- katex/auto-render.min.js removed: its renderMathInElement was overwritten by js/math-renderer.js below -->
-    <script src="js/highlight/highlight.min.js?v=<?php echo file_exists(__DIR__ . '/js/highlight/highlight.min.js') ? filemtime(__DIR__ . '/js/highlight/highlight.min.js') : '1'; ?>"></script>
-    <script src="js/highlight/powershell.min.js?v=<?php echo file_exists(__DIR__ . '/js/highlight/powershell.min.js') ? filemtime(__DIR__ . '/js/highlight/powershell.min.js') : '1'; ?>"></script>
-    <script src="js/syntax-highlight.js?v=<?php echo file_exists(__DIR__ . '/js/syntax-highlight.js') ? filemtime(__DIR__ . '/js/syntax-highlight.js') : '1'; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/highlight/highlight.min.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/highlight/powershell.min.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/syntax-highlight.js'); ?>"></script>
 </head>
 <body class="public-note-page" data-task-access-mode="<?php echo htmlspecialchars($taskAccessMode, ENT_QUOTES); ?>">
     <div class="public-note-layout">
@@ -928,12 +928,12 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
         </div>
     </div>
 </body>
-<script src="js/copy-code-on-focus.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-<script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-<script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
-<script src="js/outline-panel.js?v=<?php echo filemtime(__DIR__ . '/js/outline-panel.js'); ?>"></script>
-<script src="js/public-note.js?v=<?php echo filemtime(__DIR__ . '/js/public-note.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/copy-code-on-focus.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/math-renderer.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/outline-panel.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/public-note.js'); ?>"></script>
 <?php if ($noteBodyEditable): ?>
-<script src="js/public-note-edit.js?v=<?php echo file_exists(__DIR__ . '/js/public-note-edit.js') ? filemtime(__DIR__ . '/js/public-note-edit.js') : '1'; ?>"></script>
+<script src="<?php echo poznoteAsset('js/public-note-edit.js'); ?>"></script>
 <?php endif; ?>
 </html>

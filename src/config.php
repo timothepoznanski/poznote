@@ -91,6 +91,61 @@ function poznoteBuildAssetCacheVersion($baseVersion = '') {
 }
 
 /**
+ * Build the URL for a static asset, cache-busted by the file's own mtime.
+ *
+ * Static assets are served with `Cache-Control: public, immutable` and a
+ * one-year TTL, so a URL that never changes is never refetched. Versioning on
+ * the release number alone is not enough: an edit made within a release leaves
+ * the URL identical, and browsers keep serving the year-old copy. Worse, when
+ * two files that must agree (utils.js defining a function, main.js exporting
+ * it) are versioned differently, a browser can pair a fresh copy of one with a
+ * stale copy of the other and break at runtime.
+ *
+ * Keying on the file's own mtime fixes both: any edit changes that file's URL
+ * and only that file's URL. The release version stays in the URL as a readable
+ * prefix, so the query string still says which build the page came from.
+ *
+ * Falls back to the release version alone when the file cannot be stat'ed, so
+ * a bad path degrades to today's behaviour instead of emitting a broken link.
+ *
+ * @param string $path Asset path relative to this directory, e.g. 'css/trash.css'.
+ *                     A leading '/' is accepted and preserved in the output.
+ * @return string The HTML-safe URL to put straight into href/src.
+ */
+function poznoteAsset($path) {
+    static $cache = [];
+
+    $path = trim((string) $path);
+    if ($path === '') {
+        return '';
+    }
+
+    if (isset($cache[$path])) {
+        return $cache[$path];
+    }
+
+    // Keep the caller's leading slash (some pages are served from a nested URL
+    // and rely on root-relative asset paths) but strip it to find the file.
+    $relativePath = ltrim($path, '/');
+    $absolutePath = __DIR__ . '/' . $relativePath;
+
+    // Loaded on demand: config.php is included by pages that do not all pull in
+    // version_helper.php themselves, and the helper must not depend on that.
+    if (!function_exists('getAppVersion')) {
+        require_once __DIR__ . '/version_helper.php';
+    }
+
+    $version = getAppVersion();
+    $mtime = is_file($absolutePath) ? @filemtime($absolutePath) : false;
+    if ($mtime !== false) {
+        $version .= '-' . $mtime;
+    }
+
+    $cache[$path] = htmlspecialchars($path . '?v=' . rawurlencode($version), ENT_QUOTES, 'UTF-8');
+    return $cache[$path];
+}
+
+/**
  * Normalize a custom CSS filename stored under the css directory.
  * Returns an empty string when invalid.
  */

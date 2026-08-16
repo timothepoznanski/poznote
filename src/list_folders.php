@@ -238,37 +238,37 @@ $currentLang = getUserLanguage();
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/base.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/notes-list.css"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/base.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/base.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/notes-list.css'); ?>"/>
 	<!-- Base styling of the folder action items reused in the actions modal -->
-	<link type="text/css" rel="stylesheet" href="css/folders/actions-menu.css"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/folders/actions-menu.css'); ?>"/>
 	<!-- Icon picker opened by the "Change icon" action -->
-	<link type="text/css" rel="stylesheet" href="css/folder-icon-modal.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/buttons-modal.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modal-alerts.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/dark-mode.css"/>
-	<link type="text/css" rel="stylesheet" href="css/shared/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/folder-icon-modal.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/buttons-modal.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modal-alerts.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/dark-mode.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/responsive.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>"/>
 	<style>
 		.shared-container {
 			background: transparent !important;
@@ -754,18 +754,18 @@ $currentLang = getUserLanguage();
 	include 'modals/folder_icon_modal.php';
 	?>
 
-	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-	<script src="js/icon-sidebar-toggle.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/ui.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/utils.js?v=<?php echo file_exists(__DIR__ . '/js/utils.js') ? filemtime(__DIR__ . '/js/utils.js') : getAppVersion(); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
 	<!-- Folder action implementations reused from index.php: share modal, icon
 	     picker and the modal confirm-button delegation. Load order follows
 	     index_js.php (utils.js before share.js/folder-icon.js). -->
-	<script src="js/share.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/folder-icon.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/modals-events.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/list_folders.js?v=<?php echo file_exists(__DIR__ . '/js/list_folders.js') ? filemtime(__DIR__ . '/js/list_folders.js') : getAppVersion(); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/share.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/list_folders.js'); ?>"></script>
 </body>
 </html>
