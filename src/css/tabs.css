@@ -258,33 +258,58 @@
     align-items: center;
 }
 
+/* Same box, icon size and hover treatment as .folder-actions-toggle
+   (css/folders/actions-menu.css), so the note and folder three-dot buttons
+   read as one control. Only the visibility rule below differs: note toggles
+   appear on row hover instead of being permanently visible. */
 .note-actions-toggle,
 .note-actions-item {
     background: none;
     border: none;
+    width: 22px;
+    height: 22px;
+    padding: 0;
     cursor: pointer;
-    padding: 4px 8px;
     color: #6b7280;
     border-radius: 4px;
-    font-size: 0.85em;
     line-height: 1;
     display: none;
     /* hidden until parent row is hovered */
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: all 0.15s ease;
 }
 
 .note-list-item:hover .note-actions-toggle,
 .note-list-item:hover .note-actions-item,
 .note-actions-toggle.open {
-    display: flex;
+    display: inline-flex;
+}
+
+.note-actions-toggle i,
+.note-actions-item i {
+    font-size: 0.8em;
+    transition: color 0.15s ease;
+}
+
+.note-actions-toggle i[class*="lucide-"],
+.note-actions-toggle [class*="lucide-"],
+.note-actions-item i[class*="lucide-"],
+.note-actions-item [class*="lucide-"] {
+    font-size: 0.85em !important;
 }
 
 .note-actions-toggle:hover,
 .note-actions-item:hover {
     background: rgba(107, 114, 128, 0.12);
     color: #374151;
+}
+
+.note-actions-toggle:hover i,
+.note-actions-toggle:hover [class*="lucide-"],
+.note-actions-item:hover i,
+.note-actions-item:hover [class*="lucide-"] {
+    color: #007DB8;
 }
 
 /* Single shared menu, placed by adjustMenuPosition() in js/utils.js. Fixed
@@ -372,16 +397,24 @@
 
 /* ── Note actions dark mode ── */
 
+/* Mirrors the dark .folder-actions-toggle rules in css/dark-mode/menus.css */
 [data-theme="dark"] .note-actions-toggle,
 [data-theme="dark"] .note-actions-item {
-    color: #555;
+    color: #b0b0b0;
 }
 
 [data-theme="dark"] .note-actions-toggle:hover,
 [data-theme="dark"] .note-actions-toggle.open,
 [data-theme="dark"] .note-actions-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #aaa;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .note-actions-toggle:hover i,
+[data-theme="dark"] .note-actions-toggle:hover [class*="lucide-"],
+[data-theme="dark"] .note-actions-item:hover i,
+[data-theme="dark"] .note-actions-item:hover [class*="lucide-"] {
+    color: #38bdf8;
 }
 
 [data-theme="dark"] .note-actions-menu {
