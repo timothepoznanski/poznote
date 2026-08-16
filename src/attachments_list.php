@@ -79,8 +79,8 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<script src="js/navigation.js"></script>
+	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-	<script src="js/attachments-list.js"></script>
+	<script src="js/attachments-list.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

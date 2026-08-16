@@ -863,7 +863,9 @@
     "note": {
       "last_modified_on": "最后修改于 {{date}}",
       "show_more": "显示更多",
-      "show_less": "收起"
+      "show_less": "收起",
+      "deleted_on": "删除于 {{date}}",
+      "created_on": "创建于 {{date}}"
     },
     "empty": "回收站中没有笔记。",
     "modals": {
@@ -893,7 +895,13 @@
     },
     "count_one": "回收站中有 1 条笔记",
     "count_other": "回收站中有 {{count}} 条笔记",
-    "showing_limit": "仅显示最近修改的 {{count}} 条笔记"
+    "sort": {
+      "label": "笔记排序",
+      "deleted": "删除日期",
+      "created": "创建日期"
+    },
+    "showing_limit_deleted": "仅显示最近删除的 {{count}} 条笔记",
+    "showing_limit_created": "仅显示最近创建的 {{count}} 条笔记"
   },
   "editor": {
     "code_block_language": {

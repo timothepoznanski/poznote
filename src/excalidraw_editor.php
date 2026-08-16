@@ -6,6 +6,7 @@ require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'page_init.php';
+require_once 'version_helper.php';
 
 // Get parameters
 $note_id = isset($_GET['note_id']) ? intval($_GET['note_id']) : 0;
@@ -162,7 +163,7 @@ if ($note_id > 0) {
     <link rel="stylesheet" href="css/dark-mode/icons.css">
     
     <!-- Modal alerts system -->
-    <script src="js/modal-alerts.js"></script>
+    <script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script>
         window.EXCALIDRAW_ASSET_PATH = window.EXCALIDRAW_ASSET_PATH || 'js/excalidraw-dist/';
     </script>

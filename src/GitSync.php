@@ -1036,7 +1036,7 @@ class GitSync {
                         $meta     = $metadata[(string) $noteId] ?? [];
 
                         if (isset($existingIds[$noteId])) {
-                            $setClauses = ['entry = ?', 'trash = 0'];
+                            $setClauses = ['entry = ?', 'trash = 0', 'trashed_at = NULL'];
                             $params     = [$content];
                             $appendMetadataFields($setClauses, $params, $meta, true);
                             $params[] = $noteId;
@@ -1073,7 +1073,7 @@ class GitSync {
                         $meta     = $metadata[(string) $noteId] ?? [];
 
                         if (isset($existingIds[$noteId])) {
-                            $setClauses = ['trash = 0'];
+                            $setClauses = ['trash = 0', 'trashed_at = NULL'];
                             $params     = [];
                             $appendMetadataFields($setClauses, $params, $meta, false);
                             $params[] = $noteId;
@@ -1171,7 +1171,7 @@ class GitSync {
                 }
                 if (!empty($toTrash)) {
                     $this->con->exec('BEGIN IMMEDIATE');
-                    $trashStmt = $this->con->prepare('UPDATE entries SET trash = 1 WHERE id = ?');
+                    $trashStmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now') WHERE id = ?");
                     foreach ($toTrash as $trashId) {
                         $trashStmt->execute([$trashId]);
                         $results['deleted']++;

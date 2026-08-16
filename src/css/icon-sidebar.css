@@ -168,6 +168,42 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     transform: rotate(180deg);
 }
 
+/* "Go to note" action shown above the title on the per-note pages (info.php,
+   attachments.php), which the rail cannot link to because the target depends on
+   the note being viewed. Lives here alongside .poznote-page-title so both pages
+   get it from a stylesheet they already load. */
+.poznote-back-to-note-bar {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 16px 0;
+}
+
+.poznote-back-to-note-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: #374151;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.poznote-back-to-note-btn:hover {
+    background: #f3f4f6;
+    color: #111827;
+    text-decoration: none;
+}
+
+.poznote-back-to-note-btn i {
+    color: #007DB8;
+}
+
 /* Page title used by the pages whose Notes / Dashboard buttons were replaced by
    the rail (settings.php, notes_manager.php, ...). Lives here rather than in
    css/settings.css because that file is not loaded on every such page. */

@@ -6,6 +6,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -82,8 +83,8 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 	
-	<script src="js/navigation.js"></script>
-	<script src="js/favorites-page.js"></script>
-    <script src="js/icon-sidebar-toggle.js"></script>
+	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+	<script src="js/favorites-page.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

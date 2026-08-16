@@ -432,7 +432,7 @@
   "info": {
     "page_title": "Note Information",
     "actions": {
-      "back_to_note": "Go to note"
+      "back_to_note": "Go back to the note"
     },
     "labels": {
       "note_title": "Note title:",
@@ -3552,10 +3552,18 @@
   "trash": {
     "count_one": "1 note in trash",
     "count_other": "{{count}} notes in trash",
-    "showing_limit": "Only the {{count}} most recently modified notes are shown",
     "note": {
       "show_more": "Show more",
-      "show_less": "Show less"
-    }
+      "show_less": "Show less",
+      "deleted_on": "Deleted on {{date}}",
+      "created_on": "Created on {{date}}"
+    },
+    "sort": {
+      "label": "Sort notes",
+      "deleted": "Deletion date",
+      "created": "Creation date"
+    },
+    "showing_limit_deleted": "Only the {{count}} most recently deleted notes are shown",
+    "showing_limit_created": "Only the {{count}} most recently created notes are shown"
   }
 }

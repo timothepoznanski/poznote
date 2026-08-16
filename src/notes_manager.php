@@ -156,7 +156,6 @@ $currentLang = getUserLanguage();
 					<option value="trash"><?php echo t_h('notes_manager.move_to_trash', [], 'Move to trash'); ?></option>
 				</select>
 			</div>
-			</div>
 		</div>
 
 		<!-- Notes list -->
@@ -228,9 +227,9 @@ $currentLang = getUserLanguage();
 		</div>
 	</div>
 
-	<script src="js/navigation.js"></script>
+	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-	<script src="js/date-time-format.js"></script>
-	<script src="js/notes-manager.js"></script>
+	<script src="js/date-time-format.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+	<script src="js/notes-manager.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

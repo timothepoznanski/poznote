@@ -267,9 +267,9 @@ usort($shared_folders, function($a, $b) {
 		</div>
 	</div>
 	
-	<script src="js/navigation.js"></script>
+	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-	<script src="js/pwa-helpers.js"></script>
+	<script src="js/pwa-helpers.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/shared-page.js?v=<?php echo @filemtime('js/shared-page.js') ?: time(); ?>"></script>
 </body>
 </html>

@@ -882,7 +882,9 @@
     "note": {
       "last_modified_on": "Dernière modification le {{date}}",
       "show_more": "Afficher plus",
-      "show_less": "Afficher moins"
+      "show_less": "Afficher moins",
+      "deleted_on": "Supprimée le {{date}}",
+      "created_on": "Créée le {{date}}"
     },
     "empty": "Aucune note dans la corbeille.",
     "modals": {
@@ -912,7 +914,13 @@
     },
     "count_one": "1 note dans la corbeille",
     "count_other": "{{count}} notes dans la corbeille",
-    "showing_limit": "Seules les {{count}} notes modifiées le plus récemment sont affichées"
+    "sort": {
+      "label": "Trier les notes",
+      "deleted": "Date de suppression",
+      "created": "Date de création"
+    },
+    "showing_limit_deleted": "Seules les {{count}} notes supprimées le plus récemment sont affichées",
+    "showing_limit_created": "Seules les {{count}} notes créées le plus récemment sont affichées"
   },
   "editor": {
     "code_block_language": {
@@ -1034,7 +1042,7 @@
   "info": {
     "page_title": "Informations de la note",
     "actions": {
-      "back_to_note": "Retour à la note"
+      "back_to_note": "Retourner à la note"
     },
     "labels": {
       "note_title": "Titre de la note :",

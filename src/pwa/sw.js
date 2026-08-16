@@ -18,6 +18,19 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
+// Remove cached entries that share a pathname with `url` but carry a different
+// query string, i.e. the same asset from an earlier release.
+async function dropOtherVersions(cache, url) {
+  const keys = await cache.keys();
+  await Promise.all(keys.map((request) => {
+    const cachedUrl = new URL(request.url);
+    if (cachedUrl.pathname === url.pathname && cachedUrl.search !== url.search) {
+      return cache.delete(request);
+    }
+    return null;
+  }));
+}
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') {
     return;
@@ -37,6 +50,10 @@ self.addEventListener('fetch', (event) => {
     try {
       const networkResponse = await fetch(event.request);
       if (networkResponse.ok) {
+        // Assets are versioned with a ?v= query string, so each release stores
+        // a brand-new entry. Drop the other versions of the same path first,
+        // otherwise the cache keeps every build ever fetched.
+        await dropOtherVersions(cache, requestUrl);
         cache.put(event.request, networkResponse.clone());
       }
 

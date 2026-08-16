@@ -180,8 +180,8 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 		// Items depending on the folder state are hidden the same way the
 		// modal hides them
 		$classes = 'folder-inline-action-btn';
-		// Actions needing notes keep their slot when the folder is empty, so
-		// the icon columns stay aligned from one row to the next
+		// Actions needing notes stay visible when the folder is empty, greyed
+		// out and inert, so the icon columns stay aligned from one row to the next
 		$isPlaceholder = !empty($action['requires_notes']) && $note_count === 0;
 		if ($isPlaceholder) {
 			$classes .= ' is-placeholder';
@@ -200,9 +200,10 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 		$label = $action['label'];
 		echo '<button type="button" class="' . $classes . '"'
+			. ' title="' . $label . '" aria-label="' . $label . '"'
 			. ($isPlaceholder
-				? ' disabled aria-hidden="true" tabindex="-1"'
-				: ' data-action="' . $action['action'] . '"' . $folderAttrs . ' title="' . $label . '" aria-label="' . $label . '"')
+				? ' disabled tabindex="-1"'
+				: ' data-action="' . $action['action'] . '"' . $folderAttrs)
 			. '>';
 		echo '<i class="lucide ' . $action['icon'] . '"></i>';
 		echo '</button>';
@@ -329,12 +330,18 @@ $currentLang = getUserLanguage();
 		.folder-inline-action-btn {
 			color: var(--text-muted, #6b7280);
 		}
-		/* Keeps the column width of an action the folder cannot use */
+		/* An action the folder cannot use stays visible, greyed out and inert.
+		   It keeps its pointer events so a click on it is swallowed by the
+		   disabled button instead of falling through to the row, which would
+		   open the kanban view the user never aimed at. */
 		.folder-inline-action-btn.is-placeholder {
-			visibility: hidden;
-			pointer-events: none;
+			opacity: 0.35;
+			cursor: default;
 		}
-		.folder-inline-action-btn:hover {
+		.folder-inline-action-btn.is-placeholder:hover {
+			background-color: transparent;
+		}
+		.folder-inline-action-btn:not(.is-placeholder):hover {
 			background-color: rgba(107, 114, 128, 0.12);
 			color: #007DB8;
 		}
@@ -748,7 +755,7 @@ $currentLang = getUserLanguage();
 	?>
 
 	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/navigation.js"></script>
+	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/icon-sidebar-toggle.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/ui.js?v=<?php echo getAppVersion(); ?>"></script>

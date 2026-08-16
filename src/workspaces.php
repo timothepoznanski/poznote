@@ -7,6 +7,7 @@ require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
 require_once 'share_passwords.php';
+require_once 'version_helper.php';
 requireSettingsPassword();
 
 $currentLang = getUserLanguage();
@@ -940,11 +941,11 @@ try {
     </div>
 
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <script src="js/modal-alerts.js"></script>
-    <script src="js/navigation.js"></script>
+    <script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces.js') ?: time(); ?>"></script>
-    <script src="js/workspace-background.js"></script>
-    <script src="js/modals-events.js"></script>
+    <script src="js/workspace-background.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/modals-events.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     
     <?php include 'modals.php'; ?>
     
