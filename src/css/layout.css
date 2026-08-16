@@ -266,11 +266,17 @@ body.sidebar-collapsed .resize-handle {
     cursor: default;
 }
 
+/* Collapsed, the handle sits flush against the icon rail (or against the
+   viewport edge when the rail is hidden too), which is exactly where
+   #iconSidebarToggle is pinned: same bottom, same origin, 16px wide, and a
+   higher z-index. Clear its width plus a gap so both stay clickable side by
+   side, rail toggle first. See #iconSidebarToggle in css/icon-sidebar.css. */
 body.sidebar-collapsed .toggle-sidebar-btn {
-    left: 3px;
+    left: 20px;
     border-radius: 0 4px 4px 0;
     opacity: 1;
     pointer-events: auto;
+    z-index: 12;
 }
 
 body.sidebar-collapsed .toggle-sidebar-btn i {
