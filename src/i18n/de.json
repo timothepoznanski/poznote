@@ -864,7 +864,9 @@
     "note": {
       "last_modified_on": "Zuletzt geändert am {{date}}",
       "show_more": "Mehr anzeigen",
-      "show_less": "Weniger anzeigen"
+      "show_less": "Weniger anzeigen",
+      "deleted_on": "Gelöscht am {{date}}",
+      "created_on": "Erstellt am {{date}}"
     },
     "empty": "Keine Notizen im Papierkorb.",
     "modals": {
@@ -894,7 +896,13 @@
     },
     "count_one": "1 Notiz im Papierkorb",
     "count_other": "{{count}} Notizen im Papierkorb",
-    "showing_limit": "Es werden nur die {{count}} zuletzt geänderten Notizen angezeigt"
+    "sort": {
+      "label": "Notizen sortieren",
+      "deleted": "Löschdatum",
+      "created": "Erstellungsdatum"
+    },
+    "showing_limit_deleted": "Es werden nur die {{count}} zuletzt gelöschten Notizen angezeigt",
+    "showing_limit_created": "Es werden nur die {{count}} zuletzt erstellten Notizen angezeigt"
   },
   "editor": {
     "code_block_language": {

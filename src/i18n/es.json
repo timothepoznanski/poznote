@@ -865,7 +865,9 @@
     "note": {
       "last_modified_on": "Última modificación el {{date}}",
       "show_more": "Mostrar más",
-      "show_less": "Mostrar menos"
+      "show_less": "Mostrar menos",
+      "deleted_on": "Eliminada el {{date}}",
+      "created_on": "Creada el {{date}}"
     },
     "empty": "No hay notas en la papelera.",
     "modals": {
@@ -895,7 +897,13 @@
     },
     "count_one": "1 nota en la papelera",
     "count_other": "{{count}} notas en la papelera",
-    "showing_limit": "Solo se muestran las {{count}} notas modificadas más recientemente"
+    "sort": {
+      "label": "Ordenar notas",
+      "deleted": "Fecha de eliminación",
+      "created": "Fecha de creación"
+    },
+    "showing_limit_deleted": "Solo se muestran las {{count}} notas eliminadas más recientemente",
+    "showing_limit_created": "Solo se muestran las {{count}} notas creadas más recientemente"
   },
   "editor": {
     "code_block_language": {

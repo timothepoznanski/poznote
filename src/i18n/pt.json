@@ -862,7 +862,9 @@
     "note": {
       "last_modified_on": "Última modificação em {{date}}",
       "show_more": "Mostrar mais",
-      "show_less": "Mostrar menos"
+      "show_less": "Mostrar menos",
+      "deleted_on": "Excluída em {{date}}",
+      "created_on": "Criada em {{date}}"
     },
     "empty": "Nenhuma nota na lixeira.",
     "modals": {
@@ -892,7 +894,13 @@
     },
     "count_one": "1 nota na lixeira",
     "count_other": "{{count}} notas na lixeira",
-    "showing_limit": "Apenas as {{count}} notas modificadas mais recentemente são exibidas"
+    "sort": {
+      "label": "Ordenar notas",
+      "deleted": "Data de exclusão",
+      "created": "Data de criação"
+    },
+    "showing_limit_deleted": "Apenas as {{count}} notas excluídas mais recentemente são exibidas",
+    "showing_limit_created": "Apenas as {{count}} notas criadas mais recentemente são exibidas"
   },
   "editor": {
     "code_block_language": {

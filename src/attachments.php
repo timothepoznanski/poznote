@@ -131,6 +131,12 @@ if (!$note) {
         .attachments-back-to-note-bar {
             margin: 20px 0 0 0;
         }
+
+        /* Tighten the gap between the button and the card below it: the card's
+           own 20px top margin sat them further apart than on info.php. */
+        .attachments-back-to-note-bar + .settings-container {
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>"

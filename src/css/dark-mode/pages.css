@@ -223,6 +223,29 @@ body.dark-mode .trash-innernote {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .trash-sort-toggle,
+body.dark-mode .trash-sort-toggle {
+    background-color: var(--dm-bg);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .trash-sort-option,
+body.dark-mode .trash-sort-option {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .trash-sort-option.is-active,
+body.dark-mode .trash-sort-option.is-active {
+    background-color: var(--dm-surface);
+    color: var(--dm-accent);
+    box-shadow: none;
+}
+
+html[data-theme='dark'] .trash-sort-option:hover,
+body.dark-mode .trash-sort-option:hover {
+    color: var(--dm-accent);
+}
+
 /* ============================================
    Attachments
    ============================================ */

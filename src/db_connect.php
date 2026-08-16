@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 29; // 29: diary_date_format setting seeded (diary entry title date format)
+    $CURRENT_SCHEMA_VERSION = 30; // 30: entries.trashed_at column (trash sorting by deletion date)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -238,7 +238,8 @@ try {
             color TEXT,
             created_by_user_id INTEGER,
             updated_by_user_id INTEGER,
-            kanban_completed DATETIME
+            kanban_completed DATETIME,
+            trashed_at DATETIME
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -641,6 +642,22 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add kanban_completed column: ' . $e->getMessage());
+        }
+
+        // Ensure trashed_at column exists (Trash "sort by deletion date").
+        // Stores when the note was moved to the trash; NULL means the note is
+        // not in the trash, or was trashed before this column existed. Notes
+        // already in the trash are backfilled from 'updated', which the delete
+        // path has always bumped, so existing trashes keep a usable order.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('trashed_at', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN trashed_at DATETIME");
+                $con->exec("UPDATE entries SET trashed_at = updated WHERE trash = 1 AND trashed_at IS NULL");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add trashed_at column: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

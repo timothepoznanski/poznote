@@ -1479,10 +1479,10 @@ class NotesController {
                 foreach ($linkedNotes as $linkedNote) {
                     $linkedId = $linkedNote['id'];
                     if ($workspace) {
-                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ?");
+                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now'), updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ?");
                         $delStmt->execute([$this->getActorUserId(), $linkedId, $workspace]);
                     } else {
-                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
+                        $delStmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now'), updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
                         $delStmt->execute([$this->getActorUserId(), $linkedId]);
                     }
                     $deletedLinkedCount++;
@@ -1490,10 +1490,10 @@ class NotesController {
                 
                 // Then delete the main note
                 if ($workspace) {
-                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ?");
+                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now'), updated = datetime('now'), updated_by_user_id = ? WHERE id = ? AND workspace = ?");
                     $success = $stmt->execute([$this->getActorUserId(), $noteId, $workspace]);
                 } else {
-                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
+                    $stmt = $this->con->prepare("UPDATE entries SET trash = 1, trashed_at = datetime('now'), updated = datetime('now'), updated_by_user_id = ? WHERE id = ?");
                     $success = $stmt->execute([$this->getActorUserId(), $noteId]);
                 }
                 
@@ -1672,7 +1672,7 @@ class NotesController {
             }
             
             // Restore the note
-            $updateSql = "UPDATE entries SET trash = 0 WHERE id = ?";
+            $updateSql = "UPDATE entries SET trash = 0, trashed_at = NULL WHERE id = ?";
             $updateParams = [$noteId];
             
             if ($workspace) {

@@ -61,6 +61,35 @@ function renderTasklistHtml($tasks) {
 $search = trim($_POST['search'] ?? $_GET['search'] ?? '');
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
+
+// Sort order for the list below. The list is capped at 50 rows, so the sort
+// has to happen in SQL: a client-side sort would only reorder the 50 rows the
+// server already picked, and the "50 most recent" set itself would be wrong.
+// The choice is persisted so the trash reopens in the order the user left it.
+$allowedTrashSorts = ['trashed', 'created'];
+$trashSort = getSetting('trash_sort', 'trashed');
+
+$requestedSort = $_POST['sort'] ?? $_GET['sort'] ?? '';
+if (in_array($requestedSort, $allowedTrashSorts, true)) {
+    $trashSort = $requestedSort;
+    try {
+        $sortStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $sortStmt->execute(['trash_sort', $trashSort]);
+    } catch (Exception $e) {
+        // Non-fatal: the requested sort still applies for this request.
+    }
+}
+
+if (!in_array($trashSort, $allowedTrashSorts, true)) {
+    $trashSort = 'trashed';
+}
+
+// Notes trashed before the trashed_at column existed, and those trashed by a
+// path that predates it, fall back to 'updated' so they keep a sensible slot
+// instead of sinking to the bottom as NULL.
+$trashOrderBy = $trashSort === 'created'
+    ? 'created DESC, id DESC'
+    : 'COALESCE(trashed_at, updated) DESC, id DESC';
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -173,7 +202,8 @@ $currentLang = getUserLanguage();
         <div class="trash-filter-bar">
             <div class="filter-input-wrapper">
                 <form action="trash.php" method="POST" id="trashSearchForm">
-                    <input 
+                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($trashSort, ENT_QUOTES, 'UTF-8'); ?>">
+                    <input
                         type="text" 
                         name="search" 
                         id="searchInput"
@@ -189,12 +219,33 @@ $currentLang = getUserLanguage();
                     </button>
                 <?php endif; ?>
             </div>
+            <?php
+            // Each option is a link so the sort survives without JavaScript;
+            // the active search is carried over so re-sorting does not drop it.
+            $sortOptions = [
+                'trashed' => t_h('trash.sort.deleted', [], 'Deletion date'),
+                'created' => t_h('trash.sort.created', [], 'Creation date'),
+            ];
+            ?>
+            <div class="trash-sort-toggle" role="group" aria-label="<?php echo t_h('trash.sort.label', [], 'Sort notes'); ?>">
+                <?php foreach ($sortOptions as $sortKey => $sortLabel): ?>
+                    <?php
+                    $isActive = ($trashSort === $sortKey);
+                    $href = 'trash.php?sort=' . $sortKey
+                        . ($search !== '' ? '&search=' . urlencode($search) : '')
+                        . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : '');
+                    ?>
+                    <a class="trash-sort-option<?php echo $isActive ? ' is-active' : ''; ?>"
+                       href="<?php echo htmlspecialchars($href, ENT_QUOTES, 'UTF-8'); ?>"
+                       aria-current="<?php echo $isActive ? 'true' : 'false'; ?>"><?php echo $sortLabel; ?></a>
+                <?php endforeach; ?>
+            </div>
             <div class="trash-page-count"><?php echo $countLabel; ?></div>
         </div>
 
         <div class="trash-content">
             <?php
-            $sql = "SELECT * FROM entries WHERE trash = 1" . $search_condition . $workspace_condition . " ORDER BY updated DESC LIMIT 50";
+            $sql = "SELECT * FROM entries WHERE trash = 1" . $search_condition . $workspace_condition . " ORDER BY " . $trashOrderBy . " LIMIT 50";
 
             // Execute query
             if (!empty($params)) {
@@ -212,8 +263,23 @@ $currentLang = getUserLanguage();
                 $filename = getEntryFilename($id, $row['type'] ?? 'note');
                 $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                 $heading = $row['heading'];
-                $updated = formatDateTime(strtotime($row['updated']));
-                $lastModifiedLabel = t_h('trash.note.last_modified_on', ['date' => $updated], 'Last modified on {{date}}');
+                // Show the date the list is ordered on, so the order the user
+                // sees is the one the cards can be checked against.
+                if ($trashSort === 'created') {
+                    $shownDate = formatDateTime(strtotime($row['created']));
+                    $dateLabel = t_h('trash.note.created_on', ['date' => $shownDate], 'Created on {{date}}');
+                } else {
+                    $trashedRaw = $row['trashed_at'] ?? null;
+                    if ($trashedRaw) {
+                        $shownDate = formatDateTime(strtotime($trashedRaw));
+                        $dateLabel = t_h('trash.note.deleted_on', ['date' => $shownDate], 'Deleted on {{date}}');
+                    } else {
+                        // Trashed before trashed_at existed: no deletion date to
+                        // show, so fall back to the last modification.
+                        $shownDate = formatDateTime(strtotime($row['updated']));
+                        $dateLabel = t_h('trash.note.last_modified_on', ['date' => $shownDate], 'Last modified on {{date}}');
+                    }
+                }
 
                 // Handle tasklist type notes
                 $displayContent = $entryfinal;
@@ -232,7 +298,7 @@ $currentLang = getUserLanguage();
                     . '<div class="trash-note-header">'
                     . '<div class="trash-note-titleblock">'
                     . '<h3 class="css-title">' . htmlspecialchars($heading, ENT_QUOTES) . '</h3>'
-                    . '<div class="lastupdated">' . $lastModifiedLabel . '</div>'
+                    . '<div class="lastupdated">' . $dateLabel . '</div>'
                     . '</div>'
                     . '<div class="trash-action-icons">'
                     . '<button type="button" class="trash-action-btn trash-restore-btn" title="' . t_h('trash.actions.restore_note_tooltip', [], 'Restore this note') . '" data-noteid="' . $id . '">'
@@ -260,7 +326,10 @@ $currentLang = getUserLanguage();
                     . '<div class="trash-no-notes-text">' . t_h('trash.empty', [], 'No notes in trash.') . '</div>'
                     . '</div>';
             } elseif ($totalCount > 50) {
-                echo '<div class="trash-limit-notice">' . t_h('trash.showing_limit', ['count' => 50], 'Only the {{count}} most recently modified notes are shown') . '</div>';
+                $limitNotice = $trashSort === 'created'
+                    ? t_h('trash.showing_limit_created', ['count' => 50], 'Only the {{count}} most recently created notes are shown')
+                    : t_h('trash.showing_limit_deleted', ['count' => 50], 'Only the {{count}} most recently deleted notes are shown');
+                echo '<div class="trash-limit-notice">' . $limitNotice . '</div>';
             }
             ?>
         </div>

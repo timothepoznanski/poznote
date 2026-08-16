@@ -823,7 +823,7 @@ class FoldersController {
                 // Trashing by folder_id is reliable. 
                 // We don't reset entries.folder (TEXT) because it's used for restoration, 
                 // but repairDatabaseEntries is now modified to ignore trashed notes.
-                $query = "UPDATE entries SET trash = 1 WHERE folder_id IN ($placeholders) AND workspace = ?";
+                $query = "UPDATE entries SET trash = 1, trashed_at = datetime('now') WHERE folder_id IN ($placeholders) AND workspace = ?";
                 $stmt = $this->db->prepare($query);
                 $stmt->execute(array_merge($allFolderIds, [$actualWorkspace]));
             }
@@ -1141,7 +1141,7 @@ class FoldersController {
         $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
         
         [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
-        $query = "UPDATE entries SET trash = 1 WHERE folder_id = ? AND trash = 0" . $wsCond;
+        $query = "UPDATE entries SET trash = 1, trashed_at = datetime('now') WHERE folder_id = ? AND trash = 0" . $wsCond;
         $stmt = $this->db->prepare($query);
         $stmt->execute(array_merge([$folderId], $wsParams));
         
