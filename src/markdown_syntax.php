@@ -5,6 +5,7 @@ requireAuth();
 require_once 'config.php';
 require_once 'db_connect.php';
 require_once 'functions.php';
+require_once 'version_helper.php';
 
 $workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : '';
 $backUrl = 'index.php';
@@ -520,6 +521,6 @@ $examples = [
         applyFilter();
     })();
     </script>
-    <script src="js/icon-sidebar-toggle.js"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

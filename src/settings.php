@@ -10,6 +10,7 @@ require_once 'db_connect.php';
 
 // Include page initialization
 require_once 'page_init.php';
+require_once 'version_helper.php';
 
 // Initialize search parameters (needed for workspace filter)
 $search_params = initializeSearchParams();
@@ -1245,18 +1246,18 @@ if ($canUseUserWebhooks) {
     <script type="application/json" id="page-config-data"><?php
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     ?></script>
-    <script src="js/modal-alerts.js"></script>
+    <script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/font-size-settings.js"></script>
+    <script src="js/ui.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/utils.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/font-size-settings.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/index-icon-scale-settings.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/index-icon-scale-settings.js') ?: time(); ?>"></script>
-    <script src="js/note-width-settings.js"></script>
-    <script src="js/background-settings.js"></script>
-    <script src="js/copy-code-on-focus.js"></script>
-    <script src="js/modals-events.js"></script>
+    <script src="js/note-width-settings.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/background-settings.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/copy-code-on-focus.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/modals-events.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script>
     // Factory palette, used by the "Reset to defaults" action in the editor.
     window.NOTE_COLOR_DEFAULT_PALETTE = <?php echo json_encode(getDefaultNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;

@@ -5,6 +5,7 @@ requireApiAuth();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 // First, check if there are any attachments at all
 $checkQuery = "SELECT COUNT(*) as count FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
@@ -74,7 +75,7 @@ if (!$hasAttachments) {
             </div>
         </div>
         
-        <script src="js/export-attachments.js"></script>
+        <script src="js/export-attachments.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     </body>
     </html>
     <?php

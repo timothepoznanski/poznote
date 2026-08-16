@@ -678,7 +678,7 @@ function createBackup() {
     </script>
 
     <script src="js/backup-export.js?v=<?php echo filemtime(__DIR__ . '/js/backup-export.js'); ?>"></script>
-    <script src="js/backup-export-init.js"></script>
+    <script src="js/backup-export-init.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

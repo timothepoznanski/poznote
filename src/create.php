@@ -9,6 +9,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -176,7 +177,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     
     <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
-    <script src="js/navigation.js"></script>
+    <script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/utils.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime(__DIR__ . '/js/utils.js') ?: time(); ?>"></script>

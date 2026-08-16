@@ -9,6 +9,7 @@ ob_start();
 require_once 'functions.php';
 require_once 'config.php';
 require_once 'db_connect.php';
+require_once 'version_helper.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -712,7 +713,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 		};
 		</script>
 		<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
-		<script src="js/navigation.js"></script>
+		<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/dashboard-page.js?v=<?php echo file_exists(__DIR__ . '/js/dashboard-page.js') ? filemtime(__DIR__ . '/js/dashboard-page.js') : $cache_v; ?>"></script>
 		<script src="js/board-view-menu.js?v=<?php echo file_exists(__DIR__ . '/js/board-view-menu.js') ? filemtime(__DIR__ . '/js/board-view-menu.js') : $cache_v; ?>"></script>

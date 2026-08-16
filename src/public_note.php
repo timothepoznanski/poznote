@@ -10,6 +10,7 @@ require_once 'functions.php';
 require_once 'note_loader.php';
 require_once 'markdown_parser.php';
 require_once 'public_helpers.php';
+require_once 'version_helper.php';
 
 $currentLang = getUserLanguage();
 
@@ -927,8 +928,8 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
         </div>
     </div>
 </body>
-<script src="js/copy-code-on-focus.js"></script>
-<script src="js/modal-alerts.js"></script>
+<script src="js/copy-code-on-focus.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+<script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 <script src="js/math-renderer.js?v=<?php echo filemtime(__DIR__ . '/js/math-renderer.js'); ?>"></script>
 <script src="js/outline-panel.js?v=<?php echo filemtime(__DIR__ . '/js/outline-panel.js'); ?>"></script>
 <script src="js/public-note.js?v=<?php echo filemtime(__DIR__ . '/js/public-note.js'); ?>"></script>

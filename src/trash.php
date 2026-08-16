@@ -318,17 +318,17 @@ $currentLang = getUserLanguage();
     <script src="js/workspaces.js?v=<?php echo getAppVersion(); ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
     <script src="js/notes.js?v=<?php echo getAppVersion(); ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
-    <script src="js/ui.js"></script>
+    <script src="js/ui.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : getAppVersion(); ?>"></script>
-    <script src="js/attachments.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/search-highlight.js"></script>
-    <script src="js/toolbar.js"></script>
-    <script src="js/checklist.js"></script>
-    <script src="js/bulletlist.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/navigation.js"></script>
+    <script src="js/attachments.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/utils.js?v=<?php echo rawurlencode(getAppVersion()); ?>&m=<?php echo @filemtime(__DIR__ . '/js/utils.js') ?: time(); ?>"></script>
+    <script src="js/search-highlight.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/toolbar.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/checklist.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/bulletlist.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="js/main.js?v=<?php echo rawurlencode(getAppVersion()); ?>&m=<?php echo @filemtime(__DIR__ . '/js/main.js') ?: time(); ?>"></script>
+    <script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/trash.js"></script>
+    <script src="js/trash.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 </body>
 </html>

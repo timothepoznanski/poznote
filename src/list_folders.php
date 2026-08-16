@@ -755,7 +755,7 @@ $currentLang = getUserLanguage();
 	?>
 
 	<script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
-	<script src="js/navigation.js"></script>
+	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
 	<script src="js/icon-sidebar-toggle.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo getAppVersion(); ?>"></script>
 	<script src="js/ui.js?v=<?php echo getAppVersion(); ?>"></script>
