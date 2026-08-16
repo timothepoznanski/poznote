@@ -418,6 +418,7 @@
       "note_age_filter": "仅显示在所选天数内更新过的笔记。",
       "tasklist_insert_order": "选择新任务添加到任务列表的顶部还是底部。",
       "diary_note_type": "选择新日记条目使用的笔记格式。",
+      "diary_date_format": "选择用于命名新日记条目的日期格式。",
       "show_created": "在笔记标题栏显示创建日期。",
       "note_icons": "在笔记列表的标题旁显示自定义图标。",
       "type_based_note_icons": "为任务列表和 Markdown 笔记使用专属的默认图标，以便在笔记列表中区分它们。",
@@ -469,6 +470,7 @@
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
+      "behavior": "行为",
       "about": "关于",
       "documentation": "文档"
     },
@@ -672,6 +674,7 @@
       "note_age_filter": "笔记时间筛选",
       "tasklist_insert_order": "任务列表插入顺序",
       "diary_default_note_type": "日记条目格式",
+      "diary_date_format": "日记条目日期格式",
       "timezone": "时区",
       "date_time_format": "日期和时间格式",
       "show_note_created": "显示笔记创建日期",
@@ -1125,7 +1128,8 @@
         "dashboard_toolbar": "仪表盘",
         "icon_sidebar": "图标侧边栏",
         "folder_actions": "文件夹操作",
-        "workspace_menu": "工作区菜单"
+        "workspace_menu": "工作区菜单",
+        "note_actions": "笔记操作"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1137,7 +1141,10 @@
       "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
       "s3_backups_section": "备份页面:“S3 备份”部分",
       "s3_restore_section": "恢复页面:“从 S3 恢复”部分",
-      "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?"
+      "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?",
+      "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
+      "note_actions_toggle": "笔记上的菜单按钮（⋮）",
+      "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。"
     },
     "theme": {
       "title": "主题选择",
@@ -1466,7 +1473,45 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "标记：YYYY、MM、DD、HH、h、hh、mm、ss、A",
-      "custom_invalid": "请输入有效的自定义格式。"
+      "custom_invalid": "请输入有效的自定义格式。",
+      "tokens_title": "占位符：",
+      "tokens": {
+        "YYYY": "年 (2026)",
+        "MM": "月 (08)",
+        "DD": "日 (16)",
+        "HH": "小时，24 小时制 (14)",
+        "h": "小时，12 小时制 (2)",
+        "hh": "小时，12 小时制补零 (02)",
+        "mm": "分钟 (05)",
+        "ss": "秒 (09)",
+        "A": "上午/下午"
+      }
+    },
+    "diary_date_format": {
+      "title": "日记条目日期格式",
+      "description": "选择用于命名新日记条目的日期格式：",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "自定义"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "可用标记：YYYY、YY、MMMM、MMM、MM、DD。必须包含年、月和日。",
+      "custom_invalid": "请输入有效的自定义格式，需包含年、月和日。",
+      "hint": "已有条目保留原标题，并仍与其日期关联。",
+      "tokens_title": "占位符：",
+      "tokens": {
+        "YYYY": "年 (2026)",
+        "YY": "年份后两位 (26)",
+        "MMMM": "月份名称 (August)",
+        "MMM": "月份简称 (Aug)",
+        "MM": "月 (08)",
+        "DD": "日 (16)"
+      },
+      "tokens_required": "必须包含年、月和日。"
     },
     "tenant_isolation": {
       "title": "租户隔离",
@@ -1490,6 +1535,10 @@
       "title": "插入任务列表",
       "description": "选择要在此笔记中显示的任务列表。",
       "confirm": "插入"
+    },
+    "note": {
+      "rename_title": "重命名笔记",
+      "rename_placeholder": "新笔记标题"
     }
   },
   "notes_list": {
@@ -1530,6 +1579,15 @@
     },
     "folder_filter": {
       "exit": "退出文件夹视图"
+    },
+    "note_actions": {
+      "menu": "笔记操作",
+      "move_note": "移动笔记",
+      "is_shared": "已共享",
+      "share_note": "共享笔记",
+      "rename_note": "重命名笔记",
+      "delete_note": "删除笔记",
+      "enter_note_name": "请输入笔记标题"
     }
   },
   "note_color": {
@@ -1542,7 +1600,17 @@
     "filter_all": "全部笔记",
     "filter_any": "任意颜色",
     "filter_none": "无颜色",
-    "manage_button": "管理颜色"
+    "manage_button": "管理颜色",
+    "names": {
+      "blue": "蓝色",
+      "green": "绿色",
+      "yellow": "黄色",
+      "orange": "橙色",
+      "red": "红色",
+      "purple": "紫色",
+      "pink": "粉色",
+      "gray": "灰色"
+    }
   },
   "tabs": {
     "context_menu": {
@@ -3692,6 +3760,9 @@
     "config_title": "配置",
     "enable_label": "启用 AI 助手",
     "enable_description": "在笔记工具栏中显示 AI 聊天按钮。",
+    "users_label": "允许的用户",
+    "users_description": "只有选中的用户才能看到 AI 聊天按钮。新用户在您将其添加到此处之前没有访问权限。",
+    "users_admin": "管理员",
     "url_label": "服务器 URL",
     "url_description": "兼容 OpenAI 的 API 基础 URL。若 Ollama 运行在 Docker 主机上，请使用 http://host.docker.internal:11434",
     "model_label": "模型",

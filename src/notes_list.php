@@ -151,6 +151,31 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
 
 <?php
 
+/**
+ * Whether a note is publicly shared.
+ *
+ * Pre-loads shared_notes on first call so the tree costs one query instead of
+ * one per note, mirroring the shared-folders cache in generateFolderActions().
+ */
+function isNoteShared($noteId) {
+    global $con;
+    static $sharedNotesCache = null;
+
+    if ($sharedNotesCache === null) {
+        $sharedNotesCache = [];
+        try {
+            $stmt = $con->query('SELECT note_id FROM shared_notes');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $sharedNotesCache[(int)$row['note_id']] = true;
+            }
+        } catch (Exception $e) {
+            $sharedNotesCache = [];
+        }
+    }
+
+    return isset($sharedNotesCache[(int)$noteId]);
+}
+
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
     global $show_note_icons_setting;
 
@@ -186,6 +211,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
     echo "</a>";
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), isNoteShared($noteDbId));
     echo "</div>";
     echo "<div id=pxbetweennotes></div>";
 }
@@ -466,6 +492,8 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 // populated and placed by toggleFolderActionsMenu in js/utils.js). Kept
 // outside the scrollable container so no ancestor can clip or transform it.
 echo renderFolderActionsMenu();
+// Same arrangement for the per-note three-dot toggles.
+echo renderNoteActionsMenu();
 ?>
 
 <!-- Mini Calendar Component -->

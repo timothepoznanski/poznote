@@ -241,13 +241,22 @@
         });
     }
 
+    function isKeyHidden(key) {
+        var config = window.PoznoteUiCustomization;
+        return !!(config && config.hiddenKeyMap && config.hiddenKeyMap[key]);
+    }
+
     function syncFolderActionToggles() {
         // Single shared dropdown serves every folder's toggle: when UI
         // customization hides all of its items, hide every toggle
         var menu = document.getElementById('folder-actions-menu');
         if (!menu) return;
 
-        var visibleItems = Array.prototype.some.call(
+        // The toggle can also be hidden on its own, without touching the menu
+        // items. Checked here because this function rewrites the inline
+        // display below, which would otherwise undo the generated CSS rule.
+        var visibleItems = !isKeyHidden('panel:folder-actions-toggle') &&
+            Array.prototype.some.call(
             Array.prototype.filter.call(menu.children, function (child) {
                 return child.classList && child.classList.contains('folder-actions-menu-item');
             }),
@@ -266,6 +275,42 @@
                 actionsContainer.style.display = visibleItems ? '' : 'none';
             }
         });
+    }
+
+    function syncNoteActionToggles() {
+        // Same arrangement as syncFolderActionToggles: one shared dropdown for
+        // every note's toggle, so when UI customization hides all of its items
+        // the three-dot button has nothing left to open.
+        var menu = document.getElementById('note-actions-menu');
+        if (!menu) return;
+
+        // Same as folders: the toggle has its own key, and the inline display
+        // written below would otherwise beat the generated CSS rule.
+        var visibleItems = !isKeyHidden('panel:note-actions-toggle') &&
+            Array.prototype.some.call(
+            Array.prototype.filter.call(menu.children, function (child) {
+                return child.classList && child.classList.contains('note-actions-menu-item');
+            }),
+            isVisibleElement
+        );
+
+        if (!visibleItems) {
+            menu.classList.remove('show');
+        }
+
+        document.querySelectorAll('.note-actions-toggle').forEach(function (toggle) {
+            var actionsContainer = toggle.parentElement;
+
+            toggle.style.display = visibleItems ? '' : 'none';
+            if (actionsContainer && actionsContainer.classList.contains('note-actions')) {
+                actionsContainer.style.display = visibleItems ? '' : 'none';
+            }
+        });
+
+        // Give the note titles back the strip reserved for the toggle.
+        if (document.body) {
+            document.body.classList.toggle('note-actions-hidden', !visibleItems);
+        }
     }
 
     function syncSectionVisibility(titleId, gridId) {
@@ -303,6 +348,10 @@
         syncSectionVisibility('display', 'settings-display-section-grid');
     }
 
+    function syncSettingsBehaviorSection() {
+        syncSectionVisibility('behavior', 'settings-behavior-section-grid');
+    }
+
     function syncSettingsAdminToolsSection() {
         syncSectionVisibility('admin-tools', 'admin-tools-grid');
     }
@@ -321,10 +370,12 @@
             syncFolderIconClickBehavior();
             syncToolbarOverflowButtons();
             syncFolderActionToggles();
+            syncNoteActionToggles();
             syncHomeDashboardSection();
             syncHomeActionsSection();
             syncSettingsActionsSection();
             syncSettingsDisplaySection();
+            syncSettingsBehaviorSection();
             syncSettingsAdminToolsSection();
             syncSettingsDocumentationSection();
         });
@@ -393,9 +444,26 @@
                     if (id === 'toggle-sort-submenu') {
                         rules.push('.sort-submenu { display: none !important; }');
                     }
+                } else if (type === 'note') {
+                    // Scoped to the menu: the same data-action values are used by
+                    // the note toolbar and by the note icons in the tree, which
+                    // this setting must not touch. !important also beats the
+                    // inline display populateNoteActionsMenu() sets on the
+                    // share/favorite state variants.
+                    rules.push('.note-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
                 } else if (type === 'panel') {
                     if (id === 'mini-calendar') {
                         rules.push('.mini-calendar-container { display: none !important; }');
+                    } else if (id === 'folder-actions-toggle') {
+                        rules.push('.folder-actions-toggle { display: none !important; }');
+                    } else if (id === 'note-actions-toggle') {
+                        rules.push('.note-actions-toggle { display: none !important; }');
+                    } else if (id === 'note-created-date') {
+                        rules.push('.note-subline { display: none !important; }');
+                    } else if (id === 'note-icons') {
+                        rules.push('.note-icon { display: none !important; }');
+                    } else if (id === 'folder-note-count') {
+                        rules.push('.folder-note-count { display: none !important; }');
                     } else if (id === 'outline-panel') {
                         rules.push('#outline-panel { display: none !important; }');
                         rules.push('#outlineResizeHandle { display: none !important; }');

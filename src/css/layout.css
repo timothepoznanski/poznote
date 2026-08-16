@@ -177,14 +177,15 @@ body {
 
 /* Toggle sidebar and collapsed state */
 
+/* Zero-width on purpose: the subtle divider line is the border, and ::before
+   below widens the drag target to 8px either side. Giving the bar a real width
+   would push #right_pane over and thicken the divider. */
 .resize-handle {
-    /* width: 3px; */
+    width: 0;
     height: 100vh;
-    background: #f8f9fa;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    /* subtle divider line to match the mockup */
     border-right: 1px solid #ccc;
 }
 
@@ -199,12 +200,13 @@ body {
     z-index: 1;
 }
 
-/* Toggle sidebar button */
+/* Toggle sidebar button. Hangs off the handle's right edge into #right_pane,
+   since the handle itself has no width to sit inside. The collapsed state
+   moves it clear of the icon rail's own toggle further down. */
 .toggle-sidebar-btn {
     position: absolute;
     bottom: 0px;
-    left: 50%;
-    /* transform: translateX(-50%); */
+    left: 0;
     width: 16px;
     height: 25px;
     background: #fff;
@@ -266,11 +268,17 @@ body.sidebar-collapsed .resize-handle {
     cursor: default;
 }
 
+/* Collapsed, the handle sits flush against the icon rail (or against the
+   viewport edge when the rail is hidden too), which is exactly where
+   #iconSidebarToggle is pinned: same bottom, same origin, 16px wide, and a
+   higher z-index. Clear its width plus a gap so both stay clickable side by
+   side, rail toggle first. See #iconSidebarToggle in css/icon-sidebar.css. */
 body.sidebar-collapsed .toggle-sidebar-btn {
-    left: 3px;
+    left: 20px;
     border-radius: 0 4px 4px 0;
     opacity: 1;
     pointer-events: auto;
+    z-index: 12;
 }
 
 body.sidebar-collapsed .toggle-sidebar-btn i {

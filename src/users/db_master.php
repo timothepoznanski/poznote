@@ -64,6 +64,7 @@ function initializeMasterDatabase(PDO $con): void {
             active INTEGER DEFAULT 1,
             is_admin INTEGER DEFAULT 0,
             notify_new_user INTEGER DEFAULT 0,
+            ai_chat_enabled INTEGER DEFAULT 0,
             language TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -111,6 +112,13 @@ function initializeMasterDatabase(PDO $con): void {
 
         if (!in_array('notify_new_user', $existingColumns)) {
             $con->exec("ALTER TABLE users ADD COLUMN notify_new_user INTEGER DEFAULT 0");
+        }
+
+        // Per-user access to the AI assistant. The connection itself is
+        // instance-wide (global_settings), but each profile is opted in
+        // individually; new profiles start without access.
+        if (!in_array('ai_chat_enabled', $existingColumns)) {
+            $con->exec("ALTER TABLE users ADD COLUMN ai_chat_enabled INTEGER DEFAULT 0");
         }
 
         // Interface language, mirrored from the per-user settings table on every
@@ -1054,7 +1062,7 @@ function updateUserProfile(int $id, array $data): array {
             return ['success' => false, 'error' => 'User profile not found'];
         }
         
-        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb', 'quota_max_backups_s3_mb'];
+        $allowedFields = ['username', 'email', 'email_verified', 'first_name', 'last_name', 'active', 'is_admin', 'notify_new_user', 'ai_chat_enabled', 'oidc_subject', 'quota_max_notes', 'quota_max_storage_mb', 'quota_max_storage_s3_mb', 'quota_max_backups_s3_mb'];
         $updates = [];
         $params = [];
 
@@ -1122,7 +1130,7 @@ function updateUserProfile(int $id, array $data): array {
 
         foreach ($data as $key => $value) {
             if (in_array($key, $allowedFields)) {
-                if ($key === 'active' || $key === 'is_admin' || $key === 'notify_new_user') {
+                if ($key === 'active' || $key === 'is_admin' || $key === 'notify_new_user' || $key === 'ai_chat_enabled') {
                     $value = (int)(bool)$value;
                 }
                 $updates[] = "$key = ?";
@@ -1156,6 +1164,12 @@ function updateUserProfile(int $id, array $data): array {
         $emailCleared = array_key_exists('email', $data) && trim((string)$data['email']) === '';
         if (($newActive !== 1 || $newIsAdmin !== 1 || $emailCleared) && !array_key_exists('notify_new_user', $data)) {
             $updates[] = "notify_new_user = 0";
+        }
+
+        // A deactivated profile keeps no AI grant: reactivating it should not
+        // silently restore access the admin granted long ago.
+        if ($newActive !== 1 && !array_key_exists('ai_chat_enabled', $data)) {
+            $updates[] = "ai_chat_enabled = 0";
         }
 
         $updates[] = "updated_at = CURRENT_TIMESTAMP";
@@ -1722,6 +1736,85 @@ function setNewUserNotificationRecipients(array $userIds): bool {
             $con->rollBack();
         }
         error_log('Failed to save new user notification recipients: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * List the active profiles that can be granted access to the AI assistant,
+ * with their current opt-in state.
+ */
+function listAiChatCandidates(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT id, username, email, first_name, last_name, is_admin, ai_chat_enabled
+            FROM users
+            WHERE active = 1
+            ORDER BY username
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/**
+ * Replace the set of users allowed to use the AI assistant.
+ * Ids that are not eligible profiles are ignored rather than rejected.
+ */
+function setAiChatUsers(array $userIds): bool {
+    try {
+        $con = getMasterConnection();
+
+        $eligible = [];
+        foreach (listAiChatCandidates() as $candidate) {
+            $eligible[(int)$candidate['id']] = true;
+        }
+
+        $selected = [];
+        foreach ($userIds as $userId) {
+            $userId = (int)$userId;
+            if (isset($eligible[$userId])) {
+                $selected[$userId] = true;
+            }
+        }
+
+        $con->beginTransaction();
+        $con->exec("UPDATE users SET ai_chat_enabled = 0 WHERE ai_chat_enabled = 1");
+        if (!empty($selected)) {
+            $stmt = $con->prepare("UPDATE users SET ai_chat_enabled = 1 WHERE id = ?");
+            foreach (array_keys($selected) as $userId) {
+                $stmt->execute([$userId]);
+            }
+        }
+        $con->commit();
+
+        return true;
+    } catch (Exception $e) {
+        if (isset($con) && $con instanceof PDO && $con->inTransaction()) {
+            $con->rollBack();
+        }
+        error_log('Failed to save AI assistant users: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * True when the given profile has been granted access to the AI assistant.
+ * Access is opt-in: an unknown or unlisted profile has none.
+ */
+function isAiChatAllowedForUser(?int $userId): bool {
+    if ($userId === null || $userId <= 0) {
+        return false;
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT ai_chat_enabled FROM users WHERE id = ? AND active = 1");
+        $stmt->execute([$userId]);
+        $value = $stmt->fetchColumn();
+        return $value !== false && (int)$value === 1;
+    } catch (Exception $e) {
         return false;
     }
 }

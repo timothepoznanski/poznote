@@ -92,6 +92,11 @@
                     saveFolderName();
                 }
                 break;
+            case 'save-note-name':
+                if (typeof window.saveNoteName === 'function') {
+                    window.saveNoteName();
+                }
+                break;
             case 'execute-delete-folder':
                 if (typeof executeDeleteFolder === 'function') {
                     executeDeleteFolder();

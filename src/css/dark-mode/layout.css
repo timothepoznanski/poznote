@@ -396,15 +396,15 @@ body.dark-mode .lastupdated {
    Resize Handle & Toggle Sidebar
    ============================================ */
 
+/* The handle is zero-width (see css/layout.css), so only its border shows;
+   a background-color here would never paint. */
 html[data-theme='dark'] .resize-handle,
 body.dark-mode .resize-handle {
-    background-color: var(--dm-sidebar-bg);
     border-right: 1px solid var(--dm-border);
 }
 
 html[data-theme='dark'] .resize-handle:hover,
 body.dark-mode .resize-handle:hover {
-    background-color: var(--dm-sidebar-surface);
     border-right: 1px solid var(--dm-border-light);
 }
 

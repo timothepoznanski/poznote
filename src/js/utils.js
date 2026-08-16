@@ -2950,8 +2950,9 @@ function createNoteOfType(noteType, globalFnNames) {
  * Open today's diary entry, creating it first when it does not exist yet.
  * Goes straight to the note: routing through diary.php?today=1 made the diary
  * board render for a moment before the note replaced it.
- * api/v1/calendar/diary-entry.php supplies the target folder, workspace and
- * the configured note type (see the diary_default_note_type setting).
+ * api/v1/calendar/diary-entry.php supplies the target folder, workspace, the
+ * configured note type (see the diary_default_note_type setting) and the entry
+ * title in the configured diary date format (diary_date_format).
  */
 function createDiaryEntryForToday() {
     var diaryWs = window.selectedWorkspace || '';
@@ -2998,7 +2999,9 @@ function createDiaryEntryForToday() {
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify({
-                    heading: today,
+                    // The title follows the configured diary date format;
+                    // created_date stays YYYY-MM-DD, as the API expects.
+                    heading: diary.title || today,
                     folder_name: diary.folder,
                     workspace: diary.workspace,
                     type: diary.noteType === 'markdown' ? 'markdown' : 'note',
@@ -3111,6 +3114,21 @@ function populateFolderActionsMenu(menu, toggle) {
     });
 }
 
+// Keeps exactly one folder toggle marked .open, so the hover-reveal rule in
+// css/folders/actions-menu.css holds it visible while its menu is open.
+function markFolderActionsToggleOpen(toggle) {
+    document.querySelectorAll('.folder-actions-toggle.open').forEach(function (other) {
+        if (other !== toggle) other.classList.remove('open');
+    });
+    if (toggle) toggle.classList.add('open');
+}
+
+function clearFolderActionsToggleOpen() {
+    document.querySelectorAll('.folder-actions-toggle.open').forEach(function (toggle) {
+        toggle.classList.remove('open');
+    });
+}
+
 function toggleFolderActionsMenu(folderId) {
     var menu = document.getElementById('folder-actions-menu');
     if (!menu) return;
@@ -3130,6 +3148,10 @@ function toggleFolderActionsMenu(folderId) {
 
     populateFolderActionsMenu(menu, toggle);
     menu.classList.add('show');
+    // Folder toggles only show on row hover (css/folders/actions-menu.css);
+    // while the menu is open the pointer is over the menu, not the row, so
+    // mark the toggle to keep it visible. Mirrors .note-actions-toggle.open.
+    markFolderActionsToggleOpen(toggle);
     adjustMenuPosition(menu, toggle);
 }
 
@@ -3206,6 +3228,95 @@ function adjustMenuPosition(menu, toggleButton) {
     }
 }
 
+/**
+ * Place an already-populated dropdown at a point instead of next to a toggle,
+ * for the right-click context menus. Same overflow handling as
+ * adjustMenuPosition, but constrained to the viewport rather than to #left_col:
+ * a menu opened at the cursor is allowed to spill over the note pane.
+ */
+function positionMenuAtPoint(menu, x, y) {
+    menu.style.bottom = '';
+    menu.style.top = '';
+    menu.style.marginTop = '';
+    menu.style.marginBottom = '';
+    menu.style.left = '';
+    menu.style.right = '';
+    menu.style.maxHeight = '';
+    menu.style.overflowY = '';
+
+    menu.style.top = y + 'px';
+    menu.style.left = x + 'px';
+
+    var rect = menu.getBoundingClientRect();
+    var viewportHeight = window.innerHeight;
+    var viewportWidth = window.innerWidth;
+
+    if (rect.bottom > viewportHeight) {
+        var topAbove = y - rect.height;
+        if (topAbove >= 0) {
+            menu.style.top = topAbove + 'px';
+        } else {
+            menu.style.maxHeight = Math.max(100, viewportHeight - y - 10) + 'px';
+            menu.style.overflowY = 'auto';
+        }
+        rect = menu.getBoundingClientRect();
+    }
+
+    if (rect.right > viewportWidth) {
+        menu.style.left = Math.max(0, viewportWidth - rect.width - 10) + 'px';
+        rect = menu.getBoundingClientRect();
+    }
+
+    if (rect.left < 0) {
+        menu.style.left = '10px';
+    }
+}
+
+/**
+ * Hidden by UI customization? syncFolderActionToggles / syncNoteActionToggles
+ * in js/ui-customization.js set that inline display when every item of the
+ * matching menu is unchecked. Checked instead of the computed style because
+ * note toggles are display:none until their row is hovered.
+ */
+function isActionsToggleDisabled(toggle) {
+    return !toggle || toggle.style.display === 'none';
+}
+
+// Right-click on a folder row: same dropdown as its three-dot toggle, opened
+// at the cursor. Returns false when there is no menu to show, so the caller
+// can leave the browser's own context menu alone.
+function openFolderActionsMenuAtPoint(folderId, x, y) {
+    var menu = document.getElementById('folder-actions-menu');
+    var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+    if (!menu || isActionsToggleDisabled(toggle)) return false;
+
+    closeNoteActionsMenu();
+    populateFolderActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    markFolderActionsToggleOpen(toggle);
+    positionMenuAtPoint(menu, x, y);
+    return true;
+}
+
+// Same for a note row. Takes the row's own toggle element because a favorited
+// note appears twice in the tree under the same note id.
+function openNoteActionsMenuAtPoint(toggle, x, y) {
+    var menu = document.getElementById('note-actions-menu');
+    if (!menu || isActionsToggleDisabled(toggle)) return false;
+
+    closeFolderActionsMenu();
+    closeNoteActionsMenu();
+    populateNoteActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    toggle.classList.add('open');
+    openNoteActionsToggle = toggle;
+    positionMenuAtPoint(menu, x, y);
+    return true;
+}
+
+window.openFolderActionsMenuAtPoint = openFolderActionsMenuAtPoint;
+window.openNoteActionsMenuAtPoint = openNoteActionsMenuAtPoint;
+
 function closeFolderActionsMenu(folderId) {
     // Single shared menu: folderId is accepted for backwards compatibility
     // but closing is unconditional
@@ -3220,6 +3331,7 @@ function closeFolderActionsMenu(folderId) {
             chevron.style.transform = 'rotate(0deg)';
         });
     }
+    clearFolderActionsToggleOpen();
 }
 
 // Close folder menus when clicking outside
@@ -3237,8 +3349,191 @@ document.addEventListener('click', function (event) {
                 chevron.style.transform = 'rotate(0deg)';
             });
         });
+        clearFolderActionsToggleOpen();
     }
 });
+
+// ============================================
+// Note actions menu (three-dot toggle on each note row in the tree)
+//
+// Same arrangement as the folder menu above: one shared #note-actions-menu is
+// rendered per page, and opening a toggle copies that note's identity onto
+// every item before positioning the menu. The items reuse the data-action
+// values the note toolbar already uses, so js/index-events.js handles them
+// without any per-item wiring here.
+// ============================================
+
+function populateNoteActionsMenu(menu, toggle) {
+    var noteId = toggle.getAttribute('data-note-id') || '';
+    var noteTitle = toggle.getAttribute('data-note-title') || '';
+    var noteType = toggle.getAttribute('data-note-type') || 'note';
+    var folderId = toggle.getAttribute('data-folder-id') || '';
+    var folderName = toggle.getAttribute('data-folder') || '';
+    var isShared = toggle.getAttribute('data-shared') === '1';
+    var isFavorite = toggle.getAttribute('data-favorite') === '1';
+
+    menu.setAttribute('data-note-id', noteId);
+
+    // Copy note identity onto every action item (handlers read it there).
+    // The names match what each existing handler expects: show-export-modal
+    // reads title/noteType, show-move-folder-dialog reads the folder, and the
+    // icon picker reads data-note-title.
+    menu.querySelectorAll('[data-action]').forEach(function (item) {
+        item.setAttribute('data-note-id', noteId);
+        item.setAttribute('data-note-title', noteTitle);
+        item.setAttribute('data-title', noteTitle);
+        item.setAttribute('data-note-type', noteType);
+        item.setAttribute('data-folder-id', folderId);
+        item.setAttribute('data-folder', folderName);
+    });
+
+    menu.querySelectorAll('.share-state-shared').forEach(function (item) {
+        item.style.display = isShared ? '' : 'none';
+    });
+    menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
+        item.style.display = isShared ? 'none' : '';
+    });
+
+    menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? '' : 'none';
+    });
+    menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? 'none' : '';
+    });
+}
+
+// The toggle that opened the menu, so it can be closed by a second click and
+// so the menu stays anchored to the row that was actually clicked. A note can
+// appear more than once in the tree (its folder plus the Favorites section),
+// so the caller passes the element instead of us looking it up by note id.
+var openNoteActionsToggle = null;
+
+function toggleNoteActionsMenu(noteId, toggleElement) {
+    var menu = document.getElementById('note-actions-menu');
+    if (!menu) return;
+
+    var toggle = toggleElement ||
+        document.querySelector('.note-actions-toggle[data-note-id="' + noteId + '"]');
+    if (!toggle) return;
+
+    // Clicking the toggle whose menu is already open closes it; any other
+    // toggle re-populates and moves the menu
+    var isOpenForToggle = menu.classList.contains('show') && openNoteActionsToggle === toggle;
+
+    closeNoteActionsMenu();
+    if (isOpenForToggle) return;
+
+    populateNoteActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    toggle.classList.add('open');
+    openNoteActionsToggle = toggle;
+    adjustMenuPosition(menu, toggle);
+}
+
+function closeNoteActionsMenu() {
+    var menu = document.getElementById('note-actions-menu');
+    if (menu) {
+        menu.classList.remove('show');
+    }
+    document.querySelectorAll('.note-actions-toggle.open').forEach(function (btn) {
+        btn.classList.remove('open');
+    });
+    openNoteActionsToggle = null;
+}
+
+window.toggleNoteActionsMenu = toggleNoteActionsMenu;
+window.closeNoteActionsMenu = closeNoteActionsMenu;
+
+// Dismiss the menu as soon as one of its items is clicked. Capture phase
+// because some item handlers (the icon picker) call stopImmediatePropagation,
+// which would otherwise prevent the bubble-phase closer in
+// js/notes-list-events.js from ever running. Hiding the menu leaves it in the
+// DOM, so the handlers still resolve their data-action target normally.
+document.addEventListener('click', function (event) {
+    if (event.target.closest && event.target.closest('#note-actions-menu')) {
+        closeNoteActionsMenu();
+    }
+}, true);
+
+// ============================================
+// Note rename (from the tree's note actions menu)
+// ============================================
+
+function renameNote(noteId, currentTitle) {
+    var modal = document.getElementById('renameNoteModal');
+    var input = document.getElementById('renameNoteName');
+    if (!modal || !input) return;
+
+    modal.style.display = 'flex';
+    input.value = currentTitle || '';
+    input.dataset.noteId = noteId;
+    input.dataset.oldName = currentTitle || '';
+    input.focus();
+    input.select();
+}
+
+function saveNoteName() {
+    var input = document.getElementById('renameNoteName');
+    if (!input) return;
+
+    var newName = input.value.trim();
+    var oldName = input.dataset.oldName;
+    var noteId = input.dataset.noteId;
+
+    if (!newName) {
+        showNotificationPopup(
+            (window.t ? window.t('notes_list.note_actions.enter_note_name', null, 'Please enter a note title') : 'Please enter a note title'),
+            'error'
+        );
+        return;
+    }
+
+    if (newName === oldName) {
+        closeModal('renameNoteModal');
+        return;
+    }
+
+    // Send the browser's editor session id so renaming a note that is open in
+    // this tab passes the edit lock check; a note locked by someone else still
+    // gets refused by the API.
+    var editorSessionId = (typeof window.getCurrentEditorSessionId === 'function')
+        ? window.getCurrentEditorSessionId()
+        : '';
+
+    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    if (editorSessionId) {
+        headers['X-Editor-Session-ID'] = editorSessionId;
+    }
+
+    // Heading only: the API leaves content untouched when it is not provided.
+    fetch('/api/v1/notes/' + encodeURIComponent(noteId), {
+        method: 'PATCH',
+        headers: headers,
+        credentials: 'same-origin',
+        body: JSON.stringify({ heading: newName, editor_session_id: editorSessionId })
+    })
+        .then(function (response) {
+            return response.json().catch(function () { return {}; });
+        })
+        .then(function (data) {
+            if (data && data.success) {
+                closeModal('renameNoteModal');
+                window.location.reload();
+                return;
+            }
+            showNotificationPopup(
+                'Error: ' + ((data && (data.error || data.message)) || 'Unknown error'),
+                'error'
+            );
+        })
+        .catch(function (error) {
+            showNotificationPopup('Network error while renaming the note', 'error');
+            console.error('Note rename error:', error);
+        });
+}
+
+window.renameNote = renameNote;
+window.saveNoteName = saveNoteName;
 
 // ============================================
 // Note Conversion Functions

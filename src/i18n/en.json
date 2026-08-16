@@ -56,7 +56,8 @@
     "link_copied": "Link copied",
     "print": "Print",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "download": "Download"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -142,6 +143,7 @@
       "note_age_filter": "Only show notes updated within the chosen number of days.",
       "tasklist_insert_order": "Choose whether new tasks are added to the top or the bottom of task lists.",
       "diary_note_type": "Choose the note format used for new diary entries.",
+      "diary_date_format": "Choose the date format used to title new diary entries.",
       "show_created": "Show the creation date in the note header.",
       "note_icons": "Show custom icons next to note titles in the list.",
       "type_based_note_icons": "Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.",
@@ -193,6 +195,7 @@
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
+      "behavior": "Behavior",
       "about": "About",
       "documentation": "Documentation"
     },
@@ -314,6 +317,7 @@
       "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
       "diary_default_note_type": "Diary entry format",
+      "diary_date_format": "Diary entry date format",
       "timezone": "Timezone",
       "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",
@@ -623,7 +627,8 @@
         "dashboard_toolbar": "Dashboard",
         "icon_sidebar": "Icon sidebar",
         "folder_actions": "Folder Actions",
-        "workspace_menu": "Workspace Menu"
+        "workspace_menu": "Workspace Menu",
+        "note_actions": "Note Actions"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
@@ -635,7 +640,10 @@
       "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section",
       "s3_backups_section": "Backup page: \"S3 Backups\" section",
       "s3_restore_section": "Restore page: \"Restore from S3\" section",
-      "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?"
+      "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?",
+      "folder_actions_toggle": "Menu button (⋮) on folders",
+      "note_actions_toggle": "Menu button (⋮) on notes",
+      "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button."
     },
     "theme": {
       "title": "Theme Selection",
@@ -1019,7 +1027,45 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
-      "custom_invalid": "Enter a valid custom format."
+      "custom_invalid": "Enter a valid custom format.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "year (2026)",
+        "MM": "month (08)",
+        "DD": "day (16)",
+        "HH": "hour, 24h (14)",
+        "h": "hour, 12h (2)",
+        "hh": "hour, 12h padded (02)",
+        "mm": "minutes (05)",
+        "ss": "seconds (09)",
+        "A": "AM/PM"
+      }
+    },
+    "diary_date_format": {
+      "title": "Diary entry date format",
+      "description": "Choose the date format used to title new diary entries:",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "Custom"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, DD. A year, a month and a day are required.",
+      "custom_invalid": "Enter a valid custom format, with a year, a month and a day.",
+      "hint": "Existing entries keep their title and stay linked to their day.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "year (2026)",
+        "YY": "year, 2 digits (26)",
+        "MMMM": "month name (August)",
+        "MMM": "short month name (Aug)",
+        "MM": "month (08)",
+        "DD": "day (16)"
+      },
+      "tokens_required": "A year, a month and a day are required."
     },
     "tenant_isolation": {
       "title": "Tenant isolation",
@@ -1034,6 +1080,10 @@
         "user_s3_restore": "S3 restore on the Restore page",
         "user_s3_restore_help": "Non-admin users no longer see the Restore from S3 section of the Restore / Import page and cannot restore bucket archives."
       }
+    },
+    "note": {
+      "rename_title": "Rename Note",
+      "rename_placeholder": "New note title"
     }
   },
   "notes_list": {
@@ -1075,6 +1125,15 @@
     },
     "folder_filter": {
       "exit": "Exit folder view"
+    },
+    "note_actions": {
+      "menu": "Note actions",
+      "move_note": "Move note",
+      "is_shared": "Is shared",
+      "share_note": "Share note",
+      "rename_note": "Rename note",
+      "delete_note": "Delete note",
+      "enter_note_name": "Please enter a note title"
     }
   },
   "note_color": {
@@ -1087,7 +1146,17 @@
     "filter_all": "All notes",
     "filter_any": "Any color",
     "filter_none": "No color",
-    "manage_button": "Manage colors"
+    "manage_button": "Manage colors",
+    "names": {
+      "blue": "Blue",
+      "green": "Green",
+      "yellow": "Yellow",
+      "orange": "Orange",
+      "red": "Red",
+      "purple": "Purple",
+      "pink": "Pink",
+      "gray": "Gray"
+    }
   },
   "tabs": {
     "context_menu": {
@@ -3269,6 +3338,9 @@
     "config_title": "Configuration",
     "enable_label": "Enable AI assistant",
     "enable_description": "Shows an AI chat button in the note toolbar.",
+    "users_label": "Allowed users",
+    "users_description": "Only the selected users see the AI chat button. New users have no access until you add them here.",
+    "users_admin": "Administrator",
     "url_label": "Server URL",
     "url_description": "Base URL of an OpenAI-compatible API. For Ollama running on the Docker host, use http://host.docker.internal:11434",
     "model_label": "Model",

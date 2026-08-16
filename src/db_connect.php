@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 28; // 28: shared_notes.access_mode normalized for non-tasklist notes (read_only/edit)
+    $CURRENT_SCHEMA_VERSION = 29; // 29: diary_date_format setting seeded (diary entry title date format)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -574,6 +574,7 @@ try {
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('hide_folder_counts', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('note_age_filter_days', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('date_time_format', 'default')");
+        $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('diary_date_format', 'ymd')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_split_card_view', '1')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('markdown_colored', '0')");
         $con->exec("INSERT OR IGNORE INTO settings (key, value) VALUES ('slash_menu_require_alt', '0')");

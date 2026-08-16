@@ -317,6 +317,34 @@ body.dark-mode .modal .modal-info-note {
     flex: 0 0 auto;
 }
 
+/* Legend of the tokens a custom date pattern accepts. The tokens themselves
+   stay literal, only their meaning is translated. */
+.date-format-tokens {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2px 10px;
+    margin: 4px 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.date-format-tokens dt {
+    margin: 0;
+}
+
+.date-format-tokens dt code {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+}
+
+.date-format-tokens dd {
+    margin: 0;
+}
+
 /* Colored markdown per-element color pickers */
 .mdc-custom-row {
     display: none;

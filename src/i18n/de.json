@@ -416,6 +416,7 @@
       "note_age_filter": "Nur Notizen anzeigen, die innerhalb der gewählten Anzahl von Tagen geändert wurden.",
       "tasklist_insert_order": "Wählen Sie, ob neue Aufgaben oben oder unten in Aufgabenlisten eingefügt werden.",
       "diary_note_type": "Wählen Sie das Notizformat für neue Tagebucheinträge.",
+      "diary_date_format": "Wählen Sie das Datumsformat für die Titel neuer Tagebucheinträge.",
       "show_created": "Zeigen Sie das Erstellungsdatum im Notizkopf an.",
       "note_icons": "Zeigen Sie eigene Symbole neben den Notiztiteln in der Liste an.",
       "type_based_note_icons": "Verwenden Sie ein eigenes Standardsymbol für Aufgabenlisten und Markdown-Notizen, damit sie in der Notizliste unterscheidbar sind.",
@@ -467,6 +468,7 @@
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
+      "behavior": "Verhalten",
       "about": "Über",
       "documentation": "Dokumentation"
     },
@@ -671,6 +673,7 @@
       "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "diary_default_note_type": "Format der Tagebucheinträge",
+      "diary_date_format": "Datumsformat der Tagebucheinträge",
       "timezone": "Zeitzone",
       "date_time_format": "Datums- und Uhrzeitformat",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
@@ -1124,7 +1127,8 @@
         "dashboard_toolbar": "Dashboard",
         "icon_sidebar": "Icon-Seitenleiste",
         "folder_actions": "Ordneraktionen",
-        "workspace_menu": "Workspace-Menü"
+        "workspace_menu": "Workspace-Menü",
+        "note_actions": "Notizaktionen"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1136,7 +1140,10 @@
       "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
       "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
       "s3_restore_section": "Wiederherstellungsseite: Abschnitt „Aus S3 wiederherstellen“",
-      "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?"
+      "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
+      "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
+      "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
+      "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche."
     },
     "theme": {
       "title": "Themenauswahl",
@@ -1471,7 +1478,45 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
-      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format ein."
+      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format ein.",
+      "tokens_title": "Token:",
+      "tokens": {
+        "YYYY": "Jahr (2026)",
+        "MM": "Monat (08)",
+        "DD": "Tag (16)",
+        "HH": "Stunde, 24 h (14)",
+        "h": "Stunde, 12 h (2)",
+        "hh": "Stunde, 12 h zweistellig (02)",
+        "mm": "Minuten (05)",
+        "ss": "Sekunden (09)",
+        "A": "AM/PM"
+      }
+    },
+    "diary_date_format": {
+      "title": "Datumsformat der Tagebucheinträge",
+      "description": "Wählen Sie das Datumsformat für die Titel neuer Tagebucheinträge:",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "Benutzerdefiniert"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "Token: YYYY, YY, MMMM, MMM, MM, DD. Jahr, Monat und Tag sind erforderlich.",
+      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format mit Jahr, Monat und Tag ein.",
+      "hint": "Bestehende Einträge behalten ihren Titel und bleiben ihrem Tag zugeordnet.",
+      "tokens_title": "Token:",
+      "tokens": {
+        "YYYY": "Jahr (2026)",
+        "YY": "Jahr, zweistellig (26)",
+        "MMMM": "Monatsname (August)",
+        "MMM": "kurzer Monatsname (Aug)",
+        "MM": "Monat (08)",
+        "DD": "Tag (16)"
+      },
+      "tokens_required": "Jahr, Monat und Tag sind erforderlich."
     },
     "move_folder": {
       "title": "Ordner verschieben",
@@ -1497,6 +1542,10 @@
         "user_s3_restore": "S3-Wiederherstellung auf der Wiederherstellungsseite",
         "user_s3_restore_help": "Nicht-Admin-Benutzer sehen den Abschnitt Aus S3 wiederherstellen der Seite Wiederherstellen / Importieren nicht mehr und können keine Bucket-Archive mehr wiederherstellen."
       }
+    },
+    "note": {
+      "rename_title": "Notiz umbenennen",
+      "rename_placeholder": "Neuer Notiztitel"
     }
   },
   "notes_list": {
@@ -1537,6 +1586,15 @@
     },
     "folder_filter": {
       "exit": "Ordneransicht verlassen"
+    },
+    "note_actions": {
+      "menu": "Notizaktionen",
+      "move_note": "Notiz verschieben",
+      "is_shared": "Ist geteilt",
+      "share_note": "Notiz teilen",
+      "rename_note": "Notiz umbenennen",
+      "delete_note": "Notiz löschen",
+      "enter_note_name": "Bitte geben Sie einen Notiztitel ein"
     }
   },
   "note_color": {
@@ -1549,7 +1607,17 @@
     "filter_all": "Alle Notizen",
     "filter_any": "Beliebige Farbe",
     "filter_none": "Ohne Farbe",
-    "manage_button": "Farben verwalten"
+    "manage_button": "Farben verwalten",
+    "names": {
+      "blue": "Blau",
+      "green": "Grün",
+      "yellow": "Gelb",
+      "orange": "Orange",
+      "red": "Rot",
+      "purple": "Lila",
+      "pink": "Rosa",
+      "gray": "Grau"
+    }
   },
   "tabs": {
     "context_menu": {
@@ -3571,6 +3639,9 @@
     "config_title": "Konfiguration",
     "enable_label": "KI-Assistent aktivieren",
     "enable_description": "Zeigt eine KI-Chat-Schaltfläche in der Notiz-Symbolleiste an.",
+    "users_label": "Berechtigte Benutzer",
+    "users_description": "Nur die ausgewählten Benutzer sehen die KI-Chat-Schaltfläche. Neue Benutzer haben keinen Zugriff, bis Sie sie hier hinzufügen.",
+    "users_admin": "Administrator",
     "url_label": "Server-URL",
     "url_description": "Basis-URL einer OpenAI-kompatiblen API. Für Ollama auf dem Docker-Host: http://host.docker.internal:11434",
     "model_label": "Modell",

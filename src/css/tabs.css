@@ -258,27 +258,74 @@
     align-items: center;
 }
 
+/* Overlay the row instead of taking space in it. As a flex sibling the toggle
+   shortened the note link by its own width, so the hover and selection band
+   stopped short of the sidebar's right edge. .note-list-item is already
+   position: relative. Scoped to the tree: favorites.php and shared.php reuse
+   .note-actions as an ordinary flex child. */
+.note-list-item > .note-actions {
+    position: absolute;
+    right: 0;
+    /* Match .links_arbo_left's 4px top margin (css/sidebar.css): the row box is
+       taller than the visible band, so stretching to top: 0 centred the toggle
+       on the row and left it sitting 2px above the band's centre. */
+    top: 4px;
+    bottom: 0;
+}
+
+/* Keep the title clear of the toggle. Reserved at all times rather than on
+   hover: padding sits inside the link's background, so the band still spans
+   the full width, and the text does not jump when the toggle appears. */
+.note-list-item > a.links_arbo_left {
+    padding-right: 26px;
+}
+
+/* Set by syncNoteActionToggles() in js/ui-customization.js when every item of
+   the note menu is unchecked: with no toggle to clear, give the title the
+   reserved strip back. */
+body.note-actions-hidden .note-list-item > a.links_arbo_left {
+    padding-right: 6px;
+}
+
+/* Same box, icon size and hover treatment as .folder-actions-toggle
+   (css/folders/actions-menu.css), so the note and folder three-dot buttons
+   read as one control. Only the visibility rule below differs: note toggles
+   appear on row hover instead of being permanently visible. */
 .note-actions-toggle,
 .note-actions-item {
     background: none;
     border: none;
+    width: 22px;
+    height: 22px;
+    padding: 0;
     cursor: pointer;
-    padding: 4px 8px;
     color: #6b7280;
     border-radius: 4px;
-    font-size: 0.85em;
     line-height: 1;
     display: none;
     /* hidden until parent row is hovered */
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease, color 0.15s ease;
+    transition: all 0.15s ease;
 }
 
 .note-list-item:hover .note-actions-toggle,
 .note-list-item:hover .note-actions-item,
 .note-actions-toggle.open {
-    display: flex;
+    display: inline-flex;
+}
+
+.note-actions-toggle i,
+.note-actions-item i {
+    font-size: 0.8em;
+    transition: color 0.15s ease;
+}
+
+.note-actions-toggle i[class*="lucide-"],
+.note-actions-toggle [class*="lucide-"],
+.note-actions-item i[class*="lucide-"],
+.note-actions-item [class*="lucide-"] {
+    font-size: 0.85em !important;
 }
 
 .note-actions-toggle:hover,
@@ -287,11 +334,18 @@
     color: #374151;
 }
 
+.note-actions-toggle:hover i,
+.note-actions-toggle:hover [class*="lucide-"],
+.note-actions-item:hover i,
+.note-actions-item:hover [class*="lucide-"] {
+    color: #007DB8;
+}
+
+/* Single shared menu, placed by adjustMenuPosition() in js/utils.js. Fixed
+   rather than absolute because #left_col scrolls (overflow-y: scroll,
+   overflow-x: hidden), which would clip a menu positioned inside a row. */
 .note-actions-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 2px;
+    position: fixed;
     background: white;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -347,18 +401,49 @@
     color: #374151;
 }
 
+/* Destructive and "already shared" items, matching the folder menu */
+.note-actions-menu-item.danger,
+.note-actions-menu-item.shared {
+    color: #dc2626;
+}
+
+.note-actions-menu-item.danger:hover,
+.note-actions-menu-item.shared:hover {
+    background-color: #fee2e2;
+}
+
+.note-actions-menu-item.danger i,
+.note-actions-menu-item.shared i {
+    color: #dc2626;
+}
+
+/* No hover on touch screens, so the toggle has to stay visible there. */
+@media (hover: none), (max-width: 800px) {
+    .note-actions-toggle {
+        display: inline-flex;
+    }
+}
+
 /* ── Note actions dark mode ── */
 
+/* Mirrors the dark .folder-actions-toggle rules in css/dark-mode/menus.css */
 [data-theme="dark"] .note-actions-toggle,
 [data-theme="dark"] .note-actions-item {
-    color: #555;
+    color: #b0b0b0;
 }
 
 [data-theme="dark"] .note-actions-toggle:hover,
 [data-theme="dark"] .note-actions-toggle.open,
 [data-theme="dark"] .note-actions-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #aaa;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--dm-text);
+}
+
+[data-theme="dark"] .note-actions-toggle:hover i,
+[data-theme="dark"] .note-actions-toggle:hover [class*="lucide-"],
+[data-theme="dark"] .note-actions-item:hover i,
+[data-theme="dark"] .note-actions-item:hover [class*="lucide-"] {
+    color: #38bdf8;
 }
 
 [data-theme="dark"] .note-actions-menu {
@@ -381,4 +466,17 @@
 
 [data-theme="dark"] .note-actions-menu-item:hover i {
     color: #e5e7eb;
+}
+
+/* Same specificity as the rules above, so these must come after them to win. */
+[data-theme="dark"] .note-actions-menu-item.danger,
+[data-theme="dark"] .note-actions-menu-item.shared,
+[data-theme="dark"] .note-actions-menu-item.danger i,
+[data-theme="dark"] .note-actions-menu-item.shared i {
+    color: #f87171;
+}
+
+[data-theme="dark"] .note-actions-menu-item.danger:hover,
+[data-theme="dark"] .note-actions-menu-item.shared:hover {
+    background-color: rgba(220, 38, 38, 0.18);
 }

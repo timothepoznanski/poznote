@@ -139,6 +139,12 @@ if (!$aiEnabled || $aiUrl === '' || $aiModel === '') {
     aiChatJsonError(400, 'AI assistant is not configured');
 }
 
+// Access is granted per user by an admin: hiding the button is not enough,
+// the endpoint itself must refuse users who were never allowed.
+if (!isAiChatAllowedForUser((int)(getAuthenticatedUserId() ?? 0))) {
+    aiChatJsonError(403, 'AI assistant access is not enabled for this user');
+}
+
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input) || !isset($input['messages']) || !is_array($input['messages'])) {
     aiChatJsonError(400, 'Invalid request body');

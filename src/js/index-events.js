@@ -712,6 +712,14 @@
                 }
                 break;
             }
+            case 'rename-note':
+                if (isPublicWorkspaceReadOnly()) {
+                    break;
+                }
+                if (noteId && typeof window.renameNote === 'function') {
+                    window.renameNote(noteId, target.dataset.noteTitle || '');
+                }
+                break;
             case 'delete-note':
                 if (noteId && typeof deleteNote === 'function') {
                     deleteNote(noteId);

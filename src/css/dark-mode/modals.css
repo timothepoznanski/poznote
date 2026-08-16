@@ -1130,3 +1130,15 @@ html[data-theme='dark'] #updateCheckModal .modal-content p,
 body.dark-mode #updateCheckModal .modal-content p {
     color: var(--dm-text) !important;
 }
+
+/* Custom date pattern token legend */
+html[data-theme='dark'] .date-format-tokens,
+body.dark-mode .date-format-tokens {
+    color: var(--dm-text-muted, #9ca3af) !important;
+}
+
+html[data-theme='dark'] .date-format-tokens dt code,
+body.dark-mode .date-format-tokens dt code {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: var(--dm-text) !important;
+}

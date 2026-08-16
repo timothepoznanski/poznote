@@ -534,60 +534,10 @@
                 event.preventDefault();
                 event.stopPropagation();
                 var noteId = actionElement.getAttribute('data-note-id');
-                if (!noteId) return;
-                var menu = document.getElementById('note-actions-menu-' + noteId);
-                if (!menu) return;
-                var isOpen = menu.classList.contains('show');
-
-                // Close all other open note menus first
-                closeAllNoteActionMenus();
-
-                if (!isOpen) {
-                    // Reset any previously applied manual positioning
-                    menu.style.top = '';
-                    menu.style.bottom = '';
-                    menu.style.left = '';
-                    menu.style.right = '0';
-
-                    // Show it first to get its dimensions
-                    menu.classList.add('show');
-                    actionElement.classList.add('open');
-
-                    if (window.tabManager && typeof window.tabManager.updateUI === 'function') {
-                        window.tabManager.updateUI();
-                    }
-
-                    // Smart positioning to detect window boundaries
-                    var rect = menu.getBoundingClientRect();
-                    var windowHeight = window.innerHeight;
-                    var windowWidth = window.innerWidth;
-
-                    // Vertical check
-                    if (rect.bottom > windowHeight) {
-                        // Not enough space below, open upwards
-                        menu.style.top = 'auto';
-                        menu.style.bottom = '100%';
-                        menu.style.marginTop = '0';
-                        menu.style.marginBottom = '2px';
-                    } else {
-                        // Enough space below, ensure default
-                        menu.style.top = '100%';
-                        menu.style.bottom = 'auto';
-                        menu.style.marginTop = '2px';
-                        menu.style.marginBottom = '0';
-                    }
-
-                    // Horizontal check (ensure it doesn't go off-screen to the right)
-                    if (rect.right > windowWidth) {
-                        var offset = rect.right - windowWidth + 10;
-                        menu.style.right = offset + 'px';
-                    }
-
-                    // Minimal check to ensure it doesn't go off-screen to the left
-                    if (rect.left < 0) {
-                        menu.style.left = '0';
-                        menu.style.right = 'auto';
-                    }
+                if (noteId && typeof window.toggleNoteActionsMenu === 'function') {
+                    // Pass the element: a favorited note has a second row in
+                    // the Favorites section with the same note id.
+                    window.toggleNoteActionsMenu(noteId, actionElement);
                 }
             }
         };
@@ -816,6 +766,47 @@
     }
 
     /**
+     * Right-click on a tree row opens that row's actions menu at the cursor,
+     * instead of the browser's own context menu (discussion #1251).
+     *
+     * Notes are tested first: .folder-header wraps .folder-content, so a note
+     * row is inside its folder's header too. .folder-toggle is the header line
+     * alone, which is what should answer for the folder.
+     *
+     * Left alone, so the native menu still shows: touch devices, where the
+     * event comes from a long press and would fight note drag-and-drop; rows
+     * whose menu is fully hidden by UI customization; and the favorite folder
+     * shortcuts, which have no actions toggle of their own.
+     */
+    function handleTreeContextMenu(event) {
+        if (window.matchMedia && window.matchMedia('(hover: none)').matches) {
+            return;
+        }
+
+        var target = event.target;
+        if (!target || !target.closest) return;
+
+        var noteItem = target.closest('.note-list-item');
+        if (noteItem) {
+            var noteToggle = noteItem.querySelector('.note-actions-toggle');
+            if (noteToggle && typeof window.openNoteActionsMenuAtPoint === 'function' &&
+                window.openNoteActionsMenuAtPoint(noteToggle, event.clientX, event.clientY)) {
+                event.preventDefault();
+            }
+            return;
+        }
+
+        var folderRow = target.closest('.folder-toggle');
+        if (!folderRow) return;
+
+        var folderId = parseInt(folderRow.getAttribute('data-folder-id'), 10);
+        if (folderId && typeof window.openFolderActionsMenuAtPoint === 'function' &&
+            window.openFolderActionsMenuAtPoint(folderId, event.clientX, event.clientY)) {
+            event.preventDefault();
+        }
+    }
+
+    /**
      * Attach all event listeners
      */
     function attachEventListeners() {
@@ -827,6 +818,9 @@
 
         // Main click event delegation
         document.addEventListener('click', handleNotesListClick);
+
+        // Right-click menus on the tree rows
+        document.addEventListener('contextmenu', handleTreeContextMenu);
 
         // Double-click event delegation
         document.addEventListener('dblclick', handleNotesListDblClick);

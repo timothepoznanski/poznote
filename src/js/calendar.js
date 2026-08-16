@@ -422,7 +422,9 @@ class MiniCalendar {
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify({
-                    heading: dateStr,
+                    // The title follows the configured diary date format;
+                    // created_date stays YYYY-MM-DD, as the API expects.
+                    heading: diary.title || dateStr,
                     folder_name: diary.folder,
                     workspace: diary.workspace,
                     type: diary.noteType === 'markdown' ? 'markdown' : 'note',
@@ -491,6 +493,7 @@ class MiniCalendar {
                     folder: d.folder,
                     workspace: d.workspace,
                     noteType: d.noteType,
+                    title: d.title,
                     name: d.name
                 }))
                 : [diary])

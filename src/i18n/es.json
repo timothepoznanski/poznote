@@ -417,6 +417,7 @@
       "note_age_filter": "Muestra solo las notas modificadas en los últimos días elegidos.",
       "tasklist_insert_order": "Elige si las nuevas tareas se añaden arriba o abajo de las listas de tareas.",
       "diary_note_type": "Elige el formato de nota para las nuevas entradas de diario.",
+      "diary_date_format": "Elija el formato de fecha utilizado para titular las nuevas entradas del diario.",
       "show_created": "Muestra la fecha de creación en el encabezado de la nota.",
       "note_icons": "Muestra iconos personalizados junto a los títulos en la lista de notas.",
       "type_based_note_icons": "Usa un icono predeterminado específico para las listas de tareas y las notas markdown para distinguirlas en la lista de notas.",
@@ -468,6 +469,7 @@
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",
+      "behavior": "Comportamiento",
       "about": "Acerca de",
       "documentation": "Documentación"
     },
@@ -672,6 +674,7 @@
       "note_age_filter": "Filtro de antigüedad",
       "tasklist_insert_order": "Orden de inserción de tareas",
       "diary_default_note_type": "Formato de las entradas del diario",
+      "diary_date_format": "Formato de fecha de las entradas del diario",
       "timezone": "Zona horaria",
       "date_time_format": "Formato de fecha y hora",
       "show_note_created": "Mostrar fecha de creación de la nota",
@@ -1125,7 +1128,8 @@
         "dashboard_toolbar": "Panel",
         "icon_sidebar": "Barra de iconos",
         "folder_actions": "Acciones de carpeta",
-        "workspace_menu": "Menú del espacio de trabajo"
+        "workspace_menu": "Menú del espacio de trabajo",
+        "note_actions": "Acciones de las notas"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1137,7 +1141,10 @@
       "direct_copy_restore_section": "Página de restauración: sección «Restaurar cuando la restauración estándar no funciona»",
       "s3_backups_section": "Página de copia de seguridad: sección «Copias de seguridad S3»",
       "s3_restore_section": "Página de restauración: sección «Restaurar desde S3»",
-      "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?"
+      "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?",
+      "folder_actions_toggle": "Botón de menú (⋮) en las carpetas",
+      "note_actions_toggle": "Botón de menú (⋮) en las notas",
+      "note_actions_hint": "Elementos del menú ⋮ de cada nota en la barra lateral. Si se desmarcan todos, se oculta el botón del menú."
     },
     "theme": {
       "title": "Selección de tema",
@@ -1472,7 +1479,45 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
-      "custom_invalid": "Introduce un formato personalizado válido."
+      "custom_invalid": "Introduce un formato personalizado válido.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "año (2026)",
+        "MM": "mes (08)",
+        "DD": "día (16)",
+        "HH": "hora, 24 h (14)",
+        "h": "hora, 12 h (2)",
+        "hh": "hora, 12 h con dos dígitos (02)",
+        "mm": "minutos (05)",
+        "ss": "segundos (09)",
+        "A": "AM/PM"
+      }
+    },
+    "diary_date_format": {
+      "title": "Formato de fecha de las entradas del diario",
+      "description": "Elija el formato de fecha utilizado para titular las nuevas entradas del diario:",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "Personalizado"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, DD. Se requieren un año, un mes y un día.",
+      "custom_invalid": "Introduzca un formato personalizado válido, con un año, un mes y un día.",
+      "hint": "Las entradas existentes conservan su título y siguen vinculadas a su día.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "año (2026)",
+        "YY": "año con dos dígitos (26)",
+        "MMMM": "nombre del mes (August)",
+        "MMM": "nombre del mes abreviado (Aug)",
+        "MM": "mes (08)",
+        "DD": "día (16)"
+      },
+      "tokens_required": "Se requieren un año, un mes y un día."
     },
     "move_folder": {
       "title": "Mover carpeta",
@@ -1498,6 +1543,10 @@
         "user_s3_restore": "Restauración S3 en la página de restauración",
         "user_s3_restore_help": "Los usuarios no administradores ya no ven la sección Restaurar desde S3 de la página Restaurar / Importar y no pueden restaurar archivos del bucket."
       }
+    },
+    "note": {
+      "rename_title": "Renombrar nota",
+      "rename_placeholder": "Nuevo título de la nota"
     }
   },
   "notes_list": {
@@ -1538,6 +1587,15 @@
     },
     "folder_filter": {
       "exit": "Salir de la vista de la carpeta"
+    },
+    "note_actions": {
+      "menu": "Acciones de la nota",
+      "move_note": "Mover nota",
+      "is_shared": "Es compartida",
+      "share_note": "Compartir nota",
+      "rename_note": "Renombrar nota",
+      "delete_note": "Eliminar nota",
+      "enter_note_name": "Introduzca un título de nota"
     }
   },
   "note_color": {
@@ -1550,7 +1608,17 @@
     "filter_all": "Todas las notas",
     "filter_any": "Cualquier color",
     "filter_none": "Sin color",
-    "manage_button": "Gestionar colores"
+    "manage_button": "Gestionar colores",
+    "names": {
+      "blue": "Azul",
+      "green": "Verde",
+      "yellow": "Amarillo",
+      "orange": "Naranja",
+      "red": "Rojo",
+      "purple": "Morado",
+      "pink": "Rosa",
+      "gray": "Gris"
+    }
   },
   "tabs": {
     "context_menu": {
@@ -3571,6 +3639,9 @@
     "config_title": "Configuración",
     "enable_label": "Activar el asistente IA",
     "enable_description": "Muestra un botón de chat IA en la barra de herramientas de las notas.",
+    "users_label": "Usuarios autorizados",
+    "users_description": "Solo los usuarios seleccionados ven el botón de chat de IA. Los nuevos usuarios no tienen acceso hasta que los añadas aquí.",
+    "users_admin": "Administrador",
     "url_label": "URL del servidor",
     "url_description": "URL base de una API compatible con OpenAI. Para Ollama en el host de Docker, usa http://host.docker.internal:11434",
     "model_label": "Modelo",

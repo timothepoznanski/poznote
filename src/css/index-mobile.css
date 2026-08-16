@@ -33,14 +33,18 @@
     outline: none !important;
 }
 
-/* Force folder actions to be visible on mobile regardless of hide_folder_actions setting */
+/* Force folder actions to be visible on mobile: the desktop rule in
+   css/folders/actions-menu.css hides the toggle until the folder row is
+   hovered, and there is no hover on touch. The toggle itself carries the
+   opacity, so overriding only the inner <i> would leave it invisible. */
 
 .folder-toggle .folder-actions i {
     opacity: 1 !important;
     pointer-events: auto !important;
 }
 
-.folder-toggle:hover .folder-actions i {
+.folder-header .folder-actions-toggle,
+.folder-toggle .folder-actions-toggle {
     opacity: 1 !important;
     pointer-events: auto !important;
 }

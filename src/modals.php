@@ -516,6 +516,18 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Modal for renaming a note from the tree's note actions menu -->
+<div id="renameNoteModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.note.rename_title', [], 'Rename note'); ?></h3>
+        <input type="text" id="renameNoteName" placeholder="<?php echo t_h('modals.note.rename_placeholder', [], 'Note title'); ?>" maxlength="255">
+        <div class="modal-buttons">
+            <button data-action="save-note-name"><?php echo t_h('common.save'); ?></button>
+            <button data-action="close-modal" data-modal="renameNoteModal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal for deleting folder -->
 <div id="deleteFolderModal" class="modal">
     <div class="modal-content">
@@ -1178,12 +1190,44 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="dateTimeFormat" value="mdy_hia"> <?php echo t_h('modals.date_time_format.options.mdy_hia', [], 'MM/DD/YYYY hh:mm AM/PM'); ?></label>
                 <label><input type="radio" name="dateTimeFormat" value="custom"> <?php echo t_h('modals.date_time_format.options.custom', [], 'Custom'); ?></label>
                 <input type="text" id="dateTimeFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.date_time_format.custom_placeholder', [], 'YYYY-MM-DD HH:mm:ss'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
-                <small style="display: block; margin: 4px 0 0 24px; color: #6b7280;"><?php echo t_h('modals.date_time_format.custom_hint', [], 'Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A'); ?></small>
+                <div class="date-format-tokens-wrap" style="margin: 4px 0 0 24px;">
+                    <small style="display: block; color: #6b7280;"><?php echo t_h('modals.date_time_format.tokens_title', [], 'Tokens:'); ?></small>
+                    <?php echo renderDateFormatTokenLegend('date_time_format'); ?>
+                </div>
             </div>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="dateTimeFormatModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveDateTimeFormatModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<!-- Diary entry date format modal -->
+<div id="diaryDateFormatModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.diary_date_format.title', [], 'Diary entry date format'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.diary_date_format.description', [], 'Choose the date format used to title new diary entries:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="diaryDateFormat" value="ymd"> <?php echo t_h('modals.diary_date_format.options.ymd', [], 'YYYY-MM-DD'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="dmy_slash"> <?php echo t_h('modals.diary_date_format.options.dmy_slash', [], 'DD/MM/YYYY'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="mdy_slash"> <?php echo t_h('modals.diary_date_format.options.mdy_slash', [], 'MM/DD/YYYY'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="dmy_dot"> <?php echo t_h('modals.diary_date_format.options.dmy_dot', [], 'DD.MM.YYYY'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="ymd_slash"> <?php echo t_h('modals.diary_date_format.options.ymd_slash', [], 'YYYY/MM/DD'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="custom"> <?php echo t_h('modals.diary_date_format.options.custom', [], 'Custom'); ?></label>
+                <input type="text" id="diaryDateFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.diary_date_format.custom_placeholder', [], 'DD MMMM YYYY'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
+                <div class="date-format-tokens-wrap" style="margin: 4px 0 0 24px;">
+                    <small style="display: block; color: #6b7280;"><?php echo t_h('modals.diary_date_format.tokens_title', [], 'Tokens:'); ?></small>
+                    <?php echo renderDateFormatTokenLegend('diary_date_format'); ?>
+                    <small style="display: block; color: #6b7280;"><?php echo t_h('modals.diary_date_format.tokens_required', [], 'A year, a month and a day are required.'); ?></small>
+                </div>
+            </div>
+            <small style="display: block; margin: 8px 0 16px 0; color: #6b7280;"><?php echo t_h('modals.diary_date_format.hint', [], 'Existing entries keep their title and stay linked to their day.'); ?></small>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="diaryDateFormatModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveDiaryDateFormatModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
@@ -1590,11 +1634,9 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:show-created-card" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-icons-card" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:type-note-icons-card" checked><span><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-counts-card" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
@@ -1712,6 +1754,9 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-created-date" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-note-count" checked><span><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder counts'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarCreateBtn" checked><span><?php echo t_h('sidebar.create', [], 'Create'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarExpandFoldersBtn" checked><span><?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
@@ -1772,6 +1817,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.folder_actions_toggle', [], 'Menu button (⋮) on folders'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:create-note-in-folder" checked><span><?php echo t_h('notes_list.folder_actions.create', [], 'Create note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-kanban-view" checked><span><?php echo t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-all-notes-in-tabs" checked><span><?php echo t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes in tabs'); ?></span></label>
@@ -1783,6 +1829,22 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:change-folder-icon" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:toggle-sort-submenu" checked><span><?php echo t_h('sort.header', [], 'Sort by'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:delete-folder" checked><span><?php echo t_h('notes_list.folder_actions.delete_folder', [], 'Delete'); ?></span></label>
+                </div>
+                </div>
+
+                <!-- Note Actions Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.note_actions', [], 'Note Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.note_actions_hint', [], 'Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.'); ?></p>
+                <div class="ui-custom-items">
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-export-modal" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-note-icon-picker" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:delete-note" checked><span><?php echo t_h('notes_list.note_actions.delete_note', [], 'Delete note'); ?></span></label>
                 </div>
                 </div>
             </div>
