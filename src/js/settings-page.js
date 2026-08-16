@@ -115,6 +115,7 @@
             'date_time_format',
             'hidden_ui_elements',
             'settings_pinned_cards',
+            'settings_recent_cards',
             'spellcheck_html_notes',
             'slash_menu_require_alt',
             'note_nav_shortcuts_enabled',
@@ -2567,9 +2568,9 @@
         // Search functionality - filters settings cards
         var searchInput = document.getElementById('home-search-input');
         var cards = document.querySelectorAll('.home-grid .home-card');
-        // Skip the pinned-cards grid: it may be empty/hidden, and the
+        // Skip the pinned and recent grids: they may be empty/hidden, and the
         // "no results" element must live in an always-rendered grid.
-        var grid = document.querySelector('.home-grid:not(#settings-pinned-section-grid)');
+        var grid = document.querySelector('.home-grid:not(#settings-pinned-section-grid):not(#settings-recent-section-grid)');
 
         if (searchInput && grid) {
             // Create "no results" message element
@@ -2651,11 +2652,17 @@
         // migrated on first load.
         var pinnedGrid = document.getElementById('settings-pinned-section-grid');
         var pinnedTitle = document.getElementById('settings-pinned-section-title');
+        var recentGrid = document.getElementById('settings-recent-section-grid');
+        var recentTitle = document.getElementById('settings-recent-section-title');
+        var RECENT_CARDS_LIMIT = 4;
         if (pinnedGrid && pinnedTitle) {
             var pinnedCardIds = [];
+            var recentCardIds = [];
 
             var pinnedClones = {};    // card id -> clone element in the pinned grid
             var cloneObservers = {};  // card id -> MutationObserver keeping the clone in sync
+            var recentClones = {};    // card id -> clone element in the recent grid
+            var recentObservers = {}; // card id -> MutationObserver keeping the recent clone in sync
 
             var parsePinnedCardIds = function (raw) {
                 try {
@@ -2703,7 +2710,9 @@
                 stripIds(clone);
             };
 
-            var createPinnedClone = function (orig) {
+            // Shared by the "Pinned" and "Recent" sections: both show live
+            // clones of cards that stay in place in their own section.
+            var buildClone = function (orig) {
                 var clone = orig.cloneNode(true);
                 stripIds(clone);
                 clone.dataset.pinCloneOf = orig.id;
@@ -2725,14 +2734,75 @@
                     syncCloneContent(orig, clone);
                 });
                 observer.observe(orig, { subtree: true, childList: true, attributes: true, characterData: true });
-                pinnedClones[orig.id] = clone;
-                cloneObservers[orig.id] = observer;
-                pinnedGrid.appendChild(clone);
+                return { clone: clone, observer: observer };
+            };
+
+            var createPinnedClone = function (orig) {
+                var built = buildClone(orig);
+                pinnedClones[orig.id] = built.clone;
+                cloneObservers[orig.id] = built.observer;
+                pinnedGrid.appendChild(built.clone);
             };
 
             var removePinnedClone = function (id) {
                 if (cloneObservers[id]) { cloneObservers[id].disconnect(); delete cloneObservers[id]; }
                 if (pinnedClones[id]) { pinnedClones[id].remove(); delete pinnedClones[id]; }
+            };
+
+            // "Recent": the last RECENT_CARDS_LIMIT cards the user clicked,
+            // most recent first, persisted per user in the settings table.
+            // Most cards navigate away on click, which cancels a plain fetch,
+            // so the save is sent with keepalive to outlive the page.
+            var saveRecentCards = function () {
+                var body = JSON.stringify({ value: JSON.stringify(recentCardIds) });
+                try {
+                    fetch('/api/v1/settings/settings_recent_cards', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        credentials: 'same-origin',
+                        keepalive: true,
+                        body: body
+                    }).catch(function () { /* best effort */ });
+                } catch (e) {
+                    setSetting('settings_recent_cards', JSON.stringify(recentCardIds));
+                }
+            };
+
+            var renderRecentSection = function () {
+                if (!recentGrid || !recentTitle) return;
+                Object.keys(recentObservers).forEach(function (id) {
+                    recentObservers[id].disconnect();
+                    delete recentObservers[id];
+                });
+                Object.keys(recentClones).forEach(function (id) {
+                    recentClones[id].remove();
+                    delete recentClones[id];
+                });
+                recentCardIds.forEach(function (id) {
+                    var card = document.getElementById(id);
+                    if (!card || !card.classList.contains('home-card')) return;
+                    var built = buildClone(card);
+                    recentClones[id] = built.clone;
+                    recentObservers[id] = built.observer;
+                    recentGrid.appendChild(built.clone);
+                });
+                var empty = recentGrid.children.length === 0;
+                recentTitle.hidden = empty;
+                recentGrid.hidden = empty;
+            };
+
+            // Recorded on the original card; clones forward their clicks to it,
+            // so a click on a pinned or recent clone counts too.
+            var recordRecentCard = function (id) {
+                if (!recentGrid || !id) return;
+                var idx = recentCardIds.indexOf(id);
+                if (idx !== -1) recentCardIds.splice(idx, 1);
+                recentCardIds.unshift(id);
+                if (recentCardIds.length > RECENT_CARDS_LIMIT) {
+                    recentCardIds.length = RECENT_CARDS_LIMIT;
+                }
+                saveRecentCards();
+                renderRecentSection();
             };
 
             var togglePin = function (card) {
@@ -2750,7 +2820,7 @@
             };
 
             var pinnableCards = [];
-            document.querySelectorAll('.home-grid:not(#settings-pinned-section-grid) .home-card').forEach(function (card) {
+            document.querySelectorAll('.home-grid:not(#settings-pinned-section-grid):not(#settings-recent-section-grid) .home-card').forEach(function (card) {
                 if (!card.id) return;
                 pinnableCards.push(card);
                 // A real <button> is not allowed inside the <a> cards, so the
@@ -2777,6 +2847,13 @@
                 });
                 card.appendChild(btn);
                 applyPinState(card);
+                // Capture phase: some card handlers navigate away, so the
+                // history has to be recorded before they run.
+                card.addEventListener('click', function (e) {
+                    if (e.target.closest('.settings-card-pin')) return;
+                    if (e.target.closest('.setting-help')) return;
+                    recordRecentCard(card.id);
+                }, true);
             });
 
             // Load saved pins, then build the pinned section in saved order.
@@ -2806,19 +2883,33 @@
                 refreshPinnedSection();
             });
 
+            // Load the saved click history and build the "Recent" section.
+            if (recentGrid && recentTitle) {
+                getSetting('settings_recent_cards', function (value) {
+                    recentCardIds = parsePinnedCardIds(typeof value === 'string' ? value : '')
+                        .slice(0, RECENT_CARDS_LIMIT);
+                    renderRecentSection();
+                });
+            }
+
             document.addEventListener('poznote:i18n:loaded', function () {
                 pinnableCards.forEach(applyPinState);
             });
         }
 
         // Collapsible sections: each category title gets a chevron button that
-        // collapses the grid below it, persisted per user.
+        // collapses the grid below it. Every visit to settings.php starts with
+        // all sections collapsed except "Pinned" and "Recent", so the page
+        // always opens on the same short view; expanding is a per-visit action
+        // and is no longer persisted across loads.
         var sectionStore = window.__poznoteUserStorage || window.localStorage;
-        var collapsedSections = [];
         try {
-            collapsedSections = JSON.parse(sectionStore.getItem('settingsCollapsedSections') || '[]');
-            if (!Array.isArray(collapsedSections)) collapsedSections = [];
-        } catch (e) { /* storage unavailable or corrupt */ }
+            // Drop any state saved by earlier versions: it would otherwise
+            // re-expand sections on load.
+            sectionStore.removeItem('settingsCollapsedSections');
+        } catch (e) { /* storage unavailable */ }
+
+        var alwaysExpandedSections = ['settings-pinned-section-grid', 'settings-recent-section-grid'];
 
         var sectionLabelRefreshers = [];
 
@@ -2846,27 +2937,45 @@
                 toggleBtn.setAttribute('aria-label', label);
                 toggleBtn.title = label;
             };
-            applySectionState(collapsedSections.indexOf(sectionKey) !== -1);
+            applySectionState(alwaysExpandedSections.indexOf(sectionKey) === -1);
             sectionLabelRefreshers.push(function () {
                 applySectionState(title.classList.contains('section-collapsed'));
             });
 
             // The button's click bubbles up here, so one listener covers both
             title.addEventListener('click', function () {
-                var collapsed = !title.classList.contains('section-collapsed');
-                applySectionState(collapsed);
-                var idx = collapsedSections.indexOf(sectionKey);
-                if (collapsed && idx === -1) collapsedSections.push(sectionKey);
-                if (!collapsed && idx !== -1) collapsedSections.splice(idx, 1);
-                try {
-                    sectionStore.setItem('settingsCollapsedSections', JSON.stringify(collapsedSections));
-                } catch (e) { /* storage unavailable */ }
+                applySectionState(!title.classList.contains('section-collapsed'));
             });
         });
 
         document.addEventListener('poznote:i18n:loaded', function () {
             sectionLabelRefreshers.forEach(function (refresh) { refresh(); });
         });
+
+        // Deep link from the rail's About button: settings.php?open=about shows
+        // the About section on its own, instead of the default view where only
+        // "Pinned" and "Recent" are expanded.
+        if (new URLSearchParams(window.location.search || '').get('open') === 'about') {
+            var aboutGrid = document.getElementById('settings-documentation-section-grid');
+            document.querySelectorAll('.settings-category-title').forEach(function (title) {
+                var grid = title.nextElementSibling;
+                if (!grid || !grid.classList.contains('home-grid')) return;
+                // The pinned section is hidden when empty; leave it as it is.
+                if (title.hidden) return;
+                var isAbout = grid === aboutGrid;
+                title.classList.toggle('section-collapsed', !isAbout);
+                grid.classList.toggle('section-collapsed', !isAbout);
+                var btn = title.querySelector('.settings-section-toggle');
+                if (btn) btn.setAttribute('aria-expanded', isAbout ? 'true' : 'false');
+            });
+            var aboutTitle = document.getElementById('settings-documentation-section-title');
+            if (aboutTitle && typeof aboutTitle.scrollIntoView === 'function') {
+                aboutTitle.scrollIntoView({ block: 'start' });
+            }
+            // ?open=about deliberately stays in the URL: icon_sidebar.php reads
+            // it to highlight About instead of Settings, so stripping it would
+            // move the highlight back to Settings on the next reload.
+        }
 
         // Card/list layout toggle next to the filter bar (same pattern as the
         // dashboard's board-view-menu.js), persisted per user.

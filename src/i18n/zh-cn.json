@@ -467,12 +467,13 @@
     "expand_section": "展开此部分",
     "categories": {
       "pinned": "已固定",
+      "recent": "最近使用",
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
       "behavior": "行为",
       "about": "关于",
-      "documentation": "文档"
+      "documentation": "关于"
     },
     "sections": {
       "account_display": "账户与显示",
@@ -501,6 +502,7 @@
       "restore_import": "还原 / 导入",
       "git_sync": "Git 同步",
       "check_updates": "检查更新",
+      "version": "版本",
       "api_docs": "API 文档",
       "documentation": "Documentation GitHub",
       "news": "Poznote 博客",
@@ -1066,7 +1068,7 @@
       "backup_hint": "<strong>设置 > 备份</strong>",
       "current_version": "当前版本:",
       "latest_available": "最新可用版本:",
-      "view_release_notes": "查看发布日志 <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">此处</a>",
+      "release_notes_button": "查看发布日志",
       "self_hosted": "自托管说明",
       "cloud": "云端说明"
     },
@@ -1660,7 +1662,8 @@
     "new_version_available": "如需更新，请查看 GitHub 上的说明 <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">此处</a>",
     "description": "您的数据在更新过程中将被保留。",
     "up_to_date": "✅ Poznote 已是最新版本",
-    "error_loading_version": "加载版本信息出错"
+    "error_loading_version": "加载版本信息出错",
+    "error_getting_version": "获取版本出错"
   },
   "slash_menu": {
     "plain_block": "普通块",
@@ -1940,7 +1943,6 @@
       "download_attachments_export": "下载附件(ZIP)"
     },
     "spinner": {
-      "home_hint": "可从仪表盘执行推送和拉取操作。",
       "preparing": "正在准备备份...",
       "preparing_long": "正在准备备份... 这可能需要一些时间。"
     },
@@ -3061,6 +3063,7 @@
     "auto_pull_no_changes": "Git 同步完成。未发现更改。",
     "pulling": "正在拉取更改...",
     "starting": "同步中...",
+    "completed": "已完成！",
     "config": {
       "title": "配置",
       "status": "状态",
@@ -3099,6 +3102,7 @@
       "workspace": "工作区",
       "target_workspace": "目标工作区",
       "all_workspaces": "所有工作区",
+      "home_hint": "可从主页侧边栏执行推送和拉取操作",
       "push": {
         "title": "推送到 {{provider}}",
         "description": "将您的所有笔记和附件作为扁平文件导出到 {{provider}}。更新现有文件并删除 Poznote 中不再存在的文件。",
@@ -3375,12 +3379,12 @@
     "card": "我的资料",
     "modal": {
       "title": "我的资料",
-      "description": "更新您的个人信息。",
+      "title_of": "{{name}} 的资料",
       "username": "用户名",
       "first_name": "名字",
       "last_name": "姓氏",
       "email_admin_only": "只有管理员才能修改您的电子邮件地址。",
-      "your_id": "您的 ID"
+      "id": "ID"
     },
     "errors": {
       "username_required": "用户名为必填项",
@@ -3388,6 +3392,9 @@
       "username_taken": "该用户名已被使用",
       "email_invalid": "电子邮件地址无效",
       "email_taken": "该电子邮件已被使用"
+    },
+    "logout": {
+      "confirm": "确定要退出登录吗？"
     }
   },
   "password": {

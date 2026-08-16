@@ -158,7 +158,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <p><strong><?php echo t_h('modals.update.current_version'); ?></strong> <span id="currentVersion"><?php echo t_h('common.loading'); ?></span></p>
             <p><strong><?php echo t_h('modals.update.latest_available'); ?></strong> <span id="availableVersion"><?php echo t_h('common.loading'); ?></span></p>
         </div>
-        <p id="releaseNotesLink" class="initially-hidden"><?php echo t('modals.update.view_release_notes'); ?></p>
         <p id="updateMessage"></p>
         <div class="backup-warning initially-hidden" id="updateBackupWarning">
             <p><strong>⚠️ </strong> <span class="backup-warning-text"><?php echo t_h('modals.update.backup_warning'); ?></span></p>
@@ -166,6 +165,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-update-modal"><?php echo t_h('common.close'); ?></button>
+            <button type="button" class="btn-primary" id="releaseNotesHref" onclick="window.open('https://github.com/timothepoznanski/poznote/releases', '_blank', 'noopener');"><?php echo t_h('modals.update.release_notes_button', [], 'View release notes'); ?></button>
         </div>
     </div>
 </div>
@@ -1616,7 +1616,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-user-card" checked><span><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:check-updates-card" checked><span><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:spellcheck-html-notes-card" checked><span><?php echo t_h('display.cards.spellcheck_html_notes', [], 'Spell check'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:slash-menu-require-alt-card" checked><span><?php echo t_h('display.cards.slash_menu_require_alt', [], 'Command menu shortcut'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-nav-shortcuts-card" checked><span><?php echo t_h('display.cards.note_nav_shortcuts', [], 'Switch notes with Alt + ↑/↓'); ?></span></label>
@@ -1665,7 +1664,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:activity-log-card" checked><span><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:version-card" checked><span><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:check-updates-card" checked><span><?php echo t_h('settings.cards.version', [], 'Version'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:support-card" checked><span><?php echo t_h('settings.cards.support', [], 'Support Poznote'); ?></span></label>
@@ -1796,6 +1795,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarProfileBtn" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAboutBtn" checked><span><?php echo t_h('settings.categories.documentation', [], 'About'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarLogoutBtn" checked><span><?php echo t_h('workspace_menu.logout', [], 'Logout'); ?></span></label>
                 </div>
                 </div>

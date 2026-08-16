@@ -306,10 +306,6 @@ body.git-sync-page {
 }
 
 /* Forms */
-.sync-form {
-    text-align: center;
-}
-
 .form-group {
     margin-bottom: 16px;
     text-align: left;
@@ -664,79 +660,8 @@ body.dark-mode .repo-link {
 
 
 
-.git-sync-nav {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 24px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.git-sync-nav .btn.btn-toolbar-size {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 6px 8px;
-    line-height: 1.2;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.git-sync-nav .btn.btn-secondary {
-    background: #6c757d;
-    color: white !important;
-}
-
-.git-sync-nav .btn.btn-secondary:hover {
-    background: #5a6268;
-    color: white !important;
-    text-decoration: none;
-}
-
-.git-sync-nav .sync-form {
-    display: inline-block;
-    margin: 0;
-}
-
 /* Responsive */
 @media (max-width: 600px) {
-    .git-sync-nav {
-        gap: 12px;
-        padding: 0;
-        justify-content: center;
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap;
-    }
-
-    .git-sync-nav .btn {
-        flex: 0 1 auto !important;
-        width: auto !important;
-        min-width: 140px !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        padding: 8px 16px !important;
-        text-align: center !important;
-        min-height: 36px !important;
-        line-height: 1.2 !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-sizing: border-box !important;
-        margin-bottom: 5px !important;
-    }
-
-    .git-sync-nav .sync-form {
-        flex: 0 1 auto;
-        display: flex;
-    }
-
-    .git-sync-nav .sync-form .btn {
-        width: auto !important;
-        margin: 0;
-    }
-
     .git-sync-header h1 {
         font-size: 1.4rem;
     }

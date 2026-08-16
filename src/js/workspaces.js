@@ -159,22 +159,6 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || '');
     var menuHtml = '';
 
-    // Add username at the top if available
-    if (username) {
-        var displayText = username.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        if (actingAs) {
-            var safeActingAs = String(actingAs).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-            var actingText = wsTr('workspace_menu.acting_as', { user: safeActingAs }, ' (acting as {{user}})');
-            displayText += actingText;
-        }
-
-        menuHtml += '<div class="workspace-menu-item workspace-menu-username" data-action="user-settings">';
-        menuHtml += '<i class="lucide lucide-user"></i>';
-        menuHtml += '<span>' + displayText + '</span>';
-        menuHtml += '</div>';
-        menuHtml += '<div class="workspace-menu-divider"></div>';
-    }
-
     // Check if current workspace exists in the list
     var workspaceExists = false;
     for (var i = 0; i < workspaces.length; i++) {
@@ -208,21 +192,6 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
         menuHtml += '</div>';
     }
 
-    // Add divider before action items
-    menuHtml += '<div class="workspace-menu-divider"></div>';
-
-    // Add "Workspaces" menu item
-    menuHtml += '<div class="workspace-menu-item" data-action="goto-workspaces">';
-    menuHtml += '<i class="lucide lucide-settings"></i>';
-    menuHtml += '<span>' + wsTr('workspace_menu.workspaces', {}, 'Workspaces') + '</span>';
-    menuHtml += '</div>';
-
-    // Add "Logout" menu item
-    menuHtml += '<div class="workspace-menu-item" data-action="logout">';
-    menuHtml += '<i class="lucide lucide-log-out"></i>';
-    menuHtml += '<span>' + wsTr('workspace_menu.logout', {}, 'Logout') + '</span>';
-    menuHtml += '</div>';
-
     menu.innerHTML = menuHtml;
 
     // Add event listeners using delegation
@@ -231,28 +200,6 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
             switchToWorkspace(this.getAttribute('data-workspace-name'));
         });
     });
-
-    // Add event listener for username click
-    var usernameItem = menu.querySelector('.workspace-menu-username');
-    if (usernameItem) {
-        usernameItem.addEventListener('click', handleUsernameClick);
-    }
-
-    // Add event listener for Workspaces item
-    var workspacesItem = menu.querySelector('[data-action="goto-workspaces"]');
-    if (workspacesItem) {
-        workspacesItem.addEventListener('click', function () {
-            window.location.href = 'workspaces.php';
-        });
-    }
-
-    // Add event listener for Logout item
-    var logoutItem = menu.querySelector('[data-action="logout"]');
-    if (logoutItem) {
-        logoutItem.addEventListener('click', function () {
-            window.location.href = 'logout.php';
-        });
-    }
 }
 
 function switchToWorkspace(workspaceName) {

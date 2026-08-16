@@ -1014,22 +1014,24 @@ function checkForUpdates() {
             return response.json();
         })
         .then(function (data) {
+            closeUpdateCheckModal();
             if (data.error) {
-                const versionInfo = data.current_version ? '\nCurrent version: ' + data.current_version : '';
-                showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + data.error + versionInfo, 'error');
+                // A failed check (no network, GitHub rate limit, ...) is not
+                // worth an error screen: show the usual modal with the latest
+                // available version left blank.
+                showUpdateInstructions(false, true);
             } else if (data.has_updates) {
                 // Store version information for the modal
-                closeUpdateCheckModal();
                 showUpdateInstructions(true);
             } else {
                 // No updates available
-                closeUpdateCheckModal();
                 showUpdateInstructions(false);
             }
         })
         .catch(function (error) {
             console.error('Failed to check for updates:', error);
-            showUpdateCheckResult('❌ Failed to check for updates', 'Please check your internet connection. Error: ' + error.message, 'error');
+            closeUpdateCheckModal();
+            showUpdateInstructions(false, true);
         });
 }
 
@@ -1090,18 +1092,20 @@ window.showUpdateBadge = showUpdateBadge;
 window.hideUpdateBadge = hideUpdateBadge;
 window.restoreUpdateBadge = restoreUpdateBadge;
 
-function showUpdateInstructions(hasUpdate = false) {
+function showUpdateInstructions(hasUpdate = false, checkFailed = false) {
     var modal = document.getElementById('updateModal');
     if (modal) {
         var titleEl = modal.querySelector('h3');
         var messageEl = modal.querySelector('#updateMessage');
-        var releaseNotesLink = document.getElementById('releaseNotesLink');
         var backupWarning = document.getElementById('updateBackupWarning');
         var howToUpdate = document.getElementById('updateHowToUpdate');
 
-        if (releaseNotesLink) releaseNotesLink.style.display = 'block';
-
-        if (hasUpdate) {
+        if (checkFailed) {
+            // The remote version could not be read: say so plainly instead of
+            // claiming the app is up to date.
+            if (titleEl) titleEl.textContent = window.t ? window.t('update.error_getting_version', null, 'Error getting version') : 'Error getting version';
+            if (messageEl) messageEl.style.display = 'none';
+        } else if (hasUpdate) {
             if (titleEl) titleEl.textContent = window.t ? window.t('update.new_available', null, 'New update available') : 'New update available';
             if (messageEl) {
                 messageEl.innerHTML = window.t ? window.t('update.new_version_available', null, 'To update, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a>.') : 'To update, follow the instructions on GitHub <a href="https://github.com/timothepoznanski/poznote#update-application" target="_blank">here</a>.';
@@ -1129,28 +1133,25 @@ function showUpdateInstructions(hasUpdate = false) {
                 return response.json();
             })
             .then(function (data) {
-                if (!data.error) {
-                    // Update modal
-                    if (currentVersionEl) {
-                        currentVersionEl.textContent = data.current_version || 'unknown';
-                    }
-                    if (availableVersionEl) {
-                        availableVersionEl.textContent = data.remote_version || 'unknown';
-                    }
-                    // Always link to the releases list instead of a specific tag.
-                    var releaseNotesHref = document.getElementById('releaseNotesHref');
-                    if (releaseNotesHref) {
-                        releaseNotesHref.href = 'https://github.com/timothepoznanski/poznote/releases';
-                    }
-                } else {
-                    // Error
-                    if (currentVersionEl) currentVersionEl.textContent = data.current_version || 'unknown';
-                    if (availableVersionEl) availableVersionEl.textContent = window.t ? window.t('update.error_loading_version', null, 'Error loading version') : 'Error loading version';
+                // The local version is known even when the remote lookup
+                // failed; only "Latest available" is left blank in that case.
+                if (currentVersionEl) {
+                    currentVersionEl.textContent = data.current_version || '';
                 }
+                if (availableVersionEl) {
+                    availableVersionEl.textContent = data.error ? '' : (data.remote_version || '');
+                }
+                // The "View release notes" button links to the releases
+                // list statically (see modals.php), so nothing to set here.
             })
             .catch(function (error) {
-                if (currentVersionEl) currentVersionEl.textContent = window.t ? window.t('update.error_loading_version', null, 'Error loading version') : 'Error loading version';
-                if (availableVersionEl) availableVersionEl.textContent = window.t ? window.t('update.error_loading_version', null, 'Error loading version') : 'Error loading version';
+                // The request itself failed, so fall back to the version the
+                // page was rendered with (the Version card in Settings).
+                if (currentVersionEl) {
+                    var cardVersion = document.querySelector('#check-updates-card .setting-status');
+                    currentVersionEl.textContent = cardVersion ? cardVersion.textContent.trim() : '';
+                }
+                if (availableVersionEl) availableVersionEl.textContent = '';
             });
 
         modal.style.display = 'flex';

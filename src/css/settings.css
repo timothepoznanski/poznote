@@ -390,10 +390,8 @@ body.dark-mode .settings-view-toggle:hover {
     opacity: 1;
 }
 
-/* A pinned card reads as pinned even before the button is noticed. */
-.home-card.is-pinned {
-    border-color: rgba(0, 125, 184, 0.45);
-}
+/* A pinned card keeps the plain card border: the blue pin icon is the only
+   pinned indicator, on the source card and on its clone alike. */
 
 /* Desktop (hover-capable) grid view: the help icon and the pin only appear
    while the card is hovered (or holds keyboard focus), keeping the cards
@@ -419,11 +417,6 @@ body.dark-mode .settings-view-toggle:hover {
 :root[data-theme='dark'] .home-card.is-pinned .settings-card-pin i,
 body.dark-mode .home-card.is-pinned .settings-card-pin i {
     background-color: #4aa8d8;
-}
-
-:root[data-theme='dark'] .home-card.is-pinned,
-body.dark-mode .home-card.is-pinned {
-    border-color: rgba(74, 168, 216, 0.45);
 }
 
 /* Change Password card when a password change is impossible (SSO-only instance,

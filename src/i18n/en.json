@@ -192,12 +192,13 @@
     "expand_section": "Expand section",
     "categories": {
       "pinned": "Pinned",
+      "recent": "Recent",
       "actions": "Actions",
       "admin_tools": "Admin Tools",
       "display": "Display",
       "behavior": "Behavior",
       "about": "About",
-      "documentation": "Documentation"
+      "documentation": "About"
     },
     "cards": {
       "tenant_isolation": "Tenant isolation",
@@ -207,6 +208,7 @@
       "restore_import": "Restore / Import",
       "git_sync": "Git Sync",
       "check_updates": "Check for Updates",
+      "version": "Version",
       "api_docs": "API Documentation",
       "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
@@ -557,7 +559,7 @@
       "backup_hint": "<strong>Settings > Backup</strong>",
       "current_version": "Current version:",
       "latest_available": "Latest available:",
-      "view_release_notes": "View release notes <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">here</a>",
+      "release_notes_button": "View release notes",
       "self_hosted": "Self-Hosted Instructions",
       "cloud": "Cloud Instructions"
     },
@@ -1204,7 +1206,8 @@
     "new_version_available": "To update, follow the instructions on GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">here</a>",
     "description": "Your data will be preserved during the update.",
     "up_to_date": "✅ Poznote is up to date",
-    "error_loading_version": "Error loading version"
+    "error_loading_version": "Error loading version",
+    "error_getting_version": "Error getting version"
   },
   "slash_menu": {
     "plain_block": "Plain block",
@@ -2506,6 +2509,7 @@
     "auto_pull_no_changes": "Git pull complete. No changes found.",
     "pulling": "Pulling changes...",
     "starting": "Syncing...",
+    "completed": "Completed!",
     "config": {
       "title": "Configuration",
       "status": "Status",
@@ -2550,7 +2554,7 @@
       "workspace": "Workspace: {{workspace}}",
       "target_workspace": "Target Workspace",
       "all_workspaces": "All workspaces",
-      "home_hint": "Push and Pull can be done from Dashboard.",
+      "home_hint": "Push and Pull can be done from home sidebar",
       "push": {
         "title": "Push to {{provider}}",
         "description": "Exports all your notes and attachments to {{provider}} as flat files. Updates existing files and removes files that no longer exist in Poznote.",
@@ -2933,12 +2937,12 @@
     "card": "My Profile",
     "modal": {
       "title": "My Profile",
-      "description": "Update your personal information.",
+      "title_of": "Profile of {{name}}",
       "username": "Username",
       "first_name": "First name",
       "last_name": "Last name",
       "email_admin_only": "Only an administrator can change your email address.",
-      "your_id": "Your ID"
+      "id": "ID"
     },
     "errors": {
       "username_required": "Username is required",
@@ -2946,6 +2950,9 @@
       "username_taken": "This username is already taken",
       "email_invalid": "Invalid email address",
       "email_taken": "This email is already in use"
+    },
+    "logout": {
+      "confirm": "Are you sure you want to log out?"
     }
   },
   "password": {

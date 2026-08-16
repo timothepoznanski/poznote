@@ -192,12 +192,13 @@
     "expand_section": "Развернуть раздел",
     "categories": {
       "pinned": "Закреплённые",
+      "recent": "Недавние",
       "actions": "Действия",
       "admin_tools": "Инструменты администратора",
       "display": "Отображение",
       "behavior": "Поведение",
       "about": "О программе",
-      "documentation": "Документация"
+      "documentation": "О программе"
     },
     "cards": {
       "tenant_isolation": "Изоляция аккаунтов",
@@ -209,6 +210,7 @@
       "restore_import": "Восстановление / Импорт",
       "git_sync": "Синхронизация с Git",
       "check_updates": "Проверить обновления",
+      "version": "Версия",
       "api_docs": "Документация API",
       "documentation": "Documentation GitHub",
       "news": "Блог Poznote",
@@ -550,7 +552,7 @@
       "backup_hint": "<strong>Настройки > Резервное копирование</strong>",
       "current_version": "Текущая версия:",
       "latest_available": "Доступная версия:",
-      "view_release_notes": "Посмотреть примечания к выпуску <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">здесь</a>",
+      "release_notes_button": "Посмотреть примечания к выпуску",
       "self_hosted": "Инструкции для самостоятельного хостинга",
       "cloud": "Инструкции для облачной версии"
     },
@@ -1189,7 +1191,8 @@
     "new_version_available": "Для обновления следуйте инструкциям на GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">здесь</a>",
     "description": "Ваши данные будут сохранены во время обновления.",
     "up_to_date": "✅ Poznote обновлен",
-    "error_loading_version": "Ошибка загрузки версии"
+    "error_loading_version": "Ошибка загрузки версии",
+    "error_getting_version": "Ошибка получения версии"
   },
   "slash_menu": {
     "plain_block": "Обычный блок",
@@ -2484,6 +2487,7 @@
     "auto_pull_no_changes": "Git pull завершен. Изменений не найдено.",
     "pulling": "Загрузка изменений...",
     "starting": "Синхронизация...",
+    "completed": "Готово!",
     "config": {
       "title": "Конфигурация",
       "status": "Статус",
@@ -2523,7 +2527,7 @@
       "workspace": "Рабочее пространство: {{workspace}}",
       "target_workspace": "Целевое рабочее пространство",
       "all_workspaces": "Все рабочие пространства",
-      "home_hint": "Отправку и загрузку можно выполнять с панели управления.",
+      "home_hint": "Отправку и загрузку можно выполнять с боковой панели главной страницы",
       "push": {
         "title": "Отправить в {{provider}}",
         "description": "Экспортирует все ваши заметки и вложения в {{provider}} как обычные файлы. Обновляет существующие файлы и удаляет файлы, которых больше нет в Poznote.",
@@ -2901,12 +2905,12 @@
     "card": "Мой профиль",
     "modal": {
       "title": "Мой профиль",
-      "description": "Измените свои личные данные.",
+      "title_of": "Профиль {{name}}",
       "username": "Имя пользователя",
       "first_name": "Имя",
       "last_name": "Фамилия",
       "email_admin_only": "Изменить адрес email может только администратор.",
-      "your_id": "Ваш ID"
+      "id": "ID"
     },
     "errors": {
       "username_required": "Требуется имя пользователя",
@@ -2914,6 +2918,9 @@
       "username_taken": "Это имя пользователя уже занято",
       "email_invalid": "Недопустимый адрес email",
       "email_taken": "Этот email уже используется"
+    },
+    "logout": {
+      "confirm": "Вы действительно хотите выйти?"
     }
   },
   "password": {

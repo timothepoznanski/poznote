@@ -13,7 +13,9 @@
  * Optional variables the caller may set before including this file:
  *   $iconSidebarWorkspace  workspace to carry in the links; defaults to
  *                          getWorkspaceFilter().
- *   $iconSidebarExtraItems buttons appended after the navigation entries.
+ *   $iconSidebarExtraItems buttons appended after the navigation entries, in
+ *                          the scrolling part of the rail (the account group at
+ *                          the bottom is fixed and defined here).
  *                          index.php uses this for its notifications /
  *                          git-sync / AI-chat buttons, which depend on
  *                          handlers that only that page loads. Each entry is
@@ -53,6 +55,11 @@ $iconSidebarUrl = static function (string $page, array $extra = []) use ($iconSi
 $iconSidebarScriptPath = (string)parse_url($_SERVER['SCRIPT_NAME'] ?? '', PHP_URL_PATH);
 $iconSidebarCurrentPage = $iconSidebarBasePath === '' ? basename($iconSidebarScriptPath) : '';
 
+// The About view is settings.php?open=about. js/settings-page.js strips the
+// param once it has applied the section state, so it also flips the highlight
+// over to the About button to keep the rail matching the cleaned URL.
+$iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET['open'] ?? '') === 'about');
+
 $iconSidebarItems = [
     ['id' => 'iconSidebarHomeBtn', 'url' => $iconSidebarUrl('index.php'), 'page' => 'index.php', 'icon' => 'lucide-home', 'label' => t('common.home', [], 'Home')],
     ['id' => 'iconSidebarDashboardBtn', 'url' => $iconSidebarUrl('dashboard.php'), 'page' => 'dashboard.php', 'icon' => 'lucide-layout-dashboard', 'label' => t('common.back_to_home', [], 'Dashboard')],
@@ -75,16 +82,69 @@ if (!empty($iconSidebarExtraItems)) {
     $iconSidebarItems = array_merge($iconSidebarItems, $iconSidebarExtraItems);
 }
 
-// Account actions, flush against the bottom of the rail (the 'bottom' flag
-// adds the class css/icon-sidebar.css uses to push the group down).
-// Logout has no 'page' so it never highlights.
+// Account actions, in their own group pinned to the bottom of the rail: only
+// the navigation entries above scroll, this group always stays visible.
+// Profile and Logout have no 'page' so they never highlight. js/profile.js,
+// loaded below, opens the My Profile modal in place on whatever page the rail
+// is on; the href is the no-JS fallback (settings.php auto-opens the same
+// modal on ?open=profile).
 // The update badge is admin-only, matching the Check for Updates card in
 // settings.php; js/utils.js reveals every .update-badge when a release is out.
-$iconSidebarItems[] = ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'page' => 'settings.php', 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'bottom' => true, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()];
-$iconSidebarItems[] = ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')];
+$iconSidebarBottomItems = [
+    ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'profile']) . '#my-profile-card', 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile')],
+    // ?open=about lands on settings.php with the About section expanded and
+    // every other section collapsed (js/settings-page.js). It is settings.php
+    // with a query flag rather than a page of its own, so the two entries below
+    // split the active state by that flag, the way Favorites does above: About
+    // lights up on ?open=about, Settings on every other settings.php visit.
+    ['id' => 'iconSidebarSettingsBtn', 'url' => $iconSidebarUrl('settings.php'), 'icon' => 'lucide-settings', 'label' => t('sidebar.settings', [], 'Settings'), 'activeFlag' => $iconSidebarCurrentPage === 'settings.php' && !$iconSidebarIsAboutView, 'updateBadge' => function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()],
+    ['id' => 'iconSidebarAboutBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'about']), 'icon' => 'lucide-info-circle', 'label' => t('settings.categories.documentation', [], 'About'), 'activeFlag' => $iconSidebarIsAboutView],
+    ['id' => 'iconSidebarLogoutBtn', 'url' => $iconSidebarBasePath . 'logout.php', 'icon' => 'lucide-log-out', 'label' => t('workspace_menu.logout', [], 'Logout')],
+];
 
 $iconSidebarToggleLabel = t_h('sidebar.toggle_icon_sidebar', [], 'Hide/Show icon sidebar');
+
+// Assets are addressed from the document root, so a page in a subdirectory
+// needs the same prefix as the links above.
+$iconSidebarAsset = static function (string $path) use ($iconSidebarBasePath): string {
+    $url = function_exists('poznoteAsset')
+        ? poznoteAsset($path)
+        : htmlspecialchars($path, ENT_QUOTES, 'UTF-8');
+    return $iconSidebarBasePath . $url;
+};
+
+// js/profile.js falls back to English when window.t is missing, and half the
+// pages carrying the rail never load the i18n runtime (js/globals.js). The
+// modal's strings are therefore resolved here, server-side, where the user's
+// language is already known.
+$iconSidebarProfileStrings = [
+    'profile.modal.title' => t('profile.modal.title', [], 'My Profile'),
+    // Keeps its {{name}} placeholder: js/profile.js substitutes it client-side.
+    'profile.modal.title_of' => t('profile.modal.title_of', [], 'Profile of {{name}}'),
+    'profile.modal.username' => t('profile.modal.username', [], 'Username'),
+    'profile.modal.first_name' => t('profile.modal.first_name', [], 'First name'),
+    'profile.modal.last_name' => t('profile.modal.last_name', [], 'Last name'),
+    'profile.modal.email_admin_only' => t('profile.modal.email_admin_only', [], 'Only an administrator can change your email address.'),
+    'profile.modal.id' => t('profile.modal.id', [], 'ID'),
+    'profile.errors.username_required' => t('profile.errors.username_required', [], 'Username is required'),
+    'profile.errors.username_invalid' => t('profile.errors.username_invalid', [], 'Username may only contain letters, digits, dots, underscores and dashes, and cannot be a number'),
+    'profile.errors.username_taken' => t('profile.errors.username_taken', [], 'This username is already taken'),
+    'profile.errors.email_invalid' => t('profile.errors.email_invalid', [], 'Invalid email address'),
+    'profile.errors.email_taken' => t('profile.errors.email_taken', [], 'This email is already in use'),
+    'profile.logout.confirm' => t('profile.logout.confirm', [], 'Are you sure you want to log out?'),
+    'workspace_menu.logout' => t('workspace_menu.logout', [], 'Logout'),
+    'multiuser.admin.email' => t('multiuser.admin.email', [], 'Email'),
+    'common.cancel' => t('common.cancel', [], 'Cancel'),
+    'common.save' => t('common.save', [], 'Save'),
+    'common.loading' => t('common.loading', [], 'Loading...'),
+    'common.error' => t('common.error', [], 'Error'),
+];
 ?>
+<link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/profile-modal.css'); ?>">
+<script>
+window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
+</script>
+<script src="<?php echo $iconSidebarAsset('js/profile.js'); ?>" defer></script>
 <script>
 // Apply the collapsed state before the rail paints; js/icon-sidebar-toggle.js
 // owns it afterwards.
@@ -95,15 +155,14 @@ try {
 } catch (e) {}
 </script>
 <nav id="icon_sidebar">
+    <div class="icon-sidebar-scroll">
     <?php foreach ($iconSidebarItems as $iconSidebarItem): ?>
     <?php
     $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $iconSidebarIcon = htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8');
     // Only the navigation entries carry a 'page'; the extras never highlight.
     $iconSidebarIsCurrent = isset($iconSidebarItem['page']) && $iconSidebarItem['page'] === $iconSidebarCurrentPage;
-    // Starts the bottom-aligned group.
     $iconSidebarClass = 'icon-sidebar-btn'
-        . (!empty($iconSidebarItem['bottom']) ? ' icon-sidebar-btn-bottom-start' : '')
         . ($iconSidebarIsCurrent ? ' icon-sidebar-btn-active' : '')
         . (!empty($iconSidebarItem['activeFavorite']) ? ' icon-sidebar-btn-active-favorite' : '');
     ?>
@@ -132,6 +191,32 @@ try {
     </a>
     <?php endif; ?>
     <?php endforeach; ?>
+    </div>
+    <!-- Account group: fixed under the divider, never scrolls. -->
+    <div class="icon-sidebar-bottom">
+    <?php foreach ($iconSidebarBottomItems as $iconSidebarItem): ?>
+    <?php
+    $iconSidebarLabel = htmlspecialchars($iconSidebarItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $iconSidebarIcon = htmlspecialchars($iconSidebarItem['icon'], ENT_QUOTES, 'UTF-8');
+    // 'activeFlag' covers the entries that share a page and split the highlight
+    // by query string (Settings vs About); the rest match on 'page'.
+    $iconSidebarIsCurrent = isset($iconSidebarItem['activeFlag'])
+        ? (bool)$iconSidebarItem['activeFlag']
+        : (isset($iconSidebarItem['page']) && $iconSidebarItem['page'] === $iconSidebarCurrentPage);
+    $iconSidebarClass = 'icon-sidebar-btn' . ($iconSidebarIsCurrent ? ' icon-sidebar-btn-active' : '');
+    ?>
+    <a href="<?php echo htmlspecialchars($iconSidebarItem['url'], ENT_QUOTES, 'UTF-8'); ?>"
+       id="<?php echo $iconSidebarItem['id']; ?>"
+       class="<?php echo $iconSidebarClass; ?>"
+       title="<?php echo $iconSidebarLabel; ?>"
+       aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo $iconSidebarIsCurrent ? ' aria-current="page"' : ''; ?>>
+        <i class="lucide <?php echo $iconSidebarIcon; ?>"></i>
+        <?php if (!empty($iconSidebarItem['updateBadge'])): ?>
+        <span class="update-badge update-badge-hidden"></span>
+        <?php endif; ?>
+    </a>
+    <?php endforeach; ?>
+    </div>
 </nav>
 <!-- Sits outside #icon_sidebar so it stays clickable once the rail is hidden. -->
 <button type="button" id="iconSidebarToggle" title="<?php echo $iconSidebarToggleLabel; ?>" aria-label="<?php echo $iconSidebarToggleLabel; ?>" aria-expanded="true" aria-controls="icon_sidebar">
