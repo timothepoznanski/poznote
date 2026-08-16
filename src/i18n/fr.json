@@ -1034,7 +1034,7 @@
   "info": {
     "page_title": "Informations de la note",
     "actions": {
-      "back_to_note": "Retour à la note"
+      "back_to_note": "Retourner à la note"
     },
     "labels": {
       "note_title": "Titre de la note :",

@@ -145,30 +145,45 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo t_h('info.page_title', [], 'Note Information'); ?> - <?php echo htmlspecialchars($title); ?></title>
     <meta name="color-scheme" content="dark light">
+    <?php
+    // Every asset below is versioned: the PWA service worker serves cached CSS
+    // when the network fails, so an unversioned URL can pin a stale stylesheet
+    // with no way to force-refresh from inside the installed app.
+    $v = @file_get_contents('version.txt');
+    if ($v === false) $v = time();
+    $v = urlencode(poznoteBuildAssetCacheVersion(trim($v)));
+    ?>
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/info.css?v=<?php echo filemtime(__DIR__ . '/css/info.css'); ?>">
-    <link rel="stylesheet" href="css/home/buttons.css">
-    <link rel="stylesheet" href="css/modal-alerts.css">
+    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modal-alerts.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css">
-    <link rel="stylesheet" href="css/dark-mode/menus.css">
-    <link rel="stylesheet" href="css/dark-mode/editor.css">
-    <link rel="stylesheet" href="css/dark-mode/modals.css">
-    <link rel="stylesheet" href="css/dark-mode/components.css">
-    <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css">
-    <link rel="stylesheet" href="css/dark-mode/icons.css">
-    <link rel="stylesheet" href="css/icon-sidebar.css">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>" data-workspace="<?php echo htmlspecialchars($workspace ?? '', ENT_QUOTES, 'UTF-8'); ?>">
     <?php include 'icon_sidebar.php'; ?>
     
     <div class="info-page">
+
+        <div class="poznote-back-to-note-bar">
+            <button type="button" id="backToNoteBtn" class="poznote-back-to-note-btn">
+                <i class="lucide lucide-arrow-left"></i>
+                <?php echo t_h('info.actions.back_to_note', [], 'Go back to the note'); ?>
+            </button>
+        </div>
 
         <h1 class="poznote-page-title"><i class="lucide lucide-info"></i> <?php echo t_h('info.page_title', [], 'Note Information'); ?></h1>
 
@@ -249,10 +264,10 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
         </div>
     </div>
 
-    <script src="js/ui.js"></script>
-    <script src="js/modal-alerts.js"></script>
-    <script src="js/navigation.js"></script>
-    <script src="js/info-page.js"></script>
-    <script src="js/icon-sidebar-toggle.js"></script>
+    <script src="js/ui.js?v=<?php echo $v; ?>"></script>
+    <script src="js/modal-alerts.js?v=<?php echo $v; ?>"></script>
+    <script src="js/navigation.js?v=<?php echo $v; ?>"></script>
+    <script src="js/info-page.js?v=<?php echo $v; ?>"></script>
+    <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
 </body>
 </html>

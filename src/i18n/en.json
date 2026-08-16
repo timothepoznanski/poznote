@@ -432,7 +432,7 @@
   "info": {
     "page_title": "Note Information",
     "actions": {
-      "back_to_note": "Go to note"
+      "back_to_note": "Go back to the note"
     },
     "labels": {
       "note_title": "Note title:",

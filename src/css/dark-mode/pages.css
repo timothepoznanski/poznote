@@ -25,6 +25,19 @@ body.dark-mode .poznote-page-title {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .poznote-back-to-note-btn,
+body.dark-mode .poznote-back-to-note-btn {
+    background-color: var(--dm-content-bg);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .poznote-back-to-note-btn:hover,
+body.dark-mode .poznote-back-to-note-btn:hover {
+    background-color: var(--dm-surface-hover);
+    color: var(--dm-text);
+}
+
 html[data-theme='dark'] .settings-container h1,
 body.dark-mode .settings-container h1 {
     color: var(--dm-text);

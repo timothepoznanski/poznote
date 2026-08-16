@@ -431,7 +431,7 @@
   "info": {
     "page_title": "Информация о заметке",
     "actions": {
-      "back_to_note": "Перейти к заметке"
+      "back_to_note": "Вернуться к заметке"
     },
     "labels": {
       "note_title": "Заголовок заметки:",

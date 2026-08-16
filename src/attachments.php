@@ -51,30 +51,30 @@ if (!$note) {
     $v = urlencode(poznoteBuildAssetCacheVersion(trim($v)));
     ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css">
-    <link rel="stylesheet" href="css/attachments/base.css">
-    <link rel="stylesheet" href="css/attachments/upload.css">
-    <link rel="stylesheet" href="css/attachments/display.css">
-    <link rel="stylesheet" href="css/attachments/buttons-alerts.css">
-    <link rel="stylesheet" href="css/home/buttons.css">
-    <link rel="stylesheet" href="css/attachments/preview-modal.css">
-    <link rel="stylesheet" href="css/attachments/responsive.css">
-    <link rel="stylesheet" href="css/modals/base.css">
-    <link rel="stylesheet" href="css/modals/specific-modals.css">
-    <link rel="stylesheet" href="css/modals/attachments.css">
-    <link rel="stylesheet" href="css/modals/share-modal.css">
-    <link rel="stylesheet" href="css/modals/alerts-utilities.css">
-    <link rel="stylesheet" href="css/modals/responsive.css">
+    <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/base.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/upload.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/display.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/buttons-alerts.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/preview-modal.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/responsive.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/base.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/specific-modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/attachments.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/share-modal.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/alerts-utilities.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/modals/responsive.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/layout.css">
-    <link rel="stylesheet" href="css/dark-mode/menus.css">
-    <link rel="stylesheet" href="css/dark-mode/editor.css">
-    <link rel="stylesheet" href="css/dark-mode/modals.css">
-    <link rel="stylesheet" href="css/dark-mode/components.css">
-    <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <link rel="stylesheet" href="css/dark-mode/markdown.css">
-    <link rel="stylesheet" href="css/dark-mode/kanban.css">
-    <link rel="stylesheet" href="css/dark-mode/icons.css">
+    <link rel="stylesheet" href="css/dark-mode/layout.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/menus.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/editor.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/modals.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/markdown.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/kanban.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/dark-mode/icons.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
@@ -124,6 +124,13 @@ if (!$note) {
             background: #172554;
             color: #bfdbfe;
         }
+
+        /* The bar sits outside .settings-container so it floats above the white
+           card rather than inside it, matching info.php. That card owns the
+           page's top spacing, so the bar supplies its own. */
+        .attachments-back-to-note-bar {
+            margin: 20px 0 0 0;
+        }
     </style>
 </head>
 <body class="has-icon-sidebar" data-note-id="<?php echo $note_id; ?>"
@@ -169,6 +176,23 @@ if (!$note) {
     ?></script>
     <script src="js/error-handler.js?v=<?php echo $v; ?>"></script>
     
+    <?php
+    // Built server-side rather than through navigation.js's goBackToNote():
+    // this page does not load that script, and the note id and workspace are
+    // already known here.
+    $backParams = ['note' => $note_id];
+    if ($workspace) {
+        $backParams['workspace'] = $workspace;
+    }
+    $backToNoteUrl = 'index.php?' . http_build_query($backParams);
+    ?>
+    <div class="poznote-back-to-note-bar attachments-back-to-note-bar">
+        <a href="<?php echo htmlspecialchars($backToNoteUrl, ENT_QUOTES, 'UTF-8'); ?>" class="poznote-back-to-note-btn">
+            <i class="lucide lucide-arrow-left"></i>
+            <?php echo t_h('info.actions.back_to_note', [], 'Go back to the note'); ?>
+        </a>
+    </div>
+
     <div class="settings-container">
         <!-- Upload Section -->
         <div class="settings-section">
