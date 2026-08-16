@@ -3206,6 +3206,94 @@ function adjustMenuPosition(menu, toggleButton) {
     }
 }
 
+/**
+ * Place an already-populated dropdown at a point instead of next to a toggle,
+ * for the right-click context menus. Same overflow handling as
+ * adjustMenuPosition, but constrained to the viewport rather than to #left_col:
+ * a menu opened at the cursor is allowed to spill over the note pane.
+ */
+function positionMenuAtPoint(menu, x, y) {
+    menu.style.bottom = '';
+    menu.style.top = '';
+    menu.style.marginTop = '';
+    menu.style.marginBottom = '';
+    menu.style.left = '';
+    menu.style.right = '';
+    menu.style.maxHeight = '';
+    menu.style.overflowY = '';
+
+    menu.style.top = y + 'px';
+    menu.style.left = x + 'px';
+
+    var rect = menu.getBoundingClientRect();
+    var viewportHeight = window.innerHeight;
+    var viewportWidth = window.innerWidth;
+
+    if (rect.bottom > viewportHeight) {
+        var topAbove = y - rect.height;
+        if (topAbove >= 0) {
+            menu.style.top = topAbove + 'px';
+        } else {
+            menu.style.maxHeight = Math.max(100, viewportHeight - y - 10) + 'px';
+            menu.style.overflowY = 'auto';
+        }
+        rect = menu.getBoundingClientRect();
+    }
+
+    if (rect.right > viewportWidth) {
+        menu.style.left = Math.max(0, viewportWidth - rect.width - 10) + 'px';
+        rect = menu.getBoundingClientRect();
+    }
+
+    if (rect.left < 0) {
+        menu.style.left = '10px';
+    }
+}
+
+/**
+ * Hidden by UI customization? syncFolderActionToggles / syncNoteActionToggles
+ * in js/ui-customization.js set that inline display when every item of the
+ * matching menu is unchecked. Checked instead of the computed style because
+ * note toggles are display:none until their row is hovered.
+ */
+function isActionsToggleDisabled(toggle) {
+    return !toggle || toggle.style.display === 'none';
+}
+
+// Right-click on a folder row: same dropdown as its three-dot toggle, opened
+// at the cursor. Returns false when there is no menu to show, so the caller
+// can leave the browser's own context menu alone.
+function openFolderActionsMenuAtPoint(folderId, x, y) {
+    var menu = document.getElementById('folder-actions-menu');
+    var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + folderId + '"]');
+    if (!menu || isActionsToggleDisabled(toggle)) return false;
+
+    closeNoteActionsMenu();
+    populateFolderActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    positionMenuAtPoint(menu, x, y);
+    return true;
+}
+
+// Same for a note row. Takes the row's own toggle element because a favorited
+// note appears twice in the tree under the same note id.
+function openNoteActionsMenuAtPoint(toggle, x, y) {
+    var menu = document.getElementById('note-actions-menu');
+    if (!menu || isActionsToggleDisabled(toggle)) return false;
+
+    closeFolderActionsMenu();
+    closeNoteActionsMenu();
+    populateNoteActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    toggle.classList.add('open');
+    openNoteActionsToggle = toggle;
+    positionMenuAtPoint(menu, x, y);
+    return true;
+}
+
+window.openFolderActionsMenuAtPoint = openFolderActionsMenuAtPoint;
+window.openNoteActionsMenuAtPoint = openNoteActionsMenuAtPoint;
+
 function closeFolderActionsMenu(folderId) {
     // Single shared menu: folderId is accepted for backwards compatibility
     // but closing is unconditional
