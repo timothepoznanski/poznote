@@ -177,14 +177,15 @@ body {
 
 /* Toggle sidebar and collapsed state */
 
+/* Zero-width on purpose: the subtle divider line is the border, and ::before
+   below widens the drag target to 8px either side. Giving the bar a real width
+   would push #right_pane over and thicken the divider. */
 .resize-handle {
-    /* width: 3px; */
+    width: 0;
     height: 100vh;
-    background: #f8f9fa;
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
-    /* subtle divider line to match the mockup */
     border-right: 1px solid #ccc;
 }
 
@@ -199,12 +200,13 @@ body {
     z-index: 1;
 }
 
-/* Toggle sidebar button */
+/* Toggle sidebar button. Hangs off the handle's right edge into #right_pane,
+   since the handle itself has no width to sit inside. The collapsed state
+   moves it clear of the icon rail's own toggle further down. */
 .toggle-sidebar-btn {
     position: absolute;
     bottom: 0px;
-    left: 50%;
-    /* transform: translateX(-50%); */
+    left: 0;
     width: 16px;
     height: 25px;
     background: #fff;
