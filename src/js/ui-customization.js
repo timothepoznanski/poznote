@@ -348,6 +348,10 @@
         syncSectionVisibility('display', 'settings-display-section-grid');
     }
 
+    function syncSettingsBehaviorSection() {
+        syncSectionVisibility('behavior', 'settings-behavior-section-grid');
+    }
+
     function syncSettingsAdminToolsSection() {
         syncSectionVisibility('admin-tools', 'admin-tools-grid');
     }
@@ -371,6 +375,7 @@
             syncHomeActionsSection();
             syncSettingsActionsSection();
             syncSettingsDisplaySection();
+            syncSettingsBehaviorSection();
             syncSettingsAdminToolsSection();
             syncSettingsDocumentationSection();
         });

@@ -565,18 +565,6 @@ if ($canUseUserWebhooks) {
             </div>
             <?php endif; ?>
 
-            <!-- Language -->
-            <div class="home-card" id="language-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.language', [], 'Change the language of the interface.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-flag"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.language.label'); ?></span>
-                    <span id="language-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
             <!-- Theme Mode -->
             <div class="home-card" id="theme-mode-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_mode', [], 'Switch between light, dark or automatic theme.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -641,6 +629,120 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Show Note Created / Show Note Icons: moved to the "Element
+                 visibility" modal (panel:note-created-date, panel:note-icons). -->
+
+            <!-- Type-based Default Note Icons -->
+            <div class="home-card" id="type-note-icons-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.type_based_note_icons', [], 'Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-list-todo"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span>
+                    <span id="type-note-icons-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Note Color Palette -->
+            <div class="home-card" id="note-color-palette-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_color_palette', [], 'Customize the color palette available for notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span>
+                    <span id="note-color-palette-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Show Folder Counts: moved to the "Element visibility" modal
+                 (panel:folder-note-count). -->
+
+            <!-- Note Width -->
+            <div class="home-card desktop-only" id="note-width-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_width', [], 'Adjust the maximum width of the note content.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-move-horizontal"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
+                    <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Markdown Split Card View -->
+            <div class="home-card" id="markdown-split-card-view-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_card_view', [], 'Display markdown notes in a framed split view with editor and preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
+                    <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Colored Markdown -->
+            <div class="home-card" id="markdown-colored-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span>
+                    <span id="markdown-colored-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Code Block Line Numbers -->
+            <div class="home-card" id="code-line-numbers-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
+                    <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Attachment Previews in Notes -->
+            <div class="home-card" id="attachment-previews-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachment_previews', [], 'Show previews of attachments inside notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-file-image"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
+                    <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Default Image Border (No Padding) -->
+            <div class="home-card" id="default-image-border-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.default_image_border', [], 'Display images in notes with a border and no padding by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
+                    <span id="default-image-border-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- UI Customization -->
+            <div class="home-card" id="ui-customization-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ui_customization', [], 'Hide interface elements you do not use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-eye-off"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.ui_customization', [], 'UI Customization'); ?></span>
+                    <span id="ui-customization-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BEHAVIOR CATEGORY -->
+        <h2 class="settings-category-title" id="behavior"><?php echo t_h('settings.categories.behavior', [], 'Behavior') . ' (' . $username . ')'; ?></h2>
+        <div class="home-grid" id="settings-behavior-section-grid">
+
+            <!-- Language -->
+            <div class="home-card" id="language-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.language', [], 'Change the language of the interface.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-flag"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.language.label'); ?></span>
+                    <span id="language-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
             <!-- Timezone -->
             <div class="home-card" id="timezone-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.timezone', [], 'Set the timezone used to display dates and times.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -681,6 +783,16 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Notes Without Folders Position -->
+            <div class="home-card" id="notes-without-folders-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.notes_without_folders', [], 'Show notes without a folder after the folder list instead of before.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-folder-tree"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
+                    <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
             <!-- Tasklist Insert Order -->
             <div class="home-card" id="tasklist-insert-order-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tasklist_insert_order', [], 'Choose whether new tasks are added to the top or the bottom of task lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -698,102 +810,6 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span>
                     <span id="diary-note-type-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Show Note Created / Show Note Icons: moved to the "Element
-                 visibility" modal (panel:note-created-date, panel:note-icons). -->
-
-            <!-- Type-based Default Note Icons -->
-            <div class="home-card" id="type-note-icons-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.type_based_note_icons', [], 'Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-list-todo"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span>
-                    <span id="type-note-icons-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Note Color Palette -->
-            <div class="home-card" id="note-color-palette-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_color_palette', [], 'Customize the color palette available for notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span>
-                    <span id="note-color-palette-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Show Folder Counts: moved to the "Element visibility" modal
-                 (panel:folder-note-count). -->
-
-            <!-- Notes Without Folders Position -->
-            <div class="home-card" id="notes-without-folders-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.notes_without_folders', [], 'Show notes without a folder after the folder list instead of before.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-folder-tree"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
-                    <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Note Width -->
-            <div class="home-card desktop-only" id="note-width-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_width', [], 'Adjust the maximum width of the note content.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-move-horizontal"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></span>
-                    <span id="note-width-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Markdown Split Card View -->
-            <div class="home-card" id="markdown-split-card-view-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_split_card_view', [], 'Display markdown notes in a framed split view with editor and preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span>
-                    <span id="markdown-split-card-view-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Colored Markdown -->
-            <div class="home-card" id="markdown-colored-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_colored', [], 'Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-palette"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span>
-                    <span id="markdown-colored-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Code Block Word Wrap -->
-            <div class="home-card" id="code-wrap-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_wrap', [], 'Wrap long lines in code blocks instead of scrolling horizontally.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
-                    <span id="code-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Code Block Line Numbers -->
-            <div class="home-card" id="code-line-numbers-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_line_numbers', [], 'Show line numbers in code blocks in the markdown preview.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-list-ordered"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span>
-                    <span id="code-line-numbers-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Attachment Previews in Notes -->
-            <div class="home-card" id="attachment-previews-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.attachment_previews', [], 'Show previews of attachments inside notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-file-image"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span>
-                    <span id="attachment-previews-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 
@@ -817,13 +833,13 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Default Image Border (No Padding) -->
-            <div class="home-card" id="default-image-border-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.default_image_border', [], 'Display images in notes with a border and no padding by default.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-image"></i></div>
+            <!-- Code Block Word Wrap -->
+            <div class="home-card" id="code-wrap-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.code_wrap', [], 'Wrap long lines in code blocks instead of scrolling horizontally.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-code"></i></div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span>
-                    <span id="default-image-border-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span>
+                    <span id="code-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 
@@ -864,16 +880,6 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.ctrl_s_save', [], 'Save note with Ctrl + S'); ?></span>
                     <span id="ctrl-s-save-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- UI Customization -->
-            <div class="home-card" id="ui-customization-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ui_customization', [], 'Hide interface elements you do not use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-eye-off"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.ui_customization', [], 'UI Customization'); ?></span>
-                    <span id="ui-customization-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
                 </div>
             </div>
 
