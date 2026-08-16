@@ -1025,7 +1025,19 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
-      "custom_invalid": "Enter a valid custom format."
+      "custom_invalid": "Enter a valid custom format.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "year (2026)",
+        "MM": "month (08)",
+        "DD": "day (16)",
+        "HH": "hour, 24h (14)",
+        "h": "hour, 12h (2)",
+        "hh": "hour, 12h padded (02)",
+        "mm": "minutes (05)",
+        "ss": "seconds (09)",
+        "A": "AM/PM"
+      }
     },
     "tenant_isolation": {
       "title": "Tenant isolation",
@@ -1106,7 +1118,17 @@
     "filter_all": "All notes",
     "filter_any": "Any color",
     "filter_none": "No color",
-    "manage_button": "Manage colors"
+    "manage_button": "Manage colors",
+    "names": {
+      "blue": "Blue",
+      "green": "Green",
+      "yellow": "Yellow",
+      "orange": "Orange",
+      "red": "Red",
+      "purple": "Purple",
+      "pink": "Pink",
+      "gray": "Gray"
+    }
   },
   "tabs": {
     "context_menu": {

@@ -1476,7 +1476,19 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A",
-      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format ein."
+      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format ein.",
+      "tokens_title": "Token:",
+      "tokens": {
+        "YYYY": "Jahr (2026)",
+        "MM": "Monat (08)",
+        "DD": "Tag (16)",
+        "HH": "Stunde, 24 h (14)",
+        "h": "Stunde, 12 h (2)",
+        "hh": "Stunde, 12 h zweistellig (02)",
+        "mm": "Minuten (05)",
+        "ss": "Sekunden (09)",
+        "A": "AM/PM"
+      }
     },
     "move_folder": {
       "title": "Ordner verschieben",
@@ -1567,7 +1579,17 @@
     "filter_all": "Alle Notizen",
     "filter_any": "Beliebige Farbe",
     "filter_none": "Ohne Farbe",
-    "manage_button": "Farben verwalten"
+    "manage_button": "Farben verwalten",
+    "names": {
+      "blue": "Blau",
+      "green": "Grün",
+      "yellow": "Gelb",
+      "orange": "Orange",
+      "red": "Rot",
+      "purple": "Lila",
+      "pink": "Rosa",
+      "gray": "Grau"
+    }
   },
   "tabs": {
     "context_menu": {

@@ -1508,7 +1508,19 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "Tokens : YYYY, MM, DD, HH, h, hh, mm, ss, A",
-      "custom_invalid": "Saisissez un format personnalisé valide."
+      "custom_invalid": "Saisissez un format personnalisé valide.",
+      "tokens_title": "Jetons :",
+      "tokens": {
+        "YYYY": "année (2026)",
+        "MM": "mois (08)",
+        "DD": "jour (16)",
+        "HH": "heure, 24 h (14)",
+        "h": "heure, 12 h (2)",
+        "hh": "heure, 12 h sur 2 chiffres (02)",
+        "mm": "minutes (05)",
+        "ss": "secondes (09)",
+        "A": "AM/PM"
+      }
     },
     "move_folder": {
       "title": "Déplacer le dossier",
@@ -1600,7 +1612,17 @@
     "filter_all": "Toutes les notes",
     "filter_any": "N'importe quelle couleur",
     "filter_none": "Sans couleur",
-    "manage_button": "Gérer les couleurs"
+    "manage_button": "Gérer les couleurs",
+    "names": {
+      "blue": "Bleu",
+      "green": "Vert",
+      "yellow": "Jaune",
+      "orange": "Orange",
+      "red": "Rouge",
+      "purple": "Violet",
+      "pink": "Rose",
+      "gray": "Gris"
+    }
   },
   "tabs": {
     "context_menu": {

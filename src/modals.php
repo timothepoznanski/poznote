@@ -1190,7 +1190,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="dateTimeFormat" value="mdy_hia"> <?php echo t_h('modals.date_time_format.options.mdy_hia', [], 'MM/DD/YYYY hh:mm AM/PM'); ?></label>
                 <label><input type="radio" name="dateTimeFormat" value="custom"> <?php echo t_h('modals.date_time_format.options.custom', [], 'Custom'); ?></label>
                 <input type="text" id="dateTimeFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.date_time_format.custom_placeholder', [], 'YYYY-MM-DD HH:mm:ss'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
-                <small style="display: block; margin: 4px 0 0 24px; color: #6b7280;"><?php echo t_h('modals.date_time_format.custom_hint', [], 'Tokens: YYYY, MM, DD, HH, h, hh, mm, ss, A'); ?></small>
+                <div class="date-format-tokens-wrap" style="margin: 4px 0 0 24px;">
+                    <small style="display: block; color: #6b7280;"><?php echo t_h('modals.date_time_format.tokens_title', [], 'Tokens:'); ?></small>
+                    <?php echo renderDateFormatTokenLegend('date_time_format'); ?>
+                </div>
             </div>
         </div>
         <div class="modal-buttons">

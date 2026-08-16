@@ -1471,7 +1471,19 @@
       },
       "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
       "custom_hint": "标记：YYYY、MM、DD、HH、h、hh、mm、ss、A",
-      "custom_invalid": "请输入有效的自定义格式。"
+      "custom_invalid": "请输入有效的自定义格式。",
+      "tokens_title": "占位符：",
+      "tokens": {
+        "YYYY": "年 (2026)",
+        "MM": "月 (08)",
+        "DD": "日 (16)",
+        "HH": "小时，24 小时制 (14)",
+        "h": "小时，12 小时制 (2)",
+        "hh": "小时，12 小时制补零 (02)",
+        "mm": "分钟 (05)",
+        "ss": "秒 (09)",
+        "A": "上午/下午"
+      }
     },
     "tenant_isolation": {
       "title": "租户隔离",
@@ -1560,7 +1572,17 @@
     "filter_all": "全部笔记",
     "filter_any": "任意颜色",
     "filter_none": "无颜色",
-    "manage_button": "管理颜色"
+    "manage_button": "管理颜色",
+    "names": {
+      "blue": "蓝色",
+      "green": "绿色",
+      "yellow": "黄色",
+      "orange": "橙色",
+      "red": "红色",
+      "purple": "紫色",
+      "pink": "粉色",
+      "gray": "灰色"
+    }
   },
   "tabs": {
     "context_menu": {

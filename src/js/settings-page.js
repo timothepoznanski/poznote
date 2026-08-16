@@ -622,11 +622,27 @@
             : [];
     }
 
+    // Show built-in colors in the current language unless the user renamed
+    // them: a stored name that matches any shipped translation of that color
+    // was never edited, it was just saved under another language.
+    function localizePalette(palette) {
+        var localized = window.NOTE_COLOR_LOCALIZED_NAMES || {};
+        var known = window.NOTE_COLOR_KNOWN_NAMES || {};
+        palette.forEach(function (entry) {
+            var names = known[entry.id];
+            if (!names) return;
+            if (names.indexOf(String(entry.name || '').toLowerCase()) !== -1) {
+                entry.name = localized[entry.id] || entry.name;
+            }
+        });
+        return palette;
+    }
+
     function parsePalette(value) {
         if (!value) return defaultPalette();
         try {
             var parsed = typeof value === 'string' ? JSON.parse(value) : value;
-            return Array.isArray(parsed) && parsed.length ? parsed : defaultPalette();
+            return Array.isArray(parsed) && parsed.length ? localizePalette(parsed) : defaultPalette();
         } catch (e) {
             return defaultPalette();
         }

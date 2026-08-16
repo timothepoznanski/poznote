@@ -1249,6 +1249,10 @@ if ($canUseUserWebhooks) {
     <script>
     // Factory palette, used by the "Reset to defaults" action in the editor.
     window.NOTE_COLOR_DEFAULT_PALETTE = <?php echo json_encode(getDefaultNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
+    // id => localized name, and id => every shipped name for that color, so the
+    // editor can translate built-in entries the user never renamed.
+    window.NOTE_COLOR_LOCALIZED_NAMES = <?php echo json_encode(getLocalizedNoteColorNames(), JSON_UNESCAPED_UNICODE); ?>;
+    window.NOTE_COLOR_KNOWN_NAMES = <?php echo json_encode(getKnownNoteColorNames(), JSON_UNESCAPED_UNICODE); ?>;
     </script>
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>

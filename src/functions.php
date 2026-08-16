@@ -868,20 +868,114 @@ function renderEditableNoteIcon($noteId, $noteTitle, $iconClass = '', $iconColor
 define('NOTE_COLOR_PALETTE_SETTING', 'note_color_palette');
 
 /**
+ * English names of the factory palette, keyed by id. They are what a palette
+ * saved before the names became translatable still holds in the database, so
+ * localizeNoteColorPalette() uses them to tell an untouched entry from one the
+ * user renamed on purpose.
+ */
+function getDefaultNoteColorNames() {
+    return [
+        'blue'   => 'Blue',
+        'green'  => 'Green',
+        'yellow' => 'Yellow',
+        'orange' => 'Orange',
+        'red'    => 'Red',
+        'purple' => 'Purple',
+        'pink'   => 'Pink',
+        'gray'   => 'Gray',
+    ];
+}
+
+/**
  * Factory palette, used when the user has never customized theirs.
- * Ids are stable identifiers; names are translation keys' fallbacks.
+ * Ids are stable identifiers; names are localized for display.
  */
 function getDefaultNoteColorPalette() {
-    return [
-        ['id' => 'blue',   'name' => 'Blue',   'hex' => '#3b82f6'],
-        ['id' => 'green',  'name' => 'Green',  'hex' => '#22c55e'],
-        ['id' => 'yellow', 'name' => 'Yellow', 'hex' => '#eab308'],
-        ['id' => 'orange', 'name' => 'Orange', 'hex' => '#f97316'],
-        ['id' => 'red',    'name' => 'Red',    'hex' => '#ef4444'],
-        ['id' => 'purple', 'name' => 'Purple', 'hex' => '#a855f7'],
-        ['id' => 'pink',   'name' => 'Pink',   'hex' => '#ec4899'],
-        ['id' => 'gray',   'name' => 'Gray',   'hex' => '#6b7280'],
+    $hex = [
+        'blue'   => '#3b82f6',
+        'green'  => '#22c55e',
+        'yellow' => '#eab308',
+        'orange' => '#f97316',
+        'red'    => '#ef4444',
+        'purple' => '#a855f7',
+        'pink'   => '#ec4899',
+        'gray'   => '#6b7280',
     ];
+
+    $palette = [];
+    foreach (getDefaultNoteColorNames() as $id => $englishName) {
+        $palette[] = [
+            'id'   => $id,
+            'name' => t('note_color.names.' . $id, [], $englishName),
+            'hex'  => $hex[$id],
+        ];
+    }
+    return $palette;
+}
+
+/**
+ * id => name of the built-in colors in the current user's language.
+ */
+function getLocalizedNoteColorNames() {
+    $names = [];
+    foreach (getDefaultNoteColorNames() as $id => $englishName) {
+        $names[$id] = t('note_color.names.' . $id, [], $englishName);
+    }
+    return $names;
+}
+
+/**
+ * id => every name a built-in color goes by across the shipped languages,
+ * lowercased. A stored palette entry whose name is in this list was never
+ * renamed by the user, only saved in whatever language was active at the time,
+ * so it is safe to re-translate.
+ */
+function getKnownNoteColorNames() {
+    static $known = null;
+    if ($known !== null) {
+        return $known;
+    }
+
+    $known = [];
+    foreach (getDefaultNoteColorNames() as $id => $englishName) {
+        $known[$id] = [mb_strtolower($englishName)];
+    }
+    foreach (glob(__DIR__ . '/i18n/*.json') ?: [] as $file) {
+        $dict = loadI18nDictionary(basename($file, '.json'));
+        foreach (array_keys($known) as $id) {
+            $translated = i18nGet($dict, 'note_color.names.' . $id);
+            if ($translated !== null) {
+                $known[$id][] = mb_strtolower($translated);
+            }
+        }
+    }
+    foreach ($known as $id => $names) {
+        $known[$id] = array_values(array_unique($names));
+    }
+
+    return $known;
+}
+
+/**
+ * Translate the names of built-in palette entries the user never renamed.
+ * A deliberate rename such as "Bleu client" is always left alone.
+ */
+function localizeNoteColorPalette($palette) {
+    $known = getKnownNoteColorNames();
+    $localized = getLocalizedNoteColorNames();
+
+    foreach ($palette as &$entry) {
+        $id = $entry['id'] ?? '';
+        if (!isset($known[$id])) {
+            continue;
+        }
+        if (in_array(mb_strtolower((string)($entry['name'] ?? '')), $known[$id], true)) {
+            $entry['name'] = $localized[$id];
+        }
+    }
+    unset($entry);
+
+    return $palette;
 }
 
 /**
@@ -962,7 +1056,7 @@ function getNoteColorPalette() {
     }
 
     $stored = sanitizeNoteColorPalette(getSetting(NOTE_COLOR_PALETTE_SETTING, ''));
-    $cached = !empty($stored) ? $stored : getDefaultNoteColorPalette();
+    $cached = !empty($stored) ? localizeNoteColorPalette($stored) : getDefaultNoteColorPalette();
     return $cached;
 }
 
@@ -4419,6 +4513,40 @@ function renderBoardViewMenu(string $prefix) {
  */
 function getDiaryDefaultNoteType(): string {
     return trim((string)getSetting('diary_default_note_type', '')) === 'markdown' ? 'markdown' : 'note';
+}
+
+/**
+ * Render the legend of a custom date pattern under its input: the tokens stay
+ * literal because the compiler matches them verbatim, only their meaning is
+ * translated. $group is 'date_time_format' or 'diary_date_format'.
+ */
+function renderDateFormatTokenLegend(string $group): string {
+    $dict = loadI18nDictionary(getUserLanguage());
+    $en = loadI18nDictionary('en');
+    $path = ['modals', $group, 'tokens'];
+
+    $tokens = $dict;
+    foreach ($path as $part) {
+        $tokens = is_array($tokens) && isset($tokens[$part]) ? $tokens[$part] : null;
+    }
+    if (!is_array($tokens) || empty($tokens)) {
+        $tokens = $en;
+        foreach ($path as $part) {
+            $tokens = is_array($tokens) && isset($tokens[$part]) ? $tokens[$part] : null;
+        }
+    }
+    if (!is_array($tokens) || empty($tokens)) {
+        return '';
+    }
+
+    $html = '<dl class="date-format-tokens">';
+    foreach ($tokens as $token => $meaning) {
+        $html .= '<dt><code>' . htmlspecialchars((string)$token, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</code></dt>'
+               . '<dd>' . htmlspecialchars((string)$meaning, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</dd>';
+    }
+    $html .= '</dl>';
+
+    return $html;
 }
 
 /**
