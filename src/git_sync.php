@@ -98,45 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
             break;
             
-        case 'push':
-            $result = $gitSync->pushNotes();
-            if ($result['success']) {
-                $message = tp('git_sync.messages.push_success', [
-                    'count' => $result['pushed'],
-                    'deleted' => $result['deleted'] ?? 0,
-                    'errors' => count($result['errors'])
-                ]);
-                if (count($result['errors']) > 0) {
-                    $warning = $message;
-                    $message = '';
-                }
-            } else {
-                $error = tp('git_sync.messages.push_error', ['error' => $result['errors'][0]['error'] ?? 'Unknown error']);
-            }
-            // Refresh last sync info
-            $lastSync = $gitSync->getLastSyncInfo();
-            break;
-            
-        case 'pull':
-            $result = $gitSync->pullNotes();
-            if ($result['success']) {
-                $message = tp('git_sync.messages.pull_success', [
-                    'pulled' => $result['pulled'],
-                    'updated' => $result['updated'],
-                    'deleted' => $result['deleted'] ?? 0,
-                    'errors' => count($result['errors'])
-                ]);
-                if (count($result['errors']) > 0) {
-                    $warning = $message;
-                    $message = '';
-                }
-            } else {
-                $error = tp('git_sync.messages.pull_error', ['error' => $result['errors'][0]['error'] ?? 'Unknown error']);
-            }
-            // Refresh last sync info
-            $lastSync = $gitSync->getLastSyncInfo();
-            break;
-            
         case 'update_auto_settings':
             $autoPush = isset($_POST['auto_push']) ? true : false;
             $autoPull = isset($_POST['auto_pull']) ? true : false;
@@ -228,17 +189,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <div class="home-container git-sync-container">
     <h1 class="poznote-page-title"><i class="lucide lucide-git-branch"></i> <?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></h1>
 
-
-        <div class="git-sync-nav">
-            <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
-            <form method="post" class="sync-form">
-                <input type="hidden" name="action" value="test">
-                <button type="submit" class="btn btn-primary btn-toolbar-size">
-                    <?php echo tp_h('git_sync.test.button'); ?>
-                </button>
-            </form>
-            <?php endif; ?>
-        </div>
 
         <div class="git-sync-header">
             <p class="git-sync-description"><?php echo tp_h('git_sync.description'); ?></p>
@@ -447,6 +397,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <i class="lucide lucide-save"></i>
                             <?php echo t_h('git_sync.config.save', [], 'Save Configuration'); ?>
                         </button>
+                        <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
+                        <button type="submit" name="action" value="test" class="btn btn-primary">
+                            <?php echo tp_h('git_sync.test.button'); ?>
+                        </button>
+                        <?php endif; ?>
                     </div>
                 </div>
                 
@@ -488,7 +443,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         <?php if ($configStatus['enabled'] && $configStatus['configured']): ?>
         <div class="alert alert-warning" style="justify-content: center; text-align: center; margin-top: 20px;">
             <span>
-                <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from Dashboard.', $currentLang); ?></strong>
+                <strong><?php echo t_h('git_sync.actions.home_hint', [], 'Push and Pull can be done from home sidebar', $currentLang); ?></strong>
             </span>
         </div>
         <?php endif; ?>
@@ -504,88 +459,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const syncForms = document.querySelectorAll('form.sync-form');
-        
-        // Localization strings from PHP
-        const i18n = {
-            confirmPush: <?php echo json_encode(tp('git_sync.confirm_push')); ?>,
-            confirmPull: <?php echo json_encode(tp('git_sync.confirm_pull')); ?>,
-            starting: <?php echo json_encode(t('git_sync.starting', [], 'Syncing...')); ?>,
-            completed: <?php echo json_encode(t('git_sync.completed', [], 'Completed!')); ?>
-        };
-
-        syncForms.forEach(form => {
-            const actionInput = form.querySelector('input[name="action"]');
-            if (!actionInput) return;
-            
-            const action = actionInput.value;
-            // Only handle push/pull actions (not test)
-            if (action !== 'push' && action !== 'pull') return;
-            
-            form.addEventListener('submit', function(e) {
-                // Prevent default submission
-                e.preventDefault();
-                
-                // Build confirmation message
-                const confirmMsg = action === 'push' ? i18n.confirmPush : i18n.confirmPull;
-                
-                // Show modal and wait for user response
-                window.modalAlert.confirm(confirmMsg).then(function(confirmed) {
-                    if (confirmed) {
-                        const title = (action === 'push' ? "Push" : "Pull");
-                        
-                        // Show progress bar modal
-                        const progressBar = window.modalAlert.showProgressBar(
-                            title, 
-                            i18n.starting
-                        );
-
-                        // Polling setup
-                        let progressInterval = setInterval(async () => {
-                            try {
-                                const response = await fetch('api/v1/git-sync/progress');
-                                const data = await response.json();
-                                if (data.success && data.progress) {
-                                    progressBar.update(data.progress.percentage, data.progress.message);
-                                }
-                            } catch (e) {
-                                console.error("Error polling progress:", e);
-                            }
-                        }, 500);
-
-                        // Execute the sync
-                        fetch('api/v1/git-sync/' + action, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({})
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            clearInterval(progressInterval);
-                            
-                            if (data.success) {
-                                progressBar.update(100, i18n.completed);
-                                setTimeout(() => {
-                                    progressBar.close();
-                                    window.location.reload();
-                                }, 500);
-                            } else {
-                                progressBar.close();
-                                window.location.reload();
-                            }
-                        })
-                        .catch(err => {
-                            clearInterval(progressInterval);
-                            progressBar.close();
-                            window.location.reload();
-                        });
-                    }
-                });
-            });
-        });
-        
         // Toggle API base URL field based on provider selection
         const providerSelect = document.getElementById('git_provider');
         const apiBaseInput = document.getElementById('git_api_base');

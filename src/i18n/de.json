@@ -465,12 +465,13 @@
     "expand_section": "Bereich ausklappen",
     "categories": {
       "pinned": "Angepinnt",
+      "recent": "Zuletzt verwendet",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
       "behavior": "Verhalten",
       "about": "Über",
-      "documentation": "Dokumentation"
+      "documentation": "Über"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -498,6 +499,7 @@
       "restore_import": "Wiederherstellen / Importieren",
       "git_sync": "Git-Synchronisierung",
       "check_updates": "Nach Updates suchen",
+      "version": "Version",
       "api_docs": "API-Dokumentation",
       "documentation": "Documentation GitHub",
       "news": "Poznote-Blog",
@@ -1065,7 +1067,7 @@
       "backup_hint": "<strong>Einstellungen > Backup</strong>",
       "current_version": "Aktuelle Version:",
       "latest_available": "Neueste verfügbare:",
-      "view_release_notes": "Versionshinweise ansehen <a href=\"#\" id=\"releaseNotesHref\" target=\"_blank\">hier</a>",
+      "release_notes_button": "Versionshinweise ansehen",
       "self_hosted": "Selbst-gehostete Anweisungen",
       "cloud": "Cloud-Anweisungen"
     },
@@ -1667,7 +1669,8 @@
     "new_version_available": "Zum Aktualisieren folgen Sie der Anleitung auf GitHub <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">hier</a>",
     "description": "Ihre Daten werden während des Updates erhalten bleiben.",
     "up_to_date": "✅ Poznote ist auf dem neuesten Stand",
-    "error_loading_version": "Fehler beim Laden der Version"
+    "error_loading_version": "Fehler beim Laden der Version",
+    "error_getting_version": "Fehler beim Abrufen der Version"
   },
   "slash_menu": {
     "plain_block": "Einfacher Block",
@@ -2935,6 +2938,7 @@
     "auto_pull_no_changes": "Git-Synchronisation abgeschlossen. Keine Änderungen gefunden.",
     "pulling": "Änderungen abrufen...",
     "starting": "Synchronisierung...",
+    "completed": "Fertig!",
     "config": {
       "title": "Konfiguration",
       "status": "Status",
@@ -2974,7 +2978,7 @@
       "workspace": "Arbeitsbereich",
       "target_workspace": "Zielarbeitsbereich",
       "all_workspaces": "Alle Arbeitsbereiche",
-      "home_hint": "Senden und Abrufen können über das Dashboard ausgeführt werden.",
+      "home_hint": "Senden und Abrufen können über die Seitenleiste der Startseite ausgeführt werden",
       "push": {
         "title": "An {{provider}} senden",
         "description": "Exportiert alle Notizen und Anhänge als flache Dateien zu {{provider}}. Aktualisiert vorhandene Dateien und entfernt Dateien, die in Poznote nicht mehr vorhanden sind.",
@@ -3254,12 +3258,12 @@
     "card": "Mein Profil",
     "modal": {
       "title": "Mein Profil",
-      "description": "Aktualisieren Sie Ihre persoenlichen Daten.",
+      "title_of": "Profil von {{name}}",
       "username": "Benutzername",
       "first_name": "Vorname",
       "last_name": "Nachname",
       "email_admin_only": "Nur ein Administrator kann Ihre E-Mail-Adresse aendern.",
-      "your_id": "Ihre ID"
+      "id": "ID"
     },
     "errors": {
       "username_required": "Benutzername ist erforderlich",
@@ -3267,6 +3271,9 @@
       "username_taken": "Dieser Benutzername ist bereits vergeben",
       "email_invalid": "Ungueltige E-Mail-Adresse",
       "email_taken": "Diese E-Mail wird bereits verwendet"
+    },
+    "logout": {
+      "confirm": "Möchten Sie sich wirklich abmelden?"
     }
   },
   "password": {

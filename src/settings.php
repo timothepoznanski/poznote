@@ -21,7 +21,6 @@ $note_id = isset($_GET['note']) ? intval($_GET['note']) : null;
 // Get current user and language settings
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
-$username = htmlspecialchars(($currentUser['display_name'] ?? '') ?: $currentUser['username']);
 $pageWorkspace = trim(getWorkspaceFilter());
 
 // Check if current user is admin (used multiple times in template)
@@ -135,6 +134,7 @@ $settingsPageUserKeys = [
     'date_time_format',
     'hidden_ui_elements',
     'settings_pinned_cards',
+    'settings_recent_cards',
     'spellcheck_html_notes',
     'slash_menu_require_alt',
     'note_nav_shortcuts_enabled',
@@ -364,8 +364,12 @@ if ($canUseUserWebhooks) {
         <h2 class="settings-category-title" id="settings-pinned-section-title" hidden><?php echo t_h('settings.categories.pinned', [], 'Pinned'); ?></h2>
         <div class="home-grid" id="settings-pinned-section-grid" hidden></div>
 
+        <!-- RECENT CARDS (filled by settings-page.js from the per-user click history) -->
+        <h2 class="settings-category-title" id="settings-recent-section-title" hidden><?php echo t_h('settings.categories.recent', [], 'Recent'); ?></h2>
+        <div class="home-grid" id="settings-recent-section-grid" hidden></div>
+
         <!-- ACTIONS CATEGORY -->
-        <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions') . ' (' . $username . ')'; ?></h2>
+        <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid" id="settings-actions-section-grid">
 
             <!-- Workspaces -->
@@ -486,21 +490,6 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <?php if ($isAdmin): ?>
-            <!-- Check for Updates -->
-            <div class="home-card" id="check-updates-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.check_updates', [], 'Check whether a newer version of Poznote is available.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-refresh-cw-alt"></i>
-                    <span class="update-badge update-badge-hidden"></span>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.check_updates', [], 'Check for Updates'); ?></span>
-                    <span class="setting-status enabled"><?php echo $app_version_display; ?></span>
-                </div>
-            </div>
-            <?php endif; ?>
-
             <!-- Backup / Export -->
             <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backup_export', [], 'Download your notes, attachments and database as a backup.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -550,7 +539,7 @@ if ($canUseUserWebhooks) {
         </div>
 
         <!-- DISPLAY CATEGORY -->
-        <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display') . ' (' . $username . ')'; ?></h2>
+        <h2 class="settings-category-title" id="display"><?php echo t_h('settings.categories.display'); ?></h2>
         <div class="home-grid" id="settings-display-section-grid">
 
             <?php if ($isAdmin): ?>
@@ -730,7 +719,7 @@ if ($canUseUserWebhooks) {
         </div>
 
         <!-- BEHAVIOR CATEGORY -->
-        <h2 class="settings-category-title" id="behavior"><?php echo t_h('settings.categories.behavior', [], 'Behavior') . ' (' . $username . ')'; ?></h2>
+        <h2 class="settings-category-title" id="behavior"><?php echo t_h('settings.categories.behavior', [], 'Behavior'); ?></h2>
         <div class="home-grid" id="settings-behavior-section-grid">
 
             <!-- Language -->
@@ -1152,21 +1141,26 @@ if ($canUseUserWebhooks) {
         </div>
         <?php endif; ?>
 
-        <!-- DOCUMENTATION CATEGORY -->
-        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'Documentation'); ?></h2>
+        <!-- ABOUT CATEGORY (grid id kept as -documentation- so saved collapse
+             state and pinned cards survive the rename) -->
+        <h2 class="settings-category-title" id="settings-documentation-section-title"><?php echo t_h('settings.categories.documentation', [], 'About'); ?></h2>
         <div class="home-grid" id="settings-documentation-section-grid">
 
-            <!-- Version -->
-            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" rel="noopener noreferrer" class="home-card" id="version-card" title="<?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?>">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.version', [], 'Open the release notes of this version on GitHub.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <!-- Version: the former "Check for Updates" card of the Actions
+                 section, kept under its own id so saved pins and the
+                 "Element visibility" entry keep working. Visible to every
+                 user: the /system/updates endpoint is not admin-only. -->
+            <div class="home-card" id="check-updates-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.check_updates', [], 'Check whether a newer version of Poznote is available.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
-                    <i class="lucide lucide-info-circle"></i>
+                    <i class="lucide lucide-refresh-cw-alt"></i>
+                    <span class="update-badge update-badge-hidden"></span>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span>
-                    <span class="home-card-count"><?php echo $app_version_display; ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.version', [], 'Version'); ?></span>
+                    <span class="setting-status enabled"><?php echo $app_version_display; ?></span>
                 </div>
-            </a>
+            </div>
 
             <!-- GitHub documentation -->
             <a href="https://github.com/timothepoznanski/poznote" target="_blank" rel="noopener noreferrer" class="home-card" id="github-card">
@@ -1269,7 +1263,8 @@ if ($canUseUserWebhooks) {
     <script src="js/settings-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/settings-page.js') ?: time(); ?>"></script>
     <script src="js/ui-customization.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
-    <script src="js/profile.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/profile.js') ?: time(); ?>"></script>
+    <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
+         which every page carrying the rail includes. -->
     <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>
 </body>
 </html>

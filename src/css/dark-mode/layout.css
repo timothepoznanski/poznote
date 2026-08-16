@@ -432,6 +432,11 @@ body.dark-mode #icon_sidebar {
     border-right: 1px solid var(--dm-border);
 }
 
+html[data-theme='dark'] .icon-sidebar-bottom,
+body.dark-mode .icon-sidebar-bottom {
+    border-top-color: var(--dm-border);
+}
+
 html[data-theme='dark'] .icon-sidebar-btn,
 body.dark-mode .icon-sidebar-btn {
     color: var(--dm-text-muted);

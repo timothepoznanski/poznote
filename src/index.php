@@ -487,10 +487,13 @@ if ($isPublicWorkspaceReadonly) {
     <!-- MENU RIGHT COLUMN -->	 
     <div class="sidebar-header">
         <div class="sidebar-title-row">
-            <div class="sidebar-title" role="button" tabindex="0" data-action="toggle-workspace-menu">
+            <?php $hasMultipleWorkspaces = count($workspaces) > 1; ?>
+            <div class="sidebar-title<?php echo $hasMultipleWorkspaces ? '' : ' sidebar-title-static'; ?>"<?php echo $hasMultipleWorkspaces ? ' role="button" tabindex="0" data-action="toggle-workspace-menu"' : ''; ?>>
                 <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
+                <?php if ($hasMultipleWorkspaces): ?>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
+                <?php endif; ?>
             </div>
             <div class="sidebar-title-actions">
                 <?php if (!$isPublicWorkspaceReadonly): ?>

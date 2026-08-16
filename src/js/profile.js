@@ -1,13 +1,53 @@
 /**
- * Profile editing functionality for Settings page
- * Handles the "My Profile" card, modal, and API calls
- * (username, first name, last name).
+ * Profile editing: the "My Profile" modal, its API calls (username, first
+ * name, last name) and the two entry points that open it - the Settings page
+ * card and the icon rail's user button, which icon_sidebar.php puts on nearly
+ * every page.
+ *
+ * icon_sidebar.php loads this file (plus css/profile-modal.css), so on the
+ * Settings page it is pulled in twice; the flag below makes the second copy a
+ * no-op instead of binding every handler again.
  */
 (function () {
     'use strict';
 
-    const tr = window.t || function (key, vars, fallback) { return fallback || key; };
+    if (window.__poznoteProfileModalLoaded) return;
+    window.__poznoteProfileModalLoaded = true;
+
+    // window.PoznoteProfileI18n comes from icon_sidebar.php, already resolved
+    // in the user's language, and is checked first because window.t is absent
+    // on the pages that do not load js/globals.js.
+    const tr = function (key, vars, fallback) {
+        var preset = window.PoznoteProfileI18n && window.PoznoteProfileI18n[key];
+        if (typeof preset === 'string') return interpolate(preset, vars);
+        if (typeof window.t === 'function') return window.t(key, vars, fallback);
+        return interpolate(fallback || key, vars);
+    };
+
+    // Same {{var}} substitution js/globals.js does, applied to the server-side
+    // preset strings and to the English fallbacks, which window.t never sees.
+    function interpolate(str, vars) {
+        if (!vars) return str;
+        Object.keys(vars).forEach(function (k) {
+            str = str.split('{{' + k + '}}').join(String(vars[k]));
+        });
+        return str;
+    }
     var profileCache = null;
+
+    // "Profile of <username> - ID 12". The whole string goes through one
+    // placeholder key so languages that do not use an "X of Y" word order
+    // (ru, zh) can place the name where it belongs.
+    function profileModalTitle(profile) {
+        if (!profile) return tr('profile.modal.title', {}, 'My Profile');
+
+        var name = (profile.username || '').trim();
+        if (!name) return tr('profile.modal.title', {}, 'My Profile');
+
+        var title = tr('profile.modal.title_of', { name: name }, 'Profile of {{name}}');
+        if (profile.id) title += ' - ' + tr('profile.modal.id', {}, 'ID') + ' ' + profile.id;
+        return title;
+    }
 
     // ========== Profile data ==========
 
@@ -37,11 +77,9 @@
 
         modal.innerHTML =
             '<div class="modal-content">' +
+                /* Placeholder until the profile arrives; fillProfileFields
+                   rewrites it as "Profile of <name> (ID n)". */
                 '<h3>' + tr('profile.modal.title', {}, 'My Profile') + '</h3>' +
-                '<p class="text-small-muted edit-profile-description">' +
-                    '<span class="edit-profile-description-text">' + tr('profile.modal.description', {}, 'Update your personal information.') + '</span>' +
-                    '<span class="edit-profile-user-id" style="margin-left:6px;white-space:nowrap;"></span>' +
-                '</p>' +
                 '<div class="form-group" style="margin-bottom: 8px;">' +
                     '<label for="epUsername" class="text-small-muted">' + tr('profile.modal.username', {}, 'Username') + '</label>' +
                     '<input type="text" id="epUsername" autocomplete="username" maxlength="60" placeholder="' + tr('profile.modal.username', {}, 'Username') + '" style="width:100%;box-sizing:border-box;">' +
@@ -77,16 +115,7 @@
         if (!modal) return;
 
         var title = modal.querySelector('h3');
-        if (title) title.textContent = tr('profile.modal.title', {}, 'My Profile');
-
-        // Only the text span: the sibling span holds the user id.
-        var description = modal.querySelector('.edit-profile-description-text');
-        if (description) description.textContent = tr('profile.modal.description', {}, 'Update your personal information.');
-
-        var userId = modal.querySelector('.edit-profile-user-id');
-        if (userId && userId.textContent.trim() !== '' && profileCache && profileCache.id) {
-            userId.textContent = tr('profile.modal.your_id', {}, 'Your ID') + ' : ' + profileCache.id;
-        }
+        if (title) title.textContent = profileModalTitle(profileCache);
 
         var fields = [
             { id: 'epUsername', key: 'profile.modal.username', fallback: 'Username' },
@@ -119,13 +148,8 @@
         document.getElementById('epLastName').value = (profile && profile.last_name) || '';
         document.getElementById('epEmail').value = (profile && profile.email) || '';
 
-        // Shown next to the description line; hidden when the id is unknown.
-        var userId = document.querySelector('#editProfileModal .edit-profile-user-id');
-        if (userId) {
-            userId.textContent = (profile && profile.id)
-                ? (tr('profile.modal.your_id', {}, 'Your ID') + ' : ' + profile.id)
-                : '';
-        }
+        var title = document.querySelector('#editProfileModal h3');
+        if (title) title.textContent = profileModalTitle(profile);
 
         // Email is admin-managed: the field stays locked for regular users
         // (the API rejects self-service email changes too).
@@ -287,6 +311,50 @@
             });
     }
 
+    // ========== Logout confirmation ==========
+
+    // Self-contained like the profile modal above: the rail's Logout button is
+    // on nearly every page, while the shared #confirmModal from modals.php only
+    // exists on four of them, so showConfirmModal() is not an option here.
+    function showLogoutConfirmModal(logoutUrl) {
+        var existing = document.getElementById('confirmLogoutModal');
+        if (existing) existing.remove();
+
+        var modal = document.createElement('div');
+        modal.id = 'confirmLogoutModal';
+        modal.className = 'modal';
+        modal.innerHTML =
+            '<div class="modal-content">' +
+                '<h3>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
+                '<p class="text-small-muted">' + tr('profile.logout.confirm', {}, 'Are you sure you want to log out?') + '</p>' +
+                '<div class="modal-buttons">' +
+                    '<button type="button" class="btn-cancel" id="clCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
+                    '<button type="button" class="btn-danger" id="clConfirmBtn">' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
+                '</div>' +
+            '</div>';
+
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+
+        var close = function () { modal.remove(); };
+        document.getElementById('clCancelBtn').addEventListener('click', close);
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) close();
+        });
+        document.addEventListener('keydown', function onKey(e) {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', onKey);
+                close();
+            }
+        });
+
+        var confirmBtn = document.getElementById('clConfirmBtn');
+        confirmBtn.addEventListener('click', function () {
+            window.location.href = logoutUrl;
+        });
+        confirmBtn.focus();
+    }
+
     // ========== Init ==========
 
     function initProfileCard() {
@@ -295,8 +363,31 @@
             card.addEventListener('click', showProfileModal);
         }
 
-        if (card && shouldAutoOpenProfileModal()) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Icon rail entry (icon_sidebar.php): open the modal over the current
+        // page. Its href to settings.php?open=profile is only a fallback for
+        // when this script never runs, so the click is cancelled here.
+        var railBtn = document.getElementById('iconSidebarProfileBtn');
+        if (railBtn) {
+            railBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                showProfileModal();
+            });
+        }
+
+        // Icon rail Logout: confirm first. The href stays the no-JS fallback.
+        var logoutBtn = document.getElementById('iconSidebarLogoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                showLogoutConfirmModal(logoutBtn.getAttribute('href') || 'logout.php');
+            });
+        }
+
+        // No card guard: ?open=profile is also the rail's no-JS fallback, and
+        // the card can be hidden through UI Customization, but the modal must
+        // open either way.
+        if (shouldAutoOpenProfileModal()) {
+            if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
             clearAutoOpenProfileModalParam();
             showProfileModal();
         }

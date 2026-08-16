@@ -259,7 +259,7 @@ body.dark-mode .workspace-menu-item:hover {
 
 html[data-theme='dark'] .workspace-menu-item.current-workspace,
 body.dark-mode .workspace-menu-item.current-workspace {
-    background-color: var(--dm-active);
+    background-color: transparent;
     color: var(--dm-accent);
 }
 

@@ -37,9 +37,40 @@
         confirmAction(confirmMsg).then(function (confirmed) {
             if (!confirmed) return;
 
-            var spinner = window.modalAlert && typeof window.modalAlert.showSpinner === 'function'
-                ? window.modalAlert.showSpinner(tr('git_sync.starting', {}, 'Syncing...'))
-                : null;
+            var title = action === 'pull'
+                ? tr('git_sync.actions.pull.button', {}, 'Pull')
+                : tr('git_sync.actions.push.button', {}, 'Push');
+
+            // Progress bar when available, spinner otherwise: GitSync.php reports
+            // per-file progress that /git-sync/progress exposes while the sync runs.
+            var progress = window.modalAlert && typeof window.modalAlert.showProgressBar === 'function'
+                ? window.modalAlert.showProgressBar(tr('git_sync.starting', {}, 'Syncing...'), title)
+                : (window.modalAlert && typeof window.modalAlert.showSpinner === 'function'
+                    ? window.modalAlert.showSpinner(tr('git_sync.starting', {}, 'Syncing...'))
+                    : null);
+
+            var polling = null;
+            if (progress && typeof progress.update === 'function') {
+                polling = setInterval(function () {
+                    fetch('/api/v1/git-sync/progress', {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                        .then(function (response) { return response.json(); })
+                        .then(function (data) {
+                            if (data && data.success && data.progress) {
+                                progress.update(data.progress.percentage, data.progress.message);
+                            }
+                        })
+                        .catch(function () { /* keep polling; the sync call reports failures */ });
+                }, 500);
+            }
+
+            function stopPolling() {
+                if (polling) {
+                    clearInterval(polling);
+                    polling = null;
+                }
+            }
 
             fetch('/api/v1/git-sync/' + action, {
                 method: 'POST',
@@ -51,19 +82,31 @@
             })
                 .then(function (response) { return response.json(); })
                 .then(function (data) {
-                    if (spinner) spinner.close();
+                    stopPolling();
 
                     if (data && data.success) {
-                        window.location.reload();
+                        // Show the finished state before the reload wipes the modal.
+                        if (progress && typeof progress.update === 'function') {
+                            progress.update(100, tr('git_sync.completed', {}, 'Completed!'));
+                            setTimeout(function () {
+                                progress.close();
+                                window.location.reload();
+                            }, 1200);
+                        } else {
+                            if (progress) progress.close();
+                            window.location.reload();
+                        }
                         return;
                     }
 
+                    if (progress) progress.close();
                     var detail = data && (data.error || data.message
                         || (data.errors && data.errors[0] && data.errors[0].error));
                     showError(detail || 'Sync failed.');
                 })
                 .catch(function (error) {
-                    if (spinner) spinner.close();
+                    stopPolling();
+                    if (progress) progress.close();
                     showError(tr('git_sync.messages.connection_error', { error: error.message }, 'Connection failed: ') + error.message);
                 });
         });

@@ -63,6 +63,11 @@
     cursor: pointer;
 }
 
+/* Single workspace: the title is plain text, not a dropdown trigger */
+.sidebar-title.sidebar-title-static {
+    cursor: default;
+}
+
 .sidebar-title-actions {
     display: flex;
     align-items: center;

@@ -13,7 +13,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
     width: var(--icon-sidebar-width);
     height: 100vh;
     padding: 10px 5px;
@@ -21,14 +20,43 @@
     background: #f8f9fa;
     border-right: 1px solid #e0e0e0;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+/* Navigation entries: the only part that scrolls when the rail runs out of
+   room. min-height:0 lets it actually shrink inside the flex column instead of
+   pushing the account group off the bottom. */
+.icon-sidebar-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-#icon_sidebar::-webkit-scrollbar {
+.icon-sidebar-scroll::-webkit-scrollbar {
     display: none;
+}
+
+/* Account actions, fixed under a divider at the bottom of the rail. The
+   divider stays inset from the rail edges rather than spanning its full
+   width. */
+.icon-sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    align-self: stretch;
+    margin: 8px 4px 0;
+    padding: 8px 0 0;
+    border-top: 1px solid #e0e0e0;
 }
 
 .icon-sidebar-btn {
@@ -102,13 +130,6 @@
 
 .icon-sidebar-btn .update-badge.update-badge-hidden {
     display: none;
-}
-
-/* Account actions sit flush against the bottom: the auto margin eats the free
-   space above them. When the rail is too short for every icon it collapses to
-   zero and the group simply follows the list, which then scrolls. */
-.icon-sidebar-btn-bottom-start {
-    margin-top: auto;
 }
 
 .icon-sidebar-btn .lucide {

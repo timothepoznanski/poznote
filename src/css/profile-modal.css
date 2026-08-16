@@ -1,0 +1,172 @@
+/**
+ * My Profile modal and the logout confirmation (js/profile.js)
+ *
+ * Both are opened from the icon rail, which is on nearly every page, while
+ * css/modals/base.css is only loaded by about half of them. Everything here is
+ * therefore scoped to those two ids and self-contained: it restates the
+ * standard modal look (same values as css/modals/base.css and
+ * css/dark-mode/modals.css) so the dialogs are identical whether or not the
+ * host page ships the modal stylesheets. The ids keep the specificity above
+ * those sheets on the pages that do load them, and stop these rules from
+ * reaching anything else.
+ *
+ * Loaded by icon_sidebar.php alongside js/profile.js.
+ */
+
+:is(#editProfileModal, #confirmLogoutModal) {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    padding: 20px 16px 16px 16px;
+    box-sizing: border-box;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-content {
+    width: 90%;
+    max-width: var(--modal-max-width, 420px);
+    margin: 0 auto;
+    padding: 28px;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 8px;
+    background-color: #fefefe;
+    color: rgb(55, 53, 47);
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    overflow-x: hidden;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-content h3 {
+    margin: 0 0 15px 0;
+    color: rgb(55, 53, 47);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .text-small-muted {
+    margin-top: 8px;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) input {
+    max-width: 100%;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    color: rgb(55, 53, 47);
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) input:focus {
+    outline: none;
+    border-color: #007DB8;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    /* Separates the actions from the last field above them. */
+    margin-top: 22px;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 0.2s;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-primary {
+    background-color: #007DB8;
+    color: #fff;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-primary:hover {
+    background-color: #005a8a;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Grey "Cancel", used by the logout confirmation. .btn-cancel is only styled
+   inside .modal-buttons by the shared sheets, which half the host pages skip. */
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel {
+    background-color: #e9ecef;
+    color: rgb(55, 53, 47);
+}
+
+:is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover {
+    background-color: #dde1e5;
+}
+
+/* Dark mode. Every host page loads css/dark-mode/variables.css, so the tokens
+   are always defined; both theme hooks are needed, as elsewhere. */
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal),
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content,
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-content {
+    background-color: var(--dm-content-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-content h3,
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-content h3 {
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .text-small-muted,
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .text-small-muted {
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) input,
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) input {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel,
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel {
+    background-color: var(--dm-surface);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover,
+body.dark-mode :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-cancel:hover {
+    background-color: var(--dm-border);
+}
