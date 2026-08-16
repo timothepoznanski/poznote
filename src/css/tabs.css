@@ -277,6 +277,13 @@
     padding-right: 26px;
 }
 
+/* Set by syncNoteActionToggles() in js/ui-customization.js when every item of
+   the note menu is unchecked: with no toggle to clear, give the title the
+   reserved strip back. */
+body.note-actions-hidden .note-list-item > a.links_arbo_left {
+    padding-right: 6px;
+}
+
 /* Same box, icon size and hover treatment as .folder-actions-toggle
    (css/folders/actions-menu.css), so the note and folder three-dot buttons
    read as one control. Only the visibility rule below differs: note toggles

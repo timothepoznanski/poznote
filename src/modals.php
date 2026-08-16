@@ -1797,6 +1797,21 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:delete-folder" checked><span><?php echo t_h('notes_list.folder_actions.delete_folder', [], 'Delete'); ?></span></label>
                 </div>
                 </div>
+
+                <!-- Note Actions Section -->
+                <div class="ui-custom-section">
+                <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.note_actions', [], 'Note Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+                <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.note_actions_hint', [], 'Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.'); ?></p>
+                <div class="ui-custom-items">
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-export-modal" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-note-icon-picker" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:delete-note" checked><span><?php echo t_h('notes_list.note_actions.delete_note', [], 'Delete note'); ?></span></label>
+                </div>
+                </div>
             </div>
         </div>
         <div class="modal-buttons">

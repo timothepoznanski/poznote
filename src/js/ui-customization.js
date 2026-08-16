@@ -268,6 +268,39 @@
         });
     }
 
+    function syncNoteActionToggles() {
+        // Same arrangement as syncFolderActionToggles: one shared dropdown for
+        // every note's toggle, so when UI customization hides all of its items
+        // the three-dot button has nothing left to open.
+        var menu = document.getElementById('note-actions-menu');
+        if (!menu) return;
+
+        var visibleItems = Array.prototype.some.call(
+            Array.prototype.filter.call(menu.children, function (child) {
+                return child.classList && child.classList.contains('note-actions-menu-item');
+            }),
+            isVisibleElement
+        );
+
+        if (!visibleItems) {
+            menu.classList.remove('show');
+        }
+
+        document.querySelectorAll('.note-actions-toggle').forEach(function (toggle) {
+            var actionsContainer = toggle.parentElement;
+
+            toggle.style.display = visibleItems ? '' : 'none';
+            if (actionsContainer && actionsContainer.classList.contains('note-actions')) {
+                actionsContainer.style.display = visibleItems ? '' : 'none';
+            }
+        });
+
+        // Give the note titles back the strip reserved for the toggle.
+        if (document.body) {
+            document.body.classList.toggle('note-actions-hidden', !visibleItems);
+        }
+    }
+
     function syncSectionVisibility(titleId, gridId) {
         var title = document.getElementById(titleId);
         var grid = document.getElementById(gridId);
@@ -321,6 +354,7 @@
             syncFolderIconClickBehavior();
             syncToolbarOverflowButtons();
             syncFolderActionToggles();
+            syncNoteActionToggles();
             syncHomeDashboardSection();
             syncHomeActionsSection();
             syncSettingsActionsSection();
@@ -393,6 +427,13 @@
                     if (id === 'toggle-sort-submenu') {
                         rules.push('.sort-submenu { display: none !important; }');
                     }
+                } else if (type === 'note') {
+                    // Scoped to the menu: the same data-action values are used by
+                    // the note toolbar and by the note icons in the tree, which
+                    // this setting must not touch. !important also beats the
+                    // inline display populateNoteActionsMenu() sets on the
+                    // share/favorite state variants.
+                    rules.push('.note-actions-menu-item[data-action="' + id + '"] { display: none !important; }');
                 } else if (type === 'panel') {
                     if (id === 'mini-calendar') {
                         rules.push('.mini-calendar-container { display: none !important; }');

@@ -1149,7 +1149,8 @@
         "dashboard_toolbar": "Tableau de bord",
         "icon_sidebar": "Barre d'icônes",
         "folder_actions": "Actions des dossiers",
-        "workspace_menu": "Menu du workspace"
+        "workspace_menu": "Menu du workspace",
+        "note_actions": "Actions des notes"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
@@ -1161,7 +1162,8 @@
       "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »",
       "s3_backups_section": "Page Sauvegarde : section « Sauvegardes S3 »",
       "s3_restore_section": "Page Restauration : section « Restauration depuis S3 »",
-      "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?"
+      "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?",
+      "note_actions_hint": "Éléments du menu ⋮ de chaque note dans la barre latérale. Tout décocher masque le bouton du menu."
     },
     "theme": {
       "title": "Sélection du thème",

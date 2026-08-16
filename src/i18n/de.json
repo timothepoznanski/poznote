@@ -1124,7 +1124,8 @@
         "dashboard_toolbar": "Dashboard",
         "icon_sidebar": "Icon-Seitenleiste",
         "folder_actions": "Ordneraktionen",
-        "workspace_menu": "Workspace-Menü"
+        "workspace_menu": "Workspace-Menü",
+        "note_actions": "Notizaktionen"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1136,7 +1137,8 @@
       "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
       "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
       "s3_restore_section": "Wiederherstellungsseite: Abschnitt „Aus S3 wiederherstellen“",
-      "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?"
+      "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
+      "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche."
     },
     "theme": {
       "title": "Themenauswahl",

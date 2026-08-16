@@ -1125,7 +1125,8 @@
         "dashboard_toolbar": "Panel",
         "icon_sidebar": "Barra de iconos",
         "folder_actions": "Acciones de carpeta",
-        "workspace_menu": "Menú del espacio de trabajo"
+        "workspace_menu": "Menú del espacio de trabajo",
+        "note_actions": "Acciones de las notas"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1137,7 +1138,8 @@
       "direct_copy_restore_section": "Página de restauración: sección «Restaurar cuando la restauración estándar no funciona»",
       "s3_backups_section": "Página de copia de seguridad: sección «Copias de seguridad S3»",
       "s3_restore_section": "Página de restauración: sección «Restaurar desde S3»",
-      "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?"
+      "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?",
+      "note_actions_hint": "Elementos del menú ⋮ de cada nota en la barra lateral. Si se desmarcan todos, se oculta el botón del menú."
     },
     "theme": {
       "title": "Selección de tema",

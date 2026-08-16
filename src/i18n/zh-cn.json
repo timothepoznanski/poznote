@@ -1125,7 +1125,8 @@
         "dashboard_toolbar": "仪表盘",
         "icon_sidebar": "图标侧边栏",
         "folder_actions": "文件夹操作",
-        "workspace_menu": "工作区菜单"
+        "workspace_menu": "工作区菜单",
+        "note_actions": "笔记操作"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1137,7 +1138,8 @@
       "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
       "s3_backups_section": "备份页面:“S3 备份”部分",
       "s3_restore_section": "恢复页面:“从 S3 恢复”部分",
-      "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?"
+      "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?",
+      "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。"
     },
     "theme": {
       "title": "主题选择",
