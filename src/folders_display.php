@@ -520,8 +520,116 @@ function renderFolderActionsMenu() {
 }
 
 /**
+ * Generate the three-dot actions toggle for a note row in the tree.
+ *
+ * Mirrors generateFolderActions(): only the toggle is emitted per note, and it
+ * carries everything populateNoteActionsMenu() needs to fill the single shared
+ * dropdown rendered once per page by renderNoteActionsMenu().
+ *
+ * @param int $noteId Note ID
+ * @param string $noteTitle Note title (used by the icon picker and rename)
+ * @param string $noteType Note type ('note', 'markdown', 'tasklist', ...)
+ * @param int|string|null $folderId Containing folder ID
+ * @param string $folderName Containing folder name
+ * @param bool $isFavorite Whether the note is marked as favorite
+ * @param bool $isShared Whether the note is publicly shared
+ * @return string HTML for the note actions toggle
+ */
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isShared = false) {
+    $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
+    $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
+    $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
+    $htmlFolderId = htmlspecialchars((string)$folderId, ENT_QUOTES);
+    $htmlFolderName = htmlspecialchars((string)$folderName, ENT_QUOTES);
+
+    // No data-filename here, unlike the note toolbar: showExportModal() stores
+    // that argument and never reads it, so emitting the on-disk path on every
+    // row of the tree would leak the entries directory for nothing.
+    return "<div class='note-actions'>"
+        . "<button type='button' class='note-actions-toggle' data-action='toggle-note-actions-menu'"
+        . " data-note-id='$htmlNoteId' data-note-title='$htmlNoteTitle'"
+        . " data-note-type='$htmlNoteType'"
+        . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName'"
+        . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
+        . " data-shared='" . ($isShared ? '1' : '0') . "'"
+        . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
+        . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
+        . "<i class='lucide lucide-more-vertical'></i>"
+        . "</button>"
+        . "</div>";
+}
+
+/**
+ * Render the single shared note-actions dropdown menu.
+ *
+ * Emitted once per page (see notes_list.php). Every item reuses an existing
+ * note action already wired in js/index-events.js, so opening the note first
+ * is no longer required; populateNoteActionsMenu (js/utils.js) copies the note
+ * identity onto each item and picks the share/favorite variants on open.
+ *
+ * @return string HTML for the shared dropdown menu
+ */
+function renderNoteActionsMenu() {
+    $menu = "<div class='note-actions-menu' id='note-actions-menu'>";
+
+    // Move note (same dialog as the note toolbar's move button)
+    $menu .= "<div class='note-actions-menu-item' data-action='show-move-folder-dialog'>";
+    $menu .= "<i class='lucide lucide-folder-output'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.move_note', [], 'Move note') . "</span>";
+    $menu .= "</div>";
+
+    // Download note
+    $menu .= "<div class='note-actions-menu-item' data-action='show-export-modal'>";
+    $menu .= "<i class='lucide lucide-download'></i>";
+    $menu .= "<span>" . t_h('common.download', [], 'Download') . "</span>";
+    $menu .= "</div>";
+
+    // Share: two variants, the client shows the one matching the note's state
+    $menu .= "<div class='note-actions-menu-item shared share-state-shared' data-action='open-share-modal'>";
+    $menu .= "<i class='lucide lucide-share-2'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.is_shared', [], 'Is shared') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item share-state-not-shared' data-action='open-share-modal'>";
+    $menu .= "<i class='lucide lucide-share-2'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.share_note', [], 'Share note') . "</span>";
+    $menu .= "</div>";
+
+    // Favorite: two variants, keyed on the note's favorite state
+    $menu .= "<div class='note-actions-menu-item favorite-state-favorite' data-action='toggle-favorite'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item favorite-state-not-favorite' data-action='toggle-favorite'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
+    $menu .= "</div>";
+
+    // Rename note
+    $menu .= "<div class='note-actions-menu-item' data-action='rename-note'>";
+    $menu .= "<i class='lucide lucide-pencil'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.rename_note', [], 'Rename note') . "</span>";
+    $menu .= "</div>";
+
+    // Change icon (same picker as clicking the icon in the tree)
+    $menu .= "<div class='note-actions-menu-item' data-action='open-note-icon-picker'>";
+    $menu .= "<i class='lucide lucide-palette'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
+    $menu .= "</div>";
+
+    // Delete note (moves to trash, like the toolbar's delete button)
+    $menu .= "<div class='note-actions-menu-item danger' data-action='delete-note'>";
+    $menu .= "<i class='lucide lucide-trash-2'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.delete_note', [], 'Delete note') . "</span>";
+    $menu .= "</div>";
+
+    $menu .= "</div>"; // Close dropdown menu
+
+    return $menu;
+}
+
+/**
  * Generate link for a note while preserving search state
- * 
+ *
  * @param string $search Search query
  * @param string $tags_search Tags search query
  * @param string $folder_filter Folder filter

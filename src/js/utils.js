@@ -3241,6 +3241,188 @@ document.addEventListener('click', function (event) {
 });
 
 // ============================================
+// Note actions menu (three-dot toggle on each note row in the tree)
+//
+// Same arrangement as the folder menu above: one shared #note-actions-menu is
+// rendered per page, and opening a toggle copies that note's identity onto
+// every item before positioning the menu. The items reuse the data-action
+// values the note toolbar already uses, so js/index-events.js handles them
+// without any per-item wiring here.
+// ============================================
+
+function populateNoteActionsMenu(menu, toggle) {
+    var noteId = toggle.getAttribute('data-note-id') || '';
+    var noteTitle = toggle.getAttribute('data-note-title') || '';
+    var noteType = toggle.getAttribute('data-note-type') || 'note';
+    var folderId = toggle.getAttribute('data-folder-id') || '';
+    var folderName = toggle.getAttribute('data-folder') || '';
+    var isShared = toggle.getAttribute('data-shared') === '1';
+    var isFavorite = toggle.getAttribute('data-favorite') === '1';
+
+    menu.setAttribute('data-note-id', noteId);
+
+    // Copy note identity onto every action item (handlers read it there).
+    // The names match what each existing handler expects: show-export-modal
+    // reads title/noteType, show-move-folder-dialog reads the folder, and the
+    // icon picker reads data-note-title.
+    menu.querySelectorAll('[data-action]').forEach(function (item) {
+        item.setAttribute('data-note-id', noteId);
+        item.setAttribute('data-note-title', noteTitle);
+        item.setAttribute('data-title', noteTitle);
+        item.setAttribute('data-note-type', noteType);
+        item.setAttribute('data-folder-id', folderId);
+        item.setAttribute('data-folder', folderName);
+    });
+
+    menu.querySelectorAll('.share-state-shared').forEach(function (item) {
+        item.style.display = isShared ? '' : 'none';
+    });
+    menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
+        item.style.display = isShared ? 'none' : '';
+    });
+
+    menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? '' : 'none';
+    });
+    menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? 'none' : '';
+    });
+}
+
+// The toggle that opened the menu, so it can be closed by a second click and
+// so the menu stays anchored to the row that was actually clicked. A note can
+// appear more than once in the tree (its folder plus the Favorites section),
+// so the caller passes the element instead of us looking it up by note id.
+var openNoteActionsToggle = null;
+
+function toggleNoteActionsMenu(noteId, toggleElement) {
+    var menu = document.getElementById('note-actions-menu');
+    if (!menu) return;
+
+    var toggle = toggleElement ||
+        document.querySelector('.note-actions-toggle[data-note-id="' + noteId + '"]');
+    if (!toggle) return;
+
+    // Clicking the toggle whose menu is already open closes it; any other
+    // toggle re-populates and moves the menu
+    var isOpenForToggle = menu.classList.contains('show') && openNoteActionsToggle === toggle;
+
+    closeNoteActionsMenu();
+    if (isOpenForToggle) return;
+
+    populateNoteActionsMenu(menu, toggle);
+    menu.classList.add('show');
+    toggle.classList.add('open');
+    openNoteActionsToggle = toggle;
+    adjustMenuPosition(menu, toggle);
+}
+
+function closeNoteActionsMenu() {
+    var menu = document.getElementById('note-actions-menu');
+    if (menu) {
+        menu.classList.remove('show');
+    }
+    document.querySelectorAll('.note-actions-toggle.open').forEach(function (btn) {
+        btn.classList.remove('open');
+    });
+    openNoteActionsToggle = null;
+}
+
+window.toggleNoteActionsMenu = toggleNoteActionsMenu;
+window.closeNoteActionsMenu = closeNoteActionsMenu;
+
+// Dismiss the menu as soon as one of its items is clicked. Capture phase
+// because some item handlers (the icon picker) call stopImmediatePropagation,
+// which would otherwise prevent the bubble-phase closer in
+// js/notes-list-events.js from ever running. Hiding the menu leaves it in the
+// DOM, so the handlers still resolve their data-action target normally.
+document.addEventListener('click', function (event) {
+    if (event.target.closest && event.target.closest('#note-actions-menu')) {
+        closeNoteActionsMenu();
+    }
+}, true);
+
+// ============================================
+// Note rename (from the tree's note actions menu)
+// ============================================
+
+function renameNote(noteId, currentTitle) {
+    var modal = document.getElementById('renameNoteModal');
+    var input = document.getElementById('renameNoteName');
+    if (!modal || !input) return;
+
+    modal.style.display = 'flex';
+    input.value = currentTitle || '';
+    input.dataset.noteId = noteId;
+    input.dataset.oldName = currentTitle || '';
+    input.focus();
+    input.select();
+}
+
+function saveNoteName() {
+    var input = document.getElementById('renameNoteName');
+    if (!input) return;
+
+    var newName = input.value.trim();
+    var oldName = input.dataset.oldName;
+    var noteId = input.dataset.noteId;
+
+    if (!newName) {
+        showNotificationPopup(
+            (window.t ? window.t('notes_list.note_actions.enter_note_name', null, 'Please enter a note title') : 'Please enter a note title'),
+            'error'
+        );
+        return;
+    }
+
+    if (newName === oldName) {
+        closeModal('renameNoteModal');
+        return;
+    }
+
+    // Send the browser's editor session id so renaming a note that is open in
+    // this tab passes the edit lock check; a note locked by someone else still
+    // gets refused by the API.
+    var editorSessionId = (typeof window.getCurrentEditorSessionId === 'function')
+        ? window.getCurrentEditorSessionId()
+        : '';
+
+    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    if (editorSessionId) {
+        headers['X-Editor-Session-ID'] = editorSessionId;
+    }
+
+    // Heading only: the API leaves content untouched when it is not provided.
+    fetch('/api/v1/notes/' + encodeURIComponent(noteId), {
+        method: 'PATCH',
+        headers: headers,
+        credentials: 'same-origin',
+        body: JSON.stringify({ heading: newName, editor_session_id: editorSessionId })
+    })
+        .then(function (response) {
+            return response.json().catch(function () { return {}; });
+        })
+        .then(function (data) {
+            if (data && data.success) {
+                closeModal('renameNoteModal');
+                window.location.reload();
+                return;
+            }
+            showNotificationPopup(
+                'Error: ' + ((data && (data.error || data.message)) || 'Unknown error'),
+                'error'
+            );
+        })
+        .catch(function (error) {
+            showNotificationPopup('Network error while renaming the note', 'error');
+            console.error('Note rename error:', error);
+        });
+}
+
+window.renameNote = renameNote;
+window.saveNoteName = saveNoteName;
+
+// ============================================
 // Note Conversion Functions
 // ============================================
 

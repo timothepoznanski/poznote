@@ -287,11 +287,11 @@
     color: #374151;
 }
 
+/* Single shared menu, placed by adjustMenuPosition() in js/utils.js. Fixed
+   rather than absolute because #left_col scrolls (overflow-y: scroll,
+   overflow-x: hidden), which would clip a menu positioned inside a row. */
 .note-actions-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    margin-top: 2px;
+    position: fixed;
     background: white;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -347,6 +347,29 @@
     color: #374151;
 }
 
+/* Destructive and "already shared" items, matching the folder menu */
+.note-actions-menu-item.danger,
+.note-actions-menu-item.shared {
+    color: #dc2626;
+}
+
+.note-actions-menu-item.danger:hover,
+.note-actions-menu-item.shared:hover {
+    background-color: #fee2e2;
+}
+
+.note-actions-menu-item.danger i,
+.note-actions-menu-item.shared i {
+    color: #dc2626;
+}
+
+/* No hover on touch screens, so the toggle has to stay visible there. */
+@media (hover: none), (max-width: 800px) {
+    .note-actions-toggle {
+        display: flex;
+    }
+}
+
 /* ── Note actions dark mode ── */
 
 [data-theme="dark"] .note-actions-toggle,
@@ -381,4 +404,17 @@
 
 [data-theme="dark"] .note-actions-menu-item:hover i {
     color: #e5e7eb;
+}
+
+/* Same specificity as the rules above, so these must come after them to win. */
+[data-theme="dark"] .note-actions-menu-item.danger,
+[data-theme="dark"] .note-actions-menu-item.shared,
+[data-theme="dark"] .note-actions-menu-item.danger i,
+[data-theme="dark"] .note-actions-menu-item.shared i {
+    color: #f87171;
+}
+
+[data-theme="dark"] .note-actions-menu-item.danger:hover,
+[data-theme="dark"] .note-actions-menu-item.shared:hover {
+    background-color: rgba(220, 38, 38, 0.18);
 }

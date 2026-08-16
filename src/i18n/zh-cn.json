@@ -1490,6 +1490,10 @@
       "title": "插入任务列表",
       "description": "选择要在此笔记中显示的任务列表。",
       "confirm": "插入"
+    },
+    "note": {
+      "rename_title": "重命名笔记",
+      "rename_placeholder": "新笔记标题"
     }
   },
   "notes_list": {
@@ -1530,6 +1534,15 @@
     },
     "folder_filter": {
       "exit": "退出文件夹视图"
+    },
+    "note_actions": {
+      "menu": "笔记操作",
+      "move_note": "移动笔记",
+      "is_shared": "已共享",
+      "share_note": "共享笔记",
+      "rename_note": "重命名笔记",
+      "delete_note": "删除笔记",
+      "enter_note_name": "请输入笔记标题"
     }
   },
   "note_color": {

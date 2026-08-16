@@ -56,7 +56,8 @@
     "link_copied": "Link copied",
     "print": "Print",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "download": "Download"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -1034,6 +1035,10 @@
         "user_s3_restore": "S3 restore on the Restore page",
         "user_s3_restore_help": "Non-admin users no longer see the Restore from S3 section of the Restore / Import page and cannot restore bucket archives."
       }
+    },
+    "note": {
+      "rename_title": "Rename Note",
+      "rename_placeholder": "New note title"
     }
   },
   "notes_list": {
@@ -1075,6 +1080,15 @@
     },
     "folder_filter": {
       "exit": "Exit folder view"
+    },
+    "note_actions": {
+      "menu": "Note actions",
+      "move_note": "Move note",
+      "is_shared": "Is shared",
+      "share_note": "Share note",
+      "rename_note": "Rename note",
+      "delete_note": "Delete note",
+      "enter_note_name": "Please enter a note title"
     }
   },
   "note_color": {

@@ -516,6 +516,18 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Modal for renaming a note from the tree's note actions menu -->
+<div id="renameNoteModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.note.rename_title', [], 'Rename note'); ?></h3>
+        <input type="text" id="renameNoteName" placeholder="<?php echo t_h('modals.note.rename_placeholder', [], 'Note title'); ?>" maxlength="255">
+        <div class="modal-buttons">
+            <button data-action="save-note-name"><?php echo t_h('common.save'); ?></button>
+            <button data-action="close-modal" data-modal="renameNoteModal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Modal for deleting folder -->
 <div id="deleteFolderModal" class="modal">
     <div class="modal-content">

@@ -1497,6 +1497,10 @@
         "user_s3_restore": "S3-Wiederherstellung auf der Wiederherstellungsseite",
         "user_s3_restore_help": "Nicht-Admin-Benutzer sehen den Abschnitt Aus S3 wiederherstellen der Seite Wiederherstellen / Importieren nicht mehr und können keine Bucket-Archive mehr wiederherstellen."
       }
+    },
+    "note": {
+      "rename_title": "Notiz umbenennen",
+      "rename_placeholder": "Neuer Notiztitel"
     }
   },
   "notes_list": {
@@ -1537,6 +1541,15 @@
     },
     "folder_filter": {
       "exit": "Ordneransicht verlassen"
+    },
+    "note_actions": {
+      "menu": "Notizaktionen",
+      "move_note": "Notiz verschieben",
+      "is_shared": "Ist geteilt",
+      "share_note": "Notiz teilen",
+      "rename_note": "Notiz umbenennen",
+      "delete_note": "Notiz löschen",
+      "enter_note_name": "Bitte geben Sie einen Notiztitel ein"
     }
   },
   "note_color": {

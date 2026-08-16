@@ -534,60 +534,10 @@
                 event.preventDefault();
                 event.stopPropagation();
                 var noteId = actionElement.getAttribute('data-note-id');
-                if (!noteId) return;
-                var menu = document.getElementById('note-actions-menu-' + noteId);
-                if (!menu) return;
-                var isOpen = menu.classList.contains('show');
-
-                // Close all other open note menus first
-                closeAllNoteActionMenus();
-
-                if (!isOpen) {
-                    // Reset any previously applied manual positioning
-                    menu.style.top = '';
-                    menu.style.bottom = '';
-                    menu.style.left = '';
-                    menu.style.right = '0';
-
-                    // Show it first to get its dimensions
-                    menu.classList.add('show');
-                    actionElement.classList.add('open');
-
-                    if (window.tabManager && typeof window.tabManager.updateUI === 'function') {
-                        window.tabManager.updateUI();
-                    }
-
-                    // Smart positioning to detect window boundaries
-                    var rect = menu.getBoundingClientRect();
-                    var windowHeight = window.innerHeight;
-                    var windowWidth = window.innerWidth;
-
-                    // Vertical check
-                    if (rect.bottom > windowHeight) {
-                        // Not enough space below, open upwards
-                        menu.style.top = 'auto';
-                        menu.style.bottom = '100%';
-                        menu.style.marginTop = '0';
-                        menu.style.marginBottom = '2px';
-                    } else {
-                        // Enough space below, ensure default
-                        menu.style.top = '100%';
-                        menu.style.bottom = 'auto';
-                        menu.style.marginTop = '2px';
-                        menu.style.marginBottom = '0';
-                    }
-
-                    // Horizontal check (ensure it doesn't go off-screen to the right)
-                    if (rect.right > windowWidth) {
-                        var offset = rect.right - windowWidth + 10;
-                        menu.style.right = offset + 'px';
-                    }
-
-                    // Minimal check to ensure it doesn't go off-screen to the left
-                    if (rect.left < 0) {
-                        menu.style.left = '0';
-                        menu.style.right = 'auto';
-                    }
+                if (noteId && typeof window.toggleNoteActionsMenu === 'function') {
+                    // Pass the element: a favorited note has a second row in
+                    // the Favorites section with the same note id.
+                    window.toggleNoteActionsMenu(noteId, actionElement);
                 }
             }
         };

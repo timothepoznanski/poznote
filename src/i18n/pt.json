@@ -1496,6 +1496,10 @@
         "user_s3_restore": "Restauração S3 na página de restauração",
         "user_s3_restore_help": "Usuários não administradores deixam de ver a seção Restaurar do S3 da página Restaurar / Importar e não podem restaurar arquivos do bucket."
       }
+    },
+    "note": {
+      "rename_title": "Renomear Nota",
+      "rename_placeholder": "Novo título da nota"
     }
   },
   "notes_list": {
@@ -1536,6 +1540,15 @@
     },
     "folder_filter": {
       "exit": "Sair da vista da pasta"
+    },
+    "note_actions": {
+      "menu": "Ações da nota",
+      "move_note": "Mover nota",
+      "is_shared": "É compartilhada",
+      "share_note": "Compartilhar nota",
+      "rename_note": "Renomear nota",
+      "delete_note": "Excluir nota",
+      "enter_note_name": "Digite um título para a nota"
     }
   },
   "note_color": {
