@@ -315,15 +315,15 @@ $noteBaseUrl = $protocol . '://' . $host;
     <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/public-note-theme-init.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
     <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/lucide.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/dark-mode/variables.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
-    <link rel="stylesheet" href="/css/dark-mode/layout.css">
-    <link rel="stylesheet" href="/css/dark-mode/menus.css">
-    <link rel="stylesheet" href="/css/dark-mode/editor.css">
-    <link rel="stylesheet" href="/css/dark-mode/modals.css">
-    <link rel="stylesheet" href="/css/dark-mode/components.css">
-    <link rel="stylesheet" href="/css/dark-mode/pages.css">
-    <link rel="stylesheet" href="/css/dark-mode/markdown.css">
-    <link rel="stylesheet" href="/css/dark-mode/kanban.css">
-    <link rel="stylesheet" href="/css/dark-mode/icons.css">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/layout.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/menus.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/editor.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/modals.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/components.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/pages.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/markdown.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/kanban.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('/css/dark-mode/icons.css'); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('css/public_folder.css'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
 </head>
 <body class="public-folder-body" 

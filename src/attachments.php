@@ -242,7 +242,7 @@ if (!$note) {
         <div class="section-bottom-spacer"></div>
     </div>
 
-    <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : $v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/date-time-format.js'); ?>"></script>
     <script src="js/attachments-page.js?v=<?php echo $v; ?>"></script>
     
     <!-- Delete Attachment Confirmation Modal -->

@@ -100,33 +100,33 @@ $trashOrderBy = $trashSort === 'created'
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link type="text/css" rel="stylesheet" href="css/lucide.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/attachments.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
-    <link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
-    <link type="text/css" rel="stylesheet" href="css/trash.css"/>
-    <link type="text/css" rel="stylesheet" href="css/notes/noteentry.css"/>
-    <link type="text/css" rel="stylesheet" href="css/checklists.css"/>
-    <link type="text/css" rel="stylesheet" href="css/tasks.css"/>
-    <link type="text/css" rel="stylesheet" href="css/markdown.css"/>
-    <link type="text/css" rel="stylesheet" href="css/code-blocks.css"/>
-    <link type="text/css" rel="stylesheet" href="css/syntax-highlight.css"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/base.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/trash.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/notes/noteentry.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/checklists.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/tasks.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/markdown.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/code-blocks.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/syntax-highlight.css'); ?>"/>
     <link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/markdown.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/kanban.css"/>
-    <link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
-    <link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
-    <link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo rawurlencode(getAppVersion()); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/markdown.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/kanban.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>"/>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
@@ -383,21 +383,21 @@ $trashOrderBy = $trashSort === 'created'
     </div>
     
     <!-- JavaScript modules -->
-    <script src="js/globals.js?v=<?php echo getAppVersion(); ?>"></script>
-    <script src="js/workspaces.js?v=<?php echo getAppVersion(); ?>&m=<?php echo @filemtime(__DIR__ . '/js/workspaces.js') ?: time(); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces.js'); ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
-    <script src="js/notes.js?v=<?php echo getAppVersion(); ?>&m=<?php echo @filemtime(__DIR__ . '/js/notes.js') ?: time(); ?>"></script>
-    <script src="js/ui.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/date-time-format.js?v=<?php echo file_exists(__DIR__ . '/js/date-time-format.js') ? filemtime(__DIR__ . '/js/date-time-format.js') : getAppVersion(); ?>"></script>
-    <script src="js/attachments.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/utils.js?v=<?php echo rawurlencode(getAppVersion()); ?>&m=<?php echo @filemtime(__DIR__ . '/js/utils.js') ?: time(); ?>"></script>
-    <script src="js/search-highlight.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/toolbar.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/checklist.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/bulletlist.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/main.js?v=<?php echo rawurlencode(getAppVersion()); ?>&m=<?php echo @filemtime(__DIR__ . '/js/main.js') ?: time(); ?>"></script>
-    <script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/trash.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/notes.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/date-time-format.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/attachments.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/search-highlight.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/toolbar.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/checklist.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/bulletlist.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/main.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/trash.js'); ?>"></script>
 </body>
 </html>

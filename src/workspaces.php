@@ -941,11 +941,11 @@ try {
     </div>
 
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <script src="js/modal-alerts.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
     <script src="js/workspaces.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces.js') ?: time(); ?>"></script>
-    <script src="js/workspace-background.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
-    <script src="js/modals-events.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspace-background.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
     
     <?php include 'modals.php'; ?>
     

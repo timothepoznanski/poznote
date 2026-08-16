@@ -24,24 +24,24 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 	<title><?php echo getPageTitle(); ?></title>
 	<meta name="color-scheme" content="dark light">
 	<script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-	<link type="text/css" rel="stylesheet" href="css/lucide.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/base.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/specific-modals.css"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/base.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/modals/reminders.css?v=<?php echo $cache_v; ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/share-modal.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/alerts-utilities.css"/>
-	<link type="text/css" rel="stylesheet" href="css/modals/responsive.css"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/share-modal.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/alerts-utilities.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/modals/responsive.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/slash-commands.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/note-reference.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/tasks-page.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/layout.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/menus.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/editor.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/modals.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/components.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/pages.css"/>
-	<link type="text/css" rel="stylesheet" href="css/dark-mode/icons.css"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/layout.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/menus.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/editor.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/modals.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/components.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/icons.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>"/>
 	<link type="text/css" rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>"/>
@@ -153,7 +153,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 		apply: <?php echo json_encode(t('common.apply', [], 'Apply')); ?>
 	};
 	</script>
-	<script src="js/navigation.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 	<script src="js/icon-sidebar-toggle.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/note-reference.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/date-time-format.js?v=<?php echo $cache_v; ?>"></script>

@@ -394,15 +394,15 @@ $examples = [
     <title><?php echo t_h('markdown_syntax.page_title', [], 'Markdown syntax'); ?> - Poznote</title>
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <link rel="stylesheet" href="css/lucide.css">
-    <link rel="stylesheet" href="css/info.css">
-    <link rel="stylesheet" href="css/home/buttons.css">
-    <link rel="stylesheet" href="css/markdown-syntax.css">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/info.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/home/buttons.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/markdown-syntax.css'); ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>">
-    <link rel="stylesheet" href="css/dark-mode/pages.css">
-    <link rel="stylesheet" href="css/icon-sidebar.css">
-    <link rel="stylesheet" href="css/icon-sidebar-page.css">
-    <link rel="stylesheet" href="css/icon-sidebar-mobile.css">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/pages.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>">
+    <link rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>">
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body class="has-icon-sidebar">
@@ -521,6 +521,6 @@ $examples = [
         applyFilter();
     })();
     </script>
-    <script src="js/icon-sidebar-toggle.js?v=<?php echo rawurlencode(getAppVersion()); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>
