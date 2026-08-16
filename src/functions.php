@@ -1443,6 +1443,29 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
         } elseif ($type === 'panel') {
             if ($id === 'mini-calendar') {
                 $rules[] = '.mini-calendar-container { display: none !important; }';
+            } elseif ($id === 'folder-actions-toggle') {
+                // The ⋮ button on folder rows. The menu itself is shared and
+                // stays in the DOM: with no toggle it can no longer be opened.
+                $rules[] = '.folder-actions-toggle { display: none !important; }';
+            } elseif ($id === 'note-actions-toggle') {
+                // The ⋮ button on note rows. body.note-actions-hidden gives the
+                // titles back the strip reserved for it (css/tabs.css).
+                $rules[] = '.note-actions-toggle { display: none !important; }';
+            } elseif ($id === 'note-created-date') {
+                // Creation date under the note title. Overrides
+                // body.show-note-created in css/notes/subline.css, which the
+                // note_display.php markup still sets.
+                $rules[] = '.note-subline { display: none !important; }';
+            } elseif ($id === 'note-icons') {
+                // Icon before the note title, in the sidebar list and in the
+                // note header. Both are rendered by renderEditableNoteIcon(),
+                // which always emits .note-icon.
+                $rules[] = '.note-icon { display: none !important; }';
+            } elseif ($id === 'folder-note-count') {
+                // The (n) after a folder name. !important beats the
+                // .hide-folder-counts hover-reveal in css/sidebar.css, which
+                // otherwise brings the count back on hover.
+                $rules[] = '.folder-note-count { display: none !important; }';
             } elseif ($id === 'outline-panel') {
                 $rules[] = '#outline-panel { display: none !important; }';
                 $rules[] = '#outlineResizeHandle { display: none !important; }';

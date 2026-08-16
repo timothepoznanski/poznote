@@ -266,7 +266,10 @@
 .note-list-item > .note-actions {
     position: absolute;
     right: 0;
-    top: 0;
+    /* Match .links_arbo_left's 4px top margin (css/sidebar.css): the row box is
+       taller than the visible band, so stretching to top: 0 centred the toggle
+       on the row and left it sitting 2px above the band's centre. */
+    top: 4px;
     bottom: 0;
 }
 

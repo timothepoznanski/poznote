@@ -1138,6 +1138,8 @@
       "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
       "s3_restore_section": "Wiederherstellungsseite: Abschnitt „Aus S3 wiederherstellen“",
       "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
+      "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
+      "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
       "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche."
     },
     "theme": {

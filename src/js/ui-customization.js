@@ -241,13 +241,22 @@
         });
     }
 
+    function isKeyHidden(key) {
+        var config = window.PoznoteUiCustomization;
+        return !!(config && config.hiddenKeyMap && config.hiddenKeyMap[key]);
+    }
+
     function syncFolderActionToggles() {
         // Single shared dropdown serves every folder's toggle: when UI
         // customization hides all of its items, hide every toggle
         var menu = document.getElementById('folder-actions-menu');
         if (!menu) return;
 
-        var visibleItems = Array.prototype.some.call(
+        // The toggle can also be hidden on its own, without touching the menu
+        // items. Checked here because this function rewrites the inline
+        // display below, which would otherwise undo the generated CSS rule.
+        var visibleItems = !isKeyHidden('panel:folder-actions-toggle') &&
+            Array.prototype.some.call(
             Array.prototype.filter.call(menu.children, function (child) {
                 return child.classList && child.classList.contains('folder-actions-menu-item');
             }),
@@ -275,7 +284,10 @@
         var menu = document.getElementById('note-actions-menu');
         if (!menu) return;
 
-        var visibleItems = Array.prototype.some.call(
+        // Same as folders: the toggle has its own key, and the inline display
+        // written below would otherwise beat the generated CSS rule.
+        var visibleItems = !isKeyHidden('panel:note-actions-toggle') &&
+            Array.prototype.some.call(
             Array.prototype.filter.call(menu.children, function (child) {
                 return child.classList && child.classList.contains('note-actions-menu-item');
             }),
@@ -437,6 +449,16 @@
                 } else if (type === 'panel') {
                     if (id === 'mini-calendar') {
                         rules.push('.mini-calendar-container { display: none !important; }');
+                    } else if (id === 'folder-actions-toggle') {
+                        rules.push('.folder-actions-toggle { display: none !important; }');
+                    } else if (id === 'note-actions-toggle') {
+                        rules.push('.note-actions-toggle { display: none !important; }');
+                    } else if (id === 'note-created-date') {
+                        rules.push('.note-subline { display: none !important; }');
+                    } else if (id === 'note-icons') {
+                        rules.push('.note-icon { display: none !important; }');
+                    } else if (id === 'folder-note-count') {
+                        rules.push('.folder-note-count { display: none !important; }');
                     } else if (id === 'outline-panel') {
                         rules.push('#outline-panel { display: none !important; }');
                         rules.push('#outlineResizeHandle { display: none !important; }');

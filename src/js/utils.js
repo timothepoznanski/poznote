@@ -3111,6 +3111,21 @@ function populateFolderActionsMenu(menu, toggle) {
     });
 }
 
+// Keeps exactly one folder toggle marked .open, so the hover-reveal rule in
+// css/folders/actions-menu.css holds it visible while its menu is open.
+function markFolderActionsToggleOpen(toggle) {
+    document.querySelectorAll('.folder-actions-toggle.open').forEach(function (other) {
+        if (other !== toggle) other.classList.remove('open');
+    });
+    if (toggle) toggle.classList.add('open');
+}
+
+function clearFolderActionsToggleOpen() {
+    document.querySelectorAll('.folder-actions-toggle.open').forEach(function (toggle) {
+        toggle.classList.remove('open');
+    });
+}
+
 function toggleFolderActionsMenu(folderId) {
     var menu = document.getElementById('folder-actions-menu');
     if (!menu) return;
@@ -3130,6 +3145,10 @@ function toggleFolderActionsMenu(folderId) {
 
     populateFolderActionsMenu(menu, toggle);
     menu.classList.add('show');
+    // Folder toggles only show on row hover (css/folders/actions-menu.css);
+    // while the menu is open the pointer is over the menu, not the row, so
+    // mark the toggle to keep it visible. Mirrors .note-actions-toggle.open.
+    markFolderActionsToggleOpen(toggle);
     adjustMenuPosition(menu, toggle);
 }
 
@@ -3271,6 +3290,7 @@ function openFolderActionsMenuAtPoint(folderId, x, y) {
     closeNoteActionsMenu();
     populateFolderActionsMenu(menu, toggle);
     menu.classList.add('show');
+    markFolderActionsToggleOpen(toggle);
     positionMenuAtPoint(menu, x, y);
     return true;
 }
@@ -3308,6 +3328,7 @@ function closeFolderActionsMenu(folderId) {
             chevron.style.transform = 'rotate(0deg)';
         });
     }
+    clearFolderActionsToggleOpen();
 }
 
 // Close folder menus when clicking outside
@@ -3325,6 +3346,7 @@ document.addEventListener('click', function (event) {
                 chevron.style.transform = 'rotate(0deg)';
             });
         });
+        clearFolderActionsToggleOpen();
     }
 });
 

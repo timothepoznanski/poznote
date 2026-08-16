@@ -1163,6 +1163,8 @@
       "s3_backups_section": "Page Sauvegarde : section « Sauvegardes S3 »",
       "s3_restore_section": "Page Restauration : section « Restauration depuis S3 »",
       "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?",
+      "folder_actions_toggle": "Bouton de menu (⋮) sur les dossiers",
+      "note_actions_toggle": "Bouton de menu (⋮) sur les notes",
       "note_actions_hint": "Éléments du menu ⋮ de chaque note dans la barre latérale. Tout décocher masque le bouton du menu."
     },
     "theme": {

@@ -1137,6 +1137,8 @@
       "s3_backups_section": "Página de backup: seção «Backups S3»",
       "s3_restore_section": "Página de restauração: seção «Restaurar do S3»",
       "toggle_all_warning": "Esta ação fará perder todas as suas personalizações existentes. Deseja continuar?",
+      "folder_actions_toggle": "Botão de menu (⋮) nas pastas",
+      "note_actions_toggle": "Botão de menu (⋮) nas notas",
       "note_actions_hint": "Itens do menu ⋮ de cada nota na barra lateral. Desmarcar todos oculta o botão do menu."
     },
     "theme": {

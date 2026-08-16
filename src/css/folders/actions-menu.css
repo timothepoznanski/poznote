@@ -17,15 +17,33 @@
     transition: opacity 0.2s;
 }
 
-/* Show folder action icons always visible */
+/* .folder-actions is the legacy inline container (still used by pages that
+   render their own action icons); the sidebar tree emits a bare
+   .folder-actions-toggle instead, so both are covered here. */
 .folder-actions i {
     opacity: 1;
     transition: opacity 0.12s ease-in-out, color 0.12s;
     pointer-events: auto;
 }
 
-/* Reveal icons on folder hover */
-.folder-toggle:hover .folder-actions i {
+/* Hidden until the folder row is hovered, like the note toggles
+   (.note-actions-toggle in css/tabs.css). Kept as opacity rather than display
+   so the icon fades instead of popping and the row's layout never shifts.
+   Mobile forces it back on in index-mobile.css: there is no hover there. */
+.folder-header .folder-actions-toggle,
+.folder-toggle .folder-actions-toggle {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.12s ease-in-out;
+}
+
+/* Reveal on folder row hover, or while this folder's menu is open: the pointer
+   then sits over the menu, not the row, so the toggle would otherwise fade out
+   from under its own open menu. .open is set by toggleFolderActionsMenu() in
+   js/utils.js, mirroring .note-actions-toggle.open. */
+.folder-header:hover .folder-actions-toggle,
+.folder-toggle:hover .folder-actions-toggle,
+.folder-actions-toggle.open {
     opacity: 1;
     pointer-events: auto;
 }

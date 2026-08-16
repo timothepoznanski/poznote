@@ -1618,10 +1618,10 @@
         }, true);
 
         // Setup toggle cards
-        setupToggleCard('show-created-card', 'show-created-status', 'show_note_created', false);
-        setupToggleCard('note-icons-card', 'note-icons-status', 'show_note_icons', false, false);
+        // show-created-card, note-icons-card and folder-counts-card were
+        // replaced by checkboxes in the "Element visibility" modal
+        // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
         setupToggleCard('type-note-icons-card', 'type-note-icons-status', 'type_based_note_icons', false, true);
-        setupToggleCard('folder-counts-card', 'folder-counts-status', 'hide_folder_counts', true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);

@@ -701,25 +701,8 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Show Note Created -->
-            <div class="home-card" id="show-created-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.show_created', [], 'Show the creation date in the note header.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-calendar-alt"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span>
-                    <span id="show-created-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
-
-            <!-- Show Note Icons -->
-            <div class="home-card" id="note-icons-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_icons', [], 'Show custom icons next to note titles in the list.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-file-text"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span>
-                    <span id="note-icons-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
-                </div>
-            </div>
+            <!-- Show Note Created / Show Note Icons: moved to the "Element
+                 visibility" modal (panel:note-created-date, panel:note-icons). -->
 
             <!-- Type-based Default Note Icons -->
             <div class="home-card" id="type-note-icons-card">
@@ -741,15 +724,8 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Show Folder Counts -->
-            <div class="home-card desktop-only" id="folder-counts-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.folder_counts', [], 'Show the number of notes next to each folder.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-hash"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.show_folder_counts', [], 'Show folder note counts'); ?></span>
-                    <span id="folder-counts-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
-                </div>
-            </div>
+            <!-- Show Folder Counts: moved to the "Element visibility" modal
+                 (panel:folder-note-count). -->
 
             <!-- Notes Without Folders Position -->
             <div class="home-card" id="notes-without-folders-card">
