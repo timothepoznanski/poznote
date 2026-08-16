@@ -128,6 +128,7 @@ $settingsPageUserKeys = [
     'note_age_filter_days',
     'tasklist_insert_order',
     'diary_default_note_type',
+    'diary_date_format',
     'toolbar_mode',
     'timezone',
     'date_time_format',
@@ -810,6 +811,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span>
                     <span id="diary-note-type-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Diary Entry Date Format -->
+            <div class="home-card" id="diary-date-format-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.diary_date_format', [], 'Choose the date format used to title new diary entries.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-calendar-alt"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span>
+                    <span id="diary-date-format-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                 </div>
             </div>
 

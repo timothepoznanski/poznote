@@ -272,6 +272,26 @@ class SettingsController {
             return $normalized;
         }
 
+        if ($key === 'diary_date_format') {
+            $normalized = trim((string) $value);
+            // Keys of getDiaryDateFormats() in functions.php
+            $allowedFormats = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash'];
+            if (strpos($normalized, 'custom:') === 0) {
+                require_once __DIR__ . '/../../../functions.php';
+                $customPattern = trim(substr($normalized, 7));
+                // Rejects patterns that could not be parsed back into a day
+                // (no year/month/day, a part twice, illegal characters).
+                if (compileDiaryDateCustomFormat($customPattern) === null) {
+                    throw new InvalidArgumentException('invalid diary date format', 400);
+                }
+                return 'custom:' . $customPattern;
+            }
+            if (!in_array($normalized, $allowedFormats, true)) {
+                throw new InvalidArgumentException('invalid diary date format', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'timezone') {
             $normalized = trim((string) $value);
             if ($normalized === '') {
@@ -589,6 +609,16 @@ class SettingsController {
                 // For user settings, use the user database
                 $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
                 $stmt->execute([$key, $value]);
+
+                if ($key === 'diary_date_format' && strpos((string) $value, 'custom:') === 0) {
+                    // Remember the pattern so entries titled with it stay
+                    // recognized after the user switches to another format.
+                    $history = buildDiaryDateFormatHistory(trim(substr((string) $value, 7)));
+                    if ($history !== null) {
+                        $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+                        $stmt->execute(['diary_date_format_history', $history]);
+                    }
+                }
 
                 if ($key === 'language') {
                     // An explicit choice ends the browser-driven language: from now

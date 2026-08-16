@@ -415,6 +415,7 @@
       "note_age_filter": "Mostre apenas as notas modificadas nos últimos dias escolhidos.",
       "tasklist_insert_order": "Escolha se novas tarefas são adicionadas no topo ou no final das listas de tarefas.",
       "diary_note_type": "Escolha o formato de nota usado para novas entradas de diário.",
+      "diary_date_format": "Escolha o formato de data usado para intitular as novas entradas do diário.",
       "show_created": "Mostre a data de criação no cabeçalho da nota.",
       "note_icons": "Mostre ícones personalizados ao lado dos títulos na lista de notas.",
       "type_based_note_icons": "Use um ícone padrão específico para listas de tarefas e notas markdown para distingui-las na lista de notas.",
@@ -670,6 +671,7 @@
       "note_age_filter": "Filtro de antiguidade",
       "tasklist_insert_order": "Ordem de inserção das tarefas",
       "diary_default_note_type": "Formato das entradas do diário",
+      "diary_date_format": "Formato de data das entradas do diário",
       "timezone": "Fuso Horário",
       "date_time_format": "Formato de data e hora",
       "show_note_created": "Mostrar Data de Criação da Nota",
@@ -1488,6 +1490,32 @@
         "ss": "segundos (09)",
         "A": "AM/PM"
       }
+    },
+    "diary_date_format": {
+      "title": "Formato de data das entradas do diário",
+      "description": "Escolha o formato de data usado para intitular as novas entradas do diário:",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "Personalizado"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, DD. São obrigatórios um ano, um mês e um dia.",
+      "custom_invalid": "Introduza um formato personalizado válido, com um ano, um mês e um dia.",
+      "hint": "As entradas existentes mantêm o título e continuam associadas ao seu dia.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "ano (2026)",
+        "YY": "ano com dois dígitos (26)",
+        "MMMM": "nome do mês (August)",
+        "MMM": "nome do mês abreviado (Aug)",
+        "MM": "mês (08)",
+        "DD": "dia (16)"
+      },
+      "tokens_required": "São obrigatórios um ano, um mês e um dia."
     },
     "move_folder": {
       "title": "Mover pasta",
@@ -3614,6 +3642,9 @@
     "config_title": "Configuração",
     "enable_label": "Ativar o assistente IA",
     "enable_description": "Mostra um botão de chat IA na barra de ferramentas das notas.",
+    "users_label": "Utilizadores autorizados",
+    "users_description": "Apenas os utilizadores selecionados veem o botão de chat de IA. Os novos utilizadores não têm acesso até os adicionar aqui.",
+    "users_admin": "Administrador",
     "url_label": "URL do servidor",
     "url_description": "URL base de uma API compatível com OpenAI. Para o Ollama no host Docker, use http://host.docker.internal:11434",
     "model_label": "Modelo",

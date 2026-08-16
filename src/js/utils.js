@@ -2950,8 +2950,9 @@ function createNoteOfType(noteType, globalFnNames) {
  * Open today's diary entry, creating it first when it does not exist yet.
  * Goes straight to the note: routing through diary.php?today=1 made the diary
  * board render for a moment before the note replaced it.
- * api/v1/calendar/diary-entry.php supplies the target folder, workspace and
- * the configured note type (see the diary_default_note_type setting).
+ * api/v1/calendar/diary-entry.php supplies the target folder, workspace, the
+ * configured note type (see the diary_default_note_type setting) and the entry
+ * title in the configured diary date format (diary_date_format).
  */
 function createDiaryEntryForToday() {
     var diaryWs = window.selectedWorkspace || '';
@@ -2998,7 +2999,9 @@ function createDiaryEntryForToday() {
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
                 body: JSON.stringify({
-                    heading: today,
+                    // The title follows the configured diary date format;
+                    // created_date stays YYYY-MM-DD, as the API expects.
+                    heading: diary.title || today,
                     folder_name: diary.folder,
                     workspace: diary.workspace,
                     type: diary.noteType === 'markdown' ? 'markdown' : 'note',

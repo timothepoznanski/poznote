@@ -416,6 +416,7 @@
       "note_age_filter": "Nur Notizen anzeigen, die innerhalb der gewählten Anzahl von Tagen geändert wurden.",
       "tasklist_insert_order": "Wählen Sie, ob neue Aufgaben oben oder unten in Aufgabenlisten eingefügt werden.",
       "diary_note_type": "Wählen Sie das Notizformat für neue Tagebucheinträge.",
+      "diary_date_format": "Wählen Sie das Datumsformat für die Titel neuer Tagebucheinträge.",
       "show_created": "Zeigen Sie das Erstellungsdatum im Notizkopf an.",
       "note_icons": "Zeigen Sie eigene Symbole neben den Notiztiteln in der Liste an.",
       "type_based_note_icons": "Verwenden Sie ein eigenes Standardsymbol für Aufgabenlisten und Markdown-Notizen, damit sie in der Notizliste unterscheidbar sind.",
@@ -672,6 +673,7 @@
       "note_age_filter": "Altersfilter",
       "tasklist_insert_order": "Einfüge-Reihenfolge der Aufgaben",
       "diary_default_note_type": "Format der Tagebucheinträge",
+      "diary_date_format": "Datumsformat der Tagebucheinträge",
       "timezone": "Zeitzone",
       "date_time_format": "Datums- und Uhrzeitformat",
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
@@ -1489,6 +1491,32 @@
         "ss": "Sekunden (09)",
         "A": "AM/PM"
       }
+    },
+    "diary_date_format": {
+      "title": "Datumsformat der Tagebucheinträge",
+      "description": "Wählen Sie das Datumsformat für die Titel neuer Tagebucheinträge:",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "Benutzerdefiniert"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "Token: YYYY, YY, MMMM, MMM, MM, DD. Jahr, Monat und Tag sind erforderlich.",
+      "custom_invalid": "Geben Sie ein gültiges benutzerdefiniertes Format mit Jahr, Monat und Tag ein.",
+      "hint": "Bestehende Einträge behalten ihren Titel und bleiben ihrem Tag zugeordnet.",
+      "tokens_title": "Token:",
+      "tokens": {
+        "YYYY": "Jahr (2026)",
+        "YY": "Jahr, zweistellig (26)",
+        "MMMM": "Monatsname (August)",
+        "MMM": "kurzer Monatsname (Aug)",
+        "MM": "Monat (08)",
+        "DD": "Tag (16)"
+      },
+      "tokens_required": "Jahr, Monat und Tag sind erforderlich."
     },
     "move_folder": {
       "title": "Ordner verschieben",
@@ -3611,6 +3639,9 @@
     "config_title": "Konfiguration",
     "enable_label": "KI-Assistent aktivieren",
     "enable_description": "Zeigt eine KI-Chat-Schaltfläche in der Notiz-Symbolleiste an.",
+    "users_label": "Berechtigte Benutzer",
+    "users_description": "Nur die ausgewählten Benutzer sehen die KI-Chat-Schaltfläche. Neue Benutzer haben keinen Zugriff, bis Sie sie hier hinzufügen.",
+    "users_admin": "Administrator",
     "url_label": "Server-URL",
     "url_description": "Basis-URL einer OpenAI-kompatiblen API. Für Ollama auf dem Docker-Host: http://host.docker.internal:11434",
     "model_label": "Modell",

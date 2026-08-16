@@ -1203,6 +1203,35 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Diary entry date format modal -->
+<div id="diaryDateFormatModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.diary_date_format.title', [], 'Diary entry date format'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.diary_date_format.description', [], 'Choose the date format used to title new diary entries:'); ?></p>
+            <div class="radio-options">
+                <label><input type="radio" name="diaryDateFormat" value="ymd"> <?php echo t_h('modals.diary_date_format.options.ymd', [], 'YYYY-MM-DD'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="dmy_slash"> <?php echo t_h('modals.diary_date_format.options.dmy_slash', [], 'DD/MM/YYYY'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="mdy_slash"> <?php echo t_h('modals.diary_date_format.options.mdy_slash', [], 'MM/DD/YYYY'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="dmy_dot"> <?php echo t_h('modals.diary_date_format.options.dmy_dot', [], 'DD.MM.YYYY'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="ymd_slash"> <?php echo t_h('modals.diary_date_format.options.ymd_slash', [], 'YYYY/MM/DD'); ?></label>
+                <label><input type="radio" name="diaryDateFormat" value="custom"> <?php echo t_h('modals.diary_date_format.options.custom', [], 'Custom'); ?></label>
+                <input type="text" id="diaryDateFormatCustomInput" maxlength="80" placeholder="<?php echo t_h('modals.diary_date_format.custom_placeholder', [], 'DD MMMM YYYY'); ?>" style="width: 100%; box-sizing: border-box; margin: 4px 0 0 24px;">
+                <div class="date-format-tokens-wrap" style="margin: 4px 0 0 24px;">
+                    <small style="display: block; color: #6b7280;"><?php echo t_h('modals.diary_date_format.tokens_title', [], 'Tokens:'); ?></small>
+                    <?php echo renderDateFormatTokenLegend('diary_date_format'); ?>
+                    <small style="display: block; color: #6b7280;"><?php echo t_h('modals.diary_date_format.tokens_required', [], 'A year, a month and a day are required.'); ?></small>
+                </div>
+            </div>
+            <small style="display: block; margin: 8px 0 16px 0; color: #6b7280;"><?php echo t_h('modals.diary_date_format.hint', [], 'Existing entries keep their title and stay linked to their day.'); ?></small>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="diaryDateFormatModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveDiaryDateFormatModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <?php if (!empty($showWelcomeSetupModal)): ?>
 <!-- First-run welcome setup wizard. Rendered only while the 'welcome_setup'
      setting is 'pending' (seeded at account creation); js/welcome-setup.js
@@ -1605,6 +1634,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:type-note-icons-card" checked><span><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>

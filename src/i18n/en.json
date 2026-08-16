@@ -143,6 +143,7 @@
       "note_age_filter": "Only show notes updated within the chosen number of days.",
       "tasklist_insert_order": "Choose whether new tasks are added to the top or the bottom of task lists.",
       "diary_note_type": "Choose the note format used for new diary entries.",
+      "diary_date_format": "Choose the date format used to title new diary entries.",
       "show_created": "Show the creation date in the note header.",
       "note_icons": "Show custom icons next to note titles in the list.",
       "type_based_note_icons": "Use a specific default icon for task lists and markdown notes so they can be told apart in the notes list.",
@@ -316,6 +317,7 @@
       "note_age_filter": "Note age filter",
       "tasklist_insert_order": "Task list insert order",
       "diary_default_note_type": "Diary entry format",
+      "diary_date_format": "Diary entry date format",
       "timezone": "Timezone",
       "date_time_format": "Date & time format",
       "show_note_created": "Show creation date",
@@ -1038,6 +1040,32 @@
         "ss": "seconds (09)",
         "A": "AM/PM"
       }
+    },
+    "diary_date_format": {
+      "title": "Diary entry date format",
+      "description": "Choose the date format used to title new diary entries:",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "custom": "Custom"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "Tokens: YYYY, YY, MMMM, MMM, MM, DD. A year, a month and a day are required.",
+      "custom_invalid": "Enter a valid custom format, with a year, a month and a day.",
+      "hint": "Existing entries keep their title and stay linked to their day.",
+      "tokens_title": "Tokens:",
+      "tokens": {
+        "YYYY": "year (2026)",
+        "YY": "year, 2 digits (26)",
+        "MMMM": "month name (August)",
+        "MMM": "short month name (Aug)",
+        "MM": "month (08)",
+        "DD": "day (16)"
+      },
+      "tokens_required": "A year, a month and a day are required."
     },
     "tenant_isolation": {
       "title": "Tenant isolation",
@@ -3310,6 +3338,9 @@
     "config_title": "Configuration",
     "enable_label": "Enable AI assistant",
     "enable_description": "Shows an AI chat button in the note toolbar.",
+    "users_label": "Allowed users",
+    "users_description": "Only the selected users see the AI chat button. New users have no access until you add them here.",
+    "users_admin": "Administrator",
     "url_label": "Server URL",
     "url_description": "Base URL of an OpenAI-compatible API. For Ollama running on the Docker host, use http://host.docker.internal:11434",
     "model_label": "Model",

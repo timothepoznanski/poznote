@@ -51,6 +51,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     if ($saved && $apiKey !== '••••••••') {
         $saved = setGlobalSetting('ai_chat_api_key', $apiKey);
     }
+
+    // Per-user access. The checkbox list only shows eligible profiles, so
+    // anything else posted is ignored.
+    $postedAiUsers = $_POST['ai_user_ids'] ?? [];
+    if (!is_array($postedAiUsers)) {
+        $postedAiUsers = [];
+    }
+    if ($saved) {
+        $saved = setAiChatUsers(array_map('intval', $postedAiUsers));
+    }
     if ($saved) {
         $message = t('ai_settings.messages.saved', [], 'Configuration saved successfully.');
     } else {
@@ -86,6 +96,7 @@ if (!in_array($aiProvider, $AI_PROVIDERS, true)) {
 }
 
 $aiEnabled = $aiConfig['ai_chat_enabled'] === '1';
+$aiUserCandidates = listAiChatCandidates();
 
 /**
  * Best local-server host as seen from inside this container.
@@ -161,6 +172,22 @@ $aiLocalHost = aiChatLocalDefaultHost();
     }
     html[data-theme='dark'] .ai-model-suggestion:hover,
     body.dark-mode .ai-model-suggestion:hover { background: rgba(127, 179, 227, 0.12); }
+
+    /* Per-user AI access list */
+    /* Instances can have many profiles: keep the list from burying the
+       provider/model fields below it */
+    .ai-user-list {
+        display: flex; flex-direction: column; gap: 2px; margin-top: 8px;
+        max-height: 260px; overflow-y: auto;
+        border: 1px solid #dfe3e8; border-radius: 6px; padding: 6px 10px;
+    }
+    html[data-theme='dark'] .ai-user-list,
+    body.dark-mode .ai-user-list { border-color: var(--dm-border, #404040); }
+    .ai-user { display: flex; align-items: center; gap: 10px; padding: 6px 4px; cursor: pointer; }
+    .ai-user input[type="checkbox"] { flex: 0 0 auto; margin: 0; }
+    .ai-user-copy { display: flex; flex-direction: column; line-height: 1.3; min-width: 0; }
+    .ai-user-name { font-weight: 500; }
+    .ai-user-meta { font-size: 0.85rem; opacity: 0.7; }
     </style>
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -203,6 +230,44 @@ $aiLocalHost = aiChatLocalDefaultHost();
                         <div class="check-label">
                             <span class="label-title"><?php echo t_h('ai_settings.enable_label', [], 'Enable AI assistant'); ?></span>
                             <span class="label-desc"><?php echo t_h('ai_settings.enable_description', [], 'Shows an AI chat button in the note toolbar.'); ?></span>
+                        </div>
+                    </div>
+
+                    <div class="git-field-group" id="ai-users-group">
+                        <label class="git-field-label"><?php echo t_h('ai_settings.users_label', [], 'Allowed users'); ?></label>
+                        <span class="label-desc"><?php echo t_h('ai_settings.users_description', [], 'Only the selected users see the AI chat button. New users have no access until you add them here.'); ?></span>
+                        <div class="ai-user-list">
+                            <?php foreach ($aiUserCandidates as $candidate): ?>
+                                <?php
+                                    $candidateId = (int)$candidate['id'];
+                                    $candidateUsername = (string)$candidate['username'];
+                                    $candidateName = trim(trim((string)($candidate['first_name'] ?? '')) . ' ' . trim((string)($candidate['last_name'] ?? '')));
+                                    if ($candidateName === '') {
+                                        $candidateName = $candidateUsername;
+                                    }
+                                    // The second line only adds information when it is not
+                                    // just the name again
+                                    $candidateMeta = ($candidateName === $candidateUsername) ? '' : $candidateUsername;
+                                    if (!empty($candidate['is_admin'])) {
+                                        $adminTag = t('ai_settings.users_admin', [], 'Administrator');
+                                        $candidateMeta = ($candidateMeta === '') ? $adminTag : $candidateMeta . ' · ' . $adminTag;
+                                    }
+                                ?>
+                                <label class="ai-user" for="ai_user_<?php echo $candidateId; ?>">
+                                    <input
+                                        type="checkbox"
+                                        id="ai_user_<?php echo $candidateId; ?>"
+                                        name="ai_user_ids[]"
+                                        value="<?php echo $candidateId; ?>"
+                                        <?php echo !empty($candidate['ai_chat_enabled']) ? 'checked' : ''; ?>>
+                                    <span class="ai-user-copy">
+                                        <span class="ai-user-name"><?php echo htmlspecialchars($candidateName, ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <?php if ($candidateMeta !== ''): ?>
+                                        <span class="ai-user-meta"><?php echo htmlspecialchars($candidateMeta, ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
                         </div>
                     </div>
 

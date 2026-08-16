@@ -48,14 +48,12 @@ function diaryBuildSwitchUrl(string $pageWorkspace, int $diaryId): string {
 }
 
 /**
- * The day a diary entry belongs to: its YYYY-MM-DD title when valid (so
- * renaming an entry re-dates it), otherwise its creation date.
+ * The day a diary entry belongs to, as YYYY-MM-DD: the day its title
+ * designates when the title is a date in a supported format (so renaming an
+ * entry re-dates it), otherwise its creation date.
  */
 function diaryEntryDate(string $heading, string $created): string {
-    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $heading, $m) && checkdate((int)$m[2], (int)$m[3], (int)$m[1])) {
-        return $heading;
-    }
-    return $created;
+    return parseDiaryEntryTitle($heading) ?? $created;
 }
 
 function diaryBuildNoteData(array $note, string $pageWorkspace): array {
@@ -93,7 +91,8 @@ try {
 } catch (Exception $e) {
     $userNow = new DateTime('now', new DateTimeZone('UTC'));
 }
-$todayTitle = $userNow->format('Y-m-d');
+$todayIso   = $userNow->format('Y-m-d');
+$todayTitle = formatDiaryEntryTitle($userNow);
 $diaryFolderPath = $diaryRootName . '/' . $userNow->format('Y') . '/' . $userNow->format('m');
 
 try {
@@ -113,7 +112,11 @@ try {
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $noteData = diaryBuildNoteData($row, $pageWorkspace);
-                if ($todayNoteId === null && trim((string)$row['heading']) === $todayTitle) {
+                // Compare the parsed day, not the raw title: an entry written
+                // before the title format changed must still count as today's.
+                // Only dated titles qualify, so a note merely created today
+                // does not take the place of the day's entry.
+                if ($todayNoteId === null && parseDiaryEntryTitle((string)$row['heading']) === $todayIso) {
                     $todayNoteId = (int)$row['id'];
                 }
                 $diaryNotes[] = $noteData;

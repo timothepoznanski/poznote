@@ -2,10 +2,11 @@
 /**
  * Calendar API - Diary entry lookup for a specific date
  *
- * Returns the diary entry (note titled YYYY-MM-DD inside the diary subtree)
- * for the requested date, plus the folder path, workspace and note type to use
- * when the entry does not exist yet. Used by the mini calendar day popup to
- * offer an "open or create diary entry" action.
+ * Returns the diary entry (the dated note inside the diary subtree) for the
+ * requested date, plus the folder path, workspace, note type and the title to
+ * use when the entry does not exist yet. The `date` parameter is always
+ * YYYY-MM-DD; `title` carries it in the configured diary date format. Used by
+ * the mini calendar day popup to offer an "open or create diary entry" action.
  *
  * With several diaries in the workspace, the `diaries` array lists the entry
  * status of each one; the top-level fields describe the diary selected with
@@ -37,6 +38,8 @@ try {
     }
 
     $noteType = getDiaryDefaultNoteType();
+    // Title to create the entry with, in the configured diary date format.
+    $entryTitle = formatDiaryEntryTitle($date);
     $diaries = [];
     foreach (getDiaryRoots($con, $workspace) as $root) {
         $entryId = findDiaryEntryIdForDate($con, $workspace, $date, $root['id']);
@@ -47,7 +50,8 @@ try {
             'noteId'    => $entryId,
             'folder'    => $root['name'] . '/' . $m[1] . '/' . $m[2],
             'workspace' => $workspace,
-            'noteType'  => $noteType
+            'noteType'  => $noteType,
+            'title'     => $entryTitle
         ];
     }
     if (empty($diaries)) {
@@ -60,7 +64,8 @@ try {
             'noteId'    => null,
             'folder'    => $defaultName . '/' . $m[1] . '/' . $m[2],
             'workspace' => $workspace,
-            'noteType'  => $noteType
+            'noteType'  => $noteType,
+            'title'     => $entryTitle
         ];
     }
 
@@ -78,6 +83,7 @@ try {
         'folder'    => $selected['folder'],
         'workspace' => $workspace,
         'noteType'  => $noteType,
+        'title'     => $entryTitle,
         'diaries'   => $diaries
     ]);
 

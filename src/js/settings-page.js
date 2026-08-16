@@ -109,6 +109,7 @@
             'note_age_filter_days',
             'tasklist_insert_order',
             'diary_default_note_type',
+            'diary_date_format',
             'toolbar_mode',
             'timezone',
             'date_time_format',
@@ -835,6 +836,84 @@
         });
     }
 
+    // Diary entry title formats; must mirror getDiaryDateFormats() in functions.php.
+    var DIARY_DATE_FORMATS = ['ymd', 'dmy_slash', 'mdy_slash', 'dmy_dot', 'ymd_slash'];
+
+    function isCustomDiaryDateFormat(value) {
+        return typeof value === 'string' && value.indexOf('custom:') === 0;
+    }
+
+    function getCustomDiaryDatePattern(value) {
+        return String(value || '').slice(7).trim();
+    }
+
+    /**
+     * Mirrors compileDiaryDateCustomFormat() in functions.php: a diary title has
+     * to be parseable back into a day, so a pattern needs a year, a month and a
+     * day, each at most once.
+     */
+    function isValidCustomDiaryDateFormat(pattern) {
+        var value = String(pattern || '').trim();
+        if (value === '' || value.length > 80) return false;
+        if (!/^[A-Za-z0-9\s\/.,_\-()]+$/.test(value)) return false;
+
+        // Longest token first, matching the PHP compiler's greedy scan.
+        var tokens = [['YYYY','y'], ['YY','y'], ['MMMM','m'], ['MMM','m'], ['MM','m'], ['DD','d']];
+        var seen = {};
+        for (var i = 0; i < value.length; i++) {
+            for (var t = 0; t < tokens.length; t++) {
+                var token = tokens[t][0], part = tokens[t][1];
+                if (value.substr(i, token.length) === token) {
+                    if (seen[part]) return false;
+                    seen[part] = true;
+                    i += token.length - 1;
+                    break;
+                }
+            }
+        }
+        return !!(seen.y && seen.m && seen.d);
+    }
+
+    function normalizeDiaryDateFormat(value) {
+        var format = String(value || '').trim();
+        if (isCustomDiaryDateFormat(format)
+            && isValidCustomDiaryDateFormat(getCustomDiaryDatePattern(format))) {
+            return format;
+        }
+        return DIARY_DATE_FORMATS.indexOf(format) !== -1 ? format : 'ymd';
+    }
+
+    function getDiaryDateFormatLabel(format) {
+        var normalized = normalizeDiaryDateFormat(format);
+        if (isCustomDiaryDateFormat(normalized)) {
+            return getCustomDiaryDatePattern(normalized);
+        }
+
+        switch (normalized) {
+            case 'dmy_slash':
+                return tr('modals.diary_date_format.options.dmy_slash', {}, 'DD/MM/YYYY');
+            case 'mdy_slash':
+                return tr('modals.diary_date_format.options.mdy_slash', {}, 'MM/DD/YYYY');
+            case 'dmy_dot':
+                return tr('modals.diary_date_format.options.dmy_dot', {}, 'DD.MM.YYYY');
+            case 'ymd_slash':
+                return tr('modals.diary_date_format.options.ymd_slash', {}, 'YYYY/MM/DD');
+            case 'ymd':
+            default:
+                return tr('modals.diary_date_format.options.ymd', {}, 'YYYY-MM-DD');
+        }
+    }
+
+    function refreshDiaryDateFormatBadge() {
+        getSetting('diary_date_format', function (value) {
+            var badge = document.getElementById('diary-date-format-badge');
+            if (!badge) return;
+
+            badge.textContent = getDiaryDateFormatLabel(value);
+            badge.className = 'setting-status enabled';
+        });
+    }
+
     function refreshToolbarModeBadge() {
         getSetting('toolbar_mode', function (value) {
             var badge = document.getElementById('toolbar-mode-badge');
@@ -1443,6 +1522,29 @@
         });
     }
 
+    function openDiaryDateFormatModal() {
+        var modal = document.getElementById('diaryDateFormatModal');
+        if (!modal) return;
+
+        getSetting('diary_date_format', function (value) {
+            var currentValue = normalizeDiaryDateFormat(value);
+            var customPattern = '';
+            if (isCustomDiaryDateFormat(currentValue)) {
+                customPattern = getCustomDiaryDatePattern(currentValue);
+                currentValue = 'custom';
+            }
+            var radios = document.getElementsByName('diaryDateFormat');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].checked = (radios[i].value === currentValue);
+            }
+            var customInput = document.getElementById('diaryDateFormatCustomInput');
+            if (customInput) {
+                customInput.value = customPattern;
+            }
+            modal.style.display = 'flex';
+        });
+    }
+
 
 
     // ========== Initialization ==========
@@ -1718,6 +1820,19 @@
         var dateTimeFormatCard = document.getElementById('date-time-format-card');
         if (dateTimeFormatCard) {
             dateTimeFormatCard.addEventListener('click', openDateTimeFormatModal);
+        }
+
+        var diaryDateFormatCard = document.getElementById('diary-date-format-card');
+        if (diaryDateFormatCard) {
+            diaryDateFormatCard.addEventListener('click', openDiaryDateFormatModal);
+        }
+
+        var customDiaryDateFormatInput = document.getElementById('diaryDateFormatCustomInput');
+        if (customDiaryDateFormatInput) {
+            customDiaryDateFormatInput.addEventListener('focus', function () {
+                var customRadio = document.querySelector('input[name="diaryDateFormat"][value="custom"]');
+                if (customRadio) customRadio.checked = true;
+            });
         }
 
         var customDateTimeFormatInput = document.getElementById('dateTimeFormatCustomInput');
@@ -2135,6 +2250,42 @@
             });
         }
 
+        // Save diary entry date format modal button
+        var saveDiaryDateFormatBtn = document.getElementById('saveDiaryDateFormatModalBtn');
+        if (saveDiaryDateFormatBtn) {
+            saveDiaryDateFormatBtn.addEventListener('click', function () {
+                var radios = document.getElementsByName('diaryDateFormat');
+                var selected = 'ymd';
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) { selected = radios[i].value; break; }
+                }
+
+                if (selected === 'custom') {
+                    var customInput = document.getElementById('diaryDateFormatCustomInput');
+                    var customPattern = customInput ? customInput.value.trim() : '';
+                    if (!isValidCustomDiaryDateFormat(customPattern)) {
+                        alert(tr('modals.diary_date_format.custom_invalid', {},
+                            'Enter a valid custom format, with a year, a month and a day.'));
+                        if (customInput) customInput.focus();
+                        return;
+                    }
+                    selected = 'custom:' + customPattern;
+                } else {
+                    selected = normalizeDiaryDateFormat(selected);
+                }
+
+                setSetting('diary_date_format', selected, function (success) {
+                    if (success) {
+                        try { closeModal('diaryDateFormatModal'); } catch (e) { }
+                        refreshDiaryDateFormatBadge();
+                        reloadOpener();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
         // Save theme modal button
         var saveThemeBtn = document.getElementById('saveThemeModalBtn');
         if (saveThemeBtn) {
@@ -2398,6 +2549,7 @@
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshDiaryNoteTypeBadge();
+            refreshDiaryDateFormatBadge();
             refreshToolbarModeBadge();
             refreshTimezoneBadge();
             refreshDateTimeFormatBadge();
@@ -2755,6 +2907,7 @@
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshDiaryNoteTypeBadge();
+            refreshDiaryDateFormatBadge();
             refreshToolbarModeBadge();
             refreshDateTimeFormatBadge();
             refreshInstallAppBadge();
@@ -3314,6 +3467,7 @@
     window.openNoteAgeFilterModal = openNoteAgeFilterModal;
     window.showTimezonePrompt = showTimezonePrompt;
     window.openDateTimeFormatModal = openDateTimeFormatModal;
+    window.openDiaryDateFormatModal = openDiaryDateFormatModal;
     window.refreshLanguageBadge = refreshLanguageBadge;
     window.refreshLoginDisplayBadge = refreshLoginDisplayBadge;
     window.refreshFontSizeBadge = refreshFontSizeBadge;
@@ -3321,6 +3475,7 @@
     window.refreshNoteAgeFilterBadge = refreshNoteAgeFilterBadge;
     window.refreshTasklistInsertOrderBadge = refreshTasklistInsertOrderBadge;
     window.refreshDiaryNoteTypeBadge = refreshDiaryNoteTypeBadge;
+    window.refreshDiaryDateFormatBadge = refreshDiaryDateFormatBadge;
     window.refreshToolbarModeBadge = refreshToolbarModeBadge;
     window.refreshTimezoneBadge = refreshTimezoneBadge;
     window.refreshDateTimeFormatBadge = refreshDateTimeFormatBadge;
