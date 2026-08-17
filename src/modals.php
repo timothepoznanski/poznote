@@ -1646,6 +1646,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachments-at-bottom-card" checked><span><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backlinks-at-bottom-card" checked><span><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-image-border-card" checked><span><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon-sidebar-order-card" checked><span><?php echo t_h('display.cards.icon_sidebar_order', [], 'Icon sidebar order'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:users-admin-card" checked><span><?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:oidc-config-card" checked><span><?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></span></label>
@@ -1853,6 +1854,44 @@ include __DIR__ . '/modals/folder_icon_modal.php';
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="uiCustomizationModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveUiCustomizationBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
+<?php
+// Icon Sidebar Order modal. The rows come from the list icon_sidebar.php
+// published while rendering the rail, so the modal can never offer an entry the
+// rail does not have (or miss one it gained). Only the scrolling navigation
+// group is listed: the account group at the bottom of the rail is fixed, which
+// keeps Settings reachable no matter how the rest is arranged.
+$iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
+?>
+<!-- Icon Sidebar Order Modal -->
+<div id="iconSidebarOrderModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><?php echo t_h('modals.icon_sidebar_order.title', [], 'Icon sidebar order'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <p class="ui-custom-description"><?php echo t_h('modals.icon_sidebar_order.description', [], 'Drag the entries to change the order of the buttons in the icon sidebar. The account buttons at the bottom of the sidebar stay in place.'); ?></p>
+            <ul class="icon-sidebar-order-list" id="iconSidebarOrderList">
+            <?php foreach ($iconSidebarOrderItems as $iconSidebarOrderItem): ?>
+                <li class="icon-sidebar-order-item" data-entry-id="<?php echo htmlspecialchars($iconSidebarOrderItem['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>
+                    <i class="lucide <?php echo htmlspecialchars($iconSidebarOrderItem['icon'], ENT_QUOTES, 'UTF-8'); ?> icon-sidebar-order-icon"></i>
+                    <span class="icon-sidebar-order-label"><?php echo htmlspecialchars($iconSidebarOrderItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                    <span class="icon-sidebar-order-moves">
+                        <button type="button" class="icon-sidebar-order-move" data-move="up" title="<?php echo t_h('modals.icon_sidebar_order.move_up', [], 'Move up'); ?>" aria-label="<?php echo t_h('modals.icon_sidebar_order.move_up', [], 'Move up'); ?>"><i class="lucide lucide-chevron-up"></i></button>
+                        <button type="button" class="icon-sidebar-order-move" data-move="down" title="<?php echo t_h('modals.icon_sidebar_order.move_down', [], 'Move down'); ?>" aria-label="<?php echo t_h('modals.icon_sidebar_order.move_down', [], 'Move down'); ?>"><i class="lucide lucide-chevron-down"></i></button>
+                    </span>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="resetIconSidebarOrderBtn"><?php echo t_h('modals.icon_sidebar_order.reset', [], 'Reset order'); ?></button>
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="iconSidebarOrderModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveIconSidebarOrderBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>

@@ -371,3 +371,128 @@
 #uiCustomizationModal.ui-custom-mode-user .ui-custom-section[data-ui-global-only] {
     display: none !important;
 }
+
+/* ============================================
+   Icon Sidebar Order Modal
+   ============================================
+   Sibling of the UI Customization modal (one chooses which rail buttons show,
+   the other in what order), so it lives here and reuses .ui-custom-description.
+   Neutral translucent greys throughout, like the rules above, so the rows read
+   correctly in both themes without dark-mode overrides. */
+
+/* Cap the modal and let the list be the only part that scrolls, so the Save /
+   Cancel row stays reachable however many entries the rail has. */
+#iconSidebarOrderModal .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+}
+
+#iconSidebarOrderModal .modal-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* .modal-buttons only has margin-top:auto, which collapses to nothing once the
+   list fills the modal and leaves the buttons flush against the last row. */
+#iconSidebarOrderModal .modal-buttons {
+    margin-top: 18px;
+}
+
+.icon-sidebar-order-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 2px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.icon-sidebar-order-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    margin-bottom: 4px;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    border-radius: 8px;
+    background: rgba(128, 128, 128, 0.05);
+    font-size: 0.92em;
+    user-select: none;
+}
+
+/* SortableJS adds this to the row being dragged (see js/settings-page.js). */
+.icon-sidebar-order-item.dragging {
+    opacity: 0.5;
+}
+
+.icon-sidebar-order-handle {
+    display: inline-flex;
+    align-items: center;
+    color: #9aa1ab;
+    cursor: grab;
+    flex-shrink: 0;
+}
+
+.icon-sidebar-order-handle:active {
+    cursor: grabbing;
+}
+
+/* The entry's own rail icon, so a row is recognisable at a glance. Masks are
+   tinted by background-color, and the global lucide filter would grey them
+   out, hence the reset (see css/icons.css). */
+.icon-sidebar-order-item .lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    background-color: currentColor;
+    filter: none !important;
+    transform: none !important;
+}
+
+.icon-sidebar-order-icon {
+    color: #007DB8;
+}
+
+.icon-sidebar-order-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Keyboard and touch alternative to dragging: the handle is pointer-only. */
+.icon-sidebar-order-moves {
+    display: inline-flex;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.icon-sidebar-order-move {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.icon-sidebar-order-move:hover:not(:disabled) {
+    background: rgba(128, 128, 128, 0.15);
+    color: #007DB8;
+}
+
+.icon-sidebar-order-move:disabled {
+    opacity: 0.35;
+    cursor: default;
+}

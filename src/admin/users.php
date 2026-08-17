@@ -753,6 +753,13 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             return;
         }
 
+        // Activating or deactivating an account is never done in one click:
+        // it locks the user out (or lets them back in) immediately.
+        if (field === 'active' && !force) {
+            openStatusConfirmModal(userId, newValue, username);
+            return;
+        }
+
         submitForm({
             action: 'toggle_status',
             user_id: userId,
@@ -777,6 +784,46 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     function confirmAdminPromotion() {
         const userId = document.getElementById('admin_confirm_user_id').value;
         toggleUserStatus(userId, 'is_admin', 1, true);
+    }
+
+    const statusConfirmTexts = <?php echo json_encode([
+        'activate' => [
+            'title' => t('multiuser.admin.confirm_status.activate_title', [], 'Confirm activation'),
+            'message' => t('multiuser.admin.confirm_status.activate_message', ['username' => 'NAME_HOLDER'], 'Are you sure you want to activate the user "NAME_HOLDER"? They will be able to log in again.'),
+            'button' => t('multiuser.admin.confirm_status.activate_button', [], 'Activate'),
+        ],
+        'deactivate' => [
+            'title' => t('multiuser.admin.confirm_status.deactivate_title', [], 'Confirm deactivation'),
+            'message' => t('multiuser.admin.confirm_status.deactivate_message', ['username' => 'NAME_HOLDER'], 'Are you sure you want to deactivate the user "NAME_HOLDER"? They will no longer be able to log in.'),
+            'button' => t('multiuser.admin.confirm_status.deactivate_button', [], 'Deactivate'),
+        ],
+    ]); ?>;
+
+    /**
+     * Open the activate/deactivate confirmation modal
+     */
+    function openStatusConfirmModal(userId, newValue, username) {
+        const texts = newValue === 1 ? statusConfirmTexts.activate : statusConfirmTexts.deactivate;
+        const confirmButton = document.getElementById('status_confirm_button');
+
+        document.getElementById('status_confirm_user_id').value = userId;
+        document.getElementById('status_confirm_value').value = newValue;
+        document.getElementById('status_confirm_title').textContent = texts.title;
+        document.getElementById('status_confirm_message').textContent = texts.message.replace('NAME_HOLDER', function () { return username; });
+        confirmButton.textContent = texts.button;
+        // Deactivating locks someone out, activating does not: colour accordingly.
+        confirmButton.classList.toggle('btn-danger', newValue !== 1);
+        confirmButton.classList.toggle('btn-primary', newValue === 1);
+        document.getElementById('statusConfirmModal').classList.add('active');
+    }
+
+    /**
+     * Confirm the activation/deactivation from the modal
+     */
+    function confirmStatusChange() {
+        const userId = document.getElementById('status_confirm_user_id').value;
+        const newValue = parseInt(document.getElementById('status_confirm_value').value, 10);
+        toggleUserStatus(userId, 'active', newValue, true);
     }
 
     /**
@@ -1009,13 +1056,13 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                                     <?php if ($user['active']): ?>
                                         <span class="badge badge-active clickable-badge"
                                               title="<?php echo t_h('multiuser.admin.click_to_deactivate', [], 'Click to deactivate'); ?>"
-                                              onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 0)">
+                                              onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 0, false, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <?php echo t_h('multiuser.admin.active', [], 'Active'); ?>
                                         </span>
                                     <?php else: ?>
                                         <span class="badge badge-inactive clickable-badge"
                                               title="<?php echo t_h('multiuser.admin.click_to_activate', [], 'Click to activate'); ?>"
-                                              onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 1)">
+                                              onclick="toggleUserStatus(<?php echo $user['id']; ?>, 'active', 1, false, <?php echo htmlspecialchars(json_encode($user['username']), ENT_QUOTES); ?>)">
                                             <?php echo t_h('multiuser.admin.inactive', [], 'Inactive'); ?>
                                         </span>
                                     <?php endif; ?>
@@ -1344,6 +1391,21 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <input type="hidden" id="admin_confirm_user_id">
                 <button type="button" class="btn btn-secondary btn-cancel-admin" onclick="closeModal('adminConfirmModal'); location.reload();"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
                 <button type="button" class="btn btn-primary" onclick="confirmAdminPromotion()"><?php echo t_h('multiuser.admin.confirm_admin.confirm_button', [], 'Confirm admin promotion'); ?></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activate / Deactivate Confirmation Modal -->
+    <div class="modal" id="statusConfirmModal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="status_confirm_title"></h2>
+            <p id="status_confirm_message"></p>
+
+            <div class="form-actions">
+                <input type="hidden" id="status_confirm_user_id">
+                <input type="hidden" id="status_confirm_value">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('statusConfirmModal')"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="btn btn-danger" id="status_confirm_button" onclick="confirmStatusChange()"></button>
             </div>
         </div>
     </div>

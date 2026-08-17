@@ -114,6 +114,7 @@
             'timezone',
             'date_time_format',
             'hidden_ui_elements',
+            'icon_sidebar_order',
             'settings_pinned_cards',
             'settings_recent_cards',
             'spellcheck_html_notes',
@@ -2008,6 +2009,10 @@
             uiCustomizationAdminCard.addEventListener('click', showUiCustomizationGlobalModal);
         }
 
+        // Icon Sidebar Order card - opens its own modal (card click, move
+        // buttons, save and reset are all bound in there)
+        initIconSidebarOrderModal();
+
         // Init section toggle-all buttons (event delegation, one-time setup)
         var uiCustomModal = document.getElementById('uiCustomizationModal');
         if (uiCustomModal) {
@@ -3559,6 +3564,189 @@
                 applyState([]);
             }
         });
+    }
+
+    // ========== Icon Sidebar Order ==========
+    // The rows are rendered server-side by modals.php from the very list
+    // icon_sidebar.php used for the rail, so this only has to reorder them.
+    // The rail itself is rendered in PHP, hence the reload after saving.
+
+    function getIconSidebarOrderList() {
+        return document.getElementById('iconSidebarOrderList');
+    }
+
+    function getIconSidebarOrderIds() {
+        var list = getIconSidebarOrderList();
+        if (!list) return [];
+
+        return Array.prototype.map.call(list.querySelectorAll('.icon-sidebar-order-item'), function (row) {
+            return row.getAttribute('data-entry-id');
+        }).filter(function (id) {
+            return !!id;
+        });
+    }
+
+    // The saved order can name entries this page does not render (the git
+    // buttons only exist on index.php) and can miss ones it does. Sort what is
+    // present by its saved rank and leave the rest in declared order after it,
+    // matching poznoteApplyIconSidebarOrder() in functions.php.
+    function applyIconSidebarOrderToList(order) {
+        var list = getIconSidebarOrderList();
+        if (!list) return;
+
+        var rows = Array.prototype.slice.call(list.querySelectorAll('.icon-sidebar-order-item'));
+        var rank = {};
+        order.forEach(function (id, index) {
+            if (!(id in rank)) rank[id] = index;
+        });
+
+        rows.forEach(function (row, index) {
+            row.dataset.declaredIndex = String(index);
+        });
+
+        rows.sort(function (a, b) {
+            var ra = rank[a.getAttribute('data-entry-id')];
+            var rb = rank[b.getAttribute('data-entry-id')];
+            var ka = ra === undefined ? Infinity : ra;
+            var kb = rb === undefined ? Infinity : rb;
+            if (ka !== kb) return ka - kb;
+            return Number(a.dataset.declaredIndex) - Number(b.dataset.declaredIndex);
+        });
+
+        rows.forEach(function (row) {
+            list.appendChild(row);
+        });
+
+        syncIconSidebarOrderMoveButtons();
+    }
+
+    // The first row cannot move up and the last cannot move down; disabling
+    // rather than hiding keeps the rows the same width.
+    function syncIconSidebarOrderMoveButtons() {
+        var list = getIconSidebarOrderList();
+        if (!list) return;
+
+        var rows = list.querySelectorAll('.icon-sidebar-order-item');
+        rows.forEach(function (row, index) {
+            var up = row.querySelector('[data-move="up"]');
+            var down = row.querySelector('[data-move="down"]');
+            if (up) up.disabled = index === 0;
+            if (down) down.disabled = index === rows.length - 1;
+        });
+    }
+
+    function moveIconSidebarOrderRow(row, direction) {
+        var list = getIconSidebarOrderList();
+        if (!list || !row) return;
+
+        if (direction === 'up') {
+            var previous = row.previousElementSibling;
+            if (previous) list.insertBefore(row, previous);
+        } else {
+            var next = row.nextElementSibling;
+            if (next) list.insertBefore(next, row);
+        }
+
+        syncIconSidebarOrderMoveButtons();
+    }
+
+    // SortableJS is vendored but not loaded on the settings page; pull it in on
+    // first open, exactly as js/tasklist.js does. The up/down buttons are the
+    // fallback, so a failed load costs nothing but the dragging.
+    function initIconSidebarOrderSortable() {
+        var list = getIconSidebarOrderList();
+        if (!list || list.dataset.sortable === '1') return;
+
+        if (typeof Sortable === 'undefined') {
+            if (!document.querySelector('script[data-sortable-local]')) {
+                var script = document.createElement('script');
+                script.src = 'js/Sortable.min.js';
+                script.async = true;
+                script.setAttribute('data-sortable-local', '1');
+                script.onload = initIconSidebarOrderSortable;
+                document.head.appendChild(script);
+            }
+            return;
+        }
+
+        new Sortable(list, {
+            animation: 150,
+            handle: '.icon-sidebar-order-handle',
+            draggable: '.icon-sidebar-order-item',
+            onStart: function (evt) { evt.item.classList.add('dragging'); },
+            onEnd: function (evt) {
+                evt.item.classList.remove('dragging');
+                syncIconSidebarOrderMoveButtons();
+            }
+        });
+
+        list.dataset.sortable = '1';
+    }
+
+    function openIconSidebarOrderModal() {
+        var modal = document.getElementById('iconSidebarOrderModal');
+        if (!modal) return;
+
+        getSetting('icon_sidebar_order', function (value) {
+            var order = [];
+            try {
+                var decoded = JSON.parse(value || '[]');
+                if (Array.isArray(decoded)) {
+                    order = decoded.filter(function (id) { return typeof id === 'string' && id; });
+                }
+            } catch (e) {
+                order = [];
+            }
+
+            applyIconSidebarOrderToList(order);
+            initIconSidebarOrderSortable();
+            modal.style.display = 'flex';
+        });
+    }
+
+    function saveIconSidebarOrder(order) {
+        setSetting('icon_sidebar_order', JSON.stringify(order), function (success) {
+            if (!success) {
+                alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                return;
+            }
+
+            try { closeModal('iconSidebarOrderModal'); } catch (e) { }
+            reloadOpener();
+            reloadCurrentSettingsPage();
+        });
+    }
+
+    function initIconSidebarOrderModal() {
+        var card = document.getElementById('icon-sidebar-order-card');
+        if (card) {
+            card.addEventListener('click', openIconSidebarOrderModal);
+        }
+
+        var list = getIconSidebarOrderList();
+        if (list) {
+            list.addEventListener('click', function (event) {
+                var button = event.target.closest('.icon-sidebar-order-move');
+                if (!button || button.disabled) return;
+                moveIconSidebarOrderRow(button.closest('.icon-sidebar-order-item'), button.getAttribute('data-move'));
+            });
+        }
+
+        var saveBtn = document.getElementById('saveIconSidebarOrderBtn');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function () {
+                saveIconSidebarOrder(getIconSidebarOrderIds());
+            });
+        }
+
+        // Reset clears the preference, so the rail falls back to the order
+        // icon_sidebar.php declares.
+        var resetBtn = document.getElementById('resetIconSidebarOrderBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () {
+                saveIconSidebarOrder([]);
+            });
+        }
     }
 
     function showUiCustomizationModal() {

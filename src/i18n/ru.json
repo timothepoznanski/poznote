@@ -164,6 +164,7 @@
       "note_nav_shortcuts": "Переход к предыдущей или следующей заметке текущей папки по Alt + ↑/↓.",
       "ctrl_s_save": "Мгновенно сохранить текущую заметку по Ctrl + S (Cmd + S на Mac).",
       "ui_customization": "Скрыть элементы интерфейса, которыми вы не пользуетесь.",
+      "icon_sidebar_order": "Изменить порядок кнопок на боковой панели значков.",
       "users_admin": "Создание, изменение и управление учётными записями пользователей.",
       "oidc_config": "Настройка единого входа через провайдера OpenID Connect.",
       "smtp_config": "Настройка SMTP-сервера для отправки писем, например напоминаний.",
@@ -339,6 +340,7 @@
       "backlinks_at_bottom": "Backlinks внизу",
       "default_image_border_no_padding": "Рамка изображения по умолчанию",
       "ui_customization": "Видимость элементов",
+      "icon_sidebar_order": "Порядок боковой панели значков",
       "notes_dashboard": "Доска заметок",
       "spellcheck_html_notes": "Проверка орфографии",
       "note_color_palette": "Цвета заметок",
@@ -349,6 +351,7 @@
     "badges": {
       "font_size_default": "по умолчанию ({{size}}px)",
       "ui_customization_configure": "Настроить",
+      "icon_sidebar_order_configure": "Настроить",
       "note_font_size": "{{size}}px",
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
@@ -639,6 +642,13 @@
       "folder_actions_toggle": "Кнопка меню (⋮) у папок",
       "note_actions_toggle": "Кнопка меню (⋮) у заметок",
       "note_actions_hint": "Пункты меню ⋮ у каждой заметки в боковой панели. Если снять все флажки, кнопка меню скрывается."
+    },
+    "icon_sidebar_order": {
+      "title": "Порядок боковой панели значков",
+      "description": "Перетащите записи, чтобы изменить порядок кнопок на боковой панели значков. Кнопки учётной записи внизу панели остаются на месте.",
+      "move_up": "Вверх",
+      "move_down": "Вниз",
+      "reset": "Сбросить порядок"
     },
     "theme": {
       "title": "Выбор темы",
@@ -2086,7 +2096,8 @@
     "expand_all_folders": "Развернуть все папки",
     "collapse_all_folders": "Свернуть все папки",
     "toggle": "Скрыть/Показать левую колонку",
-    "toggle_icon_sidebar": "Скрыть/Показать боковую панель значков"
+    "toggle_icon_sidebar": "Скрыть/Показать боковую панель значков",
+    "show_hidden_icons": "Показать скрытые значки"
   },
   "home": {
     "title": "Панель",
@@ -2832,6 +2843,14 @@
         "privilege_passwords": "Изменять пароли всех других пользователей",
         "privilege_admin_panel": "Доступ к этой панели управления пользователями",
         "confirm_button": "Подтвердите повышение роли"
+      },
+      "confirm_status": {
+        "deactivate_title": "Подтвердите отключение",
+        "deactivate_message": "Вы уверены, что хотите отключить пользователя \"{{username}}\"? Он больше не сможет войти в систему.",
+        "deactivate_button": "Отключить",
+        "activate_title": "Подтвердите включение",
+        "activate_message": "Вы уверены, что хотите включить пользователя \"{{username}}\"? Он снова сможет войти в систему.",
+        "activate_button": "Включить"
       },
       "password_management": {
         "manage_password": "Пароль",

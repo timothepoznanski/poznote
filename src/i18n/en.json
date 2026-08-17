@@ -164,6 +164,7 @@
       "note_nav_shortcuts": "Switch to the previous or next note in the current folder with Alt + ↑/↓.",
       "ctrl_s_save": "Save the current note immediately with Ctrl + S (Cmd + S on Mac).",
       "ui_customization": "Hide interface elements you do not use.",
+      "icon_sidebar_order": "Change the order of the buttons in the icon sidebar.",
       "users_admin": "Create, edit and manage user accounts.",
       "oidc_config": "Configure single sign-on with an OpenID Connect provider.",
       "smtp_config": "Configure the SMTP server used to send emails such as reminders.",
@@ -341,6 +342,7 @@
       "backlinks_at_bottom": "Backlinks at bottom",
       "default_image_border_no_padding": "Default image border",
       "ui_customization": "Element visibility",
+      "icon_sidebar_order": "Icon sidebar order",
       "notes_dashboard": "Notes board",
       "spellcheck_html_notes": "Spell check",
       "slash_menu_require_alt": "Command menu shortcut",
@@ -353,6 +355,7 @@
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
       "ui_customization_configure": "Configure",
+      "icon_sidebar_order_configure": "Configure",
       "slash_menu_alt_slash": "Alt + /",
       "slash_menu_slash": "/"
     }
@@ -646,6 +649,13 @@
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
       "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button."
+    },
+    "icon_sidebar_order": {
+      "title": "Icon sidebar order",
+      "description": "Drag the entries to change the order of the buttons in the icon sidebar. The account buttons at the bottom of the sidebar stay in place.",
+      "move_up": "Move up",
+      "move_down": "Move down",
+      "reset": "Reset order"
     },
     "theme": {
       "title": "Theme Selection",
@@ -2107,7 +2117,8 @@
     "expand_all_folders": "Expand all folders",
     "collapse_all_folders": "Collapse all folders",
     "toggle": "Hide/Show left column",
-    "toggle_icon_sidebar": "Hide/Show icon sidebar"
+    "toggle_icon_sidebar": "Hide/Show icon sidebar",
+    "show_hidden_icons": "Show hidden icons"
   },
   "home": {
     "title": "Dashboard",
@@ -2892,6 +2903,14 @@
         "privilege_passwords": "Change passwords of all other users",
         "privilege_admin_panel": "Access this user management panel",
         "confirm_button": "Confirm admin promotion"
+      },
+      "confirm_status": {
+        "deactivate_title": "Confirm deactivation",
+        "deactivate_message": "Are you sure you want to deactivate the user \"{{username}}\"? They will no longer be able to log in.",
+        "deactivate_button": "Deactivate",
+        "activate_title": "Confirm activation",
+        "activate_message": "Are you sure you want to activate the user \"{{username}}\"? They will be able to log in again.",
+        "activate_button": "Activate"
       },
       "password_management": {
         "manage_password": "Password",

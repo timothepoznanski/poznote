@@ -133,6 +133,7 @@ $settingsPageUserKeys = [
     'timezone',
     'date_time_format',
     'hidden_ui_elements',
+    'icon_sidebar_order',
     'settings_pinned_cards',
     'settings_recent_cards',
     'spellcheck_html_notes',
@@ -713,6 +714,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.ui_customization', [], 'UI Customization'); ?></span>
                     <span id="ui-customization-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
+                </div>
+            </div>
+
+            <!-- Icon Sidebar Order -->
+            <div class="home-card" id="icon-sidebar-order-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.icon_sidebar_order', [], 'Change the order of the buttons in the icon sidebar.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-arrow-up-down"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.icon_sidebar_order', [], 'Icon sidebar order'); ?></span>
+                    <span id="icon-sidebar-order-badge" class="setting-status enabled"><?php echo t_h('display.badges.icon_sidebar_order_configure', [], 'Configure'); ?></span>
                 </div>
             </div>
 

@@ -437,6 +437,7 @@
       "note_nav_shortcuts": "Wechseln Sie mit Alt + ↑/↓ zur vorherigen oder nächsten Notiz im aktuellen Ordner.",
       "ctrl_s_save": "Speichern Sie die aktuelle Notiz sofort mit Strg + S (Cmd + S auf dem Mac).",
       "ui_customization": "Blenden Sie Oberflächenelemente aus, die Sie nicht verwenden.",
+      "icon_sidebar_order": "Die Reihenfolge der Schaltflächen in der Icon-Seitenleiste ändern.",
       "users_admin": "Benutzerkonten erstellen, bearbeiten und verwalten.",
       "oidc_config": "Konfigurieren Sie Single Sign-On mit einem OpenID-Connect-Anbieter.",
       "smtp_config": "Konfigurieren Sie den SMTP-Server für den E-Mail-Versand, z. B. für Erinnerungen.",
@@ -695,6 +696,7 @@
       "backlinks_at_bottom": "Backlinks unten",
       "default_image_border_no_padding": "Standard-Bildrahmen",
       "ui_customization": "Sichtbarkeit von Elementen",
+      "icon_sidebar_order": "Reihenfolge der Icon-Seitenleiste",
       "notes_dashboard": "Notiz-Board",
       "spellcheck_html_notes": "Rechtschreibprüfung",
       "note_color_palette": "Notizfarben",
@@ -705,6 +707,7 @@
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
       "ui_customization_configure": "Konfigurieren",
+      "icon_sidebar_order_configure": "Konfigurieren",
       "toolbar_mode": {
         "full": "Nur Symbolleiste",
         "slash": "Nur Schrägstrich-Befehl",
@@ -731,7 +734,8 @@
     "expand_all_folders": "Alle Ordner aufklappen",
     "collapse_all_folders": "Alle Ordner zuklappen",
     "toggle": "Linke Spalte ein-/ausblenden",
-    "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden"
+    "toggle_icon_sidebar": "Icon-Seitenleiste ein-/ausblenden",
+    "show_hidden_icons": "Ausgeblendete Symbole anzeigen"
   },
   "home": {
     "title": "Dashboard",
@@ -1154,6 +1158,13 @@
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
       "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche."
+    },
+    "icon_sidebar_order": {
+      "title": "Reihenfolge der Icon-Seitenleiste",
+      "description": "Ziehen Sie die Einträge, um die Reihenfolge der Schaltflächen in der Icon-Seitenleiste zu ändern. Die Konto-Schaltflächen am unteren Rand der Leiste bleiben an ihrem Platz.",
+      "move_up": "Nach oben",
+      "move_down": "Nach unten",
+      "reset": "Reihenfolge zurücksetzen"
     },
     "theme": {
       "title": "Themenauswahl",
@@ -2873,6 +2884,14 @@
       "first_name": "Vorname",
       "last_name": "Nachname",
       "click_to_activate": "Zum Aktivieren klicken",
+      "confirm_status": {
+        "deactivate_title": "Deaktivierung bestätigen",
+        "deactivate_message": "Möchten Sie den Benutzer \"{{username}}\" wirklich deaktivieren? Er kann sich dann nicht mehr anmelden.",
+        "deactivate_button": "Deaktivieren",
+        "activate_title": "Aktivierung bestätigen",
+        "activate_message": "Möchten Sie den Benutzer \"{{username}}\" wirklich aktivieren? Er kann sich dann wieder anmelden.",
+        "activate_button": "Aktivieren"
+      },
       "click_to_deactivate": "Zum Deaktivieren klicken",
       "toggle_admin": "Administrator-Berechtigungen gewähren oder entziehen",
       "admin_id_1_locked": "Die Administrator-Rolle kann für Benutzer-ID 1 nicht entfernt werden",

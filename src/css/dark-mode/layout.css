@@ -477,6 +477,46 @@ body.dark-mode .icon-sidebar-btn-active .lucide {
     background-color: var(--dm-accent);
 }
 
+/* Overflow menu: a floating popup rather than part of the rail, so it takes the
+   surface colours instead of the sidebar's. */
+html[data-theme='dark'] #iconSidebarOverflowMenu,
+body.dark-mode #iconSidebarOverflowMenu {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Same resting treatment as .icon-sidebar-btn above, dimmed opacity included:
+   the menu lists the rail's own entries and must not read brighter than them. */
+html[data-theme='dark'] .icon-sidebar-overflow-item,
+body.dark-mode .icon-sidebar-overflow-item {
+    color: var(--dm-text-muted);
+    opacity: 0.4;
+}
+
+html[data-theme='dark'] .icon-sidebar-overflow-item:hover,
+html[data-theme='dark'] .icon-sidebar-overflow-item:focus-visible,
+html[data-theme='dark'] .icon-sidebar-overflow-item-active,
+body.dark-mode .icon-sidebar-overflow-item:hover,
+body.dark-mode .icon-sidebar-overflow-item:focus-visible,
+body.dark-mode .icon-sidebar-overflow-item-active {
+    opacity: 1;
+}
+
+html[data-theme='dark'] .icon-sidebar-overflow-item:hover,
+html[data-theme='dark'] .icon-sidebar-overflow-item:focus-visible,
+body.dark-mode .icon-sidebar-overflow-item:hover,
+body.dark-mode .icon-sidebar-overflow-item:focus-visible {
+    background: var(--dm-surface-hover);
+    color: var(--dm-accent);
+}
+
+html[data-theme='dark'] .icon-sidebar-overflow-item-active,
+body.dark-mode .icon-sidebar-overflow-item-active {
+    background: rgba(0, 125, 184, 0.30);
+    color: var(--dm-accent);
+}
+
 html[data-theme='dark'] #iconSidebarToggle,
 body.dark-mode #iconSidebarToggle {
     background: var(--dm-surface);

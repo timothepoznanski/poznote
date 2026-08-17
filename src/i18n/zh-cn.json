@@ -439,6 +439,7 @@
       "note_nav_shortcuts": "使用 Alt + ↑/↓ 切换到当前文件夹中的上一条或下一条笔记。",
       "ctrl_s_save": "使用 Ctrl + S（Mac 上为 Cmd + S）立即保存当前笔记。",
       "ui_customization": "隐藏您不使用的界面元素。",
+      "icon_sidebar_order": "更改图标侧边栏中按钮的顺序。",
       "users_admin": "创建、编辑和管理用户账户。",
       "oidc_config": "配置 OpenID Connect 提供商的单点登录。",
       "smtp_config": "配置用于发送提醒等邮件的 SMTP 服务器。",
@@ -696,6 +697,7 @@
       "backlinks_at_bottom": "Backlinks 显示在底部",
       "default_image_border_no_padding": "默认图片边框",
       "ui_customization": "元素可见性",
+      "icon_sidebar_order": "图标侧边栏顺序",
       "notes_dashboard": "笔记看板",
       "spellcheck_html_notes": "拼写检查",
       "note_color_palette": "笔记颜色",
@@ -706,6 +708,7 @@
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
       "ui_customization_configure": "配置",
+      "icon_sidebar_order_configure": "配置",
       "toolbar_mode": {
         "full": "仅工具栏",
         "slash": "仅斜杠命令",
@@ -732,7 +735,8 @@
     "expand_all_folders": "展开所有文件夹",
     "collapse_all_folders": "折叠所有文件夹",
     "toggle": "显示/隐藏左侧边栏",
-    "toggle_icon_sidebar": "显示/隐藏图标侧边栏"
+    "toggle_icon_sidebar": "显示/隐藏图标侧边栏",
+    "show_hidden_icons": "显示隐藏的图标"
   },
   "home": {
     "title": "仪表盘",
@@ -1155,6 +1159,13 @@
       "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
       "note_actions_toggle": "笔记上的菜单按钮（⋮）",
       "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。"
+    },
+    "icon_sidebar_order": {
+      "title": "图标侧边栏顺序",
+      "description": "拖动条目以更改图标侧边栏中按钮的顺序。侧边栏底部的账户按钮保持不变。",
+      "move_up": "上移",
+      "move_down": "下移",
+      "reset": "重置顺序"
     },
     "theme": {
       "title": "主题选择",
@@ -2982,6 +2993,14 @@
         "privilege_passwords": "更改所有其他用户的密码",
         "privilege_admin_panel": "访问此用户管理面板",
         "confirm_button": "确认管理员晋升"
+      },
+      "confirm_status": {
+        "deactivate_title": "确认停用",
+        "deactivate_message": "您确定要停用用户 \"{{username}}\" 吗？该用户将无法再登录。",
+        "deactivate_button": "停用",
+        "activate_title": "确认启用",
+        "activate_message": "您确定要启用用户 \"{{username}}\" 吗？该用户将可以重新登录。",
+        "activate_button": "启用"
       },
       "delete_warning_everything": "属于该账户的所有内容都将被立即永久删除。",
       "delete_warning_item_data": "其笔记、文件夹、标签和附件",

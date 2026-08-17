@@ -449,6 +449,7 @@
       "note_nav_shortcuts": "Passez à la note précédente ou suivante du dossier courant avec Alt + ↑/↓.",
       "ctrl_s_save": "Enregistrez immédiatement la note courante avec Ctrl + S (Cmd + S sur Mac).",
       "ui_customization": "Masquez les éléments de l'interface que vous n'utilisez pas.",
+      "icon_sidebar_order": "Modifier l'ordre des boutons de la barre d'icônes.",
       "users_admin": "Créez, modifiez et gérez les comptes utilisateurs.",
       "oidc_config": "Configurez l'authentification unique avec un fournisseur OpenID Connect.",
       "smtp_config": "Configurez le serveur SMTP utilisé pour envoyer des e-mails comme les rappels.",
@@ -710,6 +711,7 @@
       "backlinks_at_bottom": "Backlinks en bas",
       "default_image_border_no_padding": "Bordure par défaut des images",
       "ui_customization": "Visibilité des éléments",
+      "icon_sidebar_order": "Ordre de la barre d'icônes",
       "notes_dashboard": "Tableau de notes",
       "spellcheck_html_notes": "Vérification orthographique",
       "slash_menu_require_alt": "Raccourci du menu de commandes",
@@ -722,6 +724,7 @@
       "sidebar_font_size": "{{size}}px",
       "code_block_font_size": "{{size}}px",
       "ui_customization_configure": "Configurer",
+      "icon_sidebar_order_configure": "Configurer",
       "toolbar_mode": {
         "full": "Barre d’outils uniquement",
         "slash": "Commandes slash uniquement",
@@ -748,7 +751,8 @@
     "expand_all_folders": "Tout déplier",
     "collapse_all_folders": "Tout replier",
     "toggle": "Cacher/Afficher la colonne de gauche",
-    "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes"
+    "toggle_icon_sidebar": "Cacher/Afficher la barre d'icônes",
+    "show_hidden_icons": "Afficher les icônes masquées"
   },
   "home": {
     "title": "Tableau de bord",
@@ -1179,6 +1183,13 @@
       "folder_actions_toggle": "Bouton de menu (⋮) sur les dossiers",
       "note_actions_toggle": "Bouton de menu (⋮) sur les notes",
       "note_actions_hint": "Éléments du menu ⋮ de chaque note dans la barre latérale. Tout décocher masque le bouton du menu."
+    },
+    "icon_sidebar_order": {
+      "title": "Ordre de la barre d'icônes",
+      "description": "Faites glisser les entrées pour modifier l'ordre des boutons de la barre d'icônes. Les boutons de compte en bas de la barre restent en place.",
+      "move_up": "Monter",
+      "move_down": "Descendre",
+      "reset": "Réinitialiser l'ordre"
     },
     "theme": {
       "title": "Sélection du thème",
@@ -3034,6 +3045,14 @@
         "privilege_passwords": "Changer les mots de passe de tous les autres utilisateurs",
         "privilege_admin_panel": "Accéder à ce panneau de gestion des utilisateurs",
         "confirm_button": "Confirmer le passage admin"
+      },
+      "confirm_status": {
+        "deactivate_title": "Confirmer la désactivation",
+        "deactivate_message": "Êtes-vous sûr de vouloir désactiver l'utilisateur \"{{username}}\" ? Il ne pourra plus se connecter.",
+        "deactivate_button": "Désactiver",
+        "activate_title": "Confirmer l'activation",
+        "activate_message": "Êtes-vous sûr de vouloir activer l'utilisateur \"{{username}}\" ? Il pourra de nouveau se connecter.",
+        "activate_button": "Activer"
       },
       "id": "ID",
       "admin_id_1_locked": "Le rôle d'administrateur ne peut pas être retiré à l'utilisateur ID 1",
