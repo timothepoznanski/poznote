@@ -364,8 +364,12 @@ class SettingsController {
             return substr(trim((string) $value), 0, 1000);
         }
 
+        // icon_sidebar_order is an ordered list rather than a set, but the
+        // element-key handling below is the same and its dedupe preserves the
+        // first occurrence, which is the order the client sent.
         if ($key === 'hidden_ui_elements' || $key === 'hidden_ui_elements_global' || $key === 'settings_pinned_cards'
-            || $key === 'settings_recent_cards' || $key === 'tenant_isolation_applied_ui_keys') {
+            || $key === 'settings_recent_cards' || $key === 'tenant_isolation_applied_ui_keys'
+            || $key === 'icon_sidebar_order') {
             $raw = is_string($value) ? trim($value) : $value;
             if ($raw === '' || $raw === null || $raw === '[]') {
                 return '[]';

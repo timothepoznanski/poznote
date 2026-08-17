@@ -886,6 +886,27 @@ html[data-theme='dark'] .public-note .content .heading-anchor {
     color: #e5e7eb;
 }
 
+html[data-theme='dark'] .public-note .content blockquote {
+    border-left-color: var(--dm-border);
+    color: #b0b0b0;
+}
+
+/* Text pasted from external editors carries near-black inline colors (e.g.
+   Notion's rgb(55, 53, 47)) that are invisible on the dark background. Inline
+   styles beat any stylesheet rule, so the dark themes must neutralize the
+   known-dark values explicitly. Only these near-black colors are matched:
+   deliberate colors (red, blue, highlights) keep rendering as authored. */
+html[data-theme='dark'] .public-note .content [style*="color: rgb(55, 53, 47)"],
+html[data-theme='dark'] .public-note .content [style*="color:rgb(55,53,47)"],
+html[data-theme='dark'] .public-note .content [style*="color: rgb(0, 0, 0)"],
+html[data-theme='dark'] .public-note .content [style*="color:rgb(0,0,0)"],
+html[data-theme='dark'] .public-note .content [style*="color: #000"],
+html[data-theme='dark'] .public-note .content [style*="color:#000"],
+html[data-theme='dark'] .public-note .content [style*="color: black"],
+html[data-theme='dark'] .public-note .content [style*="color:black"] {
+    color: var(--dm-text) !important;
+}
+
 /* ============================================================================
    Public note editing (shares with access_mode 'edit')
    ============================================================================ */

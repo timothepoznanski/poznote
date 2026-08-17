@@ -436,6 +436,7 @@
       "note_nav_shortcuts": "Vá para a nota anterior ou seguinte da pasta atual com Alt + ↑/↓.",
       "ctrl_s_save": "Salve imediatamente a nota atual com Ctrl + S (Cmd + S no Mac).",
       "ui_customization": "Oculte os elementos da interface que você não usa.",
+      "icon_sidebar_order": "Alterar a ordem dos botões da barra de ícones.",
       "users_admin": "Crie, edite e gerencie contas de usuário.",
       "oidc_config": "Configure o login único com um provedor OpenID Connect.",
       "smtp_config": "Configure o servidor SMTP usado para enviar e-mails como lembretes.",
@@ -693,6 +694,7 @@
       "backlinks_at_bottom": "Backlinks no final",
       "default_image_border_no_padding": "Borda padrão de imagem",
       "ui_customization": "Visibilidade dos elementos",
+      "icon_sidebar_order": "Ordem da barra de ícones",
       "notes_dashboard": "Quadro de notas",
       "spellcheck_html_notes": "Verificação ortográfica",
       "note_color_palette": "Cores das notas",
@@ -703,6 +705,7 @@
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
       "ui_customization_configure": "Configurar",
+      "icon_sidebar_order_configure": "Configurar",
       "toolbar_mode": {
         "full": "Apenas barra de ferramentas",
         "slash": "Apenas comando barra",
@@ -729,7 +732,8 @@
     "expand_all_folders": "Expandir todas as pastas",
     "collapse_all_folders": "Recolher todas as pastas",
     "toggle": "Mostrar/Ocultar a coluna esquerda",
-    "toggle_icon_sidebar": "Mostrar/Ocultar a barra de ícones"
+    "toggle_icon_sidebar": "Mostrar/Ocultar a barra de ícones",
+    "show_hidden_icons": "Mostrar os ícones ocultos"
   },
   "home": {
     "title": "Painel",
@@ -1153,6 +1157,13 @@
       "folder_actions_toggle": "Botão de menu (⋮) nas pastas",
       "note_actions_toggle": "Botão de menu (⋮) nas notas",
       "note_actions_hint": "Itens do menu ⋮ de cada nota na barra lateral. Desmarcar todos oculta o botão do menu."
+    },
+    "icon_sidebar_order": {
+      "title": "Ordem da barra de ícones",
+      "description": "Arraste as entradas para alterar a ordem dos botões da barra de ícones. Os botões de conta na parte inferior da barra permanecem no lugar.",
+      "move_up": "Mover para cima",
+      "move_down": "Mover para baixo",
+      "reset": "Repor a ordem"
     },
     "theme": {
       "title": "Seleção de Tema",
@@ -2877,6 +2888,14 @@
       "first_name": "Nome",
       "last_name": "Sobrenome",
       "click_to_activate": "Clique para ativar",
+      "confirm_status": {
+        "deactivate_title": "Confirmar a desativação",
+        "deactivate_message": "Tem a certeza de que pretende desativar o utilizador \"{{username}}\"? Deixará de conseguir iniciar sessão.",
+        "deactivate_button": "Desativar",
+        "activate_title": "Confirmar a ativação",
+        "activate_message": "Tem a certeza de que pretende ativar o utilizador \"{{username}}\"? Poderá iniciar sessão novamente.",
+        "activate_button": "Ativar"
+      },
       "click_to_deactivate": "Clique para desativar",
       "toggle_admin": "Conceder ou revogar privilégios de administrador",
       "admin_id_1_locked": "O perfil de administrador não pode ser removido do usuário com ID 1",

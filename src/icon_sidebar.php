@@ -82,6 +82,78 @@ if (!empty($iconSidebarExtraItems)) {
     $iconSidebarItems = array_merge($iconSidebarItems, $iconSidebarExtraItems);
 }
 
+// The Icon Sidebar Order card in settings.php lets the user rearrange these.
+// Applied after the extras are merged so index.php's git buttons can be placed
+// among the navigation entries too. Entries the preference does not mention
+// keep their declared order and follow the ones it does.
+if (function_exists('poznoteApplyIconSidebarOrder')) {
+    $iconSidebarItems = poznoteApplyIconSidebarOrder($iconSidebarItems, poznoteGetIconSidebarOrder());
+}
+
+// Published for the Icon Sidebar Order modal in modals.php, which settings.php
+// includes long after this file. Taking the list from here rather than
+// restating it means the modal always offers exactly the entries the rail
+// renders, in the order it renders them, whatever a later release adds.
+$iconSidebarOrderable = array_values(array_map(
+    static function (array $item): array {
+        return [
+            'id' => $item['id'],
+            'icon' => $item['icon'],
+            'label' => $item['label'],
+        ];
+    },
+    array_filter($iconSidebarItems, static function ($item): bool {
+        return is_array($item) && isset($item['id'], $item['icon'], $item['label']);
+    })
+));
+
+// Push and Pull are rail entries too, but index.php is the only page that adds
+// them (their handlers live there), so the modal, rendered on settings.php,
+// would never offer them. Append them here whenever git sync is on so they can
+// be positioned like any other entry; poznoteApplyIconSidebarOrder() then
+// places them on index.php, and every other page simply ignores the two ids.
+// The same isEnabled() && isConfigured() test index.php uses, so the modal
+// offers the two rows exactly when the rail would show them, never listing an
+// entry the user cannot actually see.
+if (!isset($GLOBALS['poznoteIconSidebarGitOrderables'])) {
+    $iconSidebarGitOrderables = [];
+    // settings.php requires GitSync.php further down the page, after this
+    // include, so pull it in here rather than depending on load order.
+    if (!class_exists('GitSync') && is_file(__DIR__ . '/GitSync.php')) {
+        require_once __DIR__ . '/GitSync.php';
+    }
+    if (class_exists('GitSync') && GitSync::isEnabled()) {
+        try {
+            $iconSidebarGitSync = new GitSync($GLOBALS['con'] ?? null, $_SESSION['user_id'] ?? null);
+            if ($iconSidebarGitSync->isConfigured()) {
+                foreach ([
+                    ['id' => 'iconSidebarGitPushBtn', 'icon' => 'lucide-upload', 'label' => 'Push'],
+                    ['id' => 'iconSidebarGitPullBtn', 'icon' => 'lucide-download', 'label' => 'Pull'],
+                ] as $iconSidebarGitOrderable) {
+                    $iconSidebarGitOrderables[$iconSidebarGitOrderable['id']] = $iconSidebarGitOrderable;
+                }
+            }
+        } catch (Throwable $e) {
+            // Git misconfiguration must never take the rail down with it.
+        }
+    }
+    $GLOBALS['poznoteIconSidebarGitOrderables'] = $iconSidebarGitOrderables;
+}
+
+foreach ($GLOBALS['poznoteIconSidebarGitOrderables'] as $iconSidebarGitId => $iconSidebarGitOrderable) {
+    if (!in_array($iconSidebarGitId, array_column($iconSidebarOrderable, 'id'), true)) {
+        $iconSidebarOrderable[] = $iconSidebarGitOrderable;
+    }
+}
+
+// Re-sort: the entries just appended have to take their saved position rather
+// than sit at the end, or the modal would misreport where they actually are.
+if (function_exists('poznoteApplyIconSidebarOrder')) {
+    $iconSidebarOrderable = poznoteApplyIconSidebarOrder($iconSidebarOrderable, poznoteGetIconSidebarOrder());
+}
+
+$GLOBALS['poznoteIconSidebarOrderableItems'] = $iconSidebarOrderable;
+
 // Account actions, in their own group pinned to the bottom of the rail: only
 // the navigation entries above scroll, this group always stays visible.
 // Profile and Logout have no 'page' so they never highlight. js/profile.js,
@@ -103,6 +175,7 @@ $iconSidebarBottomItems = [
 ];
 
 $iconSidebarToggleLabel = t_h('sidebar.toggle_icon_sidebar', [], 'Hide/Show icon sidebar');
+$iconSidebarOverflowLabel = t_h('sidebar.show_hidden_icons', [], 'Show hidden icons');
 
 // Assets are addressed from the document root, so a page in a subdirectory
 // needs the same prefix as the links above.
@@ -192,6 +265,11 @@ try {
     <?php endif; ?>
     <?php endforeach; ?>
     </div>
+    <!-- Overflow: hidden until js/icon-sidebar-toggle.js finds entries the rail
+         is too short to show, then lists them in #iconSidebarOverflowMenu. -->
+    <button type="button" id="iconSidebarOverflowBtn" class="icon-sidebar-btn" title="<?php echo $iconSidebarOverflowLabel; ?>" aria-label="<?php echo $iconSidebarOverflowLabel; ?>" aria-haspopup="true" aria-expanded="false" aria-controls="iconSidebarOverflowMenu">
+        <i class="lucide lucide-more-horizontal"></i>
+    </button>
     <!-- Account group: fixed under the divider, never scrolls. -->
     <div class="icon-sidebar-bottom">
     <?php foreach ($iconSidebarBottomItems as $iconSidebarItem): ?>
@@ -218,6 +296,9 @@ try {
     <?php endforeach; ?>
     </div>
 </nav>
+<!-- Filled in and positioned by js/icon-sidebar-toggle.js. Outside the rail,
+     which is overflow:hidden and would clip it. -->
+<div id="iconSidebarOverflowMenu" role="menu" aria-labelledby="iconSidebarOverflowBtn"></div>
 <!-- Sits outside #icon_sidebar so it stays clickable once the rail is hidden. -->
 <button type="button" id="iconSidebarToggle" title="<?php echo $iconSidebarToggleLabel; ?>" aria-label="<?php echo $iconSidebarToggleLabel; ?>" aria-expanded="true" aria-controls="icon_sidebar">
     <i class="lucide lucide-chevron-left"></i>

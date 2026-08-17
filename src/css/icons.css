@@ -102,9 +102,12 @@
     filter: brightness(0) saturate(100%) invert(27%) sepia(95%) saturate(1500%) hue-rotate(195deg) brightness(98%) contrast(102%);
 }
 
-/* The icon rail colours its icons via currentColor, not the global filter */
+/* The icon rail colours its icons via currentColor, not the global filter. The
+   rail's overflow menu clones those icons, so it needs the same exemption. */
 #icon_sidebar .icon-sidebar-btn [class*="lucide-"],
-#icon_sidebar .icon-sidebar-btn [class*="lucide-"]:hover {
+#icon_sidebar .icon-sidebar-btn [class*="lucide-"]:hover,
+#iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"],
+#iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"]:hover {
     transform: none;
     filter: none !important;
 }

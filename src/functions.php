@@ -1477,6 +1477,75 @@ function poznoteGetHiddenUiElements() {
     return $hiddenKeys;
 }
 
+/**
+ * User-chosen order of the icon rail's navigation entries, as a list of the
+ * button ids declared in icon_sidebar.php.
+ *
+ * Stored under the 'icon_sidebar_order' user setting by the Icon Sidebar Order
+ * card in settings.php. Only the scrolling navigation group is reorderable:
+ * the account group at the bottom of the rail (Profile, Settings, About,
+ * Logout) is fixed, so a user cannot bury the way back into settings.
+ */
+function poznoteGetIconSidebarOrder() {
+    static $order = null;
+
+    if ($order !== null) {
+        return $order;
+    }
+
+    $order = [];
+    $decoded = json_decode((string)getSetting('icon_sidebar_order', '[]'), true);
+    if (is_array($decoded)) {
+        $seen = [];
+        foreach ($decoded as $id) {
+            if (!is_string($id) || $id === '' || isset($seen[$id])) {
+                continue;
+            }
+            $seen[$id] = true;
+            $order[] = $id;
+        }
+    }
+
+    return $order;
+}
+
+/**
+ * Apply a saved order to a list of rail items keyed by their 'id'.
+ *
+ * Ids the preference does not mention keep their declared position relative to
+ * one another and follow the ordered ones, so an entry added by a later release
+ * appears at the end rather than vanishing, and a stale id is simply ignored.
+ */
+function poznoteApplyIconSidebarOrder(array $items, array $order) {
+    if (!$order) {
+        return $items;
+    }
+
+    $byId = [];
+    foreach ($items as $item) {
+        if (isset($item['id'])) {
+            $byId[$item['id']] = $item;
+        }
+    }
+
+    $ordered = [];
+    $placed = [];
+    foreach ($order as $id) {
+        if (isset($byId[$id]) && !isset($placed[$id])) {
+            $placed[$id] = true;
+            $ordered[] = $byId[$id];
+        }
+    }
+
+    foreach ($items as $item) {
+        if (!isset($item['id']) || !isset($placed[$item['id']])) {
+            $ordered[] = $item;
+        }
+    }
+
+    return $ordered;
+}
+
 function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
     $createModalOptionSelectors = [
         'card:create-note-card' => '.create-note-option[data-type="html"]',
