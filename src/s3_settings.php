@@ -199,7 +199,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
                         </label>
                         <div class="check-label">
                             <span class="label-title"><?php echo t_h('s3_settings.enable_label', [], 'Store attachments in S3'); ?></span>
-                            <span class="label-desc"><?php echo t_h('s3_settings.enable_description', [], 'New attachments are written to the bucket. Files still on local disk keep working and can be migrated below.'); ?></span>
+                            <span class="label-desc"><?php echo t_h('s3_settings.enable_description', [], 'Only decides where new attachments are written. Existing files keep working wherever they are, on disk or in the bucket; use the migration below to move them.'); ?></span>
                         </div>
                     </div>
 
@@ -268,7 +268,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
 
         <div class="git-sync-section">
             <h2><i class="lucide lucide-repeat"></i> <?php echo t_h('s3_settings.migration_title', [], 'Migration'); ?></h2>
-            <p class="git-sync-description"><?php echo t_h('s3_settings.migration_description', [], 'Move existing attachment files between the local disk and the bucket, for every user of the instance. Migration runs in batches and can be safely interrupted and resumed.'); ?></p>
+            <p class="git-sync-description"><?php echo t_h('s3_settings.migration_description', [], 'Move existing attachment files between the local disk and the bucket, for every user of the instance. Migration runs in batches and can be safely interrupted and resumed. The switch above and this migration are independent: files are served from both sides, so you can run them in either order.'); ?></p>
 
             <div class="s3-status-grid">
                 <div class="s3-status-item">

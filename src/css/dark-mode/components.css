@@ -586,6 +586,15 @@ body.dark-mode .alert-error {
     border-color: #6d2a2a;
 }
 
+/* Without this the generic .alert above wins and warnings read as a
+   neutral grey panel, losing the caution signal entirely. */
+html[data-theme='dark'] .alert-warning,
+body.dark-mode .alert-warning {
+    background-color: #4d3d14;
+    color: #ffd479;
+    border-color: #6d5a2a;
+}
+
 html[data-theme='dark'] #poznoteToast,
 body.dark-mode #poznoteToast {
     background-color: var(--dm-surface);
