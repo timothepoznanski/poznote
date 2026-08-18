@@ -1852,27 +1852,27 @@
                                 window.insertChecklist();
                             }
                         }
+                    },
+                    {
+                        id: 'tasklist-embed',
+                        icon: 'lucide-layout-list',
+                        label: t('slash_menu.tasklist_embed', null, 'Task list'),
+                        action: function () {
+                            if (typeof window.openTaskListPickerModal !== 'function') return;
+
+                            // Capture the insertion point now: the slash globals are
+                            // cleared right after the action while the modal is open
+                            const editable = savedEditableElement || window._slashCommandSavedEditableElement;
+                            const range = (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function')
+                                ? window._slashCommandSavedRange.cloneRange()
+                                : null;
+
+                            window.openTaskListPickerModal(function (target) {
+                                insertTaskListEmbedHtml(editable, range, target);
+                            });
+                        }
                     }
                 ]
-            },
-            {
-                id: 'tasklist-embed',
-                icon: 'lucide-layout-list',
-                label: t('slash_menu.tasklist_embed', null, 'Task list'),
-                action: function () {
-                    if (typeof window.openTaskListPickerModal !== 'function') return;
-
-                    // Capture the insertion point now: the slash globals are
-                    // cleared right after the action while the modal is open
-                    const editable = savedEditableElement || window._slashCommandSavedEditableElement;
-                    const range = (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function')
-                        ? window._slashCommandSavedRange.cloneRange()
-                        : null;
-
-                    window.openTaskListPickerModal(function (target) {
-                        insertTaskListEmbedHtml(editable, range, target);
-                    });
-                }
             },
             {
                 id: 'quote',
@@ -2158,29 +2158,29 @@
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
-                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
+                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') },
+                    {
+                        id: 'tasklist-embed',
+                        icon: 'lucide-layout-list',
+                        label: t('slash_menu.tasklist_embed', null, 'Task list'),
+                        action: function () {
+                            if (typeof window.openTaskListPickerModal !== 'function') return;
+
+                            // Capture the markdown insertion point before the slash
+                            // globals are cleared while the modal is open
+                            const insertionContext = captureEditorInsertionContext();
+
+                            window.openTaskListPickerModal(function (target) {
+                                const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
+                                const safeHeading = (typeof escapeHtml === 'function') ? escapeHtml(heading) : heading;
+                                const marker = '<div class="tasklist-embed" data-task-embed="' + target.id
+                                    + '" contenteditable="false"><a class="tasklist-embed-link" href="index.php?note='
+                                    + target.id + '">' + safeHeading + '</a></div>';
+                                insertMarkdownAtContext(insertionContext, '\n' + marker + '\n', 0);
+                            });
+                        }
+                    }
                 ]
-            },
-            {
-                id: 'tasklist-embed',
-                icon: 'lucide-layout-list',
-                label: t('slash_menu.tasklist_embed', null, 'Task list'),
-                action: function () {
-                    if (typeof window.openTaskListPickerModal !== 'function') return;
-
-                    // Capture the markdown insertion point before the slash
-                    // globals are cleared while the modal is open
-                    const insertionContext = captureEditorInsertionContext();
-
-                    window.openTaskListPickerModal(function (target) {
-                        const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
-                        const safeHeading = (typeof escapeHtml === 'function') ? escapeHtml(heading) : heading;
-                        const marker = '<div class="tasklist-embed" data-task-embed="' + target.id
-                            + '" contenteditable="false"><a class="tasklist-embed-link" href="index.php?note='
-                            + target.id + '">' + safeHeading + '</a></div>';
-                        insertMarkdownAtContext(insertionContext, '\n' + marker + '\n', 0);
-                    });
-                }
             },
             {
                 id: 'quote',
