@@ -8,6 +8,12 @@
  * the bucket under attachments/{userId}/{filename}. The migration tooling in
  * api_s3_storage.php moves files between the two.
  *
+ * The mode only governs where new files are WRITTEN. Reads and deletions
+ * check both sides whenever bucket credentials are configured (local disk
+ * first, then the bucket), so files not yet migrated in either direction
+ * keep being served and can still be cleaned up after the switch is
+ * flipped — see remoteReachable().
+ *
  * Every consumer goes through the poznoteAttachment*() helpers in
  * functions.php; this class is the single place that knows where bytes live.
  */
@@ -92,6 +98,17 @@ class AttachmentStorage {
         return $this->userId !== null && self::isEnabled();
     }
 
+    /**
+     * The bucket may still hold files for this user: credentials are
+     * configured, whether or not the master switch is on. Reads and
+     * deletions are gated on this instead of isRemote(), so attachments
+     * left in the bucket after S3 storage is turned off stay served and
+     * removable; only writes follow the active mode.
+     */
+    private function remoteReachable(): bool {
+        return $this->userId !== null && self::isConfigured();
+    }
+
     private function client(): S3Client {
         if ($this->client === null) {
             $this->client = new S3Client(self::getConfig());
@@ -170,7 +187,7 @@ class AttachmentStorage {
     }
 
     public function delete(string $filename): bool {
-        if ($this->isRemote()) {
+        if ($this->remoteReachable()) {
             try {
                 $this->client()->deleteObject($this->key($filename));
             } catch (Exception $e) {
@@ -193,7 +210,7 @@ class AttachmentStorage {
         if (file_exists($this->localDir() . '/' . basename($filename))) {
             return true;
         }
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return false;
         }
         try {
@@ -215,7 +232,7 @@ class AttachmentStorage {
             return $localPath;
         }
 
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return null;
         }
 
@@ -273,7 +290,7 @@ class AttachmentStorage {
             return true;
         }
 
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return false;
         }
 
@@ -310,7 +327,7 @@ class AttachmentStorage {
      * Remove every remote object belonging to this user (full restore wipe).
      */
     public function deleteAllRemote(): int {
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return 0;
         }
         return self::purgeUserObjects((int)$this->userId)['deleted'];

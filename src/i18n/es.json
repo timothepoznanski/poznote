@@ -3802,7 +3802,9 @@
     "messages": {
       "saved": "Configuración guardada correctamente.",
       "save_error": "No se pudo guardar la configuración.",
-      "incomplete": "El endpoint, el bucket y las credenciales son necesarios para activar el almacenamiento S3."
+      "incomplete": "El endpoint, el bucket y las credenciales son necesarios para activar el almacenamiento S3.",
+      "disabled_files_remaining": "El almacenamiento S3 está ahora desactivado, pero {{count}} archivo(s) adjunto(s) siguen en el bucket. Se seguirán sirviendo mientras las credenciales anteriores permanezcan configuradas; use la migración de abajo para devolverlos al disco local.",
+      "disabled_bucket_unreachable": "El almacenamiento S3 está ahora desactivado, pero no se pudo comprobar si quedan archivos en el bucket. Si aún hay adjuntos almacenados allí, mantenga las credenciales configuradas para que se sigan sirviendo y migre los archivos al disco local cuando el bucket vuelva a estar accesible."
     },
     "git_sync_note": "La sincronización Git ignora los adjuntos mientras el almacenamiento S3 esté activado."
   },

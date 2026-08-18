@@ -26,8 +26,10 @@ $pageWorkspace = trim(getWorkspaceFilter());
 
 $message = '';
 $error = '';
+$warning = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_config') {
+    $wasEnabled = getGlobalSetting('s3_storage_enabled', '0') === '1';
     $enabled = isset($_POST['s3_enabled']) ? '1' : '0';
     $endpoint = trim((string)($_POST['s3_endpoint'] ?? ''));
     $region = trim((string)($_POST['s3_region'] ?? '')) ?: 'us-east-1';
@@ -51,6 +53,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         }
         if ($saved) {
             $message = t('s3_settings.messages.saved', [], 'Configuration saved successfully.');
+
+            // Turning S3 off while files remain in the bucket is a classic
+            // trap: warn (never block — the bucket may be down, and that is
+            // a legitimate reason to disable) and point at the migration.
+            if ($wasEnabled && $enabled === '0') {
+                $checkSecret = ($secretKey !== '' && $secretKey !== '••••••••')
+                    ? $secretKey
+                    : (string)getGlobalSetting('s3_storage_secret_key', '');
+                if ($endpoint !== '' && $bucket !== '' && $accessKey !== '' && $checkSecret !== '') {
+                    try {
+                        $checkClient = AttachmentStorage::makeClient([
+                            'endpoint' => $endpoint,
+                            'region' => $region,
+                            'bucket' => $bucket,
+                            'access_key' => $accessKey,
+                            'secret_key' => $checkSecret,
+                            'path_style' => $pathStyle === '1',
+                        ]);
+                        $remaining = 0;
+                        foreach ($checkClient->listObjects('attachments/') as $ignored) {
+                            $remaining++;
+                        }
+                        if ($remaining > 0) {
+                            $warning = t('s3_settings.messages.disabled_files_remaining', ['count' => $remaining],
+                                'S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.');
+                        }
+                    } catch (Exception $e) {
+                        $warning = t('s3_settings.messages.disabled_bucket_unreachable', [],
+                            'S3 storage is now disabled, but the bucket could not be checked for remaining files. If attachments are still stored there, keep the credentials configured so they stay served, and migrate them back to local disk once the bucket is reachable again.');
+                    }
+                }
+            }
         } else {
             $error = t('s3_settings.messages.save_error', [], 'Failed to save configuration.');
         }
@@ -134,6 +168,13 @@ $s3Enabled = $s3Config['enabled'] === '1';
         <div class="alert alert-error">
             <i class="lucide lucide-alert-triangle-circle"></i>
             <?php echo htmlspecialchars($error); ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($warning): ?>
+        <div class="alert alert-warning">
+            <i class="lucide lucide-alert-triangle-circle"></i>
+            <?php echo htmlspecialchars($warning); ?>
         </div>
         <?php endif; ?>
 

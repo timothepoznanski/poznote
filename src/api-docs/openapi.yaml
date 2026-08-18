@@ -2420,7 +2420,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
+            example: '6a296134d3bd0'
       responses:
         '200':
           description: File download
@@ -2443,7 +2444,8 @@ paths:
           in: path
           required: true
           schema:
-            type: integer
+            type: string
+            example: '6a296134d3bd0'
       responses:
         '200':
           description: Attachment deleted

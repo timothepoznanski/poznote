@@ -367,9 +367,10 @@ function convertImageToBase64($imagePath) {
     $expectedDir = realpath($attachmentsPath);
 
     if ($realPath === false || $expectedDir === false || strpos($realPath, $expectedDir) !== 0) {
-        // S3 mode: the file may live in the bucket instead of on disk.
+        // The file may live in the bucket instead of on disk, including
+        // after S3 storage was turned off with files still there.
         // basename() keeps the lookup confined to this user's prefix.
-        $realPath = poznoteAttachmentsAreRemote() ? poznoteAttachmentLocalFile(basename((string)$fullPath)) : null;
+        $realPath = poznoteAttachmentsBucketMayHoldFiles() ? poznoteAttachmentLocalFile(basename((string)$fullPath)) : null;
         if ($realPath === null) {
             return $imagePath; // Return original path if security check fails
         }
