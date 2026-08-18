@@ -1079,14 +1079,33 @@
         }
     }
 
-    // Insert an image (opens file picker)
-    function insertImage() {
+    // Whether to offer the camera as its own menu entry. Chrome on Android 13+
+    // routes a plain accept="image/*" input to the system photo picker, which
+    // has no camera entry, so shooting a photo needs a second input carrying
+    // capture="environment". Detected by touch device rather than by the
+    // capture property: Blink only exposes that property on Android, so a
+    // feature test would hide the entry on other mobile browsers that do honor
+    // the attribute. Where it is not honored the input just opens the normal
+    // file picker, so the fallback is harmless.
+    function supportsCameraCapture() {
+        try {
+            const coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            const touch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+            return coarsePointer && touch;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Insert an image (opens the file picker, or the camera when useCamera is set)
+    function insertImage(useCamera) {
         const insertionContext = captureEditorInsertionContext();
 
         // Create a temporary file input for images
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = 'image/*';
+        if (useCamera) fileInput.setAttribute('capture', 'environment');
         fileInput.style.display = 'none';
 
         fileInput.addEventListener('change', function () {
@@ -1731,6 +1750,12 @@
                 label: t('slash_menu.image', null, 'Image'),
                 action: function () { insertImage(); }
             },
+            takePhoto: {
+                id: 'take-photo',
+                icon: 'lucide lucide-camera',
+                label: t('slash_menu.take_photo', null, 'Take a photo'),
+                action: function () { insertImage(true); }
+            },
             cancel: {
                 id: 'cancel',
                 icon: 'lucide-times-circle',
@@ -1852,27 +1877,27 @@
                                 window.insertChecklist();
                             }
                         }
+                    },
+                    {
+                        id: 'tasklist-embed',
+                        icon: 'lucide-layout-list',
+                        label: t('slash_menu.tasklist_embed', null, 'Task list'),
+                        action: function () {
+                            if (typeof window.openTaskListPickerModal !== 'function') return;
+
+                            // Capture the insertion point now: the slash globals are
+                            // cleared right after the action while the modal is open
+                            const editable = savedEditableElement || window._slashCommandSavedEditableElement;
+                            const range = (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function')
+                                ? window._slashCommandSavedRange.cloneRange()
+                                : null;
+
+                            window.openTaskListPickerModal(function (target) {
+                                insertTaskListEmbedHtml(editable, range, target);
+                            });
+                        }
                     }
                 ]
-            },
-            {
-                id: 'tasklist-embed',
-                icon: 'lucide-layout-list',
-                label: t('slash_menu.tasklist_embed', null, 'Task list'),
-                action: function () {
-                    if (typeof window.openTaskListPickerModal !== 'function') return;
-
-                    // Capture the insertion point now: the slash globals are
-                    // cleared right after the action while the modal is open
-                    const editable = savedEditableElement || window._slashCommandSavedEditableElement;
-                    const range = (window._slashCommandSavedRange && typeof window._slashCommandSavedRange.cloneRange === 'function')
-                        ? window._slashCommandSavedRange.cloneRange()
-                        : null;
-
-                    window.openTaskListPickerModal(function (target) {
-                        insertTaskListEmbedHtml(editable, range, target);
-                    });
-                }
             },
             {
                 id: 'quote',
@@ -2041,6 +2066,7 @@
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
                     common.image,
+                    supportsCameraCapture() ? common.takePhoto : null,
                     {
                         id: 'youtube-video',
                         icon: 'lucide lucide-video',
@@ -2158,29 +2184,29 @@
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
-                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') }
+                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') },
+                    {
+                        id: 'tasklist-embed',
+                        icon: 'lucide-layout-list',
+                        label: t('slash_menu.tasklist_embed', null, 'Task list'),
+                        action: function () {
+                            if (typeof window.openTaskListPickerModal !== 'function') return;
+
+                            // Capture the markdown insertion point before the slash
+                            // globals are cleared while the modal is open
+                            const insertionContext = captureEditorInsertionContext();
+
+                            window.openTaskListPickerModal(function (target) {
+                                const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
+                                const safeHeading = (typeof escapeHtml === 'function') ? escapeHtml(heading) : heading;
+                                const marker = '<div class="tasklist-embed" data-task-embed="' + target.id
+                                    + '" contenteditable="false"><a class="tasklist-embed-link" href="index.php?note='
+                                    + target.id + '">' + safeHeading + '</a></div>';
+                                insertMarkdownAtContext(insertionContext, '\n' + marker + '\n', 0);
+                            });
+                        }
+                    }
                 ]
-            },
-            {
-                id: 'tasklist-embed',
-                icon: 'lucide-layout-list',
-                label: t('slash_menu.tasklist_embed', null, 'Task list'),
-                action: function () {
-                    if (typeof window.openTaskListPickerModal !== 'function') return;
-
-                    // Capture the markdown insertion point before the slash
-                    // globals are cleared while the modal is open
-                    const insertionContext = captureEditorInsertionContext();
-
-                    window.openTaskListPickerModal(function (target) {
-                        const heading = target.heading || t('note_reference.untitled', null, 'Untitled');
-                        const safeHeading = (typeof escapeHtml === 'function') ? escapeHtml(heading) : heading;
-                        const marker = '<div class="tasklist-embed" data-task-embed="' + target.id
-                            + '" contenteditable="false"><a class="tasklist-embed-link" href="index.php?note='
-                            + target.id + '">' + safeHeading + '</a></div>';
-                        insertMarkdownAtContext(insertionContext, '\n' + marker + '\n', 0);
-                    });
-                }
             },
             {
                 id: 'quote',
@@ -2389,6 +2415,7 @@
                 label: t('slash_menu.media', null, 'Media'),
                 submenu: [
                     common.image,
+                    supportsCameraCapture() ? common.takePhoto : null,
                     {
                         id: 'youtube-video',
                         icon: 'lucide lucide-video',

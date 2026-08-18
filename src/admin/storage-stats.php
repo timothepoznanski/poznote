@@ -157,9 +157,11 @@ function collectStorageStats(): array {
         $row['db_bytes']          = poznoteDirSize($databaseDir);
         $row['entries_bytes']     = poznoteDirSize($entriesDir);
         $row['attachments_bytes'] = poznoteDirSize($attachmentsDir);
-        // Total is the sum of the three displayed columns so the row adds up.
-        // It deliberately excludes backups/snapshots/backgrounds, which are not
-        // part of the backup export either.
+        // Total is the sum of the three local columns so the row adds up, and
+        // it matches the local storage quota enforced elsewhere. It deliberately
+        // excludes S3 attachments (own column, own quota) as well as
+        // backups/snapshots/backgrounds, which are not part of the backup
+        // export either.
         $row['total_bytes']       = $row['db_bytes'] + $row['entries_bytes'] + $row['attachments_bytes'];
 
         if (file_exists($dbPath)) {
@@ -189,8 +191,10 @@ function collectStorageStats(): array {
                             }
                         }
                     }
+                    // Kept out of total_bytes: Total carries the local storage
+                    // quota, which counts only the on-disk perimeter. Bucket
+                    // usage has its own column and its own quota.
                     $row['attachments_s3_bytes'] = $s3Bytes;
-                    $row['total_bytes']         += $s3Bytes;
                 }
                 $db = null;
             } catch (Exception $e) {

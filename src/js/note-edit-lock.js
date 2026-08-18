@@ -182,6 +182,15 @@
         return !!(entry && entry.getAttribute && entry.getAttribute('data-note-type') === 'markdown');
     }
 
+    // Tasklist notes replace the note body with the task UI and turn the entry
+    // itself non-editable (js/tasklist.js). The lock snapshot is taken from the
+    // server markup, before that happens, so restoring it verbatim would make
+    // the entry editable again and every tap on a task button (three-dot menu,
+    // star, move) would place a caret in the entry and pop the mobile keyboard.
+    function isTasklistEntry(entry) {
+        return !!(entry && entry.getAttribute && entry.getAttribute('data-note-type') === 'tasklist');
+    }
+
     function restoreEntryContentEditableState(entry) {
         if (!entry) {
             return;
@@ -189,11 +198,12 @@
 
         setContentEditableState(entry, true);
 
-        if (isMarkdownEntry(entry)) {
+        if (isMarkdownEntry(entry) || isTasklistEntry(entry)) {
             entry.setAttribute('contenteditable', 'false');
-            if (typeof window.syncMarkdownEditorEditableState === 'function') {
-                window.syncMarkdownEditorEditableState(entry);
-            }
+        }
+
+        if (isMarkdownEntry(entry) && typeof window.syncMarkdownEditorEditableState === 'function') {
+            window.syncMarkdownEditorEditableState(entry);
         }
     }
 
