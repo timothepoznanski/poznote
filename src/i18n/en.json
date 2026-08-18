@@ -3501,6 +3501,7 @@
       "save_error": "Failed to save configuration.",
       "incomplete": "Endpoint, bucket and credentials are required to enable S3 storage.",
       "disabled_files_remaining": "S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.",
+      "disabled_files_remaining_many": "S3 storage is now disabled, but attachment files are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.",
       "disabled_bucket_unreachable": "S3 storage is now disabled, but the bucket could not be checked for remaining files. If attachments are still stored there, keep the credentials configured so they stay served, and migrate them back to local disk once the bucket is reachable again."
     },
     "git_sync_note": "Git sync ignores attachments while S3 storage is enabled."

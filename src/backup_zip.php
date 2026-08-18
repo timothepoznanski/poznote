@@ -469,8 +469,12 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
     // Fetch the exported user's remaining attachments from the bucket,
     // unless the lighter-zip option was checked. Gated on isConfigured()
     // rather than the S3 switch: files left in the bucket after S3 storage
-    // was turned off must still land in the backup. The metadata file
-    // below lists them either way; a full archive can be rebuilt later by
+    // was turned off must still land in the backup, otherwise the archive
+    // would silently omit them. Files already on disk were added above, so
+    // this only reaches the network for the ones that are not; an
+    // unreachable bucket trips the per-request circuit breaker in
+    // AttachmentStorage after the first failure. The metadata file below
+    // lists them either way; a full archive can be rebuilt later by
     // dropping the files from the attachments export into attachments/.
     $exportStorage = AttachmentStorage::forUser($userId);
     if (AttachmentStorage::isConfigured() && !$skipS3Attachments) {

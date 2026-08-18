@@ -25,6 +25,8 @@ class AttachmentStorage {
     private static $instances = [];
     private static $tempFiles = [];
     private static $shutdownRegistered = false;
+    /** Bucket failed at connection level in this request: stop retrying. */
+    private static $remoteUnreachable = false;
 
     private $userId;
     private $client = null;
@@ -104,9 +106,26 @@ class AttachmentStorage {
      * deletions are gated on this instead of isRemote(), so attachments
      * left in the bucket after S3 storage is turned off stay served and
      * removable; only writes follow the active mode.
+     *
+     * Skipped once the bucket has failed in this request: an unreachable
+     * endpoint costs a connect timeout per call, and a page embedding many
+     * missing attachments would otherwise stall on every one of them.
      */
     private function remoteReachable(): bool {
-        return $this->userId !== null && self::isConfigured();
+        return $this->userId !== null && !self::$remoteUnreachable && self::isConfigured();
+    }
+
+    /**
+     * Remember a connection-level failure so the remaining lookups in this
+     * request stop paying the timeout. Deliberately per-request only: the
+     * next request retries, so a transient outage never sticks.
+     */
+    private static function noteRemoteFailure(Exception $e): void {
+        // A 404 is a definitive answer from a healthy bucket, not an outage
+        if ($e instanceof S3StorageException && $e->getCode() === 404) {
+            return;
+        }
+        self::$remoteUnreachable = true;
     }
 
     private function client(): S3Client {
@@ -216,6 +235,7 @@ class AttachmentStorage {
         try {
             return $this->client()->headObject($this->key($filename)) !== null;
         } catch (Exception $e) {
+            self::noteRemoteFailure($e);
             error_log('S3 attachment head failed: ' . $e->getMessage());
             return false;
         }
@@ -250,6 +270,7 @@ class AttachmentStorage {
             $this->client()->getObjectToFile($key, $tempPath);
         } catch (Exception $e) {
             @unlink($tempPath);
+            self::noteRemoteFailure($e);
             if (!($e instanceof S3StorageException) || $e->getCode() !== 404) {
                 error_log('S3 attachment download failed: ' . $e->getMessage());
             }
@@ -298,6 +319,7 @@ class AttachmentStorage {
             $this->client()->streamObject($this->key($filename));
             return true;
         } catch (Exception $e) {
+            self::noteRemoteFailure($e);
             error_log('S3 attachment stream failed: ' . $e->getMessage());
             return false;
         }

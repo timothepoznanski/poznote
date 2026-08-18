@@ -28,6 +28,9 @@ $message = '';
 $error = '';
 $warning = '';
 
+/** Upper bound for the "files left in the bucket" probe on disable. */
+const S3_REMAINING_PROBE_LIMIT = 200;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_config') {
     $wasEnabled = getGlobalSetting('s3_storage_enabled', '0') === '1';
     $enabled = isset($_POST['s3_enabled']) ? '1' : '0';
@@ -71,13 +74,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                             'secret_key' => $checkSecret,
                             'path_style' => $pathStyle === '1',
                         ]);
-                        $remaining = 0;
-                        foreach ($checkClient->listObjects('attachments/') as $ignored) {
-                            $remaining++;
-                        }
+                        // Capped: this only needs to know whether anything is
+                        // left, and an unbounded listing would page through
+                        // (and buffer) every object on a large instance.
+                        $found = $checkClient->listObjects('attachments/', S3_REMAINING_PROBE_LIMIT);
+                        $remaining = count($found);
                         if ($remaining > 0) {
-                            $warning = t('s3_settings.messages.disabled_files_remaining', ['count' => $remaining],
-                                'S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.');
+                            $warning = $remaining >= S3_REMAINING_PROBE_LIMIT
+                                ? t('s3_settings.messages.disabled_files_remaining_many', [],
+                                    'S3 storage is now disabled, but attachment files are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.')
+                                : t('s3_settings.messages.disabled_files_remaining', ['count' => $remaining],
+                                    'S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.');
                         }
                     } catch (Exception $e) {
                         $warning = t('s3_settings.messages.disabled_bucket_unreachable', [],

@@ -3362,7 +3362,9 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         // storage is active would purge the bucket below and lose every
         // attachment, so refuse before wiping anything: the zip must be
         // completed with the files (from the attachments export) first.
-        if (poznoteAttachmentsBucketMayHoldFiles()) {
+        // Mirrors the purge condition below: it only guards against wiping
+        // the bucket, so it must not block restores that never purge.
+        if (poznoteAttachmentsAreRemote()) {
             $backupAttachmentsDir = $tempExtractDir . '/attachments';
             $backupMetadataFile = $backupAttachmentsDir . '/poznote_attachments_metadata.json';
             if (file_exists($backupMetadataFile)) {
@@ -3434,10 +3436,14 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
 
         // A full restore replaces all attachments, so purge the user's
-        // objects from the bucket as well. Gated on the credentials, not the
-        // master switch: objects left behind after S3 storage was turned off
-        // are still served, and would otherwise survive the restore.
-        if (poznoteAttachmentsBucketMayHoldFiles()) {
+        // objects from the bucket as well.
+        //
+        // Deliberately gated on the active mode, NOT on the credentials:
+        // the restore rewrites files through storeFile(), which follows the
+        // active mode too. Purging on credentials alone would empty the
+        // bucket and then rewrite everything to local disk, destroying
+        // objects nothing puts back.
+        if (poznoteAttachmentsAreRemote()) {
             $remoteCleared = poznoteAttachmentStorage()->deleteAllRemote();
             error_log("CLEARED $remoteCleared attachment objects from S3 bucket");
         }

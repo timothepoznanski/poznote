@@ -3991,6 +3991,7 @@
       "save_error": "Échec de l'enregistrement de la configuration.",
       "incomplete": "Le endpoint, le bucket et les identifiants sont requis pour activer le stockage S3.",
       "disabled_files_remaining": "Le stockage S3 est désormais désactivé, mais {{count}} fichier(s) de pièces jointes se trouvent encore dans le bucket. Ils restent servis tant que les identifiants ci-dessus restent configurés ; utilisez la migration ci-dessous pour les rapatrier sur le disque local.",
+      "disabled_files_remaining_many": "Le stockage S3 est désormais désactivé, mais des fichiers de pièces jointes se trouvent encore dans le bucket. Ils restent servis tant que les identifiants ci-dessus restent configurés ; utilisez la migration ci-dessous pour les rapatrier sur le disque local.",
       "disabled_bucket_unreachable": "Le stockage S3 est désormais désactivé, mais le bucket n'a pas pu être vérifié. Si des pièces jointes y sont encore stockées, conservez les identifiants configurés pour qu'elles restent servies, puis rapatriez-les sur le disque local une fois le bucket de nouveau joignable."
     },
     "git_sync_note": "La synchronisation Git ignore les pièces jointes tant que le stockage S3 est activé."

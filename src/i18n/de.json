@@ -3804,6 +3804,7 @@
       "save_error": "Konfiguration konnte nicht gespeichert werden.",
       "incomplete": "Endpoint, Bucket und Zugangsdaten sind erforderlich, um den S3-Speicher zu aktivieren.",
       "disabled_files_remaining": "Der S3-Speicher ist jetzt deaktiviert, aber {{count}} Anhang-Datei(en) liegen noch im Bucket. Sie werden weiterhin ausgeliefert, solange die obigen Zugangsdaten konfiguriert bleiben; nutzen Sie die Migration unten, um sie zurück auf die lokale Festplatte zu holen.",
+      "disabled_files_remaining_many": "Der S3-Speicher ist jetzt deaktiviert, aber es liegen noch Anhang-Dateien im Bucket. Sie werden weiterhin ausgeliefert, solange die obigen Zugangsdaten konfiguriert bleiben; nutzen Sie die Migration unten, um sie zurück auf die lokale Festplatte zu holen.",
       "disabled_bucket_unreachable": "Der S3-Speicher ist jetzt deaktiviert, aber der Bucket konnte nicht auf verbleibende Dateien geprüft werden. Falls dort noch Anhänge liegen, lassen Sie die Zugangsdaten konfiguriert, damit sie weiterhin ausgeliefert werden, und migrieren Sie sie zurück auf die lokale Festplatte, sobald der Bucket wieder erreichbar ist."
     },
     "git_sync_note": "Git-Sync ignoriert Anhänge, solange der S3-Speicher aktiviert ist."
