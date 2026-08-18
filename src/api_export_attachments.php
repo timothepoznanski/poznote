@@ -148,9 +148,11 @@ if ($attachmentsPath && is_dir($attachmentsPath)) {
     }
 }
 
-// S3 mode: fetch the attachments referenced in the database from the bucket
-// (files still on disk, e.g. not yet migrated, were already added above)
-if (poznoteAttachmentsAreRemote()) {
+// Fetch the attachments referenced in the database from the bucket (files
+// still on disk, e.g. not yet migrated, were already added above). Gated on
+// the credentials so files left in the bucket after S3 storage was turned
+// off are exported too.
+if (poznoteAttachmentsBucketMayHoldFiles()) {
     foreach ($metadataInfo as $info) {
         $filename = $info['attachment_data']['filename'] ?? '';
         if ($filename === '' || isset($addedToZip[$filename])) {

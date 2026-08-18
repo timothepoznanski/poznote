@@ -130,7 +130,10 @@ class UserDataManager {
         // count the sizes recorded in the user's database instead.
         $stats['attachments'] = $this->getDirectorySize($this->getUserAttachmentsPath());
         require_once __DIR__ . '/../storage/AttachmentStorage.php';
-        if (AttachmentStorage::isEnabled()) {
+        // Gated on the credentials, not the S3 switch: files left in the
+        // bucket after S3 storage is turned off still take up (paid) space
+        // and must not silently drop out of the totals.
+        if (AttachmentStorage::isConfigured()) {
             $stats['attachments'] += $this->sumAttachmentBytesFromDb();
         }
 
@@ -152,6 +155,11 @@ class UserDataManager {
         if (!file_exists($dbPath)) {
             return 0;
         }
+        // Callers add this to an on-disk scan, so anything still present
+        // locally would otherwise be counted twice in a partly migrated
+        // state; only the files that are not on disk are missing from
+        // that scan.
+        $localDir = $this->getUserAttachmentsPath();
         $total = 0;
         try {
             $db = new PDO('sqlite:' . $dbPath);
@@ -161,6 +169,10 @@ class UserDataManager {
                 $list = json_decode($row['attachments'] ?? '', true);
                 if (is_array($list)) {
                     foreach ($list as $attachment) {
+                        $filename = (string)($attachment['filename'] ?? '');
+                        if ($filename !== '' && file_exists($localDir . '/' . basename($filename))) {
+                            continue;
+                        }
                         $total += max(0, (int)($attachment['file_size'] ?? 0));
                     }
                 }

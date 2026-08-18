@@ -671,10 +671,16 @@ class GitSync {
 
             $orphanPaths = [];
             foreach ($shaMap as $remotePath => $_sha) {
-                // In S3 mode, repo attachments are not orphans: the local
-                // directory is empty by design, deleting them would destroy
-                // the repo's history of pre-migration attachments.
-                if ($skipAttachments && strpos($remotePath, 'attachments/') === 0) {
+                // Repo attachments are not orphans while a bucket is in play:
+                // the local directory is empty by design, and deleting them
+                // would destroy the repo's history of pre-migration
+                // attachments. Gated on the credentials rather than the S3
+                // switch, because turning the switch off does not bring the
+                // files back to disk: they stay in the bucket and Poznote
+                // still serves them. Instances that never configured a bucket
+                // are unaffected and keep pruning normally.
+                if (strpos($remotePath, 'attachments/') === 0
+                    && ($skipAttachments || AttachmentStorage::isConfigured())) {
                     continue;
                 }
                 if (!isset($expectedPathSet[$remotePath])) {
@@ -841,6 +847,26 @@ class GitSync {
             $attachmentFiles = [];   // ['attachments/foo.png', ...]
             $remoteShaMap    = [];
             $hasMetadata     = false;
+
+            // Filenames the bucket already holds. Copying those back to disk
+            // would shadow the objects Poznote serves and take the space
+            // twice, so they are skipped below. Deliberately a skip list
+            // rather than a blanket "a bucket exists, pull nothing": an
+            // attachment the bucket does NOT have must still be restored
+            // from the repo. An unreachable bucket leaves the list empty,
+            // which falls back to pulling everything — duplicated at worst,
+            // never lost.
+            $bucketFilenames = [];
+            require_once __DIR__ . '/storage/AttachmentStorage.php';
+            if (AttachmentStorage::isConfigured() && $this->userId !== null) {
+                try {
+                    foreach (AttachmentStorage::forUser((int)$this->userId)->listRemote() as $object) {
+                        $bucketFilenames[$object['filename']] = true;
+                    }
+                } catch (Exception $e) {
+                    error_log('Git pull: bucket listing failed, pulling every attachment: ' . $e->getMessage());
+                }
+            }
             foreach ($tree as $item) {
                 if ($item['type'] !== 'blob') continue;
                 $path = $item['path'];
@@ -851,8 +877,9 @@ class GitSync {
                     $ext = pathinfo($path, PATHINFO_EXTENSION);
                     if (in_array($ext, self::SUPPORTED_NOTE_EXTENSIONS)) $noteFiles[] = $path;
                 } elseif (strpos($path, 'attachments/') === 0) {
-                    // S3 mode: do not pull attachments back onto local disk
-                    if (!$this->attachmentsInS3()) {
+                    // S3 mode: do not pull attachments back onto local disk;
+                    // otherwise skip only the ones the bucket already serves
+                    if (!$this->attachmentsInS3() && !isset($bucketFilenames[basename($path)])) {
                         $attachmentFiles[] = $path;
                     }
                 }

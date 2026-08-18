@@ -1962,7 +1962,8 @@
       "complete_backup_error": "完整备份错误: {{error}}",
       "cannot_create_zip": "无法创建 ZIP 文件",
       "failed_to_create_db_backup": "创建数据库备份失败",
-      "failed_to_create_backup_file": "创建备份文件失败"
+      "failed_to_create_backup_file": "创建备份文件失败",
+      "s3_unreachable": "创建归档时无法读取 S3 存储桶，因此归档中会缺少部分附件。未保存任何内容。请检查存储桶后重试。"
     },
     "dump": {
       "title": "Poznote 数据库转储",
@@ -3891,7 +3892,7 @@
     "attachments_only_note": "仅涉及附件文件。",
     "config_title": "配置",
     "enable_label": "将附件存储到 S3",
-    "enable_description": "新附件将写入存储桶。仍在本地磁盘上的文件继续可用,并可在下方迁移。",
+    "enable_description": "仅决定新附件写入的位置。现有文件无论存放在磁盘还是存储桶中都能正常使用；请使用下方的迁移功能来移动它们。",
     "endpoint_label": "端点 URL",
     "endpoint_description": "S3 API 的基础 URL。示例:https://s3.amazonaws.com、http://minio:9000、https://<账户>.r2.cloudflarestorage.com",
     "region_label": "区域",
@@ -3907,7 +3908,7 @@
     "test_success": "连接成功,存储桶可访问。",
     "test_failure": "连接失败:{{error}}",
     "migration_title": "迁移",
-    "migration_description": "在本地磁盘和存储桶之间迁移现有附件文件,覆盖实例的所有用户。迁移按批次执行,可随时安全中断并恢复。",
+    "migration_description": "在本地磁盘和存储桶之间移动现有的附件文件，适用于本实例的所有用户。迁移分批执行，可以安全地中断和恢复。上方的开关与此迁移相互独立：文件会从两侧提供，因此您可以按任意顺序执行。",
     "status_local": "本地磁盘上",
     "status_remote": "存储桶中",
     "status_unavailable": "不可用",
@@ -3923,7 +3924,11 @@
     "messages": {
       "saved": "配置保存成功。",
       "save_error": "配置保存失败。",
-      "incomplete": "启用 S3 存储需要填写端点、存储桶和凭据。"
+      "incomplete": "启用 S3 存储需要填写端点、存储桶和凭据。",
+      "disabled_files_remaining": "S3 存储已停用，但存储桶中仍有 {{count}} 个附件文件。只要上方的凭据保持配置，这些文件仍会正常显示；请使用下方的迁移功能将它们移回本地磁盘。",
+      "disabled_files_remaining_many": "S3 存储已停用，但存储桶中仍有附件文件。只要上方的凭据保持配置，这些文件仍会正常显示；请使用下方的迁移功能将它们移回本地磁盘。",
+      "disabled_bucket_unreachable": "S3 存储已停用，但无法检查存储桶中是否还有剩余文件。如果附件仍存储在那里，请保留已配置的凭据以便继续提供这些文件，并在存储桶恢复可用后将它们迁移回本地磁盘。",
+      "cleared_files_remaining": "S3 凭据已被清除，但存储桶中仍有附件文件。Poznote 无法再访问它们，因此相关笔记中的图片会显示为损坏。请重新填入凭据，并先使用下方的迁移功能将文件移回本地磁盘。"
     },
     "git_sync_note": "启用 S3 存储期间,Git 同步会忽略附件。"
   },

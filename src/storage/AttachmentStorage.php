@@ -8,6 +8,12 @@
  * the bucket under attachments/{userId}/{filename}. The migration tooling in
  * api_s3_storage.php moves files between the two.
  *
+ * The mode only governs where new files are WRITTEN. Reads and deletions
+ * check both sides whenever bucket credentials are configured (local disk
+ * first, then the bucket), so files not yet migrated in either direction
+ * keep being served and can still be cleaned up after the switch is
+ * flipped — see remoteReachable().
+ *
  * Every consumer goes through the poznoteAttachment*() helpers in
  * functions.php; this class is the single place that knows where bytes live.
  */
@@ -19,6 +25,8 @@ class AttachmentStorage {
     private static $instances = [];
     private static $tempFiles = [];
     private static $shutdownRegistered = false;
+    /** Bucket failed at connection level in this request: stop retrying. */
+    private static $remoteUnreachable = false;
 
     private $userId;
     private $client = null;
@@ -90,6 +98,44 @@ class AttachmentStorage {
 
     public function isRemote(): bool {
         return $this->userId !== null && self::isEnabled();
+    }
+
+    /**
+     * The bucket may still hold files for this user: credentials are
+     * configured, whether or not the master switch is on. Reads and
+     * deletions are gated on this instead of isRemote(), so attachments
+     * left in the bucket after S3 storage is turned off stay served and
+     * removable; only writes follow the active mode.
+     *
+     * Skipped once the bucket has failed in this request: an unreachable
+     * endpoint costs a connect timeout per call, and a page embedding many
+     * missing attachments would otherwise stall on every one of them.
+     */
+    private function remoteReachable(): bool {
+        return $this->userId !== null && !self::$remoteUnreachable && self::isConfigured();
+    }
+
+    /**
+     * Remember a connection-level failure so the remaining lookups in this
+     * request stop paying the timeout. Deliberately per-request only: the
+     * next request retries, so a transient outage never sticks.
+     */
+    private static function noteRemoteFailure(Exception $e): void {
+        // A 404 is a definitive answer from a healthy bucket, not an outage
+        if ($e instanceof S3StorageException && $e->getCode() === 404) {
+            return;
+        }
+        self::$remoteUnreachable = true;
+    }
+
+    /**
+     * The bucket errored in this request, so later lookups were skipped and
+     * any "file not found" answer since then is unreliable. Callers that must
+     * not silently omit data (backup archives) check this and fail loudly
+     * instead of shipping a truncated result.
+     */
+    public static function remoteFailedThisRequest(): bool {
+        return self::$remoteUnreachable;
     }
 
     private function client(): S3Client {
@@ -170,7 +216,7 @@ class AttachmentStorage {
     }
 
     public function delete(string $filename): bool {
-        if ($this->isRemote()) {
+        if ($this->remoteReachable()) {
             try {
                 $this->client()->deleteObject($this->key($filename));
             } catch (Exception $e) {
@@ -193,12 +239,13 @@ class AttachmentStorage {
         if (file_exists($this->localDir() . '/' . basename($filename))) {
             return true;
         }
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return false;
         }
         try {
             return $this->client()->headObject($this->key($filename)) !== null;
         } catch (Exception $e) {
+            self::noteRemoteFailure($e);
             error_log('S3 attachment head failed: ' . $e->getMessage());
             return false;
         }
@@ -215,7 +262,7 @@ class AttachmentStorage {
             return $localPath;
         }
 
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return null;
         }
 
@@ -233,6 +280,7 @@ class AttachmentStorage {
             $this->client()->getObjectToFile($key, $tempPath);
         } catch (Exception $e) {
             @unlink($tempPath);
+            self::noteRemoteFailure($e);
             if (!($e instanceof S3StorageException) || $e->getCode() !== 404) {
                 error_log('S3 attachment download failed: ' . $e->getMessage());
             }
@@ -273,7 +321,7 @@ class AttachmentStorage {
             return true;
         }
 
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return false;
         }
 
@@ -281,6 +329,7 @@ class AttachmentStorage {
             $this->client()->streamObject($this->key($filename));
             return true;
         } catch (Exception $e) {
+            self::noteRemoteFailure($e);
             error_log('S3 attachment stream failed: ' . $e->getMessage());
             return false;
         }
@@ -310,7 +359,7 @@ class AttachmentStorage {
      * Remove every remote object belonging to this user (full restore wipe).
      */
     public function deleteAllRemote(): int {
-        if (!$this->isRemote()) {
+        if (!$this->remoteReachable()) {
             return 0;
         }
         return self::purgeUserObjects((int)$this->userId)['deleted'];
@@ -346,7 +395,9 @@ class AttachmentStorage {
      * @return array List of ['key' => ..., 'size' => ..., 'filename' => ...]
      */
     public function listRemote(): array {
-        if ($this->userId === null || !self::isEnabled()) {
+        // A read, so it follows the same rule as the others: the bucket may
+        // still hold this user's files after the switch was turned off.
+        if (!$this->remoteReachable()) {
             return [];
         }
         $prefix = self::keyPrefixForUser((int)$this->userId);

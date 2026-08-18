@@ -26,8 +26,18 @@ $pageWorkspace = trim(getWorkspaceFilter());
 
 $message = '';
 $error = '';
+$warning = '';
+
+/** Upper bound for the "files left in the bucket" probe on disable. */
+const S3_REMAINING_PROBE_LIMIT = 200;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_config') {
+    // Snapshot before saving: the warning below has to probe the bucket the
+    // instance was using, which is the only way to look at it once the form
+    // is clearing those very credentials.
+    $previousConfig = AttachmentStorage::getConfig();
+    $wasConfigured = AttachmentStorage::isConfigured();
+    $wasEnabled = getGlobalSetting('s3_storage_enabled', '0') === '1';
     $enabled = isset($_POST['s3_enabled']) ? '1' : '0';
     $endpoint = trim((string)($_POST['s3_endpoint'] ?? ''));
     $region = trim((string)($_POST['s3_region'] ?? '')) ?: 'us-east-1';
@@ -51,6 +61,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         }
         if ($saved) {
             $message = t('s3_settings.messages.saved', [], 'Configuration saved successfully.');
+
+            // Two ways to strand attachments in the bucket: turning the
+            // switch off, and clearing the credentials (which stops Poznote
+            // reaching the bucket at all, so the files go dark). Warn on
+            // both — never block, since a dead bucket is a legitimate reason
+            // to do either — and point at the migration.
+            // Computed from the submitted values, not from isConfigured():
+            // getConfig() caches statically and still holds the pre-save
+            // values at this point.
+            $newSecret = ($secretKey === '••••••••')
+                ? $previousConfig['secret_key']
+                : $secretKey;
+            $nowConfigured = $endpoint !== '' && $bucket !== '' && $accessKey !== '' && $newSecret !== '';
+            $credentialsCleared = $wasConfigured && !$nowConfigured;
+            if (($wasEnabled && $enabled === '0') || $credentialsCleared) {
+                // Probe the bucket the instance was using: when the form is
+                // clearing the credentials, the new ones cannot reach it.
+                $probeConfig = $previousConfig;
+                if (!$credentialsCleared) {
+                    $probeConfig = [
+                        'endpoint' => $endpoint,
+                        'region' => $region,
+                        'bucket' => $bucket,
+                        'access_key' => $accessKey,
+                        'secret_key' => ($secretKey !== '' && $secretKey !== '••••••••')
+                            ? $secretKey
+                            : (string)getGlobalSetting('s3_storage_secret_key', ''),
+                        'path_style' => $pathStyle === '1',
+                    ];
+                }
+
+                if ($probeConfig['endpoint'] !== '' && $probeConfig['bucket'] !== ''
+                    && $probeConfig['access_key'] !== '' && $probeConfig['secret_key'] !== '') {
+                    try {
+                        $checkClient = AttachmentStorage::makeClient($probeConfig);
+                        // Capped: this only needs to know whether anything is
+                        // left, and an unbounded listing would page through
+                        // (and buffer) every object on a large instance.
+                        $found = $checkClient->listObjects('attachments/', S3_REMAINING_PROBE_LIMIT);
+                        $remaining = count($found);
+                        if ($remaining > 0) {
+                            if ($credentialsCleared) {
+                                $warning = t('s3_settings.messages.cleared_files_remaining', [],
+                                    'The S3 credentials have been cleared, but attachment files are still in the bucket. Poznote can no longer reach them, so the notes using them will show broken images. Put the credentials back and use the migration below to bring the files to local disk first.');
+                            } else {
+                                $warning = $remaining >= S3_REMAINING_PROBE_LIMIT
+                                    ? t('s3_settings.messages.disabled_files_remaining_many', [],
+                                        'S3 storage is now disabled, but attachment files are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.')
+                                    : t('s3_settings.messages.disabled_files_remaining', ['count' => $remaining],
+                                        'S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.');
+                            }
+                        }
+                    } catch (Exception $e) {
+                        $warning = t('s3_settings.messages.disabled_bucket_unreachable', [],
+                            'S3 storage is now disabled, but the bucket could not be checked for remaining files. If attachments are still stored there, keep the credentials configured so they stay served, and migrate them back to local disk once the bucket is reachable again.');
+                    }
+                }
+            }
         } else {
             $error = t('s3_settings.messages.save_error', [], 'Failed to save configuration.');
         }
@@ -137,6 +205,13 @@ $s3Enabled = $s3Config['enabled'] === '1';
         </div>
         <?php endif; ?>
 
+        <?php if ($warning): ?>
+        <div class="alert alert-warning">
+            <i class="lucide lucide-alert-triangle-circle"></i>
+            <?php echo htmlspecialchars($warning); ?>
+        </div>
+        <?php endif; ?>
+
         <div class="git-sync-section">
             <h2><i class="lucide lucide-cloud"></i> <?php echo t_h('s3_settings.config_title', [], 'Configuration'); ?></h2>
 
@@ -151,7 +226,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
                         </label>
                         <div class="check-label">
                             <span class="label-title"><?php echo t_h('s3_settings.enable_label', [], 'Store attachments in S3'); ?></span>
-                            <span class="label-desc"><?php echo t_h('s3_settings.enable_description', [], 'New attachments are written to the bucket. Files still on local disk keep working and can be migrated below.'); ?></span>
+                            <span class="label-desc"><?php echo t_h('s3_settings.enable_description', [], 'Only decides where new attachments are written. Existing files keep working wherever they are, on disk or in the bucket; use the migration below to move them.'); ?></span>
                         </div>
                     </div>
 
@@ -220,7 +295,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
 
         <div class="git-sync-section">
             <h2><i class="lucide lucide-repeat"></i> <?php echo t_h('s3_settings.migration_title', [], 'Migration'); ?></h2>
-            <p class="git-sync-description"><?php echo t_h('s3_settings.migration_description', [], 'Move existing attachment files between the local disk and the bucket, for every user of the instance. Migration runs in batches and can be safely interrupted and resumed.'); ?></p>
+            <p class="git-sync-description"><?php echo t_h('s3_settings.migration_description', [], 'Move existing attachment files between the local disk and the bucket, for every user of the instance. Migration runs in batches and can be safely interrupted and resumed. The switch above and this migration are independent: files are served from both sides, so you can run them in either order.'); ?></p>
 
             <div class="s3-status-grid">
                 <div class="s3-status-item">

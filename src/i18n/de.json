@@ -1960,7 +1960,8 @@
       "complete_backup_error": "Vollständiger Sicherungsfehler: {{error}}",
       "cannot_create_zip": "ZIP-Datei kann nicht erstellt werden",
       "failed_to_create_db_backup": "Datenbanksicherung konnte nicht erstellt werden",
-      "failed_to_create_backup_file": "Sicherungsdatei konnte nicht erstellt werden"
+      "failed_to_create_backup_file": "Sicherungsdatei konnte nicht erstellt werden",
+      "s3_unreachable": "Der S3-Bucket konnte beim Erstellen des Archivs nicht gelesen werden, es würden also Anhänge fehlen. Es wurde nichts gespeichert. Prüfen Sie den Bucket und versuchen Sie es erneut."
     },
     "dump": {
       "title": "Poznote Datenbank-Dump",
@@ -3770,7 +3771,7 @@
     "attachments_only_note": "Es sind nur die Anhang-Dateien betroffen.",
     "config_title": "Konfiguration",
     "enable_label": "Anhänge in S3 speichern",
-    "enable_description": "Neue Anhänge werden in den Bucket geschrieben. Dateien auf der lokalen Festplatte funktionieren weiterhin und können unten migriert werden.",
+    "enable_description": "Legt nur fest, wohin neue Anhänge geschrieben werden. Vorhandene Dateien bleiben erreichbar, egal wo sie liegen, auf der Festplatte oder im Bucket; nutzen Sie die Migration unten, um sie zu verschieben.",
     "endpoint_label": "Endpoint-URL",
     "endpoint_description": "Basis-URL der S3-API. Beispiele: https://s3.amazonaws.com, http://minio:9000, https://<account>.r2.cloudflarestorage.com",
     "region_label": "Region",
@@ -3786,7 +3787,7 @@
     "test_success": "Verbindung erfolgreich, der Bucket ist erreichbar.",
     "test_failure": "Verbindung fehlgeschlagen: {{error}}",
     "migration_title": "Migration",
-    "migration_description": "Verschieben Sie vorhandene Anhänge zwischen lokaler Festplatte und Bucket, für alle Benutzer der Instanz. Die Migration läuft in Stapeln und kann gefahrlos unterbrochen und fortgesetzt werden.",
+    "migration_description": "Verschiebt vorhandene Anhang-Dateien zwischen lokaler Festplatte und Bucket, für alle Benutzer der Instanz. Die Migration läuft in Stapeln und kann gefahrlos unterbrochen und fortgesetzt werden. Der Schalter oben und diese Migration sind unabhängig: Dateien werden von beiden Seiten ausgeliefert, Sie können sie also in beliebiger Reihenfolge ausführen.",
     "status_local": "Auf lokaler Festplatte",
     "status_remote": "Im Bucket",
     "status_unavailable": "nicht verfügbar",
@@ -3802,7 +3803,11 @@
     "messages": {
       "saved": "Konfiguration erfolgreich gespeichert.",
       "save_error": "Konfiguration konnte nicht gespeichert werden.",
-      "incomplete": "Endpoint, Bucket und Zugangsdaten sind erforderlich, um den S3-Speicher zu aktivieren."
+      "incomplete": "Endpoint, Bucket und Zugangsdaten sind erforderlich, um den S3-Speicher zu aktivieren.",
+      "disabled_files_remaining": "Der S3-Speicher ist jetzt deaktiviert, aber {{count}} Anhang-Datei(en) liegen noch im Bucket. Sie werden weiterhin ausgeliefert, solange die obigen Zugangsdaten konfiguriert bleiben; nutzen Sie die Migration unten, um sie zurück auf die lokale Festplatte zu holen.",
+      "disabled_files_remaining_many": "Der S3-Speicher ist jetzt deaktiviert, aber es liegen noch Anhang-Dateien im Bucket. Sie werden weiterhin ausgeliefert, solange die obigen Zugangsdaten konfiguriert bleiben; nutzen Sie die Migration unten, um sie zurück auf die lokale Festplatte zu holen.",
+      "disabled_bucket_unreachable": "Der S3-Speicher ist jetzt deaktiviert, aber der Bucket konnte nicht auf verbleibende Dateien geprüft werden. Falls dort noch Anhänge liegen, lassen Sie die Zugangsdaten konfiguriert, damit sie weiterhin ausgeliefert werden, und migrieren Sie sie zurück auf die lokale Festplatte, sobald der Bucket wieder erreichbar ist.",
+      "cleared_files_remaining": "Die S3-Zugangsdaten wurden gelöscht, aber es liegen noch Anhang-Dateien im Bucket. Poznote kann sie nicht mehr erreichen, die betroffenen Notizen zeigen also defekte Bilder. Tragen Sie die Zugangsdaten wieder ein und holen Sie die Dateien zuerst über die Migration unten auf die lokale Festplatte."
     },
     "git_sync_note": "Git-Sync ignoriert Anhänge, solange der S3-Speicher aktiviert ist."
   },

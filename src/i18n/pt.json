@@ -1964,7 +1964,8 @@
       "complete_backup_error": "Erro de backup completo: {{error}}",
       "cannot_create_zip": "Não é possível criar arquivo ZIP",
       "failed_to_create_db_backup": "Falha ao criar backup do banco de dados",
-      "failed_to_create_backup_file": "Falha ao criar arquivo de backup"
+      "failed_to_create_backup_file": "Falha ao criar arquivo de backup",
+      "s3_unreachable": "Não foi possível ler o bucket S3 ao criar o arquivo, portanto faltariam alguns anexos. Nada foi salvo. Verifique o bucket e tente novamente."
     },
     "dump": {
       "title": "Dump do Banco de Dados Poznote",
@@ -3773,7 +3774,7 @@
     "attachments_only_note": "Apenas os arquivos de anexos são afetados.",
     "config_title": "Configuração",
     "enable_label": "Armazenar anexos no S3",
-    "enable_description": "Os novos anexos são gravados no bucket. Os arquivos ainda no disco local continuam funcionando e podem ser migrados abaixo.",
+    "enable_description": "Determina apenas onde os novos anexos são gravados. Os arquivos existentes continuam funcionando onde estiverem, no disco ou no bucket; use a migração abaixo para movê-los.",
     "endpoint_label": "URL do endpoint",
     "endpoint_description": "URL base da API S3. Exemplos: https://s3.amazonaws.com, http://minio:9000, https://<conta>.r2.cloudflarestorage.com",
     "region_label": "Região",
@@ -3789,7 +3790,7 @@
     "test_success": "Conexão bem-sucedida, o bucket está acessível.",
     "test_failure": "Falha na conexão: {{error}}",
     "migration_title": "Migração",
-    "migration_description": "Mova os anexos existentes entre o disco local e o bucket, para todos os usuários da instância. A migração é executada em lotes e pode ser interrompida e retomada com segurança.",
+    "migration_description": "Move os arquivos de anexos existentes entre o disco local e o bucket, para todos os usuários da instância. A migração é executada em lotes e pode ser interrompida e retomada com segurança. O botão acima e esta migração são independentes: os arquivos são servidos dos dois lados, então você pode executá-los em qualquer ordem.",
     "status_local": "No disco local",
     "status_remote": "No bucket",
     "status_unavailable": "indisponível",
@@ -3805,7 +3806,11 @@
     "messages": {
       "saved": "Configuração salva com sucesso.",
       "save_error": "Falha ao salvar a configuração.",
-      "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar o armazenamento S3."
+      "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar o armazenamento S3.",
+      "disabled_files_remaining": "O armazenamento S3 está agora desativado, mas {{count}} arquivo(s) de anexos ainda estão no bucket. Eles continuam sendo servidos enquanto as credenciais acima permanecerem configuradas; use a migração abaixo para trazê-los de volta ao disco local.",
+      "disabled_files_remaining_many": "O armazenamento S3 está agora desativado, mas ainda há arquivos de anexos no bucket. Eles continuam sendo servidos enquanto as credenciais acima permanecerem configuradas; use a migração abaixo para trazê-los de volta ao disco local.",
+      "disabled_bucket_unreachable": "O armazenamento S3 está agora desativado, mas não foi possível verificar se restam arquivos no bucket. Se ainda houver anexos armazenados lá, mantenha as credenciais configuradas para que continuem sendo servidos e migre-os de volta ao disco local quando o bucket voltar a ficar acessível.",
+      "cleared_files_remaining": "As credenciais do S3 foram apagadas, mas ainda há arquivos de anexos no bucket. O Poznote não consegue mais acessá-los, então as notas afetadas mostrarão imagens quebradas. Insira as credenciais novamente e use a migração abaixo para trazer os arquivos ao disco local primeiro."
     },
     "git_sync_note": "A sincronização Git ignora os anexos enquanto o armazenamento S3 estiver ativado."
   },

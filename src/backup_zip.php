@@ -466,12 +466,18 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
         }
     }
 
-    // S3 mode: fetch the exported user's remaining attachments from the
-    // bucket, unless the lighter-zip option was checked. The metadata file
-    // below lists them either way; a full archive can be rebuilt later by
+    // Fetch the exported user's remaining attachments from the bucket,
+    // unless the lighter-zip option was checked. Gated on isConfigured()
+    // rather than the S3 switch: files left in the bucket after S3 storage
+    // was turned off must still land in the backup, otherwise the archive
+    // would silently omit them. Files already on disk were added above, so
+    // this only reaches the network for the ones that are not; an
+    // unreachable bucket trips the per-request circuit breaker in
+    // AttachmentStorage after the first failure. The metadata file below
+    // lists them either way; a full archive can be rebuilt later by
     // dropping the files from the attachments export into attachments/.
     $exportStorage = AttachmentStorage::forUser($userId);
-    if ($exportStorage->isRemote() && !$skipS3Attachments) {
+    if (AttachmentStorage::isConfigured() && !$skipS3Attachments) {
         foreach ($filenameToIdMap as $filename => $attachmentId) {
             if (isset($addedAttachmentFiles[$filename])) {
                 continue;
@@ -481,6 +487,22 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
                 $zip->addFile($localCopy, 'attachments/' . $attachmentId . ($ext ? '.' . $ext : ''));
             }
+        }
+
+        // A file the bucket answers 404 for is simply gone and must not block
+        // the backup, but a bucket that errored means the lookups after it
+        // were skipped: we cannot tell what is missing. Refuse rather than
+        // hand back an archive that looks complete and is not.
+        if (AttachmentStorage::remoteFailedThisRequest()) {
+            $zip->close();
+            @unlink($zipFileName);
+            return [
+                'success' => false,
+                'zip_path' => null,
+                'filename' => null,
+                'error' => t('backup_export.errors.s3_unreachable', [],
+                    'The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again.'),
+            ];
         }
     }
 

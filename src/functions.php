@@ -2206,9 +2206,20 @@ function poznoteAttachmentStorage(): AttachmentStorage {
     return AttachmentStorage::current();
 }
 
-/** Whether attachments are stored remotely (S3) for this instance. */
+/** Whether NEW attachments are written to S3 for this instance. */
 function poznoteAttachmentsAreRemote(): bool {
     return poznoteAttachmentStorage()->isRemote();
+}
+
+/**
+ * Whether the bucket may still hold attachments, regardless of the master
+ * switch. Read and cleanup paths use this so files left in the bucket after
+ * S3 storage was turned off are still found; only write paths care about
+ * poznoteAttachmentsAreRemote().
+ */
+function poznoteAttachmentsBucketMayHoldFiles(): bool {
+    require_once __DIR__ . '/storage/AttachmentStorage.php';
+    return AttachmentStorage::isConfigured();
 }
 
 /**
@@ -3351,6 +3362,8 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         // storage is active would purge the bucket below and lose every
         // attachment, so refuse before wiping anything: the zip must be
         // completed with the files (from the attachments export) first.
+        // Mirrors the purge condition below: it only guards against wiping
+        // the bucket, so it must not block restores that never purge.
         if (poznoteAttachmentsAreRemote()) {
             $backupAttachmentsDir = $tempExtractDir . '/attachments';
             $backupMetadataFile = $backupAttachmentsDir . '/poznote_attachments_metadata.json';
@@ -3422,8 +3435,14 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             createDirectoryWithPermissions($attachmentsPath);
         }
 
-        // S3 mode: a full restore replaces all attachments, purge the
-        // user's objects from the bucket as well
+        // A full restore replaces all attachments, so purge the user's
+        // objects from the bucket as well.
+        //
+        // Deliberately gated on the active mode, NOT on the credentials:
+        // the restore rewrites files through storeFile(), which follows the
+        // active mode too. Purging on credentials alone would empty the
+        // bucket and then rewrite everything to local disk, destroying
+        // objects nothing puts back.
         if (poznoteAttachmentsAreRemote()) {
             $remoteCleared = poznoteAttachmentStorage()->deleteAllRemote();
             error_log("CLEARED $remoteCleared attachment objects from S3 bucket");
