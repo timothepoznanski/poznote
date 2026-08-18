@@ -79,7 +79,9 @@
    sit between, so they are scaled down to balance the row optically.
    !important because js/index-icon-scale-settings.js injects an !important
    font-size on .sidebar-folder-toggle when the user picks a non-default icon
-   scale; em keeps these two proportional to whatever scale is in effect. */
+   scale. The em here is relative to the button, not to that injected value, so
+   the ids below would freeze both glyphs at 0.85em; the scale script restates
+   this pair with the same id specificity to keep them in step. */
 #sidebarNotificationsBtn .lucide,
 #sidebarAiChatBtn .lucide {
     font-size: 0.85em !important;

@@ -134,6 +134,23 @@ function applyIndexIconScale(scale) {
             font-size: ${20 * s}px !important;
         }
 
+        /* Sidebar header: notifications bell / AI assistant. css/sidebar.css
+           sizes these through an id selector, so the override has to carry the
+           same id specificity or the two would stay at their base size. */
+        #sidebarNotificationsBtn .lucide,
+        #sidebarAiChatBtn .lucide {
+            font-size: ${0.85 * s}em !important;
+        }
+
+        /* Note header actions: change folder, manage note tags, open
+           attachments. All three are pinned to 14px in css/notes/tags.css and
+           css/notes/attachments-row.css. */
+        .lucide-folder.icon_folder,
+        .lucide-tag.icon_tag,
+        .lucide-paperclip.icon_attachment {
+            font-size: ${14 * s}px !important;
+        }
+
         /* Note editor toolbar icons */
         .toolbar-btn {
             min-width: ${38 * s}px !important;

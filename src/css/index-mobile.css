@@ -218,7 +218,9 @@ body.mobile-keyboard-open #taskEditModal.modal,
 body.mobile-formatting-toolbar-active #taskListPickerModal.modal,
 body.mobile-keyboard-open #taskListPickerModal.modal,
 body.mobile-formatting-toolbar-active #imageLinkModal.modal,
-body.mobile-keyboard-open #imageLinkModal.modal {
+body.mobile-keyboard-open #imageLinkModal.modal,
+body.mobile-formatting-toolbar-active #taskDueModal.modal,
+body.mobile-keyboard-open #taskDueModal.modal {
     z-index: 2147483004 !important;
 }
 
@@ -234,8 +236,19 @@ body.mobile-keyboard-open #taskEditModal .modal-content,
 body.mobile-formatting-toolbar-active #taskListPickerModal .modal-content,
 body.mobile-keyboard-open #taskListPickerModal .modal-content,
 body.mobile-formatting-toolbar-active #imageLinkModal .modal-content,
-body.mobile-keyboard-open #imageLinkModal .modal-content {
+body.mobile-keyboard-open #imageLinkModal .modal-content,
+body.mobile-formatting-toolbar-active #taskDueModal .modal-content,
+body.mobile-keyboard-open #taskDueModal .modal-content {
     z-index: 2147483005 !important;
+}
+
+/* Popups opened from those dialogs (task menu, date/time picker) must stay
+   above both the raised note header and the dialog they belong to. */
+body.mobile-formatting-toolbar-active .task-actions-menu,
+body.mobile-keyboard-open .task-actions-menu,
+body.mobile-formatting-toolbar-active .slash-date-picker,
+body.mobile-keyboard-open .slash-date-picker {
+    z-index: 2147483006 !important;
 }
 
 body.mobile-formatting-toolbar-active .color-palette-popup .color-grid {

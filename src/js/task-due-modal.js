@@ -53,6 +53,23 @@
             : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
+    // On mobile the note toolbar is raised above every overlay while the virtual
+    // keyboard is up, and the keyboard itself eats most of the screen. The due
+    // date is picked with taps only, so drop the focus that keeps the keyboard
+    // open (the "new task" field, the note title) when the modal opens, like the
+    // date picker popup does.
+    function dismissMobileKeyboard() {
+        if (window.innerWidth > 800) return;
+
+        var active = document.activeElement;
+        if (!active || active === document.body || typeof active.blur !== 'function') return;
+        if (!active.matches || !active.matches('input, textarea, select, [contenteditable="true"]')) return;
+        // Never fight the modal's own controls
+        if (active.closest && active.closest('#taskDueModal')) return;
+
+        try { active.blur(); } catch (e) { }
+    }
+
     function emailAvailable() {
         const modal = modalEl();
         return !!(modal && modal.dataset.emailAvailable === '1');
@@ -320,6 +337,11 @@
         setTaskDueRecurrence(opts.task.dueRecurrence);
         syncUi();
         modal.style.display = 'flex';
+
+        // Mobile browsers can move the focus into an editable while handling the
+        // tap that opened the modal, so re-check once the tap is fully processed.
+        dismissMobileKeyboard();
+        requestAnimationFrame(dismissMobileKeyboard);
     };
 
     window.closeTaskDueModal = closeTaskDueModal;
