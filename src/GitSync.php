@@ -671,10 +671,16 @@ class GitSync {
 
             $orphanPaths = [];
             foreach ($shaMap as $remotePath => $_sha) {
-                // In S3 mode, repo attachments are not orphans: the local
-                // directory is empty by design, deleting them would destroy
-                // the repo's history of pre-migration attachments.
-                if ($skipAttachments && strpos($remotePath, 'attachments/') === 0) {
+                // Repo attachments are not orphans while a bucket is in play:
+                // the local directory is empty by design, and deleting them
+                // would destroy the repo's history of pre-migration
+                // attachments. Gated on the credentials rather than the S3
+                // switch, because turning the switch off does not bring the
+                // files back to disk: they stay in the bucket and Poznote
+                // still serves them. Instances that never configured a bucket
+                // are unaffected and keep pruning normally.
+                if (strpos($remotePath, 'attachments/') === 0
+                    && ($skipAttachments || AttachmentStorage::isConfigured())) {
                     continue;
                 }
                 if (!isset($expectedPathSet[$remotePath])) {

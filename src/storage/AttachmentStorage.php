@@ -395,7 +395,9 @@ class AttachmentStorage {
      * @return array List of ['key' => ..., 'size' => ..., 'filename' => ...]
      */
     public function listRemote(): array {
-        if ($this->userId === null || !self::isEnabled()) {
+        // A read, so it follows the same rule as the others: the bucket may
+        // still hold this user's files after the switch was turned off.
+        if (!$this->remoteReachable()) {
             return [];
         }
         $prefix = self::keyPrefixForUser((int)$this->userId);

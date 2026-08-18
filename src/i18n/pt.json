@@ -3809,7 +3809,8 @@
       "incomplete": "O endpoint, o bucket e as credenciais são necessários para ativar o armazenamento S3.",
       "disabled_files_remaining": "O armazenamento S3 está agora desativado, mas {{count}} arquivo(s) de anexos ainda estão no bucket. Eles continuam sendo servidos enquanto as credenciais acima permanecerem configuradas; use a migração abaixo para trazê-los de volta ao disco local.",
       "disabled_files_remaining_many": "O armazenamento S3 está agora desativado, mas ainda há arquivos de anexos no bucket. Eles continuam sendo servidos enquanto as credenciais acima permanecerem configuradas; use a migração abaixo para trazê-los de volta ao disco local.",
-      "disabled_bucket_unreachable": "O armazenamento S3 está agora desativado, mas não foi possível verificar se restam arquivos no bucket. Se ainda houver anexos armazenados lá, mantenha as credenciais configuradas para que continuem sendo servidos e migre-os de volta ao disco local quando o bucket voltar a ficar acessível."
+      "disabled_bucket_unreachable": "O armazenamento S3 está agora desativado, mas não foi possível verificar se restam arquivos no bucket. Se ainda houver anexos armazenados lá, mantenha as credenciais configuradas para que continuem sendo servidos e migre-os de volta ao disco local quando o bucket voltar a ficar acessível.",
+      "cleared_files_remaining": "As credenciais do S3 foram apagadas, mas ainda há arquivos de anexos no bucket. O Poznote não consegue mais acessá-los, então as notas afetadas mostrarão imagens quebradas. Insira as credenciais novamente e use a migração abaixo para trazer os arquivos ao disco local primeiro."
     },
     "git_sync_note": "A sincronização Git ignora os anexos enquanto o armazenamento S3 estiver ativado."
   },

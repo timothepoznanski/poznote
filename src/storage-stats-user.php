@@ -56,7 +56,7 @@ try {
 // on-disk directory; S3 is the recorded size of files absent from it (files
 // not yet migrated stay in the local column).
 require_once __DIR__ . '/storage/AttachmentStorage.php';
-$s3ColumnVisible      = AttachmentStorage::isEnabled();
+$s3ColumnVisible      = AttachmentStorage::isConfigured();
 $attachmentLocalBytes = (int)$sizes['attachments'];
 $attachmentS3Bytes    = 0;
 if ($s3ColumnVisible) {

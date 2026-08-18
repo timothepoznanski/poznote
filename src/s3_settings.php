@@ -32,6 +32,11 @@ $warning = '';
 const S3_REMAINING_PROBE_LIMIT = 200;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_config') {
+    // Snapshot before saving: the warning below has to probe the bucket the
+    // instance was using, which is the only way to look at it once the form
+    // is clearing those very credentials.
+    $previousConfig = AttachmentStorage::getConfig();
+    $wasConfigured = AttachmentStorage::isConfigured();
     $wasEnabled = getGlobalSetting('s3_storage_enabled', '0') === '1';
     $enabled = isset($_POST['s3_enabled']) ? '1' : '0';
     $endpoint = trim((string)($_POST['s3_endpoint'] ?? ''));
@@ -57,34 +62,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
         if ($saved) {
             $message = t('s3_settings.messages.saved', [], 'Configuration saved successfully.');
 
-            // Turning S3 off while files remain in the bucket is a classic
-            // trap: warn (never block — the bucket may be down, and that is
-            // a legitimate reason to disable) and point at the migration.
-            if ($wasEnabled && $enabled === '0') {
-                $checkSecret = ($secretKey !== '' && $secretKey !== '••••••••')
-                    ? $secretKey
-                    : (string)getGlobalSetting('s3_storage_secret_key', '');
-                if ($endpoint !== '' && $bucket !== '' && $accessKey !== '' && $checkSecret !== '') {
+            // Two ways to strand attachments in the bucket: turning the
+            // switch off, and clearing the credentials (which stops Poznote
+            // reaching the bucket at all, so the files go dark). Warn on
+            // both — never block, since a dead bucket is a legitimate reason
+            // to do either — and point at the migration.
+            // Computed from the submitted values, not from isConfigured():
+            // getConfig() caches statically and still holds the pre-save
+            // values at this point.
+            $newSecret = ($secretKey === '••••••••')
+                ? $previousConfig['secret_key']
+                : $secretKey;
+            $nowConfigured = $endpoint !== '' && $bucket !== '' && $accessKey !== '' && $newSecret !== '';
+            $credentialsCleared = $wasConfigured && !$nowConfigured;
+            if (($wasEnabled && $enabled === '0') || $credentialsCleared) {
+                // Probe the bucket the instance was using: when the form is
+                // clearing the credentials, the new ones cannot reach it.
+                $probeConfig = $previousConfig;
+                if (!$credentialsCleared) {
+                    $probeConfig = [
+                        'endpoint' => $endpoint,
+                        'region' => $region,
+                        'bucket' => $bucket,
+                        'access_key' => $accessKey,
+                        'secret_key' => ($secretKey !== '' && $secretKey !== '••••••••')
+                            ? $secretKey
+                            : (string)getGlobalSetting('s3_storage_secret_key', ''),
+                        'path_style' => $pathStyle === '1',
+                    ];
+                }
+
+                if ($probeConfig['endpoint'] !== '' && $probeConfig['bucket'] !== ''
+                    && $probeConfig['access_key'] !== '' && $probeConfig['secret_key'] !== '') {
                     try {
-                        $checkClient = AttachmentStorage::makeClient([
-                            'endpoint' => $endpoint,
-                            'region' => $region,
-                            'bucket' => $bucket,
-                            'access_key' => $accessKey,
-                            'secret_key' => $checkSecret,
-                            'path_style' => $pathStyle === '1',
-                        ]);
+                        $checkClient = AttachmentStorage::makeClient($probeConfig);
                         // Capped: this only needs to know whether anything is
                         // left, and an unbounded listing would page through
                         // (and buffer) every object on a large instance.
                         $found = $checkClient->listObjects('attachments/', S3_REMAINING_PROBE_LIMIT);
                         $remaining = count($found);
                         if ($remaining > 0) {
-                            $warning = $remaining >= S3_REMAINING_PROBE_LIMIT
-                                ? t('s3_settings.messages.disabled_files_remaining_many', [],
-                                    'S3 storage is now disabled, but attachment files are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.')
-                                : t('s3_settings.messages.disabled_files_remaining', ['count' => $remaining],
-                                    'S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.');
+                            if ($credentialsCleared) {
+                                $warning = t('s3_settings.messages.cleared_files_remaining', [],
+                                    'The S3 credentials have been cleared, but attachment files are still in the bucket. Poznote can no longer reach them, so the notes using them will show broken images. Put the credentials back and use the migration below to bring the files to local disk first.');
+                            } else {
+                                $warning = $remaining >= S3_REMAINING_PROBE_LIMIT
+                                    ? t('s3_settings.messages.disabled_files_remaining_many', [],
+                                        'S3 storage is now disabled, but attachment files are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.')
+                                    : t('s3_settings.messages.disabled_files_remaining', ['count' => $remaining],
+                                        'S3 storage is now disabled, but {{count}} attachment file(s) are still in the bucket. They keep being served as long as the credentials above stay configured; use the migration below to bring them back to local disk.');
+                            }
                         }
                     } catch (Exception $e) {
                         $warning = t('s3_settings.messages.disabled_bucket_unreachable', [],

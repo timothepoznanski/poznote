@@ -172,7 +172,9 @@ function collectStorageStats(): array {
                 // the bucket; sum their sizes recorded in the database. Files
                 // still on disk (not yet migrated) stay in the local column.
                 require_once __DIR__ . '/../storage/AttachmentStorage.php';
-                if (AttachmentStorage::isEnabled()) {
+                // Credentials, not the S3 switch: objects left in the bucket
+                // after it is turned off still occupy (paid) space.
+                if (AttachmentStorage::isConfigured()) {
                     $s3Bytes = 0;
                     $attStmt = $db->query("SELECT attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'");
                     foreach ($attStmt as $attRow) {
@@ -304,9 +306,10 @@ $storageTotal = count($storageRows);
 
 // Which optional columns exist. Resolved here rather than next to the table
 // markup because the CSV export below has to emit the same set of columns.
-// Show a dedicated S3 column when attachments are stored in a bucket
+// Show a dedicated S3 column whenever a bucket may hold attachments,
+// including after S3 storage was turned off with files still in it
 require_once __DIR__ . '/../storage/AttachmentStorage.php';
-$s3ColumnVisible = AttachmentStorage::isEnabled();
+$s3ColumnVisible = AttachmentStorage::isConfigured();
 
 // Same for backups, which target their own (independent) bucket
 require_once __DIR__ . '/../S3BackupService.php';
