@@ -2013,7 +2013,8 @@
       "complete_backup_error": "Erreur de sauvegarde complète : {{error}}",
       "cannot_create_zip": "Impossible de créer le fichier ZIP",
       "failed_to_create_db_backup": "Échec de la création de la sauvegarde de la base de données",
-      "failed_to_create_backup_file": "Échec de la création du fichier de sauvegarde"
+      "failed_to_create_backup_file": "Échec de la création du fichier de sauvegarde",
+      "s3_unreachable": "Le bucket S3 n'a pas pu être lu pendant la création de l'archive, des pièces jointes y manqueraient donc. Rien n'a été enregistré. Vérifiez le bucket et réessayez."
     },
     "dump": {
       "title": "Export de la base de données Poznote",

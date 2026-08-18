@@ -1614,7 +1614,8 @@
       "complete_backup_error": "Complete backup error: {{error}}",
       "cannot_create_zip": "Cannot create ZIP file",
       "failed_to_create_db_backup": "Failed to create database backup",
-      "failed_to_create_backup_file": "Failed to create backup file"
+      "failed_to_create_backup_file": "Failed to create backup file",
+      "s3_unreachable": "The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again."
     },
     "dump": {
       "title": "Poznote Database Dump",

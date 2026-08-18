@@ -1964,7 +1964,8 @@
       "complete_backup_error": "Erro de backup completo: {{error}}",
       "cannot_create_zip": "Não é possível criar arquivo ZIP",
       "failed_to_create_db_backup": "Falha ao criar backup do banco de dados",
-      "failed_to_create_backup_file": "Falha ao criar arquivo de backup"
+      "failed_to_create_backup_file": "Falha ao criar arquivo de backup",
+      "s3_unreachable": "Não foi possível ler o bucket S3 ao criar o arquivo, portanto faltariam alguns anexos. Nada foi salvo. Verifique o bucket e tente novamente."
     },
     "dump": {
       "title": "Dump do Banco de Dados Poznote",

@@ -1961,7 +1961,8 @@
       "complete_backup_error": "Error de copia de seguridad completa: {{error}}",
       "cannot_create_zip": "No se puede crear archivo ZIP",
       "failed_to_create_db_backup": "Falló al crear copia de seguridad de base de datos",
-      "failed_to_create_backup_file": "Falló al crear archivo de copia de seguridad"
+      "failed_to_create_backup_file": "Falló al crear archivo de copia de seguridad",
+      "s3_unreachable": "No se pudo leer el bucket S3 al crear el archivo, por lo que faltarían algunos adjuntos. No se guardó nada. Compruebe el bucket e inténtelo de nuevo."
     },
     "dump": {
       "title": "Volcado de base de datos de Poznote",

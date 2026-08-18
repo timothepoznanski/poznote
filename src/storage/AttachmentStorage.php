@@ -128,6 +128,16 @@ class AttachmentStorage {
         self::$remoteUnreachable = true;
     }
 
+    /**
+     * The bucket errored in this request, so later lookups were skipped and
+     * any "file not found" answer since then is unreliable. Callers that must
+     * not silently omit data (backup archives) check this and fail loudly
+     * instead of shipping a truncated result.
+     */
+    public static function remoteFailedThisRequest(): bool {
+        return self::$remoteUnreachable;
+    }
+
     private function client(): S3Client {
         if ($this->client === null) {
             $this->client = new S3Client(self::getConfig());

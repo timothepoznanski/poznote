@@ -1962,7 +1962,8 @@
       "complete_backup_error": "完整备份错误: {{error}}",
       "cannot_create_zip": "无法创建 ZIP 文件",
       "failed_to_create_db_backup": "创建数据库备份失败",
-      "failed_to_create_backup_file": "创建备份文件失败"
+      "failed_to_create_backup_file": "创建备份文件失败",
+      "s3_unreachable": "创建归档时无法读取 S3 存储桶，因此归档中会缺少部分附件。未保存任何内容。请检查存储桶后重试。"
     },
     "dump": {
       "title": "Poznote 数据库转储",

@@ -488,6 +488,22 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
                 $zip->addFile($localCopy, 'attachments/' . $attachmentId . ($ext ? '.' . $ext : ''));
             }
         }
+
+        // A file the bucket answers 404 for is simply gone and must not block
+        // the backup, but a bucket that errored means the lookups after it
+        // were skipped: we cannot tell what is missing. Refuse rather than
+        // hand back an archive that looks complete and is not.
+        if (AttachmentStorage::remoteFailedThisRequest()) {
+            $zip->close();
+            @unlink($zipFileName);
+            return [
+                'success' => false,
+                'zip_path' => null,
+                'filename' => null,
+                'error' => t('backup_export.errors.s3_unreachable', [],
+                    'The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again.'),
+            ];
+        }
     }
 
     // Add metadata file for attachments using user's database
