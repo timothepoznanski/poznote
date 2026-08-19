@@ -205,6 +205,9 @@ $iconSidebarProfileStrings = [
     'profile.errors.email_invalid' => t('profile.errors.email_invalid', [], 'Invalid email address'),
     'profile.errors.email_taken' => t('profile.errors.email_taken', [], 'This email is already in use'),
     'profile.logout.confirm' => t('profile.logout.confirm', [], 'Are you sure you want to log out?'),
+    // Keeps its {{username}} placeholder: js/profile.js substitutes it client-side.
+    'profile.logout.signed_in_as' => t('profile.logout.signed_in_as', [], 'Signed in as {{username}}'),
+    'profile.logout.in_progress' => t('profile.logout.in_progress', [], 'Logging out...'),
     'workspace_menu.logout' => t('workspace_menu.logout', [], 'Logout'),
     'multiuser.admin.email' => t('multiuser.admin.email', [], 'Email'),
     'common.cancel' => t('common.cancel', [], 'Cancel'),

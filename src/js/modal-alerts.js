@@ -30,23 +30,25 @@ class ModalAlert {
      * @param {string} title - Optional title, defaults based on type
      * @returns {Promise} - Resolves when modal is closed
      */
-    alert(message, type = 'info', title = null) {
+    alert(message, type = 'info', title = null, options = null) {
         return new Promise((resolve) => {
             if (shouldSuppressAlertMessage(message)) {
                 resolve();
                 return;
             }
 
+            const alertOptions = options || {};
             const config = {
                 type: 'alert',
                 message,
+                messageNode: alertOptions.messageNode || null,
                 alertType: type,
                 title: title || this.getDefaultTitle(type),
                 buttons: [
                     { text: tr('common.close', {}, 'Close'), type: 'primary', action: () => resolve() }
                 ]
             };
-            
+
             this.showModal(config);
         });
     }
@@ -64,6 +66,7 @@ class ModalAlert {
             const config = {
                 type: 'confirm',
                 message,
+                messageNode: confirmOptions.messageNode || null,
                 alertType: confirmOptions.alertType || 'warning',
                 title: title || tr('common.confirmation', {}, 'Confirmation'),
                 modalClass: confirmOptions.modalClass || '',
@@ -265,7 +268,14 @@ class ModalAlert {
         
         const body = document.createElement('div');
         body.className = 'alert-modal-body';
-        body.textContent = config.message;
+        // A caller can hand over a pre-built DOM node when parts of the
+        // message need styling (built from createTextNode/textContent, so
+        // translations are still never parsed as HTML)
+        if (config.messageNode instanceof Node) {
+            body.appendChild(config.messageNode);
+        } else {
+            body.textContent = config.message;
+        }
         // Allow displayed newlines (\n) in translations to render as line breaks
         body.style.whiteSpace = 'pre-wrap';
         

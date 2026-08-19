@@ -28,6 +28,7 @@ $currentLang = getUserLanguage();
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/dark-mode.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/shared/responsive.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/attachments_list.css'); ?>"/>
+	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/attachments/usage-notice.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-page.css'); ?>"/>
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/icon-sidebar-mobile.css'); ?>"/>
@@ -48,6 +49,13 @@ $currentLang = getUserLanguage();
 	<?php include 'icon_sidebar.php'; ?>
 	<div class="shared-container">
 		<h1 class="poznote-page-title"><i class="lucide lucide-paperclip"></i> <?php echo t_h('notes_list.system_folders.attachments', [], 'Attachments'); ?></h1>
+		<?php if (poznoteSaasNoticesEnabled()): ?>
+		<div class="attachment-usage-notice">
+			<i class="lucide lucide-alert-triangle"></i>
+			<span><?php echo t_h('attachments.page.note_taking_notice', [], 'Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.'); ?>
+				<a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
+		</div>
+		<?php endif; ?>
 
 
 		

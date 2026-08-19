@@ -168,6 +168,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
     <link rel="stylesheet" href="css/dark-mode/components.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/dark-mode/pages.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $cache_v; ?>">
+    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -192,6 +193,13 @@ $s3Enabled = $s3Config['enabled'] === '1';
                 <?php echo t_h('s3_settings.description_scope', [], 'The setting applies to all users of this instance.'); ?><br>
                 <?php echo t_h('s3_settings.attachments_only_note', [], 'Only the attachment files are concerned.'); ?><br>
                 <?php echo t_h('s3_settings.git_sync_note', [], 'Git sync ignores attachments while S3 storage is enabled.'); ?></p>
+            <?php if (poznoteSaasNoticesEnabled()): ?>
+            <div class="attachment-usage-notice">
+                <i class="lucide lucide-alert-triangle"></i>
+                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.'); ?>
+                    <a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
+            </div>
+            <?php endif; ?>
         </div>
 
         <?php if ($message): ?>

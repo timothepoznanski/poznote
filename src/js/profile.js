@@ -325,31 +325,52 @@
         modal.className = 'modal';
         modal.innerHTML =
             '<div class="modal-content">' +
-                '<h3>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
+                '<h3 style="display:flex;align-items:center;gap:8px;"><i class="lucide lucide-log-out"></i>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
                 '<p class="text-small-muted">' + tr('profile.logout.confirm', {}, 'Are you sure you want to log out?') + '</p>' +
+                '<p class="text-small-muted" id="clSignedInAs" style="display:none;"></p>' +
                 '<div class="modal-buttons">' +
                     '<button type="button" class="btn-cancel" id="clCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
-                    '<button type="button" class="btn-danger" id="clConfirmBtn">' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
+                    '<button type="button" class="btn-danger" id="clConfirmBtn"><i class="lucide lucide-log-out"></i> ' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
                 '</div>' +
             '</div>';
 
         document.body.appendChild(modal);
         modal.style.display = 'flex';
 
-        var close = function () { modal.remove(); };
+        function onKey(e) {
+            if (e.key === 'Escape') close();
+        }
+        function close() {
+            document.removeEventListener('keydown', onKey);
+            modal.remove();
+        }
         document.getElementById('clCancelBtn').addEventListener('click', close);
         modal.addEventListener('click', function (e) {
             if (e.target === modal) close();
         });
-        document.addEventListener('keydown', function onKey(e) {
-            if (e.key === 'Escape') {
-                document.removeEventListener('keydown', onKey);
-                close();
-            }
-        });
+        document.addEventListener('keydown', onKey);
+
+        // Remind which account is about to be signed out; purely informative,
+        // so a failed lookup simply leaves the line hidden.
+        fetch('/api/v1/users/me', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (data) {
+                if (!data || !data.username) return;
+                var el = document.getElementById('clSignedInAs');
+                if (!el) return;   // modal already closed
+                el.textContent = tr('profile.logout.signed_in_as', {}, 'Signed in as {{username}}')
+                    .replace('{{username}}', data.username);
+                el.style.display = '';
+            })
+            .catch(function () {});
 
         var confirmBtn = document.getElementById('clConfirmBtn');
         confirmBtn.addEventListener('click', function () {
+            // One-way action: freeze the buttons and show progress while the
+            // browser navigates to logout.php
+            confirmBtn.disabled = true;
+            document.getElementById('clCancelBtn').disabled = true;
+            confirmBtn.textContent = tr('profile.logout.in_progress', {}, 'Logging out...');
             window.location.href = logoutUrl;
         });
         confirmBtn.focus();

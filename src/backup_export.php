@@ -301,6 +301,10 @@ function createBackup() {
            (same red as .text-warning-bold used elsewhere on this page) */
         #s3-user-backup-section .s3-self-policy-value { color: #dc3545; font-weight: 600; }
         body.dark-mode #s3-user-backup-section .s3-self-policy-value { color: #f87171; }
+        /* Red sentence in the run confirmation modal (appended to body,
+           so the rule cannot be scoped to the section) */
+        .s3-self-overwrite-warning { color: #dc3545; font-weight: 600; }
+        body.dark-mode .s3-self-overwrite-warning { color: #f87171; }
         /* Successful upload gets a blue info box (same palette as .config-hint
            on the settings pages, which this page does not load) */
         #s3-user-backup-section .s3-self-status.is-success { padding: 12px; border-radius: 8px; background: #f0f7ff; color: #1a56db; }
@@ -336,10 +340,11 @@ function createBackup() {
                 deleteLabel: <?php echo json_encode(t('s3_backup.delete', [], 'Delete')); ?>,
                 confirmDelete: <?php echo json_encode(t('s3_backup.confirm_delete', [], 'Delete the backup {{filename}} from the bucket?')); ?>,
                 confirmRun: <?php echo json_encode(t('backup_export.sections.s3_backup.confirm_run', [], 'Back up your account to the S3 bucket now? The archive can take a while to upload.')); ?>,
+                confirmRunOverwrite: <?php echo json_encode(t('backup_export.sections.s3_backup.confirm_run_overwrite', [], 'Warning: the maximum number of backups is reached, so this backup will delete the oldest archive, {{filename}}.')); ?>,
                 confirmRunTitle: <?php echo json_encode(t('backup_export.sections.s3_backup.backup_now', [], 'Back up my account to S3')); ?>,
-                policyAuto: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto', [], 'The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user.')); ?>,
+                policyAuto: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto', [], 'The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user. Once that number is reached, each new backup deletes the oldest archive.')); ?>,
                 policyAutoKeepAll: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto_keep_all', [], 'The administrator has set up an automatic backup {{frequency}}; every archive is kept.')); ?>,
-                policyManual: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual', [], 'Automatic backups are disabled; the last {{retention}} archive(s) per user are kept.')); ?>,
+                policyManual: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual', [], 'Automatic backups are disabled; the last {{retention}} archive(s) per user are kept. Once that number is reached, each new backup deletes the oldest archive.')); ?>,
                 policyManualKeepAll: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual_keep_all', [], 'Automatic backups are disabled; every archive is kept.')); ?>,
                 freqDaily: <?php echo json_encode(t('s3_backup.frequency_daily_inline', [], 'every day')); ?>,
                 freqWeekly: <?php echo json_encode(t('s3_backup.frequency_weekly_inline', [], 'every week')); ?>,
@@ -420,6 +425,10 @@ function createBackup() {
             var backupList = [];
             var sortKey = null;
             var sortDir = 'asc';
+            // Retention configured by the admin (0 = keep everything), kept
+            // from the last self_status call so the run confirmation can
+            // warn when the next backup will prune the oldest archive.
+            var currentRetention = 0;
 
             function sortedBackups() {
                 if (!sortKey) return backupList.slice();
@@ -470,6 +479,7 @@ function createBackup() {
                             return;
                         }
                         renderPolicy(data);
+                        currentRetention = Number(data.retention || 0);
                         if (!data.configured || !data.backups.length) {
                             table.hidden = true;
                             listStatusEl.hidden = false;
@@ -548,11 +558,37 @@ function createBackup() {
             runBtn.addEventListener('click', function() {
                 if (runBtn.disabled) return;
 
+                // When the retention limit is already reached, this backup
+                // will prune the oldest archive: name it in the confirmation.
+                var overwriteText = '';
+                if (currentRetention > 0 && backupList.length >= currentRetention) {
+                    var oldest = backupList.reduce(function(a, b) {
+                        return Number(b.mtime || 0) < Number(a.mtime || 0) ? b : a;
+                    });
+                    overwriteText = i18n.confirmRunOverwrite.replace('{{filename}}', oldest.filename);
+                }
+
                 // Uploading a full archive is slow and costs bucket storage,
                 // so ask before starting (same pattern as the delete button)
-                var confirmed = window.modalAlert
-                    ? window.modalAlert.confirm(i18n.confirmRun, i18n.confirmRunTitle)
-                    : Promise.resolve(window.confirm(i18n.confirmRun));
+                var confirmed;
+                if (window.modalAlert) {
+                    var options = null;
+                    if (overwriteText) {
+                        // Plain text nodes only: the highlighted sentence is
+                        // styled, never parsed as HTML
+                        var messageNode = document.createDocumentFragment();
+                        messageNode.appendChild(document.createTextNode(i18n.confirmRun + '\n\n'));
+                        var warnSpan = document.createElement('span');
+                        warnSpan.className = 's3-self-overwrite-warning';
+                        warnSpan.textContent = overwriteText;
+                        messageNode.appendChild(warnSpan);
+                        options = { messageNode: messageNode };
+                    }
+                    confirmed = window.modalAlert.confirm(i18n.confirmRun, i18n.confirmRunTitle, options);
+                } else {
+                    var plain = overwriteText ? i18n.confirmRun + '\n\n' + overwriteText : i18n.confirmRun;
+                    confirmed = Promise.resolve(window.confirm(plain));
+                }
 
                 confirmed.then(function(ok) {
                     if (!ok) return;

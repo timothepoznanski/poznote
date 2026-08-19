@@ -598,3 +598,22 @@ html[data-theme='dark'] .status-deleted {
         padding: 6px 10px;
     }
 }
+
+/* Usage colouring against a quota (storage stats pages): the whole
+   "used / limit" pair turns orange from 50% of the quota and red from 80%. */
+.quota-level-warn,
+.quota-level-warn .quota-inline {
+    color: #e8830c;
+}
+.quota-level-danger,
+.quota-level-danger .quota-inline {
+    color: #dc3545;
+}
+html[data-theme='dark'] .quota-level-warn,
+body.dark-mode .quota-level-warn {
+    color: #fbbf24;
+}
+html[data-theme='dark'] .quota-level-danger,
+body.dark-mode .quota-level-danger {
+    color: #f87171;
+}

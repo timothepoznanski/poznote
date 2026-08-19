@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Bienvenido a Poznote",
-    "content": "<p>Poznote es una plataforma personal para tomar notas y documentar.</p>\n<br><br>\nDescubre <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todas las funciones</a> incluidas en Poznote.\n<br><br>\nHaz clic en el botón <code>+</code> para crear tu primera nota.\n<br><br>\nDentro de una nota, escribe <code>/</code> para abrir el menú de comandos.\n<br><br>\n¡Espero que disfrutes usando Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote es una plataforma personal para tomar notas y documentar.</p>\n<br>\nDescubre <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todas las funciones</a> incluidas en Poznote.\n<br><br>\nHaz clic en el botón <code>+</code> para crear tu primera nota.\n<br><br>\nDentro de una nota, escribe <code>/</code> para abrir el menú de comandos.\n<br><br>\n¡Espero que disfrutes usando Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
   },
   "markdown_syntax": {
     "menu_item": "Sintaxis Markdown",
@@ -340,6 +340,8 @@
       "upload_section_title": "Subir nuevo adjunto",
       "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
       "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
+      "note_taking_notice": "Tenga en cuenta que Poznote es una aplicación de toma de notas, no un servicio de almacenamiento de fotos o vídeos: los archivos multimedia grandes llenan muy rápido su espacio de almacenamiento.",
+      "note_taking_notice_link": "Ver mi almacenamiento",
       "upload_button": "Adjuntar",
       "current_attachments": "Adjuntos actuales",
       "loading_attachments": "Cargando adjuntos...",
@@ -444,6 +446,8 @@
       "smtp_config": "Configura el servidor SMTP usado para enviar correos como los recordatorios.",
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
+      "saas": "Elementos de visualización para instancias ofrecidas como servicio alojado (SaaS). Todos ocultos por defecto.",
+      "admin_contact": "Contactar por correo electrónico al administrador de esta instancia de Poznote.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
@@ -531,6 +535,8 @@
       "smtp_config": "SMTP / Correo",
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Asistente IA",
+      "saas": "Modo SaaS",
+      "admin_contact": "Contactar al administrador",
       "s3_storage": "Adjuntos S3",
       "s3_backup": "Copias de seguridad S3"
     },
@@ -1938,9 +1944,10 @@
         "description": "Sube un archivo de copia de seguridad de su cuenta al bucket S3 configurado en esta instancia y descarga los archivos ya almacenados allí.",
         "backup_now": "Respaldar mi cuenta en S3",
         "confirm_run": "Respaldar tu cuenta en el bucket S3 ahora? La subida del archivo puede tardar un rato.",
-        "policy_auto": "El administrador ha configurado una copia de seguridad automática {{frequency}}, conservando los últimos {{retention}} archivos por usuario.",
+        "confirm_run_overwrite": "Atención: se ha alcanzado el número máximo de copias de seguridad, por lo que esta copia eliminará el archivo más antiguo, {{filename}}.",
+        "policy_auto": "El administrador ha configurado una copia de seguridad automática {{frequency}}, conservando los últimos {{retention}} archivos por usuario. Una vez alcanzado ese número, cada nueva copia de seguridad elimina el archivo más antiguo.",
         "policy_auto_keep_all": "El administrador ha configurado una copia de seguridad automática {{frequency}}; se conservan todos los archivos.",
-        "policy_manual": "Las copias de seguridad automáticas están desactivadas; se conservan los últimos {{retention}} archivos por usuario.",
+        "policy_manual": "Las copias de seguridad automáticas están desactivadas; se conservan los últimos {{retention}} archivos por usuario. Una vez alcanzado ese número, cada nueva copia de seguridad elimina el archivo más antiguo.",
         "policy_manual_keep_all": "Las copias de seguridad automáticas están desactivadas; se conservan todos los archivos.",
         "running": "Subiendo la copia al bucket...",
         "done": "Copia subida ({{size}}).",
@@ -3125,15 +3132,19 @@
     "storage_stats": {
       "title": "Estadísticas de almacenamiento",
       "description": "Número de notas y espacio en disco utilizado por cada cuenta.",
+      "quota_click_tip": "Consejo: haga clic en un valor de cuota en la tabla para cambiarlo directamente para esa cuenta.",
       "user_description": "Número de notas y espacio en disco utilizado por tu cuenta.",
+      "user_s3_notice": "Los archivos adjuntos se almacenan en un almacenamiento S3 en lugar de localmente, según la configuración del administrador.",
+      "db_help": "La base de datos contiene sus ajustes y el texto sin formato de sus notas, usado para la búsqueda rápida.",
+      "files_help": "Los archivos son los contenidos de sus notas, en formato HTML o Markdown.",
       "table_id": "ID",
       "table_account": "Cuenta",
       "table_notes": "Notas",
       "table_trash": "Papelera",
-      "table_db": "Base de datos (MB)",
-      "table_entries": "Archivos (MB)",
+      "table_db": "Base de datos local (MB)",
+      "table_entries": "Archivos locales (MB)",
       "table_attachments": "Adjuntos (MB)",
-      "table_total": "Total (MB)",
+      "table_total": "Total local (MB)",
       "table_total_row": "Total",
       "table_total_row_hint": "De todas las cuentas, no solo de esta página",
       "quota_modal_description": "Deje un campo vacío para usar el ajuste global. 0 significa ilimitado.\nEstos valores reemplazan las cuotas globales de usuario.",
@@ -3294,7 +3305,9 @@
       "email_taken": "Este email ya está en uso"
     },
     "logout": {
-      "confirm": "¿Seguro que quieres cerrar sesión?"
+      "confirm": "¿Seguro que quieres cerrar sesión?",
+      "signed_in_as": "Sesión iniciada como {{username}}",
+      "in_progress": "Cerrando sesión..."
     }
   },
   "password": {
@@ -3883,5 +3896,27 @@
   "tasklist_embed": {
     "unavailable": "Esta lista de tareas ya no está disponible.",
     "empty": "Aún no hay tareas en esta lista."
+  },
+  "saas": {
+    "description": "Elementos de visualización útiles cuando esta instancia se ofrece como servicio alojado (SaaS). Todo está oculto por defecto.",
+    "storage_notices_label": "Mostrar los avisos de almacenamiento",
+    "storage_notices_description": "Recuerda a los usuarios que Poznote es una aplicación de toma de notas, no un servicio de almacenamiento de fotos o vídeos, en las páginas de adjuntos, la página de estadísticas de almacenamiento del usuario y los ajustes de adjuntos S3.",
+    "admin_contact_label": "Mostrar una tarjeta de contacto del administrador",
+    "admin_contact_description": "Añade una tarjeta en la sección Acerca de los ajustes, para todos los usuarios, con la dirección de correo del administrador.",
+    "admin_contact_email_label": "Dirección de correo a mostrar",
+    "admin_contact_email_description": "Déjelo vacío para usar la dirección de correo de la primera cuenta de administrador.",
+    "admin_contact_no_email": "Ninguna cuenta de administrador tiene todavía una dirección de correo, así que la tarjeta permanece oculta.",
+    "admin_contact_modal_generic_title": "Pregunta general",
+    "admin_contact_modal_generic": "Publíquela en GitHub para que todos se beneficien de la respuesta:",
+    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_account_title": "Sobre su cuenta",
+    "admin_contact_modal_account": "Escriba al administrador a esta dirección:",
+    "admin_contact_copy": "Copiar",
+    "admin_contact_copied": "¡Copiado!",
+    "messages": {
+      "saved": "Configuración guardada correctamente.",
+      "save_error": "Error al guardar la configuración.",
+      "invalid_email": "La dirección de correo de contacto no es válida."
+    }
   }
 }

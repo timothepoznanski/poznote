@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Welcome to Poznote",
-    "content": "<p>Poznote is a personal note-taking and documentation platform.</p>\n<br><br>\nDiscover <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">all the features</a> included in Poznote.\n<br><br>\nClick the <code>+</code> button to create your first note.\n<br><br>\nInside a note, type <code>/</code> to open the commands menu.\n<br><br>\nI hope you will enjoy using Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote is a personal note-taking and documentation platform.</p>\n<br>\nDiscover <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">all the features</a> included in Poznote.\n<br><br>\nClick the <code>+</code> button to create your first note.\n<br><br>\nInside a note, type <code>/</code> to open the commands menu.\n<br><br>\nI hope you will enjoy using Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
   },
   "markdown_syntax": {
     "menu_item": "Markdown syntax",
@@ -170,6 +170,8 @@
       "smtp_config": "Configure the SMTP server used to send emails such as reminders.",
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
+      "saas": "Display elements meant for instances offered as a hosted service (SaaS). All hidden by default.",
+      "admin_contact": "Contact the administrator of this Poznote instance by email.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
@@ -238,6 +240,8 @@
       "smtp_config": "SMTP / Email",
       "webhooks": "Admin Webhooks",
       "ai_assistant": "AI Assistant",
+      "saas": "SaaS mode",
+      "admin_contact": "Contact admin",
       "s3_storage": "S3 Attachments",
       "s3_backup": "S3 Backups"
     },
@@ -504,6 +508,8 @@
       "upload_section_title": "Choose a new attachment",
       "drag_drop_info": "You can drag and drop your file below:",
       "all_types_accepted": "All file types accepted (max 200 MB)",
+      "note_taking_notice": "Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.",
+      "note_taking_notice_link": "View my storage",
       "upload_button": "Attach",
       "current_attachments": "Current attachments",
       "loading_attachments": "Loading attachments...",
@@ -1591,9 +1597,10 @@
         "description": "Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.",
         "backup_now": "Back up my account to S3",
         "confirm_run": "Back up your account to the S3 bucket now? The archive can take a while to upload.",
-        "policy_auto": "The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user.",
+        "confirm_run_overwrite": "Warning: the maximum number of backups is reached, so this backup will delete the oldest archive, {{filename}}.",
+        "policy_auto": "The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user. Once that number is reached, each new backup deletes the oldest archive.",
         "policy_auto_keep_all": "The administrator has set up an automatic backup {{frequency}}; every archive is kept.",
-        "policy_manual": "Automatic backups are disabled; the last {{retention}} archive(s) per user are kept.",
+        "policy_manual": "Automatic backups are disabled; the last {{retention}} archive(s) per user are kept. Once that number is reached, each new backup deletes the oldest archive.",
         "policy_manual_keep_all": "Automatic backups are disabled; every archive is kept.",
         "running": "Uploading the backup to the bucket...",
         "done": "Backup uploaded ({{size}}).",
@@ -2695,15 +2702,19 @@
     "storage_stats": {
       "title": "Storage statistics",
       "description": "Number of notes and disk space used by each account.",
+      "quota_click_tip": "Tip: click a quota value in the table to change it for that account.",
       "user_description": "Number of notes and disk space used by your account.",
+      "user_s3_notice": "Attachments are stored in S3 storage rather than locally, as configured by the administrator.",
+      "db_help": "The database stores your settings and the raw text of your notes, used for fast search.",
+      "files_help": "The files are the contents of your notes, in HTML or Markdown format.",
       "table_id": "ID",
       "table_account": "Account",
       "table_notes": "Notes",
       "table_trash": "Trash",
-      "table_db": "Database (MB)",
-      "table_entries": "Files (MB)",
+      "table_db": "Database local (MB)",
+      "table_entries": "Files local (MB)",
       "table_attachments": "Attachments (MB)",
-      "table_total": "Total (MB)",
+      "table_total": "Total local (MB)",
       "table_total_row": "Total",
       "table_total_row_hint": "Across all accounts, not just this page",
       "quota_modal_description": "Leave a field empty to use the global setting. 0 means unlimited.\nThese values override the global user quotas.",
@@ -2973,7 +2984,9 @@
       "email_taken": "This email is already in use"
     },
     "logout": {
-      "confirm": "Are you sure you want to log out?"
+      "confirm": "Are you sure you want to log out?",
+      "signed_in_as": "Signed in as {{username}}",
+      "in_progress": "Logging out..."
     }
   },
   "password": {
@@ -3597,5 +3610,27 @@
     },
     "showing_limit_deleted": "Only the {{count}} most recently deleted notes are shown",
     "showing_limit_created": "Only the {{count}} most recently created notes are shown"
+  },
+  "saas": {
+    "description": "Display elements that make sense when this instance is offered as a hosted service (SaaS). Everything here is hidden by default.",
+    "storage_notices_label": "Show storage usage notices",
+    "storage_notices_description": "Reminds users that Poznote is a note-taking app, not a photo or video storage service, on the attachment pages, the user storage statistics page and the S3 attachments settings.",
+    "admin_contact_label": "Show an admin contact card",
+    "admin_contact_description": "Adds a card in the About section of the settings, for every user, with the administrator's email address.",
+    "admin_contact_email_label": "Email address to display",
+    "admin_contact_email_description": "Leave empty to use the email address of the first administrator account.",
+    "admin_contact_no_email": "No administrator account has an email address yet, so the card stays hidden.",
+    "admin_contact_modal_generic_title": "General question",
+    "admin_contact_modal_generic": "Post it on GitHub so everyone can benefit from the answer:",
+    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_account_title": "About your account",
+    "admin_contact_modal_account": "Write to the administrator at this address:",
+    "admin_contact_copy": "Copy",
+    "admin_contact_copied": "Copied!",
+    "messages": {
+      "saved": "Configuration saved successfully.",
+      "save_error": "Failed to save configuration.",
+      "invalid_email": "The contact email address is not valid."
+    }
   }
 }

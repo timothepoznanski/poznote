@@ -263,7 +263,8 @@ body.dark-mode {
     border-radius: 8px;
     background: rgba(20, 20, 20, 0.94);
     color: #ffffff;
-    font-size: 14px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95rem;
     font-weight: 400;
     letter-spacing: normal;
     line-height: 1.45;

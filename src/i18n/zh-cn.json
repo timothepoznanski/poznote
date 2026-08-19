@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "欢迎使用 Poznote",
-    "content": "<p>Poznote 是一个用于个人笔记和文档管理的平台。</p>\n<br><br>\n了解 Poznote 提供的<a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">所有功能</a>。\n<br><br>\n点击 <code>+</code> 按钮创建第一篇笔记。\n<br><br>\n在笔记中输入 <code>/</code> 以打开命令菜单。\n<br><br>\n希望您喜欢使用 Poznote！✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote 是一个用于个人笔记和文档管理的平台。</p>\n<br>\n了解 Poznote 提供的<a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">所有功能</a>。\n<br><br>\n点击 <code>+</code> 按钮创建第一篇笔记。\n<br><br>\n在笔记中输入 <code>/</code> 以打开命令菜单。\n<br><br>\n希望您喜欢使用 Poznote！✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
   },
   "markdown_syntax": {
     "menu_item": "Markdown 语法",
@@ -340,6 +340,8 @@
       "upload_section_title": "上传新附件",
       "drag_drop_info": "您可以将文件拖放到下方:",
       "all_types_accepted": "接受所有文件类型 (最大 200MB)",
+      "note_taking_notice": "请注意，Poznote 是一款笔记应用，而非照片或视频存储服务：大体积媒体文件会很快占满您的存储空间。",
+      "note_taking_notice_link": "查看我的存储空间",
       "upload_button": "添加",
       "current_attachments": "当前附件",
       "loading_attachments": "正在加载附件...",
@@ -445,6 +447,8 @@
       "smtp_config": "配置用于发送提醒等邮件的 SMTP 服务器。",
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
+      "saas": "面向作为托管服务（SaaS）提供的实例的显示元素。默认全部隐藏。",
+      "admin_contact": "通过电子邮件联系此 Poznote 实例的管理员。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
@@ -532,6 +536,8 @@
       "smtp_config": "SMTP / 邮件",
       "webhooks": "管理员 Webhook",
       "ai_assistant": "AI 助手",
+      "saas": "SaaS 模式",
+      "admin_contact": "联系管理员",
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份"
     },
@@ -1939,9 +1945,10 @@
         "description": "将您账户的备份归档上传到此实例配置的 S3 存储桶,并下载已存储在那里的归档。",
         "backup_now": "将我的账户备份到 S3",
         "confirm_run": "现在将您的账户备份到 S3 存储桶？归档上传可能需要一些时间。",
-        "policy_auto": "管理员已设置{{frequency}}自动备份，每位用户保留最近 {{retention}} 个归档。",
+        "confirm_run_overwrite": "注意：已达到备份数量上限，本次备份将删除最旧的归档 {{filename}}。",
+        "policy_auto": "管理员已设置{{frequency}}自动备份，每位用户保留最近 {{retention}} 个归档。达到该数量后，每次新备份都会删除最旧的归档。",
         "policy_auto_keep_all": "管理员已设置{{frequency}}自动备份；所有归档都会保留。",
-        "policy_manual": "自动备份已禁用；每位用户保留最近 {{retention}} 个归档。",
+        "policy_manual": "自动备份已禁用；每位用户保留最近 {{retention}} 个归档。达到该数量后，每次新备份都会删除最旧的归档。",
         "policy_manual_keep_all": "自动备份已禁用；所有归档都会保留。",
         "running": "正在将备份上传到存储桶...",
         "done": "备份已上传({{size}})。",
@@ -3249,15 +3256,19 @@
     "storage_stats": {
       "title": "存储统计",
       "description": "每个账户的笔记数量和已用磁盘空间。",
+      "quota_click_tip": "提示：点击表格中的配额值即可直接为该账户修改。",
       "user_description": "您账户的笔记数量和已用磁盘空间。",
+      "user_s3_notice": "根据管理员的配置，附件存储在 S3 存储中而不是本地。",
+      "db_help": "数据库存储您的设置以及用于快速搜索的笔记原始文本。",
+      "files_help": "文件是您的笔记内容，采用 HTML 或 Markdown 格式。",
       "table_id": "ID",
       "table_account": "账户",
       "table_notes": "笔记",
       "table_trash": "回收站",
-      "table_db": "数据库 (MB)",
-      "table_entries": "文件 (MB)",
+      "table_db": "本地数据库 (MB)",
+      "table_entries": "本地文件 (MB)",
       "table_attachments": "附件 (MB)",
-      "table_total": "合计 (MB)",
+      "table_total": "本地合计 (MB)",
       "table_total_row": "合计",
       "table_total_row_hint": "统计所有账户，而非仅当前页",
       "quota_modal_description": "留空表示使用全局设置。0 表示不限制。\n这些值会覆盖全局用户配额。",
@@ -3415,7 +3426,9 @@
       "email_taken": "该电子邮件已被使用"
     },
     "logout": {
-      "confirm": "确定要退出登录吗？"
+      "confirm": "确定要退出登录吗？",
+      "signed_in_as": "当前登录账户：{{username}}",
+      "in_progress": "正在退出登录..."
     }
   },
   "password": {
@@ -4004,5 +4017,27 @@
   "tasklist_embed": {
     "unavailable": "此任务列表已不可用。",
     "empty": "此列表中还没有任务。"
+  },
+  "saas": {
+    "description": "当此实例作为托管服务（SaaS）提供时有用的显示元素。默认全部隐藏。",
+    "storage_notices_label": "显示存储空间提醒",
+    "storage_notices_description": "在附件页面、用户存储统计页面和 S3 附件设置中提醒用户：Poznote 是一款笔记应用，而非照片或视频存储服务。",
+    "admin_contact_label": "显示管理员联系卡片",
+    "admin_contact_description": "在设置的关于版块中为所有用户添加一张显示管理员电子邮件地址的卡片。",
+    "admin_contact_email_label": "要显示的电子邮件地址",
+    "admin_contact_email_description": "留空则使用第一个管理员账户的电子邮件地址。",
+    "admin_contact_no_email": "尚无管理员账户设置电子邮件地址，卡片将保持隐藏。",
+    "admin_contact_modal_generic_title": "一般问题",
+    "admin_contact_modal_generic": "请在 GitHub 上提问，让所有人都能从回答中受益：",
+    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_account_title": "关于您的账户",
+    "admin_contact_modal_account": "请写信给管理员：",
+    "admin_contact_copy": "复制",
+    "admin_contact_copied": "已复制！",
+    "messages": {
+      "saved": "配置保存成功。",
+      "save_error": "保存配置失败。",
+      "invalid_email": "联系电子邮件地址无效。"
+    }
   }
 }
