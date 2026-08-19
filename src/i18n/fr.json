@@ -458,7 +458,7 @@
       "webhooks": "Envoyez les événements de l'instance vers des services externes via des webhooks.",
       "ai_assistant": "Configurez l'assistant IA utilisé pour discuter avec vos notes.",
       "saas": "Éléments d'affichage destinés aux instances proposées en service hébergé (SaaS). Tous masqués par défaut.",
-      "admin_contact": "Contacter par e-mail l'administrateur de cette instance Poznote.",
+      "admin_contact": "Où poser vos questions : l'espace communautaire, ou l'administrateur pour tout ce qui concerne votre compte.",
       "git_sync_enabled": "Activez ou désactivez la synchronisation Git sur cette instance.",
       "import_limits": "Définissez le nombre maximal de fichiers autorisés par import.",
       "user_quotas": "Limitez le nombre de notes et le stockage disponibles par utilisateur.",
@@ -547,7 +547,7 @@
       "webhooks": "Webhooks admin",
       "ai_assistant": "Assistant IA",
       "saas": "Mode SaaS",
-      "admin_contact": "Contacter l'administrateur",
+      "admin_contact": "Aide",
       "s3_storage": "Pièces jointes S3",
       "s3_backup": "Sauvegardes S3"
     },
@@ -4086,24 +4086,25 @@
   },
   "saas": {
     "description": "Éléments d'affichage utiles lorsque cette instance est proposée en service hébergé (SaaS). Tout est masqué par défaut.",
+    "section_storage_notices": "Avertissements de stockage",
     "storage_notices_label": "Afficher les avertissements de stockage",
     "storage_notices_description": "Rappelle aux utilisateurs que Poznote est une application de prise de notes, pas un service de stockage de photos ou de vidéos, sur les pages de pièces jointes, la page de statistiques de stockage utilisateur et les réglages S3 des pièces jointes.",
-    "admin_contact_label": "Afficher une carte de contact administrateur",
-    "admin_contact_description": "Ajoute une carte dans la section À propos des réglages, pour tous les utilisateurs, avec l'adresse e-mail de l'administrateur.",
+    "admin_contact_label": "Afficher une carte Aide",
+    "admin_contact_description": "Ajoute une carte Aide dans la section À propos des réglages, pour tous les utilisateurs, proposant l'espace communautaire et l'adresse e-mail de l'administrateur configurés ci-dessous. La carte n'apparaît que si au moins l'un des deux est renseigné.",
     "admin_contact_email_label": "Adresse e-mail à afficher",
-    "admin_contact_email_description": "Laissez vide pour utiliser l'adresse e-mail du premier compte administrateur.",
-    "admin_contact_no_email": "Aucun compte administrateur n'a d'adresse e-mail pour le moment, la carte reste donc masquée.",
     "admin_contact_modal_generic_title": "Question générique",
-    "admin_contact_modal_generic": "Posez-la sur GitHub pour que la réponse profite à tout le monde :",
-    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_generic": "Posez-la dans l'espace communautaire pour que la réponse profite à tout le monde :",
+    "admin_contact_modal_link_label": "Espace communautaire",
     "admin_contact_modal_account_title": "À propos de votre compte",
     "admin_contact_modal_account": "Écrivez à l'administrateur à cette adresse :",
     "admin_contact_copy": "Copier",
     "admin_contact_copied": "Copié !",
+    "community_url_label": "URL à afficher",
     "messages": {
       "saved": "Configuration enregistrée avec succès.",
       "save_error": "Échec de l'enregistrement de la configuration.",
-      "invalid_email": "L'adresse e-mail de contact n'est pas valide."
+      "invalid_email": "L'adresse e-mail de contact n'est pas valide.",
+      "invalid_url": "L'URL communautaire n'est pas valide."
     }
   }
 }

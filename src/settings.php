@@ -1188,28 +1188,35 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- Admin contact (SaaS mode): shown to every user when enabled
-                 and an administrator account carries an email address -->
-            <?php $saasAdminContactEmail = poznoteSaasAdminContactEnabled() ? poznoteSaasAdminContactEmail() : ''; ?>
-            <?php if ($saasAdminContactEmail !== ''): ?>
+            <!-- Help card (SaaS mode): shown to every user when enabled and
+                 at least one channel (community URL, contact email) is
+                 configured; each block only appears when its value is set. -->
+            <?php
+            $saasHelpEnabled        = poznoteSaasAdminContactEnabled();
+            $saasAdminContactEmail  = $saasHelpEnabled ? poznoteSaasAdminContactEmail() : '';
+            $saasCommunityUrl       = $saasHelpEnabled ? poznoteSaasCommunityUrl() : '';
+            ?>
+            <?php if ($saasHelpEnabled && ($saasAdminContactEmail !== '' || $saasCommunityUrl !== '')): ?>
             <div class="home-card" id="admin-contact-card" role="button" tabindex="0" style="cursor:pointer"
                  data-email="<?php echo htmlspecialchars($saasAdminContactEmail, ENT_QUOTES); ?>"
-                 data-modal-title="<?php echo t_h('settings.cards.admin_contact', [], 'Contact admin'); ?>"
+                 data-modal-title="<?php echo t_h('settings.cards.admin_contact', [], 'Help'); ?>"
                  data-generic-title="<?php echo t_h('saas.admin_contact_modal_generic_title', [], 'General question'); ?>"
-                 data-generic-text="<?php echo t_h('saas.admin_contact_modal_generic', [], 'Post it on GitHub so everyone can benefit from the answer:'); ?>"
-                 data-link-url="https://github.com/timothepoznanski/poznote/discussions/categories/questions-about-poznote-cloud"
-                 data-link-label="<?php echo t_h('saas.admin_contact_modal_link_label', [], 'Questions about Poznote Cloud'); ?>"
+                 data-generic-text="<?php echo t_h('saas.admin_contact_modal_generic', [], 'Post it in the community space so everyone can benefit from the answer:'); ?>"
+                 data-link-url="<?php echo htmlspecialchars($saasCommunityUrl, ENT_QUOTES); ?>"
+                 data-link-label="<?php echo t_h('saas.admin_contact_modal_link_label', [], 'Community forum'); ?>"
                  data-account-title="<?php echo t_h('saas.admin_contact_modal_account_title', [], 'About your account'); ?>"
                  data-account-text="<?php echo t_h('saas.admin_contact_modal_account', [], 'Write to the administrator at this address:'); ?>"
                  data-copy-label="<?php echo t_h('saas.admin_contact_copy', [], 'Copy'); ?>"
                  data-copied-label="<?php echo t_h('saas.admin_contact_copied', [], 'Copied!'); ?>">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.admin_contact', [], 'Contact the administrator of this Poznote instance by email.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.admin_contact', [], 'Where to ask your questions: the community space, or the administrator for anything about your account.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
-                    <i class="lucide lucide-mail"></i>
+                    <i class="lucide lucide-help-circle"></i>
                 </div>
                 <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.admin_contact', [], 'Contact admin'); ?></span>
+                    <span class="home-card-title"><?php echo t_h('settings.cards.admin_contact', [], 'Help'); ?></span>
+                    <?php if ($saasAdminContactEmail !== ''): ?>
                     <span class="setting-status enabled"><?php echo htmlspecialchars($saasAdminContactEmail); ?></span>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>

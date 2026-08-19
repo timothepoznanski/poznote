@@ -446,7 +446,7 @@
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
       "saas": "Anzeigeelemente für Instanzen, die als gehosteter Dienst (SaaS) angeboten werden. Standardmäßig alle ausgeblendet.",
-      "admin_contact": "Den Administrator dieser Poznote-Instanz per E-Mail kontaktieren.",
+      "admin_contact": "Wo Sie Ihre Fragen stellen: im Community-Bereich, oder beim Administrator für alles rund um Ihr Konto.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
@@ -535,7 +535,7 @@
       "webhooks": "Admin-Webhooks",
       "ai_assistant": "KI-Assistent",
       "saas": "SaaS-Modus",
-      "admin_contact": "Admin kontaktieren",
+      "admin_contact": "Hilfe",
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen"
     },
@@ -3899,24 +3899,25 @@
   },
   "saas": {
     "description": "Anzeigeelemente, die sinnvoll sind, wenn diese Instanz als gehosteter Dienst (SaaS) angeboten wird. Standardmäßig ist alles ausgeblendet.",
+    "section_storage_notices": "Speicherhinweise",
     "storage_notices_label": "Speicherhinweise anzeigen",
     "storage_notices_description": "Erinnert die Benutzer auf den Anhangseiten, der Speicherstatistik-Seite und den S3-Anhangseinstellungen daran, dass Poznote eine Notiz-App ist und kein Speicherdienst für Fotos oder Videos.",
-    "admin_contact_label": "Eine Admin-Kontaktkarte anzeigen",
-    "admin_contact_description": "Fügt im Bereich Über der Einstellungen für alle Benutzer eine Karte mit der E-Mail-Adresse des Administrators hinzu.",
+    "admin_contact_label": "Eine Hilfe-Karte anzeigen",
+    "admin_contact_description": "Fügt im Bereich Über der Einstellungen für alle Benutzer eine Hilfe-Karte hinzu, die den unten konfigurierten Community-Bereich und die Administrator-E-Mail anbietet. Die Karte erscheint nur, wenn mindestens eines davon gesetzt ist.",
     "admin_contact_email_label": "Anzuzeigende E-Mail-Adresse",
-    "admin_contact_email_description": "Leer lassen, um die E-Mail-Adresse des ersten Administratorkontos zu verwenden.",
-    "admin_contact_no_email": "Noch kein Administratorkonto hat eine E-Mail-Adresse, die Karte bleibt daher ausgeblendet.",
     "admin_contact_modal_generic_title": "Allgemeine Frage",
-    "admin_contact_modal_generic": "Stellen Sie sie auf GitHub, damit alle von der Antwort profitieren:",
-    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_generic": "Stellen Sie sie im Community-Bereich, damit alle von der Antwort profitieren:",
+    "admin_contact_modal_link_label": "Community-Forum",
     "admin_contact_modal_account_title": "Zu Ihrem Konto",
     "admin_contact_modal_account": "Schreiben Sie dem Administrator an diese Adresse:",
     "admin_contact_copy": "Kopieren",
     "admin_contact_copied": "Kopiert!",
+    "community_url_label": "Anzuzeigende URL",
     "messages": {
       "saved": "Konfiguration erfolgreich gespeichert.",
       "save_error": "Konfiguration konnte nicht gespeichert werden.",
-      "invalid_email": "Die Kontakt-E-Mail-Adresse ist ungültig."
+      "invalid_email": "Die Kontakt-E-Mail-Adresse ist ungültig.",
+      "invalid_url": "Die Community-URL ist ungültig."
     }
   }
 }

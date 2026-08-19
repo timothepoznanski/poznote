@@ -447,7 +447,7 @@
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
       "saas": "Elementos de visualización para instancias ofrecidas como servicio alojado (SaaS). Todos ocultos por defecto.",
-      "admin_contact": "Contactar por correo electrónico al administrador de esta instancia de Poznote.",
+      "admin_contact": "Dónde hacer sus preguntas: el espacio comunitario, o el administrador para todo lo relativo a su cuenta.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
@@ -536,7 +536,7 @@
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Asistente IA",
       "saas": "Modo SaaS",
-      "admin_contact": "Contactar al administrador",
+      "admin_contact": "Ayuda",
       "s3_storage": "Adjuntos S3",
       "s3_backup": "Copias de seguridad S3"
     },
@@ -3899,24 +3899,25 @@
   },
   "saas": {
     "description": "Elementos de visualización útiles cuando esta instancia se ofrece como servicio alojado (SaaS). Todo está oculto por defecto.",
+    "section_storage_notices": "Avisos de almacenamiento",
     "storage_notices_label": "Mostrar los avisos de almacenamiento",
     "storage_notices_description": "Recuerda a los usuarios que Poznote es una aplicación de toma de notas, no un servicio de almacenamiento de fotos o vídeos, en las páginas de adjuntos, la página de estadísticas de almacenamiento del usuario y los ajustes de adjuntos S3.",
-    "admin_contact_label": "Mostrar una tarjeta de contacto del administrador",
-    "admin_contact_description": "Añade una tarjeta en la sección Acerca de los ajustes, para todos los usuarios, con la dirección de correo del administrador.",
+    "admin_contact_label": "Mostrar una tarjeta de Ayuda",
+    "admin_contact_description": "Añade una tarjeta de Ayuda en la sección Acerca de los ajustes, para todos los usuarios, que ofrece el espacio comunitario y el correo del administrador configurados abajo. La tarjeta solo aparece cuando al menos uno de ellos está definido.",
     "admin_contact_email_label": "Dirección de correo a mostrar",
-    "admin_contact_email_description": "Déjelo vacío para usar la dirección de correo de la primera cuenta de administrador.",
-    "admin_contact_no_email": "Ninguna cuenta de administrador tiene todavía una dirección de correo, así que la tarjeta permanece oculta.",
     "admin_contact_modal_generic_title": "Pregunta general",
-    "admin_contact_modal_generic": "Publíquela en GitHub para que todos se beneficien de la respuesta:",
-    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_generic": "Publíquela en el espacio comunitario para que todos se beneficien de la respuesta:",
+    "admin_contact_modal_link_label": "Foro de la comunidad",
     "admin_contact_modal_account_title": "Sobre su cuenta",
     "admin_contact_modal_account": "Escriba al administrador a esta dirección:",
     "admin_contact_copy": "Copiar",
     "admin_contact_copied": "¡Copiado!",
+    "community_url_label": "URL a mostrar",
     "messages": {
       "saved": "Configuración guardada correctamente.",
       "save_error": "Error al guardar la configuración.",
-      "invalid_email": "La dirección de correo de contacto no es válida."
+      "invalid_email": "La dirección de correo de contacto no es válida.",
+      "invalid_url": "La URL de la comunidad no es válida."
     }
   }
 }

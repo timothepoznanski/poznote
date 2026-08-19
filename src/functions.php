@@ -2285,22 +2285,24 @@ function poznoteSaasAdminContactEnabled(): bool {
 }
 
 /**
- * Email address shown on the admin contact card: the address configured on
- * the SaaS settings page when set, otherwise the first administrator account
- * (lowest id) with a non-empty email. Empty string when neither exists.
+ * URL where users should post general questions, as configured on the SaaS
+ * settings page. Empty string when not configured: the Help card then skips
+ * the community block (and disappears entirely when the contact email is
+ * empty too).
+ */
+function poznoteSaasCommunityUrl(): string {
+    require_once __DIR__ . '/users/db_master.php';
+    return trim((string)getGlobalSetting('saas_community_url', ''));
+}
+
+/**
+ * Email address shown on the Help card, as configured on the SaaS settings
+ * page. Empty string when not configured: the card then only offers the
+ * community space link.
  */
 function poznoteSaasAdminContactEmail(): string {
     require_once __DIR__ . '/users/db_master.php';
-    $configured = trim((string)getGlobalSetting('saas_admin_contact_email', ''));
-    if ($configured !== '') {
-        return $configured;
-    }
-    foreach (listAllUserProfiles() as $profile) {
-        if (!empty($profile['is_admin']) && trim((string)($profile['email'] ?? '')) !== '') {
-            return trim((string)$profile['email']);
-        }
-    }
-    return '';
+    return trim((string)getGlobalSetting('saas_admin_contact_email', ''));
 }
 
 /**

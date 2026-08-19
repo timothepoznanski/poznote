@@ -171,7 +171,7 @@
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
       "saas": "Display elements meant for instances offered as a hosted service (SaaS). All hidden by default.",
-      "admin_contact": "Contact the administrator of this Poznote instance by email.",
+      "admin_contact": "Where to ask your questions: the community space, or the administrator for anything about your account.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
@@ -241,7 +241,7 @@
       "webhooks": "Admin Webhooks",
       "ai_assistant": "AI Assistant",
       "saas": "SaaS mode",
-      "admin_contact": "Contact admin",
+      "admin_contact": "Help",
       "s3_storage": "S3 Attachments",
       "s3_backup": "S3 Backups"
     },
@@ -3613,24 +3613,25 @@
   },
   "saas": {
     "description": "Display elements that make sense when this instance is offered as a hosted service (SaaS). Everything here is hidden by default.",
+    "section_storage_notices": "Storage notices",
     "storage_notices_label": "Show storage usage notices",
     "storage_notices_description": "Reminds users that Poznote is a note-taking app, not a photo or video storage service, on the attachment pages, the user storage statistics page and the S3 attachments settings.",
-    "admin_contact_label": "Show an admin contact card",
-    "admin_contact_description": "Adds a card in the About section of the settings, for every user, with the administrator's email address.",
+    "admin_contact_label": "Show a Help card",
+    "admin_contact_description": "Adds a Help card in the About section of the settings, for every user, offering the community space and the administrator email configured below. The card only appears when at least one of them is set.",
     "admin_contact_email_label": "Email address to display",
-    "admin_contact_email_description": "Leave empty to use the email address of the first administrator account.",
-    "admin_contact_no_email": "No administrator account has an email address yet, so the card stays hidden.",
     "admin_contact_modal_generic_title": "General question",
-    "admin_contact_modal_generic": "Post it on GitHub so everyone can benefit from the answer:",
-    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_generic": "Post it in the community space so everyone can benefit from the answer:",
+    "admin_contact_modal_link_label": "Community forum",
     "admin_contact_modal_account_title": "About your account",
     "admin_contact_modal_account": "Write to the administrator at this address:",
     "admin_contact_copy": "Copy",
     "admin_contact_copied": "Copied!",
+    "community_url_label": "URL to display",
     "messages": {
       "saved": "Configuration saved successfully.",
       "save_error": "Failed to save configuration.",
-      "invalid_email": "The contact email address is not valid."
+      "invalid_email": "The contact email address is not valid.",
+      "invalid_url": "The community URL is not valid."
     }
   }
 }

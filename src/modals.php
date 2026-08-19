@@ -1667,7 +1667,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:activity-log-card" checked><span><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:check-updates-card" checked><span><?php echo t_h('settings.cards.version', [], 'Version'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:admin-contact-card" checked><span><?php echo t_h('settings.cards.admin_contact', [], 'Contact admin'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:admin-contact-card" checked><span><?php echo t_h('settings.cards.admin_contact', [], 'Help'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:support-card" checked><span><?php echo t_h('settings.cards.support', [], 'Support Poznote'); ?></span></label>

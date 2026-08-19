@@ -445,7 +445,7 @@
       "webhooks": "Envie eventos da instância para serviços externos via webhooks.",
       "ai_assistant": "Configure o assistente de IA usado para conversar com suas notas.",
       "saas": "Elementos de exibição para instâncias oferecidas como serviço hospedado (SaaS). Todos ocultos por padrão.",
-      "admin_contact": "Contatar por e-mail o administrador desta instância do Poznote.",
+      "admin_contact": "Onde fazer suas perguntas: no espaço da comunidade, ou ao administrador para tudo o que diz respeito à sua conta.",
       "git_sync_enabled": "Ative ou desative a sincronização Git nesta instância.",
       "import_limits": "Defina o número máximo de arquivos permitidos por importação.",
       "user_quotas": "Limite o número de notas e o armazenamento disponível por usuário.",
@@ -534,7 +534,7 @@
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Assistente IA",
       "saas": "Modo SaaS",
-      "admin_contact": "Contatar o administrador",
+      "admin_contact": "Ajuda",
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3"
     },
@@ -3902,24 +3902,25 @@
   },
   "saas": {
     "description": "Elementos de exibição úteis quando esta instância é oferecida como serviço hospedado (SaaS). Tudo fica oculto por padrão.",
+    "section_storage_notices": "Avisos de armazenamento",
     "storage_notices_label": "Mostrar os avisos de armazenamento",
     "storage_notices_description": "Lembra aos usuários que o Poznote é um aplicativo de notas, não um serviço de armazenamento de fotos ou vídeos, nas páginas de anexos, na página de estatísticas de armazenamento do usuário e nas configurações de anexos S3.",
-    "admin_contact_label": "Mostrar um cartão de contato do administrador",
-    "admin_contact_description": "Adiciona um cartão na seção Sobre das configurações, para todos os usuários, com o endereço de e-mail do administrador.",
+    "admin_contact_label": "Mostrar um cartão de Ajuda",
+    "admin_contact_description": "Adiciona um cartão de Ajuda na seção Sobre das configurações, para todos os usuários, oferecendo o espaço da comunidade e o e-mail do administrador configurados abaixo. O cartão só aparece quando pelo menos um deles está definido.",
     "admin_contact_email_label": "Endereço de e-mail a exibir",
-    "admin_contact_email_description": "Deixe vazio para usar o endereço de e-mail da primeira conta de administrador.",
-    "admin_contact_no_email": "Nenhuma conta de administrador tem um endereço de e-mail ainda, então o cartão permanece oculto.",
     "admin_contact_modal_generic_title": "Pergunta geral",
-    "admin_contact_modal_generic": "Publique-a no GitHub para que todos se beneficiem da resposta:",
-    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_generic": "Publique-a no espaço da comunidade para que todos se beneficiem da resposta:",
+    "admin_contact_modal_link_label": "Fórum da comunidade",
     "admin_contact_modal_account_title": "Sobre a sua conta",
     "admin_contact_modal_account": "Escreva ao administrador neste endereço:",
     "admin_contact_copy": "Copiar",
     "admin_contact_copied": "Copiado!",
+    "community_url_label": "URL a exibir",
     "messages": {
       "saved": "Configuração salva com sucesso.",
       "save_error": "Falha ao salvar a configuração.",
-      "invalid_email": "O endereço de e-mail de contato não é válido."
+      "invalid_email": "O endereço de e-mail de contato não é válido.",
+      "invalid_url": "A URL da comunidade não é válida."
     }
   }
 }

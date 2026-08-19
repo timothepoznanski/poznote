@@ -1716,26 +1716,36 @@
                 var email = data.email || '';
                 var linkUrl = data.linkUrl || '';
 
+                // Both channels are optional; the card itself only renders
+                // when at least one of them is configured
                 if (!window.modalAlert) {
-                    alert((data.modalTitle || '') + '\n\n' + (data.genericText || '') + '\n' + linkUrl
-                        + '\n\n' + (data.accountText || '') + '\n' + email);
+                    alert((data.modalTitle || '')
+                        + (linkUrl ? '\n\n' + (data.genericText || '') + '\n' + linkUrl : '')
+                        + (email ? '\n\n' + (data.accountText || '') + '\n' + email : ''));
                     return;
                 }
 
                 var wrap = document.createElement('div');
                 wrap.className = 'admin-contact-options';
 
-                var github = buildContactOption('lucide-github', data.genericTitle || '', data.genericText || '');
-                var link = document.createElement('a');
-                link.href = linkUrl;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                link.textContent = data.linkLabel || linkUrl;
-                var extIcon = document.createElement('i');
-                extIcon.className = 'lucide lucide-external-link';
-                link.appendChild(extIcon);
-                github.body.appendChild(link);
-                wrap.appendChild(github.option);
+                if (linkUrl !== '') {
+                    var community = buildContactOption('lucide-message-circle', data.genericTitle || '', data.genericText || '');
+                    var link = document.createElement('a');
+                    link.href = linkUrl;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.textContent = data.linkLabel || linkUrl;
+                    var extIcon = document.createElement('i');
+                    extIcon.className = 'lucide lucide-external-link';
+                    link.appendChild(extIcon);
+                    community.body.appendChild(link);
+                    wrap.appendChild(community.option);
+                }
+
+                if (email === '') {
+                    window.modalAlert.alert('', 'info', data.modalTitle || '', { messageNode: wrap });
+                    return;
+                }
 
                 var mail = buildContactOption('lucide-mail', data.accountTitle || '', data.accountText || '');
                 var row = document.createElement('div');

@@ -448,7 +448,7 @@
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
       "saas": "面向作为托管服务（SaaS）提供的实例的显示元素。默认全部隐藏。",
-      "admin_contact": "通过电子邮件联系此 Poznote 实例的管理员。",
+      "admin_contact": "在哪里提问：社区空间，或就账户相关事宜联系管理员。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
@@ -537,7 +537,7 @@
       "webhooks": "管理员 Webhook",
       "ai_assistant": "AI 助手",
       "saas": "SaaS 模式",
-      "admin_contact": "联系管理员",
+      "admin_contact": "帮助",
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份"
     },
@@ -4020,24 +4020,25 @@
   },
   "saas": {
     "description": "当此实例作为托管服务（SaaS）提供时有用的显示元素。默认全部隐藏。",
+    "section_storage_notices": "存储空间提醒",
     "storage_notices_label": "显示存储空间提醒",
     "storage_notices_description": "在附件页面、用户存储统计页面和 S3 附件设置中提醒用户：Poznote 是一款笔记应用，而非照片或视频存储服务。",
-    "admin_contact_label": "显示管理员联系卡片",
-    "admin_contact_description": "在设置的关于版块中为所有用户添加一张显示管理员电子邮件地址的卡片。",
+    "admin_contact_label": "显示帮助卡片",
+    "admin_contact_description": "在设置的关于版块中为所有用户添加一张帮助卡片，提供下方配置的社区空间和管理员电子邮件。只有至少设置其中一项时卡片才会显示。",
     "admin_contact_email_label": "要显示的电子邮件地址",
-    "admin_contact_email_description": "留空则使用第一个管理员账户的电子邮件地址。",
-    "admin_contact_no_email": "尚无管理员账户设置电子邮件地址，卡片将保持隐藏。",
     "admin_contact_modal_generic_title": "一般问题",
-    "admin_contact_modal_generic": "请在 GitHub 上提问，让所有人都能从回答中受益：",
-    "admin_contact_modal_link_label": "Questions about Poznote Cloud",
+    "admin_contact_modal_generic": "请在社区空间提问，让所有人都能从回答中受益：",
+    "admin_contact_modal_link_label": "社区论坛",
     "admin_contact_modal_account_title": "关于您的账户",
     "admin_contact_modal_account": "请写信给管理员：",
     "admin_contact_copy": "复制",
     "admin_contact_copied": "已复制！",
+    "community_url_label": "要显示的 URL",
     "messages": {
       "saved": "配置保存成功。",
       "save_error": "保存配置失败。",
-      "invalid_email": "联系电子邮件地址无效。"
+      "invalid_email": "联系电子邮件地址无效。",
+      "invalid_url": "社区 URL 无效。"
     }
   }
 }
