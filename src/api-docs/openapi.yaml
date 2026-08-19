@@ -3203,6 +3203,13 @@ paths:
       description: |
         Creates a backup for the specified user. Requires admin credentials.
         The X-User-ID header specifies which user's data to backup.
+
+        The archive is the same complete backup as the web UI's "Complete
+        Backup": database dump, note files, and every attachment, including
+        the ones stored in the S3 bucket when S3 attachment storage is
+        configured (they are fetched from the bucket while building the
+        archive). If the bucket cannot be read, the request fails instead of
+        returning an archive with missing files.
       parameters:
         - name: X-User-ID
           in: header
@@ -3341,7 +3348,16 @@ paths:
     post:
       tags: [Backups]
       summary: Restore a backup
-      description: Restore a backup file. This will replace all current user data (database, notes, and attachments) with the data from the backup.
+      description: |
+        Restore a backup file. This will replace all current user data
+        (database, notes, and attachments) with the data from the backup.
+
+        When S3 attachment storage is enabled, the restore replaces the
+        user's bucket content too, so it refuses archives that do not carry
+        every attachment file their metadata references (for example a
+        backup made with the "lighter archive" option), and it refuses to
+        run while the bucket is unreachable. Nothing is modified when the
+        restore is refused.
       parameters:
         - name: filename
           in: path

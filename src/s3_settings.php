@@ -46,7 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $secretKey = trim((string)($_POST['s3_secret_key'] ?? ''));
     $pathStyle = isset($_POST['s3_path_style']) ? '1' : '0';
 
-    if ($enabled === '1' && ($endpoint === '' || $bucket === '' || $accessKey === '')) {
+    // The secret the instance will effectively hold after this save: the
+    // masked placeholder means "keep the existing key", anything else
+    // (including empty) replaces it.
+    $effectiveSecretKey = ($secretKey === '••••••••') ? $previousConfig['secret_key'] : $secretKey;
+
+    if ($enabled === '1' && ($endpoint === '' || $bucket === '' || $accessKey === '' || $effectiveSecretKey === '')) {
+        // The secret key matters here too: saving "enabled" without one
+        // would leave the switch showing on while every write silently
+        // stays on local disk (isEnabled() requires full credentials).
         $error = t('s3_settings.messages.incomplete', [], 'Endpoint, bucket and credentials are required to enable S3 storage.');
     } else {
         $saved = setGlobalSetting('s3_storage_enabled', $enabled)
@@ -70,10 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
             // Computed from the submitted values, not from isConfigured():
             // getConfig() caches statically and still holds the pre-save
             // values at this point.
-            $newSecret = ($secretKey === '••••••••')
-                ? $previousConfig['secret_key']
-                : $secretKey;
-            $nowConfigured = $endpoint !== '' && $bucket !== '' && $accessKey !== '' && $newSecret !== '';
+            $nowConfigured = $endpoint !== '' && $bucket !== '' && $accessKey !== '' && $effectiveSecretKey !== '';
             $credentialsCleared = $wasConfigured && !$nowConfigured;
             if (($wasEnabled && $enabled === '0') || $credentialsCleared) {
                 // Probe the bucket the instance was using: when the form is
@@ -85,9 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
                         'region' => $region,
                         'bucket' => $bucket,
                         'access_key' => $accessKey,
-                        'secret_key' => ($secretKey !== '' && $secretKey !== '••••••••')
-                            ? $secretKey
-                            : (string)getGlobalSetting('s3_storage_secret_key', ''),
+                        'secret_key' => $effectiveSecretKey,
                         'path_style' => $pathStyle === '1',
                     ];
                 }

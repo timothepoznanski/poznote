@@ -2063,7 +2063,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 POST /backups
 ```
 
-Create a complete backup ZIP containing database, all notes, and attachments.
+Create a complete backup ZIP containing database, all notes, and attachments. Attachments stored in the S3 bucket (when S3 attachment storage is configured) are fetched into the archive; if the bucket cannot be read, the request fails instead of returning an archive with missing files.
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
@@ -2117,7 +2117,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /backups/{filename}/restore
 ```
 
-Restore a backup file. This replaces all current user data.
+Restore a backup file. This replaces all current user data. When S3 attachment storage is enabled, the user's bucket content is replaced too, so the restore refuses archives that do not carry every attachment file their metadata references (for example a backup made with the "lighter archive" option), and refuses to run while the bucket is unreachable. Nothing is modified when the restore is refused.
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \

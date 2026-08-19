@@ -100,84 +100,41 @@ class BackupController {
             http_response_code(500);
             return ['success' => false, 'error' => 'Failed to create backups directory'];
         }
-        
-        // Use user's timezone for backup filename
+
+        $userId = (int)(getCurrentUserId() ?? ($GLOBALS['activeUserId'] ?? 0));
+        if ($userId <= 0) {
+            http_response_code(500);
+            return ['success' => false, 'error' => 'Cannot resolve the active user'];
+        }
+
+        // Same builder as the web UI's complete backup and the S3 backups:
+        // attachments stored in the S3 bucket are fetched into the archive,
+        // and a bucket read failure refuses the backup instead of shipping
+        // one that silently misses files.
+        require_once dirname(__DIR__, 3) . '/backup_zip.php';
+        $build = buildUserBackupZip($userId);
+        if (empty($build['success'])) {
+            http_response_code(500);
+            return ['success' => false, 'error' => (string)$build['error']];
+        }
+
+        // Move to this endpoint's canonical name: index(), download() and
+        // restore() only accept poznote_backup_{timestamp}.zip.
         $userTimezone = getUserTimezone();
         $dt = new DateTime('now', new DateTimeZone($userTimezone));
-        $timestamp = $dt->format('Y-m-d_H-i-s');
-        $zipFileName = 'poznote_backup_' . $timestamp . '.zip';
+        $zipFileName = 'poznote_backup_' . $dt->format('Y-m-d_H-i-s') . '.zip';
         $zipFilePath = $this->backupsDir . '/' . $zipFileName;
-        
-        $zip = new ZipArchive();
-        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-            http_response_code(500);
-            return ['success' => false, 'error' => 'Cannot create ZIP file'];
-        }
-        
-        // Add SQL dump
-        $sqlContent = $this->generateSQLDump();
-        if ($sqlContent) {
-            $zip->addFromString('database/poznote_backup.sql', $sqlContent);
-        } else {
-            $zip->close();
-            if (file_exists($zipFilePath)) unlink($zipFilePath);
-            http_response_code(500);
-            return ['success' => false, 'error' => 'Failed to create database backup'];
-        }
-        
-        // Add all note entries
-        $entriesPath = getEntriesPath();
-        if ($entriesPath && is_dir($entriesPath)) {
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($entriesPath), 
-                RecursiveIteratorIterator::LEAVES_ONLY
-            );
-            
-            foreach ($files as $name => $file) {
-                if (!$file->isDir()) {
-                    $filePath = $file->getRealPath();
-                    $relativePath = substr($filePath, strlen($entriesPath) + 1);
-                    $extension = pathinfo($relativePath, PATHINFO_EXTENSION);
-                    
-                    if ($extension === 'html' || $extension === 'md') {
-                        $zip->addFile($filePath, 'entries/' . $relativePath);
-                    }
-                }
+        if (!@rename($build['zip_path'], $zipFilePath)) {
+            // rename() fails across filesystems when the temp dir is a
+            // separate mount; fall back to copy + delete
+            if (!copy($build['zip_path'], $zipFilePath)) {
+                @unlink($build['zip_path']);
+                http_response_code(500);
+                return ['success' => false, 'error' => 'Failed to move backup file into the backups directory'];
             }
+            @unlink($build['zip_path']);
         }
-        
-        // Generate index.html
-        $indexContent = $this->generateIndexHtml();
-        $zip->addFromString('index.html', $indexContent);
-        
-        // Add attachments
-        $attachmentsPath = getAttachmentsPath();
-        if ($attachmentsPath && is_dir($attachmentsPath)) {
-            $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($attachmentsPath), 
-                RecursiveIteratorIterator::LEAVES_ONLY
-            );
-            
-            foreach ($files as $name => $file) {
-                if (!$file->isDir()) {
-                    $filePath = $file->getRealPath();
-                    $relativePath = substr($filePath, strlen($attachmentsPath) + 1);
-                    
-                    if (!str_starts_with($relativePath, '.')) {
-                        $zip->addFile($filePath, 'attachments/' . $relativePath);
-                    }
-                }
-            }
-        }
-        
-        // Add attachments metadata
-        $metadataInfo = $this->getAttachmentsMetadata();
-        if (!empty($metadataInfo)) {
-            $zip->addFromString('attachments/poznote_attachments_metadata.json', json_encode($metadataInfo, JSON_PRETTY_PRINT));
-        }
-        
-        $zip->close();
-        
+
         if (file_exists($zipFilePath) && filesize($zipFilePath) > 0) {
             require_once dirname(__DIR__, 3) . '/ActivityLog.php';
             logActivity(ACTIVITY_BACKUP_CREATED, [
@@ -389,118 +346,4 @@ class BackupController {
         }
     }
     
-    // Helper methods
-    
-    private function generateSQLDump() {
-        $sql = "-- Poznote Database Dump\n-- Generated on " . date('Y-m-d H:i:s') . "\n\n";
-        
-        $tables = $this->con->query("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-        $tableNames = [];
-        while ($row = $tables->fetch(PDO::FETCH_ASSOC)) {
-            $tableNames[] = $row['name'];
-        }
-        
-        foreach ($tableNames as $table) {
-        // Get CREATE TABLE statement using prepared statement to prevent SQL injection
-        $stmt = $this->con->prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?");
-        $stmt->execute([$table]);
-        $createStmt = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($createStmt && $createStmt['sql']) {
-            $sql .= "DROP TABLE IF EXISTS \"{$table}\";\n";
-            $sql .= $createStmt['sql'] . ";\n\n";
-        }
-        
-        // Get all data using prepared statement
-        $stmt = $this->con->prepare("SELECT * FROM \"{$table}\"");
-        $stmt->execute();
-        $data = $stmt;
-            while ($row = $data->fetch(PDO::FETCH_ASSOC)) {
-                $columns = array_keys($row);
-                $values = array_map(function($value) {
-                    if ($value === null) return 'NULL';
-                    return $this->con->quote($value);
-                }, array_values($row));
-                
-                $sql .= "INSERT INTO \"{$table}\" (" . implode(', ', array_map(function($col) {
-                    return "\"{$col}\"";
-                }, $columns)) . ") VALUES (" . implode(', ', $values) . ");\n";
-            }
-            $sql .= "\n";
-        }
-        
-        return $sql;
-    }
-    
-    private function generateIndexHtml() {
-        $query = "SELECT id, heading, tags, folder, folder_id, workspace, attachments, type FROM entries WHERE trash = 0 ORDER BY workspace, folder, updated DESC";
-        $result = $this->con->query($query);
-        
-        $content = "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\">\n<title>Poznote Index</title>\n";
-        $content .= "<style>\nbody { font-family: Arial, sans-serif; }\nh2 { margin-top: 30px; }\nh3 { color: #28a745; margin-top: 20px; }\n";
-        $content .= "ul { list-style-type: none; }\nli { margin: 5px 0; }\na { text-decoration: none; color: #007bff; }\na:hover { text-decoration: underline; }\n</style>\n";
-        $content .= "</head>\n<body>\n";
-        
-        $currentWorkspace = '';
-        $currentFolder = '';
-        
-        if ($result) {
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $workspace = htmlspecialchars($row['workspace'] ?: 'Default');
-                $folder = htmlspecialchars($row['folder'] ?: 'Default');
-                
-                if ($currentWorkspace !== $workspace) {
-                    if ($currentWorkspace !== '') {
-                        if ($currentFolder !== '') $content .= "</ul>\n";
-                        $content .= "</div>\n";
-                    }
-                    $content .= "<h2>{$workspace}</h2>\n<div>\n";
-                    $currentWorkspace = $workspace;
-                    $currentFolder = '';
-                }
-                
-                if ($currentFolder !== $folder) {
-                    if ($currentFolder !== '') $content .= "</ul>\n";
-                    $content .= "<h3>{$folder}</h3>\n<ul>\n";
-                    $currentFolder = $folder;
-                }
-                
-                $heading = htmlspecialchars($row['heading'] ?: 'Untitled');
-                $noteType = $row['type'] ?? 'note';
-                $fileExtension = ($noteType === 'markdown') ? 'md' : 'html';
-                
-                $content .= "<li><a href='entries/{$row['id']}.{$fileExtension}'>{$heading}</a></li>\n";
-            }
-            
-            if ($currentFolder !== '') $content .= "</ul>\n";
-            if ($currentWorkspace !== '') $content .= "</div>\n";
-        }
-        
-        $content .= "</body>\n</html>";
-        return $content;
-    }
-    
-    private function getAttachmentsMetadata() {
-        $query = "SELECT id, heading, attachments FROM entries WHERE attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
-        $result = $this->con->query($query);
-        $metadata = [];
-        
-        if ($result) {
-            while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $attachments = json_decode($row['attachments'], true);
-                if (is_array($attachments) && !empty($attachments)) {
-                    foreach ($attachments as $attachment) {
-                        if (isset($attachment['filename'])) {
-                            $metadata[] = [
-                                'note_id' => $row['id'],
-                                'note_heading' => $row['heading'],
-                                'attachment_data' => $attachment
-                            ];
-                        }
-                    }
-                }
-            }
-        }
-        
-        return $metadata;
-    }
 }

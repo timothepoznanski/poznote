@@ -138,6 +138,23 @@ class AttachmentStorage {
         return self::$remoteUnreachable;
     }
 
+    /**
+     * Drop the temp copies downloaded so far and forget a remembered bucket
+     * failure. Backup builds call this before fetching, so an earlier
+     * unrelated failure cannot fail their completeness check, and again after
+     * closing the archive, so a worker looping over many users does not pile
+     * every account's downloads up in the temp dir until the process exits.
+     * Safe at any point outside an addFile()..close() window: localFile()
+     * re-downloads a deleted temp copy on the next call.
+     */
+    public static function resetRequestBucketState(): void {
+        foreach (self::$tempFiles as $path) {
+            @unlink($path);
+        }
+        self::$tempFiles = [];
+        self::$remoteUnreachable = false;
+    }
+
     private function client(): S3Client {
         if ($this->client === null) {
             $this->client = new S3Client(self::getConfig());
@@ -301,8 +318,9 @@ class AttachmentStorage {
 
     /**
      * A readable local path only when the file is on disk; bucket-stored
-     * files return null. Backup zips use this so S3 attachments stay out of
-     * the archives (the dedicated attachments export still fetches them).
+     * files return null. Exports with a lighter-zip option use this to keep
+     * S3 attachments out of the archive (the complete backup and the
+     * attachments export fetch them through localFile() by default).
      */
     public function localFileIfOnDisk(string $filename): ?string {
         $localPath = $this->localDir() . '/' . basename($filename);
