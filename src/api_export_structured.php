@@ -227,6 +227,20 @@ if (!empty($allNoteAttachments)) {
             $zip->addFile($attachmentFile, $zipAttachmentName);
         }
     }
+
+    // A bucket error means the fetches after it were skipped, so the archive
+    // may silently miss attachments. Refuse rather than ship it (same rule
+    // as the complete backup in backup_zip.php). Only relevant when bucket
+    // fetches were attempted at all.
+    if (!$skipS3Attachments && class_exists('AttachmentStorage')
+        && AttachmentStorage::remoteFailedThisRequest()) {
+        $zip->close();
+        @unlink($zipFileName);
+        ob_end_clean();
+        http_response_code(502);
+        die(t('backup_export.errors.s3_unreachable', [],
+            'The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again.'));
+    }
 }
 
 // Add empty .gitkeep files to empty folders to ensure they're preserved

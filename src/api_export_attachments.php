@@ -165,6 +165,21 @@ if (poznoteAttachmentsBucketMayHoldFiles()) {
             $attachmentCount++;
         }
     }
+
+    // A file the bucket answers 404 for is simply gone, but a bucket that
+    // errored means the lookups after it were skipped: the archive may be
+    // missing files with no way to tell which. This export is exactly what
+    // users rely on to save their S3 attachments, so refuse rather than
+    // ship a zip that looks complete and is not (same rule as the complete
+    // backup in backup_zip.php).
+    if (AttachmentStorage::remoteFailedThisRequest()) {
+        $zip->close();
+        @unlink($zipFileName);
+        ob_end_clean();
+        http_response_code(502);
+        die(t('backup_export.errors.s3_unreachable', [],
+            'The S3 bucket could not be read while building the archive, so some attachments would be missing from it. Nothing was saved. Check the bucket and try again.'));
+    }
 }
 
 // Add metadata file with linking information

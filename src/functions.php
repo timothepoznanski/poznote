@@ -2235,8 +2235,9 @@ function poznoteAttachmentLocalFile($filename): ?string {
 }
 
 /**
- * Like poznoteAttachmentLocalFile() but never downloads from the bucket:
- * backup zips skip S3-stored attachments to keep the archives light.
+ * Like poznoteAttachmentLocalFile() but never downloads from the bucket.
+ * Used by exports whose lighter-zip option deliberately leaves S3-stored
+ * attachments out of the archive.
  */
 function poznoteAttachmentLocalOnlyFile($filename): ?string {
     if (!is_string($filename) || $filename === '') {
@@ -3358,10 +3359,14 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
 
         // A backup made with the lighter-zip option references attachments in
-        // its metadata but carries none of the files. Restoring it while S3
-        // storage is active would purge the bucket below and lose every
-        // attachment, so refuse before wiping anything: the zip must be
-        // completed with the files (from the attachments export) first.
+        // its metadata but does not carry all of the files (none of them in
+        // pure S3 mode, only the not-yet-migrated ones in a partially
+        // migrated state). Restoring it while S3 storage is active would
+        // purge the bucket below and lose every file the zip does not carry,
+        // so refuse before wiping anything unless the zip has a file for
+        // EVERY attachment its metadata references. Checking for "at least
+        // one file" is not enough: one unmigrated file in the zip would let
+        // the purge destroy all the migrated ones.
         // Mirrors the purge condition below: it only guards against wiping
         // the bucket, so it must not block restores that never purge.
         if (poznoteAttachmentsAreRemote()) {
@@ -3370,26 +3375,70 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             if (file_exists($backupMetadataFile)) {
                 $backupMetadata = json_decode((string)file_get_contents($backupMetadataFile), true);
                 if (is_array($backupMetadata) && count($backupMetadata) > 0) {
-                    $hasAttachmentFiles = false;
+                    // Files present in the zip, addressable the two ways
+                    // restoreAttachmentsFromDir() resolves them: by attachment
+                    // id ({id}.{ext}, complete-backup naming) or by storage
+                    // filename (attachments-export naming, rebuilt archives)
+                    $presentBasenames = [];
+                    $presentIds = [];
                     $backupFiles = new RecursiveIteratorIterator(
                         new RecursiveDirectoryIterator($backupAttachmentsDir, RecursiveDirectoryIterator::SKIP_DOTS)
                     );
                     foreach ($backupFiles as $backupFile) {
                         if ($backupFile->isFile() && $backupFile->getFilename() !== 'poznote_attachments_metadata.json') {
-                            $hasAttachmentFiles = true;
-                            break;
+                            $presentBasenames[$backupFile->getFilename()] = true;
+                            $presentIds[pathinfo($backupFile->getFilename(), PATHINFO_FILENAME)] = true;
                         }
                     }
-                    if (!$hasAttachmentFiles) {
+
+                    $referencedCount = 0;
+                    $missingCount = 0;
+                    foreach ($backupMetadata as $metadataItem) {
+                        $attachmentId = (string)($metadataItem['attachment_data']['id'] ?? '');
+                        $attachmentFilename = (string)($metadataItem['attachment_data']['filename'] ?? '');
+                        if ($attachmentId === '' && $attachmentFilename === '') {
+                            continue;
+                        }
+                        $referencedCount++;
+                        if (($attachmentId !== '' && isset($presentIds[$attachmentId]))
+                            || ($attachmentFilename !== '' && isset($presentBasenames[$attachmentFilename]))) {
+                            continue;
+                        }
+                        $missingCount++;
+                    }
+
+                    if ($missingCount > 0) {
                         deleteDirectory($tempExtractDir);
                         $tempExtractDir = null;
                         return [
                             'success' => false,
-                            'error' => 'This backup was created without its S3 attachments, and restoring it would remove every attachment from the bucket. Add the files to the attachments/ folder of the ZIP (from the attachments export) before restoring. Nothing was modified: your notes, your attachments and the bucket content are untouched.',
+                            'error' => 'This backup is missing ' . $missingCount . ' of the ' . $referencedCount . ' attachment file(s) it references (they were stored in S3 when it was created), and restoring it while S3 storage is enabled would remove every attachment from the bucket. Two options: turn off S3 storage in the settings (keep the credentials), restore this backup, then turn it back on, so attachments still in the bucket keep being served; or add the missing files to the attachments/ folder of the ZIP (the attachments export contains them) and restore the rebuilt zip. Nothing was modified: your notes, your attachments and the bucket content are untouched.',
                             'message' => ''
                         ];
                     }
                 }
+            }
+        }
+
+        // The restore below purges the user's bucket objects and rewrites the
+        // archive's attachments through the bucket. Probe it first: wiping
+        // the local files while the bucket is unreachable would leave the
+        // attachments stored nowhere, with the upload failures only visible
+        // in the server logs.
+        if (poznoteAttachmentsAreRemote()) {
+            try {
+                $bucketProbe = AttachmentStorage::makeClient(AttachmentStorage::getConfig())->testConnection();
+            } catch (Exception $bucketProbeError) {
+                $bucketProbe = ['success' => false, 'error' => $bucketProbeError->getMessage()];
+            }
+            if (empty($bucketProbe['success'])) {
+                deleteDirectory($tempExtractDir);
+                $tempExtractDir = null;
+                return [
+                    'success' => false,
+                    'error' => 'The S3 bucket cannot be reached (' . (string)($bucketProbe['error'] ?? 'unknown error') . '). This restore stores the attachments in the bucket, so nothing was restored. Check the S3 storage settings or try again once the bucket is reachable.',
+                    'message' => ''
+                ];
             }
         }
 
@@ -3519,6 +3568,13 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
                     if ($skippedDetailsMessage !== '') {
                         $attachmentsMessage .= "\n" . $skippedDetailsMessage;
                     }
+                }
+                if (!empty($attachmentsResult['failed'])) {
+                    // Storage failures (bucket upload refused, disk full, ...)
+                    // must fail the restore visibly: the archive still has the
+                    // files, so the user can fix the storage and restore again
+                    $attachmentsMessage .= ', FAILED to store ' . $attachmentsResult['failed'] . ' file(s), see the server logs; fix the storage (disk space, S3 bucket) and restore this backup again';
+                    $hasErrors = true;
                 }
                 $results[] = 'Attachments: ' . $attachmentsMessage;
             } else {
@@ -3743,15 +3799,16 @@ function restoreAttachmentsFromDir($sourceDir) {
     
     $importedCount = 0;
     $skippedCount = 0;
+    $failedCount = 0;
     $restoredFilenames = [];
     $skippedFiles = [];
-    
+
     foreach ($files as $name => $file) {
         if (!$file->isDir()) {
             $filePath = $file->getRealPath();
             $relativePath = substr($filePath, strlen($sourceDir) + 1);
             $basename = basename($relativePath);
-            
+
             // Skip metadata file
             if ($basename === 'poznote_attachments_metadata.json') {
                 continue;
@@ -3790,6 +3847,12 @@ function restoreAttachmentsFromDir($sourceDir) {
             if (poznoteStoreAttachmentFromPath($filePath, $validation['filename'], $validation['mime_type'] ?? 'application/octet-stream')) {
                 $importedCount++;
                 $restoredFilenames[] = $validation['filename'];
+            } else {
+                // Disk full, bucket upload refused, ...: the file is in the
+                // archive but could not be stored. Counted so the caller can
+                // report a failed restore instead of a quietly partial one.
+                $failedCount++;
+                error_log('Failed to store attachment during restore: ' . $relativePath . ' -> ' . $validation['filename']);
             }
         }
     }
@@ -3798,6 +3861,7 @@ function restoreAttachmentsFromDir($sourceDir) {
         'success' => true,
         'count' => $importedCount,
         'skipped' => $skippedCount,
+        'failed' => $failedCount,
         'filenames' => $restoredFilenames,
         'skipped_files' => $skippedFiles
     ];

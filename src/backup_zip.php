@@ -478,6 +478,12 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
     // dropping the files from the attachments export into attachments/.
     $exportStorage = AttachmentStorage::forUser($userId);
     if (AttachmentStorage::isConfigured() && !$skipS3Attachments) {
+        // Fresh bucket state for THIS build: a failure remembered from
+        // earlier in the request (or from another user's build, in the
+        // backup worker's loop) must not fail this archive's completeness
+        // check below, and this build's fetches deserve a fresh attempt.
+        AttachmentStorage::resetRequestBucketState();
+
         foreach ($filenameToIdMap as $filename => $attachmentId) {
             if (isset($addedAttachmentFiles[$filename])) {
                 continue;
@@ -496,6 +502,7 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
         if (AttachmentStorage::remoteFailedThisRequest()) {
             $zip->close();
             @unlink($zipFileName);
+            AttachmentStorage::resetRequestBucketState();
             return [
                 'success' => false,
                 'zip_path' => null,
@@ -536,6 +543,11 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
     // No external icon/font files added to ZIP — index.html is icon-free
 
     $zip->close();
+
+    // The bucket downloads were only needed until close() read them into the
+    // archive; dropping them now keeps long worker runs from accumulating
+    // every user's attachments in the temp dir until the process exits.
+    AttachmentStorage::resetRequestBucketState();
 
     if (!file_exists($zipFileName) || filesize($zipFileName) <= 0) {
         if (file_exists($zipFileName)) {
