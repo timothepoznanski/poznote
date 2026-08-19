@@ -54,6 +54,7 @@ if (!$note) {
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/attachments/base.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/attachments/upload.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/attachments/display.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/attachments/buttons-alerts.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/home/buttons.css?v=<?php echo $v; ?>">
@@ -211,6 +212,13 @@ if (!$note) {
                     <div class="accepted-types">
                         <?php echo t_h('attachments.page.all_types_accepted'); ?>
                     </div>
+                    <?php if (poznoteSaasNoticesEnabled()): ?>
+                    <div class="attachment-usage-notice">
+                        <i class="lucide lucide-alert-triangle"></i>
+                        <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.'); ?>
+                            <a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
+                    </div>
+                    <?php endif; ?>
                     <br>
                     <div class="selected-filename" id="selectedFileName"></div>
                 </div>

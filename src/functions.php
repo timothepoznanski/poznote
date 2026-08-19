@@ -2264,6 +2264,48 @@ function poznoteDeleteAttachmentFile($filename): void {
 }
 
 /**
+ * Whether the SaaS-mode storage usage notices are shown (red "note-taking
+ * app, not media storage" reminders on the attachment pages, the user
+ * storage statistics page and the S3 attachments settings). Hidden by
+ * default; the admin enables them from the SaaS mode settings page.
+ */
+function poznoteSaasNoticesEnabled(): bool {
+    require_once __DIR__ . '/users/db_master.php';
+    return getGlobalSetting('saas_show_storage_notices', '0') === '1';
+}
+
+/**
+ * Whether the "contact the administrator" card is shown to every user in
+ * the About section of the settings page. Hidden by default; enabled from
+ * the SaaS mode settings page.
+ */
+function poznoteSaasAdminContactEnabled(): bool {
+    require_once __DIR__ . '/users/db_master.php';
+    return getGlobalSetting('saas_show_admin_contact', '0') === '1';
+}
+
+/**
+ * URL where users should post general questions, as configured on the SaaS
+ * settings page. Empty string when not configured: the Help card then skips
+ * the community block (and disappears entirely when the contact email is
+ * empty too).
+ */
+function poznoteSaasCommunityUrl(): string {
+    require_once __DIR__ . '/users/db_master.php';
+    return trim((string)getGlobalSetting('saas_community_url', ''));
+}
+
+/**
+ * Email address shown on the Help card, as configured on the SaaS settings
+ * page. Empty string when not configured: the card then only offers the
+ * community space link.
+ */
+function poznoteSaasAdminContactEmail(): string {
+    require_once __DIR__ . '/users/db_master.php';
+    return trim((string)getGlobalSetting('saas_admin_contact_email', ''));
+}
+
+/**
  * Total bytes of the attachments recorded in the active user's database.
  * Used for quotas and stats in S3 mode, where nothing is on disk to scan.
  */

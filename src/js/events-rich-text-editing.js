@@ -458,6 +458,21 @@ function insertCodeBlockLineBreak(selection) {
 }
 
 /**
+ * Get the plain text of a range with <br> elements counted as newlines,
+ * since Range.toString() ignores them entirely.
+ * @param {Range} range - The range to serialize
+ * @returns {string} The text content with line breaks preserved
+ */
+function getRangeTextWithLineBreaks(range) {
+    var container = document.createElement('div');
+    container.appendChild(range.cloneContents());
+    container.querySelectorAll('br').forEach(function (br) {
+        br.replaceWith('\n');
+    });
+    return container.textContent;
+}
+
+/**
  * Check whether the caret is currently on an empty line inside a code block.
  * @param {HTMLElement} pre - The containing pre element
  * @param {Range} range - The current selection range
@@ -475,8 +490,8 @@ function isCaretOnEmptyCodeBlockLine(pre, range) {
         afterRange.selectNodeContents(pre);
         afterRange.setStart(range.endContainer, range.endOffset);
 
-        var textBefore = beforeRange.toString();
-        var textAfter = afterRange.toString();
+        var textBefore = getRangeTextWithLineBreaks(beforeRange);
+        var textAfter = getRangeTextWithLineBreaks(afterRange);
         var currentLineBefore = textBefore.split('\n').pop() || '';
         var currentLineAfter = textAfter.split('\n')[0] || '';
 
@@ -487,7 +502,81 @@ function isCaretOnEmptyCodeBlockLine(pre, range) {
 }
 
 /**
- * Handle Enter key in code block - exit block on Enter
+ * Check whether the caret is on the last line of a code block (only
+ * whitespace or line breaks remain after it).
+ * @param {HTMLElement} pre - The containing pre element
+ * @param {Range} range - The current selection range
+ * @returns {boolean} True when nothing but whitespace follows the caret
+ */
+function isCaretOnLastCodeBlockLine(pre, range) {
+    try {
+        var afterRange = range.cloneRange();
+        afterRange.selectNodeContents(pre);
+        afterRange.setStart(range.endContainer, range.endOffset);
+        return getRangeTextWithLineBreaks(afterRange).trim() === '';
+    } catch (err) {
+        return false;
+    }
+}
+
+/**
+ * Remove the line break (newline character or <br>) that starts the empty
+ * line the caret sits on, so exiting the code block does not leave a blank
+ * line at its end.
+ * @param {HTMLElement} pre - The containing pre element
+ * @param {Range} range - The current selection range
+ */
+function removeEmptyCodeBlockLine(pre, range) {
+    try {
+        var caret = range.cloneRange();
+        caret.collapse(true);
+
+        // Collect text nodes and <br> elements located before the caret
+        var walker = document.createTreeWalker(pre, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, null);
+        var beforeCaret = [];
+        var node;
+        while ((node = walker.nextNode())) {
+            if (node.nodeType === 3) {
+                if (node === caret.startContainer) {
+                    beforeCaret.push({ node: node, end: caret.startOffset });
+                } else if (caret.comparePoint(node, 0) < 0) {
+                    beforeCaret.push({ node: node, end: node.textContent.length });
+                }
+            } else if (node.nodeName === 'BR') {
+                var index = Array.prototype.indexOf.call(node.parentNode.childNodes, node) + 1;
+                if (caret.comparePoint(node.parentNode, index) <= 0) {
+                    beforeCaret.push({ node: node, end: 0 });
+                }
+            }
+        }
+
+        // Walk backwards over the empty line until the break that starts it
+        var whitespaceEntries = [];
+        for (var i = beforeCaret.length - 1; i >= 0; i--) {
+            var entry = beforeCaret[i];
+            if (entry.node.nodeName === 'BR') {
+                entry.node.remove();
+                whitespaceEntries.forEach(function (t) { t.node.deleteData(0, t.end); });
+                return;
+            }
+            var text = entry.node.textContent.slice(0, entry.end);
+            var breakPos = text.lastIndexOf('\n');
+            if (breakPos !== -1) {
+                entry.node.deleteData(breakPos, entry.end - breakPos);
+                whitespaceEntries.forEach(function (t) { t.node.deleteData(0, t.end); });
+                return;
+            }
+            if (text.trim() !== '') return;
+            if (entry.end > 0) whitespaceEntries.push(entry);
+        }
+    } catch (err) {
+        // Leave the block untouched when the DOM walk fails
+    }
+}
+
+/**
+ * Handle Enter key in code block - insert a line break, or exit the block
+ * when the caret is on an empty line.
  * @param {Event} e - The keyboard event
  * @param {Selection} selection - The current selection
  */
@@ -506,15 +595,18 @@ function handleCodeBlockEnter(e, selection) {
     var noteentry = pre.closest('.noteentry');
     if (!noteentry) return;
 
-    if (typeof isMobileDevice === 'function' && isMobileDevice()) {
-        if (!isCaretOnEmptyCodeBlockLine(pre, range)) {
-            e.preventDefault();
-            insertCodeBlockLineBreak(selection);
-            return;
-        }
+    if (!isCaretOnEmptyCodeBlockLine(pre, range)) {
+        e.preventDefault();
+        insertCodeBlockLineBreak(selection);
+        return;
     }
 
     e.preventDefault();
+
+    // Drop the trailing empty line so repeated exits don't stack blank lines
+    if (isCaretOnLastCodeBlockLine(pre, range)) {
+        removeEmptyCodeBlockLine(pre, range);
+    }
 
     // Create a new paragraph after the code block
     var newPara = document.createElement('div');

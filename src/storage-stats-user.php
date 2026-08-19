@@ -110,6 +110,31 @@ $quotaBackupsS3  = $quotaIsAdmin ? 0 : (int)round($quotaLimits['max_backups_s3_b
 function poznoteUserQuotaSuffix(int $value): string {
     return ' <span class="quota-inline">/&nbsp;' . ($value > 0 ? (string)$value : '∞') . '</span>';
 }
+
+/**
+ * CSS class colouring a usage figure against its quota: orange from 50% of
+ * the limit, red from 80%. Empty when the quota is 0 (unlimited, including
+ * exempt admins) or below the first threshold. $used must be in the same
+ * unit as the limit (count for notes, MB for storage figures).
+ */
+function poznoteUserQuotaLevelClass(float $used, int $limit): string {
+    if ($limit <= 0) {
+        return '';
+    }
+    $ratio = $used / $limit;
+    if ($ratio >= 0.8) {
+        return 'quota-level-danger';
+    }
+    if ($ratio >= 0.5) {
+        return 'quota-level-warn';
+    }
+    return '';
+}
+
+// Local columns only, matching the admin page and the local storage quota:
+// S3 attachments have their own column and their own quota; backups,
+// snapshots and backgrounds are excluded as well.
+$displayedTotalBytes = (int)$sizes['database'] + (int)$sizes['entries'] + $attachmentLocalBytes;
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
@@ -120,6 +145,7 @@ function poznoteUserQuotaSuffix(int $value): string {
     <meta name="color-scheme" content="dark light">
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <link rel="stylesheet" href="css/lucide.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/fonts.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/users.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/dark-mode/variables.css?v=<?php echo $v; ?>">
@@ -136,6 +162,7 @@ function poznoteUserQuotaSuffix(int $value): string {
     <link rel="stylesheet" href="css/icon-sidebar.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
+    <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $v; ?>">
     <style>
     /* Same sizes as the admin storage-stats page: slightly larger column
        headers, smaller cell values than the admin-tools defaults. */
@@ -178,6 +205,41 @@ function poznoteUserQuotaSuffix(int $value): string {
         font-weight: normal;
         color: inherit;
     }
+    /* Account name inside the description: emphasised, and kept on one line. */
+    .storage-user-name {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    /* Help icon on the local attachments figure when S3 storage is on.
+       No vertical-align override: lucide.css's -0.125em keeps the icon on
+       the text baseline. */
+    .storage-local-help {
+        font-size: 0.85em;
+        opacity: 0.6;
+        cursor: help;
+        margin-left: 2px;
+    }
+    /* Instant tooltip for the help icon, fixed-position so the scrollable
+       table container cannot clip it. */
+    .storage-help-tooltip {
+        position: fixed;
+        z-index: 1000;
+        max-width: 320px;
+        padding: 10px 12px;
+        border-radius: 6px;
+        background: #1f2937;
+        color: #f9fafb;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.95rem;
+        line-height: 1.45;
+        text-align: left;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        pointer-events: none;
+    }
+    /* Centred like the rest of the hero text on this page. */
+    .attachment-usage-notice {
+        justify-content: center;
+    }
     </style>
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -193,14 +255,20 @@ function poznoteUserQuotaSuffix(int $value): string {
             <p><?php
                 $userDesc = t_h('admin_tools.storage_stats.user_description', [], 'Number of notes and disk space used by your account.');
                 if ($activeUsername !== '') {
-                    // Drop a trailing sentence stop (ASCII or ideographic) so the
-                    // account name lands before the final punctuation.
+                    // Drop the translation's trailing sentence stop (ASCII or
+                    // ideographic): the account name ends the line, unpunctuated.
                     $trimmed = preg_replace('/[.。]\s*$/u', '', $userDesc);
-                    echo $trimmed . ' (' . htmlspecialchars($activeUsername, ENT_QUOTES) . ').';
+                    echo $trimmed . ' <span class="storage-user-name">' . htmlspecialchars($activeUsername, ENT_QUOTES) . '</span>';
                 } else {
                     echo $userDesc;
                 }
             ?></p>
+            <?php if (poznoteSaasNoticesEnabled()): ?>
+            <div class="attachment-usage-notice">
+                <i class="lucide lucide-alert-triangle"></i>
+                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.'); ?></span>
+            </div>
+            <?php endif; ?>
         </div>
 
         <div class="results-container">
@@ -212,15 +280,15 @@ function poznoteUserQuotaSuffix(int $value): string {
                         <?php // The note quota counts active + trashed notes, so its
                               // total sits after both, carrying the "/ 500" suffix. ?>
                         <th><?php echo t_h('admin_tools.storage_stats.table_notes_total', [], 'Total notes'); ?></th>
-                        <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')); ?></th>
-                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')); ?></th>
+                        <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database local (MB)')); ?></th>
+                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files local (MB)')); ?></th>
                         <?php if ($s3ColumnVisible): ?>
                             <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')); ?></th>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')); ?></th>
                             <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')); ?></th>
                         <?php else: ?>
                             <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')); ?></th>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')); ?></th>
+                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')); ?></th>
                         <?php endif; ?>
                         <?php if ($backupsColumnVisible): ?>
                             <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_backups_s3', [], 'Backups S3 (MB)')); ?></th>
@@ -233,24 +301,16 @@ function poznoteUserQuotaSuffix(int $value): string {
                         <td><?php echo $notesTrash; ?></td>
                         <?php // Trashed notes count against the quota too: they still
                               // exist and can be restored. ?>
-                        <td style="white-space: nowrap;"><?php echo ($notesActive + $notesTrash) . poznoteUserQuotaSuffix($quotaNotes); ?></td>
-                        <td class="col-group-start"><?php echo poznoteFormatMb((int)$sizes['database']); ?></td>
-                        <td><?php echo poznoteFormatMb((int)$sizes['entries']); ?></td>
-                        <td><?php echo poznoteFormatMb($attachmentLocalBytes); ?></td>
-                        <?php // The local storage quota covers the whole account
-                              // perimeter, which is what Total sums. ?>
-                        <td style="white-space: nowrap;"><strong><?php
-                            // Sum of the displayed columns so the row adds up.
-                            // Excludes backups/snapshots/backgrounds, which are not
-                            // part of the backup export either.
-                            $displayedTotal = (int)$sizes['database'] + (int)$sizes['entries'] + $attachmentLocalBytes + $attachmentS3Bytes;
-                            echo poznoteFormatMb($displayedTotal);
-                        ?></strong><?php echo poznoteUserQuotaSuffix($quotaStorage); ?></td>
+                        <td style="white-space: nowrap;" class="<?php echo poznoteUserQuotaLevelClass($notesActive + $notesTrash, $quotaNotes); ?>"><?php echo ($notesActive + $notesTrash) . poznoteUserQuotaSuffix($quotaNotes); ?></td>
+                        <td class="col-group-start" style="white-space: nowrap;"><?php echo poznoteFormatMb((int)$sizes['database']); ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo t_h('admin_tools.storage_stats.db_help', [], 'The database stores your settings and the raw text of your notes, used for fast search.'); ?>"></i></td>
+                        <td style="white-space: nowrap;"><?php echo poznoteFormatMb((int)$sizes['entries']); ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo t_h('admin_tools.storage_stats.files_help', [], 'The files are the contents of your notes, in HTML or Markdown format.'); ?>"></i></td>
+                        <td style="white-space: nowrap;"><?php echo poznoteFormatMb($attachmentLocalBytes); ?><?php if (AttachmentStorage::isEnabled()): ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo t_h('admin_tools.storage_stats.user_s3_notice', [], 'Attachments are stored in S3 storage rather than locally, as configured by the administrator.'); ?>"></i><?php endif; ?></td>
+                        <td style="white-space: nowrap;" class="<?php echo poznoteUserQuotaLevelClass($displayedTotalBytes / 1048576, $quotaStorage); ?>"><?php echo poznoteFormatMb($displayedTotalBytes) . poznoteUserQuotaSuffix($quotaStorage); ?></td>
                         <?php if ($s3ColumnVisible): ?>
-                            <td class="col-group-start" style="white-space: nowrap;"><?php echo poznoteFormatMb($attachmentS3Bytes) . poznoteUserQuotaSuffix($quotaStorageS3); ?></td>
+                            <td class="col-group-start <?php echo poznoteUserQuotaLevelClass($attachmentS3Bytes / 1048576, $quotaStorageS3); ?>" style="white-space: nowrap;"><?php echo poznoteFormatMb($attachmentS3Bytes) . poznoteUserQuotaSuffix($quotaStorageS3); ?></td>
                         <?php endif; ?>
                         <?php if ($backupsColumnVisible): ?>
-                            <td class="col-group-start" style="white-space: nowrap;"><?php echo poznoteFormatMb($backupsS3Bytes) . poznoteUserQuotaSuffix($quotaBackupsS3); ?></td>
+                            <td class="col-group-start <?php echo poznoteUserQuotaLevelClass($backupsS3Bytes / 1048576, $quotaBackupsS3); ?>" style="white-space: nowrap;"><?php echo poznoteFormatMb($backupsS3Bytes) . poznoteUserQuotaSuffix($quotaBackupsS3); ?></td>
                         <?php endif; ?>
                     </tr>
                 </tbody>
@@ -259,5 +319,35 @@ function poznoteUserQuotaSuffix(int $value): string {
     </div>
 </div>
     <script src="js/icon-sidebar-toggle.js?v=<?php echo $v; ?>"></script>
+    <script>
+    // Instant hover tooltip for the help icons: the native title attribute
+    // only shows after the OS delay, and a CSS ::after tooltip would be
+    // clipped by the scrollable table container, hence fixed positioning.
+    (function() {
+        var tip = null;
+        function hide() {
+            if (tip) { tip.remove(); tip = null; }
+        }
+        document.querySelectorAll('.storage-local-help[data-tooltip]').forEach(function(el) {
+            el.addEventListener('mouseenter', function() {
+                hide();
+                tip = document.createElement('div');
+                tip.className = 'storage-help-tooltip';
+                tip.textContent = el.getAttribute('data-tooltip') || '';
+                document.body.appendChild(tip);
+                var r = el.getBoundingClientRect();
+                var t = tip.getBoundingClientRect();
+                var left = Math.min(Math.max(8, r.left + r.width / 2 - t.width / 2), window.innerWidth - t.width - 8);
+                var top = r.bottom + 8;
+                if (top + t.height > window.innerHeight - 8) {
+                    top = r.top - t.height - 8;
+                }
+                tip.style.left = left + 'px';
+                tip.style.top = top + 'px';
+            });
+            el.addEventListener('mouseleave', hide);
+        });
+    })();
+    </script>
 </body>
 </html>

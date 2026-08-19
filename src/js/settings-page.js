@@ -1683,6 +1683,124 @@
             });
         }
 
+        // Admin contact card (SaaS mode): no mailto, just a modal routing the
+        // user: general questions go to the GitHub discussions (link), account
+        // questions go to the admin's email. Strings come from the card's data
+        // attributes, resolved server-side; the node is built from text nodes,
+        // so none of them is ever parsed as HTML.
+        var adminContactCard = document.getElementById('admin-contact-card');
+        if (adminContactCard) {
+            // One bordered block per channel, icon + title + hint, built from
+            // text nodes so no translated string is ever parsed as HTML
+            var buildContactOption = function (iconClass, titleText, descText) {
+                var opt = document.createElement('div');
+                opt.className = 'admin-contact-option';
+                var icon = document.createElement('i');
+                icon.className = 'lucide ' + iconClass;
+                opt.appendChild(icon);
+                var body = document.createElement('div');
+                var titleEl = document.createElement('span');
+                titleEl.className = 'admin-contact-option-title';
+                titleEl.textContent = titleText;
+                body.appendChild(titleEl);
+                var descEl = document.createElement('span');
+                descEl.className = 'admin-contact-option-desc';
+                descEl.textContent = descText;
+                body.appendChild(descEl);
+                opt.appendChild(body);
+                return { option: opt, body: body };
+            };
+
+            var openAdminContactModal = function () {
+                var data = adminContactCard.dataset;
+                var email = data.email || '';
+                var linkUrl = data.linkUrl || '';
+
+                // Both channels are optional; the card itself only renders
+                // when at least one of them is configured
+                if (!window.modalAlert) {
+                    alert((data.modalTitle || '')
+                        + (linkUrl ? '\n\n' + (data.genericText || '') + '\n' + linkUrl : '')
+                        + (email ? '\n\n' + (data.accountText || '') + '\n' + email : ''));
+                    return;
+                }
+
+                var wrap = document.createElement('div');
+                wrap.className = 'admin-contact-options';
+
+                if (linkUrl !== '') {
+                    var community = buildContactOption('lucide-message-circle', data.genericTitle || '', data.genericText || '');
+                    var link = document.createElement('a');
+                    link.href = linkUrl;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.textContent = data.linkLabel || linkUrl;
+                    var extIcon = document.createElement('i');
+                    extIcon.className = 'lucide lucide-external-link';
+                    link.appendChild(extIcon);
+                    community.body.appendChild(link);
+                    wrap.appendChild(community.option);
+                }
+
+                if (email === '') {
+                    window.modalAlert.alert('', 'info', data.modalTitle || '', { messageNode: wrap });
+                    return;
+                }
+
+                var mail = buildContactOption('lucide-mail', data.accountTitle || '', data.accountText || '');
+                var row = document.createElement('div');
+                row.className = 'admin-contact-email-row';
+                var emailEl = document.createElement('span');
+                emailEl.className = 'admin-contact-email';
+                emailEl.textContent = email;
+                row.appendChild(emailEl);
+                var copyBtn = document.createElement('button');
+                copyBtn.type = 'button';
+                copyBtn.className = 'admin-contact-copy';
+                var renderCopyBtn = function (iconName, label) {
+                    copyBtn.textContent = '';
+                    var ic = document.createElement('i');
+                    ic.className = 'lucide ' + iconName;
+                    copyBtn.appendChild(ic);
+                    copyBtn.appendChild(document.createTextNode(' ' + label));
+                };
+                renderCopyBtn('lucide-copy', data.copyLabel || 'Copy');
+                copyBtn.addEventListener('click', function () {
+                    var done = function () {
+                        renderCopyBtn('lucide-check', data.copiedLabel || 'Copied!');
+                        setTimeout(function () { renderCopyBtn('lucide-copy', data.copyLabel || 'Copy'); }, 1500);
+                    };
+                    // Old-school path doubles as the fallback when the async
+                    // clipboard is missing (non-secure context) or refused
+                    var legacyCopy = function () {
+                        var tmp = document.createElement('textarea');
+                        tmp.value = email;
+                        document.body.appendChild(tmp);
+                        tmp.select();
+                        try { document.execCommand('copy'); done(); } catch (err) {}
+                        tmp.remove();
+                    };
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(email).then(done).catch(legacyCopy);
+                    } else {
+                        legacyCopy();
+                    }
+                });
+                row.appendChild(copyBtn);
+                mail.body.appendChild(row);
+                wrap.appendChild(mail.option);
+
+                window.modalAlert.alert('', 'info', data.modalTitle || '', { messageNode: wrap });
+            };
+            adminContactCard.addEventListener('click', openAdminContactModal);
+            adminContactCard.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openAdminContactModal();
+                }
+            });
+        }
+
         if (openGithubApiDocsBtn) {
             openGithubApiDocsBtn.addEventListener('click', function () {
                 window.open(githubApiDocsUrl, '_blank');

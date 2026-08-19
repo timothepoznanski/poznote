@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Bem-vindo ao Poznote",
-    "content": "<p>O Poznote é uma plataforma pessoal para fazer anotações e documentação.</p>\n<br><br>\nDescubra <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todos os recursos</a> incluídos no Poznote.\n<br><br>\nClique no botão <code>+</code> para criar sua primeira nota.\n<br><br>\nDentro de uma nota, digite <code>/</code> para abrir o menu de comandos.\n<br><br>\nEspero que goste de usar o Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>O Poznote é uma plataforma pessoal para fazer anotações e documentação.</p>\n<br>\nDescubra <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">todos os recursos</a> incluídos no Poznote.\n<br><br>\nClique no botão <code>+</code> para criar sua primeira nota.\n<br><br>\nDentro de uma nota, digite <code>/</code> para abrir o menu de comandos.\n<br><br>\nEspero que goste de usar o Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
   },
   "markdown_syntax": {
     "menu_item": "Sintaxe Markdown",
@@ -338,6 +338,8 @@
       "upload_section_title": "Enviar Novo Anexo",
       "drag_drop_info": "Você pode arrastar e soltar seu arquivo abaixo:",
       "all_types_accepted": "Todos os tipos de arquivo aceitos (máx 200MB)",
+      "note_taking_notice": "Lembre-se de que o Poznote é um aplicativo de notas, não um serviço de armazenamento de fotos ou vídeos: arquivos de mídia grandes enchem muito rapidamente o seu espaço de armazenamento.",
+      "note_taking_notice_link": "Ver meu armazenamento",
       "upload_button": "Anexar",
       "current_attachments": "Anexos Atuais",
       "loading_attachments": "Carregando anexos...",
@@ -442,6 +444,8 @@
       "smtp_config": "Configure o servidor SMTP usado para enviar e-mails como lembretes.",
       "webhooks": "Envie eventos da instância para serviços externos via webhooks.",
       "ai_assistant": "Configure o assistente de IA usado para conversar com suas notas.",
+      "saas": "Elementos de exibição para instâncias oferecidas como serviço hospedado (SaaS). Todos ocultos por padrão.",
+      "admin_contact": "Onde fazer suas perguntas: no espaço da comunidade, ou ao administrador para tudo o que diz respeito à sua conta.",
       "git_sync_enabled": "Ative ou desative a sincronização Git nesta instância.",
       "import_limits": "Defina o número máximo de arquivos permitidos por importação.",
       "user_quotas": "Limite o número de notas e o armazenamento disponível por usuário.",
@@ -529,6 +533,8 @@
       "smtp_config": "SMTP / E-mail",
       "webhooks": "Webhooks de administrador",
       "ai_assistant": "Assistente IA",
+      "saas": "Modo SaaS",
+      "admin_contact": "Ajuda",
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3"
     },
@@ -1941,9 +1947,10 @@
         "description": "Envia um arquivo de backup da sua conta para o bucket S3 configurado nesta instância e baixa os arquivos já armazenados lá.",
         "backup_now": "Fazer backup da minha conta para o S3",
         "confirm_run": "Fazer backup da sua conta para o bucket S3 agora? O envio do arquivo pode demorar um pouco.",
-        "policy_auto": "O administrador configurou um backup automático {{frequency}}, mantendo os últimos {{retention}} arquivos por usuário.",
+        "confirm_run_overwrite": "Atenção: o número máximo de backups foi atingido, portanto este backup excluirá o arquivo mais antigo, {{filename}}.",
+        "policy_auto": "O administrador configurou um backup automático {{frequency}}, mantendo os últimos {{retention}} arquivos por usuário. Quando esse número é atingido, cada novo backup exclui o arquivo mais antigo.",
         "policy_auto_keep_all": "O administrador configurou um backup automático {{frequency}}; todos os arquivos são mantidos.",
-        "policy_manual": "Os backups automáticos estão desativados; os últimos {{retention}} arquivos por usuário são mantidos.",
+        "policy_manual": "Os backups automáticos estão desativados; os últimos {{retention}} arquivos por usuário são mantidos. Quando esse número é atingido, cada novo backup exclui o arquivo mais antigo.",
         "policy_manual_keep_all": "Os backups automáticos estão desativados; todos os arquivos são mantidos.",
         "running": "Enviando o backup para o bucket...",
         "done": "Backup enviado ({{size}}).",
@@ -3128,15 +3135,19 @@
     "storage_stats": {
       "title": "Estatísticas de armazenamento",
       "description": "Número de notas e espaço em disco usado por cada conta.",
+      "quota_click_tip": "Dica: clique em um valor de cota na tabela para alterá-lo diretamente para essa conta.",
       "user_description": "Número de notas e espaço em disco usado pela sua conta.",
+      "user_s3_notice": "Os anexos são armazenados em um armazenamento S3 em vez de localmente, conforme configurado pelo administrador.",
+      "db_help": "O banco de dados contém suas configurações e o texto bruto das suas notas, usado para a busca rápida.",
+      "files_help": "Os arquivos são os conteúdos das suas notas, em formato HTML ou Markdown.",
       "table_id": "ID",
       "table_account": "Conta",
       "table_notes": "Notas",
       "table_trash": "Lixeira",
-      "table_db": "Banco de dados (MB)",
-      "table_entries": "Arquivos (MB)",
+      "table_db": "Banco de dados local (MB)",
+      "table_entries": "Arquivos locais (MB)",
       "table_attachments": "Anexos (MB)",
-      "table_total": "Total (MB)",
+      "table_total": "Total local (MB)",
       "table_total_row": "Total",
       "table_total_row_hint": "De todas as contas, não apenas desta página",
       "quota_modal_description": "Deixe um campo vazio para usar a configuração global. 0 significa ilimitado.\nEsses valores substituem as cotas globais de usuário.",
@@ -3297,7 +3308,9 @@
       "email_taken": "Este email ja esta em uso"
     },
     "logout": {
-      "confirm": "Tem certeza de que deseja sair?"
+      "confirm": "Tem certeza de que deseja sair?",
+      "signed_in_as": "Conectado como {{username}}",
+      "in_progress": "Saindo..."
     }
   },
   "password": {
@@ -3886,5 +3899,28 @@
   "tasklist_embed": {
     "unavailable": "Esta lista de tarefas não está mais disponível.",
     "empty": "Ainda não há tarefas nesta lista."
+  },
+  "saas": {
+    "description": "Elementos de exibição úteis quando esta instância é oferecida como serviço hospedado (SaaS). Tudo fica oculto por padrão.",
+    "section_storage_notices": "Avisos de armazenamento",
+    "storage_notices_label": "Mostrar os avisos de armazenamento",
+    "storage_notices_description": "Lembra aos usuários que o Poznote é um aplicativo de notas, não um serviço de armazenamento de fotos ou vídeos, nas páginas de anexos, na página de estatísticas de armazenamento do usuário e nas configurações de anexos S3.",
+    "admin_contact_label": "Mostrar um cartão de Ajuda",
+    "admin_contact_description": "Adiciona um cartão de Ajuda na seção Sobre das configurações, para todos os usuários, oferecendo o espaço da comunidade e o e-mail do administrador configurados abaixo. O cartão só aparece quando pelo menos um deles está definido.",
+    "admin_contact_email_label": "Endereço de e-mail a exibir",
+    "admin_contact_modal_generic_title": "Pergunta geral",
+    "admin_contact_modal_generic": "Publique-a no espaço da comunidade para que todos se beneficiem da resposta:",
+    "admin_contact_modal_link_label": "Fórum da comunidade",
+    "admin_contact_modal_account_title": "Sobre a sua conta",
+    "admin_contact_modal_account": "Escreva ao administrador neste endereço:",
+    "admin_contact_copy": "Copiar",
+    "admin_contact_copied": "Copiado!",
+    "community_url_label": "URL a exibir",
+    "messages": {
+      "saved": "Configuração salva com sucesso.",
+      "save_error": "Falha ao salvar a configuração.",
+      "invalid_email": "O endereço de e-mail de contato não é válido.",
+      "invalid_url": "A URL da comunidade não é válida."
+    }
   }
 }

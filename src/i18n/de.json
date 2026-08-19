@@ -4,7 +4,7 @@
   },
   "welcome_note": {
     "title": "Willkommen bei Poznote",
-    "content": "<p>Poznote ist eine persönliche Plattform zum Erstellen von Notizen und Dokumentationen.</p>\n<br><br>\nEntdecken Sie <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">alle Funktionen</a>, die Poznote bietet.\n<br><br>\nKlicken Sie auf die Schaltfläche <code>+</code>, um Ihre erste Notiz zu erstellen.\n<br><br>\nGeben Sie in einer Notiz <code>/</code> ein, um das Befehlsmenü zu öffnen.\n<br><br>\nViel Freude bei der Nutzung von Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
+    "content": "<p>Poznote ist eine persönliche Plattform zum Erstellen von Notizen und Dokumentationen.</p>\n<br>\nEntdecken Sie <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">alle Funktionen</a>, die Poznote bietet.\n<br><br>\nKlicken Sie auf die Schaltfläche <code>+</code>, um Ihre erste Notiz zu erstellen.\n<br><br>\nGeben Sie in einer Notiz <code>/</code> ein, um das Befehlsmenü zu öffnen.\n<br><br>\nViel Freude bei der Nutzung von Poznote! ✨\n<br><br>\n<a href=\"https://ko-fi.com/timothepoznanski\" target=\"_blank\" style=\"text-decoration: none;\">Tim</a>"
   },
   "markdown_syntax": {
     "menu_item": "Markdown-Syntax",
@@ -339,6 +339,8 @@
       "upload_section_title": "Neuen Anhang hochladen",
       "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
       "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
+      "note_taking_notice": "Beachten Sie, dass Poznote eine Notiz-App ist und kein Speicherdienst für Fotos oder Videos: große Mediendateien füllen Ihren Speicherplatz sehr schnell.",
+      "note_taking_notice_link": "Meinen Speicher ansehen",
       "upload_button": "Anhängen",
       "current_attachments": "Aktuelle Anhänge",
       "loading_attachments": "Anhänge werden geladen...",
@@ -443,6 +445,8 @@
       "smtp_config": "Konfigurieren Sie den SMTP-Server für den E-Mail-Versand, z. B. für Erinnerungen.",
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
+      "saas": "Anzeigeelemente für Instanzen, die als gehosteter Dienst (SaaS) angeboten werden. Standardmäßig alle ausgeblendet.",
+      "admin_contact": "Wo Sie Ihre Fragen stellen: im Community-Bereich, oder beim Administrator für alles rund um Ihr Konto.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
@@ -530,6 +534,8 @@
       "smtp_config": "SMTP / E-Mail",
       "webhooks": "Admin-Webhooks",
       "ai_assistant": "KI-Assistent",
+      "saas": "SaaS-Modus",
+      "admin_contact": "Hilfe",
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen"
     },
@@ -1937,9 +1943,10 @@
         "description": "Lädt ein Sicherungsarchiv Ihres Kontos in den auf dieser Instanz konfigurierten S3-Bucket hoch und lädt die dort bereits gespeicherten Archive herunter.",
         "backup_now": "Mein Konto nach S3 sichern",
         "confirm_run": "Ihr Konto jetzt in den S3-Bucket sichern? Das Hochladen des Archivs kann eine Weile dauern.",
-        "policy_auto": "Der Administrator hat eine automatische Sicherung {{frequency}} eingerichtet und bewahrt die letzten {{retention}} Archive pro Benutzer auf.",
+        "confirm_run_overwrite": "Achtung: Die maximale Anzahl an Sicherungen ist erreicht, diese Sicherung löscht daher das älteste Archiv, {{filename}}.",
+        "policy_auto": "Der Administrator hat eine automatische Sicherung {{frequency}} eingerichtet und bewahrt die letzten {{retention}} Archive pro Benutzer auf. Sobald diese Anzahl erreicht ist, löscht jede neue Sicherung das älteste Archiv.",
         "policy_auto_keep_all": "Der Administrator hat eine automatische Sicherung {{frequency}} eingerichtet; alle Archive werden aufbewahrt.",
-        "policy_manual": "Automatische Sicherungen sind deaktiviert; die letzten {{retention}} Archive pro Benutzer werden aufbewahrt.",
+        "policy_manual": "Automatische Sicherungen sind deaktiviert; die letzten {{retention}} Archive pro Benutzer werden aufbewahrt. Sobald diese Anzahl erreicht ist, löscht jede neue Sicherung das älteste Archiv.",
         "policy_manual_keep_all": "Automatische Sicherungen sind deaktiviert; alle Archive werden aufbewahrt.",
         "running": "Sicherung wird in den Bucket hochgeladen...",
         "done": "Sicherung hochgeladen ({{size}}).",
@@ -3125,15 +3132,19 @@
     "storage_stats": {
       "title": "Speicherstatistik",
       "description": "Anzahl der Notizen und belegter Speicherplatz pro Konto.",
+      "quota_click_tip": "Tipp: Klicken Sie auf einen Quotenwert in der Tabelle, um ihn für dieses Konto direkt zu ändern.",
       "user_description": "Anzahl der Notizen und belegter Speicherplatz Ihres Kontos.",
+      "user_s3_notice": "Anhänge werden gemäß der Konfiguration des Administrators in einem S3-Speicher statt lokal gespeichert.",
+      "db_help": "Die Datenbank enthält Ihre Einstellungen und den Rohtext Ihrer Notizen für die schnelle Suche.",
+      "files_help": "Die Dateien sind die Inhalte Ihrer Notizen im HTML- oder Markdown-Format.",
       "table_id": "ID",
       "table_account": "Konto",
       "table_notes": "Notizen",
       "table_trash": "Papierkorb",
-      "table_db": "Datenbank (MB)",
-      "table_entries": "Dateien (MB)",
+      "table_db": "Datenbank lokal (MB)",
+      "table_entries": "Dateien lokal (MB)",
       "table_attachments": "Anhänge (MB)",
-      "table_total": "Gesamt (MB)",
+      "table_total": "Gesamt lokal (MB)",
       "table_total_row": "Gesamt",
       "table_total_row_hint": "Über alle Konten, nicht nur diese Seite",
       "quota_modal_description": "Ein leeres Feld übernimmt die globale Einstellung. 0 bedeutet unbegrenzt.\nDiese Werte überschreiben die globalen Benutzerkontingente.",
@@ -3294,7 +3305,9 @@
       "email_taken": "Diese E-Mail wird bereits verwendet"
     },
     "logout": {
-      "confirm": "Möchten Sie sich wirklich abmelden?"
+      "confirm": "Möchten Sie sich wirklich abmelden?",
+      "signed_in_as": "Angemeldet als {{username}}",
+      "in_progress": "Abmeldung..."
     }
   },
   "password": {
@@ -3883,5 +3896,28 @@
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",
     "empty": "Noch keine Aufgaben in dieser Liste."
+  },
+  "saas": {
+    "description": "Anzeigeelemente, die sinnvoll sind, wenn diese Instanz als gehosteter Dienst (SaaS) angeboten wird. Standardmäßig ist alles ausgeblendet.",
+    "section_storage_notices": "Speicherhinweise",
+    "storage_notices_label": "Speicherhinweise anzeigen",
+    "storage_notices_description": "Erinnert die Benutzer auf den Anhangseiten, der Speicherstatistik-Seite und den S3-Anhangseinstellungen daran, dass Poznote eine Notiz-App ist und kein Speicherdienst für Fotos oder Videos.",
+    "admin_contact_label": "Eine Hilfe-Karte anzeigen",
+    "admin_contact_description": "Fügt im Bereich Über der Einstellungen für alle Benutzer eine Hilfe-Karte hinzu, die den unten konfigurierten Community-Bereich und die Administrator-E-Mail anbietet. Die Karte erscheint nur, wenn mindestens eines davon gesetzt ist.",
+    "admin_contact_email_label": "Anzuzeigende E-Mail-Adresse",
+    "admin_contact_modal_generic_title": "Allgemeine Frage",
+    "admin_contact_modal_generic": "Stellen Sie sie im Community-Bereich, damit alle von der Antwort profitieren:",
+    "admin_contact_modal_link_label": "Community-Forum",
+    "admin_contact_modal_account_title": "Zu Ihrem Konto",
+    "admin_contact_modal_account": "Schreiben Sie dem Administrator an diese Adresse:",
+    "admin_contact_copy": "Kopieren",
+    "admin_contact_copied": "Kopiert!",
+    "community_url_label": "Anzuzeigende URL",
+    "messages": {
+      "saved": "Konfiguration erfolgreich gespeichert.",
+      "save_error": "Konfiguration konnte nicht gespeichert werden.",
+      "invalid_email": "Die Kontakt-E-Mail-Adresse ist ungültig.",
+      "invalid_url": "Die Community-URL ist ungültig."
+    }
   }
 }

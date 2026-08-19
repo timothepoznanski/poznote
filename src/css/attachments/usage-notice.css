@@ -1,0 +1,34 @@
+/* Reminder that Poznote is for notes, not photo/video storage. Shared by
+   attachments.php, attachments_list.php and storage-stats-user.php. */
+.attachment-usage-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #dc3545;
+}
+
+.attachment-usage-notice .lucide-alert-triangle {
+    flex: none;
+    margin-top: 2px;
+    color: #dc3545;
+    background-color: #dc3545;
+}
+
+.attachment-usage-notice a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+html[data-theme='dark'] .attachment-usage-notice,
+body.dark-mode .attachment-usage-notice {
+    color: #f87171;
+}
+
+html[data-theme='dark'] .attachment-usage-notice .lucide-alert-triangle,
+body.dark-mode .attachment-usage-notice .lucide-alert-triangle {
+    color: #f87171;
+    background-color: #f87171;
+}

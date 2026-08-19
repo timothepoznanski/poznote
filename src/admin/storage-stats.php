@@ -87,6 +87,15 @@ function poznoteSortHeader(string $escapedLabel, string $column, string $current
     $searchParam = trim((string)($_GET['q'] ?? ''));
     $href = '?sort=' . $nextSort . ($searchParam !== '' ? '&q=' . urlencode($searchParam) : '');
 
+    // Multi-word labels always render on two lines so the columns stay
+    // narrow whatever the screen width: break at the last regular space
+    // (the "(MB)" unit is already glued to its word with &nbsp; by
+    // poznoteGlueUnit, so it never ends up alone on the second line).
+    $breakPos = strrpos($escapedLabel, ' ');
+    if ($breakPos !== false) {
+        $escapedLabel = substr($escapedLabel, 0, $breakPos) . '<br>' . substr($escapedLabel, $breakPos + 1);
+    }
+
     return '<th' . $class . '>'
         . '<a class="users-sort-link' . ($isActive ? ' users-sort-active' : '') . '" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">'
         . $escapedLabel
@@ -340,10 +349,10 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
         t('admin_tools.storage_stats.table_notes', [], 'Notes'),
         t('admin_tools.storage_stats.table_trash', [], 'Trash'),
         t('admin_tools.storage_stats.table_notes_total', [], 'Total notes'),
-        t('admin_tools.storage_stats.table_db', [], 'Database (MB)'),
-        t('admin_tools.storage_stats.table_entries', [], 'Files (MB)'),
+        t('admin_tools.storage_stats.table_db', [], 'Database local (MB)'),
+        t('admin_tools.storage_stats.table_entries', [], 'Files local (MB)'),
         t('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)'),
-        t('admin_tools.storage_stats.table_total', [], 'Total (MB)'),
+        t('admin_tools.storage_stats.table_total', [], 'Total local (MB)'),
     ];
     if ($s3ColumnVisible) {
         $csvHeader[] = t('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)');
@@ -434,6 +443,30 @@ function poznoteFormatQuotaValue(int $value): string {
  * $override is that user's per-user value, or null when they inherit the
  * global one; both render the same way.
  */
+/**
+ * CSS class colouring a usage figure against its effective quota: orange
+ * from 50% of the limit, red from 80%. Empty for admins (exempt), when the
+ * limit is 0/unlimited, or below the first threshold. $used must be in the
+ * same unit as the limit (count for notes, MB for storage figures).
+ */
+function poznoteQuotaLevelClass(float $used, ?int $override, int $globalValue, bool $isAdmin): string {
+    if ($isAdmin) {
+        return '';
+    }
+    $limit = $override ?? $globalValue;
+    if ($limit <= 0) {
+        return '';
+    }
+    $ratio = $used / $limit;
+    if ($ratio >= 0.8) {
+        return 'quota-level-danger';
+    }
+    if ($ratio >= 0.5) {
+        return 'quota-level-warn';
+    }
+    return '';
+}
+
 function poznoteQuotaSuffix(array $row, ?int $override, int $globalValue, bool $isAdmin): string {
     if ($isAdmin) {
         return '<button type="button" class="quota-inline quota-admin-exempt"'
@@ -520,6 +553,15 @@ foreach ($stats as $r) {
     }
     .dr-hero {
         padding: 0 0 15px;
+    }
+    /* Small hint under the description: quotas in the table are clickable. */
+    .storage-quota-tip {
+        margin-top: 6px;
+        font-size: 0.85rem;
+        opacity: 0.75;
+    }
+    .storage-quota-tip .lucide-info {
+        font-size: 0.85em;
     }
     /* The table below already carries a 20px margin-top of its own */
     .home-search-container {
@@ -659,8 +701,8 @@ foreach ($stats as $r) {
     .results-table th {
         font-size: 0.78rem;
         font-weight: 600;
-        /* Long labels scroll with .table-scroll instead of wrapping onto two lines */
-        white-space: nowrap;
+        /* Labels wrap onto two lines to keep the columns narrow; the "(MB)"
+           unit stays glued to the preceding word via poznoteGlueUnit(). */
     }
     .results-table td {
         font-size: 0.85rem;
@@ -825,6 +867,7 @@ foreach ($stats as $r) {
     <div class="dr-page">
         <div class="dr-hero">
             <p><?php echo t_h('admin_tools.storage_stats.description', [], 'Number of notes and disk space used by each account.'); ?></p>
+            <p class="storage-quota-tip"><i class="lucide lucide-info"></i> <?php echo t_h('admin_tools.storage_stats.quota_click_tip', [], 'Tip: click a quota value in the table to change it for that account.'); ?></p>
         </div>
 
         <!-- A GET form so Enter searches every account server-side; on a
@@ -850,15 +893,15 @@ foreach ($stats as $r) {
                         <?php // The note quota counts active + trashed notes, so its
                               // total sits after both, carrying the "/ 500" suffix. ?>
                         <?php echo poznoteSortHeader(t_h('admin_tools.storage_stats.table_notes_total', [], 'Total notes'), 'notes_total', $storageSort); ?>
-                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database (MB)')), 'db', $storageSort, 'hide-mobile col-group-start'); ?>
-                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files (MB)')), 'files', $storageSort, 'hide-mobile'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database local (MB)')), 'db', $storageSort, 'hide-mobile col-group-start'); ?>
+                        <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files local (MB)')), 'files', $storageSort, 'hide-mobile'); ?>
                         <?php if ($s3ColumnVisible): ?>
                             <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')), 'attachments', $storageSort, 'hide-mobile'); ?>
-                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'total', $storageSort); ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')), 'total', $storageSort); ?>
                             <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')), 'attachments_s3', $storageSort, 'hide-mobile col-group-start'); ?>
                         <?php else: ?>
                             <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')), 'attachments', $storageSort, 'hide-mobile'); ?>
-                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total (MB)')), 'total', $storageSort); ?>
+                            <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')), 'total', $storageSort); ?>
                         <?php endif; ?>
                         <?php if ($backupsColumnVisible): ?>
                             <?php echo poznoteSortHeader(poznoteGlueUnit(t_h('admin_tools.storage_stats.table_backups_s3', [], 'Backups S3 (MB)')), 'backups_s3', $storageSort, 'hide-mobile col-group-start'); ?>
@@ -886,7 +929,7 @@ foreach ($stats as $r) {
                             <td class="hide-mobile"><?php echo $row['notes_trash']; ?></td>
                             <?php // Trashed notes count against the quota too: they still
                                   // exist and can be restored. ?>
-                            <td style="white-space: nowrap;">
+                            <td style="white-space: nowrap;" class="<?php echo poznoteQuotaLevelClass($row['notes_active'] + $row['notes_trash'], $row['quota_max_notes'], $globalMaxNotes, $row['is_admin']); ?>">
                                 <?php if ($row['error']): ?>
                                     <span style="color:red">—</span>
                                 <?php else: ?>
@@ -899,18 +942,18 @@ foreach ($stats as $r) {
                             <td class="hide-mobile"><?php echo poznoteFormatMb($row['attachments_bytes']); ?></td>
                             <?php // The local storage quota covers the whole account perimeter
                                   // (database + files + attachments), which is what Total sums. ?>
-                            <td style="white-space: nowrap;">
+                            <td style="white-space: nowrap;" class="<?php echo poznoteQuotaLevelClass($row['total_bytes'] / 1048576, $row['quota_max_storage_mb'], $globalMaxStorageMb, $row['is_admin']); ?>">
                                 <?php echo poznoteFormatMb($row['total_bytes']); ?>
                                 <?php echo poznoteQuotaSuffix($row, $row['quota_max_storage_mb'], $globalMaxStorageMb, $row['is_admin']); ?>
                             </td>
                             <?php if ($s3ColumnVisible): ?>
-                                <td class="hide-mobile col-group-start" style="white-space: nowrap;">
+                                <td class="hide-mobile col-group-start <?php echo poznoteQuotaLevelClass($row['attachments_s3_bytes'] / 1048576, $row['quota_max_storage_s3_mb'], $globalMaxStorageS3Mb, $row['is_admin']); ?>" style="white-space: nowrap;">
                                     <?php echo poznoteFormatMb($row['attachments_s3_bytes']); ?>
                                     <?php echo poznoteQuotaSuffix($row, $row['quota_max_storage_s3_mb'], $globalMaxStorageS3Mb, $row['is_admin']); ?>
                                 </td>
                             <?php endif; ?>
                             <?php if ($backupsColumnVisible): ?>
-                                <td class="hide-mobile col-group-start" style="white-space: nowrap;">
+                                <td class="hide-mobile col-group-start <?php echo poznoteQuotaLevelClass($row['backups_s3_bytes'] / 1048576, $row['quota_max_backups_s3_mb'], $globalMaxBackupsS3Mb, $row['is_admin']); ?>" style="white-space: nowrap;">
                                     <?php echo poznoteFormatMb($row['backups_s3_bytes']); ?>
                                     <?php echo poznoteQuotaSuffix($row, $row['quota_max_backups_s3_mb'], $globalMaxBackupsS3Mb, $row['is_admin']); ?>
                                 </td>
@@ -1000,22 +1043,22 @@ foreach ($stats as $r) {
         <input type="hidden" id="quota_user_id" value="">
         <div class="form-group">
             <label for="quota_max_notes" id="quota_max_notes_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_notes_for', [], 'Max notes for {{user}}'); ?>"></label>
-            <input type="number" id="quota_max_notes" min="0" max="100000000" step="1" placeholder="0">
+            <input type="number" id="quota_max_notes" min="0" max="100000000" step="1" placeholder="<?php echo (int)$globalMaxNotes; ?>">
         </div>
         <div class="form-group">
             <label for="quota_max_storage" id="quota_max_storage_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_for', [], 'Max local storage for {{user}} (MB)'); ?>"></label>
-            <input type="number" id="quota_max_storage" min="0" max="100000000" step="1" placeholder="0">
+            <input type="number" id="quota_max_storage" min="0" max="100000000" step="1" placeholder="<?php echo (int)$globalMaxStorageMb; ?>">
         </div>
         <?php if ($s3ColumnVisible): ?>
         <div class="form-group">
             <label for="quota_max_storage_s3" id="quota_max_storage_s3_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_storage_s3_for', [], 'Max S3 attachments storage for {{user}} (MB)'); ?>"></label>
-            <input type="number" id="quota_max_storage_s3" min="0" max="100000000" step="1" placeholder="0">
+            <input type="number" id="quota_max_storage_s3" min="0" max="100000000" step="1" placeholder="<?php echo (int)$globalMaxStorageS3Mb; ?>">
         </div>
         <?php endif; ?>
         <?php if ($backupsColumnVisible): ?>
         <div class="form-group">
             <label for="quota_max_backups_s3" id="quota_max_backups_s3_label" data-template="<?php echo t_h('admin_tools.storage_stats.quota_max_backups_s3_for', [], 'Max S3 backups storage for {{user}} (MB)'); ?>"></label>
-            <input type="number" id="quota_max_backups_s3" min="0" max="100000000" step="1" placeholder="0">
+            <input type="number" id="quota_max_backups_s3" min="0" max="100000000" step="1" placeholder="<?php echo (int)$globalMaxBackupsS3Mb; ?>">
         </div>
         <?php endif; ?>
         <div class="form-actions">

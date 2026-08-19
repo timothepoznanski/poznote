@@ -371,3 +371,105 @@ html[data-theme='dark'] .spinner,
     border-color: var(--border-color-dark, #4a5568);
     border-top-color: var(--primary-color, #007DB8);
 }
+
+/* Admin contact modal (SaaS mode): two routing options, GitHub for general
+   questions and the admin's email for account-specific ones. */
+.admin-contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-align: left;
+    white-space: normal;
+}
+.admin-contact-option {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+}
+.admin-contact-option > .lucide {
+    flex: none;
+    margin-top: 3px;
+    font-size: 1.1rem;
+    color: #007DB8;
+    background-color: #007DB8;
+}
+.admin-contact-option-title {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+.admin-contact-option-desc {
+    display: block;
+    color: #6b7280;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+.admin-contact-option a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    color: #007DB8;
+    font-weight: 600;
+    text-decoration: none;
+}
+.admin-contact-option a:hover {
+    text-decoration: underline;
+}
+.admin-contact-option a .lucide {
+    font-size: 0.85em;
+}
+.admin-contact-email-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+.admin-contact-email {
+    font-weight: 600;
+    padding: 4px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+}
+.admin-contact-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.85rem;
+    color: inherit;
+}
+.admin-contact-copy:hover {
+    border-color: #007DB8;
+    color: #007DB8;
+}
+.admin-contact-copy .lucide {
+    font-size: 0.9em;
+}
+html[data-theme='dark'] .admin-contact-option,
+body.dark-mode .admin-contact-option {
+    background: var(--dm-surface, #1f2937);
+    border-color: var(--dm-border, #374151);
+}
+html[data-theme='dark'] .admin-contact-option-desc,
+body.dark-mode .admin-contact-option-desc {
+    color: #9ca3af;
+}
+html[data-theme='dark'] .admin-contact-email,
+html[data-theme='dark'] .admin-contact-copy,
+body.dark-mode .admin-contact-email,
+body.dark-mode .admin-contact-copy {
+    background: transparent;
+    border-color: var(--dm-border, #374151);
+}
