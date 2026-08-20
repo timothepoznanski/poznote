@@ -114,7 +114,7 @@ function collectStorageStats(): array {
     // Map user id => profile (username, admin flag, per-user quota overrides).
     $profiles = [];
     try {
-        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb, quota_max_backups_s3_mb FROM users");
+        $stmt = getMasterConnection()->query("SELECT id, username, is_admin, active, quota_max_notes, quota_max_storage_mb, quota_max_storage_s3_mb, quota_max_backups_s3_mb FROM users");
         foreach ($stmt as $profile) {
             $profiles[(int)$profile['id']] = $profile;
         }
@@ -147,6 +147,10 @@ function collectStorageStats(): array {
             'user_id'          => (int)$userId,
             'username'         => $profile['username'] ?? null,
             'is_admin'         => $profile ? (bool)$profile['is_admin'] : false,
+            // A directory with no matching profile row (leftover data) counts
+            // as active: the "hide disabled accounts" filter must never be
+            // what makes orphan storage invisible.
+            'active'           => $profile ? (bool)$profile['active'] : true,
             'quota_max_notes'  => ($profile && $profile['quota_max_notes'] !== null) ? (int)$profile['quota_max_notes'] : null,
             'quota_max_storage_mb' => ($profile && $profile['quota_max_storage_mb'] !== null) ? (int)$profile['quota_max_storage_mb'] : null,
             'quota_max_storage_s3_mb' => ($profile && $profile['quota_max_storage_s3_mb'] !== null) ? (int)$profile['quota_max_storage_s3_mb'] : null,
@@ -303,14 +307,37 @@ if ($requestedPageSize !== null && ctype_digit((string)$requestedPageSize)
         : 50;
 }
 
+// === Hide deactivated accounts (persisted in the settings table, like the
+// sort and the page size, so it never has to travel in the URL) ===
+// The checkbox always posts a value, so an explicit "0" turns the filter off;
+// a request without the param at all (a pager or sort link) keeps the stored
+// preference.
+$requestedHideInactive = $_GET['hide_inactive'] ?? null;
+if ($requestedHideInactive !== null && in_array((string)$requestedHideInactive, ['0', '1'], true)) {
+    $storageHideInactive = $requestedHideInactive === '1';
+    global $con;
+    try {
+        $hideStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $hideStmt->execute(['admin_storage_stats_hide_inactive', $storageHideInactive ? '1' : '0']);
+    } catch (Exception $e) {
+        // Non-fatal: the requested state still applies for this request.
+    }
+} else {
+    $storageHideInactive = getSetting('admin_storage_stats_hide_inactive') === '1';
+}
+
 // === Search + pagination (server-side) ===
-// The totals row further down is computed over $stats before this filter, so
-// it always reports the whole instance whatever the page or search shows.
+// The totals row further down is computed over $stats before these filters, so
+// it always reports the whole instance whatever the page, the search or the
+// hidden accounts show.
 $storageSearch = trim((string)($_GET['q'] ?? ''));
 $storageRows = $stats;
+if ($storageHideInactive) {
+    $storageRows = array_values(array_filter($storageRows, fn($row) => $row['active']));
+}
 if ($storageSearch !== '') {
     $needle = mb_strtolower($storageSearch);
-    $storageRows = array_values(array_filter($stats, function ($row) use ($needle) {
+    $storageRows = array_values(array_filter($storageRows, function ($row) use ($needle) {
         return mb_strpos(mb_strtolower((string)($row['username'] ?? '')), $needle) !== false
             || strpos((string)$row['user_id'], $needle) !== false;
     }));
@@ -880,6 +907,14 @@ foreach ($stats as $r) {
                     <i class="lucide lucide-x"></i>
                 </button>
             </div>
+            <?php // Hidden twin: an unchecked box posts nothing, so without it
+                  // turning the filter back off would look like "no opinion"
+                  // and the stored preference would win. ?>
+            <input type="hidden" name="hide_inactive" value="0">
+            <label class="admin-hide-inactive">
+                <input type="checkbox" name="hide_inactive" value="1" onchange="this.form.submit()" <?php echo $storageHideInactive ? 'checked' : ''; ?>>
+                <span><?php echo t_h('admin_tools.storage_stats.hide_inactive', [], 'Hide disabled accounts'); ?></span>
+            </label>
         </form>
 
         <div class="results-container table-scroll">

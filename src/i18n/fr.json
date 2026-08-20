@@ -350,7 +350,7 @@
       "upload_section_title": "Choisissez une nouvelle pièce jointe",
       "drag_drop_info": "Vous pouvez glisser-déposer votre fichier ci-dessous :",
       "all_types_accepted": "Tous types de fichiers acceptés (max 200 Mo)",
-      "note_taking_notice": "Gardez à l'esprit que Poznote est une application de prise de notes, pas un service de stockage de photos ou de vidéos : les fichiers médias volumineux remplissent très vite votre espace de stockage.",
+      "note_taking_notice": "Poznote est une application de prise de notes : vous pouvez y stocker des médias, mais les fichiers volumineux remplissent vite votre espace.",
       "note_taking_notice_link": "Voir mon stockage",
       "upload_button": "Joindre",
       "current_attachments": "Pièces jointes actuelles",
@@ -472,7 +472,6 @@
       "github": "Ouvrez le code source de Poznote sur GitHub.",
       "api_rest": "Affichez les informations sur l'API REST de Poznote.",
       "website": "Ouvrez le site officiel de Poznote.",
-      "cloud": "Découvrez l'offre hébergée Poznote Cloud.",
       "support": "Soutenez le développement de Poznote par un don.",
       "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification."
@@ -522,7 +521,6 @@
       "documentation": "Documentation GitHub",
       "news": "Blog Poznote",
       "website": "Site Poznote",
-      "cloud": "Poznote Cloud",
       "github_star": "Mettre une étoile sur GitHub",
       "guestbook": "Livre d'or Poznote",
       "support": "Soutenir Poznote",
@@ -2928,6 +2926,7 @@
       "export_csv": "Exporter en CSV",
       "edit_user": "Modifier l'utilisateur",
       "filter_placeholder": "Filtrer les utilisateurs...",
+      "hide_inactive": "Masquer les comptes désactivés",
       "pager": {
         "previous": "Précédent",
         "next": "Suivant",
@@ -3338,6 +3337,7 @@
       "quota_max_notes_for": "Nombre max de notes pour {{user}}",
       "quota_max_storage_for": "Stockage local max pour {{user}} (Mo)",
       "filter_placeholder": "Filtrer les comptes...",
+      "hide_inactive": "Masquer les comptes désactivés",
       "export_csv": "Exporter en CSV",
       "pager": {
         "previous": "Précédent",
@@ -3354,7 +3354,10 @@
       "table_backups_s3": "Sauvegardes S3 (Mo)",
       "quota_admin_exempt": "Illimité car administrateur",
       "quota_admin_exempt_message": "Les quotas ne s’appliquent pas aux comptes administrateurs : leurs notes et leur stockage sont illimités.",
-      "table_notes_total": "Total notes"
+      "table_notes_total": "Total notes",
+      "quota_unlimited": "Illimité",
+      "quota_percent_used": "{{percent}} % utilisé",
+      "quota_unit_mb": "Mo"
     }
   },
   "activity_log": {

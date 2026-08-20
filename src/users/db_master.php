@@ -769,8 +769,8 @@ function withComputedDisplayName(?array $user): ?array {
  * as listAllUserProfiles). Returns null when the count cannot be established,
  * so callers enforcing a cap can fail closed instead of reading a failure as 0.
  */
-function countUserProfiles(?string $search = null): ?int {
-    [$where, $params] = buildUserProfilesSearchClause($search);
+function countUserProfiles(?string $search = null, bool $activeOnly = false): ?int {
+    [$where, $params] = buildUserProfilesSearchClause($search, $activeOnly);
     try {
         $con = getMasterConnection();
         $stmt = $con->prepare("SELECT COUNT(*) FROM users" . $where);
@@ -1355,21 +1355,30 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
  */
 /**
  * WHERE fragment + bound values for a free-text user search across the
- * columns shown in the admin table. Shared by listAllUserProfiles() and
- * countUserProfiles() so the page slice and the total can never disagree.
+ * columns shown in the admin table, optionally restricted to active accounts.
+ * Shared by listAllUserProfiles() and countUserProfiles() so the page slice
+ * and the total can never disagree.
  */
-function buildUserProfilesSearchClause(?string $search): array {
+function buildUserProfilesSearchClause(?string $search, bool $activeOnly = false): array {
     $search = trim((string)$search);
-    if ($search === '') {
+    $conditions = [];
+    $params = [];
+    if ($search !== '') {
+        // LIKE wildcards in the typed text are data, not patterns.
+        $pattern = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search) . '%';
+        $conditions[] = "(username LIKE ? ESCAPE '\\'"
+            . " OR email LIKE ? ESCAPE '\\'"
+            . " OR first_name LIKE ? ESCAPE '\\'"
+            . " OR last_name LIKE ? ESCAPE '\\')";
+        $params = [$pattern, $pattern, $pattern, $pattern];
+    }
+    if ($activeOnly) {
+        $conditions[] = 'active = 1';
+    }
+    if (!$conditions) {
         return ['', []];
     }
-    // LIKE wildcards in the typed text are data, not patterns.
-    $pattern = '%' . str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search) . '%';
-    $where = " WHERE (username LIKE ? ESCAPE '\\'"
-        . " OR email LIKE ? ESCAPE '\\'"
-        . " OR first_name LIKE ? ESCAPE '\\'"
-        . " OR last_name LIKE ? ESCAPE '\\')";
-    return [$where, [$pattern, $pattern, $pattern, $pattern]];
+    return [' WHERE ' . implode(' AND ', $conditions), $params];
 }
 
 /**
@@ -1392,7 +1401,7 @@ function listUserProfileNames(): array {
     }
 }
 
-function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?int $limit = null, int $offset = 0): array {
+function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?int $limit = null, int $offset = 0, bool $activeOnly = false): array {
     // Text columns push empty values last in both directions; NULL dates sort
     // as "least recent" (SQLite treats NULL as smallest, so DESC puts them last).
     // The "note access" count lives in user_account_access, hence the scalar
@@ -1431,7 +1440,7 @@ function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?i
     // up on two consecutive pages while another is skipped entirely.
     $orderBy = ($orderClauses[$sort] ?? $orderClauses['id_asc']) . ', id ASC';
 
-    [$where, $params] = buildUserProfilesSearchClause($search);
+    [$where, $params] = buildUserProfilesSearchClause($search, $activeOnly);
 
     // Interpolated rather than bound: SQLite rejects placeholders in
     // LIMIT/OFFSET on some builds. Both are cast to int by the signature and

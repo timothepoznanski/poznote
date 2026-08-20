@@ -340,7 +340,7 @@
       "upload_section_title": "上传新附件",
       "drag_drop_info": "您可以将文件拖放到下方:",
       "all_types_accepted": "接受所有文件类型 (最大 200MB)",
-      "note_taking_notice": "请注意，Poznote 是一款笔记应用，而非照片或视频存储服务：大体积媒体文件会很快占满您的存储空间。",
+      "note_taking_notice": "Poznote 是笔记应用：可以存放媒体文件，但大文件会很快占满空间。",
       "note_taking_notice_link": "查看我的存储空间",
       "upload_button": "添加",
       "current_attachments": "当前附件",
@@ -462,7 +462,6 @@
       "github": "在 GitHub 上打开 Poznote 源代码。",
       "api_rest": "显示 Poznote REST API 的相关信息。",
       "website": "打开 Poznote 官方网站。",
-      "cloud": "了解 Poznote Cloud 托管服务。",
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。"
@@ -512,7 +511,6 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote 博客",
       "website": "Poznote 网站",
-      "cloud": "Poznote Cloud",
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
       "ui_customization_global": "元素可见性（所有用户）",
@@ -2875,6 +2873,7 @@
       "export_csv": "导出 CSV",
       "edit_user": "编辑用户",
       "filter_placeholder": "筛选用户...",
+      "hide_inactive": "隐藏已停用的账户",
       "pager": {
         "previous": "上一页",
         "next": "下一页",
@@ -3275,6 +3274,7 @@
       "quota_max_notes_for": "{{user}} 的最大笔记数",
       "quota_max_storage_for": "{{user}} 的本地存储上限 (MB)",
       "filter_placeholder": "筛选账户...",
+      "hide_inactive": "隐藏已停用的账户",
       "export_csv": "导出 CSV",
       "pager": {
         "previous": "上一页",
@@ -3291,7 +3291,10 @@
       "table_backups_s3": "备份 S3 (MB)",
       "quota_admin_exempt": "管理员不受限制",
       "quota_admin_exempt_message": "配额不适用于管理员账户：其笔记和存储空间均无限制。",
-      "table_notes_total": "笔记总数"
+      "table_notes_total": "笔记总数",
+      "quota_unlimited": "无限制",
+      "quota_percent_used": "已使用 {{percent}}%",
+      "quota_unit_mb": "MB"
     }
   },
   "activity_log": {

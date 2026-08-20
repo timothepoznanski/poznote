@@ -29,19 +29,16 @@ function poznoteFormatMb(int $bytes): string {
 }
 
 /**
- * Glue a trailing unit like "(MB)" to the preceding word so it never wraps
- * onto its own line. Expects an already HTML-safe string from t_h().
+ * Drop a trailing unit like "(MB)" from a table header label: the cards
+ * carry the unit inside the figure itself. Expects an HTML-safe string.
  */
-function poznoteGlueUnit(string $label): string {
-    return preg_replace('/ (\([^()]*\))\s*$/u', '&nbsp;$1', $label);
+function poznoteStripUnit(string $label): string {
+    return trim(preg_replace('/\s*\([^()]*\)\s*$/u', '', $label));
 }
 
 $activeUserId = (int)(getCurrentUserId() ?? 0);
 $manager      = new UserDataManager($activeUserId);
 $sizes        = $manager->getStorageStats();
-
-$activeProfile  = getUserProfileById($activeUserId);
-$activeUsername = $activeProfile['username'] ?? '';
 
 $notesActive = 0;
 $notesTrash  = 0;
@@ -104,14 +101,6 @@ $quotaStorageS3  = $quotaIsAdmin ? 0 : (int)round($quotaLimits['max_storage_s3_b
 $quotaBackupsS3  = $quotaIsAdmin ? 0 : (int)round($quotaLimits['max_backups_s3_bytes'] / (1024 * 1024));
 
 /**
- * The "/ 500" quota suffix appended to a usage figure. Read-only here: unlike
- * the admin page, a user cannot edit their own limits.
- */
-function poznoteUserQuotaSuffix(int $value): string {
-    return ' <span class="quota-inline">/&nbsp;' . ($value > 0 ? (string)$value : '∞') . '</span>';
-}
-
-/**
  * CSS class colouring a usage figure against its quota: orange from 50% of
  * the limit, red from 80%. Empty when the quota is 0 (unlimited, including
  * exempt admins) or below the first threshold. $used must be in the same
@@ -135,6 +124,117 @@ function poznoteUserQuotaLevelClass(float $used, int $limit): string {
 // S3 attachments have their own column and their own quota; backups,
 // snapshots and backgrounds are excluded as well.
 $displayedTotalBytes = (int)$sizes['database'] + (int)$sizes['entries'] + $attachmentLocalBytes;
+
+// Cards shown under the table: one per quota, so the headroom left can be
+// read without decoding a dense row. Each card shows its limit, a fill bar
+// and a percentage, plus the table columns feeding its total.
+$quotaUnitMb = t_h('admin_tools.storage_stats.quota_unit_mb', [], 'MB');
+
+/**
+ * Link to the page managing what a card counts, keeping the workspace the
+ * page was opened with.
+ */
+$cardHref = function (string $page) use ($pageWorkspace): string {
+    if ($pageWorkspace !== '') {
+        $page .= '?workspace=' . rawurlencode($pageWorkspace);
+    }
+    return htmlspecialchars($page, ENT_QUOTES, 'UTF-8');
+};
+
+/**
+ * A quota card for a storage figure, with the values already formatted in MB.
+ * A limit of 0 means unlimited (global setting unset, or exempt admin).
+ */
+$makeSizeCard = function (string $icon, string $label, int $bytes, int $limitMb, string $href = '') use ($quotaUnitMb): array {
+    return [
+        'icon'      => $icon,
+        'href'      => $href,
+        'label'     => $label,
+        'help'      => '',
+        'used'      => $bytes / 1048576,
+        'limit'     => $limitMb,
+        'usedText'  => poznoteFormatMb($bytes) . '&nbsp;' . $quotaUnitMb,
+        'limitText' => number_format($limitMb) . '&nbsp;' . $quotaUnitMb,
+    ];
+};
+
+$statCards = [
+    // Every note in a single card: the total is what the note quota counts,
+    // with the active/trashed split underneath.
+    [
+        'icon'      => 'lucide-sticky-note',
+        'href'      => $cardHref('notes_manager.php'),
+        'label'     => t_h('admin_tools.storage_stats.table_notes_total', [], 'Total notes'),
+        'help'      => '',
+        'used'      => (float)($notesActive + $notesTrash),
+        'limit'     => $quotaNotes,
+        'usedText'  => number_format($notesActive + $notesTrash),
+        'limitText' => number_format($quotaNotes),
+        'breakdown' => [
+            [
+                'label' => t_h('admin_tools.storage_stats.table_notes', [], 'Notes'),
+                'value' => number_format($notesActive),
+                'help'  => '',
+            ],
+            [
+                'label' => t_h('admin_tools.storage_stats.table_trash', [], 'Trash'),
+                'value' => number_format($notesTrash),
+                'help'  => '',
+            ],
+        ],
+    ],
+    // Everything stored locally in a single card: the total carries the
+    // local storage quota, and the columns feeding it (database, note
+    // files, attachments) are listed underneath.
+    [
+        'icon'      => 'lucide-hard-drive',
+        'label'     => poznoteStripUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')),
+        'help'      => '',
+        'used'      => $displayedTotalBytes / 1048576,
+        'limit'     => $quotaStorage,
+        'usedText'  => poznoteFormatMb($displayedTotalBytes) . '&nbsp;' . $quotaUnitMb,
+        'limitText' => number_format($quotaStorage) . '&nbsp;' . $quotaUnitMb,
+        'breakdown' => [
+            [
+                'label' => poznoteStripUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database local (MB)')),
+                'value' => poznoteFormatMb((int)$sizes['database']) . '&nbsp;' . $quotaUnitMb,
+                'help'  => t_h('admin_tools.storage_stats.db_help', [], 'The database stores your settings and the raw text of your notes, used for fast search.'),
+            ],
+            [
+                'label' => poznoteStripUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files local (MB)')),
+                'value' => poznoteFormatMb((int)$sizes['entries']) . '&nbsp;' . $quotaUnitMb,
+                'help'  => t_h('admin_tools.storage_stats.files_help', [], 'The files are the contents of your notes, in HTML or Markdown format.'),
+            ],
+            [
+                'label' => $s3ColumnVisible
+                    ? poznoteStripUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)'))
+                    : poznoteStripUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')),
+                'value' => poznoteFormatMb($attachmentLocalBytes) . '&nbsp;' . $quotaUnitMb,
+                'help'  => AttachmentStorage::isEnabled()
+                    ? t_h('admin_tools.storage_stats.user_s3_notice', [], 'Attachments are stored in S3 storage rather than locally, as configured by the administrator.')
+                    : '',
+            ],
+        ],
+    ],
+];
+if ($s3ColumnVisible) {
+    $statCards[] = $makeSizeCard(
+        'lucide-cloud',
+        poznoteStripUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')),
+        $attachmentS3Bytes,
+        $quotaStorageS3,
+        $cardHref('attachments_list.php')
+    );
+}
+if ($backupsColumnVisible) {
+    $statCards[] = $makeSizeCard(
+        'lucide-archive',
+        poznoteStripUnit(t_h('admin_tools.storage_stats.table_backups_s3', [], 'Backups S3 (MB)')),
+        $backupsS3Bytes,
+        $quotaBackupsS3,
+        $cardHref('backup_export.php')
+    );
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES); ?>">
@@ -164,52 +264,6 @@ $displayedTotalBytes = (int)$sizes['database'] + (int)$sizes['entries'] + $attac
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $v; ?>">
     <link rel="stylesheet" href="css/attachments/usage-notice.css?v=<?php echo $v; ?>">
     <style>
-    /* Same sizes as the admin storage-stats page: slightly larger column
-       headers, smaller cell values than the admin-tools defaults. */
-    .results-table th {
-        font-size: 0.78rem;
-    }
-    .results-table td {
-        font-size: 0.85rem;
-    }
-    /* Centered over their (mostly numeric) columns, like the admin page. */
-    .results-table th,
-    .results-table td {
-        text-align: center;
-    }
-    /* With S3 attachments and backups enabled the table reaches 8 columns,
-       far past the 700px .dr-page wrapper. Let the page take the window and
-       the table shrink-fit and centre inside it, so no column is clipped by
-       a fixed guess; narrow screens scroll the container instead. */
-    .dr-page {
-        max-width: none;
-    }
-    .results-container {
-        overflow-x: auto;
-    }
-    .results-table {
-        width: auto;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    /* Rule separating the column groups: note counts, trash, local storage,
-       S3 attachments, S3 backups. It sits on the column that opens each
-       group, so it lands correctly whichever S3 features are enabled. */
-    .results-table th.col-group-start,
-    .results-table td.col-group-start {
-        border-left: 2px solid var(--border-color, #e5e7eb);
-    }
-    /* "/ 500" suffix appended to the usage figure it limits, in the same
-       colour and weight as that figure so the pair reads as one value. */
-    .quota-inline {
-        font-weight: normal;
-        color: inherit;
-    }
-    /* Account name inside the description: emphasised, and kept on one line. */
-    .storage-user-name {
-        font-weight: 600;
-        white-space: nowrap;
-    }
     /* Help icon on the local attachments figure when S3 storage is on.
        No vertical-align override: lucide.css's -0.125em keeps the icon on
        the text baseline. */
@@ -240,6 +294,171 @@ $displayedTotalBytes = (int)$sizes['database'] + (int)$sizes['entries'] + $attac
     .attachment-usage-notice {
         justify-content: center;
     }
+    /* ── Quota cards ──────────────────────────────────────────────
+       The table packs everything into one dense row; these cards group
+       it per quota (notes, local storage, and each S3 bucket), showing
+       the limit, a fill bar, a percentage and the detail behind the
+       total. */
+    .quota-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        max-width: 700px;
+        margin: 28px auto 0;
+    }
+    .quota-card {
+        /* Accent driving the figure and the bar. Overridden by the level
+           classes below, which win on two-class specificity over
+           admin-tools.css's plain .quota-level-* colour rules. The icon
+           keeps its own muted tone so it stays a marker, not the focus,
+           and only takes the accent once a quota crosses a threshold. */
+        --quota-accent: #007cba;
+        --quota-icon: #c2c8d0;
+        display: flex;
+        /* Top-aligned: grid rows stretch every card to the tallest one, and
+           centring left the shorter card (fewer breakdown rows) floating in
+           the middle, with a gap above its title. */
+        align-items: flex-start;
+        gap: 16px;
+        padding: 18px 20px;
+        border: 1.5px solid var(--border-color, #e5e7eb);
+        border-radius: 12px;
+        background: var(--bg-color, #fff);
+        text-align: left;
+        color: var(--text-color, #1a1a1a);
+    }
+    a.quota-card {
+        text-decoration: none;
+        transition: border-color 0.15s;
+    }
+    a.quota-card:hover,
+    a.quota-card:focus-visible {
+        border-color: var(--quota-accent);
+    }
+    .quota-card.quota-level-warn {
+        --quota-accent: #e8830c;
+        --quota-icon: #e8830c;
+    }
+    .quota-card.quota-level-danger {
+        --quota-accent: #dc3545;
+        --quota-icon: #dc3545;
+    }
+    /* Lucide icons are CSS masks: they need background-color, not just
+       color, to take the accent. */
+    .quota-card-icon {
+        flex: none;
+        /* Optically level with the label now that the card is top-aligned. */
+        margin-top: 2px;
+        font-size: 1.6rem;
+        stroke-width: 1.75;
+        color: var(--quota-icon);
+        background-color: var(--quota-icon);
+    }
+    .quota-card-body {
+        flex: 1;
+        min-width: 0;
+    }
+    .quota-card-label {
+        margin-bottom: 14px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-muted, #6b7280);
+    }
+    .quota-card-value {
+        font-size: 1.35rem;
+        font-weight: 700;
+        white-space: nowrap;
+        color: var(--quota-accent);
+    }
+    .quota-card-limit {
+        margin-left: 3px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        opacity: 0.75;
+    }
+    .quota-card-limit .lucide-infinity {
+        font-size: 1.1rem;
+    }
+    .quota-card-bar {
+        margin-top: 9px;
+        height: 6px;
+        border-radius: 999px;
+        background: rgba(127, 127, 127, 0.22);
+        overflow: hidden;
+    }
+    .quota-card-bar > span {
+        display: block;
+        height: 100%;
+        border-radius: 999px;
+        background: var(--quota-accent);
+    }
+    .quota-card-meta {
+        margin-top: 6px;
+        font-size: 0.78rem;
+        color: var(--text-muted, #6b7280);
+    }
+    /* Columns feeding the card's total, listed as "label … value" rows. */
+    .quota-card-breakdown {
+        display: grid;
+        gap: 3px;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--border-color, #e5e7eb);
+        font-size: 0.78rem;
+        color: var(--text-muted, #6b7280);
+    }
+    .quota-card-breakdown-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .quota-card-breakdown-value {
+        flex: none;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    html[data-theme='dark'] .quota-card,
+    body.dark-mode .quota-card {
+        --quota-accent: var(--dm-accent, #4a9eff);
+        --quota-icon: #6f7885;
+        background: var(--dm-surface, #333);
+        border-color: var(--dm-border, #404040);
+        color: var(--dm-text, #bebebe);
+    }
+    html[data-theme='dark'] .quota-card.quota-level-warn,
+    body.dark-mode .quota-card.quota-level-warn {
+        --quota-accent: #fbbf24;
+        --quota-icon: #fbbf24;
+    }
+    html[data-theme='dark'] .quota-card.quota-level-danger,
+    body.dark-mode .quota-card.quota-level-danger {
+        --quota-accent: #f87171;
+        --quota-icon: #f87171;
+    }
+    html[data-theme='dark'] .quota-card-label,
+    body.dark-mode .quota-card-label,
+    html[data-theme='dark'] .quota-card-meta,
+    body.dark-mode .quota-card-meta,
+    html[data-theme='dark'] .quota-card-breakdown,
+    body.dark-mode .quota-card-breakdown {
+        color: var(--dm-text-muted, #c5c5c5);
+    }
+    html[data-theme='dark'] .quota-card-breakdown,
+    body.dark-mode .quota-card-breakdown {
+        border-top-color: var(--dm-border, #404040);
+    }
+    @media (max-width: 540px) {
+        .quota-card {
+            padding: 16px;
+            gap: 14px;
+        }
+        .quota-card-icon {
+            font-size: 1.5rem;
+        }
+    }
     </style>
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
@@ -252,69 +471,68 @@ $displayedTotalBytes = (int)$sizes['database'] + (int)$sizes['entries'] + $attac
 
     <div class="dr-page">
         <div class="dr-hero">
-            <p><?php
-                $userDesc = t_h('admin_tools.storage_stats.user_description', [], 'Number of notes and disk space used by your account.');
-                if ($activeUsername !== '') {
-                    // Drop the translation's trailing sentence stop (ASCII or
-                    // ideographic): the account name ends the line, unpunctuated.
-                    $trimmed = preg_replace('/[.。]\s*$/u', '', $userDesc);
-                    echo $trimmed . ' <span class="storage-user-name">' . htmlspecialchars($activeUsername, ENT_QUOTES) . '</span>';
-                } else {
-                    echo $userDesc;
-                }
-            ?></p>
             <?php if (poznoteSaasNoticesEnabled()): ?>
             <div class="attachment-usage-notice">
                 <i class="lucide lucide-alert-triangle"></i>
-                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.'); ?></span>
+                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Poznote is a note-taking app: you can store media, but large files fill up your space quickly.'); ?></span>
             </div>
             <?php endif; ?>
         </div>
 
-        <div class="results-container">
-            <table class="results-table">
-                <thead>
-                    <tr>
-                        <th><?php echo t_h('admin_tools.storage_stats.table_notes', [], 'Notes'); ?></th>
-                        <th><?php echo t_h('admin_tools.storage_stats.table_trash', [], 'Trash'); ?></th>
-                        <?php // The note quota counts active + trashed notes, so its
-                              // total sits after both, carrying the "/ 500" suffix. ?>
-                        <th><?php echo t_h('admin_tools.storage_stats.table_notes_total', [], 'Total notes'); ?></th>
-                        <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_db', [], 'Database local (MB)')); ?></th>
-                        <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_entries', [], 'Files local (MB)')); ?></th>
-                        <?php if ($s3ColumnVisible): ?>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_local', [], 'Attachments local (MB)')); ?></th>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')); ?></th>
-                            <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments_s3', [], 'Attachments S3 (MB)')); ?></th>
+        <div class="quota-cards">
+            <?php foreach ($statCards as $card):
+                $isUnlimited = ((int)$card['limit'] <= 0);
+                $levelClass  = poznoteUserQuotaLevelClass((float)$card['used'], (int)$card['limit']);
+                $percent     = 0.0;
+                if (!$isUnlimited) {
+                    $percent = min(100, max(0, ((float)$card['used'] / (int)$card['limit']) * 100));
+                }
+                // Show "<1%" rather than "0%" as soon as anything is used, so a
+                // non-empty quota never reads as untouched.
+                $percentText = ($percent > 0 && $percent < 1) ? '<1' : (string)round($percent);
+                $cardTag     = empty($card['href']) ? 'div' : 'a';
+                $cardAttr    = empty($card['href']) ? '' : ' href="' . $card['href'] . '"';
+            ?>
+            <?php // Cards pointing at the page that manages what they count
+                  // render as links; the others stay plain blocks. ?>
+            <<?php echo $cardTag; ?> class="quota-card <?php echo $levelClass; ?>"<?php echo $cardAttr; ?>>
+                <i class="lucide <?php echo $card['icon']; ?> quota-card-icon"></i>
+                <div class="quota-card-body">
+                    <div class="quota-card-label"><?php echo $card['label']; ?></div>
+                    <?php // The help icon rides with the figure, like in the
+                          // table: labels wrap, the short figure never does. ?>
+                    <div class="quota-card-value">
+                        <span class="quota-card-used"><?php echo $card['usedText']; ?></span>
+                        <?php if (!empty($card['help'])): ?>
+                            <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo $card['help']; ?>"></i>
+                        <?php endif; ?>
+                        <?php if ($isUnlimited): ?>
+                            <span class="quota-card-limit">/&nbsp;<i class="lucide lucide-infinity"></i></span>
                         <?php else: ?>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_attachments', [], 'Attachments (MB)')); ?></th>
-                            <th><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_total', [], 'Total local (MB)')); ?></th>
+                            <span class="quota-card-limit">/&nbsp;<?php echo $card['limitText']; ?></span>
                         <?php endif; ?>
-                        <?php if ($backupsColumnVisible): ?>
-                            <th class="col-group-start"><?php echo poznoteGlueUnit(t_h('admin_tools.storage_stats.table_backups_s3', [], 'Backups S3 (MB)')); ?></th>
-                        <?php endif; ?>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><?php echo $notesActive; ?></td>
-                        <td><?php echo $notesTrash; ?></td>
-                        <?php // Trashed notes count against the quota too: they still
-                              // exist and can be restored. ?>
-                        <td style="white-space: nowrap;" class="<?php echo poznoteUserQuotaLevelClass($notesActive + $notesTrash, $quotaNotes); ?>"><?php echo ($notesActive + $notesTrash) . poznoteUserQuotaSuffix($quotaNotes); ?></td>
-                        <td class="col-group-start" style="white-space: nowrap;"><?php echo poznoteFormatMb((int)$sizes['database']); ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo t_h('admin_tools.storage_stats.db_help', [], 'The database stores your settings and the raw text of your notes, used for fast search.'); ?>"></i></td>
-                        <td style="white-space: nowrap;"><?php echo poznoteFormatMb((int)$sizes['entries']); ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo t_h('admin_tools.storage_stats.files_help', [], 'The files are the contents of your notes, in HTML or Markdown format.'); ?>"></i></td>
-                        <td style="white-space: nowrap;"><?php echo poznoteFormatMb($attachmentLocalBytes); ?><?php if (AttachmentStorage::isEnabled()): ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo t_h('admin_tools.storage_stats.user_s3_notice', [], 'Attachments are stored in S3 storage rather than locally, as configured by the administrator.'); ?>"></i><?php endif; ?></td>
-                        <td style="white-space: nowrap;" class="<?php echo poznoteUserQuotaLevelClass($displayedTotalBytes / 1048576, $quotaStorage); ?>"><?php echo poznoteFormatMb($displayedTotalBytes) . poznoteUserQuotaSuffix($quotaStorage); ?></td>
-                        <?php if ($s3ColumnVisible): ?>
-                            <td class="col-group-start <?php echo poznoteUserQuotaLevelClass($attachmentS3Bytes / 1048576, $quotaStorageS3); ?>" style="white-space: nowrap;"><?php echo poznoteFormatMb($attachmentS3Bytes) . poznoteUserQuotaSuffix($quotaStorageS3); ?></td>
-                        <?php endif; ?>
-                        <?php if ($backupsColumnVisible): ?>
-                            <td class="col-group-start <?php echo poznoteUserQuotaLevelClass($backupsS3Bytes / 1048576, $quotaBackupsS3); ?>" style="white-space: nowrap;"><?php echo poznoteFormatMb($backupsS3Bytes) . poznoteUserQuotaSuffix($quotaBackupsS3); ?></td>
-                        <?php endif; ?>
-                    </tr>
-                </tbody>
-            </table>
+                    </div>
+                    <?php if ($isUnlimited): ?>
+                        <div class="quota-card-meta"><?php echo $quotaIsAdmin
+                            ? t_h('admin_tools.storage_stats.quota_admin_exempt', [], 'Unlimited because admin')
+                            : t_h('admin_tools.storage_stats.quota_unlimited', [], 'Unlimited'); ?></div>
+                    <?php else: ?>
+                        <div class="quota-card-bar"><span style="width: <?php echo ($percent > 0 ? max(2, round($percent)) : 0); ?>%;"></span></div>
+                        <div class="quota-card-meta"><?php echo t_h('admin_tools.storage_stats.quota_percent_used', ['percent' => $percentText], '{{percent}}% used'); ?></div>
+                    <?php endif; ?>
+                    <?php if (!empty($card['breakdown'])): ?>
+                        <div class="quota-card-breakdown">
+                            <?php foreach ($card['breakdown'] as $row): ?>
+                            <div class="quota-card-breakdown-row">
+                                <span><?php echo $row['label']; ?><?php if (!empty($row['help'])): ?> <i class="lucide lucide-help-circle storage-local-help" data-tooltip="<?php echo $row['help']; ?>"></i><?php endif; ?></span>
+                                <span class="quota-card-breakdown-value"><?php echo $row['value']; ?></span>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </<?php echo $cardTag; ?>>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>

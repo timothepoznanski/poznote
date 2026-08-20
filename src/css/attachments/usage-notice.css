@@ -32,3 +32,13 @@ body.dark-mode .attachment-usage-notice .lucide-alert-triangle {
     color: #f87171;
     background-color: #f87171;
 }
+
+/* Directly under a page title (attachments_list.php), the notice is centred
+   like the title and the filter bar it sits between. In attachments.php it
+   belongs to the left-aligned upload form, so only the top-level placement
+   is centred. */
+.shared-container > .attachment-usage-notice {
+    justify-content: center;
+    text-align: center;
+    margin-bottom: 18px;
+}

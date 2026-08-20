@@ -185,7 +185,6 @@
       "github": "Открыть исходный код Poznote на GitHub.",
       "api_rest": "Показать информацию о REST API Poznote.",
       "website": "Открыть официальный сайт Poznote.",
-      "cloud": "Откройте облачный сервис Poznote Cloud.",
       "support": "Поддержите разработку Poznote пожертвованием.",
       "s3_storage": "Хранить вложения заметок в S3-совместимом объектном хранилище вместо локального диска.",
       "s3_backup": "Загружает полные архивы резервных копий в S3-совместимый bucket, вручную или по расписанию."
@@ -218,7 +217,6 @@
       "documentation": "Documentation GitHub",
       "news": "Блог Poznote",
       "website": "Сайт Poznote",
-      "cloud": "Poznote Cloud",
       "github_star": "Поставить звезду на GitHub",
       "guestbook": "Гостевая книга Poznote",
       "support": "Поддержать Poznote",
@@ -501,7 +499,7 @@
       "upload_section_title": "Выберите новое вложение",
       "drag_drop_info": "Вы можете перетащить файл ниже:",
       "all_types_accepted": "Принимаются все типы файлов (макс. 200 МБ)",
-      "note_taking_notice": "Помните, что Poznote — это приложение для заметок, а не сервис хранения фото и видео: большие медиафайлы очень быстро заполняют ваше хранилище.",
+      "note_taking_notice": "Poznote — приложение для заметок: медиафайлы хранить можно, но большие файлы быстро заполнят хранилище.",
       "note_taking_notice_link": "Посмотреть моё хранилище",
       "upload_button": "Прикрепить",
       "current_attachments": "Текущие вложения",
@@ -2692,6 +2690,7 @@
       "quota_max_notes_for": "Макс. заметок для {{user}}",
       "quota_max_storage_for": "Макс. локальное хранилище для {{user}} (МБ)",
       "filter_placeholder": "Фильтровать учётные записи...",
+      "hide_inactive": "Скрыть отключённые учётные записи",
       "export_csv": "Экспорт в CSV",
       "pager": {
         "previous": "Назад",
@@ -2708,7 +2707,10 @@
       "table_backups_s3": "Резервные копии S3 (МБ)",
       "quota_admin_exempt": "Без ограничений, так как администратор",
       "quota_admin_exempt_message": "Квоты не применяются к учётным записям администраторов: их заметки и хранилище не ограничены.",
-      "table_notes_total": "Всего заметок"
+      "table_notes_total": "Всего заметок",
+      "quota_unlimited": "Без ограничений",
+      "quota_percent_used": "Использовано {{percent}} %",
+      "quota_unit_mb": "МБ"
     }
   },
   "activity_log": {
@@ -2900,6 +2902,7 @@
       "export_csv": "Экспорт в CSV",
       "edit_user": "Редактировать пользователя",
       "filter_placeholder": "Фильтровать пользователей...",
+      "hide_inactive": "Скрыть отключённые учётные записи",
       "pager": {
         "previous": "Назад",
         "next": "Вперёд",

@@ -396,6 +396,24 @@ if ($requestedUsersPageSize !== null && ctype_digit((string)$requestedUsersPageS
         : 50;
 }
 
+// === Hide deactivated accounts (persisted in the settings table, like the
+// sort and the page size, so it never has to travel in the URL) ===
+// The checkbox always posts a value, so an explicit "0" turns the filter off;
+// a request without the param at all (a pager or sort link) keeps the stored
+// preference.
+$requestedHideInactive = $_GET['hide_inactive'] ?? null;
+if ($requestedHideInactive !== null && in_array((string)$requestedHideInactive, ['0', '1'], true)) {
+    $usersHideInactive = $requestedHideInactive === '1';
+    try {
+        $hideStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $hideStmt->execute(['admin_users_hide_inactive', $usersHideInactive ? '1' : '0']);
+    } catch (Exception $e) {
+        // Non-fatal: the requested state still applies for this request.
+    }
+} else {
+    $usersHideInactive = getSetting('admin_users_hide_inactive') === '1';
+}
+
 /**
  * Interface language code shown for a profile.
  *
@@ -443,15 +461,15 @@ function usersPageSizeLabel(int $size): string {
 // lightweight listUserProfileNames() instead, so it stays correct and cheap
 // with hundreds of accounts.
 $usersSearch = trim((string)($_GET['q'] ?? ''));
-$usersTotal = countUserProfiles($usersSearch) ?? 0;
+$usersTotal = countUserProfiles($usersSearch, $usersHideInactive) ?? 0;
 if ($usersPageSize === 0) {
     $usersTotalPages = 1;
     $usersPage = 1;
-    $users = listAllUserProfiles($usersSort, $usersSearch);
+    $users = listAllUserProfiles($usersSort, $usersSearch, null, 0, $usersHideInactive);
 } else {
     $usersTotalPages = max(1, (int)ceil($usersTotal / $usersPageSize));
     $usersPage = min(max(1, (int)($_GET['page'] ?? 1)), $usersTotalPages);
-    $users = listAllUserProfiles($usersSort, $usersSearch, $usersPageSize, ($usersPage - 1) * $usersPageSize);
+    $users = listAllUserProfiles($usersSort, $usersSearch, $usersPageSize, ($usersPage - 1) * $usersPageSize, $usersHideInactive);
 }
 $accountAccessMap = getUserAccountAccessMap();
 
@@ -470,7 +488,7 @@ foreach ($allUserNames as $listedUser) {
 // mistaken for the full list. The active search and sort still apply, so the
 // file matches what the admin is looking at, just without the paging.
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
-    $exportUsers = listAllUserProfiles($usersSort, $usersSearch);
+    $exportUsers = listAllUserProfiles($usersSort, $usersSearch, null, 0, $usersHideInactive);
 
     $filename = 'poznote-users-' . date('Y-m-d') . '.csv';
     header('Content-Type: text/csv; charset=utf-8');
@@ -1009,6 +1027,14 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="users-filter-input" name="q" value="<?php echo htmlspecialchars($usersSearch, ENT_QUOTES, 'UTF-8'); ?>" class="home-search-input" placeholder="<?php echo t_h('multiuser.admin.filter_placeholder', [], 'Filter users...'); ?>" autocomplete="off">
             </div>
+            <?php // Hidden twin: an unchecked box posts nothing, so without it
+                  // turning the filter back off would look like "no opinion"
+                  // and the stored preference would win. ?>
+            <input type="hidden" name="hide_inactive" value="0">
+            <label class="admin-hide-inactive">
+                <input type="checkbox" name="hide_inactive" value="1" onchange="this.form.submit()" <?php echo $usersHideInactive ? 'checked' : ''; ?>>
+                <span><?php echo t_h('multiuser.admin.hide_inactive', [], 'Hide disabled accounts'); ?></span>
+            </label>
         </form>
 
         <!-- Users Table -->

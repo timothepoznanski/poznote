@@ -3021,20 +3021,49 @@
         }
 
         // Collapsible sections: each category title gets a chevron button that
-        // collapses the grid below it. Every visit to settings.php starts with
-        // all sections collapsed except "Pinned" and "Recent", so the page
-        // always opens on the same short view; expanding is a per-visit action
-        // and is no longer persisted across loads.
+        // collapses the grid below it. The expanded/collapsed state is kept per
+        // user across loads. Sections default to collapsed (except "Pinned" and
+        // "Recent"), so the saved list holds the EXPANDED keys: a section added
+        // by a later version, absent from that list, still starts collapsed.
         var sectionStore = window.__poznoteUserStorage || window.localStorage;
+        var SECTION_STATE_KEY = 'settingsExpandedSections';
+        var expandedSections = [];
         try {
-            // Drop any state saved by earlier versions: it would otherwise
-            // re-expand sections on load.
+            var savedSections = sectionStore.getItem(SECTION_STATE_KEY);
+            if (savedSections) {
+                var parsedSections = JSON.parse(savedSections);
+                if (Array.isArray(parsedSections)) {
+                    expandedSections = parsedSections.filter(function (key) {
+                        return typeof key === 'string' && key !== '';
+                    });
+                }
+            }
+        } catch (e) { /* storage unavailable or corrupted value */ }
+        try {
+            // Drop the state saved by earlier versions: it listed the collapsed
+            // sections instead, so it would be read the wrong way round.
             sectionStore.removeItem('settingsCollapsedSections');
         } catch (e) { /* storage unavailable */ }
 
         var alwaysExpandedSections = ['settings-pinned-section-grid', 'settings-recent-section-grid'];
 
         var sectionLabelRefreshers = [];
+
+        // Rebuilt from the DOM on every toggle so the stored list stays in sync
+        // even when several sections change at once.
+        var persistSectionStates = function () {
+            var expanded = [];
+            document.querySelectorAll('.settings-category-title').forEach(function (title) {
+                var grid = title.nextElementSibling;
+                if (!grid || !grid.classList.contains('home-grid')) return;
+                var key = grid.id || title.id;
+                if (!key || alwaysExpandedSections.indexOf(key) !== -1) return;
+                if (!title.classList.contains('section-collapsed')) expanded.push(key);
+            });
+            try {
+                sectionStore.setItem(SECTION_STATE_KEY, JSON.stringify(expanded));
+            } catch (e) { /* storage unavailable */ }
+        };
 
         document.querySelectorAll('.settings-category-title').forEach(function (title) {
             var sectionGrid = title.nextElementSibling;
@@ -3060,7 +3089,8 @@
                 toggleBtn.setAttribute('aria-label', label);
                 toggleBtn.title = label;
             };
-            applySectionState(alwaysExpandedSections.indexOf(sectionKey) === -1);
+            applySectionState(alwaysExpandedSections.indexOf(sectionKey) === -1
+                && expandedSections.indexOf(sectionKey) === -1);
             sectionLabelRefreshers.push(function () {
                 applySectionState(title.classList.contains('section-collapsed'));
             });
@@ -3068,6 +3098,7 @@
             // The button's click bubbles up here, so one listener covers both
             title.addEventListener('click', function () {
                 applySectionState(!title.classList.contains('section-collapsed'));
+                persistSectionStates();
             });
         });
 
