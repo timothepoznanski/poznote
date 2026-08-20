@@ -339,7 +339,7 @@
       "upload_section_title": "Neuen Anhang hochladen",
       "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
       "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
-      "note_taking_notice": "Beachten Sie, dass Poznote eine Notiz-App ist und kein Speicherdienst für Fotos oder Videos: große Mediendateien füllen Ihren Speicherplatz sehr schnell.",
+      "note_taking_notice": "Poznote ist eine Notiz-App: Sie können Medien speichern, aber große Dateien füllen Ihren Speicher schnell.",
       "note_taking_notice_link": "Meinen Speicher ansehen",
       "upload_button": "Anhängen",
       "current_attachments": "Aktuelle Anhänge",
@@ -460,7 +460,6 @@
       "github": "Öffnen Sie den Quellcode von Poznote auf GitHub.",
       "api_rest": "Zeigen Sie Informationen zur REST-API von Poznote an.",
       "website": "Öffnen Sie die offizielle Poznote-Website.",
-      "cloud": "Entdecken Sie das gehostete Angebot Poznote Cloud.",
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan."
@@ -509,7 +508,6 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote-Blog",
       "website": "Poznote-Website",
-      "cloud": "Poznote Cloud",
       "github_star": "Auf GitHub einen Stern vergeben",
       "guestbook": "Poznote Gästebuch",
       "support": "Poznote unterstützen",
@@ -2883,6 +2881,7 @@
       "export_csv": "CSV exportieren",
       "edit_user": "Benutzer bearbeiten",
       "filter_placeholder": "Benutzer filtern...",
+      "hide_inactive": "Deaktivierte Konten ausblenden",
       "pager": {
         "previous": "Zurück",
         "next": "Weiter",
@@ -3151,6 +3150,7 @@
       "quota_max_notes_for": "Max. Notizen für {{user}}",
       "quota_max_storage_for": "Max. lokaler Speicher für {{user}} (MB)",
       "filter_placeholder": "Konten filtern...",
+      "hide_inactive": "Deaktivierte Konten ausblenden",
       "export_csv": "CSV exportieren",
       "pager": {
         "previous": "Zurück",
@@ -3167,7 +3167,10 @@
       "table_backups_s3": "Backups S3 (MB)",
       "quota_admin_exempt": "Unbegrenzt, da Administrator",
       "quota_admin_exempt_message": "Kontingente gelten nicht für Administratorkonten: Ihre Notizen und ihr Speicher sind unbegrenzt.",
-      "table_notes_total": "Notizen gesamt"
+      "table_notes_total": "Notizen gesamt",
+      "quota_unlimited": "Unbegrenzt",
+      "quota_percent_used": "{{percent}} % belegt",
+      "quota_unit_mb": "MB"
     }
   },
   "activity_log": {

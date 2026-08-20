@@ -207,6 +207,42 @@ body.dark-mode {
     width: 60px;
 }
 
+/* "Hide disabled accounts" toggle sitting next to the filter input of the
+   admin tables (users and storage statistics). The search container is a
+   centered flex row, so the label wraps under the input on narrow screens
+   instead of squeezing it. */
+.home-search-container:has(.admin-hide-inactive) {
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.home-search-container:has(.admin-hide-inactive) .home-search-wrapper {
+    /* Keep the input at its usual width but let it shrink, so the label sits
+       beside it rather than being pushed to its own line. */
+    flex: 0 1 500px;
+    margin: 0;
+}
+
+.admin-hide-inactive {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    color: var(--text-color, #4b5563);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+}
+
+.admin-hide-inactive input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #007DB8;
+    cursor: pointer;
+}
+
 .users-sort-link {
     display: inline-flex;
     align-items: center;

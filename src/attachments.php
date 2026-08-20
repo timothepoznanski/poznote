@@ -215,7 +215,7 @@ if (!$note) {
                     <?php if (poznoteSaasNoticesEnabled()): ?>
                     <div class="attachment-usage-notice">
                         <i class="lucide lucide-alert-triangle"></i>
-                        <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.'); ?>
+                        <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Poznote is a note-taking app: you can store media, but large files fill up your space quickly.'); ?>
                             <a href="storage-stats-user.php"><?php echo t_h('attachments.page.note_taking_notice_link', [], 'View my storage'); ?></a></span>
                     </div>
                     <?php endif; ?>

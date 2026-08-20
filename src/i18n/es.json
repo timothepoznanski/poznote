@@ -340,7 +340,7 @@
       "upload_section_title": "Subir nuevo adjunto",
       "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
       "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
-      "note_taking_notice": "Tenga en cuenta que Poznote es una aplicación de toma de notas, no un servicio de almacenamiento de fotos o vídeos: los archivos multimedia grandes llenan muy rápido su espacio de almacenamiento.",
+      "note_taking_notice": "Poznote es una aplicación de notas: puede guardar medios, pero los archivos grandes llenan rápido su espacio.",
       "note_taking_notice_link": "Ver mi almacenamiento",
       "upload_button": "Adjuntar",
       "current_attachments": "Adjuntos actuales",
@@ -461,7 +461,6 @@
       "github": "Abre el código fuente de Poznote en GitHub.",
       "api_rest": "Muestra información sobre la API REST de Poznote.",
       "website": "Abre el sitio web oficial de Poznote.",
-      "cloud": "Descubre la oferta alojada Poznote Cloud.",
       "support": "Apoya el desarrollo de Poznote con una donación.",
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
       "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación."
@@ -510,7 +509,6 @@
       "documentation": "Documentation GitHub",
       "news": "Blog de Poznote",
       "website": "Sitio web de Poznote",
-      "cloud": "Poznote Cloud",
       "github_star": "Dar una estrella en GitHub",
       "guestbook": "Libro de visitas de Poznote",
       "support": "Apoyar Poznote",
@@ -2884,6 +2882,7 @@
       "export_csv": "Exportar CSV",
       "edit_user": "Editar usuario",
       "filter_placeholder": "Filtrar usuarios...",
+      "hide_inactive": "Ocultar cuentas desactivadas",
       "pager": {
         "previous": "Anterior",
         "next": "Siguiente",
@@ -3151,6 +3150,7 @@
       "quota_max_notes_for": "Máx. de notas para {{user}}",
       "quota_max_storage_for": "Almacenamiento local máx. para {{user}} (MB)",
       "filter_placeholder": "Filtrar cuentas...",
+      "hide_inactive": "Ocultar cuentas desactivadas",
       "export_csv": "Exportar CSV",
       "pager": {
         "previous": "Anterior",
@@ -3167,7 +3167,10 @@
       "table_backups_s3": "Copias S3 (MB)",
       "quota_admin_exempt": "Ilimitado por ser administrador",
       "quota_admin_exempt_message": "Las cuotas no se aplican a las cuentas de administrador: sus notas y su almacenamiento son ilimitados.",
-      "table_notes_total": "Notas totales"
+      "table_notes_total": "Notas totales",
+      "quota_unlimited": "Ilimitado",
+      "quota_percent_used": "{{percent}} % usado",
+      "quota_unit_mb": "MB"
     }
   },
   "activity_log": {

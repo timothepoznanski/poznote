@@ -1256,17 +1256,6 @@ if ($canUseUserWebhooks) {
                 </div>
             </a>
 
-            <!-- Poznote Cloud -->
-            <a href="https://poznote.com/index.html#cloud" target="_blank" rel="noopener noreferrer" class="home-card" id="cloud-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.cloud', [], 'Open the hosted Poznote Cloud offer.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-cloud"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.cloud', [], 'Poznote Cloud'); ?></span>
-                </div>
-            </a>
-
             <!-- Support -->
             <a href="https://ko-fi.com/timothepoznanski" target="_blank" rel="noopener noreferrer" class="home-card" id="support-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.support', [], 'Support the development of Poznote with a donation.'); ?>"><i class="lucide lucide-help-circle"></i></span>

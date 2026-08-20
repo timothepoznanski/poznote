@@ -185,7 +185,6 @@
       "github": "Open the Poznote source code on GitHub.",
       "api_rest": "Show information about the Poznote REST API.",
       "website": "Open the official Poznote website.",
-      "cloud": "Open the hosted Poznote Cloud offer.",
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule."
@@ -216,7 +215,6 @@
       "documentation": "Documentation GitHub",
       "news": "Poznote Blog",
       "website": "Poznote Website",
-      "cloud": "Poznote Cloud",
       "github_star": "Star on GitHub",
       "guestbook": "Poznote Guestbook",
       "support": "Support Poznote",
@@ -508,7 +506,7 @@
       "upload_section_title": "Choose a new attachment",
       "drag_drop_info": "You can drag and drop your file below:",
       "all_types_accepted": "All file types accepted (max 200 MB)",
-      "note_taking_notice": "Keep in mind that Poznote is a note-taking app, not a photo or video storage service: large media files fill up your storage space very quickly.",
+      "note_taking_notice": "Poznote is a note-taking app: you can store media, but large files fill up your space quickly.",
       "note_taking_notice_link": "View my storage",
       "upload_button": "Attach",
       "current_attachments": "Current attachments",
@@ -2721,6 +2719,7 @@
       "quota_max_notes_for": "Max notes for {{user}}",
       "quota_max_storage_for": "Max local storage for {{user}} (MB)",
       "filter_placeholder": "Filter accounts...",
+      "hide_inactive": "Hide disabled accounts",
       "export_csv": "Export CSV",
       "pager": {
         "previous": "Previous",
@@ -2737,7 +2736,10 @@
       "table_backups_s3": "Backups S3 (MB)",
       "quota_admin_exempt": "Unlimited because admin",
       "quota_admin_exempt_message": "Quotas do not apply to administrator accounts: their notes and storage are unlimited.",
-      "table_notes_total": "Total notes"
+      "table_notes_total": "Total notes",
+      "quota_unlimited": "Unlimited",
+      "quota_percent_used": "{{percent}}% used",
+      "quota_unit_mb": "MB"
     }
   },
   "activity_log": {
@@ -2885,6 +2887,7 @@
       "export_csv": "Export CSV",
       "edit_user": "Edit User",
       "filter_placeholder": "Filter users...",
+      "hide_inactive": "Hide disabled accounts",
       "pager": {
         "previous": "Previous",
         "next": "Next",
