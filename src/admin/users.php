@@ -1010,6 +1010,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                         <i class="lucide lucide-plus" style="margin-right: 5px;"></i> <?php echo t_h('multiuser.admin.create_user', [], 'Create Profile'); ?>
                     </button>
                 </div>
+        <?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
             </div>
         </div>
 

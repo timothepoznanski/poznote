@@ -219,6 +219,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 <body class="has-icon-sidebar" data-workspace="<?php echo webhooks_h($pageWorkspace); ?>">
     <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="settings-container webhooks-page">
+<?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
 <h1 class="poznote-page-title"><i class="lucide lucide-webhook"></i> <?php echo t_h('settings.cards.webhooks', [], 'Admin Webhooks'); ?></h1>
 
 

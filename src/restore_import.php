@@ -226,6 +226,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php include 'icon_sidebar.php'; ?>
     <div class="backup-container">
+    <?php include 'back_to_settings.php'; ?>
     <h1 class="poznote-page-title"><i class="lucide lucide-download"></i> <?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></h1>
 
         

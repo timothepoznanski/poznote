@@ -183,6 +183,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container git-sync-container">
+    <?php include 'back_to_settings.php'; ?>
     <h1 class="poznote-page-title"><i class="lucide lucide-cloud"></i> <?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></h1>
 
 

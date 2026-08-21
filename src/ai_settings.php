@@ -166,6 +166,7 @@ $aiLocalHost = aiChatLocalDefaultHost();
         border-radius: 12px; padding: 3px 10px; font-size: 0.85rem; cursor: pointer;
     }
     .ai-model-suggestion:hover { background: #e7f1fb; }
+    <?php include 'back_to_settings.php'; ?>
     html[data-theme='dark'] .ai-model-suggestion,
     body.dark-mode .ai-model-suggestion {
         background: transparent; border-color: #3d5a75; color: #7fb3e3;

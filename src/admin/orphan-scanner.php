@@ -147,10 +147,8 @@ function runScanner(bool $doDelete): array {
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="admin-container">
-    <div class="admin-header">
-    </div>
-
     <div class="dr-page">
+        <?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
         <div class="dr-hero">
             <h1><?php echo t_h('admin_tools.orphan_scanner.title', [], 'Orphan attachments scanner'); ?></h1>
             <p><?php echo t_h('admin_tools.orphan_scanner.description', [], 'This tool scans your attachment folders and identifies files that are no longer referenced in any of your notes.'); ?></p>

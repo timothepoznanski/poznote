@@ -202,6 +202,7 @@ $allBackupUsers = listAllUserProfiles();
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container git-sync-container s3-backup-container">
+    <?php include 'back_to_settings.php'; ?>
     <h1 class="poznote-page-title"><i class="lucide lucide-archive"></i> <?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></h1>
 
 

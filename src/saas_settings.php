@@ -102,6 +102,7 @@ $configuredCommunityUrl = trim((string)getGlobalSetting('saas_community_url', ''
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container git-sync-container">
+    <?php include 'back_to_settings.php'; ?>
     <h1 class="poznote-page-title"><i class="lucide lucide-briefcase"></i> <?php echo t_h('settings.cards.saas', [], 'SaaS mode'); ?></h1>
 
         <div class="git-sync-header">

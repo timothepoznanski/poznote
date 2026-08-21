@@ -270,17 +270,21 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     transform: rotate(180deg);
 }
 
-/* "Go to note" action shown above the title on the per-note pages (info.php,
-   attachments.php), which the rail cannot link to because the target depends on
-   the note being viewed. Lives here alongside .poznote-page-title so both pages
-   get it from a stylesheet they already load. */
-.poznote-back-to-note-bar {
+/* Back link shown above the title: "Go to note" on the per-note pages
+   (info.php, attachments.php), which the rail cannot link to because the target
+   depends on the note being viewed, and "Back to Settings" on every page opened
+   from settings.php (back_to_settings.php). Lives here alongside
+   .poznote-page-title so those pages get it from a stylesheet they already
+   load. */
+.poznote-back-to-note-bar,
+.poznote-back-bar {
     display: flex;
     justify-content: center;
     margin: 0 0 16px 0;
 }
 
-.poznote-back-to-note-btn {
+.poznote-back-to-note-btn,
+.poznote-back-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -296,14 +300,43 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     cursor: pointer;
 }
 
-.poznote-back-to-note-btn:hover {
+.poznote-back-to-note-btn:hover,
+.poznote-back-btn:hover {
     background: #f3f4f6;
     color: #111827;
     text-decoration: none;
 }
 
-.poznote-back-to-note-btn i {
+.poznote-back-to-note-btn i,
+.poznote-back-btn i {
     color: #007DB8;
+}
+
+/* The settings sub-pages each use their own container (.settings-container,
+   .home-container, .backup-container, .admin-container, .dr-page), with its own
+   top offset and its own title spacing. These rules line the "Back to Settings"
+   bar up the same way on all of them: the title keeps the place it has without
+   the bar (91px from the top of the page), and the button sits centred in the
+   space above it, 28px from the top and 28px above the title. */
+.poznote-back-to-settings-bar {
+    /* The hosts' top offset puts the bar at 40px; pull it up to 28px. */
+    margin-top: -12px;
+    margin-bottom: 28px;
+}
+
+/* .admin-container and .dr-page carry no top margin of their own, where the
+   other hosts carry 20px, so their bar already starts at 28px. */
+.admin-container > .poznote-back-to-settings-bar,
+.dr-page > .poznote-back-to-settings-bar {
+    margin-top: 0;
+}
+
+/* Narrow screens shrink the hosts' top padding, so the pull-up would push the
+   button against the top edge. */
+@media (max-width: 800px) {
+    .poznote-back-to-settings-bar {
+        margin-top: 0;
+    }
 }
 
 /* Page title used by the pages whose Notes / Dashboard buttons were replaced by
@@ -382,6 +415,13 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     .home-container > .poznote-page-title {
         margin-top: 0;
     }
+}
+
+/* A title that follows the "Back to Settings" bar keeps its full gap: the
+   pull-ups above exist to absorb the container's top padding, which the bar now
+   sits in, so applying them here would leave the button touching the title. */
+.poznote-back-to-settings-bar + .poznote-page-title {
+    margin-top: 0;
 }
 
 /* Both pages stack their own controls right under the title, so the shared

@@ -578,6 +578,7 @@ $notifyCandidates = listNewUserNotificationCandidates();
 <body class="has-icon-sidebar" data-workspace="<?php echo smtp_h($pageWorkspace); ?>">
     <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="settings-container smtp-page">
+<?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
 <h1 class="poznote-page-title"><i class="lucide lucide-mail"></i> <?php echo t_h('settings.cards.smtp_config', [], 'SMTP / Email'); ?></h1>
 
     <div class="workspaces-nav">
