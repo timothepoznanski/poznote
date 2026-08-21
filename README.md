@@ -4,7 +4,7 @@
 </p>
 
 <h3 align="center">
-Your note-taking and documentation platform.
+Powerful note-taking without the hassle.
 </h3>
 
 <br>
