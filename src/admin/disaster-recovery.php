@@ -63,11 +63,9 @@ $pageWorkspace = trim(getWorkspaceFilter());
     <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="admin-container">
 
-    <!-- Nav -->
-    <div class="admin-header">
-    </div>
-
     <div class="dr-page">
+
+        <?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
 
         <!-- Hero -->
         <div class="dr-hero">

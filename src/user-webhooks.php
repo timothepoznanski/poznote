@@ -200,6 +200,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 <body class="has-icon-sidebar" data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">
     <?php include 'icon_sidebar.php'; ?>
 <div class="settings-container webhooks-page">
+<?php include 'back_to_settings.php'; ?>
 <h1 class="poznote-page-title"><i class="lucide lucide-webhook"></i> <?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></h1>
 
 

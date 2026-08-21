@@ -765,12 +765,12 @@ function withComputedDisplayName(?array $user): ?array {
 }
 
 /**
- * Count user profiles, optionally restricted to a search term (same matching
- * as listAllUserProfiles). Returns null when the count cannot be established,
+ * Count user profiles, optionally restricted to a search term and a status
+ * (same matching as listAllUserProfiles). Returns null when the count cannot be established,
  * so callers enforcing a cap can fail closed instead of reading a failure as 0.
  */
-function countUserProfiles(?string $search = null, bool $activeOnly = false): ?int {
-    [$where, $params] = buildUserProfilesSearchClause($search, $activeOnly);
+function countUserProfiles(?string $search = null, $statusFilter = false): ?int {
+    [$where, $params] = buildUserProfilesSearchClause($search, $statusFilter);
     try {
         $con = getMasterConnection();
         $stmt = $con->prepare("SELECT COUNT(*) FROM users" . $where);
@@ -1355,11 +1355,12 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
  */
 /**
  * WHERE fragment + bound values for a free-text user search across the
- * columns shown in the admin table, optionally restricted to active accounts.
+ * columns shown in the admin table, optionally restricted to enabled or
+ * disabled accounts ($statusFilter: true/'active', 'inactive', or false).
  * Shared by listAllUserProfiles() and countUserProfiles() so the page slice
  * and the total can never disagree.
  */
-function buildUserProfilesSearchClause(?string $search, bool $activeOnly = false): array {
+function buildUserProfilesSearchClause(?string $search, $statusFilter = false): array {
     $search = trim((string)$search);
     $conditions = [];
     $params = [];
@@ -1372,8 +1373,13 @@ function buildUserProfilesSearchClause(?string $search, bool $activeOnly = false
             . " OR last_name LIKE ? ESCAPE '\\')";
         $params = [$pattern, $pattern, $pattern, $pattern];
     }
-    if ($activeOnly) {
+    // Accepts the historical boolean ("active only") as well as the explicit
+    // 'active'/'inactive' filter the admin users page toggles; anything else
+    // (false, null, '') means "every account".
+    if ($statusFilter === true || $statusFilter === 'active') {
         $conditions[] = 'active = 1';
+    } elseif ($statusFilter === 'inactive') {
+        $conditions[] = 'active = 0';
     }
     if (!$conditions) {
         return ['', []];
@@ -1401,7 +1407,7 @@ function listUserProfileNames(): array {
     }
 }
 
-function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?int $limit = null, int $offset = 0, bool $activeOnly = false): array {
+function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?int $limit = null, int $offset = 0, $statusFilter = false): array {
     // Text columns push empty values last in both directions; NULL dates sort
     // as "least recent" (SQLite treats NULL as smallest, so DESC puts them last).
     // The "note access" count lives in user_account_access, hence the scalar
@@ -1440,7 +1446,7 @@ function listAllUserProfiles(string $sort = 'id_asc', ?string $search = null, ?i
     // up on two consecutive pages while another is skipped entirely.
     $orderBy = ($orderClauses[$sort] ?? $orderClauses['id_asc']) . ', id ASC';
 
-    [$where, $params] = buildUserProfilesSearchClause($search, $activeOnly);
+    [$where, $params] = buildUserProfilesSearchClause($search, $statusFilter);
 
     // Interpolated rather than bound: SQLite rejects placeholders in
     // LIMIT/OFFSET on some builds. Both are cast to int by the signature and

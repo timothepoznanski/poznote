@@ -763,8 +763,11 @@
 
   /**
    * Insert a new checklist at cursor position
+   * @param {{checked?: boolean}} [options] - checked: start with a completed item
+   *   (the slash menu's "Done" entry, for journaling what was achieved)
    */
-  function insertChecklist() {
+  function insertChecklist(options) {
+    const startChecked = !!(options && options.checked);
     if (!isCursorInEditableNote()) {
       if (typeof window.showCursorWarning === 'function') {
         window.showCursorWarning();
@@ -784,17 +787,33 @@
     
     // Create checklist with one item
     const checklist = createChecklist();
-    const firstItem = createChecklistItem(false, '');
+    const firstItem = createChecklistItem(startChecked, '');
     checklist.appendChild(firstItem);
     
-    // Create empty line before
-    const emptyLine = document.createElement('div');
-    emptyLine.appendChild(document.createElement('br'));
-    
-    // Insert at cursor position
     range.deleteContents();
-    range.insertNode(checklist);
-    range.insertNode(emptyLine);
+
+    // Top-level block the caret sits in (the line the slash command was
+    // typed on, empty once the "/..." text is gone)
+    let block = container;
+    while (block && block !== noteentry && block.parentNode !== noteentry) {
+      block = block.parentNode;
+    }
+    const blockIsEmpty = block && block !== noteentry && block.nodeType === 1
+      && getCleanText(block) === ''
+      && !block.querySelector('img, video, iframe, input, table');
+
+    if (blockIsEmpty) {
+      // Typed on an empty line: the checklist takes that line's place, no
+      // extra blank line is added
+      noteentry.insertBefore(checklist, block);
+      block.remove();
+    } else {
+      // Mid-content: keep a blank line before the checklist
+      const emptyLine = document.createElement('div');
+      emptyLine.appendChild(document.createElement('br'));
+      range.insertNode(checklist);
+      range.insertNode(emptyLine);
+    }
     
     // Focus first item
     const textSpan = firstItem.querySelector('.' + TEXT_CLASS);

@@ -776,6 +776,7 @@ function activityExportUrl(string $action, string $search): string {
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="admin-container">
+<?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
 <h1 class="poznote-page-title"><i class="lucide lucide-clipboard-list"></i> <?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></h1>
 
     <div class="admin-header">

@@ -17,7 +17,7 @@
     "back": "返回",
     "back_to_notes": "笔记",
     "home": "主页",
-    "back_to_settings": "设置",
+    "back_to_settings": "返回设置",
     "close": "关闭",
     "disable": "禁用",
     "cancel": "取消",
@@ -1607,6 +1607,7 @@
     },
     "note_actions": {
       "menu": "笔记操作",
+      "open_in_new_tab": "在新标签页中打开",
       "move_note": "移动笔记",
       "is_shared": "已共享",
       "share_note": "共享笔记",
@@ -1643,7 +1644,8 @@
       "unpin": "取消固定标签页",
       "close": "关闭",
       "close_all": "关闭所有"
-    }
+    },
+    "close_all_tabs": "关闭所有标签页"
   },
   "notes_manager": {
     "actions": "批量操作",
@@ -1701,6 +1703,7 @@
     "bullet_list": "无序列表",
     "numbered_list": "有序列表",
     "checklist": "清单",
+    "done": "已完成",
     "image": "图片",
     "take_photo": "拍照",
     "excalidraw": "Excalidraw",
@@ -2894,6 +2897,11 @@
       "status": "状态",
       "active": "激活",
       "inactive": "未激活",
+      "active_count": "{{count}} 个激活",
+      "inactive_count": "{{count}} 个未激活",
+      "filter_status_active": "仅显示已激活的账户",
+      "filter_status_inactive": "仅显示已停用的账户",
+      "filter_status_clear": "显示所有账户",
       "created_at": "创建于",
       "last_login": "上次登录",
       "never_connected": "从未",
@@ -3430,7 +3438,7 @@
     },
     "logout": {
       "confirm": "确定要退出登录吗？",
-      "signed_in_as": "当前登录账户：{{username}}",
+      "signed_in_as": "您当前登录的账户是 {{username}}",
       "in_progress": "正在退出登录..."
     }
   },
@@ -3812,8 +3820,10 @@
     "config_title": "配置",
     "enable_label": "启用 AI 助手",
     "enable_description": "在笔记工具栏中显示 AI 聊天按钮。",
-    "users_label": "允许的用户",
-    "users_description": "只有选中的用户才能看到 AI 聊天按钮。新用户在您将其添加到此处之前没有访问权限。",
+    "users_label": "允许使用管理员配置的全局 AI 助手的用户",
+    "users_description": "只有选中的用户才能看到使用本页配置的 AI 聊天按钮。新用户在被添加到此列表前没有访问权限。",
+    "users_filter_placeholder": "筛选用户",
+    "users_filter_empty": "没有用户符合此筛选条件。",
     "users_admin": "管理员",
     "url_label": "服务器 URL",
     "url_description": "兼容 OpenAI 的 API 基础 URL。若 Ollama 运行在 Docker 主机上，请使用 http://host.docker.internal:11434",
@@ -3821,7 +3831,7 @@
     "api_key_label": "API 密钥（可选）",
     "api_key_description": "本地 Ollama 服务器可留空。云服务商需要填写。",
     "save": "保存配置",
-    "test": "测试连接",
+    "test": "检查访问并列出模型",
     "testing": "正在测试连接...",
     "test_success": "连接成功。{{count}} 个可用模型。点击下方模型并保存。",
     "test_failure": "连接失败：{{error}}",
@@ -3833,7 +3843,21 @@
     "provider_label": "AI 服务商",
     "provider_custom": "其他（自定义 URL）",
     "api_key_label_required": "API 密钥",
-    "model_description": "点击“Test connection”列出服务器上可用的模型。"
+    "user_keys_label": "允许使用个人 API 密钥",
+    "user_keys_description": "每位用户都会在自己的设置中看到一张 AI 助手卡片，可在其中填写自己的提供商和 API 密钥。此时助手将通过该用户自己的服务器和密钥作答，而不是本页的配置，无论该用户是否出现在上面的列表中。"
+  },
+  "ai_settings_user": {
+    "title": "我的 AI 助手",
+    "card": "我的 AI 助手",
+    "card_help": "使用你自己的提供商和 API 密钥来运行 AI 助手。",
+    "description": "使用你自己的 API 密钥，将 AI 助手连接到你自己的 OpenAI 兼容服务器（Ollama、LM Studio、OpenAI、Anthropic 等）。你的配置将取代管理员设置的配置。",
+    "disabled_notice": "管理员未在此实例上允许使用个人 API 密钥。",
+    "using_instance": "助手目前使用管理员设置的配置作答。在下方启用你自己的配置即可改用你的 API 密钥。",
+    "enable_label": "使用我自己的配置",
+    "enable_description": "AI 聊天按钮将使用下面的服务器和 API 密钥，而不是实例的设置。",
+    "messages": {
+      "incomplete": "启用你自己的助手前，请填写服务器 URL 和模型。"
+    }
   },
   "ai_chat": {
     "title": "AI 助手",
@@ -3891,8 +3915,11 @@
     "filter_dated": "有日期",
     "filter_completed": "已完成",
     "filter_placeholder": "按任务、标题或文件夹筛选...",
-    "empty": "还没有任务。创建一个任务清单笔记开始吧。",
+    "empty": "还没有任务。创建一个任务清单笔记或在笔记中添加清单开始吧。",
     "empty_filtered": "没有符合此筛选条件的任务。",
+    "note_badge": "笔记",
+    "note_badge_title": "来自笔记的清单项",
+    "show_note_checklists": "显示笔记中的任务",
     "collapse": "收起",
     "expand": "展开",
     "collapse_all": "全部折叠",

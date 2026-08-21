@@ -70,6 +70,33 @@ body.tasks-page {
     transition: width 0.3s ease;
 }
 
+/* "Display tasks in notes" toggle, right of the progress label: shows or
+   hides the groups built from the checklists of regular notes */
+.tasks-progress-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    order: 4;
+    flex-shrink: 0;
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tasks-progress-option input {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: #007DB8;
+}
+
+[data-theme="dark"] .tasks-progress-option {
+    color: #aaa;
+}
+
 /* Filter bar. On desktop the filter input sits on the same row, to the right
    of the filter chips; the mobile media query restores the stacked layout. */
 .tasks-filter-bar {
@@ -251,6 +278,26 @@ body.tasks-page {
     background-color: #f0f0f0;
     padding: 2px 8px;
     border-radius: 4px;
+}
+
+/* Groups built from the checklist items of a regular note (as opposed to a
+   tasklist note) carry a "Note" badge next to the folder */
+.tasks-note-source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #007DB8;
+    background-color: rgba(0, 125, 184, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .tasks-note-source-badge {
+    color: #5cb8ea;
+    background-color: rgba(92, 184, 234, 0.15);
 }
 
 .tasks-note-count {
@@ -804,6 +851,10 @@ body.tasks-page {
     .tasks-progress-header {
         display: flex;
         gap: 20px;
+    }
+
+    .tasks-progress-option {
+        margin-top: 10px;
     }
 
     .tasks-buttons-container {

@@ -25,15 +25,30 @@ body.dark-mode .poznote-page-title {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .settings-current-user-badge,
+body.dark-mode .settings-current-user-badge {
+    background: var(--dm-surface-hover);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .settings-current-user-badge i,
+body.dark-mode .settings-current-user-badge i {
+    color: var(--dm-text);
+}
+
 html[data-theme='dark'] .poznote-back-to-note-btn,
-body.dark-mode .poznote-back-to-note-btn {
+html[data-theme='dark'] .poznote-back-btn,
+body.dark-mode .poznote-back-to-note-btn,
+body.dark-mode .poznote-back-btn {
     background-color: var(--dm-content-bg);
     border-color: var(--dm-border);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .poznote-back-to-note-btn:hover,
-body.dark-mode .poznote-back-to-note-btn:hover {
+html[data-theme='dark'] .poznote-back-btn:hover,
+body.dark-mode .poznote-back-to-note-btn:hover,
+body.dark-mode .poznote-back-btn:hover {
     background-color: var(--dm-surface-hover);
     color: var(--dm-text);
 }

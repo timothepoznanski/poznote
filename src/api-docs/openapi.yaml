@@ -1357,6 +1357,49 @@ paths:
                           type: array
                           items:
                             $ref: '#/components/schemas/Task'
+                  checklists:
+                    type: array
+                    description: >
+                      Checklist items found in regular notes (HTML checklists
+                      and markdown "- [ ]" task lists), grouped by note. A
+                      task id here is the item's position in the note source
+                      (checkbox ordinal for HTML notes, 0-based line number
+                      for markdown notes), not a task id: these items are
+                      toggled by rewriting the note content through
+                      PATCH /notes/{id}, not through the per-task endpoints.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        heading:
+                          type: string
+                        folder:
+                          type: string
+                        folder_id:
+                          type: integer
+                          nullable: true
+                        workspace:
+                          type: string
+                        updated:
+                          type: string
+                        favorite:
+                          type: boolean
+                        type:
+                          type: string
+                          enum: [note, markdown]
+                        tasks:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                description: Position of the item in the note source
+                              text:
+                                type: string
+                              completed:
+                                type: boolean
 
   /notes/{id}/tasks:
     get:

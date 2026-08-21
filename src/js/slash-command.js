@@ -1872,9 +1872,23 @@
                         id: 'checklist',
                         icon: 'lucide-list-check',
                         label: t('slash_menu.checklist', null, 'Checklist'),
+                        // "/todo" and "/task" reach the checklist whatever the UI
+                        // language; its items show up on the global tasks page
+                        aliases: ['todo', 'task'],
                         action: () => {
                             if (typeof window.insertChecklist === 'function') {
                                 window.insertChecklist();
+                            }
+                        }
+                    },
+                    {
+                        id: 'done',
+                        icon: 'lucide-check-square',
+                        label: t('slash_menu.done', null, 'Done'),
+                        aliases: ['done', 'completed'],
+                        action: () => {
+                            if (typeof window.insertChecklist === 'function') {
+                                window.insertChecklist({ checked: true });
                             }
                         }
                     },
@@ -2184,7 +2198,8 @@
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
-                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') },
+                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), aliases: ['todo', 'task'], action: () => insertMarkdownPrefixAtLineStart('- [ ] ') },
+                    { id: 'done', icon: 'lucide-check-square', label: t('slash_menu.done', null, 'Done'), aliases: ['done', 'completed'], action: () => insertMarkdownPrefixAtLineStart('- [x] ') },
                     {
                         id: 'tasklist-embed',
                         icon: 'lucide-layout-list',
@@ -2526,6 +2541,16 @@
         return { noteType: noteType || 'note', noteEntry, editableElement };
     }
 
+    // A command matches the typed filter through its (translated) label or
+    // one of its language-independent aliases (e.g. "/todo" for Checklist)
+    function commandMatchesSearch(item, search) {
+        if (!item) return false;
+        if (item.label && removeAccents(item.label.toLowerCase()).includes(search)) return true;
+        return Array.isArray(item.aliases) && item.aliases.some(function (alias) {
+            return removeAccents(String(alias).toLowerCase()).includes(search);
+        });
+    }
+
     // Filter slash menu commands based on search text
     function getFilteredCommands(searchText) {
         const isMobile = window.innerWidth < 768;
@@ -2543,7 +2568,7 @@
         // Flatten the menu structure when filtering
         commands.forEach(cmd => {
             // Check if main command label matches
-            const cmdMatches = cmd.label && removeAccents(cmd.label.toLowerCase()).includes(search);
+            const cmdMatches = commandMatchesSearch(cmd, search);
 
             if (cmdMatches && (!cmd.submenu || cmd.submenu.length === 0)) {
                 // Command without submenu matches - add it directly
@@ -2571,7 +2596,7 @@
             } else if (cmd.submenu && cmd.submenu.length > 0) {
                 // Command doesn't match but might have matching submenu items
                 cmd.submenu.forEach(subItem => {
-                    const subItemMatches = subItem.label && removeAccents(subItem.label.toLowerCase()).includes(search);
+                    const subItemMatches = commandMatchesSearch(subItem, search);
 
                     if (subItemMatches && (!subItem.submenu || subItem.submenu.length === 0)) {
                         // Submenu item matches and has no sub-submenu
@@ -2592,7 +2617,7 @@
                     } else if (subItem.submenu && subItem.submenu.length > 0) {
                         // Submenu item doesn't match but might have matching sub-submenu items
                         subItem.submenu.forEach(subSubItem => {
-                            if (subSubItem.label && removeAccents(subSubItem.label.toLowerCase()).includes(search)) {
+                            if (commandMatchesSearch(subSubItem, search)) {
                                 results.push({
                                     ...subSubItem,
                                     label: cmd.label + ' › ' + subItem.label + ' › ' + subSubItem.label,

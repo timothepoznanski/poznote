@@ -28,6 +28,13 @@
     display: none;
 }
 
+/* The sticky "Close all tabs" button is pinned to the bar's content edge, so
+   the bar drops its right padding: otherwise scrolling tabs would show through
+   the 8px gutter left past the button. */
+#app-tab-bar.has-close-all {
+    padding-right: 0;
+}
+
 .app-tab {
     display: flex;
     align-items: center;
@@ -91,6 +98,58 @@
 .app-tab-close:hover {
     background: rgba(0, 0, 0, 0.08);
     color: #374151;
+}
+
+/* ── "Close all tabs" button ── */
+
+/* Pinned to the right end of the bar: `margin-left: auto` parks it there while
+   the tabs fit, `position: sticky` keeps it on screen once they overflow and
+   the bar scrolls. The background is opaque so tabs scroll underneath it. */
+.app-tab-close-all {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    position: sticky;
+    /* Both offsets keep the same 8px gap on the right: `right` applies while the
+       bar scrolls and the button is stuck, `margin-right` while the tabs still
+       fit. The solid second shadow below paints that gap opaque so a tab
+       scrolling past cannot show through it. */
+    right: 8px;
+    margin-right: 8px;
+    flex-shrink: 0;
+    padding: 4px 10px;
+    margin-bottom: 4px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.12), 9px 0 0 0 #fff;
+    color: #6b7280;
+    font-family: inherit;
+    font-size: 0.75rem;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.app-tab-close-all:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #b91c1c;
+}
+
+.app-tab-close-all .lucide {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    background-color: currentColor;
+}
+
+/* Keep only the icon when the pane is too narrow for the label. */
+@media (max-width: 1100px) {
+    .app-tab-close-all-label {
+        display: none;
+    }
 }
 
 /* ── Pinned tab ── */
@@ -209,6 +268,18 @@
 [data-theme="dark"] .app-tab-close:hover {
     background: rgba(255, 255, 255, 0.1);
     color: #e5e7eb;
+}
+
+[data-theme="dark"] .app-tab-close-all {
+    background: var(--dm-content-bg, #1e293b);
+    border-color: var(--dm-border, #334155);
+    color: var(--dm-text-secondary, #94a3b8);
+    box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.5), 9px 0 0 0 var(--dm-tabbar-bg);
+}
+
+[data-theme="dark"] .app-tab-close-all:hover {
+    background: var(--dm-surface-hover, #334155);
+    color: #fca5a5;
 }
 
 [data-theme="dark"] .app-tab-context-menu {

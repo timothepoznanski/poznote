@@ -805,6 +805,7 @@ try {
       <?php endif; ?>>
     <?php include 'icon_sidebar.php'; ?>
     <div class="settings-container">
+    <?php include 'back_to_settings.php'; ?>
     <h1 class="poznote-page-title"><i class="lucide lucide-layers"></i> <?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></h1>
 
 

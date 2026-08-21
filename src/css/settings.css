@@ -53,6 +53,24 @@
     color: #991b1b;
 }
 
+.settings-current-user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #eef2f7;
+    color: #4b5563;
+}
+
+.settings-current-user-badge i {
+    color: #4b5563;
+    width: 14px;
+    height: 14px;
+}
+
 /* Heart Blink Animation */
 .heart-blink {
     color: #ef4444;

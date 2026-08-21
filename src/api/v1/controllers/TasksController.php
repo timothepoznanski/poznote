@@ -39,8 +39,14 @@ class TasksController
      * GET /api/v1/tasks
      *
      * Returns every non-trash tasklist note of the workspace with its
-     * decoded task array:
-     *   { success: true, notes: [{ id, heading, folder, workspace, updated, tasks: [...] }] }
+     * decoded task array, plus the checklist items found in regular notes:
+     *   { success: true,
+     *     notes:      [{ id, heading, folder, workspace, updated, tasks: [...] }],
+     *     checklists: [{ id, heading, folder, workspace, updated, type, tasks: [{ id, text, completed }] }] }
+     *
+     * A checklist task's id is the item's position in the note source (see
+     * extractNoteChecklistItems), not a task id: checklist items are toggled
+     * by rewriting the note content, not through the per-task endpoints.
      */
     public function index(): void
     {
@@ -88,11 +94,77 @@ class TasksController
                 ];
             }
 
-            echo json_encode(['success' => true, 'notes' => $notes], JSON_UNESCAPED_UNICODE);
+            echo json_encode([
+                'success'    => true,
+                'notes'      => $notes,
+                'checklists' => $this->collectNoteChecklists($workspace),
+            ], JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'Failed to load tasks']);
         }
+    }
+
+    /**
+     * Checklist items of the regular notes (HTML and markdown) of the
+     * workspace, grouped by note, most recently updated first. Notes without
+     * any checklist item are left out. The on-disk entry file is read, as it
+     * is the source of truth for note content.
+     */
+    private function collectNoteChecklists(string $workspace): array
+    {
+        $sql = "SELECT id, heading, folder, folder_id, workspace, updated, favorite, type
+                  FROM entries
+                 WHERE trash = 0
+                   AND type IN ('note', 'markdown')";
+        $params = [];
+        if ($workspace !== '') {
+            $sql .= ' AND workspace = ?';
+            $params[] = $workspace;
+        }
+        $this->appendPublicWorkspaceAgeFilter($sql, $params);
+        $sql .= ' ORDER BY updated DESC';
+
+        $stmt = $this->con->prepare($sql);
+        $stmt->execute($params);
+
+        $checklists = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $type = (string) ($row['type'] ?? 'note');
+            $filename = getEntryFilename((int) $row['id'], $type);
+            if (!is_file($filename)) {
+                continue;
+            }
+            $content = @file_get_contents($filename);
+            if ($content === false || $content === '') {
+                continue;
+            }
+
+            $items = extractNoteChecklistItems($content, $type);
+            if ($items === []) {
+                continue;
+            }
+
+            $checklists[] = [
+                'id'        => (int) $row['id'],
+                'heading'   => (string) ($row['heading'] ?? ''),
+                'folder'    => (string) ($row['folder'] ?? ''),
+                'folder_id' => $row['folder_id'] !== null ? (int) $row['folder_id'] : null,
+                'workspace' => (string) ($row['workspace'] ?? ''),
+                'updated'   => (string) ($row['updated'] ?? ''),
+                'favorite'  => (int) ($row['favorite'] ?? 0) === 1,
+                'type'      => $type,
+                'tasks'     => array_map(static function (array $item): array {
+                    return [
+                        'id'        => $item['index'],
+                        'text'      => $item['text'],
+                        'completed' => $item['completed'],
+                    ];
+                }, $items),
+            ];
+        }
+
+        return $checklists;
     }
 
     /**

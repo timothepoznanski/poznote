@@ -396,22 +396,29 @@ if ($requestedUsersPageSize !== null && ctype_digit((string)$requestedUsersPageS
         : 50;
 }
 
-// === Hide deactivated accounts (persisted in the settings table, like the
-// sort and the page size, so it never has to travel in the URL) ===
-// The checkbox always posts a value, so an explicit "0" turns the filter off;
-// a request without the param at all (a pager or sort link) keeps the stored
-// preference.
-$requestedHideInactive = $_GET['hide_inactive'] ?? null;
-if ($requestedHideInactive !== null && in_array((string)$requestedHideInactive, ['0', '1'], true)) {
-    $usersHideInactive = $requestedHideInactive === '1';
+// === Status filter (persisted in the settings table, like the sort and the
+// page size, so it never has to travel in the URL) ===
+// Driven by the two count badges above the table: clicking one restricts the
+// list to that status, clicking it again clears the filter. '' means "all".
+$usersStatusFilter = '';
+$requestedStatus = $_GET['status'] ?? null;
+if ($requestedStatus !== null && in_array((string)$requestedStatus, ['', 'all', 'active', 'inactive'], true)) {
+    $usersStatusFilter = ((string)$requestedStatus === 'all') ? '' : (string)$requestedStatus;
     try {
-        $hideStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
-        $hideStmt->execute(['admin_users_hide_inactive', $usersHideInactive ? '1' : '0']);
+        $statusStmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $statusStmt->execute(['admin_users_status_filter', $usersStatusFilter]);
     } catch (Exception $e) {
-        // Non-fatal: the requested state still applies for this request.
+        // Non-fatal: the requested filter still applies for this request.
     }
 } else {
-    $usersHideInactive = getSetting('admin_users_hide_inactive') === '1';
+    $storedStatus = getSetting('admin_users_status_filter');
+    if (in_array((string)$storedStatus, ['active', 'inactive'], true)) {
+        $usersStatusFilter = (string)$storedStatus;
+    } elseif ($storedStatus === null && getSetting('admin_users_hide_inactive') === '1') {
+        // Carried over from the "hide disabled accounts" checkbox this filter
+        // replaces, so an admin who had it ticked keeps the same view.
+        $usersStatusFilter = 'active';
+    }
 }
 
 /**
@@ -461,15 +468,15 @@ function usersPageSizeLabel(int $size): string {
 // lightweight listUserProfileNames() instead, so it stays correct and cheap
 // with hundreds of accounts.
 $usersSearch = trim((string)($_GET['q'] ?? ''));
-$usersTotal = countUserProfiles($usersSearch, $usersHideInactive) ?? 0;
+$usersTotal = countUserProfiles($usersSearch, $usersStatusFilter) ?? 0;
 if ($usersPageSize === 0) {
     $usersTotalPages = 1;
     $usersPage = 1;
-    $users = listAllUserProfiles($usersSort, $usersSearch, null, 0, $usersHideInactive);
+    $users = listAllUserProfiles($usersSort, $usersSearch, null, 0, $usersStatusFilter);
 } else {
     $usersTotalPages = max(1, (int)ceil($usersTotal / $usersPageSize));
     $usersPage = min(max(1, (int)($_GET['page'] ?? 1)), $usersTotalPages);
-    $users = listAllUserProfiles($usersSort, $usersSearch, $usersPageSize, ($usersPage - 1) * $usersPageSize, $usersHideInactive);
+    $users = listAllUserProfiles($usersSort, $usersSearch, $usersPageSize, ($usersPage - 1) * $usersPageSize, $usersStatusFilter);
 }
 $accountAccessMap = getUserAccountAccessMap();
 
@@ -478,9 +485,17 @@ $accountAccessMap = getUserAccountAccessMap();
 // column (a grant can target an account on another page).
 $allUserNames = listUserProfileNames();
 $userNamesById = [];
+$usersActiveCount = 0;
 foreach ($allUserNames as $listedUser) {
     $userNamesById[(int)$listedUser['id']] = (string)$listedUser['username'];
+    if ((int)$listedUser['active'] === 1) {
+        $usersActiveCount++;
+    }
 }
+// Enabled/disabled tallies, counted from that same full list so they describe
+// the whole instance rather than the current page, the active search or the
+// "hide disabled accounts" filter (which the pager total already reflects).
+$usersInactiveCount = max(0, count($allUserNames) - $usersActiveCount);
 
 // === CSV export ===
 // Re-queries without a limit rather than exporting $users: that variable holds
@@ -488,7 +503,7 @@ foreach ($allUserNames as $listedUser) {
 // mistaken for the full list. The active search and sort still apply, so the
 // file matches what the admin is looking at, just without the paging.
 if (isset($_GET['export']) && $_GET['export'] === 'csv') {
-    $exportUsers = listAllUserProfiles($usersSort, $usersSearch, null, 0, $usersHideInactive);
+    $exportUsers = listAllUserProfiles($usersSort, $usersSearch, null, 0, $usersStatusFilter);
 
     $filename = 'poznote-users-' . date('Y-m-d') . '.csv';
     header('Content-Type: text/csv; charset=utf-8');
@@ -995,6 +1010,7 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
          ADMIN CONTAINER - User Management
          ======================================== -->
     <div class="admin-container">
+        <?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
         <h1 class="poznote-page-title"><i class="lucide lucide-users-cog"></i> <?php echo t_h('settings.cards.user_management', [], 'User Management'); ?></h1>
         <!-- Header with navigation and actions -->
         <div class="admin-header">
@@ -1027,14 +1043,39 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
                 <i class="lucide lucide-search home-search-icon"></i>
                 <input type="text" id="users-filter-input" name="q" value="<?php echo htmlspecialchars($usersSearch, ENT_QUOTES, 'UTF-8'); ?>" class="home-search-input" placeholder="<?php echo t_h('multiuser.admin.filter_placeholder', [], 'Filter users...'); ?>" autocomplete="off">
             </div>
-            <?php // Hidden twin: an unchecked box posts nothing, so without it
-                  // turning the filter back off would look like "no opinion"
-                  // and the stored preference would win. ?>
-            <input type="hidden" name="hide_inactive" value="0">
-            <label class="admin-hide-inactive">
-                <input type="checkbox" name="hide_inactive" value="1" onchange="this.form.submit()" <?php echo $usersHideInactive ? 'checked' : ''; ?>>
-                <span><?php echo t_h('multiuser.admin.hide_inactive', [], 'Hide disabled accounts'); ?></span>
-            </label>
+            <?php // Instance-wide account tallies, doubling as the status filter.
+                  // The numbers deliberately ignore the search and the filter
+                  // itself, so they stay a stable picture of the instance while
+                  // the pager line under the table reports the filtered count.
+                  // Selecting a status greys out the other badge; clicking the
+                  // selected one again clears the filter. ?>
+            <div class="users-stats">
+                <?php foreach ([
+                    ['status' => 'active', 'class' => 'badge-active', 'label' => t_h('multiuser.admin.active_count', ['count' => $usersActiveCount], '{{count}} active')],
+                    ['status' => 'inactive', 'class' => 'badge-inactive', 'label' => t_h('multiuser.admin.inactive_count', ['count' => $usersInactiveCount], '{{count}} inactive')],
+                ] as $statBadge): ?>
+                    <?php
+                        $isSelected = $usersStatusFilter === $statBadge['status'];
+                        $isMuted = $usersStatusFilter !== '' && !$isSelected;
+                        // Clicking the selected badge clears the filter. The page
+                        // number is dropped on purpose: the old offset points
+                        // nowhere in a re-filtered list.
+                        $statHref = '?status=' . ($isSelected ? 'all' : $statBadge['status'])
+                            . ($usersSearch !== '' ? '&q=' . urlencode($usersSearch) : '');
+                        $statTitle = $isSelected
+                            ? t('multiuser.admin.filter_status_clear', [], 'Show all accounts')
+                            : ($statBadge['status'] === 'active'
+                                ? t('multiuser.admin.filter_status_active', [], 'Show only enabled accounts')
+                                : t('multiuser.admin.filter_status_inactive', [], 'Show only disabled accounts'));
+                    ?>
+                    <a class="badge <?php echo $statBadge['class']; ?> users-stat-badge<?php echo $isSelected ? ' users-stat-selected' : ''; ?><?php echo $isMuted ? ' users-stat-muted' : ''; ?>"
+                       href="<?php echo htmlspecialchars($statHref, ENT_QUOTES, 'UTF-8'); ?>"
+                       <?php echo $isSelected ? 'aria-current="true"' : ''; ?>
+                       title="<?php echo htmlspecialchars($statTitle, ENT_QUOTES, 'UTF-8'); ?>">
+                        <?php echo $statBadge['label']; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </form>
 
         <!-- Users Table -->

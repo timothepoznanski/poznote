@@ -342,8 +342,8 @@
             var scrollLeft = 0;
 
             bar.addEventListener('mousedown', function (e) {
-                // Don't start dragging on close button
-                if (e.target.closest('.app-tab-close')) return;
+                // Don't start dragging on the close buttons
+                if (e.target.closest('.app-tab-close') || e.target.closest('.app-tab-close-all')) return;
 
                 isDragging = true;
                 hasDragged = false;
@@ -397,6 +397,10 @@
                     return;
                 }
 
+                if (e.target.closest('.app-tab-close-all')) {
+                    closeAllTabs();
+                    return;
+                }
                 var closeBtn = e.target.closest('.app-tab-close');
                 if (closeBtn) {
                     var tabEl = closeBtn.closest('.app-tab');
@@ -405,6 +409,17 @@
                 }
                 var tabEl = e.target.closest('.app-tab');
                 if (tabEl) switchToTab(tabEl.getAttribute('data-tab-id'));
+            });
+
+            // Double-click on a tab closes it (same rules as the × button:
+            // pinned tabs and the last remaining tab stay open)
+            bar.addEventListener('dblclick', function (e) {
+                if (hasDragged) return;
+                if (e.target.closest('.app-tab-close') || e.target.closest('.app-tab-close-all')) return;
+                var tabEl = e.target.closest('.app-tab');
+                if (!tabEl) return;
+                e.preventDefault();
+                closeTab(tabEl.getAttribute('data-tab-id'));
             });
 
             // Context menu (right-click) on the bar
@@ -457,18 +472,43 @@
             bar.appendChild(el);
         });
 
+        // "Close all tabs" runs the same action as the right-click menu, but
+        // is reachable without knowing the menu exists. Pinned to the right
+        // edge (sticky) so it stays put while the bar scrolls.
+        bar.classList.toggle('has-close-all', tabs.length > 1);
+        if (tabs.length > 1) {
+            var closeAllLabel = _t('tabs.close_all_tabs', 'Close all tabs');
+            var closeAllBtn = document.createElement('button');
+            closeAllBtn.type = 'button';
+            closeAllBtn.className = 'app-tab-close-all';
+            closeAllBtn.title = closeAllLabel;
+            closeAllBtn.setAttribute('aria-label', closeAllLabel);
+            closeAllBtn.innerHTML = '<i class="lucide lucide-x"></i>';
+
+            var closeAllText = document.createElement('span');
+            closeAllText.className = 'app-tab-close-all-label';
+            closeAllText.textContent = _t('tabs.context_menu.close_all', 'Close all');
+            closeAllBtn.appendChild(closeAllText);
+
+            bar.appendChild(closeAllBtn);
+        }
+
         _applySearchTabVisibility();
 
         // Ensure active tab is visible if bar overflowed — scroll only the bar horizontally
         if (activeTabId) {
             var activeEl = bar.querySelector('.app-tab.active');
             if (activeEl) {
+                // The "Close all tabs" button is sticky at the right end, so the
+                // space it covers is not usable to show the active tab.
+                var closeAllEl = bar.querySelector('.app-tab-close-all');
+                var trailingWidth = closeAllEl ? closeAllEl.offsetWidth : 0;
                 var tabLeft = activeEl.offsetLeft;
                 var tabRight = tabLeft + activeEl.offsetWidth;
                 if (tabLeft < bar.scrollLeft) {
                     bar.scrollLeft = tabLeft;
-                } else if (tabRight > bar.scrollLeft + bar.offsetWidth) {
-                    bar.scrollLeft = tabRight - bar.offsetWidth;
+                } else if (tabRight > bar.scrollLeft + bar.offsetWidth - trailingWidth) {
+                    bar.scrollLeft = tabRight - bar.offsetWidth + trailingWidth;
                 }
             }
         }

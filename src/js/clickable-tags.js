@@ -163,17 +163,27 @@ function convertTagsToEditable(noteId) {
     // Show suggestions while typing
     tagInput.addEventListener('input', function (e) {
         try {
-            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId);
+            showTagSuggestions(tagInput, editableContainer, _tagSuggestionWorkspace(), noteId);
         } catch (err) {
             // Silently ignore autocomplete errors to not disrupt user experience
         }
     });
-    // Show suggestions on focus
+    // Show suggestions on focus (and load the tag list, so the first character
+    // typed already has something to match against)
     tagInput.addEventListener('focus', function () {
         try {
-            showTagSuggestions(tagInput, editableContainer, window.selectedWorkspace || window.pageWorkspace, noteId);
+            showTagSuggestions(tagInput, editableContainer, _tagSuggestionWorkspace(), noteId);
         } catch (e) {
             console.warn('Failed to show tag suggestions on focus:', e);
+        }
+    });
+    // Hovering the field is the earliest reliable hint that tags are about to
+    // be typed, so warm the list before the click even lands.
+    tagInput.addEventListener('pointerenter', function () {
+        try {
+            prefetchAllTags(_tagSuggestionWorkspace());
+        } catch (e) {
+            // Prefetching is best-effort
         }
     });
 
@@ -201,8 +211,70 @@ function convertTagsToEditable(noteId) {
 // Tag Autocomplete System
 // ============================================
 
-// Cache for tags per workspace to avoid repeated API calls
-const _tagCache = { tags: null, fetchedForWorkspace: null };
+// Cache of the workspace's existing tags, shared by every tag input on the
+// page. `pending` holds the in-flight request so that typing several characters
+// in a row reuses one call instead of firing (and waiting on) one per keystroke:
+// the API scans every note, and concurrent calls also queue behind each other on
+// the PHP session lock, which is what used to delay the first suggestions.
+const _tagCache = { tags: null, workspace: null, pending: null, pendingWorkspace: null };
+
+/**
+ * Normalize a workspace name for the tags API. '__last_opened__' is a UI
+ * placeholder, not a real workspace: sending it as a filter would match no note
+ * and yield an empty suggestion list.
+ * @param {string} workspace - The raw workspace value
+ * @returns {string} The workspace to filter on, or '' for "all workspaces"
+ */
+function _normalizeTagWorkspace(workspace) {
+    const ws = (workspace === null || workspace === undefined) ? '' : String(workspace);
+    if (ws === 'undefined' || ws === 'null' || ws === '__last_opened__') return '';
+    return ws;
+}
+
+/**
+ * The workspace whose tags should be suggested on this page.
+ * @returns {string} The workspace name, or '' for "all workspaces"
+ */
+function _tagSuggestionWorkspace() {
+    return _normalizeTagWorkspace(window.selectedWorkspace || window.pageWorkspace);
+}
+
+/**
+ * Ask the server for the workspace tags, reusing any request already in flight.
+ * @param {string} workspace - The normalized workspace to fetch tags for
+ * @returns {Promise<Array<string>>} Array of tag names
+ */
+function _requestAllTags(workspace) {
+    if (_tagCache.pending && _tagCache.pendingWorkspace === workspace) {
+        return _tagCache.pending;
+    }
+
+    const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
+    const request = fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+            const tags = (data && data.success && Array.isArray(data.tags)) ? data.tags : [];
+            _tagCache.tags = tags;
+            _tagCache.workspace = workspace;
+            return tags;
+        })
+        .catch(err => {
+            console.warn('Failed to fetch tags:', err);
+            // Keep serving what we already have rather than dropping suggestions
+            return (_tagCache.workspace === workspace && _tagCache.tags) ? _tagCache.tags : [];
+        })
+        .then(tags => {
+            if (_tagCache.pending === request) {
+                _tagCache.pending = null;
+                _tagCache.pendingWorkspace = null;
+            }
+            return tags;
+        });
+
+    _tagCache.pending = request;
+    _tagCache.pendingWorkspace = workspace;
+    return request;
+}
 
 /**
  * Fetch tags from server (cached per workspace)
@@ -210,29 +282,46 @@ const _tagCache = { tags: null, fetchedForWorkspace: null };
  * @returns {Promise<Array<string>>} Array of tag names
  */
 function fetchAllTags(workspace) {
-    return new Promise((resolve, reject) => {
-        if (_tagCache.tags !== null && _tagCache.fetchedForWorkspace === workspace) {
-            resolve(_tagCache.tags);
-            return;
-        }
+    const ws = _normalizeTagWorkspace(workspace);
+    if (_tagCache.tags !== null && _tagCache.workspace === ws) {
+        return Promise.resolve(_tagCache.tags);
+    }
+    return _requestAllTags(ws);
+}
 
-        const url = '/api/v1/tags' + (workspace ? ('?workspace=' + encodeURIComponent(workspace)) : '');
-        fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
-            .then(r => r.json())
-            .then(data => {
-                if (data && data.success && Array.isArray(data.tags)) {
-                    _tagCache.tags = data.tags;
-                    _tagCache.fetchedForWorkspace = workspace;
-                    resolve(data.tags);
-                } else {
-                    resolve([]);
-                }
-            })
-            .catch(err => {
-                console.warn('Failed to fetch tags:', err);
-                resolve([]);
-            });
+/**
+ * Warm the cache before the user types, so the first character can be answered
+ * from memory instead of waiting on a round trip.
+ * @param {string} workspace - The workspace to fetch tags for
+ */
+function prefetchAllTags(workspace) {
+    const ws = _normalizeTagWorkspace(workspace);
+    if (_tagCache.tags === null || _tagCache.workspace !== ws) {
+        _requestAllTags(ws);
+    }
+}
+
+/**
+ * Add tags the user just created to the cache, so they are suggested in the
+ * other notes of this page without waiting for a refetch.
+ * @param {Array<string>} tags - The tags currently set on a note
+ */
+function rememberTagsForSuggestions(tags) {
+    if (!Array.isArray(_tagCache.tags)) return;
+
+    const known = new Set(_tagCache.tags.map(t => t.toLowerCase()));
+    let added = false;
+    tags.forEach(tag => {
+        const clean = (tag || '').trim();
+        if (clean && !known.has(clean.toLowerCase())) {
+            _tagCache.tags.push(clean);
+            known.add(clean.toLowerCase());
+            added = true;
+        }
     });
+    if (added) {
+        _tagCache.tags.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+    }
 }
 
 /**
@@ -334,9 +423,19 @@ window.highlightMatchingTags = highlightMatchingTags;
 function showTagSuggestions(inputEl, container, workspace, noteId) {
     const dd = getOrCreateSuggestions(container);
     const value = inputEl.value.trim().toLowerCase();
-    if (!value) { dd.style.display = 'none'; return; }
+    if (!value) {
+        dd.style.display = 'none';
+        // Nothing to match yet, but load the list now so the first character
+        // typed can be answered without a round trip.
+        prefetchAllTags(workspace);
+        return;
+    }
 
     fetchAllTags(workspace).then(allTags => {
+        // A slow response must not overwrite the dropdown of what is now a
+        // different prefix (or of an input the user has already left).
+        if (!inputEl.isConnected || inputEl.value.trim().toLowerCase() !== value) return;
+
         // Exclude tags already present
         const existing = Array.from(container.querySelectorAll('.clickable-tag')).map(t => (t.getAttribute('data-tag') || t.textContent).trim().toLowerCase());
         const matches = allTags.filter(t => t.toLowerCase().includes(value) && !existing.includes(t.toLowerCase()));
@@ -352,13 +451,21 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
             item.style.cursor = 'pointer';
             item.addEventListener('mousedown', function (e) {
                 e.preventDefault();
-                addTagElement(container, tag, noteId);
-                inputEl.value = '';
-                const targetNoteId = noteId;
-                updateTagsInput(targetNoteId, container);
-                // Tags are auto-saved directly via updateTagsInput, no need to mark as modified
+                // The dropdown is deliberately left visible here: see the click
+                // handler below.
+                applyTagSuggestion(container, inputEl, tag, noteId, null);
+            });
+            item.addEventListener('click', function (e) {
+                // Hiding the dropdown on mousedown would make the browser
+                // resolve this click against whatever sits under it (the note
+                // body), and the "clicked the note background" handler would
+                // then move the caret out of the tag field. Keeping the item
+                // hit-testable until here also lets stopPropagation() shield
+                // the click from that handler.
+                e.preventDefault();
+                e.stopPropagation();
                 dd.style.display = 'none';
-                setTimeout(() => inputEl.focus(), 10);
+                focusTagInput(container, inputEl);
             });
             dd.appendChild(item);
         });
@@ -403,12 +510,13 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
                         it.classList.toggle('highlighted', i === inputEl._highlightedIdx);
                         it.style.background = i === inputEl._highlightedIdx ? '#f0f7ff' : '';
                     });
-                } else if (ev.key === 'Enter' && inputEl._highlightedIdx >= 0) {
+                } else if ((ev.key === 'Enter' || ev.key === 'Tab') && inputEl._highlightedIdx >= 0) {
+                    // Tab accepts the highlighted suggestion too, instead of
+                    // leaving the tag input for the next field.
                     ev.preventDefault();
                     ev.stopPropagation();
-                    // Dispatch mousedown to reuse the same handler which also triggers save
-                    items[inputEl._highlightedIdx].dispatchEvent(new MouseEvent('mousedown'));
-                    // Tags are auto-saved via the mousedown handler, no need to mark as modified
+                    // Tags are auto-saved by applyTagSuggestion, no need to mark as modified
+                    applyTagSuggestion(container, inputEl, items[inputEl._highlightedIdx].textContent, noteId, dd);
                 } else if (ev.key === 'Escape') {
                     dd.style.display = 'none';
                 }
@@ -416,6 +524,68 @@ function showTagSuggestions(inputEl, container, workspace, noteId) {
             inputEl.hasNavigationHandler = true;
         }
     });
+}
+
+/**
+ * Put the caret back in the tag input so the next tag can be typed straight
+ * away, without having to click the field again.
+ * The input is re-read from the container instead of being reused directly:
+ * the save that follows a tag change can re-render the tag editor, which would
+ * leave the original element detached (focusing it then does nothing).
+ * @param {HTMLElement} container - The editable tags container
+ * @param {HTMLInputElement} [fallbackInput] - Input to use if the container has none
+ */
+function focusTagInput(container, fallbackInput) {
+    const focusNow = () => {
+        const live = (container && container.querySelector('.tag-input')) || fallbackInput;
+        if (!live || !live.isConnected) return;
+
+        // Never steal focus back from somewhere the user moved to on purpose
+        // (the note body, the title, another field) between the two attempts.
+        const active = document.activeElement;
+        if (active && active !== live && active !== document.body && active !== document.documentElement
+            && !active.classList.contains('tag-input')) {
+            return;
+        }
+
+        if (active !== live) live.focus();
+        try {
+            live.setSelectionRange(live.value.length, live.value.length);
+        } catch (e) {
+            // Not all input types support selection ranges
+        }
+    };
+
+    focusNow();
+    // Re-assert once the click / blur sequence is over, then once more after the
+    // save triggered by the change has had a chance to redraw the editor.
+    setTimeout(focusNow, 0);
+    setTimeout(focusNow, 120);
+}
+
+/**
+ * Add the tag picked from the suggestions dropdown and keep typing where it
+ * left off.
+ * @param {HTMLElement} container - The editable tags container
+ * @param {HTMLInputElement} inputEl - The tag input the suggestion was picked from
+ * @param {string} tag - The suggested tag to add
+ * @param {string} noteId - The ID of the note
+ * @param {HTMLElement|null} dd - The suggestions dropdown to hide, or null to
+ *                                  leave it to the caller
+ */
+function applyTagSuggestion(container, inputEl, tag, noteId, dd) {
+    // Clear the typed prefix first: a click on a suggestion can still blur the
+    // input in some browsers, and the blur handler would then commit that
+    // prefix as a second, unwanted tag alongside the suggestion.
+    if (inputEl) inputEl.value = '';
+    if (dd) dd.style.display = 'none';
+
+    if (!tagExistsInContainer(container, tag)) {
+        addTagElement(container, tag, noteId);
+    }
+    // Tags are auto-saved directly via updateTagsInput, no need to mark as modified
+    updateTagsInput(noteId, container);
+    focusTagInput(container, inputEl);
 }
 
 // Close suggestions when clicking outside
@@ -570,9 +740,7 @@ function handleTagInput(e, noteId, container) {
             updateTagsInput(noteId, container);
 
             // Keep focus on input to continue typing
-            setTimeout(() => {
-                input.focus();
-            }, 10);
+            focusTagInput(container, input);
         }
 
         return false;
@@ -669,6 +837,10 @@ function updateTagsInput(noteId, container) {
     const tags = Array.from(tagElements).map(tag => tag.getAttribute('data-tag') || tag.textContent.trim());
 
     tagsInput.value = tags.join(' ');
+
+    // A tag typed here is a tag that exists from now on: make it suggestible in
+    // the other notes right away, instead of only after the next page load.
+    rememberTagsForSuggestions(tags);
 
     // Update the placeholder based on whether there are tags
     const tagInput = container.querySelector('.tag-input');

@@ -15,8 +15,18 @@
             txtDue: body.getAttribute('data-txt-due') || 'Due date',
             txtDueRemove: body.getAttribute('data-txt-due-remove') || 'Remove due date',
             txtDueRemoveTime: body.getAttribute('data-txt-due-remove-time') || 'Remove time',
-            txtCalNoTasks: body.getAttribute('data-txt-cal-no-tasks') || 'No tasks on this day.'
+            txtCalNoTasks: body.getAttribute('data-txt-cal-no-tasks') || 'No tasks on this day.',
+            txtNoteBadge: body.getAttribute('data-txt-note-badge') || 'Note',
+            txtNoteBadgeTitle: body.getAttribute('data-txt-note-badge-title') || 'Checklist items of a note'
         };
+    }
+
+    // Groups come from two sources: tasklist notes (source 'tasklist', full
+    // task objects with due dates, importance...) and the checklists found in
+    // regular HTML/markdown notes (source 'checklist', plain text + completed
+    // only, toggled by rewriting the note content)
+    function isChecklistNote(note) {
+        return !!note && note.source === 'checklist';
     }
 
     var config = getConfig();
@@ -133,6 +143,33 @@
         } catch (e) { }
     }
 
+    // "Display tasks in notes" toggle (checklists of regular notes), on by
+    // default and persisted per user across visits
+    var SHOW_NOTE_CHECKLISTS_KEY = 'poznote-tasks-page-show-note-checklists';
+
+    function loadShowNoteChecklists() {
+        try {
+            return getPrefsStorage().getItem(SHOW_NOTE_CHECKLISTS_KEY) !== '0';
+        } catch (e) {
+            return true;
+        }
+    }
+
+    var showNoteChecklists = loadShowNoteChecklists();
+
+    function saveShowNoteChecklists() {
+        try {
+            getPrefsStorage().setItem(SHOW_NOTE_CHECKLISTS_KEY, showNoteChecklists ? '1' : '0');
+        } catch (e) { }
+    }
+
+    // Groups currently taken into account (counts, progress, lists)
+    function getActiveNotes() {
+        return showNoteChecklists ? taskNotes : taskNotes.filter(function (note) {
+            return !isChecklistNote(note);
+        });
+    }
+
     // Same per-tab editor session identity as note-edit-lock.js, so saving
     // from this page cooperates with the note edit-lock system.
     function getEditorSessionId() {
@@ -213,12 +250,28 @@
             .then(function (data) {
                 if (data.error) throw new Error(data.error);
 
-                taskNotes = (data.notes || []).filter(function (note) {
+                var tasklistNotes = (data.notes || []).filter(function (note) {
                     return Array.isArray(note.tasks);
+                }).map(function (note) {
+                    note.source = 'tasklist';
+                    return note;
+                });
+                var checklistNotes = (data.checklists || []).filter(function (note) {
+                    return Array.isArray(note.tasks);
+                }).map(function (note) {
+                    note.source = 'checklist';
+                    return note;
+                });
+                // Both lists come back most recently updated first; keep that
+                // order across sources
+                taskNotes = tasklistNotes.concat(checklistNotes).sort(function (a, b) {
+                    return String(b.updated || '').localeCompare(String(a.updated || ''));
                 });
                 if (spinner) spinner.style.display = 'none';
 
-                var total = countAllTasks();
+                // Empty state only when there is nothing at all, whatever the
+                // "Display tasks in notes" toggle says
+                var total = taskNotes.reduce(function (sum, note) { return sum + note.tasks.length; }, 0);
                 if (total === 0) {
                     if (emptyMessage) emptyMessage.style.display = 'block';
                     updateProgress();
@@ -240,11 +293,11 @@
     }
 
     function countAllTasks() {
-        return taskNotes.reduce(function (sum, note) { return sum + note.tasks.length; }, 0);
+        return getActiveNotes().reduce(function (sum, note) { return sum + note.tasks.length; }, 0);
     }
 
     function countCompletedTasks() {
-        return taskNotes.reduce(function (sum, note) {
+        return getActiveNotes().reduce(function (sum, note) {
             return sum + note.tasks.filter(function (t) { return t.completed; }).length;
         }, 0);
     }
@@ -284,7 +337,7 @@
     }
 
     function getFilteredNotes() {
-        return taskNotes.map(function (note) {
+        return getActiveNotes().map(function (note) {
             var heading = (note.heading || '').toLowerCase();
             var folder = (note.folder || '').toLowerCase();
             var noteMatchesText = !filterText || heading.includes(filterText) || folder.includes(filterText);
@@ -390,6 +443,16 @@
                 header.appendChild(badge);
             }
 
+            // Checklists of regular notes are told apart from tasklist notes
+            if (isChecklistNote(note)) {
+                var sourceBadge = document.createElement('span');
+                sourceBadge.className = 'tasks-note-source-badge';
+                sourceBadge.title = config.txtNoteBadgeTitle;
+                sourceBadge.innerHTML = '<i class="lucide lucide-file-text"></i> ';
+                sourceBadge.appendChild(document.createTextNode(config.txtNoteBadge));
+                header.appendChild(sourceBadge);
+            }
+
             var count = document.createElement('span');
             count.className = 'tasks-note-count';
             var done = note.tasks.filter(function (t) { return t.completed; }).length;
@@ -473,7 +536,8 @@
                 openDueDatePicker(note, task, due, e);
             });
             row.appendChild(due);
-        } else if (!task.completed) {
+        } else if (!task.completed && !isChecklistNote(note)) {
+            // Checklist items of regular notes carry no due date
             var addDue = document.createElement('button');
             addDue.type = 'button';
             addDue.className = 'tasks-task-due-btn';
@@ -929,7 +993,111 @@
             });
     }
 
+    // Flip the "- [ ]" / "- [x]" marker of one line of a markdown note. The
+    // line index is the one the API reported (0-based in the "\n"-split
+    // source). Returns null when the line is no longer a task item.
+    function toggleMarkdownChecklistLine(content, lineIndex, completed) {
+        var lines = String(content || '').split('\n');
+        if (lineIndex < 0 || lineIndex >= lines.length) return null;
+        var line = lines[lineIndex];
+        var match = /^(\s*[*\-+]\s+)\[[ xX]\]/.exec(line);
+        if (!match) return null;
+        lines[lineIndex] = match[1] + (completed ? '[x]' : '[ ]') + line.slice(match[0].length);
+        return lines.join('\n');
+    }
+
+    // Flip the n-th checklist checkbox of an HTML note (same ordinal the API
+    // used: document order of input.checklist-checkbox), mirroring what
+    // js/checklist.js writes when the box is clicked in the editor. Returns
+    // null when the checkbox no longer exists.
+    function toggleHtmlChecklistItem(content, index, completed) {
+        var doc = new DOMParser().parseFromString('<!DOCTYPE html><html><body>' + String(content || '') + '</body></html>', 'text/html');
+        var boxes = doc.querySelectorAll('input.checklist-checkbox');
+        var box = boxes[index];
+        if (!box) return null;
+        if (completed) {
+            box.setAttribute('checked', 'checked');
+            box.setAttribute('data-checked', '1');
+        } else {
+            box.removeAttribute('checked');
+            box.setAttribute('data-checked', '0');
+        }
+        var item = box.closest('.checklist-item');
+        if (item) item.classList.toggle('checklist-item-checked', completed);
+        return doc.body.innerHTML;
+    }
+
+    // Toggle one checklist item of a regular note by rewriting the note
+    // content through the notes API (read-modify-write, like tasklist
+    // notes). The item is re-located in the freshly read content, so a
+    // stale index (note edited meanwhile) fails instead of flipping the
+    // wrong line. Returns a promise that resolves when the save succeeded.
+    function mutateChecklistInNote(note, task, completed) {
+        var workspaceParam = 'workspace=' + encodeURIComponent(config.workspace);
+
+        return fetch('api/v1/notes/' + note.id + '?' + workspaceParam)
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (!data || !data.success || !data.note) {
+                    throw new Error(config.txtError);
+                }
+                var noteType = data.note.type || 'note';
+                var index = parseInt(task.id, 10);
+                var newContent = null;
+                if (noteType === 'markdown') {
+                    newContent = toggleMarkdownChecklistLine(data.note.content, index, completed);
+                } else if (noteType === 'note') {
+                    newContent = toggleHtmlChecklistItem(data.note.content, index, completed);
+                }
+                if (newContent === null) {
+                    throw new Error(config.txtError);
+                }
+
+                var editorSessionId = getEditorSessionId();
+                var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+                var payload = { content: newContent };
+                if (editorSessionId) {
+                    headers['X-Editor-Session-ID'] = editorSessionId;
+                    payload.editor_session_id = editorSessionId;
+                }
+
+                return fetch('api/v1/notes/' + note.id, {
+                    method: 'PATCH',
+                    headers: headers,
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+            })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (!data || !data.success) {
+                    throw new Error(config.txtError);
+                }
+            });
+    }
+
+    function toggleChecklistItem(note, task, checkbox) {
+        var newCompleted = checkbox.checked;
+        checkbox.disabled = true;
+
+        mutateChecklistInNote(note, task, newCompleted)
+            .then(function () {
+                // Items keep their place in the note, no regrouping
+                task.completed = newCompleted;
+                render();
+            })
+            .catch(function () {
+                checkbox.checked = !newCompleted;
+                checkbox.disabled = false;
+            });
+    }
+
     function toggleTask(note, task, checkbox) {
+        if (isChecklistNote(note)) {
+            toggleChecklistItem(note, task, checkbox);
+            return;
+        }
+
         var newCompleted = checkbox.checked;
         checkbox.disabled = true;
 
@@ -1036,6 +1204,16 @@
                 if (mode === viewMode) return;
                 viewMode = mode;
                 saveViewMode();
+                render();
+            });
+        }
+
+        var showNotesToggle = document.getElementById('tasksShowNoteChecklists');
+        if (showNotesToggle) {
+            showNotesToggle.checked = showNoteChecklists;
+            showNotesToggle.addEventListener('change', function () {
+                showNoteChecklists = showNotesToggle.checked;
+                saveShowNoteChecklists();
                 render();
             });
         }

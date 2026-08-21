@@ -13,7 +13,8 @@
  *                      → SSE stream (OpenAI chat.completion.chunk passthrough,
  *                        plus {"poznote_tool": ...} status events and
  *                        {"poznote_error": ...} on failure)
- *   POST ?action=test  → JSON {success, models?: [...], error?} (admin only)
+ *   POST ?action=test  → JSON {success, models?: [...], error?} (admins, and
+ *                        any user when personal API keys are allowed)
  */
 require 'auth.php';
 requireApiAuth();
@@ -22,6 +23,7 @@ require_once 'config.php';
 require_once 'functions.php';
 require_once 'db_connect.php';
 require_once 'users/db_master.php';
+require_once 'ai_config.php';
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
@@ -74,16 +76,20 @@ function aiChatJsonError($httpCode, $message) {
     exit;
 }
 
-// The AI configuration is instance-wide (master.db), managed by the admin
-$aiEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1';
-$aiUrl = trim((string)getGlobalSetting('ai_chat_url', ''));
-$aiModel = trim((string)getGlobalSetting('ai_chat_model', ''));
-$aiApiKey = trim((string)getGlobalSetting('ai_chat_api_key', ''));
+// Either the instance configuration (master.db, managed by an admin and
+// granted per user) or the user's own provider and API key when the admin
+// allows personal keys. See poznoteResolveAiChatConfig() in ai_config.php.
+$aiUserId = (int)(getAuthenticatedUserId() ?? 0);
+$aiConfig = poznoteResolveAiChatConfig($con, $aiUserId);
+$aiUrl = $aiConfig['url'];
+$aiModel = $aiConfig['model'];
+$aiApiKey = $aiConfig['api_key'];
 
 if ($action === 'test') {
-    // Probing arbitrary URLs is reserved for the admin, like the
-    // settings page itself (ai_settings.php uses requireAdmin)
-    if (!isCurrentUserAdmin()) {
+    // Probing arbitrary URLs from the server is reserved for admins, plus
+    // regular users when personal API keys are on: listing the models of their
+    // own server is what makes ai_settings_user.php usable.
+    if (!isCurrentUserAdmin() && !poznoteAiUserKeysAllowed()) {
         aiChatJsonError(403, 'Admin access required');
     }
     $testUrl = trim((string)($_POST['url'] ?? $aiUrl));
@@ -91,7 +97,22 @@ if ($action === 'test') {
         aiChatJsonError(400, 'No server URL configured');
     }
     $ch = curl_init(aiChatModelsUrl($testUrl));
-    $testKey = trim((string)($_POST['api_key'] ?? $aiApiKey));
+    // The settings pages only post the key when the user typed one; a field
+    // still showing the mask posts nothing. Fall back to the stored key of the
+    // configuration being edited ('scope'), not to the one the chat resolves
+    // to: that one ignores a personal configuration until it is enabled with a
+    // model, and on the admin page it may be the admin's own personal key.
+    $testKey = trim((string)($_POST['api_key'] ?? ''));
+    if ($testKey === '') {
+        $testScope = (string)($_POST['scope'] ?? '');
+        if ($testScope === 'user' && poznoteAiUserKeysAllowed()) {
+            $testKey = poznoteAiUserConfig($con)['api_key'];
+        } elseif ($testScope === 'instance' && isCurrentUserAdmin()) {
+            $testKey = poznoteAiInstanceConfig()['api_key'];
+        } else {
+            $testKey = $aiApiKey;
+        }
+    }
     $headers = array_merge(['Accept: application/json'], aiChatAuthHeaders($testUrl, $testKey));
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
@@ -135,14 +156,10 @@ if ($action !== 'chat') {
     aiChatJsonError(400, 'Unknown action');
 }
 
-if (!$aiEnabled || $aiUrl === '' || $aiModel === '') {
+// Hiding the chat button is not enough: the endpoint itself must refuse users
+// who have neither a personal configuration nor access to the instance one.
+if (!$aiConfig['available']) {
     aiChatJsonError(400, 'AI assistant is not configured');
-}
-
-// Access is granted per user by an admin: hiding the button is not enough,
-// the endpoint itself must refuse users who were never allowed.
-if (!isAiChatAllowedForUser((int)(getAuthenticatedUserId() ?? 0))) {
-    aiChatJsonError(403, 'AI assistant access is not enabled for this user');
 }
 
 $input = json_decode(file_get_contents('php://input'), true);

@@ -207,17 +207,19 @@ body.dark-mode {
     width: 60px;
 }
 
-/* "Hide disabled accounts" toggle sitting next to the filter input of the
-   admin tables (users and storage statistics). The search container is a
-   centered flex row, so the label wraps under the input on narrow screens
-   instead of squeezing it. */
-.home-search-container:has(.admin-hide-inactive) {
+/* Controls sitting next to the filter input of the admin tables: the "hide
+   disabled accounts" toggle (storage statistics) and the status badges
+   (users). The search container is a centered flex row, so they wrap under
+   the input on narrow screens instead of squeezing it. */
+.home-search-container:has(.admin-hide-inactive),
+.home-search-container:has(.users-stats) {
     align-items: center;
     gap: 14px;
     flex-wrap: wrap;
 }
 
-.home-search-container:has(.admin-hide-inactive) .home-search-wrapper {
+.home-search-container:has(.admin-hide-inactive) .home-search-wrapper,
+.home-search-container:has(.users-stats) .home-search-wrapper {
     /* Keep the input at its usual width but let it shrink, so the label sits
        beside it rather than being pushed to its own line. */
     flex: 0 1 500px;
@@ -1092,4 +1094,40 @@ input.admin-toggle:disabled:checked+.slider {
     .maintenance-title {
         font-size: 1.2rem;
     }
+}
+
+/* Instance-wide enabled/disabled tallies, sitting to the right of the filter
+   input (where the "hide disabled accounts" checkbox used to be). Reuses the
+   row status badges so the colors match the Status column at a glance, and
+   doubles as the status filter: each badge is a link. */
+.users-stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.users-stat-badge {
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.2s, filter 0.2s, box-shadow 0.2s;
+}
+
+.users-stat-badge:hover {
+    opacity: 0.85;
+}
+
+/* The badge whose filter is applied. The greyed-out sibling already carries
+   most of the signal, so this only firms up the selected label. */
+.users-stat-badge.users-stat-selected {
+    font-weight: 700;
+}
+
+/* The other status while a filter is applied: greyed out rather than hidden,
+   so the count stays readable and one click brings it back. */
+.users-stat-badge.users-stat-muted {
+    filter: grayscale(0.9);
+    opacity: 0.6;
 }

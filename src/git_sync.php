@@ -187,6 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container git-sync-container">
+    <?php include 'back_to_settings.php'; ?>
     <h1 class="poznote-page-title"><i class="lucide lucide-git-branch"></i> <?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></h1>
 
 

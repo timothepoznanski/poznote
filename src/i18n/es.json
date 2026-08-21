@@ -17,7 +17,7 @@
     "back": "Volver",
     "back_to_notes": "Notas",
     "home": "Inicio",
-    "back_to_settings": "Configuración",
+    "back_to_settings": "Volver a la configuración",
     "close": "Cerrar",
     "disable": "Desactivar",
     "cancel": "Cancelar",
@@ -1615,6 +1615,7 @@
     },
     "note_actions": {
       "menu": "Acciones de la nota",
+      "open_in_new_tab": "Abrir en nueva pestaña",
       "move_note": "Mover nota",
       "is_shared": "Es compartida",
       "share_note": "Compartir nota",
@@ -1651,7 +1652,8 @@
       "unpin": "Desfijar pestaña",
       "close": "Cerrar",
       "close_all": "Cerrar todas"
-    }
+    },
+    "close_all_tabs": "Cerrar todas las pestañas"
   },
   "notes_manager": {
     "actions": "Acciones masivas",
@@ -1709,6 +1711,7 @@
     "bullet_list": "Lista con viñetas",
     "numbered_list": "Lista numerada",
     "checklist": "Lista de verificación",
+    "done": "Hecho",
     "image": "Imagen",
     "take_photo": "Hacer una foto",
     "excalidraw": "Excalidraw",
@@ -2877,6 +2880,11 @@
       "actions": "Acciones",
       "active": "Activo",
       "inactive": "Inactivo",
+      "active_count": "{{count}} activos",
+      "inactive_count": "{{count}} inactivos",
+      "filter_status_active": "Mostrar solo las cuentas activas",
+      "filter_status_inactive": "Mostrar solo las cuentas desactivadas",
+      "filter_status_clear": "Mostrar todas las cuentas",
       "not_defined": "no definido",
       "create_user": "Crear perfil",
       "export_csv": "Exportar CSV",
@@ -3309,7 +3317,7 @@
     },
     "logout": {
       "confirm": "¿Seguro que quieres cerrar sesión?",
-      "signed_in_as": "Sesión iniciada como {{username}}",
+      "signed_in_as": "Has iniciado sesión como {{username}}",
       "in_progress": "Cerrando sesión..."
     }
   },
@@ -3691,8 +3699,10 @@
     "config_title": "Configuración",
     "enable_label": "Activar el asistente IA",
     "enable_description": "Muestra un botón de chat IA en la barra de herramientas de las notas.",
-    "users_label": "Usuarios autorizados",
-    "users_description": "Solo los usuarios seleccionados ven el botón de chat de IA. Los nuevos usuarios no tienen acceso hasta que los añadas aquí.",
+    "users_label": "Usuarios autorizados a usar el asistente de IA global configurado por el administrador",
+    "users_description": "Solo los usuarios seleccionados ven el botón de chat de IA para la configuración de esta página. Los usuarios nuevos no tienen acceso hasta que los añadas aquí.",
+    "users_filter_placeholder": "Filtrar usuarios",
+    "users_filter_empty": "Ningún usuario coincide con este filtro.",
     "users_admin": "Administrador",
     "url_label": "URL del servidor",
     "url_description": "URL base de una API compatible con OpenAI. Para Ollama en el host de Docker, usa http://host.docker.internal:11434",
@@ -3700,7 +3710,7 @@
     "api_key_label": "Clave API (opcional)",
     "api_key_description": "Déjala vacía para un servidor Ollama local. Necesaria para proveedores en la nube.",
     "save": "Guardar configuración",
-    "test": "Probar conexión",
+    "test": "Comprobar el acceso y listar los modelos",
     "testing": "Probando conexión...",
     "test_success": "Conexión correcta. {{count}} modelo(s) disponible(s). Haz clic en un modelo abajo y guarda.",
     "test_failure": "Error de conexión: {{error}}",
@@ -3712,7 +3722,21 @@
     "provider_label": "Proveedor de IA",
     "provider_custom": "Otro (URL personalizada)",
     "api_key_label_required": "Clave API",
-    "model_description": "Usa «Test connection» para listar los modelos disponibles en el servidor."
+    "user_keys_label": "Permitir claves API personales",
+    "user_keys_description": "Cada usuario obtiene una tarjeta de asistente de IA en sus propios ajustes, donde puede indicar su proveedor y su clave API. En ese caso, el asistente responde a través de su propio servidor y su propia clave en lugar de la configuración de esta página, aparezca o no ese usuario en la lista de arriba."
+  },
+  "ai_settings_user": {
+    "title": "Mi asistente de IA",
+    "card": "Mi asistente de IA",
+    "card_help": "Usa el asistente de IA con tu propio proveedor y tu propia clave API.",
+    "description": "Conecta el asistente de IA a tu propio servidor compatible con OpenAI (Ollama, LM Studio, OpenAI, Anthropic, ...) con tu clave API. Tu configuración sustituye a la definida por el administrador.",
+    "disabled_notice": "Tu administrador no ha permitido claves API personales en esta instancia.",
+    "using_instance": "Actualmente el asistente responde con la configuración definida por el administrador. Activa tu propia configuración a continuación para usar tu clave API.",
+    "enable_label": "Usar mi propia configuración",
+    "enable_description": "El botón de chat de IA usa el servidor y la clave API de abajo en lugar de los de la instancia.",
+    "messages": {
+      "incomplete": "Introduce una URL de servidor y un modelo antes de activar tu propio asistente."
+    }
   },
   "ai_chat": {
     "title": "Asistente IA",
@@ -3770,8 +3794,11 @@
     "filter_dated": "Con fecha",
     "filter_completed": "Completadas",
     "filter_placeholder": "Filtrar por tarea, título o carpeta...",
-    "empty": "Aún no hay tareas. Crea una nota de lista de tareas para empezar.",
+    "empty": "Aún no hay tareas. Crea una nota de lista de tareas o añade una lista de verificación a una nota para empezar.",
     "empty_filtered": "Ninguna tarea coincide con este filtro.",
+    "note_badge": "Nota",
+    "note_badge_title": "Elementos de lista de verificación de una nota",
+    "show_note_checklists": "Mostrar las tareas de las notas",
     "collapse": "Contraer",
     "expand": "Expandir",
     "collapse_all": "Contraer todo",

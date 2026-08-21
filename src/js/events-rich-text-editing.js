@@ -1022,7 +1022,7 @@ function handleNoteEntryKeydown(e) {
         }
     }
 
-    // Handle note keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+K, Ctrl+Shift+S, etc.)
+    // Handle note keyboard shortcuts (Ctrl+B, Ctrl+I, Ctrl+K, Ctrl+Shift+S, Ctrl+Shift+B, etc.)
     if (e.ctrlKey || e.metaKey) {
         var container = selection.rangeCount > 0
             ? selection.getRangeAt(0).commonAncestorContainer
@@ -1067,6 +1067,20 @@ function handleNoteEntryKeydown(e) {
             } else {
                 document.execCommand('underline');
             }
+            return;
+        }
+
+        // Ctrl+Shift+B toggles a code block (overrides Chrome's bookmarks bar
+        // shortcut while the caret is in a note). toggleCodeBlock handles both
+        // the rich-text note and the markdown editor.
+        if (e.shiftKey && e.key.toLowerCase() === 'b' && noteEditor) {
+            e.preventDefault();
+            if (typeof window.toggleCodeBlock === 'function') {
+                window.toggleCodeBlock();
+            } else if (typeof toggleCodeBlock === 'function') {
+                toggleCodeBlock();
+            }
+            triggerNoteSave();
             return;
         }
 
@@ -1753,6 +1767,13 @@ function setupPasteHandling() {
 
             var htmlData = e.clipboardData ? e.clipboardData.getData('text/html') : '';
             var plainText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+
+            // Windows editors (VS Code, Notepad++) put CRLF on the clipboard.
+            // The handlers below split on \n, which would leave a stray CR at
+            // the end of every line: invisible until the note is reloaded, at
+            // which point the HTML parser turns each CR into a real newline and
+            // every line break shows up twice inside a code block.
+            plainText = plainText.replace(/\r\n?/g, '\n');
 
             // Try different paste handlers
             if (handleIframePaste(plainText)) {

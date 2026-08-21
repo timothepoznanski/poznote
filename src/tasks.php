@@ -61,7 +61,9 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
       data-txt-due="<?php echo t_h('tasklist.due_date', [], 'Due date'); ?>"
       data-txt-due-remove="<?php echo t_h('tasklist.due_remove', [], 'Remove due date'); ?>"
       data-txt-due-remove-time="<?php echo t_h('tasklist.due_remove_time', [], 'Remove time'); ?>"
-      data-txt-cal-no-tasks="<?php echo t_h('tasks_page.calendar_no_tasks', [], 'No tasks on this day.'); ?>">
+      data-txt-cal-no-tasks="<?php echo t_h('tasks_page.calendar_no_tasks', [], 'No tasks on this day.'); ?>"
+      data-txt-note-badge="<?php echo t_h('tasks_page.note_badge', [], 'Note'); ?>"
+      data-txt-note-badge-title="<?php echo t_h('tasks_page.note_badge_title', [], 'Checklist items of a note'); ?>">
 	<?php include 'icon_sidebar.php'; ?>
 	<div class="tasks-container">
 
@@ -74,6 +76,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 			<div class="tasks-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="tasksProgressBar">
 				<div class="tasks-progress-fill" id="tasksProgressFill"></div>
 			</div>
+			<label class="tasks-progress-option" for="tasksShowNoteChecklists" title="<?php echo t_h('tasks_page.note_badge_title', [], 'Checklist items of a note'); ?>">
+				<input type="checkbox" id="tasksShowNoteChecklists" checked>
+				<span><?php echo t_h('tasks_page.show_note_checklists', [], 'Display tasks in notes'); ?></span>
+			</label>
 		</div>
 
 		<div class="tasks-filter-bar">
@@ -121,7 +127,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(trim($rawVersion)));
 			</div>
 			<div id="tasksNotesContainer"></div>
 			<div id="emptyMessage" class="empty-message initially-hidden">
-				<p><?php echo t_h('tasks_page.empty', [], 'No tasks yet. Create a task list note to get started.'); ?></p>
+				<p><?php echo t_h('tasks_page.empty', [], 'No tasks yet. Create a task list note or add a checklist to a note to get started.'); ?></p>
 			</div>
 		</div>
 	</div>

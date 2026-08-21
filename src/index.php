@@ -442,15 +442,15 @@ if ($isPublicWorkspaceReadonly) {
     ?>
 
     <?php
-    // AI assistant availability (instance-wide config, used for the icon
-    // sidebar button and the chat panel below)
+    // AI assistant availability (used for the icon sidebar button and the
+    // chat panel below)
     require_once 'users/db_master.php';
-    // Access is opt-in per user on top of the instance-wide configuration
-    // (see the allowed-users list in ai_settings.php).
-    $aiChatEnabled = getGlobalSetting('ai_chat_enabled', '0') === '1'
-        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
-        && trim((string)getGlobalSetting('ai_chat_model', '')) !== ''
-        && isAiChatAllowedForUser((int)(getAuthenticatedUserId() ?? 0));
+    require_once 'ai_config.php';
+    // Either the user's own configuration (ai_settings_user.php) or the
+    // instance one, which is opt-in per user (see the allowed-users list in
+    // ai_settings.php).
+    $aiChatConfig = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 0));
+    $aiChatEnabled = $aiChatConfig['available'];
 
     // Icon-only left rail mirroring the dashboard topbar actions
     // (see .dashboard-topbar-actions in dashboard.php). The navigation entries

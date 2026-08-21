@@ -450,6 +450,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
 <body class="has-icon-sidebar" data-workspace="<?php echo h($pageWorkspace); ?>">
     <?php $iconSidebarBasePath = '../'; include '../icon_sidebar.php'; ?>
 <div class="settings-container oidc-page">
+<?php $backToSettingsBasePath = '../'; include '../back_to_settings.php'; ?>
 <h1 class="poznote-page-title"><i class="lucide lucide-shield"></i> <?php echo t_h('settings.cards.oidc_config', [], 'OIDC / SSO'); ?></h1>
 
 

@@ -17,7 +17,7 @@
     "back": "Zurück",
     "back_to_notes": "Notizen",
     "home": "Startseite",
-    "back_to_settings": "Einstellungen",
+    "back_to_settings": "Zurück zu den Einstellungen",
     "close": "Schließen",
     "disable": "Deaktivieren",
     "cancel": "Abbrechen",
@@ -1614,6 +1614,7 @@
     },
     "note_actions": {
       "menu": "Notizaktionen",
+      "open_in_new_tab": "In neuem Tab öffnen",
       "move_note": "Notiz verschieben",
       "is_shared": "Ist geteilt",
       "share_note": "Notiz teilen",
@@ -1650,7 +1651,8 @@
       "unpin": "Tab lösen",
       "close": "Schließen",
       "close_all": "Alle schließen"
-    }
+    },
+    "close_all_tabs": "Alle Tabs schließen"
   },
   "notes_manager": {
     "actions": "Stapelaktionen",
@@ -1709,6 +1711,7 @@
     "bullet_list": "Aufzählung",
     "numbered_list": "Nummerierte Liste",
     "checklist": "Checkliste",
+    "done": "Erledigt",
     "image": "Bild",
     "take_photo": "Foto aufnehmen",
     "excalidraw": "Excalidraw",
@@ -2876,6 +2879,11 @@
       "actions": "Aktionen",
       "active": "Aktiv",
       "inactive": "Inaktiv",
+      "active_count": "{{count}} aktiv",
+      "inactive_count": "{{count}} inaktiv",
+      "filter_status_active": "Nur aktive Konten anzeigen",
+      "filter_status_inactive": "Nur deaktivierte Konten anzeigen",
+      "filter_status_clear": "Alle Konten anzeigen",
       "not_defined": "nicht festgelegt",
       "create_user": "Profil erstellen",
       "export_csv": "CSV exportieren",
@@ -3309,7 +3317,7 @@
     },
     "logout": {
       "confirm": "Möchten Sie sich wirklich abmelden?",
-      "signed_in_as": "Angemeldet als {{username}}",
+      "signed_in_as": "Sie sind angemeldet als {{username}}",
       "in_progress": "Abmeldung..."
     }
   },
@@ -3691,8 +3699,10 @@
     "config_title": "Konfiguration",
     "enable_label": "KI-Assistent aktivieren",
     "enable_description": "Zeigt eine KI-Chat-Schaltfläche in der Notiz-Symbolleiste an.",
-    "users_label": "Berechtigte Benutzer",
-    "users_description": "Nur die ausgewählten Benutzer sehen die KI-Chat-Schaltfläche. Neue Benutzer haben keinen Zugriff, bis Sie sie hier hinzufügen.",
+    "users_label": "Benutzer, die den vom Administrator konfigurierten globalen KI-Assistenten verwenden dürfen",
+    "users_description": "Nur die ausgewählten Benutzer sehen die KI-Chat-Schaltfläche für die Konfiguration auf dieser Seite. Neue Benutzer haben keinen Zugriff, bis Sie sie hier hinzufügen.",
+    "users_filter_placeholder": "Benutzer filtern",
+    "users_filter_empty": "Kein Benutzer entspricht diesem Filter.",
     "users_admin": "Administrator",
     "url_label": "Server-URL",
     "url_description": "Basis-URL einer OpenAI-kompatiblen API. Für Ollama auf dem Docker-Host: http://host.docker.internal:11434",
@@ -3700,7 +3710,7 @@
     "api_key_label": "API-Schlüssel (optional)",
     "api_key_description": "Für einen lokalen Ollama-Server leer lassen. Für Cloud-Anbieter erforderlich.",
     "save": "Konfiguration speichern",
-    "test": "Verbindung testen",
+    "test": "Zugang prüfen und Modelle auflisten",
     "testing": "Verbindung wird getestet...",
     "test_success": "Verbindung erfolgreich. {{count}} Modell(e) verfügbar. Klicken Sie unten auf ein Modell und speichern Sie.",
     "test_failure": "Verbindung fehlgeschlagen: {{error}}",
@@ -3712,7 +3722,21 @@
     "provider_label": "KI-Anbieter",
     "provider_custom": "Anderer (eigene URL)",
     "api_key_label_required": "API-Schlüssel",
-    "model_description": "Mit „Test connection“ die auf dem Server verfügbaren Modelle auflisten."
+    "user_keys_label": "Persönliche API-Schlüssel erlauben",
+    "user_keys_description": "Jeder Benutzer erhält in seinen eigenen Einstellungen eine Karte für den KI-Assistenten, in der er seinen Anbieter und seinen API-Schlüssel eintragen kann. Dann antwortet der Assistent über dessen eigenen Server und Schlüssel statt über die Konfiguration auf dieser Seite, unabhängig davon, ob der Benutzer in der Liste oben steht."
+  },
+  "ai_settings_user": {
+    "title": "Mein KI-Assistent",
+    "card": "Mein KI-Assistent",
+    "card_help": "Nutzen Sie den KI-Assistenten mit Ihrem eigenen Anbieter und Ihrem eigenen API-Schlüssel.",
+    "description": "Verbinden Sie den KI-Assistenten mit Ihrem eigenen OpenAI-kompatiblen Server (Ollama, LM Studio, OpenAI, Anthropic, ...) und Ihrem eigenen API-Schlüssel. Ihre Konfiguration ersetzt die des Administrators.",
+    "disabled_notice": "Ihr Administrator hat persönliche API-Schlüssel auf dieser Instanz nicht erlaubt.",
+    "using_instance": "Der Assistent antwortet derzeit über die vom Administrator festgelegte Konfiguration. Aktivieren Sie unten Ihre eigene Konfiguration, um stattdessen Ihren API-Schlüssel zu verwenden.",
+    "enable_label": "Meine eigene Konfiguration verwenden",
+    "enable_description": "Die KI-Chat-Schaltfläche verwendet den Server und den API-Schlüssel unten anstelle derer der Instanz.",
+    "messages": {
+      "incomplete": "Geben Sie eine Server-URL und ein Modell an, bevor Sie Ihren eigenen Assistenten aktivieren."
+    }
   },
   "ai_chat": {
     "title": "KI-Assistent",
@@ -3770,8 +3794,11 @@
     "filter_dated": "Mit Datum",
     "filter_completed": "Erledigt",
     "filter_placeholder": "Nach Aufgabe, Titel oder Ordner filtern...",
-    "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz, um zu beginnen.",
+    "empty": "Noch keine Aufgaben. Erstellen Sie eine Aufgabenlisten-Notiz oder fügen Sie einer Notiz eine Checkliste hinzu, um zu beginnen.",
     "empty_filtered": "Keine Aufgaben entsprechen diesem Filter.",
+    "note_badge": "Notiz",
+    "note_badge_title": "Checklisten-Einträge einer Notiz",
+    "show_note_checklists": "Aufgaben aus Notizen anzeigen",
     "collapse": "Einklappen",
     "expand": "Ausklappen",
     "collapse_all": "Alle einklappen",
