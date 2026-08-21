@@ -16,6 +16,10 @@ Powerful note-taking without the hassle.
 
 Discover all the features [here](https://poznote.com/selfhosting.html).
 
+### Screenshots
+
+See all the screenshots [here](https://poznote.com/screenshots.html).
+
 ### Demo
 
 https://demo.poznote.com
