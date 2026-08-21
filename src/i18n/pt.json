@@ -1613,6 +1613,7 @@
     },
     "note_actions": {
       "menu": "Ações da nota",
+      "open_in_new_tab": "Abrir em nova aba",
       "move_note": "Mover nota",
       "is_shared": "É compartilhada",
       "share_note": "Compartilhar nota",

@@ -1615,6 +1615,7 @@
     },
     "note_actions": {
       "menu": "Acciones de la nota",
+      "open_in_new_tab": "Abrir en nueva pestaña",
       "move_note": "Mover nota",
       "is_shared": "Es compartida",
       "share_note": "Compartir nota",

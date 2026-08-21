@@ -1607,6 +1607,7 @@
     },
     "note_actions": {
       "menu": "笔记操作",
+      "open_in_new_tab": "在新标签页中打开",
       "move_note": "移动笔记",
       "is_shared": "已共享",
       "share_note": "共享笔记",

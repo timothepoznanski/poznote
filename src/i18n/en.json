@@ -1144,6 +1144,7 @@
     },
     "note_actions": {
       "menu": "Note actions",
+      "open_in_new_tab": "Open in new tab",
       "move_note": "Move note",
       "is_shared": "Is shared",
       "share_note": "Share note",

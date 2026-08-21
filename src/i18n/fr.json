@@ -1647,6 +1647,7 @@
     },
     "note_actions": {
       "menu": "Actions de la note",
+      "open_in_new_tab": "Ouvrir dans un nouvel onglet",
       "move_note": "Déplacer la note",
       "is_shared": "Est partagée",
       "share_note": "Partager la note",

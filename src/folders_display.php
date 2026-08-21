@@ -572,6 +572,12 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
 function renderNoteActionsMenu() {
     $menu = "<div class='note-actions-menu' id='note-actions-menu'>";
 
+    // Open note in a new browser tab
+    $menu .= "<div class='note-actions-menu-item' data-action='open-note-new-tab'>";
+    $menu .= "<i class='lucide lucide-external-link'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.open_in_new_tab', [], 'Open in new tab') . "</span>";
+    $menu .= "</div>";
+
     // Move note (same dialog as the note toolbar's move button)
     $menu .= "<div class='note-actions-menu-item' data-action='show-move-folder-dialog'>";
     $menu .= "<i class='lucide lucide-folder-output'></i>";
