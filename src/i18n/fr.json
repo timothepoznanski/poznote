@@ -3504,7 +3504,7 @@
     },
     "logout": {
       "confirm": "Voulez-vous vraiment vous déconnecter ?",
-      "signed_in_as": "Connecté en tant que {{username}}",
+      "signed_in_as": "Vous êtes connecté en tant que {{username}}",
       "in_progress": "Déconnexion..."
     }
   },

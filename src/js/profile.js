@@ -325,12 +325,12 @@
         modal.className = 'modal';
         modal.innerHTML =
             '<div class="modal-content">' +
-                '<h3 style="display:flex;align-items:center;gap:8px;"><i class="lucide lucide-log-out"></i>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
+                '<h3>' + tr('workspace_menu.logout', {}, 'Logout') + '</h3>' +
                 '<p class="text-small-muted">' + tr('profile.logout.confirm', {}, 'Are you sure you want to log out?') + '</p>' +
                 '<p class="text-small-muted" id="clSignedInAs" style="display:none;"></p>' +
                 '<div class="modal-buttons">' +
                     '<button type="button" class="btn-cancel" id="clCancelBtn">' + tr('common.cancel', {}, 'Cancel') + '</button>' +
-                    '<button type="button" class="btn-danger" id="clConfirmBtn"><i class="lucide lucide-log-out"></i> ' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
+                    '<button type="button" class="btn-danger" id="clConfirmBtn">' + tr('workspace_menu.logout', {}, 'Logout') + '</button>' +
                 '</div>' +
             '</div>';
 
@@ -358,8 +358,15 @@
                 if (!data || !data.username) return;
                 var el = document.getElementById('clSignedInAs');
                 if (!el) return;   // modal already closed
-                el.textContent = tr('profile.logout.signed_in_as', {}, 'Signed in as {{username}}')
-                    .replace('{{username}}', data.username);
+                var template = tr('profile.logout.signed_in_as', {}, 'You are signed in as {{username}}');
+                var parts = template.split('{{username}}');
+                el.textContent = '';
+                el.appendChild(document.createTextNode(parts[0]));
+                var strong = document.createElement('strong');
+                strong.style.color = 'var(--primary-color, #007DB8)';
+                strong.textContent = data.username;
+                el.appendChild(strong);
+                if (parts[1]) el.appendChild(document.createTextNode(parts[1]));
                 el.style.display = '';
             })
             .catch(function () {});

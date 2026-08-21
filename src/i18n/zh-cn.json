@@ -3438,7 +3438,7 @@
     },
     "logout": {
       "confirm": "确定要退出登录吗？",
-      "signed_in_as": "当前登录账户：{{username}}",
+      "signed_in_as": "您当前登录的账户是 {{username}}",
       "in_progress": "正在退出登录..."
     }
   },

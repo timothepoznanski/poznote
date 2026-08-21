@@ -3317,7 +3317,7 @@
     },
     "logout": {
       "confirm": "Möchten Sie sich wirklich abmelden?",
-      "signed_in_as": "Angemeldet als {{username}}",
+      "signed_in_as": "Sie sind angemeldet als {{username}}",
       "in_progress": "Abmeldung..."
     }
   },

@@ -25,6 +25,17 @@ body.dark-mode .poznote-page-title {
     color: var(--dm-text);
 }
 
+html[data-theme='dark'] .settings-current-user-badge,
+body.dark-mode .settings-current-user-badge {
+    background: var(--dm-surface-hover);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .settings-current-user-badge i,
+body.dark-mode .settings-current-user-badge i {
+    color: var(--dm-text);
+}
+
 html[data-theme='dark'] .poznote-back-to-note-btn,
 html[data-theme='dark'] .poznote-back-btn,
 body.dark-mode .poznote-back-to-note-btn,

@@ -3317,7 +3317,7 @@
     },
     "logout": {
       "confirm": "¿Seguro que quieres cerrar sesión?",
-      "signed_in_as": "Sesión iniciada como {{username}}",
+      "signed_in_as": "Has iniciado sesión como {{username}}",
       "in_progress": "Cerrando sesión..."
     }
   },

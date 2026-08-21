@@ -343,7 +343,10 @@ if ($canUseUserWebhooks) {
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
     <div class="home-container">
 
-        <h1 class="poznote-page-title"><i class="lucide lucide-settings"></i> <?php echo t_h('settings.title', [], 'Settings'); ?></h1>
+        <h1 class="poznote-page-title">
+            <i class="lucide lucide-settings"></i> <?php echo t_h('settings.title', [], 'Settings'); ?>
+            <span id="settings-current-user-badge" class="settings-current-user-badge"><i class="lucide lucide-user"></i> <?php echo htmlspecialchars((string)($currentUser['username'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></span>
+        </h1>
 
         <div class="home-search-container settings-filter-row">
             <button type="button" id="settingsViewToggle" class="settings-view-toggle"
@@ -468,9 +471,6 @@ if ($canUseUserWebhooks) {
             </div>
             <?php endif; ?>
 
-            <!-- Browser Extension -->
-            <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
             <!-- My AI Assistant (personal provider and API key) -->
             <div class="home-card settings-card-clickable" id="ai-assistant-user-card" data-href="ai_settings_user.php">
                 <span class="setting-help" data-tooltip="<?php echo t_h('ai_settings_user.card_help', [], 'Use the AI assistant with your own provider and API key.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -500,6 +500,9 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Browser Extension -->
+            <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon">
                     <i class="lucide lucide-chrome"></i>
                 </div>

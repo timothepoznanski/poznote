@@ -3320,7 +3320,7 @@
     },
     "logout": {
       "confirm": "Tem certeza de que deseja sair?",
-      "signed_in_as": "Conectado como {{username}}",
+      "signed_in_as": "Você está conectado como {{username}}",
       "in_progress": "Saindo..."
     }
   },

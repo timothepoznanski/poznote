@@ -2996,7 +2996,7 @@
     },
     "logout": {
       "confirm": "Are you sure you want to log out?",
-      "signed_in_as": "Signed in as {{username}}",
+      "signed_in_as": "You are signed in as {{username}}",
       "in_progress": "Logging out..."
     }
   },
