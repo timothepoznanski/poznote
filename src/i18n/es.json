@@ -1651,7 +1651,8 @@
       "unpin": "Desfijar pestaña",
       "close": "Cerrar",
       "close_all": "Cerrar todas"
-    }
+    },
+    "close_all_tabs": "Cerrar todas las pestañas"
   },
   "notes_manager": {
     "actions": "Acciones masivas",

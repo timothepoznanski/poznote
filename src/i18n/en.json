@@ -1180,7 +1180,8 @@
       "unpin": "Unpin tab",
       "close": "Close",
       "close_all": "Close all"
-    }
+    },
+    "close_all_tabs": "Close all tabs"
   },
   "notes_manager": {
     "actions": "Bulk actions",

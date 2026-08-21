@@ -1643,7 +1643,8 @@
       "unpin": "取消固定标签页",
       "close": "关闭",
       "close_all": "关闭所有"
-    }
+    },
+    "close_all_tabs": "关闭所有标签页"
   },
   "notes_manager": {
     "actions": "批量操作",

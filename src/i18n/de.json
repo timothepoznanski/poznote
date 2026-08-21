@@ -1650,7 +1650,8 @@
       "unpin": "Tab lösen",
       "close": "Schließen",
       "close_all": "Alle schließen"
-    }
+    },
+    "close_all_tabs": "Alle Tabs schließen"
   },
   "notes_manager": {
     "actions": "Stapelaktionen",
