@@ -1768,6 +1768,13 @@ function setupPasteHandling() {
             var htmlData = e.clipboardData ? e.clipboardData.getData('text/html') : '';
             var plainText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
 
+            // Windows editors (VS Code, Notepad++) put CRLF on the clipboard.
+            // The handlers below split on \n, which would leave a stray CR at
+            // the end of every line: invisible until the note is reloaded, at
+            // which point the HTML parser turns each CR into a real newline and
+            // every line break shows up twice inside a code block.
+            plainText = plainText.replace(/\r\n?/g, '\n');
+
             // Try different paste handlers
             if (handleIframePaste(plainText)) {
                 e.preventDefault();
