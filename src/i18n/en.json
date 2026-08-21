@@ -3387,8 +3387,10 @@
     "config_title": "Configuration",
     "enable_label": "Enable AI assistant",
     "enable_description": "Shows an AI chat button in the note toolbar.",
-    "users_label": "Allowed users",
-    "users_description": "Only the selected users see the AI chat button. New users have no access until you add them here.",
+    "users_label": "Users allowed to use the global AI assistant configured by the administrator",
+    "users_description": "Only the selected users see the AI chat button for the configuration on this page. New users have no access until you add them here.",
+    "users_filter_placeholder": "Filter users",
+    "users_filter_empty": "No user matches this filter.",
     "users_admin": "Administrator",
     "url_label": "Server URL",
     "url_description": "Base URL of an OpenAI-compatible API. For Ollama running on the Docker host, use http://host.docker.internal:11434",
@@ -3396,7 +3398,7 @@
     "api_key_label": "API key (optional)",
     "api_key_description": "Leave empty for a local Ollama server. Required for cloud providers.",
     "save": "Save Configuration",
-    "test": "Test connection",
+    "test": "Check access and list models",
     "testing": "Testing connection...",
     "test_success": "Connection successful. {{count}} model(s) available. Click a model below and save.",
     "test_failure": "Connection failed: {{error}}",
@@ -3408,7 +3410,21 @@
     "provider_label": "AI provider",
     "provider_custom": "Other (custom URL)",
     "api_key_label_required": "API key",
-    "model_description": "Use \"Test connection\" to list the models available on the server."
+    "user_keys_label": "Allow personal API keys",
+    "user_keys_description": "Every user gets an AI assistant card in their own settings, where they can enter their own provider and API key. When a user does so, the assistant answers through that user's own server and key rather than through the configuration on this page, whether or not that user appears in the list above."
+  },
+  "ai_settings_user": {
+    "title": "My AI Assistant",
+    "card": "My AI Assistant",
+    "card_help": "Use the AI assistant with your own provider and API key.",
+    "description": "Connect the AI assistant to your own OpenAI-compatible server (Ollama, LM Studio, OpenAI, Anthropic, ...) with your own API key. Your configuration replaces the one set by the administrator.",
+    "disabled_notice": "Your administrator has not allowed personal API keys on this instance.",
+    "using_instance": "The assistant currently answers through the configuration set by the administrator. Enable your own configuration below to use your API key instead.",
+    "enable_label": "Use my own configuration",
+    "enable_description": "The AI chat button uses the server and API key below instead of the instance ones.",
+    "messages": {
+      "incomplete": "Enter a server URL and a model before enabling your own assistant."
+    }
   },
   "ai_chat": {
     "title": "AI Assistant",

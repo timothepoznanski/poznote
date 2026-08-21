@@ -9,8 +9,18 @@
     <div id="ai-chat-panel">
         <div class="ai-chat-header">
             <h2 class="ai-chat-title"><i class="lucide lucide-bot"></i> <span data-i18n="ai_chat.title">AI Assistant</span></h2>
-            <?php if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()): ?>
-            <a class="ai-chat-header-btn" href="ai_settings.php" aria-label="<?php echo t_h('ai_settings.title', [], 'AI Assistant'); ?>" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
+            <?php
+            // Admins land on the instance configuration, everyone else on their
+            // own one when personal API keys are allowed
+            $aiPanelSettingsHref = '';
+            if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+                $aiPanelSettingsHref = 'ai_settings.php';
+            } elseif (function_exists('poznoteAiUserKeysAllowed') && poznoteAiUserKeysAllowed()) {
+                $aiPanelSettingsHref = 'ai_settings_user.php';
+            }
+            ?>
+            <?php if ($aiPanelSettingsHref !== ''): ?>
+            <a class="ai-chat-header-btn" href="<?php echo $aiPanelSettingsHref; ?>" aria-label="<?php echo t_h('ai_settings.title', [], 'AI Assistant'); ?>" title="<?php echo t_h('sidebar.settings', [], 'Settings'); ?>">
                 <i class="lucide lucide-settings"></i>
             </a>
             <?php endif; ?>

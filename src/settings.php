@@ -471,6 +471,35 @@ if ($canUseUserWebhooks) {
             <!-- Browser Extension -->
             <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <!-- My AI Assistant (personal provider and API key) -->
+            <div class="home-card settings-card-clickable" id="ai-assistant-user-card" data-href="ai_settings_user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('ai_settings_user.card_help', [], 'Use the AI assistant with your own provider and API key.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-bot"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span>
+                    <?php
+                    require_once 'ai_config.php';
+                    $aiUserKeysAllowedCard = poznoteAiUserKeysAllowed();
+                    $aiUserConfigCard = poznoteAiUserConfig($con);
+                    $aiUserHasConfigCard = $aiUserConfigCard['url'] !== '' && $aiUserConfigCard['model'] !== '';
+                    $aiUserActiveCard = $aiUserKeysAllowedCard && poznoteAiConfigUsable($aiUserConfigCard);
+                    ?>
+                    <span class="setting-status <?php echo $aiUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($aiUserActiveCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif ($aiUserKeysAllowedCard && !$aiUserHasConfigCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
                 <div class="home-card-icon">
                     <i class="lucide lucide-chrome"></i>
                 </div>
@@ -973,13 +1002,24 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.ai_assistant', [], 'AI Assistant'); ?></span>
                     <?php
-                    require_once 'users/db_master.php';
-                    $aiChatEnabledCard = getGlobalSetting('ai_chat_enabled', '0') === '1'
-                        && trim((string)getGlobalSetting('ai_chat_url', '')) !== ''
-                        && trim((string)getGlobalSetting('ai_chat_model', '')) !== '';
+                    require_once 'ai_config.php';
+                    // Three states, like the SMTP card: a switched-on assistant
+                    // with no server or no model is not "disabled", it is
+                    // waiting for the rest of its configuration.
+                    $aiInstanceCard = poznoteAiInstanceConfig();
+                    $aiInstanceCompleteCard = $aiInstanceCard['url'] !== '' && $aiInstanceCard['model'] !== '';
+                    $aiChatEnabledCard = $aiInstanceCard['enabled'] && $aiInstanceCompleteCard;
                     ?>
                     <span class="setting-status <?php echo $aiChatEnabledCard ? 'enabled' : 'disabled'; ?>">
-                        <?php echo $aiChatEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                        <?php
+                        if ($aiChatEnabledCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif (!$aiInstanceCompleteCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
                     </span>
                 </div>
             </div>

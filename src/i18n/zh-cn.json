@@ -3817,8 +3817,10 @@
     "config_title": "配置",
     "enable_label": "启用 AI 助手",
     "enable_description": "在笔记工具栏中显示 AI 聊天按钮。",
-    "users_label": "允许的用户",
-    "users_description": "只有选中的用户才能看到 AI 聊天按钮。新用户在您将其添加到此处之前没有访问权限。",
+    "users_label": "允许使用管理员配置的全局 AI 助手的用户",
+    "users_description": "只有选中的用户才能看到使用本页配置的 AI 聊天按钮。新用户在被添加到此列表前没有访问权限。",
+    "users_filter_placeholder": "筛选用户",
+    "users_filter_empty": "没有用户符合此筛选条件。",
     "users_admin": "管理员",
     "url_label": "服务器 URL",
     "url_description": "兼容 OpenAI 的 API 基础 URL。若 Ollama 运行在 Docker 主机上，请使用 http://host.docker.internal:11434",
@@ -3826,7 +3828,7 @@
     "api_key_label": "API 密钥（可选）",
     "api_key_description": "本地 Ollama 服务器可留空。云服务商需要填写。",
     "save": "保存配置",
-    "test": "测试连接",
+    "test": "检查访问并列出模型",
     "testing": "正在测试连接...",
     "test_success": "连接成功。{{count}} 个可用模型。点击下方模型并保存。",
     "test_failure": "连接失败：{{error}}",
@@ -3838,7 +3840,21 @@
     "provider_label": "AI 服务商",
     "provider_custom": "其他（自定义 URL）",
     "api_key_label_required": "API 密钥",
-    "model_description": "点击“Test connection”列出服务器上可用的模型。"
+    "user_keys_label": "允许使用个人 API 密钥",
+    "user_keys_description": "每位用户都会在自己的设置中看到一张 AI 助手卡片，可在其中填写自己的提供商和 API 密钥。此时助手将通过该用户自己的服务器和密钥作答，而不是本页的配置，无论该用户是否出现在上面的列表中。"
+  },
+  "ai_settings_user": {
+    "title": "我的 AI 助手",
+    "card": "我的 AI 助手",
+    "card_help": "使用你自己的提供商和 API 密钥来运行 AI 助手。",
+    "description": "使用你自己的 API 密钥，将 AI 助手连接到你自己的 OpenAI 兼容服务器（Ollama、LM Studio、OpenAI、Anthropic 等）。你的配置将取代管理员设置的配置。",
+    "disabled_notice": "管理员未在此实例上允许使用个人 API 密钥。",
+    "using_instance": "助手目前使用管理员设置的配置作答。在下方启用你自己的配置即可改用你的 API 密钥。",
+    "enable_label": "使用我自己的配置",
+    "enable_description": "AI 聊天按钮将使用下面的服务器和 API 密钥，而不是实例的设置。",
+    "messages": {
+      "incomplete": "启用你自己的助手前，请填写服务器 URL 和模型。"
+    }
   },
   "ai_chat": {
     "title": "AI 助手",

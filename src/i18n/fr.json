@@ -3883,8 +3883,10 @@
     "config_title": "Configuration",
     "enable_label": "Activer l'assistant IA",
     "enable_description": "Affiche un bouton de chat IA dans la barre d'outils des notes.",
-    "users_label": "Utilisateurs autorisés",
-    "users_description": "Seuls les utilisateurs sélectionnés voient le bouton de chat IA. Les nouveaux utilisateurs n'y ont pas accès tant que vous ne les ajoutez pas ici.",
+    "users_label": "Utilisateurs autorisés à utiliser l'assistant IA global configuré par l'administrateur",
+    "users_description": "Seuls les utilisateurs sélectionnés voient le bouton de discussion IA pour la configuration de cette page. Les nouveaux utilisateurs n'ont aucun accès tant que vous ne les ajoutez pas ici.",
+    "users_filter_placeholder": "Filtrer les utilisateurs",
+    "users_filter_empty": "Aucun utilisateur ne correspond à ce filtre.",
     "users_admin": "Administrateur",
     "url_label": "URL du serveur",
     "url_description": "URL de base d'une API compatible OpenAI. Pour Ollama sur l'hôte Docker, utilisez http://host.docker.internal:11434",
@@ -3892,7 +3894,7 @@
     "api_key_label": "Clé API (optionnelle)",
     "api_key_description": "Laissez vide pour un serveur Ollama local. Requise pour les fournisseurs cloud.",
     "save": "Enregistrer la configuration",
-    "test": "Tester la connexion",
+    "test": "Vérifier l'accès et lister les modèles",
     "testing": "Test de la connexion...",
     "test_success": "Connexion réussie. {{count}} modèle(s) disponible(s). Cliquez sur un modèle ci-dessous et enregistrez.",
     "test_failure": "Échec de la connexion : {{error}}",
@@ -3904,7 +3906,21 @@
     "provider_label": "Fournisseur d'IA",
     "provider_custom": "Autre (URL personnalisée)",
     "api_key_label_required": "Clé API",
-    "model_description": "Utilisez « Test connection » pour lister les modèles disponibles sur le serveur."
+    "user_keys_label": "Autoriser les clés API personnelles",
+    "user_keys_description": "Chaque utilisateur obtient une carte Assistant IA dans ses propres paramètres, où il peut indiquer son fournisseur et sa clé API. Dans ce cas, l'assistant répond via son propre serveur et sa propre clé plutôt que via la configuration de cette page, qu'il figure ou non dans la liste ci-dessus."
+  },
+  "ai_settings_user": {
+    "title": "Mon assistant IA",
+    "card": "Mon assistant IA",
+    "card_help": "Utilisez l'assistant IA avec votre propre fournisseur et votre propre clé API.",
+    "description": "Connectez l'assistant IA à votre propre serveur compatible OpenAI (Ollama, LM Studio, OpenAI, Anthropic, ...) avec votre clé API. Votre configuration remplace celle définie par l'administrateur.",
+    "disabled_notice": "Votre administrateur n'a pas autorisé les clés API personnelles sur cette instance.",
+    "using_instance": "L'assistant répond actuellement via la configuration définie par l'administrateur. Activez votre propre configuration ci-dessous pour utiliser votre clé API.",
+    "enable_label": "Utiliser ma propre configuration",
+    "enable_description": "Le bouton de discussion IA utilise le serveur et la clé API ci-dessous au lieu de ceux de l'instance.",
+    "messages": {
+      "incomplete": "Renseignez une URL de serveur et un modèle avant d'activer votre propre assistant."
+    }
   },
   "ai_chat": {
     "title": "Assistant IA",

@@ -3699,8 +3699,10 @@
     "config_title": "Configuração",
     "enable_label": "Ativar o assistente IA",
     "enable_description": "Mostra um botão de chat IA na barra de ferramentas das notas.",
-    "users_label": "Utilizadores autorizados",
-    "users_description": "Apenas os utilizadores selecionados veem o botão de chat de IA. Os novos utilizadores não têm acesso até os adicionar aqui.",
+    "users_label": "Utilizadores autorizados a usar o assistente de IA global configurado pelo administrador",
+    "users_description": "Apenas os utilizadores selecionados veem o botão de conversa com a IA para a configuração desta página. Os novos utilizadores não têm acesso até os adicionar aqui.",
+    "users_filter_placeholder": "Filtrar utilizadores",
+    "users_filter_empty": "Nenhum utilizador corresponde a este filtro.",
     "users_admin": "Administrador",
     "url_label": "URL do servidor",
     "url_description": "URL base de uma API compatível com OpenAI. Para o Ollama no host Docker, use http://host.docker.internal:11434",
@@ -3708,7 +3710,7 @@
     "api_key_label": "Chave de API (opcional)",
     "api_key_description": "Deixe vazio para um servidor Ollama local. Necessária para provedores na nuvem.",
     "save": "Salvar configuração",
-    "test": "Testar conexão",
+    "test": "Verificar o acesso e listar os modelos",
     "testing": "Testando conexão...",
     "test_success": "Conexão bem-sucedida. {{count}} modelo(s) disponível(is). Clique em um modelo abaixo e salve.",
     "test_failure": "Falha na conexão: {{error}}",
@@ -3720,7 +3722,21 @@
     "provider_label": "Provedor de IA",
     "provider_custom": "Outro (URL personalizada)",
     "api_key_label_required": "Chave de API",
-    "model_description": "Use \"Test connection\" para listar os modelos disponíveis no servidor."
+    "user_keys_label": "Permitir chaves de API pessoais",
+    "user_keys_description": "Cada utilizador recebe um cartão de assistente de IA nas suas próprias definições, onde pode indicar o seu fornecedor e a sua chave de API. Nesse caso, o assistente responde através do servidor e da chave desse utilizador em vez da configuração desta página, esteja ou não esse utilizador na lista acima."
+  },
+  "ai_settings_user": {
+    "title": "O meu assistente de IA",
+    "card": "O meu assistente de IA",
+    "card_help": "Utilize o assistente de IA com o seu próprio fornecedor e a sua própria chave de API.",
+    "description": "Ligue o assistente de IA ao seu próprio servidor compatível com OpenAI (Ollama, LM Studio, OpenAI, Anthropic, ...) com a sua chave de API. A sua configuração substitui a definida pelo administrador.",
+    "disabled_notice": "O seu administrador não permitiu chaves de API pessoais nesta instância.",
+    "using_instance": "De momento, o assistente responde através da configuração definida pelo administrador. Ative a sua própria configuração abaixo para usar a sua chave de API.",
+    "enable_label": "Usar a minha própria configuração",
+    "enable_description": "O botão de conversa com a IA usa o servidor e a chave de API abaixo em vez dos da instância.",
+    "messages": {
+      "incomplete": "Indique um URL de servidor e um modelo antes de ativar o seu próprio assistente."
+    }
   },
   "ai_chat": {
     "title": "Assistente IA",
