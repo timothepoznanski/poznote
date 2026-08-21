@@ -691,11 +691,56 @@ function toggleCodeBlock() {
   let container = range.commonAncestorContainer;
   if (container.nodeType === 3) container = container.parentNode;
 
-  // If already in a code block, remove it
+  // If already in a code block, unwrap it: keep the code as plain lines and
+  // drop the copy/delete/language buttons that copy-code-on-focus.js added
+  // around the <pre> (the .code-block-actions-host wrapper)
   const existingPre = container.closest ? container.closest('pre') : null;
   if (existingPre) {
-    const text = existingPre.textContent;
-    existingPre.outerHTML = text.replace(/\n/g, '<br>');
+    const host = existingPre.parentElement;
+    const isActionButton = node => !!(node && node.nodeType === 1 && node.classList &&
+      (node.classList.contains('code-block-copy-btn') ||
+       node.classList.contains('code-block-delete-btn') ||
+       node.classList.contains('code-block-lang-btn') ||
+       node.classList.contains('code-block-line-numbers-btn')));
+    const hostIsDedicated = !!(host && host.classList && host.classList.contains('code-block-actions-host') &&
+      Array.from(host.childNodes).every(node =>
+        node === existingPre || isActionButton(node) || (node.nodeType === 3 && !node.textContent.trim())));
+
+    const replaceTarget = hostIsDedicated ? host : existingPre;
+    // innerText keeps the <br> line breaks typed inside the block as newlines
+    const codeText = (typeof existingPre.innerText === 'string' ? existingPre.innerText : existingPre.textContent)
+      .replace(/\u200B/g, '').replace(/\r/g, '').replace(/\n$/, '');
+    // Keep the unwrapped lines as their own block so they do not merge with
+    // the text that precedes the code block (unless the block already sits
+    // alone inside a line container such as a <div> created by Enter)
+    const unwrappedNoteEntry = replaceTarget.closest ? replaceTarget.closest('.noteentry') : null;
+    const lineParent = replaceTarget.parentElement;
+    const alreadyOnOwnLine = !!(lineParent && lineParent !== unwrappedNoteEntry &&
+      /^(DIV|P|LI)$/.test(lineParent.tagName) &&
+      Array.from(lineParent.childNodes).every(node =>
+        node === replaceTarget || (node.nodeType === 1 && node.tagName === 'BR') || (node.nodeType === 3 && !node.textContent.trim())));
+    const fragment = alreadyOnOwnLine ? document.createDocumentFragment() : document.createElement('div');
+    codeText.split('\n').forEach((line, index) => {
+      if (index > 0) fragment.appendChild(document.createElement('br'));
+      fragment.appendChild(document.createTextNode(line));
+    });
+    const lastNode = fragment.lastChild;
+
+    if (!hostIsDedicated && host && host.classList && host.classList.contains('code-block-actions-host')) {
+      Array.from(host.children).forEach(child => { if (isActionButton(child)) child.remove(); });
+    }
+    replaceTarget.parentNode.replaceChild(fragment, replaceTarget);
+
+    if (lastNode) {
+      const caretRange = document.createRange();
+      caretRange.setStart(lastNode, lastNode.nodeType === 3 ? lastNode.length : 0);
+      caretRange.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(caretRange);
+    }
+    if (unwrappedNoteEntry) {
+      unwrappedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+    }
     return;
   }
 

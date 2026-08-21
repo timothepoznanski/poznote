@@ -1,7 +1,7 @@
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, snippetCompletion, startCompletion } from '@codemirror/autocomplete'
 import { defaultKeymap, history, historyKeymap, indentLess, indentMore } from '@codemirror/commands'
 import { markdown, markdownLanguage, insertNewlineContinueMarkup } from '@codemirror/lang-markdown'
-import { bracketMatching, HighlightStyle, LanguageDescription, LanguageSupport, StreamLanguage, syntaxHighlighting } from '@codemirror/language'
+import { bracketMatching, HighlightStyle, LanguageDescription, LanguageSupport, StreamLanguage, syntaxHighlighting, syntaxTree } from '@codemirror/language'
 import { cpp } from '@codemirror/lang-cpp'
 import { css } from '@codemirror/lang-css'
 import { go } from '@codemirror/lang-go'
@@ -90,6 +90,56 @@ const markdownTableLinePlugin = ViewPlugin.fromClass(class {
   update(update) {
     if (update.docChanged || update.viewportChanged) {
       this.decorations = buildMarkdownTableLineDecorations(update.view)
+    }
+  }
+}, {
+  decorations: plugin => plugin.decorations
+})
+
+// Code blocks hold code, which readers expect in a fixed-width font, but the
+// editor otherwise runs in the app font (the markdown editor font setting
+// defaults to it). Every line of a fenced or indented code block, including the
+// ``` markers and the blank lines inside, is tagged with a class that
+// markdown.css switches to monospace.
+const markdownCodeLineDecoration = Decoration.line({ class: 'cm-md-code-line' })
+
+function buildMarkdownCodeLineDecorations(view) {
+  const builder = new RangeSetBuilder()
+  const tree = syntaxTree(view.state)
+  let lastLineFrom = -1
+
+  for (const range of view.visibleRanges) {
+    tree.iterate({
+      from: range.from,
+      to: range.to,
+      enter(node) {
+        if (node.name !== 'FencedCode' && node.name !== 'CodeBlock') return
+
+        let pos = Math.max(node.from, range.from)
+        const end = Math.min(node.to, range.to)
+        while (pos <= end) {
+          const line = view.state.doc.lineAt(pos)
+          if (line.from > lastLineFrom) {
+            builder.add(line.from, line.from, markdownCodeLineDecoration)
+            lastLineFrom = line.from
+          }
+          pos = line.to + 1
+        }
+      }
+    })
+  }
+
+  return builder.finish()
+}
+
+const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.decorations = buildMarkdownCodeLineDecorations(view)
+  }
+
+  update(update) {
+    if (update.docChanged || update.viewportChanged) {
+      this.decorations = buildMarkdownCodeLineDecorations(update.view)
     }
   }
 }, {
@@ -410,6 +460,73 @@ function wrapSelection(prefix, suffix) {
     }))
     return true
   }
+}
+
+// Ctrl/Cmd+Shift+B toggles a fenced code block around the selection (the
+// toolbar "Code block" button's keyboard twin). It deliberately overrides
+// Chrome's bookmarks-bar shortcut while the caret is in the editor.
+function findEnclosingFencedCode(state, from, to) {
+  let node = syntaxTree(state).resolveInner(from, 1)
+  while (node) {
+    if (node.type.name === 'FencedCode' && node.from <= from && node.to >= to) {
+      return node
+    }
+    node = node.parent
+  }
+  return null
+}
+
+function toggleFencedCodeBlock(view) {
+  const fence = '```'
+  view.dispatch(view.state.changeByRange(range => {
+    const doc = view.state.doc
+    const selected = doc.sliceString(range.from, range.to)
+
+    // Toggle off when the selection itself carries its fences
+    const wrapped = !range.empty && /^```[^\n]*\n([\s\S]*?)\n```$/.exec(selected)
+    if (wrapped) {
+      return {
+        changes: { from: range.from, to: range.to, insert: wrapped[1] },
+        range: EditorSelectionRange(range.from, range.from + wrapped[1].length)
+      }
+    }
+
+    // Toggle off when the caret/selection sits inside an existing fenced block:
+    // drop the opening and closing fence lines, keep the code
+    const block = findEnclosingFencedCode(view.state, range.from, range.to)
+    if (block) {
+      const openLine = doc.lineAt(block.from)
+      const closeLine = doc.lineAt(block.to)
+      if (/^\s*(```|~~~)/.test(openLine.text) && closeLine.number > openLine.number && /^\s*(```|~~~)\s*$/.test(closeLine.text)) {
+        const openEnd = Math.min(openLine.to + 1, doc.length)
+        const closeStart = closeLine.from - 1
+        const shift = openEnd - openLine.from
+        const clamp = pos => Math.max(openLine.from, Math.min(pos - shift, closeStart - shift))
+        return {
+          changes: [
+            { from: openLine.from, to: openEnd },
+            { from: closeStart, to: closeLine.to }
+          ],
+          range: EditorSelectionRange(clamp(range.from), clamp(range.to))
+        }
+      }
+    }
+
+    // Wrap: the fences need their own lines, so only add line breaks when the
+    // selection does not already start/end at a line boundary
+    const startLine = doc.lineAt(range.from)
+    const endLine = doc.lineAt(range.to)
+    const prefix = (range.from === startLine.from ? '' : '\n') + fence + '\n'
+    const suffix = '\n' + fence + (range.to === endLine.to ? '' : '\n')
+    const insert = prefix + selected + suffix
+    return {
+      changes: { from: range.from, to: range.to, insert },
+      range: range.empty
+        ? EditorSelection.cursor(range.from + prefix.length)
+        : EditorSelectionRange(range.from + prefix.length, range.from + prefix.length + selected.length)
+    }
+  }))
+  return true
 }
 
 // Ctrl/Cmd+K opens Poznote's link modal, which knows how to build a safe
@@ -870,6 +987,7 @@ function createEditor(host, options = {}) {
       placeholder(placeholderText),
       EditorView.lineWrapping,
       markdownTableLinePlugin,
+      markdownCodeLinePlugin,
       readOnlyCompartment.of(createReadOnlyExtensions(!!options.readOnly)),
       themeCompartment.of(createThemeExtensions()),
       updateListener,
@@ -879,6 +997,7 @@ function createEditor(host, options = {}) {
         { key: 'Enter', run: insertNewlineContinueMarkup },
         { key: 'Mod-Space', run: startCompletion },
         { key: 'Ctrl-Space', run: startCompletion },
+        { key: 'Mod-Shift-b', run: toggleFencedCodeBlock },
         { key: 'Mod-b', run: wrapSelection('**', '**') },
         ...closeBracketsKeymap,
         ...completionKeymap,

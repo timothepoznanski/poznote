@@ -43,6 +43,14 @@
     font-family: 'Courier New', Courier, monospace !important;
 }
 
+/* Lines of a code block (cm-md-code-line, set by the markdown editor bundle)
+   keep the monospace font the rendered preview uses, instead of the app font
+   the rest of the editor runs in. Same #id specificity boost as above. */
+.markdown-editor .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line),
+.markdown-editor .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) span {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+}
+
 .markdown-editor:empty:before {
     content: attr(data-ph);
     color: #999;
