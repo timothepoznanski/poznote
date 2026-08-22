@@ -279,7 +279,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
 html[data-theme='dark'] .settings-view-toggle,
 body.dark-mode .settings-view-toggle {
     background: var(--dm-surface, #262626);
-    border-color: var(--dm-border, #404040);
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dm-text-muted, #a0a0a0);
 }
 

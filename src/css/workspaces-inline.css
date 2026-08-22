@@ -223,7 +223,7 @@ body.dark-mode .dropdown-menu .dropdown-item {
 
 :root[data-theme='dark'] .dropdown-menu .dropdown-item:hover,
 body.dark-mode .dropdown-menu .dropdown-item:hover {
-    background-color: #3a3a3a !important;
+    background-color: var(--dm-surface-hover) !important;
     color: #ffffff !important;
 }
 

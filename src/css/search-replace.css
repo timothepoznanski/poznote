@@ -146,13 +146,13 @@
 
 /* Dark mode adjustments */
 [data-theme="dark"] .search-replace-bar {
-    background: var(--dm-surface, #333333);
-    border-bottom-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-bottom-color: var(--dm-border, var(--dm-border));
 }
 
 [data-theme="dark"] .search-replace-input {
-    background: var(--dm-bg, #252526);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dark-text-color, #e0e0e0);
 }
 
@@ -172,7 +172,7 @@
 }
 
 [data-theme="dark"] .search-replace-btn:hover {
-    background: var(--dark-background-hover, #3a3a3a);
+    background: var(--dark-background-hover, var(--dm-surface-hover));
     border-color: var(--dark-border-hover, #555);
 }
 
@@ -183,7 +183,7 @@
 }
 
 [data-theme="dark"] .search-replace-close-btn:hover {
-    background: var(--dark-background-hover, #3a3a3a);
+    background: var(--dark-background-hover, var(--dm-surface-hover));
     color: var(--dark-text-color, #e0e0e0);
 }
 

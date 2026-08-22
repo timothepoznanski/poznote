@@ -284,7 +284,7 @@
 
 [data-theme="dark"] .app-tab-context-menu {
     background: #2a2a2a;
-    border-color: #3a3a3a;
+    border-color: var(--dm-surface-hover);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -305,7 +305,7 @@
 }
 
 [data-theme="dark"] .app-tab-context-separator {
-    background: #3a3a3a;
+    background: var(--dm-surface-hover);
 }
 
 /* ── Note actions (3-dot menu in sidebar) ── */

@@ -263,7 +263,7 @@ a.note-internal-link:hover {
 
 /* Dark mode adjustments */
 [data-theme="dark"] .note-reference-modal-content {
-    background-color: var(--dm-content-bg, #252526);
+    background-color: var(--dm-content-bg, var(--dm-content-bg));
 }
 
 [data-theme="dark"] .note-reference-modal-header h3 {
@@ -279,8 +279,8 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-search-input {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dark-text-color, #e0e0e0);
 }
 
@@ -290,8 +290,8 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-search input {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dark-text-color, #e0e0e0);
 }
 

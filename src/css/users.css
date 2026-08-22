@@ -436,12 +436,12 @@ html[data-theme='dark'] .users-table td {
 }
 
 .badge-admin {
-    background: #ffc107;
+    background: var(--pz-warning);
     color: var(--pz-text);
 }
 
 .badge-active {
-    background: #28a745;
+    background: var(--pz-success);
     color: white;
 }
 
@@ -898,7 +898,7 @@ input:checked+.slider:before {
 
 /* Admin specific toggle color */
 input.admin-toggle:checked+.slider {
-    background-color: #ffc107;
+    background-color: var(--pz-warning);
 }
 
 /* Disabled toggle styling */
@@ -916,7 +916,7 @@ input:disabled+.slider {
 }
 
 input.admin-toggle:disabled:checked+.slider {
-    background-color: #ffc107;
+    background-color: var(--pz-warning);
 }
 
 /* Maintenance Section */

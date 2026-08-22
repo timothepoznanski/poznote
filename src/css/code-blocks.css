@@ -185,7 +185,7 @@ pre.code-block .code-block-delete-btn,
 
 .code-block-copy-btn.copied {
     background: transparent;
-    color: #28a745;
+    color: var(--pz-success);
     border: none;
     opacity: 1;
 }

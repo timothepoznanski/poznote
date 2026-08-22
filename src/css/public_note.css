@@ -346,7 +346,7 @@ body.public-note-page {
 .public-note .content .code-block-copy-btn.copied {
     background: transparent;
     border: none;
-    color: #28a745;
+    color: var(--pz-success);
 }
 
 .public-note .content .code-block-copy-btn svg,

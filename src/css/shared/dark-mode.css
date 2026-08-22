@@ -68,7 +68,7 @@
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb {
-    background-color: #555555 !important;
+    background-color: var(--dm-border-light) !important;
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
@@ -268,7 +268,7 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input {
-    background-color: #3a3a3a !important;
+    background-color: var(--dm-surface-hover) !important;
     border-color: #707070 !important;
     color: #f5f7fa !important;
 }

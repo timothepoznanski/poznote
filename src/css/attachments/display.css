@@ -163,7 +163,7 @@
 }
 
 .btn-download {
-    background: #28a745;
+    background: var(--pz-success);
     color: white;
 }
 
@@ -189,7 +189,7 @@
 }
 
 .btn-icon.btn-download {
-    background: #28a745 !important;
+    background: var(--pz-success) !important;
     color: #fff !important;
 }
 

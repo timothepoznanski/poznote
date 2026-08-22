@@ -35,7 +35,7 @@
 
 .alert-success {
     background-color: #d4edda;
-    border-color: #28a745;
+    border-color: var(--pz-success);
     color: #155724;
 }
 
@@ -53,7 +53,7 @@
 
 .alert-warning {
     background-color: #fff3cd;
-    border-color: #ffc107;
+    border-color: var(--pz-warning);
     color: #856404;
 }
 

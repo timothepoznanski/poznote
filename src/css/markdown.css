@@ -933,7 +933,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
-    border-right-color: #404040 !important;
+    border-right-color: var(--dm-border) !important;
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode {

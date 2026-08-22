@@ -69,9 +69,9 @@
 }
 
 .excalidraw-toolbar .btn-save {
-    background: #28a745;
+    background: var(--pz-success);
     color: #ffffff;
-    border-color: #28a745;
+    border-color: var(--pz-success);
 }
 
 .excalidraw-toolbar .btn-save:hover {
@@ -181,8 +181,8 @@ div[onclick*="openExcalidrawNote"] {
 
 /* Dark mode styles */
 [data-theme="dark"] .excalidraw-toolbar {
-    background: var(--dm-bg, #252526);
-    border-bottom-color: var(--dm-border, #404040);
+    background: var(--dm-bg, var(--dm-content-bg));
+    border-bottom-color: var(--dm-border, var(--dm-border));
 }
 
 [data-theme="dark"] .excalidraw-toolbar h3 {
@@ -190,19 +190,19 @@ div[onclick*="openExcalidrawNote"] {
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--text-primary, #e0e0e0);
 }
 
 [data-theme="dark"] .excalidraw-toolbar .toolbar-btn:hover {
-    background: var(--dm-surface-hover, #3a3a3a);
-    border-color: var(--dm-border-light, #555555);
+    background: var(--dm-surface-hover, var(--dm-surface-hover));
+    border-color: var(--dm-border-light, var(--dm-border-light));
 }
 
 [data-theme="dark"] .excalidraw-preview-container {
-    border-color: var(--dm-border, #404040);
-    background: var(--dm-surface, #333333);
+    border-color: var(--dm-border, var(--dm-border));
+    background: var(--dm-surface, var(--dm-surface));
 }
 
 /* Mobile responsive */
@@ -278,8 +278,8 @@ div[onclick*="openExcalidrawNote"] {
     /* Dark mode adjustments for mobile */
     [data-theme="dark"] .excalidraw-toolbar,
     [data-theme="dark"] div[style*="justify-content: space-between"][style*="align-items: center"] {
-        background: var(--dm-bg, #252526) !important;
-        border-bottom-color: var(--dm-border, #404040) !important;
+        background: var(--dm-bg, var(--dm-content-bg)) !important;
+        border-bottom-color: var(--dm-border, var(--dm-border)) !important;
     }
 
     /* The spacer only balances the desktop layout; it steals 100px here */
@@ -511,8 +511,8 @@ body.excalidraw-editor-page .excalidraw .layer-ui__wrapper {
 
 html[data-theme='dark'] body.excalidraw-editor-page,
 body.excalidraw-editor-page.excalidraw-shell-dark {
-    background: var(--dm-content-bg, #252526);
-    color: var(--dm-text, #bebebe);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    color: var(--dm-text, var(--dm-text));
 }
 
 html[data-theme='dark'] body.excalidraw-editor-page #app,
@@ -585,8 +585,8 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw {
 
 html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar,
 body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar {
-    background: var(--dm-surface, #333333) !important;
-    border-bottom-color: var(--dm-border, #404040) !important;
+    background: var(--dm-surface, var(--dm-surface)) !important;
+    border-bottom-color: var(--dm-border, var(--dm-border)) !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35) !important;
 }
 
@@ -627,7 +627,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar {
 
 html[data-theme='dark'] body.excalidraw-editor-page .poznote-toolbar-title,
 body.excalidraw-editor-page.excalidraw-shell-dark .poznote-toolbar-title {
-    color: var(--dm-text, #bebebe);
+    color: var(--dm-text, var(--dm-text));
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
@@ -719,7 +719,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
 
 html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-app-container,
 body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-app-container {
-    background: var(--dm-content-bg, #252526);
+    background: var(--dm-content-bg, var(--dm-content-bg));
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-app-container {
@@ -738,7 +738,7 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-app-containe
 
 html[data-theme='dark'] body.excalidraw-editor-page .excalidraw-loading,
 body.excalidraw-editor-page.excalidraw-shell-dark .excalidraw-loading {
-    color: var(--dm-text, #bebebe);
+    color: var(--dm-text, var(--dm-text));
 }
 
 html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {

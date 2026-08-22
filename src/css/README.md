@@ -73,6 +73,8 @@ Light (on `:root`):
 | `--pz-link` | `#2e8cfa` | hyperlinks in notes |
 | `--pz-accent-strong` | `#0b4da6` | selected note/folder title in the sidebar |
 | `--pz-accent-soft` | `#e3f2fd` | active item background |
+| `--pz-success` | `#28a745` | success alerts, enabled states |
+| `--pz-warning` | `#ffc107` | warning alerts, badges |
 
 Dark and black (on `html[data-theme='dark']` / `html.theme-black[data-theme='dark']`):
 `--dm-text`, `--dm-text-muted`, `--dm-bg`, `--dm-content-bg`, `--dm-sidebar-bg`,
@@ -95,9 +97,9 @@ html[data-theme='dark'] { --dm-accent: #a78bfa; --dm-bg: #1a1625; --dm-content-b
 
 - New colours: use the `--pz-*` tokens in light rules and `--dm-*` in dark
   rules when the colour is one of the tokens above; literals are fine for
-  everything else. Dark rules use `--dm-accent` for the accent and keep the other literals
-  for now (a `#333` there is a dark surface, not text: do not map it to
-  `--pz-text`).
+  everything else. Dark rules use the `--dm-*` tokens wherever the value is one of them
+  (`#252526` is `--dm-content-bg`, `#333333` is `--dm-surface`, ...); a `#333`
+  in a dark rule is a surface, never `--pz-text`.
 - Prefer one rule with grouped selectors over two identical rules (the folder
   and note action menus in `folders/actions-menu.css` are the model); rules
   that are byte-identical in two files always loaded together are duplicates,

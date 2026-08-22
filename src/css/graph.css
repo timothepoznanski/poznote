@@ -291,7 +291,7 @@ body.graph-page {
 /* Dark mode ------------------------------------------------------------- */
 
 html[data-theme="dark"] body.graph-page {
-    background: var(--dm-bg, #252526);
+    background: var(--dm-bg, var(--dm-content-bg));
 }
 
 html[data-theme="dark"] .graph-toolbar {
@@ -299,9 +299,9 @@ html[data-theme="dark"] .graph-toolbar {
 }
 
 html[data-theme="dark"] .graph-search-input {
-    background: var(--dm-content-bg, #252526);
-    border-color: var(--dm-border, #404040);
-    color: var(--dm-text, #bebebe);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text, var(--dm-text));
 }
 
 html[data-theme="dark"] .graph-search-input:focus {
@@ -309,9 +309,9 @@ html[data-theme="dark"] .graph-search-input:focus {
 }
 
 html[data-theme="dark"] .graph-folder-select {
-    background: var(--dm-content-bg, #252526);
-    border-color: var(--dm-border, #404040);
-    color: var(--dm-text-muted, #c5c5c5);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-folder-select:focus {
@@ -327,17 +327,17 @@ html[data-theme="dark"] .graph-orphans-toggle,
 html[data-theme="dark"] .graph-stats,
 html[data-theme="dark"] .graph-loading,
 html[data-theme="dark"] .graph-empty {
-    color: var(--dm-text-muted, #c5c5c5);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-reset-btn {
-    background: var(--dm-content-bg, #252526);
-    border-color: var(--dm-border, #404040);
-    color: var(--dm-text-muted, #c5c5c5);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-reset-btn:hover {
-    background: var(--dm-surface, #333333);
+    background: var(--dm-surface, var(--dm-surface));
 }
 
 html[data-theme="dark"] .graph-edge {
@@ -349,11 +349,11 @@ html[data-theme="dark"] .graph-edge.hl {
 }
 
 html[data-theme="dark"] .graph-node circle {
-    stroke: var(--dm-bg, #252526);
+    stroke: var(--dm-bg, var(--dm-content-bg));
 }
 
 html[data-theme="dark"] .graph-label {
-    fill: var(--dm-text-muted, #c5c5c5);
+    fill: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-node.search-hit circle {
@@ -361,17 +361,17 @@ html[data-theme="dark"] .graph-node.search-hit circle {
 }
 
 html[data-theme="dark"] .graph-tooltip {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 html[data-theme="dark"] .graph-tooltip-title {
-    color: var(--dm-text, #bebebe);
+    color: var(--dm-text, var(--dm-text));
 }
 
 html[data-theme="dark"] .graph-tooltip-meta {
-    color: var(--dm-text-muted, #c5c5c5);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 /* Responsive ------------------------------------------------------------ */

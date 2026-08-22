@@ -212,9 +212,9 @@ body.dark-mode .nm-bulk-select option {
 /* ── Dark Mode Overrides ────────────────────────────────────────────── */
 :root[data-theme='dark'],
 body.dark-mode {
-    --bg-color: var(--dm-bg, #252526);
+    --bg-color: var(--dm-bg, var(--dm-content-bg));
     --text-color: var(--dm-text, #e3e3e3);
-    --border-color: var(--dm-border, #404040);
+    --border-color: var(--dm-border, var(--dm-border));
     --border-color-light: var(--dm-border);
     --input-bg: var(--dm-surface);
     --folder-header-bg: var(--dm-surface);
@@ -230,7 +230,7 @@ body.dark-mode {
     --selected-color: #e5e7eb;
     --badge-bg: #3730a3;
     --badge-color: #e0e7ff;
-    --badge-bg-subtle: #404040;
+    --badge-bg-subtle: var(--dm-border);
     --muted-color: #888888;
 }
 

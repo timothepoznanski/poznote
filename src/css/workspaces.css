@@ -650,9 +650,9 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-rename {
-    background-color: #ffc107;
+    background-color: var(--pz-warning);
     color: white;
-    border-color: #ffc107;
+    border-color: var(--pz-warning);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -781,8 +781,8 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-download:hover {
-    color: #28a745;
-    border-color: #28a745;
+    color: var(--pz-success);
+    border-color: var(--pz-success);
 }
 
 .btn-delete:hover {
@@ -833,7 +833,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-success {
-    background: #28a745;
+    background: var(--pz-success);
     color: white;
 }
 
@@ -842,7 +842,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-warning {
-    background: #ffc107;
+    background: var(--pz-warning);
     /* color: #212529; */
 }
 
@@ -1054,8 +1054,8 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-download:hover {
-    color: #28a745 !important;
-    border-color: #28a745 !important;
+    color: var(--pz-success) !important;
+    border-color: var(--pz-success) !important;
 }
 
 .btn-delete:hover {

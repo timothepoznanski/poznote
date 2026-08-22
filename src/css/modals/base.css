@@ -249,7 +249,7 @@ body.dark-mode .modal .modal-info-note {
 }
 
 .modal-buttons button.btn-success {
-    background-color: #28a745;
+    background-color: var(--pz-success);
     color: white;
     border: none;
 }

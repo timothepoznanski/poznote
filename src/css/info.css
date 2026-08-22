@@ -65,7 +65,7 @@ body {
 }
 
 .favorite-yes {
-    color: #ffc107;
+    color: var(--pz-warning);
     font-weight: 600;
 }
 

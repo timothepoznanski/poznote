@@ -76,11 +76,11 @@
 }
 
 input:checked+.toggle-slider {
-    background-color: #28a745 !important;
+    background-color: var(--pz-success) !important;
 }
 
 input:focus+.toggle-slider {
-    box-shadow: 0 0 1px #28a745;
+    box-shadow: 0 0 1px var(--pz-success);
 }
 
 input:checked+.toggle-slider:before {
@@ -95,7 +95,7 @@ input:checked+.toggle-slider:before {
 }
 
 #shareModal .btn-create-share {
-    background: #28a745;
+    background: var(--pz-success);
     color: #ffffff;
     border: none;
 }

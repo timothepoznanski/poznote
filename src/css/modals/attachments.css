@@ -121,7 +121,7 @@
 }
 
 .attachment-download {
-    background: #28a745;
+    background: var(--pz-success);
     color: white;
 }
 
