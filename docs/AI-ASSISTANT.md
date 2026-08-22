@@ -9,7 +9,9 @@ Integrated AI chat that can search and read your notes. It works with a local [O
 
 Once configured, an **AI** button appears in the dashboard toolbar and opens the chat panel right there.
 
-The assistant has tools to **search and read all your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
+The assistant has tools to **search and read your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
+
+The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first.
 
 The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header.
 

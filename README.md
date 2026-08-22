@@ -1040,7 +1040,9 @@ Server: my-server.com
 
 Poznote includes an integrated AI chat that connects to any OpenAI-compatible server, a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, or a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI. Once configured, an **AI** button appears in the dashboard toolbar and opens the chat panel right there.
 
-The assistant is global, MCP-style: it has tools to **search and read all your notes**, and uses them on its own to answer questions, like "what do my notes say about X?", cross-note summaries, finding that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
+The assistant is global, MCP-style: it has tools to **search and read your notes**, and uses them on its own to answer questions, like "what do my notes say about X?", cross-note summaries, finding that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
+
+The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first.
 
 To enable it, go to **Settings → Admin Tools → AI Assistant** (administrator only), pick a provider and use **Test connection** to verify the server and choose a model. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
 
