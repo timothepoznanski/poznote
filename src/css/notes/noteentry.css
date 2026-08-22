@@ -84,7 +84,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
         border: 1px solid rgba(0, 0, 0, 0.12);
         border-radius: 7px;
         background: rgba(255, 255, 255, 0.96);
-        color: #007DB8;
+        color: var(--pz-accent);
         box-shadow: 0 5px 14px rgba(15, 23, 42, 0.14);
         cursor: pointer;
         display: inline-flex;
@@ -108,7 +108,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     }
 
     .note-scroll-edge-btn:focus-visible {
-        outline: 2px solid #007DB8;
+        outline: 2px solid var(--pz-accent);
         outline-offset: 2px;
     }
 

@@ -76,11 +76,11 @@
 }
 
 input:checked+.toggle-slider {
-    background-color: #28a745 !important;
+    background-color: var(--pz-success) !important;
 }
 
 input:focus+.toggle-slider {
-    box-shadow: 0 0 1px #28a745;
+    box-shadow: 0 0 1px var(--pz-success);
 }
 
 input:checked+.toggle-slider:before {
@@ -89,13 +89,13 @@ input:checked+.toggle-slider:before {
 
 /* Button Variants */
 #shareModal .btn-cancel {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: #ffffff;
     border: none;
 }
 
 #shareModal .btn-create-share {
-    background: #28a745;
+    background: var(--pz-success);
     color: #ffffff;
     border: none;
 }
@@ -143,13 +143,13 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 
 /* Button Variants */
 #folderShareModal .btn-cancel {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: #ffffff;
     border: none;
 }
 
 #folderShareModal .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
     border: none;
 }

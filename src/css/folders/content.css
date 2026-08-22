@@ -59,14 +59,14 @@
 
 .close:hover,
 .close:focus {
-    color: #333;
+    color: var(--pz-text);
     text-decoration: none;
 }
 
 .folders-list {
     max-height: 200px;
     overflow-y: auto;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 4px;
     background-color: #fafafa;
     margin-top: 8px;
@@ -74,9 +74,9 @@
 
 .folder-item {
     padding: 8px 12px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--pz-border);
     font-size: 13px;
-    color: #333;
+    color: var(--pz-text);
     display: flex;
     align-items: center;
 }

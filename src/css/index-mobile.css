@@ -537,7 +537,7 @@ body.mobile-formatting-toolbar-active #right_col .note-edit-toolbar .mobile-home
 }
 
 .slash-command-back:hover {
-    background-color: #f3f4f6 !important;
+    background-color: var(--pz-surface-hover) !important;
 }
 
 /* Responsive tables in note view (mobile)

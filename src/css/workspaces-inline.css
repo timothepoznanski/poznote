@@ -151,7 +151,7 @@
     padding: 10px 15px;
     clear: both;
     font-weight: 400;
-    color: var(--text-main, #333);
+    color: var(--text-main, var(--pz-text));
     text-align: inherit;
     white-space: nowrap;
     background-color: transparent;
@@ -163,14 +163,14 @@
 
 .dropdown-menu .dropdown-item {
     background: transparent !important;
-    color: #333 !important;
+    color: var(--pz-text) !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
 }
 
 .dropdown-item:hover {
-    background-color: var(--hover-bg, #f8f9fa);
+    background-color: var(--hover-bg, var(--pz-surface));
 }
 
 .dropdown-item i, .dropdown-item svg {
@@ -183,7 +183,7 @@
 }
 
 .dropdown-menu .dropdown-item:hover {
-    background-color: #f3f4f6 !important;
+    background-color: var(--pz-surface-hover) !important;
     color: #111 !important;
 }
 
@@ -198,12 +198,12 @@
 }
 
 .dropdown-menu .dropdown-item.text-danger {
-    color: #dc3545 !important;
+    color: var(--pz-danger) !important;
 }
 
 .dropdown-menu .dropdown-item.text-danger:hover {
     background-color: #fff5f5 !important;
-    color: #dc3545 !important;
+    color: var(--pz-danger) !important;
 }
 
 .dropdown-divider {
@@ -223,7 +223,7 @@ body.dark-mode .dropdown-menu .dropdown-item {
 
 :root[data-theme='dark'] .dropdown-menu .dropdown-item:hover,
 body.dark-mode .dropdown-menu .dropdown-item:hover {
-    background-color: #3a3a3a !important;
+    background-color: var(--dm-surface-hover) !important;
     color: #ffffff !important;
 }
 

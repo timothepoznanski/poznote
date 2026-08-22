@@ -9,25 +9,25 @@
     align-items: center;
     padding: 6px 12px;
     background-color: #f5f5f5;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 20px;
     cursor: pointer;
     font-size: 13px;
-    color: #333;
+    color: var(--pz-text);
     transition: all 0.2s;
     white-space: nowrap;
 }
 
 .suggested-folder-option:hover {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .suggested-folder-option.selected {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .suggested-folder-option i {
@@ -39,11 +39,11 @@
     display: flex;
     align-items: center;
     padding: 12px 15px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--pz-border);
     cursor: pointer;
     transition: background-color 0.2s;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .folder-option:last-child {
@@ -55,12 +55,12 @@
 }
 
 .folder-option.selected {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
 }
 
 .folder-option.selected:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 .folder-option i {
@@ -77,7 +77,7 @@
 /* Create folder option styling */
 .create-folder-option {
     background-color: #f8f9ff !important;
-    border: 1px dashed #007DB8 !important;
+    border: 1px dashed var(--pz-accent) !important;
     margin: 5px 0;
     border-radius: 4px;
 }
@@ -88,10 +88,10 @@
 }
 
 .create-folder-option .folder-name {
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 500;
 }
 
 .create-folder-option i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }

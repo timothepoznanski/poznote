@@ -68,7 +68,7 @@
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb {
-    background-color: #555555 !important;
+    background-color: var(--dm-border-light) !important;
 }
 
 [data-theme="dark"] body.shared-page::-webkit-scrollbar-thumb:hover {
@@ -210,15 +210,15 @@
 }
 
 [data-theme="dark"] .filter-type-btn:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     color: #4db9eb;
-    background: rgba(0, 125, 184, 0.18);
+    background: rgba(var(--pz-accent-rgb), 0.18);
 }
 
 [data-theme="dark"] .filter-type-btn.active {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 [data-theme="dark"] .shared-type-icon:not([data-icon-color]) {
@@ -268,7 +268,7 @@
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value input,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select,
 [data-theme="dark"] body.shared-page .shared-edit-token-modal .modal-password-input {
-    background-color: #3a3a3a !important;
+    background-color: var(--dm-surface-hover) !important;
     border-color: #707070 !important;
     color: #f5f7fa !important;
 }

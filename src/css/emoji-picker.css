@@ -25,7 +25,7 @@
 .emoji-hint {
     padding: 10px 15px;
     margin: 5px 10px 10px 10px;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     border-left: 3px solid #0066cc;
     font-size: 12px;
     color: #555;

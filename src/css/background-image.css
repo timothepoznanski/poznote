@@ -52,7 +52,7 @@
     border: none;
     border-radius: 6px;
     padding: 10px 20px;
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
     font-weight: 400;
     cursor: pointer;
@@ -63,7 +63,7 @@
 }
 
 #uploadBackgroundBtn:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 #removeBackgroundBtn {
@@ -79,7 +79,7 @@
     display: block;
     font-weight: 600;
     margin-bottom: 10px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .background-opacity-control input[type="range"] {
@@ -97,7 +97,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #007DB8;
+    background: var(--pz-accent);
     cursor: pointer;
 }
 
@@ -105,14 +105,14 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #007DB8;
+    background: var(--pz-accent);
     cursor: pointer;
     border: none;
 }
 
 #backgroundOpacityValue {
     font-weight: 700;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Dark mode support */

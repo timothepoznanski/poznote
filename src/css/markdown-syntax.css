@@ -40,7 +40,7 @@
     border: 1px solid #d7dee5;
     border-radius: 10px;
     font-size: 14px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background: var(--input-bg, #ffffff);
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
@@ -48,8 +48,8 @@
 
 .markdown-syntax-filter-bar .filter-input:focus {
     outline: none;
-    border-color: #007db8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .markdown-syntax-filter-bar .clear-filter-btn {
@@ -73,7 +73,7 @@
 
 .markdown-syntax-filter-bar .filter-stats {
     font-size: 13px;
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
     white-space: nowrap;
 }
 
@@ -93,7 +93,7 @@
 
 .syntax-card-category {
     margin: 0 0 10px;
-    color: #007db8;
+    color: var(--pz-accent);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -102,7 +102,7 @@
 
 .syntax-card h2 {
     margin: 0 0 8px;
-    color: #333;
+    color: var(--pz-text);
     font-size: 20px;
 }
 
@@ -117,7 +117,7 @@
     overflow-x: auto;
     border: 1px solid #f0f0f0;
     border-radius: 4px;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     color: #212529;
     padding: 12px;
     font-size: 13px;

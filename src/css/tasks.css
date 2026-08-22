@@ -51,7 +51,7 @@
     height: 100%;
     width: 0;
     border-radius: 4px;
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     transition: width 0.3s ease;
 }
 
@@ -85,8 +85,8 @@
 
 .task-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 
@@ -105,7 +105,7 @@
     align-items: flex-start;
     padding: 6px 12px !important;
     margin-bottom: 8px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: #fafafa;
     transition: all 0.2s ease;
@@ -146,7 +146,7 @@
 
 /* Drag & drop visual helpers */
 .task-item.drag-over {
-    outline: 2px dashed rgba(0, 125, 184, 0.35);
+    outline: 2px dashed rgba(var(--pz-accent-rgb), 0.35);
     background: #eef9ff;
 }
 
@@ -155,7 +155,7 @@
     /* transform: rotate(3deg) scale(1.05); */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1000;
-    border: 4px solid #007DB8 !important;
+    border: 4px solid var(--pz-accent) !important;
 }
 
 /* Placeholder used for touch drag-and-drop */
@@ -188,7 +188,7 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
     margin-right: 12px;
     /* Center on the first text line (2px text padding + half of the 21px line
        box, minus half the 16px checkbox) now that the row is top-aligned */
@@ -214,20 +214,20 @@
 }
 
 .task-text a {
-    color: #007DB8;
+    color: var(--pz-accent);
     text-decoration: none;
     word-break: break-all;
 }
 
 .task-text a:hover {
-    color: #005a8a;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 
 .task-edit-input {
     flex: 1;
     padding: 2px 4px;
-    border: 1px solid #007DB8;
+    border: 1px solid var(--pz-accent);
     border-radius: 3px;
     font-size: 14px;
     font-family: inherit;
@@ -289,8 +289,8 @@
 }
 
 .task-edit-textarea:focus {
-    border-color: #007DB8;
-    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .task-edit-hint {
@@ -395,7 +395,7 @@
 }
 
 .task-move-btn:hover i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .task-due-btn {
@@ -421,7 +421,7 @@
 }
 
 .task-due-btn:hover i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Due date pill shown next to the task text when a date is set */
@@ -449,8 +449,8 @@
 }
 
 .task-due-chip:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .task-due-chip.overdue {
@@ -495,7 +495,7 @@
 }
 
 .task-menu-btn:hover i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Popup menu opened by the three-dot button */
@@ -533,7 +533,7 @@
 
 .task-actions-menu-item i {
     font-size: 15px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     flex-shrink: 0;
 }
 
@@ -641,16 +641,16 @@
 }
 
 .btn-task-order.active {
-    background-color: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
+    background-color: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent);
 }
 
 .btn-task-order:hover {
-    background-color: rgba(0, 125, 184, 0.05);
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
 }
 
 .btn-task-order.active:hover {
-    background-color: rgba(0, 125, 184, 0.15);
+    background-color: rgba(var(--pz-accent-rgb), 0.15);
 }
 
 /* Callout / alert styles (Note, Tip, Important, Warning, Caution).
@@ -943,7 +943,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-widget {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     padding: 12px 16px;
 }
@@ -977,7 +977,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-toggle:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .noteentry .tasklist-embed-toggle i {
@@ -1045,7 +1045,7 @@ body.dark-mode .toggle-block[open]>summary {
     width: 15px;
     height: 15px;
     cursor: pointer;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
     flex-shrink: 0;
     /* Center on the first text line of the top-aligned row */
     margin: 3px 0 0;
@@ -1081,7 +1081,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-due.overdue {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 .noteentry .tasklist-embed-empty:is(#pz-specificity-boost, *),

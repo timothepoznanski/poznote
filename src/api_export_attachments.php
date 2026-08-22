@@ -38,6 +38,7 @@ if (!$hasAttachments) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Poznote - Attachments Export</title>
         <link rel="stylesheet" href="<?php echo poznoteAsset('css/lucide.css'); ?>">
+        <link rel="stylesheet" href="<?php echo poznoteAsset('css/dark-mode/variables.css'); ?>">
         <link href="<?php echo poznoteAsset('css/modals/base.css'); ?>" rel="stylesheet">
         <link href="<?php echo poznoteAsset('css/modals/specific-modals.css'); ?>" rel="stylesheet">
         <link href="<?php echo poznoteAsset('css/modals/attachments.css'); ?>" rel="stylesheet">

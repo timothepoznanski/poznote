@@ -57,7 +57,7 @@
 }
 
 .btn-primary {
-    background: #007db8;
+    background: var(--pz-accent);
     color: white;
     border: none;
 }
@@ -97,7 +97,7 @@ body.shared-page .modal {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title h3 {
@@ -112,13 +112,13 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
     overflow-wrap: anywhere;
     word-break: break-word;
     text-decoration: none;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     font-size: 15px;
     font-weight: 400;
     line-height: 1.45;
     letter-spacing: 0;
     font-family: "JetBrains Mono", "Fira Code", monospace;
-    background: rgba(0, 125, 184, 0.06);
+    background: rgba(var(--pz-accent-rgb), 0.06);
     border-radius: 6px;
     padding: 8px 10px;
     cursor: default;
@@ -130,7 +130,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
 
 .modal-body p {
     margin: 0;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .modal-footer {
@@ -166,7 +166,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
     gap: 12px;
     padding: 0 0 14px;
     margin-bottom: 2px;
-    background: linear-gradient(180deg, rgba(0, 125, 184, 0.08), rgba(0, 125, 184, 0));
+    background: linear-gradient(180deg, rgba(var(--pz-accent-rgb), 0.08), rgba(var(--pz-accent-rgb), 0));
     border-bottom: 1px solid rgba(15, 23, 42, 0.1);
 }
 
@@ -197,7 +197,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-label {
     flex: 0 0 170px;
     font-size: 15px;
     font-weight: 500;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     white-space: nowrap;
 }
 
@@ -235,15 +235,15 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select 
     border-radius: 10px;
     border: 1px solid #cfd6de;
     background: #ffffff;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 body.shared-page .shared-edit-token-modal .modal-password-input:focus,
 body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus {
-    border-color: rgba(0, 125, 184, 0.7);
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.14);
+    border-color: rgba(var(--pz-accent-rgb), 0.7);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.14);
     outline: none;
 }
 
@@ -314,7 +314,7 @@ body.shared-page .shared-edit-token-modal .share-user-list-container {
 
 body.shared-page .shared-edit-token-modal .share-user-list-message {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     padding: 4px 0;
 }
 

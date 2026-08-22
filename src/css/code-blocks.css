@@ -17,7 +17,7 @@ pre.code-block,
     border-radius: 4px;
     padding: 20px 20px;
     margin: 0;
-    color: #333;
+    color: var(--pz-text);
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
@@ -185,7 +185,7 @@ pre.code-block .code-block-delete-btn,
 
 .code-block-copy-btn.copied {
     background: transparent;
-    color: #28a745;
+    color: var(--pz-success);
     border: none;
     opacity: 1;
 }
@@ -275,7 +275,7 @@ code {
     background-color: #f4f4f4;
     padding: 2px 4px;
     border-radius: 3px;
-    color: #333;
+    color: var(--pz-text);
     font-size: var(--code-block-font-size, 15px) !important;
 }
 

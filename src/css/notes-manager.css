@@ -5,7 +5,7 @@ body.notes-manager-page {
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--bg-color, #ffffff);
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .notes-manager-container {
@@ -42,10 +42,10 @@ body.notes-manager-page {
 .nm-filter-bar .filter-input {
     width: 100%;
     padding: 10px 40px 10px 36px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 14px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, #ffffff);
     transition: border-color 0.2s;
     box-sizing: border-box;
@@ -53,8 +53,8 @@ body.notes-manager-page {
 
 .nm-filter-bar .filter-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .nm-filter-bar .clear-filter-btn {
@@ -72,7 +72,7 @@ body.notes-manager-page {
 
 .filter-stats {
     font-size: 13px;
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
     white-space: nowrap;
 }
 
@@ -80,18 +80,18 @@ body.notes-manager-page {
     min-width: 130px;
     flex: 0 0 auto;
     padding: 10px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 14px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, #ffffff);
     box-sizing: border-box;
 }
 
 .nm-filter-select:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 /* Bulk action bar */
@@ -140,7 +140,7 @@ body.notes-manager-page {
     font-weight: 500;
     background: transparent;
     color: #64748b;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
 }
 
 #nmBulkBar .nm-bulk-btn:hover {
@@ -165,8 +165,8 @@ body.notes-manager-page {
 
 .nm-bulk-select:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.12);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.12);
 }
 
 .nm-bulk-select:disabled {
@@ -195,26 +195,26 @@ body.dark-mode .nm-bulk-select option {
 .nm-modal-input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 14px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, #ffffff);
     box-sizing: border-box;
 }
 
 .nm-modal-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 /* ── Dark Mode Overrides ────────────────────────────────────────────── */
 :root[data-theme='dark'],
 body.dark-mode {
-    --bg-color: var(--dm-bg, #252526);
+    --bg-color: var(--dm-bg, var(--dm-content-bg));
     --text-color: var(--dm-text, #e3e3e3);
-    --border-color: var(--dm-border, #404040);
+    --border-color: var(--dm-border, var(--dm-border));
     --border-color-light: var(--dm-border);
     --input-bg: var(--dm-surface);
     --folder-header-bg: var(--dm-surface);
@@ -230,7 +230,7 @@ body.dark-mode {
     --selected-color: #e5e7eb;
     --badge-bg: #3730a3;
     --badge-color: #e0e7ff;
-    --badge-bg-subtle: #404040;
+    --badge-bg-subtle: var(--dm-border);
     --muted-color: #888888;
 }
 
@@ -243,7 +243,7 @@ body.dark-mode .nm-selected-count {
 }
 
 body.dark-mode .nm-note-link {
-    color: var(--dm-accent, #4a9eff);
+    color: var(--dm-accent, var(--dm-accent));
 }
 
 body.dark-mode .nm-tag-chip {
@@ -291,7 +291,7 @@ body.dark-mode .nm-folder-option-selected {
 
 .nm-folder-chevron {
     flex-shrink: 0;
-    color: var(--muted-color, #9ca3af);
+    color: var(--muted-color, var(--pz-text-subtle));
     display: flex;
     align-items: center;
 }
@@ -314,7 +314,7 @@ body.dark-mode .nm-folder-option-selected {
     border: none;
     padding: 4px 6px;
     cursor: pointer;
-    color: var(--muted-color, #9ca3af);
+    color: var(--muted-color, var(--pz-text-subtle));
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -322,8 +322,8 @@ body.dark-mode .nm-folder-option-selected {
 }
 
 .nm-group-select-btn:hover {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.08);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 .nm-folder-count {
@@ -333,7 +333,7 @@ body.dark-mode .nm-folder-option-selected {
     padding: 1px 8px;
     border-radius: 10px;
     background: var(--badge-bg-subtle, #e5e7eb);
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
 }
 
 /* ── Note rows ───────────────────────────────────────────────────────── */
@@ -366,7 +366,7 @@ body.dark-mode .nm-folder-option-selected {
     flex-shrink: 0;
     width: 16px;
     height: 16px;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
     cursor: pointer;
 }
 
@@ -374,7 +374,7 @@ body.dark-mode .nm-folder-option-selected {
     flex: 1;
     min-width: 0;
     font-size: 14px;
-    color: var(--link-color, #007DB8);
+    color: var(--link-color, var(--pz-accent));
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -400,7 +400,7 @@ body.dark-mode .nm-folder-option-selected {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
 }
 
 .nm-note-type-html {
@@ -435,7 +435,7 @@ body.dark-mode .nm-folder-option-selected {
     padding: 1px 7px;
     border-radius: 10px;
     background: var(--badge-bg-subtle, #e5e7eb);
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -450,14 +450,14 @@ body.dark-mode .nm-folder-option-selected {
 .nm-note-tags:has(.nm-tag-chip:nth-child(4))::after {
     content: '…';
     font-size: 12px;
-    color: var(--muted-color, #9ca3af);
+    color: var(--muted-color, var(--pz-text-subtle));
     flex-shrink: 0;
 }
 
 .nm-note-meta {
     flex-shrink: 0;
     font-size: 12px;
-    color: var(--muted-color, #9ca3af);
+    color: var(--muted-color, var(--pz-text-subtle));
 }
 
 @media (max-width: 768px) {
@@ -511,12 +511,12 @@ body.dark-mode .nm-folder-option-selected {
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     transition: background 0.12s;
 }
 
 .nm-folder-option:hover {
-    background: var(--hover-bg, #f3f4f6);
+    background: var(--hover-bg, var(--pz-surface-hover));
 }
 
 .nm-folder-option-selected {
@@ -532,14 +532,14 @@ body.dark-mode .nm-folder-option-selected {
     gap: 10px;
     justify-content: center;
     padding: 40px;
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
     font-size: 15px;
 }
 
 .empty-message {
     text-align: center;
     padding: 40px;
-    color: var(--muted-color, #6b7280);
+    color: var(--muted-color, var(--pz-text-muted));
     font-size: 15px;
 }
 
@@ -548,10 +548,6 @@ body.dark-mode .nm-folder-option-selected {
     padding: 20px;
     color: #dc2626;
     font-size: 14px;
-}
-
-.initially-hidden {
-    display: none;
 }
 
 /* ── Dark mode overrides ─────────────────────────────────────────────── */

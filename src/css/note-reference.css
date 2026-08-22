@@ -26,7 +26,7 @@
 }
 
 .note-reference-modal-close:hover {
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--hover-bg, rgba(0, 0, 0, 0.05));
 }
 
@@ -46,7 +46,7 @@
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--input-bg, #fff);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
 }
@@ -69,7 +69,7 @@
 }
 
 .modal-buttons .btn-cancel {
-    background-color: #dc3545;
+    background-color: var(--pz-danger);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -119,7 +119,7 @@
     font-size: 15px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--input-bg, #fff);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s, box-shadow 0.2s;
     box-sizing: border-box;
 }
@@ -195,7 +195,7 @@
     flex: 1;
     font-size: 15px;
     font-weight: 500;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.4;
@@ -212,7 +212,7 @@
 .note-reference-item-title {
     font-size: 14px;
     font-weight: 500;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -248,7 +248,7 @@ a.note-internal-link:hover {
 
 /* Broken/not found link (span or dead anchor) — clickable to create the missing note */
 .note-internal-link.note-link-broken {
-    color: var(--error-color, #dc3545);
+    color: var(--error-color, var(--pz-danger));
     text-decoration: line-through;
     cursor: pointer;
 }
@@ -263,7 +263,7 @@ a.note-internal-link:hover {
 
 /* Dark mode adjustments */
 [data-theme="dark"] .note-reference-modal-content {
-    background-color: var(--dm-content-bg, #252526);
+    background-color: var(--dm-content-bg, var(--dm-content-bg));
 }
 
 [data-theme="dark"] .note-reference-modal-header h3 {
@@ -279,8 +279,8 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-search-input {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dark-text-color, #e0e0e0);
 }
 
@@ -290,8 +290,8 @@ a.note-internal-link:hover {
 }
 
 [data-theme="dark"] .note-reference-search input {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     color: var(--dark-text-color, #e0e0e0);
 }
 

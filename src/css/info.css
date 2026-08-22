@@ -22,7 +22,7 @@ body {
 .titre-info {
     text-align: center;
     /* margin-bottom: 20px; */
-    color: #333;
+    color: var(--pz-text);
     font-size: 24px;
 }
 
@@ -65,7 +65,7 @@ body {
 }
 
 .favorite-yes {
-    color: #ffc107;
+    color: var(--pz-warning);
     font-weight: 600;
 }
 
@@ -92,12 +92,12 @@ body {
 }
 
 .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
     text-decoration: none;
 }
 

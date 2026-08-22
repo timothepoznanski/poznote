@@ -129,11 +129,11 @@
 }
 
 .kanban-add-card-btn:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .kanban-add-card-btn:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -254,7 +254,7 @@
 }
 
 .kanban-card-complete-btn:focus-visible {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -332,7 +332,7 @@
 }
 
 .kanban-completed-toggle:focus-visible {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: -2px;
 }
 

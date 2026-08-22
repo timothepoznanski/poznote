@@ -35,13 +35,13 @@
 
 .alert-success {
     background-color: #d4edda;
-    border-color: #28a745;
+    border-color: var(--pz-success);
     color: #155724;
 }
 
 .alert-danger {
     background-color: #f8d7da;
-    border-color: #dc3545;
+    border-color: var(--pz-danger);
     color: #721c24;
 }
 
@@ -53,7 +53,7 @@
 
 .alert-warning {
     background-color: #fff3cd;
-    border-color: #ffc107;
+    border-color: var(--pz-warning);
     color: #856404;
 }
 
@@ -83,11 +83,11 @@
 
 /* Text colors */
 .text-danger {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 .text-warning-bold {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: bold;
 }
 
@@ -95,7 +95,7 @@
 .maintenance-subtitle {
     font-weight: 600;
     margin-bottom: 8px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .maintenance-description {

@@ -76,7 +76,7 @@ body.trash-page {
 .trash-header {
     text-align: center;
     font-weight: 500;
-    color: #333;
+    color: var(--pz-text);
     margin-top: 40px;
     margin-bottom: 20px;
 }
@@ -131,7 +131,7 @@ body.trash-page {
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     background-color: #f8f8f8;
     transition: all 0.2s ease;
     box-sizing: border-box;
@@ -139,8 +139,8 @@ body.trash-page {
 
 .trash-search-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .clear-filter-btn {
@@ -198,12 +198,12 @@ body.trash-page {
 }
 
 .trash-sort-option:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .trash-sort-option.is-active {
     background-color: #fff;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 600;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
@@ -395,7 +395,7 @@ body.trash-page {
     border: none;
     border-radius: 6px;
     background: transparent;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 12.5px;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
@@ -412,8 +412,8 @@ body.trash-page {
 .trash-expand-btn .lucide {
     width: 13px;
     height: 13px;
-    color: #007DB8;
-    background-color: #007DB8;
+    color: var(--pz-accent);
+    background-color: var(--pz-accent);
     vertical-align: -2px;
     margin-right: 4px;
 }
@@ -449,15 +449,15 @@ body.trash-page {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     margin-bottom: 16px;
 }
 
 .trash-no-notes-icon .lucide {
     width: 32px;
     height: 32px;
-    color: #9ca3af;
-    background-color: #9ca3af;
+    color: var(--pz-text-subtle);
+    background-color: var(--pz-text-subtle);
 }
 
 .trash-no-notes-text {
@@ -478,7 +478,7 @@ body.trash-page {
 }
 
 .trash-close-search:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchtrash::-webkit-input-placeholder {
@@ -496,7 +496,7 @@ body.trash-page {
 /* Notice de recherche */
 .trash-search-notice {
     text-align: center;
-    background: #e3f2fd;
+    background: var(--pz-accent-soft);
     border: 1px solid #bbdefb;
     border-radius: 6px;
     padding: 10px;
@@ -725,13 +725,13 @@ body.dark-mode .trash-notecard {
 
 html[data-theme='dark'] .trash-innernote,
 body.dark-mode .trash-innernote {
-    /* background-color: #333333 !important; */
+    /* background-color: var(--dm-surface) !important; */
     color: #e0e0e0;
 }
 
 html[data-theme='dark'] .css-title,
 body.dark-mode .css-title {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .trash-no-notes,
@@ -821,13 +821,13 @@ body.dark-mode .trash-expand-btn:hover {
 
 html[data-theme='dark'] .trash-expand-btn,
 body.dark-mode .trash-expand-btn {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .trash-expand-btn .lucide,
 body.dark-mode .trash-expand-btn .lucide {
-    color: #4a9eff;
-    background-color: #4a9eff;
+    color: var(--dm-accent);
+    background-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .trash-no-notes-icon,

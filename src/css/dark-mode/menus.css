@@ -284,121 +284,128 @@ body.dark-mode .workspace-menu-divider {
 }
 
 /* ============================================
-   Create Menu
-   ============================================ */
-
-html[data-theme='dark'] .create-menu,
-html[data-theme='dark'] #header-create-menu,
-body.dark-mode .create-menu,
-body.dark-mode #header-create-menu {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-html[data-theme='dark'] .create-menu-item,
-body.dark-mode .create-menu-item {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .create-menu-item:hover,
-body.dark-mode .create-menu-item:hover {
-    background-color: var(--dm-surface-hover);
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .create-menu-item i,
-body.dark-mode .create-menu-item i {
-    color: #b0b0b0;
-}
-
-html[data-theme='dark'] .create-menu-item:hover i,
-body.dark-mode .create-menu-item:hover i {
-    color: var(--dm-accent);
-}
-
-/* ============================================
-   Folder Actions Menu
+   Folder & Note Actions Menus (light rules: css/folders/actions-menu.css)
    ============================================ */
 
 html[data-theme='dark'] .folder-actions-toggle,
-body.dark-mode .folder-actions-toggle {
+html[data-theme='dark'] .note-actions-toggle,
+html[data-theme='dark'] .note-actions-item,
+body.dark-mode .folder-actions-toggle,
+body.dark-mode .note-actions-toggle,
+body.dark-mode .note-actions-item {
     color: #b0b0b0;
 }
 
 html[data-theme='dark'] .folder-actions-toggle:hover,
-body.dark-mode .folder-actions-toggle:hover {
+html[data-theme='dark'] .note-actions-toggle:hover,
+html[data-theme='dark'] .note-actions-toggle.open,
+html[data-theme='dark'] .note-actions-item:hover,
+body.dark-mode .folder-actions-toggle:hover,
+body.dark-mode .note-actions-toggle:hover,
+body.dark-mode .note-actions-toggle.open,
+body.dark-mode .note-actions-item:hover {
     background: rgba(255, 255, 255, 0.12);
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder-actions-toggle:hover i,
 html[data-theme='dark'] .folder-actions-toggle:hover [class*="lucide-"],
+html[data-theme='dark'] .note-actions-toggle:hover i,
+html[data-theme='dark'] .note-actions-toggle:hover [class*="lucide-"],
+html[data-theme='dark'] .note-actions-item:hover i,
+html[data-theme='dark'] .note-actions-item:hover [class*="lucide-"],
 body.dark-mode .folder-actions-toggle:hover i,
-body.dark-mode .folder-actions-toggle:hover [class*="lucide-"] {
+body.dark-mode .folder-actions-toggle:hover [class*="lucide-"],
+body.dark-mode .note-actions-toggle:hover i,
+body.dark-mode .note-actions-toggle:hover [class*="lucide-"],
+body.dark-mode .note-actions-item:hover i,
+body.dark-mode .note-actions-item:hover [class*="lucide-"] {
     color: #38bdf8;
 }
 
 html[data-theme='dark'] .folder-actions-menu,
-body.dark-mode .folder-actions-menu {
+html[data-theme='dark'] .note-actions-menu,
+body.dark-mode .folder-actions-menu,
+body.dark-mode .note-actions-menu {
     background: var(--dm-surface);
     border: 1px solid var(--dm-border);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item,
-body.dark-mode .folder-actions-menu-item {
+html[data-theme='dark'] .note-actions-menu-item,
+body.dark-mode .folder-actions-menu-item,
+body.dark-mode .note-actions-menu-item {
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item:hover,
-body.dark-mode .folder-actions-menu-item:hover {
+html[data-theme='dark'] .note-actions-menu-item:hover,
+body.dark-mode .folder-actions-menu-item:hover,
+body.dark-mode .note-actions-menu-item:hover {
     background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item i,
-body.dark-mode .folder-actions-menu-item i {
+html[data-theme='dark'] .note-actions-menu-item i,
+body.dark-mode .folder-actions-menu-item i,
+body.dark-mode .note-actions-menu-item i {
     color: #b0b0b0;
 }
 
 html[data-theme='dark'] .folder-actions-menu-item:hover i,
-body.dark-mode .folder-actions-menu-item:hover i {
+html[data-theme='dark'] .note-actions-menu-item:hover i,
+body.dark-mode .folder-actions-menu-item:hover i,
+body.dark-mode .note-actions-menu-item:hover i {
     color: var(--dm-text);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.danger,
-body.dark-mode .folder-actions-menu-item.danger {
+html[data-theme='dark'] .note-actions-menu-item.danger,
+body.dark-mode .folder-actions-menu-item.danger,
+body.dark-mode .note-actions-menu-item.danger {
     color: #ff6b6b;
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.danger:hover,
-body.dark-mode .folder-actions-menu-item.danger:hover {
+html[data-theme='dark'] .note-actions-menu-item.danger:hover,
+body.dark-mode .folder-actions-menu-item.danger:hover,
+body.dark-mode .note-actions-menu-item.danger:hover {
     background-color: rgba(220, 38, 38, 0.15);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.danger i,
-body.dark-mode .folder-actions-menu-item.danger i {
+html[data-theme='dark'] .note-actions-menu-item.danger i,
+body.dark-mode .folder-actions-menu-item.danger i,
+body.dark-mode .note-actions-menu-item.danger i {
     color: #ff6b6b;
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared,
-body.dark-mode .folder-actions-menu-item.shared {
+html[data-theme='dark'] .note-actions-menu-item.shared,
+body.dark-mode .folder-actions-menu-item.shared,
+body.dark-mode .note-actions-menu-item.shared {
     color: #ff6b6b;
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared:hover,
-body.dark-mode .folder-actions-menu-item.shared:hover {
+html[data-theme='dark'] .note-actions-menu-item.shared:hover,
+body.dark-mode .folder-actions-menu-item.shared:hover,
+body.dark-mode .note-actions-menu-item.shared:hover {
     background-color: rgba(220, 38, 38, 0.15);
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.shared i,
-body.dark-mode .folder-actions-menu-item.shared i {
+html[data-theme='dark'] .note-actions-menu-item.shared i,
+body.dark-mode .folder-actions-menu-item.shared i,
+body.dark-mode .note-actions-menu-item.shared i {
     color: #ff6b6b;
 }
 
 html[data-theme='dark'] .folder-actions-menu-separator,
-body.dark-mode .folder-actions-menu-separator {
+html[data-theme='dark'] .note-actions-menu-separator,
+body.dark-mode .folder-actions-menu-separator,
+body.dark-mode .note-actions-menu-separator {
     background: var(--dm-border);
 }
 
@@ -415,7 +422,7 @@ body.dark-mode .export-option {
 html[data-theme='dark'] .export-option:hover,
 body.dark-mode .export-option:hover {
     background-color: var(--dm-surface);
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .export-option span,
@@ -430,7 +437,7 @@ body.dark-mode .export-option p {
 
 html[data-theme='dark'] .export-option i,
 body.dark-mode .export-option i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Mobile toolbar dropdown menu */

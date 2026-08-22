@@ -39,7 +39,7 @@ html.tags-page {
 
 .tags-header {
     font-size: 1.8em;
-    color: #333;
+    color: var(--pz-text);
     font-weight: 500;
     margin: 0;
 }
@@ -106,7 +106,7 @@ html.tags-page {
 
 .tag-item {
     background: white;
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--pz-border);
     border-radius: 12px;
     padding: 15px;
     text-align: center;
@@ -121,7 +121,7 @@ html.tags-page {
 }
 
 .tag-item:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
@@ -129,7 +129,7 @@ html.tags-page {
 .tag-name {
     font-weight: normal;
     font-size: 1.1em;
-    color: #333;
+    color: var(--pz-text);
     margin-bottom: 0;
 }
 
@@ -320,7 +320,7 @@ body.dark-mode .tag-color-swatch.selected {
     background: none;
     border: none;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     cursor: pointer;
     text-align: left;
     font-family: 'Inter', sans-serif;
@@ -381,7 +381,7 @@ body.dark-mode .tag-context-menu-item.danger:hover {
 }
 
 .tag-rename-input:focus {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .tag-rename-input,

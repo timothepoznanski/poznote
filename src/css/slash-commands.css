@@ -56,7 +56,7 @@
     width: 18px;
     min-width: 18px;
     text-align: center;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .slash-command-label {
@@ -73,7 +73,7 @@
 .slash-command-submenu-indicator {
     margin-left: auto;
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
 }
 
 .slash-command-submenu {
@@ -86,7 +86,7 @@
 
 .slash-command-empty {
     padding: 10px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 13px;
 }
 
@@ -136,7 +136,7 @@
     height: 26px;
     font-size: 16px;
     line-height: 1;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .slash-date-picker-nav:hover {
@@ -152,7 +152,7 @@
 
 .slash-date-picker-weekday {
     font-size: 11px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     padding: 2px 0;
 }
 
@@ -199,7 +199,7 @@
     gap: 6px;
     margin-top: 6px;
     padding-top: 8px;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--pz-surface-hover);
 }
 
 .slash-date-picker-actions-row .slash-date-picker-apply-btn {
@@ -222,7 +222,7 @@
 
 .slash-date-picker-time-btn i {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .slash-date-picker-time-btn:hover {
@@ -325,8 +325,8 @@
 }
 
 .slash-date-picker-remove-time-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .slash-date-picker-today-btn {

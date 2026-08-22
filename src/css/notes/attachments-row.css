@@ -17,7 +17,7 @@
 .noteentry ~ .note-attachments-row,
 .noteentry ~ .note-attachment-previews,
 .noteentry ~ .backlinks-row {
-    border-top: 1px solid var(--border-color, #e0e0e0);
+    border-top: 1px solid var(--border-color, var(--pz-border));
     margin-top: 12px;
     padding-top: 22px;
     margin-bottom: 10px;
@@ -54,7 +54,7 @@
 
 /* Attachment Link */
 .attachment-link {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     text-decoration: none;
     font-size: 14px;
     transition: color 0.2s;
@@ -72,7 +72,7 @@
 }
 
 .attachment-link:visited {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 /* Paperclip icon button wrapper */
@@ -89,7 +89,7 @@
 }
 
 .icon-attachment-btn:focus {
-    outline: 2px solid rgba(0, 125, 184, 0.25);
+    outline: 2px solid rgba(var(--pz-accent-rgb), 0.25);
     outline-offset: 2px;
     border-radius: 4px;
 }

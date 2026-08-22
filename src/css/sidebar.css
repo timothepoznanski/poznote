@@ -5,64 +5,6 @@
  * update badge, new note/folder buttons, searchbar, and footer.
  */
 
-/* Sidebar header and primary action */
-.sidebar-header {
-    /* padding: 6px 0 14px 0; */
-    margin-bottom: 6px;
-}
-
-.sidebar-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 6px 2px;
-    position: relative;
-    /* anchor dropdown menus inside the title row */
-}
-
-.sidebar-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
-    /* dark */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.workspace-burger-icon {
-    font-size: 1.1rem;
-    color: #6c757d;
-    pointer-events: none;
-}
-
-.workspace-dropdown-icon {
-    margin-left: 1px;
-    font-size: 0.9rem;
-    color: #6c757d;
-    pointer-events: none;
-    transition: transform 0.2s ease;
-    position: relative;
-    top: 2px;
-}
-
-.workspace-title-icon {
-    width: 20px;
-    height: 20px;
-    vertical-align: middle;
-    pointer-events: none;
-}
-
-.workspace-title-text {
-    vertical-align: middle;
-    flex: 1;
-}
-
-.sidebar-title[role="button"] {
-    cursor: pointer;
-}
-
 /* Single workspace: the title is plain text, not a dropdown trigger */
 .sidebar-title.sidebar-title-static {
     cursor: default;
@@ -90,7 +32,7 @@
 }
 
 /* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
-   Needs !important to beat the shared #007DB8 below. */
+   Needs !important to beat the shared var(--pz-accent) below. */
 #sidebarNotificationsBtn.has-notifications .lucide-bell {
     color: #f59e0b !important;
     background-color: #f59e0b;
@@ -100,7 +42,7 @@
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -111,27 +53,17 @@
     justify-content: center;
 }
 
-.sidebar-plus {
-    background: transparent;
-    border: none;
-    color: #6c757d !important;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-}
-
 /* Hover and focus states for sidebar buttons */
 .sidebar-howto:hover,
 .sidebar-folder-toggle:hover,
 .sidebar-plus:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -164,13 +96,13 @@
 .sidebar-folder-toggle:hover,
 .sidebar-howto:hover,
 .sidebar-plus:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -193,83 +125,6 @@
 }
 
 /* Hide mobile burger menu completely */
-.sidebar-menu-btn {
-    display: none !important;
-}
-
-/* Sidebar dropdown menu */
-.sidebar-menu-dropdown {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: #fff;
-    border: 1px solid #e6eef8;
-    box-shadow: 0 8px 24px rgba(15, 120, 230, 0.08);
-    border-radius: 8px;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 60;
-    min-width: 180px;
-    margin-top: 4px;
-}
-
-.sidebar-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    transition: background-color 0.2s;
-    font-family: 'Inter', sans-serif;
-    background: transparent;
-    border: none;
-    width: 100%;
-    text-align: left;
-    border-radius: 6px;
-}
-
-.sidebar-menu-item:hover {
-    background: #f6fbff;
-    color: #007DB8;
-}
-
-.sidebar-menu-item i {
-    font-size: 18px;
-    color: #007DB8;
-    width: 20px;
-    text-align: center;
-}
-
-.sidebar-menu-item span {
-    flex: 1;
-}
-
-/* Update badge in menu item */
-.sidebar-menu-item .update-badge {
-    position: relative;
-    top: auto;
-    right: auto;
-    background: #ef4444;
-    color: white;
-    border-radius: 50%;
-    width: 12px;
-    height: 12px;
-    font-size: 8px;
-    /* font-weight: bold; */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-}
-
-.sidebar-menu-item .update-badge.update-badge-hidden {
-    display: none;
-}
-
 /* Reduce the size of Lucide icons in the sidebar */
 .sidebar-title-actions i,
 .sidebar-title-actions [class*="lucide-"],
@@ -291,7 +146,7 @@
     color: #6c757d !important;
 }
 
-/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
+/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
 
 .btn-new-note {
     display: inline-flex;
@@ -332,7 +187,7 @@
     gap: 10px;
     background: #f7fafc;
     /* subtle light */
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
     border: 1px solid #e6eef8;
     padding: 0 12px;
     border-radius: 8px;
@@ -346,7 +201,7 @@
 }
 
 .btn-new-folder i {
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
     font-size: 16px;
     width: 20px;
     height: 20px;
@@ -392,7 +247,7 @@
 }
 
 .folder-note-count {
-    color: #6b7280;
+    color: var(--pz-text-muted);
     margin-left: 6px;
     font-weight: 400;
 }
@@ -450,7 +305,7 @@
 /* Icon for linked notes */
 .note-type-icon-inline {
     font-size: 0.85em;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     margin-right: 4px;
     opacity: 0.8;
 }
@@ -471,7 +326,7 @@
 
 .note-icon:hover {
     transform: scale(1.15);
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 /* Notes without folder - indent to align with folder items */
@@ -482,7 +337,7 @@
 
 /* Hover effect: blue and bold title when hovering over a note */
 .links_arbo_left:hover .note-title {
-    color: #0b4da6 !important;
+    color: var(--pz-accent-strong) !important;
     font-weight: 600 !important;
     transition: color 0.2s ease, font-weight 0.2s ease;
 }
@@ -493,77 +348,11 @@
     /* remove blue background */
     /* keep layout consistent but remove rounded background */
     border-radius: 0;
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
 }
 
 .links_arbo_left.selected-note .note-title {
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
     font-weight: 600;
 }
 
-.create-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: #fff;
-    border: 1px solid #e6eef8;
-    box-shadow: 0 8px 24px rgba(15, 120, 230, 0.08);
-    border-radius: 8px;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    z-index: 60;
-    min-width: 140px;
-}
-
-.create-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #333;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s;
-    font-family: 'Inter', sans-serif;
-    background: transparent;
-    border: none;
-    width: 100%;
-    text-align: left;
-}
-
-.create-menu-item:last-child {
-    border-bottom: none;
-}
-
-.create-menu-item:hover {
-    background-color: #f8f9fa;
-    color: #007DB8;
-}
-
-.create-menu-item {
-    background: transparent;
-    border: none;
-    padding: 10px 12px;
-    text-align: left;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.create-menu-item:hover {
-    background: #f6fbff;
-}
-
-/* Enlarge icons in create menu */
-.create-menu-item i {
-    font-size: 20px;
-    margin-right: 10px;
-    color: #007DB8;
-}
-
-/* Override for Lucide icons in create menu */
-.create-menu-item i[class*="lucide-"],
-.create-menu-item [class*="lucide-"] {
-    font-size: 18px !important;
-}

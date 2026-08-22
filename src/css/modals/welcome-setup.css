@@ -33,7 +33,7 @@
 .welcome-setup-subtitle {
     margin: 0 auto;
     max-width: 400px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 14px;
     line-height: 1.5;
 }
@@ -64,7 +64,7 @@
     flex: 0 0 auto;
     width: 14px;
     height: 14px;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Compact sizing must out-rank the global iOS-zoom rule
@@ -106,7 +106,7 @@
 }
 
 .welcome-setup-tip:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background: #f0f9ff;
 }
 
@@ -114,14 +114,14 @@
     flex: 0 0 auto;
     width: 16px;
     height: 16px;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .welcome-setup-tip .welcome-setup-tip-arrow {
     margin-left: auto;
     width: 14px;
     height: 14px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
 }
 
 @media (max-width: 520px) {
@@ -156,7 +156,7 @@ body.dark-mode .welcome-setup-tip {
 :root[data-theme='dark'] .welcome-setup-tip:hover,
 body.dark-mode .welcome-setup-tip:hover {
     background: var(--dm-surface-hover);
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 :root[data-theme='dark'] .welcome-setup-tip .welcome-setup-tip-arrow,

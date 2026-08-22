@@ -7,7 +7,7 @@
 
 /* Boîte d'information */
 .info-box {
-    background: #e3f2fd;
+    background: var(--pz-accent-soft);
     border: 1px solid #1976d2;
     border-radius: 4px;
     padding: 12px;
@@ -38,7 +38,7 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #333;
+    color: var(--pz-text);
 }
 
 /* Form file input */
@@ -53,7 +53,7 @@
 }
 
 .form-file-input:hover {
-    border-color: #007cba;
+    border-color: var(--pz-accent);
     background: #f0f8ff;
 }
 
@@ -70,7 +70,7 @@
 
 .form-select-styled:focus {
     outline: none;
-    border-color: #007cba;
+    border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(0, 124, 186, 0.1);
 }
 
@@ -88,7 +88,7 @@
 }
 
 .form-text-danger {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: 500;
 }
 
@@ -133,12 +133,12 @@
 }
 
 .btn-primary {
-    background-color: #007cba;
+    background-color: var(--pz-accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 .btn-secondary {

@@ -239,7 +239,11 @@
                     $updated_json_escaped = htmlspecialchars($updated_json, ENT_QUOTES);
                     
                     // Prepare additional data for note info
-                    $folder_name = $row['folder'] ?? t('modals.folder.no_folder', [], 'No folder');
+                    // Legacy rows can store an empty string instead of NULL, so test the value and not just its presence
+                    $folder_name = trim((string)($row['folder'] ?? ''));
+                    if ($folder_name === '') {
+                        $folder_name = t('modals.folder.no_folder', [], 'No folder');
+                    }
                     // Get the complete folder path including parents
                     $folder_id = $row['folder_id'] ?? null;
                     $folder_path = $folder_id ? getFolderPath($folder_id, $con) : $folder_name;

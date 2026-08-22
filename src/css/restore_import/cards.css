@@ -8,7 +8,7 @@
 /* Card Container */
 .card-container {
     background: #fff;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
@@ -17,22 +17,22 @@
 
 .card-container:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    border-color: #007cba;
+    border-color: var(--pz-accent);
     transform: translateY(-2px);
 }
 
 /* Card Header */
 .card-header {
     padding: 20px 24px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, var(--pz-surface) 0%, #ffffff 100%);
+    border-bottom: 1px solid var(--pz-border);
     cursor: pointer;
     user-select: none;
     transition: background 0.2s ease;
 }
 
 .card-header:hover {
-    background: linear-gradient(135deg, #f0f4f8 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, #f0f4f8 0%, var(--pz-surface) 100%);
 }
 
 .card-header h3 {
@@ -46,7 +46,7 @@
 }
 
 .card-header h3 i.card-icon {
-    color: #007cba;
+    color: var(--pz-accent);
     font-size: 20px;
 }
 
@@ -95,7 +95,7 @@
 
 /* Sub-cards (for nested sections) */
 .sub-card {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     border: 1px solid #e9ecef;
     border-radius: 8px;
     margin-bottom: 16px;
@@ -119,7 +119,7 @@
 
 .sub-card h4 {
     margin: 0;
-    color: #333;
+    color: var(--pz-text);
     font-size: 16px;
     font-weight: 400;
     display: flex;
@@ -128,7 +128,7 @@
 }
 
 .sub-card h4 i.sub-card-icon {
-    color: #007cba;
+    color: var(--pz-accent);
     font-size: 16px;
 }
 
@@ -176,7 +176,7 @@
 }
 
 .accordion-header:hover {
-    color: #007cba;
+    color: var(--pz-accent);
 }
 
 .accordion-icon {

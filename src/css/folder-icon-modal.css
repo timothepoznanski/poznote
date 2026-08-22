@@ -26,7 +26,7 @@
 
 .folder-icon-description {
     margin: 0 0 20px 0;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 14px;
 }
 
@@ -104,7 +104,7 @@
 }
 
 .folder-icon-item:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     border-color: #6366f1;
     transform: scale(1.05);
 }
@@ -137,7 +137,7 @@
 }
 
 .folder-icon-modal-content .modal-buttons .btn-secondary:hover {
-    background: #d1d5db;
+    background: var(--pz-border-strong);
 }
 
 .folder-icon-modal-content .modal-buttons .btn-cancel {

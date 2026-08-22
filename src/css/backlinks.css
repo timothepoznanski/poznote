@@ -57,7 +57,7 @@
 
 /* Individual link — identical to .attachment-link */
 .backlink-link {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     text-decoration: none;
     font-size: 14px;
     transition: color 0.2s;
@@ -75,5 +75,5 @@
 }
 
 .backlink-link:visited {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }

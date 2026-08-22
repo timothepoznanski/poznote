@@ -34,7 +34,7 @@
 }
 
 .note-creation-loading-content i {
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 34px;
     line-height: 1;
 }
@@ -95,14 +95,14 @@ body.dark-mode .note-creation-loading-content {
 
 .alert-modal-header {
     padding: 20px 20px 0 20px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
 }
 
 .alert-modal-title {
     margin: 0 0 16px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     display: flex;
     align-items: center;
     gap: 10px;
@@ -158,22 +158,22 @@ body.dark-mode .note-creation-loading-content {
 }
 
 .alert-modal-button.primary {
-    background: var(--primary-color, #007DB8);
+    background: var(--primary-color, var(--pz-accent));
     color: white;
 }
 
 .alert-modal-button.primary:hover {
-    background: var(--primary-color-dark, #005a8a);
+    background: var(--primary-color-dark, var(--pz-accent-hover));
 }
 
 .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
 .alert-modal-button.primary.snapshot-restore-confirm-button {
-    background: #007DB8;
+    background: var(--pz-accent);
 }
 
 .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
 .alert-modal-button.primary.snapshot-restore-confirm-button:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 .alert-modal-button.secondary {
@@ -188,7 +188,7 @@ body.dark-mode .note-creation-loading-content {
 /* Destructive confirmation (confirmButtonClass: 'danger'): the confirm button
    carries the warning colour rather than the default primary blue. */
 .alert-modal-button.primary.danger {
-    background: #dc3545;
+    background: var(--pz-danger);
 }
 
 .alert-modal-button.primary.danger:hover {
@@ -231,13 +231,13 @@ html[data-theme='dark'] .alert-modal-button:hover,
 
 html[data-theme='dark'] .alert-modal-button.primary,
 .dark-mode .alert-modal-button.primary {
-    background-color: var(--primary-color, #007DB8);
+    background-color: var(--primary-color, var(--pz-accent));
     color: white;
 }
 
 html[data-theme='dark'] .alert-modal-button.primary:hover,
 .dark-mode .alert-modal-button.primary:hover {
-    background-color: var(--primary-color-dark, #005a8a);
+    background-color: var(--primary-color-dark, var(--pz-accent-hover));
 }
 
 /* Placed after the .primary rule above, which sets background-color and would
@@ -268,14 +268,14 @@ html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-butto
 html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-button,
 .dark-mode .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
 .dark-mode .alert-modal-button.primary.snapshot-restore-confirm-button {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
 html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-button:hover,
 .dark-mode .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
 .dark-mode .alert-modal-button.primary.snapshot-restore-confirm-button:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 /* Responsive */
@@ -319,7 +319,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 .progress-container {
     width: 100%;
     height: 12px;
-    background: var(--border-color, #e0e0e0);
+    background: var(--border-color, var(--pz-border));
     border-radius: 6px;
     overflow: hidden;
     margin: 15px 0;
@@ -328,7 +328,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 
 .progress-bar-inner {
     height: 100%;
-    background: var(--primary-color, #007DB8);
+    background: var(--primary-color, var(--pz-accent));
     width: 0%;
     position: absolute;
     left: 0;
@@ -349,8 +349,8 @@ html[data-theme='dark'] .progress-container,
 .spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid var(--border-color, #e0e0e0);
-    border-top: 2px solid var(--primary-color, #007DB8);
+    border: 2px solid var(--border-color, var(--pz-border));
+    border-top: 2px solid var(--primary-color, var(--pz-accent));
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -369,7 +369,7 @@ html[data-theme='dark'] .progress-container,
 html[data-theme='dark'] .spinner,
 .dark-mode .spinner {
     border-color: var(--border-color-dark, #4a5568);
-    border-top-color: var(--primary-color, #007DB8);
+    border-top-color: var(--primary-color, var(--pz-accent));
 }
 
 /* Admin contact modal (SaaS mode): two routing options, GitHub for general
@@ -394,8 +394,8 @@ html[data-theme='dark'] .spinner,
     flex: none;
     margin-top: 3px;
     font-size: 1.1rem;
-    color: #007DB8;
-    background-color: #007DB8;
+    color: var(--pz-accent);
+    background-color: var(--pz-accent);
 }
 .admin-contact-option-title {
     display: block;
@@ -404,7 +404,7 @@ html[data-theme='dark'] .spinner,
 }
 .admin-contact-option-desc {
     display: block;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 0.92rem;
     line-height: 1.45;
 }
@@ -413,7 +413,7 @@ html[data-theme='dark'] .spinner,
     align-items: center;
     gap: 5px;
     margin-top: 8px;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 600;
     text-decoration: none;
 }
@@ -451,8 +451,8 @@ html[data-theme='dark'] .spinner,
     color: inherit;
 }
 .admin-contact-copy:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 .admin-contact-copy .lucide {
     font-size: 0.9em;

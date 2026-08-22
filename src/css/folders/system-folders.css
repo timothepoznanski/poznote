@@ -45,7 +45,7 @@
 
 .system-menu-item i {
     font-size: 14px;
-    color: #007DB8;
+    color: var(--pz-accent);
     width: 20px;
     text-align: center;
 }
@@ -53,7 +53,7 @@
 .system-menu-item span:not(.menu-item-count) {
     flex: 1;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .system-menu-item .menu-item-count {
@@ -68,7 +68,7 @@
 .system-folder .lucide-more-vertical.folder-icon {
     font-size: 1em !important;
     margin-right: 0 !important;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Dossiers système: affichage en icônes uniquement */
@@ -91,7 +91,7 @@
 .system-folder:not([data-folder="Favorites"]) [class*="lucide-"].folder-icon {
     font-size: 1em !important;
     margin-right: 0 !important;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .system-folder[data-folder="Favorites"] [class*="lucide-"].folder-icon {
@@ -124,6 +124,6 @@
 }
 
 .system-folder:not([data-folder="Favorites"]) .folder-toggle:hover .folder-icon {
-    color: #005a8a;
+    color: var(--pz-accent-hover);
     transform: scale(1.15);
 }

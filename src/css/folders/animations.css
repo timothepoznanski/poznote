@@ -57,7 +57,7 @@ body.dark-mode #new-note-loading-placeholder {
 
 @keyframes folderRevealFlash {
     0%, 50% {
-        background-color: rgba(0, 125, 184, 0.18);
+        background-color: rgba(var(--pz-accent-rgb), 0.18);
     }
     100% {
         background-color: transparent;

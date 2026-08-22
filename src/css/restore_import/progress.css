@@ -16,14 +16,14 @@
     width: 20px;
     height: 20px;
     border: 3px solid rgba(0, 0, 0, 0.08);
-    border-top-color: #007cba;
+    border-top-color: var(--pz-accent);
     border-radius: 50%;
     animation: restore-spin 1s linear infinite;
 }
 
 .restore-spinner-text {
     font-size: 13px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .sr-only {
@@ -51,11 +51,11 @@
 }
 
 .backup-item {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     padding: 15px;
     margin-bottom: 12px;
-    background: #f8f9fa;
+    background: var(--pz-surface);
 }
 
 .backup-item:last-child {
@@ -70,7 +70,7 @@
 }
 
 .backup-header strong {
-    color: #333;
+    color: var(--pz-text);
     font-size: 16px;
 }
 

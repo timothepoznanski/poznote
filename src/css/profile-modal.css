@@ -79,7 +79,7 @@
 
 :is(#editProfileModal, #confirmLogoutModal) input:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons {
@@ -102,16 +102,16 @@
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-primary {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #fff;
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger {
-    background-color: #dc3545;
+    background-color: var(--pz-danger);
     color: #fff;
 }
 

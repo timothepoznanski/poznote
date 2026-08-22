@@ -5,7 +5,7 @@ body.tasks-page {
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--bg-color, #ffffff);
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .tasks-container {
@@ -66,7 +66,7 @@ body.tasks-page {
     height: 100%;
     width: 0;
     border-radius: 4px;
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     transition: width 0.3s ease;
 }
 
@@ -90,7 +90,7 @@ body.tasks-page {
     height: 14px;
     margin: 0;
     cursor: pointer;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
 }
 
 [data-theme="dark"] .tasks-progress-option {
@@ -116,23 +116,23 @@ body.tasks-page {
 
 .tasks-filter-chip {
     padding: 6px 14px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 16px;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .tasks-filter-chip:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .tasks-filter-chip.active {
-    background-color: #007DB8;
-    border-color: #007DB8;
+    background-color: var(--pz-accent);
+    border-color: var(--pz-accent);
     color: #ffffff;
 }
 
@@ -149,10 +149,10 @@ body.tasks-page {
     /* Same vertical metrics as the filter chips (6px padding, 13px font) so
        both end up the same height on the shared row */
     padding: 6px 36px 6px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 13px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, #ffffff);
     transition: all 0.2s ease;
     box-sizing: border-box;
@@ -160,8 +160,8 @@ body.tasks-page {
 
 .filter-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .clear-filter-btn {
@@ -179,7 +179,7 @@ body.tasks-page {
 }
 
 .clear-filter-btn:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Collapse-all / expand-all chevrons, right of the filter input */
@@ -196,17 +196,17 @@ body.tasks-page {
     width: 29px;
     height: 29px;
     padding: 0;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .tasks-collapse-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 /* Note groups */
@@ -220,7 +220,7 @@ body.tasks-page {
     align-items: center;
     gap: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
 }
 
 .tasks-note-toggle {
@@ -240,7 +240,7 @@ body.tasks-page {
 }
 
 .tasks-note-toggle:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .tasks-note-toggle i {
@@ -258,7 +258,7 @@ body.tasks-page {
 .note-name {
     font-weight: 500;
     font-size: 16px;
-    color: #007DB8;
+    color: var(--pz-accent);
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -287,8 +287,8 @@ body.tasks-page {
     align-items: center;
     gap: 5px;
     font-size: 11px;
-    color: #007DB8;
-    background-color: rgba(0, 125, 184, 0.1);
+    color: var(--pz-accent);
+    background-color: rgba(var(--pz-accent-rgb), 0.1);
     padding: 2px 8px;
     border-radius: 4px;
     white-space: nowrap;
@@ -323,7 +323,7 @@ body.tasks-page {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
     flex-shrink: 0;
     /* Center on the first text line now that the row is top-aligned */
     margin-top: 2px;
@@ -339,13 +339,13 @@ body.tasks-page {
 }
 
 .tasks-task-text a {
-    color: #007DB8;
+    color: var(--pz-accent);
     text-decoration: none;
     word-break: break-all;
 }
 
 .tasks-task-text a:hover {
-    color: #005a8a;
+    color: var(--pz-accent-hover);
     text-decoration: underline;
 }
 
@@ -383,7 +383,7 @@ body.tasks-page {
 }
 
 .tasks-task-due-btn:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
     opacity: 1;
 }
 
@@ -406,8 +406,8 @@ body.tasks-page {
 }
 
 .task-due-chip:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .task-due-chip i {
@@ -428,7 +428,7 @@ body.tasks-page {
 .tasks-view-toggle {
     display: flex;
     flex-shrink: 0;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     overflow: hidden;
 }
@@ -442,17 +442,17 @@ body.tasks-page {
     padding: 0;
     border: none;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .tasks-view-btn:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .tasks-view-btn.active {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #ffffff;
 }
 
@@ -486,10 +486,10 @@ body.tasks-page {
     align-items: center;
     justify-content: center;
     height: 28px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -507,8 +507,8 @@ body.tasks-page {
 
 .tasks-cal-nav:hover,
 .tasks-cal-today-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .tasks-cal-title {
@@ -534,7 +534,7 @@ body.tasks-page {
     text-align: center;
     font-size: 11px;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     padding: 6px 0;
     background: var(--bg-color, #ffffff);
 }
@@ -552,16 +552,16 @@ body.tasks-page {
 }
 
 .tasks-cal-day:hover {
-    background-color: rgba(0, 125, 184, 0.05);
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
 }
 
 .tasks-cal-day.selected {
-    box-shadow: inset 0 0 0 2px #007DB8;
+    box-shadow: inset 0 0 0 2px var(--pz-accent);
 }
 
 .tasks-cal-day.drag-over {
-    box-shadow: inset 0 0 0 2px #007DB8;
-    background-color: rgba(0, 125, 184, 0.08);
+    box-shadow: inset 0 0 0 2px var(--pz-accent);
+    background-color: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 .tasks-cal-day-num {
@@ -577,7 +577,7 @@ body.tasks-page {
 }
 
 .tasks-cal-day.today .tasks-cal-day-num {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #ffffff;
     font-weight: 600;
 }
@@ -598,10 +598,10 @@ body.tasks-page {
     width: 100%;
     padding: 2px 6px;
     border: none;
-    border-left: 3px solid #007DB8;
+    border-left: 3px solid var(--pz-accent);
     border-radius: 4px;
-    background: rgba(0, 125, 184, 0.1);
-    color: var(--text-color, #333333);
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--text-color, var(--pz-text));
     font-size: 11px;
     font-family: inherit;
     line-height: 1.5;
@@ -613,7 +613,7 @@ body.tasks-page {
 
 .tasks-cal-chip-time {
     font-weight: 600;
-    color: #007DB8;
+    color: var(--pz-accent);
     flex-shrink: 0;
 }
 
@@ -713,7 +713,7 @@ body.tasks-page {
         padding: 0;
         border-left: none;
         border-radius: 2px;
-        background: #007DB8;
+        background: var(--pz-accent);
     }
 
     .tasks-cal-chip .tasks-cal-chip-time,
@@ -727,7 +727,7 @@ body.tasks-page {
     }
 
     .tasks-cal-chip.completed {
-        background: #9ca3af;
+        background: var(--pz-text-subtle);
     }
 }
 
@@ -765,10 +765,6 @@ body.tasks-page {
     text-align: center;
     padding: 40px;
     color: #666;
-}
-
-.initially-hidden {
-    display: none;
 }
 
 /* Mobile: dated tasks show the due date on the first line, then the task
@@ -900,8 +896,8 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-filter-chip.active {
-    background-color: #007DB8;
-    border-color: #007DB8;
+    background-color: var(--pz-accent);
+    border-color: var(--pz-accent);
     color: #ffffff;
 }
 
@@ -911,8 +907,8 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-collapse-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 [data-theme="dark"] .tasks-progress-bar {
@@ -977,7 +973,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-view-btn.active {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #ffffff;
 }
 
@@ -1017,7 +1013,7 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-cal-day.today .tasks-cal-day-num {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #ffffff;
 }
 

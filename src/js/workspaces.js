@@ -214,6 +214,11 @@ function switchToWorkspace(workspaceName) {
     // Remember the old workspace for tab saving
     var oldWorkspace = selectedWorkspace;
     selectedWorkspace = workspaceName;
+    // Keep the body attribute in sync for scripts that read it instead of
+    // the JS variable (the page is not reloaded on this path)
+    if (document.body && document.body.dataset) {
+        document.body.dataset.workspace = workspaceName;
+    }
 
     // Save last opened workspace to database
     if (typeof saveLastOpenedWorkspace === 'function') {
@@ -231,6 +236,11 @@ function switchToWorkspace(workspaceName) {
     // Switch tabs: save old workspace's tabs, load new workspace's tabs
     if (window.tabManager && typeof window.tabManager.switchWorkspace === 'function') {
         window.tabManager.switchWorkspace(oldWorkspace);
+    }
+
+    // The AI chat is scoped to the workspace: swap its conversation too
+    if (window.AIChat && typeof window.AIChat.switchWorkspace === 'function') {
+        window.AIChat.switchWorkspace(oldWorkspace);
     }
 
     var url = new URL(window.location.href);

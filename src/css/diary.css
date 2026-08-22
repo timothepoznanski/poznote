@@ -65,12 +65,12 @@
 /* favorites.css provides .btn/.btn-secondary but not .btn-primary
    (dark mode is covered by css/dark-mode/components.css) */
 .diary-page .btn-primary {
-    background: #007cba;
+    background: var(--pz-accent);
     color: white !important;
 }
 
 .diary-page .btn-primary:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 /* Diary switcher: one pill per diary, shown when the workspace has several */
@@ -98,13 +98,13 @@
 }
 
 .diary-switch-btn:hover {
-    border-color: #007cba;
-    color: #007cba;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .diary-switch-btn.diary-switch-active {
-    background: #007cba;
-    border-color: #007cba;
+    background: var(--pz-accent);
+    border-color: var(--pz-accent);
     color: #ffffff;
 }
 
@@ -147,7 +147,7 @@
     width: 100%;
     box-sizing: border-box;
     padding: 8px 10px;
-    border: 1.5px solid #d1d5db;
+    border: 1.5px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
     background: transparent;
@@ -156,7 +156,7 @@
 
 .diary-new-modal .diary-new-input:focus {
     outline: none;
-    border-color: #007cba;
+    border-color: var(--pz-accent);
 }
 
 .diary-new-modal .diary-new-error {
@@ -167,16 +167,16 @@
 
 /* Highlight today's card in the grid */
 .diary-card-today {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .diary-today-tag {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
 }
 
 .diary-empty .lucide {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Dark mode */

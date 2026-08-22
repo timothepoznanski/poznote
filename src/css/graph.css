@@ -12,7 +12,7 @@ body.graph-page {
 
 body.graph-page {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     overflow: hidden;
 }
 
@@ -51,7 +51,7 @@ body.graph-page {
     width: 100%;
     box-sizing: border-box;
     padding: 8px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
     background: #ffffff;
@@ -60,13 +60,13 @@ body.graph-page {
 
 .graph-search-input:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .graph-folder-select {
     max-width: 220px;
     padding: 7px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 13px;
     background: #ffffff;
@@ -76,7 +76,7 @@ body.graph-page {
 
 .graph-folder-select:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .graph-options {
@@ -100,7 +100,7 @@ body.graph-page {
 
 .graph-stats {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     white-space: nowrap;
 }
 
@@ -109,7 +109,7 @@ body.graph-page {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: #ffffff;
     font-size: 13px;
@@ -119,7 +119,7 @@ body.graph-page {
 }
 
 .graph-reset-btn:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
 }
 
 /* Canvas --------------------------------------------------------------- */
@@ -141,7 +141,7 @@ body.graph-page {
     align-items: center;
     gap: 5px;
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     white-space: nowrap;
     pointer-events: none;
 }
@@ -221,7 +221,7 @@ body.graph-page {
 }
 
 .graph-node.search-hit circle {
-    stroke: #007DB8;
+    stroke: var(--pz-accent);
     stroke-width: 2.5;
 }
 
@@ -250,7 +250,7 @@ body.graph-page {
 .graph-tooltip-meta {
     margin-top: 2px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 /* Loading / empty states ------------------------------------------------ */
@@ -264,7 +264,7 @@ body.graph-page {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     text-align: center;
     padding: 20px;
 }
@@ -291,7 +291,7 @@ body.graph-page {
 /* Dark mode ------------------------------------------------------------- */
 
 html[data-theme="dark"] body.graph-page {
-    background: var(--dm-bg, #252526);
+    background: var(--dm-bg, var(--dm-content-bg));
 }
 
 html[data-theme="dark"] .graph-toolbar {
@@ -299,23 +299,23 @@ html[data-theme="dark"] .graph-toolbar {
 }
 
 html[data-theme="dark"] .graph-search-input {
-    background: var(--dm-content-bg, #252526);
-    border-color: var(--dm-border, #404040);
-    color: var(--dm-text, #bebebe);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text, var(--dm-text));
 }
 
 html[data-theme="dark"] .graph-search-input:focus {
-    border-color: var(--dm-accent, #4a9eff);
+    border-color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme="dark"] .graph-folder-select {
-    background: var(--dm-content-bg, #252526);
-    border-color: var(--dm-border, #404040);
-    color: var(--dm-text-muted, #c5c5c5);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-folder-select:focus {
-    border-color: var(--dm-accent, #4a9eff);
+    border-color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme="dark"] .graph-hint {
@@ -327,17 +327,17 @@ html[data-theme="dark"] .graph-orphans-toggle,
 html[data-theme="dark"] .graph-stats,
 html[data-theme="dark"] .graph-loading,
 html[data-theme="dark"] .graph-empty {
-    color: var(--dm-text-muted, #c5c5c5);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-reset-btn {
-    background: var(--dm-content-bg, #252526);
-    border-color: var(--dm-border, #404040);
-    color: var(--dm-text-muted, #c5c5c5);
+    background: var(--dm-content-bg, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-border));
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-reset-btn:hover {
-    background: var(--dm-surface, #333333);
+    background: var(--dm-surface, var(--dm-surface));
 }
 
 html[data-theme="dark"] .graph-edge {
@@ -349,29 +349,29 @@ html[data-theme="dark"] .graph-edge.hl {
 }
 
 html[data-theme="dark"] .graph-node circle {
-    stroke: var(--dm-bg, #252526);
+    stroke: var(--dm-bg, var(--dm-content-bg));
 }
 
 html[data-theme="dark"] .graph-label {
-    fill: var(--dm-text-muted, #c5c5c5);
+    fill: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 html[data-theme="dark"] .graph-node.search-hit circle {
-    stroke: var(--dm-accent, #4a9eff);
+    stroke: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme="dark"] .graph-tooltip {
-    background: var(--dm-surface, #333333);
-    border-color: var(--dm-border, #404040);
+    background: var(--dm-surface, var(--dm-surface));
+    border-color: var(--dm-border, var(--dm-border));
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 html[data-theme="dark"] .graph-tooltip-title {
-    color: var(--dm-text, #bebebe);
+    color: var(--dm-text, var(--dm-text));
 }
 
 html[data-theme="dark"] .graph-tooltip-meta {
-    color: var(--dm-text-muted, #c5c5c5);
+    color: var(--dm-text-muted, var(--dm-text-muted));
 }
 
 /* Responsive ------------------------------------------------------------ */

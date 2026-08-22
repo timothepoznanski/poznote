@@ -41,7 +41,7 @@
     gap: 6px;
     padding: 5px 8px 5px 12px;
     border-radius: 6px 6px 0 0;
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     cursor: pointer;
     max-width: 200px;
     min-width: 80px;
@@ -62,8 +62,8 @@
 
 .app-tab.active {
     background: #fff;
-    border-color: #d1d5db;
-    border-top: 2px solid #007DB8;
+    border-color: var(--pz-border-strong);
+    border-top: 2px solid var(--pz-accent);
     font-weight: 500;
     z-index: 1;
 }
@@ -85,7 +85,7 @@
     border: none;
     cursor: pointer;
     padding: 1px 4px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     font-size: 1rem;
     line-height: 1;
     border-radius: 3px;
@@ -124,7 +124,7 @@
     border-radius: 6px;
     background: #fff;
     box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.12), 9px 0 0 0 #fff;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-family: inherit;
     font-size: 0.75rem;
     line-height: 1;
@@ -133,8 +133,8 @@
 }
 
 .app-tab-close-all:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border-strong);
     color: #b91c1c;
 }
 
@@ -163,7 +163,7 @@
 }
 
 .app-tab-pin-icon .lucide-pin {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
 }
 
@@ -172,7 +172,7 @@
 .app-tab-context-menu {
     position: fixed;
     background: #fff;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     min-width: 160px;
@@ -193,7 +193,7 @@
 }
 
 .app-tab-context-item:hover {
-    background-color: #f3f4f6;
+    background-color: var(--pz-surface-hover);
 }
 
 .app-tab-context-icon {
@@ -242,7 +242,7 @@
 [data-theme="dark"] .app-tab.active {
     background: var(--dm-tab-active-bg);
     border-color: var(--dm-border-light);
-    border-top: 2px solid #007DB8;
+    border-top: 2px solid var(--pz-accent);
 }
 
 [data-theme="dark"] .app-tab-title {
@@ -284,7 +284,7 @@
 
 [data-theme="dark"] .app-tab-context-menu {
     background: #2a2a2a;
-    border-color: #3a3a3a;
+    border-color: var(--dm-surface-hover);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
@@ -305,7 +305,7 @@
 }
 
 [data-theme="dark"] .app-tab-context-separator {
-    background: #3a3a3a;
+    background: var(--dm-surface-hover);
 }
 
 /* ── Note actions (3-dot menu in sidebar) ── */
@@ -358,196 +358,6 @@ body.note-actions-hidden .note-list-item > a.links_arbo_left {
     padding-right: 6px;
 }
 
-/* Same box, icon size and hover treatment as .folder-actions-toggle
-   (css/folders/actions-menu.css), so the note and folder three-dot buttons
-   read as one control. Only the visibility rule below differs: note toggles
-   appear on row hover instead of being permanently visible. */
-.note-actions-toggle,
-.note-actions-item {
-    background: none;
-    border: none;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    cursor: pointer;
-    color: #6b7280;
-    border-radius: 4px;
-    line-height: 1;
-    display: none;
-    /* hidden until parent row is hovered */
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
-
-.note-list-item:hover .note-actions-toggle,
-.note-list-item:hover .note-actions-item,
-.note-actions-toggle.open {
-    display: inline-flex;
-}
-
-.note-actions-toggle i,
-.note-actions-item i {
-    font-size: 0.8em;
-    transition: color 0.15s ease;
-}
-
-.note-actions-toggle i[class*="lucide-"],
-.note-actions-toggle [class*="lucide-"],
-.note-actions-item i[class*="lucide-"],
-.note-actions-item [class*="lucide-"] {
-    font-size: 0.85em !important;
-}
-
-.note-actions-toggle:hover,
-.note-actions-item:hover {
-    background: rgba(107, 114, 128, 0.12);
-    color: #374151;
-}
-
-.note-actions-toggle:hover i,
-.note-actions-toggle:hover [class*="lucide-"],
-.note-actions-item:hover i,
-.note-actions-item:hover [class*="lucide-"] {
-    color: #007DB8;
-}
-
-/* Single shared menu, placed by adjustMenuPosition() in js/utils.js. Fixed
-   rather than absolute because #left_col scrolls (overflow-y: scroll,
-   overflow-x: hidden), which would clip a menu positioned inside a row. */
-.note-actions-menu {
-    position: fixed;
-    background: white;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    min-width: 180px;
-    padding: 6px 0;
-    z-index: 10000;
-    display: none;
-    opacity: 0;
-}
-
-.note-actions-menu.show {
-    display: block;
-    animation: noteMenuFadeIn 0.2s ease-out forwards;
-}
-
-@keyframes noteMenuFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.note-actions-menu-item {
-    padding: 8px 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #374151;
-    font-size: 0.875rem;
-    transition: background-color 0.15s ease;
-    white-space: nowrap;
-}
-
-.note-actions-menu-item:hover {
-    background-color: #f3f4f6;
-}
-
-.note-actions-menu-item i {
-    font-size: 0.85em;
-    color: #6b7280;
-    width: 14px;
-    text-align: center;
-}
-
-.note-actions-menu-item:hover i {
-    color: #374151;
-}
-
-/* Destructive and "already shared" items, matching the folder menu */
-.note-actions-menu-item.danger,
-.note-actions-menu-item.shared {
-    color: #dc2626;
-}
-
-.note-actions-menu-item.danger:hover,
-.note-actions-menu-item.shared:hover {
-    background-color: #fee2e2;
-}
-
-.note-actions-menu-item.danger i,
-.note-actions-menu-item.shared i {
-    color: #dc2626;
-}
-
-/* No hover on touch screens, so the toggle has to stay visible there. */
-@media (hover: none), (max-width: 800px) {
-    .note-actions-toggle {
-        display: inline-flex;
-    }
-}
-
-/* ── Note actions dark mode ── */
-
-/* Mirrors the dark .folder-actions-toggle rules in css/dark-mode/menus.css */
-[data-theme="dark"] .note-actions-toggle,
-[data-theme="dark"] .note-actions-item {
-    color: #b0b0b0;
-}
-
-[data-theme="dark"] .note-actions-toggle:hover,
-[data-theme="dark"] .note-actions-toggle.open,
-[data-theme="dark"] .note-actions-item:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--dm-text);
-}
-
-[data-theme="dark"] .note-actions-toggle:hover i,
-[data-theme="dark"] .note-actions-toggle:hover [class*="lucide-"],
-[data-theme="dark"] .note-actions-item:hover i,
-[data-theme="dark"] .note-actions-item:hover [class*="lucide-"] {
-    color: #38bdf8;
-}
-
-[data-theme="dark"] .note-actions-menu {
-    background: #2a2a2a;
-    border-color: #3a3a3a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .note-actions-menu-item {
-    color: #d1d5db;
-}
-
-[data-theme="dark"] .note-actions-menu-item:hover {
-    background-color: #383838;
-}
-
-[data-theme="dark"] .note-actions-menu-item i {
-    color: #9ca3af;
-}
-
-[data-theme="dark"] .note-actions-menu-item:hover i {
-    color: #e5e7eb;
-}
-
-/* Same specificity as the rules above, so these must come after them to win. */
-[data-theme="dark"] .note-actions-menu-item.danger,
-[data-theme="dark"] .note-actions-menu-item.shared,
-[data-theme="dark"] .note-actions-menu-item.danger i,
-[data-theme="dark"] .note-actions-menu-item.shared i {
-    color: #f87171;
-}
-
-[data-theme="dark"] .note-actions-menu-item.danger:hover,
-[data-theme="dark"] .note-actions-menu-item.shared:hover {
-    background-color: rgba(220, 38, 38, 0.18);
-}
+/* The note three-dot toggle (.note-actions-toggle) and its menu
+   (.note-actions-menu) share their rules with the folder ones in
+   css/folders/actions-menu.css and css/dark-mode/menus.css. */

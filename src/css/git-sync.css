@@ -53,22 +53,6 @@ body.git-sync-page {
     gap: 10px;
 }
 
-.alert i {
-    font-size: 1.2rem;
-}
-
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
 .alert-warning {
     background: #fff3cd;
     color: #856404;
@@ -110,7 +94,7 @@ body.git-sync-page {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .git-sync-section h2 i {
@@ -132,8 +116,6 @@ body.git-sync-page {
     border-bottom: 1px solid #eee;
 }
 
-
-
 .config-item:last-child {
     border-bottom: none;
 }
@@ -144,7 +126,7 @@ body.git-sync-page {
 }
 
 .config-value {
-    color: #333;
+    color: var(--pz-text);
 }
 
 .config-hint {
@@ -229,12 +211,12 @@ body.git-sync-page {
 }
 
 .debug-controls .btn[aria-pressed="true"] {
-    background: #007cba;
+    background: var(--pz-accent);
     color: #fff;
 }
 
 .debug-info {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     border: 1px solid #dee2e6;
     border-radius: 4px;
     padding: 15px;
@@ -296,7 +278,7 @@ body.git-sync-page {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 8px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .sync-action-card p {
@@ -349,12 +331,12 @@ body.git-sync-page {
 }
 
 .btn-primary {
-    background-color: #007cba;
+    background-color: var(--pz-accent);
     color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
     transform: translateY(-1px);
 }
 
@@ -423,7 +405,7 @@ body.git-sync-page {
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 16px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .setup-instructions ol {
@@ -496,7 +478,7 @@ body.dark-mode .git-field-input {
 
 body.dark-mode .git-field-input:focus {
     background: var(--dm-surface-hover);
-    border-color: #007cba;
+    border-color: var(--pz-accent);
     box-shadow: none;
 }
 
@@ -549,19 +531,19 @@ body.dark-mode .btn-secondary {
 }
 
 body.dark-mode .btn-secondary:hover {
-    background: #404040;
+    background: var(--dm-border);
 }
 
 html[data-theme='dark'] .debug-controls .btn[aria-pressed="true"],
 body.dark-mode .debug-controls .btn[aria-pressed="true"] {
-    background: #007cba;
+    background: var(--pz-accent);
     color: #fff;
 }
 
 html[data-theme='dark'] .debug-info,
 body.dark-mode .debug-info {
-    background: var(--dm-surface, #252526);
-    border-color: var(--dm-border, #3a3a3a);
+    background: var(--dm-surface, var(--dm-content-bg));
+    border-color: var(--dm-border, var(--dm-surface-hover));
     color: var(--dm-text, #e0e0e0);
 }
 
@@ -658,8 +640,6 @@ body.dark-mode .repo-link {
     color: #a5b4fc;
 }
 
-
-
 /* Responsive */
 @media (max-width: 600px) {
     .git-sync-header h1 {
@@ -696,7 +676,7 @@ body.dark-mode .auto-sync-settings {
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 16px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 body.dark-mode .auto-sync-settings h4 {
@@ -732,7 +712,7 @@ body.dark-mode .form-check {
 .label-title {
     font-weight: 500;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--pz-text);
 }
 
 body.dark-mode .label-title {
@@ -831,7 +811,7 @@ input:checked+.slider:before {
 
 .git-field-input {
     padding: 10px 14px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 10px;
     font-size: 0.92rem;
     background: #f9fafb;
@@ -843,19 +823,19 @@ input:checked+.slider:before {
 
 .git-field-input:focus {
     outline: none;
-    border-color: #007cba;
+    border-color: var(--pz-accent);
     background: #fff;
     box-shadow: none;
 }
 
 .git-field-input[readonly]:focus {
-    border-color: #d1d5db;
+    border-color: var(--pz-border-strong);
     background: #f9fafb;
     box-shadow: none;
 }
 
 .git-field-input::placeholder {
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
 }
 
 select.git-field-input {

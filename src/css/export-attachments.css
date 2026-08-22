@@ -24,7 +24,7 @@
 
 /* Empty state title */
 .empty-state-title {
-    color: #333;
+    color: var(--pz-text);
     margin-bottom: 15px;
     font-size: 24px;
 }

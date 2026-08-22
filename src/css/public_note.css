@@ -252,7 +252,7 @@ body.public-note-page {
     padding: 2px 6px;
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
     font-size: 0.9em;
-    color: #333;
+    color: var(--pz-text);
     border-radius: 3px;
 }
 
@@ -270,7 +270,7 @@ body.public-note-page {
     word-wrap: break-word !important;
     overflow-wrap: break-word !important;
     font-size: var(--code-block-font-size, 15px) !important;
-    color: #333;
+    color: var(--pz-text);
     width: 100%;
     box-sizing: border-box;
 }
@@ -328,7 +328,7 @@ body.public-note-page {
 .public-note .content .code-block-copy-btn:hover,
 .code-block-copy-btn:hover {
     background-color: #fff;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .public-note .content .code-block-copy-btn:hover {
@@ -346,7 +346,7 @@ body.public-note-page {
 .public-note .content .code-block-copy-btn.copied {
     background: transparent;
     border: none;
-    color: #28a745;
+    color: var(--pz-success);
 }
 
 .public-note .content .code-block-copy-btn svg,
@@ -463,7 +463,7 @@ body.public-note-page {
 }
 
 .public-task-delete-btn:hover {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 /* Interactive task text */
@@ -496,7 +496,7 @@ body.public-note-page {
 
 .public-task-edit-title {
     margin: 0 0 8px 0;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     font-size: 18px;
     font-weight: 600;
 }
@@ -528,7 +528,7 @@ body.public-note-page {
 /* Horizontal rule */
 .public-note .content hr {
     border: 0;
-    border-top: 2px solid #e0e0e0;
+    border-top: 2px solid var(--pz-border);
     margin: 2em 0;
 }
 
@@ -567,7 +567,7 @@ body.public-note-page {
     font-size: 2em;
     font-weight: bold;
     margin: 0.67em 0;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid var(--pz-border);
     padding-bottom: 0.3em;
 }
 
@@ -575,7 +575,7 @@ body.public-note-page {
     font-size: 1.5em;
     font-weight: bold;
     margin: 0.75em 0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
 }
 
@@ -677,7 +677,7 @@ body.public-note-page {
 
 .public-note-attachment-link:hover,
 .public-note-attachment-link:focus {
-    border-color: #007db8;
+    border-color: var(--pz-accent);
     background: #f7fbfd;
     color: #005a8b;
     text-decoration: none;
@@ -752,7 +752,7 @@ body.public-note-page {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 18px;
-    color: #333;
+    color: var(--pz-text);
     transition: all 0.2s;
     display: flex;
     align-items: center;
@@ -935,7 +935,7 @@ html[data-theme='dark'] .public-note .content [style*="color:black"] {
     border: 1px solid #ddd;
     border-radius: 6px;
     background: #fff;
-    color: #333;
+    color: var(--pz-text);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 14px;
     line-height: 1.6;

@@ -15,6 +15,23 @@
     var STORAGE_KEY = 'poznote-ai-chat-conversation';
     var MAX_STORED_MESSAGES = 40; // matches the backend's conversation window
 
+    /**
+     * Workspace the chat is scoped to. The workspace menu switches without a
+     * page reload (history.pushState), so the live JS variable is the source
+     * of truth and body[data-workspace] only the initial value.
+     */
+    function currentWorkspace() {
+        var ws = '';
+        if (typeof window.getSelectedWorkspace === 'function') ws = window.getSelectedWorkspace() || '';
+        if (!ws && document.body && document.body.dataset) ws = document.body.dataset.workspace || '';
+        return ws;
+    }
+
+    /** One stored conversation per workspace, so switching back restores it. */
+    function storageKey(workspace) {
+        return STORAGE_KEY + '::' + (workspace || '');
+    }
+
     function t(key, vars, fallback) {
         if (typeof window.t === 'function') return window.t(key, vars, fallback);
         return fallback || key;
@@ -173,12 +190,13 @@
         scrollToBottom();
     }
 
-    function saveConversation() {
+    function saveConversation(workspace) {
+        var key = storageKey(workspace !== undefined ? workspace : currentWorkspace());
         try {
             if (conversation.length) {
-                sessionStorage.setItem(STORAGE_KEY, JSON.stringify(conversation.slice(-MAX_STORED_MESSAGES)));
+                sessionStorage.setItem(key, JSON.stringify(conversation.slice(-MAX_STORED_MESSAGES)));
             } else {
-                sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(key);
             }
         } catch (e) {
             // Storage full or unavailable — persistence is best-effort
@@ -188,7 +206,7 @@
     function restoreConversation() {
         var raw;
         try {
-            raw = sessionStorage.getItem(STORAGE_KEY);
+            raw = sessionStorage.getItem(storageKey(currentWorkspace()));
         } catch (e) {
             return;
         }
@@ -241,18 +259,36 @@
         }
     }
 
+    function resetMessages() {
+        var el = messagesEl();
+        if (!el) return;
+        el.innerHTML = '';
+        var hint = document.createElement('div');
+        hint.className = 'ai-chat-empty';
+        hint.textContent = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, rename and edit your notes.');
+        el.appendChild(hint);
+    }
+
     function clear() {
         if (streaming && abortController) abortController.abort();
         conversation = [];
         saveConversation();
-        var el = messagesEl();
-        if (el) {
-            el.innerHTML = '';
-            var hint = document.createElement('div');
-            hint.className = 'ai-chat-empty';
-            hint.textContent = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, rename and edit your notes.');
-            el.appendChild(hint);
-        }
+        resetMessages();
+    }
+
+    /**
+     * Called by workspaces.js when the user switches workspace without a page
+     * reload: park the current conversation under the workspace we are
+     * leaving and show the one of the workspace we arrive in (if any). The
+     * backend scopes every tool to the current workspace, so carrying the old
+     * conversation over would only let the model answer from stale context.
+     */
+    function switchWorkspace(oldWorkspace) {
+        if (streaming && abortController) abortController.abort();
+        saveConversation(oldWorkspace);
+        conversation = [];
+        resetMessages();
+        restoreConversation();
     }
 
     function send() {
@@ -271,8 +307,9 @@
         appendBubble('ai-chat-msg-user', text);
 
         var body = { messages: conversation };
-        if (document.body.dataset.workspace) {
-            body.workspace = document.body.dataset.workspace;
+        var workspace = currentWorkspace();
+        if (workspace) {
+            body.workspace = workspace;
         }
 
         var bubble = appendBubble('ai-chat-msg-assistant ai-chat-pending', '');
@@ -434,6 +471,7 @@
 
     window.AIChat = {
         toggle: toggle,
-        clear: clear
+        clear: clear,
+        switchWorkspace: switchWorkspace
     };
 })();

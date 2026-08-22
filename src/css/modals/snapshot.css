@@ -100,7 +100,7 @@
 }
 
 .snapshot-date-btn.active {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #fff;
 }
 
@@ -607,14 +607,14 @@
 }
 
 .snapshot-restore-btn {
-    background-color: #007DB8 !important;
-    border-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
+    border-color: var(--pz-accent) !important;
     color: white !important;
 }
 
 .snapshot-restore-btn:hover {
-    background-color: #005a8a !important;
-    border-color: #005a8a !important;
+    background-color: var(--pz-accent-hover) !important;
+    border-color: var(--pz-accent-hover) !important;
 }
 
 /* ============================================
@@ -704,7 +704,7 @@
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-restore-btn i.lucide {
-        color: #007DB8 !important;
+        color: var(--pz-accent) !important;
     }
 
     #snapshotModal .snapshot-modal-actions .btn-danger i.lucide {
@@ -712,11 +712,11 @@
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide {
-        color: #6b7280 !important;
+        color: var(--pz-text-muted) !important;
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-markdown-preview-btn i.lucide {
-        color: #007DB8 !important;
+        color: var(--pz-accent) !important;
     }
 
     #snapshotModal .snapshot-modal-actions button span {

@@ -117,7 +117,7 @@ body.dark-mode .folder_name:hover {
 
 html[data-theme='dark'] .folder-path-segment:hover,
 body.dark-mode .folder-path-segment:hover {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-path-separator,
@@ -145,7 +145,7 @@ body.dark-mode .tag-suggestion-item:hover {
 
 html[data-theme='dark'] .tag-suggestion-item.highlighted,
 body.dark-mode .tag-suggestion-item.highlighted {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: #ffffff !important;
 }
 
@@ -174,7 +174,7 @@ body.dark-mode .task-input {
 html[data-theme='dark'] .task-edit-input,
 body.dark-mode .task-edit-input {
     background-color: var(--dm-surface);
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     color: var(--dm-text);
 }
 
@@ -326,18 +326,18 @@ body.dark-mode .task-item.important .task-text a:hover {
 /* Task order buttons */
 html[data-theme='dark'] .btn-task-order.active,
 body.dark-mode .btn-task-order.active {
-    background-color: rgba(0, 125, 184, 0.2);
+    background-color: rgba(var(--pz-accent-rgb), 0.2);
     color: #4da6ff;
 }
 
 html[data-theme='dark'] .btn-task-order:hover,
 body.dark-mode .btn-task-order:hover {
-    background-color: rgba(0, 125, 184, 0.1);
+    background-color: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 html[data-theme='dark'] .btn-task-order.active:hover,
 body.dark-mode .btn-task-order.active:hover {
-    background-color: rgba(0, 125, 184, 0.25);
+    background-color: rgba(var(--pz-accent-rgb), 0.25);
 }
 
 /* ============================================
@@ -410,15 +410,15 @@ body.dark-mode .btn-shared:hover {
 
 html[data-theme='dark'] .btn-primary,
 body.dark-mode .btn-primary {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: #ffffff !important;
-    border-color: #007DB8 !important;
+    border-color: var(--pz-accent) !important;
 }
 
 html[data-theme='dark'] .btn-primary:hover,
 body.dark-mode .btn-primary:hover {
-    background-color: #005a8a !important;
-    border-color: #005a8a !important;
+    background-color: var(--pz-accent-hover) !important;
+    border-color: var(--pz-accent-hover) !important;
 }
 
 html[data-theme='dark'] .btn-warning,

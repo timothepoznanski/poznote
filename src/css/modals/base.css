@@ -85,7 +85,7 @@
 .modal-content input:focus,
 .modal-content select:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .modal .form-group label {
@@ -130,17 +130,17 @@
 }
 
 .modal-buttons button:first-child {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
 }
 
 .modal-buttons button:first-child:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 .modal-buttons button:last-child {
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
     border: 1px solid #ddd;
 }
 
@@ -178,13 +178,13 @@
 
 /* Explicit button classes (take precedence over first/last child rules) */
 .modal-buttons button.btn-primary {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
     border: none;
 }
 
 .modal-buttons button.btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 /* Actions kept visible but unavailable (e.g. Change Password on an account
@@ -249,7 +249,7 @@ body.dark-mode .modal .modal-info-note {
 }
 
 .modal-buttons button.btn-success {
-    background-color: #28a745;
+    background-color: var(--pz-success);
     color: white;
     border: none;
 }
@@ -259,7 +259,7 @@ body.dark-mode .modal .modal-info-note {
 }
 
 .modal-buttons button.btn-danger {
-    background-color: #dc3545;
+    background-color: var(--pz-danger);
     color: white;
     border: none;
 }
@@ -284,7 +284,7 @@ body.dark-mode .modal .modal-info-note {
 
 .default-info {
     font-size: 12px;
-    color: #dc3545;
+    color: var(--pz-danger);
     margin-top: 5px;
     font-style: italic;
 }
@@ -325,7 +325,7 @@ body.dark-mode .modal .modal-info-note {
     gap: 2px 10px;
     margin: 4px 0;
     font-size: 13px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .date-format-tokens dt {
@@ -426,7 +426,7 @@ body.dark-mode .modal .modal-info-note {
     flex: 0 0 auto;
     padding: 0;
     margin: 0;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 7px;
     background: none;
     cursor: pointer;
@@ -455,7 +455,7 @@ body.dark-mode .modal .modal-info-note {
     height: 34px;
     padding: 0 10px;
     margin: 0;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 7px;
     font-size: 14px;
 }
@@ -467,7 +467,7 @@ body.dark-mode .modal .modal-info-note {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 7px;
     background: none;
     color: #b91c1c;
@@ -501,8 +501,8 @@ body.dark-mode .modal .modal-info-note {
 
 .modal-content .note-palette-add:hover,
 .modal-content button.note-palette-add:hover {
-    border-color: #007DB8;
-    color: #007DB8 !important;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent) !important;
     background: #f0f9ff;
 }
 
@@ -547,7 +547,7 @@ body.dark-mode .modal .modal-info-note {
     align-items: center;
     gap: 6px;
     margin-right: auto;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     background: transparent;
     color: #374151;
     cursor: pointer;
@@ -555,7 +555,7 @@ body.dark-mode .modal .modal-info-note {
 }
 
 .modal-buttons button.note-palette-back:hover {
-    border-color: #9ca3af;
+    border-color: var(--pz-text-subtle);
     background: #f9fafb;
 }
 
@@ -590,8 +590,8 @@ body.dark-mode .modal-content button.note-palette-add {
 body.dark-mode .modal-content .note-palette-add:hover,
 :root[data-theme='dark'] .modal-content button.note-palette-add:hover,
 body.dark-mode .modal-content button.note-palette-add:hover {
-    border-color: #007DB8;
-    color: #007DB8 !important;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent) !important;
     background: var(--dm-surface-hover);
 }
 
@@ -640,7 +640,7 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .move-task-item:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
 }
 
 .move-task-item.selected {
@@ -648,12 +648,12 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .move-task-item small {
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 0.8rem;
 }
 
 .move-task-empty {
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 0.9rem;
     padding: 8px;
 }
@@ -696,7 +696,7 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .modal-footer .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
@@ -705,9 +705,9 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .modal-footer .btn-cancel {
-    background-color: #dc3545 !important;
+    background-color: var(--pz-danger) !important;
     color: white !important;
-    border: 1px solid #dc3545 !important;
+    border: 1px solid var(--pz-danger) !important;
 }
 
 .modal-footer .btn-cancel:hover {

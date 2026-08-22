@@ -15,8 +15,8 @@ body.dark-mode .webhooks-page .alert-warning {
 }
 .webhooks-section h2 {
     margin: 0 0 16px;
-    color: var(--text-color, #333);
-    border-bottom: 2px solid #007cba;
+    color: var(--text-color, var(--pz-text));
+    border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
     font-size: 1.15rem;
     font-weight: 600;
@@ -49,7 +49,7 @@ body.dark-mode .webhooks-page .alert-warning {
     border: 1px solid #ddd;
     border-radius: 4px;
     background: #fff;
-    color: var(--text-primary, #333);
+    color: var(--text-primary, var(--pz-text));
     box-sizing: border-box;
 }
 .webhooks-events {
@@ -95,7 +95,7 @@ body.dark-mode .webhooks-page .alert-warning {
 .webhooks-event-help .lucide {
     width: 13px;
     height: 13px;
-    background-color: #9ca3af;
+    background-color: var(--pz-text-subtle);
     opacity: 0.55;
     transition: opacity 0.15s ease;
 }
@@ -265,18 +265,18 @@ body.dark-mode .webhooks-page .alert-warning {
     text-align: left;
     font-family: inherit;
     font-size: 0.88rem;
-    color: var(--text-primary, #333);
+    color: var(--text-primary, var(--pz-text));
     cursor: pointer;
 }
 .webhooks-actions-item:hover {
     background: #f2f6f9;
-    color: #007cba;
+    color: var(--pz-accent);
 }
 .webhooks-actions-item .lucide {
     width: 16px;
     height: 16px;
     flex: 0 0 auto;
-    background-color: #007cba;
+    background-color: var(--pz-accent);
 }
 .webhooks-actions-item.is-danger { color: #c0392b; }
 .webhooks-actions-item.is-danger:hover {

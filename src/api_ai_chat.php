@@ -3,10 +3,15 @@
  * AI Chat endpoint — proxies chat requests to an OpenAI-compatible server
  * (Ollama, LM Studio, OpenAI, ...) configured in the AI Assistant settings.
  *
- * The assistant is global: it can search and read all of the user's notes
- * through tool calling (search_notes / get_note / list_recent_notes), the
- * same way an MCP client would. Tool calls are executed server-side against
- * the current user's database, then fed back to the model.
+ * The assistant is global: it can search and read the user's notes through
+ * tool calling (search_notes / get_note / list_recent_notes), the same way an
+ * MCP client would. Tool calls are executed server-side against the current
+ * user's database, then fed back to the model.
+ *
+ * Scope: the current user (their own database is the only one opened) and
+ * the workspace the chat was opened in. The workspace restriction is enforced
+ * server-side in every tool, it is not left to the model: notes from other
+ * workspaces are neither searched, listed, read nor modified.
  *
  * Actions:
  *   POST ?action=chat  JSON {messages: [{role, content}...], note_id?, workspace?}
@@ -189,11 +194,12 @@ if (empty($messages)) {
 
 /**
  * Read a note's content as plain text (tasklist and HTML notes converted).
- * Returns null if the note doesn't exist or is trashed.
+ * Returns null if the note doesn't exist, is trashed, or (when $workspace is
+ * given) belongs to another workspace.
  */
-function aiReadNote($con, $noteId, $maxLen = 24000) {
-    $stmt = $con->prepare('SELECT id, heading, entry, type, tags, folder, workspace, updated FROM entries WHERE id = ? AND trash = 0');
-    $stmt->execute([intval($noteId)]);
+function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
+    $stmt = $con->prepare('SELECT id, heading, entry, type, tags, folder, workspace, updated FROM entries WHERE id = ? AND trash = 0' . ($workspace !== '' ? ' AND workspace = ?' : ''));
+    $stmt->execute($workspace !== '' ? [intval($noteId), $workspace] : [intval($noteId)]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$note) return null;
 
@@ -236,13 +242,15 @@ function aiReadNote($con, $noteId, $maxLen = 24000) {
 }
 
 /**
- * Execute a tool call against the current user's notes. Always returns a
- * string (JSON) to send back to the model as the tool result.
+ * Execute a tool call against the current user's notes, restricted to
+ * $chatWorkspace (the workspace the chat was opened in, always resolved to an
+ * existing one by the caller). Always returns a string (JSON) to send back to
+ * the model as the tool result.
  * Write tools (create_note, rename_note, update_note_content) mirror the
  * REST controller's core logic: same sanitizers, same title-uniqueness rule.
  * Deletion is deliberately not exposed to the assistant.
  */
-function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
+function aiExecuteTool($con, $name, $args, $chatWorkspace) {
     if (!is_array($args)) $args = [];
     $actorUserId = $_SESSION['user_id'] ?? null;
 
@@ -252,19 +260,15 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
             return json_encode(['error' => 'query is required']);
         }
         $limit = max(1, min(20, intval($args['limit'] ?? 8)));
-        $workspace = trim((string)($args['workspace'] ?? ''));
 
         $sql = "SELECT id, heading, folder, workspace, tags, updated, search_clean_entry(entry, type) AS content
                 FROM entries
                 WHERE trash = 0
+                  AND workspace = ?
                   AND (remove_accents(heading) LIKE remove_accents(?)
-                       OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
-        $params = ['%' . $query . '%', '%' . $query . '%'];
-        if ($workspace !== '') {
-            $sql .= ' AND workspace = ?';
-            $params[] = $workspace;
-        }
-        $sql .= ' ORDER BY updated DESC LIMIT ' . $limit;
+                       OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))
+                ORDER BY updated DESC LIMIT " . $limit;
+        $params = [$chatWorkspace, '%' . $query . '%', '%' . $query . '%'];
         $stmt = $con->prepare($sql);
         $stmt->execute($params);
 
@@ -291,25 +295,17 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
     }
 
     if ($name === 'get_note') {
-        $note = aiReadNote($con, intval($args['note_id'] ?? 0), 16000);
+        $note = aiReadNote($con, intval($args['note_id'] ?? 0), 16000, $chatWorkspace);
         if ($note === null) {
-            return json_encode(['error' => 'Note not found']);
+            return json_encode(['error' => 'Note not found in the current workspace']);
         }
         return json_encode($note, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
     }
 
     if ($name === 'list_recent_notes') {
         $limit = max(1, min(50, intval($args['limit'] ?? 20)));
-        $workspace = trim((string)($args['workspace'] ?? ''));
-        $sql = 'SELECT id, heading, folder, workspace, updated FROM entries WHERE trash = 0';
-        $params = [];
-        if ($workspace !== '') {
-            $sql .= ' AND workspace = ?';
-            $params[] = $workspace;
-        }
-        $sql .= ' ORDER BY updated DESC LIMIT ' . $limit;
-        $stmt = $con->prepare($sql);
-        $stmt->execute($params);
+        $stmt = $con->prepare('SELECT id, heading, folder, workspace, updated FROM entries WHERE trash = 0 AND workspace = ? ORDER BY updated DESC LIMIT ' . $limit);
+        $stmt->execute([$chatWorkspace]);
         $results = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $results[] = [
@@ -332,11 +328,11 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
         if (mb_strlen($newTitle) > 255) {
             $newTitle = mb_substr($newTitle, 0, 255);
         }
-        $stmt = $con->prepare('SELECT id, heading, workspace, folder_id FROM entries WHERE id = ? AND trash = 0');
-        $stmt->execute([$noteId]);
+        $stmt = $con->prepare('SELECT id, heading, workspace, folder_id FROM entries WHERE id = ? AND trash = 0 AND workspace = ?');
+        $stmt->execute([$noteId, $chatWorkspace]);
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$note) {
-            return json_encode(['error' => 'Note not found']);
+            return json_encode(['error' => 'Note not found in the current workspace']);
         }
         $folderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
         $check = $con->prepare('SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND id != ? AND workspace = ? AND ' . ($folderId !== null ? 'folder_id = ' . $folderId : 'folder_id IS NULL'));
@@ -362,11 +358,11 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
         if (strlen($content) > 200000) {
             return json_encode(['error' => 'Content too large (200 KB max)']);
         }
-        $stmt = $con->prepare('SELECT id, heading, type FROM entries WHERE id = ? AND trash = 0');
-        $stmt->execute([$noteId]);
+        $stmt = $con->prepare('SELECT id, heading, type FROM entries WHERE id = ? AND trash = 0 AND workspace = ?');
+        $stmt->execute([$noteId, $chatWorkspace]);
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$note) {
-            return json_encode(['error' => 'Note not found']);
+            return json_encode(['error' => 'Note not found in the current workspace']);
         }
         $noteType = $note['type'] ?? 'note';
         if ($noteType === 'markdown') {
@@ -404,14 +400,6 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace = '') {
             return json_encode(['error' => $quotaError]);
         }
         $workspace = $chatWorkspace;
-        if ($workspace !== '') {
-            $ws = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
-            $ws->execute([$workspace]);
-            if ($ws->fetchColumn() == 0) $workspace = '';
-        }
-        if ($workspace === '') {
-            $workspace = getFirstWorkspaceName();
-        }
         $check = $con->prepare('SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND folder_id IS NULL AND workspace = ?');
         $check->execute([$title, $workspace]);
         if ($check->fetchColumn() > 0) {
@@ -438,13 +426,12 @@ $aiTools = [
         'type' => 'function',
         'function' => [
             'name' => 'search_notes',
-            'description' => "Search the user's notes by text (matches title and content, accent-insensitive). Returns matching notes with a snippet. Use get_note to read a full note.",
+            'description' => "Search the user's notes in the current workspace by text (matches title and content, accent-insensitive). Returns matching notes with a snippet. Use get_note to read a full note.",
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'query' => ['type' => 'string', 'description' => 'Text to search for'],
                     'limit' => ['type' => 'integer', 'description' => 'Max results (default 8, max 20)'],
-                    'workspace' => ['type' => 'string', 'description' => 'Restrict to one workspace (optional; searches all workspaces when omitted)'],
                 ],
                 'required' => ['query'],
             ],
@@ -468,12 +455,11 @@ $aiTools = [
         'type' => 'function',
         'function' => [
             'name' => 'list_recent_notes',
-            'description' => 'List the most recently updated notes (titles and ids only).',
+            'description' => 'List the most recently updated notes of the current workspace (titles and ids only).',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'limit' => ['type' => 'integer', 'description' => 'Max results (default 20, max 50)'],
-                    'workspace' => ['type' => 'string', 'description' => 'Restrict to one workspace (optional)'],
                 ],
             ],
         ],
@@ -512,7 +498,7 @@ $aiTools = [
         'type' => 'function',
         'function' => [
             'name' => 'create_note',
-            'description' => 'Create a new markdown note. Only use when the user explicitly asked to create a note in this conversation.',
+            'description' => 'Create a new markdown note in the current workspace. Only use when the user explicitly asked to create a note in this conversation.',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
@@ -530,7 +516,7 @@ $aiTools = [
 // ---------------------------------------------------------------------------
 
 $system = 'You are the AI assistant built into Poznote, a personal note-taking app. '
-    . "You have tools to access ALL of the user's notes: search_notes (find notes by text), "
+    . "You have tools to access the user's notes: search_notes (find notes by text), "
     . 'get_note (read one note in full) and list_recent_notes. '
     . 'Whenever a question may relate to the notes, use the tools instead of guessing: '
     . 'search first, then read the most relevant notes before answering. '
@@ -546,11 +532,22 @@ $system = 'You are the AI assistant built into Poznote, a personal note-taking a
     . 'Cite the titles of the notes you used. Be concise. '
     . 'Answer in the language the user writes in.';
 
+// The chat is scoped to the workspace it was opened in. Resolve it once to an
+// existing workspace (the client may send a stale or placeholder name) and
+// pass it to every tool: the model cannot widen the scope.
 $workspace = isset($input['workspace']) && is_string($input['workspace']) ? trim($input['workspace']) : '';
 if ($workspace !== '') {
-    $system .= "\n\nThe user is currently in the workspace \"" . $workspace . '". '
-        . 'Tool searches cover all workspaces unless you pass a workspace filter.';
+    $ws = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+    $ws->execute([$workspace]);
+    if ($ws->fetchColumn() == 0) $workspace = '';
 }
+if ($workspace === '') {
+    $workspace = getFirstWorkspaceName();
+}
+$system .= "\n\nThe user is currently in the workspace \"" . $workspace . '". '
+    . 'All tools are restricted to this workspace: notes from other workspaces '
+    . 'are not searchable, readable or editable from this conversation. '
+    . 'If the user asks about another workspace, tell them to switch to it first.';
 
 array_unshift($messages, ['role' => 'system', 'content' => $system]);
 

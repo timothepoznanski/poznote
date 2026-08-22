@@ -659,7 +659,7 @@ html[data-theme='dark'] #noteWidthModal .font-size-section,
 body.dark-mode #fontSizeModal .font-size-section,
 body.dark-mode #noteWidthModal .font-size-section {
     background-color: #1f1f1f;
-    border-color: #3a3a3a;
+    border-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls label,
@@ -693,9 +693,9 @@ body.dark-mode #noteWidthModal .btn-full-width-footer:hover {
 
 html[data-theme='dark'] #noteWidthModal .btn-full-width-footer.active,
 body.dark-mode #noteWidthModal .btn-full-width-footer.active {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: white !important;
-    border-color: #007DB8 !important;
+    border-color: var(--pz-accent) !important;
 }
 
 html[data-theme='dark'] #fontSizeModal .font-size-controls input::placeholder,
@@ -715,7 +715,7 @@ body.dark-mode #noteWidthModal .default-info {
 html[data-theme='dark'] #fontSizeModal .font-size-preview,
 body.dark-mode #fontSizeModal .font-size-preview {
     background-color: var(--dm-surface);
-    border-color: #3a3a3a;
+    border-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] #fontSizeModal .modal-footer .btn-primary,
@@ -1066,7 +1066,7 @@ body.dark-mode .snapshot-date-btn:hover {
 
 html[data-theme='dark'] .snapshot-date-btn.active,
 body.dark-mode .snapshot-date-btn.active {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: #fff;
 }
 
@@ -1100,7 +1100,7 @@ body.dark-mode #updateModal .version-info p {
 
 html[data-theme='dark'] #updateModal .modal-content p,
 body.dark-mode #updateModal .modal-content p {
-    color: #bebebe !important;
+    color: var(--dm-text) !important;
 }
 
 html[data-theme='dark'] #updateModal .backup-warning,

@@ -17,8 +17,8 @@
     height: 100vh;
     padding: 10px 5px;
     box-sizing: border-box;
-    background: #f8f9fa;
-    border-right: 1px solid #e0e0e0;
+    background: var(--pz-surface);
+    border-right: 1px solid var(--pz-border);
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -71,7 +71,7 @@
     padding: 6px;
     box-sizing: border-box;
     background: #fff;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
@@ -106,8 +106,8 @@
 
 .icon-sidebar-overflow-item:hover,
 .icon-sidebar-overflow-item:focus-visible {
-    background: rgba(0, 125, 184, 0.08);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.08);
+    color: var(--pz-accent);
     text-decoration: none;
 }
 
@@ -121,8 +121,8 @@
 }
 
 .icon-sidebar-overflow-item-active {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.12);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.12);
 }
 
 /* Account actions, fixed under a divider at the bottom of the rail. The
@@ -137,7 +137,7 @@
     align-self: stretch;
     margin: 8px 4px 0;
     padding: 8px 0 0;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--pz-border);
 }
 
 .icon-sidebar-btn {
@@ -165,15 +165,15 @@
 
 .icon-sidebar-btn:hover,
 .icon-sidebar-btn:focus-visible {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.08);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 /* Current page. Lives here rather than in css/icon-sidebar-page.css so that
    index.php, which loads only this file, highlights its Home entry too. */
 .icon-sidebar-btn-active {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.12);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.12);
 }
 
 /* Favorites view active: amber rather than the usual blue, matching the star.
@@ -245,8 +245,8 @@
 }
 
 #iconSidebarToggle:hover {
-    background: #f8f9fa;
-    color: #007DB8;
+    background: var(--pz-surface);
+    color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -289,7 +289,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: #fff;
     color: #374151;
@@ -302,14 +302,14 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
 .poznote-back-to-note-btn:hover,
 .poznote-back-btn:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     color: #111827;
     text-decoration: none;
 }
 
 .poznote-back-to-note-btn i,
 .poznote-back-btn i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* The settings sub-pages each use their own container (.settings-container,
@@ -354,7 +354,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 }
 
 .poznote-page-title i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* The book glyph's ink sits high in its box, so a box-centred icon still reads

@@ -156,12 +156,12 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 }
 
 .markdown-codemirror-host .cm-activeLine {
-    background: rgba(0, 125, 184, 0.05);
+    background: rgba(var(--pz-accent-rgb), 0.05);
 }
 
 .markdown-codemirror-host .cm-selectionBackground,
 .markdown-codemirror-host .cm-focused .cm-selectionBackground {
-    background: rgba(0, 125, 184, 0.22);
+    background: rgba(var(--pz-accent-rgb), 0.22);
 }
 
 .markdown-codemirror-host .cm-placeholder {
@@ -280,7 +280,7 @@ body.dark-mode .markdown-editor .markdown-excalidraw-placeholder::before {
 }
 
 .cm-tooltip-autocomplete ul li[aria-selected] {
-    background: #007db8;
+    background: var(--pz-accent);
     color: #fff;
 }
 
@@ -294,7 +294,7 @@ body.slash-menu-cursor-hidden * {
     font-size: 2em;
     font-weight: bold;
     margin: 0.67em 0;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 2px solid var(--pz-border);
     padding-bottom: 0.3em;
 }
 
@@ -302,7 +302,7 @@ body.slash-menu-cursor-hidden * {
     font-size: 1.5em;
     font-weight: bold;
     margin: 0.75em 0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
 }
 
@@ -401,7 +401,7 @@ body.slash-menu-cursor-hidden * {
     /* border-radius: 3px; */
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .markdown-preview pre {
@@ -557,7 +557,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
 
 .markdown-preview hr {
     border: 0;
-    border-top: 2px solid #e0e0e0;
+    border-top: 2px solid var(--pz-border);
     margin: 2em 0;
 }
 
@@ -611,7 +611,7 @@ body.dark-mode .markdown-preview pre.indented-pre {
    css/dark-mode/editor.css and above the dark-mode preview defaults, so one
    set of rules serves both themes. */
 body.markdown-colored {
-    --mdc-h1: #007db8;
+    --mdc-h1: var(--pz-accent);
     --mdc-h2: #1a7f37;
     --mdc-h3: #8250df;
     --mdc-h4: #bf3989;
@@ -619,9 +619,9 @@ body.markdown-colored {
     --mdc-h6: #656d76;
     --mdc-code: #b34e00;
     --mdc-codeblock: #b34e00;
-    --mdc-quote: #007db8;
-    --mdc-table: #007db8;
-    --mdc-hr: #007db8;
+    --mdc-quote: var(--pz-accent);
+    --mdc-table: var(--pz-accent);
+    --mdc-hr: var(--pz-accent);
 }
 
 /* Editor: retint the CodeMirror heading and inline-code tokens with the
@@ -720,7 +720,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     cursor: pointer;
     width: 16px;
     height: 16px;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
 }
 
 .markdown-preview .markdown-task-checkbox:hover {
@@ -748,19 +748,19 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 }
 
 .noteentry.markdown-split-mode .markdown-preview [data-line]:not(.markdown-task-checkbox):not(summary):not(details):hover {
-    background-color: rgba(0, 125, 184, 0.05);
+    background-color: rgba(var(--pz-accent-rgb), 0.05);
     border-radius: 3px;
 }
 
 /* Indicateur visuel pour le drag & drop */
 .noteentry.drag-over {
-    border: 2px dashed #007DB8 !important;
-    background-color: rgba(0, 125, 184, 0.05) !important;
+    border: 2px dashed var(--pz-accent) !important;
+    background-color: rgba(var(--pz-accent-rgb), 0.05) !important;
     transition: all 0.2s ease;
 }
 
 .noteentry.drag-over .markdown-editor {
-    background-color: rgba(0, 125, 184, 0.02);
+    background-color: rgba(var(--pz-accent-rgb), 0.02);
     transition: background-color 0.2s ease;
 }
 
@@ -878,7 +878,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     min-width: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    border-right: 1px solid #e0e0e0 !important;
+    border-right: 1px solid var(--pz-border) !important;
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
 }
@@ -933,7 +933,7 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
-    border-right-color: #404040 !important;
+    border-right-color: var(--dm-border) !important;
 }
 
 body.markdown-split-card-view .noteentry.markdown-split-mode {
