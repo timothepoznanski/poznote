@@ -49,6 +49,58 @@
         syncButton(collapsed);
     }
 
+    // --- Workspace links ---------------------------------------------------
+
+    /**
+     * Re-point every rail link at another workspace.
+     *
+     * index.php switches workspace without reloading (js/workspaces.js pushes
+     * the new one into the URL and re-fetches only #left_col), and the rail
+     * lives outside that column, so the hrefs icon_sidebar.php rendered would
+     * otherwise keep carrying the workspace that was selected when the page
+     * loaded: clicking Tags right after a switch landed on the previous
+     * workspace's tags, since an explicit ?workspace= wins over the
+     * last-opened setting server-side.
+     *
+     * @param {string} workspaceName - The workspace now selected
+     */
+    function updateWorkspaceLinks(workspaceName) {
+        var rail = document.getElementById('icon_sidebar');
+        if (!rail) return;
+
+        var workspace = (workspaceName === null || workspaceName === undefined)
+            ? '' : String(workspaceName);
+
+        Array.prototype.forEach.call(rail.querySelectorAll('a[href]'), function (link) {
+            var href = link.getAttribute('href');
+            // Leave anchors, absolute URLs and anything not page-relative alone.
+            if (!href || /^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(href)) return;
+
+            var url;
+            try {
+                url = new URL(href, window.location.href);
+            } catch (error) {
+                return;
+            }
+
+            // Logging out is workspace-agnostic.
+            if (url.pathname.split('/').pop() === 'logout.php') return;
+
+            // '__last_opened__' is a UI placeholder, not a workspace name.
+            if (workspace === '' || workspace === '__last_opened__') {
+                url.searchParams.delete('workspace');
+            } else {
+                url.searchParams.set('workspace', workspace);
+            }
+
+            link.setAttribute('href', url.pathname + url.search + url.hash);
+        });
+    }
+
+    // The overflow menu reads each entry's href when the copy is clicked, so
+    // it picks the refreshed links up on its own.
+    window.updateIconSidebarWorkspace = updateWorkspaceLinks;
+
     // --- Overflow menu -----------------------------------------------------
 
     function getScrollArea() {
