@@ -187,7 +187,7 @@
     gap: 10px;
     background: #f7fafc;
     /* subtle light */
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
     border: 1px solid #e6eef8;
     padding: 0 12px;
     border-radius: 8px;
@@ -201,7 +201,7 @@
 }
 
 .btn-new-folder i {
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
     font-size: 16px;
     width: 20px;
     height: 20px;
@@ -337,7 +337,7 @@
 
 /* Hover effect: blue and bold title when hovering over a note */
 .links_arbo_left:hover .note-title {
-    color: #0b4da6 !important;
+    color: var(--pz-accent-strong) !important;
     font-weight: 600 !important;
     transition: color 0.2s ease, font-weight 0.2s ease;
 }
@@ -348,11 +348,11 @@
     /* remove blue background */
     /* keep layout consistent but remove rounded background */
     border-radius: 0;
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
 }
 
 .links_arbo_left.selected-note .note-title {
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
     font-weight: 600;
 }
 

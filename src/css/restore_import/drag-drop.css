@@ -14,7 +14,7 @@
 }
 
 .form-group.drag-over {
-    background-color: #e3f2fd;
+    background-color: var(--pz-accent-soft);
     border: 2px dashed #2196F3 !important;
 }
 

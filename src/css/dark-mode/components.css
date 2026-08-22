@@ -117,7 +117,7 @@ body.dark-mode .folder_name:hover {
 
 html[data-theme='dark'] .folder-path-segment:hover,
 body.dark-mode .folder-path-segment:hover {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .folder-path-separator,

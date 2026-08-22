@@ -494,7 +494,7 @@ html[data-theme='dark'] .password-toggle:hover {
 
 html[data-theme='dark'] input[type="text"]:focus,
 html[data-theme='dark'] input[type="password"]:focus {
-    border-color: #4a9eff;
+    border-color: var(--dm-accent);
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.18);
 }
 
@@ -504,11 +504,11 @@ html[data-theme='dark'] input[type="password"]::placeholder {
 }
 
 html[data-theme='dark'] .github-link a {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .github-link a:hover {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .admin-warning {
@@ -528,7 +528,7 @@ html[data-theme='dark'] .account-select-logout {
 }
 
 html[data-theme='dark'] .account-select-logout:hover {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .account-option {
@@ -540,7 +540,7 @@ html[data-theme='dark'] .account-option {
 html[data-theme='dark'] .account-option:hover,
 html[data-theme='dark'] .account-option:focus {
     background: var(--dm-surface-hover);
-    border-color: #4a9eff;
+    border-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .account-option-badge {

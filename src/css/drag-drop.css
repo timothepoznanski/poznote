@@ -166,7 +166,7 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    background-color: #e3f2fd !important;
+    background-color: var(--pz-accent-soft) !important;
     border: 3px dashed #007bff !important;
     color: #007bff !important;
     font-weight: bold !important;
@@ -194,7 +194,7 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
 
 .root-drop-zone.drag-over {
     border-color: #007bff !important;
-    background-color: #e3f2fd !important;
+    background-color: var(--pz-accent-soft) !important;
     transform: scale(1.02) !important;
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3) !important;
 }

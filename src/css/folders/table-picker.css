@@ -47,7 +47,7 @@
 }
 
 .table-picker-cell.highlighted {
-    background: #e3f2fd;
+    background: var(--pz-accent-soft);
     border-color: var(--pz-accent);
 }
 

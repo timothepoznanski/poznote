@@ -1660,8 +1660,8 @@ body.dark-mode .board-view-btn {
 
 :root[data-theme='dark'] .board-view-btn:hover,
 body.dark-mode .board-view-btn:hover {
-    border-color: var(--dm-accent, #4a9eff);
-    color: var(--dm-accent, #4a9eff);
+    border-color: var(--dm-accent, var(--dm-accent));
+    color: var(--dm-accent, var(--dm-accent));
 }
 
 

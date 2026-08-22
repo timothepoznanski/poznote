@@ -45,7 +45,7 @@ form {
 /* LINKS */
 
 a {
-    color: #2E8CFA;
+    color: var(--pz-link);
     text-decoration: none;
 }
 

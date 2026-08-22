@@ -993,7 +993,7 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     --text-color: var(--dm-text, #bebebe);
     --text-muted: var(--dm-text-muted, #c5c5c5);
     --border-color: var(--dm-border, #404040);
-    --primary-color: #4a9eff;
+    --primary-color: var(--dm-accent);
     --primary-hover: #3a8eef;
     --button-bg: var(--dm-surface, #333333);
     --button-hover-bg: var(--dm-surface-hover, #3a3a3a);

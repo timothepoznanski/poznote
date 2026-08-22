@@ -496,7 +496,7 @@ body.trash-page {
 /* Notice de recherche */
 .trash-search-notice {
     text-align: center;
-    background: #e3f2fd;
+    background: var(--pz-accent-soft);
     border: 1px solid #bbdefb;
     border-radius: 6px;
     padding: 10px;
@@ -731,7 +731,7 @@ body.dark-mode .trash-innernote {
 
 html[data-theme='dark'] .css-title,
 body.dark-mode .css-title {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .trash-no-notes,
@@ -821,13 +821,13 @@ body.dark-mode .trash-expand-btn:hover {
 
 html[data-theme='dark'] .trash-expand-btn,
 body.dark-mode .trash-expand-btn {
-    color: #4a9eff;
+    color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .trash-expand-btn .lucide,
 body.dark-mode .trash-expand-btn .lucide {
-    color: #4a9eff;
-    background-color: #4a9eff;
+    color: var(--dm-accent);
+    background-color: var(--dm-accent);
 }
 
 html[data-theme='dark'] .trash-no-notes-icon,

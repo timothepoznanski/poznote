@@ -285,8 +285,8 @@ body.dark-mode .settings-view-toggle {
 
 html[data-theme='dark'] .settings-view-toggle:hover,
 body.dark-mode .settings-view-toggle:hover {
-    border-color: var(--dm-accent, #4a9eff);
-    color: var(--dm-accent, #4a9eff);
+    border-color: var(--dm-accent, var(--dm-accent));
+    color: var(--dm-accent, var(--dm-accent));
 }
 
 /* ---------- List layout: cards become compact full-width rows ---------- */

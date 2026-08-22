@@ -153,7 +153,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 .folder-kanban-icon:hover {
     background: rgba(107, 114, 128, 0.1);
-    color: #0b4da6;
+    color: var(--pz-accent-strong);
 }
 
 .folder-kanban-icon i,
@@ -258,7 +258,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 .folder-actions-menu-item.active,
 .note-actions-menu-item.active {
-    background-color: #e3f2fd;
+    background-color: var(--pz-accent-soft);
     color: var(--pz-accent);
     font-weight: 600;
 }

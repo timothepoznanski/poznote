@@ -305,7 +305,7 @@ html[data-theme="dark"] .graph-search-input {
 }
 
 html[data-theme="dark"] .graph-search-input:focus {
-    border-color: var(--dm-accent, #4a9eff);
+    border-color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme="dark"] .graph-folder-select {
@@ -315,7 +315,7 @@ html[data-theme="dark"] .graph-folder-select {
 }
 
 html[data-theme="dark"] .graph-folder-select:focus {
-    border-color: var(--dm-accent, #4a9eff);
+    border-color: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme="dark"] .graph-hint {
@@ -357,7 +357,7 @@ html[data-theme="dark"] .graph-label {
 }
 
 html[data-theme="dark"] .graph-node.search-hit circle {
-    stroke: var(--dm-accent, #4a9eff);
+    stroke: var(--dm-accent, var(--dm-accent));
 }
 
 html[data-theme="dark"] .graph-tooltip {

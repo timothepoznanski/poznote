@@ -137,7 +137,7 @@ body {
 /* Dark mode support for info box */
 html[data-theme='dark'] .info-box {
     background-color: #1a3a52;
-    border-left: 4px solid #4a9eff;
+    border-left: 4px solid var(--dm-accent);
     color: #64b5f6;
 }
 

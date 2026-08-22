@@ -22,6 +22,9 @@
     --pz-surface: #f8f9fa;         /* panels, cards, code backgrounds */
     --pz-surface-hover: #f3f4f6;   /* hover rows and items */
     --pz-danger: #dc3545;          /* destructive actions, errors */
+    --pz-link: #2e8cfa;            /* hyperlinks in notes */
+    --pz-accent-strong: #0b4da6;   /* selected note/folder title in the sidebar */
+    --pz-accent-soft: #e3f2fd;     /* active item background */
 }
 
 /* ============================================

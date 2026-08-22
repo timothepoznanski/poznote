@@ -342,7 +342,7 @@ html[data-theme='dark'] .tags-modal-item-name {
 
 html[data-theme='dark'] .tags-modal-item-name:focus {
     background: rgba(74, 158, 255, 0.2);
-    box-shadow: 0 0 0 1px #4a9eff;
+    box-shadow: 0 0 0 1px var(--dm-accent);
 }
 
 html[data-theme='dark'] #tagsModalInput {
