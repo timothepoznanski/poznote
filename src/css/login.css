@@ -227,7 +227,7 @@ input[type="password"]::placeholder {
     display: block;
     text-decoration: none;
     text-align: center;
-    background: #333333;
+    background: var(--pz-text);
     margin-top: 0.75rem;
 }
 
@@ -239,7 +239,7 @@ input[type="password"]::placeholder {
    Doubled class keeps these rules above .login-button:hover below. */
 .oidc-other-account-button.oidc-other-account-button {
     background: transparent;
-    color: #333333;
+    color: var(--pz-text);
     border: 1px solid #cbd5e0;
 }
 
@@ -428,7 +428,7 @@ input[type="password"]::placeholder {
     border-radius: 4px;
     font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
     font-size: 0.8125rem;
-    color: #333333;
+    color: var(--pz-text);
     display: inline-block;
     margin: 0.5rem 0;
 }

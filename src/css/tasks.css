@@ -105,7 +105,7 @@
     align-items: flex-start;
     padding: 6px 12px !important;
     margin-bottom: 8px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 6px;
     background: #fafafa;
     transition: all 0.2s ease;
@@ -533,7 +533,7 @@
 
 .task-actions-menu-item i {
     font-size: 15px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     flex-shrink: 0;
 }
 
@@ -943,7 +943,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-widget {
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     padding: 12px 16px;
 }
@@ -1081,7 +1081,7 @@ body.dark-mode .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-due.overdue {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 .noteentry .tasklist-embed-empty:is(#pz-specificity-boost, *),

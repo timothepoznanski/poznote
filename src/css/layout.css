@@ -33,7 +33,7 @@ body {
     overflow-x: hidden;
     padding: 6px 16px 16px 16px;
     box-sizing: border-box;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -233,7 +233,7 @@ body {
 }
 
 .toggle-sidebar-btn:hover {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

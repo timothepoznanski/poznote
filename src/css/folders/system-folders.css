@@ -53,7 +53,7 @@
 .system-menu-item span:not(.menu-item-count) {
     flex: 1;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .system-menu-item .menu-item-count {

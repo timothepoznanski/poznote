@@ -38,7 +38,7 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #333;
+    color: var(--pz-text);
 }
 
 /* Form file input */
@@ -88,7 +88,7 @@
 }
 
 .form-text-danger {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: 500;
 }
 

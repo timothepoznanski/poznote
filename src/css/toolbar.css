@@ -166,7 +166,7 @@
 
 .font-size-popup .size-label {
     font-size: 0.95rem;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .font-size-popup .size-preview {

@@ -95,14 +95,14 @@ body.dark-mode .note-creation-loading-content {
 
 .alert-modal-header {
     padding: 20px 20px 0 20px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
 }
 
 .alert-modal-title {
     margin: 0 0 16px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     display: flex;
     align-items: center;
     gap: 10px;
@@ -188,7 +188,7 @@ body.dark-mode .note-creation-loading-content {
 /* Destructive confirmation (confirmButtonClass: 'danger'): the confirm button
    carries the warning colour rather than the default primary blue. */
 .alert-modal-button.primary.danger {
-    background: #dc3545;
+    background: var(--pz-danger);
 }
 
 .alert-modal-button.primary.danger:hover {
@@ -319,7 +319,7 @@ html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-but
 .progress-container {
     width: 100%;
     height: 12px;
-    background: var(--border-color, #e0e0e0);
+    background: var(--border-color, var(--pz-border));
     border-radius: 6px;
     overflow: hidden;
     margin: 15px 0;
@@ -349,7 +349,7 @@ html[data-theme='dark'] .progress-container,
 .spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid var(--border-color, #e0e0e0);
+    border: 2px solid var(--border-color, var(--pz-border));
     border-top: 2px solid var(--primary-color, var(--pz-accent));
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -404,7 +404,7 @@ html[data-theme='dark'] .spinner,
 }
 .admin-contact-option-desc {
     display: block;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 0.92rem;
     line-height: 1.45;
 }

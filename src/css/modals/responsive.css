@@ -36,7 +36,7 @@
 /* Final error message style (overrides base) */
 .modal-error-message {
     text-align: center !important;
-    color: #dc3545 !important;
+    color: var(--pz-danger) !important;
     font-size: 15px !important;
     margin-top: 15px !important;
     padding: 12px !important;

@@ -41,7 +41,7 @@ body {
 
 .settings-section h3 {
     margin-top: 0;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
 }
@@ -140,7 +140,7 @@ body {
 
 .workspace-name-item {
     font-weight: 500;
-    color: #333;
+    color: var(--pz-text);
     font-size: 16px;
 }
 
@@ -291,8 +291,8 @@ body {
 }
 
 .shared-edit-token-modal .workspace-share-modal-copy-btn {
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
+    background: var(--pz-surface-hover);
+    border: 1px solid var(--pz-border-strong);
     color: #374151;
     flex-shrink: 0;
     align-self: center;
@@ -327,7 +327,7 @@ body {
     min-width: 0;
     height: 40px;
     padding: 8px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
     margin: 0;
@@ -349,8 +349,8 @@ body {
     box-sizing: border-box;
     line-height: 1;
     align-self: stretch;
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
+    background: var(--pz-surface-hover);
+    border: 1px solid var(--pz-border-strong);
     color: #374151;
     border-radius: 6px;
 }
@@ -358,7 +358,7 @@ body {
 .shared-edit-token-modal .shared-edit-token-password-toggle:hover:not(:disabled),
 .shared-edit-token-modal .workspace-share-modal-copy-btn:hover:not(:disabled) {
     background: #e5e7eb;
-    border-color: #9ca3af;
+    border-color: var(--pz-text-subtle);
     color: #111827;
 }
 
@@ -406,7 +406,7 @@ body {
 
 .shared-edit-token-modal .share-user-list-message {
     padding: 10px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 13px;
 }
 
@@ -423,7 +423,7 @@ body {
 }
 
 .shared-edit-token-modal .share-user-list-row + .share-user-list-row {
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--pz-surface-hover);
 }
 
 .shared-edit-token-modal .share-user-list-name {
@@ -624,8 +624,8 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         align-items: center;
         justify-content: center;
         border-radius: 6px;
-        background: #f3f4f6;
-        border: 1px solid #d1d5db;
+        background: var(--pz-surface-hover);
+        border: 1px solid var(--pz-border-strong);
         align-self: center;
     }
 
@@ -645,7 +645,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .action-btn:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     border-color: #adb5bd;
 }
 
@@ -679,9 +679,9 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-delete-ws {
-    background-color: #dc3545;
+    background-color: var(--pz-danger);
     color: white;
-    border-color: #dc3545;
+    border-color: var(--pz-danger);
 }
 
 .btn-delete-ws:hover {
@@ -715,14 +715,14 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     color: #666;
     font-style: italic;
     padding: 40px;
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     border-radius: 6px;
     border: 1px solid #dee2e6;
 }
 
 /* Statistiques des workspaces */
 .workspace-stats {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     padding: 15px;
     border-radius: 6px;
     margin-bottom: 20px;
@@ -771,7 +771,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-icon:hover {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     border-color: #bbb;
 }
 
@@ -786,8 +786,8 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-delete:hover {
-    color: #dc3545;
-    border-color: #dc3545;
+    color: var(--pz-danger);
+    border-color: var(--pz-danger);
 }
 
 .workspace-list .action-btn:active { transform: translateY(1px); }
@@ -925,7 +925,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         align-items: stretch !important;
         gap: 10px !important;
         padding: 15px 0 !important;
-        border-bottom: 1px solid #e0e0e0 !important;
+        border-bottom: 1px solid var(--pz-border) !important;
     }
     
     .workspace-list .ws-col {
@@ -1044,7 +1044,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-icon:hover {
-    background: #f8f9fa !important;
+    background: var(--pz-surface) !important;
     border-color: #bbb !important;
 }
 
@@ -1059,8 +1059,8 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-delete:hover {
-    color: #dc3545 !important;
-    border-color: #dc3545 !important;
+    color: var(--pz-danger) !important;
+    border-color: var(--pz-danger) !important;
 }
 
 .workspace-list ul li {

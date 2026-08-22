@@ -33,7 +33,7 @@
 .welcome-setup-subtitle {
     margin: 0 auto;
     max-width: 400px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 14px;
     line-height: 1.5;
 }
@@ -121,7 +121,7 @@
     margin-left: auto;
     width: 14px;
     height: 14px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
 }
 
 @media (max-width: 520px) {

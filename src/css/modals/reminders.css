@@ -76,7 +76,7 @@
 
 .reminder-datetime-part i {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .reminder-datetime-part:hover {
@@ -197,7 +197,7 @@
 .reminder-email-option {
     border: 1px solid var(--border-color, #ddd);
     border-radius: 8px;
-    background: var(--card-bg, #f8f9fa);
+    background: var(--card-bg, var(--pz-surface));
     padding: 10px 12px;
 }
 
@@ -479,7 +479,7 @@
 }
 
 .home-card-icon-notifications i {
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 #notificationsModal .modal-content {
@@ -497,7 +497,7 @@
 }
 
 #notificationsModal .notification-item:hover {
-    background: var(--hover-bg, #f3f4f6);
+    background: var(--hover-bg, var(--pz-surface-hover));
 }
 
 #notificationsModal .notification-item.unread {
@@ -535,7 +535,7 @@
 
 #notificationsModal .notification-time {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     margin-top: 2px;
 }
 
@@ -544,7 +544,7 @@
     border: none;
     cursor: pointer;
     padding: 4px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     border-radius: 4px;
     flex-shrink: 0;
     opacity: 0.65;

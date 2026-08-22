@@ -2,8 +2,8 @@
 
 /* Search replace bar container */
 .search-replace-bar {
-    /* background: var(--background-secondary, #f8f9fa); */
-    /* border-bottom: 1px solid var(--border-color, #e0e0e0); */
+    /* background: var(--background-secondary, var(--pz-surface)); */
+    /* border-bottom: 1px solid var(--border-color, var(--pz-border)); */
     padding: 8px 12px;
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
     position: relative;
@@ -49,7 +49,7 @@
     font-size: 13px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--input-bg, #fff);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     transition: border-color 0.2s;
 }
 
@@ -85,7 +85,7 @@
     border: 1px solid var(--border-color, #d0d0d0);
     border-radius: 4px;
     background: var(--background, #fff);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     font-size: 12px;
     cursor: pointer;
     transition: all 0.2s;
@@ -128,7 +128,7 @@
 
 .search-replace-close-btn:hover {
     background: var(--background-hover, #f0f0f0);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
 }
 
 /* Highlight for search results in note */

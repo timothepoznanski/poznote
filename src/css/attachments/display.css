@@ -38,7 +38,7 @@
 .error-message {
     text-align: center;
     padding: 20px;
-    color: #dc3545;
+    color: var(--pz-danger);
     background: #f8d7da;
     border: 1px solid #f5c6cb;
     border-radius: 4px;
@@ -59,7 +59,7 @@
 }
 
 .attachment-card:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
 }
 
 .attachment-icon {
@@ -107,7 +107,7 @@
 
 .attachment-name {
     font-weight: 500;
-    color: #333;
+    color: var(--pz-text);
     font-size: 16px;
     margin-bottom: 4px;
     word-break: break-word;
@@ -173,7 +173,7 @@
 }
 
 .btn-delete {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: white;
 }
 
@@ -194,7 +194,7 @@
 }
 
 .btn-icon.btn-delete {
-    background: #dc3545 !important;
+    background: var(--pz-danger) !important;
     color: #fff !important;
 }
 

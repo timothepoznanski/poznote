@@ -712,7 +712,7 @@
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-take-btn i.lucide {
-        color: #6b7280 !important;
+        color: var(--pz-text-muted) !important;
     }
 
     #snapshotModal .snapshot-modal-actions .snapshot-markdown-preview-btn i.lucide {

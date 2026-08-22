@@ -62,6 +62,14 @@ Light (on `:root`):
 | `--pz-accent` | `#007db8` | brand blue: links, active states, primary buttons, focus rings |
 | `--pz-accent-hover` | `#005a8a` | hover/darker variant |
 | `--pz-accent-rgb` | `0, 125, 184` | tints: `rgba(var(--pz-accent-rgb), 0.1)` |
+| `--pz-text` | `#333333` | main text |
+| `--pz-text-muted` | `#6b7280` | secondary text, icons |
+| `--pz-text-subtle` | `#9ca3af` | placeholders, hints |
+| `--pz-border` | `#e0e0e0` | default borders, separators |
+| `--pz-border-strong` | `#d1d5db` | inputs, menus, cards |
+| `--pz-surface` | `#f8f9fa` | panels, cards, code backgrounds |
+| `--pz-surface-hover` | `#f3f4f6` | hover rows and items |
+| `--pz-danger` | `#dc3545` | destructive actions, errors |
 
 Dark and black (on `html[data-theme='dark']` / `html.theme-black[data-theme='dark']`):
 `--dm-text`, `--dm-text-muted`, `--dm-bg`, `--dm-content-bg`, `--dm-sidebar-bg`,
@@ -73,14 +81,19 @@ These names are part of the custom-CSS contract: rename nothing, add freely.
 Re-theming example for a custom stylesheet:
 
 ```css
-:root { --pz-accent: #7c3aed; --pz-accent-hover: #5b21b6; --pz-accent-rgb: 124, 58, 237; }
+:root {
+    --pz-accent: #7c3aed; --pz-accent-hover: #5b21b6; --pz-accent-rgb: 124, 58, 237;
+    --pz-text: #2b2118; --pz-border: #e6dccb; --pz-surface: #f7f1e6;   /* sepia-ish light */
+}
 html[data-theme='dark'] { --dm-accent: #a78bfa; --dm-bg: #1a1625; --dm-content-bg: #1a1625; }
 ```
 
 ## Conventions
 
-- New colours: use `var(--pz-accent)` / `var(--dm-*)` when the colour is one of
-  the tokens above; literals are fine for everything else.
+- New colours: use the `--pz-*` tokens in light rules and `--dm-*` in dark
+  rules when the colour is one of the tokens above; literals are fine for
+  everything else. Dark rules keep literals for now (a `#333` there is a dark
+  surface, not text: do not map it to `--pz-text`).
 - Prefer one rule with grouped selectors over two identical rules (the folder
   and note action menus in `folders/actions-menu.css` are the model); rules
   that are byte-identical in two files always loaded together are duplicates,

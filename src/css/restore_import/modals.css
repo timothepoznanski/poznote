@@ -76,7 +76,7 @@
     justify-content: center;
     gap: 8px;
     margin-top: 14px;
-    color: #333;
+    color: var(--pz-text);
     font-size: 13px;
 }
 
@@ -106,8 +106,8 @@
 }
 
 .import-confirm-modal-content .btn-cancel {
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
     border: 1px solid #ddd;
 }
 
@@ -157,7 +157,7 @@
 .custom-alert-content h3 {
     margin-top: 0;
     margin-bottom: 15px;
-    color: #dc3545;
+    color: var(--pz-danger);
     font-size: 18px;
     font-weight: 600;
 }

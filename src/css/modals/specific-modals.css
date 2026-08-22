@@ -87,7 +87,7 @@
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 18px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .font-size-controls label {
@@ -199,9 +199,9 @@
 }
 
 .btn-full-width-footer {
-    background-color: #f3f4f6 !important;
+    background-color: var(--pz-surface-hover) !important;
     color: #4b5563 !important;
-    border: 1px solid #d1d5db !important;
+    border: 1px solid var(--pz-border-strong) !important;
 }
 
 .btn-full-width-footer:hover {
@@ -257,13 +257,13 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     padding: 8px 0 0 0;
     margin-top: 8px;
 }
 
 #moveFolderFilesModal .modal-info-message i {
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 #moveFolderFilesModal .modal-buttons {
@@ -294,7 +294,7 @@
     display: block;
     margin-bottom: 6px;
     font-weight: 600;
-    color: #333;
+    color: var(--pz-text);
 }
 
 #moveNoteFolderModal label[for="moveNoteTargetSelect"] {
@@ -362,8 +362,8 @@
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
-    background-color: #f8f9fa;
-    color: #333;
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
     border: 1px solid #ddd;
 }
 
@@ -455,14 +455,14 @@
     align-items: center;
     margin: 15px 0;
     padding: 8px;
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     border-radius: 4px;
     border-left: 3px solid var(--pz-accent);
 }
 
 #noteInfoModal .info-row strong {
     min-width: 180px;
-    color: #333;
+    color: var(--pz-text);
     font-weight: 600;
 }
 
@@ -507,7 +507,7 @@
 }
 
 #updateModal .version-info {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     border-radius: 8px;
     padding: 15px 20px;
     margin: 20px 0;
@@ -516,7 +516,7 @@
 #updateModal .version-info p {
     margin: 10px 0;
     font-size: 15px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 #updateModal .version-info strong {
@@ -534,11 +534,11 @@
 
 #updateModal .backup-warning p {
     margin: 5px 0;
-    color: #333;
+    color: var(--pz-text);
 }
 
 #updateModal .backup-warning strong {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: 600;
 }
 
@@ -649,7 +649,7 @@
 }
 
 #confirmModal .modal-content h3 {
-    color: #333;
+    color: var(--pz-text);
     margin-bottom: 20px;
 }
 
@@ -772,7 +772,7 @@
 }
 
 #deleteFolderModal .btn-danger {
-    background-color: #dc3545 !important;
+    background-color: var(--pz-danger) !important;
     color: #fff !important;
     border: none !important;
     padding: 8px 12px;
@@ -919,8 +919,8 @@
 
 #deleteModal .modal-buttons .btn-cancel,
 #deleteModal .modal-buttons .btn-secondary {
-    background: #f8f9fa;
-    color: #333;
+    background: var(--pz-surface);
+    color: var(--pz-text);
     border: 1px solid #ddd;
 }
 
@@ -972,7 +972,7 @@
 
 .rename-modal-content h3 {
     margin-top: 0;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .rename-form {
@@ -1024,8 +1024,8 @@
 #moveNotesModal .modal-buttons .btn-secondary,
 #renameModal .modal-buttons .btn-cancel,
 #moveNotesModal .modal-buttons .btn-cancel {
-    background: #f8f9fa;
-    color: #333;
+    background: var(--pz-surface);
+    color: var(--pz-text);
     border: 1px solid #ddd;
 }
 

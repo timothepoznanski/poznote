@@ -17,8 +17,8 @@
     height: 100vh;
     padding: 10px 5px;
     box-sizing: border-box;
-    background: #f8f9fa;
-    border-right: 1px solid #e0e0e0;
+    background: var(--pz-surface);
+    border-right: 1px solid var(--pz-border);
     flex-shrink: 0;
     overflow: hidden;
 }
@@ -71,7 +71,7 @@
     padding: 6px;
     box-sizing: border-box;
     background: #fff;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--pz-border);
     border-radius: 8px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
@@ -137,7 +137,7 @@
     align-self: stretch;
     margin: 8px 4px 0;
     padding: 8px 0 0;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--pz-border);
 }
 
 .icon-sidebar-btn {
@@ -245,7 +245,7 @@
 }
 
 #iconSidebarToggle:hover {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -289,7 +289,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: #fff;
     color: #374151;
@@ -302,7 +302,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
 .poznote-back-to-note-btn:hover,
 .poznote-back-btn:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     color: #111827;
     text-decoration: none;
 }

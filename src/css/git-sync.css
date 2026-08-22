@@ -94,7 +94,7 @@ body.git-sync-page {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .git-sync-section h2 i {
@@ -126,7 +126,7 @@ body.git-sync-page {
 }
 
 .config-value {
-    color: #333;
+    color: var(--pz-text);
 }
 
 .config-hint {
@@ -216,7 +216,7 @@ body.git-sync-page {
 }
 
 .debug-info {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     border: 1px solid #dee2e6;
     border-radius: 4px;
     padding: 15px;
@@ -278,7 +278,7 @@ body.git-sync-page {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 8px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .sync-action-card p {
@@ -405,7 +405,7 @@ body.git-sync-page {
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 16px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .setup-instructions ol {
@@ -676,7 +676,7 @@ body.dark-mode .auto-sync-settings {
     font-size: 1rem;
     font-weight: 600;
     margin: 0 0 16px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 body.dark-mode .auto-sync-settings h4 {
@@ -712,7 +712,7 @@ body.dark-mode .form-check {
 .label-title {
     font-weight: 500;
     font-size: 0.95rem;
-    color: #333;
+    color: var(--pz-text);
 }
 
 body.dark-mode .label-title {
@@ -811,7 +811,7 @@ input:checked+.slider:before {
 
 .git-field-input {
     padding: 10px 14px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 10px;
     font-size: 0.92rem;
     background: #f9fafb;
@@ -829,13 +829,13 @@ input:checked+.slider:before {
 }
 
 .git-field-input[readonly]:focus {
-    border-color: #d1d5db;
+    border-color: var(--pz-border-strong);
     background: #f9fafb;
     box-shadow: none;
 }
 
 .git-field-input::placeholder {
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
 }
 
 select.git-field-input {

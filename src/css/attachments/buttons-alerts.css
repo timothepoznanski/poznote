@@ -42,7 +42,7 @@
 }
 
 .btn-danger {
-    background: #dc3545 !important;
+    background: var(--pz-danger) !important;
     color: #fff !important;
     border: none !important;
 }

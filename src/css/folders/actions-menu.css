@@ -73,7 +73,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     height: 22px;
     padding: 0;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     border-radius: 4px;
     transition: all 0.15s ease;
     align-items: center;
@@ -143,7 +143,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-kanban-icon {
     padding: 2px 4px;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     border-radius: 4px;
     transition: all 0.15s ease;
     display: inline-flex;
@@ -170,7 +170,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .note-actions-menu {
     position: fixed;
     background: white;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     min-width: 190px;
@@ -199,13 +199,13 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 .folder-actions-menu-item:hover,
 .note-actions-menu-item:hover {
-    background-color: #f3f4f6;
+    background-color: var(--pz-surface-hover);
 }
 
 .folder-actions-menu-item i,
 .note-actions-menu-item i {
     font-size: 0.85em;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     width: 15px;
     text-align: center;
 }
@@ -250,7 +250,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     padding: 6px 16px;
     font-size: 0.75em;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     font-weight: 600;
     pointer-events: none;
     letter-spacing: 0.05em;

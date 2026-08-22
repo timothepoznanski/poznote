@@ -246,7 +246,7 @@ body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     cursor: pointer;
     flex-shrink: 0;
     transition: border-color 0.2s ease, color 0.2s ease;
@@ -393,7 +393,7 @@ body.dark-mode .settings-view-toggle:hover {
     display: block;
     width: 13px;
     height: 13px;
-    background-color: #9ca3af;
+    background-color: var(--pz-text-subtle);
     opacity: 0.55;
     transition: opacity 0.15s ease;
 }
@@ -460,7 +460,7 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
     margin-top: 15px;
     padding: 12px 14px;
     border: 1px solid rgba(220, 53, 69, 0.35);
-    border-left: 3px solid #dc3545;
+    border-left: 3px solid var(--pz-danger);
     border-radius: 6px;
     background: rgba(220, 53, 69, 0.06);
     text-align: left;
@@ -468,7 +468,7 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
 
 .delete-warning-box .delete-warning {
     margin: 0 0 8px;
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: 500;
 }
 

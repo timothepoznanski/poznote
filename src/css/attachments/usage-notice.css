@@ -7,14 +7,14 @@
     margin-top: 10px;
     font-size: 14px;
     line-height: 1.4;
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 .attachment-usage-notice .lucide-alert-triangle {
     flex: none;
     margin-top: 2px;
-    color: #dc3545;
-    background-color: #dc3545;
+    color: var(--pz-danger);
+    background-color: var(--pz-danger);
 }
 
 .attachment-usage-notice a {

@@ -19,7 +19,7 @@
 .table-picker-header {
     font-size: 14px;
     font-weight: 600;
-    color: #333;
+    color: var(--pz-text);
     margin-bottom: 12px;
     text-align: center;
 }
@@ -62,7 +62,7 @@
 .table-picker-input-section {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--pz-border);
 }
 
 .table-picker-input-label {

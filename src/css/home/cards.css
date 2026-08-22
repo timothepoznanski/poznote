@@ -241,7 +241,7 @@ body.dark-mode .home-card-green .home-card-icon {
 
 .home-card-description {
     font-size: 11px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-weight: 500;
     margin-top: 2px;
     display: block;
@@ -249,7 +249,7 @@ body.dark-mode .home-card-green .home-card-icon {
 
 .home-card-count {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 /* Help icon with hover tooltip on settings cards */
@@ -265,7 +265,7 @@ body.dark-mode .home-card-green .home-card-icon {
 .setting-help .lucide {
     width: 13px;
     height: 13px;
-    background-color: #9ca3af;
+    background-color: var(--pz-text-subtle);
     opacity: 0.55;
     transition: opacity 0.15s ease;
 }

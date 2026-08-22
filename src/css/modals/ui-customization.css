@@ -20,7 +20,7 @@
 
 .ui-custom-description {
     margin: 0 0 16px 0;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 0.9em;
 }
 
@@ -128,7 +128,7 @@
     padding: 14px 16px;
     border: 1px dashed rgba(128, 128, 128, 0.35);
     border-radius: 8px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 0.9em;
     text-align: center;
 }

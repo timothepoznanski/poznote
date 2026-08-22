@@ -79,7 +79,7 @@
     display: block;
     font-weight: 600;
     margin-bottom: 10px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .background-opacity-control input[type="range"] {

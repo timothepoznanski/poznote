@@ -76,7 +76,7 @@ body.trash-page {
 .trash-header {
     text-align: center;
     font-weight: 500;
-    color: #333;
+    color: var(--pz-text);
     margin-top: 40px;
     margin-bottom: 20px;
 }
@@ -131,7 +131,7 @@ body.trash-page {
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     background-color: #f8f8f8;
     transition: all 0.2s ease;
     box-sizing: border-box;
@@ -449,15 +449,15 @@ body.trash-page {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     margin-bottom: 16px;
 }
 
 .trash-no-notes-icon .lucide {
     width: 32px;
     height: 32px;
-    color: #9ca3af;
-    background-color: #9ca3af;
+    color: var(--pz-text-subtle);
+    background-color: var(--pz-text-subtle);
 }
 
 .trash-no-notes-text {

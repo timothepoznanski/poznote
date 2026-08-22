@@ -12,7 +12,7 @@ body.graph-page {
 
 body.graph-page {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     overflow: hidden;
 }
 
@@ -51,7 +51,7 @@ body.graph-page {
     width: 100%;
     box-sizing: border-box;
     padding: 8px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
     background: #ffffff;
@@ -66,7 +66,7 @@ body.graph-page {
 .graph-folder-select {
     max-width: 220px;
     padding: 7px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 13px;
     background: #ffffff;
@@ -100,7 +100,7 @@ body.graph-page {
 
 .graph-stats {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     white-space: nowrap;
 }
 
@@ -109,7 +109,7 @@ body.graph-page {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 6px;
     background: #ffffff;
     font-size: 13px;
@@ -119,7 +119,7 @@ body.graph-page {
 }
 
 .graph-reset-btn:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
 }
 
 /* Canvas --------------------------------------------------------------- */
@@ -141,7 +141,7 @@ body.graph-page {
     align-items: center;
     gap: 5px;
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     white-space: nowrap;
     pointer-events: none;
 }
@@ -250,7 +250,7 @@ body.graph-page {
 .graph-tooltip-meta {
     margin-top: 2px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 /* Loading / empty states ------------------------------------------------ */
@@ -264,7 +264,7 @@ body.graph-page {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     text-align: center;
     padding: 20px;
 }

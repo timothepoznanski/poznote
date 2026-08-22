@@ -109,7 +109,7 @@
     text-align: center;
     font-weight: 700;
     font-size: 9px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     padding: 0;
     line-height: 1.1;
 }
@@ -300,7 +300,7 @@
 }
 
 .calendar-note-item:hover {
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     border-color: #0b78e6;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -335,7 +335,7 @@
 
 .calendar-notes-empty {
     padding: 12px 4px;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-size: 14px;
     text-align: center;
 }

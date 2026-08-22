@@ -92,7 +92,7 @@
 
 .attachment-filename {
     font-weight: bold;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .attachment-size {
@@ -130,7 +130,7 @@
 }
 
 .attachment-delete {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: white;
 }
 

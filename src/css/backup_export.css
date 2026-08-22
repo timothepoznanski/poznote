@@ -42,7 +42,7 @@ body {
 
 .backup-section h3 {
     margin-top: 0;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
 }
@@ -101,7 +101,7 @@ body {
 
 .backup-spinner-text {
     font-size: 13px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .sr-only {
@@ -152,7 +152,7 @@ html[data-theme='dark'] .info-box {
 
 /* Text warning styles */
 .text-warning-bold {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: bold;
 }
 

@@ -73,13 +73,13 @@
     align-items: center;
     padding: 15px 20px;
     border-bottom: 1px solid #eee;
-    background: #f8f9fa;
+    background: var(--pz-surface);
 }
 
 .pdf-preview-header h3 {
     margin: 0;
     font-size: 18px;
-    color: #333;
+    color: var(--pz-text);
     flex: 1;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -104,13 +104,13 @@
 
 .pdf-preview-close:hover {
     background: #e9ecef;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .pdf-preview-actions {
     padding: 15px 20px;
     border-top: 1px solid #eee;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     display: flex;
     gap: 10px;
     justify-content: center;

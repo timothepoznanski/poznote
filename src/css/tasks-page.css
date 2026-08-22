@@ -5,7 +5,7 @@ body.tasks-page {
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--bg-color, #ffffff);
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .tasks-container {
@@ -116,10 +116,10 @@ body.tasks-page {
 
 .tasks-filter-chip {
     padding: 6px 14px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 16px;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -149,10 +149,10 @@ body.tasks-page {
     /* Same vertical metrics as the filter chips (6px padding, 13px font) so
        both end up the same height on the shared row */
     padding: 6px 36px 6px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 13px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, #ffffff);
     transition: all 0.2s ease;
     box-sizing: border-box;
@@ -196,10 +196,10 @@ body.tasks-page {
     width: 29px;
     height: 29px;
     padding: 0;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -220,7 +220,7 @@ body.tasks-page {
     align-items: center;
     gap: 10px;
     padding-bottom: 8px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--border-color, var(--pz-border));
 }
 
 .tasks-note-toggle {
@@ -428,7 +428,7 @@ body.tasks-page {
 .tasks-view-toggle {
     display: flex;
     flex-shrink: 0;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     overflow: hidden;
 }
@@ -442,7 +442,7 @@ body.tasks-page {
     padding: 0;
     border: none;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -486,10 +486,10 @@ body.tasks-page {
     align-items: center;
     justify-content: center;
     height: 28px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     background: transparent;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -534,7 +534,7 @@ body.tasks-page {
     text-align: center;
     font-size: 11px;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     padding: 6px 0;
     background: var(--bg-color, #ffffff);
 }
@@ -601,7 +601,7 @@ body.tasks-page {
     border-left: 3px solid var(--pz-accent);
     border-radius: 4px;
     background: rgba(var(--pz-accent-rgb), 0.1);
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     font-size: 11px;
     font-family: inherit;
     line-height: 1.5;
@@ -727,7 +727,7 @@ body.tasks-page {
     }
 
     .tasks-cal-chip.completed {
-        background: #9ca3af;
+        background: var(--pz-text-subtle);
     }
 }
 

@@ -154,7 +154,7 @@
     padding: 10px 12px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
     background: transparent;
@@ -324,7 +324,7 @@
 }
 
 .folder-note-count {
-    color: #6b7280;
+    color: var(--pz-text-muted);
     margin-left: 6px;
     font-weight: 400;
 }
@@ -382,7 +382,7 @@
 /* Icon for linked notes */
 .note-type-icon-inline {
     font-size: 0.85em;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     margin-right: 4px;
     opacity: 0.8;
 }
@@ -455,7 +455,7 @@
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
@@ -470,7 +470,7 @@
 }
 
 .create-menu-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     color: var(--pz-accent);
 }
 

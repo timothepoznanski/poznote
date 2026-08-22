@@ -13,6 +13,15 @@
     --pz-accent-hover: #005a8a;
     /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
     --pz-accent-rgb: 0, 125, 184;
+    /* Neutral palette of the light theme. Dark and black use --dm-* below. */
+    --pz-text: #333333;            /* main text */
+    --pz-text-muted: #6b7280;      /* secondary text, icons */
+    --pz-text-subtle: #9ca3af;     /* placeholders, hints */
+    --pz-border: #e0e0e0;          /* default borders, separators */
+    --pz-border-strong: #d1d5db;   /* inputs, menus, cards */
+    --pz-surface: #f8f9fa;         /* panels, cards, code backgrounds */
+    --pz-surface-hover: #f3f4f6;   /* hover rows and items */
+    --pz-danger: #dc3545;          /* destructive actions, errors */
 }
 
 /* ============================================

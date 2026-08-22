@@ -111,7 +111,7 @@
 }
 
 :is(#editProfileModal, #confirmLogoutModal) .modal-buttons button.btn-danger {
-    background-color: #dc3545;
+    background-color: var(--pz-danger);
     color: #fff;
 }
 

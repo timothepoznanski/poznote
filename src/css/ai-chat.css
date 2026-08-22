@@ -16,7 +16,7 @@
     z-index: 1200;
     display: flex;
     flex-direction: column;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     border-left: 1px solid #dee2e6;
     box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
     transform: translateX(100%);
@@ -160,7 +160,7 @@ a.ai-chat-header-btn {
     border-radius: 4px;
     padding: 1px 4px;
     font-size: 0.9em;
-    color: inherit; /* the global `code` rule hardcodes #333, unreadable on dark bubbles */
+    color: inherit; /* the global `code` rule hardcodes var(--pz-text), unreadable on dark bubbles */
 }
 
 .ai-chat-md pre {
@@ -233,7 +233,7 @@ a.ai-chat-header-btn {
     gap: 8px;
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid #dee2e6;
-    background: #f8f9fa;
+    background: var(--pz-surface);
 }
 
 #ai-chat-input {

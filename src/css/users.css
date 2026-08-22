@@ -67,7 +67,7 @@ body.dark-mode {
 
 .admin-title {
     font-size: 1.8rem;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .admin-subtitle {
@@ -117,7 +117,7 @@ body.dark-mode {
 }
 
 .btn-danger {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: white !important;
 }
 
@@ -128,7 +128,7 @@ body.dark-mode {
 /* Delete stays visibly locked until the username is typed */
 .btn-danger:disabled,
 .btn-danger:disabled:hover {
-    background: #dc3545;
+    background: var(--pz-danger);
     opacity: 0.45;
     cursor: not-allowed;
 }
@@ -156,7 +156,7 @@ body.dark-mode {
 }
 
 .btn-cancel-admin {
-    background-color: #dc3545 !important;
+    background-color: var(--pz-danger) !important;
     color: white !important;
 }
 
@@ -188,7 +188,7 @@ body.dark-mode {
     padding: 15px;
     text-align: left;
     border-bottom: 1px solid var(--border-color, #eee);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .users-table th {
@@ -339,7 +339,7 @@ body.dark-mode .users-header-help:focus-visible {
 
 .users-table td.user-id-cell {
     font-family: monospace;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     font-size: 1.1rem;
     font-weight: 600;
 }
@@ -386,7 +386,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .user-username {
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     font-size: 0.95em;
     padding: 4px 8px;
     border-radius: 4px;
@@ -437,7 +437,7 @@ html[data-theme='dark'] .users-table td {
 
 .badge-admin {
     background: #ffc107;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .badge-active {
@@ -446,7 +446,7 @@ html[data-theme='dark'] .users-table td {
 }
 
 .badge-inactive {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: white;
 }
 
@@ -662,7 +662,7 @@ html[data-theme='dark'] .users-table td {
     padding: 10px 12px;
     border: 1px solid var(--border-color, #ddd);
     border-radius: 6px;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     cursor: pointer;
 }
 
@@ -721,7 +721,7 @@ html[data-theme='dark'] .account-access-own-label {
 .modal-title {
     font-size: 1.4rem;
     margin-bottom: 0;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
 }
 
 #createModal .modal-title {
@@ -737,7 +737,7 @@ html[data-theme='dark'] .account-access-own-label {
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .form-group input:not([type="checkbox"]),
@@ -749,7 +749,7 @@ html[data-theme='dark'] .account-access-own-label {
     border-radius: 8px;
     font-size: 14px;
     background: var(--bg-color, #fff);
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     box-sizing: border-box;
 }
 
@@ -816,7 +816,7 @@ html[data-theme='dark'] .account-access-own-label {
 }
 
 .delete-warning {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: 500;
     margin-top: 15px;
 }

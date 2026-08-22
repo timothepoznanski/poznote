@@ -427,7 +427,7 @@
 .via-badge {
     font-size: 10px;
     margin-right: 5px;
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     border: 1px solid #dee2e6;
     color: #6c757d;
 }
@@ -449,7 +449,7 @@
 
 .folder-name-text {
     font-size: 13px;
-    color: var(--text-color, var(--dm-text, #333333));
+    color: var(--text-color, var(--dm-text, var(--pz-text)));
     cursor: pointer;
     user-select: none;
 }
@@ -509,7 +509,7 @@
     align-items: center;
     gap: 10px;
     margin: 10px 0;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     font-size: 16px;
     line-height: 1.4;
 }

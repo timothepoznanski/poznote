@@ -29,7 +29,7 @@
     padding: 12px 16px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-style: normal;
@@ -55,7 +55,7 @@
 }
 
 .dropdown-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
 }
 
 .dropdown-item i {
@@ -95,7 +95,7 @@
 }
 
 .workspace-menu-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
 }
 
 .workspace-menu-item.current-workspace {
@@ -118,7 +118,7 @@
 .workspace-menu-username {
     cursor: default;
     font-weight: 400;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     border-bottom: none;
 }
 
@@ -128,7 +128,7 @@
 
 .workspace-menu-divider {
     height: 1px;
-    background-color: #e0e0e0;
+    background-color: var(--pz-border);
     margin: 4px 0;
 }
 
@@ -187,7 +187,7 @@
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
@@ -198,7 +198,7 @@
 }
 
 .settings-menu-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     color: var(--pz-accent);
 }
 
@@ -220,7 +220,7 @@
 }
 
 .settings-menu-item .setting-status.disabled {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 /* Update Status */
@@ -261,7 +261,7 @@
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
@@ -272,7 +272,7 @@
 }
 
 .share-menu-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     color: var(--pz-accent);
 }
 
@@ -315,7 +315,7 @@
     padding: 10px 15px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: var(--pz-text);
     border-bottom: 1px solid #f0f0f0;
     transition: background-color 0.2s;
     font-family: 'Inter', sans-serif;
@@ -326,7 +326,7 @@
 }
 
 .actions-menu-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--pz-surface);
     color: var(--pz-accent);
 }
 

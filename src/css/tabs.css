@@ -41,7 +41,7 @@
     gap: 6px;
     padding: 5px 8px 5px 12px;
     border-radius: 6px 6px 0 0;
-    background: #f3f4f6;
+    background: var(--pz-surface-hover);
     cursor: pointer;
     max-width: 200px;
     min-width: 80px;
@@ -62,7 +62,7 @@
 
 .app-tab.active {
     background: #fff;
-    border-color: #d1d5db;
+    border-color: var(--pz-border-strong);
     border-top: 2px solid var(--pz-accent);
     font-weight: 500;
     z-index: 1;
@@ -85,7 +85,7 @@
     border: none;
     cursor: pointer;
     padding: 1px 4px;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     font-size: 1rem;
     line-height: 1;
     border-radius: 3px;
@@ -124,7 +124,7 @@
     border-radius: 6px;
     background: #fff;
     box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.12), 9px 0 0 0 #fff;
-    color: #6b7280;
+    color: var(--pz-text-muted);
     font-family: inherit;
     font-size: 0.75rem;
     line-height: 1;
@@ -133,8 +133,8 @@
 }
 
 .app-tab-close-all:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border-strong);
     color: #b91c1c;
 }
 
@@ -172,7 +172,7 @@
 .app-tab-context-menu {
     position: fixed;
     background: #fff;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--pz-border-strong);
     border-radius: 8px;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     min-width: 160px;
@@ -193,7 +193,7 @@
 }
 
 .app-tab-context-item:hover {
-    background-color: #f3f4f6;
+    background-color: var(--pz-surface-hover);
 }
 
 .app-tab-context-icon {

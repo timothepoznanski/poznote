@@ -17,7 +17,7 @@
 .noteentry ~ .note-attachments-row,
 .noteentry ~ .note-attachment-previews,
 .noteentry ~ .backlinks-row {
-    border-top: 1px solid var(--border-color, #e0e0e0);
+    border-top: 1px solid var(--border-color, var(--pz-border));
     margin-top: 12px;
     padding-top: 22px;
     margin-bottom: 10px;

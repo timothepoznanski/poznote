@@ -56,7 +56,7 @@ body.shared-page {
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background-color: var(--bg-color, #ffffff);
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .shared-container {
@@ -72,7 +72,7 @@ body.shared-page {
     background-color: var(--info-bg, #e7f3ff);
     border-left: 4px solid var(--primary-color, #007bff);
     border-radius: 4px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .shared-buttons-container {
@@ -233,10 +233,10 @@ body.shared-page {
 .filter-input {
     width: 100%;
     padding: 10px 40px 10px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color, var(--pz-border));
     border-radius: 8px;
     font-size: 14px;
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, #ffffff);
     transition: all 0.2s ease;
     box-sizing: border-box;
@@ -269,7 +269,7 @@ body.shared-page {
 
 .clear-filter-btn:hover {
     background-color: var(--hover-bg, #f0f0f0);
-    color: var(--text-color, #333333);
+    color: var(--text-color, var(--pz-text));
 }
 
 .filter-stats {

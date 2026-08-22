@@ -147,7 +147,7 @@
     width: 100%;
     box-sizing: border-box;
     padding: 8px 10px;
-    border: 1.5px solid #d1d5db;
+    border: 1.5px solid var(--pz-border-strong);
     border-radius: 6px;
     font-size: 14px;
     background: transparent;

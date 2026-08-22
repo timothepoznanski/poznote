@@ -9,7 +9,7 @@
 /* Base layout */
 .home-page {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     min-height: 100vh;
     margin: 0;
     padding: 0;
@@ -25,7 +25,7 @@
 .version-display-desktop-bottom {
     margin-top: 18px;
     text-align: center;
-    color: #6b7280;
+    color: var(--pz-text-muted);
 }
 
 .version-display-desktop-bottom a.release-notes-link {
@@ -65,7 +65,7 @@
 }
 
 .home-info-separator {
-    color: #6b7280;
+    color: var(--pz-text-muted);
     opacity: 0.5;
 }
 
@@ -86,7 +86,7 @@
 
 /* Back link */
 .home-back-link {
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     text-decoration: none;
     padding: 8px;
     border-radius: 6px;
@@ -108,7 +108,7 @@
 .create-page-title {
     font-size: 28px;
     font-weight: 600;
-    color: var(--text-color, #333);
+    color: var(--text-color, var(--pz-text));
     margin: 0 0 24px 0;
     text-align: center;
 }
@@ -117,8 +117,8 @@
 .home-notes-count {
     font-size: 1rem;
     font-weight: 400;
-    color: #6b7280;
-    background: #f3f4f6;
+    color: var(--pz-text-muted);
+    background: var(--pz-surface-hover);
     padding: 4px 10px;
     border-radius: 12px;
     margin-left: auto;

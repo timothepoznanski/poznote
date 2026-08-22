@@ -41,7 +41,7 @@
 
 .alert-danger {
     background-color: #f8d7da;
-    border-color: #dc3545;
+    border-color: var(--pz-danger);
     color: #721c24;
 }
 
@@ -83,11 +83,11 @@
 
 /* Text colors */
 .text-danger {
-    color: #dc3545;
+    color: var(--pz-danger);
 }
 
 .text-warning-bold {
-    color: #dc3545;
+    color: var(--pz-danger);
     font-weight: bold;
 }
 
@@ -95,7 +95,7 @@
 .maintenance-subtitle {
     font-weight: 600;
     margin-bottom: 8px;
-    color: #333;
+    color: var(--pz-text);
 }
 
 .maintenance-description {

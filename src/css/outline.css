@@ -16,7 +16,7 @@
     overflow-x: hidden;
     padding: 0px 16px 16px 16px;
     box-sizing: border-box;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
@@ -39,7 +39,7 @@
     z-index: 1;
     margin: -16px -16px 16px;
     padding: 16px 16px 12px;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     /* border-bottom: 1px solid #dee2e6; */
 }
 
@@ -175,7 +175,7 @@
 /* Outline resize handle */
 .outline-resize-handle {
     height: 100vh;
-    background: #f8f9fa;
+    background: var(--pz-surface);
     cursor: col-resize;
     position: relative;
     flex-shrink: 0;
@@ -231,7 +231,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 }
 
 .toggle-outline-btn:hover {
-    background: #f8f9fa;
+    background: var(--pz-surface);
     color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -499,7 +499,7 @@ html[data-theme='dark'] .toggle-outline-btn[aria-disabled="true"]:hover {
     bottom: 1.5rem;
     left: 50%;
     transform: translateX(-50%) translateY(0.5rem);
-    background: #333;
+    background: var(--pz-text);
     color: #fff;
     font-size: 0.82rem;
     padding: 0.4em 0.9em;

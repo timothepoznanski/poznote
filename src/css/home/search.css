@@ -25,7 +25,7 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     font-size: 14px;
 }
 
@@ -68,7 +68,7 @@
     border: none;
     border-radius: 6px;
     background: transparent;
-    color: #9ca3af;
+    color: var(--pz-text-subtle);
     cursor: pointer;
 }
 

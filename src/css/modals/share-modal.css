@@ -89,7 +89,7 @@ input:checked+.toggle-slider:before {
 
 /* Button Variants */
 #shareModal .btn-cancel {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: #ffffff;
     border: none;
 }
@@ -143,7 +143,7 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 
 /* Button Variants */
 #folderShareModal .btn-cancel {
-    background: #dc3545;
+    background: var(--pz-danger);
     color: #ffffff;
     border: none;
 }
