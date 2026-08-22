@@ -220,6 +220,15 @@ function switchToWorkspace(workspaceName) {
         document.body.dataset.workspace = workspaceName;
     }
 
+    // The icon rail is rendered outside #left_col, so the partial refresh at
+    // the end of this function never touches it: re-point its links by hand or
+    // they keep carrying the previous workspace, and an explicit ?workspace=
+    // wins over the last-opened setting server-side
+    // (js/icon-sidebar-toggle.js).
+    if (typeof window.updateIconSidebarWorkspace === 'function') {
+        window.updateIconSidebarWorkspace(workspaceName);
+    }
+
     // Save last opened workspace to database
     if (typeof saveLastOpenedWorkspace === 'function') {
         saveLastOpenedWorkspace(workspaceName);
