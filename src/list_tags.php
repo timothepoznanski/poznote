@@ -11,8 +11,15 @@ require_once 'version_helper.php';
 $where_conditions = ["trash = 0"];
 $search_params = [];
 
-// Respect optional workspace parameter to scope tags
-$workspace = isset($_GET['workspace']) ? trim($_GET['workspace']) : (isset($_POST['workspace']) ? trim($_POST['workspace']) : '');
+// Scope the tag list to the effective workspace, like every other secondary
+// page: getWorkspaceFilter() honours ?workspace= first, then the default /
+// last-opened setting. Reading the parameter directly left the page listing
+// the tags of every workspace whenever it was missing, while the search behind
+// a tag click stayed workspace-scoped.
+$workspace = trim((string)getWorkspaceFilter());
+if ($workspace === '__last_opened__') {
+	$workspace = '';
+}
 
 $where_clause = implode(" AND ", $where_conditions);
 
@@ -92,9 +99,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 </head>
 <body class="tags-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php
-	// $workspace only reflects an explicit ?workspace= (it scopes the tag query);
-	// the rail links should carry the effective workspace like the other pages.
-	$iconSidebarWorkspace = $workspace !== '' ? $workspace : trim((string)getWorkspaceFilter());
+	$iconSidebarWorkspace = $workspace;
 	include 'icon_sidebar.php';
 	?>
 	<div class="tags-container">
