@@ -107,7 +107,7 @@ body.dark-mode .dashboard-sidebar-sep {
 
 .dashboard-sidebar-context-link:hover,
 .dashboard-sidebar-context-link:focus-visible {
-    color: #007DB8;
+    color: var(--pz-accent);
     transform: translateY(-1px);
 }
 
@@ -194,8 +194,8 @@ body.dark-mode .dashboard-sidebar-sep {
 
 .dashboard-filter-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .dashboard-filter-clear {
@@ -268,14 +268,14 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-topbar-btn:hover {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.08);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
     border-radius: 8px;
     transform: translateY(-2px);
 }
 
 .dashboard-topbar-btn.active .lucide {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 #dashboardToggleFavorites.active .lucide-star {
@@ -293,7 +293,7 @@ body.dark-mode .dashboard-sidebar-sep {
     right: 0;
     text-align: center;
     padding: 0;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 13px;
     font-weight: 400;
     /* 1.2 leaves room for descenders (p, y); overflow:hidden clips them at 1 */
@@ -323,12 +323,12 @@ body.dark-mode .dashboard-sidebar-sep {
 .dashboard-topbar-btn .lucide-bell,
 .dashboard-topbar-btn .lucide-upload,
 .dashboard-topbar-btn .lucide-download {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .dashboard-topbar-btn .lucide-star,
 .dashboard-topbar-btn .lucide-trash-2 {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .dashboard-topbar-btn .lucide-search {
@@ -371,7 +371,7 @@ body.dark-mode .dashboard-sidebar-sep {
 }
 
 .dashboard-debug-btn[aria-pressed="true"] {
-    background: #007cba;
+    background: var(--pz-accent);
     color: #fff;
 }
 
@@ -401,7 +401,7 @@ body.dark-mode .dashboard-sidebar-sep {
 
 :root[data-theme='dark'] .dashboard-debug-btn[aria-pressed="true"],
 body.dark-mode .dashboard-debug-btn[aria-pressed="true"] {
-    background: #007cba;
+    background: var(--pz-accent);
     color: #fff;
 }
 
@@ -451,13 +451,13 @@ body.dark-mode .dashboard-debug-info pre {
     background: none;
     border: none;
     border-radius: 6px;
-    color: #007DB8;
+    color: var(--pz-accent);
     cursor: pointer;
     transition: background 0.15s ease;
 }
 
 .bc-home:hover {
-    background: rgba(0, 125, 184, 0.08);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 .bc-home .lucide {
@@ -479,13 +479,13 @@ body.dark-mode .dashboard-debug-info pre {
     border-radius: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: #007DB8;
+    color: var(--pz-accent);
     cursor: pointer;
     transition: background 0.15s ease;
 }
 
 .bc-item:hover {
-    background: rgba(0, 125, 184, 0.08);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 .bc-current {
@@ -597,8 +597,8 @@ body.dark-mode .dash-section-title {
 }
 
 .board-view-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .board-view-btn .lucide {
@@ -839,8 +839,8 @@ body.dark-mode .dash-section-title {
 }
 
 .dash-card:hover {
-    border-color: #007DB8;
-    box-shadow: 0 3px 12px rgba(0, 125, 184, 0.14);
+    border-color: var(--pz-accent);
+    box-shadow: 0 3px 12px rgba(var(--pz-accent-rgb), 0.14);
     transform: translateY(-2px);
 }
 
@@ -893,13 +893,13 @@ body.dark-mode .dash-section-title {
 }
 
 .dashboard-color-filter-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .dashboard-color-filter-btn.active {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
     background: #eff6ff;
 }
 
@@ -919,8 +919,8 @@ body.dark-mode .dashboard-color-filter-btn {
 body.dark-mode .dashboard-color-filter-btn:hover,
 :root[data-theme='dark'] .dashboard-color-filter-btn.active,
 body.dark-mode .dashboard-color-filter-btn.active {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
     background: var(--dm-surface-hover);
 }
 
@@ -1033,7 +1033,7 @@ body.dark-mode .note-color-swatch-empty {
 }
 
 .note-color-option.selected {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background: #eff6ff;
 }
 
@@ -1065,7 +1065,7 @@ body.dark-mode .note-color-option {
 
 :root[data-theme='dark'] .note-color-option.selected,
 body.dark-mode .note-color-option.selected {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background: var(--dm-surface-hover);
 }
 
@@ -1172,7 +1172,7 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 .dash-card-icon [class*=" lucide-"] {
     width: 26px;
     height: 26px;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .dash-card-name {
@@ -1262,12 +1262,12 @@ body.dark-mode .modal-buttons button.note-color-manage-btn:hover {
 
 .dash-card-pin:hover i,
 .dash-card.is-pinned .dash-card-pin i {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
 }
 
 /* A pinned card reads as pinned even before the button is noticed. */
 .dash-card.is-pinned {
-    border-color: rgba(0, 125, 184, 0.45);
+    border-color: rgba(var(--pz-accent-rgb), 0.45);
 }
 
 .dash-note-icon {
@@ -1488,14 +1488,14 @@ body.dark-mode .dashboard-topbar-btn {
 
 :root[data-theme='dark'] .dashboard-topbar-btn:hover,
 body.dark-mode .dashboard-topbar-btn:hover {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.12);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.12);
     transform: translateY(-2px);
 }
 
 :root[data-theme='dark'] .dashboard-topbar-btn.active .lucide,
 body.dark-mode .dashboard-topbar-btn.active .lucide {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 :root[data-theme='dark'] #dashboardToggleFavorites.active .lucide-star,
@@ -1519,7 +1519,7 @@ body.dark-mode .dashboard-topbar-btn .lucide-paperclip,
 body.dark-mode .dashboard-topbar-btn .lucide-bell,
 body.dark-mode .dashboard-topbar-btn .lucide-upload,
 body.dark-mode .dashboard-topbar-btn .lucide-download {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 :root[data-theme='dark'] .dashboard-notifications-btn.has-notifications .lucide-bell,
@@ -1536,7 +1536,7 @@ body.dark-mode .dashboard-notifications-btn.has-notifications .dashboard-topbar-
 :root[data-theme='dark'] .dashboard-topbar-btn .lucide-trash-2,
 body.dark-mode .dashboard-topbar-btn .lucide-star,
 body.dark-mode .dashboard-topbar-btn .lucide-trash-2 {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .dashboard-topbar-actions .dashboard-topbar-btn .lucide-search,
@@ -1580,7 +1580,7 @@ body.dark-mode .dash-card {
 
 :root[data-theme='dark'] .dash-card:hover,
 body.dark-mode .dash-card:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
 }
 
@@ -1698,11 +1698,11 @@ body.dark-mode .dashboard-empty {
 }
 
 .dashboard-mobile-back:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .dashboard-mobile-back:hover .lucide {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 :root[data-theme='dark'] .dashboard-mobile-back:hover,
@@ -1940,13 +1940,13 @@ body.dark-mode .dashboard-version-badge {
 .dashboard-workspace-trigger:hover,
 .dashboard-user-trigger:hover,
 .dashboard-top-info-link:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .dashboard-workspace-trigger:hover .lucide,
 .dashboard-user-trigger:hover .lucide,
 .dashboard-top-info-link:hover .lucide {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Scroll the top info bar horizontally instead of truncating its items,

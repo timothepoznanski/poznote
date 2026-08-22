@@ -1,8 +1,10 @@
 /**
- * Folder Actions & Dropdown Menu
+ * Folder & Note Actions Menus
  *
- * Folder action buttons, three-dot toggle, dropdown menu items,
- * kanban icon, and action button visibility rules.
+ * Three-dot toggles and dropdown menus of the folder rows
+ * (.folder-actions-*) and note rows (.note-actions-*) in the sidebar tree,
+ * kanban icon, and action button visibility rules. Dark-mode counterparts
+ * live in css/dark-mode/menus.css.
  */
 
 /* Folder actions container */
@@ -59,8 +61,14 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     pointer-events: auto;
 }
 
-/* Three-dot toggle button */
-.folder-actions-toggle {
+/* Three-dot toggle button, shared by folder rows (.folder-actions-toggle) and
+   note rows (.note-actions-toggle / .note-actions-item, see js/utils.js) so
+   both read as one control. Only the visibility rules differ: folder toggles
+   fade in on row hover (opacity rules above), note toggles are display:none
+   until their row is hovered. */
+.folder-actions-toggle,
+.note-actions-toggle,
+.note-actions-item {
     width: 22px;
     height: 22px;
     padding: 0;
@@ -68,30 +76,67 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     color: #6b7280;
     border-radius: 4px;
     transition: all 0.15s ease;
-    display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
-.folder-actions-toggle:hover {
+.folder-actions-toggle {
+    display: inline-flex;
+}
+
+/* Note toggles are <button>s: reset the UA styles, hide until the row is hovered */
+.note-actions-toggle,
+.note-actions-item {
+    background: none;
+    border: none;
+    line-height: 1;
+    display: none;
+}
+
+.note-list-item:hover .note-actions-toggle,
+.note-list-item:hover .note-actions-item,
+.note-actions-toggle.open {
+    display: inline-flex;
+}
+
+/* No hover on touch screens, so the note toggle has to stay visible there. */
+@media (hover: none), (max-width: 800px) {
+    .note-actions-toggle {
+        display: inline-flex;
+    }
+}
+
+.folder-actions-toggle:hover,
+.note-actions-toggle:hover,
+.note-actions-item:hover {
     background: rgba(107, 114, 128, 0.12);
     color: #374151;
 }
 
-.folder-actions-toggle i {
+.folder-actions-toggle i,
+.note-actions-toggle i,
+.note-actions-item i {
     font-size: 0.8em;
     transition: color 0.15s ease;
 }
 
-/* Reduce Lucide icon size in folder-actions-toggle */
+/* Reduce Lucide icon size inside the toggles */
 .folder-actions-toggle i[class*="lucide-"],
-.folder-actions-toggle [class*="lucide-"] {
+.folder-actions-toggle [class*="lucide-"],
+.note-actions-toggle i[class*="lucide-"],
+.note-actions-toggle [class*="lucide-"],
+.note-actions-item i[class*="lucide-"],
+.note-actions-item [class*="lucide-"] {
     font-size: 0.85em !important;
 }
 
 .folder-actions-toggle:hover i,
-.folder-actions-toggle:hover [class*="lucide-"] {
-    color: #007DB8;
+.folder-actions-toggle:hover [class*="lucide-"],
+.note-actions-toggle:hover i,
+.note-actions-toggle:hover [class*="lucide-"],
+.note-actions-item:hover i,
+.note-actions-item:hover [class*="lucide-"] {
+    color: var(--pz-accent);
 }
 
 /* Kanban icon style */
@@ -116,8 +161,13 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     font-size: 0.75em !important;
 }
 
-/* Dropdown menu for folder actions */
-.folder-actions-menu {
+/* Dropdown menu shared by folder actions (.folder-actions-menu) and note
+   actions (.note-actions-menu): one look, two JS hooks. Each is a single
+   shared menu placed by adjustMenuPosition() in js/utils.js; fixed rather
+   than absolute because #left_col scrolls, which would clip a menu positioned
+   inside a row. */
+.folder-actions-menu,
+.note-actions-menu {
     position: fixed;
     background: white;
     border: 1px solid #d1d5db;
@@ -129,11 +179,13 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     display: none;
 }
 
-.folder-actions-menu.show {
+.folder-actions-menu.show,
+.note-actions-menu.show {
     display: block;
 }
 
-.folder-actions-menu-item {
+.folder-actions-menu-item,
+.note-actions-menu-item {
     padding: 7px 14px;
     cursor: pointer;
     display: flex;
@@ -142,54 +194,59 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     color: #374151;
     transition: background-color 0.15s ease;
     font-size: 0.9em;
+    white-space: nowrap;
 }
 
-.folder-actions-menu-item:hover {
+.folder-actions-menu-item:hover,
+.note-actions-menu-item:hover {
     background-color: #f3f4f6;
 }
 
-.folder-actions-menu-item i {
+.folder-actions-menu-item i,
+.note-actions-menu-item i {
     font-size: 0.85em;
     color: #6b7280;
     width: 15px;
+    text-align: center;
 }
 
-.folder-actions-menu-item:hover i {
+.folder-actions-menu-item:hover i,
+.note-actions-menu-item:hover i {
     color: #374151;
 }
 
-.folder-actions-menu-item.danger {
+/* Destructive and "already shared" items */
+.folder-actions-menu-item.danger,
+.folder-actions-menu-item.shared,
+.note-actions-menu-item.danger,
+.note-actions-menu-item.shared {
     color: #dc2626;
 }
 
-.folder-actions-menu-item.danger:hover {
+.folder-actions-menu-item.danger:hover,
+.folder-actions-menu-item.shared:hover,
+.note-actions-menu-item.danger:hover,
+.note-actions-menu-item.shared:hover {
     background-color: #fee2e2;
 }
 
-.folder-actions-menu-item.danger i {
-    color: #dc2626;
-}
-
-.folder-actions-menu-item.shared {
-    color: #dc2626;
-}
-
-.folder-actions-menu-item.shared:hover {
-    background-color: #fee2e2;
-}
-
-.folder-actions-menu-item.shared i {
+.folder-actions-menu-item.danger i,
+.folder-actions-menu-item.shared i,
+.note-actions-menu-item.danger i,
+.note-actions-menu-item.shared i {
     color: #dc2626;
 }
 
 /* Separator in menu */
-.folder-actions-menu-separator {
+.folder-actions-menu-separator,
+.note-actions-menu-separator {
     height: 1px;
     background: #e5e7eb;
     margin: 4px 0;
 }
 
-.folder-actions-menu-header {
+.folder-actions-menu-header,
+.note-actions-menu-header {
     padding: 6px 16px;
     font-size: 0.75em;
     text-transform: uppercase;
@@ -199,25 +256,31 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     letter-spacing: 0.05em;
 }
 
-.folder-actions-menu-item.active {
+.folder-actions-menu-item.active,
+.note-actions-menu-item.active {
     background-color: #e3f2fd;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 600;
 }
 
-.folder-actions-menu-item.active i {
-    color: #007DB8;
+.folder-actions-menu-item.active i,
+.note-actions-menu-item.active i {
+    color: var(--pz-accent);
 }
 
 /* Dark mode adjustments */
 html[data-theme='dark'] .folder-actions-menu-item.active,
-body.dark-mode .folder-actions-menu-item.active {
-    background-color: rgba(0, 125, 184, 0.2);
+html[data-theme='dark'] .note-actions-menu-item.active,
+body.dark-mode .folder-actions-menu-item.active,
+body.dark-mode .note-actions-menu-item.active {
+    background-color: rgba(var(--pz-accent-rgb), 0.2);
     color: #38bdf8;
 }
 
 html[data-theme='dark'] .folder-actions-menu-item.active i,
-body.dark-mode .folder-actions-menu-item.active i {
+html[data-theme='dark'] .note-actions-menu-item.active i,
+body.dark-mode .folder-actions-menu-item.active i,
+body.dark-mode .note-actions-menu-item.active i {
     color: #38bdf8;
 }
 
@@ -231,7 +294,7 @@ body.dark-mode .folder-actions-menu-item.active i {
 .folder-delete-btn,
 .folder-empty-btn,
 .folder-move-files-btn {
-    color: #007DB8;
+    color: var(--pz-accent);
     margin-left: 8px;
     cursor: pointer;
     border-radius: 4px;

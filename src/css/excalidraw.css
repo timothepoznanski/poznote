@@ -688,13 +688,13 @@ html body.excalidraw-editor-page.excalidraw-shell-light .poznote-toolbar-title {
 }
 
 .excalidraw-btn-blue {
-    background: #007DB8;
-    border: 1px solid #007DB8;
+    background: var(--pz-accent);
+    border: 1px solid var(--pz-accent);
 }
 
 .excalidraw-btn-blue:hover {
-    background: #005a8a;
-    border-color: #005a8a;
+    background: var(--pz-accent-hover);
+    border-color: var(--pz-accent-hover);
 }
 
 .excalidraw-btn-blue:disabled {
@@ -759,8 +759,8 @@ html body.excalidraw-editor-page.excalidraw-shell-light .excalidraw-loading {
 }
 
 #saveAndExitBtn:hover {
-    background: #005a8a !important;
-    border-color: #005a8a !important;
+    background: var(--pz-accent-hover) !important;
+    border-color: var(--pz-accent-hover) !important;
 }
 
 .excalidraw-toolbar-btn:disabled,

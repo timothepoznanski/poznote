@@ -108,12 +108,12 @@ body.dark-mode {
 }
 
 .btn-primary {
-    background: #007cba;
+    background: var(--pz-accent);
     color: white !important;
 }
 
 .btn-primary:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 .btn-danger {
@@ -241,7 +241,7 @@ body.dark-mode {
     width: 16px;
     height: 16px;
     margin: 0;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
     cursor: pointer;
 }
 
@@ -756,8 +756,8 @@ html[data-theme='dark'] .account-access-own-label {
 .form-group input:not([type="checkbox"]):focus,
 .form-group select:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .form-actions {
@@ -841,7 +841,7 @@ html[data-theme='dark'] .account-access-own-label {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #007DB8;
+    color: var(--pz-accent);
     text-decoration: none;
     margin-bottom: 20px;
 }
@@ -889,7 +889,7 @@ html[data-theme='dark'] .account-access-own-label {
 }
 
 input:checked+.slider {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
 }
 
 input:checked+.slider:before {

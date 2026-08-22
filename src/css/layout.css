@@ -117,7 +117,7 @@ body {
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -141,12 +141,12 @@ body {
 /* Hover and focus states for sidebar buttons */
 .sidebar-howto:hover,
 .sidebar-plus:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -234,7 +234,7 @@ body {
 
 .toggle-sidebar-btn:hover {
     background: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 

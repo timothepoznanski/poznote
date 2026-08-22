@@ -253,8 +253,8 @@ body:not(.dark-mode) #changePasswordModal .change-password-status-sso {
 }
 
 .settings-view-toggle:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .settings-view-toggle .lucide {
@@ -404,7 +404,7 @@ body.dark-mode .settings-view-toggle:hover {
 }
 
 .home-card.is-pinned .settings-card-pin i {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     opacity: 1;
 }
 

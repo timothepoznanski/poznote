@@ -60,7 +60,7 @@ body.graph-page {
 
 .graph-search-input:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .graph-folder-select {
@@ -76,7 +76,7 @@ body.graph-page {
 
 .graph-folder-select:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .graph-options {
@@ -221,7 +221,7 @@ body.graph-page {
 }
 
 .graph-node.search-hit circle {
-    stroke: #007DB8;
+    stroke: var(--pz-accent);
     stroke-width: 2.5;
 }
 

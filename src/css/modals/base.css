@@ -85,7 +85,7 @@
 .modal-content input:focus,
 .modal-content select:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .modal .form-group label {
@@ -130,12 +130,12 @@
 }
 
 .modal-buttons button:first-child {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
 }
 
 .modal-buttons button:first-child:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 .modal-buttons button:last-child {
@@ -178,13 +178,13 @@
 
 /* Explicit button classes (take precedence over first/last child rules) */
 .modal-buttons button.btn-primary {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
     border: none;
 }
 
 .modal-buttons button.btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 /* Actions kept visible but unavailable (e.g. Change Password on an account
@@ -501,8 +501,8 @@ body.dark-mode .modal .modal-info-note {
 
 .modal-content .note-palette-add:hover,
 .modal-content button.note-palette-add:hover {
-    border-color: #007DB8;
-    color: #007DB8 !important;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent) !important;
     background: #f0f9ff;
 }
 
@@ -590,8 +590,8 @@ body.dark-mode .modal-content button.note-palette-add {
 body.dark-mode .modal-content .note-palette-add:hover,
 :root[data-theme='dark'] .modal-content button.note-palette-add:hover,
 body.dark-mode .modal-content button.note-palette-add:hover {
-    border-color: #007DB8;
-    color: #007DB8 !important;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent) !important;
     background: var(--dm-surface-hover);
 }
 
@@ -696,7 +696,7 @@ body.dark-mode .note-palette-remove:hover {
 }
 
 .modal-footer .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 

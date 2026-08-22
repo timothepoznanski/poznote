@@ -1,4 +1,21 @@
 /* ============================================
+   Theme tokens
+   ============================================
+   This stylesheet is the one every page loads, so it is where the shared
+   colour tokens live. Light values on :root, dark/black values in the
+   --dm-* blocks below. A custom stylesheet (Settings > Custom CSS) can
+   re-theme the app by overriding these on :root / html[data-theme='dark'].
+   Keep the names stable: they are part of the custom-CSS contract. */
+
+:root {
+    /* Brand blue: links, active states, primary buttons, focus rings. */
+    --pz-accent: #007db8;
+    --pz-accent-hover: #005a8a;
+    /* Same colour as RGB channels, for tints: rgba(var(--pz-accent-rgb), 0.1) */
+    --pz-accent-rgb: 0, 125, 184;
+}
+
+/* ============================================
    Dark Mode - CSS Custom Properties & Base
    ============================================ */
 

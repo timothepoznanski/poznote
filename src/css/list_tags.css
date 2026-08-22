@@ -121,7 +121,7 @@ html.tags-page {
 }
 
 .tag-item:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
@@ -381,7 +381,7 @@ body.dark-mode .tag-context-menu-item.danger:hover {
 }
 
 .tag-rename-input:focus {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .tag-rename-input,

@@ -73,8 +73,8 @@
 
 .outline-close-btn:hover,
 .outline-close-btn:focus {
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent);
 }
 
 .outline-close-btn i {
@@ -113,13 +113,13 @@
 }
 
 .outline-nav-link:hover {
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent);
 }
 
 .outline-nav-link.active {
-    background: rgba(0, 125, 184, 0.15);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.15);
+    color: var(--pz-accent);
     font-weight: 500;
 }
 
@@ -232,7 +232,7 @@ body:not(.outline-collapsed) .toggle-outline-btn {
 
 .toggle-outline-btn:hover {
     background: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 

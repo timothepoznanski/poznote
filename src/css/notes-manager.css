@@ -53,8 +53,8 @@ body.notes-manager-page {
 
 .nm-filter-bar .filter-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .nm-filter-bar .clear-filter-btn {
@@ -90,8 +90,8 @@ body.notes-manager-page {
 
 .nm-filter-select:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 /* Bulk action bar */
@@ -165,8 +165,8 @@ body.notes-manager-page {
 
 .nm-bulk-select:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.12);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.12);
 }
 
 .nm-bulk-select:disabled {
@@ -205,8 +205,8 @@ body.dark-mode .nm-bulk-select option {
 
 .nm-modal-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 /* ── Dark Mode Overrides ────────────────────────────────────────────── */
@@ -322,8 +322,8 @@ body.dark-mode .nm-folder-option-selected {
 }
 
 .nm-group-select-btn:hover {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.08);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 .nm-folder-count {
@@ -366,7 +366,7 @@ body.dark-mode .nm-folder-option-selected {
     flex-shrink: 0;
     width: 16px;
     height: 16px;
-    accent-color: #007DB8;
+    accent-color: var(--pz-accent);
     cursor: pointer;
 }
 
@@ -374,7 +374,7 @@ body.dark-mode .nm-folder-option-selected {
     flex: 1;
     min-width: 0;
     font-size: 14px;
-    color: var(--link-color, #007DB8);
+    color: var(--link-color, var(--pz-accent));
     text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -548,10 +548,6 @@ body.dark-mode .nm-folder-option-selected {
     padding: 20px;
     color: #dc2626;
     font-size: 14px;
-}
-
-.initially-hidden {
-    display: none;
 }
 
 /* ── Dark mode overrides ─────────────────────────────────────────────── */

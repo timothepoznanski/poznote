@@ -92,12 +92,12 @@ body {
 }
 
 .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
     text-decoration: none;
 }
 

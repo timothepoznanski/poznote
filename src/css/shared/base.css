@@ -122,15 +122,15 @@ body.shared-page {
 }
 
 .filter-type-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.08);
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 .filter-type-btn.active {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .filter-type-btn i {
@@ -192,9 +192,9 @@ body.shared-page {
 }
 
 .shared-filter-tree-actions .btn:hover {
-    border-color: rgba(0, 125, 184, 0.22);
-    background: rgba(0, 125, 184, 0.06);
-    color: #007DB8;
+    border-color: rgba(var(--pz-accent-rgb), 0.22);
+    background: rgba(var(--pz-accent-rgb), 0.06);
+    color: var(--pz-accent);
     text-decoration: none;
 }
 

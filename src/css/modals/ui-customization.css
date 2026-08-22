@@ -453,7 +453,7 @@
 }
 
 .icon-sidebar-order-icon {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .icon-sidebar-order-label {
@@ -489,7 +489,7 @@
 
 .icon-sidebar-order-move:hover:not(:disabled) {
     background: rgba(128, 128, 128, 0.15);
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .icon-sidebar-order-move:disabled {

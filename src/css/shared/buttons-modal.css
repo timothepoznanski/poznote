@@ -57,7 +57,7 @@
 }
 
 .btn-primary {
-    background: #007db8;
+    background: var(--pz-accent);
     color: white;
     border: none;
 }
@@ -118,7 +118,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title-link {
     line-height: 1.45;
     letter-spacing: 0;
     font-family: "JetBrains Mono", "Fira Code", monospace;
-    background: rgba(0, 125, 184, 0.06);
+    background: rgba(var(--pz-accent-rgb), 0.06);
     border-radius: 6px;
     padding: 8px 10px;
     cursor: default;
@@ -166,7 +166,7 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-title {
     gap: 12px;
     padding: 0 0 14px;
     margin-bottom: 2px;
-    background: linear-gradient(180deg, rgba(0, 125, 184, 0.08), rgba(0, 125, 184, 0));
+    background: linear-gradient(180deg, rgba(var(--pz-accent-rgb), 0.08), rgba(var(--pz-accent-rgb), 0));
     border-bottom: 1px solid rgba(15, 23, 42, 0.1);
 }
 
@@ -242,8 +242,8 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select 
 
 body.shared-page .shared-edit-token-modal .modal-password-input:focus,
 body.shared-page .shared-edit-token-modal .shared-edit-token-field-value select:focus {
-    border-color: rgba(0, 125, 184, 0.7);
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.14);
+    border-color: rgba(var(--pz-accent-rgb), 0.7);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.14);
     outline: none;
 }
 

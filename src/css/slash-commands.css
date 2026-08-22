@@ -325,8 +325,8 @@
 }
 
 .slash-date-picker-remove-time-btn:hover {
-    border-color: #007DB8;
-    color: #007DB8;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 .slash-date-picker-today-btn {

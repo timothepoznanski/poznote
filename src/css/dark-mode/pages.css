@@ -482,7 +482,7 @@ body.dark-mode .card-container {
 html[data-theme='dark'] .card-container:hover,
 body.dark-mode .card-container:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    border-color: #007cba;
+    border-color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .card-header,
@@ -565,8 +565,8 @@ body.dark-mode .filter-input {
 
 html[data-theme='dark'] .filter-input:focus,
 body.dark-mode .filter-input:focus {
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.2);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.2);
 }
 
 html[data-theme='dark'] .filter-input::placeholder,
@@ -587,7 +587,7 @@ body.dark-mode .clear-filter-btn:hover {
 
 html[data-theme='dark'] .filter-stats,
 body.dark-mode .filter-stats {
-    background-color: rgba(0, 125, 184, 0.2);
+    background-color: rgba(var(--pz-accent-rgb), 0.2);
     color: #a0c4e0;
 }
 

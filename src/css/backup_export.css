@@ -43,7 +43,7 @@ body {
 .backup-section h3 {
     margin-top: 0;
     color: #333;
-    border-bottom: 2px solid #007cba;
+    border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
 }
 
@@ -61,12 +61,12 @@ body {
 }
 
 .btn-primary {
-    background-color: #007cba;
+    background-color: var(--pz-accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 .btn-secondary {
@@ -94,7 +94,7 @@ body {
     width: 20px;
     height: 20px;
     border: 3px solid rgba(0, 0, 0, 0.08);
-    border-top-color: #007cba;
+    border-top-color: var(--pz-accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -213,7 +213,7 @@ html[data-theme='dark'] .info-box {
 .export-help .lucide {
     width: 16px;
     height: 16px;
-    background-color: #007cba;
+    background-color: var(--pz-accent);
     opacity: 0.85;
     transition: opacity 0.15s ease;
 }

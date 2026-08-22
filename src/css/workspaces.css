@@ -42,7 +42,7 @@ body {
 .settings-section h3 {
     margin-top: 0;
     color: #333;
-    border-bottom: 2px solid #007cba;
+    border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
 }
 
@@ -743,7 +743,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 .stat-number {
     font-size: 24px;
     font-weight: bold;
-    color: #007DB8;
+    color: var(--pz-accent);
     display: block;
 }
 
@@ -824,12 +824,12 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
 }
 
 .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 .btn-success {

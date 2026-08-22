@@ -40,30 +40,6 @@
     min-height: 1.5em;
 }
 
-/* Note list subline (created date) */
-.note-subline {
-    font-size: 0.95em;
-    /* slightly smaller than normal */
-    color: #6b7280;
-    margin-top: -2px;
-    /* space between title and subline */
-    margin-bottom: 18px;
-    /* same space between subline and note content */
-    display: none;
-    /* hidden by default */
-}
-
-/* Remove margins from h4 note title */
-h4 {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-form {
-    margin: 0px;
-    padding: 0px;
-}
-
 .contains_forms_search {
     width: 100%;
     margin: 5px 0 5px 0;
@@ -92,7 +68,7 @@ img {
     right: 0;
     width: 28px;
     height: 28px;
-    background: #007DB8;
+    background: var(--pz-accent);
     border: 2px solid white;
     border-radius: 4px 0 4px 0;
     cursor: nwse-resize;
@@ -110,7 +86,7 @@ img {
 }
 
 .image-resize-handle:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
     width: 32px;
     height: 32px;
 }
@@ -139,14 +115,14 @@ img {
     top: 50%;
     transform: translate(-50%, -50%);
     padding: 16px 24px;
-    color: #007DB8;
+    color: var(--pz-accent);
     background-color: #fff;
-    border: 2px solid #007DB8;
+    border: 2px solid var(--pz-accent);
     z-index: 1000;
     font-size: 1em;
     text-align: center;
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+    box-shadow: 0 4px 16px rgba(var(--pz-accent-rgb), 0.2);
     max-width: 400px;
     min-width: 200px;
 }
@@ -159,9 +135,9 @@ img {
 }
 
 #poznoteToast.notification-warning {
-    color: #007DB8;
-    border-color: #007DB8;
-    box-shadow: 0 4px 16px rgba(0, 125, 184, 0.2);
+    color: var(--pz-accent);
+    border-color: var(--pz-accent);
+    box-shadow: 0 4px 16px rgba(var(--pz-accent-rgb), 0.2);
 }
 
 #poznoteToast.notification-success {
@@ -171,25 +147,6 @@ img {
 }
 
 /* NOTE DISPLAY */
-
-div[contentEditable=true]:empty:before {
-    content: attr(data-ph);
-    color: #bababa;
-}
-
-/* Placeholder lines around embedded Excalidraw diagrams */
-.excalidraw-placeholder:empty:before {
-    content: attr(data-ph);
-    color: #999;
-    font-style: italic;
-    opacity: 0.6;
-}
-
-/* Exclure les blocs de code du placeholder automatique */
-.code-block:empty:before,
-.noteentry .code-block:empty:before {
-    content: none !important;
-}
 
 /* Unified create modal styles */
 .create-options {
@@ -217,18 +174,18 @@ div[contentEditable=true]:empty:before {
 }
 
 .create-note-option:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background-color: #f8fafb;
 }
 
 .create-note-option.selected {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background-color: #e8f4f8;
 }
 
 .create-note-option i {
     font-size: 24px;
-    color: #007DB8;
+    color: var(--pz-accent);
     margin-right: 16px;
     min-width: 30px;
     text-align: center;
@@ -262,13 +219,13 @@ body.dark-mode .create-note-option {
 
 html[data-theme='dark'] .create-note-option:hover,
 body.dark-mode .create-note-option:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background-color: var(--dm-surface-hover);
 }
 
 html[data-theme='dark'] .create-note-option.selected,
 body.dark-mode .create-note-option.selected {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background-color: #1a3a4a;
 }
 
@@ -337,14 +294,14 @@ body.dark-mode .create-section h4 {
 
 .image-menu-item:hover {
     background-color: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .image-menu-item i {
     margin-right: 10px;
     width: 16px;
     text-align: center;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Submenu styles */
@@ -386,7 +343,7 @@ body.dark-mode .create-section h4 {
 
 .image-submenu-item:hover {
     background-color: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Image border helpers (used by image menu actions) */
@@ -426,12 +383,12 @@ img.img-with-border-no-padding {
 
 .export-option:hover {
     background-color: #f9fafb;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .export-option i {
     font-size: 1.5em;
-    color: #007DB8;
+    color: var(--pz-accent);
     width: 24px;
     flex-shrink: 0;
     margin-top: 2px;
@@ -470,7 +427,7 @@ img.img-with-border-no-padding {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
     padding: 15px 20px;
     border-radius: 8px;

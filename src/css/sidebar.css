@@ -5,64 +5,6 @@
  * update badge, new note/folder buttons, searchbar, and footer.
  */
 
-/* Sidebar header and primary action */
-.sidebar-header {
-    /* padding: 6px 0 14px 0; */
-    margin-bottom: 6px;
-}
-
-.sidebar-title-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 6px 2px;
-    position: relative;
-    /* anchor dropdown menus inside the title row */
-}
-
-.sidebar-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #1f2937;
-    /* dark */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.workspace-burger-icon {
-    font-size: 1.1rem;
-    color: #6c757d;
-    pointer-events: none;
-}
-
-.workspace-dropdown-icon {
-    margin-left: 1px;
-    font-size: 0.9rem;
-    color: #6c757d;
-    pointer-events: none;
-    transition: transform 0.2s ease;
-    position: relative;
-    top: 2px;
-}
-
-.workspace-title-icon {
-    width: 20px;
-    height: 20px;
-    vertical-align: middle;
-    pointer-events: none;
-}
-
-.workspace-title-text {
-    vertical-align: middle;
-    flex: 1;
-}
-
-.sidebar-title[role="button"] {
-    cursor: pointer;
-}
-
 /* Single workspace: the title is plain text, not a dropdown trigger */
 .sidebar-title.sidebar-title-static {
     cursor: default;
@@ -90,7 +32,7 @@
 }
 
 /* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
-   Needs !important to beat the shared #007DB8 below. */
+   Needs !important to beat the shared var(--pz-accent) below. */
 #sidebarNotificationsBtn.has-notifications .lucide-bell {
     color: #f59e0b !important;
     background-color: #f59e0b;
@@ -100,7 +42,7 @@
 .sidebar-howto{
     background: transparent;
     border: none;
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     font-size: 1.3rem;
     cursor: pointer;
     padding: 6px;
@@ -111,27 +53,17 @@
     justify-content: center;
 }
 
-.sidebar-plus {
-    background: transparent;
-    border: none;
-    color: #6c757d !important;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-}
-
 /* Hover and focus states for sidebar buttons */
 .sidebar-howto:hover,
 .sidebar-folder-toggle:hover,
 .sidebar-plus:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -164,13 +96,13 @@
 .sidebar-folder-toggle:hover,
 .sidebar-howto:hover,
 .sidebar-plus:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .sidebar-folder-toggle:focus,
 .sidebar-howto:focus,
 .sidebar-plus:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 
@@ -234,12 +166,12 @@
 
 .sidebar-menu-item:hover {
     background: #f6fbff;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .sidebar-menu-item i {
     font-size: 18px;
-    color: #007DB8;
+    color: var(--pz-accent);
     width: 20px;
     text-align: center;
 }
@@ -291,7 +223,7 @@
     color: #6c757d !important;
 }
 
-/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: #005a8a; } /* Display background button plus on hover */
+/* .sidebar-plus:hover { background: rgba(0,0,0,0.04); color: var(--pz-accent-hover); } /* Display background button plus on hover */
 
 .btn-new-note {
     display: inline-flex;
@@ -471,7 +403,7 @@
 
 .note-icon:hover {
     transform: scale(1.15);
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 /* Notes without folder - indent to align with folder items */
@@ -539,7 +471,7 @@
 
 .create-menu-item:hover {
     background-color: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .create-menu-item {
@@ -559,7 +491,7 @@
 .create-menu-item i {
     font-size: 20px;
     margin-right: 10px;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Override for Lucide icons in create menu */

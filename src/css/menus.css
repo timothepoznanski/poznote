@@ -62,7 +62,7 @@
     margin-right: 10px;
     width: 16px;
     text-align: center;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .workspace-menu {
@@ -100,7 +100,7 @@
 
 .workspace-menu-item.current-workspace {
     font-weight: 600;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .workspace-menu-item i {
@@ -112,7 +112,7 @@
 }
 
 .workspace-menu-item.current-workspace i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .workspace-menu-username {
@@ -146,15 +146,15 @@
     height: 36px;
     cursor: pointer;
     margin: 4px;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 16px;
     border-radius: 4px;
     transition: background-color 0.2s, color 0.2s;
 }
 
 .list_tags:hover {
-    background-color: rgba(0, 125, 184, 0.1);
-    color: #005a8a;
+    background-color: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent-hover);
 }
 
 /* Settings dropdown styles */
@@ -199,14 +199,14 @@
 
 .settings-menu-item:hover {
     background-color: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .settings-menu-item i {
     margin-right: 10px;
     width: 16px;
     text-align: center;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .settings-menu-item .setting-status {
@@ -273,14 +273,14 @@
 
 .share-menu-item:hover {
     background-color: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .share-menu-item i {
     margin-right: 10px;
     width: 16px;
     text-align: center;
-    color: #007DB8;
+    color: var(--pz-accent);
     width: 20px !important;
     font-size: 18px !important;
 }
@@ -327,14 +327,14 @@
 
 .actions-menu-item:hover {
     background-color: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .actions-menu-item i {
     margin-right: 10px;
     width: 16px;
     text-align: center;
-    color: #007DB8;
+    color: var(--pz-accent);
     width: 24px !important;
     font-size: 20px !important;
 }
@@ -348,6 +348,6 @@
 /* .actions-dropdown.mobile .actions-menu { min-width: 120px; padding: 6px 0; } */
 
 .icon_trash {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 

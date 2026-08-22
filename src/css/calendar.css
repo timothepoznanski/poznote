@@ -87,8 +87,8 @@
 .mini-calendar-nav:hover,
 .mini-calendar-today:hover,
 .mini-calendar-toggle:hover {
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent);
 }
 
 .mini-calendar-nav i,
@@ -317,7 +317,7 @@
 }
 
 .calendar-note-open-btn {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
     border: none;
     padding: 6px 16px;
@@ -330,7 +330,7 @@
 }
 
 .calendar-note-open-btn:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 .calendar-notes-empty {
@@ -349,7 +349,7 @@
     gap: 12px;
 }
 .calendar-notes-modal .btn-open-all {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
     border: none;
     padding: 8px 20px;
@@ -361,7 +361,7 @@
 }
 
 .calendar-notes-modal .btn-open-all:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 .calendar-notes-modal .btn-close-red {

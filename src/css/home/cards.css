@@ -25,8 +25,8 @@
 }
 
 .home-card:hover {
-    border-color: #007DB8;
-    box-shadow: 0 4px 12px rgba(0, 125, 184, 0.15);
+    border-color: var(--pz-accent);
+    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.15);
     transform: translateY(-2px);
     /* The transform creates a stacking context: without a z-index the
        help tooltip (z-index inside the card) paints under later sibling
@@ -55,8 +55,8 @@
     height: 18px;
     margin-top: -9px;
     margin-left: -9px;
-    border: 2px solid rgba(0, 125, 184, 0.22);
-    border-top-color: #007DB8;
+    border: 2px solid rgba(var(--pz-accent-rgb), 0.22);
+    border-top-color: var(--pz-accent);
     border-radius: 999px;
     animation: lucide-spin 0.8s linear infinite;
 }
@@ -68,7 +68,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
     border-radius: 8px;
     flex-shrink: 0;
     position: relative;
@@ -76,7 +76,7 @@
 
 .home-card-icon i {
     font-size: 18px;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-style: normal;
 }
 
@@ -178,12 +178,12 @@ body.dark-mode .home-card-green .home-card-icon {
 
 /* Special icon colors — shared & kanban (Poznote blue) */
 .home-card-icon-shared {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .home-card-icon-shared i,
 .home-card-icon-kanban i {
-    color: #007DB8;
+    color: var(--pz-accent);
     transition: color 0.15s ease;
 }
 

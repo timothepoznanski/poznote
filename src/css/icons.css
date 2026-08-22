@@ -7,77 +7,21 @@
 
 /* Custom SVG icons for index.php */
 
-/* When attachments exist, make the paperclip icon use its SVG and remove tint so it appears filled/blue */
-.btn-attachment.has-attachments i.lucide-paperclip,
-.btn-attachment.has-attachments .lucide-paperclip {
-    color: #007DB8 !important;
-}
-
-/* Blue color for favorite star when it's marked as favorite - #007DB8 */
+/* Blue color for favorite star when it's marked as favorite - var(--pz-accent) */
 .toolbar-btn.btn-favorite.is-favorite i.lucide-star,
 .toolbar-btn.btn-favorite.is-favorite .lucide-star,
 .toolbar-btn.btn-publish.is-shared i.lucide-share-2,
 .toolbar-btn.btn-publish.is-shared .lucide-share-2,
 .toolbar-btn.btn-attachment.has-attachments i,
 .toolbar-btn.btn-reminder.has-reminder i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
-}
-
-/* Blue color for markdown view mode toggle button */
-.toolbar-btn.markdown-view-mode-btn i,
-.toolbar-btn.markdown-view-mode-btn [class*="lucide-"] {
-    color: #007DB8 !important;
-    filter: none !important;
-}
-
-.toolbar-btn.markdown-view-mode-btn:hover i,
-.toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
-    color: #007DB8 !important;
-    filter: none !important;
-    transform: scale(1.18);
-}
-
-/* Blue color for markdown help button */
-.toolbar-btn.markdown-help-btn i,
-.toolbar-btn.markdown-help-btn [class*="lucide-"] {
-    color: #007DB8 !important;
-    filter: none !important;
-}
-
-.toolbar-btn.markdown-help-btn:hover i,
-.toolbar-btn.markdown-help-btn:hover [class*="lucide-"] {
-    color: #007DB8 !important;
-    filter: none !important;
-    transform: scale(1.18);
 }
 
 /* Markdown split view button - normal icon color (not blue) */
 .toolbar-btn.markdown-split-btn i,
 .toolbar-btn.markdown-split-btn [class*="lucide-"] {
     /* Use default icon color */
-}
-
-.toolbar-btn.markdown-split-btn:hover i,
-.toolbar-btn.markdown-split-btn:hover [class*="lucide-"] {
-    transform: scale(1.18);
-}
-
-/* Add slash through icon when in split mode (active state) */
-.toolbar-btn.markdown-split-btn.active {
-    position: relative;
-}
-
-.toolbar-btn.markdown-split-btn.active::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 24px;
-    height: 2px;
-    background-color: #666;
-    transform: translate(-50%, -50%) rotate(-45deg);
-    pointer-events: none;
 }
 
 /* Apply default gray filter (lighter gray) to all icons not on hover */
@@ -149,14 +93,14 @@
 .markdown-edit-btn [class*="lucide-"],
 .markdown-preview-btn [class*="lucide-"],
 .markdown-view-mode-btn i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
 }
 
 .markdown-edit-btn:hover [class*="lucide-"],
 .markdown-preview-btn:hover [class*="lucide-"],
 .markdown-view-mode-btn:hover i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
     transform: scale(1.18);
 }
@@ -172,7 +116,7 @@
 
 .lucide-bold:hover {
     transform: scale(1.2);
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 /* Red color for cancel icon in mobile slash menu */

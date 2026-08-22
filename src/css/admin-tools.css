@@ -75,7 +75,7 @@ body.dark-mode .dr-hero p {
     position: relative;
     transition: border-color 0.2s;
 }
-.ci-card:hover { border-color: #007cba55; }
+.ci-card:hover { border-color: rgba(var(--pz-accent-rgb), 0.33); }
 
 .ci-card-step {
     display: inline-block;
@@ -83,7 +83,7 @@ body.dark-mode .dr-hero p {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #007cba;
+    color: var(--pz-accent);
     background: rgba(0, 124, 186, 0.1);
     border-radius: 4px;
     padding: 2px 8px;
@@ -117,7 +117,7 @@ body.dark-mode .dr-hero p {
     padding: 18px 24px;
     border-bottom: 1px solid var(--border-color, #e5e7eb);
 }
-.ci-results-header i { color: #007cba; }
+.ci-results-header i { color: var(--pz-accent); }
 .ci-results-header h2 {
     margin: 0;
     font-size: 1rem;
@@ -297,8 +297,8 @@ html[data-theme='dark'] .deletion-notice {
 
 .btn-view-files:hover {
     background: var(--hover-bg, #e8e8e8);
-    border-color: #007cba;
-    color: #007cba;
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
 }
 
 html[data-theme='dark'] .btn-view-files {

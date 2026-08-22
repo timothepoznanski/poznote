@@ -58,7 +58,7 @@
 
 .attachment-upload button {
     padding: 8px 16px;
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
     border: none;
     border-radius: 3px;
@@ -66,7 +66,7 @@
 }
 
 .attachment-upload button:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
 }
 
 /* Attachments List */

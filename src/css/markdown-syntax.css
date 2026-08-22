@@ -48,8 +48,8 @@
 
 .markdown-syntax-filter-bar .filter-input:focus {
     outline: none;
-    border-color: #007db8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .markdown-syntax-filter-bar .clear-filter-btn {
@@ -93,7 +93,7 @@
 
 .syntax-card-category {
     margin: 0 0 10px;
-    color: #007db8;
+    color: var(--pz-accent);
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.08em;

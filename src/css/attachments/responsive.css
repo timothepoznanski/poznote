@@ -95,15 +95,15 @@
     /* Hover/focus visual for attachment button (mobile) */
     .btn-attachment:hover,
     .btn-attachment:focus {
-        background: rgba(0, 125, 184, 0.1) !important;
-        color: #005a8a !important;
+        background: rgba(var(--pz-accent-rgb), 0.1) !important;
+        color: var(--pz-accent-hover) !important;
     }
 
     /* Attachment indicators (use app blue) */
     .btn-settings.has-attachments i,
     .btn-attachment.has-attachments i {
         filter: none !important;
-        color: #007DB8 !important;
+        color: var(--pz-accent) !important;
     }
 
     .btn-settings.has-attachments:hover i,
@@ -111,7 +111,7 @@
     .btn-attachment.has-attachments:hover i,
     .btn-attachment.has-attachments:focus i {
         filter: none !important;
-        color: #005a8a !important;
+        color: var(--pz-accent-hover) !important;
     }
 }
 

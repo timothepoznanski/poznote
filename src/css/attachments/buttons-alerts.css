@@ -20,12 +20,12 @@
 }
 
 .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
     transform: translateY(-1px);
 }
 
@@ -66,7 +66,7 @@
 }
 
 .settings-container > a.btn-primary {
-    background: #007DB8 !important;
+    background: var(--pz-accent) !important;
     color: #fff !important;
     border: none !important;
 }

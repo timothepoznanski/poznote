@@ -126,7 +126,7 @@
 }
 
 .shared-note-item:hover {
-    background-color: rgba(0, 125, 184, 0.035);
+    background-color: rgba(var(--pz-accent-rgb), 0.035);
 }
 
 .shared-note-item.shared-hierarchy-item {
@@ -176,14 +176,14 @@
     padding: 0;
     border: none;
     border-radius: 7px;
-    background: rgba(0, 125, 184, 0.08);
+    background: rgba(var(--pz-accent-rgb), 0.08);
     color: var(--link-color, #007bff);
     cursor: pointer;
     transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
 }
 
 .shared-folder-toggle:hover {
-    background: rgba(0, 125, 184, 0.14);
+    background: rgba(var(--pz-accent-rgb), 0.14);
 }
 
 .shared-folder-toggle:focus-visible {

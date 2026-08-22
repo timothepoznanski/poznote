@@ -46,7 +46,7 @@ body {
 .settings-section h3 {
     margin-top: 0;
     color: #333;
-    border-bottom: 2px solid #007DB8;
+    border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
     display: flex;
     align-items: center;

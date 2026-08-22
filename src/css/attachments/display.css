@@ -65,7 +65,7 @@
 .attachment-icon {
     flex-shrink: 0;
     width: 40px;
-    background: #007DB8;
+    background: var(--pz-accent);
     border-radius: 8px;
     display: flex;
     align-items: center;
@@ -153,12 +153,12 @@
 }
 
 .btn-view {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
 .btn-view:hover {
-    background: #005a8a;
+    background: var(--pz-accent-hover);
     transform: translateY(-1px);
 }
 
@@ -184,7 +184,7 @@
 
 /* Ensure action icon buttons keep their background/color */
 .btn-icon.btn-view {
-    background: #007DB8 !important;
+    background: var(--pz-accent) !important;
     color: #fff !important;
 }
 

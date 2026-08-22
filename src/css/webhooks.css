@@ -16,7 +16,7 @@ body.dark-mode .webhooks-page .alert-warning {
 .webhooks-section h2 {
     margin: 0 0 16px;
     color: var(--text-color, #333);
-    border-bottom: 2px solid #007cba;
+    border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
     font-size: 1.15rem;
     font-weight: 600;
@@ -270,13 +270,13 @@ body.dark-mode .webhooks-page .alert-warning {
 }
 .webhooks-actions-item:hover {
     background: #f2f6f9;
-    color: #007cba;
+    color: var(--pz-accent);
 }
 .webhooks-actions-item .lucide {
     width: 16px;
     height: 16px;
     flex: 0 0 auto;
-    background-color: #007cba;
+    background-color: var(--pz-accent);
 }
 .webhooks-actions-item.is-danger { color: #c0392b; }
 .webhooks-actions-item.is-danger:hover {

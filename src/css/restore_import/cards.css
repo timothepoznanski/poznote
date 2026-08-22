@@ -17,7 +17,7 @@
 
 .card-container:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-    border-color: #007cba;
+    border-color: var(--pz-accent);
     transform: translateY(-2px);
 }
 
@@ -46,7 +46,7 @@
 }
 
 .card-header h3 i.card-icon {
-    color: #007cba;
+    color: var(--pz-accent);
     font-size: 20px;
 }
 
@@ -128,7 +128,7 @@
 }
 
 .sub-card h4 i.sub-card-icon {
-    color: #007cba;
+    color: var(--pz-accent);
     font-size: 16px;
 }
 
@@ -176,7 +176,7 @@
 }
 
 .accordion-header:hover {
-    color: #007cba;
+    color: var(--pz-accent);
 }
 
 .accordion-icon {

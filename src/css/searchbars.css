@@ -91,11 +91,11 @@
 }
 
 .searchbar-options-toggle:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchbar-options-toggle.active {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* Search type toggle buttons */
@@ -135,27 +135,27 @@
 }
 
 .searchbar-type-btn:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchbar-type-btn:hover i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchbar-type-btn:hover i::before {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchbar-type-btn.active {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 .searchbar-type-btn.active i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 .searchbar-type-btn.active i::before {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 .searchbar-type-btn i {
@@ -281,7 +281,7 @@
 
 .searchbar-date-toggle:hover,
 .searchbar-date-toggle.active {
-    color: #007DB8;
+    color: var(--pz-accent);
     background: transparent;
 }
 
@@ -478,19 +478,19 @@
 }
 
 .search-type-btn:hover {
-    background: rgba(0, 125, 184, 0.1);
+    background: rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .search-type-btn:hover i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .search-type-btn.active i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .search-type-btn.active:hover i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchbar-row {

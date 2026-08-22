@@ -262,7 +262,7 @@ html[data-theme='dark'] .toolbar-btn.has-attachments i,
 body.dark-mode .toolbar-btn.is-favorite i,
 body.dark-mode .toolbar-btn.is-shared i,
 body.dark-mode .toolbar-btn.has-attachments i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
 }
 
@@ -271,7 +271,7 @@ html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn i,
 html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-view-mode-btn i,
 body.dark-mode .toolbar-btn.markdown-view-mode-btn [class*="lucide-"] {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
 }
 
@@ -279,7 +279,7 @@ html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover i,
 html[data-theme='dark'] .toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover i,
 body.dark-mode .toolbar-btn.markdown-view-mode-btn:hover [class*="lucide-"] {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
     transform: scale(1.18);
 }
@@ -291,7 +291,7 @@ html[data-theme='dark'] .markdown-view-mode-btn i,
 body.dark-mode .markdown-edit-btn [class*="lucide-"],
 body.dark-mode .markdown-preview-btn [class*="lucide-"],
 body.dark-mode .markdown-view-mode-btn i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
 }
 
@@ -301,7 +301,7 @@ html[data-theme='dark'] .markdown-view-mode-btn:hover i,
 body.dark-mode .markdown-edit-btn:hover [class*="lucide-"],
 body.dark-mode .markdown-preview-btn:hover [class*="lucide-"],
 body.dark-mode .markdown-view-mode-btn:hover i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
     transform: scale(1.18);
 }
@@ -317,7 +317,7 @@ html[data-theme='dark'] .toolbar-btn.markdown-help-btn i,
 html[data-theme='dark'] .toolbar-btn.markdown-help-btn [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-help-btn i,
 body.dark-mode .toolbar-btn.markdown-help-btn [class*="lucide-"] {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
 }
 
@@ -325,7 +325,7 @@ html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover i,
 html[data-theme='dark'] .toolbar-btn.markdown-help-btn:hover [class*="lucide-"],
 body.dark-mode .toolbar-btn.markdown-help-btn:hover i,
 body.dark-mode .toolbar-btn.markdown-help-btn:hover [class*="lucide-"] {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
     filter: none !important;
     transform: scale(1.18);
 }

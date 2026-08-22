@@ -634,6 +634,7 @@ Notes:
 - Click **Remove** to delete the file and disable the custom stylesheet.
 - Poznote appends a cache-busting `v=` parameter automatically.
 - The stylesheet is injected near the end of `<head>`, so it can override the default application styles.
+- The brand colour and the dark/black palette are CSS variables, so a theme is a few lines: override `--pz-accent`, `--pz-accent-hover`, `--pz-accent-rgb` on `:root` and the `--dm-*` variables on `html[data-theme='dark']`. The list lives in `src/css/dark-mode/variables.css`, with an example in `src/css/README.md`.
 - Only administrators can upload or remove the custom CSS file.
 
 </details>

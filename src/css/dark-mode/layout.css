@@ -468,7 +468,7 @@ html[data-theme='dark'] .icon-sidebar-btn-active:hover,
 body.dark-mode .icon-sidebar-btn-active,
 body.dark-mode .icon-sidebar-btn-active:hover {
     color: var(--dm-accent);
-    background: rgba(0, 125, 184, 0.30);
+    background: rgba(var(--pz-accent-rgb), 0.30);
     opacity: 1;
 }
 
@@ -513,7 +513,7 @@ body.dark-mode .icon-sidebar-overflow-item:focus-visible {
 
 html[data-theme='dark'] .icon-sidebar-overflow-item-active,
 body.dark-mode .icon-sidebar-overflow-item-active {
-    background: rgba(0, 125, 184, 0.30);
+    background: rgba(var(--pz-accent-rgb), 0.30);
     color: var(--dm-accent);
 }
 

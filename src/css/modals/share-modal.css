@@ -149,7 +149,7 @@ html[data-theme='dark'] input:checked+.toggle-slider {
 }
 
 #folderShareModal .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #ffffff;
     border: none;
 }

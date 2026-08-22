@@ -210,9 +210,9 @@
 }
 
 .btn-full-width-footer.active {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: white !important;
-    border-color: #007DB8 !important;
+    border-color: var(--pz-accent) !important;
 }
 
 #noteWidthModal .modal-buttons {
@@ -315,7 +315,7 @@
     padding: 2px 4px;
     border: none;
     background: none;
-    color: #007DB8;
+    color: var(--pz-accent);
     cursor: pointer;
     font-size: 13px;
     font-weight: 600;
@@ -353,12 +353,12 @@
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-primary {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-primary:hover {
-    background-color: #005a8a;
+    background-color: var(--pz-accent-hover);
 }
 
 #moveNoteFolderModal .move-note-inline-create button.btn-cancel {
@@ -409,7 +409,7 @@
 
 #moveNoteFolderModal .move-note-recent-folder:hover,
 #moveNoteFolderModal .move-note-recent-folder.is-selected {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
     background: #e8f4fa;
     color: #005f8c;
 }
@@ -440,9 +440,9 @@
 }
 
 #noteInfoModal .modal-content h3 {
-    color: #007DB8;
+    color: var(--pz-accent);
     margin-bottom: 20px;
-    border-bottom: 2px solid #007DB8;
+    border-bottom: 2px solid var(--pz-accent);
     padding-bottom: 10px;
 }
 
@@ -457,7 +457,7 @@
     padding: 8px;
     background-color: #f8f9fa;
     border-radius: 4px;
-    border-left: 3px solid #007DB8;
+    border-left: 3px solid var(--pz-accent);
 }
 
 #noteInfoModal .info-row strong {
@@ -468,7 +468,7 @@
 
 #noteInfoModal .info-row strong i {
     margin-right: 6px;
-    color: #007DB8;
+    color: var(--pz-accent);
     width: 16px;
     text-align: center;
 }
@@ -495,7 +495,7 @@
 }
 
 #updateModal .modal-content h3 {
-    color: #007DB8;
+    color: var(--pz-accent);
     margin-bottom: 15px;
     font-size: 24px;
 }
@@ -520,7 +520,7 @@
 }
 
 #updateModal .version-info strong {
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 600;
 }
 
@@ -599,7 +599,7 @@
 }
 
 #updateModal .btn-update {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: white !important;
     border: none !important;
     padding: 12px 20px !important;
@@ -614,7 +614,7 @@
 #updateModal .btn-update:hover {
     background-color: #0056b3 !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 125, 184, 0.4);
+    box-shadow: 0 4px 12px rgba(var(--pz-accent-rgb), 0.4);
 }
 
 #updateModal .btn-update:active {
@@ -629,7 +629,7 @@
 }
 
 #updateCheckModal .modal-content h3 {
-    color: #007DB8;
+    color: var(--pz-accent);
     margin-bottom: 20px;
 }
 
@@ -660,7 +660,7 @@
 }
 
 #confirmModal .btn-secondary {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: white !important;
     border: none !important;
 }
@@ -692,7 +692,7 @@
 }
 
 #confirmModal #confirmButton.btn-primary {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: #fff !important;
     border: none !important;
 }
@@ -881,7 +881,7 @@
 }
 
 #restoreConfirmModal .btn-primary {
-    background-color: #007DB8 !important;
+    background-color: var(--pz-accent) !important;
     color: white !important;
     border: none !important;
 }
@@ -1015,7 +1015,7 @@
 
 #renameModal .modal-buttons .btn-primary,
 #moveNotesModal .modal-buttons .btn-primary {
-    background-color: #007DB8;
+    background-color: var(--pz-accent);
     color: white;
     border: none;
 }
@@ -1099,8 +1099,8 @@
 
 .workspace-select:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 2px rgba(0, 125, 184, 0.2);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.2);
 }
 
 /* ============================================

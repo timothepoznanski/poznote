@@ -67,8 +67,8 @@
 
 .ai-chat-header-btn:hover,
 .ai-chat-header-btn:focus {
-    background: rgba(0, 125, 184, 0.1);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent);
 }
 
 /* The settings shortcut is a link styled like the header buttons */
@@ -107,7 +107,7 @@ a.ai-chat-header-btn {
 
 .ai-chat-msg-user {
     align-self: flex-end;
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #fff;
     border-bottom-right-radius: 3px;
 }
@@ -194,7 +194,7 @@ a.ai-chat-header-btn {
 }
 
 .ai-chat-md a {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .ai-chat-md img {
@@ -256,7 +256,7 @@ a.ai-chat-header-btn {
 
 #ai-chat-input:focus {
     outline: none;
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .ai-chat-send-btn {
@@ -265,7 +265,7 @@ a.ai-chat-header-btn {
     flex-shrink: 0;
     border: none;
     border-radius: 8px;
-    background: #007DB8;
+    background: var(--pz-accent);
     color: #fff;
     cursor: pointer;
     display: inline-flex;

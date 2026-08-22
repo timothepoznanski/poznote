@@ -102,7 +102,7 @@
 }
 
 .color-item:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
 }
 
 /* baseline removed - simplified palette */
@@ -207,32 +207,32 @@
 }
 
 .btn-settings.active {
-    background: rgba(0, 125, 184, 0.1) !important;
-    color: #007DB8 !important;
+    background: rgba(var(--pz-accent-rgb), 0.1) !important;
+    color: var(--pz-accent) !important;
 }
 
 /* Attachment indicators (use app blue instead of green) */
 .btn-settings.has-attachments {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 .btn-settings.has-attachments:hover {
-    color: #005a8a !important;
+    color: var(--pz-accent-hover) !important;
 }
 
 .btn-attachment.has-attachments i {
     /* adjust icon tint to match the blue color */
     filter: none !important;
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 .btn-attachment.has-attachments:hover i {
     filter: none !important;
-    color: #005a8a !important;
+    color: var(--pz-accent-hover) !important;
 }
 
 .dropdown-item.has-attachments i {
-    color: #007DB8 !important;
+    color: var(--pz-accent) !important;
 }
 
 /* Note Header */
@@ -392,7 +392,7 @@ a.links_arbo_left.selected-note {
 
 /* MENU RIGHT - Note action icons (download, info, save) */
 .icon_download {
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 17px;
 }
 
@@ -408,12 +408,12 @@ a.links_arbo_left.selected-note {
 }
 
 .icon_info {
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 1.1em;
 }
 
 .icon_save {
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 1.1em;
 }
 

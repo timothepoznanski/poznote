@@ -478,7 +478,7 @@ body.dark-mode .font-size-popup .size-preview {
 /* Image resize handle */
 html[data-theme='dark'] .image-resize-handle,
 body.dark-mode .image-resize-handle {
-    background: #007DB8;
+    background: var(--pz-accent);
     border-color: var(--dm-surface);
 }
 

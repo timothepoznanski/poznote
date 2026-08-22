@@ -677,7 +677,7 @@ body.public-note-page {
 
 .public-note-attachment-link:hover,
 .public-note-attachment-link:focus {
-    border-color: #007db8;
+    border-color: var(--pz-accent);
     background: #f7fbfd;
     color: #005a8b;
     text-decoration: none;

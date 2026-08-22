@@ -139,8 +139,8 @@ body.trash-page {
 
 .trash-search-input:focus {
     outline: none;
-    border-color: #007DB8;
-    box-shadow: 0 0 0 3px rgba(0, 125, 184, 0.1);
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .clear-filter-btn {
@@ -198,12 +198,12 @@ body.trash-page {
 }
 
 .trash-sort-option:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .trash-sort-option.is-active {
     background-color: #fff;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 600;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
@@ -395,7 +395,7 @@ body.trash-page {
     border: none;
     border-radius: 6px;
     background: transparent;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 12.5px;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
@@ -412,8 +412,8 @@ body.trash-page {
 .trash-expand-btn .lucide {
     width: 13px;
     height: 13px;
-    color: #007DB8;
-    background-color: #007DB8;
+    color: var(--pz-accent);
+    background-color: var(--pz-accent);
     vertical-align: -2px;
     margin-right: 4px;
 }
@@ -478,7 +478,7 @@ body.trash-page {
 }
 
 .trash-close-search:hover {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 .searchtrash::-webkit-input-placeholder {

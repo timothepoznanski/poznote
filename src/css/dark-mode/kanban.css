@@ -38,13 +38,13 @@ body.dark-mode .kanban-add-card-btn {
 
 html[data-theme='dark'] .kanban-add-card-btn:hover,
 body.dark-mode .kanban-add-card-btn:hover {
-    background: rgba(0, 125, 184, 0.2);
+    background: rgba(var(--pz-accent-rgb), 0.2);
     color: #fff;
 }
 
 html[data-theme='dark'] .kanban-add-card-btn:focus,
 body.dark-mode .kanban-add-card-btn:focus {
-    outline: 2px solid #007DB8;
+    outline: 2px solid var(--pz-accent);
     outline-offset: 2px;
 }
 

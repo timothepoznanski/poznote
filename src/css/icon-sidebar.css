@@ -106,8 +106,8 @@
 
 .icon-sidebar-overflow-item:hover,
 .icon-sidebar-overflow-item:focus-visible {
-    background: rgba(0, 125, 184, 0.08);
-    color: #007DB8;
+    background: rgba(var(--pz-accent-rgb), 0.08);
+    color: var(--pz-accent);
     text-decoration: none;
 }
 
@@ -121,8 +121,8 @@
 }
 
 .icon-sidebar-overflow-item-active {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.12);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.12);
 }
 
 /* Account actions, fixed under a divider at the bottom of the rail. The
@@ -165,15 +165,15 @@
 
 .icon-sidebar-btn:hover,
 .icon-sidebar-btn:focus-visible {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.08);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.08);
 }
 
 /* Current page. Lives here rather than in css/icon-sidebar-page.css so that
    index.php, which loads only this file, highlights its Home entry too. */
 .icon-sidebar-btn-active {
-    color: #007DB8;
-    background: rgba(0, 125, 184, 0.12);
+    color: var(--pz-accent);
+    background: rgba(var(--pz-accent-rgb), 0.12);
 }
 
 /* Favorites view active: amber rather than the usual blue, matching the star.
@@ -246,7 +246,7 @@
 
 #iconSidebarToggle:hover {
     background: #f8f9fa;
-    color: #007DB8;
+    color: var(--pz-accent);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -309,7 +309,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
 .poznote-back-to-note-btn i,
 .poznote-back-btn i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* The settings sub-pages each use their own container (.settings-container,
@@ -354,7 +354,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 }
 
 .poznote-page-title i {
-    color: #007DB8;
+    color: var(--pz-accent);
 }
 
 /* The book glyph's ink sits high in its box, so a box-centred icon still reads

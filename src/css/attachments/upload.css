@@ -35,7 +35,7 @@
 }
 
 .file-input:hover {
-    border-color: #007DB8;
+    border-color: var(--pz-accent);
 }
 
 .accepted-types {
@@ -50,9 +50,9 @@
     margin-top: 10px;
     padding: 8px 12px;
     background: #e8f4f8;
-    border: 1px solid #007DB8;
+    border: 1px solid var(--pz-accent);
     border-radius: 4px;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-size: 14px;
 }
 
@@ -254,7 +254,7 @@
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #007DB8, #005a8a);
+    background: linear-gradient(90deg, var(--pz-accent), var(--pz-accent-hover));
     border-radius: 10px;
     transition: width 0.3s ease;
     width: 0%;
@@ -263,6 +263,6 @@
 .progress-text {
     text-align: center;
     font-size: 14px;
-    color: #007DB8;
+    color: var(--pz-accent);
     font-weight: 500;
 }

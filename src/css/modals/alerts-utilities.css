@@ -58,7 +58,7 @@
 }
 
 .modal-footer .btn-primary {
-    background: #007DB8;
+    background: var(--pz-accent);
     color: white;
 }
 
