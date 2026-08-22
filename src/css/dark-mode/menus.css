@@ -284,41 +284,6 @@ body.dark-mode .workspace-menu-divider {
 }
 
 /* ============================================
-   Create Menu
-   ============================================ */
-
-html[data-theme='dark'] .create-menu,
-html[data-theme='dark'] #header-create-menu,
-body.dark-mode .create-menu,
-body.dark-mode #header-create-menu {
-    background-color: var(--dm-surface);
-    border-color: var(--dm-border);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-html[data-theme='dark'] .create-menu-item,
-body.dark-mode .create-menu-item {
-    color: var(--dm-text);
-    border-bottom-color: var(--dm-border);
-}
-
-html[data-theme='dark'] .create-menu-item:hover,
-body.dark-mode .create-menu-item:hover {
-    background-color: var(--dm-surface-hover);
-    color: var(--dm-accent);
-}
-
-html[data-theme='dark'] .create-menu-item i,
-body.dark-mode .create-menu-item i {
-    color: #b0b0b0;
-}
-
-html[data-theme='dark'] .create-menu-item:hover i,
-body.dark-mode .create-menu-item:hover i {
-    color: var(--dm-accent);
-}
-
-/* ============================================
    Folder & Note Actions Menus (light rules: css/folders/actions-menu.css)
    ============================================ */
 

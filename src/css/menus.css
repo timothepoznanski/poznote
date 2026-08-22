@@ -1,8 +1,8 @@
 /**
  * Menus Styles
  * 
- * Styles for dropdown menus including task list actions, workspace menu,
- * settings dropdown, share/export dropdown, actions dropdown, and other menus.
+ * Styles for dropdown menus: task list actions, workspace menu, actions
+ * dropdown. The folder/note action menus live in css/folders/actions-menu.css.
  */
 
 .tasklist-actions-dropdown {
@@ -157,135 +157,11 @@
     color: var(--pz-accent-hover);
 }
 
-/* Settings dropdown styles */
-.settings-dropdown {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.settings-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    min-width: 180px;
-    padding: 8px 0;
-    margin-top: 5px;
-    display: none;
-}
-
-.settings-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--pz-text);
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s;
-    font-family: 'Inter', sans-serif;
-}
-
-.settings-menu-item:last-child {
-    border-bottom: none;
-}
-
-.settings-menu-item:hover {
-    background-color: var(--pz-surface);
-    color: var(--pz-accent);
-}
-
-.settings-menu-item i {
-    margin-right: 10px;
-    width: 16px;
-    text-align: center;
-    color: var(--pz-accent);
-}
-
-.settings-menu-item .setting-status {
-    margin-left: 8px;
-    /* font-size: 0.85em; */
-    vertical-align: baseline;
-}
-
-.settings-menu-item .setting-status.enabled {
-    color: #28a745;
-}
-
-.settings-menu-item .setting-status.disabled {
-    color: var(--pz-danger);
-}
-
-/* Update Status */
-
-/* Update status styling */
-/* #update-status, #mobileupdate-status- {
-    display: block;
-    margin-top: 2px;
-    font-size: 0.75em;
-    line-height: 1.2;
-} */
-
 /* Share / Export dropdown styles */
 .share-dropdown {
     position: relative;
     display: inline-block;
 }
-
-.share-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
-    min-width: 160px;
-    padding: 8px 0;
-    margin-top: 5px;
-    display: none;
-}
-
-.share-menu-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--pz-text);
-    border-bottom: 1px solid #f0f0f0;
-    transition: background-color 0.2s;
-    font-family: 'Inter', sans-serif;
-}
-
-.share-menu-item:last-child {
-    border-bottom: none;
-}
-
-.share-menu-item:hover {
-    background-color: var(--pz-surface);
-    color: var(--pz-accent);
-}
-
-.share-menu-item i {
-    margin-right: 10px;
-    width: 16px;
-    text-align: center;
-    color: var(--pz-accent);
-    width: 20px !important;
-    font-size: 18px !important;
-}
-
-/* .share-dropdown.mobile .share-menu { min-width: 140px; padding: 6px 0; } */
 
 /* Actions dropdown styles */
 .actions-dropdown {
