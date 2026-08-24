@@ -468,7 +468,9 @@ try {
     // DATABASE: FETCH NOTE CONTENT
     // ============================================================================
     
-    $stmt = $con->prepare('SELECT heading, entry, created, updated, type, attachments, icon, icon_color, linked_note_id FROM entries WHERE id = ?');
+    // A trashed note must not be served publicly: the share goes dormant and
+    // comes back if the note is restored from the trash.
+    $stmt = $con->prepare('SELECT heading, entry, created, updated, type, attachments, icon, icon_color, linked_note_id FROM entries WHERE id = ? AND trash = 0');
     $stmt->execute([$note_id]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
 
