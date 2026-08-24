@@ -111,7 +111,7 @@ class ShareController {
             if ($custom !== '') {
                 if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
                     http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                    echo json_encode(['success' => false, 'error' => t('public.errors.link_invalid', [], 'Invalid custom link. Allowed characters: letters, numbers, -, _, . (4 to 128 characters)'), 'error_code' => 'invalid_custom_link']);
                     return;
                 }
                 
@@ -126,7 +126,7 @@ class ShareController {
             // Check global uniqueness (across all users)
             if (!isTokenAvailable($token, $_SESSION['user_id'], 'note', (int)$noteId)) {
                 http_response_code(409);
-                echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                echo json_encode(['success' => false, 'error' => t('public.errors.link_in_use', [], 'This custom link is already in use'), 'error_code' => 'link_already_in_use']);
                 return;
             }
             
@@ -278,7 +278,7 @@ class ShareController {
                 if ($custom !== '') {
                     if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
                         http_response_code(400);
-                        echo json_encode(['success' => false, 'error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                        echo json_encode(['success' => false, 'error' => t('public.errors.link_invalid', [], 'Invalid custom link. Allowed characters: letters, numbers, -, _, . (4 to 128 characters)'), 'error_code' => 'invalid_custom_link']);
                         return;
                     }
 
@@ -286,7 +286,7 @@ class ShareController {
 
                     if (!isTokenAvailable($custom, $_SESSION['user_id'], 'note', (int)$noteId)) {
                         http_response_code(409);
-                        echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                        echo json_encode(['success' => false, 'error' => t('public.errors.link_in_use', [], 'This custom link is already in use'), 'error_code' => 'link_already_in_use']);
                         return;
                     }
 

@@ -828,6 +828,12 @@ class FoldersController {
                 $stmt->execute(array_merge($allFolderIds, [$actualWorkspace]));
             }
             
+            // Free any folder share tokens in the master registry before the
+            // folders are deleted (the ON DELETE CASCADE only removes the
+            // shared_folders rows)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            unregisterSharedLinksForFolders($this->db, !empty($allFolderIds) ? $allFolderIds : [$folderId]);
+
             // Explicitly delete ALL folders in the hierarchy to be safe (regardless of CASCADE)
             if (!empty($allFolderIds)) {
                 $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));

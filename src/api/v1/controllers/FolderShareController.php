@@ -99,7 +99,7 @@ class FolderShareController {
             if ($custom !== '') {
                 if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
                     http_response_code(400);
-                    echo json_encode(['success' => false, 'error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                    echo json_encode(['success' => false, 'error' => t('public.errors.link_invalid', [], 'Invalid custom link. Allowed characters: letters, numbers, -, _, . (4 to 128 characters)'), 'error_code' => 'invalid_custom_link']);
                     return;
                 }
                 
@@ -114,7 +114,7 @@ class FolderShareController {
             // Check global uniqueness (across all users)
             if (!isTokenAvailable($token, $_SESSION['user_id'], 'folder', (int)$folderId)) {
                 http_response_code(409);
-                echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                echo json_encode(['success' => false, 'error' => t('public.errors.link_in_use', [], 'This custom link is already in use'), 'error_code' => 'link_already_in_use']);
                 return;
             }
             
@@ -244,7 +244,7 @@ class FolderShareController {
                 if ($custom !== '') {
                     if (!preg_match('/^[A-Za-z0-9\-_.]{4,128}$/', $custom)) {
                         http_response_code(400);
-                        echo json_encode(['success' => false, 'error' => 'Invalid custom token. Allowed: letters, numbers, -, _, . (4-128 chars)']);
+                        echo json_encode(['success' => false, 'error' => t('public.errors.link_invalid', [], 'Invalid custom link. Allowed characters: letters, numbers, -, _, . (4 to 128 characters)'), 'error_code' => 'invalid_custom_link']);
                         return;
                     }
                     
@@ -254,7 +254,7 @@ class FolderShareController {
                     // Check global uniqueness (across all users)
                     if (!isTokenAvailable($custom, $_SESSION['user_id'], 'folder', (int)$folderId)) {
                         http_response_code(409);
-                        echo json_encode(['success' => false, 'error' => 'Token already in use']);
+                        echo json_encode(['success' => false, 'error' => t('public.errors.link_in_use', [], 'This custom link is already in use'), 'error_code' => 'link_already_in_use']);
                         return;
                     }
                     

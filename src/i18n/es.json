@@ -2411,6 +2411,8 @@
     "errors": {
       "token_missing": "Falta el enlace",
       "token_or_folder_auth_missing": "Falta el enlace o la autorización de carpeta",
+      "link_in_use": "Este enlace personalizado ya está en uso",
+      "link_invalid": "Enlace personalizado no válido. Caracteres permitidos: letras, números, -, _, . (4 a 128 caracteres)",
       "shared_folder_not_found": "Carpeta compartida no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "folder_not_found": "Carpeta no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",

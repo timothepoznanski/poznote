@@ -177,6 +177,11 @@ class TrashController {
                 $deletedCount++;
             }
             
+            // Free any share tokens in the master registry before the entries
+            // are deleted (the ON DELETE CASCADE only removes shared_notes rows)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            unregisterSharedLinksForNotes($this->db, array_column($rows, 'id'));
+
             // Delete all trash entries from database
             if ($workspace) {
                 $delStmt = $this->db->prepare("DELETE FROM entries WHERE trash = 1 AND workspace = ?");
@@ -257,7 +262,12 @@ class TrashController {
             }
 
             deleteNoteSnapshots($noteId);
-            
+
+            // Free any share token in the master registry before the entry is
+            // deleted (the ON DELETE CASCADE only removes the shared_notes row)
+            require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+            unregisterSharedLinksForNotes($this->db, [$noteId]);
+
             // Delete database entry
             if ($workspace) {
                 $delStmt = $this->db->prepare("DELETE FROM entries WHERE id = ? AND workspace = ?");

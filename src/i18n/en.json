@@ -2067,6 +2067,8 @@
     "errors": {
       "token_missing": "Link missing",
       "token_or_folder_auth_missing": "Link or folder authorization missing",
+      "link_in_use": "This custom link is already in use",
+      "link_invalid": "Invalid custom link. Allowed characters: letters, numbers, -, _, . (4 to 128 characters)",
       "shared_folder_not_found": "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",

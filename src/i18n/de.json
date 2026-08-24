@@ -2410,6 +2410,8 @@
     "errors": {
       "token_missing": "Link fehlt",
       "token_or_folder_auth_missing": "Link oder Ordnerberechtigung fehlt",
+      "link_in_use": "Dieser individuelle Link wird bereits verwendet",
+      "link_invalid": "Ungültiger individueller Link. Erlaubte Zeichen: Buchstaben, Zahlen, -, _, . (4 bis 128 Zeichen)",
       "shared_folder_not_found": "Geteilter Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "folder_not_found": "Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",

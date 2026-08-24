@@ -1917,7 +1917,7 @@ function registerSharedLink(string $token, int $userId, string $targetType, int 
 
 /**
  * Check if a token is available for use.
- * Returns true if the token is not used by anyone, 
+ * Returns true if the token is not used by anyone,
  * or if it is already used by the SAME user for the SAME item.
  */
 function isTokenAvailable(string $token, int $userId, string $targetType, int $targetId): bool {
@@ -1926,18 +1926,110 @@ function isTokenAvailable(string $token, int $userId, string $targetType, int $t
         $stmt = $con->prepare("SELECT user_id, target_type, target_id FROM shared_links WHERE token = ? LIMIT 1");
         $stmt->execute([$token]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$row) {
             return true;
         }
-        
+
         // It's available if it's the exact same item
-        return (int)$row['user_id'] === $userId && 
-               $row['target_type'] === $targetType && 
-               (int)$row['target_id'] === $targetId;
+        if ((int)$row['user_id'] === $userId &&
+            $row['target_type'] === $targetType &&
+            (int)$row['target_id'] === $targetId) {
+            return true;
+        }
+
+        // Self-heal: deleting a shared note/folder cascades away the share row
+        // in the owner's database but historically left the registry row
+        // behind, blocking the token forever. If the registered share no
+        // longer exists, drop the stale row and treat the token as free.
+        if (sharedLinkTargetStillExists((int)$row['user_id'], (string)$row['target_type'], $token) === false) {
+            unregisterSharedLink($token);
+            return true;
+        }
+
+        return false;
     } catch (Exception $e) {
         error_log("Failed to check token availability: " . $e->getMessage());
         return false;
+    }
+}
+
+/**
+ * Check whether the share registered for a token still exists in its owner's
+ * database. Returns false when the owner's database or the share row is gone
+ * (stale registry entry), true when the share still exists, and null when the
+ * check could not be performed (in doubt, callers must keep the token).
+ */
+function sharedLinkTargetStillExists(int $ownerId, string $targetType, string $token): ?bool {
+    $tables = [
+        'note' => 'shared_notes',
+        'folder' => 'shared_folders',
+        'workspace' => 'shared_workspaces',
+    ];
+    if (!isset($tables[$targetType]) || $ownerId <= 0) {
+        return null;
+    }
+    try {
+        require_once __DIR__ . '/UserDataManager.php';
+        $dbPath = (new UserDataManager($ownerId))->getUserDatabasePath();
+        if (!file_exists($dbPath)) {
+            return false;
+        }
+        $ownerCon = new PDO('sqlite:' . $dbPath);
+        $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $stmt = $ownerCon->prepare('SELECT 1 FROM ' . $tables[$targetType] . ' WHERE token = ? LIMIT 1');
+        $stmt->execute([$token]);
+        return $stmt->fetchColumn() !== false;
+    } catch (Exception $e) {
+        error_log("Failed to check shared link target: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Unregister every share token attached to the given notes. Called before
+ * permanently deleting notes: the shared_notes rows themselves are removed by
+ * the ON DELETE CASCADE on entries, but the global registry in master.db is
+ * not, which would leave the tokens unusable forever.
+ */
+function unregisterSharedLinksForNotes(PDO $userCon, array $noteIds): void {
+    $noteIds = array_values(array_filter(array_map('intval', $noteIds)));
+    if (empty($noteIds)) {
+        return;
+    }
+    try {
+        $placeholders = implode(',', array_fill(0, count($noteIds), '?'));
+        $stmt = $userCon->prepare("SELECT token FROM shared_notes WHERE note_id IN ($placeholders)");
+        $stmt->execute($noteIds);
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $token) {
+            if ($token) {
+                unregisterSharedLink((string)$token);
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Failed to unregister shared links for deleted notes: " . $e->getMessage());
+    }
+}
+
+/**
+ * Same as unregisterSharedLinksForNotes, for folder share tokens.
+ */
+function unregisterSharedLinksForFolders(PDO $userCon, array $folderIds): void {
+    $folderIds = array_values(array_filter(array_map('intval', $folderIds)));
+    if (empty($folderIds)) {
+        return;
+    }
+    try {
+        $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
+        $stmt = $userCon->prepare("SELECT token FROM shared_folders WHERE folder_id IN ($placeholders)");
+        $stmt->execute($folderIds);
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $token) {
+            if ($token) {
+                unregisterSharedLink((string)$token);
+            }
+        }
+    } catch (Exception $e) {
+        error_log("Failed to unregister shared links for deleted folders: " . $e->getMessage());
     }
 }
 
