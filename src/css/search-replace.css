@@ -8,6 +8,12 @@
     /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
     position: relative;
     z-index: 9;
+    /* Keep the bar about as wide as the centered toolbar instead of
+       stretching across the whole note on large screens */
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    box-sizing: border-box;
     animation: slideDown 0.2s ease-out;
 }
 

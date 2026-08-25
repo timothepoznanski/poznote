@@ -65,7 +65,7 @@
      * multi-line or sits outside the note content.
      */
     function getSelectedNoteText(noteId) {
-        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
         const cmApi = window.PoznoteMarkdownCodeMirror;
         if (cmEditor && cmApi && typeof cmApi.getSelectionOffsets === 'function' && typeof cmApi.getValue === 'function') {
             const offsets = cmApi.getSelectionOffsets(cmEditor);
@@ -79,11 +79,11 @@
         const selection = window.getSelection ? window.getSelection() : null;
         if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return '';
 
-        // Accept the rendered markdown preview too: opening the bar switches the note
-        // back to edit mode, where the same text is searched in the source.
+        // Accept the rendered markdown preview too (split mode): the same text is then
+        // searched in the source.
         const noteEntry = getNoteEntry(noteId);
         const searchRoot = getSearchContentRoot(noteId);
-        const roots = [searchRoot, noteEntry ? noteEntry.querySelector('.markdown-preview') : null];
+        const roots = [searchRoot, getMarkdownPreviewElement(noteId)];
 
         // Only prefill from a selection that belongs to this note's content
         const range = selection.getRangeAt(0);
@@ -139,8 +139,56 @@
         }
     }
 
+    function getMarkdownPreviewElement(noteId) {
+        const noteEntry = getNoteEntry(noteId);
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown') return null;
+
+        return noteEntry.querySelector('.markdown-preview');
+    }
+
+    /**
+     * A markdown note showing only its rendered preview (editor hidden, no split).
+     * The search then runs on the preview DOM instead of switching to the editor.
+     */
+    function isMarkdownPreviewMode(noteId) {
+        if (!getMarkdownEditorElement(noteId) || !getMarkdownPreviewElement(noteId)) return false;
+
+        return !isMarkdownEditorVisible(noteId);
+    }
+
+    /**
+     * CodeMirror editor to search in, or null when the preview is the visible pane
+     * (the hidden editor must not be searched then).
+     */
+    function getActiveCodeMirrorEditor(noteId) {
+        if (isMarkdownPreviewMode(noteId)) return null;
+
+        return getMarkdownCodeMirrorEditor(noteId);
+    }
+
     function getSearchContentRoot(noteId) {
+        if (isMarkdownPreviewMode(noteId)) {
+            return getMarkdownPreviewElement(noteId);
+        }
+
         return getMarkdownEditorElement(noteId) || getNoteEntry(noteId);
+    }
+
+    /**
+     * Replacing edits the source, so leave the preview-only view for the editor and
+     * rebuild the matches there, keeping the current position when possible.
+     */
+    function ensureEditModeForReplace(noteId) {
+        if (!isMarkdownPreviewMode(noteId) || typeof window.switchToEditMode !== 'function') return;
+
+        clearHighlights(noteId);
+        window.switchToEditMode(noteId);
+        findMatches(noteId, { preserveIndex: true, skipScroll: true });
+
+        const state = getNoteState(noteId);
+        if (state.matches.length > 0 && state.currentIndex >= 0) {
+            scrollToMatch(noteId, state.currentIndex);
+        }
     }
 
     /**
@@ -175,10 +223,6 @@
 
         // Make sure listeners are initialized
         initNoteListeners(noteId);
-
-        if (getMarkdownEditorElement(noteId) && !isMarkdownEditorVisible(noteId) && typeof window.switchToEditMode === 'function') {
-            window.switchToEditMode(noteId);
-        }
 
         // Clear previous state
         clearHighlights(noteId);
@@ -300,6 +344,10 @@
         const state = getNoteState(noteId);
         state.replaceVisible = !state.replaceVisible;
 
+        if (state.replaceVisible) {
+            ensureEditModeForReplace(noteId);
+        }
+
         const replaceRow = document.getElementById('searchReplaceRow' + noteId);
 
         if (replaceRow) {
@@ -336,26 +384,32 @@
         const noteEntry = getNoteEntry(noteId);
         if (!noteEntry) return false;
 
+        // Returns whether the note content itself carried highlights (the caller then
+        // saves the cleanup). Preview highlights live in rendered HTML only, so they
+        // never count, and CodeMirror decorations are cleared even when the preview is
+        // shown, in case the view mode changed while matches were active.
+        let hadContentHighlights = false;
+
         const cmEditor = getMarkdownCodeMirrorEditor(noteId);
         if (cmEditor && window.PoznoteMarkdownCodeMirror && typeof window.PoznoteMarkdownCodeMirror.clearSearch === 'function') {
             const cmApi = window.PoznoteMarkdownCodeMirror;
-            const hadCmHighlights = (getNoteState(noteId).matches || []).length > 0;
+            hadContentHighlights = (getNoteState(noteId).matches || []).some(match => match && match.isCodeMirrorMatch);
             cmApi.clearSearch(cmEditor);
-            return hadCmHighlights;
         }
 
         const highlights = noteEntry.querySelectorAll('.search-replace-highlight');
-        const hadHighlights = highlights.length > 0;
-        
+
         highlights.forEach(highlight => {
             const parent = highlight.parentNode;
-            if (parent) {
-                parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-                parent.normalize();
+            if (!parent) return;
+            if (!highlight.closest('.markdown-preview')) {
+                hadContentHighlights = true;
             }
+            parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+            parent.normalize();
         });
-        
-        return hadHighlights;
+
+        return hadContentHighlights;
     }
 
     /**
@@ -387,7 +441,7 @@
         state.matches = [];
         state.currentIndex = preserveIndex ? previousIndex : -1;
 
-        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
         const cmApi = window.PoznoteMarkdownCodeMirror;
         if (cmEditor && cmApi && typeof cmApi.findMatches === 'function') {
             let cmMatches = cmApi.findMatches(cmEditor, searchText).map(match => ({
@@ -451,8 +505,8 @@
         let pattern = searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(pattern, 'gi'); // Case insensitive for now
 
-        // Search in the note
-        highlightMatches(searchRoot, regex, noteId);
+        // Search in the note (or in the rendered preview when that is the visible pane)
+        highlightMatches(searchRoot, regex, noteId, searchRoot);
 
         // Update count
         const countEl = document.getElementById('searchCount' + noteId);
@@ -481,7 +535,7 @@
     /**
      * Highlight matches in a node
      */
-    function highlightMatches(node, regex, noteId) {
+    function highlightMatches(node, regex, noteId, root) {
         const state = getNoteState(noteId);
 
         if (node.nodeType === Node.TEXT_NODE) {
@@ -525,8 +579,9 @@
                 return;
             }
 
-            // Skip markdown preview pane (rendered HTML) — searching happens in the editor source only
-            if (node.classList && node.classList.contains('markdown-preview')) {
+            // Skip the markdown preview pane (rendered HTML) unless it is the search root,
+            // i.e. the note is in preview-only mode: with the editor visible the source is searched
+            if (node !== root && node.classList && node.classList.contains('markdown-preview')) {
                 return;
             }
 
@@ -550,7 +605,7 @@
 
             // Process child nodes
             const children = Array.from(node.childNodes);
-            children.forEach(child => highlightMatches(child, regex, noteId));
+            children.forEach(child => highlightMatches(child, regex, noteId, root));
         }
     }
 
@@ -595,7 +650,7 @@
         const noteEntryEl = getNoteEntry(noteId);
         const inSplit = !!(noteEntryEl && noteEntryEl.classList.contains('markdown-split-mode'));
 
-        const cmEditor = getMarkdownCodeMirrorEditor(noteId);
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
         const cmApi = window.PoznoteMarkdownCodeMirror;
         const cmMatch = state.matches[index];
         if (cmMatch && cmMatch.isCodeMirrorMatch && cmEditor && cmApi) {
@@ -697,6 +752,8 @@
      * Replace current match
      */
     function replaceOne(noteId) {
+        ensureEditModeForReplace(noteId);
+
         const state = getNoteState(noteId);
         if (state.matches.length === 0 || state.currentIndex < 0) return;
 
@@ -792,6 +849,8 @@
      * Replace all matches
      */
     function replaceAll(noteId) {
+        ensureEditModeForReplace(noteId);
+
         const state = getNoteState(noteId);
         if (state.matches.length === 0) return;
 
