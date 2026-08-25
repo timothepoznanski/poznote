@@ -552,6 +552,14 @@ class AttachmentsController {
             return false;
         }
 
+        // A trashed note is not served publicly (public_note.php refuses it),
+        // so its attachments must not be either.
+        $stmt = $this->con->prepare('SELECT 1 FROM entries WHERE id = ? AND trash = 0');
+        $stmt->execute([$noteId]);
+        if ($stmt->fetchColumn() === false) {
+            return false;
+        }
+
         $ownerId = $ownerId ?? $this->getActiveOwnerId();
         $passedUserRestriction = false;
         if (!$this->validateAllowedUsers($sharedNote['allowed_users'] ?? null, $ownerId, $passedUserRestriction)) {

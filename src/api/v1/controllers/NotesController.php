@@ -1528,7 +1528,12 @@ class NotesController {
         $linkedNotesStmt = $this->con->prepare("SELECT id, type, attachments FROM entries WHERE linked_note_id = ?");
         $linkedNotesStmt->execute([$noteId]);
         $linkedNotes = $linkedNotesStmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
+        // Free any share tokens in the master registry before the entries are
+        // deleted (the ON DELETE CASCADE only removes the shared_notes rows)
+        require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+        unregisterSharedLinksForNotes($this->con, array_merge([$noteId], array_column($linkedNotes, 'id')));
+
         $deletedLinkedCount = 0;
         foreach ($linkedNotes as $linkedNote) {
             $linkedId = $linkedNote['id'];

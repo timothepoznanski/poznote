@@ -2414,6 +2414,8 @@
     "errors": {
       "token_missing": "Link ausente",
       "token_or_folder_auth_missing": "Link ou autorização da pasta ausente",
+      "link_in_use": "Este link personalizado já está em uso",
+      "link_invalid": "Link personalizado inválido. Caracteres permitidos: letras, números, -, _, . (4 a 128 caracteres)",
       "shared_folder_not_found": "Pasta compartilhada não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "folder_not_found": "Pasta não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",

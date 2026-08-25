@@ -397,6 +397,273 @@ function handleEmptyQuoteBackspace(e, selection) {
     return false;
 }
 
+// ============================================================================
+// HEADING DELETION HANDLING
+// ============================================================================
+
+var HEADING_BLOCK_SELECTOR = 'h1, h2, h3, h4, h5, h6';
+var HEADING_ANCHOR_NODE_SELECTOR = '.heading-anchor, [data-heading-anchor="true"]';
+// Blocks containing any of these are left to the browser's default merge logic
+var HEADING_MERGE_BLOCKING_SELECTOR = 'img, video, audio, iframe, table, pre, ul, ol, li, hr, details, blockquote, aside, ' +
+    'h1, h2, h3, h4, h5, h6, .excalidraw-wrapper';
+
+function isHeadingElement(el) {
+    return !!(el && el.nodeType === 1 && /^H[1-6]$/.test(el.tagName));
+}
+
+function isPlainTextBlock(el) {
+    return !!(el && el.nodeType === 1 && (el.tagName === 'DIV' || el.tagName === 'P'));
+}
+
+/**
+ * A block whose children can safely be moved into a sibling block
+ */
+function isMergeableBlock(el) {
+    return (isHeadingElement(el) || isPlainTextBlock(el)) && !el.querySelector(HEADING_MERGE_BLOCKING_SELECTOR);
+}
+
+function removeHeadingAnchorNodes(el) {
+    var anchors = el.querySelectorAll(HEADING_ANCHOR_NODE_SELECTOR);
+    for (var i = 0; i < anchors.length; i++) {
+        anchors[i].remove();
+    }
+}
+
+/**
+ * True when the block holds no visible text (heading anchor icons ignored)
+ */
+function isBlockVisuallyEmpty(el) {
+    if (!el) return false;
+    var clone = el.cloneNode(true);
+    removeHeadingAnchorNodes(clone);
+    var text = (clone.textContent || '').replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g, '');
+    return text === '' && !clone.querySelector('img, video, audio, iframe, table, pre, ul, ol, hr, details, .excalidraw-wrapper');
+}
+
+function isTextNodeWithContent(node) {
+    return !!(node && node.nodeType === 3 && (node.textContent || '').replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g, '') !== '');
+}
+
+function isCaretAtBlockStart(range, block) {
+    var probe = document.createRange();
+    probe.setStart(block, 0);
+    probe.setEnd(range.startContainer, range.startOffset);
+    return probe.toString().replace(/[\u200B-\u200D\uFEFF]/g, '') === '';
+}
+
+function isCaretAtBlockEnd(range, block) {
+    var probe = document.createRange();
+    probe.setStart(range.endContainer, range.endOffset);
+    probe.setEnd(block, block.childNodes.length);
+    return probe.toString().replace(/[\u200B-\u200D\uFEFF]/g, '') === '';
+}
+
+function getFirstTextNode(el) {
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    return walker.nextNode();
+}
+
+function selectCollapsedRange(range) {
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+function placeCaretAtBlockStart(block) {
+    var range = document.createRange();
+    var textNode = getFirstTextNode(block);
+    if (textNode) {
+        range.setStart(textNode, 0);
+    } else {
+        range.setStart(block, 0);
+    }
+    range.collapse(true);
+    selectCollapsedRange(range);
+}
+
+function placeCaretAtBlockEnd(block) {
+    var range = document.createRange();
+    var last = block.lastChild;
+    // Skip a trailing <br>: the caret must sit before it, otherwise Chrome
+    // renders it on a phantom extra line
+    while (last && last.nodeType === 1 && last.tagName === 'BR') {
+        last = last.previousSibling;
+    }
+    if (!last) {
+        range.setStart(block, 0);
+    } else if (last.nodeType === 3) {
+        range.setStart(last, last.textContent.length);
+    } else {
+        range.setStartAfter(last);
+    }
+    range.collapse(true);
+    selectCollapsedRange(range);
+}
+
+/**
+ * Replace a heading with a plain block holding the same content
+ * @returns {HTMLElement} The new block
+ */
+function convertHeadingToPlainBlock(heading) {
+    var block = document.createElement('div');
+    removeHeadingAnchorNodes(heading);
+    while (heading.firstChild) {
+        block.appendChild(heading.firstChild);
+    }
+    if (isBlockVisuallyEmpty(block)) {
+        block.innerHTML = '<br>';
+    }
+    heading.parentNode.replaceChild(block, heading);
+    return block;
+}
+
+/**
+ * Move the content of `source` to the end of `target`, remove `source`
+ * and put the caret at the junction. Unlike the browser's native merge this
+ * never wraps the moved text in style spans (font-size, font-weight...), so
+ * text joining a heading becomes heading text and heading text joining a
+ * paragraph becomes plain text.
+ */
+function mergeBlockIntoPrevious(target, source) {
+    removeHeadingAnchorNodes(target);
+    removeHeadingAnchorNodes(source);
+
+    if (isBlockVisuallyEmpty(target)) {
+        target.innerHTML = '';
+    }
+    while (target.lastChild && target.lastChild.nodeType === 1 && target.lastChild.tagName === 'BR') {
+        target.removeChild(target.lastChild);
+    }
+    if (isBlockVisuallyEmpty(source)) {
+        source.innerHTML = '';
+    }
+
+    var junction = target.lastChild;
+    while (source.firstChild) {
+        target.appendChild(source.firstChild);
+    }
+    source.remove();
+
+    if (!target.firstChild) {
+        target.innerHTML = '<br>';
+    }
+
+    var range = document.createRange();
+    if (junction && junction.nodeType === 3) {
+        range.setStart(junction, junction.textContent.length);
+    } else if (junction) {
+        range.setStartAfter(junction);
+    } else {
+        var firstText = getFirstTextNode(target);
+        if (firstText) {
+            range.setStart(firstText, 0);
+        } else {
+            range.setStart(target, 0);
+        }
+    }
+    range.collapse(true);
+    selectCollapsedRange(range);
+}
+
+/**
+ * Handle Backspace/Delete when a heading is involved at the caret boundary.
+ * The browser's native merge keeps an emptied heading alive (with its id, so
+ * its section link) and wraps merged text in inline style spans, which is
+ * how a paragraph pulled up into a deleted heading ended up as bold heading
+ * text. This handler removes emptied headings outright and merges the
+ * neighbouring blocks itself.
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ * @param {HTMLElement} noteentry - The editable note container
+ * @returns {boolean} True if handled
+ */
+function handleHeadingBoundaryDelete(e, selection, noteentry) {
+    if (!noteentry || !selection || selection.rangeCount === 0) return false;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return false;
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed) return false;
+
+    var node = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer;
+    if (!node || !node.closest || !noteentry.contains(node)) return false;
+    if (node.closest('li, table, pre, code, blockquote, aside, details, .markdown-editor')) return false;
+
+    var block = node.closest(HEADING_BLOCK_SELECTOR + ', p, div');
+    if (!block || block === noteentry || !noteentry.contains(block)) return false;
+
+    var isBackspace = e.key === 'Backspace';
+    var neighbor, adjacentNode;
+
+    if (isBackspace) {
+        if (!isCaretAtBlockStart(range, block)) return false;
+        adjacentNode = block.previousSibling;
+        neighbor = block.previousElementSibling;
+    } else {
+        if (!isCaretAtBlockEnd(range, block)) return false;
+        adjacentNode = block.nextSibling;
+        neighbor = block.nextElementSibling;
+    }
+
+    // Raw text directly next to the block: leave the browser to it
+    if (isTextNodeWithContent(adjacentNode)) return false;
+
+    var blockIsHeading = isHeadingElement(block);
+    var neighborIsHeading = isHeadingElement(neighbor);
+    if (!blockIsHeading && !neighborIsHeading) return false;
+
+    // Emptied heading under the caret: drop it and move on to the neighbour
+    if (blockIsHeading && isBlockVisuallyEmpty(block)) {
+        e.preventDefault();
+        if (neighbor && isMergeableBlock(neighbor)) {
+            block.remove();
+            if (isBackspace) {
+                placeCaretAtBlockEnd(neighbor);
+            } else {
+                placeCaretAtBlockStart(neighbor);
+            }
+        } else {
+            placeCaretAtBlockStart(convertHeadingToPlainBlock(block));
+        }
+        triggerNoteSave();
+        return true;
+    }
+
+    // Emptied heading next to the caret: just remove it
+    if (neighborIsHeading && isBlockVisuallyEmpty(neighbor)) {
+        e.preventDefault();
+        neighbor.remove();
+        triggerNoteSave();
+        return true;
+    }
+
+    // Heading at the very start of the note: Backspace turns it into plain text
+    if (blockIsHeading && isBackspace && !neighbor) {
+        e.preventDefault();
+        placeCaretAtBlockStart(convertHeadingToPlainBlock(block));
+        triggerNoteSave();
+        return true;
+    }
+
+    if (!neighbor || !isMergeableBlock(block) || !isMergeableBlock(neighbor)) return false;
+
+    // Backspace at the start of a heading with an empty line above: remove the line
+    if (blockIsHeading && isBackspace && isBlockVisuallyEmpty(neighbor)) {
+        e.preventDefault();
+        neighbor.remove();
+        triggerNoteSave();
+        return true;
+    }
+
+    e.preventDefault();
+    if (isBackspace) {
+        mergeBlockIntoPrevious(neighbor, block);
+    } else {
+        mergeBlockIntoPrevious(block, neighbor);
+    }
+    triggerNoteSave();
+    return true;
+}
+
 /**
  * Handle arrow down navigation from note entry to checklist
  * @param {Event} e - The keyboard event
@@ -938,6 +1205,13 @@ function handleNoteEntryKeydown(e) {
     // Handle Backspace in empty quote/callout blocks
     if (e.key === 'Backspace') {
         if (handleEmptyQuoteBackspace(e, selection)) {
+            return;
+        }
+    }
+
+    // Handle Backspace/Delete at heading boundaries (emptied headings, merges)
+    if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (handleHeadingBoundaryDelete(e, selection, target.closest('.noteentry[contenteditable="true"]'))) {
             return;
         }
     }

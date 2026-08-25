@@ -174,6 +174,22 @@ if ($_POST) {
                 }
             }
 
+            // Free note/folder share tokens in the master registry before the
+            // rows are deleted (the ON DELETE CASCADE only removes the
+            // shared_notes / shared_folders rows)
+            try {
+                require_once __DIR__ . '/users/db_master.php';
+                $tokStmt = $con->prepare('SELECT sn.note_id FROM shared_notes sn JOIN entries e ON e.id = sn.note_id WHERE e.workspace = ?');
+                $tokStmt->execute([$name]);
+                unregisterSharedLinksForNotes($con, $tokStmt->fetchAll(PDO::FETCH_COLUMN));
+
+                $tokStmt = $con->prepare('SELECT sf.folder_id FROM shared_folders sf JOIN folders f ON f.id = sf.folder_id WHERE f.workspace = ?');
+                $tokStmt->execute([$name]);
+                unregisterSharedLinksForFolders($con, $tokStmt->fetchAll(PDO::FETCH_COLUMN));
+            } catch (Exception $e) {
+                // Non-fatal: don't block workspace deletion if share cleanup fails
+            }
+
             // Remove entries rows from DB
             $delEntries = $con->prepare('DELETE FROM entries WHERE workspace = ?');
         $delEntries->execute([$name]);
