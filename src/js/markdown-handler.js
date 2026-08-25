@@ -2383,6 +2383,33 @@ function parseMarkdown(text) {
             + '<a class="tasklist-embed-link" href="index.php?note=' + embedNoteId + '">' + escapeHtml(label) + '</a></div>';
     }
 
+    // Raw markdown source of every inline placeholder, so contexts that must print
+    // the source verbatim (indented code blocks) can restore it instead of leaking
+    // the placeholder (PLNK0) or the rendered element.
+    let placeholderSources = {};
+
+    function rememberPlaceholderSource(placeholder, source) {
+        placeholderSources[placeholder] = source;
+        return placeholder;
+    }
+
+    // Replaces placeholders in already HTML-escaped text with their escaped source.
+    // Sources can themselves contain placeholders (a link whose text has a backslash
+    // escape), hence the bounded passes.
+    function restorePlaceholderSources(escapedText) {
+        var output = String(escapedText || '');
+        for (var pass = 0; pass < 5; pass++) {
+            var changed = false;
+            output = output.replace(/\x00[A-Z]+\d+\x00/g, function (match) {
+                if (!Object.prototype.hasOwnProperty.call(placeholderSources, match)) return match;
+                changed = true;
+                return escapeHtml(placeholderSources[match]);
+            });
+            if (!changed) break;
+        }
+        return output;
+    }
+
     // Extract and protect fenced code blocks first so they are not processed by other rules
     let protectedFencedCode = [];
     let fencedCodeIndex = 0;
@@ -2402,7 +2429,7 @@ function parseMarkdown(text) {
         let placeholder = '\x00RAWCODE' + rawCodeIndex + '\x00';
         protectedRawCode[rawCodeIndex] = code;
         rawCodeIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     // Extract and protect math equations first (before HTML escaping)
@@ -2428,7 +2455,7 @@ function parseMarkdown(text) {
         let placeholder = '\x00MATHINLINE' + mathInlineIndex + '\x00';
         protectedMathInline[mathInlineIndex] = math.trim();
         mathInlineIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     let protectedMarkdownEscapes = [];
@@ -2439,7 +2466,7 @@ function parseMarkdown(text) {
             let placeholder = '\x00MDESC' + markdownEscapeIndex + '\x00';
             protectedMarkdownEscapes[markdownEscapeIndex] = escapeHtml(escapedChar + (repeatedChars || ''));
             markdownEscapeIndex++;
-            return placeholder;
+            return rememberPlaceholderSource(placeholder, match);
         });
     }
 
@@ -2480,7 +2507,7 @@ function parseMarkdown(text) {
         protectedElements[protectedIndex] = imgTag;
         markdownImageIndex++;
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     // Protect links [text](url "title")
@@ -2504,7 +2531,7 @@ function parseMarkdown(text) {
         }
         protectedElements[protectedIndex] = linkTag;
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     // Protect Poznote-generated Excalidraw containers as safe block HTML.
@@ -2538,12 +2565,13 @@ function parseMarkdown(text) {
     // whole span would emit already-protected placeholders (PLNK0) as literal text.
     text = text.replace(/<span\s+style="([^"]+)">((?:(?!<\/?span\b)[\s\S])*)<\/span>/gi, function (match, styleAttr, content) {
         let openTag = '<span style="' + styleAttr + '">';
+        let openTagSource = match.slice(0, match.indexOf('>') + 1);
 
-        function protect(html) {
+        function protect(html, source) {
             let placeholder = '\x00PSPAN' + protectedIndex + '\x00';
             protectedElements[protectedIndex] = html;
             protectedIndex++;
-            return placeholder;
+            return rememberPlaceholderSource(placeholder, source);
         }
 
         // A span whose content spans several markdown blocks must be closed and
@@ -2560,7 +2588,7 @@ function parseMarkdown(text) {
             if (block === '') {
                 return;
             }
-            result += protect(openTag) + block + protect('</span>');
+            result += protect(openTag, openTagSource) + block + protect('</span>', '</span>');
         });
 
         return result;
@@ -2576,13 +2604,13 @@ function parseMarkdown(text) {
             protectedElements[protectedIndex] = '<' + tag + attrs + '>';
         }
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
     text = text.replace(/<\/(details|summary|u)>/gi, function (match, tag) {
         let placeholder = '\x00PTAG' + protectedIndex + '\x00';
         protectedElements[protectedIndex] = '</' + tag + '>';
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     // Protect video tags for local or http(s) sources
@@ -2624,7 +2652,7 @@ function parseMarkdown(text) {
         const videoTag = '<video ' + safeAttrs.join(' ') + '></video>';
         protectedElements[protectedIndex] = videoTag;
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     // Protect audio tags for local or http(s) sources
@@ -2666,7 +2694,7 @@ function parseMarkdown(text) {
         const audioTag = '<audio ' + safeAttrs.join(' ') + '></audio>';
         protectedElements[protectedIndex] = audioTag;
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, match);
     });
 
     function decodeHtmlEntities(value) {
@@ -2758,7 +2786,7 @@ function parseMarkdown(text) {
 
         protectedElements[protectedIndex] = '<iframe ' + safeAttrs.join(' ') + '></iframe>';
         protectedIndex++;
-        return placeholder;
+        return rememberPlaceholderSource(placeholder, original);
     }
 
     // Protect iframe tags (YouTube, Bilibili, and Poznote audio player embeds).
@@ -3012,7 +3040,9 @@ function parseMarkdown(text) {
                 indentedLines.pop();
             }
             i--; // The for loop will increment
-            result.push('<pre class="indented-pre" data-line="' + indentedBlockStartLine + '">' + escapeHtml(indentedLines.join('\n')) + '</pre>');
+            // Lines are already HTML-escaped at this point; only the placeholders
+            // still need to be swapped back for their (escaped) markdown source.
+            result.push('<pre class="indented-pre" data-line="' + indentedBlockStartLine + '">' + restorePlaceholderSources(indentedLines.join('\n')) + '</pre>');
             continue;
         }
 
