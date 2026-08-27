@@ -113,8 +113,8 @@
     position: sticky;
     /* Both offsets keep the same 8px gap on the right: `right` applies while the
        bar scrolls and the button is stuck, `margin-right` while the tabs still
-       fit. The solid second shadow below paints that gap opaque so a tab
-       scrolling past cannot show through it. */
+       fit. The solid box-shadow below is not a visual shadow: it paints that
+       gap opaque so a tab scrolling past cannot show through it. */
     right: 8px;
     margin-right: 8px;
     flex-shrink: 0;
@@ -123,7 +123,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     background: #fff;
-    box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.12), 9px 0 0 0 #fff;
+    box-shadow: 9px 0 0 0 #fff;
     color: var(--pz-text-muted);
     font-family: inherit;
     font-size: 0.75rem;
@@ -274,7 +274,7 @@
     background: var(--dm-content-bg, #1e293b);
     border-color: var(--dm-border, #334155);
     color: var(--dm-text-secondary, #94a3b8);
-    box-shadow: -8px 0 8px -6px rgba(0, 0, 0, 0.5), 9px 0 0 0 var(--dm-tabbar-bg);
+    box-shadow: 9px 0 0 0 var(--dm-tabbar-bg);
 }
 
 [data-theme="dark"] .app-tab-close-all:hover {
