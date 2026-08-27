@@ -523,21 +523,25 @@ function getExternalHostWithPort() {
         return $host;
     }
 
+    // Only trust a port explicitly forwarded by a reverse proxy. Never fall
+    // back to SERVER_PORT: inside the container it is the port nginx listens
+    // on (80, or 8080 for the rootless image), which says nothing about the
+    // port the visitor used since Docker port mappings and reverse proxies
+    // both hide it. When the visitor did use a non-default port, the Host
+    // header already carries it (handled above).
     $forwardedPort = trim((string)($_SERVER['HTTP_X_FORWARDED_PORT'] ?? ''));
-    if ($forwardedPort !== '') {
-        $forwardedPortParts = array_values(array_filter(array_map('trim', explode(',', $forwardedPort)), 'strlen'));
-        $port = $forwardedPortParts ? (string)$forwardedPortParts[0] : '';
-    } else {
-        $port = isset($_SERVER['SERVER_PORT']) ? trim((string)$_SERVER['SERVER_PORT']) : '';
+    if ($forwardedPort === '') {
+        return $host;
     }
+    $forwardedPortParts = array_values(array_filter(array_map('trim', explode(',', $forwardedPort)), 'strlen'));
+    $port = $forwardedPortParts ? (string)$forwardedPortParts[0] : '';
 
     if ($port === '' || !ctype_digit($port)) {
         return $host;
     }
 
-    // Special case for Docker/internal mapping: if port is 80 but we are in HTTPS, 
-    // it probably means we are behind a proxy that talks to Nginx on port 80.
-    // In this case, adding :80 would be wrong for the external URL.
+    // A proxy reporting port 80 on an HTTPS request is describing its own
+    // upstream hop to nginx, not the visitor's port: adding :80 would be wrong.
     $isSecure = getProtocol() === 'https';
     if ($port === '80' && $isSecure) {
         return $host;

@@ -619,6 +619,27 @@ body.public-note-page {
     fill: currentColor;
 }
 
+/* Desktop: the "Copy section link" anchor only shows while its heading is
+   hovered, like in the editor. Touch devices have no hover, so the
+   anchor stays visible there. */
+@media screen and (min-width: 801px) and (hover: hover) {
+    .public-note .content .heading-anchor {
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .public-note .content :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+        opacity: 0.5;
+    }
+
+    /* Same heading scope plus the anchor's own state, so it outranks the
+       heading-hover rule above without !important. */
+    .public-note .content :is(h1, h2, h3, h4, h5, h6) .heading-anchor:hover,
+    .public-note .content :is(h1, h2, h3, h4, h5, h6) .heading-anchor:focus-visible {
+        opacity: 1;
+    }
+}
+
 /* Paragraphs */
 .public-note .content p {
     margin: 0;
