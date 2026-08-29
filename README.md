@@ -9,6 +9,11 @@ Powerful note-taking without the hassle.
 
 <br>
 <p align="center">
+A free, self-hosted, open-source alternative to Notion, Obsidian, Evernote, or OneNote.
+</p>
+<br>
+
+<p align="center">
   <img src="images/pres1.png" alt="Poznote-light" width="100%">
 </p>
 
