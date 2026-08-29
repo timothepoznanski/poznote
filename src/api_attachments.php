@@ -271,7 +271,7 @@ function handleUpload() {
         $new_attachment = [
             'id' => uniqid(),
             'filename' => $unique_filename,
-            'original_filename' => $original_name,
+            'original_filename' => poznoteSanitizeAttachmentDisplayName($validation['filename']),
             'file_size' => $file_size,
             'file_type' => $file_type,
             'uploaded_at' => date('Y-m-d H:i:s')

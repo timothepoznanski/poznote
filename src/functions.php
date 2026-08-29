@@ -2718,6 +2718,14 @@ function poznoteNormalizeAttachmentFilename(string $filename): string {
     return trim(basename(str_replace('\\', '/', $filename)));
 }
 
+// Display name stored as original_filename. Uses the validated basename and drops
+// characters that are meaningless in a filename but significant in HTML, as
+// defense in depth: every renderer must still escape the value.
+function poznoteSanitizeAttachmentDisplayName(string $filename): string {
+    $name = trim(str_replace(['<', '>', '"'], '', poznoteNormalizeAttachmentFilename($filename)));
+    return $name !== '' ? $name : 'attachment';
+}
+
 function poznoteValidateAttachmentFilename(string $filename): array {
     $baseFilename = poznoteNormalizeAttachmentFilename($filename);
 

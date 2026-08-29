@@ -9,6 +9,7 @@
     var noteWorkspace = null;
     var uploadInProgress = false;
     var currentAttachmentIdForAction = null;
+    var attachmentsById = {};
 
     // Translations cache (loaded from body data attributes)
     var TXT = {};
@@ -60,8 +61,19 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + FILESIZE_UNITS[i];
     }
 
+    // Escape untrusted text for HTML text and attribute contexts.
+    // Attachment filenames are user-supplied and must never reach innerHTML raw.
+    function escapeHtml(value) {
+        return String(value === null || value === undefined ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     function getAttachmentFilename(attachment) {
-        return attachment.original_filename || attachment.filename || '';
+        return String(attachment.original_filename || attachment.filename || '');
     }
 
     function getAttachmentExtension(attachment) {
@@ -134,7 +146,7 @@
             var isPDF = file.type === 'application/pdf';
             var isVideo = file.type.startsWith('video/') || /\.mp4$/i.test(fileName);
 
-            var htmlContent = '<div class="selected-file-info"><span>' + fileName + ' (' + fileSize + ')</span></div>';
+            var htmlContent = '<div class="selected-file-info"><span>' + escapeHtml(fileName) + ' (' + escapeHtml(fileSize) + ')</span></div>';
 
             if (isImage) {
                 var reader = new FileReader();
@@ -302,8 +314,10 @@
             return;
         }
 
+        attachmentsById = {};
         var html = '';
         visibleAttachments.forEach(function (attachment) {
+            attachmentsById[String(attachment.id || '')] = attachment;
             var fileSize = formatFileSize(attachment.file_size);
             var uploadDate = typeof window.poznoteFormatDateTime === 'function'
                 ? window.poznoteFormatDateTime(attachment.uploaded_at, { defaultDateOnly: true })
@@ -317,22 +331,25 @@
             if (!isVideo && attachment.original_filename) {
                 isVideo = /\.mp4$/i.test(attachment.original_filename);
             }
-            var fileUrl = '/api/v1/notes/' + noteId + '/attachments/' + attachment.id;
-            if (noteWorkspace) {
-                fileUrl += '?workspace=' + encodeURIComponent(noteWorkspace);
-            }
+            var attachmentId = String(attachment.id || '');
+            var fileUrl = buildAttachmentUrl(attachmentId, false);
+            var safeUrl = escapeHtml(fileUrl);
+            var safeId = escapeHtml(attachmentId);
+            var safeName = escapeHtml(fileName);
 
+            // Actions are wired through data attributes and event delegation so the
+            // filename never lands inside an inline event-handler string.
             var previewContent = '';
             if (isImage) {
-                previewContent = '<img src="' + fileUrl + '" alt="' + TXT.previewAlt + '" class="attachment-thumbnail" onclick="previewImage(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\')">';
+                previewContent = '<img src="' + safeUrl + '" alt="' + escapeHtml(TXT.previewAlt) + '" class="attachment-thumbnail" data-action="preview-image" data-attachment-id="' + safeId + '">';
             } else if (isPDF) {
-                previewContent = '<div class="pdf-thumbnail" onclick="previewPDF(\'' + fileUrl + '\', \'' + fileName.replace(/'/g, "\\'") + '\', \'' + attachment.id + '\')">' +
-                    '<iframe src="' + fileUrl + '" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>' +
-                    '<div class="pdf-overlay"><span>' + TXT.pdfLabel + '</span></div>' +
+                previewContent = '<div class="pdf-thumbnail" data-action="preview-pdf" data-attachment-id="' + safeId + '">' +
+                    '<iframe src="' + safeUrl + '" width="60" height="60" frameborder="0" style="pointer-events: none; transform: scale(0.8); transform-origin: top left;"></iframe>' +
+                    '<div class="pdf-overlay"><span>' + escapeHtml(TXT.pdfLabel) + '</span></div>' +
                     '</div>';
             } else if (isVideo) {
-                previewContent = '<div class="video-thumbnail" onclick="viewAttachment(\'' + attachment.id + '\')">' +
-                    '<video src="' + fileUrl + '#t=0.1" muted playsinline preload="metadata"></video>' +
+                previewContent = '<div class="video-thumbnail" data-action="view" data-attachment-id="' + safeId + '">' +
+                    '<video src="' + safeUrl + '#t=0.1" muted playsinline preload="metadata"></video>' +
                     '<div class="video-overlay"><i class="lucide lucide-play"></i></div>' +
                     '</div>';
             }
@@ -347,30 +364,30 @@
                 previewContent = '<div class="file-icon-placeholder"><i class="' + iconClass + '"></i></div>';
             }
 
-            html += '<div class="attachment-card">' +
+            html += '<div class="attachment-card" data-attachment-id="' + safeId + '">' +
                 '<div class="attachment-icon">' + previewContent + '</div>' +
                 '<div class="attachment-details">' +
-                '<div class="attachment-name" title="' + fileName + '">' + shortName + '</div>' +
+                '<div class="attachment-name" title="' + safeName + '">' + escapeHtml(shortName) + '</div>' +
                 '<div class="attachment-meta">' +
-                '<span class="attachment-size">' + fileSize + '</span>' +
-                '<span class="attachment-date">' + TXT.uploadedPrefix + uploadDate + '</span>' +
+                '<span class="attachment-size">' + escapeHtml(fileSize) + '</span>' +
+                '<span class="attachment-date">' + escapeHtml(TXT.uploadedPrefix) + escapeHtml(uploadDate) + '</span>' +
                 '</div>' +
                 '</div>' +
                 '<div class="attachment-actions">' +
-                '<button onclick="viewAttachment(\'' + attachment.id + '\')" class="btn-icon btn-view" title="' + TXT.view + '" aria-label="' + TXT.view + '">' +
+                '<button type="button" data-action="view" data-attachment-id="' + safeId + '" class="btn-icon btn-view" title="' + escapeHtml(TXT.view) + '" aria-label="' + escapeHtml(TXT.view) + '">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                 '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>' +
                 '<circle cx="12" cy="12" r="3"></circle>' +
                 '</svg>' +
                 '</button>' +
-                '<button onclick="downloadAttachment(\'' + attachment.id + '\')" class="btn-icon btn-download" title="' + TXT.download + '" aria-label="' + TXT.download + '">' +
+                '<button type="button" data-action="download" data-attachment-id="' + safeId + '" class="btn-icon btn-download" title="' + escapeHtml(TXT.download) + '" aria-label="' + escapeHtml(TXT.download) + '">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                 '<path d="M12 3v12"></path>' +
                 '<path d="m7 10 5 5 5-5"></path>' +
                 '<path d="M5 21h14"></path>' +
                 '</svg>' +
                 '</button>' +
-                '<button onclick="showDeleteAttachmentConfirm(\'' + attachment.id + '\')" class="btn-icon btn-delete" title="' + TXT.deleteTxt + '">' +
+                '<button type="button" data-action="delete" data-attachment-id="' + safeId + '" class="btn-icon btn-delete" title="' + escapeHtml(TXT.deleteTxt) + '">' +
                 '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
                 '<polyline points="3,6 5,6 21,6"></polyline>' +
                 '<path d="m19,6v14a2,2 0 0,1-2,2H7a2,2 0 0,1-2-2V6m3,0V4a2,2 0 0,1,2-2h4a2,2 0 0,1,2,2v2"></path>' +
@@ -391,8 +408,8 @@
         modal.className = 'image-preview-modal';
         modal.innerHTML = '<div class="image-preview-content">' +
             '<span class="image-preview-close">&times;</span>' +
-            '<img src="' + imageUrl + '" alt="' + fileName + '" class="image-preview-large">' +
-            '<div class="image-preview-title">' + fileName + '</div>' +
+            '<img src="' + escapeHtml(imageUrl) + '" alt="' + escapeHtml(fileName) + '" class="image-preview-large">' +
+            '<div class="image-preview-title">' + escapeHtml(fileName) + '</div>' +
             '</div>';
 
         document.body.appendChild(modal);
@@ -410,15 +427,28 @@
         modal.className = 'image-preview-modal';
         modal.innerHTML = '<div class="pdf-preview-content">' +
             '<div class="pdf-preview-header">' +
-            '<h3>' + fileName + '</h3>' +
-            '<button class="pdf-preview-close">&times;</button>' +
+            '<h3>' + escapeHtml(fileName) + '</h3>' +
+            '<button type="button" class="pdf-preview-close">&times;</button>' +
             '</div>' +
-            '<embed src="' + pdfUrl + '" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">' +
+            '<embed src="' + escapeHtml(pdfUrl) + '" type="application/pdf" width="90%" height="80%" style="margin: 20px auto; display: block; border-radius: 4px;">' +
             '<div class="pdf-preview-actions">' +
-            '<button onclick="window.open(\'' + pdfUrl + '\', \'_blank\')" class="btn btn-primary">' + TXT.openNewTab + '</button>' +
-            '<button onclick="downloadAttachment(\'' + attachmentId + '\')" class="btn btn-secondary">' + TXT.download + '</button>' +
+            '<button type="button" class="btn btn-primary pdf-preview-open">' + escapeHtml(TXT.openNewTab) + '</button>' +
+            '<button type="button" class="btn btn-secondary pdf-preview-download">' + escapeHtml(TXT.download) + '</button>' +
             '</div>' +
             '</div>';
+
+        var openBtn = modal.querySelector('.pdf-preview-open');
+        if (openBtn) {
+            openBtn.addEventListener('click', function () {
+                window.open(pdfUrl, '_blank');
+            });
+        }
+        var downloadBtn = modal.querySelector('.pdf-preview-download');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', function () {
+                downloadAttachment(attachmentId);
+            });
+        }
 
         document.body.appendChild(modal);
 
@@ -430,7 +460,7 @@
     }
 
     function buildAttachmentUrl(attachmentId, forceDownload) {
-        var url = '/api/v1/notes/' + noteId + '/attachments/' + attachmentId;
+        var url = '/api/v1/notes/' + encodeURIComponent(noteId) + '/attachments/' + encodeURIComponent(attachmentId);
         var queryParams = [];
         if (noteWorkspace) {
             queryParams.push('workspace=' + encodeURIComponent(noteWorkspace));
@@ -596,11 +626,53 @@
             confirmBtn.addEventListener('click', executeDeleteAttachment);
         }
 
+        // Delegate clicks on the attachment cards (preview/view/download/delete)
+        var listContainer = document.getElementById('attachmentsList');
+        if (listContainer) {
+            listContainer.addEventListener('click', handleAttachmentListClick);
+        }
+
         // Update back link
         updateBackLink();
 
         // Load attachments
         loadAttachments();
+    }
+
+    // Click handler for actions rendered in displayAttachments()
+    function handleAttachmentListClick(event) {
+        var target = event.target && event.target.closest ? event.target.closest('[data-action]') : null;
+        if (!target || !event.currentTarget.contains(target)) return;
+
+        var action = target.getAttribute('data-action');
+        var attachmentId = target.getAttribute('data-attachment-id') || '';
+        if (!attachmentId) return;
+
+        var attachment = attachmentsById[attachmentId];
+        var fileName = attachment ? getAttachmentFilename(attachment) : '';
+
+        switch (action) {
+            case 'preview-image':
+                event.preventDefault();
+                previewImage(buildAttachmentUrl(attachmentId, false), fileName);
+                break;
+            case 'preview-pdf':
+                event.preventDefault();
+                previewPDF(buildAttachmentUrl(attachmentId, false), fileName, attachmentId);
+                break;
+            case 'view':
+                event.preventDefault();
+                viewAttachment(attachmentId);
+                break;
+            case 'download':
+                event.preventDefault();
+                downloadAttachment(attachmentId);
+                break;
+            case 'delete':
+                event.preventDefault();
+                showDeleteAttachmentConfirm(attachmentId);
+                break;
+        }
     }
 
     // Expose functions globally for onclick handlers in dynamic HTML
