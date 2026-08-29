@@ -3,15 +3,13 @@
   <img src="images/poznote-logo-text.png" alt="Poznote Logo" width="400">
 </p>
 
-<h3 align="center">
+<h2 align="center">
 Powerful note-taking without the hassle.
-</h3>
+</h2>
 
-<br>
-<p align="center">
+<h3 align="center">
 A free, self-hosted, open-source alternative to Notion, Obsidian, Evernote, or OneNote.
-</p>
-<br>
+<h3 align="center">
 
 <p align="center">
   <img src="images/pres1.png" alt="Poznote-light" width="100%">
