@@ -216,7 +216,7 @@ docker compose up -d
 <details>
 <summary><strong>☁️ Cloud (Railway)</strong></summary><br>
 
-Deploy Poznote in the cloud using the official [Railway](https://railway.com) template:
+Deploy Poznote in the cloud using the official Railway template:
 
 - Runs on your own Railway account
 - No server to manage, nothing to install
