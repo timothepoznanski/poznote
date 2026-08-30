@@ -18,6 +18,137 @@ if (!defined('ALLOWED_IFRAME_DOMAINS')) {
 }
 
 /**
+ * Decide whether an iframe `src` points at a trusted origin.
+ *
+ * Uses parse_url() with EXACT host matching (plus subdomains of an allowed
+ * domain) so look-alike hosts such as `www.youtube.com.evil.test`, or a
+ * trusted domain smuggled into the query string (`/x?u=//youtube.com`), are
+ * rejected. Only http(s) and same-origin relative paths are accepted;
+ * protocol-relative, javascript:, data: and other schemes are refused.
+ */
+function poznoteIframeSrcIsTrusted($src): bool {
+    $src = trim((string) $src);
+    if ($src === '') {
+        return false;
+    }
+
+    // Reject any explicit scheme that is not http/https (javascript:, data:, ...).
+    if (preg_match('#^([a-z][a-z0-9+.\-]*):#i', $src, $schemeMatch)) {
+        if (!in_array(strtolower($schemeMatch[1]), ['http', 'https'], true)) {
+            return false;
+        }
+    }
+
+    $host = parse_url($src, PHP_URL_HOST);
+    if ($host === null || $host === false || $host === '') {
+        // No host -> relative/local path only. A leading "//" with no resolvable
+        // host is treated as untrusted.
+        if (strpos($src, '//') === 0) {
+            return false;
+        }
+        return $src[0] === '/'
+            || strpos($src, './') === 0
+            || preg_match('~^audio_player\.php(?:[?#]|$)~i', $src) === 1;
+    }
+
+    $host = strtolower($host);
+    foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
+        $domain = strtolower(trim((string) $domain));
+        if ($domain === '') {
+            continue;
+        }
+        if ($host === $domain || substr($host, -(strlen($domain) + 1)) === '.' . $domain) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Decide whether an <audio>/<video> src (or poster) is acceptable:
+ * http(s) or a same-origin relative path. Any other scheme is refused.
+ */
+function poznoteMediaSrcIsTrusted($src): bool {
+    $src = trim((string) $src);
+    if ($src === '') {
+        return false;
+    }
+    if (preg_match('#^([a-z][a-z0-9+.\-]*):#i', $src, $schemeMatch)) {
+        return in_array(strtolower($schemeMatch[1]), ['http', 'https'], true);
+    }
+    return $src[0] === '/' || strpos($src, './') === 0 || strpos($src, '../') === 0;
+}
+
+/**
+ * Rebuild an <iframe>, <video> or <audio> tag from a raw attribute string,
+ * keeping ONLY allow-listed attributes with re-encoded values.
+ *
+ * This is the single place that decides which media attributes may reach the
+ * page: every path that turns an attribute string back into markup
+ * (unescaping stored `&lt;iframe ...&gt;` text, the Markdown parser, ...)
+ * must go through it so that inline event handlers or unexpected attributes
+ * can never be re-emitted verbatim.
+ *
+ * @param string $tagName 'iframe', 'video' or 'audio'
+ * @param string $attrs   Decoded attribute string (e.g. `src="..." width="560"`)
+ * @return string|null    The rebuilt tag, or null when the src is missing/untrusted
+ */
+function poznoteRebuildMediaTag(string $tagName, string $attrs): ?string {
+    static $allowedAttrs = [
+        'iframe' => ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'allowtransparency', 'title', 'sandbox', 'loading', 'referrerpolicy', 'style', 'class', 'scrolling', 'contenteditable', 'data-is-audio', 'data-audio-src', 'data-converted-from-audio'],
+        'video' => ['src', 'width', 'height', 'preload', 'poster', 'class', 'style', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'],
+        'audio' => ['src', 'preload', 'class', 'style', 'controls', 'muted', 'loop', 'autoplay'],
+    ];
+    static $booleanAttrs = ['allowfullscreen', 'allowtransparency', 'controls', 'muted', 'playsinline', 'loop', 'autoplay'];
+
+    $tagName = strtolower($tagName);
+    if (!isset($allowedAttrs[$tagName])) {
+        return null;
+    }
+
+    // Tokenize name[=value] pairs the way a browser would (double-quoted,
+    // single-quoted or bare values). Anything that does not parse is dropped.
+    preg_match_all('/([a-zA-Z][\w:.-]*)(?:\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s"\'=<>`]+)))?/', $attrs, $matches, PREG_SET_ORDER);
+
+    $safeAttrs = [];
+    $src = null;
+    foreach ($matches as $m) {
+        $name = strtolower($m[1]);
+        if (!in_array($name, $allowedAttrs[$tagName], true) || isset($safeAttrs[$name])) {
+            continue;
+        }
+        $value = ($m[2] ?? '') !== '' ? $m[2] : ((($m[3] ?? '') !== '') ? $m[3] : ($m[4] ?? ''));
+
+        if (in_array($name, $booleanAttrs, true)) {
+            $safeAttrs[$name] = $name;
+            continue;
+        }
+        if ($name === 'src') {
+            $src = $value;
+        } elseif ($name === 'poster' || $name === 'data-audio-src') {
+            if (!poznoteMediaSrcIsTrusted($value)) {
+                continue;
+            }
+        } elseif ($name === 'style') {
+            if (preg_match('/expression\s*\(|javascript:|behavior\s*:|@import/i', $value)) {
+                continue;
+            }
+        }
+        $safeAttrs[$name] = $name . '="' . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . '"';
+    }
+
+    $srcTrusted = $src !== null && ($tagName === 'iframe'
+        ? poznoteIframeSrcIsTrusted($src)
+        : poznoteMediaSrcIsTrusted($src));
+    if (!$srcTrusted) {
+        return null;
+    }
+
+    return '<' . $tagName . ' ' . implode(' ', $safeAttrs) . '></' . $tagName . '>';
+}
+
+/**
  * Helper function to create directory with proper permissions
  * Centralizes the logic for creating directories and setting ownership
  * 
@@ -4195,50 +4326,29 @@ function repairDatabaseEntries($con) {
  * Unescape iframe HTML entities in content
  * This fixes notes that were created with HTML-escaped iframe tags
  * (e.g., &lt;iframe&gt; becomes <iframe>)
- * Only unescapes iframes from whitelisted domains for security
+ *
+ * Escaped tags are inert text for sanitizeHtml(), so anything re-emitted here
+ * reaches the page unsanitized: the tag is rebuilt from an attribute
+ * allow-list (poznoteRebuildMediaTag) and only for trusted iframe origins.
+ * Anything else stays escaped.
  */
 function unescapeIframesInHtml($content) {
     if (empty($content)) {
         return $content;
     }
-    
-    // Find escaped iframe tags: &lt;iframe...&gt;&lt;/iframe&gt;
-    $pattern = '/&lt;iframe\s+([^&]+)&gt;\s*&lt;\/iframe&gt;/i';
-    
-    return preg_replace_callback($pattern, function($matches) {
-        $escapedAttrs = $matches[1];
-        // Unescape the attributes
-        $attrs = html_entity_decode($escapedAttrs, ENT_QUOTES, 'UTF-8');
-        
-        // Extract src attribute to validate domain
-        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
-            $src = $srcMatch[1];
-            
-            $allowedDomains = ALLOWED_IFRAME_DOMAINS;
-            
-            // Check if domain is whitelisted
-            $isAllowed = false;
-            foreach ($allowedDomains as $domain) {
-                if (stripos($src, '//' . $domain) !== false || stripos($src, '.' . $domain) !== false) {
-                    $isAllowed = true;
-                    break;
-                }
-            }
-            
-            if ($isAllowed) {
-                // Return unescaped iframe
-                return '<iframe ' . $attrs . '></iframe>';
-            }
-        }
-        
+
+    return preg_replace_callback('/&lt;iframe\s([\s\S]*?)&gt;\s*&lt;\/iframe&gt;/i', function($matches) {
+        $attrs = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $tag = poznoteRebuildMediaTag('iframe', $attrs);
         // If not whitelisted, keep it escaped for security
-        return $matches[0];
+        return $tag ?? $matches[0];
     }, $content);
 }
 
 /**
  * Unescape audio/video tags that were saved as escaped HTML
- * Keeps the escaped tag if the src is not a safe URL
+ * Keeps the escaped tag if the src is not a safe URL. Same allow-list
+ * rebuild as iframes: no attribute is passed through verbatim.
  */
 function unescapeMediaInHtml($content) {
     if (empty($content)) {
@@ -4248,37 +4358,13 @@ function unescapeMediaInHtml($content) {
     // Unescape iframes first (keeps existing behavior)
     $content = unescapeIframesInHtml($content);
 
-    $unescapeMediaTag = function($matches, $tagName) {
-        $escapedAttrs = $matches[1];
-        $attrs = html_entity_decode($escapedAttrs, ENT_QUOTES, 'UTF-8');
-
-        // Strip inline event handlers for safety
-        $attrs = preg_replace('/\s+on[a-zA-Z]+=("[^"]*"|\'[^\']*\'|[^\s>]*)/i', '', $attrs);
-
-        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
-            $src = $srcMatch[1];
-            $isAllowed = preg_match('/^https?:\/\//i', $src)
-                || preg_match('/^\//', $src)
-                || preg_match('/^\.\.\//', $src)
-                || preg_match('/^\.\//', $src);
-
-            if ($isAllowed) {
-                return '<' . $tagName . ' ' . $attrs . '></' . $tagName . '>';
-            }
-        }
-
-        return $matches[0];
-    };
-
-    // Unescape audio tags
-    $content = preg_replace_callback('/&lt;audio\s+([^&]+)&gt;\s*&lt;\/audio&gt;/i', function($matches) use ($unescapeMediaTag) {
-        return $unescapeMediaTag($matches, 'audio');
-    }, $content);
-
-    // Unescape video tags
-    $content = preg_replace_callback('/&lt;video\s+([^&]+)&gt;\s*&lt;\/video&gt;/i', function($matches) use ($unescapeMediaTag) {
-        return $unescapeMediaTag($matches, 'video');
-    }, $content);
+    foreach (['audio', 'video'] as $tagName) {
+        $content = preg_replace_callback('/&lt;' . $tagName . '\s([\s\S]*?)&gt;\s*&lt;\/' . $tagName . '&gt;/i', function($matches) use ($tagName) {
+            $attrs = html_entity_decode($matches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $tag = poznoteRebuildMediaTag($tagName, $attrs);
+            return $tag ?? $matches[0];
+        }, $content);
+    }
 
     return $content;
 }
@@ -4501,24 +4587,9 @@ function sanitizeHtml($html) {
             if ($attrName === 'href' || $attrName === 'src') {
                 // For iframes, validate that src is from trusted domains or local paths
                 if ($tagName === 'iframe' && $attrName === 'src') {
-                    $allowedIframeDomains = ALLOWED_IFRAME_DOMAINS;
-                    
-                    $isTrustedIframe = false;
-                    
-                    // Allow local/relative paths (e.g., /audio_player.php)
-                    if (strpos($attrValue, '/') === 0 || strpos($attrValue, './') === 0 || preg_match('#^audio_player\.php(?:[?#]|$)#i', $attrValue)) {
-                        $isTrustedIframe = true;
-                    } else {
-                        // Check trusted domains
-                        foreach ($allowedIframeDomains as $domain) {
-                            if (stripos($attrValue, '//' . $domain) !== false || stripos($attrValue, 'https://' . $domain) !== false) {
-                                $isTrustedIframe = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (!$isTrustedIframe) {
+                    // Strict host match against ALLOWED_IFRAME_DOMAINS, or a
+                    // local/relative path (e.g., /audio_player.php)
+                    if (!poznoteIframeSrcIsTrusted($attrValue)) {
                         // Not a trusted iframe source - mark entire element for removal
                         $elementsToRemove[] = $element;
                         break; // Exit attribute loop
@@ -4609,8 +4680,9 @@ function sanitizeMarkdownContent($markdown) {
     $markdown = preg_replace('/<form\b[^>]*>.*?<\/form>/is', '', $markdown);
 
     // Remove on* event handlers from any HTML tags embedded in markdown
-    $markdown = preg_replace('/(<[^>]*)\s+on\w+\s*=\s*(["\']).*?\2/is', '$1', $markdown);
-    $markdown = preg_replace('/(<[^>]*)\s+on\w+\s*=\s*[^\s>]*/is', '$1', $markdown);
+    // ("/" is an attribute separator for browsers too: <details/onclick=...>)
+    $markdown = preg_replace('/(<[^>]*)[\s\/]+on\w+\s*=\s*(["\']).*?\2/is', '$1', $markdown);
+    $markdown = preg_replace('/(<[^>]*)[\s\/]+on\w+\s*=\s*[^\s>]*/is', '$1', $markdown);
 
     // Remove javascript: and vbscript: protocols from href/src attributes
     $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:/is', '$1=$2', $markdown);

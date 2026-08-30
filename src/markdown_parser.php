@@ -39,6 +39,26 @@ function sanitizeAttributes($attrs, $allowedAttrs, $booleanAttrs = []) {
 }
 
 /**
+ * Attributes kept on raw <details>/<summary>/<u> tags written in Markdown.
+ * Only `class` (safe token characters) and, for <details>, the boolean `open`
+ * survive: everything else (inline event handlers, style, id, ...) is dropped
+ * before the tag is re-emitted into the rendered HTML.
+ */
+function sanitizeMarkdownPassthroughTagAttrs($tag, $attrs) {
+    $safe = '';
+    if (preg_match('/(?:^|\s)class\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s"\'=<>`]+))/i', $attrs, $m)) {
+        $class = trim(preg_replace('/[^\w\s-]/', '', ($m[1] ?? '') !== '' ? $m[1] : ((($m[2] ?? '') !== '') ? $m[2] : ($m[3] ?? ''))));
+        if ($class !== '') {
+            $safe .= ' class="' . htmlspecialchars($class, ENT_QUOTES, 'UTF-8') . '"';
+        }
+    }
+    if ($tag === 'details' && preg_match('/(?:^|\s)open(?=\s|=|\/|$)/i', $attrs)) {
+        $safe .= ' open';
+    }
+    return $safe;
+}
+
+/**
  * Parse markdown content and convert it to HTML
  * 
  * @param string $text Markdown content
@@ -556,14 +576,16 @@ function parseMarkdown($text) {
     }, $text);
 
     // Protect details, summary, br, and underline tags
-    $text = preg_replace_callback('/<(details|summary|br|u)([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/<(details|summary|br|u)(?=[\s\/>])([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
         $tag = strtolower($matches[1]);
         $attrs = $matches[2];
         $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
         if ($tag === 'br') {
             $protectedElements[$protectedIndex] = '<br>';
         } else {
-            $protectedElements[$protectedIndex] = '<' . $tag . $attrs . '>';
+            // Attribute allow-list: raw HTML in Markdown must never carry
+            // inline event handlers into the rendered preview.
+            $protectedElements[$protectedIndex] = '<' . $tag . sanitizeMarkdownPassthroughTagAttrs($tag, $attrs) . '>';
         }
         $protectedIndex++;
         return $placeholder;
@@ -578,63 +600,21 @@ function parseMarkdown($text) {
     }, $text);
 
     $protectIframeTag = function($attrs, $original) use (&$protectedElements, &$protectedIndex) {
-        $attrs = html_entity_decode($attrs, ENT_QUOTES, 'UTF-8');
+        $attrs = html_entity_decode($attrs, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        // Extract src attribute to validate the source
-        if (preg_match('/src\s*=\s*["\']([^"\']+)["\']/i', $attrs, $srcMatch)) {
-            $src = $srcMatch[1];
-            
-            // Use centralized whitelist from functions.php (ALLOWED_IFRAME_DOMAINS constant)
-            // Note: functions.php must be loaded before calling parseMarkdown()
-            $allowedDomains = ALLOWED_IFRAME_DOMAINS;
-            
-            // Check if the src matches any allowed domain (properly validate hostname)
-            // or Poznote's local iframe audio player.
-            $isAllowed = preg_match('#^(?:/|\./|\.\./)?audio_player\.php(?:\?|$)#i', $src) === 1;
-            $parsedUrl = parse_url($src);
-            if (!$isAllowed && isset($parsedUrl['host'])) {
-                $host = strtolower($parsedUrl['host']);
-                foreach ($allowedDomains as $domain) {
-                    $domain = strtolower($domain);
-                    // Exact match or subdomain match (e.g., www.youtube.com or embed.youtube.com)
-                    if ($host === $domain || substr($host, -(strlen($domain) + 1)) === '.' . $domain) {
-                        $isAllowed = true;
-                        break;
-                    }
-                }
-            }
-            
-            if ($isAllowed) {
-                $placeholder = "\x00PIFRAME" . $protectedIndex . "\x00";
-                // Sanitize attributes: only allow safe attributes
-                $safeAttrs = [];
-                
-                // Extract and sanitize individual attributes
-                preg_match_all('/([\w-]+)\s*=\s*["\']([^"\']*)["\']/', $attrs, $attrMatches, PREG_SET_ORDER);
-                foreach ($attrMatches as $attr) {
-                    $attrName = strtolower($attr[1]);
-                    $attrValue = $attr[2];
-                    
-                    // Only allow safe attributes
-                    if (in_array($attrName, ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen', 'title', 'loading', 'referrerpolicy', 'sandbox', 'style', 'class', 'scrolling', 'contenteditable', 'data-is-audio', 'data-audio-src', 'data-converted-from-audio'])) {
-                        $safeAttrs[] = $attrName . '="' . htmlspecialchars($attrValue, ENT_QUOTES, 'UTF-8') . '"';
-                    }
-                }
-                
-                // Handle boolean attributes like allowfullscreen
-                if (stripos($attrs, 'allowfullscreen') !== false && !in_array('allowfullscreen', array_map(function($a) { return explode('=', $a)[0]; }, $safeAttrs))) {
-                    $safeAttrs[] = 'allowfullscreen';
-                }
-                
-                $iframeTag = '<iframe ' . implode(' ', $safeAttrs) . '></iframe>';
-                $protectedElements[$protectedIndex] = $iframeTag;
-                $protectedIndex++;
-                return $placeholder;
-            }
+        // Shared allow-list rebuild (functions.php): strict host match on src
+        // against ALLOWED_IFRAME_DOMAINS or Poznote's local audio player, and
+        // only safe attributes re-emitted with re-encoded values.
+        $iframeTag = poznoteRebuildMediaTag('iframe', $attrs);
+        if ($iframeTag === null) {
+            // If not allowed, return the original (will be escaped)
+            return $original;
         }
 
-        // If not allowed, return the original (will be escaped)
-        return $original;
+        $placeholder = "\x00PIFRAME" . $protectedIndex . "\x00";
+        $protectedElements[$protectedIndex] = $iframeTag;
+        $protectedIndex++;
+        return $placeholder;
     };
 
     // Protect iframe tags (YouTube, Bilibili, and Poznote audio player embeds).
