@@ -3412,6 +3412,23 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             ];
         }
 
+        // The dump is executed as SQL later on, so it must contain nothing
+        // but the statements a Poznote backup is made of. Checked before the
+        // wipe: a refused dump must leave the existing data untouched.
+        require_once __DIR__ . '/backup_sql_restore.php';
+        $parsedDump = poznoteParseBackupSql((string)file_get_contents($sqlFile));
+        if (!$parsedDump['success']) {
+            deleteDirectory($tempExtractDir);
+            $tempExtractDir = null;
+            return [
+                'success' => false,
+                'error' => 'Invalid backup file: database/poznote_backup.sql is not a Poznote database dump (' . $parsedDump['error'] . '). Nothing was restored.',
+                'message' => ''
+            ];
+        }
+        $dumpStatements = $parsedDump['statements'];
+        unset($parsedDump);
+
         // A backup made with the lighter-zip option references attachments in
         // its metadata but does not carry all of the files (none of them in
         // pure S3 mode, only the not-yet-migrated ones in a partially
@@ -3556,8 +3573,9 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $databaseRestored = false;
         $skippedAttachments = [];
         
-        // Restore database (presence of the SQL file was validated before the wipe)
-        $dbResult = restoreDatabaseFromFile($sqlFile);
+        // Restore database (the SQL file was validated before the wipe)
+        $dbResult = restoreDatabaseFromFile($sqlFile, $dumpStatements);
+        unset($dumpStatements);
         if ($dbResult['success']) {
             $dbLabel = basename(poznoteGetActiveDatabasePath());
             $dbSummary = '';
@@ -3688,13 +3706,32 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
 
 /**
  * Restore database from SQL file
+ *
+ * The dump comes from a user-supplied archive, so it is never executed as-is:
+ * it is parsed into DROP TABLE / CREATE TABLE / INSERT statements first and
+ * anything else (ATTACH, PRAGMA, triggers...) is refused. See
+ * backup_sql_restore.php.
+ *
+ * @param string $sqlFile Path of the dump
+ * @param array|null $statements Statements already validated by
+ *        poznoteParseBackupSql(), to avoid parsing the file twice
  */
-function restoreDatabaseFromFile($sqlFile) {
-    $content = file_get_contents($sqlFile);
-    if (!$content) {
-        return ['success' => false, 'error' => 'Cannot read SQL file'];
+function restoreDatabaseFromFile($sqlFile, $statements = null) {
+    require_once __DIR__ . '/backup_sql_restore.php';
+
+    if ($statements === null) {
+        $content = file_get_contents($sqlFile);
+        if (!$content) {
+            return ['success' => false, 'error' => 'Cannot read SQL file'];
+        }
+        $parsed = poznoteParseBackupSql($content);
+        unset($content);
+        if (!$parsed['success']) {
+            return ['success' => false, 'error' => 'Invalid SQL dump: ' . $parsed['error']];
+        }
+        $statements = $parsed['statements'];
     }
-    
+
     // Use the active database path from db_connect.php or determine it for the current user
     global $dbPath; 
     if (!isset($dbPath) || empty($dbPath)) {
@@ -3724,18 +3761,15 @@ function restoreDatabaseFromFile($sqlFile) {
         }
     }
     
-    try {
-        $restoreCon = new PDO('sqlite:' . $dbPath);
-        $restoreCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $restoreCon->exec($content);
-
-        // Ensure proper permissions on restored database
-        setFilePermissions($dbPath, 0664);
-
-        return ['success' => true];
-    } catch (Throwable $e) {
-        return ['success' => false, 'error' => $e->getMessage()];
+    $executed = poznoteExecuteBackupSql($dbPath, $statements);
+    if (!$executed['success']) {
+        return ['success' => false, 'error' => $executed['error']];
     }
+
+    // Ensure proper permissions on restored database
+    setFilePermissions($dbPath, 0664);
+
+    return ['success' => true];
 }
 
 // Note: schema migrations are handled at runtime by db_connect.php

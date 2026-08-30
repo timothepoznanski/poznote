@@ -2117,7 +2117,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /backups/{filename}/restore
 ```
 
-Restore a backup file. This replaces all current user data. When S3 attachment storage is enabled, the user's bucket content is replaced too, so the restore refuses archives that do not carry every attachment file their metadata references (for example a backup made with the "lighter archive" option), and refuses to run while the bucket is unreachable. Nothing is modified when the restore is refused.
+Restore a backup file. This replaces all current user data. When S3 attachment storage is enabled, the user's bucket content is replaced too, so the restore refuses archives that do not carry every attachment file their metadata references (for example a backup made with the "lighter archive" option), and refuses to run while the bucket is unreachable. The archive's `database/poznote_backup.sql` is also validated before anything is touched: only the statements a Poznote backup is made of (`DROP TABLE`, `CREATE TABLE`, `CREATE INDEX`, `INSERT ... VALUES` with literal values) are accepted, any other SQL is refused. Nothing is modified when the restore is refused.
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
