@@ -148,49 +148,14 @@ function replacePublicAudioEmbedIframes(string $content): string {
 
 /**
  * Decide whether an iframe `src` points at a trusted origin.
- *
- * Uses parse_url() with EXACT host matching (plus subdomains of an allowed
- * domain) so look-alike hosts such as `www.youtube.com.evil.test` are rejected.
- * Only http(s) and same-origin relative paths are accepted; protocol-relative,
- * javascript:, data: and other schemes are refused.
+ * Thin wrapper kept for callers: the strict host check now lives in
+ * functions.php (poznoteIframeSrcIsTrusted) so every sanitizer shares it.
  */
 function publicNoteIframeSrcIsTrusted(string $src): bool {
-    $src = trim($src);
-    if ($src === '') {
-        return false;
+    if (!function_exists('poznoteIframeSrcIsTrusted')) {
+        require_once __DIR__ . '/functions.php';
     }
-
-    // Reject any explicit scheme that is not http/https (javascript:, data:, ...).
-    if (preg_match('#^([a-z][a-z0-9+.\-]*):#i', $src, $schemeMatch)) {
-        if (!in_array(strtolower($schemeMatch[1]), ['http', 'https'], true)) {
-            return false;
-        }
-    }
-
-    $host = parse_url($src, PHP_URL_HOST);
-    if ($host === null || $host === false || $host === '') {
-        // No host -> relative/local path only. A leading "//" with no resolvable
-        // host is treated as untrusted.
-        if (strpos($src, '//') === 0) {
-            return false;
-        }
-        return $src[0] === '/'
-            || strpos($src, './') === 0
-            || preg_match('~^audio_player\.php(?:[?#]|$)~i', $src) === 1;
-    }
-
-    $host = strtolower($host);
-    foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
-        $domain = strtolower(trim((string) $domain));
-        if ($domain === '') {
-            continue;
-        }
-        if ($host === $domain || str_ends_with($host, '.' . $domain)) {
-            return true;
-        }
-    }
-
-    return false;
+    return poznoteIframeSrcIsTrusted($src);
 }
 
 /**

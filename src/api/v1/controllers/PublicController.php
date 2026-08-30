@@ -64,7 +64,7 @@ class PublicController {
                 return;
             }
             if (isset($input['completed'])) $tasks[$index]['completed'] = (bool)$input['completed'];
-            if (isset($input['text'])) $tasks[$index]['text'] = (string)$input['text'];
+            if (isset($input['text'])) $tasks[$index]['text'] = $this->normalizePublicTaskText((string)$input['text'], $type);
             
             // Re-sort: uncompleted first, then completed
             usort($tasks, function($a, $b) {
@@ -91,7 +91,7 @@ class PublicController {
             }
             // Editing text in markdown is trickier because we need to preserve the leading checkbox structure
             if (isset($input['text'])) {
-                $newText = (string)$input['text'];
+                $newText = $this->normalizePublicTaskText((string)$input['text'], $type);
                 // Match the prefix (indent + marker + checkbox)
                 if (preg_match('/^(\s*[\*\-\+]\s+\[[ xX]\]\s+)(.*)$/', $line, $matches)) {
                     $lines[$lineIndex] = $matches[1] . $newText;
@@ -155,7 +155,7 @@ class PublicController {
         if ($type === 'tasklist') {
             $tasks = json_decode($content, true) ?: [];
             $tasks[] = [
-                'text' => (string)$input['text'],
+                'text' => $this->normalizePublicTaskText((string)$input['text'], $type),
                 'completed' => false,
                 'important' => false
             ];
@@ -163,7 +163,7 @@ class PublicController {
         } else {
             // Markdown: append a new checkbox at the end
             $prefix = "- [ ] ";
-            $updatedContent = rtrim($content) . "\n" . $prefix . (string)$input['text'];
+            $updatedContent = rtrim($content) . "\n" . $prefix . $this->normalizePublicTaskText((string)$input['text'], $type);
         }
         
         $this->saveNote($noteId, $type, $updatedContent);
@@ -260,14 +260,12 @@ class PublicController {
             return;
         }
 
-        // Same server-side sanitization as authenticated saves: never trust
-        // the submitted markup, whoever holds the link.
+        // Never trust the submitted markup, whoever holds the link: the
+        // sanitizer itself runs in saveNote() so no public write path can
+        // skip it. Only the URL normalisation is specific to this endpoint.
         if ($type === 'note') {
             $content = $this->stripPublicUrlBase($content);
             $content = $this->stripShareTokensFromAttachmentUrls($content);
-            $content = sanitizeHtml($content);
-        } else {
-            $content = sanitizeMarkdownContent($content);
         }
 
         $filename = getEntryFilename($noteId, $type);
@@ -595,7 +593,33 @@ class PublicController {
         return $stmt->fetchColumn() ?: '';
     }
 
+    /**
+     * Normalize a task text submitted by a public (token) visitor.
+     * A task is a single line: newlines would let a task-only share write
+     * arbitrary extra Markdown lines. Markdown task text is also run through
+     * the Markdown sanitizer since it is re-rendered as raw HTML by the
+     * preview; tasklist JSON text is always escaped at render time.
+     */
+    private function normalizePublicTaskText(string $text, string $type): string {
+        $text = preg_replace('/[\r\n]+/', ' ', $text);
+        if ($type === 'markdown') {
+            $text = (string)sanitizeMarkdownContent($text);
+        }
+        return $text;
+    }
+
+    /**
+     * Single write path for every public (token) edit. The server-side
+     * sanitization is applied HERE, not in the callers, so that a new public
+     * endpoint cannot forget it (GHSA-vv49-2463-g2gj).
+     */
     private function saveNote(int $noteId, string $type, string $content): void {
+        if ($type === 'note') {
+            $content = (string)sanitizeHtml($content);
+        } elseif ($type === 'markdown') {
+            $content = (string)sanitizeMarkdownContent($content);
+        }
+
         $filename = getEntryFilename($noteId, $type);
         $entriesDir = dirname($filename);
         createDirectoryWithPermissions($entriesDir);

@@ -2594,14 +2594,31 @@ function parseMarkdown(text) {
         return result;
     });
 
+    // Attributes kept on raw <details>/<summary>/<u> tags: only `class`
+    // (safe token characters) and, for <details>, the boolean `open`. Inline
+    // event handlers, style, id, ... are dropped before the tag is re-emitted
+    // into innerHTML.
+    function sanitizePassthroughTagAttrs(tag, attrs) {
+        var safe = '';
+        var classMatch = attrs.match(/(?:^|\s)class\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/i);
+        if (classMatch) {
+            var cls = (classMatch[1] || classMatch[2] || classMatch[3] || '').replace(/[^\w\s-]/g, '').trim();
+            if (cls) safe += ' class="' + escapeHtml(cls) + '"';
+        }
+        if (tag === 'details' && /(?:^|\s)open(?=\s|=|\/|$)/i.test(attrs)) {
+            safe += ' open';
+        }
+        return safe;
+    }
+
     // Protect details, summary, br, and underline tags
-    text = text.replace(/<(details|summary|br|u)([^>]*)>/gi, function (match, tag, attrs) {
+    text = text.replace(/<(details|summary|br|u)(?=[\s\/>])([^>]*)>/gi, function (match, tag, attrs) {
         tag = tag.toLowerCase();
         let placeholder = '\x00PTAG' + protectedIndex + '\x00';
         if (tag === 'br') {
             protectedElements[protectedIndex] = '<br>';
         } else {
-            protectedElements[protectedIndex] = '<' + tag + attrs + '>';
+            protectedElements[protectedIndex] = '<' + tag + sanitizePassthroughTagAttrs(tag, attrs) + '>';
         }
         protectedIndex++;
         return rememberPlaceholderSource(placeholder, match);
@@ -2750,9 +2767,8 @@ function parseMarkdown(text) {
                 return host === domain || host.endsWith('.' + domain);
             });
         } catch (e) {
-            return allowedDomains.some(function (domain) {
-                return src.includes('//' + domain) || src.includes('.' + domain);
-            });
+            // Unparsable URL: never fall back to a substring match
+            return false;
         }
     }
 
