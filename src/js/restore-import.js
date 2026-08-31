@@ -168,6 +168,11 @@ function handleRestoreImportClick(e) {
             hideCustomAlert();
             break;
 
+        // Post-restore workspace chooser
+        case 'hide-restore-workspaces-modal':
+            hideRestoreWorkspacesModal();
+            break;
+
         // Maintenance actions
         case 'run-repair':
             runRepair(target);
@@ -184,10 +189,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const config = JSON.parse(configEl.textContent);
             window.POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES = config.maxIndividualFiles || 50;
             window.POZNOTE_IMPORT_MAX_ZIP_FILES = config.maxZipFiles || 300;
+            window.__restoreImportConfig = config;
         } catch (e) {
             console.error('Failed to parse restore-import config:', e);
         }
     }
+
+    // A restore launched earlier (or from another tab) may still be running
+    // on the server: pick its status back up instead of showing nothing.
+    chunkedRestoreResume();
 
     // Initialize cards state (open first card by default)
     initializeCardsState();
@@ -211,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
             hideIndividualNotesImportConfirmation();
             hideCompleteRestoreConfirmation();
             hideDirectCopyRestoreConfirmation();
+            hideRestoreWorkspacesModal();
             hideCustomAlert();
         }
     });
@@ -252,30 +263,12 @@ function setupFileInputListeners() {
         completeFileInput.addEventListener('change', function (e) {
             const file = e.target.files[0];
             const button = document.getElementById('completeRestoreBtn');
-            const sizeText = button ? button.parentElement.querySelector('small') : null;
 
+            // No size warning anymore: the archive travels in slices, so
+            // there is nothing slow or fragile about a large file.
             if (file && file.name.toLowerCase().endsWith('.zip')) {
-                const sizeMB = file.size / (1024 * 1024);
-
                 button.disabled = false;
                 button.textContent = tr('restore_import.inline.standard.button', 'Start Complete Restore (Standard)');
-
-                if (sizeText) {
-                    if (sizeMB > 500) {
-                        sizeText.textContent = tr(
-                            'restore_import.inline.standard.too_large',
-                            '⚠️ File is ' + sizeMB.toFixed(1) + 'MB. Standard upload may be slow or fail for large files.',
-                            { size: sizeMB.toFixed(1) }
-                        );
-                        sizeText.style.color = '#dc3545';
-                    } else {
-                        sizeText.textContent = tr(
-                            'restore_import.sections.standard_restore.helper',
-                            'Maximum recommended size: 500MB.'
-                        );
-                        sizeText.style.color = '#6c757d';
-                    }
-                }
             }
         });
     }
@@ -292,27 +285,16 @@ function showCompleteRestoreConfirmation() {
         return;
     }
 
-    const file = fileInput.files[0];
-    const sizeMB = file.size / (1024 * 1024);
-
-    // Update modal content based on file size
+    // Size no longer matters here: the archive travels in slices and the
+    // restore runs in the background, whatever the file size.
     const modal = document.getElementById('completeRestoreConfirmModal');
     const modalContent = modal.querySelector('.import-confirm-modal-content');
     const warningText = modalContent.querySelector('p');
-
-    if (sizeMB > 500) {
-        warningText.innerHTML = tr(
-            'restore_import.modals.complete_restore.warning_large_html',
-            '<strong>Warning:</strong> This file is {{size}}MB. Standard upload may be slow or fail for large files.<br><br><strong>This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.</strong>',
-            { size: sizeMB.toFixed(1) }
-        );
-    } else {
-        warningText.innerHTML = tr(
-            'restore_import.modals.complete_restore.warning_html',
-            '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.',
-            null
-        );
-    }
+    warningText.innerHTML = tr(
+        'restore_import.modals.complete_restore.warning_html',
+        '<strong>Warning:</strong> This will replace your database, restore all notes, and attachments for <span style="color: #dc3545; font-weight: bold;">all workspaces</span>.',
+        null
+    );
 
     modal.style.display = 'flex';
 }
@@ -322,20 +304,437 @@ function hideCompleteRestoreConfirmation() {
 }
 
 function proceedWithCompleteRestore() {
-    const forms = document.querySelectorAll('form[method="post"]');
-    const completeForm = Array.from(forms).find(form =>
-        form.querySelector('input[name="action"][value="complete_restore"]')
-    );
-    if (completeForm) {
-        // Hide confirmation modal first
-        hideCompleteRestoreConfirmation();
-        // Show spinner immediately
-        showRestoreSpinner();
-        // Submit the form
-        completeForm.submit();
-    } else {
+    const fileInput = document.getElementById('complete_backup_file');
+    if (!fileInput || !fileInput.files.length) {
         alert(tr('restore_import.errors.complete_restore_form_not_found', 'Complete restore form not found. Please try again.'));
+        return;
     }
+    hideCompleteRestoreConfirmation();
+    // The archive travels in slices and the restore runs server-side (see
+    // the chunked restore section below), so neither a proxy body-size
+    // limit nor an HTTP timeout can interrupt it, whatever the file size.
+    startChunkedRestore(fileInput.files[0]);
+}
+
+// ========================================
+// Chunked complete restore
+// ========================================
+// The archive is sent in slices of a few dozen MB: each slice is an
+// ordinary POST that passes every body-size limit in front of the instance
+// (Cloudflare Free/Pro caps requests at 100 MB, nginx and PHP have their
+// own caps). A server-side worker then assembles the slices and runs the
+// restore outside any HTTP request, so no proxy or browser timeout can
+// interrupt it; this page polls the job status and shows the outcome.
+
+const chunkedRestore = { pollTimer: null, uploading: false };
+
+function chunkedRestoreConfig() {
+    return window.__restoreImportConfig || {};
+}
+
+function chunkedRestoreText(key, fallback, vars) {
+    const i18n = chunkedRestoreConfig().i18n || {};
+    let template = i18n[key] || fallback;
+    if (vars) {
+        for (const k in vars) template = String(template).split('{{' + k + '}}').join(String(vars[k]));
+    }
+    return template;
+}
+
+function chunkedRestoreEls() {
+    return {
+        progress: document.getElementById('chunkedRestoreProgress'),
+        bar: document.getElementById('chunkedRestoreBar'),
+        statusText: document.getElementById('chunkedRestoreStatusText'),
+        error: document.getElementById('chunkedRestoreError'),
+        success: document.getElementById('chunkedRestoreSuccess'),
+        button: document.getElementById('completeRestoreBtn')
+    };
+}
+
+function chunkedRestoreSetBusy(busy) {
+    const els = chunkedRestoreEls();
+    if (els.button) els.button.disabled = busy;
+}
+
+function chunkedRestoreShowProgress(percent, text) {
+    const els = chunkedRestoreEls();
+    if (els.error) els.error.classList.add('initially-hidden');
+    if (els.success) els.success.classList.add('initially-hidden');
+    if (els.progress) {
+        els.progress.classList.remove('initially-hidden');
+        const circle = els.progress.querySelector('.restore-spinner-circle');
+        if (circle) circle.style.display = '';
+    }
+    if (els.bar) els.bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+    if (els.statusText) els.statusText.textContent = text;
+}
+
+/** Completion state: full bar, no spinner, summary below, chooser on top. */
+function chunkedRestoreShowDone(summary) {
+    const els = chunkedRestoreEls();
+    if (els.progress) {
+        els.progress.classList.remove('initially-hidden');
+        const circle = els.progress.querySelector('.restore-spinner-circle');
+        if (circle) circle.style.display = 'none';
+    }
+    if (els.bar) els.bar.style.width = '100%';
+    if (els.statusText) els.statusText.textContent = chunkedRestoreText('done', 'Restore completed successfully.');
+    if (els.error) els.error.classList.add('initially-hidden');
+    if (els.success) {
+        els.success.textContent = summary;
+        els.success.classList.remove('initially-hidden');
+    }
+    chunkedRestoreSetBusy(false);
+}
+
+function chunkedRestoreShowResult(ok, text) {
+    const els = chunkedRestoreEls();
+    if (els.progress) els.progress.classList.add('initially-hidden');
+    const box = ok ? els.success : els.error;
+    const other = ok ? els.error : els.success;
+    if (other) other.classList.add('initially-hidden');
+    if (box) {
+        box.textContent = text;
+        box.classList.remove('initially-hidden');
+    }
+    chunkedRestoreSetBusy(false);
+}
+
+// Warn before leaving the page while slices are still being sent: the
+// upload only lives as long as this page. Once the job is queued on the
+// server, leaving is harmless and the warning goes away.
+window.addEventListener('beforeunload', function (e) {
+    if (chunkedRestore.uploading) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
+/** POST FormData to the restore upload endpoint, expecting JSON back. */
+function chunkedRestoreFetch(body) {
+    return fetch('api_restore_upload.php', { method: 'POST', credentials: 'same-origin', body: body })
+        .then(async function (r) {
+            let data = null;
+            try { data = await r.json(); } catch (e) { /* proxy error page */ }
+            if (!data || !data.success) {
+                throw new Error((data && data.error) || ('HTTP ' + r.status));
+            }
+            return data;
+        });
+}
+
+/** Upload one slice with fine-grained progress events. */
+function chunkedRestoreSendChunk(formData, onProgress) {
+    return new Promise(function (resolve, reject) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api_restore_upload.php');
+        xhr.responseType = 'json';
+        if (xhr.upload && onProgress) {
+            xhr.upload.addEventListener('progress', function (e) {
+                if (e.lengthComputable) onProgress(e.loaded);
+            });
+        }
+        xhr.addEventListener('load', function () {
+            const data = xhr.response;
+            if (data && data.success) {
+                resolve(data);
+            } else {
+                reject(new Error((data && data.error) || ('HTTP ' + xhr.status)));
+            }
+        });
+        xhr.addEventListener('error', function () { reject(new Error('network error')); });
+        xhr.addEventListener('abort', function () { reject(new Error('upload aborted')); });
+        xhr.send(formData);
+    });
+}
+
+// The single progress bar covers the whole operation: upload takes the
+// first span, then the server-side stages (assembly, extraction, database,
+// notes, attachments) share the rest, scaled by the per-stage counts the
+// worker reports. The bar only reaches 100% when the restore is truly done.
+const CHUNKED_RESTORE_UPLOAD_SPAN = 60;
+const CHUNKED_RESTORE_STAGES = {
+    // Restoring from the bucket skips the upload entirely, so its download
+    // stage covers the span an upload would have used.
+    downloading: { from: 5, to: 60 },
+    assembling:  { from: 60, to: 68 },
+    extracting:  { from: 68, to: 76 },
+    preparing:   { from: 76, to: 81 },
+    database:    { from: 81, to: 86 },
+    notes:       { from: 86, to: 92 },
+    attachments: { from: 92, to: 99 }
+};
+
+function chunkedRestoreJobPercent(job) {
+    if (job.status === 'done') return 100;
+    const span = CHUNKED_RESTORE_STAGES[job.stage];
+    if (!span) {
+        // No stage yet (just queued): an uploaded archive has already
+        // travelled its span, an S3 restore has not started at all.
+        return job.total_chunks > 0 ? CHUNKED_RESTORE_UPLOAD_SPAN : 2;
+    }
+    let fraction = 0;
+    if (job.stage_total > 0 && job.stage_done !== null && job.stage_done !== undefined) {
+        fraction = Math.max(0, Math.min(1, job.stage_done / job.stage_total));
+    }
+    return span.from + (span.to - span.from) * fraction;
+}
+
+function chunkedRestoreStageLabel(job) {
+    const counts = (job.stage_total > 0)
+        ? { done: job.stage_done || 0, total: job.stage_total }
+        : null;
+    switch (job.stage) {
+        case 'downloading':
+            return chunkedRestoreText('stage_downloading', 'Fetching the archive from the bucket...');
+        case 'assembling':
+            return chunkedRestoreText('stage_assembling', 'Assembling the archive on the server...');
+        case 'extracting':
+            return chunkedRestoreText('stage_extracting', 'Extracting the archive...');
+        case 'preparing':
+            return chunkedRestoreText('stage_preparing', 'Preparing the data...');
+        case 'database':
+            return chunkedRestoreText('stage_database', 'Restoring the database...');
+        case 'notes':
+            return counts
+                ? chunkedRestoreText('stage_notes', 'Restoring the notes... ({{done}}/{{total}})', counts)
+                : chunkedRestoreText('stage_notes_simple', 'Restoring the notes...');
+        case 'attachments':
+            return counts
+                ? chunkedRestoreText('stage_attachments', 'Restoring the attachments... ({{done}}/{{total}})', counts)
+                : chunkedRestoreText('stage_attachments_simple', 'Restoring the attachments...');
+        default:
+            // No stage yet. Only the upload path can report an upload as done.
+            return job.total_chunks > 0
+                ? chunkedRestoreText('queued_uploaded', 'Upload complete, restore starting...')
+                : chunkedRestoreText('queued', 'Restore starting...');
+    }
+}
+
+function chunkedRestoreRenderUpload(sentBytes, totalBytes) {
+    const fraction = totalBytes > 0 ? Math.min(1, sentBytes / totalBytes) : 0;
+    // The bar shows the whole pipeline (upload is its first span), but the
+    // label states the upload's own progress: "60%" while the upload is
+    // actually finished would read as a stall.
+    chunkedRestoreShowProgress(fraction * CHUNKED_RESTORE_UPLOAD_SPAN, chunkedRestoreText(
+        'uploading',
+        'Uploading the archive... {{percent}}% ({{done}} of {{total}})',
+        {
+            percent: (fraction * 100).toFixed(0),
+            done: formatFileSize(Math.min(sentBytes, totalBytes)),
+            total: formatFileSize(totalBytes)
+        }
+    ));
+}
+
+/** Send the whole file in slices; resolves with the queued job state. */
+async function chunkedRestoreUpload(file) {
+    const cfg = chunkedRestoreConfig();
+    const chunkBytes = window.POZNOTE_UPLOAD_CHUNK_BYTES || cfg.restoreChunkBytes || (32 * 1024 * 1024);
+    const totalChunks = Math.max(1, Math.ceil(file.size / chunkBytes));
+    const csrf = cfg.csrfToken || '';
+
+    const initBody = new FormData();
+    initBody.append('action', 'init');
+    initBody.append('csrf_token', csrf);
+    initBody.append('filename', file.name);
+    initBody.append('total_size', String(file.size));
+    initBody.append('total_chunks', String(totalChunks));
+    const initData = await chunkedRestoreFetch(initBody);
+    const uploadId = initData.upload_id;
+
+    chunkedRestore.uploading = true;
+    try {
+        let sent = 0;
+        for (let i = 0; i < totalChunks; i++) {
+            const blob = file.slice(i * chunkBytes, Math.min(file.size, (i + 1) * chunkBytes));
+            let attempt = 0;
+            for (;;) {
+                try {
+                    const fd = new FormData();
+                    fd.append('action', 'chunk');
+                    fd.append('csrf_token', csrf);
+                    fd.append('upload_id', uploadId);
+                    fd.append('chunk_index', String(i));
+                    fd.append('chunk', blob, 'chunk');
+                    await chunkedRestoreSendChunk(fd, function (loaded) {
+                        chunkedRestoreRenderUpload(sent + loaded, file.size);
+                    });
+                    break;
+                } catch (e) {
+                    // A transient failure (flaky connection, proxy hiccup)
+                    // only costs this slice: retry it a couple of times
+                    // before giving up on the whole upload.
+                    attempt++;
+                    if (attempt >= 3) throw e;
+                    // Same scale as chunkedRestoreRenderUpload: a raw
+                    // percentage here would jump the bar forward, then back.
+                    chunkedRestoreShowProgress(
+                        (file.size > 0 ? sent / file.size : 0) * CHUNKED_RESTORE_UPLOAD_SPAN,
+                        chunkedRestoreText('chunkRetry', 'A slice failed to upload, retrying...')
+                    );
+                    await new Promise(function (r) { setTimeout(r, 2000); });
+                }
+            }
+            sent += blob.size;
+            chunkedRestoreRenderUpload(sent, file.size);
+        }
+
+        const finBody = new FormData();
+        finBody.append('action', 'finalize');
+        finBody.append('csrf_token', csrf);
+        finBody.append('upload_id', uploadId);
+        const finData = await chunkedRestoreFetch(finBody);
+        return finData.job;
+    } finally {
+        chunkedRestore.uploading = false;
+    }
+}
+
+function chunkedRestoreStopPolling() {
+    if (chunkedRestore.pollTimer) {
+        clearInterval(chunkedRestore.pollTimer);
+        chunkedRestore.pollTimer = null;
+    }
+}
+
+function chunkedRestoreRenderJob(job) {
+    if (!job) {
+        chunkedRestoreStopPolling();
+        return;
+    }
+    if (job.status === 'queued' || job.status === 'running') {
+        chunkedRestoreShowProgress(chunkedRestoreJobPercent(job), chunkedRestoreStageLabel(job));
+        return;
+    }
+    chunkedRestoreStopPolling();
+    if (job.status === 'done') {
+        chunkedRestoreShowDone(job.message || chunkedRestoreText('done', 'Restore completed successfully.'));
+        chunkedRestoreShowWorkspacesModal(job.message || '');
+    } else if (job.status === 'error') {
+        chunkedRestoreShowResult(false, chunkedRestoreText('error', 'The restore failed: {{error}}', { error: job.error || 'unknown' }));
+    }
+}
+
+/**
+ * Once the restore is done, show its summary and list the restored
+ * workspaces so the user can jump straight into one of them.
+ */
+function chunkedRestoreShowWorkspacesModal(summary) {
+    const modal = document.getElementById('restoreWorkspacesModal');
+    const list = document.getElementById('restoreWorkspacesList');
+    if (!modal || !list) return;
+    const summaryEl = document.getElementById('restoreWorkspacesSummary');
+    if (summaryEl) {
+        summaryEl.textContent = summary || '';
+        summaryEl.classList.toggle('initially-hidden', !summary);
+    }
+    fetch('/api/v1/workspaces', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (!data.success || !Array.isArray(data.workspaces) || !data.workspaces.length) return;
+            list.innerHTML = '';
+            data.workspaces.forEach(function (ws) {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'restore-workspace-open-btn';
+                btn.textContent = ws.name;
+                btn.addEventListener('click', function () {
+                    window.location.href = 'index.php?workspace=' + encodeURIComponent(ws.name);
+                });
+                list.appendChild(btn);
+            });
+            modal.style.display = 'flex';
+        })
+        .catch(function () { /* the success alert already tells the story */ });
+}
+
+function hideRestoreWorkspacesModal() {
+    const modal = document.getElementById('restoreWorkspacesModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function chunkedRestorePoll(uploadId) {
+    chunkedRestoreStopPolling();
+    const poll = function () {
+        fetch('api_restore_upload.php?action=status&upload_id=' + encodeURIComponent(uploadId), { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) chunkedRestoreRenderJob(data.job);
+            })
+            .catch(function () { /* transient network error: keep polling */ });
+    };
+    chunkedRestore.pollTimer = setInterval(poll, window.POZNOTE_RESTORE_POLL_MS || 3000);
+    poll();
+}
+
+async function startChunkedRestore(file) {
+    chunkedRestoreSetBusy(true);
+    chunkedRestoreRenderUpload(0, file.size);
+    try {
+        const job = await chunkedRestoreUpload(file);
+        chunkedRestoreRenderJob(job);
+        chunkedRestorePoll(job.id);
+    } catch (e) {
+        chunkedRestoreShowResult(false, chunkedRestoreText('uploadError', 'The upload failed: {{error}}', { error: e.message }));
+    }
+}
+
+// The restore controls live inside two collapsible cards that are closed by
+// default; a resumed job renders into them, so open them or the progress
+// bar (and any eventual error) would be invisible on a reloaded page.
+function chunkedRestoreOpenCards(extraIds) {
+    ['restoreBackupContent'].concat(extraIds || ['standardRestoreContent']).forEach(function (id) {
+        const content = document.getElementById(id);
+        if (content) content.classList.add('open');
+        const header = document.querySelector('[data-target="' + id + '"]');
+        const chevron = header ? header.querySelector('.chevron') : null;
+        if (chevron) chevron.classList.add('open');
+    });
+}
+
+/**
+ * Restore from an archive already in the S3 bucket. Same background job and
+ * same progress UI as an uploaded archive: fetching a large archive from the
+ * bucket and restoring it is exactly as slow, so it cannot live inside an
+ * HTTP request either.
+ */
+function startS3Restore(s3Key) {
+    chunkedRestoreOpenCards(['s3RestoreContent']);
+    chunkedRestoreSetBusy(true);
+    chunkedRestoreShowProgress(2, chunkedRestoreText('queued', 'Restore starting...'));
+
+    const body = new FormData();
+    body.append('action', 'start_s3');
+    body.append('csrf_token', chunkedRestoreConfig().csrfToken || '');
+    body.append('s3_backup_key', s3Key);
+
+    return chunkedRestoreFetch(body)
+        .then(function (data) {
+            chunkedRestoreRenderJob(data.job);
+            chunkedRestorePoll(data.job.id);
+        })
+        .catch(function (e) {
+            chunkedRestoreShowResult(false, chunkedRestoreText('error', 'The restore failed: {{error}}', { error: e.message }));
+        });
+}
+
+function chunkedRestoreResume() {
+    fetch('api_restore_upload.php?action=status', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (!data.success || !data.job) return;
+            if (data.job.status === 'queued' || data.job.status === 'running') {
+                chunkedRestoreOpenCards();
+                chunkedRestoreSetBusy(true);
+                chunkedRestoreRenderJob(data.job);
+                chunkedRestorePoll(data.job.id);
+            }
+            // A finished or failed run from an earlier visit is not
+            // resurfaced: its outcome was shown when it happened.
+        })
+        .catch(function () { /* nothing to resume */ });
 }
 
 // Advanced Import Toggle Function

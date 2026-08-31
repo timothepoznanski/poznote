@@ -2031,6 +2031,16 @@
     },
     "index": {
       "title": "Index Poznote"
+    },
+    "job": {
+      "hint": "L'archive est préparée sur le serveur. Pour les gros comptes cela peut prendre plusieurs minutes ; vous pouvez quitter cette page et revenir, la préparation continue.",
+      "download": "Télécharger l'archive",
+      "discard": "Supprimer l'archive préparée",
+      "preparing": "Préparation de l'archive... ({{elapsed}})",
+      "queued": "Export en file d'attente...",
+      "ready": "Votre archive est prête ({{size}}). Le téléchargement démarre automatiquement ; elle reste disponible ici pendant 24 heures.",
+      "error": "L'export a échoué : {{error}}",
+      "start_error": "Impossible de démarrer l'export : {{error}}"
     }
   },
   "login": {
@@ -2174,13 +2184,15 @@
       "standard_restore": {
         "title": "Restauration classique",
         "description": "Choisissez une sauvegarde complète au format ZIP.",
-        "helper": "Taille maximale recommandée : 500 Mo."
+        "helper": "Pas de limite de taille : l'archive est envoyée par tranches et restaurée en arrière-plan."
       },
       "direct_copy_restore": {
-        "title": "Restauration quand la sauvegarde classique ne fonctionne pas (timeout si le fichier zip est trop gros)",
-        "step1": "1. Copiez le fichier dans le conteneur :",
+        "title": "Restauration par copie directe (si vous avez un accès SSH au serveur)",
+        "step1": "1. Copiez le fichier dans le conteneur (adaptez le nom du conteneur et le chemin de votre archive) :",
         "docker_command": "docker cp /chemin/vers/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-        "step2": "2. Cliquez ci-dessous pour restaurer"
+        "step2": "2. Cliquez ci-dessous pour restaurer",
+        "intro": "Cette méthode ne téléverse rien par le navigateur : vous copiez vous-même l'archive de sauvegarde sur le serveur, et Poznote la restaure depuis là. Elle fonctionne quelle que soit la taille du fichier et reste utile en secours si l'envoi ci-dessus n'est pas possible.",
+        "filename_note": "L'archive doit être placée dans le conteneur Poznote exactement à /tmp/backup_restore.zip (ce nom précis). Rechargez ensuite cette page : le fichier est détecté automatiquement et sa taille s'affiche ci-dessous."
       },
       "individual_notes": {
         "title": "Vous voulez importer des fichiers HTML, Markdown, texte ou des archives ZIP ?",
@@ -2220,7 +2232,6 @@
       },
       "complete_restore": {
         "title": "Restauration complète ?",
-        "warning_large_html": "<strong>Avertissement :</strong> Ce fichier fait {{size}} Mo. Le téléversement standard peut être lent ou échouer pour les fichiers volumineux.<br><br><strong>Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.</strong>",
         "warning_html": "<strong>Avertissement :</strong> Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.",
         "body_html": "Cela remplacera votre base de données, restaurera toutes les notes et pièces jointes pour <span style=\"color: #dc3545; font-weight: bold;\">tous les espaces de travail</span>.",
         "confirm": "Oui, restauration complète"
@@ -2267,8 +2278,7 @@
     },
     "inline": {
       "standard": {
-        "button": "Démarrer la restauration complète (standard)",
-        "too_large": "⚠️ Le fichier fait {{size}} Mo. Le téléversement standard peut être lent ou échouer."
+        "button": "Démarrer la restauration complète (standard)"
       }
     },
     "drag_drop": {
@@ -2290,6 +2300,27 @@
       "errors": {
         "system_folder": "Les notes ne peuvent pas être importées dans le dossier \"{{folder}}\"."
       }
+    },
+    "chunked": {
+      "uploading": "Envoi de l'archive... {{percent}}% ({{done}} sur {{total}})",
+      "queued": "Démarrage de la restauration...",
+      "done": "Restauration terminée avec succès.",
+      "error": "La restauration a échoué : {{error}}",
+      "upload_error": "L'envoi a échoué : {{error}}",
+      "chunk_retry": "Une tranche n'a pas pu être envoyée, nouvel essai...",
+      "stage_assembling": "Assemblage de l'archive sur le serveur...",
+      "stage_extracting": "Extraction de l'archive...",
+      "stage_preparing": "Préparation des données...",
+      "stage_database": "Restauration de la base de données...",
+      "stage_notes": "Restauration des notes... ({{done}}/{{total}})",
+      "stage_notes_simple": "Restauration des notes...",
+      "stage_attachments": "Restauration des pièces jointes... ({{done}}/{{total}})",
+      "stage_attachments_simple": "Restauration des pièces jointes...",
+      "workspaces_title": "Restauration terminée",
+      "workspaces_body": "Votre sauvegarde a été restaurée. Quel espace de travail voulez-vous ouvrir ?",
+      "workspaces_close": "Fermer",
+      "stage_downloading": "Récupération de l'archive depuis le bucket...",
+      "queued_uploaded": "Envoi terminé, démarrage de la restauration..."
     }
   },
   "markdown_guide": {

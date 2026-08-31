@@ -317,6 +317,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.processing_long'); ?></span>
                 </div>
             </form>
+
             </div>
         </div>
 
@@ -330,6 +331,12 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                 </h4>
             </div>
             <div class="sub-card-content<?php echo $directCopyRestoreContentOpen ? ' open' : ''; ?>" id="directCopyRestoreContent">
+                <p>
+                <?php echo t_h('restore_import.sections.direct_copy_restore.intro', [], 'This method uploads nothing through the browser: you copy the backup archive onto the server yourself, and Poznote restores it from there. It works whatever the file size, and remains useful as a fallback when the upload above is not possible.'); ?>
+            </p>
+            <p>
+                <?php echo t_h('restore_import.sections.direct_copy_restore.filename_note', [], 'The archive must be placed inside the Poznote container at exactly /tmp/backup_restore.zip (this exact name). Reload this page after copying: the file is detected automatically and its size is shown below.'); ?>
+            </p>
                 <p>
                 <?php echo t_h('restore_import.sections.direct_copy_restore.step1'); ?>
             </p>
@@ -405,12 +412,8 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                     <button type="button" id="s3RestoreBtn" class="btn btn-primary" disabled>
                         <?php echo t_h('restore_import.buttons.start_restore'); ?>
                     </button>
-                    <!-- Spinner shown while the archive is fetched from the bucket and restored -->
-                    <div id="s3RestoreSpinner" class="restore-spinner" style="display: none;" role="status" aria-live="polite" aria-hidden="true">
-                        <div class="restore-spinner-circle" aria-hidden="true"></div>
-                        <span class="sr-only"><?php echo t_h('restore_import.spinner.processing'); ?></span>
-                        <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.processing_long'); ?></span>
-                    </div>
+                    <!-- Progress is shown by the shared restore bar below,
+                         which covers the bucket download and the restore. -->
                 </form>
             </div>
         </div>
@@ -478,20 +481,40 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                     : Promise.resolve(window.confirm(message));
                 confirmed.then(function(ok) {
                     if (!ok) return;
-                    var spinner = document.getElementById('s3RestoreSpinner');
-                    spinner.style.display = 'inline-flex';
-                    spinner.setAttribute('aria-hidden', 'false');
                     btn.disabled = true;
-                    form.submit();
+                    // Runs as the same background job as an uploaded archive:
+                    // fetching a large archive from the bucket and restoring
+                    // it takes far longer than a request may live behind a
+                    // proxy. Progress is shown by the shared bar below.
+                    startS3Restore(select.value).then(function() {
+                        btn.disabled = false;
+                    });
                 });
             });
         });
         </script>
         <?php endif; ?>
 
+            <!-- Shared restore feedback for both background restore flows
+                 (uploaded archive and archive fetched from the bucket): one
+                 bar covering the whole pipeline, from transfer to the last
+                 restored attachment. Placed at card level so it is visible
+                 whichever sub-card started the restore. -->
+            <div id="chunkedRestoreProgress" class="chunked-restore-progress initially-hidden" role="status" aria-live="polite">
+                <div class="chunked-restore-bar-track" aria-hidden="true">
+                    <div class="chunked-restore-bar" id="chunkedRestoreBar"></div>
+                </div>
+                <div class="chunked-restore-status">
+                    <span class="restore-spinner-circle" aria-hidden="true"></span>
+                    <span id="chunkedRestoreStatusText"></span>
+                </div>
+            </div>
+            <div id="chunkedRestoreError" class="alert alert-danger chunked-restore-result initially-hidden"></div>
+            <div id="chunkedRestoreSuccess" class="alert alert-success chunked-restore-result initially-hidden"></div>
+
             </div>
         </div>
-        
+
         <!-- Individual Notes Import Card -->
         <div class="backup-section">
             <div class="card-container">
@@ -674,6 +697,21 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
             </div>
         </div>
     </div>
+    <!-- Post-restore Workspace Chooser Modal -->
+    <div id="restoreWorkspacesModal" class="import-confirm-modal">
+        <div class="import-confirm-modal-content">
+            <h3><?php echo t_h('restore_import.chunked.workspaces_title', [], 'Restore complete'); ?></h3>
+            <div id="restoreWorkspacesSummary" class="alert alert-success restore-workspaces-summary initially-hidden"></div>
+            <p><?php echo t_h('restore_import.chunked.workspaces_body', [], 'Your backup has been restored. Which workspace do you want to open?'); ?></p>
+            <div id="restoreWorkspacesList" class="restore-workspaces-list"></div>
+            <div class="import-confirm-buttons">
+                <button type="button" class="btn-cancel" data-action="hide-restore-workspaces-modal">
+                    <?php echo t_h('restore_import.chunked.workspaces_close', [], 'Close'); ?>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="customAlert" class="custom-alert">
         <div class="custom-alert-content">
             <h3 id="alertTitle"><?php echo t_h('restore_import.alerts.no_file_selected.title'); ?></h3>
@@ -696,11 +734,68 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         </div>
     </div>
     
+    <style>
+    /* Chunked restore progress */
+    .chunked-restore-progress { margin-top: 16px; }
+    .chunked-restore-bar-track {
+        width: 100%; max-width: 480px; height: 10px; border-radius: 5px;
+        background: rgba(128, 128, 128, 0.2); overflow: hidden;
+    }
+    .chunked-restore-bar {
+        height: 100%; width: 0; border-radius: 5px;
+        background: var(--pz-accent, #007cba);
+        transition: width 0.3s ease;
+    }
+    .chunked-restore-status {
+        display: inline-flex; align-items: center; gap: 10px;
+        margin-top: 10px; font-size: 13px;
+    }
+    .chunked-restore-result { margin-top: 16px; white-space: pre-line; }
+    /* Post-restore workspace chooser */
+    .restore-workspaces-summary {
+        white-space: pre-line; text-align: left; font-size: 0.85rem;
+        max-height: 30vh; overflow-y: auto; margin: 12px 0;
+    }
+    .restore-workspaces-list {
+        display: flex; flex-direction: column; gap: 8px;
+        margin: 16px 0; max-height: 40vh; overflow-y: auto;
+    }
+    .restore-workspace-open-btn {
+        display: block; width: 100%; padding: 10px 14px; text-align: left;
+        border: 1px solid rgba(128, 128, 128, 0.35); border-radius: 6px;
+        background: transparent; color: inherit; font: inherit;
+        font-weight: 600; cursor: pointer;
+    }
+    .restore-workspace-open-btn:hover {
+        border-color: var(--pz-accent, #007cba);
+        color: var(--pz-accent, #007cba);
+    }
+    </style>
     <!-- Configuration for JavaScript -->
     <script type="application/json" id="restore-import-config"><?php
         echo json_encode([
             'maxIndividualFiles' => (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50')),
-            'maxZipFiles' => (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'))
+            'maxZipFiles' => (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300')),
+            'csrfToken' => $restoreImportCsrfToken,
+            'restoreChunkBytes' => 32 * 1024 * 1024,
+            'i18n' => [
+                'uploading' => t('restore_import.chunked.uploading', [], 'Uploading the archive... {{percent}}% ({{done}} of {{total}})'),
+                'queued' => t('restore_import.chunked.queued', [], 'Restore starting...'),
+                'queued_uploaded' => t('restore_import.chunked.queued_uploaded', [], 'Upload complete, restore starting...'),
+                'stage_downloading' => t('restore_import.chunked.stage_downloading', [], 'Fetching the archive from the bucket...'),
+                'stage_assembling' => t('restore_import.chunked.stage_assembling', [], 'Assembling the archive on the server...'),
+                'stage_extracting' => t('restore_import.chunked.stage_extracting', [], 'Extracting the archive...'),
+                'stage_preparing' => t('restore_import.chunked.stage_preparing', [], 'Preparing the data...'),
+                'stage_database' => t('restore_import.chunked.stage_database', [], 'Restoring the database...'),
+                'stage_notes' => t('restore_import.chunked.stage_notes', [], 'Restoring the notes... ({{done}}/{{total}})'),
+                'stage_notes_simple' => t('restore_import.chunked.stage_notes_simple', [], 'Restoring the notes...'),
+                'stage_attachments' => t('restore_import.chunked.stage_attachments', [], 'Restoring the attachments... ({{done}}/{{total}})'),
+                'stage_attachments_simple' => t('restore_import.chunked.stage_attachments_simple', [], 'Restoring the attachments...'),
+                'done' => t('restore_import.chunked.done', [], 'Restore completed successfully.'),
+                'error' => t('restore_import.chunked.error', [], 'The restore failed: {{error}}'),
+                'uploadError' => t('restore_import.chunked.upload_error', [], 'The upload failed: {{error}}'),
+                'chunkRetry' => t('restore_import.chunked.chunk_retry', [], 'A slice failed to upload, retrying...'),
+            ],
         ]);
     ?></script>
     <script src="<?php echo poznoteAsset('js/restore-import.js'); ?>"></script>

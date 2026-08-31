@@ -3457,6 +3457,32 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
 }
 
 /**
+ * Report restore progress to an optional observer.
+ *
+ * The background restore worker (workers/job-runner.php) registers a
+ * callable in $GLOBALS['poznote_restore_progress_hook'] to surface the
+ * pipeline's milestones to the browser's progress bar; the synchronous
+ * flows leave it unset and this is a no-op. The observer must never be
+ * able to break a restore, so its failures are swallowed.
+ *
+ * @param string $stage One of extracting, preparing, database, notes,
+ *        attachments
+ * @param int|null $done Items processed so far in this stage, when the
+ *        stage has countable items
+ * @param int|null $total Total items of this stage
+ */
+function poznoteRestoreReportProgress(string $stage, ?int $done = null, ?int $total = null): void {
+    $hook = $GLOBALS['poznote_restore_progress_hook'] ?? null;
+    if (is_callable($hook)) {
+        try {
+            $hook($stage, $done, $total);
+        } catch (Throwable $e) {
+            // observer only
+        }
+    }
+}
+
+/**
  * Restore a complete backup from ZIP file
  * Handles database, notes, and attachments restoration
  */
@@ -3524,7 +3550,18 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             return ['success' => false, 'error' => 'Cannot open ZIP file'];
         }
         
-        $zip->extractTo($tempExtractDir);
+        poznoteRestoreReportProgress('extracting');
+        // A failed extraction (a full disk mid-way is the realistic case)
+        // must not fall through to the wipe-and-restore below with only some
+        // of the files on disk: the SQL dump is validated and executed, then
+        // notes/attachments whose files never extracted would be silently
+        // missing. Refuse before touching any existing data.
+        if (!$zip->extractTo($tempExtractDir)) {
+            $zip->close();
+            unlink($tempFile);
+            deleteDirectory($tempExtractDir);
+            return ['success' => false, 'error' => 'Cannot extract the ZIP file (the server may be out of disk space). Nothing was restored.'];
+        }
         $zip->close();
         unlink($tempFile);
         $tempFile = null; // Mark as cleaned
@@ -3645,6 +3682,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         }
 
         // CLEAR ENTRIES DIRECTORY BEFORE RESTORATION
+        poznoteRestoreReportProgress('preparing');
         $entriesPath = getEntriesPath();
         if (is_dir($entriesPath)) {
             // Delete all files in entries directory
@@ -3705,6 +3743,7 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
         $skippedAttachments = [];
         
         // Restore database (the SQL file was validated before the wipe)
+        poznoteRestoreReportProgress('database');
         $dbResult = restoreDatabaseFromFile($sqlFile, $dumpStatements);
         unset($dumpStatements);
         if ($dbResult['success']) {
@@ -3916,14 +3955,26 @@ function restoreEntriesFromDir($sourceDir) {
     }
     
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($sourceDir), 
+        new RecursiveDirectoryIterator($sourceDir),
         RecursiveIteratorIterator::LEAVES_ONLY
     );
-    
+
+    // Total for the progress observer (cheap directory walk)
+    $totalFiles = iterator_count(new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::LEAVES_ONLY
+    ));
+    $processedFiles = 0;
+    poznoteRestoreReportProgress('notes', 0, $totalFiles);
+
     $importedCount = 0;
-    
+
     foreach ($files as $name => $file) {
         if (!$file->isDir()) {
+            $processedFiles++;
+            if ($processedFiles % 20 === 0 || $processedFiles === $totalFiles) {
+                poznoteRestoreReportProgress('notes', $processedFiles, $totalFiles);
+            }
             $filePath = $file->getRealPath();
             $relativePath = substr($filePath, strlen($sourceDir) + 1);
             $extension = pathinfo($relativePath, PATHINFO_EXTENSION);
@@ -4012,10 +4063,20 @@ function restoreAttachmentsFromDir($sourceDir) {
     }
     
     $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($sourceDir), 
+        new RecursiveDirectoryIterator($sourceDir),
         RecursiveIteratorIterator::LEAVES_ONLY
     );
-    
+
+    // Total for the progress observer: attachments are the long pole of a
+    // big restore (each one can be a slow bucket upload), so they are
+    // reported file by file.
+    $totalFiles = iterator_count(new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::LEAVES_ONLY
+    ));
+    $processedFiles = 0;
+    poznoteRestoreReportProgress('attachments', 0, $totalFiles);
+
     $importedCount = 0;
     $skippedCount = 0;
     $failedCount = 0;
@@ -4024,6 +4085,8 @@ function restoreAttachmentsFromDir($sourceDir) {
 
     foreach ($files as $name => $file) {
         if (!$file->isDir()) {
+            $processedFiles++;
+            poznoteRestoreReportProgress('attachments', $processedFiles, $totalFiles);
             $filePath = $file->getRealPath();
             $relativePath = substr($filePath, strlen($sourceDir) + 1);
             $basename = basename($relativePath);
