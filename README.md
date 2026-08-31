@@ -795,6 +795,8 @@ Single ZIP containing database, all notes, and attachments for all workspaces:
   - Notes are organized by workspace and folder
   - Attachments are accessible via clickable links
 
+The archive is built in the background by a worker process, not during the request that starts it, so a large account cannot hit a browser or reverse proxy timeout. The page follows the progress of the job, and the download starts on its own once the file is ready. You can leave the page and come back, the preparation continues. A prepared archive stays available for 24 hours, and a button lets you delete it right away.
+
 #### Per-User vs Complete Backups
 
 Poznote provides flexible backup options:
@@ -904,6 +906,12 @@ Upload the complete backup ZIP to restore everything:
 
   - Replaces database, restores all notes, and attachments
   - Works for all workspaces at once
+
+There is no practical size limit. The archive is uploaded in slices (a slice that fails is retried instead of losing the whole upload), reassembled on the server, then extracted and restored by a background worker, so neither the browser nor a reverse proxy in front of the instance can time the restore out. A progress bar covers the whole pipeline: upload, extraction, database, notes, then attachments. When the restore finishes, Poznote asks which workspace you want to open.
+
+Restoring from an S3 bucket (see [S3 Backups](#s3-backups)) runs as the same background job, so fetching a large archive from the bucket and restoring it does not depend on a request staying alive either.
+
+If the upload is not possible at all, the Restore / Import page also offers a direct copy fallback: copy the archive into the Poznote container at exactly `/tmp/backup_restore.zip` over SSH, reload the page, and restore from there.
 
 </details>
 
