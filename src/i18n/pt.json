@@ -1982,6 +1982,16 @@
     },
     "index": {
       "title": "Índice Poznote"
+    },
+    "job": {
+      "hint": "O arquivo é preparado no servidor. Para contas grandes pode demorar vários minutos; pode sair desta página e voltar, a preparação continua.",
+      "download": "Transferir o arquivo",
+      "discard": "Eliminar o arquivo preparado",
+      "preparing": "A preparar o arquivo... ({{elapsed}})",
+      "queued": "Exportação em fila de espera...",
+      "ready": "O seu arquivo está pronto ({{size}}). A transferência começa automaticamente; fica disponível aqui durante 24 horas.",
+      "error": "A exportação falhou: {{error}}",
+      "start_error": "Não é possível iniciar a exportação: {{error}}"
     }
   },
   "login": {
@@ -2125,13 +2135,15 @@
       "standard_restore": {
         "title": "Restauração padrão",
         "description": "Escolha um arquivo de backup ZIP completo.",
-        "helper": "Tamanho recomendado máximo: 500MB."
+        "helper": "Sem limite de tamanho: o arquivo é enviado por partes e restaurado em segundo plano."
       },
       "direct_copy_restore": {
-        "title": "Restauração quando a restauração padrão não funciona (timeout se o arquivo zip for muito grande)",
-        "step1": "1. Copie o arquivo para o contêiner:",
+        "title": "Restauro por cópia direta (se tiver acesso SSH ao servidor)",
+        "step1": "1. Copie o ficheiro para o contentor (adapte o nome do contentor e o caminho do seu arquivo):",
         "docker_command": "docker cp /caminho/para/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-        "step2": "2. Clique abaixo para restaurar"
+        "step2": "2. Clique abaixo para restaurar",
+        "intro": "Este método não envia nada pelo navegador: você copia o arquivo de backup para o servidor e o Poznote restaura-o a partir daí. Funciona qualquer que seja o tamanho do ficheiro e continua útil como alternativa quando o envio acima não é possível.",
+        "filename_note": "O arquivo deve ser colocado dentro do contentor Poznote exatamente em /tmp/backup_restore.zip (este nome exato). Recarregue esta página depois de copiar: o ficheiro é detetado automaticamente e o seu tamanho aparece abaixo."
       },
       "individual_notes": {
         "title": "Quer importar arquivos HTML, Markdown, de texto ou arquivos ZIP?",
@@ -2191,7 +2203,6 @@
       },
       "complete_restore": {
         "title": "Restaurar Completamente?",
-        "warning_large_html": "<strong>Aviso:</strong> Este arquivo tem {{size}}MB. O upload padrão pode ser lento ou falhar para arquivos grandes.<br><br><strong>Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.</strong>",
         "warning_html": "<strong>Aviso:</strong> Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.",
         "body_html": "Isso substituirá seu banco de dados, restaurará todas as notas e anexos para <span style=\"color: #dc3545; font-weight: bold;\">todos os espaços de trabalho</span>.",
         "confirm": "Sim, Restauração Completa"
@@ -2238,9 +2249,29 @@
     },
     "inline": {
       "standard": {
-        "button": "Iniciar Restauração Completa (Padrão)",
-        "too_large": "⚠️ Arquivo tem {{size}}MB. O upload padrão pode ser lento ou falhar."
+        "button": "Iniciar Restauração Completa (Padrão)"
       }
+    },
+    "chunked": {
+      "uploading": "A enviar o arquivo... {{percent}}% ({{done}} de {{total}})",
+      "queued": "A iniciar o restauro...",
+      "done": "Restauro concluído com sucesso.",
+      "error": "O restauro falhou: {{error}}",
+      "upload_error": "O envio falhou: {{error}}",
+      "chunk_retry": "Uma parte não pôde ser enviada, a tentar novamente...",
+      "stage_assembling": "A montar o arquivo no servidor...",
+      "stage_extracting": "A extrair o arquivo...",
+      "stage_preparing": "A preparar os dados...",
+      "stage_database": "A restaurar a base de dados...",
+      "stage_notes": "A restaurar as notas... ({{done}}/{{total}})",
+      "stage_notes_simple": "A restaurar as notas...",
+      "stage_attachments": "A restaurar os anexos... ({{done}}/{{total}})",
+      "stage_attachments_simple": "A restaurar os anexos...",
+      "workspaces_title": "Restauro concluído",
+      "workspaces_body": "A sua cópia de segurança foi restaurada. Que espaço de trabalho quer abrir?",
+      "workspaces_close": "Fechar",
+      "stage_downloading": "A obter o arquivo do bucket...",
+      "queued_uploaded": "Envio concluído, a iniciar o restauro..."
     }
   },
   "markdown_guide": {

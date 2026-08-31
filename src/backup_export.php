@@ -28,6 +28,12 @@ $s3BackupSectionVisible = S3BackupService::isEnabled()
 $message = '';
 $error = '';
 
+// CSRF token for the background export endpoint (api_backup_job.php)
+if (empty($_SESSION['backup_export_csrf_token'])) {
+    $_SESSION['backup_export_csrf_token'] = bin2hex(random_bytes(32));
+}
+$backupExportCsrfToken = $_SESSION['backup_export_csrf_token'];
+
 // Process actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -210,9 +216,28 @@ function createBackup() {
                 <div id="backupSpinner" class="backup-spinner initially-hidden" role="status" aria-live="polite" aria-hidden="true">
                     <div class="spinner-circle" aria-hidden="true"></div>
                     <span class="sr-only"><?php echo t_h('backup_export.spinner.preparing'); ?></span>
-                    <span class="backup-spinner-text"><?php echo t_h('backup_export.spinner.preparing_long'); ?></span>
+                    <span class="backup-spinner-text" id="backupSpinnerText"><?php echo t_h('backup_export.spinner.preparing_long'); ?></span>
                 </div>
             </form>
+
+            <!-- Background export job feedback: the archive is built by a
+                 worker process, this area follows the job status and offers
+                 the download once the file is ready. -->
+            <div id="backupJobHint" class="backup-job-hint initially-hidden">
+                <?php echo t_h('backup_export.job.hint', [], 'The archive is prepared on the server. For large accounts this can take several minutes; you can leave this page and come back, the preparation continues.'); ?>
+            </div>
+            <div id="backupJobError" class="alert alert-danger initially-hidden"></div>
+            <div id="backupJobReady" class="alert alert-success initially-hidden">
+                <span id="backupJobReadyText"></span>
+                <div class="backup-job-ready-actions">
+                    <a id="backupJobDownloadLink" class="btn btn-primary" href="#">
+                        <?php echo t_h('backup_export.job.download', [], 'Download the archive'); ?>
+                    </a>
+                    <button id="backupJobDiscardBtn" type="button" class="btn btn-secondary">
+                        <?php echo t_h('backup_export.job.discard', [], 'Delete the prepared archive'); ?>
+                    </button>
+                </div>
+            </div>
         </div>
         
         <!-- Structured Export Section -->
@@ -714,6 +739,24 @@ function createBackup() {
     })();
     </script>
 
+    <style>
+    /* Background export job feedback */
+    .backup-job-hint { margin-top: 12px; font-size: 0.9rem; opacity: 0.85; }
+    .backup-job-ready-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
+    #backupJobReady, #backupJobError { margin-top: 14px; margin-bottom: 0; }
+    </style>
+    <script type="application/json" id="backup-export-config"><?php
+        echo json_encode([
+            'csrfToken' => $backupExportCsrfToken,
+            'i18n' => [
+                'preparing' => t('backup_export.job.preparing', [], 'Preparing the archive... ({{elapsed}})'),
+                'queued' => t('backup_export.job.queued', [], 'Export queued...'),
+                'ready' => t('backup_export.job.ready', [], 'Your archive is ready ({{size}}). The download starts automatically; it stays available here for 24 hours.'),
+                'error' => t('backup_export.job.error', [], 'The export failed: {{error}}'),
+                'startError' => t('backup_export.job.start_error', [], 'Cannot start the export: {{error}}'),
+            ],
+        ]);
+    ?></script>
     <script src="<?php echo poznoteAsset('js/backup-export.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/backup-export-init.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>

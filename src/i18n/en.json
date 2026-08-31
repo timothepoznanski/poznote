@@ -1632,6 +1632,16 @@
     },
     "index": {
       "title": "Poznote Index"
+    },
+    "job": {
+      "hint": "The archive is prepared on the server. For large accounts this can take several minutes; you can leave this page and come back, the preparation continues.",
+      "download": "Download the archive",
+      "discard": "Delete the prepared archive",
+      "preparing": "Preparing the archive... ({{elapsed}})",
+      "queued": "Export queued...",
+      "ready": "Your archive is ready ({{size}}). The download starts automatically; it stays available here for 24 hours.",
+      "error": "The export failed: {{error}}",
+      "start_error": "Cannot start the export: {{error}}"
     }
   },
   "login": {
@@ -1775,13 +1785,15 @@
       "standard_restore": {
         "title": "Standard Restore",
         "description": "Choose a complete backup ZIP file.",
-        "helper": "Recommended max size: 500MB."
+        "helper": "No size limit: the archive is uploaded in slices and restored in the background."
       },
       "direct_copy_restore": {
-        "title": "Restore when standard restore doesn't work (timeout if zip file is too large)",
-        "step1": "1. Copy the file to the container:",
+        "title": "Restore by direct copy (if you have SSH access to the server)",
+        "step1": "1. Copy the file to the container (adapt the container name and the path to your archive):",
         "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-        "step2": "2. Click below to restore"
+        "step2": "2. Click below to restore",
+        "intro": "This method uploads nothing through the browser: you copy the backup archive onto the server yourself, and Poznote restores it from there. It works whatever the file size, and remains useful as a fallback when the upload above is not possible.",
+        "filename_note": "The archive must be placed inside the Poznote container at exactly /tmp/backup_restore.zip (this exact name). Reload this page after copying: the file is detected automatically and its size is shown below."
       },
       "individual_notes": {
         "title": "Do you want to import HTML, Markdown, text files or ZIP archives?",
@@ -1841,7 +1853,6 @@
       },
       "complete_restore": {
         "title": "Complete restore?",
-        "warning_large_html": "<strong>Warning:</strong> This file is {{size}}MB. Standard upload might be slow or fail for large files.<br><br><strong>This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.</strong>",
         "warning_html": "<strong>Warning:</strong> This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
         "body_html": "This will replace your database, restore all notes and attachments for <span style=\"color: #dc3545; font-weight: bold;\">all workspaces</span>.",
         "confirm": "Yes, Complete restore"
@@ -1888,9 +1899,29 @@
     },
     "inline": {
       "standard": {
-        "button": "Start complete restore (Standard)",
-        "too_large": "⚠️ File is {{size}}MB. Standard upload might be slow or fail."
+        "button": "Start complete restore (Standard)"
       }
+    },
+    "chunked": {
+      "uploading": "Uploading the archive... {{percent}}% ({{done}} of {{total}})",
+      "queued": "Restore starting...",
+      "done": "Restore completed successfully.",
+      "error": "The restore failed: {{error}}",
+      "upload_error": "The upload failed: {{error}}",
+      "chunk_retry": "A slice failed to upload, retrying...",
+      "stage_assembling": "Assembling the archive on the server...",
+      "stage_extracting": "Extracting the archive...",
+      "stage_preparing": "Preparing the data...",
+      "stage_database": "Restoring the database...",
+      "stage_notes": "Restoring the notes... ({{done}}/{{total}})",
+      "stage_notes_simple": "Restoring the notes...",
+      "stage_attachments": "Restoring the attachments... ({{done}}/{{total}})",
+      "stage_attachments_simple": "Restoring the attachments...",
+      "workspaces_title": "Restore complete",
+      "workspaces_body": "Your backup has been restored. Which workspace do you want to open?",
+      "workspaces_close": "Close",
+      "stage_downloading": "Fetching the archive from the bucket...",
+      "queued_uploaded": "Upload complete, restore starting..."
     }
   },
   "markdown_guide": {

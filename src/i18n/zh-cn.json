@@ -1980,6 +1980,16 @@
     },
     "index": {
       "title": "Poznote 索引"
+    },
+    "job": {
+      "hint": "存档在服务器上准备。大账户可能需要几分钟；您可以离开此页面稍后再回来，准备工作会继续进行。",
+      "download": "下载存档",
+      "discard": "删除已准备的存档",
+      "preparing": "正在准备存档... ({{elapsed}})",
+      "queued": "导出已加入队列...",
+      "ready": "您的存档已准备就绪（{{size}}）。下载将自动开始；存档将在此保留 24 小时。",
+      "error": "导出失败：{{error}}",
+      "start_error": "无法启动导出：{{error}}"
     }
   },
   "login": {
@@ -2123,13 +2133,15 @@
       "standard_restore": {
         "title": "标准还原",
         "description": "选择一个完整的备份 ZIP 文件。",
-        "helper": "建议最大尺寸：500MB。"
+        "helper": "没有大小限制：存档分片上传并在后台恢复。"
       },
       "direct_copy_restore": {
-        "title": "当标准还原不起作用时（如果 ZIP 文件太大导致超时）",
-        "step1": "1. 将文件拷贝到容器中：",
+        "title": "通过直接复制恢复（如果您拥有服务器的 SSH 访问权限）",
+        "step1": "1. 将文件复制到容器中（请替换容器名称和您的存档路径）：",
         "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-        "step2": "2. 点击下方按钮进行还原"
+        "step2": "2. 点击下方按钮进行还原",
+        "intro": "此方法不通过浏览器上传任何内容：您自行将备份存档复制到服务器上，Poznote 从那里恢复。无论文件多大都可用，当上方的上传方式不可行时，它仍是有用的备选方案。",
+        "filename_note": "存档必须放在 Poznote 容器内的 /tmp/backup_restore.zip（必须是这个确切的名称）。复制后请重新加载此页面：文件会被自动检测，其大小会显示在下方。"
       },
       "individual_notes": {
         "title": "想要导入 HTML、Markdown、文本文件或 ZIP 归档吗？",
@@ -2189,7 +2201,6 @@
       },
       "complete_restore": {
         "title": "完整还原？",
-        "warning_large_html": "<strong>警告：</strong> 该文件大小为 {{size}}MB。标准上传可能会很慢或失败。<br><br><strong>这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。</strong>",
         "warning_html": "<strong>警告：</strong> 这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。",
         "body_html": "这将替换您的数据库，并还原 <span style=\"color: #dc3545; font-weight: bold;\">所有工作区</span> 的所有笔记和附件。",
         "confirm": "是，执行完整还原"
@@ -2236,9 +2247,29 @@
     },
     "inline": {
       "standard": {
-        "button": "开始完整还原（标准）",
-        "too_large": "⚠️ 文件大小为 {{size}}MB。标准上传可能会很慢或失败。"
+        "button": "开始完整还原（标准）"
       }
+    },
+    "chunked": {
+      "uploading": "正在上传存档... {{percent}}%（{{done}} / {{total}}）",
+      "queued": "恢复即将开始...",
+      "done": "恢复成功完成。",
+      "error": "恢复失败：{{error}}",
+      "upload_error": "上传失败：{{error}}",
+      "chunk_retry": "某个分片上传失败，正在重试...",
+      "stage_assembling": "正在服务器上组装存档...",
+      "stage_extracting": "正在解压存档...",
+      "stage_preparing": "正在准备数据...",
+      "stage_database": "正在恢复数据库...",
+      "stage_notes": "正在恢复笔记...（{{done}}/{{total}}）",
+      "stage_notes_simple": "正在恢复笔记...",
+      "stage_attachments": "正在恢复附件...（{{done}}/{{total}}）",
+      "stage_attachments_simple": "正在恢复附件...",
+      "workspaces_title": "恢复完成",
+      "workspaces_body": "您的备份已恢复。要打开哪个工作区？",
+      "workspaces_close": "关闭",
+      "stage_downloading": "正在从存储桶获取存档...",
+      "queued_uploaded": "上传完成，恢复即将开始..."
     }
   },
   "markdown_guide": {

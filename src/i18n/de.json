@@ -1978,6 +1978,16 @@
     },
     "index": {
       "title": "Poznote-Index"
+    },
+    "job": {
+      "hint": "Das Archiv wird auf dem Server erstellt. Bei großen Konten kann das mehrere Minuten dauern; Sie können diese Seite verlassen und später zurückkommen, die Erstellung läuft weiter.",
+      "download": "Archiv herunterladen",
+      "discard": "Vorbereitetes Archiv löschen",
+      "preparing": "Archiv wird erstellt... ({{elapsed}})",
+      "queued": "Export in der Warteschlange...",
+      "ready": "Ihr Archiv ist bereit ({{size}}). Der Download startet automatisch; es bleibt hier 24 Stunden verfügbar.",
+      "error": "Der Export ist fehlgeschlagen: {{error}}",
+      "start_error": "Der Export kann nicht gestartet werden: {{error}}"
     }
   },
   "login": {
@@ -2121,13 +2131,15 @@
       "standard_restore": {
         "title": "Standardwiederherstellung",
         "description": "Wählen Sie eine vollständige ZIP-Sicherungsdatei.",
-        "helper": "Empfohlene maximale Größe: 500MB."
+        "helper": "Keine Größenbeschränkung: Das Archiv wird in Teilen hochgeladen und im Hintergrund wiederhergestellt."
       },
       "direct_copy_restore": {
-        "title": "Wiederherstellung, wenn die Standardwiederherstellung nicht funktioniert (Timeout, wenn die ZIP-Datei zu groß ist)",
-        "step1": "1. Kopieren Sie die Datei in den Container:",
+        "title": "Wiederherstellung per Direktkopie (wenn Sie SSH-Zugriff auf den Server haben)",
+        "step1": "1. Kopieren Sie die Datei in den Container (Containernamen und Pfad zu Ihrem Archiv anpassen):",
         "docker_command": "docker cp /pfad/zur/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
-        "step2": "2. Klicken Sie unten, um wiederherzustellen"
+        "step2": "2. Klicken Sie unten, um wiederherzustellen",
+        "intro": "Bei dieser Methode wird nichts über den Browser hochgeladen: Sie kopieren das Backup-Archiv selbst auf den Server, und Poznote stellt es von dort wieder her. Sie funktioniert unabhängig von der Dateigröße und bleibt als Ausweichlösung nützlich, wenn der Upload oben nicht möglich ist.",
+        "filename_note": "Das Archiv muss im Poznote-Container genau unter /tmp/backup_restore.zip liegen (exakt dieser Name). Laden Sie diese Seite nach dem Kopieren neu: Die Datei wird automatisch erkannt und ihre Größe unten angezeigt."
       },
       "individual_notes": {
         "title": "Möchten Sie HTML-, Markdown-, Textdateien oder ZIP-Archive importieren?",
@@ -2187,7 +2199,6 @@
       },
       "complete_restore": {
         "title": "Vollständige Wiederherstellung?",
-        "warning_large_html": "<strong>Warnung:</strong> Diese Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen für große Dateien.<br><br><strong>Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.</strong>",
         "warning_html": "<strong>Warnung:</strong> Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
         "body_html": "Dies ersetzt Ihre Datenbank, stellt alle Notizen und Anhänge für <span style=\"color: #dc3545; font-weight: bold;\">alle Arbeitsbereiche</span> wieder her.",
         "confirm": "Ja, Vollständige Wiederherstellung"
@@ -2234,9 +2245,29 @@
     },
     "inline": {
       "standard": {
-        "button": "Vollständige Wiederherstellung starten (Standard)",
-        "too_large": "⚠️ Datei ist {{size}}MB. Standard-Upload kann langsam sein oder fehlschlagen."
+        "button": "Vollständige Wiederherstellung starten (Standard)"
       }
+    },
+    "chunked": {
+      "uploading": "Archiv wird hochgeladen... {{percent}}% ({{done}} von {{total}})",
+      "queued": "Wiederherstellung startet...",
+      "done": "Wiederherstellung erfolgreich abgeschlossen.",
+      "error": "Die Wiederherstellung ist fehlgeschlagen: {{error}}",
+      "upload_error": "Der Upload ist fehlgeschlagen: {{error}}",
+      "chunk_retry": "Ein Teil konnte nicht hochgeladen werden, neuer Versuch...",
+      "stage_assembling": "Archiv wird auf dem Server zusammengesetzt...",
+      "stage_extracting": "Archiv wird entpackt...",
+      "stage_preparing": "Daten werden vorbereitet...",
+      "stage_database": "Datenbank wird wiederhergestellt...",
+      "stage_notes": "Notizen werden wiederhergestellt... ({{done}}/{{total}})",
+      "stage_notes_simple": "Notizen werden wiederhergestellt...",
+      "stage_attachments": "Anhänge werden wiederhergestellt... ({{done}}/{{total}})",
+      "stage_attachments_simple": "Anhänge werden wiederhergestellt...",
+      "workspaces_title": "Wiederherstellung abgeschlossen",
+      "workspaces_body": "Ihr Backup wurde wiederhergestellt. Welchen Arbeitsbereich möchten Sie öffnen?",
+      "workspaces_close": "Schließen",
+      "stage_downloading": "Archiv wird aus dem Bucket geladen...",
+      "queued_uploaded": "Upload abgeschlossen, Wiederherstellung startet..."
     }
   },
   "markdown_guide": {

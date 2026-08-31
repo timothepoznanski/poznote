@@ -1,8 +1,9 @@
 /**
  * Backup Export Page JavaScript
  * Handles backup and export functionality including:
+ * - Complete backup as a background job (built by a server-side worker,
+ *   polled here, downloaded once ready)
  * - Exporting notes, attachments, and structured data
- * - Managing download progress with spinner feedback
  * - Loading workspace selection for exports
  */
 
@@ -44,44 +45,6 @@ function startAttachmentsDownload() {
 }
 
 // ========================================
-// UI Helper Functions
-// ========================================
-
-/**
- * Show loading spinner and disable the backup button to prevent duplicate requests
- */
-function showBackupSpinner() {
-    var spinner = document.getElementById('backupSpinner');
-    var btn = document.getElementById('completeBackupBtn');
-    
-    if (spinner) {
-        spinner.style.display = 'inline-flex';
-        spinner.setAttribute('aria-hidden', 'false');
-    }
-    if (btn) {
-        btn.disabled = true;
-        btn.setAttribute('aria-disabled', 'true');
-    }
-}
-
-/**
- * Hide loading spinner and re-enable the backup button
- */
-function hideBackupSpinner() {
-    var spinner = document.getElementById('backupSpinner');
-    var btn = document.getElementById('completeBackupBtn');
-    
-    if (spinner) {
-        spinner.style.display = 'none';
-        spinner.setAttribute('aria-hidden', 'true');
-    }
-    if (btn) {
-        btn.disabled = false;
-        btn.setAttribute('aria-disabled', 'false');
-    }
-}
-
-// ========================================
 // Workspace Management
 // ========================================
 
@@ -92,7 +55,7 @@ function hideBackupSpinner() {
 function loadWorkspacesForStructuredExport() {
     var select = document.getElementById('structuredExportWorkspaceSelect');
     if (!select) return;
-    
+
     fetch('/api/v1/workspaces', {
         method: 'GET',
         headers: { 'Accept': 'application/json' },
@@ -102,10 +65,10 @@ function loadWorkspacesForStructuredExport() {
     .then(function(data) {
         if (data.success && data.workspaces) {
             select.innerHTML = '';
-            
+
             // Get current workspace from global variable (set by PHP)
             var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined') ? window.selectedWorkspace : '';
-            
+
             // Populate dropdown with workspace options
             data.workspaces.forEach(function(ws) {
                 var option = document.createElement('option');
@@ -116,7 +79,7 @@ function loadWorkspacesForStructuredExport() {
                 }
                 select.appendChild(option);
             });
-            
+
             // If no workspace was pre-selected, select the first one by default
             if (!currentWorkspace && data.workspaces.length > 0) {
                 select.value = data.workspaces[0].name;
@@ -130,109 +93,228 @@ function loadWorkspacesForStructuredExport() {
 }
 
 // ========================================
-// Cookie Helper Functions
+// Complete Backup as a Background Job
 // ========================================
+//
+// The archive is built by a detached worker process (api_backup_job.php):
+// a synchronous build inside the POST cannot survive the timeout of a proxy
+// sitting in front of the instance for large accounts, and would occupy a
+// php-fpm worker for many minutes. Here the page starts the job, polls its
+// status, and triggers the download once the file is ready; the download
+// itself streams immediately so no timeout applies. A page reload while the
+// build runs picks the job back up.
 
-/**
- * Get the value of a specific cookie by name
- * @param {string} name - The name of the cookie to retrieve
- * @returns {string|null} The cookie value, or null if not found
- */
-function getCookie(name) {
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
-        var parts = cookie.split('=');
-        var cookieName = parts[0];
-        var cookieValue = parts.slice(1).join('=');
-        if (cookieName === name) {
-            return cookieValue;
+var backupJob = {
+    config: null,
+    pollTimer: null,
+    // Id of the job THIS tab started. The download only auto-starts for that
+    // exact job, so neither a reload showing an already-finished archive nor
+    // an in-flight resume response for an older job can trigger one.
+    autoDownloadJobId: null
+};
+
+function backupJobConfig() {
+    if (backupJob.config) return backupJob.config;
+    var el = document.getElementById('backup-export-config');
+    try {
+        backupJob.config = JSON.parse(el ? el.textContent : '{}') || {};
+    } catch (e) {
+        backupJob.config = {};
+    }
+    backupJob.config.i18n = backupJob.config.i18n || {};
+    return backupJob.config;
+}
+
+function backupJobText(key, fallback, vars) {
+    var template = backupJobConfig().i18n[key] || fallback;
+    if (vars) {
+        for (var k in vars) {
+            template = String(template).split('{{' + k + '}}').join(String(vars[k]));
         }
     }
-    return null;
+    return template;
 }
 
-/**
- * Delete a cookie by name
- * @param {string} name - The name of the cookie to delete
- */
-function deleteCookie(name) {
-    document.cookie = name + '=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+function backupJobFormatBytes(bytes) {
+    if (bytes === null || bytes === undefined) return '';
+    var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    var i = 0, v = bytes;
+    while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+    return (i === 0 ? v : v.toFixed(1)) + ' ' + units[i];
 }
 
-// ========================================
-// Download Progress Tracking
-// ========================================
-
-/**
- * Setup download progress tracking using cookies
- * When the server starts the download, it sets a cookie with the download token.
- * This function polls for that cookie to detect when the download has started,
- * then hides the spinner to provide user feedback.
- * 
- * @param {string} token - Unique token to identify this download
- * @returns {object} Object with pollTimer and fallbackTimer for cleanup
- */
-function setupDownloadTracking(token) {
-    var pollInterval = 500; // Check every 500ms
-    var maxPollTime = 60000; // Stop polling after 60 seconds
-    var fallbackTimeout = 30000; // Re-enable UI after 30 seconds as safety
-    var elapsed = 0;
-    
-    // Poll for the download cookie
-    var pollTimer = setInterval(function() {
-        elapsed += pollInterval;
-        var cookieValue = getCookie('poznote_download_token');
-        
-        if (cookieValue === token) {
-            // Download has started - cleanup and hide spinner
-            hideBackupSpinner();
-            deleteCookie('poznote_download_token');
-            clearInterval(pollTimer);
-            clearTimeout(fallbackTimer);
-            return;
-        }
-        
-        // Stop polling after max time
-        if (elapsed >= maxPollTime) {
-            clearInterval(pollTimer);
-            hideBackupSpinner();
-        }
-    }, pollInterval);
-    
-    // Fallback timer as a safety measure
-    var fallbackTimer = setTimeout(function() {
-        hideBackupSpinner();
-        clearInterval(pollTimer);
-    }, fallbackTimeout);
-    
-    return { pollTimer: pollTimer, fallbackTimer: fallbackTimer };
+function backupJobFormatElapsed(fromEpochSeconds) {
+    var seconds = Math.max(0, Math.round(Date.now() / 1000 - fromEpochSeconds));
+    var minutes = Math.floor(seconds / 60);
+    if (minutes <= 0) return seconds + ' s';
+    return minutes + ' min ' + (seconds % 60) + ' s';
 }
 
-/**
- * Initialize a download token for tracking
- * Adds a hidden input field with a unique token to the form
- * @param {HTMLFormElement} form - The form to add the token to
- * @returns {string} The generated token
- */
-function initializeDownloadToken(form) {
-    var token = 'dt_' + Math.random().toString(36).substring(2, 11);
-    
-    // Remove existing token input if present
-    var existing = document.getElementById('downloadTokenInput');
-    if (existing) {
-        existing.parentNode.removeChild(existing);
+function backupJobElements() {
+    return {
+        form: document.getElementById('completeBackupForm'),
+        button: document.getElementById('completeBackupBtn'),
+        spinner: document.getElementById('backupSpinner'),
+        spinnerText: document.getElementById('backupSpinnerText'),
+        hint: document.getElementById('backupJobHint'),
+        error: document.getElementById('backupJobError'),
+        ready: document.getElementById('backupJobReady'),
+        readyText: document.getElementById('backupJobReadyText'),
+        downloadLink: document.getElementById('backupJobDownloadLink'),
+        discardBtn: document.getElementById('backupJobDiscardBtn')
+    };
+}
+
+function backupJobShow(el, visible) {
+    if (!el) return;
+    el.classList.toggle('initially-hidden', !visible);
+    if (el.id === 'backupSpinner') {
+        el.style.display = visible ? 'inline-flex' : 'none';
+        el.setAttribute('aria-hidden', visible ? 'false' : 'true');
     }
-    
-    // Add new token input
-    var input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'download_token';
-    input.id = 'downloadTokenInput';
-    input.value = token;
-    form.appendChild(input);
-    
-    return token;
+}
+
+function backupJobResetUi() {
+    var els = backupJobElements();
+    backupJobShow(els.spinner, false);
+    backupJobShow(els.hint, false);
+    backupJobShow(els.error, false);
+    backupJobShow(els.ready, false);
+    if (els.button) {
+        els.button.disabled = false;
+        els.button.setAttribute('aria-disabled', 'false');
+    }
+}
+
+function backupJobRenderRunning(job) {
+    var els = backupJobElements();
+    backupJobShow(els.error, false);
+    backupJobShow(els.ready, false);
+    backupJobShow(els.spinner, true);
+    backupJobShow(els.hint, true);
+    if (els.button) {
+        els.button.disabled = true;
+        els.button.setAttribute('aria-disabled', 'true');
+    }
+    if (els.spinnerText) {
+        var since = job.started_at || job.created_at;
+        els.spinnerText.textContent = job.status === 'queued'
+            ? backupJobText('queued', 'Export queued...')
+            : backupJobText('preparing', 'Preparing the archive... ({{elapsed}})', { elapsed: backupJobFormatElapsed(since) });
+    }
+}
+
+function backupJobRenderReady(job) {
+    var els = backupJobElements();
+    backupJobResetUi();
+    backupJobShow(els.ready, true);
+    if (els.readyText) {
+        els.readyText.textContent = backupJobText(
+            'ready',
+            'Your archive is ready ({{size}}). The download starts automatically; it stays available here for 24 hours.',
+            { size: backupJobFormatBytes(job.size) }
+        );
+    }
+    var url = 'api_backup_job.php?action=download&job_id=' + encodeURIComponent(job.id);
+    if (els.downloadLink) els.downloadLink.setAttribute('href', url);
+    if (els.discardBtn) els.discardBtn.dataset.jobId = job.id;
+    if (backupJob.autoDownloadJobId === job.id) {
+        backupJob.autoDownloadJobId = null;
+        window.location.href = url;
+    }
+}
+
+function backupJobRenderError(message) {
+    var els = backupJobElements();
+    backupJobResetUi();
+    backupJobShow(els.error, true);
+    if (els.error) els.error.textContent = message;
+}
+
+function backupJobStopPolling() {
+    if (backupJob.pollTimer) {
+        clearInterval(backupJob.pollTimer);
+        backupJob.pollTimer = null;
+    }
+}
+
+function backupJobHandleState(job) {
+    if (!job) {
+        backupJobStopPolling();
+        return;
+    }
+    if (job.status === 'queued' || job.status === 'running') {
+        backupJobRenderRunning(job);
+        return;
+    }
+    backupJobStopPolling();
+    if (job.status === 'done') {
+        backupJobRenderReady(job);
+    } else if (job.status === 'error') {
+        backupJobRenderError(backupJobText('error', 'The export failed: {{error}}', { error: job.error || 'unknown' }));
+    }
+}
+
+function backupJobStartPolling(jobId) {
+    backupJobStopPolling();
+    var poll = function() {
+        fetch('api_backup_job.php?action=status&job_id=' + encodeURIComponent(jobId), { credentials: 'same-origin' })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) backupJobHandleState(data.job);
+            })
+            .catch(function() { /* transient network error: keep polling */ });
+    };
+    backupJob.pollTimer = setInterval(poll, 2500);
+    poll();
+}
+
+function backupJobStart(form) {
+    var body = new FormData();
+    body.append('action', 'start');
+    body.append('csrf_token', backupJobConfig().csrfToken || '');
+    var userSelect = form.querySelector('[name="selected_user_id"]');
+    if (userSelect && userSelect.value) body.append('selected_user_id', userSelect.value);
+    var skipS3 = form.querySelector('[name="skip_s3_attachments"]');
+    if (skipS3 && skipS3.checked) body.append('skip_s3_attachments', '1');
+
+    fetch('api_backup_job.php', { method: 'POST', credentials: 'same-origin', body: body })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.success || !data.job) {
+                backupJobRenderError(backupJobText('startError', 'Cannot start the export: {{error}}', { error: data.error || 'unknown' }));
+                return;
+            }
+            backupJob.autoDownloadJobId = data.job.id;
+            backupJobRenderRunning(data.job);
+            backupJobStartPolling(data.job.id);
+        })
+        .catch(function(e) {
+            backupJobRenderError(backupJobText('startError', 'Cannot start the export: {{error}}', { error: e.message }));
+        });
+}
+
+function backupJobResume() {
+    // An export started earlier (or on another tab) may be running or ready:
+    // pick it up instead of showing a blank section.
+    fetch('api_backup_job.php?action=status', { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data.success || !data.job) return;
+            if (data.job.status === 'queued' || data.job.status === 'running') {
+                // Deliberately NOT arming autoDownload here: only the tab
+                // that started the export downloads on completion. Otherwise
+                // every open tab watching the same job would fire its own
+                // download of the same multi-hundred-MB archive.
+                backupJobRenderRunning(data.job);
+                backupJobStartPolling(data.job.id);
+            } else if (data.job.status === 'done') {
+                backupJobRenderReady(data.job);
+            }
+            // A failed job from an earlier visit is not resurfaced: the user
+            // already saw the error when it happened, or will simply retry.
+        })
+        .catch(function() { /* no job to resume */ });
 }
 
 // ========================================
@@ -245,19 +327,30 @@ function initializeDownloadToken(form) {
 function initializePage() {
     // Load workspaces for structured export dropdown
     loadWorkspacesForStructuredExport();
-    
-    // Setup complete backup form handler
+
+    // Complete backup runs as a background job
     var form = document.getElementById('completeBackupForm');
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Show spinner immediately
-            showBackupSpinner();
-            
-            // Setup download tracking with cookie polling
-            var token = initializeDownloadToken(form);
-            setupDownloadTracking(token);
+            e.preventDefault();
+            backupJobStart(form);
         });
     }
+
+    var discardBtn = document.getElementById('backupJobDiscardBtn');
+    if (discardBtn) {
+        discardBtn.addEventListener('click', function() {
+            var body = new FormData();
+            body.append('action', 'discard');
+            body.append('csrf_token', backupJobConfig().csrfToken || '');
+            body.append('job_id', discardBtn.dataset.jobId || '');
+            fetch('api_backup_job.php', { method: 'POST', credentials: 'same-origin', body: body })
+                .then(function() { backupJobResetUi(); })
+                .catch(function() { backupJobResetUi(); });
+        });
+    }
+
+    backupJobResume();
 }
 
 // Run initialization when page loads
