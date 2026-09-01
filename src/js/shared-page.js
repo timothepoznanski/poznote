@@ -67,7 +67,9 @@
             txtSharedBy: body.getAttribute('data-txt-shared-by') || 'Shared by',
             txtNoSharedWithMe: body.getAttribute('data-txt-no-shared-with-me') || 'Nothing has been shared with you yet.',
             txtExpandFolder: body.getAttribute('data-txt-expand-folder') || 'Expand folder',
-            txtCollapseFolder: body.getAttribute('data-txt-collapse-folder') || 'Collapse folder'
+            txtCollapseFolder: body.getAttribute('data-txt-collapse-folder') || 'Collapse folder',
+            txtExpandAll: body.getAttribute('data-txt-expand-all') || 'Expand all',
+            txtCollapseAll: body.getAttribute('data-txt-collapse-all') || 'Collapse all'
         };
     }
 
@@ -967,11 +969,16 @@
         }
     }
 
+    function shouldExpandAllFolders() {
+        return currentCollapsibleFolderIds.some(function(folderId) {
+            return isFolderCollapsed(folderId);
+        });
+    }
+
     function updateTreeToolbar(presentation) {
         var toolbar = document.getElementById('sharedTreeToolbar');
         var searchHint = document.getElementById('sharedTreeSearchHint');
-        var expandBtn = document.getElementById('expandAllFoldersBtn');
-        var collapseBtn = document.getElementById('collapseAllFoldersBtn');
+        var toggleBtn = document.getElementById('toggleAllFoldersBtn');
         var showToolbar = !!(presentation && presentation.collapsibleFolderIds.length > 0 && (filterType === 'all' || filterType === 'folders'));
 
         currentHierarchyBranchMeta = presentation ? presentation.branchMeta : {};
@@ -990,16 +997,21 @@
             searchHint.classList.toggle('initially-hidden', !presentation.searchExpanded);
         }
 
-        if (expandBtn) {
-            expandBtn.disabled = presentation.searchExpanded || !currentCollapsibleFolderIds.some(function(folderId) {
-                return isFolderCollapsed(folderId);
-            });
-        }
+        if (toggleBtn) {
+            var shouldExpand = shouldExpandAllFolders();
+            var label = shouldExpand ? config.txtExpandAll : config.txtCollapseAll;
+            var labelEl = document.getElementById('toggleAllFoldersLabel');
+            var icon = toggleBtn.querySelector('.lucide');
 
-        if (collapseBtn) {
-            collapseBtn.disabled = presentation.searchExpanded || !currentCollapsibleFolderIds.some(function(folderId) {
-                return !isFolderCollapsed(folderId);
-            });
+            toggleBtn.disabled = presentation.searchExpanded;
+            toggleBtn.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
+            if (labelEl) {
+                labelEl.textContent = label;
+            }
+            if (icon) {
+                icon.classList.toggle('lucide-chevron-down', shouldExpand);
+                icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+            }
         }
     }
 
@@ -2196,19 +2208,15 @@
             backBtn.addEventListener('click', goBackToNotes);
         }
 
-        var expandAllFoldersBtn = document.getElementById('expandAllFoldersBtn');
-        if (expandAllFoldersBtn) {
-            expandAllFoldersBtn.addEventListener('click', function(event) {
-                expandAllFolders();
-                blurAfterPointerActivation(expandAllFoldersBtn, event);
-            });
-        }
-
-        var collapseAllFoldersBtn = document.getElementById('collapseAllFoldersBtn');
-        if (collapseAllFoldersBtn) {
-            collapseAllFoldersBtn.addEventListener('click', function(event) {
-                collapseAllFolders();
-                blurAfterPointerActivation(collapseAllFoldersBtn, event);
+        var toggleAllFoldersBtn = document.getElementById('toggleAllFoldersBtn');
+        if (toggleAllFoldersBtn) {
+            toggleAllFoldersBtn.addEventListener('click', function(event) {
+                if (shouldExpandAllFolders()) {
+                    expandAllFolders();
+                } else {
+                    collapseAllFolders();
+                }
+                blurAfterPointerActivation(toggleAllFoldersBtn, event);
             });
         }
 

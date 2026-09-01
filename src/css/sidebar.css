@@ -310,6 +310,13 @@
     opacity: 0.8;
 }
 
+/* Light separator between the Favorites section and the notes/folders below.
+   Only rendered by notes_list.php when the Favorites section is displayed. */
+.favorites-separator {
+    border-bottom: 1px solid var(--pz-border);
+    margin: 6px 4px 6px 0;
+}
+
 /* Favorite folder shortcuts inside the Favorites section */
 .favorite-folder-item .favorite-folder-icon {
     font-size: 0.95em;

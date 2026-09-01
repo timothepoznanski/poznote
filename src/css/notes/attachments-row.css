@@ -56,9 +56,11 @@
     line-height: 1.2;
     transition: border-color 0.2s, color 0.2s;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    flex-shrink: 0;
+    display: inline-block;
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
     padding: 4px 8px;
     border: 1px solid #e2e8f0;

@@ -544,7 +544,7 @@ try {
 
 $contentSourceId = $note_id;
 if (!empty($note['linked_note_id'])) {
-    $stmtOrig = $con->prepare('SELECT entry, type, attachments FROM entries WHERE id = ? AND trash = 0');
+    $stmtOrig = $con->prepare('SELECT entry, type, attachments, icon, icon_color FROM entries WHERE id = ? AND trash = 0');
     $stmtOrig->execute([$note['linked_note_id']]);
     $originalNote = $stmtOrig->fetch(PDO::FETCH_ASSOC);
     if ($originalNote) {
@@ -553,6 +553,11 @@ if (!empty($note['linked_note_id'])) {
         $note['attachments'] = $originalNote['attachments'];
         // type must match original so rendering logic is consistent
         $note['type'] = $originalNote['type'];
+        // A shortcut without its own icon inherits the original note's icon
+        if (empty($note['icon'])) {
+            $note['icon'] = $originalNote['icon'];
+            $note['icon_color'] = $originalNote['icon_color'];
+        }
     }
 }
 
@@ -665,11 +670,19 @@ $content = preg_replace_callback('#(src|href)=(["\']?)(/?data/(?:users/\d+/)?att
 }, $content);
 
 // Convert API attachment URLs to absolute URLs
-$content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attachments/[^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl, $isFolderShared, $folderToken, $token) {
+$content = preg_replace_callback('#(src|href)=(["\']?)(/?api/v1/notes/\d+/attachments/[^"\'\s>]+)(["\']?)#i', function($m) use ($baseUrl, $isFolderShared, $folderToken, $token, $note_id, $contentSourceId) {
     $attr = $m[1];
     $quote = $m[2] ?: '';
     $apiPath = $m[3];
-    
+
+    // For a shortcut, the content comes from the original note and its inline
+    // attachment URLs carry the original note's id, which the share token does
+    // not authorize. Readdress them through the shared (shortcut) note id; the
+    // API resolves the shortcut back to the original's attachments.
+    if ((int)$contentSourceId !== (int)$note_id) {
+        $apiPath = str_replace('/notes/' . (int)$contentSourceId . '/attachments/', '/notes/' . (int)$note_id . '/attachments/', $apiPath);
+    }
+
     // Ensure no duplicate slashes
     $url = rtrim($baseUrl, '/') . '/' . ltrim($apiPath, '/');
     

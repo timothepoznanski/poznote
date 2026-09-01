@@ -237,6 +237,11 @@ body.dark-mode #folder-favorites .note-title::before {
    Folders
    ============================================ */
 
+html[data-theme='dark'] .favorites-separator,
+body.dark-mode .favorites-separator {
+    border-bottom-color: var(--dm-border);
+}
+
 html[data-theme='dark'] .folder-header,
 body.dark-mode .folder-header {
     color: var(--dm-text);

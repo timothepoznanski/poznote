@@ -533,14 +533,17 @@ function renderFolderActionsMenu() {
  * @param string $folderName Containing folder name
  * @param bool $isFavorite Whether the note is marked as favorite
  * @param bool $isShared Whether the note is publicly shared
+ * @param string $reminderAt Current reminder timestamp ('' when none), shown
+ *                           by the menu's reminder modal
  * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isShared = false) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isShared = false, $reminderAt = '') {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
     $htmlFolderId = htmlspecialchars((string)$folderId, ENT_QUOTES);
     $htmlFolderName = htmlspecialchars((string)$folderName, ENT_QUOTES);
+    $htmlReminderAt = htmlspecialchars((string)$reminderAt, ENT_QUOTES);
 
     // No data-filename here, unlike the note toolbar: showExportModal() stores
     // that argument and never reads it, so emitting the on-disk path on every
@@ -552,6 +555,7 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
         . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName'"
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " data-shared='" . ($isShared ? '1' : '0') . "'"
+        . " data-reminder-at='$htmlReminderAt'"
         . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
         . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
@@ -586,6 +590,22 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<span>" . t_h('notes_list.note_actions.move_note', [], 'Move note') . "</span>";
     $menu .= "</div>";
 
+    // Duplicate note (same API call as the toolbar's duplicate button).
+    // note-real-only: hidden on shortcut rows by populateNoteActionsMenu,
+    // because cloneNote() copies type but not linked_note_id and would
+    // produce a broken shortcut.
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='duplicate-note'>";
+    $menu .= "<i class='lucide lucide-copy'></i>";
+    $menu .= "<span>" . t_h('common.duplicate', [], 'Duplicate') . "</span>";
+    $menu .= "</div>";
+
+    // Create a shortcut to this note: same flow as the + menu's Shortcut card,
+    // minus the note-picking step since the note is already known
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='create-note-shortcut'>";
+    $menu .= "<i class='lucide lucide-link'></i>";
+    $menu .= "<span>" . t_h('editor.toolbar.create_linked_note', [], 'Create shortcut') . "</span>";
+    $menu .= "</div>";
+
     // Archive note: moves it to the archive workspace, folder path included.
     // Pointless once the note is already there, so the entry is dropped when
     // that workspace is the one on screen.
@@ -600,6 +620,37 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item' data-action='show-export-modal'>";
     $menu .= "<i class='lucide lucide-download'></i>";
     $menu .= "<span>" . t_h('common.download', [], 'Download') . "</span>";
+    $menu .= "</div>";
+
+    // Print note (same window flow as the toolbar's print entry)
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='print-note'>";
+    $menu .= "<i class='lucide lucide-printer'></i>";
+    $menu .= "<span>" . t_h('common.print', [], 'Print') . "</span>";
+    $menu .= "</div>";
+
+    // Convert: one variant per source type, populateNoteActionsMenu shows the
+    // one matching the note's own type (HTML notes to Markdown and back)
+    $menu .= "<div class='note-actions-menu-item convert-state-markdown' data-action='show-convert-modal' data-convert-to='html'>";
+    $menu .= "<i class='lucide lucide-refresh-cw-alt'></i>";
+    $menu .= "<span>" . t_h('index.toolbar.convert_to_html', [], 'Convert to HTML') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item convert-state-note' data-action='show-convert-modal' data-convert-to='markdown'>";
+    $menu .= "<i class='lucide lucide-refresh-cw-alt'></i>";
+    $menu .= "<span>" . t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown') . "</span>";
+    $menu .= "</div>";
+
+    // Attachments page. Stays available on shortcut rows: the attachments
+    // API resolves a linked note to its target.
+    $menu .= "<div class='note-actions-menu-item' data-action='show-attachment-dialog'>";
+    $menu .= "<i class='lucide lucide-paperclip'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.attachments', [], 'Attachments') . "</span>";
+    $menu .= "</div>";
+
+    // Reminder modal; data-reminder-at is copied on open so an existing
+    // reminder shows up with its Remove button
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='open-reminder-modal'>";
+    $menu .= "<i class='lucide lucide-bell'></i>";
+    $menu .= "<span>" . t_h('reminder.toolbar_button', [], 'Set reminder') . "</span>";
     $menu .= "</div>";
 
     // Share: two variants, the client shows the one matching the note's state
@@ -632,6 +683,26 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item' data-action='open-note-icon-picker'>";
     $menu .= "<i class='lucide lucide-palette'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
+    $menu .= "</div>";
+
+    // Snapshots modal (loads by note id, works without opening the note)
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='show-snapshot'>";
+    $menu .= "<i class='lucide lucide-history'></i>";
+    $menu .= "<span>" . t_h('snapshot.menu_item', [], 'Snapshots') . "</span>";
+    $menu .= "</div>";
+
+    // Search and replace: only text note types have a search bar; when the
+    // note is not the loaded one, the click handler navigates to it with
+    // open_search=1 so the bar opens after the reload
+    $menu .= "<div class='note-actions-menu-item search-capable-only' data-action='open-search-replace-modal'>";
+    $menu .= "<i class='lucide lucide-search'></i>";
+    $menu .= "<span>" . t_h('editor.toolbar.search_replace', [], 'Search and replace') . "</span>";
+    $menu .= "</div>";
+
+    // Information page (info.php), like the toolbar's info button
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='show-note-info'>";
+    $menu .= "<i class='lucide lucide-info-circle'></i>";
+    $menu .= "<span>" . t_h('common.information', [], 'Information') . "</span>";
     $menu .= "</div>";
 
     // Delete note (moves to trash, like the toolbar's delete button)

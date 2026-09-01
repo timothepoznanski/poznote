@@ -1618,7 +1618,9 @@
       "share_note": "共享笔记",
       "rename_note": "重命名笔记",
       "delete_note": "删除笔记",
-      "enter_note_name": "请输入笔记标题"
+      "enter_note_name": "请输入笔记标题",
+      "attachments": "附件",
+      "convert_note": "转换笔记"
     }
   },
   "note_color": {

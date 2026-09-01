@@ -1625,7 +1625,9 @@
       "share_note": "Notiz teilen",
       "rename_note": "Notiz umbenennen",
       "delete_note": "Notiz löschen",
-      "enter_note_name": "Bitte geben Sie einen Notiztitel ein"
+      "enter_note_name": "Bitte geben Sie einen Notiztitel ein",
+      "attachments": "Anhänge",
+      "convert_note": "Notiz konvertieren"
     }
   },
   "note_color": {

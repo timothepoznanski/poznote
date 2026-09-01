@@ -538,7 +538,18 @@
                 break;
             case 'open-search-replace-modal':
                 if (noteId && typeof openSearchReplaceModal === 'function') {
-                    openSearchReplaceModal(noteId);
+                    if (document.getElementById('searchReplaceBar' + noteId)) {
+                        openSearchReplaceModal(noteId);
+                    } else {
+                        // Sidebar menu of a note that is not the loaded one:
+                        // open it with the search bar armed via open_search=1
+                        // (handled in search-replace.js on DOMContentLoaded)
+                        var wsForSearch = (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) ||
+                            (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
+                        var searchUrl = 'index.php?note=' + encodeURIComponent(noteId) + '&open_search=1';
+                        if (wsForSearch) searchUrl += '&workspace=' + encodeURIComponent(wsForSearch);
+                        window.location.href = searchUrl;
+                    }
                 }
                 break;
             case 'clear-completed-tasks':
@@ -673,6 +684,14 @@
                     const fId = target.dataset.folderId;
                     const fName = target.dataset.folder;
                     showMoveFolderDialog(noteId, fId, fName);
+                }
+                break;
+            case 'create-note-shortcut':
+                if (isPublicWorkspaceReadOnly()) {
+                    break;
+                }
+                if (noteId && typeof window.openLinkedNoteFolderSelectorModal === 'function') {
+                    window.openLinkedNoteFolderSelectorModal(noteId, target.dataset.noteTitle || '');
                 }
                 break;
             case 'archive-note':
