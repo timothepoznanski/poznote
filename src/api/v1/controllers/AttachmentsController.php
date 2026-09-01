@@ -429,19 +429,32 @@ class AttachmentsController {
         try {
             // Get attachment info
             if ($workspace) {
-                $query = "SELECT attachments FROM entries WHERE id = ? AND workspace = ?";
+                $query = "SELECT attachments, linked_note_id FROM entries WHERE id = ? AND workspace = ?";
                 $params = [$noteId, $workspace];
                 $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
                 $stmt->execute($params);
             } else {
-                $query = "SELECT attachments FROM entries WHERE id = ?";
+                $query = "SELECT attachments, linked_note_id FROM entries WHERE id = ?";
                 $params = [$noteId];
                 $this->appendPublicWorkspaceAgeFilter($query, $params);
                 $stmt = $this->con->prepare($query);
                 $stmt->execute($params);
             }
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // A shortcut note carries no attachments of its own: serve the
+            // original note's attachments through the shortcut's id. Access
+            // was authorized above against the requested (shortcut) note,
+            // which is the one the share actually exposes.
+            if ($result && !empty($result['linked_note_id'])) {
+                $stmtLinked = $this->con->prepare('SELECT attachments FROM entries WHERE id = ? AND trash = 0');
+                $stmtLinked->execute([(int)$result['linked_note_id']]);
+                $linkedResult = $stmtLinked->fetch(PDO::FETCH_ASSOC);
+                if ($linkedResult) {
+                    $result = $linkedResult;
+                }
+            }
             
             if ($result) {
                 $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
