@@ -158,7 +158,12 @@
       "label": "Data de vencimento",
       "overdue": "Atrasado"
     },
-    "card_size": "Tamanho dos cartões"
+    "card_size": "Tamanho dos cartões",
+    "sort": {
+      "label": "Ordenar por",
+      "date": "Data",
+      "tag": "Etiqueta"
+    }
   },
   "folders": {
     "delete": {
@@ -1777,7 +1782,8 @@
       "token_already_in_use": "Link personalizado já em uso",
       "no_token_generated": "Nenhum link gerado",
       "server_error": "Erro do servidor: {{error}}",
-      "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário."
+      "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário.",
+      "backups_s3_quota_reached": "Limite de backups S3 atingido: esta instância permite no máximo {{max}} MB de arquivos de backup para este usuário."
     }
   },
   "ui": {
@@ -1873,6 +1879,9 @@
     },
     "note_permissions": {
       "editable": "Permitir edição do texto"
+    },
+    "folder_permissions": {
+      "editable": "Permitir edição das notas"
     },
     "note": {
       "new_note": "Nova nota",
@@ -2272,6 +2281,17 @@
       "workspaces_close": "Fechar",
       "stage_downloading": "A obter o arquivo do bucket...",
       "queued_uploaded": "Envio concluído, a iniciar o restauro..."
+    },
+    "chunked_import": {
+      "queued": "A iniciar a importação...",
+      "queued_uploaded": "Envio concluído, a iniciar a importação...",
+      "stage_preparing": "A ler o arquivo...",
+      "stage_attachments": "A importar as imagens e anexos... ({{done}}/{{total}} ficheiros analisados)",
+      "stage_attachments_simple": "A importar as imagens e anexos...",
+      "stage_notes": "A importar as notas... ({{done}}/{{total}})",
+      "stage_notes_simple": "A importar as notas...",
+      "done": "Importação concluída com sucesso.",
+      "error": "A importação falhou: {{error}}"
     }
   },
   "markdown_guide": {
@@ -2999,6 +3019,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Espaços de trabalho sincronizados",
+      "all_label": "Todos os espaços de trabalho",
+      "all_desc": "Todos os espaços de trabalho são sincronizados, incluindo os criados mais tarde.",
+      "selected_label": "Apenas os espaços de trabalho selecionados",
+      "selected_desc": "Apenas as notas e anexos dos espaços marcados são enviados e recebidos. Um pull nunca toca nas notas de outros espaços, e um push remove-as do repositório.",
+      "save": "Guardar espaços",
+      "saved": "Espaços de trabalho sincronizados atualizados.",
+      "none_selected": "Selecione pelo menos um espaço de trabalho."
+    },
     "title": "Sincronização {{provider}}",
     "description": "Sincronize suas notas e anexos no GitHub ou Forgejo. Os arquivos são armazenados como arquivos simples com um metadata.json que preserva tags, pastas, datas e anexos.",
     "warning": "Não dependa desta funcionalidade como única solução de backup.\nExporte seus dados regularmente usando o recurso de backup nas Configurações.",
@@ -3984,6 +4014,17 @@
       "save_error": "Falha ao salvar a configuração.",
       "invalid_email": "O endereço de e-mail de contato não é válido.",
       "invalid_url": "A URL da comunidade não é válida."
+    }
+  },
+  "archive": {
+    "menu_item": "Arquivar a nota",
+    "confirm_title": "Arquivar a nota",
+    "confirm_message": "\"{{title}}\" será movida para a área de trabalho \"{{workspace}}\", mantendo o seu caminho de pastas. A área de trabalho é criada se ainda não existir.",
+    "confirm_button": "Arquivar",
+    "already_archived": "Esta nota já está na área de trabalho \"{{workspace}}\".",
+    "errors": {
+      "duplicate_title": "Já existe uma nota arquivada com o mesmo título nesta pasta.",
+      "archive_prefix": "Erro ao arquivar a nota: {{error}}"
     }
   }
 }

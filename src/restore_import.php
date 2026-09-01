@@ -584,6 +584,21 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                     <span class="restore-spinner-text"><?php echo t_h('restore_import.spinner.importing_notes', 'Importation des notes en cours...'); ?></span>
                 </div>
             </form>
+
+            <!-- Progress of a ZIP import running as a background job (the
+                 archive travels in slices, the worker reports its stages):
+                 one bar covering upload, assembly, attachments and notes. -->
+            <div id="notesImportProgress" class="chunked-restore-progress initially-hidden" role="status" aria-live="polite">
+                <div class="chunked-restore-bar-track" aria-hidden="true">
+                    <div class="chunked-restore-bar" id="notesImportBar"></div>
+                </div>
+                <div class="chunked-restore-status">
+                    <span class="restore-spinner-circle" aria-hidden="true"></span>
+                    <span id="notesImportStatusText"></span>
+                </div>
+            </div>
+            <div id="notesImportError" class="alert alert-danger chunked-restore-result initially-hidden"></div>
+            <div id="notesImportSuccess" class="alert alert-success chunked-restore-result initially-hidden"></div>
                 </div>
             </div>
         </div>
@@ -795,6 +810,15 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                 'error' => t('restore_import.chunked.error', [], 'The restore failed: {{error}}'),
                 'uploadError' => t('restore_import.chunked.upload_error', [], 'The upload failed: {{error}}'),
                 'chunkRetry' => t('restore_import.chunked.chunk_retry', [], 'A slice failed to upload, retrying...'),
+                'import_queued' => t('restore_import.chunked_import.queued', [], 'Import starting...'),
+                'import_queued_uploaded' => t('restore_import.chunked_import.queued_uploaded', [], 'Upload complete, import starting...'),
+                'import_stage_preparing' => t('restore_import.chunked_import.stage_preparing', [], 'Reading the archive...'),
+                'import_stage_attachments' => t('restore_import.chunked_import.stage_attachments', [], 'Importing the images and attachments... ({{done}}/{{total}} files scanned)'),
+                'import_stage_attachments_simple' => t('restore_import.chunked_import.stage_attachments_simple', [], 'Importing the images and attachments...'),
+                'import_stage_notes' => t('restore_import.chunked_import.stage_notes', [], 'Importing the notes... ({{done}}/{{total}})'),
+                'import_stage_notes_simple' => t('restore_import.chunked_import.stage_notes_simple', [], 'Importing the notes...'),
+                'import_done' => t('restore_import.chunked_import.done', [], 'Import completed successfully.'),
+                'import_error' => t('restore_import.chunked_import.error', [], 'The import failed: {{error}}'),
             ],
         ]);
     ?></script>

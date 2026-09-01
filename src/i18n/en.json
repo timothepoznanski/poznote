@@ -1314,7 +1314,8 @@
       "token_already_in_use": "Custom link already in use",
       "no_token_generated": "No link generated",
       "server_error": "Server error: {{error}}",
-      "storage_s3_quota_reached": "S3 storage limit reached: this instance allows at most {{max}} MB of S3 storage for this user."
+      "storage_s3_quota_reached": "S3 storage limit reached: this instance allows at most {{max}} MB of S3 storage for this user.",
+      "backups_s3_quota_reached": "S3 backups limit reached: this instance allows at most {{max}} MB of backup archives for this user."
     }
   },
   "ui": {
@@ -1406,6 +1407,9 @@
     },
     "note_permissions": {
       "editable": "Allow text editing"
+    },
+    "folder_permissions": {
+      "editable": "Allow note editing"
     },
     "note": {
       "new_note": "New note",
@@ -1922,6 +1926,17 @@
       "workspaces_close": "Close",
       "stage_downloading": "Fetching the archive from the bucket...",
       "queued_uploaded": "Upload complete, restore starting..."
+    },
+    "chunked_import": {
+      "queued": "Import starting...",
+      "queued_uploaded": "Upload complete, import starting...",
+      "stage_preparing": "Reading the archive...",
+      "stage_attachments": "Importing the images and attachments... ({{done}}/{{total}} files scanned)",
+      "stage_attachments_simple": "Importing the images and attachments...",
+      "stage_notes": "Importing the notes... ({{done}}/{{total}})",
+      "stage_notes_simple": "Importing the notes...",
+      "done": "Import completed successfully.",
+      "error": "The import failed: {{error}}"
     }
   },
   "markdown_guide": {
@@ -2150,7 +2165,12 @@
       "label": "Due date",
       "overdue": "Overdue"
     },
-    "card_size": "Card size"
+    "card_size": "Card size",
+    "sort": {
+      "label": "Sort by",
+      "date": "Date",
+      "tag": "Tag"
+    }
   },
   "sidebar": {
     "display": "Display",
@@ -2552,6 +2572,16 @@
     "default": "Default"
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Synced workspaces",
+      "all_label": "All workspaces",
+      "all_desc": "Every workspace is synced, including ones created later.",
+      "selected_label": "Selected workspaces only",
+      "selected_desc": "Only notes and attachments from the checked workspaces are pushed and pulled. Notes in other workspaces are never touched by a pull, and a push removes them from the repository.",
+      "save": "Save Workspaces",
+      "saved": "Synced workspaces updated.",
+      "none_selected": "Select at least one workspace to sync."
+    },
     "title": "{{provider}} Sync",
     "description": "Synchronize your notes and attachments to GitHub or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
     "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
@@ -3695,6 +3725,17 @@
       "save_error": "Failed to save configuration.",
       "invalid_email": "The contact email address is not valid.",
       "invalid_url": "The community URL is not valid."
+    }
+  },
+  "archive": {
+    "menu_item": "Archive note",
+    "confirm_title": "Archive note",
+    "confirm_message": "\"{{title}}\" will be moved to the \"{{workspace}}\" workspace, keeping its folder path. The workspace is created if it does not exist yet.",
+    "confirm_button": "Archive",
+    "already_archived": "This note is already in the \"{{workspace}}\" workspace.",
+    "errors": {
+      "duplicate_title": "A note with the same title is already archived in this folder.",
+      "archive_prefix": "Error archiving the note: {{error}}"
     }
   }
 }

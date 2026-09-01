@@ -23,6 +23,12 @@ class GitSync {
     private $progressStateFile = null;
 
     /**
+     * Cached synced-workspaces setting.
+     * false = not loaded yet, null = all workspaces, array = restricted list
+     */
+    private $syncedWorkspacesCache = false;
+
+    /**
      * Get the configured git provider (github, forgejo, etc.)
      */
     public function getProvider(): string {
@@ -314,6 +320,7 @@ class GitSync {
             'apiBase' => $this->apiBase,
             'autoPush' => $this->isAutoPushEnabled(),
             'autoPull' => $this->isAutoPullEnabled(),
+            'syncedWorkspaces' => $this->getSyncedWorkspaces(),
             'hasUserConfig' => $this->hasUserConfig()
         ];
     }
@@ -425,6 +432,97 @@ class GitSync {
     }
     
     /**
+     * Get the workspaces included in Git sync.
+     * @return array|null Workspace names, or null when every workspace is synced
+     */
+    public function getSyncedWorkspaces() {
+        if ($this->syncedWorkspacesCache !== false) return $this->syncedWorkspacesCache;
+
+        $this->syncedWorkspacesCache = null;
+        if (!$this->con) return null;
+        try {
+            $stmt = $this->con->prepare("SELECT value FROM settings WHERE key = 'git_sync_workspaces'");
+            $stmt->execute();
+            $val = $stmt->fetchColumn();
+            if ($val === false || $val === null || $val === '') return null;
+
+            $list = json_decode($val, true);
+            if (!is_array($list)) return null;
+            $names = [];
+            foreach ($list as $ws) {
+                $ws = trim((string) $ws);
+                if ($ws !== '') $names[$ws] = true;
+            }
+            if (!empty($names)) {
+                // PHP turns numeric-string array keys into ints; force strings
+                // back so the strict in_array() in isWorkspaceSynced() matches
+                // a workspace named e.g. "2024".
+                $this->syncedWorkspacesCache = array_map('strval', array_keys($names));
+            }
+        } catch (Exception $e) {
+            // Fall through to "all workspaces"
+        }
+        return $this->syncedWorkspacesCache;
+    }
+
+    /**
+     * Restrict Git sync to the given workspaces.
+     * @param array|null $workspaces Workspace names; null or an empty list = sync all
+     * @return bool Success
+     */
+    public function setSyncedWorkspaces($workspaces) {
+        if (!$this->con) return false;
+        try {
+            $names = [];
+            if (is_array($workspaces)) {
+                foreach ($workspaces as $ws) {
+                    $ws = trim((string) $ws);
+                    if ($ws !== '') $names[$ws] = true;
+                }
+            }
+            $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('git_sync_workspaces', ?)");
+            $ok = $stmt->execute([empty($names) ? '' : json_encode(array_map('strval', array_keys($names)), JSON_UNESCAPED_UNICODE)]);
+            $this->syncedWorkspacesCache = false;
+            return $ok;
+        } catch (Exception $e) {
+            error_log('GitSync::setSyncedWorkspaces error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check whether a workspace is included in Git sync.
+     * @param string|null $workspace Workspace name (null = default workspace)
+     * @return bool
+     */
+    public function isWorkspaceSynced($workspace) {
+        $list = $this->getSyncedWorkspaces();
+        if ($list === null) return true;
+        $workspace = ($workspace === null || $workspace === '') ? 'Poznote' : (string) $workspace;
+        return in_array($workspace, $list, true);
+    }
+
+    /**
+     * Check whether a note's workspace is included in Git sync.
+     * Unknown notes are treated as synced so a bad lookup never blocks a push.
+     * @param int $noteId
+     * @return bool
+     */
+    private function isNoteWorkspaceSynced($noteId) {
+        if ($this->getSyncedWorkspaces() === null) return true;
+        if (!$this->con) return true;
+        try {
+            $stmt = $this->con->prepare('SELECT workspace FROM entries WHERE id = ?');
+            $stmt->execute([$noteId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$row) return true;
+            return $this->isWorkspaceSynced($row['workspace']);
+        } catch (Exception $e) {
+            return true;
+        }
+    }
+
+    /**
      * Enable or disable automatic push
      * @param bool $enabled
      */
@@ -474,7 +572,11 @@ class GitSync {
             if (!$note) {
                 return ['success' => false, 'error' => 'Note not found or in trash'];
             }
-            
+
+            if (!$this->isWorkspaceSynced($note['workspace'])) {
+                return ['success' => true, 'skipped' => true, 'reason' => 'workspace_not_synced'];
+            }
+
             require_once __DIR__ . '/functions.php';
             $entriesPath = getEntriesPath();
             $attachmentsPath = getAttachmentsPath();
@@ -532,6 +634,7 @@ class GitSync {
      */
     public function deleteNoteInGit($noteId, $folderId, $workspace, $type, $heading = '') {
         if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
+        if (!$this->isWorkspaceSynced($workspace)) return ['success' => true, 'skipped' => true, 'reason' => 'workspace_not_synced'];
 
         try {
             $localExtension = ($type === 'markdown') ? 'md' : 'html';
@@ -560,9 +663,10 @@ class GitSync {
         return AttachmentStorage::isEnabled();
     }
 
-    public function pushAttachment($filename, $message = '') {
+    public function pushAttachment($filename, $message = '', $noteId = null) {
         if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
         if ($this->attachmentsInS3()) return ['success' => true, 'skipped' => true, 'reason' => 's3_storage'];
+        if ($noteId !== null && !$this->isNoteWorkspaceSynced($noteId)) return ['success' => true, 'skipped' => true, 'reason' => 'workspace_not_synced'];
         try {
             require_once __DIR__ . '/functions.php';
             $attachmentsPath = getAttachmentsPath();
@@ -581,9 +685,10 @@ class GitSync {
      * @param string $message Commit message
      * @return array Result
      */
-    public function deleteAttachmentInGit($filename, $message = '') {
+    public function deleteAttachmentInGit($filename, $message = '', $noteId = null) {
         if (!$this->isConfigured()) return ['success' => false, 'error' => 'not_configured'];
         if ($this->attachmentsInS3()) return ['success' => true, 'skipped' => true, 'reason' => 's3_storage'];
+        if ($noteId !== null && !$this->isNoteWorkspaceSynced($noteId)) return ['success' => true, 'skipped' => true, 'reason' => 'workspace_not_synced'];
         try {
             return $this->deleteFile('attachments/' . $filename, $message ?: "Deleted attachment: {$filename}");
         } catch (Exception $e) {
@@ -661,6 +766,36 @@ class GitSync {
             $skipAttachments = $this->attachmentsInS3();
             if ($skipAttachments) $attachmentFiles = [];
 
+            // Per-workspace scope: only files belonging to synced workspaces are
+            // pushed. Out-of-scope files already in the repo become orphans below
+            // and get pruned, so the repo always mirrors the synced set exactly.
+            $syncedWorkspaces = $this->getSyncedWorkspaces();
+            if ($syncedWorkspaces !== null) {
+                $placeholders = implode(',', array_fill(0, count($syncedWorkspaces), '?'));
+                $stmt = $this->con->prepare("SELECT id, attachments FROM entries WHERE COALESCE(workspace, 'Poznote') IN ($placeholders)");
+                $stmt->execute($syncedWorkspaces);
+                $syncedNoteIds = [];
+                $syncedAttachmentNames = [];
+                foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                    $syncedNoteIds[(int) $row['id']] = true;
+                    if (!empty($row['attachments'])) {
+                        $atts = json_decode($row['attachments'], true);
+                        if (is_array($atts)) {
+                            foreach ($atts as $att) {
+                                if (!empty($att['filename'])) $syncedAttachmentNames[$att['filename']] = true;
+                            }
+                        }
+                    }
+                }
+                $entryFiles = array_values(array_filter($entryFiles, function ($f) use ($syncedNoteIds) {
+                    return isset($syncedNoteIds[(int) pathinfo($f, PATHINFO_FILENAME)]);
+                }));
+                $attachmentFiles = array_values(array_filter($attachmentFiles, function ($f) use ($syncedAttachmentNames) {
+                    return isset($syncedAttachmentNames[$f]);
+                }));
+                $results['debug'][] = 'Workspace scope: ' . implode(', ', $syncedWorkspaces);
+            }
+
             $expectedPathSet = ['metadata.json' => true];
             foreach ($entryFiles as $filename) {
                 $expectedPathSet['entries/' . $filename] = true;
@@ -681,7 +816,15 @@ class GitSync {
                 // are unaffected and keep pruning normally.
                 if (strpos($remotePath, 'attachments/') === 0
                     && ($skipAttachments || AttachmentStorage::isConfigured())) {
-                    continue;
+                    // Workspace scope overrides the bucket protection: an
+                    // attachment that belongs to no synced note must not stay
+                    // in the repo. Bucket-served attachments of synced notes
+                    // are still kept ($syncedAttachmentNames comes from the
+                    // DB, which lists them whether they are on disk or not).
+                    if ($syncedWorkspaces === null
+                        || isset($syncedAttachmentNames[substr($remotePath, strlen('attachments/'))])) {
+                        continue;
+                    }
                 }
                 if (!isset($expectedPathSet[$remotePath])) {
                     $orphanPaths[$remotePath] = $_sha;
@@ -885,13 +1028,12 @@ class GitSync {
                 }
             }
 
-            $totalSteps  = count($noteFiles) + count($attachmentFiles) + 5;
-            $currentStep = 0;
-            $this->updateProgress(0, $totalSteps, 'Starting pull...');
+            $this->updateProgress(0, 1, 'Starting pull...');
 
             // ── 2b. Download metadata.json ──
-            $metadata      = [];   // note metadata keyed by note id
-            $foldersSource = [];   // folder list to recreate
+            $metadata         = [];   // note metadata keyed by note id
+            $foldersSource    = [];   // folder list to recreate
+            $remoteWorkspaces = null; // workspaces the remote knows about (null = no metadata)
             if ($hasMetadata) {
                 $raw = $this->getFileContent('metadata.json');
                 if (!isset($raw['error'])) {
@@ -905,17 +1047,30 @@ class GitSync {
                             $metadata = $parsed; // legacy flat format
                         }
                         $results['debug'][] = 'Loaded metadata.json (' . count($metadata) . ' notes, ' . count($foldersSource) . ' folders)';
-                        
-                        // Ensure workspaces listed in metadata exist
-                        $uniqueWorkspaces = [];
-                        foreach ($metadata as $meta) {
-                            if (!empty($meta['workspace'])) {
-                                $uniqueWorkspaces[$meta['workspace']] = true;
+
+                        // Workspaces the remote is authoritative for: the explicit
+                        // list written by newer pushes, plus everything derived
+                        // from note/folder metadata (covers older repos).
+                        $remoteWorkspaces = [];
+                        if (isset($parsed['workspaces']) && is_array($parsed['workspaces'])) {
+                            foreach ($parsed['workspaces'] as $ws) {
+                                if (is_string($ws) && $ws !== '') $remoteWorkspaces[$ws] = true;
                             }
                         }
+                        foreach ($metadata as $meta) {
+                            $ws = (isset($meta['workspace']) && $meta['workspace'] !== '') ? $meta['workspace'] : 'Poznote';
+                            $remoteWorkspaces[$ws] = true;
+                        }
                         foreach ($foldersSource as $folder) {
-                            if (!empty($folder['workspace'])) {
-                                $uniqueWorkspaces[$folder['workspace']] = true;
+                            $ws = (isset($folder['workspace']) && $folder['workspace'] !== '') ? $folder['workspace'] : 'Poznote';
+                            $remoteWorkspaces[$ws] = true;
+                        }
+
+                        // Ensure workspaces listed in metadata exist (synced ones only)
+                        $uniqueWorkspaces = [];
+                        foreach (array_keys($remoteWorkspaces) as $ws) {
+                            if ($this->isWorkspaceSynced($ws)) {
+                                $uniqueWorkspaces[$ws] = true;
                             }
                         }
                         if (!empty($uniqueWorkspaces)) {
@@ -931,6 +1086,52 @@ class GitSync {
                     }
                 }
             }
+
+            // ── 2b2. Restrict the pull to synced workspaces ──
+            $syncedWorkspaces = $this->getSyncedWorkspaces();
+            if ($syncedWorkspaces !== null) {
+                $results['debug'][] = 'Workspace scope: ' . implode(', ', $syncedWorkspaces);
+
+                $keptNoteFiles = [];
+                foreach ($noteFiles as $path) {
+                    $noteKey   = (string) (int) pathinfo(basename($path), PATHINFO_FILENAME);
+                    $workspace = $metadata[$noteKey]['workspace'] ?? 'Poznote';
+                    if ($this->isWorkspaceSynced($workspace)) {
+                        $keptNoteFiles[] = $path;
+                    } else {
+                        $results['debug'][] = "  Skipped {$path}: workspace '{$workspace}' is not synced";
+                    }
+                }
+                $noteFiles = $keptNoteFiles;
+
+                // Attachments belong to notes: keep only the ones referenced by a synced note
+                if ($hasMetadata) {
+                    $allowedAttachmentNames = [];
+                    foreach ($metadata as $meta) {
+                        if (!$this->isWorkspaceSynced($meta['workspace'] ?? 'Poznote')) continue;
+                        $atts = $meta['attachments'] ?? null;
+                        if (is_string($atts)) $atts = json_decode($atts, true);
+                        if (!is_array($atts)) continue;
+                        foreach ($atts as $att) {
+                            if (!empty($att['filename'])) $allowedAttachmentNames[$att['filename']] = true;
+                        }
+                    }
+                    $attachmentFiles = array_values(array_filter($attachmentFiles, function ($path) use ($allowedAttachmentNames) {
+                        return isset($allowedAttachmentNames[basename($path)]);
+                    }));
+                } elseif (!$this->isWorkspaceSynced('Poznote')) {
+                    // No metadata: the whole repo counts as the default workspace
+                    $attachmentFiles = [];
+                }
+
+                // Only recreate folders that belong to synced workspaces
+                $foldersSource = array_values(array_filter($foldersSource, function ($folder) {
+                    return $this->isWorkspaceSynced($folder['workspace'] ?? 'Poznote');
+                }));
+            }
+
+            $totalSteps  = count($noteFiles) + count($attachmentFiles) + 5;
+            $currentStep = 0;
 
             // ── 2c. Recreate folders (parents before children) ──
             if (!empty($foldersSource)) {
@@ -1186,9 +1387,30 @@ class GitSync {
             }
 
             // ── 5. Trash local notes not on remote ──
+            // A pull may only trash notes in workspaces the remote is
+            // authoritative for: workspaces that are both synced AND known to
+            // the remote metadata. Notes in workspaces excluded from Git sync,
+            // or never pushed (e.g. freshly created or freshly added to the
+            // sync scope), must never be trashed by a pull.
             $this->updateProgress($currentStep, $totalSteps, 'Cleaning up local notes...');
             try {
-                $localIds = $this->con->query('SELECT id FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_COLUMN);
+                $cleanupWorkspaces = $syncedWorkspaces; // null = no restriction
+                if ($remoteWorkspaces !== null) {
+                    $remoteNames = array_keys($remoteWorkspaces);
+                    $cleanupWorkspaces = ($syncedWorkspaces === null)
+                        ? $remoteNames
+                        : array_values(array_intersect($syncedWorkspaces, $remoteNames));
+                }
+                if ($cleanupWorkspaces === null) {
+                    $localIds = $this->con->query('SELECT id FROM entries WHERE trash = 0')->fetchAll(PDO::FETCH_COLUMN);
+                } elseif (empty($cleanupWorkspaces)) {
+                    $localIds = [];
+                } else {
+                    $placeholders = implode(',', array_fill(0, count($cleanupWorkspaces), '?'));
+                    $localStmt = $this->con->prepare("SELECT id FROM entries WHERE trash = 0 AND COALESCE(workspace, 'Poznote') IN ($placeholders)");
+                    $localStmt->execute($cleanupWorkspaces);
+                    $localIds = $localStmt->fetchAll(PDO::FETCH_COLUMN);
+                }
                 $pulledNoteSet = array_fill_keys(array_map('intval', $pulledNoteIds), true);
                 $toTrash = [];
                 foreach ($localIds as $localId) {
@@ -1509,10 +1731,23 @@ class GitSync {
     private function buildMetadata() {
         if (!$this->con) return [];
 
+        // Per-workspace scope: metadata must not leak headings/tags/folders of
+        // workspaces excluded from sync.
+        $syncedWorkspaces = $this->getSyncedWorkspaces();
+        $workspaceFilter  = '';
+        $workspaceParams  = [];
+        if ($syncedWorkspaces !== null) {
+            $placeholders    = implode(',', array_fill(0, count($syncedWorkspaces), '?'));
+            $workspaceFilter = "COALESCE(workspace, 'Poznote') IN ($placeholders)";
+            $workspaceParams = $syncedWorkspaces;
+        }
+
         // Notes
-        $stmt  = $this->con->query(
+        $stmt = $this->con->prepare(
             'SELECT id, heading, tags, folder_id, folder, workspace, type, attachments, favorite, created, updated, icon, icon_color, color FROM entries WHERE trash = 0'
+            . ($workspaceFilter !== '' ? " AND $workspaceFilter" : '')
         );
+        $stmt->execute($workspaceParams);
         $notes = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $notes[(string) $row['id']] = [
@@ -1533,9 +1768,12 @@ class GitSync {
         }
 
         // Folders (full list so the hierarchy can be restored)
-        $fstmt   = $this->con->query(
-            'SELECT id, name, workspace, parent_id, icon, icon_color, display_order FROM folders ORDER BY id'
+        $fstmt = $this->con->prepare(
+            'SELECT id, name, workspace, parent_id, icon, icon_color, display_order FROM folders'
+            . ($workspaceFilter !== '' ? " WHERE $workspaceFilter" : '')
+            . ' ORDER BY id'
         );
+        $fstmt->execute($workspaceParams);
         $folders = [];
         foreach ($fstmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $folders[] = [
@@ -1549,7 +1787,19 @@ class GitSync {
             ];
         }
 
-        return ['notes' => $notes, 'folders' => $folders];
+        // Workspace names (scoped) so a pull can tell which workspaces the
+        // repo is authoritative for, even ones holding no notes or folders
+        $wsql    = 'SELECT name FROM workspaces';
+        $wparams = [];
+        if ($syncedWorkspaces !== null) {
+            $wsql   .= ' WHERE name IN (' . implode(',', array_fill(0, count($syncedWorkspaces), '?')) . ')';
+            $wparams = $syncedWorkspaces;
+        }
+        $wstmt = $this->con->prepare($wsql . ' ORDER BY name');
+        $wstmt->execute($wparams);
+        $workspaces = $wstmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return ['notes' => $notes, 'folders' => $folders, 'workspaces' => $workspaces];
     }
 
     /**

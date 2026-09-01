@@ -20,6 +20,14 @@ declare(strict_types=1);
  *                  then runs the same restoreCompleteBackup() pipeline as
  *                  the synchronous flows, with the job owner as the session
  *                  user so every path helper resolves to their data.
+ *
+ * notes_import     Concatenates the uploaded chunks into the notes zip,
+ *                  then runs the same importIndividualNotesZip() pipeline
+ *                  as the synchronous individual-notes import.
+ *
+ * s3_backup        Builds the target user's complete backup zip and uploads
+ *                  it to the backup bucket (S3BackupService::backupUser),
+ *                  for the manual runs triggered from the settings pages.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -70,6 +78,12 @@ try {
         case POZNOTE_JOB_TYPE_RESTORE:
             runChunkedRestoreJob($userId, $jobId, $payload);
             break;
+        case POZNOTE_JOB_TYPE_NOTES_IMPORT:
+            runNotesImportJob($userId, $jobId, $payload);
+            break;
+        case POZNOTE_JOB_TYPE_S3_BACKUP:
+            runS3BackupJob($userId, $jobId, $payload);
+            break;
         default:
             throw new RuntimeException('Unknown job type');
     }
@@ -83,6 +97,31 @@ try {
 }
 
 exit(0);
+
+/**
+ * Route poznoteRestoreReportProgress() milestones from the running pipeline
+ * into the polled job state, throttled so a per-file stage does not rewrite
+ * job.json thousands of times.
+ */
+function poznoteJobInstallProgressHook(int $userId, string $jobId): void {
+    $lastStage = '';
+    $lastWrite = 0.0;
+    $GLOBALS['poznote_restore_progress_hook'] = function (string $stage, ?int $done, ?int $total) use ($userId, $jobId, &$lastStage, &$lastWrite) {
+        $now = microtime(true);
+        $stageChanged = $stage !== $lastStage;
+        $stageFinished = $done !== null && $total !== null && $done >= $total;
+        if (!$stageChanged && !$stageFinished && $now - $lastWrite < 0.4) {
+            return;
+        }
+        $lastStage = $stage;
+        $lastWrite = $now;
+        poznoteJobUpdate($userId, $jobId, [
+            'stage' => $stage,
+            'stage_done' => $done,
+            'stage_total' => $total,
+        ]);
+    };
+}
 
 /**
  * Build the complete backup zip and park it in the job directory.
@@ -160,6 +199,18 @@ function runChunkedRestoreJob(int $userId, string $jobId, array $payload): void 
         return;
     }
 
+    assembleUploadedChunks($userId, $jobId, $zipPath, $totalChunks, $totalSize);
+
+    runRestoreOfArchive($userId, $jobId, $zipPath, $originalName);
+}
+
+/**
+ * Concatenate a job's uploaded chunks, in order, into one archive at
+ * $zipPath, reporting assembly progress into the job state.
+ */
+function assembleUploadedChunks(int $userId, string $jobId, string $zipPath, int $totalChunks, int $totalSize): void {
+    $dir = poznoteJobDir($userId, $jobId);
+
     poznoteJobUpdate($userId, $jobId, [
         'phase' => 'assembling',
         'stage' => 'assembling',
@@ -219,8 +270,123 @@ function runChunkedRestoreJob(int $userId, string $jobId, array $payload): void 
             $totalSize
         ));
     }
+}
 
-    runRestoreOfArchive($userId, $jobId, $zipPath, $originalName);
+/**
+ * Assemble the uploaded chunks, then import the resulting notes ZIP into
+ * the job owner's account, exactly like the synchronous individual-notes
+ * import does with a directly uploaded archive.
+ */
+function runNotesImportJob(int $userId, string $jobId, array $payload): void {
+    $dir = poznoteJobDir($userId, $jobId);
+    $zipPath = $dir . '/notes_import.zip';
+    $totalChunks = (int)($payload['total_chunks'] ?? 0);
+    $totalSize = (int)($payload['total_size'] ?? 0);
+    $originalName = (string)($payload['original_name'] ?? 'notes.zip');
+    $workspace = (string)($payload['target_workspace'] ?? '');
+    $folder = (string)($payload['target_folder'] ?? '');
+
+    assembleUploadedChunks($userId, $jobId, $zipPath, $totalChunks, $totalSize);
+
+    poznoteJobUpdate($userId, $jobId, [
+        'phase' => 'importing',
+        'stage' => 'preparing',
+        'stage_done' => null,
+        'stage_total' => null,
+    ]);
+
+    // Every helper in the import pipeline (paths, per-user database,
+    // attachment storage) resolves the target account through the session
+    // user id, exactly like the synchronous web flow.
+    $_SESSION['user_id'] = $userId;
+
+    require_once __DIR__ . '/../functions.php';
+    require_once __DIR__ . '/../users/db_master.php';
+    require_once __DIR__ . '/../users/UserDataManager.php';
+    require_once __DIR__ . '/../storage/AttachmentStorage.php';
+    require_once __DIR__ . '/../db_connect.php';
+    require_once __DIR__ . '/../import_helpers.php';
+
+    // The import pipeline enforces the user quotas, and the admin exemption
+    // resolves through getAuthenticatedUser() ($_SESSION['login_user']): give
+    // this CLI process the same identity a web session of the job owner would
+    // have, or an admin's background import would wrongly be quota-limited.
+    $ownerProfile = getUserProfileById($userId);
+    if ($ownerProfile !== null) {
+        $_SESSION['login_user_id'] = $userId;
+        $_SESSION['login_user'] = $ownerProfile;
+    }
+
+    // db_connect.php was included inside this function, so its $con is a
+    // local variable here; the import helpers reach it via `global $con`.
+    $GLOBALS['con'] = $con;
+
+    // Surface the import pipeline's milestones into the polled job state
+    // (same hook as the restore pipeline)
+    poznoteJobInstallProgressHook($userId, $jobId);
+
+    $result = importIndividualNotesZip(
+        ['tmp_name' => $zipPath, 'name' => $originalName],
+        $workspace !== '' ? $workspace : null,
+        $folder !== '' ? $folder : null,
+        true
+    );
+    unset($GLOBALS['poznote_restore_progress_hook']);
+    @unlink($zipPath);
+
+    if (empty($result['success'])) {
+        throw new RuntimeException((string)($result['error'] ?? 'Import failed'));
+    }
+
+    poznoteJobUpdate($userId, $jobId, [
+        'status' => 'done',
+        'phase' => '',
+        'message' => (string)($result['message'] ?? ''),
+        'finished_at' => time(),
+    ]);
+}
+
+/**
+ * Build the target user's backup zip and upload it to the backup bucket.
+ *
+ * Runs the same S3BackupService::backupUser() as the synchronous flows did:
+ * for a large account the build plus the bucket upload takes far longer than
+ * a proxied HTTP request may live, which showed the user an error while the
+ * backup silently completed server-side. The admin check happened when the
+ * job was created; here the payload is trusted (job files are only writable
+ * by the server itself).
+ */
+function runS3BackupJob(int $userId, string $jobId, array $payload): void {
+    require_once __DIR__ . '/../functions.php';
+    require_once __DIR__ . '/../users/db_master.php';
+    require_once __DIR__ . '/../users/UserDataManager.php';
+    require_once __DIR__ . '/../storage/AttachmentStorage.php';
+    require_once __DIR__ . '/../S3BackupService.php';
+
+    $targetUserId = (int)($payload['target_user_id'] ?? $userId);
+
+    poznoteJobUpdate($userId, $jobId, ['phase' => 'building', 'stage' => 'building']);
+    poznoteJobInstallProgressHook($userId, $jobId);
+
+    $result = S3BackupService::backupUser($targetUserId);
+    unset($GLOBALS['poznote_restore_progress_hook']);
+
+    if (empty($result['success'])) {
+        throw new RuntimeException((string)($result['error'] ?? 'Backup failed'));
+    }
+
+    $job = poznoteJobRead($userId, $jobId);
+    $jobPayload = is_array($job['payload'] ?? null) ? $job['payload'] : [];
+    $jobPayload['filename'] = basename((string)($result['key'] ?? ''));
+    $jobPayload['size'] = (int)($result['size'] ?? 0);
+    poznoteJobUpdate($userId, $jobId, [
+        'status' => 'done',
+        'phase' => '',
+        // A failed prune does not fail the backup; surface it as a note
+        'message' => (string)($result['error'] ?? ''),
+        'finished_at' => time(),
+        'payload' => $jobPayload,
+    ]);
 }
 
 /**
@@ -248,25 +414,8 @@ function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string
     require_once __DIR__ . '/../db_connect.php';
 
     // Surface the restore pipeline's milestones (see
-    // poznoteRestoreReportProgress) into the polled job state, throttled so
-    // a per-file stage does not rewrite job.json thousands of times.
-    $progressLastStage = '';
-    $progressLastWrite = 0.0;
-    $GLOBALS['poznote_restore_progress_hook'] = function (string $stage, ?int $done, ?int $total) use ($userId, $jobId, &$progressLastStage, &$progressLastWrite) {
-        $now = microtime(true);
-        $stageChanged = $stage !== $progressLastStage;
-        $stageFinished = $done !== null && $total !== null && $done >= $total;
-        if (!$stageChanged && !$stageFinished && $now - $progressLastWrite < 0.4) {
-            return;
-        }
-        $progressLastStage = $stage;
-        $progressLastWrite = $now;
-        poznoteJobUpdate($userId, $jobId, [
-            'stage' => $stage,
-            'stage_done' => $done,
-            'stage_total' => $total,
-        ]);
-    };
+    // poznoteRestoreReportProgress) into the polled job state
+    poznoteJobInstallProgressHook($userId, $jobId);
 
     $result = restoreCompleteBackup(['tmp_name' => $zipPath, 'name' => $originalName], true);
     unset($GLOBALS['poznote_restore_progress_hook']);

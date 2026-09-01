@@ -3169,6 +3169,17 @@ function resolveTasklistStoredContent($primaryContent, $fallbackContent = '') {
 }
 
 /**
+ * Workspace the "Archive note" action files notes into, created on first use.
+ *
+ * Deliberately not translated: the name is stored in the database, so a
+ * language change must not strand already archived notes in a workspace the
+ * action no longer points at.
+ */
+if (!defined('POZNOTE_ARCHIVE_WORKSPACE')) {
+    define('POZNOTE_ARCHIVE_WORKSPACE', 'Archives');
+}
+
+/**
  * Get the first available workspace name from the database
  * Used as fallback when no specific workspace is selected
  * 

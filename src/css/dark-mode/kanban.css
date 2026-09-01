@@ -74,6 +74,19 @@ body.dark-mode .kanban-size-toggle:hover {
     color: #fff;
 }
 
+html[data-theme='dark'] .kanban-sort-toggle,
+body.dark-mode .kanban-sort-toggle {
+    background: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-sort-toggle:hover,
+body.dark-mode .kanban-sort-toggle:hover {
+    background: var(--dm-border);
+    color: #fff;
+}
+
 /* Kanban Cards */
 html[data-theme='dark'] .kanban-card,
 body.dark-mode .kanban-card {

@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 30; // 30: entries.trashed_at column (trash sorting by deletion date)
+    $CURRENT_SCHEMA_VERSION = 31; // 31: shared_folders.access_mode column (public folder edit sharing)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -297,6 +297,7 @@ try {
             indexable INTEGER DEFAULT 0,
             password TEXT,
             password_encrypted TEXT,
+            access_mode TEXT DEFAULT "read_only",
             FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
         )');
 
@@ -453,6 +454,10 @@ try {
             }
             if (!in_array('password_encrypted', $existingColumns)) {
                 $con->exec("ALTER TABLE shared_folders ADD COLUMN password_encrypted TEXT");
+            }
+            if (!in_array('access_mode', $existingColumns)) {
+                // Existing folder shares must stay read-only: editing is opt-in.
+                $con->exec("ALTER TABLE shared_folders ADD COLUMN access_mode TEXT DEFAULT 'read_only'");
             }
         } catch (Exception $e) {
             error_log('Could not add missing columns to shared_folders: ' . $e->getMessage());

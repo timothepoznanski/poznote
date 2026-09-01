@@ -700,6 +700,41 @@ $allBackupUsers = listAllUserProfiles();
                     });
                 }
 
+                // Each user's backup runs as a background job (building and
+                // uploading a large account takes longer than a proxied
+                // request may live): queue it, poll its state until it ends,
+                // then move on to the next user.
+                function recordResult(user, job) {
+                    if (job && job.status === 'done') {
+                        uploaded++;
+                        logEl.textContent += i18n.userOk
+                            .replace('{{username}}', user.username)
+                            .replace('{{size}}', formatBytes(job.size || 0)) + '\n';
+                    } else {
+                        var error = (job && job.error) || 'unknown';
+                        errors.push(user.username + ': ' + error);
+                        logEl.textContent += i18n.userFail
+                            .replace('{{username}}', user.username)
+                            .replace('{{error}}', error) + '\n';
+                    }
+                    index++;
+                    step();
+                }
+
+                function pollUserJob(user, jobId) {
+                    var timer = setInterval(function() {
+                        fetch('api_s3_backup.php?action=run_status&job_id=' + encodeURIComponent(jobId), { credentials: 'same-origin' })
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                var job = data.success ? data.job : null;
+                                if (job && (job.status === 'queued' || job.status === 'running')) return;
+                                clearInterval(timer);
+                                recordResult(user, job);
+                            })
+                            .catch(function() { /* transient network error: keep polling */ });
+                    }, 3000);
+                }
+
                 function step() {
                     if (index >= users.length) {
                         finish();
@@ -721,19 +756,11 @@ $allBackupUsers = listAllUserProfiles();
                     })
                     .then(function(r) { return r.json(); })
                     .then(function(result) {
-                        if (result.success) {
-                            uploaded++;
-                            logEl.textContent += i18n.userOk
-                                .replace('{{username}}', user.username)
-                                .replace('{{size}}', formatBytes(result.size)) + '\n';
-                        } else {
-                            errors.push(user.username + ': ' + (result.error || 'unknown'));
-                            logEl.textContent += i18n.userFail
-                                .replace('{{username}}', user.username)
-                                .replace('{{error}}', result.error || 'unknown') + '\n';
+                        if (!result.success) {
+                            recordResult(user, { status: 'error', error: result.error });
+                            return;
                         }
-                        index++;
-                        step();
+                        pollUserJob(user, result.job_id);
                     })
                     .catch(function(e) {
                         statusEl.textContent = i18n.runError.replace('{{error}}', e.message);

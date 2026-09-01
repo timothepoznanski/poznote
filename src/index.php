@@ -103,6 +103,17 @@ $search_combined = $search_request['search_combined'];
 // Display workspace name (simplified logic)
 $displayWorkspace = htmlspecialchars($workspace_filter, ENT_QUOTES);
 
+// Git actions (rail Push/Pull buttons, auto-pull prompt) stay hidden in
+// workspaces excluded from the Git sync scope. The buttons are still rendered
+// (with the hidden attribute) because workspace switching happens client-side
+// without a reload: js/icon-sidebar-toggle.js toggles them using the
+// gitSyncedWorkspaces list from #poznote-config. '__last_opened__' is a
+// transient value replaced by a client-side redirect, so it keeps the default
+// visibility.
+$currentWorkspaceSynced = ($workspace_filter === '' || $workspace_filter === '__last_opened__')
+    || !$showGitSync
+    || $gitSync->isWorkspaceSynced($workspace_filter);
+
 // Load note-related data (res_right, default/current note folders)
 // Ensure these variables exist for included templates
 // When the URL targets a Kanban board (?kanban=<id>) without an explicit
@@ -414,12 +425,14 @@ if ($isPublicWorkspaceReadonly) {
     <script type="application/json" id="poznote-config"><?php
         echo json_encode([
             'gitSyncAutoPush' => ($showGitSync && $gitSync->isAutoPushEnabled()),
+            'gitSyncedWorkspaces' => ($showGitSync ? $gitSync->getSyncedWorkspaces() : null),
             'gitProvider' => $gitProvider,
             'dateTimeFormat' => getUserDateTimeFormat(),
             'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
             'attachmentsAtBottom' => $attachments_at_bottom_setting,
             'backlinksAtBottom' => $backlinks_at_bottom_setting,
-            'defaultImageBorderNoPadding' => poznoteSettingEnabled($settings['default_image_border_no_padding'], false)
+            'defaultImageBorderNoPadding' => poznoteSettingEnabled($settings['default_image_border_no_padding'], false),
+            'archiveWorkspace' => POZNOTE_ARCHIVE_WORKSPACE
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <!-- js/error-handler.js is bundled as the first file of index_js.php?group=app -->
@@ -461,8 +474,8 @@ if ($isPublicWorkspaceReadonly) {
     // create button); only the git buttons remain rail-side.
     $iconSidebarExtraItems = [];
     if ($showGitSync) {
-        $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push'];
-        $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull'];
+        $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push', 'hidden' => !$currentWorkspaceSynced];
+        $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull', 'hidden' => !$currentWorkspaceSynced];
     }
     ?>
     <!-- ICON SIDEBAR (dashboard topbar actions, icons only) -->
@@ -743,7 +756,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <?php endif; ?>
 
 
-<?php if ($showGitSync && $gitSync->isAutoPullEnabled()): ?>
+<?php if ($showGitSync && $currentWorkspaceSynced && $gitSync->isAutoPullEnabled()): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const runAutoPull = function() {

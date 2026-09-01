@@ -170,7 +170,12 @@
       "label": "Échéance",
       "overdue": "En retard"
     },
-    "card_size": "Taille des cartes"
+    "card_size": "Taille des cartes",
+    "sort": {
+      "label": "Trier par",
+      "date": "Date",
+      "tag": "Tag"
+    }
   },
   "folders": {
     "delete": {
@@ -1826,7 +1831,8 @@
       "token_already_in_use": "Lien personnalisé déjà utilisé",
       "no_token_generated": "Aucun lien généré",
       "server_error": "Erreur serveur : {{error}}",
-      "storage_s3_quota_reached": "Limite de stockage S3 atteinte : cette instance autorise au maximum {{max}} Mo de stockage S3 pour cet utilisateur."
+      "storage_s3_quota_reached": "Limite de stockage S3 atteinte : cette instance autorise au maximum {{max}} Mo de stockage S3 pour cet utilisateur.",
+      "backups_s3_quota_reached": "Limite de sauvegardes S3 atteinte : cette instance autorise au maximum {{max}} Mo d'archives de sauvegarde pour cet utilisateur."
     }
   },
   "ui": {
@@ -1919,6 +1925,9 @@
     },
     "note_permissions": {
       "editable": "Autoriser la modification du texte"
+    },
+    "folder_permissions": {
+      "editable": "Autoriser la modification des notes"
     },
     "note": {
       "new_note": "Nouvelle note",
@@ -2321,6 +2330,17 @@
       "workspaces_close": "Fermer",
       "stage_downloading": "Récupération de l'archive depuis le bucket...",
       "queued_uploaded": "Envoi terminé, démarrage de la restauration..."
+    },
+    "chunked_import": {
+      "queued": "Démarrage de l'import...",
+      "queued_uploaded": "Envoi terminé, démarrage de l'import...",
+      "stage_preparing": "Lecture de l'archive...",
+      "stage_attachments": "Import des images et pièces jointes... ({{done}}/{{total}} fichiers analysés)",
+      "stage_attachments_simple": "Import des images et pièces jointes...",
+      "stage_notes": "Import des notes... ({{done}}/{{total}})",
+      "stage_notes_simple": "Import des notes...",
+      "done": "Import terminé avec succès.",
+      "error": "L'import a échoué : {{error}}"
     }
   },
   "markdown_guide": {
@@ -3175,6 +3195,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Espaces de travail synchronisés",
+      "all_label": "Tous les espaces de travail",
+      "all_desc": "Tous les espaces de travail sont synchronisés, y compris ceux créés plus tard.",
+      "selected_label": "Espaces de travail sélectionnés uniquement",
+      "selected_desc": "Seuls les notes et fichiers joints des espaces cochés sont envoyés et récupérés. Les notes des autres espaces ne sont jamais touchées par un pull, et un push les retire du dépôt.",
+      "save": "Enregistrer les espaces",
+      "saved": "Espaces de travail synchronisés mis à jour.",
+      "none_selected": "Sélectionnez au moins un espace de travail à synchroniser."
+    },
     "title": "Synchronisation {{provider}}",
     "description": "Synchronisez vos notes et pièces jointes sur GitHub ou Forgejo. Les fichiers sont stockés à plat avec un fichier metadata.json qui préserve les tags, dossiers, dates et pièces jointes.",
     "warning": "Ne vous fiez pas à cette fonctionnalité comme seule solution de sauvegarde.\nExportez régulièrement vos données via la fonctionnalité de sauvegarde dans les Paramètres.",
@@ -4168,6 +4198,17 @@
       "save_error": "Échec de l'enregistrement de la configuration.",
       "invalid_email": "L'adresse e-mail de contact n'est pas valide.",
       "invalid_url": "L'URL communautaire n'est pas valide."
+    }
+  },
+  "archive": {
+    "menu_item": "Archiver la note",
+    "confirm_title": "Archiver la note",
+    "confirm_message": "« {{title}} » sera déplacée vers l'espace de travail « {{workspace}} », en conservant son arborescence de dossiers. L'espace de travail est créé s'il n'existe pas encore.",
+    "confirm_button": "Archiver",
+    "already_archived": "Cette note est déjà dans l'espace de travail « {{workspace}} ».",
+    "errors": {
+      "duplicate_title": "Une note portant le même titre est déjà archivée dans ce dossier.",
+      "archive_prefix": "Erreur lors de l'archivage de la note : {{error}}"
     }
   }
 }

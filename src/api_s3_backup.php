@@ -6,7 +6,8 @@
  *   POST ?action=test           Test a connection with the submitted (or saved) config
  *   GET  ?action=status         Configuration state, schedule info and user list
  *   GET  ?action=list           Backup archives currently in the bucket
- *   POST ?action=run            Back up one user (user_id) to the bucket
+ *   POST ?action=run            Queue a background job backing up one user
+ *                               (user_id) to the bucket, returns the job id
  *   POST ?action=record_manual  Store the summary of a finished manual run
  *   POST ?action=delete         Delete one backup archive (key)
  *   GET  ?action=download       Stream one backup archive to the browser (key)
@@ -14,9 +15,18 @@
  * Self-service actions (any authenticated user, own account only, unless the
  * user_s3_backups tenant isolation feature blocks them for non-admins):
  *   GET  ?action=self_status    Own archives in the bucket and schedule info
- *   POST ?action=self_run       Back up the current user's account
+ *   POST ?action=self_run       Queue a background job backing up the current
+ *                               user's account, returns the job id
+ *   GET  ?action=run_status     State of a backup job (job_id; without it,
+ *                               the caller's newest backup job)
  *   GET  ?action=self_download  Stream one of the current user's archives (key)
  *   POST ?action=self_delete    Delete one of the current user's archives (key)
+ *
+ * run and self_run used to build and upload the archive inside the request:
+ * for a large account that takes longer than a proxied request may live, so
+ * the browser showed an error while the backup silently completed
+ * server-side. Both now queue a job (see background_jobs.php) executed by a
+ * detached CLI worker, and the pages poll run_status.
  *
  * Manual backups are run one user per call: the settings page loops over the
  * users, which keeps every request short and shows progress, like the
@@ -29,12 +39,15 @@ require_once 'config.php';
 require_once 'functions.php';
 require_once 'users/db_master.php';
 require_once 'S3BackupService.php';
+require_once 'background_jobs.php';
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
-$selfActions = ['self_status', 'self_run', 'self_download', 'self_delete'];
+// run_status is listed here so a non-admin can follow the job their own
+// self_run queued; the job is read from their own job directory only.
+$selfActions = ['self_status', 'self_run', 'run_status', 'self_download', 'self_delete'];
 
 // Self-service actions require the feature to be enabled (master switch);
 // admin actions stay available so the feature can be configured and inspected
@@ -68,6 +81,35 @@ if (!isCurrentUserAdmin()) {
 function s3BackupKeyParam(): ?string {
     $key = (string)($_GET['key'] ?? $_POST['key'] ?? '');
     return preg_match('#^backups/\d+/[^/]+\.zip$#', $key) ? $key : null;
+}
+
+/**
+ * Queue the background job that backs up $targetUserId to the bucket.
+ *
+ * The job lives under the caller's job directory (an admin backing up other
+ * users owns those jobs), so run_status can only ever see the caller's own
+ * jobs. One backup job at a time per caller: the admin page runs its users
+ * sequentially anyway, and a dead worker's job is replaced rather than
+ * blocking until the daily cleanup.
+ */
+function s3BackupStartJob(int $callerUserId, int $targetUserId): array {
+    poznoteJobCleanup($callerUserId);
+    $active = poznoteJobFindActive($callerUserId, POZNOTE_JOB_TYPE_S3_BACKUP);
+    if ($active !== null) {
+        if (!poznoteJobIsWorkerStale($callerUserId, $active)) {
+            return ['success' => false, 'error' => 'A backup to S3 is already running. Wait for it to finish before starting a new one.'];
+        }
+        poznoteJobDelete($callerUserId, (string)$active['id']);
+    }
+    try {
+        $job = poznoteJobCreate($callerUserId, POZNOTE_JOB_TYPE_S3_BACKUP, [
+            'target_user_id' => $targetUserId,
+        ], 'queued');
+        poznoteJobSpawnRunner($callerUserId, (string)$job['id']);
+    } catch (Throwable $e) {
+        return ['success' => false, 'error' => $e->getMessage()];
+    }
+    return ['success' => true, 'job_id' => (string)$job['id']];
 }
 
 if ($action !== 'download' && $action !== 'self_download') {
@@ -181,9 +223,7 @@ switch ($action) {
             echo json_encode(['success' => false, 'error' => 'Unknown user']);
             break;
         }
-        set_time_limit(0);
-        $result = S3BackupService::backupUser($userId);
-        echo json_encode($result);
+        echo json_encode(s3BackupStartJob((int)getCurrentUserId(), $userId));
         break;
     }
 
@@ -288,8 +328,26 @@ switch ($action) {
             echo json_encode(['success' => false, 'error' => 'S3 backup is not configured']);
             break;
         }
-        set_time_limit(0);
-        echo json_encode(S3BackupService::backupUser((int)getCurrentUserId()));
+        echo json_encode(s3BackupStartJob((int)getCurrentUserId(), (int)getCurrentUserId()));
+        break;
+    }
+
+    case 'run_status': {
+        $currentUserId = (int)getCurrentUserId();
+        $jobId = (string)($_GET['job_id'] ?? $_POST['job_id'] ?? '');
+        $job = null;
+        if ($jobId !== '') {
+            $job = poznoteJobRead($currentUserId, $jobId);
+            if ($job !== null && ($job['type'] ?? '') !== POZNOTE_JOB_TYPE_S3_BACKUP) {
+                $job = null;
+            }
+        } else {
+            // No id given: report the caller's newest backup job, so a
+            // reloaded page can pick a running backup back up.
+            $jobs = poznoteJobList($currentUserId, POZNOTE_JOB_TYPE_S3_BACKUP);
+            $job = $jobs[0] ?? null;
+        }
+        echo json_encode(['success' => true, 'job' => $job !== null ? poznoteJobPublicState($job) : null]);
         break;
     }
 

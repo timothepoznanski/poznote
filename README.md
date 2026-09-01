@@ -725,6 +725,17 @@ When enabled by the user, Poznote will automatically:
 
 Manual push/pull is also available from the **Dashboard** via the **Push** and **Pull** cards.
 
+---
+
+**Synced workspaces**
+
+By default every workspace is synced. In **Settings > Git Sync**, each user can instead restrict Git Sync to selected workspaces:
+
+- Only notes and attachments from the selected workspaces are pushed and pulled.
+- A pull never touches notes in the other workspaces.
+- A push removes repository files that fall outside the selected workspaces, so the repository always mirrors exactly the synced set.
+- The Push and Pull sidebar buttons, automatic push, and the pull prompt only appear while viewing a synced workspace.
+
 </details>
 
 ## S3 Attachment Storage
@@ -937,6 +948,8 @@ Import a ZIP archive containing multiple notes:
   - Support `.html`, `.md`, `.markdown` or `.txt` files types
   - ZIP archives can contain up to 300 files, configurable in Settings > Advanced Settings > Import Limits
   - When importing a ZIP archive, Poznote automatically detects and recreates the folder structure
+
+There is no practical size limit on the archive. Like a complete restore, it is uploaded in slices (a slice that fails is retried instead of losing the whole upload), reassembled on the server, then processed by a background worker, so neither the browser nor a reverse proxy in front of the instance can time the import out. A progress bar covers the whole pipeline: upload, images and attachments, then notes.
 
 </details>
 

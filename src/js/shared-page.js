@@ -37,6 +37,7 @@
             txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
             txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
             txtNoteEditable: body.getAttribute('data-txt-note-editable') || 'Allow text editing',
+            txtFolderEditable: body.getAttribute('data-txt-folder-editable') || 'Allow note editing',
 
             txtNoteSharedThroughFolder: body.getAttribute('data-txt-note-shared-through-folder') || 'Note shared through folder',
             txtFolderSharedThroughParent: body.getAttribute('data-txt-folder-shared-through-parent') || 'Folder shared through parent folder',
@@ -236,7 +237,7 @@
                 token: item.token,
                 itemType: 'folder',
                 protocol: getPreferredPublicUrlProtocol(),
-                accessMode: item.access_mode || 'full',
+                accessMode: item.access_mode || 'read_only',
                 indexable: !!Number(item.indexable),
                 hasPassword: folderHasPassword,
                 passwordValue: item.passwordValue || '',
@@ -889,6 +890,9 @@
         if (Object.prototype.hasOwnProperty.call(updates, 'password')) {
             payload.password = updates.password;
         }
+        if (Object.prototype.hasOwnProperty.call(updates, 'access_mode') && updates.access_mode !== undefined) {
+            payload.access_mode = updates.access_mode;
+        }
         if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users')) {
             payload.allowed_users = updates.allowed_users;
         }
@@ -914,6 +918,9 @@
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'indexable')) {
                     folder.indexable = updates.indexable ? 1 : 0;
+                }
+                if (Object.prototype.hasOwnProperty.call(updates, 'access_mode') && updates.access_mode !== undefined) {
+                    folder.access_mode = data.accessMode || updates.access_mode;
                 }
                 if (Object.prototype.hasOwnProperty.call(updates, 'password') && updates.password !== undefined) {
                     folder.password = data.hasPassword ? 1 : 0;
@@ -1323,6 +1330,14 @@
             permissionOptions = [
                 { value: 'read_only', label: config.txtTaskReadOnly },
                 { value: 'edit', label: config.txtNoteEditable }
+            ];
+            options.accessMode = options.accessMode === 'edit' ? 'edit' : 'read_only';
+        } else if (options.itemType === 'folder') {
+            // Folder shares: read-only by default, or let visitors edit the
+            // notes the folder contains (like single-note edit shares).
+            permissionOptions = [
+                { value: 'read_only', label: config.txtTaskReadOnly },
+                { value: 'edit', label: config.txtFolderEditable }
             ];
             options.accessMode = options.accessMode === 'edit' ? 'edit' : 'read_only';
         }

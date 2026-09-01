@@ -167,6 +167,39 @@
     filter: none !important;
 }
 
+/* ── Drag to reorder ── */
+
+/* Pressing a tab drags it to a new position (js/tabs.js); the bar's empty
+   space keeps its drag-to-scroll. */
+#app-tab-bar.is-reordering,
+#app-tab-bar.is-reordering .app-tab {
+    cursor: grabbing;
+}
+
+body.app-tab-reordering {
+    cursor: grabbing;
+    user-select: none;
+}
+
+/* Tabs pushed aside slide to their new place. The dragged one follows the
+   pointer frame by frame, so its own transform must never be animated. */
+#app-tab-bar.is-reordering .app-tab {
+    transition: background 0.1s ease, transform 0.14s ease;
+}
+
+/* Named app-tab-dragging rather than the shared .dragging: that class carries a
+   `transform: scale() !important` (css/drag-drop.css) which would override the
+   translation that keeps the tab under the cursor. */
+.app-tab.app-tab-dragging {
+    transition: none !important;
+    z-index: 2;
+    opacity: 0.9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    /* Let the tab under the cursor keep its hover state instead of the
+       floating copy stealing it. */
+    pointer-events: none;
+}
+
 /* ── Tab context menu ── */
 
 .app-tab-context-menu {
@@ -280,6 +313,10 @@
 [data-theme="dark"] .app-tab-close-all:hover {
     background: var(--dm-surface-hover, #334155);
     color: #fca5a5;
+}
+
+[data-theme="dark"] .app-tab.app-tab-dragging {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] .app-tab-context-menu {

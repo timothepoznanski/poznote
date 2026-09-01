@@ -24,6 +24,10 @@
  *                          (=> data-icon-sidebar-git-action, index.php) or
  *                          'dashboardGitAction' (=> data-dashboard-git-action,
  *                          dashboard.php, whose git handler is its own).
+ *                          A gitAction entry may add 'hidden' => true to render
+ *                          with the hidden attribute (index.php uses it for
+ *                          workspaces outside the Git sync scope; the client
+ *                          toggles it on workspace switch).
  *
  * Requires: css/icon-sidebar.css in <head> (plus css/icon-sidebar-page.css on
  *           the secondary pages, which pin the rail instead of laying it out
@@ -243,7 +247,7 @@ try {
         . (!empty($iconSidebarItem['activeFavorite']) ? ' icon-sidebar-btn-active-favorite' : '');
     ?>
     <?php if (isset($iconSidebarItem['gitAction'])): ?>
-    <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-icon-sidebar-git-action="<?php echo htmlspecialchars($iconSidebarItem['gitAction'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
+    <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-icon-sidebar-git-action="<?php echo htmlspecialchars($iconSidebarItem['gitAction'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>"<?php echo !empty($iconSidebarItem['hidden']) ? ' hidden' : ''; ?>>
         <i class="lucide <?php echo $iconSidebarIcon; ?>"></i>
     </button>
     <?php elseif (isset($iconSidebarItem['dashboardGitAction'])): ?>

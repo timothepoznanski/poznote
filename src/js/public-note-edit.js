@@ -28,6 +28,9 @@
     if (!contentDiv || !editBtn || !saveBtn || !cancelBtn) return;
 
     const isMarkdown = config.noteType === 'markdown';
+    // Direct shares authenticate with the note token; notes opened through a
+    // shared folder use folder_token + note_id (the server provides the query).
+    const apiAuthQuery = config.apiAuthQuery || ('token=' + encodeURIComponent(config.token));
     const LOCK_HEARTBEAT_INTERVAL_MS = 20000;
     const LOCK_SESSION_STORAGE_KEY = 'poznote_public_editor_session_id';
     let editorEl = null;
@@ -69,7 +72,7 @@
     function postLock(action, keepalive) {
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';
         const suffix = action ? '/' + action : '';
-        return fetch(`${apiBaseUrl}/public/notes/lock${suffix}?token=${encodeURIComponent(config.token)}`, {
+        return fetch(`${apiBaseUrl}/public/notes/lock${suffix}?${apiAuthQuery}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ editor_session_id: getEditorSessionId() }),
@@ -213,7 +216,7 @@
         saveBtn.classList.add('is-saving');
 
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';
-        fetch(`${apiBaseUrl}/public/notes/content?token=${encodeURIComponent(config.token)}`, {
+        fetch(`${apiBaseUrl}/public/notes/content?${apiAuthQuery}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ content: getEditorValue(), editor_session_id: getEditorSessionId() })

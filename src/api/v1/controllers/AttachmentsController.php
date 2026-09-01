@@ -930,7 +930,7 @@ class AttachmentsController {
             if ($action === 'push') {
                 if ($filename) {
                     error_log("[Poznote Git] AttachmentsController: Calling gitSync->pushAttachment($filename)");
-                    $gitSync->pushAttachment($filename, "Added attachment {$filename} to note {$noteId}");
+                    $gitSync->pushAttachment($filename, "Added attachment {$filename} to note {$noteId}", $noteId);
                 }
                 error_log("[Poznote Git] AttachmentsController: Calling gitSync->pushNote($noteId)");
                 $result = $gitSync->pushNote($noteId);
@@ -938,7 +938,7 @@ class AttachmentsController {
             } elseif ($action === 'delete') {
                 if ($filename) {
                     error_log("[Poznote Git] AttachmentsController: Calling gitSync->deleteAttachmentInGit($filename)");
-                    $gitSync->deleteAttachmentInGit($filename, "Deleted attachment {$filename} from note {$noteId}");
+                    $gitSync->deleteAttachmentInGit($filename, "Deleted attachment {$filename} from note {$noteId}", $noteId);
                 }
                 error_log("[Poznote Git] AttachmentsController: Calling gitSync->pushNote($noteId)");
                 $result = $gitSync->pushNote($noteId);

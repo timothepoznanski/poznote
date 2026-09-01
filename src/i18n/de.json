@@ -159,7 +159,12 @@
       "label": "Fälligkeitsdatum",
       "overdue": "Überfällig"
     },
-    "card_size": "Kartengröße"
+    "card_size": "Kartengröße",
+    "sort": {
+      "label": "Sortieren nach",
+      "date": "Datum",
+      "tag": "Tags"
+    }
   },
   "folders": {
     "delete": {
@@ -1773,7 +1778,8 @@
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
       "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
-      "storage_s3_quota_reached": "S3-Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB S3-Speicher für diesen Benutzer."
+      "storage_s3_quota_reached": "S3-Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB S3-Speicher für diesen Benutzer.",
+      "backups_s3_quota_reached": "S3-Backup-Limit erreicht: Diese Instanz erlaubt höchstens {{max}} MB an Backup-Archiven für diesen Benutzer."
     }
   },
   "ui": {
@@ -1869,6 +1875,9 @@
     },
     "note_permissions": {
       "editable": "Textbearbeitung erlauben"
+    },
+    "folder_permissions": {
+      "editable": "Bearbeitung der Notizen erlauben"
     },
     "note": {
       "new_note": "Neue Notiz",
@@ -2268,6 +2277,17 @@
       "workspaces_close": "Schließen",
       "stage_downloading": "Archiv wird aus dem Bucket geladen...",
       "queued_uploaded": "Upload abgeschlossen, Wiederherstellung startet..."
+    },
+    "chunked_import": {
+      "queued": "Import startet...",
+      "queued_uploaded": "Upload abgeschlossen, Import startet...",
+      "stage_preparing": "Archiv wird gelesen...",
+      "stage_attachments": "Bilder und Anhänge werden importiert... ({{done}}/{{total}} Dateien geprüft)",
+      "stage_attachments_simple": "Bilder und Anhänge werden importiert...",
+      "stage_notes": "Notizen werden importiert... ({{done}}/{{total}})",
+      "stage_notes_simple": "Notizen werden importiert...",
+      "done": "Import erfolgreich abgeschlossen.",
+      "error": "Der Import ist fehlgeschlagen: {{error}}"
     }
   },
   "markdown_guide": {
@@ -2995,6 +3015,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Synchronisierte Arbeitsbereiche",
+      "all_label": "Alle Arbeitsbereiche",
+      "all_desc": "Alle Arbeitsbereiche werden synchronisiert, auch später erstellte.",
+      "selected_label": "Nur ausgewählte Arbeitsbereiche",
+      "selected_desc": "Nur Notizen und Anhänge der markierten Arbeitsbereiche werden übertragen. Notizen anderer Arbeitsbereiche bleiben bei einem Pull unberührt, ein Push entfernt sie aus dem Repository.",
+      "save": "Arbeitsbereiche speichern",
+      "saved": "Synchronisierte Arbeitsbereiche aktualisiert.",
+      "none_selected": "Wählen Sie mindestens einen Arbeitsbereich aus."
+    },
     "title": "{{provider}}-Synchronisierung",
     "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf GitHub oder Forgejo. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
     "warning": "Verlassen Sie sich nicht ausschließlich auf diese Funktion als Backup-Lösung.\nExportieren Sie Ihre Daten regelmäßig über die Backup-Funktion in den Einstellungen.",
@@ -3981,6 +4011,17 @@
       "save_error": "Konfiguration konnte nicht gespeichert werden.",
       "invalid_email": "Die Kontakt-E-Mail-Adresse ist ungültig.",
       "invalid_url": "Die Community-URL ist ungültig."
+    }
+  },
+  "archive": {
+    "menu_item": "Notiz archivieren",
+    "confirm_title": "Notiz archivieren",
+    "confirm_message": "„{{title}}“ wird in den Arbeitsbereich „{{workspace}}“ verschoben und behält dabei seinen Ordnerpfad. Der Arbeitsbereich wird angelegt, falls er noch nicht existiert.",
+    "confirm_button": "Archivieren",
+    "already_archived": "Diese Notiz liegt bereits im Arbeitsbereich „{{workspace}}“.",
+    "errors": {
+      "duplicate_title": "In diesem Ordner ist bereits eine Notiz mit demselben Titel archiviert.",
+      "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}"
     }
   }
 }

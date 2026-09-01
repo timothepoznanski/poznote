@@ -160,7 +160,12 @@
       "label": "截止日期",
       "overdue": "已逾期"
     },
-    "card_size": "卡片大小"
+    "card_size": "卡片大小",
+    "sort": {
+      "label": "排序方式",
+      "date": "日期",
+      "tag": "标签"
+    }
   },
   "folders": {
     "delete": {
@@ -1771,7 +1776,8 @@
       "token_already_in_use": "自定义链接已被使用",
       "no_token_generated": "未生成链接",
       "server_error": "服务器错误: {{error}}",
-      "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。"
+      "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。",
+      "backups_s3_quota_reached": "已达到 S3 备份上限:此实例最多允许该用户使用 {{max}} MB 的备份存档。"
     }
   },
   "ui": {
@@ -1868,6 +1874,9 @@
     },
     "note_permissions": {
       "editable": "允许编辑文本"
+    },
+    "folder_permissions": {
+      "editable": "允许编辑笔记"
     },
     "note": {
       "new_note": "新笔记",
@@ -2270,6 +2279,17 @@
       "workspaces_close": "关闭",
       "stage_downloading": "正在从存储桶获取存档...",
       "queued_uploaded": "上传完成，恢复即将开始..."
+    },
+    "chunked_import": {
+      "queued": "导入即将开始...",
+      "queued_uploaded": "上传完成，导入即将开始...",
+      "stage_preparing": "正在读取压缩包...",
+      "stage_attachments": "正在导入图片和附件...（已扫描 {{done}}/{{total}} 个文件）",
+      "stage_attachments_simple": "正在导入图片和附件...",
+      "stage_notes": "正在导入笔记...（{{done}}/{{total}}）",
+      "stage_notes_simple": "正在导入笔记...",
+      "done": "导入成功完成。",
+      "error": "导入失败：{{error}}"
     }
   },
   "markdown_guide": {
@@ -3120,6 +3140,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "同步的工作区",
+      "all_label": "所有工作区",
+      "all_desc": "同步所有工作区，包括之后创建的工作区。",
+      "selected_label": "仅选定的工作区",
+      "selected_desc": "仅推送和拉取选中工作区的笔记和附件。拉取不会影响其他工作区的笔记，推送会将它们从仓库中移除。",
+      "save": "保存工作区",
+      "saved": "同步的工作区已更新。",
+      "none_selected": "请至少选择一个工作区。"
+    },
     "title": "{{provider}} 同步",
     "description": "将您的笔记和附件同步到 GitHub 或 Forgejo。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
     "warning": "请勿将此功能作为唯一的备份方案。\n请定期使用设置中的备份功能导出您的数据。",
@@ -4102,6 +4132,17 @@
       "save_error": "保存配置失败。",
       "invalid_email": "联系电子邮件地址无效。",
       "invalid_url": "社区 URL 无效。"
+    }
+  },
+  "archive": {
+    "menu_item": "归档笔记",
+    "confirm_title": "归档笔记",
+    "confirm_message": "“{{title}}”将移动到工作区“{{workspace}}”，并保留其文件夹层级。若该工作区尚不存在，将自动创建。",
+    "confirm_button": "归档",
+    "already_archived": "该笔记已位于工作区“{{workspace}}”。",
+    "errors": {
+      "duplicate_title": "该文件夹中已归档同名笔记。",
+      "archive_prefix": "归档笔记时出错：{{error}}"
     }
   }
 }

@@ -542,6 +542,11 @@ $router->post('/notes/{id}/remove-folder', function($params) use ($foldersContro
     $foldersController->removeNoteFromFolder($params['id']);
 });
 
+// Archive a note into the Archives workspace, mirroring its folder path
+$router->post('/notes/{id}/archive', function($params) use ($foldersController) {
+    $foldersController->archiveNote($params['id']);
+});
+
 // Mark a note completed / active on the Kanban board
 $router->post('/notes/{id}/kanban-completed', function($params) use ($foldersController) {
     $foldersController->setNoteKanbanCompleted($params['id']);

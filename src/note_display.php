@@ -335,6 +335,12 @@
 
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="lucide lucide-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="lucide lucide-folder-output"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    // Archive: files the note away in the archive workspace with
+                    // its folder path. Hidden once that workspace is the one open,
+                    // where the action has nothing left to do.
+                    if (!$isPublicWorkspaceReadonly && trim((string)$workspace_filter) !== POZNOTE_ARCHIVE_WORKSPACE) {
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="archive-note" data-note-id="'.$row['id'].'" data-note-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'"><i class="lucide lucide-archive"></i> '.t_h('archive.menu_item', [], 'Archive note').'</button>';
+                    }
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="lucide lucide-download"></i> '.t_h('common.download', [], 'Download').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type.'"><i class="lucide lucide-printer"></i> '.t_h('common.print', [], 'Print').'</button>';
 

@@ -160,7 +160,12 @@
       "label": "Fecha límite",
       "overdue": "Atrasado"
     },
-    "card_size": "Tamaño de las tarjetas"
+    "card_size": "Tamaño de las tarjetas",
+    "sort": {
+      "label": "Ordenar por",
+      "date": "Fecha",
+      "tag": "Etiqueta"
+    }
   },
   "folders": {
     "delete": {
@@ -1774,7 +1779,8 @@
       "internal_server_error": "Error interno del servidor",
       "duplicate_title_in_folder": "Otra nota con el mismo título existe en esta carpeta.",
       "invalid_custom_token": "Enlace personalizado inválido.\n\nPermitidos:\n\nletras, números, -, _, . (4-128 caracteres)",
-      "storage_s3_quota_reached": "Límite de almacenamiento S3 alcanzado: esta instancia permite como máximo {{max}} MB de almacenamiento S3 para este usuario."
+      "storage_s3_quota_reached": "Límite de almacenamiento S3 alcanzado: esta instancia permite como máximo {{max}} MB de almacenamiento S3 para este usuario.",
+      "backups_s3_quota_reached": "Límite de copias de seguridad S3 alcanzado: esta instancia permite como máximo {{max}} MB de archivos de copia de seguridad para este usuario."
     }
   },
   "ui": {
@@ -1870,6 +1876,9 @@
     },
     "note_permissions": {
       "editable": "Permitir edición del texto"
+    },
+    "folder_permissions": {
+      "editable": "Permitir edición de las notas"
     },
     "note": {
       "new_note": "Nueva nota",
@@ -2269,6 +2278,17 @@
       "workspaces_close": "Cerrar",
       "stage_downloading": "Obteniendo el archivo del bucket...",
       "queued_uploaded": "Subida completada, iniciando la restauración..."
+    },
+    "chunked_import": {
+      "queued": "Iniciando la importación...",
+      "queued_uploaded": "Subida completada, iniciando la importación...",
+      "stage_preparing": "Leyendo el archivo...",
+      "stage_attachments": "Importando las imágenes y adjuntos... ({{done}}/{{total}} archivos analizados)",
+      "stage_attachments_simple": "Importando las imágenes y adjuntos...",
+      "stage_notes": "Importando las notas... ({{done}}/{{total}})",
+      "stage_notes_simple": "Importando las notas...",
+      "done": "Importación completada correctamente.",
+      "error": "La importación ha fallado: {{error}}"
     }
   },
   "markdown_guide": {
@@ -2996,6 +3016,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Espacios de trabajo sincronizados",
+      "all_label": "Todos los espacios de trabajo",
+      "all_desc": "Se sincronizan todos los espacios de trabajo, incluidos los creados más tarde.",
+      "selected_label": "Solo los espacios de trabajo seleccionados",
+      "selected_desc": "Solo se envían y reciben las notas y adjuntos de los espacios marcados. Un pull nunca toca las notas de otros espacios, y un push las elimina del repositorio.",
+      "save": "Guardar espacios",
+      "saved": "Espacios de trabajo sincronizados actualizados.",
+      "none_selected": "Seleccione al menos un espacio de trabajo."
+    },
     "title": "Sincronización {{provider}}",
     "description": "Sincroniza tus notas y archivos adjuntos en GitHub o Forgejo. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
     "warning": "No confíe únicamente en esta función como solución de copia de seguridad.\nExporte sus datos regularmente desde la función de copia de seguridad en los Ajustes.",
@@ -3981,6 +4011,17 @@
       "save_error": "Error al guardar la configuración.",
       "invalid_email": "La dirección de correo de contacto no es válida.",
       "invalid_url": "La URL de la comunidad no es válida."
+    }
+  },
+  "archive": {
+    "menu_item": "Archivar la nota",
+    "confirm_title": "Archivar la nota",
+    "confirm_message": "«{{title}}» se moverá al espacio de trabajo «{{workspace}}», conservando su ruta de carpetas. El espacio de trabajo se crea si aún no existe.",
+    "confirm_button": "Archivar",
+    "already_archived": "Esta nota ya está en el espacio de trabajo «{{workspace}}».",
+    "errors": {
+      "duplicate_title": "Ya hay archivada una nota con el mismo título en esta carpeta.",
+      "archive_prefix": "Error al archivar la nota: {{error}}"
     }
   }
 }

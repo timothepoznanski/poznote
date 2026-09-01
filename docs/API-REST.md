@@ -586,6 +586,23 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/remove-folder
 ```
 
+### Archive Note
+
+```
+POST /notes/{id}/archive
+```
+
+Move a note to the `Archives` workspace. The workspace is created on first use,
+and the note's folder path is mirrored inside it so the note keeps its place in
+the tree. The source folders are left untouched and the note's `updated` date is
+preserved. Returns `409` when a note with the same title is already archived in
+the target folder.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/archive
+```
+
 ### Emergency Save (Beacon)
 
 ```
@@ -2387,7 +2404,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /git-sync/push
 ```
 
-Push all notes to the configured Git repository (all workspaces).
+Push all notes to the configured Git repository. When synced workspaces are restricted (see `workspaces` in the config endpoint), only notes and attachments from those workspaces are pushed, and repository files outside them are removed.
 
 **Request Body (JSON):**
 
@@ -2406,7 +2423,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /git-sync/pull
 ```
 
-Pull all notes from the configured Git repository (all workspaces).
+Pull all notes from the configured Git repository. When synced workspaces are restricted (see `workspaces` in the config endpoint), only notes and attachments from those workspaces are pulled, and local notes in other workspaces are never touched.
 
 **Request Body (JSON):**
 
@@ -2451,6 +2468,7 @@ Save per-user Git sync configuration.
 | `api_base` | string | API base URL (Forgejo only) |
 | `author_name` | string | Commit author name |
 | `author_email` | string | Commit author email |
+| `workspaces` | array or null | Restrict sync to these workspace names. `null` or an empty array syncs all workspaces. Omit the field to keep the current setting. |
 
 ```bash
 curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
@@ -2977,6 +2995,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
+| `POST` | `/notes/{id}/archive` | Archive into the Archives workspace |
 
 ### Note Locks
 | Method | Endpoint | Description |

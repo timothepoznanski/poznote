@@ -3799,6 +3799,10 @@ function loadKanbanViewInline(folderId, folderName, options) {
                 window.applyKanbanCardSize();
             }
 
+            if (typeof window.applyKanbanCardSort === 'function') {
+                window.applyKanbanCardSort();
+            }
+
             activateKanbanViewState(folderId);
 
             // Remove selection from any notes in the sidebar

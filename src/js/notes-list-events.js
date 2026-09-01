@@ -685,6 +685,44 @@
         }
     }
 
+    /**
+     * Handle middle-click on a note in the tree: open it in a new in-app tab,
+     * exactly like a double-click does, instead of letting the browser open a
+     * real browser tab.
+     * @param {MouseEvent} event - The auxclick event
+     */
+    function handleNotesListAuxClick(event) {
+        if (event.button !== 1) return;
+
+        var actionElement = event.target.closest('a[data-dblaction="open-note-new-tab"]');
+        if (!actionElement) return;
+
+        // Cancel the browser's own "open link in a new tab" default
+        event.preventDefault();
+        event.stopPropagation();
+
+        var noteId = actionElement.getAttribute('data-note-id');
+        if (!noteId) return;
+
+        var noteLink = actionElement.getAttribute('href');
+        if (noteLink && shouldReuseTabForLinkedPair(actionElement) && typeof window.loadNoteDirectly === 'function') {
+            window.loadNoteDirectly(noteLink, noteId, event, actionElement);
+        } else if (typeof openNoteInNewTab === 'function') {
+            openNoteInNewTab(noteId);
+        }
+    }
+
+    /**
+     * Swallow the middle-button mousedown on note links so the browser doesn't
+     * start autoscroll before handleNotesListAuxClick opens the tab.
+     * @param {MouseEvent} event - The mousedown event
+     */
+    function preventNoteMiddleClickAutoscroll(event) {
+        if (event.button !== 1) return;
+        if (!event.target.closest('a[data-dblaction="open-note-new-tab"]')) return;
+        event.preventDefault();
+    }
+
     function preventEditorTitleIconFocus(event) {
         var actionElement = getNoteIconActionElement(event.target);
         if (!isEditorTitleNoteIcon(actionElement)) return;
@@ -824,6 +862,10 @@
 
         // Double-click event delegation
         document.addEventListener('dblclick', handleNotesListDblClick);
+
+        // Middle-click on a note opens it in a new in-app tab
+        document.addEventListener('mousedown', preventNoteMiddleClickAutoscroll);
+        document.addEventListener('auxclick', handleNotesListAuxClick);
 
         // Close note action menus when clicking outside or on a menu item
         document.addEventListener('click', function (e) {

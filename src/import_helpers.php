@@ -1020,16 +1020,37 @@ function importAttachmentsZip($uploadedFile) {
         return ['success' => false, 'error' => t('restore_import.errors.cannot_open_zip')];
     }
     
+    // Enforce the storage quota over the whole archive BEFORE storing
+    // anything, so a refusal never leaves a partial import behind. Zip entry
+    // sizes are the uncompressed sizes; blocked file types the validation
+    // skips only make the estimate conservative.
+    $attachmentsBytesEstimate = 0;
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $stat = $zip->statIndex($i);
+        if (substr($stat['name'], -1) === '/') {
+            continue;
+        }
+        $attachmentsBytesEstimate += max(0, (int)($stat['size'] ?? 0));
+    }
+    if ($attachmentsBytesEstimate > 0) {
+        $quotaError = poznoteCheckAttachmentStorageQuota($attachmentsBytesEstimate);
+        if ($quotaError !== null) {
+            $zip->close();
+            unlink($tempFile);
+            return ['success' => false, 'error' => $quotaError];
+        }
+    }
+
     $importedCount = 0;
     $skippedCount = 0;
     $errors = [];
     $skippedFiles = [];
-    
+
     // Extract each file
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
         $filename = $stat['name'];
-        
+
         // Skip directories
         if (substr($filename, -1) === '/') {
             continue;
@@ -1093,9 +1114,9 @@ function importAttachmentsZip($uploadedFile) {
     return ['success' => true, 'message' => $message, 'skipped_attachments' => $skippedFiles];
 }
 
-function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null) {
+function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = null, $isLocalFile = false) {
     global $con;
-    
+
     // If no workspace provided, get the first available workspace
     if (empty($workspace)) {
         $wsStmt = $con->query("SELECT name FROM workspaces ORDER BY name LIMIT 1");
@@ -1104,16 +1125,22 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             return ['success' => false, 'error' => t('restore_import.individual_notes.errors.no_workspace_available', [], 'No workspace available')];
         }
     }
-    
+
     // Check file type
     if (!preg_match('/\.zip$/i', $uploadedFile['name'])) {
         return ['success' => false, 'error' => t('restore_import.errors.file_type_zip_only')];
     }
-    
+
     $tempFile = '/tmp/poznote_individual_notes_import_' . uniqid() . '.zip';
-    
-    // Move uploaded file
-    if (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
+
+    if ($isLocalFile) {
+        // Archive already on the server (assembled by the background import
+        // job): move_uploaded_file() refuses anything that was not an HTTP
+        // upload of this very request.
+        if (!copy($uploadedFile['tmp_name'], $tempFile)) {
+            return ['success' => false, 'error' => t('restore_import.errors.error_uploading_file')];
+        }
+    } elseif (!move_uploaded_file($uploadedFile['tmp_name'], $tempFile)) {
         return ['success' => false, 'error' => t('restore_import.errors.error_uploading_file')];
     }
     
@@ -1256,11 +1283,62 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     $importedImages = []; // Maps original filename (lowercase) to stored attachment info
     $importedImagesCount = 0;
     $attachmentIdMap = []; // Maps attachment IDs from exported notes to stored attachment info
-    
+
+    // Enforce the storage quota over the whole attachments pass BEFORE storing
+    // anything: the per-note check in importSingleNoteFile() never sees these
+    // files, and refusing mid-pass would leave orphaned attachment files
+    // behind. Zip entry sizes are the uncompressed sizes, so the estimate
+    // matches what would actually be stored; files the validation later skips
+    // only make it conservative.
+    $attachmentsBytesEstimate = 0;
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
         $fileName = $stat['name'];
-        
+        if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
+            continue;
+        }
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if (preg_match('#(?:^|/)attachments/[^/]+$#', $fileName) || in_array($fileExtension, $imageExtensions, true)) {
+            $attachmentsBytesEstimate += max(0, (int)($stat['size'] ?? 0));
+        }
+    }
+    if ($attachmentsBytesEstimate > 0) {
+        $quotaError = poznoteCheckAttachmentStorageQuota($attachmentsBytesEstimate);
+        if ($quotaError !== null) {
+            $zip->close();
+            unlink($tempFile);
+            return ['success' => false, 'error' => $quotaError];
+        }
+    }
+
+    // Keep the per-request usage cache accurate while this pass stores files,
+    // so the per-note quota checks that follow see the space consumed here
+    // (same pattern as importSingleNoteFile for note content).
+    $attachmentsAreRemote = poznoteAttachmentsAreRemote();
+    $attachmentQuotaLimits = poznoteGetUserQuotaLimits();
+    $attachmentQuotaTracked = poznoteUserQuotasApply() && ($attachmentsAreRemote
+        ? $attachmentQuotaLimits['max_storage_s3_bytes'] > 0
+        : $attachmentQuotaLimits['max_storage_bytes'] > 0);
+    $bumpAttachmentUsage = function ($bytes) use ($attachmentsAreRemote, $attachmentQuotaTracked) {
+        if (!$attachmentQuotaTracked || $bytes <= 0) {
+            return;
+        }
+        if ($attachmentsAreRemote) {
+            poznoteGetActiveUserS3UsageBytes((int)$bytes);
+        } else {
+            poznoteGetActiveUserStorageUsageBytes((int)$bytes);
+        }
+    };
+
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        // Milestone for the background import job (no-op in the synchronous
+        // flow): this pass stores every image/attachment in the archive, the
+        // slow part of a media-heavy import.
+        poznoteRestoreReportProgress('attachments', $i + 1, $zip->numFiles);
+
+        $stat = $zip->statIndex($i);
+        $fileName = $stat['name'];
+
         // Skip directories and hidden files/folders
         if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
             continue;
@@ -1327,6 +1405,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     'file_type' => $mimeType
                 ];
                 $importedImagesCount++;
+                $bumpAttachmentUsage(strlen($imageContent));
             }
         } else {
             // Regular image (Obsidian-style or loose images)
@@ -1346,6 +1425,7 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
                     'file_type' => 'image/' . ($fileExtension === 'jpg' ? 'jpeg' : $fileExtension)
                 ];
                 $importedImagesCount++;
+                $bumpAttachmentUsage(strlen($imageContent));
             }
         }
     }
@@ -1379,23 +1459,28 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
     }
     
     // Second pass: actually import the files
+    $processedNotes = 0;
     for ($i = 0; $i < $zip->numFiles; $i++) {
         $stat = $zip->statIndex($i);
         $fileName = $stat['name'];
-        
+
         // Skip directories and hidden files
         if (substr($fileName, -1) === '/' || basename($fileName)[0] === '.') {
             continue;
         }
-        
+
         // Get file extension
         $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        
+
         // Only process HTML, MD, Markdown and TXT files
         if (!in_array($fileExtension, ['html', 'md', 'markdown', 'txt'])) {
             continue;
         }
-        
+
+        // Milestone for the background import job (no-op otherwise)
+        $processedNotes++;
+        poznoteRestoreReportProgress('notes', $processedNotes, $validFileCount);
+
         // Extract file content
         $content = $zip->getFromIndex($i);
         if ($content === false) {

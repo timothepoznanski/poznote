@@ -729,6 +729,46 @@ body.dark-mode .label-desc {
     color: #999;
 }
 
+/* Synced workspaces */
+.workspace-mode-check {
+    cursor: pointer;
+}
+
+.workspace-mode-check input[type="radio"] {
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+
+.workspace-checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f9fafb;
+}
+
+.workspace-checkbox-list[hidden] {
+    display: none;
+}
+
+body.dark-mode .workspace-checkbox-list {
+    background: var(--dm-surface);
+}
+
+.workspace-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--pz-text);
+    cursor: pointer;
+}
+
+body.dark-mode .workspace-checkbox-item {
+    color: #e0e0e0;
+}
+
 /* Switch Component */
 .switch {
     position: relative;
