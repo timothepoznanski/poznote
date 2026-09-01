@@ -4199,5 +4199,16 @@
       "invalid_email": "L'adresse e-mail de contact n'est pas valide.",
       "invalid_url": "L'URL communautaire n'est pas valide."
     }
+  },
+  "archive": {
+    "menu_item": "Archiver la note",
+    "confirm_title": "Archiver la note",
+    "confirm_message": "« {{title}} » sera déplacée vers l'espace de travail « {{workspace}} », en conservant son arborescence de dossiers. L'espace de travail est créé s'il n'existe pas encore.",
+    "confirm_button": "Archiver",
+    "already_archived": "Cette note est déjà dans l'espace de travail « {{workspace}} ».",
+    "errors": {
+      "duplicate_title": "Une note portant le même titre est déjà archivée dans ce dossier.",
+      "archive_prefix": "Erreur lors de l'archivage de la note : {{error}}"
+    }
   }
 }

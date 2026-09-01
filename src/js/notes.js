@@ -625,6 +625,123 @@ function redirectToWorkspace() {
 }
 
 // ============================================================
+// NOTE ARCHIVING
+// ============================================================
+
+/**
+ * Ask for confirmation before archiving a note
+ *
+ * The destination workspace is decided server-side; its name is read from the
+ * page config here only so the confirmation can name it.
+ *
+ * @param {string|number} noteId - The note ID to archive
+ * @param {string} [noteTitle] - Note title, shown in the confirmation
+ */
+function archiveNote(noteId, noteTitle) {
+    if (!noteId) return;
+
+    var workspace = (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.archiveWorkspace) || 'Archives';
+    var title = noteTitle || '';
+
+    showConfirmModal(
+        (window.t ? window.t('archive.confirm_title', null, 'Archive note') : 'Archive note'),
+        (window.t
+            ? window.t('archive.confirm_message', { title: title, workspace: workspace },
+                '"{{title}}" will be moved to the "{{workspace}}" workspace, keeping its folder path.')
+            : ('"' + title + '" will be moved to the "' + workspace + '" workspace, keeping its folder path.')),
+        function () {
+            executeArchiveNote(noteId, workspace);
+        },
+        {
+            confirmText: (window.t ? window.t('archive.confirm_button', null, 'Archive') : 'Archive'),
+            hideSaveAndExit: true
+        }
+    );
+}
+
+/**
+ * Move a note to the archive workspace, folder path included
+ * @private
+ */
+function executeArchiveNote(noteId, workspace) {
+    fetch('/api/v1/notes/' + noteId + '/archive', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: '{}'
+    })
+        .then(function (response) {
+            return response.json().then(function (data) {
+                return { status: response.status, data: data || {} };
+            });
+        })
+        .then(function (result) {
+            var data = result.data;
+
+            if (!data.success) {
+                showNotificationPopup(archiveErrorMessage(result.status, data), 'error');
+                return;
+            }
+
+            if (data.already_archived) {
+                showNotificationPopup(
+                    (window.t
+                        ? window.t('archive.already_archived', { workspace: workspace },
+                            'This note is already in the "{{workspace}}" workspace.')
+                        : ('This note is already in the "' + workspace + '" workspace.')),
+                    'error'
+                );
+                return;
+            }
+
+            if (typeof window.invalidateNoteDomCache === 'function') {
+                window.invalidateNoteDomCache(noteId);
+            }
+
+            // Mark note for auto-push since we moved a note (if auto-push enabled)
+            if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                window.setNeedsAutoPush(true);
+            }
+
+            if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                window.tabManager.closeTabByNoteId(noteId);
+            }
+
+            // The note left this workspace: reloading the current URL would ask
+            // for a note the page can no longer display, so an archived note
+            // that was open sends us back to the workspace root instead.
+            if (document.getElementById('note' + noteId)) {
+                redirectToWorkspace();
+            } else {
+                window.location.reload();
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup(archiveErrorMessage(0, { error: error.message }), 'error');
+        });
+}
+
+/**
+ * Build the message shown when archiving fails
+ * @private
+ */
+function archiveErrorMessage(status, data) {
+    // 409 is the only failure with a cause worth naming: the same title is
+    // already archived at that path, so the move would shadow it.
+    if (status === 409) {
+        return window.t
+            ? window.t('archive.errors.duplicate_title', null,
+                'A note with the same title is already archived in this folder.')
+            : 'A note with the same title is already archived in this folder.';
+    }
+
+    var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+    return window.t
+        ? window.t('archive.errors.archive_prefix', { error: err }, 'Error archiving the note: {{error}}')
+        : ('Error archiving the note: ' + err);
+}
+
+// ============================================================
 // CONTENT UTILITIES
 // ============================================================
 
@@ -1162,6 +1279,7 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
 // Expose functions globally for use in other scripts
 window.saveNoteToServer = saveNoteToServer;
 window.deleteNote = deleteNote;
+window.archiveNote = archiveNote;
 window.openNoteInNewTab = openNoteInNewTab;
 window.showDeleteLinkedNoteModal = showDeleteLinkedNoteModal;
 window.deleteLinkedNoteOnly = deleteLinkedNoteOnly;

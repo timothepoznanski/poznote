@@ -675,6 +675,21 @@
                     showMoveFolderDialog(noteId, fId, fName);
                 }
                 break;
+            case 'archive-note':
+                if (isPublicWorkspaceReadOnly()) {
+                    break;
+                }
+                if (noteId && typeof archiveNote === 'function') {
+                    // The toolbar menu stays open on its own item clicks, and
+                    // would sit on top of the confirmation.
+                    var toolbarElForArchive = target.closest('.note-edit-toolbar');
+                    if (toolbarElForArchive) {
+                        var menuElForArchive = toolbarElForArchive.querySelector('.mobile-toolbar-menu');
+                        if (menuElForArchive) menuElForArchive.hidden = true;
+                    }
+                    archiveNote(noteId, target.dataset.noteTitle);
+                }
+                break;
             case 'show-export-modal':
                 if (typeof showExportModal === 'function') {
                     const filename = target.dataset.filename;

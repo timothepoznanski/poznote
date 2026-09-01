@@ -567,9 +567,11 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
  * is no longer required; populateNoteActionsMenu (js/utils.js) copies the note
  * identity onto each item and picks the share/favorite variants on open.
  *
+ * @param string $currentWorkspace Workspace being displayed, used to drop the
+ *                                 archive entry inside the archive workspace
  * @return string HTML for the shared dropdown menu
  */
-function renderNoteActionsMenu() {
+function renderNoteActionsMenu($currentWorkspace = '') {
     $menu = "<div class='note-actions-menu' id='note-actions-menu'>";
 
     // Open note in a new browser tab
@@ -583,6 +585,16 @@ function renderNoteActionsMenu() {
     $menu .= "<i class='lucide lucide-folder-output'></i>";
     $menu .= "<span>" . t_h('notes_list.note_actions.move_note', [], 'Move note') . "</span>";
     $menu .= "</div>";
+
+    // Archive note: moves it to the archive workspace, folder path included.
+    // Pointless once the note is already there, so the entry is dropped when
+    // that workspace is the one on screen.
+    if (trim((string)$currentWorkspace) !== POZNOTE_ARCHIVE_WORKSPACE) {
+        $menu .= "<div class='note-actions-menu-item' data-action='archive-note'>";
+        $menu .= "<i class='lucide lucide-archive'></i>";
+        $menu .= "<span>" . t_h('archive.menu_item', [], 'Archive note') . "</span>";
+        $menu .= "</div>";
+    }
 
     // Download note
     $menu .= "<div class='note-actions-menu-item' data-action='show-export-modal'>";

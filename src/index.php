@@ -431,7 +431,8 @@ if ($isPublicWorkspaceReadonly) {
             'inlineAttachmentPreviews' => $attachment_previews_in_note_setting,
             'attachmentsAtBottom' => $attachments_at_bottom_setting,
             'backlinksAtBottom' => $backlinks_at_bottom_setting,
-            'defaultImageBorderNoPadding' => poznoteSettingEnabled($settings['default_image_border_no_padding'], false)
+            'defaultImageBorderNoPadding' => poznoteSettingEnabled($settings['default_image_border_no_padding'], false),
+            'archiveWorkspace' => POZNOTE_ARCHIVE_WORKSPACE
         ], JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP) ?: '{}';
     ?></script>
     <!-- js/error-handler.js is bundled as the first file of index_js.php?group=app -->

@@ -4012,5 +4012,16 @@
       "invalid_email": "La dirección de correo de contacto no es válida.",
       "invalid_url": "La URL de la comunidad no es válida."
     }
+  },
+  "archive": {
+    "menu_item": "Archivar la nota",
+    "confirm_title": "Archivar la nota",
+    "confirm_message": "«{{title}}» se moverá al espacio de trabajo «{{workspace}}», conservando su ruta de carpetas. El espacio de trabajo se crea si aún no existe.",
+    "confirm_button": "Archivar",
+    "already_archived": "Esta nota ya está en el espacio de trabajo «{{workspace}}».",
+    "errors": {
+      "duplicate_title": "Ya hay archivada una nota con el mismo título en esta carpeta.",
+      "archive_prefix": "Error al archivar la nota: {{error}}"
+    }
   }
 }

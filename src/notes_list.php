@@ -493,7 +493,7 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
 // outside the scrollable container so no ancestor can clip or transform it.
 echo renderFolderActionsMenu();
 // Same arrangement for the per-note three-dot toggles.
-echo renderNoteActionsMenu();
+echo renderNoteActionsMenu($workspace_filter);
 ?>
 
 <!-- Mini Calendar Component -->

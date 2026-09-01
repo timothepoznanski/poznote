@@ -4015,5 +4015,16 @@
       "invalid_email": "O endereço de e-mail de contato não é válido.",
       "invalid_url": "A URL da comunidade não é válida."
     }
+  },
+  "archive": {
+    "menu_item": "Arquivar a nota",
+    "confirm_title": "Arquivar a nota",
+    "confirm_message": "\"{{title}}\" será movida para a área de trabalho \"{{workspace}}\", mantendo o seu caminho de pastas. A área de trabalho é criada se ainda não existir.",
+    "confirm_button": "Arquivar",
+    "already_archived": "Esta nota já está na área de trabalho \"{{workspace}}\".",
+    "errors": {
+      "duplicate_title": "Já existe uma nota arquivada com o mesmo título nesta pasta.",
+      "archive_prefix": "Erro ao arquivar a nota: {{error}}"
+    }
   }
 }

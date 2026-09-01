@@ -823,6 +823,29 @@ paths:
         '200':
           description: Note moved to root
 
+  /notes/{id}/archive:
+    post:
+      tags: [Notes]
+      summary: Archive a note into the Archives workspace
+      description: >
+        Moves the note to the "Archives" workspace, creating it on first use and
+        mirroring the note's folder path inside it. The source folders are left
+        untouched, and the note's `updated` date is preserved.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Note archived (or already in the Archives workspace)
+        '404':
+          description: Note not found
+        '409':
+          description: A note with the same title is already archived in the target folder
+
   /notes/{id}/beacon:
     post:
       tags: [Notes]

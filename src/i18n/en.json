@@ -3726,5 +3726,16 @@
       "invalid_email": "The contact email address is not valid.",
       "invalid_url": "The community URL is not valid."
     }
+  },
+  "archive": {
+    "menu_item": "Archive note",
+    "confirm_title": "Archive note",
+    "confirm_message": "\"{{title}}\" will be moved to the \"{{workspace}}\" workspace, keeping its folder path. The workspace is created if it does not exist yet.",
+    "confirm_button": "Archive",
+    "already_archived": "This note is already in the \"{{workspace}}\" workspace.",
+    "errors": {
+      "duplicate_title": "A note with the same title is already archived in this folder.",
+      "archive_prefix": "Error archiving the note: {{error}}"
+    }
   }
 }

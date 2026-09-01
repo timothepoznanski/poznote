@@ -4133,5 +4133,16 @@
       "invalid_email": "联系电子邮件地址无效。",
       "invalid_url": "社区 URL 无效。"
     }
+  },
+  "archive": {
+    "menu_item": "归档笔记",
+    "confirm_title": "归档笔记",
+    "confirm_message": "“{{title}}”将移动到工作区“{{workspace}}”，并保留其文件夹层级。若该工作区尚不存在，将自动创建。",
+    "confirm_button": "归档",
+    "already_archived": "该笔记已位于工作区“{{workspace}}”。",
+    "errors": {
+      "duplicate_title": "该文件夹中已归档同名笔记。",
+      "archive_prefix": "归档笔记时出错：{{error}}"
+    }
   }
 }

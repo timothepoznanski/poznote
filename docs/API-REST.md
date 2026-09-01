@@ -586,6 +586,23 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/remove-folder
 ```
 
+### Archive Note
+
+```
+POST /notes/{id}/archive
+```
+
+Move a note to the `Archives` workspace. The workspace is created on first use,
+and the note's folder path is mirrored inside it so the note keeps its place in
+the tree. The source folders are left untouched and the note's `updated` date is
+preserved. Returns `409` when a note with the same title is already archived in
+the target folder.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/archive
+```
+
 ### Emergency Save (Beacon)
 
 ```
@@ -2978,6 +2995,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
+| `POST` | `/notes/{id}/archive` | Archive into the Archives workspace |
 
 ### Note Locks
 | Method | Endpoint | Description |

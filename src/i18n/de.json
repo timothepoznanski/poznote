@@ -4012,5 +4012,16 @@
       "invalid_email": "Die Kontakt-E-Mail-Adresse ist ungültig.",
       "invalid_url": "Die Community-URL ist ungültig."
     }
+  },
+  "archive": {
+    "menu_item": "Notiz archivieren",
+    "confirm_title": "Notiz archivieren",
+    "confirm_message": "„{{title}}“ wird in den Arbeitsbereich „{{workspace}}“ verschoben und behält dabei seinen Ordnerpfad. Der Arbeitsbereich wird angelegt, falls er noch nicht existiert.",
+    "confirm_button": "Archivieren",
+    "already_archived": "Diese Notiz liegt bereits im Arbeitsbereich „{{workspace}}“.",
+    "errors": {
+      "duplicate_title": "In diesem Ordner ist bereits eine Notiz mit demselben Titel archiviert.",
+      "archive_prefix": "Fehler beim Archivieren der Notiz: {{error}}"
+    }
   }
 }
