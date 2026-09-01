@@ -454,7 +454,10 @@ class GitSync {
                 if ($ws !== '') $names[$ws] = true;
             }
             if (!empty($names)) {
-                $this->syncedWorkspacesCache = array_keys($names);
+                // PHP turns numeric-string array keys into ints; force strings
+                // back so the strict in_array() in isWorkspaceSynced() matches
+                // a workspace named e.g. "2024".
+                $this->syncedWorkspacesCache = array_map('strval', array_keys($names));
             }
         } catch (Exception $e) {
             // Fall through to "all workspaces"
@@ -478,7 +481,7 @@ class GitSync {
                 }
             }
             $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('git_sync_workspaces', ?)");
-            $ok = $stmt->execute([empty($names) ? '' : json_encode(array_keys($names), JSON_UNESCAPED_UNICODE)]);
+            $ok = $stmt->execute([empty($names) ? '' : json_encode(array_map('strval', array_keys($names)), JSON_UNESCAPED_UNICODE)]);
             $this->syncedWorkspacesCache = false;
             return $ok;
         } catch (Exception $e) {
