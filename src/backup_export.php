@@ -623,24 +623,80 @@ function createBackup() {
                     statusEl.classList.remove('is-success');
                     statusEl.textContent = i18n.running;
 
+                    // The backup runs as a background job: building and
+                    // uploading a large archive takes longer than a proxied
+                    // request may live, so the old synchronous call showed an
+                    // error while the backup silently completed. Queue the
+                    // job, then poll its state until it finishes.
                     fetch('api_s3_backup.php?action=self_run', { method: 'POST', credentials: 'same-origin' })
                         .then(function(r) { return r.json(); })
                         .then(function(data) {
-                            statusEl.textContent = data.success
-                                ? i18n.done.replace('{{size}}', formatBytes(data.size))
-                                : i18n.error.replace('{{error}}', data.error || 'unknown');
-                            // Only the success message gets the blue box
-                            statusEl.classList.toggle('is-success', !!data.success);
-                            runBtn.disabled = false;
-                            refreshList();
+                            if (!data.success) {
+                                showRunOutcome(false, data.error);
+                                return;
+                            }
+                            pollRunJob(data.job_id);
                         })
                         .catch(function(e) {
-                            statusEl.textContent = i18n.error.replace('{{error}}', e.message);
-                            statusEl.classList.remove('is-success');
-                            runBtn.disabled = false;
+                            showRunOutcome(false, e.message);
                         });
                 });
             });
+
+            function showRunOutcome(success, sizeOrError) {
+                statusEl.hidden = false;
+                statusEl.textContent = success
+                    ? i18n.done.replace('{{size}}', formatBytes(sizeOrError))
+                    : i18n.error.replace('{{error}}', sizeOrError || 'unknown');
+                // Only the success message gets the blue box
+                statusEl.classList.toggle('is-success', success);
+                runBtn.disabled = false;
+                refreshList();
+            }
+
+            function pollRunJob(jobId) {
+                var url = 'api_s3_backup.php?action=run_status'
+                    + (jobId ? '&job_id=' + encodeURIComponent(jobId) : '');
+                var timer = setInterval(function() {
+                    fetch(url, { credentials: 'same-origin' })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            var job = data.success ? data.job : null;
+                            if (!job) {
+                                clearInterval(timer);
+                                showRunOutcome(false, 'unknown');
+                                return;
+                            }
+                            if (job.status === 'queued' || job.status === 'running') return;
+                            clearInterval(timer);
+                            if (job.status === 'done') {
+                                showRunOutcome(true, job.size || 0);
+                            } else {
+                                showRunOutcome(false, job.error);
+                            }
+                        })
+                        .catch(function() { /* transient network error: keep polling */ });
+                }, 3000);
+            }
+
+            // A backup started earlier (or in another tab) may still be
+            // running server-side: pick its status back up instead of
+            // showing nothing.
+            fetch('api_s3_backup.php?action=run_status', { credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var job = data.success ? data.job : null;
+                    if (job && (job.status === 'queued' || job.status === 'running')) {
+                        runBtn.disabled = true;
+                        statusEl.hidden = false;
+                        statusEl.classList.remove('is-success');
+                        statusEl.textContent = i18n.running;
+                        pollRunJob(job.id);
+                    }
+                    // A finished or failed run from an earlier visit is not
+                    // resurfaced: its outcome was shown when it happened.
+                })
+                .catch(function() { /* nothing to resume */ });
 
             refreshList();
         });

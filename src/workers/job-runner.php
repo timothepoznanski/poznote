@@ -24,6 +24,10 @@ declare(strict_types=1);
  * notes_import     Concatenates the uploaded chunks into the notes zip,
  *                  then runs the same importIndividualNotesZip() pipeline
  *                  as the synchronous individual-notes import.
+ *
+ * s3_backup        Builds the target user's complete backup zip and uploads
+ *                  it to the backup bucket (S3BackupService::backupUser),
+ *                  for the manual runs triggered from the settings pages.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -77,6 +81,9 @@ try {
         case POZNOTE_JOB_TYPE_NOTES_IMPORT:
             runNotesImportJob($userId, $jobId, $payload);
             break;
+        case POZNOTE_JOB_TYPE_S3_BACKUP:
+            runS3BackupJob($userId, $jobId, $payload);
+            break;
         default:
             throw new RuntimeException('Unknown job type');
     }
@@ -90,6 +97,31 @@ try {
 }
 
 exit(0);
+
+/**
+ * Route poznoteRestoreReportProgress() milestones from the running pipeline
+ * into the polled job state, throttled so a per-file stage does not rewrite
+ * job.json thousands of times.
+ */
+function poznoteJobInstallProgressHook(int $userId, string $jobId): void {
+    $lastStage = '';
+    $lastWrite = 0.0;
+    $GLOBALS['poznote_restore_progress_hook'] = function (string $stage, ?int $done, ?int $total) use ($userId, $jobId, &$lastStage, &$lastWrite) {
+        $now = microtime(true);
+        $stageChanged = $stage !== $lastStage;
+        $stageFinished = $done !== null && $total !== null && $done >= $total;
+        if (!$stageChanged && !$stageFinished && $now - $lastWrite < 0.4) {
+            return;
+        }
+        $lastStage = $stage;
+        $lastWrite = $now;
+        poznoteJobUpdate($userId, $jobId, [
+            'stage' => $stage,
+            'stage_done' => $done,
+            'stage_total' => $total,
+        ]);
+    };
+}
 
 /**
  * Build the complete backup zip and park it in the job directory.
@@ -289,26 +321,9 @@ function runNotesImportJob(int $userId, string $jobId, array $payload): void {
     // local variable here; the import helpers reach it via `global $con`.
     $GLOBALS['con'] = $con;
 
-    // Surface the import pipeline's milestones into the polled job state,
-    // throttled so a per-file stage does not rewrite job.json thousands of
-    // times (same hook as the restore pipeline).
-    $progressLastStage = '';
-    $progressLastWrite = 0.0;
-    $GLOBALS['poznote_restore_progress_hook'] = function (string $stage, ?int $done, ?int $total) use ($userId, $jobId, &$progressLastStage, &$progressLastWrite) {
-        $now = microtime(true);
-        $stageChanged = $stage !== $progressLastStage;
-        $stageFinished = $done !== null && $total !== null && $done >= $total;
-        if (!$stageChanged && !$stageFinished && $now - $progressLastWrite < 0.4) {
-            return;
-        }
-        $progressLastStage = $stage;
-        $progressLastWrite = $now;
-        poznoteJobUpdate($userId, $jobId, [
-            'stage' => $stage,
-            'stage_done' => $done,
-            'stage_total' => $total,
-        ]);
-    };
+    // Surface the import pipeline's milestones into the polled job state
+    // (same hook as the restore pipeline)
+    poznoteJobInstallProgressHook($userId, $jobId);
 
     $result = importIndividualNotesZip(
         ['tmp_name' => $zipPath, 'name' => $originalName],
@@ -328,6 +343,49 @@ function runNotesImportJob(int $userId, string $jobId, array $payload): void {
         'phase' => '',
         'message' => (string)($result['message'] ?? ''),
         'finished_at' => time(),
+    ]);
+}
+
+/**
+ * Build the target user's backup zip and upload it to the backup bucket.
+ *
+ * Runs the same S3BackupService::backupUser() as the synchronous flows did:
+ * for a large account the build plus the bucket upload takes far longer than
+ * a proxied HTTP request may live, which showed the user an error while the
+ * backup silently completed server-side. The admin check happened when the
+ * job was created; here the payload is trusted (job files are only writable
+ * by the server itself).
+ */
+function runS3BackupJob(int $userId, string $jobId, array $payload): void {
+    require_once __DIR__ . '/../functions.php';
+    require_once __DIR__ . '/../users/db_master.php';
+    require_once __DIR__ . '/../users/UserDataManager.php';
+    require_once __DIR__ . '/../storage/AttachmentStorage.php';
+    require_once __DIR__ . '/../S3BackupService.php';
+
+    $targetUserId = (int)($payload['target_user_id'] ?? $userId);
+
+    poznoteJobUpdate($userId, $jobId, ['phase' => 'building', 'stage' => 'building']);
+    poznoteJobInstallProgressHook($userId, $jobId);
+
+    $result = S3BackupService::backupUser($targetUserId);
+    unset($GLOBALS['poznote_restore_progress_hook']);
+
+    if (empty($result['success'])) {
+        throw new RuntimeException((string)($result['error'] ?? 'Backup failed'));
+    }
+
+    $job = poznoteJobRead($userId, $jobId);
+    $jobPayload = is_array($job['payload'] ?? null) ? $job['payload'] : [];
+    $jobPayload['filename'] = basename((string)($result['key'] ?? ''));
+    $jobPayload['size'] = (int)($result['size'] ?? 0);
+    poznoteJobUpdate($userId, $jobId, [
+        'status' => 'done',
+        'phase' => '',
+        // A failed prune does not fail the backup; surface it as a note
+        'message' => (string)($result['error'] ?? ''),
+        'finished_at' => time(),
+        'payload' => $jobPayload,
     ]);
 }
 
@@ -356,25 +414,8 @@ function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string
     require_once __DIR__ . '/../db_connect.php';
 
     // Surface the restore pipeline's milestones (see
-    // poznoteRestoreReportProgress) into the polled job state, throttled so
-    // a per-file stage does not rewrite job.json thousands of times.
-    $progressLastStage = '';
-    $progressLastWrite = 0.0;
-    $GLOBALS['poznote_restore_progress_hook'] = function (string $stage, ?int $done, ?int $total) use ($userId, $jobId, &$progressLastStage, &$progressLastWrite) {
-        $now = microtime(true);
-        $stageChanged = $stage !== $progressLastStage;
-        $stageFinished = $done !== null && $total !== null && $done >= $total;
-        if (!$stageChanged && !$stageFinished && $now - $progressLastWrite < 0.4) {
-            return;
-        }
-        $progressLastStage = $stage;
-        $progressLastWrite = $now;
-        poznoteJobUpdate($userId, $jobId, [
-            'stage' => $stage,
-            'stage_done' => $done,
-            'stage_total' => $total,
-        ]);
-    };
+    // poznoteRestoreReportProgress) into the polled job state
+    poznoteJobInstallProgressHook($userId, $jobId);
 
     $result = restoreCompleteBackup(['tmp_name' => $zipPath, 'name' => $originalName], true);
     unset($GLOBALS['poznote_restore_progress_hook']);

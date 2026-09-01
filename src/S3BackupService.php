@@ -139,6 +139,9 @@ class S3BackupService {
             return ['success' => false, 'key' => null, 'size' => 0, 'error' => $e->getMessage()];
         }
 
+        // Milestones for the background job runner (no-op in synchronous
+        // contexts, see poznoteRestoreReportProgress)
+        poznoteRestoreReportProgress('building');
         $build = buildUserBackupZip($userId, $config['skip_s3_attachments']);
         if (!$build['success']) {
             return ['success' => false, 'key' => null, 'size' => 0, 'error' => (string)$build['error']];
@@ -162,6 +165,7 @@ class S3BackupService {
         }
 
         try {
+            poznoteRestoreReportProgress('uploading');
             $client->putObject($key, $zipPath, 'application/zip');
             // Only trust the backup once the object is confirmed in the
             // bucket with the expected size
