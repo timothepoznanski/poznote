@@ -815,7 +815,25 @@
         _restoreScrollPosition(tab);
     }
 
+    /** Active scroll-restore watcher (ResizeObserver + timer), one at a time. */
+    var _scrollRestoreObserver = null;
+    var _scrollRestoreTimer = null;
+
+    function _cancelScrollRestoreWatch() {
+        if (_scrollRestoreObserver) {
+            try { _scrollRestoreObserver.disconnect(); } catch (e) { }
+            _scrollRestoreObserver = null;
+        }
+        if (_scrollRestoreTimer) {
+            clearTimeout(_scrollRestoreTimer);
+            _scrollRestoreTimer = null;
+        }
+    }
+
     function _saveScrollPosition() {
+        // Navigating away: a still-running restore watcher belongs to the note
+        // being left — stop it so it cannot clobber the next note's scroll.
+        _cancelScrollRestoreWatch();
         if (!activeTabId) return;
         var currentTab = _findTabById(activeTabId);
         if (!currentTab || !_isNoteTab(currentTab)) return;
@@ -834,7 +852,16 @@
         var saved = _scrollPositions[tab.id];
         if (!saved) return;
 
+        // Only one restore watcher at a time — a previous tab's watcher must
+        // not re-apply its scroll on top of this one.
+        _cancelScrollRestoreWatch();
+
         function applyScroll() {
+            // The user may have switched tabs again while we were watching
+            if (activeTabId !== tab.id) {
+                _cancelScrollRestoreWatch();
+                return;
+            }
             var rightCol = document.getElementById('right_col');
             if (!rightCol) return;
             if (typeof saved.main === 'number') rightCol.scrollTop = saved.main;
@@ -867,8 +894,27 @@
         var noteContent = rightCol.querySelector('.notecard, .noteentry, .markdown-preview');
         if (noteContent) {
             observer.observe(noteContent);
+            _scrollRestoreObserver = observer;
             // Disconnect after deadline regardless
-            setTimeout(function () { observer.disconnect(); }, 3000);
+            _scrollRestoreTimer = setTimeout(function () {
+                observer.disconnect();
+                if (_scrollRestoreObserver === observer) _scrollRestoreObserver = null;
+                _scrollRestoreTimer = null;
+            }, 3000);
+        }
+    }
+
+    /**
+     * Restore a tab's scroll position, unless the note is a markdown note whose
+     * interactive editor is not built yet — that case restores via
+     * _restoreScrollForNote() at the end of initializeMarkdownNote(), once the
+     * markdown DOM (cm-scroller, markdown-preview) actually exists.
+     */
+    function _restoreScrollWhenReady(tab) {
+        var isMarkdown = !!document.querySelector('#right_col .noteentry[data-note-type="markdown"]');
+        var markdownDomReady = !!document.querySelector('#right_col .cm-scroller, #right_col .markdown-preview');
+        if (!isMarkdown || markdownDomReady) {
+            _restoreScrollPosition(tab);
         }
     }
 
@@ -959,13 +1005,7 @@
                 var sidebarTitleForSwitch = _readSidebarTitle(noteId);
                 var freshTitle = _readTitle(noteId, sidebarTitleForSwitch || switchedTab.title || _getDefaultTitle());
                 switchedTab.title = freshTitle;
-                // For non-markdown notes, restore scroll now. Markdown notes restore via
-                // _restoreScrollForNote() called at the end of initializeMarkdownNote(),
-                // once the markdown DOM (cm-scroller, markdown-preview) is actually ready.
-                var isMarkdown = !!document.querySelector('#right_col .noteentry[data-note-type="markdown"]');
-                if (!isMarkdown) {
-                    _restoreScrollPosition(switchedTab);
-                }
+                _restoreScrollWhenReady(switchedTab);
             }
             _saveToStorage();
             return;
@@ -986,9 +1026,12 @@
         }
 
         if (existingTabWithNote) {
-            // Found existing tab for this note - make it active
+            // Found existing tab for this note - make it active.
+            // Sidebar navigation (including Alt+ArrowUp/Down) landing on a note
+            // already open in a tab is a tab switch: restore its scroll position.
             activeTabId = existingTabWithNote.id;
             existingTabWithNote.title = title; // Update title just in case
+            _restoreScrollWhenReady(existingTabWithNote);
         } else if (activeTabId !== null) {
             var tab = _findTabById(activeTabId);
             if (tab && _isPinnedTab(tab)) {
