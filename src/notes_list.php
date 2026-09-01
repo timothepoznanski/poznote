@@ -430,6 +430,13 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     foreach($favoritesFolder as $folderId => $folderData) {
         displayFolderRecursive($folderId, $folderData, 0, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined, $displayUncategorizedFirst, $created_from, $created_to);
     }
+    // Light separator between the Favorites section and the rest of the list.
+    // In search mode displayFolderRecursive() skips an empty Favorites folder,
+    // so mirror that check to avoid an orphaned line; under a folder filter the
+    // section has no header, so no separator either.
+    if (empty($folder_filter) && (!$is_search_mode || countNotesRecursively(reset($favoritesFolder)) > 0)) {
+        echo '<div class="favorites-separator"></div>';
+    }
 }
 
 // Add drop zone for moving notes to root (no folder)
