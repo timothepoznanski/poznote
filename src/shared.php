@@ -197,7 +197,9 @@ usort($shared_folders, function($a, $b) {
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
 	data-txt-access-denied-title="<?php echo t_h('public.access_denied_title', [], 'Access Denied'); ?>"
 	data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"
-	data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>">
+	data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>"
+	data-txt-expand-all="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>"
+	data-txt-collapse-all="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
 
 	<!-- Shared folders data from PHP -->
 	<script>
@@ -243,13 +245,9 @@ usort($shared_folders, function($a, $b) {
 				</div>
 				<div id="filterStats" class="filter-stats initially-hidden"></div>
 				<div class="shared-filter-tree-actions initially-hidden" id="sharedTreeToolbar">
-					<button type="button" id="expandAllFoldersBtn" class="btn btn-secondary">
+					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary">
 						<i class="lucide lucide-chevron-down" style="margin-right: 6px;"></i>
-						<?php echo t_h('public.expand_all', [], 'Expand all'); ?>
-					</button>
-					<button type="button" id="collapseAllFoldersBtn" class="btn btn-secondary">
-						<i class="lucide lucide-chevron-up" style="margin-right: 6px;"></i>
-						<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>
+						<span id="toggleAllFoldersLabel"><?php echo t_h('public.expand_all', [], 'Expand all'); ?></span>
 					</button>
 				</div>
 			</div>

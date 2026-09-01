@@ -1150,7 +1150,9 @@
       "share_note": "Share note",
       "rename_note": "Rename note",
       "delete_note": "Delete note",
-      "enter_note_name": "Please enter a note title"
+      "enter_note_name": "Please enter a note title",
+      "attachments": "Attachments",
+      "convert_note": "Convert note"
     }
   },
   "note_color": {

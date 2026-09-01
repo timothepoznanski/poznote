@@ -3372,8 +3372,29 @@ function populateNoteActionsMenu(menu, toggle) {
     var folderName = toggle.getAttribute('data-folder') || '';
     var isShared = toggle.getAttribute('data-shared') === '1';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
+    var reminderAt = toggle.getAttribute('data-reminder-at') || '';
 
     menu.setAttribute('data-note-id', noteId);
+
+    // Type-sensitive items: a shortcut row only keeps the actions that act on
+    // the link itself (attachments stay: the API resolves them to the target)
+    var isLinkedNote = noteType === 'linked';
+    menu.querySelectorAll('.note-real-only').forEach(function (item) {
+        item.style.display = isLinkedNote ? 'none' : '';
+    });
+
+    // Convert: show the variant matching the note's own type
+    menu.querySelectorAll('.convert-state-markdown').forEach(function (item) {
+        item.style.display = noteType === 'markdown' ? '' : 'none';
+    });
+    menu.querySelectorAll('.convert-state-note').forEach(function (item) {
+        item.style.display = noteType === 'note' ? '' : 'none';
+    });
+
+    // Search and replace only exists on text note types
+    menu.querySelectorAll('.search-capable-only').forEach(function (item) {
+        item.style.display = (noteType === 'note' || noteType === 'markdown') ? '' : 'none';
+    });
 
     // Copy note identity onto every action item (handlers read it there).
     // The names match what each existing handler expects: show-export-modal
@@ -3386,6 +3407,7 @@ function populateNoteActionsMenu(menu, toggle) {
         item.setAttribute('data-note-type', noteType);
         item.setAttribute('data-folder-id', folderId);
         item.setAttribute('data-folder', folderName);
+        item.setAttribute('data-reminder-at', reminderAt);
     });
 
     menu.querySelectorAll('.share-state-shared').forEach(function (item) {

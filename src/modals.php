@@ -1845,12 +1845,21 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:archive-note" checked><span><?php echo t_h('archive.menu_item', [], 'Archive note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-export-modal" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:print-note" checked><span><?php echo t_h('common.print', [], 'Print'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-convert-modal" checked><span><?php echo t_h('notes_list.note_actions.convert_note', [], 'Convert note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-attachment-dialog" checked><span><?php echo t_h('notes_list.note_actions.attachments', [], 'Attachments'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-reminder-modal" checked><span><?php echo t_h('reminder.toolbar_button', [], 'Set reminder'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-note-icon-picker" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshots'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-search-replace-modal" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and replace'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-note-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:delete-note" checked><span><?php echo t_h('notes_list.note_actions.delete_note', [], 'Delete note'); ?></span></label>
                 </div>
                 </div>

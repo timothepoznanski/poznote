@@ -1626,7 +1626,9 @@
       "share_note": "Compartir nota",
       "rename_note": "Renombrar nota",
       "delete_note": "Eliminar nota",
-      "enter_note_name": "Introduzca un título de nota"
+      "enter_note_name": "Introduzca un título de nota",
+      "attachments": "Adjuntos",
+      "convert_note": "Convertir nota"
     }
   },
   "note_color": {

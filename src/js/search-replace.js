@@ -1080,11 +1080,39 @@
         });
     }
 
+    /**
+     * The sidebar menu's "Search and replace" on a note that was not loaded
+     * navigates here with open_search=1; open the loaded note's bar now.
+     * The param is then dropped from the URL so a reload doesn't reopen it.
+     */
+    function openSearchFromUrlParam() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('open_search') !== '1') return;
+
+            const loadedNoteId = window.noteid;
+            if (loadedNoteId && loadedNoteId !== -1 && loadedNoteId !== 'search' &&
+                getSearchBar(loadedNoteId)) {
+                window.openSearchReplaceModal(String(loadedNoteId));
+            }
+
+            params.delete('open_search');
+            const qs = params.toString();
+            history.replaceState(null, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+        } catch (e) {
+            // The bar simply stays closed
+        }
+    }
+
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initAllSearchBars);
+        document.addEventListener('DOMContentLoaded', function () {
+            initAllSearchBars();
+            openSearchFromUrlParam();
+        });
     } else {
         initAllSearchBars();
+        openSearchFromUrlParam();
     }
 
     // Re-initialize when new notes are loaded

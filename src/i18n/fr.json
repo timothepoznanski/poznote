@@ -1658,7 +1658,9 @@
       "share_note": "Partager la note",
       "rename_note": "Renommer la note",
       "delete_note": "Supprimer la note",
-      "enter_note_name": "Veuillez saisir un titre de note"
+      "enter_note_name": "Veuillez saisir un titre de note",
+      "attachments": "Pièces jointes",
+      "convert_note": "Convertir la note"
     }
   },
   "note_color": {

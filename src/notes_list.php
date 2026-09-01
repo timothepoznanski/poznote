@@ -211,7 +211,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
     echo "</a>";
-    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), isNoteShared($noteDbId));
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), isNoteShared($noteDbId), $row1['reminder_at'] ?? '');
     echo "</div>";
     echo "<div id=pxbetweennotes></div>";
 }
