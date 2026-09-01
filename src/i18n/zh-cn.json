@@ -1771,7 +1771,8 @@
       "token_already_in_use": "自定义链接已被使用",
       "no_token_generated": "未生成链接",
       "server_error": "服务器错误: {{error}}",
-      "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。"
+      "storage_s3_quota_reached": "已达到 S3 存储上限:此实例最多允许该用户使用 {{max}} MB 的 S3 存储。",
+      "backups_s3_quota_reached": "已达到 S3 备份上限:此实例最多允许该用户使用 {{max}} MB 的备份存档。"
     }
   },
   "ui": {
@@ -2270,6 +2271,17 @@
       "workspaces_close": "关闭",
       "stage_downloading": "正在从存储桶获取存档...",
       "queued_uploaded": "上传完成，恢复即将开始..."
+    },
+    "chunked_import": {
+      "queued": "导入即将开始...",
+      "queued_uploaded": "上传完成，导入即将开始...",
+      "stage_preparing": "正在读取压缩包...",
+      "stage_attachments": "正在导入图片和附件...（已扫描 {{done}}/{{total}} 个文件）",
+      "stage_attachments_simple": "正在导入图片和附件...",
+      "stage_notes": "正在导入笔记...（{{done}}/{{total}}）",
+      "stage_notes_simple": "正在导入笔记...",
+      "done": "导入成功完成。",
+      "error": "导入失败：{{error}}"
     }
   },
   "markdown_guide": {

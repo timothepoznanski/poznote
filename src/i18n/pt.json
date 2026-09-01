@@ -1777,7 +1777,8 @@
       "token_already_in_use": "Link personalizado já em uso",
       "no_token_generated": "Nenhum link gerado",
       "server_error": "Erro do servidor: {{error}}",
-      "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário."
+      "storage_s3_quota_reached": "Limite de armazenamento S3 atingido: esta instância permite no máximo {{max}} MB de armazenamento S3 para este usuário.",
+      "backups_s3_quota_reached": "Limite de backups S3 atingido: esta instância permite no máximo {{max}} MB de arquivos de backup para este usuário."
     }
   },
   "ui": {
@@ -2272,6 +2273,17 @@
       "workspaces_close": "Fechar",
       "stage_downloading": "A obter o arquivo do bucket...",
       "queued_uploaded": "Envio concluído, a iniciar o restauro..."
+    },
+    "chunked_import": {
+      "queued": "A iniciar a importação...",
+      "queued_uploaded": "Envio concluído, a iniciar a importação...",
+      "stage_preparing": "A ler o arquivo...",
+      "stage_attachments": "A importar as imagens e anexos... ({{done}}/{{total}} ficheiros analisados)",
+      "stage_attachments_simple": "A importar as imagens e anexos...",
+      "stage_notes": "A importar as notas... ({{done}}/{{total}})",
+      "stage_notes_simple": "A importar as notas...",
+      "done": "Importação concluída com sucesso.",
+      "error": "A importação falhou: {{error}}"
     }
   },
   "markdown_guide": {

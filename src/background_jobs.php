@@ -27,6 +27,7 @@ const POZNOTE_JOB_MAX_AGE_SECONDS = 86400;
 // Job types
 const POZNOTE_JOB_TYPE_EXPORT = 'complete_export';
 const POZNOTE_JOB_TYPE_RESTORE = 'chunked_restore';
+const POZNOTE_JOB_TYPE_NOTES_IMPORT = 'notes_import';
 
 function poznoteJobsRootDir(): string {
     return rtrim(sys_get_temp_dir(), '/') . '/poznote_jobs';

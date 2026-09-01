@@ -1773,7 +1773,8 @@
       "internal_server_error": "Interner Serverfehler",
       "duplicate_title_in_folder": "Eine andere Notiz mit demselben Titel existiert bereits in diesem Ordner.",
       "invalid_custom_token": "Ungültiger benutzerdefinierter Link.\n\nErlaubt:\n\nBuchstaben, Zahlen, -, _, . (4-128 Zeichen)",
-      "storage_s3_quota_reached": "S3-Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB S3-Speicher für diesen Benutzer."
+      "storage_s3_quota_reached": "S3-Speicherlimit erreicht: Diese Instanz erlaubt höchstens {{max}} MB S3-Speicher für diesen Benutzer.",
+      "backups_s3_quota_reached": "S3-Backup-Limit erreicht: Diese Instanz erlaubt höchstens {{max}} MB an Backup-Archiven für diesen Benutzer."
     }
   },
   "ui": {
@@ -2268,6 +2269,17 @@
       "workspaces_close": "Schließen",
       "stage_downloading": "Archiv wird aus dem Bucket geladen...",
       "queued_uploaded": "Upload abgeschlossen, Wiederherstellung startet..."
+    },
+    "chunked_import": {
+      "queued": "Import startet...",
+      "queued_uploaded": "Upload abgeschlossen, Import startet...",
+      "stage_preparing": "Archiv wird gelesen...",
+      "stage_attachments": "Bilder und Anhänge werden importiert... ({{done}}/{{total}} Dateien geprüft)",
+      "stage_attachments_simple": "Bilder und Anhänge werden importiert...",
+      "stage_notes": "Notizen werden importiert... ({{done}}/{{total}})",
+      "stage_notes_simple": "Notizen werden importiert...",
+      "done": "Import erfolgreich abgeschlossen.",
+      "error": "Der Import ist fehlgeschlagen: {{error}}"
     }
   },
   "markdown_guide": {

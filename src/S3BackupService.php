@@ -148,6 +148,19 @@ class S3BackupService {
         $key = self::keyPrefixForUser($userId) . $build['filename'];
         $size = (int)(@filesize($zipPath) ?: 0);
 
+        // Enforce the per-user S3 backups quota BEFORE uploading. The storage
+        // stats page shows this quota in red when exceeded; without this check
+        // nothing actually stopped new archives from piling past it. The
+        // projection accounts for the retention prune that follows the upload
+        // (the new archive plus the newest retention-1 existing ones survive),
+        // so a retention-bounded schedule near its steady state is not
+        // spuriously refused.
+        $quotaError = self::checkBackupsQuota($client, $userId, $size, $config['retention']);
+        if ($quotaError !== null) {
+            @unlink($zipPath);
+            return ['success' => false, 'key' => null, 'size' => $size, 'error' => $quotaError];
+        }
+
         try {
             $client->putObject($key, $zipPath, 'application/zip');
             // Only trust the backup once the object is confirmed in the
@@ -181,6 +194,70 @@ class S3BackupService {
         ], $trigger, $userId);
 
         return ['success' => true, 'key' => $key, 'size' => $size, 'error' => $pruneError];
+    }
+
+    /**
+     * Effective S3-backups quota in bytes for one user (0 = unlimited).
+     *
+     * Resolved for the TARGET user, not the session: backups run for another
+     * user (admin manual run) or with no session at all (scheduled worker).
+     * Mirrors poznoteGetUserQuotaLimits(): global setting, then the per-user
+     * override; admin accounts are exempt, like every other quota.
+     */
+    private static function backupsQuotaBytesForUser(int $userId): int {
+        try {
+            $profile = getUserProfileById($userId);
+            if ($profile === null || !empty($profile['is_admin'])) {
+                return 0;
+            }
+            $limitMb = max(0, (int)getGlobalSetting('user_max_backups_s3_mb', '0'));
+            $overrides = getUserQuotaOverrides($userId);
+            if (($overrides['max_backups_s3_mb'] ?? null) !== null) {
+                $limitMb = max(0, (int)$overrides['max_backups_s3_mb']);
+            }
+            return $limitMb * 1024 * 1024;
+        } catch (Exception $e) {
+            // Master database unavailable: fail open, same as the other quotas
+            return 0;
+        }
+    }
+
+    /**
+     * User-facing error when uploading a $newSize-byte archive would leave the
+     * user's backup prefix over their quota AFTER the retention prune, or null
+     * when the upload is allowed.
+     */
+    private static function checkBackupsQuota(S3Client $client, int $userId, int $newSize, int $retention): ?string {
+        $quotaBytes = self::backupsQuotaBytesForUser($userId);
+        if ($quotaBytes <= 0) {
+            return null;
+        }
+
+        try {
+            $objects = $client->listObjects(self::keyPrefixForUser($userId));
+        } catch (Exception $e) {
+            // Unreadable bucket: skip the check, the upload itself will fail
+            // with the real error
+            return null;
+        }
+        usort($objects, function ($a, $b) {
+            return strcmp(self::sortStamp($b['key']), self::sortStamp($a['key']));
+        });
+
+        // What the prune keeps besides the new archive: the newest
+        // retention-1 existing ones, or all of them when retention is 0
+        $kept = $retention > 0 ? array_slice($objects, 0, max(0, $retention - 1)) : $objects;
+        $projected = max(0, $newSize);
+        foreach ($kept as $object) {
+            $projected += max(0, (int)($object['size'] ?? 0));
+        }
+        if ($projected <= $quotaBytes) {
+            return null;
+        }
+
+        $maxMb = (int)round($quotaBytes / (1024 * 1024));
+        return t('api.errors.backups_s3_quota_reached', ['max' => $maxMb],
+            'S3 backups limit reached: this instance allows at most ' . $maxMb . ' MB of backup archives for this user.');
     }
 
     /**

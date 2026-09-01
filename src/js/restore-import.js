@@ -195,9 +195,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // A restore launched earlier (or from another tab) may still be running
-    // on the server: pick its status back up instead of showing nothing.
+    // A restore or notes import launched earlier (or from another tab) may
+    // still be running on the server: pick its status back up instead of
+    // showing nothing.
     chunkedRestoreResume();
+    notesImportResume();
 
     // Initialize cards state (open first card by default)
     initializeCardsState();
@@ -528,19 +530,29 @@ function chunkedRestoreRenderUpload(sentBytes, totalBytes) {
     ));
 }
 
-/** Send the whole file in slices; resolves with the queued job state. */
-async function chunkedRestoreUpload(file) {
+/**
+ * Send a whole file in slices to the chunked upload endpoint; resolves with
+ * the queued job state. Shared by the complete restore and the notes import:
+ * opts carries the job type, extra init fields (import destination) and the
+ * two progress callbacks.
+ */
+async function chunkedUploadFile(file, opts) {
     const cfg = chunkedRestoreConfig();
     const chunkBytes = window.POZNOTE_UPLOAD_CHUNK_BYTES || cfg.restoreChunkBytes || (32 * 1024 * 1024);
     const totalChunks = Math.max(1, Math.ceil(file.size / chunkBytes));
     const csrf = cfg.csrfToken || '';
+    const jobType = opts.jobType || '';
 
     const initBody = new FormData();
     initBody.append('action', 'init');
     initBody.append('csrf_token', csrf);
+    if (jobType) initBody.append('job_type', jobType);
     initBody.append('filename', file.name);
     initBody.append('total_size', String(file.size));
     initBody.append('total_chunks', String(totalChunks));
+    for (const key in (opts.initFields || {})) {
+        initBody.append(key, String(opts.initFields[key]));
+    }
     const initData = await chunkedRestoreFetch(initBody);
     const uploadId = initData.upload_id;
 
@@ -555,11 +567,12 @@ async function chunkedRestoreUpload(file) {
                     const fd = new FormData();
                     fd.append('action', 'chunk');
                     fd.append('csrf_token', csrf);
+                    if (jobType) fd.append('job_type', jobType);
                     fd.append('upload_id', uploadId);
                     fd.append('chunk_index', String(i));
                     fd.append('chunk', blob, 'chunk');
                     await chunkedRestoreSendChunk(fd, function (loaded) {
-                        chunkedRestoreRenderUpload(sent + loaded, file.size);
+                        opts.renderProgress(sent + loaded, file.size);
                     });
                     break;
                 } catch (e) {
@@ -568,28 +581,41 @@ async function chunkedRestoreUpload(file) {
                     // before giving up on the whole upload.
                     attempt++;
                     if (attempt >= 3) throw e;
-                    // Same scale as chunkedRestoreRenderUpload: a raw
-                    // percentage here would jump the bar forward, then back.
-                    chunkedRestoreShowProgress(
-                        (file.size > 0 ? sent / file.size : 0) * CHUNKED_RESTORE_UPLOAD_SPAN,
-                        chunkedRestoreText('chunkRetry', 'A slice failed to upload, retrying...')
-                    );
+                    opts.renderRetry(sent, file.size);
                     await new Promise(function (r) { setTimeout(r, 2000); });
                 }
             }
             sent += blob.size;
-            chunkedRestoreRenderUpload(sent, file.size);
+            opts.renderProgress(sent, file.size);
         }
 
         const finBody = new FormData();
         finBody.append('action', 'finalize');
         finBody.append('csrf_token', csrf);
+        if (jobType) finBody.append('job_type', jobType);
         finBody.append('upload_id', uploadId);
         const finData = await chunkedRestoreFetch(finBody);
         return finData.job;
     } finally {
         chunkedRestore.uploading = false;
     }
+}
+
+/** Send the whole restore archive in slices; resolves with the job state. */
+function chunkedRestoreUpload(file) {
+    return chunkedUploadFile(file, {
+        renderProgress: function (sentBytes, totalBytes) {
+            chunkedRestoreRenderUpload(sentBytes, totalBytes);
+        },
+        renderRetry: function (sentBytes, totalBytes) {
+            // Same scale as chunkedRestoreRenderUpload: a raw percentage
+            // here would jump the bar forward, then back.
+            chunkedRestoreShowProgress(
+                (totalBytes > 0 ? sentBytes / totalBytes : 0) * CHUNKED_RESTORE_UPLOAD_SPAN,
+                chunkedRestoreText('chunkRetry', 'A slice failed to upload, retrying...')
+            );
+        }
+    });
 }
 
 function chunkedRestoreStopPolling() {
@@ -730,6 +756,218 @@ function chunkedRestoreResume() {
                 chunkedRestoreSetBusy(true);
                 chunkedRestoreRenderJob(data.job);
                 chunkedRestorePoll(data.job.id);
+            }
+            // A finished or failed run from an earlier visit is not
+            // resurfaced: its outcome was shown when it happened.
+        })
+        .catch(function () { /* nothing to resume */ });
+}
+
+// ========================================
+// Chunked individual-notes ZIP import
+// ========================================
+// Same mechanics as the chunked restore above, for the "import a ZIP of
+// notes" flow: a large archive (an Obsidian vault full of images, a big
+// Poznote notes export) travels in slices, then a server-side worker runs
+// the import outside any HTTP request. This page polls the job status and
+// renders it into the individual-notes card's own progress bar.
+
+const notesImportJob = { pollTimer: null };
+
+function notesImportEls() {
+    return {
+        progress: document.getElementById('notesImportProgress'),
+        bar: document.getElementById('notesImportBar'),
+        statusText: document.getElementById('notesImportStatusText'),
+        error: document.getElementById('notesImportError'),
+        success: document.getElementById('notesImportSuccess'),
+        button: document.getElementById('individualNotesImportBtn')
+    };
+}
+
+// The upload takes the bar's first span (like the restore), then the
+// worker's stages share the rest: assembling the slices, scanning the
+// archive for images/attachments, then importing the notes.
+const NOTES_IMPORT_STAGES = {
+    assembling:  { from: 60, to: 66 },
+    preparing:   { from: 66, to: 70 },
+    attachments: { from: 70, to: 85 },
+    notes:       { from: 85, to: 99 }
+};
+
+function notesImportSetBusy(busy) {
+    const els = notesImportEls();
+    if (els.button) els.button.disabled = busy;
+}
+
+function notesImportShowProgress(percent, text) {
+    const els = notesImportEls();
+    if (els.error) els.error.classList.add('initially-hidden');
+    if (els.success) els.success.classList.add('initially-hidden');
+    if (els.progress) {
+        els.progress.classList.remove('initially-hidden');
+        const circle = els.progress.querySelector('.restore-spinner-circle');
+        if (circle) circle.style.display = '';
+    }
+    if (els.bar) els.bar.style.width = Math.max(0, Math.min(100, percent)) + '%';
+    if (els.statusText) els.statusText.textContent = text;
+}
+
+/** Completion state: full bar, no spinner, import summary below. */
+function notesImportShowDone(summary) {
+    const els = notesImportEls();
+    if (els.progress) {
+        els.progress.classList.remove('initially-hidden');
+        const circle = els.progress.querySelector('.restore-spinner-circle');
+        if (circle) circle.style.display = 'none';
+    }
+    if (els.bar) els.bar.style.width = '100%';
+    if (els.statusText) els.statusText.textContent = chunkedRestoreText('import_done', 'Import completed successfully.');
+    if (els.error) els.error.classList.add('initially-hidden');
+    if (els.success) {
+        els.success.textContent = summary;
+        els.success.classList.remove('initially-hidden');
+    }
+    notesImportSetBusy(false);
+}
+
+function notesImportShowError(text) {
+    const els = notesImportEls();
+    if (els.progress) els.progress.classList.add('initially-hidden');
+    if (els.success) els.success.classList.add('initially-hidden');
+    if (els.error) {
+        els.error.textContent = text;
+        els.error.classList.remove('initially-hidden');
+    }
+    notesImportSetBusy(false);
+}
+
+function notesImportJobPercent(job) {
+    if (job.status === 'done') return 100;
+    const span = NOTES_IMPORT_STAGES[job.stage];
+    if (!span) {
+        // No stage yet (just queued): the upload span is already travelled.
+        return CHUNKED_RESTORE_UPLOAD_SPAN;
+    }
+    let fraction = 0;
+    if (job.stage_total > 0 && job.stage_done !== null && job.stage_done !== undefined) {
+        fraction = Math.max(0, Math.min(1, job.stage_done / job.stage_total));
+    }
+    return span.from + (span.to - span.from) * fraction;
+}
+
+function notesImportStageLabel(job) {
+    const counts = (job.stage_total > 0)
+        ? { done: job.stage_done || 0, total: job.stage_total }
+        : null;
+    switch (job.stage) {
+        case 'assembling':
+            return chunkedRestoreText('stage_assembling', 'Assembling the archive on the server...');
+        case 'preparing':
+            return chunkedRestoreText('import_stage_preparing', 'Reading the archive...');
+        case 'attachments':
+            return counts
+                ? chunkedRestoreText('import_stage_attachments', 'Importing the images and attachments... ({{done}}/{{total}} files scanned)', counts)
+                : chunkedRestoreText('import_stage_attachments_simple', 'Importing the images and attachments...');
+        case 'notes':
+            return counts
+                ? chunkedRestoreText('import_stage_notes', 'Importing the notes... ({{done}}/{{total}})', counts)
+                : chunkedRestoreText('import_stage_notes_simple', 'Importing the notes...');
+        default:
+            return chunkedRestoreText('import_queued_uploaded', 'Upload complete, import starting...');
+    }
+}
+
+function notesImportRenderUpload(sentBytes, totalBytes) {
+    const fraction = totalBytes > 0 ? Math.min(1, sentBytes / totalBytes) : 0;
+    notesImportShowProgress(fraction * CHUNKED_RESTORE_UPLOAD_SPAN, chunkedRestoreText(
+        'uploading',
+        'Uploading the archive... {{percent}}% ({{done}} of {{total}})',
+        {
+            percent: (fraction * 100).toFixed(0),
+            done: formatFileSize(Math.min(sentBytes, totalBytes)),
+            total: formatFileSize(totalBytes)
+        }
+    ));
+}
+
+function notesImportStopPolling() {
+    if (notesImportJob.pollTimer) {
+        clearInterval(notesImportJob.pollTimer);
+        notesImportJob.pollTimer = null;
+    }
+}
+
+function notesImportRenderJob(job) {
+    if (!job) {
+        notesImportStopPolling();
+        return;
+    }
+    if (job.status === 'queued' || job.status === 'running') {
+        notesImportShowProgress(notesImportJobPercent(job), notesImportStageLabel(job));
+        return;
+    }
+    notesImportStopPolling();
+    if (job.status === 'done') {
+        notesImportShowDone(job.message || chunkedRestoreText('import_done', 'Import completed successfully.'));
+    } else if (job.status === 'error') {
+        notesImportShowError(chunkedRestoreText('import_error', 'The import failed: {{error}}', { error: job.error || 'unknown' }));
+    }
+}
+
+function notesImportPoll(uploadId) {
+    notesImportStopPolling();
+    const poll = function () {
+        fetch('api_restore_upload.php?action=status&job_type=notes_import&upload_id=' + encodeURIComponent(uploadId), { credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (data.success) notesImportRenderJob(data.job);
+            })
+            .catch(function () { /* transient network error: keep polling */ });
+    };
+    notesImportJob.pollTimer = setInterval(poll, window.POZNOTE_RESTORE_POLL_MS || 3000);
+    poll();
+}
+
+async function startChunkedNotesImport(file, workspace, folder) {
+    notesImportSetBusy(true);
+    notesImportRenderUpload(0, file.size);
+    try {
+        const job = await chunkedUploadFile(file, {
+            jobType: 'notes_import',
+            initFields: {
+                target_workspace: workspace || '',
+                target_folder: folder || ''
+            },
+            renderProgress: notesImportRenderUpload,
+            renderRetry: function (sentBytes, totalBytes) {
+                notesImportShowProgress(
+                    (totalBytes > 0 ? sentBytes / totalBytes : 0) * CHUNKED_RESTORE_UPLOAD_SPAN,
+                    chunkedRestoreText('chunkRetry', 'A slice failed to upload, retrying...')
+                );
+            }
+        });
+        notesImportRenderJob(job);
+        notesImportPoll(job.id);
+    } catch (e) {
+        notesImportShowError(chunkedRestoreText('uploadError', 'The upload failed: {{error}}', { error: e.message }));
+    }
+}
+
+// An import launched earlier (or from another tab) may still be running on
+// the server: pick its status back up. Its card is closed by default, so
+// open it or the progress bar would be invisible on a reloaded page.
+function notesImportResume() {
+    fetch('api_restore_upload.php?action=status&job_type=notes_import', { credentials: 'same-origin' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            if (!data.success || !data.job) return;
+            if (data.job.status === 'queued' || data.job.status === 'running') {
+                const content = document.getElementById('individualNotesContent');
+                if (content) content.classList.add('open');
+                notesImportSetBusy(true);
+                notesImportRenderJob(data.job);
+                notesImportPoll(data.job.id);
             }
             // A finished or failed run from an earlier visit is not
             // resurfaced: its outcome was shown when it happened.
@@ -912,11 +1150,31 @@ function hideIndividualNotesImportConfirmation() {
 
 function proceedWithIndividualNotesImport() {
     const form = document.getElementById('individualNotesForm');
-    if (form) {
-        hideIndividualNotesImportConfirmation();
-        showIndividualNotesImportSpinner();
-        form.submit();
+    if (!form) return;
+    hideIndividualNotesImportConfirmation();
+
+    const fileInput = document.getElementById('individual_notes_files');
+    const files = fileInput ? fileInput.files : [];
+    const isSingleZip = files.length === 1 && files[0].name.toLowerCase().endsWith('.zip');
+
+    if (isSingleZip) {
+        // A ZIP can be arbitrarily large (an Obsidian vault full of images,
+        // a big notes export): send it in slices and run the import as a
+        // background job, like the complete restore, so neither a proxy
+        // body-size limit nor an HTTP timeout can interrupt it.
+        const workspaceSelect = document.getElementById('target_workspace_select');
+        const folderSelect = document.getElementById('target_folder_select');
+        startChunkedNotesImport(
+            files[0],
+            workspaceSelect ? workspaceSelect.value : '',
+            folderSelect ? folderSelect.value : ''
+        );
+        return;
     }
+
+    // A handful of individual note files stays a plain synchronous POST.
+    showIndividualNotesImportSpinner();
+    form.submit();
 }
 
 // Show/hide spinner for individual notes import

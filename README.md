@@ -938,6 +938,8 @@ Import a ZIP archive containing multiple notes:
   - ZIP archives can contain up to 300 files, configurable in Settings > Advanced Settings > Import Limits
   - When importing a ZIP archive, Poznote automatically detects and recreates the folder structure
 
+There is no practical size limit on the archive. Like a complete restore, it is uploaded in slices (a slice that fails is retried instead of losing the whole upload), reassembled on the server, then processed by a background worker, so neither the browser nor a reverse proxy in front of the instance can time the import out. A progress bar covers the whole pipeline: upload, images and attachments, then notes.
+
 </details>
 
 <a id="import-obsidian-notes"></a>
