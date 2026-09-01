@@ -17,7 +17,7 @@
 .note-attachments-row > .icon-attachment-btn,
 .note-attachments-row > .lucide-paperclip.icon_attachment {
     align-self: flex-start;
-    margin-top: 5px;
+    margin-top: 6px;
 }
 
 /* Separator when attachments/backlinks are placed below the note content */
@@ -48,23 +48,26 @@
     gap: 6px;
 }
 
-/* Attachment Link */
+/* Attachment Link (chip, matching the folder badge look) */
 .attachment-link {
     color: var(--pz-accent) !important;
     text-decoration: none;
-    font-size: 14px;
-    transition: color 0.2s;
+    font-size: 13px;
+    line-height: 1.2;
+    transition: border-color 0.2s, color 0.2s;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     flex-shrink: 0;
-    margin: 2px 4px;
     white-space: nowrap;
+    padding: 4px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
 }
 
 .attachment-link:hover {
     color: #005a8b !important;
-    text-decoration: underline;
+    border-color: #cbd5e1;
 }
 
 .attachment-link:visited {
