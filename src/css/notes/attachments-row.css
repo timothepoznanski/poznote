@@ -8,9 +8,16 @@
 /* Attachments Row */
 .note-attachments-row {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 5px;
     margin-top: 8px;
+}
+
+/* Keep the paperclip aligned with the first line of links when the list wraps */
+.note-attachments-row > .icon-attachment-btn,
+.note-attachments-row > .lucide-paperclip.icon_attachment {
+    align-self: flex-start;
+    margin-top: 5px;
 }
 
 /* Separator when attachments/backlinks are placed below the note content */
@@ -36,20 +43,9 @@
     min-width: 0;
     line-height: 1.4;
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     align-items: center;
     gap: 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.note-attachments-list::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
 }
 
 /* Attachment Link */
