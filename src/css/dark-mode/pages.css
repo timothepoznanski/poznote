@@ -304,11 +304,13 @@ body.dark-mode .note-attachments-row {
 html[data-theme='dark'] .attachment-link,
 body.dark-mode .attachment-link {
     color: var(--dm-accent);
+    border-color: var(--dm-border);
 }
 
 html[data-theme='dark'] .attachment-link:hover,
 body.dark-mode .attachment-link:hover {
     color: #6ab3ff;
+    border-color: var(--dm-border-light);
 }
 
 html[data-theme='dark'] .attachments-display,
