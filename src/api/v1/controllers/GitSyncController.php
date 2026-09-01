@@ -360,7 +360,8 @@ class GitSyncController {
     /**
      * PUT /api/v1/git-sync/config
      * Save per-user Git sync configuration
-     * Body: { "provider": "github", "repo": "owner/repo", "token": "...", "branch": "main", "api_base": "", "author_name": "...", "author_email": "..." }
+     * Body: { "provider": "github", "repo": "owner/repo", "token": "...", "branch": "main", "api_base": "", "author_name": "...", "author_email": "...", "workspaces": ["Homelab"] }
+     * "workspaces" restricts sync to the listed workspaces; null or an empty list syncs all of them.
      */
     public function saveConfig() {
         if (!$this->requireActiveAccountOwner()) {
@@ -384,7 +385,12 @@ class GitSyncController {
         
         $sync = new GitSync($this->con, $_SESSION['user_id'] ?? null);
         $result = $sync->saveUserGitConfig($input);
-        
+
+        if (array_key_exists('workspaces', $input)) {
+            $workspaces = $input['workspaces'];
+            $result = $sync->setSyncedWorkspaces(is_array($workspaces) ? $workspaces : null) && $result;
+        }
+
         echo json_encode([
             'success' => $result,
             'config' => $sync->getConfigStatus()

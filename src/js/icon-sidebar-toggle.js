@@ -95,6 +95,31 @@
 
             link.setAttribute('href', url.pathname + url.search + url.hash);
         });
+
+        // The git Push/Pull buttons only apply to workspaces included in the
+        // Git sync scope. index.php's #poznote-config carries the synced list
+        // (null = every workspace); the buttons are always in the DOM so a
+        // client-side workspace switch just toggles them.
+        var gitButtons = [
+            document.getElementById('iconSidebarGitPushBtn'),
+            document.getElementById('iconSidebarGitPullBtn')
+        ].filter(Boolean);
+        if (gitButtons.length) {
+            var syncedWorkspaces = null;
+            try {
+                var configEl = document.getElementById('poznote-config');
+                if (configEl) {
+                    syncedWorkspaces = (JSON.parse(configEl.textContent) || {}).gitSyncedWorkspaces;
+                }
+            } catch (error) {
+                syncedWorkspaces = null;
+            }
+            var visible = !Array.isArray(syncedWorkspaces)
+                || workspace === '' || workspace === '__last_opened__'
+                || syncedWorkspaces.indexOf(workspace) !== -1;
+            gitButtons.forEach(function (button) { button.hidden = !visible; });
+            syncOverflowButton();
+        }
     }
 
     // The overflow menu reads each entry's href when the copy is clicked, so
@@ -307,7 +332,7 @@
                 childList: true,
                 subtree: true,
                 attributes: true,
-                attributeFilter: ['class', 'style']
+                attributeFilter: ['class', 'style', 'hidden']
             });
         }
 

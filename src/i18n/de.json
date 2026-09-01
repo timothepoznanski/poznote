@@ -3010,6 +3010,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Synchronisierte Arbeitsbereiche",
+      "all_label": "Alle Arbeitsbereiche",
+      "all_desc": "Alle Arbeitsbereiche werden synchronisiert, auch später erstellte.",
+      "selected_label": "Nur ausgewählte Arbeitsbereiche",
+      "selected_desc": "Nur Notizen und Anhänge der markierten Arbeitsbereiche werden übertragen. Notizen anderer Arbeitsbereiche bleiben bei einem Pull unberührt, ein Push entfernt sie aus dem Repository.",
+      "save": "Arbeitsbereiche speichern",
+      "saved": "Synchronisierte Arbeitsbereiche aktualisiert.",
+      "none_selected": "Wählen Sie mindestens einen Arbeitsbereich aus."
+    },
     "title": "{{provider}}-Synchronisierung",
     "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf GitHub oder Forgejo. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
     "warning": "Verlassen Sie sich nicht ausschließlich auf diese Funktion als Backup-Lösung.\nExportieren Sie Ihre Daten regelmäßig über die Backup-Funktion in den Einstellungen.",

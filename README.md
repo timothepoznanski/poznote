@@ -725,6 +725,17 @@ When enabled by the user, Poznote will automatically:
 
 Manual push/pull is also available from the **Dashboard** via the **Push** and **Pull** cards.
 
+---
+
+**Synced workspaces**
+
+By default every workspace is synced. In **Settings > Git Sync**, each user can instead restrict Git Sync to selected workspaces:
+
+- Only notes and attachments from the selected workspaces are pushed and pulled.
+- A pull never touches notes in the other workspaces.
+- A push removes repository files that fall outside the selected workspaces, so the repository always mirrors exactly the synced set.
+- The Push and Pull sidebar buttons, automatic push, and the pull prompt only appear while viewing a synced workspace.
+
 </details>
 
 ## S3 Attachment Storage

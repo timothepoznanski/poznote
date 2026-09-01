@@ -3092,7 +3092,7 @@ class NotesController {
                 $stmt->execute([$noteId]);
                 $note = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($note) {
-                    $gitSync->deleteNoteInGit($note['heading'], $note['folder_id'], $note['workspace'], $note['type']);
+                    $gitSync->deleteNoteInGit($noteId, $note['folder_id'], $note['workspace'], $note['type'], $note['heading']);
                 }
                 return ['triggered' => true, 'success' => true];
             }
@@ -3145,7 +3145,7 @@ class NotesController {
                 $stmt->execute([$noteId]);
                 $note = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($note) {
-                    $result = $gitSync->deleteNoteInGit($note['heading'], $note['folder_id'], $note['workspace'], $note['type']);
+                    $result = $gitSync->deleteNoteInGit($noteId, $note['folder_id'], $note['workspace'], $note['type'], $note['heading']);
                     if (!$result['success']) {
                         error_log("Git auto-sync delete failed for note {$noteId}: " . ($result['error'] ?? 'unknown error'));
                     }

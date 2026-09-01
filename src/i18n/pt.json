@@ -3014,6 +3014,16 @@
     }
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Espaços de trabalho sincronizados",
+      "all_label": "Todos os espaços de trabalho",
+      "all_desc": "Todos os espaços de trabalho são sincronizados, incluindo os criados mais tarde.",
+      "selected_label": "Apenas os espaços de trabalho selecionados",
+      "selected_desc": "Apenas as notas e anexos dos espaços marcados são enviados e recebidos. Um pull nunca toca nas notas de outros espaços, e um push remove-as do repositório.",
+      "save": "Guardar espaços",
+      "saved": "Espaços de trabalho sincronizados atualizados.",
+      "none_selected": "Selecione pelo menos um espaço de trabalho."
+    },
     "title": "Sincronização {{provider}}",
     "description": "Sincronize suas notas e anexos no GitHub ou Forgejo. Os arquivos são armazenados como arquivos simples com um metadata.json que preserva tags, pastas, datas e anexos.",
     "warning": "Não dependa desta funcionalidade como única solução de backup.\nExporte seus dados regularmente usando o recurso de backup nas Configurações.",

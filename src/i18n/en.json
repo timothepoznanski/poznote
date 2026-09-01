@@ -2567,6 +2567,16 @@
     "default": "Default"
   },
   "git_sync": {
+    "workspaces": {
+      "title": "Synced workspaces",
+      "all_label": "All workspaces",
+      "all_desc": "Every workspace is synced, including ones created later.",
+      "selected_label": "Selected workspaces only",
+      "selected_desc": "Only notes and attachments from the checked workspaces are pushed and pulled. Notes in other workspaces are never touched by a pull, and a push removes them from the repository.",
+      "save": "Save Workspaces",
+      "saved": "Synced workspaces updated.",
+      "none_selected": "Select at least one workspace to sync."
+    },
     "title": "{{provider}} Sync",
     "description": "Synchronize your notes and attachments to GitHub or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
     "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",

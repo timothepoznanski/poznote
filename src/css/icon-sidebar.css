@@ -140,6 +140,12 @@
     border-top: 1px solid var(--pz-border);
 }
 
+/* display:flex would otherwise beat the browser's [hidden] rule (index.php
+   hides the git Push/Pull entries in workspaces outside the sync scope) */
+.icon-sidebar-btn[hidden] {
+    display: none;
+}
+
 .icon-sidebar-btn {
     display: flex;
     align-items: center;

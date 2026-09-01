@@ -26,6 +26,14 @@ $gitSync = new GitSync($con, $_SESSION['user_id'] ?? null);
 $configStatus = $gitSync->getConfigStatus();
 $lastSync = $gitSync->getLastSyncInfo();
 
+// Workspace list for the sync scope selector
+$workspacesList = [];
+try {
+    $workspacesList = $con->query('SELECT name FROM workspaces ORDER BY name COLLATE NOCASE')->fetchAll(PDO::FETCH_COLUMN);
+} catch (Exception $e) {
+    $workspacesList = [];
+}
+
 // Determine provider name for display
 $provider = $configStatus['provider'] ?? 'github';
 $providerName = ($provider === 'github') ? 'GitHub' : (($provider === 'forgejo') ? 'Forgejo' : 'Git');
@@ -106,6 +114,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             // Re-fetch config status to update badges
             $configStatus = $gitSync->getConfigStatus();
             $message = tp('git_sync.auto_sync.saving');
+            break;
+
+        case 'update_workspaces':
+            $workspaceMode = $_POST['workspace_mode'] ?? 'all';
+            if ($workspaceMode === 'selected') {
+                $selected = $_POST['synced_workspaces'] ?? [];
+                if (!is_array($selected)) $selected = [];
+                $selected = array_values(array_filter(array_map(function ($ws) {
+                    return trim((string) $ws);
+                }, $selected), function ($ws) {
+                    return $ws !== '';
+                }));
+                if (empty($selected)) {
+                    $error = t('git_sync.workspaces.none_selected', [], 'Select at least one workspace to sync.');
+                    break;
+                }
+                $gitSync->setSyncedWorkspaces($selected);
+            } else {
+                $gitSync->setSyncedWorkspaces(null);
+            }
+            $configStatus = $gitSync->getConfigStatus();
+            $message = t('git_sync.workspaces.saved', [], 'Synced workspaces updated.');
             break;
             
         case 'save_config':
@@ -438,6 +468,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     </div>
                 </form>
             </div>
+
+            <?php
+            $syncedWorkspacesSetting = $configStatus['syncedWorkspaces'] ?? null;
+            $workspaceOptions = $workspacesList;
+            if (is_array($syncedWorkspacesSetting)) {
+                // Keep synced names whose workspace was deleted visible so they can be unchecked
+                $workspaceOptions = array_values(array_unique(array_merge($workspaceOptions, $syncedWorkspacesSetting)));
+            }
+            ?>
+            <div class="auto-sync-settings">
+                <h4><?php echo t_h('git_sync.workspaces.title', [], 'Synced workspaces'); ?></h4>
+                <form method="post" class="auto-sync-form" id="workspace-sync-form">
+                    <input type="hidden" name="action" value="update_workspaces">
+
+                    <label class="form-check workspace-mode-check">
+                        <input type="radio" name="workspace_mode" value="all" <?php echo ($syncedWorkspacesSetting === null) ? 'checked' : ''; ?>>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('git_sync.workspaces.all_label', [], 'All workspaces'); ?></span>
+                            <span class="label-desc"><?php echo t_h('git_sync.workspaces.all_desc', [], 'Every workspace is synced, including ones created later.'); ?></span>
+                        </div>
+                    </label>
+
+                    <label class="form-check workspace-mode-check">
+                        <input type="radio" name="workspace_mode" value="selected" <?php echo ($syncedWorkspacesSetting !== null) ? 'checked' : ''; ?>>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('git_sync.workspaces.selected_label', [], 'Selected workspaces only'); ?></span>
+                            <span class="label-desc"><?php echo t_h('git_sync.workspaces.selected_desc', [], 'Only notes and attachments from the checked workspaces are pushed and pulled. Notes in other workspaces are never touched by a pull, and a push removes them from the repository.'); ?></span>
+                        </div>
+                    </label>
+
+                    <div class="workspace-checkbox-list" id="workspace-checkbox-list" <?php echo ($syncedWorkspacesSetting === null) ? 'hidden' : ''; ?>>
+                        <?php foreach ($workspaceOptions as $workspaceName): ?>
+                        <label class="workspace-checkbox-item">
+                            <input type="checkbox" name="synced_workspaces[]"
+                                   value="<?php echo htmlspecialchars($workspaceName, ENT_QUOTES, 'UTF-8'); ?>"
+                                   <?php echo ($syncedWorkspacesSetting === null || in_array($workspaceName, $syncedWorkspacesSetting, true)) ? 'checked' : ''; ?>>
+                            <span><?php echo htmlspecialchars($workspaceName, ENT_QUOTES, 'UTF-8'); ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('git_sync.workspaces.save', [], 'Save Workspaces'); ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
             <?php endif; ?>
         </div>
 
@@ -517,7 +596,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 updateTokenPlaceholder(this.value);
             });
         }
-        
+
+        // Show the workspace checkbox list only in "selected workspaces" mode
+        const workspaceForm = document.getElementById('workspace-sync-form');
+        if (workspaceForm) {
+            const checkboxList = document.getElementById('workspace-checkbox-list');
+            workspaceForm.querySelectorAll('input[name="workspace_mode"]').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    if (checkboxList) checkboxList.hidden = (this.value !== 'selected');
+                });
+            });
+        }
 
     });
     </script>
