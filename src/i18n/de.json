@@ -159,7 +159,12 @@
       "label": "Fälligkeitsdatum",
       "overdue": "Überfällig"
     },
-    "card_size": "Kartengröße"
+    "card_size": "Kartengröße",
+    "sort": {
+      "label": "Sortieren nach",
+      "date": "Datum",
+      "tag": "Tags"
+    }
   },
   "folders": {
     "delete": {

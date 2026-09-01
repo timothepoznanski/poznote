@@ -2165,7 +2165,12 @@
       "label": "Due date",
       "overdue": "Overdue"
     },
-    "card_size": "Card size"
+    "card_size": "Card size",
+    "sort": {
+      "label": "Sort by",
+      "date": "Date",
+      "tag": "Tag"
+    }
   },
   "sidebar": {
     "display": "Display",

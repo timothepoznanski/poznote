@@ -170,7 +170,12 @@
       "label": "Échéance",
       "overdue": "En retard"
     },
-    "card_size": "Taille des cartes"
+    "card_size": "Taille des cartes",
+    "sort": {
+      "label": "Trier par",
+      "date": "Date",
+      "tag": "Tag"
+    }
   },
   "folders": {
     "delete": {

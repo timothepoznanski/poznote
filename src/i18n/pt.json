@@ -158,7 +158,12 @@
       "label": "Data de vencimento",
       "overdue": "Atrasado"
     },
-    "card_size": "Tamanho dos cartões"
+    "card_size": "Tamanho dos cartões",
+    "sort": {
+      "label": "Ordenar por",
+      "date": "Data",
+      "tag": "Etiqueta"
+    }
   },
   "folders": {
     "delete": {

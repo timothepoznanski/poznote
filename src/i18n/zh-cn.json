@@ -160,7 +160,12 @@
       "label": "截止日期",
       "overdue": "已逾期"
     },
-    "card_size": "卡片大小"
+    "card_size": "卡片大小",
+    "sort": {
+      "label": "排序方式",
+      "date": "日期",
+      "tag": "标签"
+    }
   },
   "folders": {
     "delete": {

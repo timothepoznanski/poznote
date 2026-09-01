@@ -910,6 +910,30 @@ body.dark-mode .kanban-inline-header .kanban-title {
     transform: translateY(-1px);
 }
 
+/* ===== Card sort toggle (date / tag) =====
+   Same shell as the size toggle; kanban.js swaps the icon for the active sort. */
+
+.kanban-sort-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    padding: 6px 10px;
+    background: var(--bg-secondary, #f1f5f9);
+    color: var(--text-secondary, #64748b);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.kanban-sort-toggle:hover {
+    background: var(--bg-tertiary, #e2e8f0);
+    border-color: var(--text-secondary, #64748b);
+    transform: translateY(-1px);
+}
+
 .kanban-size-small {
     --kanban-col-width: 220px;
     --kanban-col-width-mobile: 200px;

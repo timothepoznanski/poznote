@@ -335,6 +335,7 @@ try {
              data-note-id="<?php echo $note['id']; ?>"
              data-folder-id="<?php echo $folderId; ?>"
              data-completed="<?php echo $isCompleted ? '1' : '0'; ?>"
+             data-tags="<?php echo htmlspecialchars(implode(',', $kanbanTags), ENT_QUOTES); ?>"
              data-reminder-due="<?php echo htmlspecialchars($reminderDue, ENT_QUOTES); ?>"
              draggable="true">
             <button type="button"
@@ -475,6 +476,14 @@ try {
             <div class="kanban-header-actions">
                 <button class="kanban-scroll-btn-header right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
                     <i class="lucide lucide-chevron-right"></i>
+                </button>
+                <button class="kanban-sort-toggle"
+                        data-action="cycle-kanban-card-sort"
+                        data-label="<?php echo t_h('kanban.sort.label', [], 'Sort by'); ?>"
+                        data-label-date="<?php echo t_h('kanban.sort.date', [], 'Date'); ?>"
+                        data-label-tag="<?php echo t_h('kanban.sort.tag', [], 'Tag'); ?>"
+                        title="<?php echo t_h('kanban.sort.label', [], 'Sort by'); ?>">
+                    <i class="lucide lucide-calendar kanban-sort-icon"></i>
                 </button>
                 <button class="kanban-size-toggle"
                         data-action="cycle-kanban-card-size"

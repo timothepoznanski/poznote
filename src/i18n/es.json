@@ -160,7 +160,12 @@
       "label": "Fecha límite",
       "overdue": "Atrasado"
     },
-    "card_size": "Tamaño de las tarjetas"
+    "card_size": "Tamaño de las tarjetas",
+    "sort": {
+      "label": "Ordenar por",
+      "date": "Fecha",
+      "tag": "Etiqueta"
+    }
   },
   "folders": {
     "delete": {

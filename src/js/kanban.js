@@ -199,6 +199,7 @@
             const originalParent = draggedCard.parentNode;
             const originalSibling = draggedCard.nextElementSibling;
             const oldFolderId = draggedFromFolderId;
+            const originalOrder = draggedCard.dataset.kanbanOrder;
 
             // A dragged card always lands in the active area, above the
             // completed section of the target column.
@@ -209,6 +210,7 @@
                 columnContent.appendChild(draggedCard);
             }
             draggedCard.dataset.folderId = targetFolderId;
+            draggedCard.dataset.kanbanOrder = nextKanbanOrder();
             draggedCard.classList.add('kanban-card-dropped');
 
             // Dragging a completed card into another column puts it back into
@@ -231,6 +233,8 @@
                 if (draggedCard) draggedCard.classList.remove('kanban-card-dropped');
             }, 300);
 
+            resortKanbanColumnIfNeeded(columnContent);
+
             // Update column counts visually
             updateColumnCounts();
 
@@ -243,6 +247,7 @@
                     // Revert the visual change if API call failed
                     if (originalParent) originalParent.insertBefore(draggedCard, originalSibling);
                     draggedCard.dataset.folderId = oldFolderId;
+                    if (originalOrder) draggedCard.dataset.kanbanOrder = originalOrder;
                     if (wasCompleted) {
                         draggedCard.classList.add('kanban-card-completed');
                         draggedCard.dataset.completed = '1';
@@ -273,6 +278,7 @@
                 if (draggedCard && originalParent) {
                     originalParent.insertBefore(draggedCard, originalSibling);
                     draggedCard.dataset.folderId = oldFolderId;
+                    if (originalOrder) draggedCard.dataset.kanbanOrder = originalOrder;
                     if (wasCompleted) {
                         draggedCard.classList.add('kanban-card-completed');
                         draggedCard.dataset.completed = '1';
@@ -366,6 +372,16 @@
             e.preventDefault();
             e.stopPropagation();
             cycleKanbanCardSize();
+        });
+
+        // Cycle the card sort (date <-> tag)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="cycle-kanban-card-sort"]');
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+            cycleKanbanCardSort();
         });
 
         // Expand / collapse a column's completed section
@@ -718,6 +734,152 @@
         const next = KANBAN_SIZES[(KANBAN_SIZES.indexOf(current) + 1) % KANBAN_SIZES.length];
         setKanbanCardSize(next);
         applyKanbanCardSize();
+    }
+
+    // ===== Card sort toggle (date / tag) =====
+    // "date" is the server-rendered order (most recently updated first) and stays
+    // the default. "tag" reorders every column alphabetically on each card's
+    // first tag, keeping the untagged ("uncategorized") cards at the bottom.
+    // Like the card size, the preference persists per user and is applied
+    // client-side after each render.
+
+    const KANBAN_SORTS = ['date', 'tag'];
+    const KANBAN_SORT_KEY = 'kanbanCardSort';
+    const KANBAN_SORT_ICONS = { date: 'lucide-calendar', tag: 'lucide-tag' };
+
+    // Rank of each card in the server-rendered (date) order, so switching back
+    // from the tag sort restores it without reloading the board.
+    let kanbanOrderCounter = 0;
+
+    function getKanbanCardSort() {
+        let stored = null;
+        try {
+            stored = (window.__poznoteUserStorage || window.localStorage).getItem(KANBAN_SORT_KEY);
+        } catch (e) { /* storage unavailable */ }
+        return KANBAN_SORTS.includes(stored) ? stored : 'date';
+    }
+
+    function setKanbanCardSort(sort) {
+        try {
+            (window.__poznoteUserStorage || window.localStorage).setItem(KANBAN_SORT_KEY, sort);
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function nextKanbanOrder() {
+        return String(++kanbanOrderCounter);
+    }
+
+    /**
+     * Stamp every not-yet-seen card with its rank in the current DOM order.
+     * Called before each sort, so cards rendered by the server keep their date
+     * order and cards moved around later keep whatever rank they were given.
+     */
+    function rememberKanbanCardOrder(root) {
+        root.querySelectorAll('.kanban-card').forEach((card) => {
+            if (!card.dataset.kanbanOrder) card.dataset.kanbanOrder = nextKanbanOrder();
+        });
+    }
+
+    /**
+     * A card's tags, lowercased, in the order they are stored on the note (the
+     * order the badges are rendered in). Empty for an untagged card.
+     */
+    function getKanbanCardTags(card) {
+        return (card.dataset.tags || '')
+            .split(',')
+            .map((tag) => tag.trim().toLowerCase())
+            .filter(Boolean);
+    }
+
+    function compareKanbanCardsByDate(a, b) {
+        return (parseInt(a.dataset.kanbanOrder, 10) || 0) - (parseInt(b.dataset.kanbanOrder, 10) || 0);
+    }
+
+    function compareKanbanCardsByTag(a, b) {
+        const tagsA = getKanbanCardTags(a);
+        const tagsB = getKanbanCardTags(b);
+
+        // Untagged cards sink below every tagged one.
+        if (!tagsA.length || !tagsB.length) {
+            if (tagsA.length === tagsB.length) return compareKanbanCardsByDate(a, b);
+            return tagsA.length ? -1 : 1;
+        }
+
+        // A card with several tags is filed under the first one of its list,
+        // which is also the first badge shown on the card.
+        const diff = tagsA[0].localeCompare(tagsB[0], undefined, { sensitivity: 'base', numeric: true });
+        if (diff !== 0) return diff;
+
+        return compareKanbanCardsByDate(a, b);
+    }
+
+    /**
+     * Reorder the cards that are direct children of a container, keeping them
+     * before `anchor` (the completed section, when the column has one).
+     */
+    function sortKanbanCardList(container, anchor) {
+        if (!container) return;
+
+        const cards = Array.from(container.children).filter((el) => el.classList.contains('kanban-card'));
+        if (cards.length < 2) return;
+
+        const compare = getKanbanCardSort() === 'tag' ? compareKanbanCardsByTag : compareKanbanCardsByDate;
+        const sorted = cards.slice().sort(compare);
+        if (sorted.every((card, index) => card === cards[index])) return;
+
+        sorted.forEach((card) => container.insertBefore(card, anchor || null));
+    }
+
+    /**
+     * Sort a column's active cards and its completed ones independently.
+     */
+    function sortKanbanColumn(columnContent) {
+        if (!columnContent) return;
+
+        const completedSection = columnContent.querySelector(':scope > .kanban-completed-section');
+        sortKanbanCardList(columnContent, completedSection);
+        if (completedSection) {
+            sortKanbanCardList(completedSection.querySelector('.kanban-completed-content'), null);
+        }
+    }
+
+    /**
+     * Re-sort a column after a card moved into it. No-op under the date sort,
+     * where the caller already dropped the card where it belongs.
+     */
+    function resortKanbanColumnIfNeeded(columnContent) {
+        if (getKanbanCardSort() !== 'tag') return;
+        sortKanbanColumn(columnContent);
+    }
+
+    function updateKanbanSortToggle(container) {
+        const btn = container.querySelector('.kanban-sort-toggle');
+        if (!btn) return;
+
+        const sort = getKanbanCardSort();
+        const icon = btn.querySelector('.kanban-sort-icon');
+        if (icon) icon.className = 'lucide ' + KANBAN_SORT_ICONS[sort] + ' kanban-sort-icon';
+
+        const title = (btn.getAttribute('data-label') || 'Sort by') + ': '
+            + (btn.getAttribute('data-label-' + sort) || sort);
+        btn.title = title;
+        btn.setAttribute('aria-label', title);
+    }
+
+    function applyKanbanCardSort() {
+        const container = document.getElementById('kanban-view-container');
+        if (!container) return;
+
+        rememberKanbanCardOrder(container);
+        container.querySelectorAll('.kanban-column-content').forEach(sortKanbanColumn);
+        updateKanbanSortToggle(container);
+    }
+
+    function cycleKanbanCardSort() {
+        const current = getKanbanCardSort();
+        const next = KANBAN_SORTS[(KANBAN_SORTS.indexOf(current) + 1) % KANBAN_SORTS.length];
+        setKanbanCardSort(next);
+        applyKanbanCardSort();
     }
 
     // ===== Due date badge (mirrors the server-side rendering in kanban_content.php) =====
@@ -1107,6 +1269,7 @@
 
         card.classList.toggle('kanban-card-completed', completed);
         card.dataset.completed = completed ? '1' : '0';
+        resortKanbanColumnIfNeeded(columnContent);
 
         const btn = card.querySelector('.kanban-card-complete-btn');
         if (btn) {
@@ -1124,6 +1287,7 @@
             if (previousParent) {
                 previousParent.insertBefore(card, previousSibling);
             }
+            resortKanbanColumnIfNeeded(columnContent);
             card.classList.toggle('kanban-card-completed', !completed);
             card.dataset.completed = completed ? '0' : '1';
             if (btn) {
@@ -1176,6 +1340,7 @@
     window.syncKanbanScrollButtons = syncKanbanScrollButtons;
     window.restoreKanbanCompletedSections = restoreCompletedSectionStates;
     window.applyKanbanCardSize = applyKanbanCardSize;
+    window.applyKanbanCardSort = applyKanbanCardSort;
 
     // Auto-init on load
     if (document.readyState === 'loading') {
