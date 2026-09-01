@@ -11,6 +11,8 @@
  * used as a fallback (it can be stale, see kanban_content.php).
  */
 
+require_once __DIR__ . '/../../../users/db_master.php';
+
 class TasksController
 {
     private PDO $con;
@@ -592,6 +594,18 @@ class TasksController
      */
     private function persistTasks(int $noteId, array $tasks): bool
     {
+        // The whole task array is rewritten, so a task write from here would
+        // silently undo what the in-app editor of the note is about to save.
+        $blockingLock = getBlockingNoteEditLock(
+            (int) (getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0)),
+            $noteId,
+            (int) (getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0))
+        );
+        if ($blockingLock !== null) {
+            $this->sendError(423, 'This note is currently being edited by ' . describeNoteEditLockHolder($blockingLock));
+            return false;
+        }
+
         $content = json_encode(array_values($tasks), JSON_UNESCAPED_UNICODE);
         if ($content === false) {
             $this->sendError(500, 'Failed to encode tasks');

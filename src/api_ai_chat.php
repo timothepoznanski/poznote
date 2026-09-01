@@ -250,6 +250,27 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
  * REST controller's core logic: same sanitizers, same title-uniqueness rule.
  * Deletion is deliberately not exposed to the assistant.
  */
+/**
+ * Tool-result error when another editor holds the note's edit lock, so the
+ * assistant never overwrites a note someone is editing right now (the next
+ * autosave of that editor would silently drop the AI's change anyway).
+ * Null when the write may proceed.
+ */
+function aiNoteEditLockError(int $noteId): ?string {
+    $blockingLock = getBlockingNoteEditLock(
+        (int)(getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0)),
+        $noteId,
+        (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0))
+    );
+    if ($blockingLock === null) {
+        return null;
+    }
+    return json_encode([
+        'error' => 'This note is currently being edited by ' . describeNoteEditLockHolder($blockingLock)
+            . '. It cannot be modified until they are done.',
+    ], JSON_UNESCAPED_UNICODE);
+}
+
 function aiExecuteTool($con, $name, $args, $chatWorkspace) {
     if (!is_array($args)) $args = [];
     $actorUserId = $_SESSION['user_id'] ?? null;
@@ -334,6 +355,10 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace) {
         if (!$note) {
             return json_encode(['error' => 'Note not found in the current workspace']);
         }
+        $lockError = aiNoteEditLockError($noteId);
+        if ($lockError !== null) {
+            return $lockError;
+        }
         $folderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
         $check = $con->prepare('SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND id != ? AND workspace = ? AND ' . ($folderId !== null ? 'folder_id = ' . $folderId : 'folder_id IS NULL'));
         $check->execute([$newTitle, $noteId, $note['workspace']]);
@@ -363,6 +388,10 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace) {
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$note) {
             return json_encode(['error' => 'Note not found in the current workspace']);
+        }
+        $lockError = aiNoteEditLockError($noteId);
+        if ($lockError !== null) {
+            return $lockError;
         }
         $noteType = $note['type'] ?? 'note';
         if ($noteType === 'markdown') {

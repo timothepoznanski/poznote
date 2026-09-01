@@ -19,6 +19,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $action = isset($_POST['action']) ? $_POST['action'] : 'save_full_note';
 $actor_user_id = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
 
+/**
+ * 423 when another editor holds this note's edit lock, the same rule the
+ * REST PATCH endpoint applies; returns only when the write may proceed.
+ */
+function excalidrawAssertNoteNotLockedByOther(int $note_id): void {
+    $blockingLock = getBlockingNoteEditLock(
+        (int)(getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0)),
+        $note_id,
+        (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0))
+    );
+    if ($blockingLock !== null) {
+        http_response_code(423);
+        echo json_encode(['success' => false, 'message' => 'This note is currently being edited by ' . describeNoteEditLockHolder($blockingLock)]);
+        exit;
+    }
+}
+
 if ($action === 'save_embedded_diagram') {
     // Handle embedded diagram save
     saveEmbeddedDiagram();
@@ -54,6 +71,7 @@ if ($note_id > 0) {
         echo json_encode(['success' => false, 'message' => 'Note not found']);
         exit;
     }
+    excalidrawAssertNoteNotLockedByOther($note_id);
 }
 
 // Save preview image as attachment if provided
@@ -318,6 +336,8 @@ function saveEmbeddedDiagram() {
             echo json_encode(['success' => false, 'message' => 'Note not found']);
             return;
         }
+
+        excalidrawAssertNoteNotLockedByOther($note_id);
 
         $note_type = !empty($row['type']) ? $row['type'] : 'note';
         $content_file = getEntryFilename($note_id, $note_type);

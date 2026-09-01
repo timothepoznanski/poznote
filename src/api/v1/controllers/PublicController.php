@@ -106,7 +106,11 @@ class PublicController {
             $this->sendError(400, 'Note type does not support task updates');
             return;
         }
-        
+
+        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(is_array($input) ? $input : null))) {
+            return;
+        }
+
         $this->saveNote($noteId, $type, $updatedContent);
         $this->sendSuccess(['success' => true]);
     }
@@ -165,7 +169,11 @@ class PublicController {
             $prefix = "- [ ] ";
             $updatedContent = rtrim($content) . "\n" . $prefix . $this->normalizePublicTaskText((string)$input['text'], $type);
         }
-        
+
+        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(is_array($input) ? $input : null))) {
+            return;
+        }
+
         $this->saveNote($noteId, $type, $updatedContent);
         $this->sendSuccess(['success' => true]);
     }
@@ -204,6 +212,9 @@ class PublicController {
         if (is_array($tasks) && isset($tasks[$index])) {
             array_splice($tasks, $index, 1);
             $updatedContent = json_encode($tasks, JSON_UNESCAPED_UNICODE);
+            if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(null))) {
+                return;
+            }
             $this->saveNote($noteId, 'tasklist', $updatedContent);
             $this->sendSuccess(['success' => true]);
         } else {

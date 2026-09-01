@@ -740,6 +740,42 @@ function noteEditLockBelongsTo(int $targetUserId, int $noteId, int $holderLoginU
 }
 
 /**
+ * Live lock that forbids a write on this note for the given account holder.
+ * Null when the note is free or the holder owns the lock (any of their own
+ * sessions); the lock row when another user or a public editor holds it.
+ * One-shot writers (task endpoints, AI tools, trash) call this instead of
+ * noteEditLockBelongsTo because they have no editor session of their own.
+ */
+function getBlockingNoteEditLock(int $targetUserId, int $noteId, int $holderLoginUserId): ?array {
+    if ($targetUserId <= 0 || $noteId <= 0) {
+        return null;
+    }
+
+    $lock = getNoteEditLock($targetUserId, $noteId);
+    if (!$lock) {
+        return null;
+    }
+
+    if ($lock['holder_kind'] === 'user' && $holderLoginUserId > 0 && $lock['holder_login_user_id'] === $holderLoginUserId) {
+        return null;
+    }
+
+    return $lock;
+}
+
+/**
+ * How to name a lock holder in an error message shown to another editor.
+ */
+function describeNoteEditLockHolder(array $lock): string {
+    if (($lock['holder_kind'] ?? 'user') === 'public') {
+        return 'a visitor on the public share link';
+    }
+
+    $username = (string)($lock['holder_username'] ?? '');
+    return $username !== '' ? $username : 'another user';
+}
+
+/**
  * Compute the display name for a user row: "First Last" when set, username otherwise.
  */
 function buildUserDisplayName(?array $user): string {
