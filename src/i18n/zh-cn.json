@@ -1870,6 +1870,9 @@
     "note_permissions": {
       "editable": "允许编辑文本"
     },
+    "folder_permissions": {
+      "editable": "允许编辑笔记"
+    },
     "note": {
       "new_note": "新笔记",
       "new_note_numbered": "新笔记 ({{number}})",

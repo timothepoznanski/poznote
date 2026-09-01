@@ -1393,6 +1393,9 @@
     "note_permissions": {
       "editable": "Разрешить редактирование текста"
     },
+    "folder_permissions": {
+      "editable": "Разрешить редактирование заметок"
+    },
     "note": {
       "new_note": "Новая заметка",
       "new_note_numbered": "Новая заметка ({{number}})",

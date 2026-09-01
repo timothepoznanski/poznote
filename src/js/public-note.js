@@ -320,6 +320,12 @@
         return ['read_only', 'check_only', 'full', 'edit'].includes(accessMode) ? accessMode : 'full';
     }
 
+    // Direct shares authenticate with the note token; notes opened through a
+    // shared folder use folder_token + note_id (the server provides the query).
+    function getApiAuthQuery(config) {
+        return config.apiAuthQuery || ('token=' + encodeURIComponent(config.token));
+    }
+
     function canToggleTasks() {
         return ['check_only', 'full', 'edit'].includes(getTaskAccessMode());
     }
@@ -364,7 +370,7 @@
             }
         }
 
-        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?token=${encodeURIComponent(config.token)}`, {
+        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?${getApiAuthQuery(config)}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ completed: completed })
@@ -427,7 +433,7 @@
         if (!config || !config.token) return;
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';
 
-        fetch(`${apiBaseUrl}/public/tasks?token=${encodeURIComponent(config.token)}`, {
+        fetch(`${apiBaseUrl}/public/tasks?${getApiAuthQuery(config)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text })
@@ -670,7 +676,7 @@
         if (!config || !config.token) return;
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';
 
-        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?token=${encodeURIComponent(config.token)}`, {
+        fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?${getApiAuthQuery(config)}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text })
@@ -697,7 +703,7 @@
         if (!config || !config.token || index === null) return;
         const apiBaseUrl = config.apiBaseUrl || 'api/v1';
 
-        fetch(`${apiBaseUrl}/public/tasks/${index}?token=${encodeURIComponent(config.token)}`, {
+        fetch(`${apiBaseUrl}/public/tasks/${index}?${getApiAuthQuery(config)}`, {
             method: 'DELETE'
         })
             .then(response => response.json())

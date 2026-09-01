@@ -1872,6 +1872,9 @@
     "note_permissions": {
       "editable": "Permitir edición del texto"
     },
+    "folder_permissions": {
+      "editable": "Permitir edición de las notas"
+    },
     "note": {
       "new_note": "Nueva nota",
       "new_note_numbered": "Nueva nota ({{number}})",

@@ -214,8 +214,8 @@ class SystemController {
         
         try {
             // 1. Get all shared folders to check if notes are shared via folder
-            $sharedFoldersQuery = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, sf.password_encrypted, sf.allowed_users, f.name as folder_name, f.parent_id, f.workspace
-                FROM shared_folders sf 
+            $sharedFoldersQuery = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, sf.password_encrypted, sf.allowed_users, sf.access_mode, f.name as folder_name, f.parent_id, f.workspace
+                FROM shared_folders sf
                 INNER JOIN folders f ON sf.folder_id = f.id";
             $sfStmt = $this->con->prepare($sharedFoldersQuery);
             $sfStmt->execute();
@@ -456,6 +456,7 @@ class SystemController {
                     'password' => !empty($entry['password']),
                     'passwordValue' => poznoteDecryptSharePassword($entry['password_encrypted'] ?? ''),
                     'allowed_users' => !empty($entry['allowed_users']) ? json_decode($entry['allowed_users'], true) : null,
+                    'access_mode' => ($entry['access_mode'] ?? 'read_only') === 'edit' ? 'edit' : 'read_only',
                     'folder_name' => $folder['name'],
                     'note_count' => (int)$countStmt->fetchColumn(),
                     'is_direct' => (bool)$directEntry,

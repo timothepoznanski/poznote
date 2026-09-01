@@ -23,13 +23,7 @@ class PublicController {
      *   - text: Optional string for task text
      */
     public function updateTask(string $id_or_index): void {
-        $token = $_GET['token'] ?? null;
-        if (!$token) {
-            $this->sendError(400, 'Token missing');
-            return;
-        }
-
-        $sharedNote = $this->validateTokenAndGetNote($token);
+        $sharedNote = $this->resolveSharedNoteFromRequest();
         if (!$sharedNote) return;
 
         if (!$this->canToggleTasks($sharedNote['access_mode'] ?? 'full')) {
@@ -123,13 +117,7 @@ class PublicController {
      *   - text: Task text
      */
     public function addTask(): void {
-        $token = $_GET['token'] ?? null;
-        if (!$token) {
-            $this->sendError(400, 'Token missing');
-            return;
-        }
-
-        $sharedNote = $this->validateTokenAndGetNote($token);
+        $sharedNote = $this->resolveSharedNoteFromRequest();
         if (!$sharedNote) return;
 
         if (!$this->canFullyEditTasks($sharedNote['access_mode'] ?? 'full')) {
@@ -184,13 +172,7 @@ class PublicController {
      *   - token: The shared note token
      */
     public function deleteTask(string $id_or_index): void {
-        $token = $_GET['token'] ?? null;
-        if (!$token) {
-            $this->sendError(400, 'Token missing');
-            return;
-        }
-
-        $sharedNote = $this->validateTokenAndGetNote($token);
+        $sharedNote = $this->resolveSharedNoteFromRequest();
         if (!$sharedNote) return;
 
         if (!$this->canFullyEditTasks($sharedNote['access_mode'] ?? 'full')) {
@@ -232,13 +214,7 @@ class PublicController {
      *   - content: The new note content (HTML for 'note', raw source for 'markdown')
      */
     public function updateNoteContent(): void {
-        $token = $_GET['token'] ?? null;
-        if (!$token) {
-            $this->sendError(400, 'Token missing');
-            return;
-        }
-
-        $sharedNote = $this->validateTokenAndGetNote($token);
+        $sharedNote = $this->resolveSharedNoteFromRequest();
         if (!$sharedNote) return;
 
         if (($sharedNote['access_mode'] ?? '') !== 'edit') {
@@ -367,13 +343,7 @@ class PublicController {
      * response and returns null when any check fails.
      */
     private function resolveEditLockContext(): ?array {
-        $token = $_GET['token'] ?? null;
-        if (!$token) {
-            $this->sendError(400, 'Token missing');
-            return null;
-        }
-
-        $sharedNote = $this->validateTokenAndGetNote($token);
+        $sharedNote = $this->resolveSharedNoteFromRequest();
         if (!$sharedNote) return null;
 
         if (($sharedNote['access_mode'] ?? '') !== 'edit') {
@@ -485,6 +455,109 @@ class PublicController {
             },
             $content
         );
+    }
+
+    /**
+     * Resolve the shared note targeted by the current request. Two ways in:
+     *   - ?token=X            : a direct note share (shared_notes row)
+     *   - ?folder_token=X&note_id=Y : a note reached through a shared folder;
+     *     its effective access_mode is derived from the folder share's own
+     *     access_mode ('edit' grants the per-type editable mode, anything
+     *     else is read-only).
+     * Sends the error response and returns null when any check fails.
+     */
+    private function resolveSharedNoteFromRequest(): ?array {
+        $token = $_GET['token'] ?? null;
+        if ($token) {
+            return $this->validateTokenAndGetNote($token);
+        }
+
+        $folderToken = $_GET['folder_token'] ?? null;
+        $noteId = isset($_GET['note_id']) ? (int)$_GET['note_id'] : 0;
+        if ($folderToken && $noteId > 0) {
+            return $this->validateFolderTokenAndGetNote($folderToken, $noteId);
+        }
+
+        $this->sendError(400, 'Token missing');
+        return null;
+    }
+
+    private function validateFolderTokenAndGetNote(string $folderToken, int $noteId): ?array {
+        $stmt = $this->con->prepare('SELECT folder_id, password, access_mode, allowed_users FROM shared_folders WHERE token = ?');
+        $stmt->execute([$folderToken]);
+        $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$sharedFolder) {
+            $this->sendError(404, 'Shared folder not found');
+            return null;
+        }
+
+        // Mirror public_note.php: when the share is restricted to specific
+        // users, that authentication replaces the folder password barrier.
+        $allowedUsersRaw = $sharedFolder['allowed_users'] ?? null;
+        $allowedUserIds = is_array($allowedUsersRaw) ? $allowedUsersRaw : json_decode((string)$allowedUsersRaw, true);
+        if (is_array($allowedUserIds) && !empty($allowedUserIds)) {
+            if (!$this->passesUserRestriction($allowedUsersRaw)) {
+                return null;
+            }
+        } elseif (!empty($sharedFolder['password'])) {
+            $sessionKey = 'public_folder_auth_' . $folderToken;
+            if (empty($_SESSION[$sessionKey])) {
+                $this->sendError(401, 'Authentication required');
+                return null;
+            }
+        }
+
+        // The note must live in the shared folder or one of its descendants.
+        $stmt = $this->con->prepare(
+            'WITH RECURSIVE folder_tree(id) AS (
+                SELECT id FROM folders WHERE id = ?
+                UNION ALL
+                SELECT child.id FROM folders child
+                INNER JOIN folder_tree parent_tree ON child.parent_id = parent_tree.id
+            )
+            SELECT e.id, e.type, e.linked_note_id FROM entries e
+            WHERE e.id = ? AND e.trash = 0 AND e.folder_id IN (SELECT id FROM folder_tree)'
+        );
+        $stmt->execute([(int)$sharedFolder['folder_id'], $noteId]);
+        $noteEntry = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$noteEntry) {
+            $this->sendError(404, 'Shared note not found');
+            return null;
+        }
+
+        // A shortcut in the shared folder edits the original note it points
+        // to (the public page renders the original's content), so writes and
+        // the access-mode mapping both target the original note. Placing the
+        // shortcut in an edit-shared folder is the owner's decision to expose
+        // that note, exactly like the read path already does.
+        $resolvedNoteId = (int)$noteEntry['id'];
+        $resolvedType = $noteEntry['type'] ?? 'note';
+        if ($resolvedType === 'linked' && !empty($noteEntry['linked_note_id'])) {
+            $stmt = $this->con->prepare('SELECT id, type FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([(int)$noteEntry['linked_note_id']]);
+            $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($originalNote) {
+                $resolvedNoteId = (int)$originalNote['id'];
+                $resolvedType = $originalNote['type'] ?? 'note';
+            }
+        }
+
+        return [
+            'note_id' => $resolvedNoteId,
+            'password' => null,
+            'access_mode' => $this->folderAccessModeForNoteType($sharedFolder['access_mode'] ?? 'read_only', $resolvedType),
+            'allowed_users' => $allowedUsersRaw,
+        ];
+    }
+
+    private function folderAccessModeForNoteType($folderAccessMode, string $noteType): string {
+        if ($folderAccessMode !== 'edit') {
+            return 'read_only';
+        }
+        if ($noteType === 'tasklist') {
+            return 'full';
+        }
+        return in_array($noteType, ['note', 'markdown'], true) ? 'edit' : 'read_only';
     }
 
     private function validateTokenAndGetNote(string $token): ?array {

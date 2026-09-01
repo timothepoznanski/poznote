@@ -156,7 +156,7 @@ try {
 
     // Fallback: Check if authorized via shared folder
     if (!$sharedNote && !empty($folderToken) && !empty($noteIdParam)) {
-        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password, allowed_users FROM shared_folders WHERE token = ?');
+        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password, allowed_users, access_mode FROM shared_folders WHERE token = ?');
         $stmt->execute([$folderToken]);
         $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -173,7 +173,7 @@ try {
                 $noteEntryParams[] = $noteAgeCutoff;
             }
 
-            $stmt = $con->prepare("SELECT id, folder_id FROM entries WHERE $noteEntryWhereClause");
+            $stmt = $con->prepare("SELECT id, folder_id, type, linked_note_id FROM entries WHERE $noteEntryWhereClause");
             $stmt->execute($noteEntryParams);
             $noteEntry = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -215,17 +215,45 @@ try {
                 }
 
                 if ($isFolderShared) {
+                    // An 'edit' folder share grants the per-type editable mode
+                    // to every note it contains (same modes a single-note edit
+                    // share would use); any other folder mode stays read-only.
+                    $folderAccessMode = ($sharedFolder['access_mode'] ?? 'read_only') === 'edit' ? 'edit' : 'read_only';
+                    $folderNoteType = $noteEntry['type'] ?? 'note';
+                    // A shortcut renders (and the public API edits) the
+                    // original note's content, so the access mode must be
+                    // derived from the original note's type.
+                    if ($folderNoteType === 'linked' && !empty($noteEntry['linked_note_id'])) {
+                        $stmtLinkedType = $con->prepare('SELECT type FROM entries WHERE id = ? AND trash = 0');
+                        $stmtLinkedType->execute([(int)$noteEntry['linked_note_id']]);
+                        $linkedType = $stmtLinkedType->fetchColumn();
+                        if ($linkedType !== false) {
+                            $folderNoteType = $linkedType ?: 'note';
+                        }
+                    }
+                    if ($folderAccessMode === 'edit') {
+                        if ($folderNoteType === 'tasklist') {
+                            $inheritedAccessMode = 'full';
+                        } elseif (in_array($folderNoteType, ['note', 'markdown'], true)) {
+                            $inheritedAccessMode = 'edit';
+                        } else {
+                            $inheritedAccessMode = 'read_only';
+                        }
+                    } else {
+                        $inheritedAccessMode = 'read_only';
+                    }
+
                     $sharedNote = [
                         'note_id' => $noteEntry['id'],
                         'created' => date('Y-m-d H:i:s'), // Mock
                         'theme' => $sharedFolder['theme'], // Inherit folder theme
                         'indexable' => $sharedFolder['indexable'],
                         'password' => null, // Folder password is enforced via $protectedFolderContext, not as a note-level password
-                        'access_mode' => 'read_only',
+                        'access_mode' => $inheritedAccessMode,
                         'allowed_users' => $sharedFolder['allowed_users'] ?? null
                     ];
                     // Override token for session consistency if needed
-                    $token = $folderToken . '_note_' . $noteIdParam; 
+                    $token = $folderToken . '_note_' . $noteIdParam;
                 }
             }
         }
@@ -557,22 +585,12 @@ $contentForAttachmentDetection = $content;
 
 $noteType = $note['type'] ?? 'note';
 
-// Public text editing is only offered on directly shared HTML/markdown notes
-// whose share explicitly allows it. Notes reached through a shared folder are
-// always read-only (their synthesized access_mode is 'read_only').
+// Public text editing is only offered on HTML/markdown notes whose share
+// allows it: either a direct share with access_mode 'edit', or a note reached
+// through a shared folder whose own access_mode is 'edit' (the folder mode is
+// mapped to the per-note synthesized access_mode above).
 $noteBodyEditable = $taskAccessMode === 'edit'
-    && in_array($noteType, ['note', 'markdown'], true)
-    && !$isFolderShared;
-
-// Markdown with tasklist: add task input (only when the share allows task editing)
-if ($noteType === 'markdown' && in_array($taskAccessMode, ['full', 'edit'], true) && strpos($content, 'class="task-list"') !== false) {
-    $addTaskHtml = '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">';
-    $addTaskHtml .= '<form class="task-input-form" action="javascript:void(0);">';
-    $addTaskHtml .= '<input type="text" class="task-input public-markdown-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" autocomplete="off" enterkeyhint="go" />';
-    $addTaskHtml .= '</form>';
-    $addTaskHtml .= '</div>';
-    $content .= $addTaskHtml;
-}
+    && in_array($noteType, ['note', 'markdown'], true);
 
 // Tasklist: parse JSON and render tasks
 if ($noteType === 'tasklist') {
@@ -587,11 +605,9 @@ if ($noteType === 'tasklist') {
 
         $tasksHtml = '<div class="task-list-container">';
         if ($taskAccessMode === 'full') {
-            $tasksHtml .= '<div class="task-input-container">';
-            $tasksHtml .= '<form class="task-input-form" action="javascript:void(0);">';
-            $tasksHtml .= '<input type="text" class="task-input public-task-add-input" placeholder="'.t('tasklist.input_placeholder', [], 'Add a task...').'" autocomplete="off" enterkeyhint="go" />';
-            $tasksHtml .= '</form>';
-            $tasksHtml .= '</div>';
+            // Anchor only: the add-task form itself is injected after
+            // sanitization below (sanitizePublicNoteHtml drops <form> tags).
+            $tasksHtml .= '<div class="task-input-container"></div>';
         }
 
         $tasksHtml .= '<div class="tasks-list">';
@@ -706,6 +722,29 @@ if (is_array($attachmentsData)) {
 
 $content = sanitizePublicNoteHtml($content);
 
+// The sanitizer drops <form>/<input> together with their content, so the
+// public add-task UI cannot be part of the note body it processes. Inject it
+// here instead: this markup is fully static, built by this page and never
+// derived from user content.
+$publicTaskAddFormHtml = '<form class="task-input-form" action="javascript:void(0);">'
+    . '<input type="text" class="task-input %INPUT_CLASS%" placeholder="' . t_h('tasklist.input_placeholder', [], 'Add a task...') . '" autocomplete="off" enterkeyhint="go" />'
+    . '</form>';
+
+if ($noteType === 'tasklist' && $taskAccessMode === 'full') {
+    $content = str_replace(
+        '<div class="task-input-container"></div>',
+        '<div class="task-input-container">' . str_replace('%INPUT_CLASS%', 'public-task-add-input', $publicTaskAddFormHtml) . '</div>',
+        $content
+    );
+}
+
+// Markdown with tasklist: add-task input (only when the share allows task editing)
+if ($noteType === 'markdown' && in_array($taskAccessMode, ['full', 'edit'], true) && strpos($content, 'class="task-list"') !== false) {
+    $content .= '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">'
+        . str_replace('%INPUT_CLASS%', 'public-markdown-task-add-input', $publicTaskAddFormHtml)
+        . '</div>';
+}
+
 // Editable source handed to the public editor (edit shares only).
 // - markdown: the raw stored source (edited as plain text in a textarea).
 // - note (HTML): the sanitized display HTML; it is re-sanitized server-side on
@@ -749,11 +788,18 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <!-- CSP-compliant theme initialization -->
     <script type="application/json" id="public-note-config"><?php
         $apiBaseUrl = $scriptDir . '/api/v1';
+        // Auth query string for the public write API. Notes reached through a
+        // shared folder have no note token of their own: the API authorizes
+        // them with the folder token plus the note id instead.
+        $publicApiAuthQuery = $isFolderShared
+            ? 'folder_token=' . rawurlencode($folderToken) . '&note_id=' . rawurlencode((string)$note_id)
+            : 'token=' . rawurlencode($token);
         // JSON_HEX_TAG is required: the config may embed note content, and an
         // unescaped "</script>" inside it would break out of this script tag.
         echo json_encode([
             'serverTheme' => $theme,
             'token' => $token,
+            'apiAuthQuery' => $publicApiAuthQuery,
             'noteType' => $noteType,
             'taskAccessMode' => $taskAccessMode,
             'noteEditable' => $noteBodyEditable,

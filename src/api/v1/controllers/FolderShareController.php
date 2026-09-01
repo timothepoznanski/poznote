@@ -38,7 +38,7 @@ class FolderShareController {
             $folderWorkspace = $folderRow['workspace'] ?? '';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password, password_encrypted, allowed_users FROM shared_folders WHERE folder_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, password_encrypted, allowed_users, access_mode FROM shared_folders WHERE folder_id = ? LIMIT 1');
             $stmt->execute([$folderId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -63,7 +63,8 @@ class FolderShareController {
                 'hasPassword' => $hasPassword,
                 'passwordValue' => poznoteDecryptSharePassword($row['password_encrypted'] ?? ''),
                 'workspace' => $folderWorkspace,
-                'allowed_users' => $allowedUsers
+                'allowed_users' => $allowedUsers,
+                'accessMode' => $this->sanitizeAccessMode($row['access_mode'] ?? 'read_only')
             ]);
             
         } catch (Exception $e) {
@@ -122,9 +123,10 @@ class FolderShareController {
             $indexable = isset($input['indexable']) ? (int)$input['indexable'] : 0;
             $passwordProvided = array_key_exists('password', $input);
             $password = $passwordProvided ? trim($input['password'] ?? '') : '';
-            
+            $accessModeProvided = array_key_exists('access_mode', $input);
+
             // Check if share already exists
-            $stmt = $this->con->prepare('SELECT id, token, password, password_encrypted FROM shared_folders WHERE folder_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT id, token, password, password_encrypted, access_mode FROM shared_folders WHERE folder_id = ? LIMIT 1');
             $stmt->execute([$folderId]);
             $existingShare = $stmt->fetch(PDO::FETCH_ASSOC);
             $existsRow = $existingShare['id'] ?? null;
@@ -134,22 +136,25 @@ class FolderShareController {
             $encryptedPassword = $passwordProvided
                 ? poznoteEncryptSharePassword($password)
                 : ($existingShare['password_encrypted'] ?? null);
-            
+            $accessMode = $accessModeProvided
+                ? $this->sanitizeAccessMode($input['access_mode'])
+                : $this->sanitizeAccessMode($existingShare['access_mode'] ?? 'read_only');
+
             $oldToken = null;
             if ($existsRow) {
                 $oldToken = $existingShare['token'] ?? null;
             }
 
             if ($existsRow) {
-                $stmt = $this->con->prepare('UPDATE shared_folders SET token = ?, theme = ?, indexable = ?, password = ?, password_encrypted = ?, created = CURRENT_TIMESTAMP WHERE folder_id = ?');
-                $stmt->execute([$token, $theme, $indexable, $hashedPassword, $encryptedPassword, $folderId]);
-                
+                $stmt = $this->con->prepare('UPDATE shared_folders SET token = ?, theme = ?, indexable = ?, password = ?, password_encrypted = ?, access_mode = ?, created = CURRENT_TIMESTAMP WHERE folder_id = ?');
+                $stmt->execute([$token, $theme, $indexable, $hashedPassword, $encryptedPassword, $accessMode, $folderId]);
+
                 if ($oldToken && $oldToken !== $token) {
                     unregisterSharedLink($oldToken);
                 }
             } else {
-                $stmt = $this->con->prepare('INSERT INTO shared_folders (folder_id, token, theme, indexable, password, password_encrypted) VALUES (?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$folderId, $token, $theme, $indexable, $hashedPassword, $encryptedPassword]);
+                $stmt = $this->con->prepare('INSERT INTO shared_folders (folder_id, token, theme, indexable, password, password_encrypted, access_mode) VALUES (?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$folderId, $token, $theme, $indexable, $hashedPassword, $encryptedPassword, $accessMode]);
             }
             
             registerSharedLink($token, $_SESSION['user_id'], 'folder', (int)$folderId);
@@ -168,6 +173,7 @@ class FolderShareController {
                 'hasPassword' => !empty($hashedPassword),
                 'passwordValue' => poznoteDecryptSharePassword($encryptedPassword),
                 'workspace' => $folderWorkspace,
+                'accessMode' => $accessMode,
                 'shared_notes_count' => 0
             ]);
             
@@ -278,6 +284,11 @@ class FolderShareController {
                 $params[] = $encryptedPassword;
             }
 
+            if (array_key_exists('access_mode', $input)) {
+                $updates[] = 'access_mode = ?';
+                $params[] = $this->sanitizeAccessMode($input['access_mode']);
+            }
+
             if (array_key_exists('allowed_users', $input)) {
                 $allowedUsersValue = $input['allowed_users'];
                 if (is_array($allowedUsersValue) && !empty($allowedUsersValue)) {
@@ -296,7 +307,7 @@ class FolderShareController {
                     $params[] = null;
                 }
             }
-            
+
             if (empty($updates)) {
                 echo json_encode(['success' => true, 'message' => 'No changes']);
                 return;
@@ -337,13 +348,16 @@ class FolderShareController {
                 $response['hasPassword'] = trim($input['password'] ?? '') !== '';
                 $response['passwordValue'] = trim($input['password'] ?? '');
             }
+            if (array_key_exists('access_mode', $input)) {
+                $response['accessMode'] = $this->sanitizeAccessMode($input['access_mode']);
+            }
             if (array_key_exists('allowed_users', $input)) {
                 $au = $input['allowed_users'];
                 $response['allowed_users'] = (is_array($au) && !empty($au))
                     ? array_values(array_unique(array_map('intval', $au)))
                     : null;
             }
-            
+
             echo json_encode($response);
             
         } catch (Exception $e) {
@@ -352,6 +366,15 @@ class FolderShareController {
         }
     }
     
+    /**
+     * A folder share is either read-only (default) or lets public visitors
+     * edit the notes it contains ('edit'), mirroring single-note edit shares.
+     */
+    private function sanitizeAccessMode($accessMode): string {
+        $normalizedMode = is_string($accessMode) ? trim($accessMode) : '';
+        return $normalizedMode === 'edit' ? 'edit' : 'read_only';
+    }
+
     /**
      * Legacy cleanup for implicit note shares that used to be created from folder shares.
      * Explicit note shares are preserved.

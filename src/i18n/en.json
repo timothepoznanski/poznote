@@ -1408,6 +1408,9 @@
     "note_permissions": {
       "editable": "Allow text editing"
     },
+    "folder_permissions": {
+      "editable": "Allow note editing"
+    },
     "note": {
       "new_note": "New note",
       "new_note_numbered": "New note ({{number}})",
