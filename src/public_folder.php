@@ -230,9 +230,14 @@ try {
         $notesQueryParams[] = $noteAgeCutoff;
     }
 
+    // A shortcut without its own icon inherits the icon of the note it links to.
     $stmt = $con->prepare("
-        SELECT e.id, e.heading, e.created, e.type, e.folder_id, e.icon, e.icon_color, sn.token
+        SELECT e.id, e.heading, e.created, e.type, e.folder_id,
+               COALESCE(NULLIF(e.icon, ''), lo.icon) AS icon,
+               CASE WHEN NULLIF(e.icon, '') IS NULL THEN lo.icon_color ELSE e.icon_color END AS icon_color,
+               sn.token
         FROM entries e
+        LEFT JOIN entries lo ON lo.id = e.linked_note_id
         LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
         WHERE $notesWhereClause
         ORDER BY e.created DESC

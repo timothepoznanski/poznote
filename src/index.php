@@ -492,7 +492,11 @@ if ($isPublicWorkspaceReadonly) {
     appendNoteAgeFilter($where_clause, $sql_params, getNoteAgeFilterDays($con));
     
     // Secure prepared queries
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, icon, icon_color FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
+    // A shortcut without its own icon inherits the icon of the note it links to.
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, "
+        . "COALESCE(NULLIF(icon, ''), (SELECT o.icon FROM entries o WHERE o.id = entries.linked_note_id)) AS icon, "
+        . "CASE WHEN NULLIF(icon, '') IS NULL THEN (SELECT o.icon_color FROM entries o WHERE o.id = entries.linked_note_id) ELSE icon_color END AS icon_color "
+        . "FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;
     $query_right_secure = "SELECT * FROM entries WHERE $where_clause ORDER BY updated DESC LIMIT 1";
     ?>
 

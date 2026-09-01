@@ -544,7 +544,7 @@ try {
 
 $contentSourceId = $note_id;
 if (!empty($note['linked_note_id'])) {
-    $stmtOrig = $con->prepare('SELECT entry, type, attachments FROM entries WHERE id = ? AND trash = 0');
+    $stmtOrig = $con->prepare('SELECT entry, type, attachments, icon, icon_color FROM entries WHERE id = ? AND trash = 0');
     $stmtOrig->execute([$note['linked_note_id']]);
     $originalNote = $stmtOrig->fetch(PDO::FETCH_ASSOC);
     if ($originalNote) {
@@ -553,6 +553,11 @@ if (!empty($note['linked_note_id'])) {
         $note['attachments'] = $originalNote['attachments'];
         // type must match original so rendering logic is consistent
         $note['type'] = $originalNote['type'];
+        // A shortcut without its own icon inherits the original note's icon
+        if (empty($note['icon'])) {
+            $note['icon'] = $originalNote['icon'];
+            $note['icon_color'] = $originalNote['icon_color'];
+        }
     }
 }
 
