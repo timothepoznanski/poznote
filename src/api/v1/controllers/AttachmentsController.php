@@ -558,7 +558,7 @@ class AttachmentsController {
             }
         }
 
-        $stmt = $this->con->prepare('SELECT note_id, password, allowed_users FROM shared_notes WHERE token = ? AND note_id = ? AND access_mode IS NOT NULL LIMIT 1');
+        $stmt = $this->con->prepare('SELECT note_id, password, allowed_users FROM shared_notes WHERE token = ? AND note_id = ? AND access_mode IS NOT NULL AND COALESCE(disabled, 0) = 0 LIMIT 1');
         $stmt->execute([$token, $noteId]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedNote) {
@@ -597,7 +597,7 @@ class AttachmentsController {
             }
         }
 
-        $stmt = $this->con->prepare('SELECT folder_id, password, allowed_users FROM shared_folders WHERE token = ? LIMIT 1');
+        $stmt = $this->con->prepare('SELECT folder_id, password, allowed_users FROM shared_folders WHERE token = ? AND COALESCE(disabled, 0) = 0 LIMIT 1');
         $stmt->execute([$token]);
         $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedFolder) {
@@ -609,6 +609,14 @@ class AttachmentsController {
         }
 
         if (!$this->noteBelongsToSharedFolder($noteId, (int)$sharedFolder['folder_id'])) {
+            return false;
+        }
+
+        // A per-note block makes just this note (and its attachments)
+        // inaccessible through the folder share.
+        $stmt = $this->con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? AND access_mode IS NULL AND COALESCE(disabled, 0) = 1');
+        $stmt->execute([$noteId]);
+        if ($stmt->fetchColumn() !== false) {
             return false;
         }
 

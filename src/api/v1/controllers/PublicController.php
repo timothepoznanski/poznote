@@ -483,7 +483,7 @@ class PublicController {
     }
 
     private function validateFolderTokenAndGetNote(string $folderToken, int $noteId): ?array {
-        $stmt = $this->con->prepare('SELECT folder_id, password, access_mode, allowed_users FROM shared_folders WHERE token = ?');
+        $stmt = $this->con->prepare('SELECT folder_id, password, access_mode, allowed_users FROM shared_folders WHERE token = ? AND COALESCE(disabled, 0) = 0');
         $stmt->execute([$folderToken]);
         $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedFolder) {
@@ -525,6 +525,15 @@ class PublicController {
             return null;
         }
 
+        // A per-note block makes just this note inaccessible through the
+        // folder share.
+        $stmtBlk = $this->con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? AND access_mode IS NULL AND COALESCE(disabled, 0) = 1');
+        $stmtBlk->execute([(int)$noteEntry['id']]);
+        if ($stmtBlk->fetchColumn()) {
+            $this->sendError(403, 'Share disabled');
+            return null;
+        }
+
         // A shortcut in the shared folder edits the original note it points
         // to (the public page renders the original's content), so writes and
         // the access-mode mapping both target the original note. Placing the
@@ -561,7 +570,7 @@ class PublicController {
     }
 
     private function validateTokenAndGetNote(string $token): ?array {
-        $stmt = $this->con->prepare('SELECT note_id, password, access_mode, allowed_users FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
+        $stmt = $this->con->prepare('SELECT note_id, password, access_mode, allowed_users FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL AND COALESCE(disabled, 0) = 0');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$sharedNote) {

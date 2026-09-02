@@ -1850,7 +1850,12 @@
       "create_url": "Criar URL",
       "error_prefix": "Erro: ",
       "unknown_error": "Erro desconhecido ao criar compartilhamento público",
-      "error_creating": "Erro ao criar compartilhamento público: "
+      "error_creating": "Erro ao criar compartilhamento público: ",
+      "shared_via_folder_title": "Nota compartilhada",
+      "shared_via_folder_message": "Esta nota já está compartilhada porque está na pasta compartilhada \"{{folder}}\".",
+      "shared_via_folder_message_generic": "Esta nota já está compartilhada porque está em uma pasta compartilhada.",
+      "shared_via_folder_create_question": "Deseja também criar um link de compartilhamento específico para esta nota, além do compartilhamento da pasta?",
+      "shared_via_folder_view_shares": "Ver compartilhamentos"
     },
     "public_modal": {
       "title": "URL compartilhada",
@@ -2415,6 +2420,20 @@
     "restrict_users_placeholder": "Selecionar utilizadores...",
     "restricted_badge": "Restrito",
     "restricted_help": "Quando restrito, apenas os utilizadores listados podem aceder a esta partilha após iniciar sessão.",
+    "disabled_badge": "Inacessível",
+    "disabled_help": "Este compartilhamento está inacessível: o link deixa de funcionar até que você o torne acessível novamente.",
+    "back_to_notes": "Voltar às notas",
+    "revoke_modal": {
+      "title": "Revogar compartilhamento",
+      "text": "Você pode excluir definitivamente este compartilhamento, ou mantê-lo e torná-lo inacessível até reativá-lo.",
+      "text_disabled": "Este compartilhamento está atualmente inacessível. Você pode torná-lo acessível novamente ou excluí-lo definitivamente.",
+      "text_via_folder": "Esta nota é compartilhada através de uma pasta. Você pode tornar inacessível apenas esta nota; o compartilhamento da pasta e suas outras notas não são afetados.",
+      "text_via_folder_disabled": "Esta nota está atualmente inacessível. Você pode torná-la acessível novamente através do compartilhamento da pasta.",
+      "text_via_folder_parent_disabled": "Esta nota está inacessível porque o compartilhamento da pasta foi tornado inacessível. Torne o compartilhamento da pasta acessível novamente para restaurar o acesso.",
+      "delete": "Excluir definitivamente",
+      "disable": "Tornar inacessível",
+      "enable": "Tornar acessível novamente"
+    },
     "no_users_found": "Nenhum outro utilizador encontrado",
     "users_loading": "A carregar utilizadores...",
     "shared_with_me": "Partilhado comigo",
@@ -2473,7 +2492,9 @@
       "shared_note_not_found_or_denied": "Nota compartilhada não encontrada ou acesso negado.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "folder_not_found": "Pasta não encontrada.\n\nIsso pode acontecer após uma restauração.\n\nUm administrador talvez precise reconstruir o banco de dados mestre em Configurações > Ferramentas de administração para reparar os links de compartilhamento.",
       "note_not_found": "Nota não encontrada",
-      "server_error": "Erro do servidor"
+      "server_error": "Erro do servidor",
+      "share_disabled_title": "Este compartilhamento está inacessível",
+      "share_disabled_message": "O proprietário tornou este compartilhamento inacessível."
     },
     "edit": {
       "button": "Editar",

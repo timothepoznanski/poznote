@@ -1847,7 +1847,12 @@
       "create_url": "Crear URL",
       "error_prefix": "Error: ",
       "unknown_error": "Error desconocido al crear el enlace público",
-      "error_creating": "Error al crear el enlace público: "
+      "error_creating": "Error al crear el enlace público: ",
+      "shared_via_folder_title": "Nota compartida",
+      "shared_via_folder_message": "Esta nota ya está compartida porque se encuentra en la carpeta compartida \"{{folder}}\".",
+      "shared_via_folder_message_generic": "Esta nota ya está compartida porque se encuentra en una carpeta compartida.",
+      "shared_via_folder_create_question": "¿Desea crear también un enlace para compartir específico de esta nota, además del uso compartido de la carpeta?",
+      "shared_via_folder_view_shares": "Ver compartidos"
     },
     "public_modal": {
       "title": "URL compartida",
@@ -2412,6 +2417,20 @@
     "restrict_users_placeholder": "Seleccionar usuarios...",
     "restricted_badge": "Restringido",
     "restricted_help": "Cuando está restringido, solo los usuarios listados pueden acceder a este enlace tras iniciar sesión.",
+    "disabled_badge": "Inaccesible",
+    "disabled_help": "Este recurso compartido está inaccesible: el enlace deja de funcionar hasta que vuelva a hacerlo accesible.",
+    "back_to_notes": "Volver a las notas",
+    "revoke_modal": {
+      "title": "Revocar el uso compartido",
+      "text": "Puede eliminar definitivamente este recurso compartido, o conservarlo y hacerlo inaccesible hasta que lo vuelva a activar.",
+      "text_disabled": "Este recurso compartido está actualmente inaccesible. Puede volver a hacerlo accesible o eliminarlo definitivamente.",
+      "text_via_folder": "Esta nota se comparte a través de una carpeta. Puede hacer inaccesible solo esta nota; el recurso compartido de la carpeta y sus otras notas no se ven afectados.",
+      "text_via_folder_disabled": "Esta nota está actualmente inaccesible. Puede volver a hacerla accesible a través del recurso compartido de su carpeta.",
+      "text_via_folder_parent_disabled": "Esta nota está inaccesible porque el recurso compartido de su carpeta se ha hecho inaccesible. Vuelva a hacer accesible el recurso compartido de la carpeta para restaurar el acceso.",
+      "delete": "Eliminar definitivamente",
+      "disable": "Hacer inaccesible",
+      "enable": "Hacer accesible de nuevo"
+    },
     "no_users_found": "No se encontraron otros usuarios",
     "users_loading": "Cargando usuarios...",
     "shared_with_me": "Compartido conmigo",
@@ -2470,7 +2489,9 @@
       "shared_note_not_found_or_denied": "No se encontró la nota compartida o se denegó el acceso.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "folder_not_found": "Carpeta no encontrada.\n\nEsto puede ocurrir después de una restauración.\n\nEs posible que un administrador deba reconstruir la base de datos maestra en Configuración > Herramientas de administración para reparar los enlaces compartidos.",
       "note_not_found": "Nota no encontrada",
-      "server_error": "Error del servidor"
+      "server_error": "Error del servidor",
+      "share_disabled_title": "Este recurso compartido está inaccesible",
+      "share_disabled_message": "El propietario ha hecho inaccesible este recurso compartido."
     },
     "edit": {
       "button": "Editar",

@@ -214,7 +214,7 @@ class SystemController {
         
         try {
             // 1. Get all shared folders to check if notes are shared via folder
-            $sharedFoldersQuery = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, sf.password_encrypted, sf.allowed_users, sf.access_mode, f.name as folder_name, f.parent_id, f.workspace
+            $sharedFoldersQuery = "SELECT sf.id, sf.folder_id, sf.token, sf.created, sf.indexable, sf.password, sf.password_encrypted, sf.allowed_users, sf.access_mode, sf.disabled, f.name as folder_name, f.parent_id, f.workspace
                 FROM shared_folders sf
                 INNER JOIN folders f ON sf.folder_id = f.id";
             $sfStmt = $this->con->prepare($sharedFoldersQuery);
@@ -230,7 +230,8 @@ class SystemController {
                 $sharedFolderMap[$sf['folder_id']] = [
                     'token' => $sf['token'],
                     'name' => $sf['folder_name'],
-                    'has_password' => !empty($sf['password'])
+                    'has_password' => !empty($sf['password']),
+                    'disabled' => (int)($sf['disabled'] ?? 0)
                 ];
                 $sharedFolderEntries[$sf['folder_id']] = $sf;
             }
@@ -280,6 +281,7 @@ class SystemController {
                 sn.access_mode,
                 sn.allowed_users,
                 sn.password_encrypted,
+                sn.disabled,
                 CASE WHEN sn.password IS NOT NULL AND sn.password != '' THEN 1 ELSE 0 END as hasPassword,
                 sn.created as shared_date,
                 e.heading,
@@ -317,6 +319,7 @@ class SystemController {
                     NULL as indexable,
                     'read_only' as access_mode,
                     NULL as password_encrypted,
+                    CASE WHEN blk.note_id IS NOT NULL THEN 1 ELSE 0 END as disabled,
                     0 as hasPassword,
                     e.created as shared_date,
                     e.heading,
@@ -329,6 +332,7 @@ class SystemController {
                     e.icon_color
                 FROM entries e
                 LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
+                LEFT JOIN shared_notes blk ON e.id = blk.note_id AND blk.access_mode IS NULL AND COALESCE(blk.disabled, 0) = 1
                 WHERE e.folder_id IN ($placeholders) AND e.trash = 0";
                 
                 $stmt = $this->con->prepare($folderNoteQuery);
@@ -395,15 +399,18 @@ class SystemController {
                 // Check if this note is in a shared folder (direct or ancestor)
                 $note['shared_via_folder'] = false;
                 $note['shared_folder_has_password'] = false;
+                $note['shared_folder_disabled'] = false;
                 $currId = $note['folder_id'] ?? null;
                 $maxDepth = 20;
                 $depth = 0;
                 while ($currId !== null && isset($allFoldersPool[$currId]) && $depth < $maxDepth) {
                     if (isset($sharedFolderMap[$currId])) {
                         $note['shared_via_folder'] = true;
+                        $note['shared_folder_id'] = (int)$currId;
                         $note['shared_folder_name'] = $sharedFolderMap[$currId]['name'];
                         $note['shared_folder_token'] = $sharedFolderMap[$currId]['token'];
                         $note['shared_folder_has_password'] = $sharedFolderMap[$currId]['has_password'];
+                        $note['shared_folder_disabled'] = !empty($sharedFolderMap[$currId]['disabled']);
                         $note['shared_folder_url'] = $base . '/folder/' . rawurlencode($sharedFolderMap[$currId]['token']);
                         
                         // If no explicit token, build URL via folder token
@@ -457,6 +464,7 @@ class SystemController {
                     'passwordValue' => poznoteDecryptSharePassword($entry['password_encrypted'] ?? ''),
                     'allowed_users' => !empty($entry['allowed_users']) ? json_decode($entry['allowed_users'], true) : null,
                     'access_mode' => ($entry['access_mode'] ?? 'read_only') === 'edit' ? 'edit' : 'read_only',
+                    'disabled' => (int)($entry['disabled'] ?? 0),
                     'folder_name' => $folder['name'],
                     'note_count' => (int)$countStmt->fetchColumn(),
                     'is_direct' => (bool)$directEntry,
@@ -522,6 +530,18 @@ class SystemController {
                 $ownerCon = new PDO('sqlite:' . $dbPath);
                 $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+                // A disabled share is inaccessible, so it must not be listed as
+                // "shared with me". The owner's DB may predate the disabled
+                // column (it is migrated when THEY connect), hence the guard.
+                $snDisabledFilter = '';
+                $sfDisabledFilter = '';
+                try {
+                    $snCols = array_column($ownerCon->query('PRAGMA table_info(shared_notes)')->fetchAll(PDO::FETCH_ASSOC), 'name');
+                    if (in_array('disabled', $snCols)) $snDisabledFilter = ' AND COALESCE(sn.disabled, 0) = 0';
+                    $sfCols = array_column($ownerCon->query('PRAGMA table_info(shared_folders)')->fetchAll(PDO::FETCH_ASSOC), 'name');
+                    if (in_array('disabled', $sfCols)) $sfDisabledFilter = ' AND COALESCE(sf.disabled, 0) = 0';
+                } catch (Exception $e) {}
+
                 // Check shared_notes
                 $stmt = $ownerCon->prepare(
                     "SELECT sn.note_id, sn.token, sn.indexable, sn.allowed_users,
@@ -529,7 +549,7 @@ class SystemController {
                      FROM shared_notes sn
                      INNER JOIN entries e ON sn.note_id = e.id
                      WHERE e.trash = 0
-                       AND sn.allowed_users IS NOT NULL AND sn.allowed_users != ''"
+                       AND sn.allowed_users IS NOT NULL AND sn.allowed_users != ''" . $snDisabledFilter
                 );
                 $stmt->execute();
                 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -559,7 +579,7 @@ class SystemController {
                             f.name as folder_name, f.workspace, f.icon, f.icon_color
                      FROM shared_folders sf
                      INNER JOIN folders f ON sf.folder_id = f.id
-                     WHERE sf.allowed_users IS NOT NULL AND sf.allowed_users != ''"
+                     WHERE sf.allowed_users IS NOT NULL AND sf.allowed_users != ''" . $sfDisabledFilter
                 );
                 $stmt2->execute();
                 while ($row = $stmt2->fetch(PDO::FETCH_ASSOC)) {

@@ -21,6 +21,29 @@
                 } catch (Exception $e) {
                     error_log('note_display: failed to prepare shared_notes lookup: ' . $e->getMessage());
                 }
+                // Nearest shared ancestor folder (a note inside a shared folder is publicly reachable too)
+                $stmt_folder_shared = null;
+                try {
+                    $stmt_folder_shared = $con->prepare(
+                        'WITH RECURSIVE folder_path(id, parent_id, depth) AS (
+                            SELECT f.id, f.parent_id, 0
+                            FROM folders f
+                            WHERE f.id = ?
+                            UNION ALL
+                            SELECT parent.id, parent.parent_id, folder_path.depth + 1
+                            FROM folders parent
+                            INNER JOIN folder_path ON folder_path.parent_id = parent.id
+                        )
+                        SELECT fo.name
+                        FROM folder_path
+                        INNER JOIN shared_folders sf ON sf.folder_id = folder_path.id
+                        INNER JOIN folders fo ON fo.id = folder_path.id
+                        ORDER BY folder_path.depth ASC
+                        LIMIT 1'
+                    );
+                } catch (Exception $e) {
+                    error_log('note_display: failed to prepare shared_folders lookup: ' . $e->getMessage());
+                }
                 $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
 
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
@@ -48,8 +71,26 @@
                             $attachments_data = $decoded_attachments;
                         }
                     }
-                    // Check if note is shared for CSS class
-                    $share_class = $is_shared ? ' is-shared' : '';
+                    // Shared indirectly through a shared (ancestor) folder? Only relevant
+                    // when there is no direct share, which always takes precedence.
+                    $shared_via_folder_name = null;
+                    if (!$is_shared && $stmt_folder_shared && !empty($row['folder_id'])) {
+                        try {
+                            $stmt_folder_shared->execute([(int)$row['folder_id']]);
+                            $folderNameResult = $stmt_folder_shared->fetchColumn();
+                            if ($folderNameResult !== false) {
+                                $shared_via_folder_name = (string)$folderNameResult;
+                            }
+                        } catch (Exception $e) {
+                            error_log('note_display: shared_folders lookup failed for note ' . $row['id'] . ': ' . $e->getMessage());
+                        }
+                    }
+
+                    // Check if note is shared for CSS class (directly or via a shared folder)
+                    $share_class = ($is_shared || $shared_via_folder_name !== null) ? ' is-shared' : '';
+                    $share_folder_attrs = $shared_via_folder_name !== null
+                        ? ' data-shared-via-folder="1" data-shared-folder-name="' . htmlspecialchars($shared_via_folder_name, ENT_QUOTES) . '"'
+                        : '';
                 
                     $note_type = $row['type'] ?? 'note';
                     
@@ -187,7 +228,7 @@
                     }
 
                     if (!$isPublicWorkspaceReadonly) {
-                        echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-share-2"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"'.$share_folder_attrs.'><i class="lucide lucide-share-2"></i></button>';
                     }
                     
                     $attachment_indicator_class = ($visible_attachments_count > 0) ? ' has-attachments' : '';

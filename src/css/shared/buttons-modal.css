@@ -56,6 +56,29 @@
     background: #c43b3b;
 }
 
+/* Action button of a share made inaccessible: same amber eye-off as the
+   badge next to the share name, still opens the revoke modal. */
+.btn-share-disabled {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+    border: none;
+}
+
+.btn-share-disabled:hover {
+    background: rgba(245, 158, 11, 0.3);
+}
+
+/* Greyed-out action button (e.g. token edit on a note shared through a
+   folder): visible for row alignment, but inert. The translucent grey works
+   on both light and dark backgrounds. */
+.note-actions .btn:disabled,
+.note-actions .btn:disabled:hover {
+    background: rgba(108, 117, 125, 0.25);
+    color: #6c757d;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
 .btn-primary {
     background: var(--pz-accent);
     color: white;
@@ -370,6 +393,50 @@ body.shared-page .shared-edit-token-modal .shared-edit-token-modal-actions > .bt
     margin-bottom: 0 !important;
     margin-left: 0 !important;
     display: inline-flex !important;
+    justify-content: center !important;
+    height: auto !important;
+    white-space: nowrap;
+}
+
+/* Revoke modal: delete for good, or toggle public accessibility. The width
+   follows the action row so the three buttons stay on one line. */
+body.shared-page .shared-revoke-modal .shared-revoke-modal-content {
+    width: fit-content;
+    min-width: min(440px, calc(100vw - 32px));
+    max-width: min(680px, calc(100vw - 32px));
+    box-sizing: border-box;
+    padding: 18px 20px 20px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.2);
+}
+
+body.shared-page .shared-revoke-modal .shared-revoke-modal-text {
+    margin: 10px 0 18px;
+    color: var(--text-muted, #666666);
+    line-height: 1.5;
+}
+
+body.shared-page .shared-revoke-modal .shared-revoke-modal-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+@media (max-width: 680px) {
+    body.shared-page .shared-revoke-modal .shared-revoke-modal-actions {
+        flex-wrap: wrap;
+    }
+}
+
+body.shared-page .shared-revoke-modal .shared-revoke-modal-actions > .btn {
+    width: auto !important;
+    min-width: 110px;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
     justify-content: center !important;
     height: auto !important;
     white-space: nowrap;

@@ -1382,7 +1382,12 @@
       "create_url": "Create URL",
       "error_prefix": "Error: ",
       "unknown_error": "Unknown error creating public link",
-      "error_creating": "Error creating public link: "
+      "error_creating": "Error creating public link: ",
+      "shared_via_folder_title": "Shared note",
+      "shared_via_folder_message": "This note is already shared because it is located in the shared folder \"{{folder}}\".",
+      "shared_via_folder_message_generic": "This note is already shared because it is located in a shared folder.",
+      "shared_via_folder_create_question": "Do you want to also create a share link specific to this note, in addition to the folder share?",
+      "shared_via_folder_view_shares": "View shares"
     },
     "public_modal": {
       "title": "Shared URL",
@@ -2060,6 +2065,20 @@
     "restrict_users_placeholder": "Select users...",
     "restricted_badge": "Restricted",
     "restricted_help": "When restricted, only the listed users can access this share after logging in.",
+    "disabled_badge": "Inaccessible",
+    "disabled_help": "This share is inaccessible: the link no longer works until you make it accessible again.",
+    "back_to_notes": "Back to notes",
+    "revoke_modal": {
+      "title": "Revoke share",
+      "text": "You can permanently delete this share, or keep it and make it inaccessible until you enable it again.",
+      "text_disabled": "This share is currently inaccessible. You can make it accessible again, or permanently delete it.",
+      "text_via_folder": "This note is shared through a folder. You can make just this note inaccessible; the folder share and its other notes are not affected.",
+      "text_via_folder_disabled": "This note is currently inaccessible. You can make it accessible again through its folder share.",
+      "text_via_folder_parent_disabled": "This note is inaccessible because its folder share has been made inaccessible. Make the folder share accessible again to restore access.",
+      "delete": "Delete permanently",
+      "disable": "Make inaccessible",
+      "enable": "Make accessible again"
+    },
     "no_users_found": "No other users found",
     "users_loading": "Loading users...",
     "shared_with_me": "Shared with me",
@@ -2121,7 +2140,9 @@
       "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "note_not_found": "Note not found",
-      "server_error": "Server error"
+      "server_error": "Server error",
+      "share_disabled_title": "This share is inaccessible",
+      "share_disabled_message": "The owner has made this share inaccessible."
     },
     "edit": {
       "button": "Edit",

@@ -606,7 +606,7 @@
                 break;
             case 'open-share-modal':
                 if (noteId && typeof openPublicShareModal === 'function') {
-                    openPublicShareModal(noteId);
+                    openPublicShareModal(noteId, target);
                 }
                 break;
             case 'show-attachment-dialog':

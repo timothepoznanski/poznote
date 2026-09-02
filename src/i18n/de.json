@@ -1846,7 +1846,12 @@
       "create_url": "URL erstellen",
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
-      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+      "error_creating": "Fehler beim Erstellen des öffentlichen Links: ",
+      "shared_via_folder_title": "Geteilte Notiz",
+      "shared_via_folder_message": "Diese Notiz ist bereits geteilt, weil sie sich im geteilten Ordner \"{{folder}}\" befindet.",
+      "shared_via_folder_message_generic": "Diese Notiz ist bereits geteilt, weil sie sich in einem geteilten Ordner befindet.",
+      "shared_via_folder_create_question": "Möchten Sie zusätzlich zur Ordnerfreigabe auch einen eigenen Freigabelink für diese Notiz erstellen?",
+      "shared_via_folder_view_shares": "Freigaben anzeigen"
     },
     "public_modal": {
       "title": "Geteilte URL",
@@ -2411,6 +2416,20 @@
     "restrict_users_placeholder": "Benutzer auswählen...",
     "restricted_badge": "Eingeschränkt",
     "restricted_help": "Bei eingeschränktem Zugang können nur die aufgeführten Benutzer nach dem Anmelden auf diesen Share zugreifen.",
+    "disabled_badge": "Unzugänglich",
+    "disabled_help": "Diese Freigabe ist unzugänglich: Der Link funktioniert nicht mehr, bis Sie sie wieder zugänglich machen.",
+    "back_to_notes": "Zurück zu den Notizen",
+    "revoke_modal": {
+      "title": "Freigabe widerrufen",
+      "text": "Sie können diese Freigabe endgültig löschen oder sie behalten und unzugänglich machen, bis Sie sie wieder aktivieren.",
+      "text_disabled": "Diese Freigabe ist derzeit unzugänglich. Sie können sie wieder zugänglich machen oder endgültig löschen.",
+      "text_via_folder": "Diese Notiz wird über einen Ordner geteilt. Sie können nur diese Notiz unzugänglich machen; die Ordnerfreigabe und ihre anderen Notizen sind nicht betroffen.",
+      "text_via_folder_disabled": "Diese Notiz ist derzeit unzugänglich. Sie können sie über die Ordnerfreigabe wieder zugänglich machen.",
+      "text_via_folder_parent_disabled": "Diese Notiz ist unzugänglich, weil die Ordnerfreigabe unzugänglich gemacht wurde. Machen Sie die Ordnerfreigabe wieder zugänglich, um den Zugriff wiederherzustellen.",
+      "delete": "Endgültig löschen",
+      "disable": "Unzugänglich machen",
+      "enable": "Wieder zugänglich machen"
+    },
     "no_users_found": "Keine anderen Benutzer gefunden",
     "users_loading": "Benutzer werden geladen...",
     "shared_with_me": "Mit mir geteilt",
@@ -2469,7 +2488,9 @@
       "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "folder_not_found": "Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "note_not_found": "Notiz nicht gefunden",
-      "server_error": "Serverfehler"
+      "server_error": "Serverfehler",
+      "share_disabled_title": "Diese Freigabe ist unzugänglich",
+      "share_disabled_message": "Der Besitzer hat diese Freigabe unzugänglich gemacht."
     },
     "edit": {
       "button": "Bearbeiten",

@@ -421,6 +421,26 @@ function renderAccessDeniedPage($currentLang) {
 }
 
 /**
+ * Dedicated page for a share whose owner made it inaccessible: the link is
+ * valid but does not resolve until the owner enables it again.
+ */
+function renderPublicShareDisabledPage($currentLang) {
+    renderPublicStatusPage($currentLang, [
+        'status' => 403,
+        'icon' => '🚫',
+        'badge' => '403',
+        'title' => t_h('public.errors.share_disabled_title', [], 'This share is inaccessible', $currentLang),
+        'message' => t_h('public.errors.share_disabled_message', [], 'The owner has made this share inaccessible.', $currentLang),
+        'actions' => [
+            [
+                'href' => '/index.php',
+                'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
+            ],
+        ],
+    ]);
+}
+
+/**
  * Check user restriction on a shared resource.
  * If the user is not authorized, renders login/access denied page and exits.
  * Returns true if user passed the restriction check, false if no restriction.

@@ -1845,7 +1845,12 @@
       "create_url": "创建 URL",
       "error_prefix": "错误: ",
       "unknown_error": "创建公开共享时发生未知错误",
-      "error_creating": "创建公开共享时出错: "
+      "error_creating": "创建公开共享时出错: ",
+      "shared_via_folder_title": "已共享的笔记",
+      "shared_via_folder_message": "这条笔记已经被共享，因为它位于共享文件夹“{{folder}}”中。",
+      "shared_via_folder_message_generic": "这条笔记已经被共享，因为它位于一个共享文件夹中。",
+      "shared_via_folder_create_question": "除了通过共享文件夹共享之外，是否还要为这条笔记单独创建一个共享链接？",
+      "shared_via_folder_view_shares": "查看共享"
     },
     "public_modal": {
       "title": "已共享 URL",
@@ -2413,6 +2418,20 @@
     "restrict_users_placeholder": "选择用户...",
     "restricted_badge": "已限制",
     "restricted_help": "限制后，只有列出的用户登录后才能访问此共享链接。",
+    "disabled_badge": "不可访问",
+    "disabled_help": "此分享不可访问：在您使其恢复可访问之前，链接将无法使用。",
+    "back_to_notes": "返回笔记",
+    "revoke_modal": {
+      "title": "撤销分享",
+      "text": "您可以永久删除此分享，或保留它并将其设为不可访问，直到您重新启用。",
+      "text_disabled": "此分享当前不可访问。您可以使其恢复可访问，或将其永久删除。",
+      "text_via_folder": "此笔记通过文件夹分享。您可以仅将此笔记设为不可访问；文件夹分享及其其他笔记不受影响。",
+      "text_via_folder_disabled": "此笔记当前不可访问。您可以通过其文件夹分享使其恢复可访问。",
+      "text_via_folder_parent_disabled": "此笔记不可访问，因为其文件夹分享已被设为不可访问。请重新使文件夹分享可访问以恢复访问。",
+      "delete": "永久删除",
+      "disable": "设为不可访问",
+      "enable": "恢复可访问"
+    },
     "no_users_found": "未找到其他用户",
     "users_loading": "正在加载用户...",
     "shared_with_me": "与我共享",
@@ -2471,7 +2490,9 @@
       "shared_note_not_found_or_denied": "未找到共享笔记或访问被拒绝。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "folder_not_found": "未找到文件夹。\n\n这可能发生在恢复之后。\n\n管理员可能需要在“设置 > 管理工具”中重建主数据库，以修复共享链接。",
       "note_not_found": "未找到笔记",
-      "server_error": "服务器错误"
+      "server_error": "服务器错误",
+      "share_disabled_title": "此分享不可访问",
+      "share_disabled_message": "所有者已将此分享设为不可访问。"
     },
     "edit": {
       "button": "编辑",

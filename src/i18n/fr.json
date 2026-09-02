@@ -1900,7 +1900,12 @@
       "create_url": "Créer l'URL",
       "error_prefix": "Erreur : ",
       "unknown_error": "Erreur inconnue lors de la création du partage public",
-      "error_creating": "Erreur lors de la création du partage public : "
+      "error_creating": "Erreur lors de la création du partage public : ",
+      "shared_via_folder_title": "Note partagée",
+      "shared_via_folder_message": "Cette note est déjà partagée car elle se trouve dans le dossier partagé « {{folder}} ».",
+      "shared_via_folder_message_generic": "Cette note est déjà partagée car elle se trouve dans un dossier partagé.",
+      "shared_via_folder_create_question": "Souhaitez-vous également créer un lien de partage spécifique à cette note, en plus du partage via le dossier ?",
+      "shared_via_folder_view_shares": "Voir les partages"
     },
     "public_modal": {
       "title": "URL partagée",
@@ -2464,6 +2469,20 @@
     "restrict_users_placeholder": "Sélectionner des utilisateurs...",
     "restricted_badge": "Restreint",
     "restricted_help": "Quand le partage est restreint, seuls les utilisateurs listés peuvent y accéder après s'être connectés.",
+    "disabled_badge": "Inaccessible",
+    "disabled_help": "Ce partage est inaccessible : le lien ne fonctionne plus tant que vous ne le rendez pas à nouveau accessible.",
+    "back_to_notes": "Retour aux notes",
+    "revoke_modal": {
+      "title": "Révoquer le partage",
+      "text": "Vous pouvez supprimer définitivement ce partage, ou le conserver et le rendre inaccessible jusqu'à sa réactivation.",
+      "text_disabled": "Ce partage est actuellement inaccessible. Vous pouvez le rendre à nouveau accessible, ou le supprimer définitivement.",
+      "text_via_folder": "Cette note est partagée via un dossier. Vous pouvez rendre uniquement cette note inaccessible ; le partage du dossier et ses autres notes ne sont pas affectés.",
+      "text_via_folder_disabled": "Cette note est actuellement inaccessible. Vous pouvez la rendre à nouveau accessible via le partage de son dossier.",
+      "text_via_folder_parent_disabled": "Cette note est inaccessible car le partage de son dossier a été rendu inaccessible. Rendez le partage du dossier à nouveau accessible pour restaurer l'accès.",
+      "delete": "Supprimer définitivement",
+      "disable": "Rendre inaccessible",
+      "enable": "Rendre à nouveau accessible"
+    },
     "no_users_found": "Aucun autre utilisateur trouvé",
     "users_loading": "Chargement des utilisateurs...",
     "shared_with_me": "Partagé avec moi",
@@ -2525,7 +2544,9 @@
       "shared_note_not_found_or_denied": "Note partagée introuvable ou accès refusé.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "folder_not_found": "Dossier introuvable.\n\nCela peut arriver après une restauration.\n\nUn administrateur doit peut-être reconstruire la base master dans Paramètres > Outils d'administration afin de réparer les liens de partage.",
       "note_not_found": "Note introuvable",
-      "server_error": "Erreur serveur"
+      "server_error": "Erreur serveur",
+      "share_disabled_title": "Ce partage est inaccessible",
+      "share_disabled_message": "Le propriétaire a rendu ce partage inaccessible."
     },
     "edit": {
       "button": "Modifier",
