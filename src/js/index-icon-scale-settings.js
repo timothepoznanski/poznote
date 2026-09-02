@@ -134,11 +134,10 @@ function applyIndexIconScale(scale) {
             font-size: ${20 * s}px !important;
         }
 
-        /* Sidebar header: notifications bell / AI assistant. css/sidebar.css
-           sizes these through an id selector, so the override has to carry the
-           same id specificity or the two would stay at their base size. */
-        #sidebarNotificationsBtn .lucide,
-        #sidebarAiChatBtn .lucide {
+        /* Sidebar header: notifications bell. css/sidebar.css sizes it through
+           an id selector, so the override has to carry the same id specificity
+           or it would stay at its base size. */
+        #sidebarNotificationsBtn .lucide {
             font-size: ${0.85 * s}em !important;
         }
 

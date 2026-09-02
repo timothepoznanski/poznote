@@ -122,7 +122,14 @@
                     // Note display
                     $markdown_attr = ($note_type === 'markdown') ? ' data-markdown-note="true"' : '';
                     $tasklist_attr = ($note_type === 'tasklist') ? ' data-tasklist-note="true"' : '';
-                    echo '<div id="note'.$row['id'].'" class="notecard">';
+                    // Per-note width override (entries.content_width, percentage of the
+                    // note column, 100 = full width); NULL follows the global setting.
+                    $content_width_attrs = '';
+                    if (isset($row['content_width']) && $row['content_width'] !== '') {
+                        $content_width = min(100, max(10, (int)$row['content_width']));
+                        $content_width_attrs = ' data-content-width="' . $content_width . '" style="--note-content-width: ' . $content_width . '%"';
+                    }
+                    echo '<div id="note'.$row['id'].'" class="notecard"'.$content_width_attrs.'>';
                     echo '<div class="innernote"'.$markdown_attr.$tasklist_attr.'>';
                     echo '<div class="note-header">';
                     echo '<div class="note-edit-toolbar">';
@@ -334,11 +341,22 @@
 
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
-                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
                     }
-                    
+
+                    // Note content width: cycles this note through the width presets,
+                    // overriding the global setting for this note only. Desktop only,
+                    // on mobile the note already fills the screen.
+                    if (!$isPublicWorkspaceReadonly) {
+                        $note_width_title = t_h('index.toolbar.note_width', [], 'Note width');
+                        echo '<button type="button" class="toolbar-btn btn-note-width note-action-btn desktop-only" title="'.$note_width_title.'" aria-label="'.$note_width_title.'" data-action="cycle-note-width" data-note-id="'.$row['id'].'"><i class="lucide lucide-move-horizontal"></i></button>';
+                    }
+
                     // Forward navigation button (desktop only)
                     echo '<button type="button" id="note-history-forward" class="toolbar-btn btn-history-nav btn-history-forward history-disabled" title="' . t_h('editor.toolbar.go_forward', [], 'Go forward') . '" disabled><i class="lucide lucide-circle-chevron-right"></i></button>';
+
+                    if (!$isPublicWorkspaceReadonly) {
+                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
+                    }
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="lucide lucide-info-circle"></i></button>';
                 

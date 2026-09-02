@@ -1,0 +1,91 @@
+/**
+ * Inline create / rename in the notes tree (js/inline-tree-edit.js)
+ *
+ * The input replaces a folder or note name inside its own row, so it borrows
+ * the row's font and leaves the leading icons where they are. The label rules
+ * it has to beat (ellipsis on desktop, horizontal scroll on mobile) are
+ * themselves !important, hence the specificity and the !important here.
+ */
+
+.tree-inline-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 1px 6px;
+    border: 1px solid var(--pz-accent);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: var(--sidebar-font-size, 13px);
+    font-weight: 500;
+    line-height: 1.5;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--pz-accent-rgb), 0.15);
+}
+
+.tree-inline-input::placeholder {
+    color: var(--pz-text-subtle);
+    font-weight: 400;
+}
+
+.tree-inline-input.is-busy {
+    opacity: 0.6;
+}
+
+/* The label is an ellipsised (or scrollable) block; while it holds the input
+   it becomes a flex row so the input takes the width the icons leave. */
+.note-in-folder a.links_arbo_left .note-title.tree-inline-editing,
+a.links_arbo_left .note-title.tree-inline-editing,
+.folder-toggle > .folder-name.tree-inline-editing {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    overflow: visible !important;
+    overflow-x: visible !important;
+    text-overflow: clip !important;
+}
+
+/* Count and actions would compete with the input for the row's width */
+.folder-toggle.tree-row-editing .folder-note-count,
+.folder-toggle.tree-row-editing .folder-actions,
+.note-list-item.tree-row-editing .note-actions {
+    display: none !important;
+}
+
+/* Strip the space reserved for the three-dot toggle that is now hidden */
+.note-list-item.tree-row-editing > a.links_arbo_left {
+    padding-right: 6px;
+}
+
+/* Draft row of a folder being created: no id, no actions, just icon + input */
+.tree-draft-folder > .folder-toggle,
+.tree-draft-folder .folder-icon {
+    cursor: default;
+}
+
+/* Flash on the note row a rename landed on, once the page has reloaded.
+   Folders reuse revealFolderInTree() and its own highlight; the keyframes
+   come from css/folders/animations.css. */
+.note-list-item.tree-reveal-highlight {
+    animation: folderRevealFlash 1.6s ease-out;
+    border-radius: 6px;
+}
+
+/* Dark and black themes */
+:root[data-theme='dark'] .tree-inline-input,
+body.dark-mode .tree-inline-input {
+    background: var(--dm-surface);
+    color: var(--dm-text);
+    border-color: var(--dm-accent);
+    box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.2);
+}
+
+:root[data-theme='dark'] .tree-inline-input::placeholder,
+body.dark-mode .tree-inline-input::placeholder {
+    color: var(--dm-text-muted);
+}

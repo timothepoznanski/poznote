@@ -28,6 +28,11 @@
  *                          with the hidden attribute (index.php uses it for
  *                          workspaces outside the Git sync scope; the client
  *                          toggles it on workspace switch).
+ *                          An entry may also add 'after' => '<entry id>' to sit
+ *                          right below that navigation entry instead of at the
+ *                          end of the rail (index.php uses it for the AI
+ *                          assistant, pinned under Dashboard). A pinned entry
+ *                          is not part of the rail's custom ordering.
  *
  * Requires: css/icon-sidebar.css in <head> (plus css/icon-sidebar-page.css on
  *           the secondary pages, which pin the rail instead of laying it out
@@ -82,8 +87,15 @@ $iconSidebarItems = [
     ['id' => 'iconSidebarGraphBtn', 'url' => $iconSidebarUrl('graph.php'), 'page' => 'graph.php', 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
 ];
 
-if (!empty($iconSidebarExtraItems)) {
-    $iconSidebarItems = array_merge($iconSidebarItems, $iconSidebarExtraItems);
+// Extras carrying an 'after' are pinned next to a navigation entry and are
+// placed at the very end of this file, once the ordering below has run.
+$iconSidebarPinnedItems = [];
+foreach (($iconSidebarExtraItems ?? []) as $iconSidebarExtraItem) {
+    if (isset($iconSidebarExtraItem['after'])) {
+        $iconSidebarPinnedItems[] = $iconSidebarExtraItem;
+    } else {
+        $iconSidebarItems[] = $iconSidebarExtraItem;
+    }
 }
 
 // The Icon Sidebar Order card in settings.php lets the user rearrange these.
@@ -158,6 +170,24 @@ if (function_exists('poznoteApplyIconSidebarOrder')) {
 
 $GLOBALS['poznoteIconSidebarOrderableItems'] = $iconSidebarOrderable;
 
+// Pinned extras take their place only now, so 'after' keeps holding for a user
+// who saved a custom order: that order cannot mention them, since the Icon
+// Sidebar Order modal renders on settings.php, where these page-specific
+// entries do not exist, and poznoteApplyIconSidebarOrder() would push every
+// unmentioned entry to the end of the rail. They are left out of
+// $iconSidebarOrderable above for the same reason: their position is fixed.
+// An 'after' naming an entry the rail is not showing falls back to appending.
+foreach ($iconSidebarPinnedItems as $iconSidebarPinnedItem) {
+    $iconSidebarPosition = count($iconSidebarItems);
+    foreach ($iconSidebarItems as $iconSidebarIndex => $iconSidebarCandidate) {
+        if (($iconSidebarCandidate['id'] ?? null) === $iconSidebarPinnedItem['after']) {
+            $iconSidebarPosition = $iconSidebarIndex + 1;
+            break;
+        }
+    }
+    array_splice($iconSidebarItems, $iconSidebarPosition, 0, [$iconSidebarPinnedItem]);
+}
+
 // Account actions, in their own group pinned to the bottom of the rail: only
 // the navigation entries above scroll, this group always stays visible.
 // Profile and Logout have no 'page' so they never highlight. js/profile.js,
@@ -168,6 +198,10 @@ $GLOBALS['poznoteIconSidebarOrderableItems'] = $iconSidebarOrderable;
 // settings.php; js/utils.js reveals every .update-badge when a release is out.
 $iconSidebarBottomItems = [
     ['id' => 'iconSidebarProfileBtn', 'url' => $iconSidebarUrl('settings.php', ['open' => 'profile']) . '#my-profile-card', 'icon' => 'lucide-user', 'label' => t('profile.card', [], 'My Profile')],
+    // Light/dark/black switch. It goes nowhere, so it renders as a button
+    // rather than a link; js/theme-manager.js picks it up through
+    // data-theme-toggle and keeps the icon on the theme the next click applies.
+    ['id' => 'iconSidebarThemeToggleBtn', 'themeToggle' => true, 'icon' => 'lucide-moon', 'label' => t('theme.toggle', [], 'Toggle theme')],
     // ?open=about lands on settings.php with the About section expanded and
     // every other section collapsed (js/settings-page.js). It is settings.php
     // with a query flag rather than a page of its own, so the two entries below
@@ -290,6 +324,11 @@ try {
         : (isset($iconSidebarItem['page']) && $iconSidebarItem['page'] === $iconSidebarCurrentPage);
     $iconSidebarClass = 'icon-sidebar-btn' . ($iconSidebarIsCurrent ? ' icon-sidebar-btn-active' : '');
     ?>
+    <?php if (!empty($iconSidebarItem['themeToggle'])): ?>
+    <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-theme-toggle title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
+        <i class="lucide <?php echo $iconSidebarIcon; ?>"></i>
+    </button>
+    <?php else: ?>
     <a href="<?php echo htmlspecialchars($iconSidebarItem['url'], ENT_QUOTES, 'UTF-8'); ?>"
        id="<?php echo $iconSidebarItem['id']; ?>"
        class="<?php echo $iconSidebarClass; ?>"
@@ -300,6 +339,7 @@ try {
         <span class="update-badge update-badge-hidden"></span>
         <?php endif; ?>
     </a>
+    <?php endif; ?>
     <?php endforeach; ?>
     </div>
 </nav>

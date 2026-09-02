@@ -113,6 +113,7 @@ $settingsPageUserKeys = [
     'note_color_palette',
     'hide_folder_counts',
     'hide_folder_actions',
+    'highlight_current_folder_tree',
     'notes_without_folders_after_folders',
     'markdown_split_card_view',
     'markdown_colored',
@@ -227,18 +228,6 @@ if ($isAdmin) {
     } catch (Exception $e) {
         // Keep the page usable if the master database is temporarily unavailable.
     }
-}
-
-// Count workspaces
-$workspaces_count = 0;
-try {
-    if (isset($con)) {
-        $stmtWs = $con->prepare("SELECT COUNT(*) as cnt FROM workspaces");
-        $stmtWs->execute();
-        $workspaces_count = (int)$stmtWs->fetchColumn();
-    }
-} catch (Exception $e) {
-    $workspaces_count = 0;
 }
 
 // Count users (for admin)
@@ -376,18 +365,6 @@ if ($canUseUserWebhooks) {
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid" id="settings-actions-section-grid">
 
-            <!-- Workspaces -->
-            <div class="home-card settings-card-clickable" id="workspaces-card" data-href="workspaces.php">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.workspaces', [], 'Organize your notes into separate workspaces, each with its own folders and notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-layers"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
-                    <span class="setting-status enabled"><?php echo $workspaces_count; ?></span>
-                </div>
-            </div>
-
             <!-- My Profile (username, first/last name) -->
             <div class="home-card" id="my-profile-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.my_profile', [], 'View and edit your profile information.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -437,7 +414,7 @@ if ($canUseUserWebhooks) {
                     $gitSyncIsConfigured = $gitSyncSettings->isConfigured();
                     $gitSyncIsEnabled = GitSync::isEnabled();
                     ?>
-                    <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : 'lucide lucide-github'; ?>"></i>
+                    <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : (($settingsGitProvider === 'gitlab') ? 'lucide lucide-gitlab' : 'lucide lucide-github'); ?>"></i>
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
@@ -589,18 +566,6 @@ if ($canUseUserWebhooks) {
             </div>
             <?php endif; ?>
 
-            <!-- Theme Mode -->
-            <div class="home-card" id="theme-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.theme_mode', [], 'Switch between light, dark or automatic theme.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-sun"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span>
-                    <span id="theme-mode-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
             <!-- App Font -->
             <div class="home-card" id="main-font-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.main_font', [], 'Choose the font used throughout the application.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -663,6 +628,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span>
                     <span id="type-note-icons-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Highlight Current Folder Tree -->
+            <div class="home-card" id="folder-tree-highlight-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.highlight_current_folder_tree', [], 'Dim the notes and folders that sit outside the folder hierarchy you are working in.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-folder-tree"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span>
+                    <span id="folder-tree-highlight-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

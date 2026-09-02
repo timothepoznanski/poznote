@@ -368,9 +368,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
             <h3><?php echo t_h('modals.note_width.title', [], 'Note Content Width'); ?></h3>
         </div>
         <div class="modal-body">
-            <p><?php echo t_h('modals.note_width.description', [], 'Select the maximum width for your notes content (in pixels):'); ?></p>
+            <p><?php echo t_h('modals.note_width.description', [], 'Select the maximum width for your notes content, as a percentage of the note column (100 = full width):'); ?></p>
             <div class="note-width-input-container">
-                <input type="number" id="noteWidthInput" min="0" max="2500" step="50" value="800" placeholder="800">
+                <input type="number" id="noteWidthInput" min="10" max="100" step="5" value="60" placeholder="60">
+                <span class="note-width-unit">%</span>
             </div>
         </div>
         <div class="modal-buttons">
@@ -642,95 +643,64 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Create modal (unified for both create button and folder actions) -->
-<div id="createModal" class="modal">
-    <div class="modal-content">
-        <h3 id="createModalTitle"><?php echo t_h('common.create', [], 'Create'); ?></h3>
-        <div class="modal-body">
-            <div class="create-options">
-                <!-- Notes section -->
-                <div class="create-section" id="notesSection">
-                    <div class="create-note-option" data-type="html" data-action="select-create-type">
-                        <i class="lucide lucide-file-text"></i>
-                        <div>
-                            <span><?php 
-                                $title = t_h('modals.create.note.title', [], 'Note');
-                                $parenPos = strpos($title, ' (');
-                                if ($parenPos !== false) {
-                                    echo substr($title, 0, $parenPos);
-                                    echo '<span class="create-note-subtitle">' . substr($title, $parenPos) . '</span>';
-                                } else {
-                                    echo $title;
-                                }
-                            ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option" data-type="markdown" data-action="select-create-type">
-                        <i class="lucide lucide-file-code"></i>
-                        <div>
-                            <span><?php 
-                                $title = t_h('modals.create.markdown.title', [], 'Markdown Note');
-                                $parenPos = strpos($title, ' (');
-                                if ($parenPos !== false) {
-                                    echo substr($title, 0, $parenPos);
-                                    echo '<span class="create-note-subtitle">' . substr($title, $parenPos) . '</span>';
-                                } else {
-                                    echo $title;
-                                }
-                            ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option" data-type="list" data-action="select-create-type">
-                        <i class="lucide lucide-list"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option initially-hidden" data-type="subfolder" data-action="select-create-type" id="subfolderOption">
-                        <i class="lucide lucide-folder-plus"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option" data-type="template" data-action="select-create-type">
-                        <i class="lucide lucide-copy"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option" data-type="linked" data-action="select-create-type">
-                        <i class="lucide lucide-link"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Other items section (only shown when creating from main button) -->
-                <div class="create-section mt-12" id="otherSection">
-                    <div class="create-note-option" data-type="folder" data-action="select-create-type">
-                        <i class="lucide lucide-folder"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option mt-12" data-type="kanban" data-action="select-create-type">
-                        <i class="lucide lucide-columns-2"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span>
-                        </div>
-                    </div>
-                    <div class="create-note-option mt-12" data-type="workspace" data-action="select-create-type">
-                        <i class="lucide lucide-layers"></i>
-                        <div>
-                            <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!-- Create dropdown, shared by the sidebar + button and the folder actions
+     "Create here" entry. Styled and placed like the folder/note actions menus
+     (css/folders/actions-menu.css, adjustMenuPosition in js/utils.js): a
+     single menu anchored to whatever opened it, not a modal.
+     The .create-note-option class and the data-type values are what the UI
+     Customization keys match on, so hiding an entry keeps working. -->
+<div id="create-menu" class="create-menu" role="menu">
+    <!-- Notes: the only group offered when creating inside a folder -->
+    <div class="create-section" id="notesSection">
+        <div class="create-menu-item create-note-option" data-type="html" data-action="select-create-type" role="menuitem">
+            <i class="lucide lucide-file-text"></i>
+            <span><?php
+                $title = t_h('modals.create.note.title', [], 'Note');
+                $parenPos = strpos($title, ' (');
+                if ($parenPos !== false) {
+                    echo substr($title, 0, $parenPos);
+                    echo '<span class="create-note-subtitle">' . substr($title, $parenPos) . '</span>';
+                } else {
+                    echo $title;
+                }
+            ?></span>
         </div>
-        <div class="modal-buttons mt-16">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="createModal"><?php echo t_h('common.cancel'); ?></button>
+        <div class="create-menu-item create-note-option" data-type="markdown" data-action="select-create-type" role="menuitem">
+            <i class="lucide lucide-file-code"></i>
+            <span><?php
+                $title = t_h('modals.create.markdown.title', [], 'Markdown Note');
+                $parenPos = strpos($title, ' (');
+                if ($parenPos !== false) {
+                    echo substr($title, 0, $parenPos);
+                    echo '<span class="create-note-subtitle">' . substr($title, $parenPos) . '</span>';
+                } else {
+                    echo $title;
+                }
+            ?></span>
+        </div>
+        <div class="create-menu-item create-note-option" data-type="list" data-action="select-create-type" role="menuitem">
+            <i class="lucide lucide-list"></i>
+            <span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span>
+        </div>
+        <div class="create-menu-item create-note-option" data-type="diary" data-action="select-create-type" role="menuitem">
+            <i class="lucide lucide-book-open"></i>
+            <span><?php echo t_h('diary.create_card_title', [], 'Diary entry'); ?></span>
+        </div>
+        <div class="create-menu-item create-note-option initially-hidden" data-type="subfolder" data-action="select-create-type" id="subfolderOption" role="menuitem">
+            <i class="lucide lucide-folder-plus"></i>
+            <span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span>
+        </div>
+    </div>
+
+    <!-- Containers: dropped when the menu is opened on a folder -->
+    <div class="create-section" id="otherSection">
+        <div class="create-menu-item create-note-option" data-type="folder" data-action="select-create-type" role="menuitem">
+            <i class="lucide lucide-folder"></i>
+            <span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
+        </div>
+        <div class="create-menu-item create-note-option" data-type="workspace" data-action="select-create-type" role="menuitem">
+            <i class="lucide lucide-layers"></i>
+            <span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span>
         </div>
     </div>
 </div>
@@ -972,25 +942,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="languageModal"><?php echo t_h('common.cancel'); ?></button>
             <button type="button" class="btn-primary" id="saveLanguageModalBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Theme selection modal -->
-<div id="themeModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.theme.title', [], 'Theme Selection'); ?></h3>
-        <div class="modal-body">
-            <div class="radio-options">
-                <label><input type="radio" name="themeChoice" value="light"> <?php echo t_h('theme.badge.light', [], 'Light'); ?></label>
-                <label><input type="radio" name="themeChoice" value="dark"> <?php echo t_h('theme.badge.dark', [], 'Dark'); ?></label>
-                <label><input type="radio" name="themeChoice" value="black"> <?php echo t_h('theme.badge.black', [], 'Black'); ?></label>
-                <label><input type="radio" name="themeChoice" value="system"> <?php echo t_h('theme.badge.system', [], 'System'); ?></label>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="themeModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveThemeModalBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>
@@ -1335,48 +1286,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 <?php // Folder icon picker, shared with list_folders.php
 include __DIR__ . '/modals/folder_icon_modal.php';
 ?>
-<!-- Kanban Structure Modal -->
-<div id="kanbanStructureModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.kanban_structure.title', [], 'Create Kanban Structure'); ?></h3>
-        <div class="modal-body modal-body-spaced">
-            <label for="kanbanFolderName"><?php echo t_h('modals.kanban_structure.folder_name_label', [], 'Folder name:'); ?></label>
-            <input type="text" id="kanbanFolderName" placeholder="<?php echo t_h('modals.kanban_structure.folder_name_placeholder', [], 'My Kanban Board'); ?>" maxlength="255" class="kanban-folder-input">
-            
-            <label for="kanbanColumnsCount" style="margin-top: 12px;"><?php echo t_h('modals.kanban_structure.columns_label', [], 'Number of columns (1-9):'); ?></label>
-            <input type="number" id="kanbanColumnsCount" min="1" max="9" value="3" class="kanban-columns-input">
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="kanbanStructureModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" data-action="create-kanban-structure"><?php echo t_h('common.create'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Template Note Selector Modal -->
-<div id="templateNoteSelectorModal" class="modal">
-    <div class="modal-content note-reference-modal-content">
-        <div class="note-reference-modal-header">
-            <h3><?php echo t_h('modals.template_selector.title', [], 'Select Note for Template'); ?></h3>
-        </div>
-        <p class="note-reference-description"><?php echo t_h('modals.template_selector.description', [], 'A note will be created in a folder Templates. You can then duplicate it and reuse it as a template.'); ?></p>
-        <div class="note-reference-search-container">
-            <input type="text" id="templateNoteSearch" placeholder="<?php echo t_h('modals.template_selector.search_placeholder', [], 'Search notes...'); ?>" class="note-reference-search-input">
-        </div>
-        <div class="note-reference-list-wrapper">
-            <div class="note-reference-recent-label"><?php echo t_h('modals.template_selector.recent_label', [], 'Recent notes'); ?></div>
-            <div id="templateNoteList" class="note-reference-list">
-                <div class="note-reference-loading">
-                    <i class="lucide lucide-loader-2 lucide-spin"></i> <?php echo t_h('common.loading', [], 'Loading...'); ?>
-                </div>
-            </div>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" data-action="close-template-selector-modal"><?php echo t_h('common.cancel'); ?></button>
-        </div>
-    </div>
-</div>
-
 <!-- Linked Note Selector Modal -->
 <div id="linkedNoteSelectorModal" class="modal">
     <div class="modal-content">
@@ -1592,11 +1501,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-markdown-note-card" checked><span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-task-list-card" checked><span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-diary-entry-card" checked><span><?php echo t_h('diary.create_card_title', [], 'Diary entry'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-linked-note-card" checked><span><?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-template-card" checked><span><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-folder-card" checked><span><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-subfolder-card" checked><span><?php echo t_h('modals.create.subfolder.title', [], 'Subfolder'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-kanban-card" checked><span><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-workspace-card" checked><span><?php echo t_h('modals.create.workspace.title', [], 'Workspace'); ?></span></label>
                 </div>
                 </div>
@@ -1605,7 +1511,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspaces-card" checked><span><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:welcome-setup-card" checked><span><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
@@ -1622,7 +1527,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:ctrl-s-save-card" checked><span><?php echo t_h('display.cards.ctrl_s_save', [], 'Save note with Ctrl + S'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-display-card" checked><span><?php echo t_h('display.cards.login_display', [], 'Login page title'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:language-card" checked><span><?php echo t_h('settings.language.label', [], 'Language'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:theme-mode-card" checked><span><?php echo t_h('display.cards.theme_mode', [], 'Theme'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-font-card" checked><span><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
@@ -1635,6 +1539,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:type-note-icons-card" checked><span><?php echo t_h('display.cards.type_based_note_icons', [], 'Icons by note type'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-tree-highlight-card" checked><span><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
@@ -1718,6 +1623,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-home"><span><?php echo t_h('icon_names.home', [], 'Home'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-note-width" checked><span><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span></label>
                 </div>
                 </div>
 
@@ -1801,6 +1707,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarProfileBtn" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarThemeToggleBtn" checked><span><?php echo t_h('modals.ui_customization.theme_toggle', [], 'Theme toggle'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarAboutBtn" checked><span><?php echo t_h('settings.categories.documentation', [], 'About'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarLogoutBtn" checked><span><?php echo t_h('workspace_menu.logout', [], 'Logout'); ?></span></label>
                 </div>
@@ -1824,7 +1731,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.folder_actions_toggle', [], 'Menu button (⋮) on folders'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:create-note-in-folder" checked><span><?php echo t_h('notes_list.folder_actions.create', [], 'Create note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:create-note-in-folder" checked><span><?php echo t_h('notes_list.folder_actions.create', [], 'Create here'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-kanban-view" checked><span><?php echo t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-all-notes-in-tabs" checked><span><?php echo t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes in tabs'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:move-folder-files" checked><span><?php echo t_h('notes_list.folder_actions.move_all_files', [], 'Move all files'); ?></span></label>
@@ -1844,22 +1751,13 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.note_actions_hint', [], 'Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.'); ?></p>
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:archive-note" checked><span><?php echo t_h('archive.menu_item', [], 'Archive note'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-export-modal" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:print-note" checked><span><?php echo t_h('common.print', [], 'Print'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-convert-modal" checked><span><?php echo t_h('notes_list.note_actions.convert_note', [], 'Convert note'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-attachment-dialog" checked><span><?php echo t_h('notes_list.note_actions.attachments', [], 'Attachments'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-reminder-modal" checked><span><?php echo t_h('reminder.toolbar_button', [], 'Set reminder'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-favorite-star" checked><span><?php echo t_h('modals.ui_customization.note_favorite_star', [], 'Favorite star (★) on notes'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-note-icon-picker" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshots'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-search-replace-modal" checked><span><?php echo t_h('editor.toolbar.search_replace', [], 'Search and replace'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-note-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:archive-note" checked><span><?php echo t_h('archive.menu_item', [], 'Archive note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:delete-note" checked><span><?php echo t_h('notes_list.note_actions.delete_note', [], 'Delete note'); ?></span></label>
                 </div>
                 </div>

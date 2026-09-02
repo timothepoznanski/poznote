@@ -176,16 +176,22 @@
     }
 
     // Shown once per conversation when the configured model rejects tool
-    // calling: the chat still works but cannot browse the notes.
-    function appendToolsUnsupportedNotice(pendingBubble) {
+    // calling: the chat still works but cannot browse the notes. Some OpenAI
+    // models only refuse tools because of the reasoning effort, which the
+    // settings page can fix: say so.
+    function appendToolsUnsupportedNotice(pendingBubble, reason) {
         if (panel() && panel().querySelector('.ai-chat-notice')) return;
         var div = document.createElement('div');
         div.className = 'ai-chat-notice';
         var icon = document.createElement('i');
         icon.className = 'lucide lucide-alert-triangle';
         div.appendChild(icon);
-        div.appendChild(document.createTextNode(' ' + t('ai_chat.no_tools_notice', {},
-            'This model does not support tools — the assistant cannot browse your notes.')));
+        var text = (reason === 'tools_need_reasoning_none')
+            ? t('ai_chat.no_tools_reasoning_notice', {},
+                'This model refuses tools at the current reasoning effort, so the assistant cannot browse your notes. Set the reasoning effort to None in the AI Assistant settings.')
+            : t('ai_chat.no_tools_notice', {},
+                'This model does not support tools — the assistant cannot browse your notes.');
+        div.appendChild(document.createTextNode(' ' + text));
         messagesEl().insertBefore(div, pendingBubble);
         scrollToBottom();
     }
@@ -348,8 +354,8 @@
                     appendToolActivity(obj.poznote_tool, bubble);
                     return;
                 }
-                if (obj.poznote_notice === 'tools_unsupported') {
-                    appendToolsUnsupportedNotice(bubble);
+                if (obj.poznote_notice === 'tools_unsupported' || obj.poznote_notice === 'tools_need_reasoning_none') {
+                    appendToolsUnsupportedNotice(bubble, obj.poznote_notice);
                     return;
                 }
                 var delta = obj.choices && obj.choices[0] && obj.choices[0].delta;

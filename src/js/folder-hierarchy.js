@@ -80,6 +80,12 @@ function escapeForJs(str) {
  * @param {string} parentFolderKey - The parent folder key (e.g., 'folder_123')
  */
 function createSubfolder(parentFolderKey) {
+    // Draft the subfolder inside its parent in the tree; the modal below is
+    // the fallback for pages without one (create.php).
+    if (window.PoznoteInlineTreeEdit && window.PoznoteInlineTreeEdit.createFolder(parentFolderKey)) {
+        return;
+    }
+
     // Get display name from the folder header
     var displayName = '';
     if (parentFolderKey && parentFolderKey.startsWith('folder_')) {

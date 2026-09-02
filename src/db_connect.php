@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 32; // 32: shared_notes.disabled / shared_folders.disabled columns (revoke-as-disable)
+    $CURRENT_SCHEMA_VERSION = 33; // 33: entries.content_width (per-note width override)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -239,7 +239,8 @@ try {
             created_by_user_id INTEGER,
             updated_by_user_id INTEGER,
             kanban_completed DATETIME,
-            trashed_at DATETIME
+            trashed_at DATETIME,
+            content_width INTEGER
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -671,6 +672,20 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add trashed_at column: ' . $e->getMessage());
+        }
+
+        // Ensure content_width column exists (per-note width override set from
+        // the toolbar). Max width of the note content as a percentage of the
+        // note column (100 = full width); NULL means the note follows the
+        // global center_note_content setting.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('content_width', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN content_width INTEGER");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add content_width column: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

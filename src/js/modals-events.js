@@ -175,13 +175,6 @@
                 }
                 break;
 
-            // Kanban structure creation
-            case 'create-kanban-structure':
-                if (typeof createKanbanStructure === 'function') {
-                    createKanbanStructure();
-                }
-                break;
-
             // Export modal - type selection
             case 'select-export-type':
                 if (type && typeof selectExportType === 'function') {
@@ -200,11 +193,6 @@
             case 'close-note-reference-modal':
                 if (typeof closeNoteReferenceModal === 'function') {
                     closeNoteReferenceModal();
-                }
-                break;
-            case 'close-template-selector-modal':
-                if (typeof closeTemplateNoteSelectorModal === 'function') {
-                    closeTemplateNoteSelectorModal();
                 }
                 break;
             case 'close-linked-selector-modal':

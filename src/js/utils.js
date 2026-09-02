@@ -536,7 +536,18 @@ function duplicateNote(noteId) {
 // Folder management
 var currentFolderToDelete = { id: null, name: null };
 
+/**
+ * New root folder. The name is typed into a draft row in the tree; the modal
+ * is only used where there is no tree, i.e. create.php.
+ */
 function newFolder() {
+    if (window.PoznoteInlineTreeEdit && window.PoznoteInlineTreeEdit.createFolder(null)) {
+        return;
+    }
+    newFolderViaModal();
+}
+
+function newFolderViaModal() {
     showInputModal(
         (window.t ? window.t('modals.folder.new_title', null, 'New Folder') : 'New Folder'),
         (window.t ? window.t('modals.folder.new_placeholder', null, 'New folder name') : 'New folder name'),
@@ -1784,6 +1795,12 @@ function editFolderName(folderId, oldName) {
         return;
     }
 
+    // Inline in the tree when the folder has a row there; list_folders.php has
+    // no tree and keeps the modal below.
+    if (window.PoznoteInlineTreeEdit && window.PoznoteInlineTreeEdit.renameFolder(folderId, oldName)) {
+        return;
+    }
+
     document.getElementById('editFolderModal').style.display = 'flex';
     document.getElementById('editFolderName').value = oldName;
     document.getElementById('editFolderName').dataset.oldName = oldName;
@@ -2705,53 +2722,101 @@ var targetFolderId = null;
 var targetFolderName = null;
 var isCreatingInFolder = false;
 
-function showCreateModal(folderId = null, folderName = null) {
-    targetFolderId = folderId;
-    targetFolderName = folderName;
-    selectedCreateType = null;
-    isCreatingInFolder = !!(folderId || folderName);
+/**
+ * Open the create dropdown (#create-menu in modals.php).
+ *
+ * options:
+ *   anchor      element to hang the menu off (the sidebar + button); when
+ *               absent the menu is placed at options.x / options.y instead,
+ *               which is what the folder actions entry uses.
+ *   folderId    creating inside this folder rather than at the root
+ *   folderName  its name, for the note-creation helpers
+ *
+ * Returns false when the menu is not on the page (secondary pages that include
+ * neither modals.php nor these handlers).
+ */
+function openCreateMenu(options) {
+    options = options || {};
 
-    // Update modal title and sections visibility
-    var modalTitle = document.getElementById('createModalTitle');
+    targetFolderId = options.folderId || null;
+    targetFolderName = options.folderName || null;
+    selectedCreateType = null;
+    isCreatingInFolder = !!(targetFolderId || targetFolderName);
+
+    var menu = document.getElementById('create-menu');
+    if (!menu) return false;
+
+    // Inside a folder the menu offers notes and a subfolder; a new folder or
+    // workspace only makes sense from the sidebar button.
     var otherSection = document.getElementById('otherSection');
     var subfolderOption = document.getElementById('subfolderOption');
-    var templateOption = document.querySelector('.create-note-option[data-type="template"]');
+    if (otherSection) otherSection.style.display = isCreatingInFolder ? 'none' : 'block';
+    if (subfolderOption) subfolderOption.style.display = isCreatingInFolder ? 'flex' : 'none';
 
-    if (isCreatingInFolder) {
-        if (window.t) {
-            modalTitle.textContent = window.t(
-                'modals.create.title_in_folder',
-                { folder: (folderName || window.t('modals.create.folder_fallback', null, 'folder')) },
-                'Create in {{folder}}'
-            );
-        } else {
-            modalTitle.textContent = 'Create in ' + (folderName || 'folder');
-        }
-        if (otherSection) otherSection.style.display = 'none';
-        // Hide template option when creating in folder
-        if (templateOption) templateOption.style.display = 'none';
-        // Allow subfolder creation for all folders
-        if (subfolderOption) {
-            subfolderOption.style.display = 'flex';
-        }
+    closeFolderActionsMenu();
+    closeNoteActionsMenu();
+
+    menu.classList.add('show');
+    if (options.anchor) {
+        adjustMenuPosition(menu, options.anchor);
     } else {
-        modalTitle.textContent = window.t ? window.t('common.create', null, 'Create') : 'Create';
-        if (otherSection) otherSection.style.display = 'block';
-        if (templateOption) templateOption.style.display = 'flex';
-        if (subfolderOption) subfolderOption.style.display = 'none';
+        positionMenuAtPoint(menu, options.x || 0, options.y || 0);
     }
 
-    // Reset selection
-    var options = document.querySelectorAll('.create-note-option');
-    options.forEach(function (option) {
-        option.classList.remove('selected');
+    createMenuAnchor = options.anchor || null;
+
+    // Registered on the next tick so the click that opened the menu does not
+    // immediately close it again.
+    setTimeout(function () {
+        document.addEventListener('click', closeCreateMenuOnOutsideClick);
+    }, 0);
+
+    return true;
+}
+
+// The element the menu is hanging off, so a second click on it is left to that
+// element's own handler (toggleCreateMenu closes the menu) instead of being
+// treated as an outside click. Which of the two document listeners runs first
+// is otherwise a matter of registration order, and getting it wrong would
+// reopen the menu the button just closed.
+var createMenuAnchor = null;
+
+function closeCreateMenu() {
+    var menu = document.getElementById('create-menu');
+    if (menu) menu.classList.remove('show');
+    createMenuAnchor = null;
+    document.removeEventListener('click', closeCreateMenuOnOutsideClick);
+}
+
+function closeCreateMenuOnOutsideClick(event) {
+    var menu = document.getElementById('create-menu');
+    if (!menu || !menu.classList.contains('show')) {
+        document.removeEventListener('click', closeCreateMenuOnOutsideClick);
+        return;
+    }
+    // A click on an entry is handled by selectCreateType, which closes the menu
+    // itself; anything else outside it just dismisses.
+    if (!event.target.closest) return;
+    if (createMenuAnchor && createMenuAnchor.contains(event.target)) {
+        return;
+    }
+    if (!event.target.closest('#create-menu')) {
+        closeCreateMenu();
+    }
+}
+
+window.openCreateMenu = openCreateMenu;
+window.closeCreateMenu = closeCreateMenu;
+
+// Kept for the callers that predate the dropdown (the Kanban view's add-card
+// button), which pass a folder but no anchor: the menu opens at the pointer.
+function showCreateModal(folderId = null, folderName = null) {
+    openCreateMenu({
+        folderId: folderId,
+        folderName: folderName,
+        x: lastPointerX,
+        y: lastPointerY
     });
-
-    // Show modal
-    var modal = document.getElementById('createModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
 }
 
 // Legacy function for backwards compatibility
@@ -2759,11 +2824,21 @@ function showCreateNoteInFolderModal(folderId, folderName) {
     showCreateModal(folderId, folderName);
 }
 
+// Last pointer position, so a caller with no anchor still opens the menu where
+// the user just clicked instead of in the top-left corner.
+var lastPointerX = 0;
+var lastPointerY = 0;
+document.addEventListener('click', function (event) {
+    if (typeof event.clientX === 'number' && (event.clientX || event.clientY)) {
+        lastPointerX = event.clientX;
+        lastPointerY = event.clientY;
+    }
+}, true);
+
 function selectCreateType(createType) {
     selectedCreateType = createType;
 
-    // Close modal immediately
-    closeModal('createModal');
+    closeCreateMenu();
 
     // Create the selected item
     executeCreateAction();
@@ -2796,25 +2871,8 @@ function executeCreateAction() {
         case 'workspace':
             createWorkspace();
             break;
-        case 'kanban':
-            showKanbanStructureModal();
-            break;
         case 'diary':
             createDiaryEntryForToday();
-            break;
-        case 'template':
-            if (typeof openTemplateNoteSelectorModal === 'function') {
-                openTemplateNoteSelectorModal();
-            } else {
-                console.error('openTemplateNoteSelectorModal function not found');
-            }
-            break;
-        case 'linked':
-            if (typeof openLinkedNoteSelectorModal === 'function') {
-                openLinkedNoteSelectorModal();
-            } else {
-                console.error('openLinkedNoteSelectorModal function not found');
-            }
             break;
         case 'subfolder':
             if (targetFolderId) {
@@ -3052,15 +3110,15 @@ function createNoteInFolder() {
 // A single shared dropdown (#folder-actions-menu, rendered once by
 // folders_display.php) serves every folder's three-dot toggle. On open it is
 // populated from the toggle's data attributes (folder id/name, note count,
-// shared state, current sort) and positioned next to the toggle.
+// shared/favorite state, current sort) and positioned next to the toggle.
 
 function populateFolderActionsMenu(menu, toggle) {
     var folderId = toggle.getAttribute('data-folder-id') || '';
     var folderName = toggle.getAttribute('data-folder-name') || '';
     var noteCount = parseInt(toggle.getAttribute('data-note-count'), 10) || 0;
     var isShared = toggle.getAttribute('data-shared') === '1';
-    var currentSort = toggle.getAttribute('data-current-sort') || '';
     var isFavorite = toggle.getAttribute('data-favorite') === '1';
+    var currentSort = toggle.getAttribute('data-current-sort') || '';
 
     menu.setAttribute('data-folder-id', folderId);
 
@@ -3113,6 +3171,8 @@ function populateFolderActionsMenu(menu, toggle) {
     menu.querySelectorAll('.sort-chevron').forEach(function (chevron) {
         chevron.style.transform = 'rotate(0deg)';
     });
+
+    syncActionsMenuSeparators(menu);
 }
 
 // Keeps exactly one folder toggle marked .open, so the hover-reveal rule in
@@ -3364,42 +3424,72 @@ document.addEventListener('click', function (event) {
 // without any per-item wiring here.
 // ============================================
 
+/**
+ * Hide the group separators of a shared actions menu that no longer sit
+ * between two visible items.
+ *
+ * Both menus are rendered once with every item they can ever show, then
+ * trimmed on open: by note type, by folder contents, and by the user's UI
+ * customization. Any of those can empty a whole group, which would otherwise
+ * leave a rule at the top or bottom of the menu, or two rules in a row.
+ *
+ * Reads the live style rather than offsetParent: the menu is populated while
+ * it is still display:none, so nothing has a layout box yet.
+ *
+ * @param {HTMLElement} menu The .note-actions-menu or .folder-actions-menu
+ */
+function syncActionsMenuSeparators(menu) {
+    if (!menu) return;
+
+    var children = Array.prototype.slice.call(menu.children);
+    var seenVisibleItem = false;
+    var pendingSeparators = [];
+
+    children.forEach(function (child) {
+        if (!child.classList) return;
+
+        var isSeparator = child.classList.contains('note-actions-menu-separator') ||
+            child.classList.contains('folder-actions-menu-separator');
+
+        if (isSeparator) {
+            // Undecided until a visible item turns up after it
+            child.style.display = 'none';
+            if (seenVisibleItem) pendingSeparators.push(child);
+            return;
+        }
+
+        if (window.getComputedStyle(child).display === 'none') return;
+
+        // A visible item closes every separator still waiting behind it, but
+        // only the last one: consecutive separators would double the rule.
+        if (pendingSeparators.length) {
+            pendingSeparators[pendingSeparators.length - 1].style.display = '';
+            pendingSeparators = [];
+        }
+        seenVisibleItem = true;
+    });
+}
+
 function populateNoteActionsMenu(menu, toggle) {
     var noteId = toggle.getAttribute('data-note-id') || '';
     var noteTitle = toggle.getAttribute('data-note-title') || '';
     var noteType = toggle.getAttribute('data-note-type') || 'note';
     var folderId = toggle.getAttribute('data-folder-id') || '';
     var folderName = toggle.getAttribute('data-folder') || '';
-    var isShared = toggle.getAttribute('data-shared') === '1';
-    var isFavorite = toggle.getAttribute('data-favorite') === '1';
-    var reminderAt = toggle.getAttribute('data-reminder-at') || '';
 
     menu.setAttribute('data-note-id', noteId);
 
     // Type-sensitive items: a shortcut row only keeps the actions that act on
-    // the link itself (attachments stay: the API resolves them to the target)
+    // the link itself, so duplicating and re-linking it are dropped
     var isLinkedNote = noteType === 'linked';
     menu.querySelectorAll('.note-real-only').forEach(function (item) {
         item.style.display = isLinkedNote ? 'none' : '';
     });
 
-    // Convert: show the variant matching the note's own type
-    menu.querySelectorAll('.convert-state-markdown').forEach(function (item) {
-        item.style.display = noteType === 'markdown' ? '' : 'none';
-    });
-    menu.querySelectorAll('.convert-state-note').forEach(function (item) {
-        item.style.display = noteType === 'note' ? '' : 'none';
-    });
-
-    // Search and replace only exists on text note types
-    menu.querySelectorAll('.search-capable-only').forEach(function (item) {
-        item.style.display = (noteType === 'note' || noteType === 'markdown') ? '' : 'none';
-    });
-
     // Copy note identity onto every action item (handlers read it there).
-    // The names match what each existing handler expects: show-export-modal
-    // reads title/noteType, show-move-folder-dialog reads the folder, and the
-    // icon picker reads data-note-title.
+    // The names match what each existing handler expects:
+    // show-move-folder-dialog reads the folder, and the icon picker and
+    // rename read data-note-title.
     menu.querySelectorAll('[data-action]').forEach(function (item) {
         item.setAttribute('data-note-id', noteId);
         item.setAttribute('data-note-title', noteTitle);
@@ -3407,22 +3497,9 @@ function populateNoteActionsMenu(menu, toggle) {
         item.setAttribute('data-note-type', noteType);
         item.setAttribute('data-folder-id', folderId);
         item.setAttribute('data-folder', folderName);
-        item.setAttribute('data-reminder-at', reminderAt);
     });
 
-    menu.querySelectorAll('.share-state-shared').forEach(function (item) {
-        item.style.display = isShared ? '' : 'none';
-    });
-    menu.querySelectorAll('.share-state-not-shared').forEach(function (item) {
-        item.style.display = isShared ? 'none' : '';
-    });
-
-    menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
-        item.style.display = isFavorite ? '' : 'none';
-    });
-    menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
-        item.style.display = isFavorite ? 'none' : '';
-    });
+    syncActionsMenuSeparators(menu);
 }
 
 // The toggle that opened the menu, so it can be closed by a second click and
@@ -3483,6 +3560,12 @@ document.addEventListener('click', function (event) {
 // ============================================
 
 function renameNote(noteId, currentTitle) {
+    // Inline in the tree row the actions menu was opened from; the modal below
+    // stays for any caller that has no such row.
+    if (window.PoznoteInlineTreeEdit && window.PoznoteInlineTreeEdit.renameNote(noteId, currentTitle)) {
+        return;
+    }
+
     var modal = document.getElementById('renameNoteModal');
     var input = document.getElementById('renameNoteName');
     if (!modal || !input) return;
@@ -3913,124 +3996,6 @@ function closeKanbanView() {
 window.closeKanbanView = closeKanbanView;
 window.resetKanbanViewState = resetKanbanViewState;
 
-
-/**
- * Show the Kanban structure modal
- */
-function showKanbanStructureModal() {
-    var modal = document.getElementById('kanbanStructureModal');
-    if (modal) {
-        // Reset form
-        var folderNameInput = document.getElementById('kanbanFolderName');
-        var columnsInput = document.getElementById('kanbanColumnsCount');
-        if (folderNameInput) folderNameInput.value = '';
-        if (columnsInput) columnsInput.value = '3';
-
-        modal.style.display = 'flex';
-    }
-}
-
-/**
- * Create a Kanban structure
- */
-function createKanbanStructure() {
-    var folderNameInput = document.getElementById('kanbanFolderName');
-    var columnsInput = document.getElementById('kanbanColumnsCount');
-
-    if (!folderNameInput || !columnsInput) {
-        console.error('Kanban structure inputs not found');
-        return;
-    }
-
-    var folderName = folderNameInput.value.trim();
-    var columns = parseInt(columnsInput.value, 10);
-
-    // If no folder name is provided, use the placeholder value
-    if (!folderName) {
-        folderName = folderNameInput.placeholder || (window.t ? window.t('modals.kanban_structure.folder_name_placeholder', null, 'My Kanban Board') : 'My Kanban Board');
-    }
-
-    if (isNaN(columns) || columns < 1 || columns > 9) {
-        showNotificationPopup(
-            window.t ? window.t('modals.kanban_structure.error_columns_range', null, 'Number of columns must be between 1 and 9') : 'Number of columns must be between 1 and 9',
-            'error'
-        );
-        return;
-    }
-
-    // Get current language from document
-    var language = document.documentElement.lang || 'en';
-
-    // Close modal
-    closeModal('kanbanStructureModal');
-
-    if (typeof window.showNoteCreationLoading === 'function') {
-        window.showNoteCreationLoading();
-    }
-
-    // Create the structure via API
-    var data = {
-        folder_name: folderName,
-        columns: columns,
-        workspace: selectedWorkspace || getSelectedWorkspace(),
-        language: language
-    };
-
-    fetch('/api/v1/folders/kanban-structure', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify(data)
-    })
-        .then(function (response) {
-            if (!response.ok) {
-                return response.json().then(function (errorData) {
-                    throw new Error(errorData.error || errorData.message || 'Unknown error');
-                });
-            }
-            return response.json();
-        })
-        .then(function (data) {
-            if (data.success && data.folder_id) {
-                // Success - close modal and open Kanban inline view
-                closeModal('kanbanStructureModal');
-
-                // If on create.php, redirect to index.php with kanban parameter
-                if (window.location.pathname.endsWith('create.php')) {
-                    var ws = selectedWorkspace || getSelectedWorkspace();
-                    var wsStr = ws ? '&workspace=' + encodeURIComponent(ws) : '';
-                    window.location.href = 'index.php?kanban=' + data.folder_id + wsStr;
-                } else {
-                    if (typeof window.refreshNotesListAfterFolderAction === 'function') {
-                        window.refreshNotesListAfterFolderAction();
-                    }
-                    // Delay slightly to let sidebar refresh, then open Kanban
-                    setTimeout(function () {
-                        if (typeof openKanbanView === 'function') {
-                            openKanbanView(data.folder_id);
-                        }
-                    }, 300);
-                }
-            } else {
-                if (typeof window.hideNoteCreationLoading === 'function') {
-                    window.hideNoteCreationLoading();
-                }
-                showNotificationPopup(
-                    data.error || (window.t ? window.t('modals.kanban_structure.error_create', null, 'Failed to create Kanban structure') : 'Failed to create Kanban structure'),
-                    'error'
-                );
-            }
-        })
-        .catch(function (error) {
-            if (typeof window.hideNoteCreationLoading === 'function') {
-                window.hideNoteCreationLoading();
-            }
-            showNotificationPopup(
-                window.t ? window.t('modals.kanban_structure.error_create_prefix', { error: error.message }, 'Error creating Kanban structure: {{error}}') : ('Error creating Kanban structure: ' + error.message),
-                'error'
-            );
-        });
-}
 
 /**
  * Shows a simple information modal

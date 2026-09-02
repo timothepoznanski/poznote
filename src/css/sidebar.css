@@ -5,7 +5,7 @@
  * update badge, new note/folder buttons, searchbar, and footer.
  */
 
-/* Single workspace: the title is plain text, not a dropdown trigger */
+/* Read-only public workspace: the title is plain text, not a dropdown trigger */
 .sidebar-title.sidebar-title-static {
     cursor: default;
 }
@@ -17,18 +17,23 @@
     position: relative;
 }
 
-/* The bell and robot glyphs read heavier than the thin chevron and plus they
-   sit between, so they are scaled down to balance the row optically.
+/* The bell glyph reads heavier than the thin chevron and plus it sits between,
+   so it is scaled down to balance the row optically.
    !important because js/index-icon-scale-settings.js injects an !important
    font-size on .sidebar-folder-toggle when the user picks a non-default icon
    scale. The em here is relative to the button, not to that injected value, so
-   the ids below would freeze both glyphs at 0.85em; the scale script restates
-   this pair with the same id specificity to keep them in step. */
-#sidebarNotificationsBtn .lucide,
-#sidebarAiChatBtn .lucide {
+   the id below would freeze the glyph at 0.85em; the scale script restates it
+   with the same id specificity to keep the two in step. */
+#sidebarNotificationsBtn .lucide {
     font-size: 0.85em !important;
     width: 1em;
     height: 1em;
+}
+
+/* display:inline-flex below would otherwise beat the browser's [hidden] rule
+   (index.php hides the bell while there is no notification to open). */
+.sidebar-folder-toggle[hidden] {
+    display: none !important;
 }
 
 /* Unread reminders: amber bell, mirroring .icon-sidebar-btn.has-notifications.
@@ -342,11 +347,10 @@
     padding-left: 7px !important;
 }
 
-/* Hover effect: blue and bold title when hovering over a note */
+/* Hover effect: keep text metrics stable while changing only the color */
 .links_arbo_left:hover .note-title {
     color: var(--pz-accent-strong) !important;
-    font-weight: 600 !important;
-    transition: color 0.2s ease, font-weight 0.2s ease;
+    transition: color 0.2s ease;
 }
 
 /* Selected note style matching light blue band from screenshot */
@@ -362,4 +366,3 @@
     color: var(--pz-accent-strong);
     font-weight: 600;
 }
-

@@ -114,6 +114,11 @@
         var triggers = document.querySelectorAll('[data-action="open-notifications-modal"]');
         triggers.forEach(function (trigger) {
             trigger.classList.toggle('has-notifications', unreadCount > 0);
+            // A trigger only exists while the modal has something to show:
+            // index.php already renders it hidden on an empty list, and this
+            // keeps it in step as reminders fire or get dismissed. The total,
+            // not the unread count, since the modal lists read ones too.
+            trigger.hidden = totalCount === 0;
         });
     }
 

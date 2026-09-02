@@ -414,7 +414,6 @@
       "delete_account": "永久删除您的账户及其所有数据。",
       "login_display": "自定义登录页面显示的标题。",
       "language": "更改界面语言。",
-      "theme_mode": "在浅色、深色或自动主题之间切换。",
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
       "font_size": "调整笔记、侧边栏和代码块的字体大小。",
@@ -432,7 +431,7 @@
       "note_color_palette": "自定义笔记可用的颜色调色板。",
       "folder_counts": "在每个文件夹旁显示笔记数量。",
       "notes_without_folders": "将没有文件夹的笔记显示在文件夹列表之后而不是之前。",
-      "note_width": "调整笔记内容的最大宽度。",
+      "note_width": "调整笔记内容的最大宽度，以笔记栏宽度的百分比表示。",
       "markdown_split_card_view": "以带边框的分栏视图（编辑器和预览）显示 Markdown 笔记。",
       "markdown_colored": "为 Markdown 笔记上色：为每级标题、行内代码、代码块背景、引用、表格表头和分隔线分别选择颜色。",
       "code_wrap": "代码块中的长行自动换行，而不是水平滚动。",
@@ -469,7 +468,8 @@
       "website": "打开 Poznote 官方网站。",
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
-      "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。"
+      "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。",
+      "highlight_current_folder_tree": "淡化当前所在文件夹层级之外的笔记和文件夹。"
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
@@ -615,7 +615,9 @@
     "menu": {
       "loading": "正在加载工作区...",
       "error_loading": "加载工作区出错",
-      "logout": "注销"
+      "logout": "注销",
+      "edit_workspaces": "编辑工作区",
+      "new_workspace": "新建工作区"
     },
     "errors": {
       "name_empty": "工作区名称不能为空",
@@ -677,7 +679,6 @@
   "display": {
     "title": "显示",
     "cards": {
-      "theme_mode": "主题",
       "main_font": "应用字体",
       "markdown_font": "Markdown 编辑器字体",
       "login_display": "登录页面标题",
@@ -692,6 +693,7 @@
       "show_note_created": "显示笔记创建日期",
       "type_based_note_icons": "按笔记类型显示图标",
       "show_folder_counts": "显示文件夹笔记数量",
+      "highlight_current_folder_tree": "突出显示当前文件夹树",
       "notes_without_folders_after": "在文件夹后显示笔记",
       "show_folder_actions": "显示文件夹操作",
       "kanban_on_folder_click": "点击文件夹时打开看板视图",
@@ -1167,7 +1169,9 @@
       "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?",
       "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
       "note_actions_toggle": "笔记上的菜单按钮（⋮）",
-      "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。"
+      "note_favorite_star": "笔记上的收藏星标（★）",
+      "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。",
+      "theme_toggle": "主题切换"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏顺序",
@@ -1175,10 +1179,6 @@
       "move_up": "上移",
       "move_down": "下移",
       "reset": "重置顺序"
-    },
-    "theme": {
-      "title": "主题选择",
-      "description": "选择您喜欢的主题："
     },
     "language": {
       "description": "选择您的首选语言:"
@@ -1211,10 +1211,10 @@
     },
     "note_width": {
       "title": "笔记内容宽度",
-      "description": "选择笔记内容的最大宽度（像素）：",
-      "label": "最大宽度 (px)：",
+      "description": "选择笔记内容的最大宽度，以笔记栏宽度的百分比表示（100 = 全宽）：",
+      "label": "最大宽度 (%)：",
       "full_width": "全宽",
-      "default_value": "{{width}} px 是默认值"
+      "default_value": "{{width}} % 是默认值"
     },
     "index_icon_scale": {
       "title": "索引页图标缩放",
@@ -1229,6 +1229,7 @@
     "folder": {
       "new_title": "新建文件夹",
       "new_placeholder": "新文件夹名称",
+      "new_subfolder_placeholder": "新子文件夹名称",
       "create": "创建",
       "rename_title": "重命名文件夹",
       "rename_placeholder": "新文件夹名称",
@@ -1307,32 +1308,15 @@
         "success": "快捷方式创建成功",
         "error": "创建快捷方式时出错"
       },
-      "template": {
-        "title": "模板"
-      },
       "subfolder": {
         "title": "子文件夹"
       },
       "folder": {
         "title": "文件夹"
       },
-      "kanban": {
-        "title": "看板结构"
-      },
       "workspace": {
         "title": "工作区"
       }
-    },
-    "kanban_structure": {
-      "title": "创建看板结构",
-      "folder_name_label": "文件夹名称：",
-      "folder_name_placeholder": "我的看板视图",
-      "columns_label": "列数 (1-9)：",
-      "error_name_required": "文件夹名称为必填项",
-      "error_columns_range": "列数必须在 1 到 9 之间",
-      "error_folder_exists": "此位置已存在文件夹",
-      "error_create": "创建看板结构失败",
-      "error_create_prefix": "创建看板结构时出错：{{error}}"
     },
     "folder_icon": {
       "title": "更改文件夹图标",
@@ -1345,12 +1329,6 @@
     "linked_selector": {
       "title": "从笔记创建快捷方式",
       "description": "从一条笔记创建快捷方式，以便在另一个文件夹中引用它。",
-      "search_placeholder": "搜索笔记...",
-      "recent_label": "最近的笔记"
-    },
-    "template_selector": {
-      "title": "选择用于模板的笔记",
-      "description": "系统会在 Templates 文件夹中创建一条笔记。之后您可以复制它，并将其重复用作模板。",
       "search_placeholder": "搜索笔记...",
       "recent_label": "最近的笔记"
     },
@@ -1589,8 +1567,8 @@
     "folder_actions": {
       "add_favorite": "添加到收藏",
       "remove_favorite": "从收藏中移除",
-      "menu": "操作",
-      "create": "创建",
+      "menu": "文件夹操作",
+      "create": "在此创建",
       "kanban_view": "看板视图",
       "open_all_in_tabs": "打开所有笔记",
       "move_all_files": "移动文件",
@@ -1793,12 +1771,7 @@
     }
   },
   "theme": {
-    "badge": {
-      "black": "黑色模式",
-      "dark": "深色模式",
-      "light": "浅色模式",
-      "system": "系统模式"
-    }
+    "toggle": "切换主题"
   },
   "table": {
     "context_menu": {
@@ -1837,6 +1810,9 @@
       "attachments_with_count": "附件 ({{count}})",
       "menu_actions": "菜单操作",
       "convert_to_html": "转换为 HTML",
+      "note_width": "笔记宽度",
+      "note_width_current": "笔记宽度：{{width}}",
+      "note_width_default": "默认（{{width}}）",
       "convert_to_markdown": "转换为 Markdown",
       "share_note": "共享笔记"
     },
@@ -3174,7 +3150,7 @@
       "none_selected": "请至少选择一个工作区。"
     },
     "title": "{{provider}} 同步",
-    "description": "将您的笔记和附件同步到 GitHub 或 Forgejo。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
+    "description": "将您的笔记和附件同步到 GitHub、GitLab 或 Forgejo。文件以扁平文件形式存储，并附带保存标签、文件夹、日期和附件的 metadata.json。",
     "warning": "请勿将此功能作为唯一的备份方案。\n请定期使用设置中的备份功能导出您的数据。",
     "confirm_push": "将所有笔记和附件推送到 {{provider}} 吗？现有文件将被更新，Poznote 中不再存在的文件将从仓库中删除。",
     "confirm_pull": "从 {{provider}} 拉取所有笔记和附件吗？本地数据将被远程版本覆盖。在 {{provider}} 上找不到的笔记将被移至回收站。",
@@ -3930,7 +3906,18 @@
     "provider_custom": "其他（自定义 URL）",
     "api_key_label_required": "API 密钥",
     "user_keys_label": "允许使用个人 API 密钥",
-    "user_keys_description": "每位用户都会在自己的设置中看到一张 AI 助手卡片，可在其中填写自己的提供商和 API 密钥。此时助手将通过该用户自己的服务器和密钥作答，而不是本页的配置，无论该用户是否出现在上面的列表中。"
+    "user_keys_description": "每位用户都会在自己的设置中看到一张 AI 助手卡片，可在其中填写自己的提供商和 API 密钥。此时助手将通过该用户自己的服务器和密钥作答，而不是本页的配置，无论该用户是否出现在上面的列表中。",
+    "reasoning_effort_label": "推理强度",
+    "reasoning_effort_description": "模型在回答前思考的程度，仅对支持该功能的模型有效。“自动”不发送任何值，由提供商决定。部分 OpenAI 模型在此项未设为“无”时会拒绝工具调用，因而无法浏览您的笔记。",
+    "reasoning_effort_options": {
+      "auto": "自动（提供商默认）",
+      "none": "无",
+      "minimal": "极低",
+      "low": "低",
+      "medium": "中",
+      "high": "高",
+      "xhigh": "极高（xhigh）"
+    }
   },
   "ai_settings_user": {
     "title": "我的 AI 助手",
@@ -3958,6 +3945,7 @@
     "tool_read": "正在读取笔记 #{{id}}",
     "tool_list": "列出最近的笔记",
     "no_tools_notice": "该模型不支持工具调用——助手无法浏览你的笔记。",
+    "no_tools_reasoning_notice": "此模型在当前推理强度下拒绝工具调用，助手因此无法浏览您的笔记。请在 AI 助手设置中将推理强度设为“无”。",
     "tool_rename": "正在将笔记 #{{id}} 重命名为“{{title}}”",
     "tool_update": "正在编辑笔记 #{{id}}",
     "tool_create": "正在创建笔记：{{title}}"

@@ -381,20 +381,47 @@ body.app-tab-reordering {
     bottom: 0;
 }
 
-/* Keep the title clear of the toggle. Reserved at all times rather than on
-   hover: padding sits inside the link's background, so the band still spans
-   the full width, and the text does not jump when the toggle appears. */
+/* Keep the title clear of the favorite star and the toggle. Reserved at all
+   times rather than on hover: padding sits inside the link's background, so
+   the band still spans the full width, and the text does not jump when the
+   two buttons appear. */
 .note-list-item > a.links_arbo_left {
+    padding-right: 48px;
+}
+
+/* One button left: give back the other's strip. .note-actions-hidden is set by
+   syncNoteActionToggles() in js/ui-customization.js when every item of the note
+   menu is unchecked (no toggle left to clear); .note-favorite-hidden when the
+   star itself is unchecked. */
+body.note-actions-hidden .note-list-item > a.links_arbo_left,
+body.note-favorite-hidden .note-list-item > a.links_arbo_left {
     padding-right: 26px;
 }
 
-/* Set by syncNoteActionToggles() in js/ui-customization.js when every item of
-   the note menu is unchecked: with no toggle to clear, give the title the
-   reserved strip back. */
-body.note-actions-hidden .note-list-item > a.links_arbo_left {
+body.note-actions-hidden.note-favorite-hidden .note-list-item > a.links_arbo_left {
     padding-right: 6px;
 }
 
-/* The note three-dot toggle (.note-actions-toggle) and its menu
-   (.note-actions-menu) share their rules with the folder ones in
-   css/folders/actions-menu.css and css/dark-mode/menus.css. */
+/* Favorite folder shortcuts share the row markup but carry no controls of
+   their own (renderFavoriteFolderItems in notes_list.php), so they keep the
+   full width for the folder name. */
+.note-list-item.favorite-folder-item > a.links_arbo_left {
+    padding-right: 6px;
+}
+
+/* The Favorites section itself: every row there is already a favorite, so
+   generateNoteActions() (folders_display.php) does not render the star and
+   marks the row .no-favorite-star. Same strip-recovery as the customization
+   toggle above, just decided server-side instead of by a body class. */
+.note-list-item.no-favorite-star > a.links_arbo_left {
+    padding-right: 26px;
+}
+
+body.note-actions-hidden .note-list-item.no-favorite-star > a.links_arbo_left {
+    padding-right: 6px;
+}
+
+/* The note three-dot toggle (.note-actions-toggle), the favorite star next to
+   it (.note-favorite-toggle) and the menu (.note-actions-menu) share their
+   rules with the folder ones in css/folders/actions-menu.css and
+   css/dark-mode/menus.css. */

@@ -416,14 +416,14 @@ $router->put('/notes/{id}/pinned', function($params) use ($notesController) {
     $notesController->updatePinned($params['id']);
 });
 
+// Per-note content width override (null = follow the global setting)
+$router->put('/notes/{id}/content-width', function($params) use ($notesController) {
+    $notesController->updateContentWidth($params['id']);
+});
+
 // Duplicate a note
 $router->post('/notes/{id}/duplicate', function($params) use ($notesController) {
     $notesController->duplicate($params['id']);
-});
-
-// Create a template from a note
-$router->post('/notes/{id}/create-template', function($params) use ($notesController) {
-    $notesController->createTemplate($params['id']);
 });
 
 // Convert note type (markdown <-> html)
@@ -574,11 +574,6 @@ $router->post('/folders/move-files', function($params) use ($foldersController) 
 // Reorder folders before/after a sibling
 $router->post('/folders/reorder', function($params) use ($foldersController) {
     $foldersController->reorder();
-});
-
-// Create a Kanban structure
-$router->post('/folders/kanban-structure', function($params) use ($foldersController) {
-    $foldersController->createKanbanStructure();
 });
 
 // List all folders

@@ -19,6 +19,15 @@
     transition: opacity 0.2s;
 }
 
+.folder-toggle > .folder-actions {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0;
+    margin-right: 0;
+}
+
 /* .folder-actions is the legacy inline container (still used by pages that
    render their own action icons); the sidebar tree emits a bare
    .folder-actions-toggle instead, so both are covered here. */
@@ -28,26 +37,38 @@
     pointer-events: auto;
 }
 
-/* Hidden until the folder row is hovered, like the note toggles
-   (.note-actions-toggle in css/tabs.css). Kept as opacity rather than display
-   so the icon fades instead of popping and the row's layout never shifts.
-   Mobile forces it back on in index-mobile.css: there is no hover there. */
+/* Taken out of the layout until the folder row is hovered, like the note
+   toggles (.note-actions-toggle below). Not opacity: .folder-toggle is a flex
+   row and .folder-actions is one of its items, so a merely transparent toggle
+   still held its 22px against the folder name, on every row, for a control
+   that was not on screen. The note rows can afford to reserve their strip
+   because .note-actions is positioned out of the flow (css/tabs.css).
+   Touch screens force it back on in the media block below. */
 .folder-header .folder-actions-toggle,
 .folder-toggle .folder-actions-toggle {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.12s ease-in-out;
+    display: none;
 }
 
 /* Reveal on folder row hover, or while this folder's menu is open: the pointer
-   then sits over the menu, not the row, so the toggle would otherwise fade out
+   then sits over the menu, not the row, so the toggle would otherwise vanish
    from under its own open menu. .open is set by toggleFolderActionsMenu() in
    js/utils.js, mirroring .note-actions-toggle.open. */
 .folder-header:hover .folder-actions-toggle,
 .folder-toggle:hover .folder-actions-toggle,
 .folder-actions-toggle.open {
-    opacity: 1;
-    pointer-events: auto;
+    display: inline-flex;
+}
+
+/* No hover on touch screens, so the toggle has to stay visible there, like
+   .note-actions-toggle below. Deliberately no !important: the rule UI
+   customization generates for panel:folder-actions-toggle is
+   display: none !important and must still win over this on a phone. Matching
+   the hide rule's specificity and sitting after it is enough. */
+@media (hover: none), (max-width: 800px) {
+    .folder-header .folder-actions-toggle,
+    .folder-toggle .folder-actions-toggle {
+        display: inline-flex;
+    }
 }
 
 /* When folder actions are set to always visible */
@@ -63,9 +84,9 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 
 /* Three-dot toggle button, shared by folder rows (.folder-actions-toggle) and
    note rows (.note-actions-toggle / .note-actions-item, see js/utils.js) so
-   both read as one control. Only the visibility rules differ: folder toggles
-   fade in on row hover (opacity rules above), note toggles are display:none
-   until their row is hovered. */
+   both read as one control. Both are display:none until their row is hovered;
+   only the selectors differ, folder rows being keyed on .folder-toggle and
+   note rows on .note-list-item. */
 .folder-actions-toggle,
 .note-actions-toggle,
 .note-actions-item {
@@ -139,6 +160,64 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     color: var(--pz-accent);
 }
 
+/* Favorite star on note rows, left of the three-dot toggle. Same 22px box and
+   hover reveal as the toggle so the pair reads as one strip; a favorited note
+   keeps its star lit at all times, which is how the tree marks favorites at a
+   glance. Emitted by generateNoteActions() in folders_display.php. */
+.note-favorite-toggle {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--pz-text-muted);
+    border-radius: 4px;
+    transition: all 0.15s ease;
+    align-items: center;
+    justify-content: center;
+    display: none;
+}
+
+.note-list-item:hover .note-favorite-toggle,
+.note-favorite-toggle.is-favorite {
+    display: inline-flex;
+}
+
+/* No hover on touch screens, so the star has to stay visible there, like the
+   three-dot toggle above. */
+@media (hover: none), (max-width: 800px) {
+    .note-favorite-toggle {
+        display: inline-flex;
+    }
+}
+
+.note-favorite-toggle:hover {
+    background: rgba(107, 114, 128, 0.12);
+    color: #374151;
+}
+
+.note-favorite-toggle i[class*="lucide-"],
+.note-favorite-toggle [class*="lucide-"] {
+    font-size: 0.85em !important;
+    transition: color 0.15s ease;
+}
+
+.note-favorite-toggle:hover i,
+.note-favorite-toggle:hover [class*="lucide-"] {
+    color: var(--pz-accent);
+}
+
+/* Lit state, matching .toolbar-btn.btn-favorite.is-favorite in
+   css/folders/toolbar-icons.css. Lucide icons are masks painted with
+   background-color: currentColor, so setting the colour is enough. */
+.note-favorite-toggle.is-favorite i.lucide-star,
+.note-favorite-toggle.is-favorite .lucide-star {
+    color: var(--pz-accent) !important;
+    filter: none !important;
+}
+
 /* Kanban icon style */
 .folder-kanban-icon {
     padding: 2px 4px;
@@ -161,13 +240,14 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     font-size: 0.75em !important;
 }
 
-/* Dropdown menu shared by folder actions (.folder-actions-menu) and note
-   actions (.note-actions-menu): one look, two JS hooks. Each is a single
-   shared menu placed by adjustMenuPosition() in js/utils.js; fixed rather
-   than absolute because #left_col scrolls, which would clip a menu positioned
-   inside a row. */
+/* Dropdown menu shared by folder actions (.folder-actions-menu), note actions
+   (.note-actions-menu) and the create menu (.create-menu): one look, three JS
+   hooks. Each is a single shared menu placed by adjustMenuPosition() in
+   js/utils.js; fixed rather than absolute because #left_col scrolls, which
+   would clip a menu positioned inside a row. */
 .folder-actions-menu,
-.note-actions-menu {
+.note-actions-menu,
+.create-menu {
     position: fixed;
     background: white;
     border: 1px solid var(--pz-border-strong);
@@ -180,12 +260,14 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-menu.show,
-.note-actions-menu.show {
+.note-actions-menu.show,
+.create-menu.show {
     display: block;
 }
 
 .folder-actions-menu-item,
-.note-actions-menu-item {
+.note-actions-menu-item,
+.create-menu-item {
     padding: 7px 14px;
     cursor: pointer;
     display: flex;
@@ -198,12 +280,14 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-menu-item:hover,
-.note-actions-menu-item:hover {
+.note-actions-menu-item:hover,
+.create-menu-item:hover {
     background-color: var(--pz-surface-hover);
 }
 
 .folder-actions-menu-item i,
-.note-actions-menu-item i {
+.note-actions-menu-item i,
+.create-menu-item i {
     font-size: 0.85em;
     color: var(--pz-text-muted);
     width: 15px;
@@ -211,7 +295,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 }
 
 .folder-actions-menu-item:hover i,
-.note-actions-menu-item:hover i {
+.note-actions-menu-item:hover i,
+.create-menu-item:hover i {
     color: #374151;
 }
 
@@ -310,4 +395,13 @@ body.dark-mode .note-actions-menu-item.active i {
     .folder-actions-menu-item.open-all-tabs-action {
         display: none !important;
     }
+}
+
+/* The create menu groups notes and containers; the rule separates them.
+   :not(:first-child) so a group left alone (creating inside a folder hides
+   #otherSection) never draws a stray line. */
+.create-menu .create-section:not(:first-child) {
+    border-top: 1px solid var(--pz-border);
+    margin-top: 4px;
+    padding-top: 4px;
 }

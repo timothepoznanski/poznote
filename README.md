@@ -690,7 +690,9 @@ For the complete reference, covering every event, the exact payload fields (`dat
 
 ## Git Synchronization
 
-Poznote supports automatic and manual synchronization with **GitHub** or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
+Poznote supports automatic and manual synchronization with **GitHub**, **GitLab** (gitlab.com or a self-hosted instance) or **Forgejo**. Each user configures their own repository independently. There is no shared global repository.
+
+Git Sync talks to the provider's REST API over HTTPS, so authentication is always token-based. SSH keys are not used.
 
 <details>
 <summary><strong>How to configure Git Sync</strong></summary>
@@ -706,10 +708,10 @@ Toggle **Git Sync** to enabled in the **Advanced Settings** section of the Setti
 
 | Field | Description |
 |---|---|
-| Provider | `GitHub` or `Forgejo` |
-| API Base URL | GitHub: auto-filled (read-only). Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
-| Access Token | GitHub PAT (`ghp_...`) or Forgejo token (Settings > Applications) |
-| Repository | `owner/repo` format |
+| Provider | `GitHub`, `GitLab` or `Forgejo` |
+| API Base URL | GitHub: auto-filled (read-only). GitLab: `https://gitlab.com/api/v4`, or your instance URL, e.g. `https://gitlab.example.com/api/v4`. Forgejo: your instance URL, e.g. `https://forgejo.example.com/api/v1` |
+| Access Token | GitHub PAT (`ghp_...`), GitLab token with the `api` scope (`glpat-...`, personal or project access token) or Forgejo token (Settings > Applications) |
+| Repository | `owner/repo` format. GitLab: the full project path, including subgroups, e.g. `group/subgroup/project` |
 | Branch | Default: `main` |
 | Author Name / Email | Used for commit metadata |
 

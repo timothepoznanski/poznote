@@ -36,7 +36,7 @@ try {
 
 // Determine provider name for display
 $provider = $configStatus['provider'] ?? 'github';
-$providerName = ($provider === 'github') ? 'GitHub' : (($provider === 'forgejo') ? 'Forgejo' : 'Git');
+$providerName = getGitProviderName($provider);
 
 // Helper for translations with provider
 function tp($key, $vars = []) {
@@ -152,8 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if ($newConfig['token'] === '••••••••') {
                 unset($newConfig['token']);
             }
-            // Do not persist the GitHub default API URL — it is handled automatically
-            if ($newConfig['api_base'] === 'https://api.github.com') {
+            // Do not persist an API URL that only restates the provider default
+            if ($newConfig['api_base'] === GitSync::defaultApiBaseFor($newConfig['provider'])) {
                 $newConfig['api_base'] = '';
             }
             if ($gitSync->saveUserGitConfig($newConfig)) {
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
             // Re-determine provider name after config change
             $provider = $configStatus['provider'] ?? 'github';
-            $providerName = ($provider === 'github') ? 'GitHub' : (($provider === 'forgejo') ? 'Forgejo' : 'Git');
+            $providerName = getGitProviderName($provider);
             break;
     }
 }
@@ -375,6 +375,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         <label class="git-field-label" for="git_provider"><?php echo t_h('git_sync.config.provider', [], 'Provider'); ?></label>
                         <select name="git_provider" id="git_provider" class="git-field-input">
                             <option value="github" <?php echo ($configStatus['provider'] === 'github') ? 'selected' : ''; ?>>GitHub</option>
+                            <option value="gitlab" <?php echo ($configStatus['provider'] === 'gitlab') ? 'selected' : ''; ?>>GitLab</option>
                             <option value="forgejo" <?php echo ($configStatus['provider'] === 'forgejo') ? 'selected' : ''; ?>>Forgejo</option>
                         </select>
                     </div>
@@ -542,27 +543,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         // Toggle API base URL field based on provider selection
         const providerSelect = document.getElementById('git_provider');
         const apiBaseInput = document.getElementById('git_api_base');
-        
-        function updateApiBaseField(provider) {
+        const providerDefaults = <?php echo json_encode([
+            'github'  => GitSync::defaultApiBaseFor('github'),
+            'gitlab'  => GitSync::defaultApiBaseFor('gitlab'),
+            'forgejo' => GitSync::defaultApiBaseFor('forgejo'),
+        ]); ?>;
+        const providerHints = {
+            github:  { api: providerDefaults.github, token: 'ghp_xxxx... (github.com/settings/tokens)', repo: 'owner/repo' },
+            gitlab:  { api: 'https://gitlab.example.com/api/v4', token: 'glpat-xxxx... (User Settings > Access Tokens, scope: api)', repo: 'group/project' },
+            forgejo: { api: providerDefaults.forgejo, token: 'a1b2c3d4e5f6... (Settings > Applications)', repo: 'owner/repo' }
+        };
+
+        // reset=true (provider switched): start from the new provider's suggestion.
+        // reset=false (page load): keep whatever is saved, just adjust the field state.
+        function updateApiBaseField(provider, reset) {
             if (!apiBaseInput) return;
-            if (provider === 'forgejo') {
-                apiBaseInput.readOnly = false;
-                apiBaseInput.style.opacity = '';
-                apiBaseInput.placeholder = 'http://localhost:3000/api/v1';
-                if (apiBaseInput.value === 'https://api.github.com') apiBaseInput.value = '';
-            } else {
+            const hints = providerHints[provider] || providerHints.github;
+            apiBaseInput.placeholder = hints.api;
+            if (provider === 'github') {
                 apiBaseInput.readOnly = true;
-                apiBaseInput.style.opacity = '';
-                apiBaseInput.value = 'https://api.github.com';
+                apiBaseInput.value = providerDefaults.github;
+                return;
+            }
+            apiBaseInput.readOnly = false;
+            if (reset) {
+                // gitlab.com is a real target, so show it; Forgejo is almost always self-hosted
+                apiBaseInput.value = provider === 'gitlab' ? providerDefaults.gitlab : '';
             }
         }
 
         function updateTokenPlaceholder(provider) {
             const tokenInput = document.getElementById('git_token');
-            if (!tokenInput) return;
-            tokenInput.placeholder = provider === 'forgejo'
-                ? 'a1b2c3d4e5f6... (Settings > Applications)'
-                : 'ghp_xxxx... (github.com/settings/tokens)';
+            const repoInput = document.getElementById('git_repo');
+            const hints = providerHints[provider] || providerHints.github;
+            if (tokenInput) tokenInput.placeholder = hints.token;
+            if (repoInput) repoInput.placeholder = hints.repo;
         }
 
         // Clear masked placeholder on focus so user can type new token
@@ -584,7 +599,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         if (providerSelect) {
             // Init on page load
-            updateApiBaseField(providerSelect.value);
+            updateApiBaseField(providerSelect.value, false);
             updateTokenPlaceholder(providerSelect.value);
 
             providerSelect.addEventListener('change', function() {
@@ -592,7 +607,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 const repoInput = document.getElementById('git_repo');
                 if (tokenInput) tokenInput.value = '';
                 if (repoInput) repoInput.value = '';
-                updateApiBaseField(this.value);
+                updateApiBaseField(this.value, true);
                 updateTokenPlaceholder(this.value);
             });
         }

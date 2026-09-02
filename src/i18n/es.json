@@ -413,7 +413,6 @@
       "delete_account": "Elimina permanentemente tu cuenta y todos sus datos.",
       "login_display": "Personaliza el título que se muestra en la página de inicio de sesión.",
       "language": "Cambia el idioma de la interfaz.",
-      "theme_mode": "Cambia entre tema claro, oscuro o automático.",
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral y los bloques de código.",
@@ -431,7 +430,7 @@
       "note_color_palette": "Personaliza la paleta de colores disponible para las notas.",
       "folder_counts": "Muestra el número de notas junto a cada carpeta.",
       "notes_without_folders": "Muestra las notas sin carpeta después de la lista de carpetas en lugar de antes.",
-      "note_width": "Ajusta el ancho máximo del contenido de las notas.",
+      "note_width": "Ajusta el ancho máximo del contenido de las notas, como porcentaje de la columna de la nota.",
       "markdown_split_card_view": "Muestra las notas markdown en una vista dividida enmarcada con editor y vista previa.",
       "markdown_colored": "Colorea las notas markdown: elige un color para cada nivel de título, el código en línea, el fondo de los bloques de código, las citas, los encabezados de tabla y los separadores.",
       "code_wrap": "Ajusta las líneas largas en los bloques de código en lugar de desplazarse horizontalmente.",
@@ -468,7 +467,8 @@
       "website": "Abre el sitio web oficial de Poznote.",
       "support": "Apoya el desarrollo de Poznote con una donación.",
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
-      "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación."
+      "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación.",
+      "highlight_current_folder_tree": "Atenuar las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas."
     },
     "title": "Configuración",
     "collapse_section": "Contraer la sección",
@@ -614,7 +614,9 @@
     "menu": {
       "loading": "Cargando espacios de trabajo...",
       "error_loading": "Error al cargar espacios de trabajo",
-      "logout": "Cerrar sesión"
+      "logout": "Cerrar sesión",
+      "edit_workspaces": "Editar espacios de trabajo",
+      "new_workspace": "Nuevo espacio de trabajo"
     },
     "errors": {
       "name_empty": "El nombre del espacio de trabajo no puede estar vacío",
@@ -677,7 +679,6 @@
   "display": {
     "title": "Pantalla",
     "cards": {
-      "theme_mode": "Tema",
       "main_font": "Fuente de la aplicación",
       "markdown_font": "Fuente del editor markdown",
       "login_display": "Título de página de inicio de sesión",
@@ -692,6 +693,7 @@
       "show_note_created": "Mostrar fecha de creación de la nota",
       "type_based_note_icons": "Iconos por tipo de nota",
       "show_folder_counts": "Mostrar conteo de notas de carpetas",
+      "highlight_current_folder_tree": "Resaltar el árbol de carpetas actual",
       "notes_without_folders_after": "Mostrar notas después de las carpetas",
       "show_folder_actions": "Mostrar acciones de carpeta",
       "kanban_on_folder_click": "Abrir vista Kanban al hacer clic en la carpeta",
@@ -1167,7 +1169,9 @@
       "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?",
       "folder_actions_toggle": "Botón de menú (⋮) en las carpetas",
       "note_actions_toggle": "Botón de menú (⋮) en las notas",
-      "note_actions_hint": "Elementos del menú ⋮ de cada nota en la barra lateral. Si se desmarcan todos, se oculta el botón del menú."
+      "note_favorite_star": "Estrella de favorito (★) en las notas",
+      "note_actions_hint": "Elementos del menú ⋮ de cada nota en la barra lateral. Si se desmarcan todos, se oculta el botón del menú.",
+      "theme_toggle": "Botón de tema"
     },
     "icon_sidebar_order": {
       "title": "Orden de la barra de iconos",
@@ -1175,10 +1179,6 @@
       "move_up": "Subir",
       "move_down": "Bajar",
       "reset": "Restablecer el orden"
-    },
-    "theme": {
-      "title": "Selección de tema",
-      "description": "Elija su tema preferido:"
     },
     "language": {
       "description": "Selecciona tu idioma preferido:"
@@ -1211,10 +1211,10 @@
     },
     "note_width": {
       "title": "Ancho del contenido de la nota",
-      "description": "Selecciona el ancho máximo para el contenido de tus notas:",
-      "label": "Ancho máximo (px):",
+      "description": "Selecciona el ancho máximo del contenido de tus notas, como porcentaje de la columna de la nota (100 = ancho total):",
+      "label": "Ancho máximo (%):",
       "full_width": "Ancho total",
-      "default_value": "{{width}} px es el valor predeterminado"
+      "default_value": "{{width}} % es el valor predeterminado"
     },
     "index_icon_scale": {
       "title": "Escalado de iconos del índice",
@@ -1229,6 +1229,7 @@
     "folder": {
       "new_title": "Nueva carpeta",
       "new_placeholder": "Nuevo nombre de carpeta",
+      "new_subfolder_placeholder": "Nuevo nombre de subcarpeta",
       "create": "Crear",
       "rename_title": "Renombrar carpeta",
       "rename_placeholder": "Nuevo nombre de carpeta",
@@ -1296,32 +1297,15 @@
         "success": "Atajo creado con éxito",
         "error": "Error al crear el atajo"
       },
-      "template": {
-        "title": "Plantilla"
-      },
       "subfolder": {
         "title": "Subcarpeta"
       },
       "folder": {
         "title": "Carpeta"
       },
-      "kanban": {
-        "title": "Estructura Kanban"
-      },
       "workspace": {
         "title": "Espacio de trabajo"
       }
-    },
-    "kanban_structure": {
-      "title": "Crear estructura Kanban",
-      "folder_name_label": "Nombre de la carpeta:",
-      "folder_name_placeholder": "Mi vista Kanban",
-      "columns_label": "Número de columnas (1-9):",
-      "error_name_required": "El nombre de la carpeta es obligatorio",
-      "error_columns_range": "El número de columnas debe estar entre 1 y 9",
-      "error_folder_exists": "Ya existe una carpeta en esta ubicación",
-      "error_create": "Error al crear la estructura Kanban",
-      "error_create_prefix": "Error al crear la estructura Kanban: {{error}}"
     },
     "folder_icon": {
       "title": "Cambiar icono de carpeta",
@@ -1334,12 +1318,6 @@
     "linked_selector": {
       "title": "Crear un atajo de una nota",
       "description": "Cree un atajo de una nota para poder referenciarla en otra carpeta.",
-      "search_placeholder": "Buscar notas...",
-      "recent_label": "Notas recientes"
-    },
-    "template_selector": {
-      "title": "Seleccionar nota para plantilla",
-      "description": "Se creará una nota en la carpeta Templates. Después podrá duplicarla y reutilizarla como plantilla.",
       "search_placeholder": "Buscar notas...",
       "recent_label": "Notas recientes"
     },
@@ -1597,8 +1575,8 @@
     "folder_actions": {
       "add_favorite": "Añadir a favoritos",
       "remove_favorite": "Quitar de favoritos",
-      "menu": "Acciones",
-      "create": "Crear",
+      "menu": "Acciones de carpeta",
+      "create": "Crear aquí",
       "kanban_view": "Vista Kanban",
       "open_all_in_tabs": "Abrir todas las notas",
       "move_all_files": "Mover los archivos",
@@ -1796,12 +1774,7 @@
     }
   },
   "theme": {
-    "badge": {
-      "black": "modo negro",
-      "dark": "modo oscuro",
-      "light": "modo claro",
-      "system": "modo sistema"
-    }
+    "toggle": "Cambiar de tema"
   },
   "table": {
     "context_menu": {
@@ -1840,6 +1813,9 @@
       "attachments_with_count": "Adjuntos ({{count}})",
       "menu_actions": "Acciones del menú",
       "convert_to_html": "Convertir a HTML",
+      "note_width": "Ancho de la nota",
+      "note_width_current": "Ancho de la nota: {{width}}",
+      "note_width_default": "Predeterminado ({{width}})",
       "convert_to_markdown": "Convertir a Markdown"
     },
     "share_modal": {
@@ -3050,7 +3026,7 @@
       "none_selected": "Seleccione al menos un espacio de trabajo."
     },
     "title": "Sincronización {{provider}}",
-    "description": "Sincroniza tus notas y archivos adjuntos en GitHub o Forgejo. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
+    "description": "Sincroniza tus notas y archivos adjuntos en GitHub, GitLab o Forgejo. Los archivos se almacenan como archivos planos con un metadata.json que conserva etiquetas, carpetas, fechas y adjuntos.",
     "warning": "No confíe únicamente en esta función como solución de copia de seguridad.\nExporte sus datos regularmente desde la función de copia de seguridad en los Ajustes.",
     "confirm_push": "¿Enviar todas las notas y archivos adjuntos a {{provider}}? Los archivos existentes se actualizarán y los archivos que ya no están en Poznote se eliminarán del repositorio.",
     "confirm_pull": "¿Extraer todas las notas y archivos adjuntos de {{provider}}? Los datos locales serán reemplazados por la versión remota. Las notas no encontradas en {{provider}} se moverán a la papelera.",
@@ -3809,7 +3785,18 @@
     "provider_custom": "Otro (URL personalizada)",
     "api_key_label_required": "Clave API",
     "user_keys_label": "Permitir claves API personales",
-    "user_keys_description": "Cada usuario obtiene una tarjeta de asistente de IA en sus propios ajustes, donde puede indicar su proveedor y su clave API. En ese caso, el asistente responde a través de su propio servidor y su propia clave en lugar de la configuración de esta página, aparezca o no ese usuario en la lista de arriba."
+    "user_keys_description": "Cada usuario obtiene una tarjeta de asistente de IA en sus propios ajustes, donde puede indicar su proveedor y su clave API. En ese caso, el asistente responde a través de su propio servidor y su propia clave en lugar de la configuración de esta página, aparezca o no ese usuario en la lista de arriba.",
+    "reasoning_effort_label": "Esfuerzo de razonamiento",
+    "reasoning_effort_description": "Cuánto piensa el modelo antes de responder, en los modelos que lo permiten. Auto no envía nada y deja la elección al proveedor. Algunos modelos de OpenAI rechazan las herramientas, y por tanto no pueden consultar sus notas, salvo que este ajuste esté en Ninguno.",
+    "reasoning_effort_options": {
+      "auto": "Auto (valor por defecto del proveedor)",
+      "none": "Ninguno",
+      "minimal": "Mínimo",
+      "low": "Bajo",
+      "medium": "Medio",
+      "high": "Alto",
+      "xhigh": "Muy alto (xhigh)"
+    }
   },
   "ai_settings_user": {
     "title": "Mi asistente de IA",
@@ -3837,6 +3824,7 @@
     "tool_read": "Leyendo la nota #{{id}}",
     "tool_list": "Listando notas recientes",
     "no_tools_notice": "Este modelo no admite herramientas: el asistente no puede consultar tus notas.",
+    "no_tools_reasoning_notice": "Este modelo rechaza las herramientas con el esfuerzo de razonamiento actual, por lo que el asistente no puede consultar sus notas. Ponga el esfuerzo de razonamiento en Ninguno en los ajustes del asistente de IA.",
     "tool_rename": "Renombrando la nota #{{id}} a «{{title}}»",
     "tool_update": "Editando la nota #{{id}}",
     "tool_create": "Creando la nota: {{title}}"

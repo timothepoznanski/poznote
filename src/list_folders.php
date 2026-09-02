@@ -212,8 +212,8 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 	echo '<button type="button" class="folder-list-menu-btn" data-action="open-folder-actions-modal"'
 		. $folderAttrs
-		. ' title="' . t_h('notes_list.folder_actions.menu', [], 'Actions') . '"'
-		. ' aria-label="' . t_h('notes_list.folder_actions.menu', [], 'Actions') . '">';
+		. ' title="' . t_h('notes_list.folder_actions.menu', [], 'Folder actions') . '"'
+		. ' aria-label="' . t_h('notes_list.folder_actions.menu', [], 'Folder actions') . '">';
 	echo '<i class="lucide lucide-more-vertical"></i>';
 	echo '</button>';
 	echo '</div>';

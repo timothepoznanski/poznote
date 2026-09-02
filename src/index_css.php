@@ -42,6 +42,7 @@ $groups = [
         'css/folders/actions-menu.css',
         'css/folders/content.css',
         'css/folders/selection.css',
+        'css/folders/tree-highlight.css',
         'css/folders/search.css',
         'css/folders/animations.css',
         'css/folders/toolbar-icons.css',
@@ -56,6 +57,7 @@ $groups = [
         'css/drag-drop.css',
         'css/icons.css',
         'css/tabs.css',
+        'css/tree-inline-edit.css',
         'css/misc.css',
     ],
     'modals' => [

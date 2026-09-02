@@ -45,20 +45,19 @@
         'btn-convert': 'action',
         'btn-trash': 'action',
         'btn-info': 'action',
+        'btn-note-width': 'action',
         'btn-split-view': 'action',
         'btn-home': 'action',
         'btn-audio': 'action'
     };
 
-    var CREATE_MODAL_OPTION_SELECTORS = {
+    var CREATE_MENU_OPTION_SELECTORS = {
         'card:create-note-card': '.create-note-option[data-type="html"]',
         'card:create-markdown-note-card': '.create-note-option[data-type="markdown"]',
         'card:create-task-list-card': '.create-note-option[data-type="list"]',
-        'card:create-linked-note-card': '.create-note-option[data-type="linked"]',
-        'card:create-template-card': '.create-note-option[data-type="template"]',
         'card:create-folder-card': '.create-note-option[data-type="folder"]',
         'card:create-subfolder-card': '.create-note-option[data-type="subfolder"]',
-        'card:create-kanban-card': '.create-note-option[data-type="kanban"]',
+        'card:create-diary-entry-card': '.create-note-option[data-type="diary"]',
         'card:create-workspace-card': '.create-note-option[data-type="workspace"]'
     };
 
@@ -79,7 +78,10 @@
         'toolbar:btn-share': 'toolbar:btn-publish',
         // Notifications and AI chat moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
-        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn'
+        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn',
+        // Favorite left the note ⋮ menu for the star on the row itself, so a
+        // user who had hidden the menu entry keeps the row free of it.
+        'note:toggle-favorite': 'panel:note-favorite-star'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -248,7 +250,7 @@
 
     function syncFolderActionToggles() {
         // Single shared dropdown serves every folder's toggle: when UI
-        // customization hides all of its items, hide every toggle
+        // customization hides all of its items, hide every toggle.
         var menu = document.getElementById('folder-actions-menu');
         if (!menu) return;
 
@@ -268,19 +270,16 @@
         }
 
         document.querySelectorAll('.folder-actions-toggle').forEach(function (toggle) {
-            var actionsContainer = toggle.parentElement;
-
             toggle.style.display = visibleItems ? '' : 'none';
-            if (actionsContainer && actionsContainer.classList.contains('folder-actions')) {
-                actionsContainer.style.display = visibleItems ? '' : 'none';
-            }
         });
     }
 
     function syncNoteActionToggles() {
         // Same arrangement as syncFolderActionToggles: one shared dropdown for
         // every note's toggle, so when UI customization hides all of its items
-        // the three-dot button has nothing left to open.
+        // the three-dot button has nothing left to open. The star sits in the
+        // same .note-actions container but is switched independently (see
+        // syncFolderActionToggles for why the container itself is left alone).
         var menu = document.getElementById('note-actions-menu');
         if (!menu) return;
 
@@ -299,17 +298,14 @@
         }
 
         document.querySelectorAll('.note-actions-toggle').forEach(function (toggle) {
-            var actionsContainer = toggle.parentElement;
-
             toggle.style.display = visibleItems ? '' : 'none';
-            if (actionsContainer && actionsContainer.classList.contains('note-actions')) {
-                actionsContainer.style.display = visibleItems ? '' : 'none';
-            }
         });
 
-        // Give the note titles back the strip reserved for the toggle.
+        // Give the note titles back the strip reserved for the toggle, and the
+        // one reserved for the star when that is switched off too.
         if (document.body) {
             document.body.classList.toggle('note-actions-hidden', !visibleItems);
+            document.body.classList.toggle('note-favorite-hidden', isKeyHidden('panel:note-favorite-star'));
         }
     }
 
@@ -411,8 +407,8 @@
                     if (id === 'ui-customization-card') return;
                     rules.push('#' + id + ' { display: none !important; }');
 
-                    if (CREATE_MODAL_OPTION_SELECTORS[key]) {
-                        rules.push('#createModal ' + CREATE_MODAL_OPTION_SELECTORS[key] + ' { display: none !important; }');
+                    if (CREATE_MENU_OPTION_SELECTORS[key]) {
+                        rules.push('#create-menu ' + CREATE_MENU_OPTION_SELECTORS[key] + ' { display: none !important; }');
                     }
                 } else if (type === 'toolbar') {
                     rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
@@ -458,6 +454,10 @@
                         rules.push('.folder-actions-toggle { display: none !important; }');
                     } else if (id === 'note-actions-toggle') {
                         rules.push('.note-actions-toggle { display: none !important; }');
+                    } else if (id === 'note-favorite-star') {
+                        // The star on note rows. !important beats the hover and
+                        // .is-favorite reveals in css/folders/actions-menu.css.
+                        rules.push('.note-favorite-toggle { display: none !important; }');
                     } else if (id === 'note-created-date') {
                         rules.push('.note-subline { display: none !important; }');
                     } else if (id === 'note-icons') {

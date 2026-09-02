@@ -154,6 +154,14 @@ function loadAndShowWorkspaceMenu(menu) {
         });
 }
 
+function escapeWorkspaceMenuText(text) {
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     // Use window.selectedWorkspace first (set by PHP), then fall back to selectedWorkspace variable
     var currentWorkspace = (typeof window.selectedWorkspace !== 'undefined' && window.selectedWorkspace) ? window.selectedWorkspace : (selectedWorkspace || '');
@@ -184,13 +192,21 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
         var isCurrent = workspace.name === currentWorkspace;
         var currentClass = isCurrent ? ' current-workspace' : '';
         var icon = isCurrent ? 'lucide-check-circle' : 'lucide-layers';
-        var safeName = workspace.name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        var safeName = escapeWorkspaceMenuText(workspace.name);
 
         menuHtml += '<div class="workspace-menu-item' + currentClass + '" data-workspace-name="' + safeName + '">';
         menuHtml += '<i class="' + icon + '"></i>';
         menuHtml += '<span>' + safeName + '</span>';
         menuHtml += '</div>';
     }
+
+    // Management entries, always the last ones: the menu opens even when the
+    // account has a single workspace (or none), so these stay reachable.
+    if (menuHtml !== '') {
+        menuHtml += '<div class="workspace-menu-divider"></div>';
+    }
+    menuHtml += workspaceMenuActionHtml('workspaces.php', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
+    menuHtml += workspaceMenuActionHtml('workspaces.php?new=1', 'lucide-plus-circle', wsTr('workspaces.menu.new_workspace', {}, 'New workspace'));
 
     menu.innerHTML = menuHtml;
 
@@ -200,6 +216,21 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
             switchToWorkspace(this.getAttribute('data-workspace-name'));
         });
     });
+
+    menu.querySelectorAll('.workspace-menu-item[data-workspace-url]').forEach(function (item) {
+        item.addEventListener('click', function () {
+            var url = this.getAttribute('data-workspace-url');
+            closeWorkspaceMenus();
+            window.location.href = url;
+        });
+    });
+}
+
+function workspaceMenuActionHtml(url, icon, label) {
+    return '<div class="workspace-menu-item workspace-menu-action" data-workspace-url="' + escapeWorkspaceMenuText(url) + '">'
+        + '<i class="' + icon + '"></i>'
+        + '<span>' + escapeWorkspaceMenuText(label) + '</span>'
+        + '</div>';
 }
 
 function switchToWorkspace(workspaceName) {
@@ -1981,6 +2012,15 @@ function initializeWorkspacesPage() {
     var createForm = document.getElementById('create-workspace-form');
     if (createForm) {
         createForm.addEventListener('submit', handleCreateWorkspace);
+    }
+
+    // Arriving from the sidebar's "New workspace" entry: put the caret in the
+    // creation field straight away instead of leaving the user to find it.
+    if (new URLSearchParams(window.location.search).get('new') === '1') {
+        var nameInput = document.getElementById('workspace-name');
+        if (nameInput) {
+            nameInput.focus();
+        }
     }
 
     // Update back link with current workspace from PHP

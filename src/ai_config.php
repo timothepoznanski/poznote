@@ -26,6 +26,37 @@ function poznoteAiFixedUrls(): array {
 }
 
 /**
+ * Reasoning effort values offered by both settings pages, in display order.
+ * 'auto' sends nothing and leaves the choice to the provider; the others are
+ * sent verbatim as the reasoning_effort parameter of every chat request
+ * (OpenAI GPT-5 / o-series, gpt-oss on Ollama, ...). Some OpenAI models only
+ * accept tools when reasoning_effort is 'none', which is why the setting
+ * exists (issue #1308).
+ */
+function poznoteAiReasoningEfforts(): array {
+    return ['auto', 'none', 'minimal', 'low', 'medium', 'high', 'xhigh'];
+}
+
+/** English fallback labels of the reasoning effort options (i18n defaults). */
+function poznoteAiReasoningEffortLabels(): array {
+    return [
+        'auto' => 'Auto (provider default)',
+        'none' => 'None',
+        'minimal' => 'Minimal',
+        'low' => 'Low',
+        'medium' => 'Medium',
+        'high' => 'High',
+        'xhigh' => 'Very high (xhigh)',
+    ];
+}
+
+/** Unknown or empty values (older configurations) mean 'auto'. */
+function poznoteAiNormalizeReasoningEffort($value): string {
+    $value = strtolower(trim((string)$value));
+    return in_array($value, poznoteAiReasoningEfforts(), true) ? $value : 'auto';
+}
+
+/**
  * Derive a 32-byte key from the instance secret, the same file GitSync and
  * share passwords use, so personal API keys are never stored in clear text.
  */
@@ -111,6 +142,7 @@ function poznoteAiInstanceConfig(): array {
         'url' => trim((string)getGlobalSetting('ai_chat_url', '')),
         'model' => trim((string)getGlobalSetting('ai_chat_model', '')),
         'api_key' => trim((string)getGlobalSetting('ai_chat_api_key', '')),
+        'reasoning_effort' => poznoteAiNormalizeReasoningEffort(getGlobalSetting('ai_chat_reasoning_effort', 'auto')),
     ];
 }
 
@@ -122,6 +154,7 @@ function poznoteAiUserSettingKeys(): array {
         'url' => 'ai_user_url',
         'model' => 'ai_user_model',
         'api_key' => 'ai_user_api_key',
+        'reasoning_effort' => 'ai_user_reasoning_effort',
     ];
 }
 
@@ -130,7 +163,7 @@ function poznoteAiUserSettingKeys(): array {
  * The API key comes back decrypted.
  */
 function poznoteAiUserConfig(?PDO $con): array {
-    $config = ['enabled' => false, 'provider' => '', 'url' => '', 'model' => '', 'api_key' => ''];
+    $config = ['enabled' => false, 'provider' => '', 'url' => '', 'model' => '', 'api_key' => '', 'reasoning_effort' => 'auto'];
     if (!$con) {
         return $config;
     }
@@ -148,6 +181,7 @@ function poznoteAiUserConfig(?PDO $con): array {
         $config['url'] = trim($rows[$keys['url']] ?? '');
         $config['model'] = trim($rows[$keys['model']] ?? '');
         $config['api_key'] = poznoteAiDecryptSecret($rows[$keys['api_key']] ?? '');
+        $config['reasoning_effort'] = poznoteAiNormalizeReasoningEffort($rows[$keys['reasoning_effort']] ?? 'auto');
     } catch (Exception $e) {
         // A database without the settings table yet: no personal configuration
     }
@@ -172,6 +206,8 @@ function poznoteSaveAiUserConfig(?PDO $con, array $config): bool {
             $value = trim((string)$config[$inputKey]);
             if ($inputKey === 'api_key') {
                 $value = poznoteAiEncryptSecret($value);
+            } elseif ($inputKey === 'reasoning_effort') {
+                $value = poznoteAiNormalizeReasoningEffort($value);
             }
             $stmt->execute([$dbKey, $value]);
         }
@@ -189,10 +225,10 @@ function poznoteAiConfigUsable(array $config): bool {
 
 /**
  * The configuration the AI chat must actually use for this user.
- * Returns ['available' => bool, 'source' => 'user'|'instance'|'', 'url', 'model', 'api_key'].
+ * Returns ['available' => bool, 'source' => 'user'|'instance'|'', 'url', 'model', 'api_key', 'reasoning_effort'].
  */
 function poznoteResolveAiChatConfig(?PDO $con, ?int $userId): array {
-    $none = ['available' => false, 'source' => '', 'url' => '', 'model' => '', 'api_key' => ''];
+    $none = ['available' => false, 'source' => '', 'url' => '', 'model' => '', 'api_key' => '', 'reasoning_effort' => 'auto'];
 
     if (poznoteAiUserKeysAllowed()) {
         $userConfig = poznoteAiUserConfig($con);
@@ -203,6 +239,7 @@ function poznoteResolveAiChatConfig(?PDO $con, ?int $userId): array {
                 'url' => $userConfig['url'],
                 'model' => $userConfig['model'],
                 'api_key' => $userConfig['api_key'],
+                'reasoning_effort' => $userConfig['reasoning_effort'],
             ];
         }
     }
@@ -217,6 +254,7 @@ function poznoteResolveAiChatConfig(?PDO $con, ?int $userId): array {
             'url' => $instance['url'],
             'model' => $instance['model'],
             'api_key' => $instance['api_key'],
+            'reasoning_effort' => $instance['reasoning_effort'],
         ];
     }
 

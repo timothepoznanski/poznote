@@ -187,7 +187,14 @@
 .note-width-input-container {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 8px;
     padding: 0 0 30px 0;
+}
+
+.note-width-unit {
+    font-size: 1.2rem;
+    color: #6b7280;
 }
 
 .note-width-input-container input {

@@ -353,11 +353,11 @@ define('TENANT_ISOLATION_FEATURES', poznoteResolveTenantIsolationFeatures());
 define('TENANT_ISOLATION', in_array('user_sharing', TENANT_ISOLATION_FEATURES, true));
 
 // ============================================================
-// GIT SYNC CONFIGURATION (GitHub, Forgejo)
+// GIT SYNC CONFIGURATION (GitHub, GitLab, Forgejo)
 // ============================================================
 // Enable or disable Git synchronization (global setting with env fallback)
 define('GIT_SYNC_ENABLED', filter_var(poznoteResolveGlobalSetting('git_sync_enabled', 'POZNOTE_GIT_SYNC_ENABLED', 'false'), FILTER_VALIDATE_BOOL));
-// Git provider: 'github', 'forgejo'
+// Git provider: 'github', 'gitlab', 'forgejo'
 define('GIT_PROVIDER', _env('POZNOTE_GIT_PROVIDER', 'github'));
 // Git API base URL (optional, defaults to provider default)
 define('GIT_API_BASE', _env('POZNOTE_GIT_API_BASE', ''));

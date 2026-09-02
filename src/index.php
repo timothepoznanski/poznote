@@ -129,27 +129,41 @@ $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;
 $res_right = $note_load_result['res_right'] ?? null;
 
+// Two counts over the same rows the notifications modal lists (everything
+// triggered and not dismissed, see RemindersController::index): the total says
+// whether the bell is shown at all, the unread one whether it is amber.
+// js/notifications-modal.js keeps both in step from its polling afterwards.
 $notifications_count = 0;
+$notifications_total = 0;
 try {
     if (isset($con)) {
         if (!empty($workspace_filter)) {
             $stmtNotif = $con->prepare("
-                SELECT COUNT(*) as cnt
+                SELECT COUNT(*) AS total,
+                       COALESCE(SUM(CASE WHEN n.is_read = 0 THEN 1 ELSE 0 END), 0) AS unread
                 FROM notifications n
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
-                WHERE n.is_read = 0 AND n.dismissed = 0 AND n.trigger_at <= datetime('now')
+                WHERE n.dismissed = 0 AND n.trigger_at <= datetime('now')
                   AND e.workspace = ?
             ");
             $stmtNotif->execute([$workspace_filter]);
         } else {
-            $stmtNotif = $con->prepare("SELECT COUNT(*) as cnt FROM notifications WHERE is_read = 0 AND dismissed = 0 AND trigger_at <= datetime('now')");
+            $stmtNotif = $con->prepare("
+                SELECT COUNT(*) AS total,
+                       COALESCE(SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END), 0) AS unread
+                FROM notifications
+                WHERE dismissed = 0 AND trigger_at <= datetime('now')
+            ");
             $stmtNotif->execute();
         }
-        $notifications_count = (int)$stmtNotif->fetchColumn();
+        $notifRow = $stmtNotif->fetch(PDO::FETCH_ASSOC) ?: [];
+        $notifications_total = (int)($notifRow['total'] ?? 0);
+        $notifications_count = (int)($notifRow['unread'] ?? 0);
     }
 } catch (Exception $e) {
     error_log('index: notifications count query failed: ' . $e->getMessage());
     $notifications_count = 0;
+    $notifications_total = 0;
 }
 
 // Handle unified search
@@ -175,11 +189,12 @@ $settings = [
     'attachments_at_bottom' => '0',
     'backlinks_at_bottom' => '0',
     'default_image_border_no_padding' => '0',
-    'spellcheck_html_notes' => '0'
+    'spellcheck_html_notes' => '0',
+    'highlight_current_folder_tree' => '0'
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'hide_folder_counts', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -192,12 +207,18 @@ try {
 $note_font_size = $settings['note_font_size'];
 $sidebar_font_size = ($settings['sidebar_font_size'] !== '' && $settings['sidebar_font_size'] !== null) ? $settings['sidebar_font_size'] : '13';
 
-// Calculate note max width; center_note_content stores '0'/'1'/'true' or a custom width in px
-$width_value = $settings['center_note_content'];
-$center_note_content_enabled = poznoteSettingEnabled($width_value, false);
-$note_max_width = '800';
+// Note max width as a CSS length. center_note_content stores a percentage of
+// the note column ('60%'), '0' for full width, or legacy values: '1'/'true'
+// (the old 800px default) and a bare number of pixels. 100% is full width too.
+$width_value = trim((string)$settings['center_note_content']);
+$center_note_content_enabled = poznoteSettingEnabled($width_value, false) && $width_value !== '100%';
+$note_max_width = '800px';
 if ($center_note_content_enabled && $width_value !== '1' && $width_value !== 'true') {
-    $note_max_width = $width_value;
+    if (preg_match('/^(\d{1,3})%$/', $width_value, $width_match)) {
+        $note_max_width = (int)$width_match[1] . '%';
+    } elseif (ctype_digit($width_value)) {
+        $note_max_width = (int)$width_value . 'px';
+    }
 }
 
 $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive();
@@ -275,7 +296,7 @@ $isPublicWorkspaceReadonly = function_exists('isPublicWorkspaceAccessActive') &&
     <!-- Dark-mode stylesheets are served concatenated (same order as the css/dark-mode/ sources) -->
     <link type="text/css" rel="stylesheet" href="dark_mode_css.php?v=<?php echo $v; ?>"/>
     <link type="text/css" rel="stylesheet" href="js/katex/katex.min.css?v=<?php echo $v; ?>"/>
-    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>px; }</style>
+    <style>:root { --note-font-size: <?php echo htmlspecialchars($note_font_size, ENT_QUOTES); ?>px; --sidebar-font-size: <?php echo htmlspecialchars($sidebar_font_size, ENT_QUOTES); ?>px; --note-max-width: <?php echo htmlspecialchars($note_max_width, ENT_QUOTES); ?>; }</style>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
     <!-- Editor/toolbar modules served as one concatenated deferred bundle
          (see index_js.php). The js/*.js files stay the source of truth. -->
@@ -313,6 +334,11 @@ if (!poznoteSettingEnabled($settings['code_block_word_wrap'], true)) {
 }
 if (poznoteSettingEnabled($settings['code_block_line_numbers'], false)) {
     $extra_body_classes .= ' code-block-line-numbers';
+}
+// Dims the notes list outside the folder hierarchy being worked in
+// (css/folders/tree-highlight.css)
+if (poznoteSettingEnabled($settings['highlight_current_folder_tree'], false)) {
+    $extra_body_classes .= ' highlight-folder-tree';
 }
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
@@ -470,9 +496,13 @@ if ($isPublicWorkspaceReadonly) {
     // live in icon_sidebar.php so every page shows the same list; the buttons
     // below are appended here because their handlers only exist on this page.
     $iconSidebarWorkspace = ($workspace_filter !== '' && $workspace_filter !== '__last_opened__') ? $workspace_filter : '';
-    // Notifications and AI chat live in the sidebar header instead (next to the
-    // create button); only the git buttons remain rail-side.
+    // Notifications live in the sidebar header instead (next to the create
+    // button). The AI assistant keeps its id from that period so the
+    // UI Customization preferences saved against it stay valid.
     $iconSidebarExtraItems = [];
+    if ($aiChatEnabled) {
+        $iconSidebarExtraItems[] = ['id' => 'sidebarAiChatBtn', 'after' => 'iconSidebarDashboardBtn', 'action' => 'toggle-ai-chat', 'icon' => 'lucide-bot', 'label' => t('ai_chat.toolbar_button', [], 'AI assistant')];
+    }
     if ($showGitSync) {
         $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPushBtn', 'gitAction' => 'push', 'icon' => 'lucide-upload', 'label' => 'Push', 'hidden' => !$currentWorkspaceSynced];
         $iconSidebarExtraItems[] = ['id' => 'iconSidebarGitPullBtn', 'gitAction' => 'pull', 'icon' => 'lucide-download', 'label' => 'Pull', 'hidden' => !$currentWorkspaceSynced];
@@ -504,11 +534,17 @@ if ($isPublicWorkspaceReadonly) {
     <!-- MENU RIGHT COLUMN -->	 
     <div class="sidebar-header">
         <div class="sidebar-title-row">
-            <?php $hasMultipleWorkspaces = count($workspaces) > 1; ?>
-            <div class="sidebar-title<?php echo $hasMultipleWorkspaces ? '' : ' sidebar-title-static'; ?>"<?php echo $hasMultipleWorkspaces ? ' role="button" tabindex="0" data-action="toggle-workspace-menu"' : ''; ?>>
+            <?php
+            // The title opens the workspace dropdown even when a single
+            // workspace exists: the menu also carries the "Edit workspaces" /
+            // "New workspace" entries (js/workspaces.js). Only the read-only
+            // public view keeps a plain, non-clickable title.
+            $workspaceMenuEnabled = !$isPublicWorkspaceReadonly;
+            ?>
+            <div class="sidebar-title<?php echo $workspaceMenuEnabled ? '' : ' sidebar-title-static'; ?>"<?php echo $workspaceMenuEnabled ? ' role="button" tabindex="0" data-action="toggle-workspace-menu"' : ''; ?>>
                 <img src="favicon.ico" class="workspace-title-icon" alt="Poznote" aria-hidden="true">
                 <span class="workspace-title-text"><?php echo htmlspecialchars($displayWorkspace, ENT_QUOTES); ?></span>
-                <?php if ($hasMultipleWorkspaces): ?>
+                <?php if ($workspaceMenuEnabled): ?>
                 <i class="lucide lucide-caret-down workspace-dropdown-icon"></i>
                 <?php endif; ?>
             </div>
@@ -517,19 +553,14 @@ if ($isPublicWorkspaceReadonly) {
                     <button class="sidebar-folder-toggle" id="sidebarExpandFoldersBtn" data-action="toggle-all-folders" title="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>" aria-label="<?php echo t_h('sidebar.expand_all_folders', [], 'Expand all folders'); ?>">
                         <i class="lucide lucide-chevron-down"></i>
                     </button>
-                    <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>">
+                    <button class="sidebar-folder-toggle<?php echo $notifications_count > 0 ? ' has-notifications' : ''; ?>" id="sidebarNotificationsBtn" data-action="open-notifications-modal" title="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>" aria-label="<?php echo t_h('reminder.notifications', [], 'Notifications'); ?>"<?php echo $notifications_total > 0 ? '' : ' hidden'; ?>>
                         <i class="lucide lucide-bell"></i>
                     </button>
-                    <?php if ($aiChatEnabled): ?>
-                    <button class="sidebar-folder-toggle" id="sidebarAiChatBtn" data-action="toggle-ai-chat" title="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>" aria-label="<?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?>">
-                        <i class="lucide lucide-bot"></i>
-                    </button>
-                    <?php endif; ?>
                     <button class="sidebar-plus" id="sidebarCreateBtn" data-action="toggle-create-menu" title="<?php echo t_h('sidebar.create'); ?>">
                         <i class="lucide lucide-plus-circle"></i>
                     </button>
                 <?php else: ?>
-                    <button type="button" id="publicWorkspaceThemeToggle" class="sidebar-plus public-workspace-theme-toggle" title="<?php echo t_h('theme.toggle', [], 'Toggle theme'); ?>" aria-label="<?php echo t_h('theme.toggle', [], 'Toggle theme'); ?>">
+                    <button type="button" id="publicWorkspaceThemeToggle" class="sidebar-plus public-workspace-theme-toggle" data-theme-toggle title="<?php echo t_h('theme.toggle', [], 'Toggle theme'); ?>" aria-label="<?php echo t_h('theme.toggle', [], 'Toggle theme'); ?>">
                         <i class="lucide lucide-moon"></i>
                     </button>
                 <?php endif; ?>

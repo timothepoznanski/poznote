@@ -518,6 +518,37 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/pinned
 ```
 
+### Set Note Content Width
+
+```
+PUT /notes/{id}/content-width
+```
+
+Override the content width for one note. Notes without an override follow the global "Note content width" setting.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `content_width` | integer or null | Yes | Maximum content width as a percentage of the note column (10 to 100), `100` for full width, `null` to follow the global setting again |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Note content width updated successfully",
+  "content_width": 60
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"content_width": 60}' \
+  http://YOUR_SERVER/api/v1/notes/123/content-width
+```
+
 ### Set Kanban Completed State
 
 ```
@@ -2368,7 +2399,7 @@ curl -u 'username:password' \
 
 ## Git Sync
 
-Git sync endpoints allow managing synchronization with GitHub or Forgejo repositories. Each user configures their own repository independently.
+Git sync endpoints allow managing synchronization with GitHub, GitLab or Forgejo repositories. Each user configures their own repository independently.
 
 Both `/git-sync/` and `/github-sync/` prefixes are supported (the latter is a legacy alias).
 
@@ -2461,11 +2492,11 @@ Save per-user Git sync configuration.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `provider` | string | `github` or `forgejo` |
-| `repo` | string | Repository in `owner/repo` format |
+| `provider` | string | `github`, `gitlab` or `forgejo` |
+| `repo` | string | Repository in `owner/repo` format (GitLab: full project path, e.g. `group/subgroup/project`) |
 | `token` | string | Access token (PAT) |
 | `branch` | string | Git branch (default: `main`) |
-| `api_base` | string | API base URL (Forgejo only) |
+| `api_base` | string | API base URL (GitLab and Forgejo; GitLab defaults to `https://gitlab.com/api/v4`) |
 | `author_name` | string | Commit author name |
 | `author_email` | string | Commit author email |
 | `workspaces` | array or null | Restrict sync to these workspace names. `null` or an empty array syncs all workspaces. Omit the field to keep the current setting. |

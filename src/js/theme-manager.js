@@ -23,6 +23,24 @@
         }
     };
 
+    // The three themes the Theme card in settings.php offers, in the order the
+    // toggle buttons walk through them. 'system' is not a theme of its own: it
+    // resolves to whichever of light/dark the OS is on, so the cycle starts
+    // from what is actually displayed.
+    var THEME_CYCLE = ['light', 'dark', 'black'];
+
+    // Each toggle button shows the theme its next click applies.
+    var THEME_ICONS = {
+        light: 'lucide-sun',
+        dark: 'lucide-moon',
+        black: 'lucide-moon-star'
+    };
+
+    function getNextTheme(theme) {
+        // An unknown value lands on 'light', the first entry of the cycle.
+        return THEME_CYCLE[(THEME_CYCLE.indexOf(theme) + 1) % THEME_CYCLE.length];
+    }
+
     function normalizeThemeMode(theme) {
         theme = String(theme || '').toLowerCase();
         return theme === 'black' || theme === 'dark' || theme === 'light' || theme === 'system'
@@ -142,63 +160,32 @@
         updateThemeUI(theme);
     }
 
-    // Toggle between light and dark mode (Legacy support for old UI if needed)
+    // Step to the next theme: light -> dark -> black -> light. Used by the
+    // toggle buttons carrying data-theme-toggle and by public_folder.php
+    // through window.toggleTheme.
     function toggleTheme() {
-        var currentTheme = themeStore.getItem('poznote-theme') || 'system';
-        var newTheme;
+        var mode = getCurrentThemeMode();
+        var selectedTheme = mode === 'system' ? getSystemTheme() : mode;
 
-        if (currentTheme === 'system') {
-            // If currently system, toggle to the opposite of current system theme
-            newTheme = getSystemTheme() === 'light' ? 'dark' : 'light';
-        } else {
-            newTheme = currentTheme === 'light' ? 'dark' : 'light';
-        }
-
-        applyTheme(newTheme, true);
+        applyTheme(getNextTheme(selectedTheme), true);
     }
 
-    // Update UI elements (badges, buttons) based on the SELECTED theme mode
+    // Point the toggle buttons at the theme the next click applies, from the
+    // SELECTED mode (light, dark, black or system).
     function updateThemeUI(mode) {
-        var badge = document.getElementById('theme-mode-badge');
-        var icon = document.querySelector('#theme-mode-card .settings-card-icon i');
-
-        var label = 'system';
-        if (mode === 'dark') label = 'dark';
-        if (mode === 'black') label = 'black';
-        if (mode === 'light') label = 'light';
-
-        if (badge) {
-            var translationKey = 'theme.badge.' + label;
-            var fallback = label + ' mode';
-            badge.textContent = (window.t ? window.t(translationKey, null, fallback) : fallback);
-            badge.className = 'setting-status enabled';
-        }
-
-        // Change icon: moon for dark mode, sun for light mode, desktop for system
-        if (icon) {
-            if (mode === 'dark' || mode === 'black') {
-                icon.className = 'lucide lucide-moon';
-            } else if (mode === 'light') {
-                icon.className = 'lucide lucide-sun';
-            } else {
-                icon.className = 'lucide lucide-monitor';
-            }
-        }
-
-        var publicWorkspaceToggle = document.getElementById('publicWorkspaceThemeToggle');
-        if (publicWorkspaceToggle) {
-            var appliedTheme = mode === 'system' ? getSystemTheme() : getEffectiveTheme(mode);
-            var publicIcon = publicWorkspaceToggle.querySelector('i');
-            if (publicIcon) {
-                publicIcon.className = appliedTheme === 'dark' ? 'lucide lucide-sun' : 'lucide lucide-moon';
+        // Toggle buttons show the theme a click would switch to. Taken from the
+        // selected mode rather than the effective one, which collapses black
+        // into dark and would leave two of the three steps on the same icon.
+        var appliedTheme = mode === 'system' ? getSystemTheme() : mode;
+        var toggleIconClass = 'lucide ' + THEME_ICONS[getNextTheme(appliedTheme)];
+        var toggles = document.querySelectorAll('[data-theme-toggle]');
+        for (var i = 0; i < toggles.length; i++) {
+            var toggleIcon = toggles[i].querySelector('i');
+            if (toggleIcon) {
+                toggleIcon.className = toggleIconClass;
             }
         }
     }
-
-    // When client-side i18n finishes loading, re-render the badge label
-    document.addEventListener('poznote:i18n:loaded', function () {
-        updateThemeUI(getCurrentThemeMode());
-    });
 
     // Get current theme mode (light, dark, black, or system)
     function getCurrentThemeMode() {
@@ -222,8 +209,8 @@
         var target = event.target;
         if (!target || typeof target.closest !== 'function') return;
 
-        var publicWorkspaceToggle = target.closest('#publicWorkspaceThemeToggle');
-        if (!publicWorkspaceToggle) return;
+        var themeToggle = target.closest('[data-theme-toggle]');
+        if (!themeToggle) return;
 
         event.preventDefault();
         toggleTheme();
