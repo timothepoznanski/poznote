@@ -32,6 +32,18 @@
             txtUrlCopied: body.getAttribute('data-txt-url-copied') || 'URL copied!',
             txtShareLinkCopied: body.getAttribute('data-txt-share-link-copied') || 'Share link copied to clipboard!',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
+            txtRevokeModalTitle: body.getAttribute('data-txt-revoke-modal-title') || 'Revoke share',
+            txtRevokeModalText: body.getAttribute('data-txt-revoke-modal-text') || 'You can permanently delete this share, or keep it and make it inaccessible until you enable it again.',
+            txtRevokeModalTextDisabled: body.getAttribute('data-txt-revoke-modal-text-disabled') || 'This share is currently inaccessible. You can make it accessible again, or permanently delete it.',
+            txtRevokeModalTextViaFolder: body.getAttribute('data-txt-revoke-modal-text-via-folder') || 'This note is shared through a folder. You can make just this note inaccessible; the folder share and its other notes are not affected.',
+            txtRevokeModalTextViaFolderDisabled: body.getAttribute('data-txt-revoke-modal-text-via-folder-disabled') || 'This note is currently inaccessible. You can make it accessible again through its folder share.',
+            txtRevokeModalTextViaFolderParentDisabled: body.getAttribute('data-txt-revoke-modal-text-via-folder-parent-disabled') || 'This note is inaccessible because its folder share has been made inaccessible. Make the folder share accessible again to restore access.',
+            txtOk: body.getAttribute('data-txt-ok') || 'OK',
+            txtRevokeDelete: body.getAttribute('data-txt-revoke-delete') || 'Delete permanently',
+            txtRevokeDisable: body.getAttribute('data-txt-revoke-disable') || 'Make inaccessible',
+            txtRevokeEnable: body.getAttribute('data-txt-revoke-enable') || 'Make accessible again',
+            txtShareDisabledBadge: body.getAttribute('data-txt-share-disabled-badge') || 'Inaccessible',
+            txtShareDisabledHelp: body.getAttribute('data-txt-share-disabled-help') || 'This share is inaccessible: the link no longer works until you make it accessible again.',
             txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Permissions',
             txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
             txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
@@ -390,6 +402,47 @@
         }
     }
 
+    function syncUrl() {
+        var params = new URLSearchParams(window.location.search);
+        if (filterText) {
+            params.set('filter', filterText);
+        } else {
+            params.delete('filter');
+        }
+        if (filterType && filterType !== 'all') {
+            params.set('type', filterType);
+        } else {
+            params.delete('type');
+        }
+        // Keep non-filter params (workspace, auto_edit, etc.) intact
+        var newSearch = params.toString();
+        var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '');
+        window.history.replaceState(null, '', newUrl);
+    }
+
+    function updateFilterTypeButtons() {
+        var counts = {
+            notes: sharedNotes.length,
+            folders: sharedFolders.length,
+            shared_with_me: sharedWithMe.length
+        };
+        var buttons = document.querySelectorAll('.filter-type-btn');
+
+        buttons.forEach(function(btn) {
+            var type = btn.getAttribute('data-filter');
+            btn.classList.toggle('initially-hidden', type !== 'all' && !counts[type]);
+        });
+
+        // Fall back to "all" when the active category has nothing left to show.
+        if (filterType !== 'all' && !counts[filterType]) {
+            filterType = 'all';
+            buttons.forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-filter') === 'all');
+            });
+            syncUrl();
+        }
+    }
+
     // ========== Data loading ==========
 
     function mergeItems() {
@@ -696,6 +749,7 @@
         var spinner = document.getElementById('loadingSpinner');
         var container = document.getElementById('sharedItemsContainer');
         var emptyMessage = document.getElementById('emptyMessage');
+        var filterBar = document.getElementById('sharedFilterBar');
 
         if (spinner) spinner.style.display = 'block';
         if (container) container.innerHTML = '';
@@ -725,6 +779,8 @@
                 sharedWithMe = data.items || [];
                 if (spinner) spinner.style.display = 'none';
                 mergeItems();
+                if (filterBar) filterBar.classList.toggle('initially-hidden', allItems.length === 0);
+                updateFilterTypeButtons();
                 if (allItems.length === 0) {
                     if (emptyMessage) emptyMessage.style.display = 'block';
                     return;
@@ -758,6 +814,21 @@
             if (data.revoked) {
                 loadSharedNotes();
             }
+        })
+        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
+    }
+
+    function setNoteShareDisabled(noteId, disabled) {
+        fetch('/api/v1/notes/' + noteId + '/share', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ disabled: disabled ? 1 : 0 })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.error) throw new Error(data.error);
+            loadSharedNotes();
         })
         .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
@@ -859,6 +930,21 @@
             if (data.revoked) {
                 loadSharedNotes();
             }
+        })
+        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
+    }
+
+    function setFolderShareDisabled(folderId, disabled) {
+        fetch('/api/v1/folders/' + folderId + '/share', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ disabled: disabled ? 1 : 0 })
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.error) throw new Error(data.error);
+            loadSharedNotes();
         })
         .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
@@ -1730,11 +1816,6 @@
         headerName.textContent = config.txtTableName;
         header.appendChild(headerName);
 
-        var headerFolder = document.createElement('div');
-        headerFolder.className = 'shared-notes-header-cell shared-notes-header-folder';
-        headerFolder.textContent = config.txtTableFolder;
-        header.appendChild(headerFolder);
-
         var headerUrl = document.createElement('div');
         headerUrl.className = 'shared-notes-header-cell shared-notes-header-token';
 
@@ -1785,6 +1866,88 @@
         });
 
         container.appendChild(list);
+        adjustSharedColumnWidths();
+    }
+
+    // Content-adaptive columns: after each render, the NAME, PATH/FOLDER and
+    // LINK columns are sized to their longest rendered content (the actions
+    // column stays fixed). When the three of them cannot fit the list width,
+    // they are scaled back proportionally; long paths then wrap and long
+    // names/links fall back to their ellipsis.
+    function adjustSharedColumnWidths() {
+        var list = document.querySelector('#sharedItemsContainer .shared-notes-list');
+        if (!list) return;
+
+        if (window.innerWidth <= 800) {
+            list.style.removeProperty('--shared-name-width');
+            list.style.removeProperty('--shared-token-width');
+            list.style.removeProperty('--shared-actions-width');
+            list.style.removeProperty('width');
+            return;
+        }
+
+        // The list is later shrunk to the columns' total width; the budget
+        // must come from its natural width, so drop the inline one first.
+        list.style.removeProperty('width');
+
+        function maxCellWidth(selector) {
+            var max = 0;
+            list.querySelectorAll(selector).forEach(function(cell) {
+                var w = cell.getBoundingClientRect().width;
+                if (w > max) max = w;
+            });
+            return Math.ceil(max);
+        }
+
+        list.classList.add('shared-measure');
+        var nameW = maxCellWidth('.shared-notes-header-note, .note-name-container');
+        var tokenW = maxCellWidth('.shared-notes-header-token, .note-token-wrap');
+        var actionsW = maxCellWidth('.shared-notes-header-actions, .note-actions');
+        list.classList.remove('shared-measure');
+
+        var styles = getComputedStyle(list);
+        var gap = parseFloat(styles.getPropertyValue('--shared-column-gap')) || 16;
+
+        // The actions column hugs its content and never shrinks below it:
+        // buttons cannot wrap or ellipsize. Name and link absorb the squeeze.
+        var actionsColW = Math.max(actionsW + 2, 120);
+        var mins = [180, 160, actionsColW];
+        var widths = [
+            Math.max(nameW + 2, mins[0]),
+            Math.max(tokenW + 2, mins[1]),
+            actionsColW
+        ];
+
+        // Row padding (5px each side) plus a small buffer keeps the widest row
+        // from overflowing the list once the gaps are added. clientWidth
+        // includes the card's own padding: subtract it, the columns live in
+        // the content box.
+        var padX = (parseFloat(styles.paddingLeft) || 0) + (parseFloat(styles.paddingRight) || 0);
+        var available = list.clientWidth - padX - gap * 2 - 12;
+
+        // When the content widths do not fit, each column gives up part of its
+        // slack above its minimum, proportionally to that slack. A few passes
+        // converge; below the minimums the row overflows like it always did.
+        for (var pass = 0; pass < 3; pass++) {
+            var total = widths[0] + widths[1] + widths[2];
+            if (available <= 0 || total <= available) break;
+            var over = total - available;
+            var slack = 0;
+            for (var i = 0; i < widths.length; i++) slack += Math.max(0, widths[i] - mins[i]);
+            if (slack <= 0) break;
+            for (var j = 0; j < widths.length; j++) {
+                var colSlack = Math.max(0, widths[j] - mins[j]);
+                widths[j] -= Math.min(colSlack, Math.ceil(over * colSlack / slack));
+            }
+        }
+
+        list.style.setProperty('--shared-name-width', widths[0] + 'px');
+        list.style.setProperty('--shared-token-width', widths[1] + 'px');
+        list.style.setProperty('--shared-actions-width', widths[2] + 'px');
+
+        // Shrink the list to the columns' total width so every column hugs
+        // its content and the table stays centered (margin: 0 auto).
+        list.style.width = (widths[0] + widths[1] + widths[2] + gap * 2 + 12) + 'px';
     }
 
     function noteHasVisiblePasswordProtection(note) {
@@ -1828,6 +1991,90 @@
         return !!sharedItem && (sharedItem._type === 'shared_with_me_note' || sharedItem._type === 'shared_with_me_folder');
     }
 
+    function appendDisabledIndicator(container) {
+        var disabledIcon = document.createElement('i');
+        disabledIcon.className = 'lucide lucide-eye-off shared-disabled-icon';
+        disabledIcon.style.marginLeft = '6px';
+        disabledIcon.style.fontSize = '14px';
+        disabledIcon.style.opacity = '1';
+        disabledIcon.title = config.txtShareDisabledHelp || config.txtShareDisabledBadge;
+        disabledIcon.setAttribute('aria-label', config.txtShareDisabledHelp || config.txtShareDisabledBadge);
+        container.appendChild(disabledIcon);
+    }
+
+    // Revoke flow: the user chooses between deleting the share for good and
+    // keeping it but toggling its public accessibility.
+    function showRevokeShareModal(options) {
+        var modal = document.createElement('div');
+        modal.className = 'modal shared-revoke-modal';
+        modal.style.display = 'flex';
+
+        var content = document.createElement('div');
+        content.className = 'modal-content shared-revoke-modal-content';
+
+        var title = document.createElement('h3');
+        title.textContent = config.txtRevokeModalTitle;
+        content.appendChild(title);
+
+        var text = document.createElement('p');
+        text.className = 'shared-revoke-modal-text';
+        text.textContent = options.text
+            || (options.isDisabled ? config.txtRevokeModalTextDisabled : config.txtRevokeModalText);
+        content.appendChild(text);
+
+        var actions = document.createElement('div');
+        actions.className = 'shared-revoke-modal-actions';
+
+        function closeModal() {
+            if (modal.parentNode) {
+                document.body.removeChild(modal);
+            }
+        }
+
+        // With no action to offer the modal is purely informational: a single
+        // OK button replaces Cancel.
+        var isInformational = !options.onToggle && !options.onDelete;
+        var cancelBtn = document.createElement('button');
+        cancelBtn.className = isInformational ? 'btn btn-primary' : 'btn btn-secondary';
+        cancelBtn.textContent = isInformational ? (config.txtOk || 'OK') : config.txtCancel;
+        cancelBtn.addEventListener('click', closeModal);
+
+        var toggleBtn = document.createElement('button');
+        toggleBtn.className = 'btn btn-primary';
+        toggleBtn.innerHTML = '<i class="lucide ' + (options.isDisabled ? 'lucide-eye' : 'lucide-eye-off') + '" style="margin-right: 6px;"></i>';
+        toggleBtn.appendChild(document.createTextNode(options.isDisabled ? config.txtRevokeEnable : config.txtRevokeDisable));
+        toggleBtn.addEventListener('click', function() {
+            closeModal();
+            if (options.onToggle) options.onToggle(!options.isDisabled);
+        });
+
+        var deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger';
+        deleteBtn.innerHTML = '<i class="lucide lucide-trash-2" style="margin-right: 6px;"></i>';
+        deleteBtn.appendChild(document.createTextNode(config.txtRevokeDelete));
+        deleteBtn.addEventListener('click', function() {
+            closeModal();
+            if (options.onDelete) options.onDelete();
+        });
+
+        actions.appendChild(cancelBtn);
+        if (options.onToggle) {
+            actions.appendChild(toggleBtn);
+        }
+        if (options.onDelete) {
+            actions.appendChild(deleteBtn);
+        }
+        content.appendChild(actions);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+    }
+
     function appendRestrictedIndicator(container) {
         var restrictedIcon = document.createElement('i');
         restrictedIcon.className = 'lucide lucide-shield shared-restricted-icon';
@@ -1866,6 +2113,12 @@
         noteLink.href = 'index.php?note=' + note.note_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
         noteLink.textContent = note.heading || config.txtUntitled;
         noteLink.className = 'note-name';
+        // The PATH/FOLDER column is gone: keep the path reachable on hover.
+        if (note.folder_path && note.folder_path !== 'Default') {
+            noteLink.title = note.shared_via_folder
+                ? (config.txtViaFolder + ': ' + note.folder_path)
+                : note.folder_path;
+        }
         nameContainer.appendChild(noteLink);
 
         if (noteHasVisiblePasswordProtection(note)) {
@@ -1883,30 +2136,28 @@
             appendRestrictedIndicator(nameContainer);
         }
 
+        // A note is flagged inaccessible when its own share (or its own
+        // per-note block, for notes reached through a folder) is disabled,
+        // or when the folder share it depends on is disabled as a whole.
+        var noteShareDisabled = !!note.disabled
+            || (!note.share_id && note.shared_via_folder && !!note.shared_folder_disabled);
+        if (noteShareDisabled) {
+            appendDisabledIndicator(nameContainer);
+            item.classList.add('is-share-disabled');
+        }
+
         item.appendChild(nameContainer);
 
-        var folderContainer = document.createElement('div');
-        folderContainer.className = 'note-folder-container';
-
-        if (note.folder_path && note.folder_path !== 'Default') {
-            var folderPath = document.createElement('span');
-            folderPath.className = 'folder-badge';
-            folderPath.title = note.shared_via_folder ? (config.txtViaFolder + ': ' + note.folder_path) : note.folder_path;
-            folderPath.textContent = note.folder_path;
-            folderContainer.appendChild(folderPath);
-        } else {
-            folderContainer.classList.add('is-empty');
-            folderContainer.setAttribute('aria-hidden', 'true');
-            folderContainer.innerHTML = '&nbsp;';
-        }
-        item.appendChild(folderContainer);
-
-        item.appendChild(renderTokenCell(note.token, note.shared_via_folder ? config.txtViaFolder : ''));
+        item.appendChild(renderTokenCell(note.token, ''));
 
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'note-actions';
 
-        if (note.share_id) {
+        // A note shared only through a folder gets the same open / copy /
+        // revoke actions as a direct share (its URL goes through the folder
+        // token, and revoke targets that folder share). Only the token edit
+        // button stays reserved for direct shares.
+        if (note.share_id || note.shared_via_folder) {
             var openBtn = document.createElement('button');
             openBtn.className = 'btn btn-sm btn-success';
             openBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
@@ -1920,16 +2171,28 @@
             })(note.url);
             actionsDiv.appendChild(openBtn);
 
-            var editTokenBtn = document.createElement('button');
-            editTokenBtn.className = 'btn btn-sm btn-primary';
-            editTokenBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
-            editTokenBtn.title = config.txtEditToken;
-            (function(noteRef) {
-                editTokenBtn.addEventListener('click', function() {
-                    openEditModalForItem(noteRef);
-                });
-            })(note);
-            actionsDiv.appendChild(editTokenBtn);
+            if (note.share_id) {
+                var editTokenBtn = document.createElement('button');
+                editTokenBtn.className = 'btn btn-sm btn-primary';
+                editTokenBtn.innerHTML = '<i class="lucide lucide-pencil"></i>';
+                editTokenBtn.title = config.txtEditToken;
+                (function(noteRef) {
+                    editTokenBtn.addEventListener('click', function() {
+                        openEditModalForItem(noteRef);
+                    });
+                })(note);
+                actionsDiv.appendChild(editTokenBtn);
+            } else {
+                // A note shared through a folder has no token of its own to
+                // edit: the button is shown greyed out to keep the action
+                // rows aligned, with a tooltip explaining why.
+                var editTokenBtnDisabled = document.createElement('button');
+                editTokenBtnDisabled.className = 'btn btn-sm btn-primary';
+                editTokenBtnDisabled.disabled = true;
+                editTokenBtnDisabled.innerHTML = '<i class="lucide lucide-pencil"></i>';
+                editTokenBtnDisabled.title = config.txtNoteSharedThroughFolder;
+                actionsDiv.appendChild(editTokenBtnDisabled);
+            }
 
             var copyBtn = document.createElement('button');
             copyBtn.className = 'btn btn-sm btn-primary';
@@ -1944,20 +2207,52 @@
             actionsDiv.appendChild(copyBtn);
         }
 
-        if (note.share_id) {
+        if (note.share_id || note.shared_via_folder) {
+            // The revoke action only ever targets THIS note: its own share,
+            // or, for a note reached through a folder share, a per-note block
+            // that leaves the folder share and its other notes untouched.
+            // The button's look follows the note's EFFECTIVE accessibility
+            // (own block or disabled folder share), like the name badge; the
+            // modal and its toggle still act on the note's own state only.
             var revokeBtn = document.createElement('button');
-            revokeBtn.className = 'btn btn-sm btn-danger';
-            revokeBtn.innerHTML = '<i class="lucide lucide-ban"></i>';
-            revokeBtn.title = config.txtRevoke;
-            (function(nId) {
-                revokeBtn.addEventListener('click', function() { revokeNoteShare(nId); });
-            })(note.note_id);
+            if (noteShareDisabled) {
+                revokeBtn.className = 'btn btn-sm btn-share-disabled';
+                revokeBtn.innerHTML = '<i class="lucide lucide-eye-off"></i>';
+                revokeBtn.title = config.txtShareDisabledBadge;
+            } else {
+                revokeBtn.className = 'btn btn-sm btn-danger';
+                revokeBtn.innerHTML = '<i class="lucide lucide-ban"></i>';
+                revokeBtn.title = config.txtRevoke;
+            }
+            (function(noteRef, isDisabled) {
+                revokeBtn.addEventListener('click', function() {
+                    // Already inaccessible through its disabled folder share,
+                    // with no block of its own: nothing at note level can
+                    // change its accessibility, so the modal only explains.
+                    if (!noteRef.share_id && !isDisabled && noteRef.shared_folder_disabled) {
+                        showRevokeShareModal({
+                            isDisabled: true,
+                            text: config.txtRevokeModalTextViaFolderParentDisabled,
+                            onDelete: null,
+                            onToggle: null
+                        });
+                        return;
+                    }
+                    showRevokeShareModal({
+                        isDisabled: isDisabled,
+                        // Deleting only applies to a note's own share; a note
+                        // shared through a folder is toggled, never deleted.
+                        onDelete: noteRef.share_id
+                            ? function() { revokeNoteShare(noteRef.note_id); }
+                            : null,
+                        text: noteRef.share_id
+                            ? null
+                            : (isDisabled ? config.txtRevokeModalTextViaFolderDisabled : config.txtRevokeModalTextViaFolder),
+                        onToggle: function(nextDisabled) { setNoteShareDisabled(noteRef.note_id, nextDisabled); }
+                    });
+                });
+            })(note, !!note.disabled);
             actionsDiv.appendChild(revokeBtn);
-        } else if (note.shared_via_folder) {
-            var viaFolderText = document.createElement('span');
-            viaFolderText.className = 'note-actions-placeholder';
-            viaFolderText.textContent = config.txtNoteSharedThroughFolder;
-            actionsDiv.appendChild(viaFolderText);
         }
 
         item.appendChild(actionsDiv);
@@ -2043,20 +2338,14 @@
             appendRestrictedIndicator(nameContainer);
         }
 
+        if (folder.disabled) {
+            appendDisabledIndicator(nameContainer);
+            item.classList.add('is-share-disabled');
+        }
+
         item.appendChild(nameContainer);
 
-        var folderContainer = document.createElement('div');
-        folderContainer.className = 'note-folder-container';
-
-        var folderPath = document.createElement('span');
-        folderPath.className = 'folder-badge';
-        folderPath.title = folder.folder_path;
-        folderPath.textContent = folder.folder_path;
-        folderContainer.appendChild(folderPath);
-
-        item.appendChild(folderContainer);
-
-        item.appendChild(renderTokenCell(folder.token, !folder.is_direct ? config.txtViaFolder : ''));
+        item.appendChild(renderTokenCell(folder.token, ''));
 
         var actionsDiv = document.createElement('div');
         actionsDiv.className = 'note-actions';
@@ -2103,15 +2392,25 @@
 
         if (folder.is_direct) {
             var revokeBtn = document.createElement('button');
-            revokeBtn.className = 'btn btn-sm btn-danger btn-revoke';
-            revokeBtn.innerHTML = '<i class="lucide lucide-ban"></i>';
-            revokeBtn.title = config.txtRevoke;
-            (function(fId) {
+            if (folder.disabled) {
+                revokeBtn.className = 'btn btn-sm btn-share-disabled btn-revoke';
+                revokeBtn.innerHTML = '<i class="lucide lucide-eye-off"></i>';
+                revokeBtn.title = config.txtShareDisabledBadge;
+            } else {
+                revokeBtn.className = 'btn btn-sm btn-danger btn-revoke';
+                revokeBtn.innerHTML = '<i class="lucide lucide-ban"></i>';
+                revokeBtn.title = config.txtRevoke;
+            }
+            (function(fId, isDisabled) {
                 revokeBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    revokeFolderShare(fId);
+                    showRevokeShareModal({
+                        isDisabled: isDisabled,
+                        onDelete: function() { revokeFolderShare(fId); },
+                        onToggle: function(nextDisabled) { setFolderShareDisabled(fId, nextDisabled); }
+                    });
                 });
-            })(folder.folder_id);
+            })(folder.folder_id, !!folder.disabled);
             actionsDiv.appendChild(revokeBtn);
         } else {
             var viaParentText = document.createElement('span');
@@ -2155,17 +2454,16 @@
             appendRestrictedIndicator(nameContainer);
         }
 
-        item.appendChild(nameContainer);
-
-        var ownerContainer = document.createElement('div');
-        ownerContainer.className = 'note-folder-container';
+        // The PATH/FOLDER column is gone: the owner is shown next to the name.
         var ownerBadge = document.createElement('span');
         ownerBadge.className = 'folder-badge';
+        ownerBadge.style.marginLeft = '8px';
         var ownerLabel = config.txtSharedBy + ' ' + (sharedItem.owner_name || '');
         ownerBadge.title = ownerLabel;
         ownerBadge.textContent = ownerLabel;
-        ownerContainer.appendChild(ownerBadge);
-        item.appendChild(ownerContainer);
+        nameContainer.appendChild(ownerBadge);
+
+        item.appendChild(nameContainer);
 
         // Token cell — show the actual token (read-only)
         item.appendChild(renderTokenCell(sharedItem.token || '', ''));
@@ -2232,24 +2530,6 @@
             });
         });
 
-        function syncUrl() {
-            var params = new URLSearchParams(window.location.search);
-            if (filterText) {
-                params.set('filter', filterText);
-            } else {
-                params.delete('filter');
-            }
-            if (filterType && filterType !== 'all') {
-                params.set('type', filterType);
-            } else {
-                params.delete('type');
-            }
-            // Keep non-filter params (workspace, auto_edit, etc.) intact
-            var newSearch = params.toString();
-            var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '');
-            window.history.replaceState(null, '', newUrl);
-        }
-
         // Text filter
         var filterInput = document.getElementById('filterInput');
         var clearFilterBtn = document.getElementById('clearFilterBtn');
@@ -2313,6 +2593,12 @@
         }
 
         loadSharedNotes();
+    });
+
+    var resizeAdjustTimer = null;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeAdjustTimer);
+        resizeAdjustTimer = setTimeout(adjustSharedColumnWidths, 150);
     });
 
     window.loadSharedNotes = loadSharedNotes;

@@ -132,7 +132,6 @@
       "delete_account": "Permanently delete your account and all its data.",
       "login_display": "Customize the title displayed on the login page.",
       "language": "Change the language of the interface.",
-      "theme_mode": "Switch between light, dark or automatic theme.",
       "main_font": "Choose the font used throughout the application.",
       "markdown_font": "Choose the font used in the markdown editor.",
       "font_size": "Adjust the font size of notes, sidebar and code blocks.",
@@ -150,7 +149,7 @@
       "note_color_palette": "Customize the color palette available for notes.",
       "folder_counts": "Show the number of notes next to each folder.",
       "notes_without_folders": "Show notes without a folder after the folder list instead of before.",
-      "note_width": "Adjust the maximum width of the note content.",
+      "note_width": "Adjust the maximum width of the note content, as a percentage of the note column.",
       "markdown_split_card_view": "Display markdown notes in a framed split view with editor and preview.",
       "markdown_colored": "Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.",
       "code_wrap": "Wrap long lines in code blocks instead of scrolling horizontally.",
@@ -187,7 +186,8 @@
       "website": "Open the official Poznote website.",
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
-      "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule."
+      "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
+      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -274,6 +274,10 @@
     }
   },
   "workspaces": {
+    "menu": {
+      "edit_workspaces": "Edit workspaces",
+      "new_workspace": "New workspace"
+    },
     "share": {
       "actions": {
         "enable": "Share",
@@ -313,7 +317,6 @@
   "display": {
     "title": "Display",
     "cards": {
-      "theme_mode": "Theme",
       "main_font": "App font",
       "markdown_font": "Markdown editor font",
       "login_display": "Login page title",
@@ -330,6 +333,7 @@
       "type_based_note_icons": "Icons by note type",
       "note_color_palette": "Note colors",
       "show_folder_counts": "Show folder note counts",
+      "highlight_current_folder_tree": "Highlight current folder tree",
       "notes_without_folders_after": "Show notes after folders",
       "show_folder_actions": "Show folder actions",
       "kanban_on_folder_click": "Open Kanban view on folder click",
@@ -652,7 +656,9 @@
       "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?",
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
-      "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button."
+      "note_favorite_star": "Favorite star (★) on notes",
+      "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.",
+      "theme_toggle": "Theme toggle"
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar order",
@@ -660,10 +666,6 @@
       "move_up": "Move up",
       "move_down": "Move down",
       "reset": "Reset order"
-    },
-    "theme": {
-      "title": "Theme Selection",
-      "description": "Choose your preferred theme:"
     },
     "language": {
       "title": "Language Selection",
@@ -698,10 +700,10 @@
     },
     "note_width": {
       "title": "Note Content Width",
-      "description": "Select the maximum width for your notes content (in pixels):",
-      "label": "Maximum width (px):",
+      "description": "Select the maximum width for your notes content, as a percentage of the note column (100 = full width):",
+      "label": "Maximum width (%):",
       "full_width": "Full Width",
-      "default_value": "{{width}} px is the Default value"
+      "default_value": "{{width}} % is the default value"
     },
     "index_icon_scale": {
       "title": "Index icon scaling",
@@ -716,6 +718,7 @@
     "folder": {
       "new_title": "New Folder",
       "new_placeholder": "New folder name",
+      "new_subfolder_placeholder": "New subfolder name",
       "create": "Create",
       "rename_title": "Rename Folder",
       "rename_placeholder": "New folder name",
@@ -830,32 +833,15 @@
         "success": "Shortcut created successfully",
         "error": "Error creating shortcut"
       },
-      "template": {
-        "title": "Template"
-      },
       "subfolder": {
         "title": "Subfolder"
       },
       "folder": {
         "title": "Folder"
       },
-      "kanban": {
-        "title": "Kanban Structure"
-      },
       "workspace": {
         "title": "Workspace"
       }
-    },
-    "kanban_structure": {
-      "title": "Create Kanban Structure",
-      "folder_name_label": "Folder name:",
-      "folder_name_placeholder": "My Kanban View",
-      "columns_label": "Number of columns (1-9):",
-      "error_name_required": "Folder name is required",
-      "error_columns_range": "Number of columns must be between 1 and 9",
-      "error_folder_exists": "Folder already exists in this location",
-      "error_create": "Failed to create Kanban structure",
-      "error_create_prefix": "Error creating Kanban structure: {{error}}"
     },
     "folder_icon": {
       "title": "Change Folder Icon",
@@ -868,12 +854,6 @@
     "linked_selector": {
       "title": "Create a Shortcut from a Note",
       "description": "Create a shortcut from a note so you can reference it from another folder.",
-      "search_placeholder": "Search notes...",
-      "recent_label": "Recent notes"
-    },
-    "template_selector": {
-      "title": "Select Note for Template",
-      "description": "A note will be created in a folder Templates. You can then duplicate it and reuse it as a template.",
       "search_placeholder": "Search notes...",
       "recent_label": "Recent notes"
     },
@@ -1120,8 +1100,8 @@
     "folder_actions": {
       "add_favorite": "Add to favorites",
       "remove_favorite": "Remove from favorites",
-      "menu": "Actions",
-      "create": "Create",
+      "menu": "Folder actions",
+      "create": "Create here",
       "kanban_view": "Kanban view",
       "open_all_in_tabs": "Open all notes",
       "move_all_files": "Move all files",
@@ -1331,12 +1311,7 @@
     }
   },
   "theme": {
-    "badge": {
-      "black": "black mode",
-      "dark": "dark mode",
-      "light": "light mode",
-      "system": "system mode"
-    }
+    "toggle": "Toggle theme"
   },
   "table": {
     "context_menu": {
@@ -1375,6 +1350,9 @@
       "attachments_with_count": "Attachments ({{count}})",
       "menu_actions": "Menu actions",
       "convert_to_html": "Convert to HTML",
+      "note_width": "Note width",
+      "note_width_current": "Note width: {{width}}",
+      "note_width_default": "Default ({{width}})",
       "convert_to_markdown": "Convert to Markdown"
     },
     "share_modal": {
@@ -1382,7 +1360,12 @@
       "create_url": "Create URL",
       "error_prefix": "Error: ",
       "unknown_error": "Unknown error creating public link",
-      "error_creating": "Error creating public link: "
+      "error_creating": "Error creating public link: ",
+      "shared_via_folder_title": "Shared note",
+      "shared_via_folder_message": "This note is already shared because it is located in the shared folder \"{{folder}}\".",
+      "shared_via_folder_message_generic": "This note is already shared because it is located in a shared folder.",
+      "shared_via_folder_create_question": "Do you want to also create a share link specific to this note, in addition to the folder share?",
+      "shared_via_folder_view_shares": "View shares"
     },
     "public_modal": {
       "title": "Shared URL",
@@ -2060,6 +2043,20 @@
     "restrict_users_placeholder": "Select users...",
     "restricted_badge": "Restricted",
     "restricted_help": "When restricted, only the listed users can access this share after logging in.",
+    "disabled_badge": "Inaccessible",
+    "disabled_help": "This share is inaccessible: the link no longer works until you make it accessible again.",
+    "back_to_notes": "Back to notes",
+    "revoke_modal": {
+      "title": "Revoke share",
+      "text": "You can permanently delete this share, or keep it and make it inaccessible until you enable it again.",
+      "text_disabled": "This share is currently inaccessible. You can make it accessible again, or permanently delete it.",
+      "text_via_folder": "This note is shared through a folder. You can make just this note inaccessible; the folder share and its other notes are not affected.",
+      "text_via_folder_disabled": "This note is currently inaccessible. You can make it accessible again through its folder share.",
+      "text_via_folder_parent_disabled": "This note is inaccessible because its folder share has been made inaccessible. Make the folder share accessible again to restore access.",
+      "delete": "Delete permanently",
+      "disable": "Make inaccessible",
+      "enable": "Make accessible again"
+    },
     "no_users_found": "No other users found",
     "users_loading": "Loading users...",
     "shared_with_me": "Shared with me",
@@ -2121,7 +2118,9 @@
       "shared_note_not_found_or_denied": "Shared note not found or access denied.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "folder_not_found": "Folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.",
       "note_not_found": "Note not found",
-      "server_error": "Server error"
+      "server_error": "Server error",
+      "share_disabled_title": "This share is inaccessible",
+      "share_disabled_message": "The owner has made this share inaccessible."
     },
     "edit": {
       "button": "Edit",
@@ -2585,7 +2584,7 @@
       "none_selected": "Select at least one workspace to sync."
     },
     "title": "{{provider}} Sync",
-    "description": "Synchronize your notes and attachments to GitHub or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
+    "description": "Synchronize your notes and attachments to GitHub, GitLab or Forgejo. Files are stored as flat files with a metadata.json that preserves tags, folders, dates and attachments.",
     "warning": "Do not rely on this feature as your sole backup.\nRegularly export your data using the backup feature in Settings.",
     "confirm_push": "Push all notes and attachments to {{provider}}? Existing files will be updated and files no longer in Poznote will be removed from the repository.",
     "confirm_pull": "Pull all notes and attachments from {{provider}}? Local data will be overwritten with the remote version. Notes not found on {{provider}} will be moved to trash.",
@@ -3479,7 +3478,18 @@
     "provider_custom": "Other (custom URL)",
     "api_key_label_required": "API key",
     "user_keys_label": "Allow personal API keys",
-    "user_keys_description": "Every user gets an AI assistant card in their own settings, where they can enter their own provider and API key. When a user does so, the assistant answers through that user's own server and key rather than through the configuration on this page, whether or not that user appears in the list above."
+    "user_keys_description": "Every user gets an AI assistant card in their own settings, where they can enter their own provider and API key. When a user does so, the assistant answers through that user's own server and key rather than through the configuration on this page, whether or not that user appears in the list above.",
+    "reasoning_effort_label": "Reasoning effort",
+    "reasoning_effort_description": "How long the model thinks before answering, for models that support it. Auto sends nothing and leaves the choice to the provider. Some OpenAI models refuse tools, and so cannot browse your notes, unless this is set to None.",
+    "reasoning_effort_options": {
+      "auto": "Auto (provider default)",
+      "none": "None",
+      "minimal": "Minimal",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "xhigh": "Very high (xhigh)"
+    }
   },
   "ai_settings_user": {
     "title": "My AI Assistant",
@@ -3507,6 +3517,7 @@
     "tool_read": "Reading note #{{id}}",
     "tool_list": "Listing recent notes",
     "no_tools_notice": "This model does not support tools — the assistant cannot browse your notes.",
+    "no_tools_reasoning_notice": "This model refuses tools at the current reasoning effort, so the assistant cannot browse your notes. Set the reasoning effort to None in the AI Assistant settings.",
     "tool_rename": "Renaming note #{{id}} to \"{{title}}\"",
     "tool_update": "Editing note #{{id}}",
     "tool_create": "Creating note: {{title}}"

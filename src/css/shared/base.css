@@ -60,8 +60,8 @@ body.shared-page {
 }
 
 .shared-container {
-    --shared-content-max-width: 980px;
-    max-width: 1200px;
+    --shared-content-max-width: 1320px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
 }

@@ -269,7 +269,37 @@ class ShareController {
             }
 
             $noteType = $noteRow['type'] ?? 'note';
-            
+
+            // A note without its own share can still be reached through a
+            // shared folder. Toggling `disabled` there manages a per-note
+            // block row (access_mode NULL, disabled = 1) so the action only
+            // affects this note, never the folder share itself.
+            if (array_key_exists('disabled', $input)) {
+                $stmtDirect = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL LIMIT 1');
+                $stmtDirect->execute([$noteId]);
+                if (!$stmtDirect->fetch()) {
+                    if (!empty($input['disabled'])) {
+                        $stmtBlock = $this->con->prepare('SELECT id FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1');
+                        $stmtBlock->execute([$noteId]);
+                        $blockId = $stmtBlock->fetchColumn();
+                        if ($blockId !== false) {
+                            $updStmt = $this->con->prepare('UPDATE shared_notes SET disabled = 1 WHERE id = ?');
+                            $updStmt->execute([$blockId]);
+                        } else {
+                            // The token is never published nor registered; it only
+                            // satisfies the UNIQUE NOT NULL constraint.
+                            $insStmt = $this->con->prepare('INSERT INTO shared_notes (note_id, token, access_mode, disabled) VALUES (?, ?, NULL, 1)');
+                            $insStmt->execute([$noteId, 'blocked_' . bin2hex(random_bytes(16))]);
+                        }
+                    } else {
+                        $delStmt = $this->con->prepare('DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL');
+                        $delStmt->execute([$noteId]);
+                    }
+                    echo json_encode(['success' => true, 'disabled' => !empty($input['disabled']) ? 1 : 0]);
+                    return;
+                }
+            }
+
             $updates = [];
             $params = [];
 
@@ -333,7 +363,14 @@ class ShareController {
                     $params[] = null;
                 }
             }
-            
+
+            // Revoke-as-disable: the share row (token, settings) is kept but the
+            // public link stops resolving until the share is re-enabled.
+            if (array_key_exists('disabled', $input)) {
+                $updates[] = 'disabled = ?';
+                $params[] = !empty($input['disabled']) ? 1 : 0;
+            }
+
             if (empty($updates)) {
                 echo json_encode(['success' => true, 'message' => 'No changes']);
                 return;
@@ -382,7 +419,10 @@ class ShareController {
                     ? array_values(array_unique(array_map('intval', $au)))
                     : null;
             }
-            
+            if (array_key_exists('disabled', $input)) {
+                $response['disabled'] = !empty($input['disabled']) ? 1 : 0;
+            }
+
             echo json_encode($response);
             
         } catch (Exception $e) {

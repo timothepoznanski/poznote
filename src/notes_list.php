@@ -151,31 +151,6 @@ $has_created_date_filter = !empty($created_from) || !empty($created_to);
 
 <?php
 
-/**
- * Whether a note is publicly shared.
- *
- * Pre-loads shared_notes on first call so the tree costs one query instead of
- * one per note, mirroring the shared-folders cache in generateFolderActions().
- */
-function isNoteShared($noteId) {
-    global $con;
-    static $sharedNotesCache = null;
-
-    if ($sharedNotesCache === null) {
-        $sharedNotesCache = [];
-        try {
-            $stmt = $con->query('SELECT note_id FROM shared_notes');
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $sharedNotesCache[(int)$row['note_id']] = true;
-            }
-        } catch (Exception $e) {
-            $sharedNotesCache = [];
-        }
-    }
-
-    return isset($sharedNotesCache[(int)$noteId]);
-}
-
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
     global $show_note_icons_setting;
 
@@ -207,11 +182,19 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     $htmlCreated = htmlspecialchars($row1['created'] ?? '', ENT_QUOTES);
     $htmlUpdated = htmlspecialchars($row1['updated'] ?? '', ENT_QUOTES);
 
-    echo "<div class='note-list-item'>";
+    // The Favorites section groups notes under the pseudo-folder name
+    // FAVORITES_FOLDER_NAME (ensureFavoritesFolder() in folders_display.php);
+    // every row there is already a favorite, so the star would be redundant
+    // on every single line and only the regular tree shows it. no-favorite-star
+    // gives the title back the strip reserved for it (css/tabs.css).
+    $showFavoriteStar = ($folderName !== FAVORITES_FOLDER_NAME);
+    $itemClass = $showFavoriteStar ? 'note-list-item' : 'note-list-item no-favorite-star';
+
+    echo "<div class='$itemClass'>";
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
     echo "</a>";
-    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), isNoteShared($noteDbId), $row1['reminder_at'] ?? '');
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), $showFavoriteStar);
     echo "</div>";
     echo "<div id=pxbetweennotes></div>";
 }
@@ -238,8 +221,36 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
     }
 }
 
+/**
+ * Path of folder ids leading to the folder named $name, deepest last.
+ *
+ * Folder names are unique within a workspace (folder views address them by
+ * name), so a name is enough to locate a single node in the hierarchy.
+ *
+ * @param array $nodes Hierarchical folder nodes
+ * @param string $name Folder name to locate
+ * @param array $path Ids collected so far (internal)
+ * @return array|null Ids from the root down to the folder, or null if absent
+ */
+function findFolderPathByName($nodes, $name, $path = []) {
+    foreach ($nodes as $nodeId => $nodeData) {
+        $currentPath = array_merge($path, [$nodeId]);
+        if (isset($nodeData['name']) && $nodeData['name'] === $name) {
+            return $currentPath;
+        }
+        if (!empty($nodeData['children'])) {
+            $found = findFolderPathByName($nodeData['children'], $name, $currentPath);
+            if ($found !== null) {
+                return $found;
+            }
+        }
+    }
+
+    return null;
+}
+
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true, $created_from = '', $created_to = '') {
-    global $selected_linked_note_id, $favorite_folders;
+    global $selected_linked_note_id, $favorite_folders, $folder_tree_active_id, $folder_tree_ancestors;
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
 
@@ -258,6 +269,17 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
     if ($showFolderHeader) {
         $folderClass = 'folder-header';
         if ($depth > 0) $folderClass .= ' subfolder subfolder-level-' . $depth;
+        // Folder hierarchy the user is working in: the folder itself carries
+        // .folder-tree-active, its ancestors .folder-tree-branch. Everything
+        // else is dimmed by css/folders/tree-highlight.css when the
+        // "Highlight current folder tree" setting is on.
+        if ($folder_tree_active_id !== null) {
+            if ((string)$folderId === $folder_tree_active_id) {
+                $folderClass .= ' folder-tree-active';
+            } elseif (isset($folder_tree_ancestors[(string)$folderId])) {
+                $folderClass .= ' folder-tree-branch';
+            }
+        }
         $folderDomId = 'folder-' . $folderId;
         
         // Determine if this folder should be open
@@ -402,6 +424,23 @@ if (!empty($folder_filter) && $folder_filter !== 'Favorites') {
     };
     $findFolderByName($hierarchicalFolders);
     $hierarchicalFolders = $filteredRoots;
+}
+
+// Resolve the folder hierarchy the user is currently working in: the folder of
+// the selected note (or of the note shown by default when none was requested).
+// Done server-side so the list paints already dimmed; js/folder-tree-highlight.js
+// takes over afterwards, since notes and folders open without a page reload.
+$folder_tree_active_id = null;
+$folder_tree_ancestors = [];
+$folder_tree_active_name = ($note != '') ? $current_note_folder : $default_note_folder;
+if (!empty($folder_tree_active_name) && $folder_tree_active_name !== FAVORITES_FOLDER_NAME) {
+    $folder_tree_path = findFolderPathByName($hierarchicalFolders, $folder_tree_active_name);
+    if (!empty($folder_tree_path)) {
+        $folder_tree_active_id = (string)array_pop($folder_tree_path);
+        foreach ($folder_tree_path as $ancestorId) {
+            $folder_tree_ancestors[(string)$ancestorId] = true;
+        }
+    }
 }
 
 // Determine if we should display uncategorized notes first (after Favorites, before other folders)

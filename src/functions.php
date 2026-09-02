@@ -617,13 +617,14 @@ function isSecureConnection() {
 }
 
 /**
- * Get the current Git provider name for display (GitHub or Forgejo)
+ * Get the current Git provider name for display (GitHub, GitLab or Forgejo)
  */
 function getGitProviderName($provider = null) {
     if ($provider === null) {
         $provider = defined('GIT_PROVIDER') ? GIT_PROVIDER : 'github';
     }
-    return ($provider === 'github') ? 'GitHub' : (($provider === 'forgejo') ? 'Forgejo' : 'Git');
+    $names = ['github' => 'GitHub', 'gitlab' => 'GitLab', 'forgejo' => 'Forgejo'];
+    return $names[$provider] ?? 'Git';
 }
 
 /**
@@ -1364,6 +1365,9 @@ function poznoteNormalizeHiddenUiKey($key) {
         // Notifications and AI chat moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn' => 'card:sidebarNotificationsBtn',
         'card:iconSidebarAiChatBtn' => 'card:sidebarAiChatBtn',
+        // Favorite left the note ⋮ menu for the star on the row itself, so a
+        // user who had hidden the menu entry keeps the row free of it.
+        'note:toggle-favorite' => 'panel:note-favorite-star',
     ];
 
     return $renamed[$key] ?? $key;
@@ -1682,15 +1686,13 @@ function poznoteApplyIconSidebarOrder(array $items, array $order) {
 }
 
 function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
-    $createModalOptionSelectors = [
+    $createMenuOptionSelectors = [
         'card:create-note-card' => '.create-note-option[data-type="html"]',
         'card:create-markdown-note-card' => '.create-note-option[data-type="markdown"]',
         'card:create-task-list-card' => '.create-note-option[data-type="list"]',
-        'card:create-linked-note-card' => '.create-note-option[data-type="linked"]',
-        'card:create-template-card' => '.create-note-option[data-type="template"]',
         'card:create-folder-card' => '.create-note-option[data-type="folder"]',
         'card:create-subfolder-card' => '.create-note-option[data-type="subfolder"]',
-        'card:create-kanban-card' => '.create-note-option[data-type="kanban"]',
+        'card:create-diary-entry-card' => '.create-note-option[data-type="diary"]',
         'card:create-workspace-card' => '.create-note-option[data-type="workspace"]',
     ];
 
@@ -1710,8 +1712,8 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             }
 
             $rules[] = '#' . $id . ' { display: none !important; }';
-            if (isset($createModalOptionSelectors[$key])) {
-                $rules[] = '#createModal ' . $createModalOptionSelectors[$key] . ' { display: none !important; }';
+            if (isset($createMenuOptionSelectors[$key])) {
+                $rules[] = '#create-menu ' . $createMenuOptionSelectors[$key] . ' { display: none !important; }';
             }
         } elseif ($type === 'toolbar') {
             $rules[] = '.note-edit-toolbar .' . $id . ', .note-edit-toolbar .' . $id . ':not(.hide-on-selection) { display: none !important; }';
@@ -1749,6 +1751,11 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // The ⋮ button on note rows. body.note-actions-hidden gives the
                 // titles back the strip reserved for it (css/tabs.css).
                 $rules[] = '.note-actions-toggle { display: none !important; }';
+            } elseif ($id === 'note-favorite-star') {
+                // The favorite star on note rows, next to the ⋮ button.
+                // !important beats the hover and .is-favorite reveals in
+                // css/folders/actions-menu.css.
+                $rules[] = '.note-favorite-toggle { display: none !important; }';
             } elseif ($id === 'note-created-date') {
                 // Creation date under the note title. Overrides
                 // body.show-note-created in css/notes/subline.css, which the

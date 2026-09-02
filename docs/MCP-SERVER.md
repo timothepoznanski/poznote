@@ -77,7 +77,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 - `create_workspace` — Create a new workspace
 - `rename_workspace` — Rename an existing workspace
 - `delete_workspace` — Delete a workspace (cannot delete the last one)
-- `get_git_sync_status` — Get the current status of Git synchronization (GitHub/Forgejo)
+- `get_git_sync_status` — Get the current status of Git synchronization (GitHub/GitLab/Forgejo)
 - `git_push` — Force push local notes to the configured Git repository
 - `git_pull` — Force pull notes from the configured Git repository
 - `get_system_info` — Get version information about the Poznote installation

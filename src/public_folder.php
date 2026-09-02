@@ -49,9 +49,15 @@ if (empty($token)) {
 }
 
 try {
-    $stmt = $con->prepare('SELECT folder_id, created, theme, indexable, password, allowed_users FROM shared_folders WHERE token = ?');
+    $stmt = $con->prepare('SELECT folder_id, created, theme, indexable, password, allowed_users, COALESCE(disabled, 0) AS disabled FROM shared_folders WHERE token = ?');
     $stmt->execute([$token]);
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // A share the owner made inaccessible gets its own page: the link is
+    // valid, it just does not resolve until the owner enables it again.
+    if ($row && !empty($row['disabled'])) {
+        renderPublicShareDisabledPage($currentLang);
+    }
 
     if (!$row) {
         $statusMsg = t_h('public.errors.shared_folder_not_found', [], "Shared folder not found.\n\nThis can happen after a restore.\n\nAn administrator may need to rebuild the master database in Settings > Administration Tools to repair shared links.", $currentLang);
@@ -65,7 +71,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
+                    'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
                 ],
             ],
         ]);
@@ -150,7 +156,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
+                    'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
                 ],
             ],
         ]);
@@ -222,7 +228,10 @@ try {
     // IMPORTANT: Include notes even without individual tokens if they belong to this shared folder hierarchy?
     // Keep explicit note shares when they exist, but inherited folder access must not create implicit note shares.
     // However, we'll try to be more inclusive in the query.
-    $notesWhereClause = "e.folder_id IN ($placeholders) AND e.trash = 0";
+    $notesWhereClause = "e.folder_id IN ($placeholders) AND e.trash = 0"
+        // Per-note blocks (notes revoked individually from the shares page)
+        // are left out of the public folder view entirely.
+        . " AND NOT EXISTS (SELECT 1 FROM shared_notes blk WHERE blk.note_id = e.id AND blk.access_mode IS NULL AND COALESCE(blk.disabled, 0) = 1)";
     $notesQueryParams = $allRelevantFolderIds;
     $noteAgeCutoff = getNoteAgeFilterCutoff(getNoteAgeFilterDays($con));
     if ($noteAgeCutoff !== null) {
@@ -238,7 +247,7 @@ try {
                sn.token
         FROM entries e
         LEFT JOIN entries lo ON lo.id = e.linked_note_id
-        LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
+        LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL AND COALESCE(sn.disabled, 0) = 0
         WHERE $notesWhereClause
         ORDER BY e.created DESC
     ");

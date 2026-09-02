@@ -1269,7 +1269,7 @@ def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
 
 @mcp.tool()
 def get_git_sync_status(user_id: Optional[int] = None) -> str:
-    """Get the current status of Git synchronization (GitHub or Forgejo)
+    """Get the current status of Git synchronization (GitHub, GitLab or Forgejo)
     
     Args:
         user_id: User profile ID to access (optional, overrides default)

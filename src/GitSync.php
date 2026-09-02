@@ -1,6 +1,6 @@
 <?php
 /**
- * GitSync - Git synchronization for Poznote notes (GitHub, Forgejo)
+ * GitSync - Git synchronization for Poznote notes (GitHub, GitLab, Forgejo)
  * 
  * Handles pushing and pulling notes from a Git repository using the provider's API.
  * Per-user configuration is stored in the user's database settings table,
@@ -11,6 +11,8 @@ class GitSync {
     // Supported file extensions
     const SUPPORTED_NOTE_EXTENSIONS = ['md', 'html', 'txt', 'markdown', 'json', 'excalidraw'];
     const MARKDOWN_EXTENSIONS = ['md', 'markdown', 'txt'];
+    // Supported providers; anything else falls back to GitHub
+    const PROVIDERS = ['github', 'gitlab', 'forgejo'];
     
     private $token;
     private $repo;
@@ -29,7 +31,7 @@ class GitSync {
     private $syncedWorkspacesCache = false;
 
     /**
-     * Get the configured git provider (github, forgejo, etc.)
+     * Get the configured git provider (github, gitlab, forgejo)
      */
     public function getProvider(): string {
         return $this->provider;
@@ -175,9 +177,12 @@ class GitSync {
             $stmt = $this->con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
             foreach ($mapping as $inputKey => $dbKey) {
                 if (array_key_exists($inputKey, $config)) {
-                    $value = trim($config[$inputKey]);
+                    $value = trim((string) $config[$inputKey]);
                     if ($inputKey === 'token' && $value !== '') {
                         $value = $this->encryptToken($value);
+                    }
+                    if ($inputKey === 'provider' && !in_array($value, self::PROVIDERS, true)) {
+                        $value = 'github';
                     }
                     $stmt->execute([$dbKey, $value]);
                 }
@@ -273,17 +278,47 @@ class GitSync {
     }
 
     /**
-     * Get default API base URL for the provider
+     * Default API base URL of a provider. Public so the settings page can
+     * avoid persisting a value that only restates the default.
      */
-    private function getDefaultApiBase() {
-        switch ($this->provider) {
+    public static function defaultApiBaseFor(string $provider): string {
+        switch ($provider) {
             case 'forgejo':
                 // Forgejo instances are often self-hosted
-                return 'http://localhost:3000/api/v1'; 
+                return 'http://localhost:3000/api/v1';
+            case 'gitlab':
+                // Self-hosted instances use https://gitlab.example.com/api/v4
+                return 'https://gitlab.com/api/v4';
             case 'github':
             default:
                 return 'https://api.github.com';
         }
+    }
+
+    /**
+     * Get default API base URL for the configured provider
+     */
+    private function getDefaultApiBase() {
+        return self::defaultApiBaseFor($this->provider);
+    }
+
+    /**
+     * GitLab addresses a project by its URL-encoded full path
+     * (group/subgroup/project) or by numeric ID.
+     */
+    private function gitlabProjectId(): string {
+        return rawurlencode(trim($this->repo, '/'));
+    }
+
+    /**
+     * GitLab takes the whole file path as one URL-encoded segment, whereas
+     * GitHub and Forgejo keep the slashes.
+     */
+    private function encodeRepoPath(string $path): string {
+        if ($this->provider === 'gitlab') {
+            return rawurlencode($path);
+        }
+        return implode('/', array_map('rawurlencode', explode('/', $path)));
     }
     
     /**
@@ -347,6 +382,26 @@ class GitSync {
                     'error' => "Auth failed: " . $userResponse['error'] . " (URL: " . $this->apiBase . ", Provider: " . $this->provider . ", Token starts with: " . substr($this->token, 0, 4) . ")"
                 ];
             }
+        }
+
+        if ($this->provider === 'gitlab') {
+            $response = $this->apiRequest('GET', '/projects/' . $this->gitlabProjectId());
+            if (isset($response['error'])) {
+                return ['success' => false, 'error' => $response['error']];
+            }
+            if (isset($response['id'])) {
+                return [
+                    'success' => true,
+                    'repo' => $response['path_with_namespace'] ?? $this->repo,
+                    'description' => $response['description'] ?? '',
+                    'private' => ($response['visibility'] ?? 'private') !== 'public',
+                    'default_branch' => $response['default_branch'] ?? 'main'
+                ];
+            }
+            return [
+                'success' => false,
+                'error' => 'Unable to access project. Check your token and project path.'
+            ];
         }
 
         // Test API access to repository
@@ -1463,8 +1518,22 @@ class GitSync {
      * @return array Result with success status and error if applicable
      */
     private function deleteFile($path, $message, $sha = null) {
-        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
-        
+        $encodedPath = $this->encodeRepoPath($path);
+
+        if ($this->provider === 'gitlab') {
+            // GitLab deletes by path alone, no blob SHA needed, and answers 204
+            $response = $this->apiRequest('DELETE', '/projects/' . $this->gitlabProjectId() . "/repository/files/{$encodedPath}", [
+                'branch' => $this->branch,
+                'commit_message' => $message,
+                'author_name' => $this->authorName,
+                'author_email' => $this->authorEmail
+            ]);
+            if (isset($response['error'])) {
+                return ['success' => false, 'error' => $response['error']];
+            }
+            return ['success' => true];
+        }
+
         // Get the file to retrieve its SHA (required for deletion)
         if ($sha === null) {
             $existingFile = $this->apiRequest('GET', "/repos/{$this->repo}/contents/{$encodedPath}?ref={$this->branch}");
@@ -1540,8 +1609,11 @@ class GitSync {
      */
     private function pushFile($path, $content, $message, $shaMap = null) {
 
-        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
-        $endpoint = "/repos/{$this->repo}/contents/{$encodedPath}";
+        $encodedPath = $this->encodeRepoPath($path);
+        $isGitLab = ($this->provider === 'gitlab');
+        $endpoint = $isGitLab
+            ? '/projects/' . $this->gitlabProjectId() . "/repository/files/{$encodedPath}"
+            : "/repos/{$this->repo}/contents/{$encodedPath}";
         
         // Determine if file exists (has a SHA) or is new
         $sha = null;
@@ -1561,7 +1633,11 @@ class GitSync {
             }
         } else {
             // Fallback to manual check if map not provided
-            $existingFile = $this->apiRequest('GET', $endpoint . "?ref={$this->branch}");
+            $existingFile = $this->apiRequest('GET', $endpoint . '?ref=' . rawurlencode($this->branch));
+            // GitLab reports the blob SHA as blob_id
+            if ($isGitLab && isset($existingFile['blob_id']) && !isset($existingFile['sha'])) {
+                $existingFile['sha'] = $existingFile['blob_id'];
+            }
             
             if (isset($existingFile['sha']) && is_string($existingFile['sha'])) {
                 $sha = $existingFile['sha'];
@@ -1579,6 +1655,26 @@ class GitSync {
                     'error' => "Pre-check failed: " . $existingFile['error'] . " (HTTP " . ($existingFile['status'] ?? '?') . ")"
                 ];
             }
+        }
+
+        if ($isGitLab) {
+            // GitLab: POST creates, PUT updates, and neither returns the blob
+            // SHA, so it is computed locally (git blob SHAs are deterministic).
+            $response = $this->apiRequest($fileExists ? 'PUT' : 'POST', $endpoint, [
+                'branch' => $this->branch,
+                'content' => base64_encode($content),
+                'encoding' => 'base64',
+                'commit_message' => $message,
+                'author_name' => $this->authorName,
+                'author_email' => $this->authorEmail
+            ]);
+            if (isset($response['file_path'])) {
+                return ['success' => true, 'sha' => $this->calculateGitSha($content)];
+            }
+            return [
+                'success' => false,
+                'error' => $response['error'] ?? "API error: GitLab didn't confirm the file write"
+            ];
         }
 
         $body = [
@@ -1624,6 +1720,10 @@ class GitSync {
      * @return array Tree array or error array
      */
     private function getRepoTree() {
+        if ($this->provider === 'gitlab') {
+            return $this->getGitLabRepoTree();
+        }
+
         $response = $this->apiRequest('GET', "/repos/{$this->repo}/git/trees/{$this->branch}?recursive=1");
         
         if (isset($response['tree'])) {
@@ -1634,20 +1734,59 @@ class GitSync {
     }
     
     /**
+     * GitLab paginates the tree endpoint (at most 100 entries per page), so
+     * the pages are stitched into the GitHub-shaped list the sync code reads:
+     * type / path / sha.
+     * @return array Tree array or error array
+     */
+    private function getGitLabRepoTree() {
+        $project = $this->gitlabProjectId();
+        $perPage = 100;
+        $base = "/projects/{$project}/repository/tree?ref=" . rawurlencode($this->branch) . "&recursive=true&per_page={$perPage}";
+        $tree = [];
+
+        for ($page = 1; $page <= 1000; $page++) {
+            $response = $this->apiRequest('GET', $base . "&page={$page}");
+            if (isset($response['error'])) {
+                // A project without any commit has no tree yet: treat it as
+                // empty so the first push creates the branch instead of failing.
+                if ($page === 1 && ($response['status'] ?? 0) == 404) {
+                    $info = $this->apiRequest('GET', "/projects/{$project}");
+                    if (!empty($info['empty_repo'])) return [];
+                }
+                return ['error' => $response['error']];
+            }
+            if (!is_array($response) || ($response !== [] && !isset($response[0]))) {
+                return ['error' => 'Unexpected response from the GitLab tree API'];
+            }
+            foreach ($response as $item) {
+                if (!isset($item['path'], $item['type'])) continue;
+                $tree[] = ['type' => $item['type'], 'path' => $item['path'], 'sha' => $item['id'] ?? null];
+            }
+            if (count($response) < $perPage) break;
+        }
+
+        return $tree;
+    }
+
+    /**
      * Get file content from repository
      * @param string $path File path in repository
      * @return array Result with content or error
      */
     private function getFileContent($path) {
-        $encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
-        $response = $this->apiRequest('GET', "/repos/{$this->repo}/contents/{$encodedPath}?ref={$this->branch}");
+        $encodedPath = $this->encodeRepoPath($path);
+        $endpoint = ($this->provider === 'gitlab')
+            ? '/projects/' . $this->gitlabProjectId() . "/repository/files/{$encodedPath}"
+            : "/repos/{$this->repo}/contents/{$encodedPath}";
+        $response = $this->apiRequest('GET', $endpoint . '?ref=' . rawurlencode($this->branch));
         
         if (isset($response['content'])) {
             $content = base64_decode($response['content']);
             return ['success' => true, 'content' => $content];
         }
         
-        return ['error' => $response['message'] ?? 'Unable to get file content'];
+        return ['error' => $response['message'] ?? $response['error'] ?? 'Unable to get file content'];
     }
     
     /**
@@ -1664,6 +1803,10 @@ class GitSync {
             $headers[] = 'Authorization: Bearer ' . $this->token;
             $headers[] = 'Accept: application/vnd.github.v3+json';
             $headers[] = 'X-GitHub-Api-Version: 2022-11-28';
+        } elseif ($this->provider === 'gitlab') {
+            // Accepted for personal, project and group access tokens
+            $headers[] = 'PRIVATE-TOKEN: ' . $this->token;
+            $headers[] = 'Accept: application/json';
         } else {
             $headers[] = 'Authorization: token ' . $this->token;
             $headers[] = 'Token: ' . $this->token;
@@ -1704,6 +1847,14 @@ class GitSync {
             // Special handling for Forgejo/Gitea errors that might be encoded differently
             if ($this->provider === 'forgejo' && isset($data['error'])) {
                 $errorMessage = $data['error'];
+            }
+            // GitLab: OAuth-style errors carry error/error_description instead of message
+            if ($this->provider === 'gitlab' && !isset($data['message']) && isset($data['error'])) {
+                $errorMessage = $data['error_description'] ?? $data['error'];
+            }
+            // Validation errors can be nested objects; keep them readable
+            if (is_array($errorMessage)) {
+                $errorMessage = json_encode($errorMessage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
             }
             
             return [

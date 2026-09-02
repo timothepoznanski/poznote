@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 31; // 31: shared_folders.access_mode column (public folder edit sharing)
+    $CURRENT_SCHEMA_VERSION = 33; // 33: entries.content_width (per-note width override)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -239,7 +239,8 @@ try {
             created_by_user_id INTEGER,
             updated_by_user_id INTEGER,
             kanban_completed DATETIME,
-            trashed_at DATETIME
+            trashed_at DATETIME,
+            content_width INTEGER
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -283,6 +284,7 @@ try {
             expires DATETIME,
             access_mode TEXT DEFAULT "full",
             password_encrypted TEXT,
+            disabled INTEGER DEFAULT 0,
             FOREIGN KEY(note_id) REFERENCES entries(id) ON DELETE CASCADE
         )');
 
@@ -298,6 +300,7 @@ try {
             password TEXT,
             password_encrypted TEXT,
             access_mode TEXT DEFAULT "read_only",
+            disabled INTEGER DEFAULT 0,
             FOREIGN KEY(folder_id) REFERENCES folders(id) ON DELETE CASCADE
         )');
 
@@ -433,6 +436,9 @@ try {
             if (!in_array('allowed_users', $existingColumns)) {
                 $con->exec("ALTER TABLE shared_notes ADD COLUMN allowed_users TEXT");
             }
+            if (!in_array('disabled', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_notes ADD COLUMN disabled INTEGER DEFAULT 0");
+            }
 
             // Non-tasklist shares only support 'read_only' and 'edit'. Legacy rows
             // were stored as 'full' (the historical default); they must stay
@@ -458,6 +464,9 @@ try {
             if (!in_array('access_mode', $existingColumns)) {
                 // Existing folder shares must stay read-only: editing is opt-in.
                 $con->exec("ALTER TABLE shared_folders ADD COLUMN access_mode TEXT DEFAULT 'read_only'");
+            }
+            if (!in_array('disabled', $existingColumns)) {
+                $con->exec("ALTER TABLE shared_folders ADD COLUMN disabled INTEGER DEFAULT 0");
             }
         } catch (Exception $e) {
             error_log('Could not add missing columns to shared_folders: ' . $e->getMessage());
@@ -663,6 +672,20 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add trashed_at column: ' . $e->getMessage());
+        }
+
+        // Ensure content_width column exists (per-note width override set from
+        // the toolbar). Max width of the note content as a percentage of the
+        // note column (100 = full width); NULL means the note follows the
+        // global center_note_content setting.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('content_width', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN content_width INTEGER");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add content_width column: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

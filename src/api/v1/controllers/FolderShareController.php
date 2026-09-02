@@ -308,11 +308,18 @@ class FolderShareController {
                 }
             }
 
+            // Revoke-as-disable: the share row (token, settings) is kept but the
+            // public link stops resolving until the share is re-enabled.
+            if (array_key_exists('disabled', $input)) {
+                $updates[] = 'disabled = ?';
+                $params[] = !empty($input['disabled']) ? 1 : 0;
+            }
+
             if (empty($updates)) {
                 echo json_encode(['success' => true, 'message' => 'No changes']);
                 return;
             }
-            
+
             $oldToken = null;
             if (isset($input['custom_token'])) {
                 $stmtToken = $this->con->prepare('SELECT token FROM shared_folders WHERE folder_id = ?');
@@ -356,6 +363,9 @@ class FolderShareController {
                 $response['allowed_users'] = (is_array($au) && !empty($au))
                     ? array_values(array_unique(array_map('intval', $au)))
                     : null;
+            }
+            if (array_key_exists('disabled', $input)) {
+                $response['disabled'] = !empty($input['disabled']) ? 1 : 0;
             }
 
             echo json_encode($response);

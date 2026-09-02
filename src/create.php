@@ -120,24 +120,8 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
             </a>
 
             <!-- Linked Note -->
-            <a href="#" class="home-card" id="create-linked-note-card" data-create-type="linked" title="<?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-link"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('modals.create.linked.title', [], 'Shortcut'); ?></span>
-                </div>
-            </a>
 
             <!-- Template -->
-            <a href="#" class="home-card" id="create-template-card" data-create-type="template" title="<?php echo t_h('modals.create.template.title', [], 'Template'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-copy"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('modals.create.template.title', [], 'Template'); ?></span>
-                </div>
-            </a>
 
             <!-- Folder -->
             <a href="#" class="home-card" id="create-folder-card" data-create-type="folder" title="<?php echo t_h('modals.create.folder.title', [], 'Folder'); ?>">
@@ -146,16 +130,6 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
                 </div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('modals.create.folder.title', [], 'Folder'); ?></span>
-                </div>
-            </a>
-
-            <!-- Kanban Structure -->
-            <a href="#" class="home-card" id="create-kanban-card" data-create-type="kanban" title="<?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?>">
-                <div class="home-card-icon">
-                    <i class="lucide lucide-columns-2"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('modals.create.kanban.title', [], 'Kanban Structure'); ?></span>
                 </div>
             </a>
 
@@ -181,7 +155,6 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
     <script src="<?php echo poznoteAsset('js/utils.js'); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/template-selector.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/linked-note-selector.js'); ?>"></script>
     <script src="js/modals-events.js?v=<?php echo $cache_v; ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>

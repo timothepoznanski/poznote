@@ -164,3 +164,30 @@ html[data-theme='dark'] #folderShareModal h3 {
     color: #e0e0e0;
 }
 
+/* ============================================
+   Shared-via-folder info modal (#sharedViaFolderModal)
+   ============================================ */
+
+#sharedViaFolderModal .modal-content {
+    max-width: 520px;
+}
+
+#sharedViaFolderModal .share-modal-buttons {
+    margin-top: 20px;
+}
+
+#sharedViaFolderModal .btn-view-shares {
+    background: var(--pz-success);
+    color: #ffffff;
+    border: none;
+}
+
+html[data-theme='dark'] #sharedViaFolderModal .modal-content {
+    background-color: var(--dm-content-bg);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] #sharedViaFolderModal h3 {
+    color: #e0e0e0;
+}
+

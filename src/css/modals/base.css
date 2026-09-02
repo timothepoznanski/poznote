@@ -18,6 +18,15 @@
     --modal-max-width: 420px;
 }
 
+/* Create dropdown (#create-menu in modals.php). Its look lives in
+   css/folders/actions-menu.css, which only the notes list bundles; the hidden
+   base state has to sit here next to .modal instead, or the markup renders as
+   loose text on every other page that includes modals.php (settings, about...).
+   .create-menu.show wins over this by specificity, whatever the file order. */
+.create-menu {
+    display: none;
+}
+
 /* ============================================
    Modal Overlay
    ============================================ */

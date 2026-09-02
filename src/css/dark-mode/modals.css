@@ -705,6 +705,11 @@ body.dark-mode #noteWidthModal .font-size-controls input::placeholder {
     color: #808080;
 }
 
+html[data-theme='dark'] #noteWidthModal .note-width-unit,
+body.dark-mode #noteWidthModal .note-width-unit {
+    color: #9ca3af;
+}
+
 html[data-theme='dark'] #fontSizeModal .default-info,
 html[data-theme='dark'] #noteWidthModal .default-info,
 body.dark-mode #fontSizeModal .default-info,

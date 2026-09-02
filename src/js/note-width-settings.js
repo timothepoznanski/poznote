@@ -30,7 +30,7 @@ function showNoteWidthPrompt() {
         }
         if (fullWidthBtn) {
             fullWidthBtn.addEventListener('click', function () {
-                noteWidthInput.value = 0;
+                noteWidthInput.value = 100;
                 saveNoteWidth(true); // pass true to redirect
             });
         }
@@ -64,28 +64,14 @@ function closeNoteWidthModal() {
     }
 }
 
-// Function to update preview/info
+// Highlight the "Full width" button when the input means full width (100 %)
 function updateNoteWidthPreview() {
     const noteWidthInput = document.getElementById('noteWidthInput');
-    const defaultInfo = document.getElementById('defaultNoteWidthInfo');
+    const fullWidthBtn = document.getElementById('fullWidthBtn');
 
-    if (noteWidthInput) {
-        const width = parseInt(noteWidthInput.value);
-
-
-
-        // Logic for input display
-        const fullWidthBtn = document.getElementById('fullWidthBtn');
-        if (fullWidthBtn) {
-            if (width === 0) {
-                fullWidthBtn.classList.add('active');
-            } else {
-                fullWidthBtn.classList.remove('active');
-            }
-        }
-        if (width === 0) {
-            // we use 0 to represent full width in the input
-        }
+    if (noteWidthInput && fullWidthBtn) {
+        const width = parseInt(noteWidthInput.value, 10);
+        fullWidthBtn.classList.toggle('active', !isNaN(width) && width >= 100);
     }
 }
 
@@ -100,16 +86,18 @@ function loadCurrentNoteWidth() {
             if (data && data.success) {
                 const noteWidthInput = document.getElementById('noteWidthInput');
                 if (noteWidthInput) {
-                    let val = data.value;
-                    // Handle old boolean values
-                    if (val === '1' || val === 'true') {
-                        val = 800;
-                    } else if (val === '0' || val === 'false' || val === '') {
-                        val = 0; // 0 represents full width/disabled
+                    // Stored as a percentage ('60%'), '0' for full width, or a
+                    // legacy pixel value ('1'/'true' = 800px, bare number). A
+                    // pixel value has no percentage equivalent: leave the
+                    // input empty so the placeholder suggests a starting point.
+                    const val = (data.value === null || data.value === undefined) ? '' : String(data.value).trim();
+                    if (val === '0' || val === 'false' || val === '' || val === '100%') {
+                        noteWidthInput.value = 100;
+                    } else if (/^\d+%$/.test(val)) {
+                        noteWidthInput.value = parseInt(val, 10);
                     } else {
-                        val = parseInt(val) || 0;
+                        noteWidthInput.value = '';
                     }
-                    noteWidthInput.value = val;
                     updateNoteWidthPreview();
                 }
             }
@@ -122,7 +110,14 @@ function saveNoteWidth(redirect = false) {
     const noteWidthInput = document.getElementById('noteWidthInput');
     if (!noteWidthInput) return;
 
-    let width = noteWidthInput.value;
+    // Percentage of the note column; 100 (or an empty input) means full
+    // width, stored as '0' like before so existing readers keep working.
+    let width = parseInt(noteWidthInput.value, 10);
+    if (isNaN(width) || width >= 100) {
+        width = '0';
+    } else {
+        width = Math.max(10, width) + '%';
+    }
 
     // Save to server
     fetch('/api/v1/settings/center_note_content', {

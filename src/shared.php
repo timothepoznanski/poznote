@@ -88,6 +88,7 @@ foreach ($allFolders as $fid => $f) {
 			'password'        => !empty($entry['password']),
 			'passwordValue'   => poznoteDecryptSharePassword($entry['password_encrypted'] ?? ''),
 			'allowed_users'   => !empty($entry['allowed_users']) ? json_decode($entry['allowed_users'], true) : null,
+			'disabled'        => (int)($entry['disabled'] ?? 0),
 			'folder_name'     => $f['name'],
 			'note_count'      => (int)$noteCount,
 			'is_direct'       => (bool)$directEntry,
@@ -159,6 +160,18 @@ usort($shared_folders, function($a, $b) {
 	data-txt-renew="<?php echo t_h('index.public_modal.renew_token', [], 'Renew token'); ?>"
       data-txt-open="<?php echo t_h('public.actions.open', [], 'Open public view'); ?>"
       data-txt-revoke="<?php echo t_h('public.actions.revoke', [], 'Revoke'); ?>"
+      data-txt-revoke-modal-title="<?php echo t_h('public.revoke_modal.title', [], 'Revoke share'); ?>"
+      data-txt-revoke-modal-text="<?php echo t_h('public.revoke_modal.text', [], 'You can permanently delete this share, or keep it and make it inaccessible until you enable it again.'); ?>"
+      data-txt-revoke-modal-text-disabled="<?php echo t_h('public.revoke_modal.text_disabled', [], 'This share is currently inaccessible. You can make it accessible again, or permanently delete it.'); ?>"
+      data-txt-revoke-modal-text-via-folder="<?php echo t_h('public.revoke_modal.text_via_folder', [], 'This note is shared through a folder. You can make just this note inaccessible; the folder share and its other notes are not affected.'); ?>"
+      data-txt-revoke-modal-text-via-folder-disabled="<?php echo t_h('public.revoke_modal.text_via_folder_disabled', [], 'This note is currently inaccessible. You can make it accessible again through its folder share.'); ?>"
+      data-txt-revoke-modal-text-via-folder-parent-disabled="<?php echo t_h('public.revoke_modal.text_via_folder_parent_disabled', [], 'This note is inaccessible because its folder share has been made inaccessible. Make the folder share accessible again to restore access.'); ?>"
+      data-txt-ok="<?php echo t_h('common.ok', [], 'OK'); ?>"
+      data-txt-revoke-delete="<?php echo t_h('public.revoke_modal.delete', [], 'Delete permanently'); ?>"
+      data-txt-revoke-disable="<?php echo t_h('public.revoke_modal.disable', [], 'Make inaccessible'); ?>"
+      data-txt-revoke-enable="<?php echo t_h('public.revoke_modal.enable', [], 'Make accessible again'); ?>"
+      data-txt-share-disabled-badge="<?php echo t_h('public.disabled_badge', [], 'Inaccessible'); ?>"
+      data-txt-share-disabled-help="<?php echo t_h('public.disabled_help', [], 'This share is inaccessible: the link no longer works until you make it accessible again.'); ?>"
 	data-txt-task-permissions="<?php echo t_h('index.task_permissions.title', [], 'Permissions'); ?>"
 	data-txt-task-read-only="<?php echo t_h('index.task_permissions.read_only', [], 'Read only'); ?>"
 	data-txt-task-check-only="<?php echo t_h('index.task_permissions.check_only', [], 'Check or uncheck only'); ?>"
@@ -212,7 +225,7 @@ usort($shared_folders, function($a, $b) {
 		<h1 class="poznote-page-title"><i class="lucide lucide-share-2"></i> <?php echo t_h('home.shares', [], 'Shares'); ?></h1>
 
 		
-		<div class="shared-filter-bar">
+		<div class="shared-filter-bar initially-hidden" id="sharedFilterBar">
 			<div class="filter-type-buttons">
 				<button class="filter-type-btn active" data-filter="all">
 					<i class="lucide lucide-layers"></i>

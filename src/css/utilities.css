@@ -85,17 +85,67 @@
 
 /* ============================================
    CENTER NOTE CONTENT
-   When enabled, the note content is centered with a max-width
-   for better readability on wide screens
+   When enabled, the note body is centered with a max-width (a percentage of
+   the note column, or a legacy pixel value) for better readability on wide
+   screens. Applied to each child of .innernote rather than to .innernote
+   itself so the sticky toolbar (.note-header) keeps the full column width;
+   only the tags row, title and content shrink. .note-scroll-edge-controls is
+   position: fixed and must keep its own size. Desktop only: below 800px the
+   note already fills the screen and a percentage would only shrink it.
+
+   Centering uses align-self, not auto margins: .innernote is a flex column,
+   and base.css resets the title with `h4 { margin: 0 !important }`, which
+   would win over margin-left/right: auto and leave the title flush left
+   while the content centers.
    ============================================ */
-body.center-note-content #right_col .innernote {
-    max-width: var(--note-max-width, 800px);
-    margin-left: auto;
-    margin-right: auto;
+@media (min-width: 801px) {
+    body.center-note-content #right_col .innernote > :not(.note-header):not(.note-scroll-edge-controls) {
+        width: 100%;
+        max-width: var(--note-max-width, 800px);
+        align-self: center;
+    }
+
+    /* Per-note override (entries.content_width, a percentage) set from the
+       toolbar toggle. Wins over the global setting above whatever its value;
+       100% renders as full width. */
+    #right_col .notecard[data-content-width] .innernote > :not(.note-header):not(.note-scroll-edge-controls) {
+        width: 100%;
+        max-width: var(--note-content-width, none);
+        align-self: center;
+    }
 }
 
-body.center-note-content #right_col .note-header {
-    max-width: var(--note-max-width, 800px);
-    margin-left: auto;
-    margin-right: auto;
+/* Transient label for the toolbar width toggle: the reflow alone does not
+   say which of the width steps you just landed on. */
+#note-width-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0.5rem);
+    background: var(--pz-text);
+    color: #fff;
+    font-size: 0.82rem;
+    padding: 0.4em 0.9em;
+    border-radius: 6px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+
+#note-width-toast.note-width-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+#note-width-toast.note-width-toast--hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0.5rem);
+}
+
+body.dark-mode #note-width-toast,
+html[data-theme='dark'] #note-width-toast {
+    background: #555;
+    color: #f0f0f0;
 }

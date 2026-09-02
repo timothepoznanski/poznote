@@ -21,6 +21,29 @@
                 } catch (Exception $e) {
                     error_log('note_display: failed to prepare shared_notes lookup: ' . $e->getMessage());
                 }
+                // Nearest shared ancestor folder (a note inside a shared folder is publicly reachable too)
+                $stmt_folder_shared = null;
+                try {
+                    $stmt_folder_shared = $con->prepare(
+                        'WITH RECURSIVE folder_path(id, parent_id, depth) AS (
+                            SELECT f.id, f.parent_id, 0
+                            FROM folders f
+                            WHERE f.id = ?
+                            UNION ALL
+                            SELECT parent.id, parent.parent_id, folder_path.depth + 1
+                            FROM folders parent
+                            INNER JOIN folder_path ON folder_path.parent_id = parent.id
+                        )
+                        SELECT fo.name
+                        FROM folder_path
+                        INNER JOIN shared_folders sf ON sf.folder_id = folder_path.id
+                        INNER JOIN folders fo ON fo.id = folder_path.id
+                        ORDER BY folder_path.depth ASC
+                        LIMIT 1'
+                    );
+                } catch (Exception $e) {
+                    error_log('note_display: failed to prepare shared_folders lookup: ' . $e->getMessage());
+                }
                 $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
 
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
@@ -48,8 +71,26 @@
                             $attachments_data = $decoded_attachments;
                         }
                     }
-                    // Check if note is shared for CSS class
-                    $share_class = $is_shared ? ' is-shared' : '';
+                    // Shared indirectly through a shared (ancestor) folder? Only relevant
+                    // when there is no direct share, which always takes precedence.
+                    $shared_via_folder_name = null;
+                    if (!$is_shared && $stmt_folder_shared && !empty($row['folder_id'])) {
+                        try {
+                            $stmt_folder_shared->execute([(int)$row['folder_id']]);
+                            $folderNameResult = $stmt_folder_shared->fetchColumn();
+                            if ($folderNameResult !== false) {
+                                $shared_via_folder_name = (string)$folderNameResult;
+                            }
+                        } catch (Exception $e) {
+                            error_log('note_display: shared_folders lookup failed for note ' . $row['id'] . ': ' . $e->getMessage());
+                        }
+                    }
+
+                    // Check if note is shared for CSS class (directly or via a shared folder)
+                    $share_class = ($is_shared || $shared_via_folder_name !== null) ? ' is-shared' : '';
+                    $share_folder_attrs = $shared_via_folder_name !== null
+                        ? ' data-shared-via-folder="1" data-shared-folder-name="' . htmlspecialchars($shared_via_folder_name, ENT_QUOTES) . '"'
+                        : '';
                 
                     $note_type = $row['type'] ?? 'note';
                     
@@ -81,7 +122,14 @@
                     // Note display
                     $markdown_attr = ($note_type === 'markdown') ? ' data-markdown-note="true"' : '';
                     $tasklist_attr = ($note_type === 'tasklist') ? ' data-tasklist-note="true"' : '';
-                    echo '<div id="note'.$row['id'].'" class="notecard">';
+                    // Per-note width override (entries.content_width, percentage of the
+                    // note column, 100 = full width); NULL follows the global setting.
+                    $content_width_attrs = '';
+                    if (isset($row['content_width']) && $row['content_width'] !== '') {
+                        $content_width = min(100, max(10, (int)$row['content_width']));
+                        $content_width_attrs = ' data-content-width="' . $content_width . '" style="--note-content-width: ' . $content_width . '%"';
+                    }
+                    echo '<div id="note'.$row['id'].'" class="notecard"'.$content_width_attrs.'>';
                     echo '<div class="innernote"'.$markdown_attr.$tasklist_attr.'>';
                     echo '<div class="note-header">';
                     echo '<div class="note-edit-toolbar">';
@@ -187,7 +235,7 @@
                     }
 
                     if (!$isPublicWorkspaceReadonly) {
-                        echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-share-2"></i></button>';
+                        echo '<button type="button" class="toolbar-btn btn-publish note-action-btn'.$share_class.'" title="'.t_h('index.toolbar.share_note', [], 'Share note').'" data-action="open-share-modal" data-note-id="'.$row['id'].'"'.$share_folder_attrs.'><i class="lucide lucide-share-2"></i></button>';
                     }
                     
                     $attachment_indicator_class = ($visible_attachments_count > 0) ? ' has-attachments' : '';
@@ -293,11 +341,22 @@
 
                     if (!$isPublicWorkspaceReadonly) {
                         echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
-                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
                     }
-                    
+
+                    // Note content width: cycles this note through the width presets,
+                    // overriding the global setting for this note only. Desktop only,
+                    // on mobile the note already fills the screen.
+                    if (!$isPublicWorkspaceReadonly) {
+                        $note_width_title = t_h('index.toolbar.note_width', [], 'Note width');
+                        echo '<button type="button" class="toolbar-btn btn-note-width note-action-btn desktop-only" title="'.$note_width_title.'" aria-label="'.$note_width_title.'" data-action="cycle-note-width" data-note-id="'.$row['id'].'"><i class="lucide lucide-move-horizontal"></i></button>';
+                    }
+
                     // Forward navigation button (desktop only)
                     echo '<button type="button" id="note-history-forward" class="toolbar-btn btn-history-nav btn-history-forward history-disabled" title="' . t_h('editor.toolbar.go_forward', [], 'Go forward') . '" disabled><i class="lucide lucide-circle-chevron-right"></i></button>';
+
+                    if (!$isPublicWorkspaceReadonly) {
+                        echo '<button type="button" class="toolbar-btn btn-trash note-action-btn" data-action="delete-note" data-note-id="'.$row['id'].'" title="'.t_h('common.delete', [], 'Delete').'"><i class="lucide lucide-trash-2"></i></button>';
+                    }
                     
                     echo '<button type="button" class="toolbar-btn btn-info note-action-btn" title="'.t_h('common.information', [], 'Information').'" data-action="show-note-info" data-note-id="'.$row['id'].'" data-created="'.htmlspecialchars($final_created, ENT_QUOTES).'" data-updated="'.htmlspecialchars($final_updated, ENT_QUOTES).'" data-folder="'.htmlspecialchars($folder_name, ENT_QUOTES).'" data-favorite="'.$is_favorite.'" data-tags="'.htmlspecialchars($tags_data, ENT_QUOTES).'" data-attachments-count="'.$attachments_count.'"><i class="lucide lucide-info-circle"></i></button>';
                 

@@ -606,7 +606,7 @@
                 break;
             case 'open-share-modal':
                 if (noteId && typeof openPublicShareModal === 'function') {
-                    openPublicShareModal(noteId);
+                    openPublicShareModal(noteId, target);
                 }
                 break;
             case 'show-attachment-dialog':
@@ -758,6 +758,12 @@
                 if (noteId && typeof deleteNote === 'function') {
                     deleteNote(noteId);
                 }
+                break;
+            case 'cycle-note-width':
+                if (noteId && typeof window.cycleNoteWidth === 'function') {
+                    window.cycleNoteWidth(noteId);
+                }
+                blurAfterPointerActivation(target, e);
                 break;
             case 'show-note-info':
                 if (noteId && typeof showNoteInfo === 'function') {
@@ -1141,36 +1147,23 @@
     // ============================================================
 
     /**
-     * Redirect to create.php with current workspace
-     * Note: Despite the name "toggle", this function only redirects
+     * Open the create dropdown under the sidebar + button.
+     * The menu itself lives in modals.php and is driven by js/utils.js.
      */
     window.toggleCreateMenu = function () {
         closeSidebarMenu();
-        // Save IDs of currently-open folders to sessionStorage so they can be
-        // restored when returning from create.php (sessionStorage survives same-tab navigation).
-        var _openFolderIds = [];
-        try {
-            document.querySelectorAll('.folder-content').forEach(function (fc) {
-                var isOpen = fc.style.display ? fc.style.display !== 'none' : window.getComputedStyle(fc).display !== 'none';
-                if (fc.id && isOpen) {
-                    _openFolderIds.push(fc.id);
-                }
-            });
-            sessionStorage.setItem('poznote_create_open_folders', JSON.stringify(_openFolderIds));
-        } catch (e) {}
-        // Also persist to localStorage for the restoreFolderStates() mechanism
-        if (typeof window.persistFolderStatesFromDOM === 'function') {
-            window.persistFolderStatesFromDOM();
-        } else if (typeof persistFolderStatesFromDOM === 'function') {
-            persistFolderStatesFromDOM();
+
+        var menu = document.getElementById('create-menu');
+        var button = document.getElementById('sidebarCreateBtn');
+        if (!menu || typeof window.openCreateMenu !== 'function') return;
+
+        // A second click on the button closes the menu again.
+        if (menu.classList.contains('show')) {
+            window.closeCreateMenu();
+            return;
         }
-        try {
-            _openFolderIds.forEach(function (folderDomId) {
-                localStorage.setItem('folder_' + folderDomId, 'open');
-            });
-        } catch (e) {}
-        var workspace = (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '';
-        window.location.href = 'create.php?workspace=' + encodeURIComponent(workspace);
+
+        window.openCreateMenu({ anchor: button });
     };
 
     /**

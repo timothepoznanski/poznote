@@ -323,6 +323,33 @@ body.dark-mode .note-actions-item:hover [class*="lucide-"] {
     color: #38bdf8;
 }
 
+html[data-theme='dark'] .note-favorite-toggle,
+body.dark-mode .note-favorite-toggle {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .note-favorite-toggle:hover,
+body.dark-mode .note-favorite-toggle:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .note-favorite-toggle:hover i,
+html[data-theme='dark'] .note-favorite-toggle:hover [class*="lucide-"],
+body.dark-mode .note-favorite-toggle:hover i,
+body.dark-mode .note-favorite-toggle:hover [class*="lucide-"] {
+    color: #38bdf8;
+}
+
+/* Group separators of both menus (light rule in css/folders/actions-menu.css):
+   the light grey would read as a hard line on the dark surface. */
+html[data-theme='dark'] .folder-actions-menu-separator,
+html[data-theme='dark'] .note-actions-menu-separator,
+body.dark-mode .folder-actions-menu-separator,
+body.dark-mode .note-actions-menu-separator {
+    background: var(--dm-border);
+}
+
 html[data-theme='dark'] .folder-actions-menu,
 html[data-theme='dark'] .note-actions-menu,
 body.dark-mode .folder-actions-menu,
@@ -526,4 +553,39 @@ body.dark-mode .emoji-autocomplete-item.selected {
 html[data-theme='dark'] .emoji-autocomplete-name,
 body.dark-mode .emoji-autocomplete-name {
     color: #ffffff;
+}
+
+/* Create menu: the same dropdown as .folder-actions-menu / .note-actions-menu
+   above, kept in its own block rather than folded into those selector lists so
+   this file stays easy to diff. */
+html[data-theme='dark'] .create-menu,
+body.dark-mode .create-menu {
+    background: var(--dm-surface);
+    border: 1px solid var(--dm-border);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme='dark'] .create-menu-item,
+body.dark-mode .create-menu-item {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .create-menu-item:hover,
+body.dark-mode .create-menu-item:hover {
+    background-color: var(--dm-surface-hover);
+}
+
+html[data-theme='dark'] .create-menu-item i,
+body.dark-mode .create-menu-item i {
+    color: #b0b0b0;
+}
+
+html[data-theme='dark'] .create-menu-item:hover i,
+body.dark-mode .create-menu-item:hover i {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .create-menu .create-section:not(:first-child),
+body.dark-mode .create-menu .create-section:not(:first-child) {
+    border-top-color: var(--dm-border);
 }

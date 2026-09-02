@@ -133,7 +133,7 @@ if (empty($token) && (empty($folderToken) || empty($noteIdParam))) {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
+                    'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
                 ],
             ],
         ]);
@@ -149,16 +149,26 @@ try {
     $isFolderShared = false;
 
     if (!empty($token)) {
-        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode, allowed_users FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
+        $stmt = $con->prepare('SELECT note_id, created, theme, indexable, password, access_mode, allowed_users, COALESCE(disabled, 0) AS disabled FROM shared_notes WHERE token = ? AND access_mode IS NOT NULL');
         $stmt->execute([$token]);
         $sharedNote = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // A share the owner made inaccessible gets its own page instead of
+        // the generic "not found" one.
+        if ($sharedNote && !empty($sharedNote['disabled'])) {
+            renderPublicShareDisabledPage($currentLang);
+        }
     }
 
     // Fallback: Check if authorized via shared folder
     if (!$sharedNote && !empty($folderToken) && !empty($noteIdParam)) {
-        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password, allowed_users, access_mode FROM shared_folders WHERE token = ?');
+        $stmt = $con->prepare('SELECT folder_id, theme, indexable, password, allowed_users, access_mode, COALESCE(disabled, 0) AS disabled FROM shared_folders WHERE token = ?');
         $stmt->execute([$folderToken]);
         $sharedFolder = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($sharedFolder && !empty($sharedFolder['disabled'])) {
+            renderPublicShareDisabledPage($currentLang);
+        }
 
         if ($sharedFolder) {
             $rootFolderId = $sharedFolder['folder_id'];
@@ -178,6 +188,14 @@ try {
             $noteEntry = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($noteEntry) {
+                // A per-note block (revoked from the shares page) makes just
+                // this note inaccessible through the folder share.
+                $stmtBlock = $con->prepare('SELECT 1 FROM shared_notes WHERE note_id = ? AND access_mode IS NULL AND COALESCE(disabled, 0) = 1');
+                $stmtBlock->execute([$noteEntry['id']]);
+                if ($stmtBlock->fetchColumn()) {
+                    renderPublicShareDisabledPage($currentLang);
+                }
+
                 $noteFolderId = (int)$noteEntry['folder_id'];
                 
                 // Check if it's the root or a descendant
@@ -272,7 +290,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
+                    'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
                 ],
             ],
         ]);
@@ -514,7 +532,7 @@ try {
             'actions' => [
                 [
                     'href' => '/index.php',
-                    'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
+                    'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
                 ],
             ],
         ]);
@@ -530,7 +548,7 @@ try {
         'actions' => [
             [
                 'href' => '/index.php',
-                'label' => t_h('common.back_to_home', [], 'Dashboard', $currentLang),
+                'label' => t_h('public.back_to_notes', [], 'Back to notes', $currentLang),
             ],
         ],
     ]);

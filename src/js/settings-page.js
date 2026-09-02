@@ -94,6 +94,7 @@
             'note_color_palette',
             'hide_folder_counts',
             'hide_folder_actions',
+            'highlight_current_folder_tree',
             'notes_without_folders_after_folders',
             'markdown_split_card_view',
             'markdown_colored',
@@ -558,19 +559,23 @@
         }
     }
 
+    // center_note_content: a percentage of the note column ('60%'), '0' for
+    // full width, or legacy values ('1'/'true' = 800px, bare pixel number).
     function refreshNoteWidthBadge() {
         getSetting('center_note_content', function (value) {
             var badge = document.getElementById('note-width-badge');
             if (badge) {
-                if (value === '0' || value === 'false' || value === '' || value === null) {
+                value = (value === null || value === undefined) ? '' : String(value).trim();
+                if (value === '0' || value === 'false' || value === '' || value === '100%') {
                     badge.textContent = tr('modals.note_width.full_width', {}, 'Full Width');
-                    badge.className = 'setting-status enabled';
+                } else if (/^\d+%$/.test(value)) {
+                    badge.textContent = value;
                 } else {
                     var width = value;
                     if (width === '1' || width === 'true') width = '800';
                     badge.textContent = width + 'px';
-                    badge.className = 'setting-status enabled';
                 }
+                badge.className = 'setting-status enabled';
             }
         });
     }
@@ -1861,6 +1866,7 @@
         // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
         setupToggleCard('type-note-icons-card', 'type-note-icons-status', 'type_based_note_icons', false, true);
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
+        setupToggleCard('folder-tree-highlight-card', 'folder-tree-highlight-status', 'highlight_current_folder_tree', false, false);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         refreshMarkdownColoredBadge();
@@ -2032,23 +2038,6 @@
                         }
                     });
                 });
-            });
-        }
-
-        // Theme mode card - opens theme selection modal
-        var themeModeCard = document.getElementById('theme-mode-card');
-        if (themeModeCard) {
-            themeModeCard.addEventListener('click', function () {
-                var modal = document.getElementById('themeModal');
-                if (!modal) return;
-                var currentMode = (typeof window.getCurrentThemeMode === 'function')
-                    ? window.getCurrentThemeMode()
-                    : 'system';
-                var radios = document.getElementsByName('themeChoice');
-                for (var i = 0; i < radios.length; i++) {
-                    radios[i].checked = (radios[i].value === currentMode);
-                }
-                modal.style.display = 'flex';
             });
         }
 
@@ -2407,23 +2396,6 @@
                         alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
                     }
                 });
-            });
-        }
-
-        // Save theme modal button
-        var saveThemeBtn = document.getElementById('saveThemeModalBtn');
-        if (saveThemeBtn) {
-            saveThemeBtn.addEventListener('click', function () {
-                var radios = document.getElementsByName('themeChoice');
-                var selected = 'system';
-                for (var i = 0; i < radios.length; i++) {
-                    if (radios[i].checked) { selected = radios[i].value; break; }
-                }
-                if (typeof window.applyTheme === 'function') {
-                    window.applyTheme(selected, true);
-                    try { closeModal('themeModal'); } catch (e) { }
-                    reloadOpener();
-                }
             });
         }
 

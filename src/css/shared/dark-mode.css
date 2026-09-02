@@ -128,6 +128,38 @@
     border-left-color: #444444;
 }
 
+/* Soft action buttons: brighter icon hues so the tinted chips stay readable
+   on a dark background; hover keeps the full-color treatment. */
+[data-theme="dark"] .note-actions .btn-success {
+    background: rgba(74, 222, 128, 0.14);
+    color: #4ade80;
+}
+
+[data-theme="dark"] .note-actions .btn-success:hover {
+    background: #2f9e44;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .note-actions .btn-primary {
+    background: rgba(74, 158, 255, 0.14);
+    color: #4a9eff;
+}
+
+[data-theme="dark"] .note-actions .btn-primary:hover {
+    background: #1d6fa5;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .note-actions .btn-danger {
+    background: rgba(248, 113, 113, 0.14);
+    color: #f87171;
+}
+
+[data-theme="dark"] .note-actions .btn-danger:hover {
+    background: #dc2626;
+    color: #ffffff;
+}
+
 [data-theme="dark"] .indexable-label-text {
     color: #e0e0e0;
 }

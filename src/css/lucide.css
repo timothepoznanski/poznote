@@ -4977,3 +4977,14 @@
   background-color: currentColor;
   background-image: none;
 }
+.lucide-gitlab {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-gitlab%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m22%2013.29-3.33-10a.42.42%200%200%200-.14-.18.38.38%200%200%200-.22-.11.39.39%200%200%200-.23.07.42.42%200%200%200-.14.18l-2.26%206.67H8.32L6.1%203.26a.42.42%200%200%200-.1-.18.38.38%200%200%200-.26-.08.39.39%200%200%200-.23.07.42.42%200%200%200-.14.18L2%2013.29a.74.74%200%200%200%20.27.83L12%2021l9.69-6.88a.71.71%200%200%200%20.31-.83Z%27%20%2F%3E%20%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml,%3C%21--%20%40license%20lucide-static%20v0.575.0%20-%20ISC%20--%3E%20%3Csvg%20class%3D%27lucide%20lucide-gitlab%27%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2724%27%20height%3D%2724%27%20viewBox%3D%270%200%2024%2024%27%20fill%3D%27none%27%20stroke%3D%27currentColor%27%20stroke-width%3D%272%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20%3E%20%3Cpath%20d%3D%27m22%2013.29-3.33-10a.42.42%200%200%200-.14-.18.38.38%200%200%200-.22-.11.39.39%200%200%200-.23.07.42.42%200%200%200-.14.18l-2.26%206.67H8.32L6.1%203.26a.42.42%200%200%200-.1-.18.38.38%200%200%200-.26-.08.39.39%200%200%200-.23.07.42.42%200%200%200-.14.18L2%2013.29a.74.74%200%200%200%20.27.83L12%2021l9.69-6.88a.71.71%200%200%200%20.31-.83Z%27%20%2F%3E%20%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  background-color: currentColor;
+  background-image: none;
+}
+

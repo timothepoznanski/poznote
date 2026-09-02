@@ -6,8 +6,13 @@
 
 /* Desktop spacing */
 @media (min-width: 801px) {
-    .shared-notes-header {
-        margin-top: 20px;
+    /* Keep the search bar compact and centered instead of full width */
+    .filter-search-row {
+        justify-content: center;
+    }
+
+    .filter-input-wrapper {
+        flex: 0 1 480px;
     }
 }
 

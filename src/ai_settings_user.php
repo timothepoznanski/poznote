@@ -44,6 +44,7 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
     }
     $model = trim((string)($_POST['ai_model'] ?? ''));
     $apiKey = trim((string)($_POST['ai_api_key'] ?? ''));
+    $reasoningEffort = poznoteAiNormalizeReasoningEffort($_POST['ai_reasoning_effort'] ?? 'auto');
 
     if ($enabled === '1' && ($url === '' || $model === '')) {
         $error = t('ai_settings_user.messages.incomplete', [], 'Enter a server URL and a model before enabling your own assistant.');
@@ -53,6 +54,7 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
             'provider' => $provider,
             'url' => $url,
             'model' => $model,
+            'reasoning_effort' => $reasoningEffort,
         ];
         // Masked placeholder means "keep the existing key"
         if ($apiKey !== '••••••••') {
@@ -69,6 +71,7 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
 $aiConfig = poznoteAiUserConfig($con);
 $aiProvider = poznoteAiGuessProvider($aiConfig['provider'], $aiConfig['url']);
 $aiEnabled = $aiConfig['enabled'];
+$aiReasoningEffort = $aiConfig['reasoning_effort'];
 $aiLocalHost = aiChatLocalDefaultHost();
 
 // What the AI chat button actually uses right now, so the page can say whether
@@ -222,6 +225,16 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
                                value="<?php echo htmlspecialchars($aiConfig['model']); ?>"
                                placeholder="llama3.1" autocomplete="off">
                         <datalist id="ai-model-list"></datalist>
+                    </div>
+
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="ai_reasoning_effort"><?php echo t_h('ai_settings.reasoning_effort_label', [], 'Reasoning effort'); ?></label>
+                        <select name="ai_reasoning_effort" id="ai_reasoning_effort" class="git-field-input">
+                            <?php foreach (poznoteAiReasoningEffortLabels() as $effortValue => $effortLabel): ?>
+                            <option value="<?php echo $effortValue; ?>" <?php echo $aiReasoningEffort === $effortValue ? 'selected' : ''; ?>><?php echo t_h('ai_settings.reasoning_effort_options.' . $effortValue, [], $effortLabel); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <span class="label-desc"><?php echo t_h('ai_settings.reasoning_effort_description', [], 'How long the model thinks before answering, for models that support it. Auto sends nothing and leaves the choice to the provider. Some OpenAI models refuse tools, and so cannot browse your notes, unless this is set to None.'); ?></span>
                     </div>
 
                     <div class="git-field-actions">

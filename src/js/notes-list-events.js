@@ -281,11 +281,21 @@
         var folderData = getFolderData(element);
         if (!folderData.id) return;
 
+        // executeFolderAction() below closes the folder actions menu before it
+        // runs the callback, so by then this row is display:none and measures
+        // zero on every side. Read it now, while it is still on screen, so the
+        // create menu can open where the entry the user clicked actually was.
+        var elementRect = element.getBoundingClientRect();
+
         var actionMap = {
             'create-note-in-folder': function () {
-                if (typeof window.showCreateNoteInFolderModal === 'function') {
-                    window.showCreateNoteInFolderModal(folderData.id, folderData.name);
-                }
+                if (typeof window.openCreateMenu !== 'function') return;
+                window.openCreateMenu({
+                    x: elementRect.left,
+                    y: elementRect.top,
+                    folderId: folderData.id,
+                    folderName: folderData.name
+                });
             },
             'move-folder-files': function () {
                 if (typeof window.showMoveFolderFilesDialog === 'function') {
@@ -867,9 +877,13 @@
         document.addEventListener('mousedown', preventNoteMiddleClickAutoscroll);
         document.addEventListener('auxclick', handleNotesListAuxClick);
 
-        // Close note action menus when clicking outside or on a menu item
+        // Close note action menus when clicking outside, on a menu item, or on
+        // the favorite star, which sits inside .note-actions but acts on its
+        // own row rather than opening anything.
         document.addEventListener('click', function (e) {
-            if (!e.target.closest('.note-actions') || e.target.closest('.note-actions-menu-item')) {
+            if (!e.target.closest('.note-actions') ||
+                e.target.closest('.note-actions-menu-item') ||
+                e.target.closest('.note-favorite-toggle')) {
                 closeAllNoteActionMenus();
             }
         });

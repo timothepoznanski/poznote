@@ -35,7 +35,7 @@ tags:
   - name: System
     description: System information and utilities
   - name: Git Sync
-    description: Git synchronization (GitHub / Forgejo)
+    description: Git synchronization (GitHub / GitLab / Forgejo)
   - name: Users
     description: User profiles management
   - name: Public Tasks
@@ -3620,7 +3620,7 @@ paths:
               properties:
                 provider:
                   type: string
-                  enum: [github, forgejo]
+                  enum: [github, gitlab, forgejo]
                 repo:
                   type: string
                   example: "username/my-notes"
@@ -3632,7 +3632,7 @@ paths:
                   default: main
                 api_base:
                   type: string
-                  description: API base URL (Forgejo only)
+                  description: API base URL (GitLab and Forgejo; GitLab defaults to https://gitlab.com/api/v4)
                 author_name:
                   type: string
                 author_email:

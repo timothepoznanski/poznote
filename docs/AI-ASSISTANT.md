@@ -11,6 +11,8 @@ Once configured, an **AI** button appears in the dashboard toolbar and opens the
 
 The assistant has tools to **search and read your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
 
+The assistant reads and writes note content as Markdown. Rich-text (HTML) notes are converted on the fly in both directions, with the same converter as the **Convert note** action, so a rewrite keeps headings, lists, links, tables and images; rich formatting such as colors or fonts is not kept. A note too long for the assistant to read in full is refused for rewriting rather than truncated.
+
 The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first.
 
 The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header.
@@ -34,6 +36,12 @@ The configuration applies to the whole instance: once enabled by the administrat
 ## Choosing a model
 
 Pick a model that supports **tool calling** (also called "function calling"), e.g. `qwen3`, `llama3.1` or `mistral`. Tool calling is what lets the assistant browse your notes: with a model that lacks it, the chat still works (a notice tells you so) but cannot access your notes on its own.
+
+### Reasoning effort
+
+Reasoning models (OpenAI GPT-5 and o-series, `gpt-oss` on Ollama, ...) accept a **reasoning effort** that sets how long the model thinks before answering. The **Reasoning effort** field of the settings page controls it: **Auto** (the default) sends nothing and leaves the choice to the provider, while **None**, **Minimal**, **Low**, **Medium**, **High** and **Very high** are sent as the `reasoning_effort` parameter of every request. Values a model does not accept are rejected by the provider and reported as an error in the chat.
+
+Some OpenAI models refuse tool calling on the chat completions API unless the reasoning effort is `none`. The chat then shows a notice saying the assistant cannot browse your notes: set **Reasoning effort** to **None** to get the tools back.
 
 ## Local servers and Docker networking
 

@@ -412,7 +412,6 @@
       "delete_account": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft.",
       "login_display": "Passen Sie den Titel auf der Anmeldeseite an.",
       "language": "Ändern Sie die Sprache der Oberfläche.",
-      "theme_mode": "Wechseln Sie zwischen hellem, dunklem oder automatischem Design.",
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste und Codeblöcken an.",
@@ -430,7 +429,7 @@
       "note_color_palette": "Passen Sie die Farbpalette für Notizen an.",
       "folder_counts": "Zeigen Sie die Anzahl der Notizen neben jedem Ordner an.",
       "notes_without_folders": "Zeigen Sie Notizen ohne Ordner nach der Ordnerliste statt davor an.",
-      "note_width": "Passen Sie die maximale Breite des Notizinhalts an.",
+      "note_width": "Passen Sie die maximale Breite des Notizinhalts an, als Prozentsatz der Notizspalte.",
       "markdown_split_card_view": "Zeigen Sie Markdown-Notizen in einer gerahmten geteilten Ansicht mit Editor und Vorschau an.",
       "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für jede Überschriftenebene, Inline-Code, Codeblock-Hintergrund, Zitate, Tabellenköpfe und Trennlinien.",
       "code_wrap": "Lange Zeilen in Codeblöcken umbrechen statt horizontal zu scrollen.",
@@ -467,7 +466,8 @@
       "website": "Öffnen Sie die offizielle Poznote-Website.",
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
-      "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan."
+      "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
+      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, abschwächen."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -613,7 +613,9 @@
     "menu": {
       "loading": "Arbeitsbereiche werden geladen...",
       "error_loading": "Fehler beim Laden der Arbeitsbereiche",
-      "logout": "Abmelden"
+      "logout": "Abmelden",
+      "edit_workspaces": "Arbeitsbereiche bearbeiten",
+      "new_workspace": "Neuer Arbeitsbereich"
     },
     "errors": {
       "name_empty": "Arbeitsbereichsname darf nicht leer sein",
@@ -676,7 +678,6 @@
   "display": {
     "title": "Anzeige",
     "cards": {
-      "theme_mode": "Thema",
       "main_font": "App-Schriftart",
       "markdown_font": "Markdown-Editor-Schriftart",
       "login_display": "Login-Seiten-Titel",
@@ -691,6 +692,7 @@
       "show_note_created": "Erstellungsdatum der Notiz anzeigen",
       "type_based_note_icons": "Symbole nach Notiztyp",
       "show_folder_counts": "Ordner-Notizzähler anzeigen",
+      "highlight_current_folder_tree": "Aktuellen Ordnerbaum hervorheben",
       "notes_without_folders_after": "Notizen nach Ordnern anzeigen",
       "show_folder_actions": "Ordner-Aktionen anzeigen",
       "kanban_on_folder_click": "Kanban-Ansicht beim Klicken auf Ordner öffnen",
@@ -1166,7 +1168,9 @@
       "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
-      "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche."
+      "note_favorite_star": "Favoriten-Stern (★) auf Notizen",
+      "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche.",
+      "theme_toggle": "Design-Umschalter"
     },
     "icon_sidebar_order": {
       "title": "Reihenfolge der Icon-Seitenleiste",
@@ -1174,10 +1178,6 @@
       "move_up": "Nach oben",
       "move_down": "Nach unten",
       "reset": "Reihenfolge zurücksetzen"
-    },
-    "theme": {
-      "title": "Themenauswahl",
-      "description": "Wählen Sie Ihr bevorzugtes Thema:"
     },
     "language": {
       "description": "Wählen Sie Ihre bevorzugte Sprache:"
@@ -1210,10 +1210,10 @@
     },
     "note_width": {
       "title": "Breite des Notizinhalts",
-      "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt (in Pixel):",
-      "label": "Maximale Breite (px):",
+      "description": "Wählen Sie die maximale Breite für Ihren Notizinhalt, als Prozentsatz der Notizspalte (100 = volle Breite):",
+      "label": "Maximale Breite (%):",
       "full_width": "Volle Breite",
-      "default_value": "{{width}} px ist der Standardwert"
+      "default_value": "{{width}} % ist der Standardwert"
     },
     "index_icon_scale": {
       "title": "Skalierung der Index-Symbole",
@@ -1228,6 +1228,7 @@
     "folder": {
       "new_title": "Neuer Ordner",
       "new_placeholder": "Neuer Ordnername",
+      "new_subfolder_placeholder": "Neuer Unterordnername",
       "create": "Erstellen",
       "rename_title": "Ordner umbenennen",
       "rename_placeholder": "Neuer Ordnername",
@@ -1295,32 +1296,15 @@
         "success": "Verknüpfung erfolgreich erstellt",
         "error": "Fehler beim Erstellen der Verknüpfung"
       },
-      "template": {
-        "title": "Vorlage"
-      },
       "subfolder": {
         "title": "Unterordner"
       },
       "folder": {
         "title": "Ordner"
       },
-      "kanban": {
-        "title": "Kanban-Struktur"
-      },
       "workspace": {
         "title": "Arbeitsbereich"
       }
-    },
-    "kanban_structure": {
-      "title": "Kanban-Struktur erstellen",
-      "folder_name_label": "Ordnername:",
-      "folder_name_placeholder": "Meine Kanban-Ansicht",
-      "columns_label": "Anzahl der Spalten (1-9):",
-      "error_name_required": "Ordnername ist erforderlich",
-      "error_columns_range": "Die Anzahl der Spalten muss zwischen 1 und 9 liegen",
-      "error_folder_exists": "An diesem Speicherort existiert bereits ein Ordner",
-      "error_create": "Fehler beim Erstellen der Kanban-Struktur",
-      "error_create_prefix": "Fehler beim Erstellen der Kanban-Struktur: {{error}}"
     },
     "folder_icon": {
       "title": "Ordnersymbol ändern",
@@ -1333,12 +1317,6 @@
     "linked_selector": {
       "title": "Verknüpfung aus einer Notiz erstellen",
       "description": "Erstellen Sie eine Verknüpfung aus einer Notiz, damit Sie sie in einem anderen Ordner referenzieren können.",
-      "search_placeholder": "Notizen suchen...",
-      "recent_label": "Aktuelle Notizen"
-    },
-    "template_selector": {
-      "title": "Notiz für Vorlage auswählen",
-      "description": "Im Ordner Templates wird eine Notiz erstellt. Danach können Sie sie duplizieren und als Vorlage wiederverwenden.",
       "search_placeholder": "Notizen suchen...",
       "recent_label": "Aktuelle Notizen"
     },
@@ -1596,8 +1574,8 @@
     "folder_actions": {
       "add_favorite": "Zu Favoriten hinzufügen",
       "remove_favorite": "Aus Favoriten entfernen",
-      "menu": "Aktionen",
-      "create": "Erstellen",
+      "menu": "Ordneraktionen",
+      "create": "Hier erstellen",
       "kanban_view": "Kanban-Ansicht",
       "open_all_in_tabs": "Alle Notizen öffnen",
       "move_all_files": "Dateien verschieben",
@@ -1795,12 +1773,7 @@
     }
   },
   "theme": {
-    "badge": {
-      "black": "Schwarzmodus",
-      "dark": "Dunkelmodus",
-      "light": "Hellmodus",
-      "system": "Systemmodus"
-    }
+    "toggle": "Design wechseln"
   },
   "table": {
     "context_menu": {
@@ -1839,6 +1812,9 @@
       "attachments_with_count": "Anhänge ({{count}})",
       "menu_actions": "Menüaktionen",
       "convert_to_html": "In HTML konvertieren",
+      "note_width": "Notizbreite",
+      "note_width_current": "Notizbreite: {{width}}",
+      "note_width_default": "Standard ({{width}})",
       "convert_to_markdown": "In Markdown konvertieren"
     },
     "share_modal": {
@@ -1846,7 +1822,12 @@
       "create_url": "URL erstellen",
       "error_prefix": "Fehler: ",
       "unknown_error": "Unbekannter Fehler beim Erstellen des öffentlichen Links",
-      "error_creating": "Fehler beim Erstellen des öffentlichen Links: "
+      "error_creating": "Fehler beim Erstellen des öffentlichen Links: ",
+      "shared_via_folder_title": "Geteilte Notiz",
+      "shared_via_folder_message": "Diese Notiz ist bereits geteilt, weil sie sich im geteilten Ordner \"{{folder}}\" befindet.",
+      "shared_via_folder_message_generic": "Diese Notiz ist bereits geteilt, weil sie sich in einem geteilten Ordner befindet.",
+      "shared_via_folder_create_question": "Möchten Sie zusätzlich zur Ordnerfreigabe auch einen eigenen Freigabelink für diese Notiz erstellen?",
+      "shared_via_folder_view_shares": "Freigaben anzeigen"
     },
     "public_modal": {
       "title": "Geteilte URL",
@@ -2411,6 +2392,20 @@
     "restrict_users_placeholder": "Benutzer auswählen...",
     "restricted_badge": "Eingeschränkt",
     "restricted_help": "Bei eingeschränktem Zugang können nur die aufgeführten Benutzer nach dem Anmelden auf diesen Share zugreifen.",
+    "disabled_badge": "Unzugänglich",
+    "disabled_help": "Diese Freigabe ist unzugänglich: Der Link funktioniert nicht mehr, bis Sie sie wieder zugänglich machen.",
+    "back_to_notes": "Zurück zu den Notizen",
+    "revoke_modal": {
+      "title": "Freigabe widerrufen",
+      "text": "Sie können diese Freigabe endgültig löschen oder sie behalten und unzugänglich machen, bis Sie sie wieder aktivieren.",
+      "text_disabled": "Diese Freigabe ist derzeit unzugänglich. Sie können sie wieder zugänglich machen oder endgültig löschen.",
+      "text_via_folder": "Diese Notiz wird über einen Ordner geteilt. Sie können nur diese Notiz unzugänglich machen; die Ordnerfreigabe und ihre anderen Notizen sind nicht betroffen.",
+      "text_via_folder_disabled": "Diese Notiz ist derzeit unzugänglich. Sie können sie über die Ordnerfreigabe wieder zugänglich machen.",
+      "text_via_folder_parent_disabled": "Diese Notiz ist unzugänglich, weil die Ordnerfreigabe unzugänglich gemacht wurde. Machen Sie die Ordnerfreigabe wieder zugänglich, um den Zugriff wiederherzustellen.",
+      "delete": "Endgültig löschen",
+      "disable": "Unzugänglich machen",
+      "enable": "Wieder zugänglich machen"
+    },
     "no_users_found": "Keine anderen Benutzer gefunden",
     "users_loading": "Benutzer werden geladen...",
     "shared_with_me": "Mit mir geteilt",
@@ -2469,7 +2464,9 @@
       "shared_note_not_found_or_denied": "Geteilte Notiz nicht gefunden oder Zugriff verweigert.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "folder_not_found": "Ordner nicht gefunden.\n\nDas kann nach einer Wiederherstellung passieren.\n\nEin Administrator muss möglicherweise die Master-Datenbank unter Einstellungen > Administrationstools neu aufbauen, um die Freigabelinks zu reparieren.",
       "note_not_found": "Notiz nicht gefunden",
-      "server_error": "Serverfehler"
+      "server_error": "Serverfehler",
+      "share_disabled_title": "Diese Freigabe ist unzugänglich",
+      "share_disabled_message": "Der Besitzer hat diese Freigabe unzugänglich gemacht."
     },
     "edit": {
       "button": "Bearbeiten",
@@ -3028,7 +3025,7 @@
       "none_selected": "Wählen Sie mindestens einen Arbeitsbereich aus."
     },
     "title": "{{provider}}-Synchronisierung",
-    "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf GitHub oder Forgejo. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
+    "description": "Synchronisieren Sie Ihre Notizen und Anhänge auf GitHub, GitLab oder Forgejo. Dateien werden als flache Dateien gespeichert mit einer metadata.json, die Tags, Ordner, Daten und Anhänge enthält.",
     "warning": "Verlassen Sie sich nicht ausschließlich auf diese Funktion als Backup-Lösung.\nExportieren Sie Ihre Daten regelmäßig über die Backup-Funktion in den Einstellungen.",
     "confirm_push": "Alle Notizen und Anhänge zu {{provider}} pushen? Vorhandene Dateien werden aktualisiert und Dateien, die nicht mehr in Poznote vorhanden sind, werden aus dem Repository gelöscht.",
     "confirm_pull": "Alle Notizen und Anhänge von {{provider}} pullen? Lokale Daten werden mit der Remote-Version überschrieben. Notizen, die auf {{provider}} nicht gefunden werden, werden in den Papierkorb verschoben.",
@@ -3788,7 +3785,18 @@
     "provider_custom": "Anderer (eigene URL)",
     "api_key_label_required": "API-Schlüssel",
     "user_keys_label": "Persönliche API-Schlüssel erlauben",
-    "user_keys_description": "Jeder Benutzer erhält in seinen eigenen Einstellungen eine Karte für den KI-Assistenten, in der er seinen Anbieter und seinen API-Schlüssel eintragen kann. Dann antwortet der Assistent über dessen eigenen Server und Schlüssel statt über die Konfiguration auf dieser Seite, unabhängig davon, ob der Benutzer in der Liste oben steht."
+    "user_keys_description": "Jeder Benutzer erhält in seinen eigenen Einstellungen eine Karte für den KI-Assistenten, in der er seinen Anbieter und seinen API-Schlüssel eintragen kann. Dann antwortet der Assistent über dessen eigenen Server und Schlüssel statt über die Konfiguration auf dieser Seite, unabhängig davon, ob der Benutzer in der Liste oben steht.",
+    "reasoning_effort_label": "Denkaufwand",
+    "reasoning_effort_description": "Wie lange das Modell vor der Antwort nachdenkt, bei Modellen, die das unterstützen. Auto sendet nichts und überlässt die Wahl dem Anbieter. Manche OpenAI-Modelle lehnen Tools ab und können Ihre Notizen daher nicht durchsuchen, solange hier nicht „Keiner“ gewählt ist.",
+    "reasoning_effort_options": {
+      "auto": "Auto (Standard des Anbieters)",
+      "none": "Keiner",
+      "minimal": "Minimal",
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch",
+      "xhigh": "Sehr hoch (xhigh)"
+    }
   },
   "ai_settings_user": {
     "title": "Mein KI-Assistent",
@@ -3816,6 +3824,7 @@
     "tool_read": "Notiz #{{id}} wird gelesen",
     "tool_list": "Neueste Notizen auflisten",
     "no_tools_notice": "Dieses Modell unterstützt keine Tools — der Assistent kann Ihre Notizen nicht durchsuchen.",
+    "no_tools_reasoning_notice": "Dieses Modell lehnt Tools beim aktuellen Denkaufwand ab, der Assistent kann Ihre Notizen daher nicht durchsuchen. Stellen Sie den Denkaufwand in den Einstellungen des KI-Assistenten auf „Keiner“.",
     "tool_rename": "Notiz #{{id}} wird umbenannt in „{{title}}“",
     "tool_update": "Notiz #{{id}} wird bearbeitet",
     "tool_create": "Notiz wird erstellt: {{title}}"

@@ -527,10 +527,13 @@ async function getPublicShare(noteId) {
 /**
  * Open the share modal for a note (checks existing share first)
  * @param {string} noteId - The note ID
+ * @param {Element} [sourceEl] - The clicked element; the toolbar button carries
+ *                              data-shared-via-folder when the note is only
+ *                              shared through a shared folder
  */
-async function openPublicShareModal(noteId) {
+async function openPublicShareModal(noteId, sourceEl) {
     if (!noteId) return;
-    
+
     const shareInfo = await getPublicShare(noteId);
 
     // Already shared: managing an existing share happens on the shared page
@@ -546,7 +549,101 @@ async function openPublicShareModal(noteId) {
         return;
     }
 
+    // No direct share, but the toolbar icon is blue because an ancestor folder
+    // is shared: explain that instead of offering to create another share URL.
+    // (The note actions menu keeps the normal share flow: its menu item does
+    // not carry the attribute.)
+    if (sourceEl && sourceEl.getAttribute && sourceEl.getAttribute('data-shared-via-folder') === '1') {
+        showSharedViaFolderModal(noteId, sourceEl.getAttribute('data-shared-folder-name') || '');
+        return;
+    }
+
     showShareModal({ noteId: noteId });
+}
+
+/**
+ * Info popup for a note that is shared only because it sits inside a shared folder.
+ * Also offers to create a note-specific share link on top of the folder share.
+ * @param {string} noteId - The note ID
+ * @param {string} folderName - Name of the shared (ancestor) folder
+ */
+function showSharedViaFolderModal(noteId, folderName) {
+    const existing = document.getElementById('sharedViaFolderModal');
+    if (existing) existing.parentNode.removeChild(existing);
+
+    const modal = document.createElement('div');
+    modal.id = 'sharedViaFolderModal';
+    modal.className = 'modal share-modal';
+    modal.style.display = 'flex';
+
+    const content = document.createElement('div');
+    content.className = 'modal-content share-modal-content';
+
+    const h3 = document.createElement('h3');
+    h3.textContent = window.t
+        ? window.t('index.share_modal.shared_via_folder_title', null, 'Shared note')
+        : 'Shared note';
+    content.appendChild(h3);
+
+    const p = document.createElement('p');
+    if (folderName) {
+        p.textContent = window.t
+            ? window.t('index.share_modal.shared_via_folder_message', { folder: folderName }, 'This note is already shared because it is located in the shared folder "{{folder}}".')
+            : 'This note is already shared because it is located in the shared folder "' + folderName + '".';
+    } else {
+        p.textContent = window.t
+            ? window.t('index.share_modal.shared_via_folder_message_generic', null, 'This note is already shared because it is located in a shared folder.')
+            : 'This note is already shared because it is located in a shared folder.';
+    }
+    content.appendChild(p);
+
+    const question = document.createElement('p');
+    question.textContent = window.t
+        ? window.t('index.share_modal.shared_via_folder_create_question', null, 'Do you want to also create a share link specific to this note, in addition to the folder share?')
+        : 'Do you want to also create a share link specific to this note, in addition to the folder share?';
+    content.appendChild(question);
+
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'modal-buttons share-modal-buttons';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn-cancel';
+    cancelBtn.textContent = window.t ? window.t('common.cancel', null, 'Cancel') : 'Cancel';
+    cancelBtn.onclick = function () { closeModal('sharedViaFolderModal'); };
+    buttonsDiv.appendChild(cancelBtn);
+
+    const viewSharesBtn = document.createElement('button');
+    viewSharesBtn.type = 'button';
+    viewSharesBtn.className = 'btn-view-shares';
+    viewSharesBtn.textContent = window.t
+        ? window.t('index.share_modal.shared_via_folder_view_shares', null, 'View shares')
+        : 'View shares';
+    viewSharesBtn.onclick = function () {
+        closeModal('sharedViaFolderModal');
+        // No itemType: land on the "All" tab of shared.php
+        openSharedManagementPage({
+            workspace: (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '',
+            autoEdit: false
+        });
+    };
+    buttonsDiv.appendChild(viewSharesBtn);
+
+    const createBtn = document.createElement('button');
+    createBtn.type = 'button';
+    // btn-primary: the green #shareModal .btn-create-share rule is scoped to
+    // that modal, so the blue accent style applies here
+    createBtn.className = 'btn-create-share btn-primary';
+    createBtn.textContent = window.t ? window.t('index.share_modal.create_url', null, 'Create URL') : 'Create URL';
+    createBtn.onclick = function () {
+        closeModal('sharedViaFolderModal');
+        createPublicShare(noteId);
+    };
+    buttonsDiv.appendChild(createBtn);
+
+    content.appendChild(buttonsDiv);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
 }
 
 /**

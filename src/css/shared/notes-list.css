@@ -35,9 +35,9 @@
 }
 
 .shared-notes-header-note {
-    flex: 1 1 var(--shared-name-width);
+    flex: 0 0 var(--shared-name-width);
     min-width: var(--shared-name-width);
-    width: auto;
+    width: var(--shared-name-width);
     box-sizing: border-box;
 }
 
@@ -156,10 +156,10 @@
 }
 
 .note-name-container {
-    flex: 1 1 var(--shared-name-width);
+    flex: 0 0 var(--shared-name-width);
     box-sizing: border-box;
     min-width: var(--shared-name-width);
-    width: auto;
+    width: var(--shared-name-width);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -233,6 +233,7 @@
     font-size: 13px;
     color: var(--link-color, #007bff);
     text-decoration: none;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -248,6 +249,18 @@
     color: #ef4444 !important;
 }
 
+/* Disabled (inaccessible) share: the row stays listed, the badge and the
+   struck-through token signal that the public link no longer resolves. */
+.shared-disabled-icon {
+    filter: none !important;
+    color: #f59e0b !important;
+}
+
+.shared-note-item.is-share-disabled .note-token {
+    opacity: 0.55;
+    text-decoration: line-through;
+}
+
 .folder-badge {
     display: inline-flex;
     align-items: center;
@@ -261,9 +274,9 @@
     text-decoration: none;
     max-width: 100%;
     transition: all 0.2s ease;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
 }
 
 .folder-badge:hover {
@@ -530,7 +543,7 @@
     box-sizing: border-box;
     display: flex;
     gap: 6px;
-    justify-content: flex-end;
+    justify-content: center;
     padding-left: 0;
 }
 
@@ -543,7 +556,7 @@
     font-size: 12px;
     font-style: italic;
     color: var(--text-muted, #666666);
-    text-align: right;
+    text-align: center;
     white-space: nowrap;
 }
 
@@ -562,4 +575,128 @@
 .empty-message p {
     font-size: 16px;
     margin: 8px 0;
+}
+
+/* Measurement pass (desktop): cells briefly hug their content on a single
+   line so JS can read the widest cell of each column, then the column width
+   variables are set from those readings. Never painted: the class is added
+   and removed within the same frame. */
+.shared-notes-list.shared-measure .shared-notes-header-note,
+.shared-notes-list.shared-measure .note-name-container,
+.shared-notes-list.shared-measure .shared-notes-header-token,
+.shared-notes-list.shared-measure .note-token-wrap,
+.shared-notes-list.shared-measure .shared-notes-header-actions,
+.shared-notes-list.shared-measure .note-actions {
+    flex: 0 0 auto !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+.shared-notes-list.shared-measure .note-token {
+    flex: 0 0 auto !important;
+    overflow: visible !important;
+}
+
+.shared-notes-list.shared-measure .folder-badge,
+.shared-notes-list.shared-measure .note-name {
+    white-space: nowrap !important;
+    overflow: visible !important;
+    max-width: none !important;
+}
+
+/* ── Table look (desktop): card outline, tinted header strip and subtle
+   column separators; no horizontal row lines. Cells stretch to the full row
+   height and carry the vertical padding themselves, so the separators run
+   as continuous lines. ── */
+@media (min-width: 801px) {
+    .shared-notes-list {
+        border: 1px solid var(--dm-border, var(--pz-border, #e0e0e0));
+        border-radius: 12px;
+        background: var(--dm-content-bg, #ffffff);
+        /* Breathing room inside the card: generous on the left and bottom,
+           tight on the right, slight at the top. */
+        padding: 5px 8px 28px 28px;
+    }
+
+    .shared-notes-header {
+        align-items: stretch;
+        /* Same horizontal padding as the rows so header and row cells line
+           up and the column separators stay straight. */
+        padding: 0 5px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .shared-notes-header-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .shared-note-item {
+        align-items: stretch;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .note-name-container,
+    .note-token-wrap,
+    .note-actions {
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+
+    .note-actions {
+        align-items: center;
+        /* Breathing room on both sides of the buttons; the measurement pass
+           includes it, so the column width follows. */
+        padding-left: 34px;
+        padding-right: 18px;
+    }
+
+    .shared-notes-header-token,
+    .shared-notes-header-actions,
+    .note-token-wrap,
+    .note-actions {
+        border-left: 1px solid var(--dm-border, rgba(15, 23, 42, 0.07));
+    }
+
+    /* Soft action buttons: tinted background with a colored icon, full color
+       on hover. Much lighter than a saturated chip on every row. */
+    .note-actions .btn {
+        border-radius: 8px;
+    }
+
+    .note-actions .btn-success {
+        background: rgba(46, 125, 50, 0.13);
+        color: #2e7d32;
+    }
+
+    .note-actions .btn-success:hover {
+        background: #2e7d32;
+        color: #ffffff;
+    }
+
+    .note-actions .btn-primary {
+        background: rgba(var(--pz-accent-rgb), 0.13);
+        color: var(--pz-accent, #007db8);
+    }
+
+    .note-actions .btn-primary:hover {
+        background: var(--pz-accent, #007db8);
+        color: #ffffff;
+    }
+
+    .note-actions .btn-danger {
+        background: rgba(224, 75, 75, 0.13);
+        color: #e04b4b;
+    }
+
+    .note-actions .btn-danger:hover {
+        background: #e04b4b;
+        color: #ffffff;
+    }
 }
