@@ -146,6 +146,54 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
   decorations: plugin => plugin.decorations
 })
 
+// With EditorView.lineWrapping on, a long list item's wrapped portion renders
+// at column 0, visually detached from its list. A hanging indent keeps wrapped
+// display lines under the item's text: padding-left pushes the whole line right
+// by the marker prefix width and the negative text-indent pulls only the first
+// display line back, so the source text is untouched. Width is measured in ch,
+// an approximation in the proportional app font. Inline padding is safe because
+// markdown.css zeroes .cm-line padding for these hosts.
+const listMarkerPrefixRegex = /^([ \t]*)(?:[-*+]|\d+(?:\.\d+)*\.)[ \t]+(?:\[[ xX]\][ \t]+)?/
+
+function buildHangingIndentDecorations(view) {
+  const builder = new RangeSetBuilder()
+  let lastLineFrom = -1
+
+  for (const range of view.visibleRanges) {
+    let pos = range.from
+    while (pos <= range.to) {
+      const line = view.state.doc.lineAt(pos)
+      if (line.from > lastLineFrom) {
+        const match = listMarkerPrefixRegex.exec(line.text)
+        if (match && match[0].length < line.text.length) {
+          const width = Math.min(match[0].replace(/\t/g, '    ').length, 32)
+          builder.add(line.from, line.from, Decoration.line({
+            attributes: { style: 'text-indent:-' + width + 'ch;padding-left:' + width + 'ch;' }
+          }))
+          lastLineFrom = line.from
+        }
+      }
+      pos = line.to + 1
+    }
+  }
+
+  return builder.finish()
+}
+
+const hangingIndentPlugin = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.decorations = buildHangingIndentDecorations(view)
+  }
+
+  update(update) {
+    if (update.docChanged || update.viewportChanged) {
+      this.decorations = buildHangingIndentDecorations(update.view)
+    }
+  }
+}, {
+  decorations: plugin => plugin.decorations
+})
+
 const excalidrawBlockRegex = /<div\b(?=[^>]*\bclass\s*=\s*(["'])[^"']*\bexcalidraw-container\b[^"']*\1)[^>]*>[\s\S]*?<\/div>/gi
 
 function getExcalidrawBlocks(text) {
@@ -988,6 +1036,7 @@ function createEditor(host, options = {}) {
       EditorView.lineWrapping,
       markdownTableLinePlugin,
       markdownCodeLinePlugin,
+      hangingIndentPlugin,
       readOnlyCompartment.of(createReadOnlyExtensions(!!options.readOnly)),
       themeCompartment.of(createThemeExtensions()),
       updateListener,
