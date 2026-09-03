@@ -307,6 +307,11 @@
                     window.showMoveEntireFolderDialog(folderData.id, folderData.name);
                 }
             },
+            'duplicate-folder': function () {
+                if (typeof window.duplicateFolder === 'function') {
+                    window.duplicateFolder(folderData.id, folderData.name);
+                }
+            },
             'download-folder': function () {
                 if (typeof window.downloadFolder === 'function') {
                     window.downloadFolder(folderData.id, folderData.name);
@@ -431,22 +436,34 @@
             window.closeFolderActionsMenu(folderId);
         }
 
-        if (folderId && typeof window.sortNotesInFolder === 'function') {
-            window.sortNotesInFolder(folderId, sortType);
+        if (!folderId) return;
 
-            // Save sort setting to database
-            fetch('api_save_folder_sort.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    folder_id: folderId,
-                    sort_type: sortType
-                })
-            }).catch(function (err) {
-                console.error('Failed to save sort setting', err);
+        // Save sort setting to database
+        var saved = fetch('api_save_folder_sort.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                folder_id: folderId,
+                sort_type: sortType
+            })
+        }).catch(function (err) {
+            console.error('Failed to save sort setting', err);
+        });
+
+        if (sortType === 'manual') {
+            // Drag-and-drop positions live in the database (entries.display_order),
+            // so there is nothing to sort client-side: reload the list once saved.
+            saved.then(function () {
+                if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                    window.refreshNotesListAfterFolderAction(folderId);
+                } else {
+                    location.reload();
+                }
             });
+        } else if (typeof window.sortNotesInFolder === 'function') {
+            window.sortNotesInFolder(folderId, sortType);
         }
     }
 
@@ -567,7 +584,7 @@
         // Folder menu actions
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
-            'download-folder', 'rename-folder', 'delete-folder',
+            'duplicate-folder', 'download-folder', 'rename-folder', 'delete-folder',
             'change-folder-icon', 'share-folder', 'favorite-folder',
             'show-only-folder'
         ];
@@ -917,7 +934,8 @@
     /**
      * Sort notes within a folder DOM element
      * @param {number} folderId - The ID of the folder to sort
-     * @param {string} sortType - The sort criteria ('alphabet', 'created', 'modified')
+     * @param {string} sortType - The sort criteria ('alphabet', 'created', 'modified');
+     *   'manual' is server-side only (handleFolderSort reloads the list instead)
      */
     function sortNotesInFolder(folderId, sortType) {
         var folderContentId = 'folder-' + folderId;

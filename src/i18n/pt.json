@@ -163,6 +163,10 @@
       "label": "Ordenar por",
       "date": "Data",
       "tag": "Etiqueta"
+    },
+    "subfolder": {
+      "expand": "Expandir subpasta",
+      "collapse": "Recolher subpasta"
     }
   },
   "folders": {
@@ -195,6 +199,7 @@
       "create_title": "Erro ao Criar Pasta",
       "create_prefix": "Erro ao criar pasta: {{error}}",
       "delete_prefix": "Erro ao excluir pasta: {{error}}",
+      "duplicate_prefix": "Erro ao duplicar pasta: {{error}}",
       "rename_prefix": "Erro ao renomear pasta: {{error}}",
       "load_prefix": "Erro ao carregar pastas: {{error}}",
       "empty_folder_prefix": "Erro ao esvaziar pasta: {{error}}",
@@ -454,7 +459,7 @@
       "import_limits": "Defina o número máximo de arquivos permitidos por importação.",
       "user_quotas": "Limite o número de notas e o armazenamento disponível por usuário.",
       "custom_css": "Aplique seu próprio CSS para personalizar a aparência do Poznote.",
-      "ui_customization_admin": "Oculte elementos da interface para todos os usuários desta instância.",
+      "ui_customization_admin": "Oculte os elementos da interface que você não usa, para você ou para todos os usuários desta instância.",
       "disaster_recovery": "Restaure a instância a partir de um backup em caso de perda de dados.",
       "orphan_scanner": "Encontre e limpe arquivos de anexos que não pertencem mais a nenhuma nota.",
       "storage_stats": "Veja o uso de armazenamento de todos os usuários desta instância.",
@@ -516,7 +521,6 @@
       "guestbook": "Livro de visitas do Poznote",
       "support": "Apoiar Poznote",
       "buy_me_a_coffee": "Oferece-me um café",
-      "ui_customization_global": "Visibilidade dos elementos (todos os usuários)",
       "custom_css": "Arquivo CSS personalizado",
       "install_extension": "Instalar extensão",
       "install_app": "Instalar aplicação",
@@ -1122,8 +1126,9 @@
     "ui_customization": {
       "title": "Personalização da interface",
       "description": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados.",
-      "title_global": "Personalização da interface (todos os usuários exceto administradores)",
-      "description_global": "Mostrar ou ocultar elementos da interface para todos os usuários desta instância. Os itens desmarcados serão ocultados para todos, exceto administradores.",
+      "description_admin": "Mostrar ou ocultar elementos da interface. Os itens desmarcados serão ocultados. A coluna \"Eu\" aplica-se à sua própria interface, a coluna \"Usuários\" a todos os usuários desta instância exceto administradores.",
+      "column_me": "Eu",
+      "column_users": "Usuários",
       "description_global_highlight": "exceto administradores",
       "locked_by_admin": "Oculto para todos os usuários pelo administrador",
       "locked_by_tenant_isolation": "Oculto automaticamente enquanto este recurso estiver bloqueado pelo isolamento de contas",
@@ -1160,6 +1165,7 @@
       "expand_all": "Expandir tudo",
       "badge_all_visible": "Tudo visível",
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
+      "badge_hidden_count_admin_columns": "{{me}} oculto(s) para você, {{users}} para os usuários",
       "badge_hidden_count": "{{count}} oculto(s)",
       "direct_copy_restore_section": "Página de restauração: seção «Restaurar quando a restauração padrão não funciona»",
       "s3_backups_section": "Página de backup: seção «Backups S3»",
@@ -1394,7 +1400,8 @@
       "options": {
         "last_modified": "Última modificação",
         "last_created": "Última criação",
-        "alphabetical": "Alfabética"
+        "alphabetical": "Alfabética",
+        "manual": "Manual (arrastar e soltar)"
       }
     },
     "markdown_colored": {
@@ -1580,6 +1587,7 @@
       "rename_folder": "Renomear pasta",
       "delete_folder": "Excluir pasta",
       "move_folder": "Mover pasta",
+      "duplicate_folder": "Duplicar pasta",
       "download_folder": "Baixar",
       "change_icon": "Alterar ícone",
       "is_public": "É compartilhada",
@@ -3132,7 +3140,8 @@
     "header": "Ordenar por",
     "alphabet": "Nome",
     "created": "Data de criação",
-    "modified": "Data de modificação"
+    "modified": "Data de modificação",
+    "manual": "Manual"
   },
   "calendar": {
     "months": {

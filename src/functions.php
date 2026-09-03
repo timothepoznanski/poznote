@@ -3041,6 +3041,141 @@ function getEntryFilename($id, $type) {
 }
 
 /**
+ * Clone one note (row, content file and attachments) into a new entry.
+ *
+ * Shared by the note duplicate endpoint and the recursive folder duplicate,
+ * so both produce the same kind of copy: same type, tags, icon, color and
+ * width, a fresh created/updated timestamp, never trashed or favorite, and
+ * attachments copied under new ids with the content rewritten to point at
+ * them. The heading is made unique in the target folder ("Title (1)").
+ *
+ * Quotas are NOT checked here; callers check them before cloning so a folder
+ * duplicate can be refused as a whole instead of half-way through.
+ *
+ * @param PDO   $con     Database connection
+ * @param int   $noteId  Source note id (must not be in the trash)
+ * @param array $options Optional overrides:
+ *   'folderId'      => int|null Target folder id (omit to keep the source folder)
+ *   'folderName'    => string   Target folder name (used with folderId)
+ *   'headingPrefix' => string   Prefix added to the copied heading
+ *   'actorUserId'   => int      User recorded as creator of the copy
+ * @return array|null ['id' => int, 'heading' => string], or null when the
+ *                    source note does not exist
+ * @throws Exception on database or file errors
+ */
+function poznoteCloneNoteRecord(PDO $con, int $noteId, array $options = []): ?array {
+    $headingPrefix  = (string)($options['headingPrefix'] ?? '');
+    $overrideFolder = array_key_exists('folderId', $options);
+    $actorUserId    = (int)($options['actorUserId'] ?? 0);
+
+    $stmt = $con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width FROM entries WHERE id = ? AND trash = 0");
+    $stmt->execute([$noteId]);
+    $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$originalNote) {
+        return null;
+    }
+
+    $workspace  = $originalNote['workspace'];
+    $folderId   = $overrideFolder ? ($options['folderId'] ?? null) : $originalNote['folder_id'];
+    $folderName = $overrideFolder ? ($options['folderName'] ?? null) : $originalNote['folder'];
+
+    // Generate unique heading
+    $originalHeading = $originalNote['heading'] ?: t('index.note.new_note', [], 'New note');
+    $newHeading = generateUniqueTitle($headingPrefix . $originalHeading, null, $workspace, $folderId);
+
+    // Duplicate attachments
+    $newAttachments = null;
+    $attachmentIdMapping = [];
+    $originalAttachments = $originalNote['attachments'] ? json_decode($originalNote['attachments'], true) : [];
+
+    if (!empty($originalAttachments)) {
+        $duplicatedAttachments = [];
+
+        foreach ($originalAttachments as $attachment) {
+            // Readable local path (fetched from the bucket in S3 mode)
+            $originalFilePath = poznoteAttachmentLocalFile($attachment['filename'] ?? '');
+
+            if ($originalFilePath !== null) {
+                $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
+                $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
+                $oldAttachmentId = $attachment['id'];
+                $newAttachmentId = uniqid();
+
+                if (poznoteStoreAttachmentFromPath($originalFilePath, $newFilename, $attachment['file_type'] ?? 'application/octet-stream')) {
+                    $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
+
+                    $duplicatedAttachments[] = [
+                        'id' => $newAttachmentId,
+                        'filename' => $newFilename,
+                        'original_filename' => $attachment['original_filename'],
+                        'file_size' => $attachment['file_size'],
+                        'file_type' => $attachment['file_type'],
+                        'uploaded_at' => date('Y-m-d H:i:s')
+                    ];
+                }
+            }
+        }
+
+        $newAttachments = !empty($duplicatedAttachments) ? json_encode($duplicatedAttachments) : null;
+    }
+
+    // Read original content and update attachment references
+    $originalFilename = getEntryFilename($noteId, $originalNote['type']);
+    $content = $originalNote['entry'] ?? '';
+    if (is_readable($originalFilename)) {
+        $fileContent = file_get_contents($originalFilename);
+        if ($fileContent !== false) {
+            $content = $fileContent;
+        }
+    }
+    foreach ($attachmentIdMapping as $oldId => $newId) {
+        $content = str_replace($oldId, $newId, $content);
+    }
+
+    // Insert new note
+    $insertStmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
+    $insertStmt->execute([
+        $newHeading,
+        $originalNote['tags'],
+        $folderName,
+        $folderId,
+        $workspace,
+        $originalNote['type'],
+        $newAttachments,
+        $originalNote['icon'],
+        $originalNote['icon_color'],
+        $originalNote['color'],
+        $originalNote['content_width'],
+        $actorUserId,
+        $actorUserId
+    ]);
+
+    $newId = (int)$con->lastInsertId();
+
+    // Update note ID references in attachment URLs
+    // Replace /api/v1/notes/{oldNoteId}/attachments/ with /api/v1/notes/{newNoteId}/attachments/
+    if (!empty($content) && !empty($attachmentIdMapping)) {
+        $content = str_replace(
+            '/api/v1/notes/' . $noteId . '/attachments/',
+            '/api/v1/notes/' . $newId . '/attachments/',
+            $content
+        );
+    }
+
+    // Write file
+    $newFilename = getEntryFilename($newId, $originalNote['type']);
+    if (!empty($content)) {
+        file_put_contents($newFilename, $content);
+        chmod($newFilename, 0644);
+    }
+
+    $updateEntryStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+    $updateEntryStmt->execute([$content, $newId]);
+
+    return ['id' => $newId, 'heading' => $newHeading];
+}
+
+/**
  * Normalize tasklist storage content to a JSON array string.
  *
  * Older tasklists may be wrapped in HTML/XML markup while the database entry

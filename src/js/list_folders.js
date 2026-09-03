@@ -188,6 +188,9 @@
         'move-entire-folder': function(folder) {
             callFn('showMoveEntireFolderDialog', folder.id, folder.name);
         },
+        'duplicate-folder': function(folder) {
+            callFn('duplicateFolder', folder.id, folder.name);
+        },
         'download-folder': function(folder) {
             callFn('downloadFolder', folder.id, folder.name);
         },

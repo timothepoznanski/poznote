@@ -26,6 +26,54 @@ function countNotesRecursively($folderData) {
 }
 
 /**
+ * Map the global note_list_sort setting to a per-folder sort type
+ * ('alphabet', 'created', 'modified' or 'manual').
+ *
+ * @param string $default_sort Global setting value
+ * @return string Folder sort type
+ */
+function noteListSortToFolderSortType($default_sort) {
+    switch ($default_sort) {
+        case 'heading_asc':
+            return 'alphabet';
+        case 'created_desc':
+            return 'created';
+        case 'manual':
+            return 'manual';
+        case 'updated_desc':
+        default:
+            return 'modified';
+    }
+}
+
+/**
+ * Comparator for the 'manual' sort (drag-and-drop ordering).
+ *
+ * Notes with a display_order (> 0) keep their saved position. Notes without
+ * one (0: created or moved in after the last drop) come first, newest update
+ * first, so a fresh note is visible at the top until the user places it.
+ * The reorder endpoint renumbers every sibling on each drop, so mixed lists
+ * only exist between a drop and the next one.
+ *
+ * @param array $a Note row
+ * @param array $b Note row
+ * @return int
+ */
+function compareNotesManualOrder($a, $b) {
+    $orderA = isset($a['display_order']) ? (int)$a['display_order'] : 0;
+    $orderB = isset($b['display_order']) ? (int)$b['display_order'] : 0;
+    if ($orderA > 0 && $orderB > 0) {
+        if ($orderA !== $orderB) return $orderA <=> $orderB;
+        return ((int)($a['id'] ?? 0)) <=> ((int)($b['id'] ?? 0));
+    }
+    if ($orderA > 0) return 1;
+    if ($orderB > 0) return -1;
+    $cmp = strcmp($b['updated'] ?? '', $a['updated'] ?? '');
+    if ($cmp !== 0) return $cmp;
+    return ((int)($b['id'] ?? 0)) <=> ((int)($a['id'] ?? 0));
+}
+
+/**
  * Organize notes by folder
  * Returns array with 'folders' and 'uncategorized_notes' keys
  * OPTIMIZED: Pre-loads all folder data to avoid N+1 queries
@@ -33,7 +81,7 @@ function countNotesRecursively($folderData) {
  * @param PDOStatement $stmt_left Statement containing notes to organize
  * @param PDO $con Database connection
  * @param string|null $workspace_filter Optional workspace filter
- * @param string $default_sort Default sort order ('updated_desc', 'heading_asc', 'created_desc')
+ * @param string $default_sort Default sort order ('updated_desc', 'heading_asc', 'created_desc', 'manual')
  * @return array Array with 'folders' and 'uncategorized_notes' keys
  */
 function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sort = 'updated_desc') {
@@ -116,18 +164,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             $sortType = $folder['sort_setting'];
         } else {
             // Map global setting to folder sort type
-            switch ($default_sort) {
-                case 'heading_asc':
-                    $sortType = 'alphabet';
-                    break;
-                case 'created_desc':
-                    $sortType = 'created';
-                    break;
-                case 'updated_desc':
-                default:
-                    $sortType = 'modified';
-                    break;
-            }
+            $sortType = noteListSortToFolderSortType($default_sort);
         }
         
         // Ensure effective sort type is used for UI rendering (e.g., checkmark display)
@@ -157,6 +194,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
                 // Newest first
                 return strcmp($updatedB, $updatedA);
             });
+        } elseif ($sortType === 'manual') {
+            usort($folder['notes'], 'compareNotesManualOrder');
         }
     }
     
@@ -451,6 +490,31 @@ function renderFolderActionsMenu() {
     $menu .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
     $menu .= "</div>";
 
+    // Duplicate folder action (copies notes and subfolders too)
+    $menu .= "<div class='folder-actions-menu-item' data-action='duplicate-folder'>";
+    $menu .= "<i class='lucide lucide-copy'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.duplicate_folder', [], 'Duplicate folder') . "</span>";
+    $menu .= "</div>";
+
+    // Copy / cut / paste (js/tree-undo-clipboard.js). Paste drops the
+    // clipboard into this folder and is hidden while the clipboard is empty;
+    // the shortcut hints are swapped for ⌘ on macOS when the menu opens.
+    $menu .= "<div class='folder-actions-menu-item' data-action='copy-folder'>";
+    $menu .= "<i class='lucide lucide-clipboard-copy'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.copy_folder', [], 'Copy') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+C</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item' data-action='cut-folder'>";
+    $menu .= "<i class='lucide lucide-scissors'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.cut_folder', [], 'Cut') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+X</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item' data-action='paste-into-folder'>";
+    $menu .= "<i class='lucide lucide-clipboard-paste'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.paste_into_folder', [], 'Paste into folder') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+V</span>";
+    $menu .= "</div>";
+
     $menu .= "<div class='folder-actions-menu-separator'></div>";
 
     // Download folder action (shown only if folder has notes)
@@ -501,7 +565,10 @@ function renderFolderActionsMenu() {
     $sortTypes = [
         'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
         'created' => ['icon' => 'lucide lucide-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
-        'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')]
+        'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')],
+        // Drag-and-drop order; selected automatically when a note is dropped
+        // before/after another one (see /api/v1/notes/reorder)
+        'manual' => ['icon' => 'lucide lucide-grip-vertical', 'label' => t_h('sort.manual', [], 'Manual')]
     ];
 
     // Sort Submenu Toggle (Accordion style); the client swaps the label for
@@ -656,6 +723,25 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item' data-action='show-move-folder-dialog'>";
     $menu .= "<i class='lucide lucide-folder-output'></i>";
     $menu .= "<span>" . t_h('notes_list.note_actions.move_note', [], 'Move note') . "</span>";
+    $menu .= "</div>";
+
+    // Copy / cut / paste (js/tree-undo-clipboard.js). Copy is note-real-only
+    // for the same reason as Duplicate; paste lands in this note's folder and
+    // is hidden while the clipboard is empty.
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='copy-note'>";
+    $menu .= "<i class='lucide lucide-clipboard-copy'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.copy_note', [], 'Copy') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+C</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item' data-action='cut-note'>";
+    $menu .= "<i class='lucide lucide-scissors'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.cut_note', [], 'Cut') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+X</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item' data-action='paste-into-note-folder'>";
+    $menu .= "<i class='lucide lucide-clipboard-paste'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.paste_note', [], 'Paste here') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+V</span>";
     $menu .= "</div>";
 
     // Archive note: moves it to the archive workspace, folder path included.

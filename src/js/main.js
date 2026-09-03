@@ -261,6 +261,7 @@ window.showContactPopup = showContactPopup;
 window.closeContactModal = closeContactModal;
 window.newFolder = newFolder;
 window.deleteFolder = deleteFolder;
+window.duplicateFolder = duplicateFolder;
 window.downloadFolder = downloadFolder;
 window.executeDeleteFolder = executeDeleteFolder;
 window.showDeleteFolderModal = showDeleteFolderModal;

@@ -425,7 +425,7 @@
         });
     }
 
-    function saveFolderName(folderId, name, done) {
+    function saveFolderName(folderId, name, done, previousName) {
         var body = { name: name };
         var ws = currentWorkspace();
         if (ws) body.workspace = ws;
@@ -436,12 +436,17 @@
                 return;
             }
             done(true);
+            if (window.PoznoteTreeHistory && previousName) {
+                window.PoznoteTreeHistory.record({
+                    type: 'folder-rename', folderId: String(folderId), from: previousName, to: name, workspace: ws
+                });
+            }
             rememberFolderReveal(folderId);
             window.location.reload();
         });
     }
 
-    function saveNoteName(noteId, name, done) {
+    function saveNoteName(noteId, name, done, previousName) {
         // Send this tab's editor session so renaming the note it has open
         // passes the edit lock; a note locked elsewhere is still refused.
         var sessionId = typeof window.getCurrentEditorSessionId === 'function'
@@ -459,6 +464,11 @@
                 return;
             }
             done(true);
+            if (window.PoznoteTreeHistory && previousName) {
+                window.PoznoteTreeHistory.record({
+                    type: 'note-rename', noteId: String(noteId), from: previousName, to: name
+                });
+            }
             rememberNoteReveal(noteId);
             window.location.reload();
         });
@@ -509,7 +519,7 @@
             row: toggle,
             value: currentName || '',
             placeholder: tr('modals.folder.rename_placeholder', 'New folder name'),
-            save: function (name, done) { saveFolderName(folderId, name, done); }
+            save: function (name, done) { saveFolderName(folderId, name, done, currentName || ''); }
         });
     }
 
@@ -527,7 +537,7 @@
             row: row,
             value: currentTitle || '',
             placeholder: tr('modals.note.rename_placeholder', 'New note title'),
-            save: function (name, done) { saveNoteName(noteId, name, done); }
+            save: function (name, done) { saveNoteName(noteId, name, done, currentTitle || ''); }
         });
     }
 

@@ -200,7 +200,9 @@ body.dark-mode .kanban-board::-webkit-scrollbar-thumb:hover {
 }
 
 html[data-theme='dark'] .kanban-column-content.drag-over,
-body.dark-mode .kanban-column-content.drag-over {
+body.dark-mode .kanban-column-content.drag-over,
+html[data-theme='dark'] .kanban-subfolder-content.drag-over,
+body.dark-mode .kanban-subfolder-content.drag-over {
     background: var(--dm-surface);
     border-color: #6366f1;
 }
@@ -263,4 +265,32 @@ html[data-theme='dark'] .kanban-completed-count,
 body.dark-mode .kanban-completed-count {
     background: var(--dm-border);
     color: var(--dm-text-muted);
+}
+
+/* ===== Nested subfolder groups ===== */
+html[data-theme='dark'] .kanban-subfolder-section,
+body.dark-mode .kanban-subfolder-section {
+    background: var(--dm-surface);
+    border-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .kanban-subfolder-toggle,
+body.dark-mode .kanban-subfolder-toggle {
+    color: var(--dm-text);
+}
+
+html[data-theme='dark'] .kanban-subfolder-toggle:hover,
+body.dark-mode .kanban-subfolder-toggle:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme='dark'] .kanban-subfolder-count,
+body.dark-mode .kanban-subfolder-count {
+    background: var(--dm-border);
+    color: var(--dm-text-muted);
+}
+
+html[data-theme='dark'] .kanban-subfolder-section.is-expanded > .kanban-subfolder-content:empty,
+body.dark-mode .kanban-subfolder-section.is-expanded > .kanban-subfolder-content:empty {
+    border-color: var(--dm-border);
 }

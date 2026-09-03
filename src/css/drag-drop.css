@@ -86,6 +86,43 @@
     bottom: -3px;
 }
 
+/* Note reordering: a note dropped on the top half of a row lands before it,
+   on the bottom half after it (js/events-drag-drop.js handleNoteReorderDragOver).
+   The row wrapper is the drop target so the line spans title and actions. */
+.note-list-item {
+    position: relative;
+}
+
+.note-list-item.note-drop-before::before,
+.note-list-item.note-drop-after::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    height: 3px;
+    background: #007bff;
+    border-radius: 999px;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.45);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.note-list-item.note-drop-before::before {
+    top: -1px;
+}
+
+.note-list-item.note-drop-after::after {
+    bottom: -3px;
+}
+
+html[data-theme='dark'] .note-list-item.note-drop-before::before,
+html[data-theme='dark'] .note-list-item.note-drop-after::after,
+body.dark-mode .note-list-item.note-drop-before::before,
+body.dark-mode .note-list-item.note-drop-after::after {
+    background: #4a90e2;
+    box-shadow: 0 0 8px rgba(74, 144, 226, 0.55);
+}
+
 /* Dark mode folder dragging */
 html[data-theme='dark'] .folder-header.folder-dragging,
 body.dark-mode .folder-header.folder-dragging {

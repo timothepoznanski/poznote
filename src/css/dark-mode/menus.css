@@ -571,3 +571,10 @@ html[data-theme='dark'] .create-menu .create-section:not(:first-child),
 body.dark-mode .create-menu .create-section:not(:first-child) {
     border-top-color: var(--dm-border);
 }
+
+html[data-theme='dark'] .folder-actions-menu-item .actions-menu-shortcut,
+html[data-theme='dark'] .note-actions-menu-item .actions-menu-shortcut,
+body.dark-mode .folder-actions-menu-item .actions-menu-shortcut,
+body.dark-mode .note-actions-menu-item .actions-menu-shortcut {
+    color: #8a8a8a;
+}

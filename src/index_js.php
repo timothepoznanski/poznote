@@ -60,6 +60,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/events-text-selection.js',
         'js/utils.js',
         'js/inline-tree-edit.js',
+        'js/tree-undo-clipboard.js',
         'js/search-highlight.js',
         'js/keyboard-shortcuts.js',
         'js/date-picker-popup.js',

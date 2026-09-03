@@ -840,6 +840,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="radio" name="noteSort" value="updated_desc"> <?php echo t_h('modals.note_sort.options.last_modified', [], 'Last modified'); ?></label>
                 <label><input type="radio" name="noteSort" value="created_desc"> <?php echo t_h('modals.note_sort.options.last_created', [], 'Last created'); ?></label>
                 <label><input type="radio" name="noteSort" value="heading_asc"> <?php echo t_h('modals.note_sort.options.alphabetical', [], 'Alphabetical'); ?></label>
+                <label><input type="radio" name="noteSort" value="manual"> <?php echo t_h('modals.note_sort.options.manual', [], 'Manual (drag and drop)'); ?></label>
             </div>
         </div>
         <div class="modal-buttons">
@@ -1463,15 +1464,20 @@ include __DIR__ . '/modals/folder_icon_modal.php';
 <div id="uiCustomizationModal" class="modal">
     <div class="modal-content modal-content-wide">
         <div class="modal-header">
-            <h3 id="uiCustomizationModalTitle"
-                data-title-user="<?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?>"
-                data-title-global="<?php echo t_h('modals.ui_customization.title_global', [], 'UI Customization (all users)'); ?>"><?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?></h3>
+            <h3 id="uiCustomizationModalTitle"><?php echo t_h('modals.ui_customization.title', [], 'UI Customization'); ?></h3>
         </div>
         <div class="modal-body">
+            <?php
+            // Administrators get a second checkbox column ("Users") editing the
+            // instance-wide set next to their own ("Me"), see
+            // openUiCustomizationModal() in js/settings-page.js.
+            ?>
             <p class="ui-custom-description" id="uiCustomizationModalDescription"
                 data-description-user="<?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?>"
-                data-description-global="<?php echo t_h('modals.ui_customization.description_global', [], 'Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.'); ?>"
-                data-description-global-highlight="<?php echo t_h('modals.ui_customization.description_global_highlight', [], 'except administrators'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
+                data-description-admin="<?php echo t_h('modals.ui_customization.description_admin', [], 'Show or hide interface elements. Unchecked items will be hidden. The "Me" column applies to your own interface, the "Users" column to every user of this instance except administrators.'); ?>"
+                data-description-admin-highlight="<?php echo t_h('modals.ui_customization.description_global_highlight', [], 'except administrators'); ?>"
+                data-column-me="<?php echo t_h('modals.ui_customization.column_me', [], 'Me'); ?>"
+                data-column-users="<?php echo t_h('modals.ui_customization.column_users', [], 'Users'); ?>"><?php echo t_h('modals.ui_customization.description', [], 'Show or hide interface elements. Unchecked items will be hidden.'); ?></p>
             <div class="ui-custom-filter">
                 <button type="button" id="uiCustomizationToggleAll" class="ui-custom-toggle-all ui-custom-toggle-all-global" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button>
                 <button type="button" id="uiCustomizationCollapseAll" class="ui-custom-collapse-all"
@@ -1736,6 +1742,10 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-all-notes-in-tabs" checked><span><?php echo t_h('notes_list.folder_actions.open_all_in_tabs', [], 'Open all notes in tabs'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:move-folder-files" checked><span><?php echo t_h('notes_list.folder_actions.move_all_files', [], 'Move all files'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:move-entire-folder" checked><span><?php echo t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:duplicate-folder" checked><span><?php echo t_h('notes_list.folder_actions.duplicate_folder', [], 'Duplicate folder'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:copy-folder" checked><span><?php echo t_h('notes_list.folder_actions.copy_folder', [], 'Copy'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:cut-folder" checked><span><?php echo t_h('notes_list.folder_actions.cut_folder', [], 'Cut'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:paste-into-folder" checked><span><?php echo t_h('notes_list.folder_actions.paste_into_folder', [], 'Paste into folder'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:download-folder" checked><span><?php echo t_h('notes_list.folder_actions.download_folder', [], 'Download folder'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:share-folder" checked><span><?php echo t_h('notes_list.folder_actions.share_folder', [], 'Make public'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:rename-folder" checked><span><?php echo t_h('notes_list.folder_actions.rename_folder', [], 'Rename'); ?></span></label>
@@ -1757,6 +1767,9 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:copy-note" checked><span><?php echo t_h('notes_list.note_actions.copy_note', [], 'Copy'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:cut-note" checked><span><?php echo t_h('notes_list.note_actions.cut_note', [], 'Cut'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:paste-into-note-folder" checked><span><?php echo t_h('notes_list.note_actions.paste_note', [], 'Paste here'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:archive-note" checked><span><?php echo t_h('archive.menu_item', [], 'Archive note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:delete-note" checked><span><?php echo t_h('notes_list.note_actions.delete_note', [], 'Delete note'); ?></span></label>
                 </div>

@@ -175,6 +175,10 @@
       "label": "Trier par",
       "date": "Date",
       "tag": "Tag"
+    },
+    "subfolder": {
+      "expand": "Déplier le sous-dossier",
+      "collapse": "Replier le sous-dossier"
     }
   },
   "folders": {
@@ -212,6 +216,7 @@
       "create_title": "Erreur lors de la création du dossier",
       "create_prefix": "Erreur lors de la création du dossier : {{error}}",
       "delete_prefix": "Erreur lors de la suppression du dossier : {{error}}",
+      "duplicate_prefix": "Erreur lors de la duplication du dossier : {{error}}",
       "rename_prefix": "Erreur lors du renommage du dossier : {{error}}",
       "load_prefix": "Erreur lors du chargement des dossiers : {{error}}",
       "empty_folder_prefix": "Erreur lors du vidage du dossier : {{error}}"
@@ -467,7 +472,7 @@
       "import_limits": "Définissez le nombre maximal de fichiers autorisés par import.",
       "user_quotas": "Limitez le nombre de notes et le stockage disponibles par utilisateur.",
       "custom_css": "Appliquez votre propre CSS pour personnaliser l'apparence de Poznote.",
-      "ui_customization_admin": "Masquez des éléments de l'interface pour tous les utilisateurs de cette instance.",
+      "ui_customization_admin": "Masquez les éléments de l'interface que vous n'utilisez pas, pour vous-même ou pour tous les utilisateurs de cette instance.",
       "disaster_recovery": "Restaurez l'instance depuis une sauvegarde en cas de perte de données.",
       "orphan_scanner": "Trouvez et nettoyez les fichiers de pièces jointes qui n'appartiennent plus à aucune note.",
       "storage_stats": "Consultez l'utilisation du stockage pour tous les utilisateurs de l'instance.",
@@ -532,7 +537,6 @@
       "buy_me_a_coffee": "Offrez-moi un café",
       "install_extension": "Installer l'extension",
       "install_app": "Installer l'application",
-      "ui_customization_global": "Visibilité des éléments (tous les utilisateurs)",
       "custom_css": "Chemin CSS personnalisé",
       "release_notes": "Notes de version",
       "orphan_scanner": "Scanner de pièces jointes orphelines",
@@ -1148,8 +1152,9 @@
     "ui_customization": {
       "title": "Personnalisation de l'interface",
       "description": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués.",
-      "title_global": "Personnalisation de l'interface (tous les utilisateurs sauf les administrateurs)",
-      "description_global": "Afficher ou masquer les éléments de l'interface pour tous les utilisateurs de cette instance. Les éléments décochés seront masqués pour tout le monde, sauf les administrateurs.",
+      "description_admin": "Afficher ou masquer les éléments de l'interface. Les éléments décochés seront masqués. La colonne « Moi » s'applique à votre propre interface, la colonne « Utilisateurs » à tous les utilisateurs de cette instance sauf les administrateurs.",
+      "column_me": "Moi",
+      "column_users": "Utilisateurs",
       "description_global_highlight": "sauf les administrateurs",
       "locked_by_admin": "Masqué pour tous les utilisateurs par l'administrateur",
       "locked_by_tenant_isolation": "Masqué automatiquement tant que cette capacité est bloquée par l'isolation des comptes",
@@ -1182,6 +1187,7 @@
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
+      "badge_hidden_count_admin_columns": "{{me}} masqué(s) pour vous, {{users}} pour les utilisateurs",
       "badge_hidden_count": "{{count}} masqué(s)",
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher",
@@ -1427,7 +1433,8 @@
       "options": {
         "last_modified": "Dernière modification",
         "last_created": "Dernière création",
-        "alphabetical": "Alphabétique"
+        "alphabetical": "Alphabétique",
+        "manual": "Manuel (glisser-déposer)"
       }
     },
     "markdown_colored": {
@@ -1611,6 +1618,10 @@
       "open_all_in_tabs": "Ouvrir toutes les notes",
       "move_all_files": "Déplacer les fichiers",
       "move_folder": "Déplacer le dossier",
+      "duplicate_folder": "Dupliquer le dossier",
+      "copy_folder": "Copier",
+      "cut_folder": "Couper",
+      "paste_into_folder": "Coller dans le dossier",
       "rename_folder": "Renommer le dossier",
       "delete_folder": "Supprimer le dossier",
       "download_folder": "Télécharger",
@@ -1635,10 +1646,43 @@
       "share_note": "Partager la note",
       "rename_note": "Renommer la note",
       "delete_note": "Supprimer la note",
+      "copy_note": "Copier",
+      "cut_note": "Couper",
+      "paste_note": "Coller ici",
       "enter_note_name": "Veuillez saisir un titre de note",
       "attachments": "Pièces jointes",
       "convert_note": "Convertir la note"
     }
+  },
+  "tree_history": {
+    "undone": "Annulé : {{action}}",
+    "redone": "Rétabli : {{action}}",
+    "nothing_to_undo": "Rien à annuler",
+    "nothing_to_redo": "Rien à rétablir",
+    "undo_failed": "Échec de l'annulation : {{error}}",
+    "redo_failed": "Échec du rétablissement : {{error}}",
+    "actions": {
+      "move_note": "Déplacer la note",
+      "move_folder": "Déplacer le dossier",
+      "delete_note": "Supprimer la note",
+      "delete_folder": "Supprimer le dossier",
+      "paste_note": "Coller la note",
+      "paste_folder": "Coller le dossier",
+      "rename_note": "Renommer la note",
+      "rename_folder": "Renommer le dossier"
+    }
+  },
+  "tree_clipboard": {
+    "copied_note": "« {{name}} » copiée",
+    "cut_note": "« {{name}} » coupée",
+    "copied_folder": "Dossier « {{name}} » copié",
+    "cut_folder": "Dossier « {{name}} » coupé",
+    "pasted_note": "« {{name}} » collée",
+    "pasted_folder": "Dossier « {{name}} » collé",
+    "nothing_to_paste": "Rien à coller",
+    "already_there": "Déjà dans ce dossier",
+    "cannot_paste_into_itself": "Un dossier ne peut pas être collé dans lui-même",
+    "paste_failed": "Échec du collage : {{error}}"
   },
   "note_color": {
     "modal_title": "Couleur de la note",
@@ -3316,7 +3360,8 @@
     "header": "Trier par",
     "alphabet": "Nom",
     "created": "Date de création",
-    "modified": "Date de modification"
+    "modified": "Date de modification",
+    "manual": "Manuel"
   },
   "calendar": {
     "months": {

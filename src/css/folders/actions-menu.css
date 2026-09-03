@@ -347,3 +347,18 @@ body.dark-mode .note-actions-menu-item.active i {
     margin-top: 4px;
     padding-top: 4px;
 }
+
+/* Keyboard hint on the copy / cut / paste items (js/tree-undo-clipboard.js) */
+.folder-actions-menu-item .actions-menu-shortcut,
+.note-actions-menu-item .actions-menu-shortcut {
+    margin-left: auto;
+    padding-left: 16px;
+    font-size: 0.8em;
+    color: var(--pz-text-muted);
+}
+
+/* A cut note or folder is dimmed until it is pasted */
+.note-list-item.tree-clipboard-cut,
+.folder-toggle.tree-clipboard-cut {
+    opacity: 0.45;
+}

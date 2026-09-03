@@ -492,6 +492,8 @@ if (isset($uncategorized_notes) && !empty($uncategorized_notes) && empty($folder
         usort($sortedUncategorized, function($a, $b) {
             return strcmp($b['created'] ?? '', $a['created'] ?? '');
         });
+    } elseif ($note_list_sort_type === 'manual') {
+        usort($sortedUncategorized, 'compareNotesManualOrder');
     }
     
     foreach ($sortedUncategorized as $row1) {

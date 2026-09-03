@@ -367,9 +367,81 @@
 }
 
 /* Sections only configurable instance-wide (e.g. the login page): hidden in
-   the per-user modal, shown in the admin "all users" modal */
+   the per-user modal; in the administrator modal only their Users column
+   applies, so the Me checkbox is blanked out. */
 #uiCustomizationModal.ui-custom-mode-user .ui-custom-section[data-ui-global-only] {
     display: none !important;
+}
+
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-section[data-ui-global-only] [data-ui-key] {
+    visibility: hidden;
+}
+
+/* ============================================
+   Administrator mode: two checkbox columns
+   ============================================
+   Administrators edit their own set ("Me") and the instance-wide set ("Users")
+   side by side, so each row becomes: label, Me checkbox, Users checkbox, with
+   a small header row per section naming the columns. The Users inputs and the
+   header rows are added by js/settings-page.js and stay in the DOM in user
+   mode, where they are disabled and hidden. */
+.ui-custom-columns,
+.ui-custom-users-input {
+    display: none;
+}
+
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-items,
+#uiCustomizationModal.ui-custom-mode-admin.ui-custom-filtering .ui-custom-items {
+    grid-template-columns: 1fr;
+    gap: 2px;
+}
+
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-columns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 0 8px 4px 8px;
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--pz-text-muted);
+    user-select: none;
+}
+
+/* Header cells match the checkbox cells below: 16px box plus 20px each side */
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-columns span {
+    width: 56px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-item span {
+    order: -1;
+    flex: 1;
+    min-width: 0;
+}
+
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-item input[type="checkbox"] {
+    margin: 0 20px;
+}
+
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-users-input {
+    display: inline-block;
+}
+
+/* A single locked checkbox (tenant isolation manages the Users column for
+   that key) rather than the whole row */
+#uiCustomizationModal.ui-custom-mode-admin .ui-custom-item input.ui-custom-input-locked {
+    cursor: not-allowed;
+    opacity: 0.4;
+}
+
+[data-theme="dark"] .ui-custom-columns,
+.dark-mode .ui-custom-columns {
+    color: #9ca3af;
 }
 
 /* ============================================

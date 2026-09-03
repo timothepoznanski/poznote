@@ -34,6 +34,7 @@
         syncKanbanCardDragState();
         bindKanbanScrollButtons();
         restoreCompletedSectionStates();
+        restoreSubfolderSectionStates();
 
         // Document-level delegation ensures listeners work even when content is replaced
         if (window._kanbanInitialized) {
@@ -42,6 +43,61 @@
 
         setupDelegatedEvents();
         window._kanbanInitialized = true;
+    }
+
+    /**
+     * The drop zone under an event target: a column content or a nested
+     * subfolder content, whichever is closest. Hovering a subfolder header
+     * targets that subfolder too, so a collapsed group still accepts drops.
+     */
+    function getKanbanDropZone(target) {
+        const el = target instanceof Element ? target : target && target.parentElement;
+        if (!el) return null;
+
+        const header = el.closest('.kanban-subfolder-header');
+        if (header) {
+            const section = header.closest('.kanban-subfolder-section');
+            return section ? section.querySelector(':scope > .kanban-subfolder-content') : null;
+        }
+        return el.closest('.kanban-subfolder-content, .kanban-column-content');
+    }
+
+    /**
+     * The element highlighted while a card hovers a drop zone: the subfolder
+     * group (header included) for a nested zone, the column otherwise.
+     */
+    function getKanbanDropHighlight(zone) {
+        if (!zone) return null;
+        if (zone.classList.contains('kanban-subfolder-content')) {
+            return zone.closest('.kanban-subfolder-section');
+        }
+        return zone.closest('.kanban-column');
+    }
+
+    function clearKanbanDragOver() {
+        document.querySelectorAll('.kanban-inline-view .drag-over').forEach((el) => {
+            el.classList.remove('drag-over');
+        });
+    }
+
+    /**
+     * The drop zone a card currently lives in (its own folder's zone, even
+     * when the card sits inside that zone's completed section).
+     */
+    function getKanbanCardZone(card) {
+        return card.closest('.kanban-subfolder-content, .kanban-column-content');
+    }
+
+    /**
+     * First non-card block of a zone (completed section or subfolder group).
+     * Active cards are always inserted before it.
+     */
+    function getKanbanZoneAnchor(zone) {
+        return zone.querySelector(':scope > .kanban-completed-section, :scope > .kanban-subfolder-section');
+    }
+
+    function insertActiveCardIntoZone(zone, card) {
+        zone.insertBefore(card, getKanbanZoneAnchor(zone));
     }
 
     /**
@@ -109,9 +165,7 @@
             card.style.opacity = '1';
 
             // Clean up visual states
-            document.querySelectorAll('.kanban-column-content, .kanban-column').forEach(el => {
-                el.classList.remove('drag-over');
-            });
+            clearKanbanDragOver();
 
             draggedCard = null;
             draggedFromFolderId = null;
@@ -124,10 +178,9 @@
                 return;
             }
 
-            const columnContent = e.target.closest('.kanban-column-content');
-            if (!columnContent) return;
+            if (!getKanbanDropZone(e.target)) return;
 
-            // Important: we are over a column, allow drop
+            // Important: we are over a drop zone, allow drop
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
         });
@@ -138,12 +191,14 @@
                 return;
             }
 
-            const columnContent = e.target.closest('.kanban-column-content');
-            if (!columnContent) return;
+            const zone = getKanbanDropZone(e.target);
+            if (!zone) return;
 
-            columnContent.classList.add('drag-over');
-            const column = columnContent.closest('.kanban-column');
-            if (column) column.classList.add('drag-over');
+            // Only the innermost hovered zone is highlighted.
+            clearKanbanDragOver();
+            zone.classList.add('drag-over');
+            const highlight = getKanbanDropHighlight(zone);
+            if (highlight) highlight.classList.add('drag-over');
         });
 
         // Drag Leave
@@ -152,14 +207,14 @@
                 return;
             }
 
-            const columnContent = e.target.closest('.kanban-column-content');
-            if (!columnContent) return;
+            const zone = getKanbanDropZone(e.target);
+            if (!zone) return;
 
-            // Check if we're actually leaving the column content (not entering a child card)
-            if (!columnContent.contains(e.relatedTarget)) {
-                columnContent.classList.remove('drag-over');
-                const column = columnContent.closest('.kanban-column');
-                if (column) column.classList.remove('drag-over');
+            // Check if we're actually leaving the zone (not entering a child card)
+            const highlight = getKanbanDropHighlight(zone) || zone;
+            if (!highlight.contains(e.relatedTarget)) {
+                zone.classList.remove('drag-over');
+                highlight.classList.remove('drag-over');
             }
         });
 
@@ -169,7 +224,7 @@
                 return;
             }
 
-            const columnContent = e.target.closest('.kanban-column-content');
+            const columnContent = getKanbanDropZone(e.target);
             if (!columnContent) return;
 
             // Prevent browser default drop action
@@ -177,10 +232,7 @@
             // Stop propagation to avoid Poznote's folder-drop logic
             e.stopPropagation();
 
-
-            columnContent.classList.remove('drag-over');
-            const column = columnContent.closest('.kanban-column');
-            if (column) column.classList.remove('drag-over');
+            clearKanbanDragOver();
 
             if (!draggedCard) {
                 console.warn("Kanban: Drop occurred but no draggedCard state found.");
@@ -202,14 +254,17 @@
             const originalOrder = draggedCard.dataset.kanbanOrder;
 
             // A dragged card always lands in the active area, above the
-            // completed section of the target column.
-            const targetCompletedSection = columnContent.querySelector(':scope > .kanban-completed-section');
-            if (targetCompletedSection) {
-                columnContent.insertBefore(draggedCard, targetCompletedSection);
-            } else {
-                columnContent.appendChild(draggedCard);
-            }
+            // completed section and the subfolder groups of the target zone.
+            insertActiveCardIntoZone(columnContent, draggedCard);
             draggedCard.dataset.folderId = targetFolderId;
+
+            // Dropping into a collapsed subfolder group opens it so the card
+            // does not vanish from view.
+            const targetSection = columnContent.closest('.kanban-subfolder-section');
+            if (targetSection && !targetSection.classList.contains('is-expanded')) {
+                applySubfolderSectionState(targetSection, true);
+                storeSubfolderSectionState(targetSection.dataset.folderId, true);
+            }
             draggedCard.dataset.kanbanOrder = nextKanbanOrder();
             draggedCard.classList.add('kanban-card-dropped');
 
@@ -398,6 +453,22 @@
             const expanded = !section.classList.contains('is-expanded');
             applyCompletedSectionState(section, expanded);
             storeCompletedSectionState(section.dataset.folderId, expanded);
+        });
+
+        // Expand / collapse a nested subfolder group
+        document.addEventListener('click', (e) => {
+            const toggle = e.target.closest('[data-action="toggle-kanban-subfolder-section"]');
+            if (!toggle) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const section = toggle.closest('.kanban-subfolder-section');
+            if (!section) return;
+
+            const expanded = !section.classList.contains('is-expanded');
+            applySubfolderSectionState(section, expanded);
+            storeSubfolderSectionState(section.dataset.folderId, expanded);
         });
 
         // Kanban Scroll Buttons
@@ -831,13 +902,14 @@
     }
 
     /**
-     * Sort a column's active cards and its completed ones independently.
+     * Sort a zone's active cards and its completed ones independently.
+     * Nested subfolder zones are sorted by their own call.
      */
     function sortKanbanColumn(columnContent) {
         if (!columnContent) return;
 
+        sortKanbanCardList(columnContent, getKanbanZoneAnchor(columnContent));
         const completedSection = columnContent.querySelector(':scope > .kanban-completed-section');
-        sortKanbanCardList(columnContent, completedSection);
         if (completedSection) {
             sortKanbanCardList(completedSection.querySelector('.kanban-completed-content'), null);
         }
@@ -871,7 +943,7 @@
         if (!container) return;
 
         rememberKanbanCardOrder(container);
-        container.querySelectorAll('.kanban-column-content').forEach(sortKanbanColumn);
+        container.querySelectorAll('.kanban-column-content, .kanban-subfolder-content').forEach(sortKanbanColumn);
         updateKanbanSortToggle(container);
     }
 
@@ -1111,25 +1183,30 @@
      * remaining work only.
      */
     function updateColumnCounts() {
-        document.querySelectorAll('.kanban-column').forEach(column => {
-            const content = column.querySelector('.kanban-column-content');
-            const countBadge = column.querySelector('.kanban-column-count');
-            if (content && countBadge) {
-                const cardCount = content.querySelectorAll(':scope > .kanban-card').length;
+        // Each zone (column content or nested subfolder content) counts only
+        // its own direct active cards; nested groups carry their own badge.
+        document.querySelectorAll('.kanban-column-content, .kanban-subfolder-content').forEach((zone) => {
+            const cardCount = zone.querySelectorAll(':scope > .kanban-card').length;
+            const owner = zone.classList.contains('kanban-subfolder-content')
+                ? zone.closest('.kanban-subfolder-section')
+                : zone.closest('.kanban-column');
+            const countBadge = owner && owner.querySelector(
+                ':scope > .kanban-subfolder-header .kanban-subfolder-count, :scope > .kanban-column-header .kanban-column-count'
+            );
+            if (countBadge) {
                 countBadge.textContent = cardCount;
             }
+        });
 
-            const completedSection = column.querySelector('.kanban-completed-section');
-            if (completedSection) {
-                const completedBadge = completedSection.querySelector('.kanban-completed-count');
-                const completedCards = completedSection.querySelectorAll('.kanban-card').length;
-                if (completedBadge) {
-                    completedBadge.textContent = completedCards;
-                }
-                // Drop the section once its last completed card leaves.
-                if (completedCards === 0) {
-                    completedSection.remove();
-                }
+        document.querySelectorAll('.kanban-completed-section').forEach((completedSection) => {
+            const completedBadge = completedSection.querySelector('.kanban-completed-count');
+            const completedCards = completedSection.querySelectorAll('.kanban-card').length;
+            if (completedBadge) {
+                completedBadge.textContent = completedCards;
+            }
+            // Drop the section once its last completed card leaves.
+            if (completedCards === 0) {
+                completedSection.remove();
             }
         });
     }
@@ -1196,6 +1273,55 @@
     }
 
     /**
+     * localStorage key holding the expanded state of a nested subfolder group.
+     * Groups start collapsed: the user opens only the ones they need.
+     */
+    function subfolderSectionStateKey(folderId) {
+        return 'kanban_subfolder_open_' + folderId;
+    }
+
+    function isSubfolderSectionExpanded(folderId) {
+        try {
+            return localStorage.getItem(subfolderSectionStateKey(folderId)) === 'open';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function storeSubfolderSectionState(folderId, expanded) {
+        try {
+            localStorage.setItem(subfolderSectionStateKey(folderId), expanded ? 'open' : 'closed');
+        } catch (e) {
+            /* localStorage unavailable (private mode): collapse state is simply not persisted */
+        }
+    }
+
+    /**
+     * Apply the expanded/collapsed state to one subfolder group.
+     */
+    function applySubfolderSectionState(section, expanded) {
+        const toggle = section.querySelector(':scope > .kanban-subfolder-header .kanban-subfolder-toggle');
+
+        section.classList.toggle('is-expanded', expanded);
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            const label = expanded
+                ? (toggle.getAttribute('data-label-collapse') || 'Collapse subfolder')
+                : (toggle.getAttribute('data-label-expand') || 'Expand subfolder');
+            toggle.title = label;
+        }
+    }
+
+    /**
+     * Restore every subfolder group's collapse state after a board render.
+     */
+    function restoreSubfolderSectionStates() {
+        document.querySelectorAll('.kanban-subfolder-section').forEach((section) => {
+            applySubfolderSectionState(section, isSubfolderSectionExpanded(section.dataset.folderId));
+        });
+    }
+
+    /**
      * Get (or build) the completed section of a column.
      */
     function ensureCompletedSection(columnContent) {
@@ -1217,7 +1343,9 @@
             '</button>' +
             '<div class="kanban-completed-content"></div>';
 
-        columnContent.appendChild(section);
+        // The completed section sits below the active cards and above the
+        // nested subfolder groups.
+        columnContent.insertBefore(section, columnContent.querySelector(':scope > .kanban-subfolder-section'));
         applyCompletedSectionState(section, isCompletedSectionExpanded(folderId));
         return section;
     }
@@ -1250,7 +1378,7 @@
      * its visual state. Returns a callback that restores the previous position.
      */
     function moveCardToCompletionArea(card, completed) {
-        const columnContent = card.closest('.kanban-column-content');
+        const columnContent = getKanbanCardZone(card);
         const previousSibling = card.nextElementSibling;
         const previousParent = card.parentNode;
 
@@ -1259,12 +1387,7 @@
             section.querySelector('.kanban-completed-content').prepend(card);
         } else {
             // Active cards go back above the completed section.
-            const section = columnContent.querySelector(':scope > .kanban-completed-section');
-            if (section) {
-                columnContent.insertBefore(card, section);
-            } else {
-                columnContent.appendChild(card);
-            }
+            insertActiveCardIntoZone(columnContent, card);
         }
 
         card.classList.toggle('kanban-card-completed', completed);
@@ -1338,7 +1461,10 @@
 
     window.bindKanbanScrollButtons = bindKanbanScrollButtons;
     window.syncKanbanScrollButtons = syncKanbanScrollButtons;
-    window.restoreKanbanCompletedSections = restoreCompletedSectionStates;
+    window.restoreKanbanCompletedSections = function () {
+        restoreCompletedSectionStates();
+        restoreSubfolderSectionStates();
+    };
     window.applyKanbanCardSize = applyKanbanCardSize;
     window.applyKanbanCardSort = applyKanbanCardSort;
 

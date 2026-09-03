@@ -576,6 +576,9 @@ function deleteNote(noteId) {
         url += "&workspace=" + encodeURIComponent(workspace);
     }
 
+    // Shortcuts to the note go to the trash with it; read them now for the undo
+    const linkedIdsForUndo = window.PoznoteTreeHistory ? window.PoznoteTreeHistory.linkedNoteIds(noteId) : [];
+
     // Use RESTful API: DELETE /api/v1/notes/{id}
     fetch(url, {
         method: "DELETE",
@@ -584,6 +587,7 @@ function deleteNote(noteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                recordNoteDeleteForUndo(noteId, linkedIdsForUndo);
                 if (typeof window.invalidateNoteDomCache === 'function') {
                     window.invalidateNoteDomCache(noteId);
                 }
@@ -609,6 +613,24 @@ function deleteNote(noteId) {
         .catch(function (error) {
             showNotificationPopup('Network error while deleting: ' + error.message, 'error');
         });
+}
+
+/**
+ * Undo support (js/tree-undo-clipboard.js): a trashed note can be restored
+ * with Ctrl+Z from the tree.
+ * @param {string|number} noteId - The note that was moved to trash
+ * @param {Array} [linkedIds] - Shortcuts trashed along with it
+ * @private
+ */
+function recordNoteDeleteForUndo(noteId, linkedIds) {
+    if (!window.PoznoteTreeHistory) return;
+    window.PoznoteTreeHistory.record({
+        type: 'note-delete',
+        noteId: String(noteId),
+        linkedIds: (linkedIds || []).map(String),
+        workspace: (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace
+            : (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '')
+    });
 }
 
 /**
@@ -1211,6 +1233,7 @@ function deleteLinkedNoteOnly(linkedNoteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                recordNoteDeleteForUndo(linkedNoteId, []);
                 if (typeof window.invalidateNoteDomCache === 'function') {
                     window.invalidateNoteDomCache(linkedNoteId);
                 }
@@ -1246,6 +1269,8 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
         url += "&workspace=" + encodeURIComponent(workspace);
     }
 
+    const linkedIdsForUndo = window.PoznoteTreeHistory ? window.PoznoteTreeHistory.linkedNoteIds(targetNoteId) : [];
+
     fetch(url, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
@@ -1253,6 +1278,7 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                recordNoteDeleteForUndo(targetNoteId, linkedIdsForUndo);
                 if (typeof window.invalidateNoteDomCache === 'function') {
                     window.invalidateNoteDomCache(targetNoteId);
                     window.invalidateNoteDomCache(linkedNoteId);
