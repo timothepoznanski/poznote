@@ -605,24 +605,18 @@
     max-width: none !important;
 }
 
-/* ── Table look (desktop): card outline, tinted header strip and subtle
-   column separators; no horizontal row lines. Cells stretch to the full row
-   height and carry the vertical padding themselves, so the separators run
-   as continuous lines. ── */
+/* ── Desktop layout: cells stretch to the full row height and carry the
+   vertical padding themselves; no card outline, no column separators, no
+   horizontal row lines. ── */
 @media (min-width: 801px) {
     .shared-notes-list {
-        border: 1px solid var(--dm-border, var(--pz-border, #e0e0e0));
-        border-radius: 12px;
-        background: var(--dm-content-bg, #ffffff);
-        /* Breathing room inside the card: generous on the left and bottom,
-           tight on the right, slight at the top. */
         padding: 5px 8px 28px 28px;
     }
 
     .shared-notes-header {
         align-items: stretch;
         /* Same horizontal padding as the rows so header and row cells line
-           up and the column separators stay straight. */
+           up. */
         padding: 0 5px;
         margin-top: 0;
         margin-bottom: 0;
@@ -649,19 +643,30 @@
         padding-bottom: 6px;
     }
 
+    /* Link column: token centered under its header (symmetric padding so
+       the centre of the cell matches the centre of the header). */
+    .shared-notes-header-token,
+    .note-token-wrap,
+    .note-token-wrap.read-only {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .note-token-wrap {
+        justify-content: center;
+    }
+
+    .note-token {
+        flex: 0 1 auto;
+        text-align: center;
+    }
+
     .note-actions {
         align-items: center;
         /* Breathing room on both sides of the buttons; the measurement pass
            includes it, so the column width follows. */
         padding-left: 34px;
         padding-right: 18px;
-    }
-
-    .shared-notes-header-token,
-    .shared-notes-header-actions,
-    .note-token-wrap,
-    .note-actions {
-        border-left: 1px solid var(--dm-border, rgba(15, 23, 42, 0.07));
     }
 
     /* Soft action buttons: tinted background with a colored icon, full color

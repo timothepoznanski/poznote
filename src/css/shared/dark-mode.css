@@ -119,15 +119,6 @@
     color: #c8d0d8;
 }
 
-[data-theme="dark"] .shared-notes-header-folder,
-[data-theme="dark"] .shared-notes-header-token,
-[data-theme="dark"] .shared-notes-header-actions,
-[data-theme="dark"] .note-folder-container,
-[data-theme="dark"] .note-token-wrap,
-[data-theme="dark"] .note-actions {
-    border-left-color: #444444;
-}
-
 /* Soft action buttons: brighter icon hues so the tinted chips stay readable
    on a dark background; hover keeps the full-color treatment. */
 [data-theme="dark"] .note-actions .btn-success {
