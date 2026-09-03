@@ -478,15 +478,23 @@ body.dark-mode .markdown-preview pre.indented-pre {
    hierarchical numbering (list-style none, padding 0, li display:block with an
    inline ::before counter). Inside the markdown preview that layout loses the
    hanging indent: wrapped lines slide back under the number. Restore native
-   ordered-list rendering there; the extra .noteentry ancestor outweighs those
-   rules at equal cascade position. */
+   list-item rendering there but keep the hierarchical numbers by drawing them
+   with ::marker, which hangs outside the text like a native marker. Browsers
+   without content support in ::marker fall back to plain decimal markers.
+   The extra .noteentry ancestor outweighs the checklists.css rules. */
 .noteentry .markdown-preview ol {
     list-style-type: decimal;
     padding-left: 2em;
+    counter-reset: item;
 }
 
 .noteentry .markdown-preview ol>li {
     display: list-item;
+    counter-increment: item;
+}
+
+.noteentry .markdown-preview ol>li::marker {
+    content: counters(item, ".") ". ";
 }
 
 .noteentry .markdown-preview ol>li::before {
