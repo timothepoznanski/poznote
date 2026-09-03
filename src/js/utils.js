@@ -754,6 +754,16 @@ function executeDeleteFolderOperation(folderId, folderName) {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
+                // Undo support (js/tree-undo-clipboard.js): the snapshot
+                // rebuilds the folder tree and untrashes its notes
+                if (window.PoznoteTreeHistory && data.restore_snapshot) {
+                    window.PoznoteTreeHistory.record({
+                        type: 'folder-delete',
+                        folderId: String(folderId),
+                        snapshot: data.restore_snapshot
+                    });
+                }
+
                 // Folder deleted successfully - remove any localStorage state for this folder
                 try {
                     // Find the folder header matching the deleted folder name and remove the stored open/closed state
@@ -793,6 +803,45 @@ function executeDeleteFolderOperation(folderId, folderName) {
         .catch(function (error) {
             showNotificationPopup(
                 (window.t ? window.t('folders.errors.delete_prefix', { error: String(error) }, 'Error deleting folder: {{error}}') : ('Error deleting folder: ' + error)),
+                'error'
+            );
+        });
+}
+
+/**
+ * Duplicate a folder with all its notes and subfolders.
+ *
+ * The copy lands next to the original under a unique name; the page reloads
+ * so the tree picks it up, like the other folder actions.
+ */
+function duplicateFolder(folderId, folderName) {
+    var ws = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '';
+
+    fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/duplicate?workspace=' + encodeURIComponent(ws || ''), {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: '{}'
+    })
+        .then(function (response) { return response.json(); })
+        .then(function (data) {
+            if (data.success) {
+                // New notes were created: mark for auto-push (if enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
+                window.location.reload();
+            } else {
+                var message = data.error || data.message || 'Unknown error';
+                showNotificationPopup(
+                    (window.t ? window.t('folders.errors.generic_prefix', { error: message }, 'Error: {{error}}') : ('Error: ' + message)),
+                    'error'
+                );
+            }
+        })
+        .catch(function (error) {
+            showNotificationPopup(
+                (window.t ? window.t('folders.errors.duplicate_prefix', { error: String(error) }, 'Error duplicating folder: {{error}}') : ('Error duplicating folder: ' + error)),
                 'error'
             );
         });
@@ -1744,6 +1793,8 @@ function executeMoveFolderToSubfolder() {
         requestData.new_parent_folder_id = null;
     }
 
+    var folderBefore = window.PoznoteTreeHistory ? window.PoznoteTreeHistory.folderState(sourceFolderId) : null;
+
     fetch('/api/v1/folders/' + sourceFolderId + '/move', {
         method: 'POST',
         headers: {
@@ -1762,6 +1813,21 @@ function executeMoveFolderToSubfolder() {
         })
         .then(function (data) {
             if (data.success) {
+                // Undo support (js/tree-undo-clipboard.js)
+                if (window.PoznoteTreeHistory && folderBefore) {
+                    window.PoznoteTreeHistory.record({
+                        type: 'folder-move',
+                        folderId: String(sourceFolderId),
+                        from: {
+                            parentId: folderBefore.parentId,
+                            workspace: folderBefore.workspace,
+                            prevSiblingId: folderBefore.prevSiblingId,
+                            nextSiblingId: folderBefore.nextSiblingId
+                        },
+                        to: { parentId: targetParentId !== null ? String(targetParentId) : null, workspace: targetWorkspace }
+                    });
+                }
+
                 // Successfully moved folder
                 showNotificationPopup(
                     (window.t ? window.t('folders.move.success', { folder: sourceFolderName }, 'Folder "{{folder}}" moved successfully') : ('Folder "' + sourceFolderName + '" moved successfully')),
@@ -2435,6 +2501,8 @@ function moveNoteToFolder() {
         workspace: targetWorkspace
     };
 
+    var noteBefore = window.PoznoteTreeHistory ? window.PoznoteTreeHistory.noteState(noteId) : null;
+
     fetch('/api/v1/notes/' + noteId + '/folder', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -2444,6 +2512,16 @@ function moveNoteToFolder() {
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data && data.success) {
+                // Undo support (js/tree-undo-clipboard.js)
+                if (window.PoznoteTreeHistory && noteBefore) {
+                    window.PoznoteTreeHistory.record({
+                        type: 'note-move',
+                        noteId: String(noteId),
+                        from: { folderId: noteBefore.folderId, workspace: noteBefore.workspace },
+                        to: { folderId: targetFolderId ? String(targetFolderId) : null, workspace: targetWorkspace }
+                    });
+                }
+
                 // Mark note for auto-push since we moved a note (if auto-push enabled)
                 if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                     window.setNeedsAutoPush(true);
@@ -3173,6 +3251,12 @@ function populateFolderActionsMenu(menu, toggle) {
     });
 
     syncActionsMenuSeparators(menu);
+
+    // Copy / cut / paste items (js/tree-undo-clipboard.js): paste only
+    // shows with something on the clipboard
+    if (window.PoznoteTreeClipboard) {
+        window.PoznoteTreeClipboard.syncMenu(menu);
+    }
 }
 
 // Keeps exactly one folder toggle marked .open, so the hover-reveal rule in
@@ -3476,6 +3560,7 @@ function populateNoteActionsMenu(menu, toggle) {
     var noteType = toggle.getAttribute('data-note-type') || 'note';
     var folderId = toggle.getAttribute('data-folder-id') || '';
     var folderName = toggle.getAttribute('data-folder') || '';
+    var isFavorite = toggle.getAttribute('data-favorite') === '1';
 
     menu.setAttribute('data-note-id', noteId);
 
@@ -3484,6 +3569,14 @@ function populateNoteActionsMenu(menu, toggle) {
     var isLinkedNote = noteType === 'linked';
     menu.querySelectorAll('.note-real-only').forEach(function (item) {
         item.style.display = isLinkedNote ? 'none' : '';
+    });
+
+    // Favorite item: show the variant matching the note's favorite state
+    menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? '' : 'none';
+    });
+    menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? 'none' : '';
     });
 
     // Copy note identity onto every action item (handlers read it there).
@@ -3500,6 +3593,12 @@ function populateNoteActionsMenu(menu, toggle) {
     });
 
     syncActionsMenuSeparators(menu);
+
+    // Copy / cut / paste items (js/tree-undo-clipboard.js): paste only
+    // shows with something on the clipboard
+    if (window.PoznoteTreeClipboard) {
+        window.PoznoteTreeClipboard.syncMenu(menu);
+    }
 }
 
 // The toggle that opened the menu, so it can be closed by a second click and

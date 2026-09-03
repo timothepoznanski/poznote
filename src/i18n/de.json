@@ -164,6 +164,10 @@
       "label": "Sortieren nach",
       "date": "Datum",
       "tag": "Tags"
+    },
+    "subfolder": {
+      "expand": "Unterordner ausklappen",
+      "collapse": "Unterordner einklappen"
     }
   },
   "folders": {
@@ -196,6 +200,7 @@
       "create_title": "Fehler beim Erstellen des Ordners",
       "create_prefix": "Fehler beim Erstellen des Ordners: {{error}}",
       "delete_prefix": "Fehler beim Löschen des Ordners: {{error}}",
+      "duplicate_prefix": "Fehler beim Duplizieren des Ordners: {{error}}",
       "rename_prefix": "Fehler beim Umbenennen des Ordners: {{error}}",
       "load_prefix": "Fehler beim Laden der Ordner: {{error}}",
       "empty_folder_prefix": "Fehler beim Leeren des Ordners: {{error}}",
@@ -455,7 +460,7 @@
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
       "custom_css": "Wenden Sie eigenes CSS an, um das Aussehen von Poznote anzupassen.",
-      "ui_customization_admin": "Blenden Sie Oberflächenelemente für alle Benutzer dieser Instanz aus.",
+      "ui_customization_admin": "Blenden Sie Oberflächenelemente aus, die Sie nicht verwenden, für sich selbst oder für alle Benutzer dieser Instanz.",
       "disaster_recovery": "Stellen Sie die Instanz nach einem Datenverlust aus einer Sicherung wieder her.",
       "orphan_scanner": "Finden und bereinigen Sie Anhangsdateien, die zu keiner Notiz mehr gehören.",
       "storage_stats": "Sehen Sie die Speichernutzung aller Benutzer dieser Instanz.",
@@ -517,7 +522,6 @@
       "guestbook": "Poznote Gästebuch",
       "support": "Poznote unterstützen",
       "buy_me_a_coffee": "Spendiere mir einen Kaffee",
-      "ui_customization_global": "Sichtbarkeit von Elementen (alle Benutzer)",
       "custom_css": "Benutzerdefinierte CSS-Datei",
       "install_extension": "Erweiterung installieren",
       "install_app": "App installieren",
@@ -1123,8 +1127,9 @@
     "ui_customization": {
       "title": "Oberfläche anpassen",
       "description": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet.",
-      "title_global": "Oberfläche anpassen (alle Benutzer außer Administratoren)",
-      "description_global": "Oberflächenelemente für alle Benutzer dieser Instanz ein- oder ausblenden. Nicht angehakte Elemente werden für alle außer Administratoren ausgeblendet.",
+      "description_admin": "Oberflächenelemente ein- oder ausblenden. Nicht angehakte Elemente werden ausgeblendet. Die Spalte „Ich“ gilt für Ihre eigene Oberfläche, die Spalte „Benutzer“ für alle Benutzer dieser Instanz außer Administratoren.",
+      "column_me": "Ich",
+      "column_users": "Benutzer",
       "description_global_highlight": "außer Administratoren",
       "locked_by_admin": "Vom Administrator für alle Benutzer ausgeblendet",
       "locked_by_tenant_isolation": "Automatisch ausgeblendet, solange diese Funktion durch die Mandantentrennung blockiert ist",
@@ -1161,6 +1166,7 @@
       "expand_all": "Alle ausklappen",
       "badge_all_visible": "Alle sichtbar",
       "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
+      "badge_hidden_count_admin_columns": "{{me}} für Sie ausgeblendet, {{users}} für Benutzer",
       "badge_hidden_count": "{{count}} ausgeblendet",
       "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
       "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
@@ -1168,7 +1174,6 @@
       "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
-      "note_favorite_star": "Favoriten-Stern (★) auf Notizen",
       "note_actions_hint": "Einträge des ⋮-Menüs jeder Notiz in der Seitenleiste. Werden alle abgewählt, verschwindet die Menüschaltfläche.",
       "theme_toggle": "Design-Umschalter"
     },
@@ -1396,7 +1401,8 @@
       "options": {
         "last_modified": "Zuletzt geändert",
         "last_created": "Zuletzt erstellt",
-        "alphabetical": "Alphabetisch"
+        "alphabetical": "Alphabetisch",
+        "manual": "Manuell (Drag & Drop)"
       }
     },
     "markdown_colored": {
@@ -1582,6 +1588,7 @@
       "rename_folder": "Ordner umbenennen",
       "delete_folder": "Ordner löschen",
       "move_folder": "Ordner verschieben",
+      "duplicate_folder": "Ordner duplizieren",
       "download_folder": "Herunterladen",
       "change_icon": "Symbol ändern",
       "is_public": "Ist geteilt",
@@ -3130,7 +3137,8 @@
     "header": "Sortieren nach",
     "alphabet": "Name",
     "created": "Erstellungsdatum",
-    "modified": "Änderungsdatum"
+    "modified": "Änderungsdatum",
+    "manual": "Manuell"
   },
   "calendar": {
     "months": {

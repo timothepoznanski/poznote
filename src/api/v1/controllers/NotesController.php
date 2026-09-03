@@ -425,7 +425,7 @@ class NotesController {
             }
             
             // Build query for notes
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width FROM entries WHERE trash = 0";
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order FROM entries WHERE trash = 0";
             $params = [];
             
             if ($workspace) {
@@ -488,7 +488,10 @@ class NotesController {
             $allowed = [
                 'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
                 'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
-                'heading_asc'  => 'folder, heading COLLATE NOCASE ASC'
+                'heading_asc'  => 'folder, heading COLLATE NOCASE ASC',
+                // Drag-and-drop order: unplaced notes (display_order 0) first,
+                // newest update first, then the saved positions
+                'manual'       => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, CASE WHEN display_order > 0 THEN 1 ELSE 0 END, display_order, updated DESC"
             ];
             
             $order_by = $allowed['updated_desc'];
@@ -609,13 +612,13 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
@@ -633,13 +636,13 @@ class NotesController {
                 
                 if (is_numeric($reference)) {
                     $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$refId, $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
                     $params = ['%' . $reference . '%', $workspace];
                     $this->appendPublicWorkspaceAgeFilter($sql, $params);
                     $sql .= " ORDER BY updated DESC LIMIT 1";
@@ -708,6 +711,7 @@ class NotesController {
                     'version' => $version,
                     'reminder_at' => $row['reminder_at'] ?? null,
                     'content_width' => isset($row['content_width']) ? (int)$row['content_width'] : null,
+                    'display_order' => (int)($row['display_order'] ?? 0),
                     'content' => $content
                 ]
             ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
@@ -2015,107 +2019,22 @@ class NotesController {
                 return;
             }
 
-            $workspace  = $originalNote['workspace'];
-            $folderId   = $overrideFolder ? ($options['folderId'] ?? null) : $originalNote['folder_id'];
-            $folderName = $overrideFolder ? ($options['folderName'] ?? null) : $originalNote['folder'];
-
-            // Generate unique heading
-            $originalHeading = $originalNote['heading'] ?: t('index.note.new_note', [], 'New note');
-            $newHeading = generateUniqueTitle($headingPrefix . $originalHeading, null, $workspace, $folderId);
-
-            // Duplicate attachments
-            $newAttachments = null;
-            $attachmentIdMapping = [];
-            $originalAttachments = $originalNote['attachments'] ? json_decode($originalNote['attachments'], true) : [];
-
-            if (!empty($originalAttachments)) {
-                $attachmentsDir = getAttachmentsPath();
-                $duplicatedAttachments = [];
-
-                foreach ($originalAttachments as $attachment) {
-                    // Readable local path (fetched from the bucket in S3 mode)
-                    $originalFilePath = poznoteAttachmentLocalFile($attachment['filename'] ?? '');
-
-                    if ($originalFilePath !== null) {
-                        $fileExtension = pathinfo($attachment['filename'], PATHINFO_EXTENSION);
-                        $newFilename = uniqid() . '_' . time() . '.' . $fileExtension;
-                        $oldAttachmentId = $attachment['id'];
-                        $newAttachmentId = uniqid();
-
-                        if (poznoteStoreAttachmentFromPath($originalFilePath, $newFilename, $attachment['file_type'] ?? 'application/octet-stream')) {
-                            $attachmentIdMapping[$oldAttachmentId] = $newAttachmentId;
-
-                            $duplicatedAttachments[] = [
-                                'id' => $newAttachmentId,
-                                'filename' => $newFilename,
-                                'original_filename' => $attachment['original_filename'],
-                                'file_size' => $attachment['file_size'],
-                                'file_type' => $attachment['file_type'],
-                                'uploaded_at' => date('Y-m-d H:i:s')
-                            ];
-                        }
-                    }
-                }
-
-                $newAttachments = !empty($duplicatedAttachments) ? json_encode($duplicatedAttachments) : null;
+            $cloned = poznoteCloneNoteRecord($this->con, (int)$id, [
+                'headingPrefix' => $headingPrefix,
+                'actorUserId'   => $this->getActorUserId(),
+            ] + ($overrideFolder ? [
+                'folderId'   => $options['folderId'] ?? null,
+                'folderName' => $options['folderName'] ?? null,
+            ] : []));
+            if ($cloned === null) {
+                $this->sendError(404, 'Note not found');
+                return;
             }
-
-            // Read original content and update attachment references
-            $originalFilename = getEntryFilename($id, $originalNote['type']);
-            $content = $originalNote['entry'] ?? '';
-            if (is_readable($originalFilename)) {
-                $fileContent = file_get_contents($originalFilename);
-                if ($fileContent !== false) {
-                    $content = $fileContent;
-                }
-            }
-            foreach ($attachmentIdMapping as $oldId => $newId) {
-                $content = str_replace($oldId, $newId, $content);
-            }
-
-            // Insert new note
-            $actorUserId = $this->getActorUserId();
-            $insertStmt = $this->con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
-            $insertStmt->execute([
-                $newHeading,
-                $originalNote['tags'],
-                $folderName,
-                $folderId,
-                $workspace,
-                $originalNote['type'],
-                $newAttachments,
-                $originalNote['icon'],
-                $originalNote['icon_color'],
-                $originalNote['color'],
-                $originalNote['content_width'],
-                $actorUserId,
-                $actorUserId
-            ]);
-
-            $newId = $this->con->lastInsertId();
-
-            // Update note ID references in attachment URLs
-            // Replace /api/v1/notes/{oldNoteId}/attachments/ with /api/v1/notes/{newNoteId}/attachments/
-            if (!empty($content) && !empty($attachmentIdMapping)) {
-                $content = str_replace(
-                    '/api/v1/notes/' . $id . '/attachments/',
-                    '/api/v1/notes/' . $newId . '/attachments/',
-                    $content
-                );
-            }
+            $newId = $cloned['id'];
+            $newHeading = $cloned['heading'];
 
             // Notes duplicated into a shared folder inherit access through the folder only.
             $wasShared = false;
-
-            // Write file
-            $newFilename = getEntryFilename($newId, $originalNote['type']);
-            if (!empty($content)) {
-                file_put_contents($newFilename, $content);
-                chmod($newFilename, 0644);
-            }
-
-            $updateEntryStmt = $this->con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
-            $updateEntryStmt->execute([$content, $newId]);
 
             http_response_code(201);
             $this->sendSuccess(array_merge([
@@ -2133,11 +2052,42 @@ class NotesController {
     /**
      * POST /api/v1/notes/{id}/duplicate
      * Duplicate a note
+     *
+     * Body (JSON, optional):
+     *   - folder_id: target folder for the copy; '' or 0 for the root.
+     *                Omit to leave the copy next to the original.
+     *   - workspace: workspace the target folder must belong to
      */
     public function duplicate(string $id): void {
-        $this->cloneNote($id, [
-            'successMessage' => 'Note duplicated successfully',
-        ]);
+        $options = ['successMessage' => 'Note duplicated successfully'];
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (is_array($input) && array_key_exists('folder_id', $input)) {
+            $targetFolderId = $input['folder_id'];
+            $targetFolderId = ($targetFolderId === null || $targetFolderId === '') ? 0 : (int)$targetFolderId;
+            if ($targetFolderId > 0) {
+                $workspace = isset($input['workspace']) ? trim((string)$input['workspace']) : '';
+                if ($workspace !== '') {
+                    $stmt = $this->con->prepare("SELECT name FROM folders WHERE id = ? AND workspace = ?");
+                    $stmt->execute([$targetFolderId, $workspace]);
+                } else {
+                    $stmt = $this->con->prepare("SELECT name FROM folders WHERE id = ?");
+                    $stmt->execute([$targetFolderId]);
+                }
+                $folderName = $stmt->fetchColumn();
+                if ($folderName === false) {
+                    $this->sendError(404, 'Target folder not found');
+                    return;
+                }
+                $options['folderId'] = $targetFolderId;
+                $options['folderName'] = (string)$folderName;
+            } else {
+                $options['folderId'] = null;
+                $options['folderName'] = null;
+            }
+        }
+
+        $this->cloneNote($id, $options);
     }
     
     /**

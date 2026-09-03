@@ -165,6 +165,10 @@
       "label": "Ordenar por",
       "date": "Fecha",
       "tag": "Etiqueta"
+    },
+    "subfolder": {
+      "expand": "Expandir subcarpeta",
+      "collapse": "Contraer subcarpeta"
     }
   },
   "folders": {
@@ -197,6 +201,7 @@
       "create_title": "Error al crear carpeta",
       "create_prefix": "Error al crear carpeta: {{error}}",
       "delete_prefix": "Error al eliminar carpeta: {{error}}",
+      "duplicate_prefix": "Error al duplicar carpeta: {{error}}",
       "rename_prefix": "Error al renombrar carpeta: {{error}}",
       "load_prefix": "Error al cargar carpetas: {{error}}",
       "empty_folder_prefix": "Error al vaciar carpeta: {{error}}",
@@ -456,7 +461,7 @@
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
       "custom_css": "Aplica tu propio CSS para personalizar la apariencia de Poznote.",
-      "ui_customization_admin": "Oculta elementos de la interfaz para todos los usuarios de esta instancia.",
+      "ui_customization_admin": "Oculta los elementos de la interfaz que no utilizas, para ti o para todos los usuarios de esta instancia.",
       "disaster_recovery": "Restaura la instancia desde una copia de seguridad en caso de pérdida de datos.",
       "orphan_scanner": "Encuentra y limpia archivos adjuntos que ya no pertenecen a ninguna nota.",
       "storage_stats": "Consulta el uso de almacenamiento de todos los usuarios de esta instancia.",
@@ -518,7 +523,6 @@
       "guestbook": "Libro de visitas de Poznote",
       "support": "Apoyar Poznote",
       "buy_me_a_coffee": "Invítame a un café",
-      "ui_customization_global": "Visibilidad de los elementos (todos los usuarios)",
       "custom_css": "Archivo CSS personalizado",
       "install_extension": "Instalar extensión",
       "install_app": "Instalar aplicación",
@@ -1124,8 +1128,9 @@
     "ui_customization": {
       "title": "Personalización de interfaz",
       "description": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán.",
-      "title_global": "Personalización de interfaz (todos los usuarios excepto los administradores)",
-      "description_global": "Mostrar u ocultar elementos de la interfaz para todos los usuarios de esta instancia. Los elementos no marcados se ocultarán para todos excepto los administradores.",
+      "description_admin": "Mostrar u ocultar elementos de la interfaz. Los elementos no marcados se ocultarán. La columna «Yo» se aplica a tu propia interfaz, la columna «Usuarios» a todos los usuarios de esta instancia excepto los administradores.",
+      "column_me": "Yo",
+      "column_users": "Usuarios",
       "description_global_highlight": "excepto los administradores",
       "locked_by_admin": "Oculto para todos los usuarios por el administrador",
       "locked_by_tenant_isolation": "Oculto automáticamente mientras esta capacidad esté bloqueada por el aislamiento de cuentas",
@@ -1162,6 +1167,7 @@
       "expand_all": "Expandir todo",
       "badge_all_visible": "Todo visible",
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} por el administrador)",
+      "badge_hidden_count_admin_columns": "{{me}} oculto(s) para ti, {{users}} para los usuarios",
       "badge_hidden_count": "{{count}} oculto(s)",
       "direct_copy_restore_section": "Página de restauración: sección «Restaurar cuando la restauración estándar no funciona»",
       "s3_backups_section": "Página de copia de seguridad: sección «Copias de seguridad S3»",
@@ -1169,7 +1175,6 @@
       "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?",
       "folder_actions_toggle": "Botón de menú (⋮) en las carpetas",
       "note_actions_toggle": "Botón de menú (⋮) en las notas",
-      "note_favorite_star": "Estrella de favorito (★) en las notas",
       "note_actions_hint": "Elementos del menú ⋮ de cada nota en la barra lateral. Si se desmarcan todos, se oculta el botón del menú.",
       "theme_toggle": "Botón de tema"
     },
@@ -1397,7 +1402,8 @@
       "options": {
         "last_modified": "Última modificación",
         "last_created": "Última creación",
-        "alphabetical": "Alfabético"
+        "alphabetical": "Alfabético",
+        "manual": "Manual (arrastrar y soltar)"
       }
     },
     "markdown_colored": {
@@ -1583,6 +1589,7 @@
       "rename_folder": "Renombrar carpeta",
       "delete_folder": "Eliminar carpeta",
       "move_folder": "Mover carpeta",
+      "duplicate_folder": "Duplicar carpeta",
       "change_icon": "Cambiar icono",
       "download_folder": "Descargar",
       "is_public": "Es compartida",
@@ -3130,7 +3137,8 @@
     "header": "Ordenar por",
     "alphabet": "Nombre",
     "created": "Fecha de creación",
-    "modified": "Fecha de modificación"
+    "modified": "Fecha de modificación",
+    "manual": "Manual"
   },
   "calendar": {
     "months": {

@@ -175,7 +175,7 @@
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
       "custom_css": "Apply your own CSS to customize the appearance of Poznote.",
-      "ui_customization_admin": "Hide interface elements for all users of this instance.",
+      "ui_customization_admin": "Hide interface elements you do not use, for yourself or for every user of this instance.",
       "disaster_recovery": "Restore the instance from a backup in case of data loss.",
       "orphan_scanner": "Find and clean up attachment files that no longer belong to any note.",
       "storage_stats": "See storage usage across all users of this instance.",
@@ -221,7 +221,6 @@
       "buy_me_a_coffee": "Buy me a coffee",
       "install_extension": "Install extension",
       "install_app": "Install application",
-      "ui_customization_global": "Element visibility (all users)",
       "custom_css": "Custom CSS path",
       "release_notes": "Release Notes",
       "orphan_scanner": "Orphan attachments scanner",
@@ -611,8 +610,9 @@
     "ui_customization": {
       "title": "UI Customization",
       "description": "Show or hide interface elements. Unchecked items will be hidden.",
-      "title_global": "UI Customization (all users except for administrators)",
-      "description_global": "Show or hide interface elements for every user of this instance. Unchecked items will be hidden for everyone except administrators.",
+      "description_admin": "Show or hide interface elements. Unchecked items will be hidden. The \"Me\" column applies to your own interface, the \"Users\" column to every user of this instance except administrators.",
+      "column_me": "Me",
+      "column_users": "Users",
       "description_global_highlight": "except administrators",
       "locked_by_admin": "Hidden for all users by the administrator",
       "locked_by_tenant_isolation": "Hidden automatically while this capability is blocked by Tenant isolation",
@@ -645,6 +645,7 @@
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
+      "badge_hidden_count_admin_columns": "{{me}} hidden for you, {{users}} for users",
       "badge_hidden_count": "{{count}} hidden",
       "check_all": "Check all",
       "uncheck_all": "Uncheck all",
@@ -656,7 +657,6 @@
       "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?",
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
-      "note_favorite_star": "Favorite star (★) on notes",
       "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.",
       "theme_toggle": "Theme toggle"
     },
@@ -933,7 +933,8 @@
       "options": {
         "last_modified": "Last modified",
         "last_created": "Last created",
-        "alphabetical": "Alphabetical"
+        "alphabetical": "Alphabetical",
+        "manual": "Manual (drag and drop)"
       }
     },
     "markdown_colored": {
@@ -1108,6 +1109,10 @@
       "rename_folder": "Rename folder",
       "delete_folder": "Delete folder",
       "move_folder": "Move folder",
+      "duplicate_folder": "Duplicate folder",
+      "copy_folder": "Copy",
+      "cut_folder": "Cut",
+      "paste_into_folder": "Paste into folder",
       "change_icon": "Change icon",
       "change_note_icon": "Change note icon",
       "download_folder": "Download",
@@ -1130,10 +1135,43 @@
       "share_note": "Share note",
       "rename_note": "Rename note",
       "delete_note": "Delete note",
+      "copy_note": "Copy",
+      "cut_note": "Cut",
+      "paste_note": "Paste here",
       "enter_note_name": "Please enter a note title",
       "attachments": "Attachments",
       "convert_note": "Convert note"
     }
+  },
+  "tree_history": {
+    "undone": "Undo: {{action}}",
+    "redone": "Redo: {{action}}",
+    "nothing_to_undo": "Nothing to undo",
+    "nothing_to_redo": "Nothing to redo",
+    "undo_failed": "Undo failed: {{error}}",
+    "redo_failed": "Redo failed: {{error}}",
+    "actions": {
+      "move_note": "Move note",
+      "move_folder": "Move folder",
+      "delete_note": "Delete note",
+      "delete_folder": "Delete folder",
+      "paste_note": "Paste note",
+      "paste_folder": "Paste folder",
+      "rename_note": "Rename note",
+      "rename_folder": "Rename folder"
+    }
+  },
+  "tree_clipboard": {
+    "copied_note": "Copied \"{{name}}\"",
+    "cut_note": "Cut \"{{name}}\"",
+    "copied_folder": "Copied folder \"{{name}}\"",
+    "cut_folder": "Cut folder \"{{name}}\"",
+    "pasted_note": "Pasted \"{{name}}\"",
+    "pasted_folder": "Pasted folder \"{{name}}\"",
+    "nothing_to_paste": "Nothing to paste",
+    "already_there": "Already in this folder",
+    "cannot_paste_into_itself": "A folder cannot be pasted into itself",
+    "paste_failed": "Paste failed: {{error}}"
   },
   "note_color": {
     "modal_title": "Note color",
@@ -2171,6 +2209,10 @@
       "label": "Sort by",
       "date": "Date",
       "tag": "Tag"
+    },
+    "subfolder": {
+      "expand": "Expand subfolder",
+      "collapse": "Collapse subfolder"
     }
   },
   "sidebar": {
@@ -2696,7 +2738,8 @@
     "header": "Sort by",
     "alphabet": "Name",
     "created": "Date Created",
-    "modified": "Date Modified"
+    "modified": "Date Modified",
+    "manual": "Manual"
   },
   "calendar": {
     "months": {

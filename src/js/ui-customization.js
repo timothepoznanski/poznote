@@ -78,10 +78,7 @@
         'toolbar:btn-share': 'toolbar:btn-publish',
         // Notifications and AI chat moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
-        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn',
-        // Favorite left the note ⋮ menu for the star on the row itself, so a
-        // user who had hidden the menu entry keeps the row free of it.
-        'note:toggle-favorite': 'panel:note-favorite-star'
+        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -277,9 +274,7 @@
     function syncNoteActionToggles() {
         // Same arrangement as syncFolderActionToggles: one shared dropdown for
         // every note's toggle, so when UI customization hides all of its items
-        // the three-dot button has nothing left to open. The star sits in the
-        // same .note-actions container but is switched independently (see
-        // syncFolderActionToggles for why the container itself is left alone).
+        // the three-dot button has nothing left to open.
         var menu = document.getElementById('note-actions-menu');
         if (!menu) return;
 
@@ -301,11 +296,9 @@
             toggle.style.display = visibleItems ? '' : 'none';
         });
 
-        // Give the note titles back the strip reserved for the toggle, and the
-        // one reserved for the star when that is switched off too.
+        // Give the note titles back the strip reserved for the toggle.
         if (document.body) {
             document.body.classList.toggle('note-actions-hidden', !visibleItems);
-            document.body.classList.toggle('note-favorite-hidden', isKeyHidden('panel:note-favorite-star'));
         }
     }
 
@@ -454,10 +447,6 @@
                         rules.push('.folder-actions-toggle { display: none !important; }');
                     } else if (id === 'note-actions-toggle') {
                         rules.push('.note-actions-toggle { display: none !important; }');
-                    } else if (id === 'note-favorite-star') {
-                        // The star on note rows. !important beats the hover and
-                        // .is-favorite reveals in css/folders/actions-menu.css.
-                        rules.push('.note-favorite-toggle { display: none !important; }');
                     } else if (id === 'note-created-date') {
                         rules.push('.note-subline { display: none !important; }');
                     } else if (id === 'note-icons') {

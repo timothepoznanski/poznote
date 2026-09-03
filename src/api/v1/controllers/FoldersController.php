@@ -9,8 +9,11 @@
  *   GET    /api/v1/folders/{id}         - Get a specific folder
  *   POST   /api/v1/folders              - Create a new folder
  *   POST   /api/v1/folders/reorder      - Move a folder before/after another folder
+ *   POST   /api/v1/notes/reorder        - Move a note before/after another note (manual order)
  *   PATCH  /api/v1/folders/{id}         - Update/rename a folder
  *   DELETE /api/v1/folders/{id}         - Delete a folder
+ *   POST   /api/v1/folders/restore      - Rebuild a deleted folder tree from the snapshot delete returned
+ *   POST   /api/v1/folders/{id}/duplicate - Duplicate a folder with its notes and subfolders
  *   POST   /api/v1/folders/{id}/move    - Move folder to new parent
  *   POST   /api/v1/folders/{id}/empty   - Empty folder (move all notes to trash)
  *   PUT    /api/v1/folders/{id}/icon    - Update folder icon
@@ -813,6 +816,10 @@ class FoldersController {
         
         // Get all folder IDs (including subfolders)
         $allFolderIds = $this->getAllFolderIds($folderId, $actualWorkspace);
+
+        // What the tree looked like before the delete, handed back to the
+        // client so an undo can rebuild it through restoreDeleted()
+        $restoreSnapshot = $this->buildDeleteSnapshot($folderId, $allFolderIds, $actualWorkspace);
         
         try {
             $this->db->beginTransaction();
@@ -850,7 +857,8 @@ class FoldersController {
 
             $this->sendJson([
                 'success' => true,
-                'message' => 'Folder and all subfolders deleted successfully'
+                'message' => 'Folder and all subfolders deleted successfully',
+                'restore_snapshot' => $restoreSnapshot
             ]);
         } catch (Exception $e) {
             if ($this->db->inTransaction()) {
@@ -859,7 +867,461 @@ class FoldersController {
             $this->sendError('Failed to delete folder: ' . $e->getMessage(), 500);
         }
     }
+
+    /**
+     * Describe a folder subtree right before delete() removes it: the folder
+     * rows (parents before children) and the ids of the notes that are about
+     * to be trashed. The client keeps this in its undo history and posts it
+     * back to restoreDeleted().
+     *
+     * @param int    $rootFolderId Folder being deleted
+     * @param int[]  $folderIds    Root plus every descendant, parents first
+     * @param string $workspace    Workspace of the folder
+     * @return array ['workspace', 'folder_id', 'folders' => [...], 'notes' => [...]]
+     */
+    private function buildDeleteSnapshot(int $rootFolderId, array $folderIds, string $workspace): array {
+        $snapshot = [
+            'workspace' => $workspace,
+            'folder_id' => $rootFolderId,
+            'folders' => [],
+            'notes' => [],
+        ];
+        if (empty($folderIds)) {
+            return $snapshot;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
+
+        $folderStmt = $this->db->prepare(
+            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned, favorite, kanban_enabled, sort_setting"
+            . " FROM folders WHERE id IN ($placeholders) AND workspace = ?"
+        );
+        $folderStmt->execute(array_merge($folderIds, [$workspace]));
+        $rowsById = [];
+        while ($row = $folderStmt->fetch(PDO::FETCH_ASSOC)) {
+            $rowsById[(int)$row['id']] = [
+                'id' => (int)$row['id'],
+                'name' => (string)$row['name'],
+                'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
+                'icon' => $row['icon'],
+                'icon_color' => $row['icon_color'],
+                'color' => $row['color'],
+                'display_order' => (int)($row['display_order'] ?? 0),
+                'pinned' => (int)($row['pinned'] ?? 0),
+                'favorite' => (int)($row['favorite'] ?? 0),
+                'kanban_enabled' => (int)($row['kanban_enabled'] ?? 0),
+                'sort_setting' => $row['sort_setting'],
+            ];
+        }
+        // Keep the parents-first order of getAllFolderIds()
+        foreach ($folderIds as $fid) {
+            if (isset($rowsById[(int)$fid])) {
+                $snapshot['folders'][] = $rowsById[(int)$fid];
+            }
+        }
+
+        // Only the notes this delete is about to trash: ones already in the
+        // trash stay there on undo
+        $noteStmt = $this->db->prepare(
+            "SELECT id, folder_id FROM entries WHERE folder_id IN ($placeholders) AND workspace = ? AND trash = 0"
+        );
+        $noteStmt->execute(array_merge($folderIds, [$workspace]));
+        while ($row = $noteStmt->fetch(PDO::FETCH_ASSOC)) {
+            $snapshot['notes'][] = [
+                'id' => (int)$row['id'],
+                'folder_id' => (int)$row['folder_id'],
+            ];
+        }
+
+        return $snapshot;
+    }
+
+    /**
+     * POST /api/v1/folders/restore - Rebuild a deleted folder tree
+     *
+     * Undo counterpart of DELETE /api/v1/folders/{id}: takes the
+     * restore_snapshot that delete returned, recreates the folders (parents
+     * first, with their icon, color, order and settings) and brings the notes
+     * listed in it back out of the trash into the recreated folders. A folder
+     * that already exists again at the same place under the same name is
+     * reused rather than duplicated, so undo after a manual recreate does not
+     * leave two "Projects" side by side. Public shares are not restored.
+     *
+     * Body: the snapshot object as returned by delete
+     *   { "workspace": "Poznote", "folder_id": 12,
+     *     "folders": [{ "id", "name", "parent_id", "icon", ... }],
+     *     "notes": [{ "id", "folder_id" }] }
+     *
+     * Response: folder_id (new id of the root folder), folder_id_map
+     * (old id => new id) and restored_notes (count).
+     */
+    public function restoreDeleted(): void {
+        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+            $this->sendError('This endpoint is not available in public workspace mode', 403);
+            return;
+        }
+
+        $data = $this->getInputData();
+        $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : '';
+        $folders = isset($data['folders']) && is_array($data['folders']) ? $data['folders'] : [];
+        $notes = isset($data['notes']) && is_array($data['notes']) ? $data['notes'] : [];
+        $rootOldId = isset($data['folder_id']) ? (int)$data['folder_id'] : 0;
+
+        if ($workspace === '' || !$this->validateWorkspace($workspace)) {
+            $this->sendError('Workspace not found', 404);
+            return;
+        }
+        if (empty($folders)) {
+            $this->sendError('folders is required', 400);
+            return;
+        }
+
+        // Normalize and index the snapshot rows
+        $rows = [];
+        foreach ($folders as $row) {
+            if (!is_array($row) || !isset($row['id'], $row['name'])) continue;
+            $oldId = (int)$row['id'];
+            if ($oldId <= 0) continue;
+            $name = trim((string)$row['name']);
+            if ($this->validateFolderSegment($name) !== null) {
+                $this->sendError('Invalid folder name in snapshot: ' . $name, 400);
+                return;
+            }
+            $rows[$oldId] = [
+                'id' => $oldId,
+                'name' => $name,
+                'parent_id' => (isset($row['parent_id']) && $row['parent_id'] !== null && $row['parent_id'] !== '') ? (int)$row['parent_id'] : null,
+                'icon' => isset($row['icon']) && $row['icon'] !== '' ? (string)$row['icon'] : null,
+                'icon_color' => isset($row['icon_color']) && $row['icon_color'] !== '' ? (string)$row['icon_color'] : null,
+                'color' => isset($row['color']) && $row['color'] !== '' ? (string)$row['color'] : null,
+                'display_order' => (int)($row['display_order'] ?? 0),
+                'pinned' => !empty($row['pinned']) ? 1 : 0,
+                'favorite' => !empty($row['favorite']) ? 1 : 0,
+                'kanban_enabled' => !empty($row['kanban_enabled']) ? 1 : 0,
+                'sort_setting' => isset($row['sort_setting']) && $row['sort_setting'] !== '' ? (string)$row['sort_setting'] : null,
+            ];
+        }
+        if (empty($rows)) {
+            $this->sendError('folders is required', 400);
+            return;
+        }
+        if ($rootOldId <= 0 || !isset($rows[$rootOldId])) {
+            $rootOldId = (int)array_key_first($rows);
+        }
+
+        // Parents before children, whatever order the client sent
+        $ordered = [];
+        $placed = [];
+        $pending = $rows;
+        while (!empty($pending)) {
+            $progress = false;
+            foreach ($pending as $oldId => $row) {
+                $parent = $row['parent_id'];
+                if ($parent === null || !isset($rows[$parent]) || isset($placed[$parent])) {
+                    $ordered[] = $row;
+                    $placed[$oldId] = true;
+                    unset($pending[$oldId]);
+                    $progress = true;
+                }
+            }
+            if (!$progress) {
+                $this->sendError('Snapshot folders form a cycle', 400);
+                return;
+            }
+        }
+
+        $idMap = [];
+        $restoredNotes = 0;
+
+        try {
+            $this->db->beginTransaction();
+
+            $findStmt = $this->db->prepare('SELECT id FROM folders WHERE workspace = ? AND name = ? AND parent_id IS ?');
+            $parentExistsStmt = $this->db->prepare('SELECT id FROM folders WHERE id = ? AND workspace = ?');
+            $insertStmt = $this->db->prepare(
+                "INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, display_order, pinned, favorite, kanban_enabled, sort_setting, created)"
+                . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))"
+            );
+
+            foreach ($ordered as $row) {
+                $newParent = null;
+                if ($row['parent_id'] !== null) {
+                    if (isset($idMap[$row['parent_id']])) {
+                        $newParent = $idMap[$row['parent_id']];
+                    } else {
+                        // Parent outside the deleted subtree: still there?
+                        $parentExistsStmt->execute([$row['parent_id'], $workspace]);
+                        $newParent = $parentExistsStmt->fetchColumn() ? $row['parent_id'] : null;
+                    }
+                }
+
+                $findStmt->execute([$workspace, $row['name'], $newParent]);
+                $existing = $findStmt->fetchColumn();
+                if ($existing) {
+                    $idMap[$row['id']] = (int)$existing;
+                    continue;
+                }
+
+                $insertStmt->execute([
+                    $row['name'], $workspace, $newParent,
+                    $row['icon'], $row['icon_color'], $row['color'],
+                    $row['display_order'], $row['pinned'], $row['favorite'],
+                    $row['kanban_enabled'], $row['sort_setting'],
+                ]);
+                $idMap[$row['id']] = (int)$this->db->lastInsertId();
+            }
+
+            $folderNameStmt = $this->db->prepare('SELECT name FROM folders WHERE id = ?');
+            $restoreStmt = $this->db->prepare(
+                "UPDATE entries SET trash = 0, trashed_at = NULL, folder_id = ?, folder = ?"
+                . " WHERE id = ? AND workspace = ? AND trash = 1"
+            );
+            foreach ($notes as $note) {
+                if (!is_array($note) || !isset($note['id'])) continue;
+                $noteId = (int)$note['id'];
+                $oldFolderId = isset($note['folder_id']) ? (int)$note['folder_id'] : 0;
+                if ($noteId <= 0 || !isset($idMap[$oldFolderId])) continue;
+
+                $newFolderId = $idMap[$oldFolderId];
+                $folderNameStmt->execute([$newFolderId]);
+                $folderName = (string)$folderNameStmt->fetchColumn();
+
+                $restoreStmt->execute([$newFolderId, $folderName, $noteId, $workspace]);
+                $restoredNotes += $restoreStmt->rowCount();
+            }
+
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Failed to restore folder: ' . $e->getMessage(), 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Folder restored successfully',
+            'folder_id' => $idMap[$rootOldId] ?? null,
+            'folder_id_map' => $idMap,
+            'restored_notes' => $restoredNotes,
+        ], 201);
+    }
     
+    /**
+     * POST /api/v1/folders/{id}/duplicate - Duplicate a folder
+     *
+     * Copies the folder next to the original (same parent, same workspace)
+     * under a unique name ("Name (1)"), then recursively copies every
+     * subfolder and every non-trashed note, attachments included. Folder
+     * icon, color, Kanban mode and sort setting are kept; pinned, favorite,
+     * diary and public-share state are not, so the copy starts private.
+     * Links between notes of the copied tree are rewritten to point at the
+     * copies, which makes a folder usable as a template.
+     *
+     * Query params:
+     *   - workspace: string (optional) restrict the lookup to a workspace
+     */
+    public function duplicate(string $id): void {
+        $folderId = (int)$id;
+        $data = $this->getInputData();
+        $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace'])
+            : (isset($data['workspace']) ? trim((string)$data['workspace']) : null);
+        if ($workspace === '') $workspace = null;
+
+        [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
+        $stmt = $this->db->prepare("SELECT * FROM folders WHERE id = ?" . $wsCond);
+        $stmt->execute(array_merge([$folderId], $wsParams));
+        $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$folder) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+
+        $actualWorkspace = (string)$folder['workspace'];
+        $parentId = $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
+
+        // Quotas: refuse the whole copy up front rather than stopping half-way
+        $allFolderIds = $this->getAllFolderIds($folderId, $actualWorkspace);
+        $placeholders = implode(',', array_fill(0, count($allFolderIds), '?'));
+        $sizeStmt = $this->db->prepare("SELECT LENGTH(entry) AS len, attachments FROM entries WHERE folder_id IN ($placeholders) AND trash = 0 AND workspace = ?");
+        $sizeStmt->execute(array_merge($allFolderIds, [$actualWorkspace]));
+        $noteCount = 0;
+        $bytes = 0;
+        while ($row = $sizeStmt->fetch(PDO::FETCH_ASSOC)) {
+            $noteCount++;
+            $bytes += (int)($row['len'] ?? 0);
+            foreach ((json_decode((string)($row['attachments'] ?? ''), true) ?: []) as $attachment) {
+                $bytes += (int)($attachment['file_size'] ?? 0);
+            }
+        }
+        if ($noteCount > 0) {
+            $quotaError = poznoteCheckNoteQuota($this->db, $noteCount) ?? poznoteCheckStorageQuota($bytes);
+            if ($quotaError !== null) {
+                $this->sendError($quotaError, 403);
+                return;
+            }
+        }
+
+        $newName = $this->uniqueFolderName((string)$folder['name'], $actualWorkspace, $parentId);
+        $err = $this->validateFolderSegment($newName);
+        if ($err !== null) {
+            $this->sendError($err, 400);
+            return;
+        }
+
+        $actorUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+        $stats = ['notes' => 0, 'folders' => 0, 'note_ids' => []];
+
+        try {
+            $this->db->beginTransaction();
+            $newFolderId = $this->copyFolderTree($folder, $newName, $parentId, $actualWorkspace, $actorUserId, $stats, 0);
+            $this->rewriteCopiedNoteLinks($stats['note_ids']);
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            // The rows are gone with the rollback; drop the content files
+            // written for them so nothing is left behind on disk
+            foreach ($stats['note_ids'] as $ids) {
+                foreach (glob(getEntriesPath() . '/' . (int)$ids['new'] . '.*') ?: [] as $file) {
+                    @unlink($file);
+                }
+            }
+            $this->sendError('Failed to duplicate folder: ' . $e->getMessage(), 500);
+            return;
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Folder duplicated successfully',
+            'folder' => [
+                'id' => $newFolderId,
+                'name' => $newName,
+                'workspace' => $actualWorkspace,
+                'parent_id' => $parentId,
+            ],
+            'folder_id' => $newFolderId,
+            'folder_name' => $newName,
+            'source_folder_id' => $folderId,
+            'notes_count' => $stats['notes'],
+            'subfolders_count' => $stats['folders'] - 1,
+        ], 201);
+    }
+
+    /**
+     * First name of the form "Name", "Name (1)", "Name (2)"... not used by a
+     * sibling folder (same workspace and parent).
+     */
+    private function uniqueFolderName(string $baseName, string $workspace, ?int $parentId): string {
+        if ($parentId === null) {
+            $stmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND parent_id IS NULL');
+        } else {
+            $stmt = $this->db->prepare('SELECT COUNT(*) FROM folders WHERE name = ? AND workspace = ? AND parent_id = ?');
+        }
+        $name = $baseName;
+        $counter = 1;
+        while (true) {
+            $stmt->execute($parentId === null ? [$name, $workspace] : [$name, $workspace, $parentId]);
+            if ((int)$stmt->fetchColumn() === 0) {
+                return $name;
+            }
+            $name = $baseName . ' (' . $counter . ')';
+            $counter++;
+        }
+    }
+
+    /**
+     * Copy one folder row under $parentId, then its notes and, recursively,
+     * its subfolders. Returns the id of the new folder.
+     *
+     * @param array $source Source folder row (SELECT * FROM folders)
+     * @param array $stats  Accumulates 'notes', 'folders' and 'note_ids'
+     *                      (list of ['old' => id, 'new' => id] pairs)
+     */
+    private function copyFolderTree(array $source, string $name, ?int $parentId, string $workspace, int $actorUserId, array &$stats, int $depth): int {
+        if ($depth > 50) {
+            throw new Exception('Folder hierarchy too deep');
+        }
+
+        $insert = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, kanban_enabled, sort_setting, display_order, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
+        $insert->execute([
+            $name,
+            $workspace,
+            $parentId,
+            $source['icon'] ?? null,
+            $source['icon_color'] ?? null,
+            $source['color'] ?? null,
+            (int)($source['kanban_enabled'] ?? 0),
+            $source['sort_setting'] ?? null,
+            (int)($source['display_order'] ?? 0),
+        ]);
+        $newFolderId = (int)$this->db->lastInsertId();
+        $stats['folders']++;
+
+        $notesStmt = $this->db->prepare("SELECT id FROM entries WHERE folder_id = ? AND trash = 0 AND workspace = ? ORDER BY id");
+        $notesStmt->execute([(int)$source['id'], $workspace]);
+        $noteIds = array_map('intval', array_column($notesStmt->fetchAll(PDO::FETCH_ASSOC), 'id'));
+        foreach ($noteIds as $noteId) {
+            $cloned = poznoteCloneNoteRecord($this->db, $noteId, [
+                'folderId' => $newFolderId,
+                'folderName' => $name,
+                'actorUserId' => $actorUserId,
+            ]);
+            if ($cloned !== null) {
+                $stats['notes']++;
+                $stats['note_ids'][] = ['old' => $noteId, 'new' => (int)$cloned['id']];
+            }
+        }
+
+        $subStmt = $this->db->prepare("SELECT * FROM folders WHERE parent_id = ? AND workspace = ? ORDER BY id");
+        $subStmt->execute([(int)$source['id'], $workspace]);
+        $subfolders = $subStmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($subfolders as $sub) {
+            $this->copyFolderTree($sub, (string)$sub['name'], $newFolderId, $workspace, $actorUserId, $stats, $depth + 1);
+        }
+
+        return $newFolderId;
+    }
+
+    /**
+     * Point internal links of the copied notes at their copies instead of the
+     * originals: "?note=<id>" hrefs and data-note-id attributes whose id is
+     * one of the source notes are rewritten, both in the entries row and the
+     * content file.
+     *
+     * @param array $pairs List of ['old' => id, 'new' => id]
+     */
+    private function rewriteCopiedNoteLinks(array $pairs): void {
+        if (count($pairs) === 0) return;
+        $map = [];
+        foreach ($pairs as $pair) {
+            $map[(string)$pair['old']] = (string)$pair['new'];
+        }
+        $pattern = '/((?:[?&]note=)|(?:data-note-id=["\']))(\d+)(?=\b)/';
+        $select = $this->db->prepare("SELECT entry, type FROM entries WHERE id = ?");
+        $update = $this->db->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+
+        foreach ($pairs as $pair) {
+            $newId = (int)$pair['new'];
+            $select->execute([$newId]);
+            $row = $select->fetch(PDO::FETCH_ASSOC);
+            if (!$row) continue;
+            $content = (string)($row['entry'] ?? '');
+            if ($content === '' || strpos($content, 'note') === false) continue;
+            $rewritten = preg_replace_callback($pattern, function ($m) use ($map) {
+                return $m[1] . ($map[$m[2]] ?? $m[2]);
+            }, $content);
+            if ($rewritten === null || $rewritten === $content) continue;
+            $update->execute([$rewritten, $newId]);
+            $file = getEntryFilename($newId, $row['type']);
+            if (is_file($file)) {
+                file_put_contents($file, $rewritten);
+            }
+        }
+    }
+
     /**
      * POST /api/v1/folders/{id}/move - Move folder to new parent
      */
@@ -1719,12 +2181,14 @@ class FoldersController {
         }
         
         // Update note
+        // display_order is reset: positions only mean something among the
+        // siblings they were numbered with (see reorderNote)
         if ($workspace) {
-            $query = "UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, updated = datetime('now') WHERE id = ?";
+            $query = "UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, display_order = 0, updated = datetime('now') WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $success = $stmt->execute([$targetFolder, $targetFolderId, $workspace, $noteId]);
         } else {
-            $query = "UPDATE entries SET folder = ?, folder_id = ?, updated = datetime('now') WHERE id = ?";
+            $query = "UPDATE entries SET folder = ?, folder_id = ?, display_order = 0, updated = datetime('now') WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $success = $stmt->execute([$targetFolder, $targetFolderId, $noteId]);
         }
@@ -2017,8 +2481,8 @@ class FoldersController {
             return;
         }
         
-        // Move to root
-        $query = "UPDATE entries SET folder = NULL, folder_id = NULL, updated = datetime('now') WHERE id = ?";
+        // Move to root (display_order reset, see reorderNote)
+        $query = "UPDATE entries SET folder = NULL, folder_id = NULL, display_order = 0, updated = datetime('now') WHERE id = ?";
         $stmt = $this->db->prepare($query);
         $success = $stmt->execute([$noteId]);
         
@@ -2044,5 +2508,317 @@ class FoldersController {
         } else {
             $this->sendError('Database error', 500);
         }
+    }
+    /**
+     * POST /api/v1/notes/reorder - Move a note before/after another note
+     *
+     * Drag-and-drop ordering for the sidebar. The dragged note lands in the
+     * target note's folder (or at the root when the target has none), every
+     * sibling there is renumbered from 1 following the order the user
+     * currently sees, and the container switches to the 'manual' sort so the
+     * position sticks:
+     *   - a folder gets sort_setting = 'manual';
+     *   - the root follows the global note_list_sort, which becomes 'manual'.
+     *     Folders that were inheriting the global default keep the ordering
+     *     they show today by having it copied into their own sort_setting.
+     *
+     * Body: { "note_id": 12, "target_note_id": 34, "position": "before"|"after",
+     *         "workspace": "Poznote" (optional check) }
+     */
+    public function reorderNote(): void {
+        if (function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive()) {
+            $this->sendError('This endpoint is not available in public workspace mode', 403);
+            return;
+        }
+
+        $data = $this->getInputData();
+
+        $noteId = isset($data['note_id']) ? (int)$data['note_id'] : 0;
+        $targetNoteId = isset($data['target_note_id']) ? (int)$data['target_note_id'] : 0;
+        $position = isset($data['position']) ? strtolower(trim((string)$data['position'])) : '';
+        $workspaceParam = isset($data['workspace']) ? trim((string)$data['workspace']) : null;
+
+        if ($noteId <= 0 || $targetNoteId <= 0) {
+            $this->sendError('note_id and target_note_id are required', 400);
+            return;
+        }
+
+        if (!in_array($position, ['before', 'after'], true)) {
+            $this->sendError('position must be before or after', 400);
+            return;
+        }
+
+        if ($noteId === $targetNoteId) {
+            $this->sendError('Note cannot be reordered relative to itself', 400);
+            return;
+        }
+
+        $stmt = $this->db->prepare('SELECT id, heading, folder, folder_id, workspace FROM entries WHERE id = ? AND trash = 0');
+        $stmt->execute([$noteId]);
+        $note = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute([$targetNoteId]);
+        $targetNote = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$note || !$targetNote) {
+            $this->sendError('Note not found', 404);
+            return;
+        }
+
+        $targetWorkspace = (string)$targetNote['workspace'];
+        if ((string)$note['workspace'] !== $targetWorkspace) {
+            $this->sendError('Notes must be in the same workspace', 400);
+            return;
+        }
+
+        if ($workspaceParam !== null && $workspaceParam !== '' && $workspaceParam !== $targetWorkspace) {
+            $this->sendError('Workspace does not match target note', 400);
+            return;
+        }
+
+        $targetFolderId = $targetNote['folder_id'] !== null ? (int)$targetNote['folder_id'] : null;
+        $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
+        $changesFolder = $currentFolderId !== $targetFolderId;
+
+        // Folder name for the legacy entries.folder column, read from the
+        // folders table rather than copied from the target note (whose own
+        // column may be empty, e.g. notes created through the API)
+        $targetFolderName = null;
+        if ($targetFolderId !== null) {
+            $folderStmt = $this->db->prepare('SELECT name FROM folders WHERE id = ? AND workspace = ?');
+            $folderStmt->execute([$targetFolderId, $targetWorkspace]);
+            $targetFolderName = $folderStmt->fetchColumn();
+            if ($targetFolderName === false) {
+                $this->sendError('Folder not found', 404);
+                return;
+            }
+            $targetFolderName = (string)$targetFolderName;
+        }
+
+        if ($changesFolder) {
+            // Same rule as moveNoteToFolder: titles are unique per folder
+            $dupSql = 'SELECT COUNT(*) FROM entries WHERE heading = ? AND trash = 0 AND id != ? AND workspace = ? AND '
+                . ($targetFolderId === null ? 'folder_id IS NULL' : 'folder_id = ?');
+            $dupParams = [$note['heading'], $noteId, $targetWorkspace];
+            if ($targetFolderId !== null) {
+                $dupParams[] = $targetFolderId;
+            }
+            $dupStmt = $this->db->prepare($dupSql);
+            $dupStmt->execute($dupParams);
+            if ((int)$dupStmt->fetchColumn() > 0) {
+                $this->sendError('A note with the same title already exists in the destination folder', 409);
+                return;
+            }
+        }
+
+        $sortType = $this->resolveNoteSortType($targetFolderId);
+        $orderedIds = $this->getOrderedSiblingNoteIds($targetWorkspace, $targetFolderId, $sortType, $noteId);
+        $targetIndex = array_search($targetNoteId, $orderedIds, true);
+
+        if ($targetIndex === false) {
+            $this->sendError('Target note is not available in the destination order', 404);
+            return;
+        }
+
+        $insertIndex = $position === 'before' ? $targetIndex : $targetIndex + 1;
+        array_splice($orderedIds, $insertIndex, 0, [$noteId]);
+
+        try {
+            $this->db->beginTransaction();
+
+            if ($changesFolder) {
+                // Changing folder is an edit, like moveNoteToFolder; a pure
+                // reorder leaves 'updated' alone so date-based views keep
+                // their meaning.
+                $updateDragged = $this->db->prepare("UPDATE entries SET folder = ?, folder_id = ?, display_order = ?, updated = datetime('now') WHERE id = ?");
+            } else {
+                $updateDragged = $this->db->prepare('UPDATE entries SET display_order = ? WHERE id = ?');
+            }
+            $updateOrder = $this->db->prepare('UPDATE entries SET display_order = ? WHERE id = ?');
+
+            foreach ($orderedIds as $index => $id) {
+                $displayOrder = $index + 1;
+                if ($id === $noteId) {
+                    if ($changesFolder) {
+                        $updateDragged->execute([$targetFolderName, $targetFolderId, $displayOrder, $noteId]);
+                    } else {
+                        $updateDragged->execute([$displayOrder, $noteId]);
+                    }
+                } else {
+                    $updateOrder->execute([$displayOrder, $id]);
+                }
+            }
+
+            $this->enableManualNoteSort($targetFolderId);
+
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            $this->sendError('Failed to reorder note: ' . $e->getMessage(), 500);
+            return;
+        }
+
+        if ($changesFolder) {
+            // Remove only legacy implicit shares created by old folder-sharing behavior.
+            $checkWasSharedStmt = $this->db->prepare("SELECT token FROM shared_notes WHERE note_id = ? AND access_mode IS NULL LIMIT 1");
+            $checkWasSharedStmt->execute([$noteId]);
+            $existingToken = $checkWasSharedStmt->fetchColumn();
+            if ($existingToken) {
+                require_once dirname(dirname(dirname(__DIR__))) . '/users/db_master.php';
+                unregisterSharedLink($existingToken);
+                $deleteShareStmt = $this->db->prepare("DELETE FROM shared_notes WHERE note_id = ? AND access_mode IS NULL");
+                $deleteShareStmt->execute([$noteId]);
+            }
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => 'Note reordered successfully',
+            'note' => [
+                'id' => $noteId,
+                'workspace' => $targetWorkspace,
+                'folder_id' => $targetFolderId,
+                'folder' => $targetFolderName,
+                'position' => $position,
+                'target_note_id' => $targetNoteId,
+                'display_order' => $insertIndex + 1,
+            ],
+            'share_delta' => 0
+        ]);
+    }
+
+    /**
+     * Raw global note_list_sort setting ('updated_desc' when unset).
+     */
+    private function getGlobalNoteListSort(): string {
+        try {
+            $stmt = $this->db->prepare('SELECT value FROM settings WHERE key = ?');
+            $stmt->execute(['note_list_sort']);
+            $pref = trim((string)$stmt->fetchColumn());
+            if (in_array($pref, ['updated_desc', 'created_desc', 'heading_asc', 'manual'], true)) {
+                return $pref;
+            }
+        } catch (Exception $e) {
+            // fall through to the default
+        }
+        return 'updated_desc';
+    }
+
+    /**
+     * Same mapping as noteListSortToFolderSortType() in folders_display.php.
+     */
+    private static function noteListSortToFolderSortType(string $pref): string {
+        switch ($pref) {
+            case 'heading_asc':
+                return 'alphabet';
+            case 'created_desc':
+                return 'created';
+            case 'manual':
+                return 'manual';
+            default:
+                return 'modified';
+        }
+    }
+
+    /**
+     * Effective sort type of a folder (or of the root when null): the
+     * folder's own sort_setting, else the global default.
+     */
+    private function resolveNoteSortType(?int $folderId): string {
+        if ($folderId !== null) {
+            $stmt = $this->db->prepare('SELECT sort_setting FROM folders WHERE id = ?');
+            $stmt->execute([$folderId]);
+            $setting = trim((string)$stmt->fetchColumn());
+            if (in_array($setting, ['alphabet', 'created', 'modified', 'manual'], true)) {
+                return $setting;
+            }
+        }
+        return self::noteListSortToFolderSortType($this->getGlobalNoteListSort());
+    }
+
+    /**
+     * Ids of the notes shown in a folder (or at the root), in the order the
+     * sidebar displays them for the given sort type, excluding one note.
+     * Mirrors the comparators of organizeNotesByFolder() so the dragged note
+     * is inserted relative to what the user actually saw.
+     */
+    private function getOrderedSiblingNoteIds(string $workspace, ?int $folderId, string $sortType, int $excludeNoteId): array {
+        $sql = 'SELECT id, heading, created, updated, display_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND '
+            . ($folderId === null ? 'folder_id IS NULL' : 'folder_id = ?')
+            . ' ORDER BY updated DESC, id DESC';
+        $params = [$workspace, $excludeNoteId];
+        if ($folderId !== null) {
+            $params[] = $folderId;
+        }
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($sortType === 'alphabet') {
+            usort($rows, function ($a, $b) {
+                $headingA = isset($a['heading']) ? mb_strtolower((string)$a['heading'], 'UTF-8') : '';
+                $headingB = isset($b['heading']) ? mb_strtolower((string)$b['heading'], 'UTF-8') : '';
+                return strnatcasecmp($headingA, $headingB);
+            });
+        } elseif ($sortType === 'created') {
+            usort($rows, function ($a, $b) {
+                return strcmp((string)($b['created'] ?? ''), (string)($a['created'] ?? ''));
+            });
+        } elseif ($sortType === 'manual') {
+            usort($rows, [self::class, 'compareNotesManualOrder']);
+        }
+        // 'modified' is the SQL order already
+
+        return array_map(function ($row) {
+            return (int)$row['id'];
+        }, $rows);
+    }
+
+    /**
+     * Same rule as compareNotesManualOrder() in folders_display.php: placed
+     * notes (display_order > 0) in saved order, unplaced ones first by
+     * newest update.
+     */
+    private static function compareNotesManualOrder(array $a, array $b): int {
+        $orderA = (int)($a['display_order'] ?? 0);
+        $orderB = (int)($b['display_order'] ?? 0);
+        if ($orderA > 0 && $orderB > 0) {
+            if ($orderA !== $orderB) return $orderA <=> $orderB;
+            return ((int)($a['id'] ?? 0)) <=> ((int)($b['id'] ?? 0));
+        }
+        if ($orderA > 0) return 1;
+        if ($orderB > 0) return -1;
+        $cmp = strcmp((string)($b['updated'] ?? ''), (string)($a['updated'] ?? ''));
+        if ($cmp !== 0) return $cmp;
+        return ((int)($b['id'] ?? 0)) <=> ((int)($a['id'] ?? 0));
+    }
+
+    /**
+     * Make the container of a reordered note keep manual positions.
+     *
+     * Runs inside the reorder transaction. For the root the global setting
+     * flips to 'manual'; folders without a sort_setting of their own were
+     * following that global value, so it is copied onto them first and they
+     * keep displaying exactly what they display today.
+     */
+    private function enableManualNoteSort(?int $folderId): void {
+        if ($folderId !== null) {
+            $stmt = $this->db->prepare("UPDATE folders SET sort_setting = 'manual' WHERE id = ?");
+            $stmt->execute([$folderId]);
+            return;
+        }
+
+        $pref = $this->getGlobalNoteListSort();
+        if ($pref === 'manual') {
+            return;
+        }
+
+        $inherited = self::noteListSortToFolderSortType($pref);
+        $freeze = $this->db->prepare("UPDATE folders SET sort_setting = ? WHERE sort_setting IS NULL OR sort_setting = ''");
+        $freeze->execute([$inherited]);
+
+        $setGlobal = $this->db->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('note_list_sort', 'manual')");
+        $setGlobal->execute();
     }
 }

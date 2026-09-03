@@ -383,7 +383,10 @@ $folder_case = $notes_without_folders_after ? '0' : '1';
 $allowed_sorts = [
     'updated_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, updated DESC",
     'created_desc' => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, created DESC",
-    'heading_asc'  => "folder, heading COLLATE NOCASE ASC"
+    'heading_asc'  => "folder, heading COLLATE NOCASE ASC",
+    // Drag-and-drop order: unplaced notes (display_order 0) first, newest
+    // update first, then the saved positions (see compareNotesManualOrder)
+    'manual'       => "CASE WHEN folder_id IS NULL THEN $folder_null_case ELSE $folder_case END, folder, CASE WHEN display_order > 0 THEN 1 ELSE 0 END, display_order, updated DESC"
 ];
 
 $note_list_order_by = $allowed_sorts['updated_desc']; // default
@@ -523,7 +526,7 @@ if ($isPublicWorkspaceReadonly) {
     
     // Secure prepared queries
     // A shortcut without its own icon inherits the icon of the note it links to.
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, reminder_at, "
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, created, updated, type, linked_note_id, reminder_at, display_order, "
         . "COALESCE(NULLIF(icon, ''), (SELECT o.icon FROM entries o WHERE o.id = entries.linked_note_id)) AS icon, "
         . "CASE WHEN NULLIF(icon, '') IS NULL THEN (SELECT o.icon_color FROM entries o WHERE o.id = entries.linked_note_id) ELSE icon_color END AS icon_color "
         . "FROM entries WHERE $where_clause ORDER BY " . $note_list_order_by;

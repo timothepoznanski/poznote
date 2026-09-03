@@ -714,9 +714,12 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- UI Customization -->
-            <div class="home-card" id="ui-customization-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ui_customization', [], 'Hide interface elements you do not use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+            <!-- UI Customization. Administrators edit their own set and the
+                 instance-wide one from the same modal (data-ui-admin). -->
+            <div class="home-card" id="ui-customization-card"<?php echo $isAdmin ? ' data-ui-admin="1"' : ''; ?>>
+                <span class="setting-help" data-tooltip="<?php echo $isAdmin
+                    ? t_h('settings.card_help.ui_customization_admin', [], 'Hide interface elements you do not use, for yourself or for every user of this instance.')
+                    : t_h('settings.card_help.ui_customization', [], 'Hide interface elements you do not use.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-eye-off"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.ui_customization', [], 'UI Customization'); ?></span>
@@ -1123,18 +1126,6 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
                     <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                </div>
-            </div>
-
-            <!-- Element visibility for all users -->
-            <div class="home-card" id="ui-customization-admin-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.ui_customization_admin', [], 'Hide interface elements for all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon">
-                    <i class="lucide lucide-eye-off"></i>
-                </div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('settings.cards.ui_customization_global', [], 'Element visibility (all users)'); ?></span>
-                    <span id="ui-customization-admin-badge" class="setting-status enabled"><?php echo t_h('display.badges.ui_customization_configure', [], 'Configure'); ?></span>
                 </div>
             </div>
 

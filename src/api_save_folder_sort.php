@@ -22,7 +22,7 @@ if (!$folderId || !$sortType) {
     exit;
 }
 
-$allowedSorts = ['alphabet', 'created', 'modified'];
+$allowedSorts = ['alphabet', 'created', 'modified', 'manual'];
 if (!in_array($sortType, $allowedSorts)) {
     echo json_encode(['success' => false, 'error' => 'Invalid sort type']);
     exit;

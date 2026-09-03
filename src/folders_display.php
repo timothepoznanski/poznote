@@ -26,6 +26,54 @@ function countNotesRecursively($folderData) {
 }
 
 /**
+ * Map the global note_list_sort setting to a per-folder sort type
+ * ('alphabet', 'created', 'modified' or 'manual').
+ *
+ * @param string $default_sort Global setting value
+ * @return string Folder sort type
+ */
+function noteListSortToFolderSortType($default_sort) {
+    switch ($default_sort) {
+        case 'heading_asc':
+            return 'alphabet';
+        case 'created_desc':
+            return 'created';
+        case 'manual':
+            return 'manual';
+        case 'updated_desc':
+        default:
+            return 'modified';
+    }
+}
+
+/**
+ * Comparator for the 'manual' sort (drag-and-drop ordering).
+ *
+ * Notes with a display_order (> 0) keep their saved position. Notes without
+ * one (0: created or moved in after the last drop) come first, newest update
+ * first, so a fresh note is visible at the top until the user places it.
+ * The reorder endpoint renumbers every sibling on each drop, so mixed lists
+ * only exist between a drop and the next one.
+ *
+ * @param array $a Note row
+ * @param array $b Note row
+ * @return int
+ */
+function compareNotesManualOrder($a, $b) {
+    $orderA = isset($a['display_order']) ? (int)$a['display_order'] : 0;
+    $orderB = isset($b['display_order']) ? (int)$b['display_order'] : 0;
+    if ($orderA > 0 && $orderB > 0) {
+        if ($orderA !== $orderB) return $orderA <=> $orderB;
+        return ((int)($a['id'] ?? 0)) <=> ((int)($b['id'] ?? 0));
+    }
+    if ($orderA > 0) return 1;
+    if ($orderB > 0) return -1;
+    $cmp = strcmp($b['updated'] ?? '', $a['updated'] ?? '');
+    if ($cmp !== 0) return $cmp;
+    return ((int)($b['id'] ?? 0)) <=> ((int)($a['id'] ?? 0));
+}
+
+/**
  * Organize notes by folder
  * Returns array with 'folders' and 'uncategorized_notes' keys
  * OPTIMIZED: Pre-loads all folder data to avoid N+1 queries
@@ -33,7 +81,7 @@ function countNotesRecursively($folderData) {
  * @param PDOStatement $stmt_left Statement containing notes to organize
  * @param PDO $con Database connection
  * @param string|null $workspace_filter Optional workspace filter
- * @param string $default_sort Default sort order ('updated_desc', 'heading_asc', 'created_desc')
+ * @param string $default_sort Default sort order ('updated_desc', 'heading_asc', 'created_desc', 'manual')
  * @return array Array with 'folders' and 'uncategorized_notes' keys
  */
 function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sort = 'updated_desc') {
@@ -116,18 +164,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
             $sortType = $folder['sort_setting'];
         } else {
             // Map global setting to folder sort type
-            switch ($default_sort) {
-                case 'heading_asc':
-                    $sortType = 'alphabet';
-                    break;
-                case 'created_desc':
-                    $sortType = 'created';
-                    break;
-                case 'updated_desc':
-                default:
-                    $sortType = 'modified';
-                    break;
-            }
+            $sortType = noteListSortToFolderSortType($default_sort);
         }
         
         // Ensure effective sort type is used for UI rendering (e.g., checkmark display)
@@ -157,6 +194,8 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $default_sor
                 // Newest first
                 return strcmp($updatedB, $updatedA);
             });
+        } elseif ($sortType === 'manual') {
+            usort($folder['notes'], 'compareNotesManualOrder');
         }
     }
     
@@ -451,6 +490,31 @@ function renderFolderActionsMenu() {
     $menu .= "<span>" . t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder') . "</span>";
     $menu .= "</div>";
 
+    // Duplicate folder action (copies notes and subfolders too)
+    $menu .= "<div class='folder-actions-menu-item' data-action='duplicate-folder'>";
+    $menu .= "<i class='lucide lucide-copy'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.duplicate_folder', [], 'Duplicate folder') . "</span>";
+    $menu .= "</div>";
+
+    // Copy / cut / paste (js/tree-undo-clipboard.js). Paste drops the
+    // clipboard into this folder and is hidden while the clipboard is empty;
+    // the shortcut hints are swapped for ⌘ on macOS when the menu opens.
+    $menu .= "<div class='folder-actions-menu-item' data-action='copy-folder'>";
+    $menu .= "<i class='lucide lucide-clipboard-copy'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.copy_folder', [], 'Copy') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+C</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item' data-action='cut-folder'>";
+    $menu .= "<i class='lucide lucide-scissors'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.cut_folder', [], 'Cut') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+X</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item' data-action='paste-into-folder'>";
+    $menu .= "<i class='lucide lucide-clipboard-paste'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.paste_into_folder', [], 'Paste into folder') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+V</span>";
+    $menu .= "</div>";
+
     $menu .= "<div class='folder-actions-menu-separator'></div>";
 
     // Download folder action (shown only if folder has notes)
@@ -473,8 +537,10 @@ function renderFolderActionsMenu() {
     $menu .= "<div class='folder-actions-menu-separator'></div>";
 
     // Favorite folder action: two variants, the client shows the one matching
-    // the folder's favorite state (data-favorite on the toggle)
-    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite' data-action='favorite-folder'>";
+    // the folder's favorite state (data-favorite on the toggle). Removing is
+    // shown in red (.danger) like the other "undo" entries, so the current
+    // state reads at a glance.
+    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite danger' data-action='favorite-folder'>";
     $menu .= "<i class='lucide lucide-star'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
     $menu .= "</div>";
@@ -499,7 +565,10 @@ function renderFolderActionsMenu() {
     $sortTypes = [
         'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
         'created' => ['icon' => 'lucide lucide-calendar-plus', 'label' => t_h('sort.created', [], 'Date Created')],
-        'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')]
+        'modified' => ['icon' => 'lucide lucide-calendar', 'label' => t_h('sort.modified', [], 'Date Modified')],
+        // Drag-and-drop order; selected automatically when a note is dropped
+        // before/after another one (see /api/v1/notes/reorder)
+        'manual' => ['icon' => 'lucide lucide-grip-vertical', 'label' => t_h('sort.manual', [], 'Manual')]
     ];
 
     // Sort Submenu Toggle (Accordion style); the client swaps the label for
@@ -534,8 +603,7 @@ function renderFolderActionsMenu() {
 }
 
 /**
- * Generate the per-note controls on a tree row: the favorite star and the
- * three-dot actions toggle.
+ * Generate the three-dot actions toggle for a note row in the tree.
  *
  * Mirrors generateFolderActions(): only the toggle is emitted per note, and it
  * carries everything populateNoteActionsMenu() needs to fill the single shared
@@ -546,50 +614,26 @@ function renderFolderActionsMenu() {
  * @param string $noteType Note type ('note', 'markdown', 'tasklist', ...)
  * @param int|string|null $folderId Containing folder ID
  * @param string $folderName Containing folder name
- * @param bool $isFavorite Whether the note is marked as favorite, which the
- *                         star renders and toggles
- * @param bool $showFavoriteStar Whether to render the star at all. False
- *                                inside the Favorites section itself, where
- *                                every row is already a favorite and the star
- *                                would be redundant on every single line.
- * @return string HTML for the note row controls
+ * @param bool $isFavorite Whether the note is marked as favorite, which picks
+ *                         the favorite variant shown by the menu
+ * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $showFavoriteStar = true) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
     $htmlFolderId = htmlspecialchars((string)$folderId, ENT_QUOTES);
     $htmlFolderName = htmlspecialchars((string)$folderName, ENT_QUOTES);
 
-    // Favorite is a one-click star on the row instead of a menu entry: it is
-    // the state the tree itself shows, so it reads better next to the title
-    // than buried in the dropdown. Hidden until the row is hovered, except on
-    // favorites, where it stays lit so the tree marks them at a glance.
-    // btn-favorite rides along for the shared .is-favorite icon colour, whose
-    // dark-mode rule in css/dark-mode/icons.css keys on that class.
-    $favoriteClass = $isFavorite ? ' is-favorite' : '';
-    $favoriteLabel = $isFavorite
-        ? t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites')
-        : t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites');
-
-    $favoriteButton = $showFavoriteStar
-        ? "<button type='button' class='note-favorite-toggle btn-favorite$favoriteClass'"
-            . " data-action='toggle-favorite' data-note-id='$htmlNoteId'"
-            . " aria-pressed='" . ($isFavorite ? 'true' : 'false') . "'"
-            . " title='$favoriteLabel' aria-label='$favoriteLabel'>"
-            . "<i class='lucide lucide-star'></i>"
-            . "</button>"
-        : "";
-
     // No data-filename here, unlike the note toolbar: showExportModal() stores
     // that argument and never reads it, so emitting the on-disk path on every
     // row of the tree would leak the entries directory for nothing.
     return "<div class='note-actions'>"
-        . $favoriteButton
         . "<button type='button' class='note-actions-toggle' data-action='toggle-note-actions-menu'"
         . " data-note-id='$htmlNoteId' data-note-title='$htmlNoteTitle'"
         . " data-note-type='$htmlNoteType'"
         . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName'"
+        . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
         . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
@@ -616,8 +660,8 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // and removing it. Everything that acts on the note's content or exposes
     // it elsewhere (attachments, share, snapshots, search and replace,
     // information, print, download, convert, reminder) stays in the opened
-    // note's toolbar and its own three-dot menu, and Favorite moved to the
-    // star button on the row itself (see generateNoteActions).
+    // note's toolbar and its own three-dot menu. Favorite stays here because
+    // it decides where the note shows up in the tree (the Favorites section).
     //
     // The groups below are separated by .note-actions-menu-separator; a
     // separator left with no visible item on one side is hidden on open by
@@ -644,6 +688,18 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
     $menu .= "</div>";
 
+    // Favorite: two variants, populateNoteActionsMenu() shows the one matching
+    // the note's favorite state (data-favorite on the toggle). Removing is
+    // shown in red (.danger), same as the folder menu.
+    $menu .= "<div class='note-actions-menu-item favorite-state-favorite danger' data-action='toggle-favorite'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item favorite-state-not-favorite' data-action='toggle-favorite'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
+    $menu .= "</div>";
+
     $menu .= "<div class='note-actions-menu-separator'></div>";
 
     // --- Copy and move ---
@@ -667,6 +723,25 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item' data-action='show-move-folder-dialog'>";
     $menu .= "<i class='lucide lucide-folder-output'></i>";
     $menu .= "<span>" . t_h('notes_list.note_actions.move_note', [], 'Move note') . "</span>";
+    $menu .= "</div>";
+
+    // Copy / cut / paste (js/tree-undo-clipboard.js). Copy is note-real-only
+    // for the same reason as Duplicate; paste lands in this note's folder and
+    // is hidden while the clipboard is empty.
+    $menu .= "<div class='note-actions-menu-item note-real-only' data-action='copy-note'>";
+    $menu .= "<i class='lucide lucide-clipboard-copy'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.copy_note', [], 'Copy') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+C</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item' data-action='cut-note'>";
+    $menu .= "<i class='lucide lucide-scissors'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.cut_note', [], 'Cut') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+X</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item' data-action='paste-into-note-folder'>";
+    $menu .= "<i class='lucide lucide-clipboard-paste'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.paste_note', [], 'Paste here') . "</span>";
+    $menu .= "<span class='actions-menu-shortcut'>Ctrl+V</span>";
     $menu .= "</div>";
 
     // Archive note: moves it to the archive workspace, folder path included.

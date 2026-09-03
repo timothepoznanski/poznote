@@ -160,64 +160,6 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     color: var(--pz-accent);
 }
 
-/* Favorite star on note rows, left of the three-dot toggle. Same 22px box and
-   hover reveal as the toggle so the pair reads as one strip; a favorited note
-   keeps its star lit at all times, which is how the tree marks favorites at a
-   glance. Emitted by generateNoteActions() in folders_display.php. */
-.note-favorite-toggle {
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    background: none;
-    border: none;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--pz-text-muted);
-    border-radius: 4px;
-    transition: all 0.15s ease;
-    align-items: center;
-    justify-content: center;
-    display: none;
-}
-
-.note-list-item:hover .note-favorite-toggle,
-.note-favorite-toggle.is-favorite {
-    display: inline-flex;
-}
-
-/* No hover on touch screens, so the star has to stay visible there, like the
-   three-dot toggle above. */
-@media (hover: none), (max-width: 800px) {
-    .note-favorite-toggle {
-        display: inline-flex;
-    }
-}
-
-.note-favorite-toggle:hover {
-    background: rgba(107, 114, 128, 0.12);
-    color: #374151;
-}
-
-.note-favorite-toggle i[class*="lucide-"],
-.note-favorite-toggle [class*="lucide-"] {
-    font-size: 0.85em !important;
-    transition: color 0.15s ease;
-}
-
-.note-favorite-toggle:hover i,
-.note-favorite-toggle:hover [class*="lucide-"] {
-    color: var(--pz-accent);
-}
-
-/* Lit state, matching .toolbar-btn.btn-favorite.is-favorite in
-   css/folders/toolbar-icons.css. Lucide icons are masks painted with
-   background-color: currentColor, so setting the colour is enough. */
-.note-favorite-toggle.is-favorite i.lucide-star,
-.note-favorite-toggle.is-favorite .lucide-star {
-    color: var(--pz-accent) !important;
-    filter: none !important;
-}
-
 /* Kanban icon style */
 .folder-kanban-icon {
     padding: 2px 4px;
@@ -404,4 +346,19 @@ body.dark-mode .note-actions-menu-item.active i {
     border-top: 1px solid var(--pz-border);
     margin-top: 4px;
     padding-top: 4px;
+}
+
+/* Keyboard hint on the copy / cut / paste items (js/tree-undo-clipboard.js) */
+.folder-actions-menu-item .actions-menu-shortcut,
+.note-actions-menu-item .actions-menu-shortcut {
+    margin-left: auto;
+    padding-left: 16px;
+    font-size: 0.8em;
+    color: var(--pz-text-muted);
+}
+
+/* A cut note or folder is dimmed until it is pasted */
+.note-list-item.tree-clipboard-cut,
+.folder-toggle.tree-clipboard-cut {
+    opacity: 0.45;
 }

@@ -165,6 +165,10 @@
       "label": "排序方式",
       "date": "日期",
       "tag": "标签"
+    },
+    "subfolder": {
+      "expand": "展开子文件夹",
+      "collapse": "折叠子文件夹"
     }
   },
   "folders": {
@@ -202,6 +206,7 @@
       "create_title": "创建文件夹出错",
       "create_prefix": "创建文件夹时出错: {{error}}",
       "delete_prefix": "删除文件夹时出错: {{error}}",
+      "duplicate_prefix": "复制文件夹时出错: {{error}}",
       "rename_prefix": "重命名文件夹时出错: {{error}}",
       "load_prefix": "加载文件夹时出错: {{error}}",
       "empty_folder_prefix": "清空文件夹时出错: {{error}}"
@@ -457,7 +462,7 @@
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
       "custom_css": "应用您自己的 CSS 来自定义 Poznote 的外观。",
-      "ui_customization_admin": "为此实例的所有用户隐藏界面元素。",
+      "ui_customization_admin": "隐藏您不使用的界面元素，为您自己或为此实例的所有用户。",
       "disaster_recovery": "在数据丢失时从备份恢复实例。",
       "orphan_scanner": "查找并清理不再属于任何笔记的附件文件。",
       "storage_stats": "查看此实例所有用户的存储使用情况。",
@@ -518,7 +523,6 @@
       "website": "Poznote 网站",
       "github_star": "在 GitHub 上加星",
       "guestbook": "Poznote 留言板",
-      "ui_customization_global": "元素可见性（所有用户）",
       "custom_css": "自定义 CSS 文件",
       "support": "支持 Poznote",
       "buy_me_a_coffee": "请我喝杯咖啡",
@@ -1124,8 +1128,9 @@
     "ui_customization": {
       "title": "界面自定义",
       "description": "显示或隐藏界面元素。未勾选的项目将被隐藏。",
-      "title_global": "界面自定义（除管理员外的所有用户）",
-      "description_global": "为此实例的所有用户显示或隐藏界面元素。未勾选的项目将对除管理员外的所有人隐藏。",
+      "description_admin": "显示或隐藏界面元素。未勾选的项目将被隐藏。“我”列适用于您自己的界面，“用户”列适用于此实例中除管理员外的所有用户。",
+      "column_me": "我",
+      "column_users": "用户",
       "description_global_highlight": "除管理员外",
       "locked_by_admin": "已由管理员对所有用户隐藏",
       "locked_by_tenant_isolation": "该功能已被租户隔离阻止，因此自动隐藏",
@@ -1162,6 +1167,7 @@
       "expand_all": "全部展开",
       "badge_all_visible": "全部可见",
       "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
+      "badge_hidden_count_admin_columns": "为您隐藏 {{me}} 个，为用户隐藏 {{users}} 个",
       "badge_hidden_count": "{{count}} 个已隐藏",
       "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
       "s3_backups_section": "备份页面:“S3 备份”部分",
@@ -1169,7 +1175,6 @@
       "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?",
       "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
       "note_actions_toggle": "笔记上的菜单按钮（⋮）",
-      "note_favorite_star": "笔记上的收藏星标（★）",
       "note_actions_hint": "侧边栏中每条笔记的 ⋮ 菜单项。全部取消勾选将隐藏菜单按钮。",
       "theme_toggle": "主题切换"
     },
@@ -1391,7 +1396,8 @@
       "options": {
         "last_modified": "最后修改",
         "last_created": "最后创建",
-        "alphabetical": "字母顺序"
+        "alphabetical": "字母顺序",
+        "manual": "手动（拖放）"
       }
     },
     "markdown_colored": {
@@ -1573,6 +1579,7 @@
       "open_all_in_tabs": "打开所有笔记",
       "move_all_files": "移动文件",
       "move_folder": "移动文件夹",
+      "duplicate_folder": "复制文件夹",
       "rename_folder": "重命名文件夹",
       "delete_folder": "删除文件夹",
       "download_folder": "下载",
@@ -3254,7 +3261,8 @@
     "header": "排序方式",
     "alphabet": "名称",
     "created": "创建日期",
-    "modified": "修改日期"
+    "modified": "修改日期",
+    "manual": "手动"
   },
   "calendar": {
     "months": {

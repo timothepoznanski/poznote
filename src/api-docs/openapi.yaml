@@ -778,6 +778,48 @@ paths:
                   new_note_id:
                     type: integer
 
+  /notes/reorder:
+    post:
+      tags: [Notes]
+      summary: Reorder a note before/after another note
+      description: >
+        Manual drag-and-drop order. The note lands in the target note's folder
+        (or at the root), every note there is renumbered, and that folder
+        switches to the manual sort so the position sticks. For a root note
+        the global note sort setting becomes manual; folders following the
+        global default keep their current ordering.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [note_id, target_note_id, position]
+              properties:
+                note_id:
+                  type: integer
+                  description: Note to move
+                target_note_id:
+                  type: integer
+                  description: Note used as anchor (same workspace)
+                position:
+                  type: string
+                  enum: [before, after]
+                workspace:
+                  type: string
+                  description: Workspace check (must match target note)
+      responses:
+        '200':
+          description: Note reordered
+        '400':
+          description: Invalid parameters or notes in different workspaces
+        '404':
+          description: Note not found
+        '409':
+          description: A note with the same title already exists in the destination folder
+
   /notes/{id}/folder:
     post:
       tags: [Notes]

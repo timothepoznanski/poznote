@@ -380,10 +380,19 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 POST /notes/{id}/duplicate
 ```
 
-Create a copy of an existing note.
+Create a copy of an existing note. Without a body the copy lands next to the original.
+
+**Body (optional):**
+- `folder_id`: Folder for the copy (`""` or `0` for the root)
+- `workspace`: Workspace the target folder belongs to
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/duplicate
+
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"folder_id": 12, "workspace": "Poznote"}' \
   http://YOUR_SERVER/api/v1/notes/123/duplicate
 ```
 
@@ -615,6 +624,30 @@ Remove a note from its folder (move to root).
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/remove-folder
+```
+
+### Reorder Notes
+
+```
+POST /notes/reorder
+```
+
+Move a note before or after another note (manual drag-and-drop order). The note lands in the target note's folder (or at the root when the target has none), every note there is renumbered, and that folder switches to the `manual` sort so the position sticks. For a root note the global note sort setting becomes `manual`; folders that were following the global default keep their current ordering.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `note_id` | integer | Yes | Note to move |
+| `target_note_id` | integer | Yes | Note used as anchor (same workspace) |
+| `position` | string | Yes | `before` or `after` the target note |
+| `workspace` | string | No | Workspace check (must match target note) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"note_id": 123, "target_note_id": 456, "position": "after"}' \
+  http://YOUR_SERVER/api/v1/notes/reorder
 ```
 
 ### Archive Note
@@ -1607,6 +1640,42 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/34/move
 ```
 
+### Duplicate Folder
+
+```
+POST /folders/{id}/duplicate
+```
+
+Copy a folder next to the original, with all of its notes (attachments included) and subfolders. The copy gets a unique name (`Name (1)` when `Name` already exists), keeps the folder icon, color, Kanban mode and sort setting, and starts unpinned, unfavorited and unshared. Links between notes of the copied tree point at the copies, so a folder can serve as a template.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `workspace` | string | Restrict the lookup to a workspace (optional) |
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/folders/34/duplicate
+```
+
+**Response (201):**
+
+```json
+{
+  "success": true,
+  "message": "Folder duplicated successfully",
+  "folder": { "id": 57, "name": "Project template (1)", "workspace": "Poznote", "parent_id": null },
+  "folder_id": 57,
+  "folder_name": "Project template (1)",
+  "source_folder_id": 34,
+  "notes_count": 8,
+  "subfolders_count": 3
+}
+```
+
+Returns `403` when the copy would exceed the note or storage quota, and `404` when the folder does not exist.
+
 ### Move Files Between Folders
 
 ```
@@ -1803,12 +1872,45 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 DELETE /folders/{id}
 ```
 
-Delete a folder.
+Delete a folder and its subfolders. Their notes go to the trash.
 
 ```bash
 curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/12
 ```
+
+The response carries a `restore_snapshot` describing what was removed, to be posted back to `POST /folders/restore` to undo the delete:
+
+```json
+{
+  "success": true,
+  "restore_snapshot": {
+    "workspace": "Poznote",
+    "folder_id": 12,
+    "folders": [{ "id": 12, "name": "Projects", "parent_id": null, "icon": null, "color": null, "display_order": 0 }],
+    "notes": [{ "id": 123, "folder_id": 12 }]
+  }
+}
+```
+
+### Restore Deleted Folder
+
+```
+POST /folders/restore
+```
+
+Rebuild a deleted folder tree from the `restore_snapshot` returned by Delete Folder. Folders are recreated (parents first, with their icon, color, order and settings) and the listed notes are taken out of the trash into the recreated folders. A folder that already exists again at the same place under the same name is reused. Public share links are not restored.
+
+**Body:** the `restore_snapshot` object as returned by Delete Folder.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"workspace": "Poznote", "folder_id": 12, "folders": [{"id": 12, "name": "Projects", "parent_id": null}], "notes": [{"id": 123, "folder_id": 12}]}' \
+  http://YOUR_SERVER/api/v1/folders/restore
+```
+
+**Response:** `folder_id` (new id of the root folder), `folder_id_map` (old id to new id) and `restored_notes`.
 
 ---
 
@@ -3026,6 +3128,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
+| `POST` | `/notes/reorder` | Reorder a note before/after another |
 | `POST` | `/notes/{id}/archive` | Archive into the Archives workspace |
 
 ### Note Locks
@@ -3096,6 +3199,7 @@ curl http://YOUR_SERVER/api_health.php
 | `PATCH` | `/folders/{id}` | Rename folder |
 | `DELETE` | `/folders/{id}` | Delete folder |
 | `POST` | `/folders/{id}/move` | Move folder |
+| `POST` | `/folders/{id}/duplicate` | Duplicate folder with notes and subfolders |
 | `POST` | `/folders/{id}/empty` | Empty folder |
 | `PUT` | `/folders/{id}/icon` | Update icon |
 | `PUT` | `/folders/{id}/color` | Update card color |

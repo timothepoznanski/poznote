@@ -86,6 +86,11 @@ function folderListInlineActions() {
 			'label' => t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder'),
 		],
 		[
+			'action' => 'duplicate-folder',
+			'icon' => 'lucide-copy',
+			'label' => t_h('notes_list.folder_actions.duplicate_folder', [], 'Duplicate folder'),
+		],
+		[
 			'action' => 'download-folder',
 			'icon' => 'lucide-download',
 			'label' => t_h('notes_list.folder_actions.download_folder', [], 'Download folder'),
@@ -634,6 +639,10 @@ $currentLang = getUserLanguage();
 					<div class="folder-actions-menu-item" data-action="move-entire-folder">
 						<i class="lucide lucide-folder-output"></i>
 						<span><?php echo t_h('notes_list.folder_actions.move_folder', [], 'Move to subfolder'); ?></span>
+					</div>
+					<div class="folder-actions-menu-item" data-action="duplicate-folder">
+						<i class="lucide lucide-copy"></i>
+						<span><?php echo t_h('notes_list.folder_actions.duplicate_folder', [], 'Duplicate folder'); ?></span>
 					</div>
 					<div class="folder-actions-menu-item requires-notes" data-action="download-folder">
 						<i class="lucide lucide-download"></i>

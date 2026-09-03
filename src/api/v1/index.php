@@ -292,6 +292,11 @@ $router->get('/notes/resolve', function($params) use ($notesController) {
     $notesController->resolveReference();
 });
 
+// Reorder a note before/after another one (must come before /notes/{id})
+$router->post('/notes/reorder', function($params) use ($foldersController) {
+    $foldersController->reorderNote();
+});
+
 // Search notes (must come before /notes/{id})
 $router->get('/notes/search', function($params) use ($notesController) {
     $notesController->search();
@@ -576,6 +581,11 @@ $router->post('/folders/reorder', function($params) use ($foldersController) {
     $foldersController->reorder();
 });
 
+// Rebuild a deleted folder tree from the snapshot DELETE /folders/{id} returned (undo)
+$router->post('/folders/restore', function($params) use ($foldersController) {
+    $foldersController->restoreDeleted();
+});
+
 // List all folders
 $router->get('/folders', function($params) use ($foldersController) {
     $foldersController->index();
@@ -604,6 +614,11 @@ $router->delete('/folders/{id}', function($params) use ($foldersController) {
 // Move folder to new parent
 $router->post('/folders/{id}/move', function($params) use ($foldersController) {
     $foldersController->move($params['id']);
+});
+
+// Duplicate a folder with all its notes and subfolders
+$router->post('/folders/{id}/duplicate', function($params) use ($foldersController) {
+    $foldersController->duplicate($params['id']);
 });
 
 // Empty folder (move notes to trash)

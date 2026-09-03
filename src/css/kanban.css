@@ -177,10 +177,139 @@
 
 
 /* Drop zone indicator */
-.kanban-column-content.drag-over {
+.kanban-column-content.drag-over,
+.kanban-subfolder-content.drag-over {
     background: #f8fafc;
     border: 2px dashed #6366f1;
     border-radius: 8px;
+}
+
+/* ===== Nested subfolder groups ===== */
+/* A subfolder of a column folder is shown as a collapsible group inside the
+   column, below the column's own cards. Groups nest recursively. */
+.kanban-subfolder-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    padding: 4px;
+}
+
+.kanban-subfolder-section.drag-over {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+.kanban-subfolder-header {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+}
+
+.kanban-subfolder-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    padding: 6px 6px;
+    border: none;
+    background: transparent;
+    color: #334155;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.kanban-subfolder-toggle:hover {
+    background: rgba(var(--pz-accent-rgb), 0.08);
+}
+
+.kanban-subfolder-toggle:focus-visible {
+    outline: 2px solid var(--pz-accent);
+    outline-offset: -2px;
+}
+
+.kanban-subfolder-toggle [class*="lucide-"] {
+    filter: none !important;
+    transform: none !important;
+}
+
+.kanban-subfolder-chevron {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.kanban-subfolder-section.is-expanded > .kanban-subfolder-header .kanban-subfolder-chevron {
+    transform: rotate(90deg) !important;
+}
+
+.kanban-subfolder-icon {
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+.kanban-subfolder-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.kanban-subfolder-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 11px;
+}
+
+.kanban-subfolder-add-btn {
+    flex-shrink: 0;
+    min-width: 24px;
+    min-height: 24px;
+    font-size: 1rem;
+}
+
+.kanban-subfolder-add-btn i {
+    font-size: 1rem;
+}
+
+.kanban-subfolder-content {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 4px 4px;
+    min-height: 0;
+}
+
+.kanban-subfolder-section.is-expanded > .kanban-subfolder-content {
+    display: flex;
+}
+
+/* An expanded group with no cards keeps a small landing area for drops */
+.kanban-subfolder-section.is-expanded > .kanban-subfolder-content:empty {
+    min-height: 36px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    margin: 0 4px 4px;
+    padding: 0;
 }
 
 /* ===== Kanban Cards ===== */

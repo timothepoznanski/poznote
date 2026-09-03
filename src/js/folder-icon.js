@@ -977,7 +977,7 @@ function updateFolderIconInUI(folderId, iconClass, iconColor) {
 
     // 2. Update in Kanban view
     // In kanban view, the icon has data-folder-id directly on it
-    const kanbanIcons = document.querySelectorAll(`.kanban-title .folder-icon[data-folder-id="${folderId}"], .kanban-column-header .folder-icon[data-folder-id="${folderId}"]`);
+    const kanbanIcons = document.querySelectorAll(`.kanban-title .folder-icon[data-folder-id="${folderId}"], .kanban-column-header .folder-icon[data-folder-id="${folderId}"], .kanban-subfolder-header .folder-icon[data-folder-id="${folderId}"]`);
     kanbanIcons.forEach(icon => {
         if (!elementsToUpdate.includes(icon)) {
             elementsToUpdate.push(icon);

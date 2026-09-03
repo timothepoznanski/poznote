@@ -127,7 +127,7 @@
         if (document.getElementById('login-display-badge')) {
             keys.push('login_display_name');
         }
-        if (document.getElementById('ui-customization-admin-badge')) {
+        if (isUiCustomizationAdmin()) {
             keys.push('hidden_ui_elements_global');
         }
         if (document.getElementById('custom-css-badge')) {
@@ -605,6 +605,9 @@
                     break;
                 case 'heading_asc':
                     sortLabel = tr('modals.note_sort.options.alphabetical', {}, 'Alphabetical');
+                    break;
+                case 'manual':
+                    sortLabel = tr('modals.note_sort.options.manual', {}, 'Manual (drag and drop)');
                     break;
                 case 'updated_desc':
                 default:
@@ -2104,16 +2107,11 @@
             customCssCard.addEventListener('click', showCustomCssModal);
         }
 
-        // UI Customization card - opens modal
+        // UI Customization card - opens modal (administrators get the extra
+        // "Users" column editing the instance-wide setting)
         var uiCustomizationCard = document.getElementById('ui-customization-card');
         if (uiCustomizationCard) {
             uiCustomizationCard.addEventListener('click', showUiCustomizationModal);
-        }
-
-        // UI Customization admin card - same modal, edits the instance-wide setting
-        var uiCustomizationAdminCard = document.getElementById('ui-customization-admin-card');
-        if (uiCustomizationAdminCard) {
-            uiCustomizationAdminCard.addEventListener('click', showUiCustomizationGlobalModal);
         }
 
         // Icon Sidebar Order card - opens its own modal (card click, move
@@ -2123,6 +2121,9 @@
         // Init section toggle-all buttons (event delegation, one-time setup)
         var uiCustomModal = document.getElementById('uiCustomizationModal');
         if (uiCustomModal) {
+            if (isUiCustomizationAdmin()) {
+                initUiCustomizationAdminColumns(uiCustomModal);
+            }
             initSectionToggleButtons(uiCustomModal);
             initSectionCollapseButtons(uiCustomModal);
         }
@@ -2134,34 +2135,37 @@
                 var modal = document.getElementById('uiCustomizationModal');
                 if (!modal) return;
 
-                var hidden = [];
-                var checkboxes = modal.querySelectorAll('[data-ui-key]');
-                checkboxes.forEach(function (cb) {
-                    var key = cb.getAttribute('data-ui-key');
-                    if (cb.disabled) {
-                        // Locked checkbox (admin-locked in user mode, tenant
-                        // isolation-locked in global mode): keep the stored
-                        // state untouched instead of adopting the lock state.
-                        if (uiCustomizationUserHiddenSnapshot.indexOf(key) !== -1) {
-                            hidden.push(key);
-                        }
+                var onSaved = function () {
+                    try { closeModal('uiCustomizationModal'); } catch (e) { }
+                    refreshUiCustomizationBadge();
+                    reloadOpener();
+                    reloadCurrentSettingsPage();
+                };
+                var onError = function () {
+                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                };
+
+                var hidden = collectHiddenUiKeys(modal, 'data-ui-key', uiCustomizationUserHiddenSnapshot);
+                setSetting('hidden_ui_elements', JSON.stringify(hidden), function (success) {
+                    if (!success) {
+                        onError();
                         return;
                     }
-                    if (!cb.checked) {
-                        hidden.push(key);
-                    }
-                });
 
-                setSetting(getUiCustomizationSettingKey(uiCustomizationModalMode), JSON.stringify(hidden), function (success) {
-                    if (success) {
-                        try { closeModal('uiCustomizationModal'); } catch (e) { }
-                        refreshUiCustomizationBadge();
-                        refreshUiCustomizationAdminBadge();
-                        reloadOpener();
-                        reloadCurrentSettingsPage();
-                    } else {
-                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    if (uiCustomizationModalMode !== 'admin') {
+                        onSaved();
+                        return;
                     }
+
+                    // Administrators also save the Users column
+                    var globalHidden = collectHiddenUiKeys(modal, 'data-ui-global-key', uiCustomizationGlobalHiddenSnapshot);
+                    setSetting('hidden_ui_elements_global', JSON.stringify(globalHidden), function (ok) {
+                        if (ok) {
+                            onSaved();
+                        } else {
+                            onError();
+                        }
+                    });
                 });
             });
         }
@@ -2624,7 +2628,6 @@
                         syncTenantIsolationHiddenKeys(features, function () {
                             try { closeModal('tenantIsolationModal'); } catch (e) { }
                             refreshTenantIsolationBadge();
-                            refreshUiCustomizationAdminBadge();
                             refreshUiCustomizationBadge();
                             reloadOpener();
                         });
@@ -2657,7 +2660,6 @@
             refreshGitSyncEnabledBadge();
             refreshTenantIsolationBadge();
             refreshUiCustomizationBadge();
-            refreshUiCustomizationAdminBadge();
         });
 
         // Search functionality - filters settings cards
@@ -3152,13 +3154,85 @@
 
     // ========== UI Customization ==========
 
-    // 'user' edits hidden_ui_elements (current user), 'global' edits
-    // hidden_ui_elements_global (admin-only, applies to every user).
+    // Every user edits hidden_ui_elements (their own interface). In 'admin'
+    // mode the modal shows a second checkbox column, "Users", editing
+    // hidden_ui_elements_global (applies to every user except administrators)
+    // next to the administrator's own "Me" column.
     var uiCustomizationModalMode = 'user';
     var uiCustomizationUserHiddenSnapshot = [];
+    var uiCustomizationGlobalHiddenSnapshot = [];
 
-    function getUiCustomizationSettingKey(mode) {
-        return mode === 'global' ? 'hidden_ui_elements_global' : 'hidden_ui_elements';
+    // Both checkbox columns: data-ui-key (own set) and data-ui-global-key
+    // (instance-wide set). The Users inputs are disabled in user mode, so the
+    // enabled selector is the one to use for anything that counts or toggles.
+    var UI_CUSTOM_CHECKBOX_SELECTOR = '[data-ui-key], [data-ui-global-key]';
+    var UI_CUSTOM_ENABLED_CHECKBOX_SELECTOR = '[data-ui-key]:not(:disabled), [data-ui-global-key]:not(:disabled)';
+
+    function isUiCustomizationAdmin() {
+        var card = document.getElementById('ui-customization-card');
+        return !!(card && card.getAttribute('data-ui-admin') === '1');
+    }
+
+    // Adds the Users column to the modal: a header row naming both columns at
+    // the top of each section and, per item, a second checkbox mirroring the
+    // item's key. The markup in modals.php stays single-column so regular
+    // users are unaffected.
+    function initUiCustomizationAdminColumns(modal) {
+        var description = document.getElementById('uiCustomizationModalDescription');
+        var meLabel = (description && description.getAttribute('data-column-me')) || 'Me';
+        var usersLabel = (description && description.getAttribute('data-column-users')) || 'Users';
+
+        modal.querySelectorAll('.ui-custom-items').forEach(function (items) {
+            if (items.querySelector('.ui-custom-columns')) return;
+
+            var header = document.createElement('div');
+            header.className = 'ui-custom-columns';
+            var me = document.createElement('span');
+            me.textContent = meLabel;
+            var users = document.createElement('span');
+            users.textContent = usersLabel;
+            header.appendChild(me);
+            header.appendChild(users);
+            items.insertBefore(header, items.firstChild);
+        });
+
+        modal.querySelectorAll('.ui-custom-item').forEach(function (item) {
+            if (item.querySelector('[data-ui-global-key]')) return;
+
+            var own = item.querySelector('[data-ui-key]');
+            if (!own) return;
+
+            // Clicking the label text still toggles the first checkbox (Me);
+            // a click on this one only toggles itself.
+            var input = document.createElement('input');
+            input.type = 'checkbox';
+            input.className = 'ui-custom-users-input';
+            input.setAttribute('data-ui-global-key', own.getAttribute('data-ui-key'));
+            input.checked = true;
+            input.disabled = true;
+            item.appendChild(input);
+        });
+    }
+
+    // Reads one checkbox column back into a hidden-key list. Disabled
+    // checkboxes (admin-locked in the own column, tenant isolation-locked in
+    // the Users column) keep their stored state instead of adopting the lock
+    // state.
+    function collectHiddenUiKeys(modal, attribute, snapshot) {
+        var hidden = [];
+        modal.querySelectorAll('[' + attribute + ']').forEach(function (cb) {
+            var key = cb.getAttribute(attribute);
+            if (cb.disabled) {
+                if (snapshot.indexOf(key) !== -1) {
+                    hidden.push(key);
+                }
+                return;
+            }
+            if (!cb.checked) {
+                hidden.push(key);
+            }
+        });
+        return hidden;
     }
 
     function getGloballyHiddenUiKeys() {
@@ -3296,9 +3370,14 @@
             var visibleItems = 0;
 
             items.forEach(function (item) {
-                var checkbox = item.querySelector('[data-ui-key]');
+                // Either column unchecked counts (the Users checkbox is kept
+                // checked in user mode, so it never matches there)
+                var anyUnchecked = Array.prototype.some.call(
+                    item.querySelectorAll(UI_CUSTOM_CHECKBOX_SELECTOR),
+                    function (cb) { return !cb.checked; }
+                );
                 var matches = (!query || normalizeUiCustomizationFilterText(item.textContent).indexOf(query) !== -1)
-                    && (!uncheckedOnly || !!(checkbox && !checkbox.checked));
+                    && (!uncheckedOnly || anyUnchecked);
 
                 item.hidden = !matches;
                 if (matches) {
@@ -3340,6 +3419,28 @@
         getSetting('hidden_ui_elements', function (value) {
             var own = parseHiddenUiCustomization(value);
 
+            if (isUiCustomizationAdmin()) {
+                // Administrators are exempt from the instance-wide set, so the
+                // badge shows the two columns separately.
+                getSetting('hidden_ui_elements_global', function (rawGlobal) {
+                    var forUsers = parseHiddenUiCustomization(rawGlobal);
+
+                    if (own.length === 0 && forUsers.length === 0) {
+                        badge.textContent = tr('modals.ui_customization.badge_all_visible', {}, 'All visible');
+                        badge.className = 'setting-status enabled';
+                        return;
+                    }
+
+                    badge.textContent = tr(
+                        'modals.ui_customization.badge_hidden_count_admin_columns',
+                        { me: own.length, users: forUsers.length },
+                        own.length + ' hidden for you, ' + forUsers.length + ' for users'
+                    );
+                    badge.className = 'setting-status disabled';
+                });
+                return;
+            }
+
             // Elements the administrator hides for everyone are applied on top
             // of the user's own set and cannot be re-enabled from the modal, so
             // the badge counts them too. The list is empty for administrators,
@@ -3372,25 +3473,8 @@
         });
     }
 
-    function refreshUiCustomizationAdminBadge() {
-        var badge = document.getElementById('ui-customization-admin-badge');
-        if (!badge) return;
-
-        getSetting('hidden_ui_elements_global', function (value) {
-            var hidden = parseHiddenUiCustomization(value);
-
-            if (hidden.length === 0) {
-                badge.textContent = tr('modals.ui_customization.badge_all_visible', {}, 'All visible');
-                badge.className = 'setting-status enabled';
-            } else {
-                badge.textContent = tr('modals.ui_customization.badge_hidden_count', { count: hidden.length }, hidden.length + ' hidden');
-                badge.className = 'setting-status disabled';
-            }
-        });
-    }
-
     // Renders the modal description, emphasising one phrase of it ("except
-    // administrators" in the all-users mode). Built from text nodes rather than
+    // administrators" in the administrator mode). Built from text nodes rather than
     // innerHTML so a translation can never inject markup.
     function setUiCustomizationDescription(element, text, highlight) {
         element.textContent = '';
@@ -3414,7 +3498,7 @@
         var btn = section.querySelector('.ui-custom-toggle-all');
         if (!btn) return;
 
-        var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
+        var checkboxes = section.querySelectorAll(UI_CUSTOM_ENABLED_CHECKBOX_SELECTOR);
         var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
 
         btn.textContent = allChecked
@@ -3426,7 +3510,7 @@
         var btn = modal.querySelector('#uiCustomizationToggleAll');
         if (!btn) return;
 
-        var checkboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
+        var checkboxes = modal.querySelectorAll(UI_CUSTOM_ENABLED_CHECKBOX_SELECTOR);
         var allChecked = checkboxes.length > 0
             && Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
 
@@ -3544,7 +3628,7 @@
             var globalBtn = e.target.closest('#uiCustomizationToggleAll');
             if (globalBtn) {
                 confirmToggleAll(function () {
-                    var allCheckboxes = modal.querySelectorAll('[data-ui-key]:not(:disabled)');
+                    var allCheckboxes = modal.querySelectorAll(UI_CUSTOM_ENABLED_CHECKBOX_SELECTOR);
                     var everyChecked = allCheckboxes.length > 0
                         && Array.prototype.every.call(allCheckboxes, function (cb) { return cb.checked; });
                     allCheckboxes.forEach(function (cb) { cb.checked = !everyChecked; });
@@ -3562,7 +3646,7 @@
             if (!section) return;
 
             confirmToggleAll(function () {
-                var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');
+                var checkboxes = section.querySelectorAll(UI_CUSTOM_ENABLED_CHECKBOX_SELECTOR);
                 var allChecked = Array.prototype.every.call(checkboxes, function (cb) { return cb.checked; });
                 checkboxes.forEach(function (cb) { cb.checked = !allChecked; });
                 updateSectionToggleBtn(section);
@@ -3573,7 +3657,7 @@
 
         // Change: keep button labels in sync when individual checkboxes change
         modal.addEventListener('change', function (e) {
-            if (!e.target || !e.target.getAttribute('data-ui-key')) return;
+            if (!e.target || !e.target.matches || !e.target.matches(UI_CUSTOM_CHECKBOX_SELECTOR)) return;
 
             var section = e.target.closest('.ui-custom-section');
             if (section) {
@@ -3592,98 +3676,120 @@
         var modal = document.getElementById('uiCustomizationModal');
         if (!modal) return;
 
-        uiCustomizationModalMode = mode === 'global' ? 'global' : 'user';
+        uiCustomizationModalMode = mode === 'admin' ? 'admin' : 'user';
+        var isAdminMode = uiCustomizationModalMode === 'admin';
 
         // Sections marked data-ui-global-only (e.g. the login page) can only be
-        // configured instance-wide; hide them from the per-user modal.
-        modal.classList.toggle('ui-custom-mode-user', uiCustomizationModalMode === 'user');
+        // configured instance-wide: hidden from the per-user modal, and only
+        // their Users checkbox is live in the administrator modal.
+        modal.classList.toggle('ui-custom-mode-user', !isAdminMode);
+        modal.classList.toggle('ui-custom-mode-admin', isAdminMode);
 
-        var title = document.getElementById('uiCustomizationModalTitle');
-        if (title) {
-            title.textContent = title.getAttribute(uiCustomizationModalMode === 'global' ? 'data-title-global' : 'data-title-user') || title.textContent;
-        }
         var description = document.getElementById('uiCustomizationModalDescription');
         if (description) {
-            var descriptionText = description.getAttribute(uiCustomizationModalMode === 'global' ? 'data-description-global' : 'data-description-user');
+            var descriptionText = description.getAttribute(isAdminMode ? 'data-description-admin' : 'data-description-user');
             if (descriptionText) {
-                setUiCustomizationDescription(description, descriptionText, uiCustomizationModalMode === 'global'
-                    ? description.getAttribute('data-description-global-highlight')
+                setUiCustomizationDescription(description, descriptionText, isAdminMode
+                    ? description.getAttribute('data-description-admin-highlight')
                     : '');
             }
         }
 
-        getSetting(getUiCustomizationSettingKey(uiCustomizationModalMode), function (value) {
-            var hidden = parseHiddenUiCustomization(value);
-            var globallyHidden = uiCustomizationModalMode === 'user' ? getGloballyHiddenUiKeys() : [];
-            var lockedTitle = tr('modals.ui_customization.locked_by_admin', {}, 'Hidden for all users by the administrator');
-            var tenantLockedTitle = tr('modals.ui_customization.locked_by_tenant_isolation', {}, 'Hidden automatically while this capability is blocked by Tenant isolation');
+        var lockedTitle = tr('modals.ui_customization.locked_by_admin', {}, 'Hidden for all users by the administrator');
+        var tenantLockedTitle = tr('modals.ui_customization.locked_by_tenant_isolation', {}, 'Hidden automatically while this capability is blocked by Tenant isolation');
 
-            // The stored hidden list backs disabled checkboxes on save, so
-            // locked keys keep their stored state in both modes.
+        var applyState = function (hidden, globalHidden, tenantLockedKeys) {
+            // Administrators are exempt from the instance-wide set, so their
+            // own column is never locked by it (the list is empty for them).
+            var globallyHidden = getGloballyHiddenUiKeys();
+
+            // The stored hidden lists back the disabled checkboxes on save, so
+            // locked keys keep their stored state.
             uiCustomizationUserHiddenSnapshot = hidden;
+            uiCustomizationGlobalHiddenSnapshot = globalHidden;
 
-            var applyState = function (tenantLockedKeys) {
-                // Set checkboxes: checked = visible (not in hidden list). Keys the
-                // admin hides for everyone are locked in user mode; keys managed
-                // by a blocked tenant isolation feature are locked in global mode.
-                var checkboxes = modal.querySelectorAll('[data-ui-key]');
-                checkboxes.forEach(function (cb) {
-                    var key = cb.getAttribute('data-ui-key');
-                    var locked = globallyHidden.indexOf(key) !== -1;
-                    var tenantLocked = tenantLockedKeys.indexOf(key) !== -1;
-                    var globalOnly = uiCustomizationModalMode === 'user' && !!cb.closest('[data-ui-global-only]');
-                    var item = cb.closest('.ui-custom-item');
+            // Own column: checked = visible (not in hidden list). Keys the
+            // admin hides for everyone are locked for regular users.
+            modal.querySelectorAll('[data-ui-key]').forEach(function (cb) {
+                var key = cb.getAttribute('data-ui-key');
+                var locked = globallyHidden.indexOf(key) !== -1;
+                var globalOnly = !!cb.closest('[data-ui-global-only]');
+                var item = cb.closest('.ui-custom-item');
 
-                    cb.disabled = locked || tenantLocked || globalOnly;
-                    cb.checked = (locked || tenantLocked) ? false : hidden.indexOf(key) === -1;
-                    if (item) {
-                        item.classList.toggle('ui-custom-item-locked', locked || tenantLocked);
-                        if (locked) {
-                            item.setAttribute('title', lockedTitle);
-                        } else if (tenantLocked) {
-                            item.setAttribute('title', tenantLockedTitle);
-                        } else {
-                            item.removeAttribute('title');
-                        }
+                cb.disabled = locked || globalOnly;
+                cb.checked = locked ? false : hidden.indexOf(key) === -1;
+                if (item) {
+                    item.classList.toggle('ui-custom-item-locked', locked);
+                    if (locked) {
+                        item.setAttribute('title', lockedTitle);
+                    } else {
+                        item.removeAttribute('title');
                     }
-                });
-
-                // Update toggle-all buttons to reflect current state
-                modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
-                updateGlobalToggleBtn(modal);
-
-                var filterInput = document.getElementById('uiCustomizationFilterInput');
-                if (filterInput) {
-                    filterInput.value = '';
                 }
+            });
 
-                var hiddenOnlyToggle = document.getElementById('uiCustomizationHiddenOnly');
-                if (hiddenOnlyToggle) {
-                    hiddenOnlyToggle.checked = false;
+            // Users column (administrators): keys managed by a blocked tenant
+            // isolation feature are locked. Disabled in user mode so the
+            // toggle buttons and the "unchecked only" filter ignore the
+            // hidden column.
+            modal.querySelectorAll('[data-ui-global-key]').forEach(function (cb) {
+                var key = cb.getAttribute('data-ui-global-key');
+                var tenantLocked = isAdminMode && tenantLockedKeys.indexOf(key) !== -1;
+
+                cb.disabled = !isAdminMode || tenantLocked;
+                cb.checked = tenantLocked ? false : globalHidden.indexOf(key) === -1;
+                cb.classList.toggle('ui-custom-input-locked', tenantLocked);
+                if (tenantLocked) {
+                    cb.setAttribute('title', tenantLockedTitle);
+                } else {
+                    cb.removeAttribute('title');
                 }
+            });
 
-                // Every section opens again on each visit, like the filter
-                modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
-                    setUiCustomizationSectionCollapsed(section, false);
-                });
-                updateCollapseAllBtn(modal);
+            // Update toggle-all buttons to reflect current state
+            modal.querySelectorAll('.ui-custom-section').forEach(updateSectionToggleBtn);
+            updateGlobalToggleBtn(modal);
 
-                applyUiCustomizationFilter(modal, '');
+            var filterInput = document.getElementById('uiCustomizationFilterInput');
+            if (filterInput) {
+                filterInput.value = '';
+            }
 
-                modal.style.display = 'flex';
-            };
+            var hiddenOnlyToggle = document.getElementById('uiCustomizationHiddenOnly');
+            if (hiddenOnlyToggle) {
+                hiddenOnlyToggle.checked = false;
+            }
 
-            if (uiCustomizationModalMode === 'global') {
+            // Every section opens again on each visit, like the filter
+            modal.querySelectorAll('.ui-custom-section').forEach(function (section) {
+                setUiCustomizationSectionCollapsed(section, false);
+            });
+            updateCollapseAllBtn(modal);
+
+            applyUiCustomizationFilter(modal, '');
+
+            modal.style.display = 'flex';
+        };
+
+        getSetting('hidden_ui_elements', function (value) {
+            var hidden = parseHiddenUiCustomization(value);
+
+            if (!isAdminMode) {
+                applyState(hidden, [], []);
+                return;
+            }
+
+            getSetting('hidden_ui_elements_global', function (rawGlobal) {
+                var globalHidden = parseHiddenUiCustomization(rawGlobal);
+
                 getTenantIsolationFeatures(function (features) {
                     var keys = [];
                     features.forEach(function (feature) {
                         keys = keys.concat(TENANT_ISOLATION_FEATURE_HIDDEN_KEYS[feature] || []);
                     });
-                    applyState(keys);
+                    applyState(hidden, globalHidden, keys);
                 });
-            } else {
-                applyState([]);
-            }
+            });
         });
     }
 
@@ -3871,11 +3977,7 @@
     }
 
     function showUiCustomizationModal() {
-        openUiCustomizationModal('user');
-    }
-
-    function showUiCustomizationGlobalModal() {
-        openUiCustomizationModal('global');
+        openUiCustomizationModal(isUiCustomizationAdmin() ? 'admin' : 'user');
     }
 
     // ========== Global API ==========

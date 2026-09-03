@@ -600,6 +600,7 @@ Configure it in **Settings > Appearance > UI Customization**.
 
 - **Granular Control:** Toggle visibility for home cards, toolbar actions, slash menu items, and more.
 - **Per-User:** Each user can have their own unique interface layout.
+- **Administrators:** The same modal shows a second "Users" column next to the administrator's own "Me" column, to hide elements for every user of the instance (administrators excepted).
 - **Searchable:** Easily find the element you want to hide using the filter in the configuration modal.
 
 </details>

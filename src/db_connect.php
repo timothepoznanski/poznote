@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 33; // 33: entries.content_width (per-note width override)
+    $CURRENT_SCHEMA_VERSION = 34; // 34: entries.display_order (manual note ordering)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -240,7 +240,8 @@ try {
             updated_by_user_id INTEGER,
             kanban_completed DATETIME,
             trashed_at DATETIME,
-            content_width INTEGER
+            content_width INTEGER,
+            display_order INTEGER DEFAULT 0
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -686,6 +687,24 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add content_width column: ' . $e->getMessage());
+        }
+
+        // Ensure display_order column exists (manual note ordering by drag and
+        // drop in the sidebar). 0 means "not ordered yet"; the reorder endpoint
+        // renumbers every sibling from 1 when a note is dropped before/after
+        // another one, and the folder (or the global default) switches to the
+        // 'manual' sort so the position sticks.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('display_order', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN display_order INTEGER DEFAULT 0");
+            }
+            // Created here rather than in the INDEXES block above, which runs
+            // before this column exists on databases being upgraded.
+            $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_order ON entries(workspace, folder_id, display_order)');
+        } catch (Exception $e) {
+            error_log('Could not add display_order column to entries: ' . $e->getMessage());
         }
 
         // === DATA DIRECTORIES ===

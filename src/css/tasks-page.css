@@ -209,10 +209,15 @@ body.tasks-page {
     color: var(--pz-accent);
 }
 
-/* Note groups */
+/* Note groups. Each group is framed as a card so consecutive sections read
+   as distinct blocks rather than one continuous list. */
 .tasks-note-group {
     max-width: 900px;
-    margin: 0 auto 25px auto;
+    margin: 0 auto 18px auto;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: 10px;
+    background-color: #fafafa;
 }
 
 .tasks-note-header {
@@ -221,6 +226,17 @@ body.tasks-page {
     gap: 10px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border-color, var(--pz-border));
+}
+
+/* A collapsed card only shows its header: drop the separator under it */
+.tasks-note-group.collapsed .tasks-note-header {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+/* The card border already closes the list: no divider under the last row */
+.tasks-note-list > .tasks-task-item:last-child {
+    border-bottom: none;
 }
 
 .tasks-note-toggle {
@@ -816,6 +832,11 @@ body.tasks-page {
         margin-bottom: 20px;
     }
 
+    .tasks-note-group {
+        padding: 10px 12px;
+        margin-bottom: 12px;
+    }
+
     /* Stacked layout: title and label above the full-width progress bar.
        The bottom margin matches the filter input's total bottom spacing
        (8px bar gap + 6px margin) so the input breathes equally on both sides */
@@ -879,8 +900,9 @@ html[data-theme="dark"]:has(body.tasks-page) {
     color: #0ea5e9;
 }
 
+/* One shade above the card background so the badge stays visible */
 [data-theme="dark"] .folder-badge {
-    background-color: var(--dm-surface);
+    background-color: var(--dm-surface-hover);
     color: var(--dm-text-muted);
 }
 
@@ -912,6 +934,11 @@ html[data-theme="dark"]:has(body.tasks-page) {
 }
 
 [data-theme="dark"] .tasks-progress-bar {
+    background-color: var(--dm-surface);
+}
+
+[data-theme="dark"] .tasks-note-group {
+    border-color: var(--dm-border);
     background-color: var(--dm-surface);
 }
 

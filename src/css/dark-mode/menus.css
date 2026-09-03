@@ -323,24 +323,6 @@ body.dark-mode .note-actions-item:hover [class*="lucide-"] {
     color: #38bdf8;
 }
 
-html[data-theme='dark'] .note-favorite-toggle,
-body.dark-mode .note-favorite-toggle {
-    color: #b0b0b0;
-}
-
-html[data-theme='dark'] .note-favorite-toggle:hover,
-body.dark-mode .note-favorite-toggle:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .note-favorite-toggle:hover i,
-html[data-theme='dark'] .note-favorite-toggle:hover [class*="lucide-"],
-body.dark-mode .note-favorite-toggle:hover i,
-body.dark-mode .note-favorite-toggle:hover [class*="lucide-"] {
-    color: #38bdf8;
-}
-
 /* Group separators of both menus (light rule in css/folders/actions-menu.css):
    the light grey would read as a hard line on the dark surface. */
 html[data-theme='dark'] .folder-actions-menu-separator,
@@ -588,4 +570,11 @@ body.dark-mode .create-menu-item:hover i {
 html[data-theme='dark'] .create-menu .create-section:not(:first-child),
 body.dark-mode .create-menu .create-section:not(:first-child) {
     border-top-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .folder-actions-menu-item .actions-menu-shortcut,
+html[data-theme='dark'] .note-actions-menu-item .actions-menu-shortcut,
+body.dark-mode .folder-actions-menu-item .actions-menu-shortcut,
+body.dark-mode .note-actions-menu-item .actions-menu-shortcut {
+    color: #8a8a8a;
 }

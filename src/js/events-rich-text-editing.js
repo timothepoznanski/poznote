@@ -665,6 +665,40 @@ function handleHeadingBoundaryDelete(e, selection, noteentry) {
 }
 
 /**
+ * Handle Enter at the very start of a heading. The browser splits the block
+ * natively, which leaves an empty copy of the heading (same tag, same id)
+ * above the caret, so the line opened above a title stays a title. Insert
+ * a plain block above instead and keep the caret in the heading.
+ * @param {Event} e - The keyboard event
+ * @param {Selection} selection - The current selection
+ * @param {HTMLElement} noteentry - The editable note container
+ * @returns {boolean} True if handled
+ */
+function handleHeadingStartEnter(e, selection, noteentry) {
+    if (!noteentry || !selection || selection.rangeCount === 0) return false;
+    if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return false;
+
+    var range = selection.getRangeAt(0);
+    if (!range.collapsed) return false;
+
+    var node = range.startContainer.nodeType === 3 ? range.startContainer.parentElement : range.startContainer;
+    if (!node || !node.closest || !noteentry.contains(node)) return false;
+    if (node.closest('li, table, pre, code, blockquote, aside, details, .markdown-editor')) return false;
+
+    var heading = node.closest(HEADING_BLOCK_SELECTOR);
+    if (!heading || !noteentry.contains(heading)) return false;
+    if (!isCaretAtBlockStart(range, heading)) return false;
+
+    e.preventDefault();
+    var block = document.createElement('div');
+    block.innerHTML = '<br>';
+    heading.parentNode.insertBefore(block, heading);
+    placeCaretAtBlockStart(heading);
+    triggerNoteSave();
+    return true;
+}
+
+/**
  * Handle arrow down navigation from note entry to checklist
  * @param {Event} e - The keyboard event
  * @param {HTMLElement} noteentry - The note entry element
@@ -1218,6 +1252,11 @@ function handleNoteEntryKeydown(e) {
 
     // Handle Enter key in code block
     if (e.key === 'Enter' && !e.shiftKey) {
+        // Enter at the start of a heading: open a plain line above it
+        if (handleHeadingStartEnter(e, selection, target.closest('.noteentry[contenteditable="true"]'))) {
+            return;
+        }
+
         // Check if we're in a code block
         var container = selection.rangeCount > 0
             ? selection.getRangeAt(0).commonAncestorContainer

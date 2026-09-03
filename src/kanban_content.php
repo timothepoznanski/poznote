@@ -46,11 +46,6 @@ try {
         throw new Exception('Folder not found');
     }
 
-    // Get subfolders
-    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE parent_id = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE");
-    $stmt->execute([$folder_id]);
-    $subfolders = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
     // Get notes directly in parent folder (using 'entries' table and 'trash' column)
     // Completed cards are ordered by completion date so the newest finished card
     // sits at the top of the "completed" section.
@@ -105,20 +100,58 @@ try {
     }
     unset($note);
 
-    // Get notes for each subfolder
-    $subfolderNotes = [];
-    foreach ($subfolders as $subfolder) {
+    /**
+     * Notes of one folder with their preview snippets loaded.
+     */
+    $loadKanbanFolderNotes = function ($folderId) use ($con, $loadNoteSnippet) {
         $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
-        $stmt->execute([$subfolder['id']]);
+        $stmt->execute([$folderId]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         foreach ($notes as &$note) {
             $loadNoteSnippet($note);
         }
         unset($note);
-        
-        $subfolderNotes[$subfolder['id']] = $notes;
-    }
+
+        return $notes;
+    };
+
+    /**
+     * Build the folder tree below a folder, recursively. Each node holds the
+     * folder row, its notes and its own child nodes. Direct children of the
+     * board folder become columns, deeper folders become collapsible groups
+     * nested inside their parent column. The visited set and the depth cap
+     * guard against corrupted parent chains.
+     */
+    $KANBAN_MAX_DEPTH = 10;
+    $buildKanbanFolderTree = function ($parentId, $depth, array $visited) use (&$buildKanbanFolderTree, $con, $loadKanbanFolderNotes, $KANBAN_MAX_DEPTH) {
+        if ($depth > $KANBAN_MAX_DEPTH) {
+            return [];
+        }
+
+        $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE parent_id = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE");
+        $stmt->execute([$parentId]);
+        $folders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $nodes = [];
+        foreach ($folders as $folder) {
+            $childId = (int) $folder['id'];
+            if (isset($visited[$childId])) {
+                continue;
+            }
+            $visited[$childId] = true;
+
+            $nodes[] = [
+                'folder' => $folder,
+                'notes' => $loadKanbanFolderNotes($childId),
+                'children' => $buildKanbanFolderTree($childId, $depth + 1, $visited),
+            ];
+        }
+
+        return $nodes;
+    };
+
+    $kanbanColumns = $buildKanbanFolderTree($folder_id, 1, [$folder_id => true]);
 
     /**
      * Format a note update date without breaking the whole Kanban view on malformed data.
@@ -412,20 +445,77 @@ try {
     }
 
     /**
-     * Render the cards of a single column: active cards first, then a
-     * collapsible "completed" section holding the finished cards.
+     * Render the cards of a folder: active cards first, then a collapsible
+     * "completed" section holding the finished cards, then one collapsible
+     * group per subfolder (each rendered the same way, recursively).
      */
-    function renderKanbanColumnCards($notes, $folderId) {
+    function renderKanbanColumnCards($notes, $folderId, $children = []) {
         [$activeNotes, $completedNotes] = splitKanbanNotesByCompletion($notes);
 
         foreach ($activeNotes as $note) {
             renderKanbanCard($note, $folderId);
         }
 
-        if (empty($completedNotes)) {
-            return;
+        if (!empty($completedNotes)) {
+            renderKanbanCompletedSection($completedNotes, $folderId);
         }
 
+        foreach ($children as $child) {
+            renderKanbanSubfolderSection($child);
+        }
+    }
+
+    /**
+     * Render a nested, collapsible group for a subfolder inside a column.
+     * The group content is a drop zone targeting that subfolder.
+     */
+    function renderKanbanSubfolderSection($node) {
+        $folder = $node['folder'];
+        $folderId = (int) $folder['id'];
+        $folderName = (string) ($folder['name'] ?? '');
+        $iconRaw = $folder['icon'] ?? null;
+        $icon = $iconRaw ? convertFontAwesomeToLucide($iconRaw) : 'lucide-folder';
+        $iconColor = (string) ($folder['icon_color'] ?? '');
+        $activeCount = count(splitKanbanNotesByCompletion($node['notes'])[0]);
+        ?>
+        <div class="kanban-subfolder-section" data-folder-id="<?php echo $folderId; ?>">
+            <div class="kanban-subfolder-header">
+                <button type="button"
+                        class="kanban-subfolder-toggle"
+                        data-action="toggle-kanban-subfolder-section"
+                        data-folder-id="<?php echo $folderId; ?>"
+                        data-label-expand="<?php echo t_h('kanban.subfolder.expand', [], 'Expand subfolder'); ?>"
+                        data-label-collapse="<?php echo t_h('kanban.subfolder.collapse', [], 'Collapse subfolder'); ?>"
+                        title="<?php echo t_h('kanban.subfolder.expand', [], 'Expand subfolder'); ?>"
+                        aria-expanded="false">
+                    <i class="lucide lucide-chevron-right kanban-subfolder-chevron"></i>
+                    <i class="<?php echo htmlspecialchars($icon); ?> folder-icon kanban-subfolder-icon"
+                       data-folder-id="<?php echo $folderId; ?>"
+                       data-icon-color="<?php echo htmlspecialchars($iconColor, ENT_QUOTES); ?>"
+                       <?php echo $iconColor ? 'style="color: ' . htmlspecialchars($iconColor, ENT_QUOTES) . ' !important;"' : ''; ?>></i>
+                    <span class="kanban-subfolder-name"><?php echo htmlspecialchars($folderName, ENT_QUOTES); ?></span>
+                    <span class="kanban-subfolder-count"><?php echo $activeCount; ?></span>
+                </button>
+                <button type="button"
+                        class="kanban-add-card-btn kanban-subfolder-add-btn"
+                        data-action="create-kanban-note"
+                        data-folder-id="<?php echo $folderId; ?>"
+                        data-folder-name="<?php echo htmlspecialchars($folderName, ENT_QUOTES); ?>"
+                        title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
+                    <i class="lucide lucide-plus-circle"></i>
+                </button>
+            </div>
+            <div class="kanban-subfolder-content" data-folder-id="<?php echo $folderId; ?>">
+                <?php renderKanbanColumnCards($node['notes'], $folderId, $node['children']); ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the collapsible "completed" section of a folder.
+     */
+    function renderKanbanCompletedSection($completedNotes, $folderId) {
         $completedCount = count($completedNotes);
         ?>
         <div class="kanban-completed-section" data-folder-id="<?php echo $folderId; ?>">
@@ -532,7 +622,8 @@ try {
             </div>
             <?php endif; ?>
 
-            <?php foreach ($subfolders as $subfolder): ?>
+            <?php foreach ($kanbanColumns as $kanbanColumn): ?>
+            <?php $subfolder = $kanbanColumn['folder']; ?>
             <!-- Column for subfolder: <?php echo htmlspecialchars($subfolder['name']); ?> -->
             <div class="kanban-column" data-folder-id="<?php echo $subfolder['id']; ?>">
                 <div class="kanban-column-header">
@@ -562,16 +653,16 @@ try {
                                 title="<?php echo t_h('kanban.add_note', [], 'Add note'); ?>">
                             <i class="lucide lucide-plus-circle"></i>
                         </button>
-                        <span class="kanban-column-count"><?php echo count(splitKanbanNotesByCompletion($subfolderNotes[$subfolder['id']] ?? [])[0]); ?></span>
+                        <span class="kanban-column-count"><?php echo count(splitKanbanNotesByCompletion($kanbanColumn['notes'])[0]); ?></span>
                     </div>
                 </div>
                 <div class="kanban-column-content" data-folder-id="<?php echo $subfolder['id']; ?>">
-                    <?php renderKanbanColumnCards($subfolderNotes[$subfolder['id']] ?? [], $subfolder['id']); ?>
+                    <?php renderKanbanColumnCards($kanbanColumn['notes'], $subfolder['id'], $kanbanColumn['children']); ?>
                 </div>
             </div>
             <?php endforeach; ?>
 
-            <?php if (empty($subfolders) && empty($parentNotes)): ?>
+            <?php if (empty($kanbanColumns) && empty($parentNotes)): ?>
             <!-- Empty state -->
             <div class="kanban-empty-state">
                 <h2><?php echo t_h('kanban.empty.title', [], 'No subfolders yet'); ?></h2>

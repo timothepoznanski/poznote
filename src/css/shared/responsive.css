@@ -6,12 +6,15 @@
 
 /* Desktop spacing */
 @media (min-width: 801px) {
-    /* Keep the search bar compact and centered instead of full width */
+    /* Keep the search bar compact and centered instead of full width. The
+       basis is scoped to the row (shared.php): list_folders.php and
+       attachments_list.php put .filter-input-wrapper straight into the
+       column-direction .shared-filter-bar, where a flex-basis is a height. */
     .filter-search-row {
         justify-content: center;
     }
 
-    .filter-input-wrapper {
+    .filter-search-row .filter-input-wrapper {
         flex: 0 1 480px;
     }
 }
