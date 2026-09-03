@@ -84,12 +84,12 @@
 }
 
 /* ============================================
-   CENTER NOTE CONTENT
-   When enabled, the note body is centered with a max-width (a percentage of
-   the note column, or a legacy pixel value) for better readability on wide
-   screens. Applied to each child of .innernote rather than to .innernote
-   itself so the sticky toolbar (.note-header) keeps the full column width;
-   only the tags row, title and content shrink. .note-scroll-edge-controls is
+   NOTE CONTENT WIDTH
+   The note body is centered with a max-width (a percentage of the note
+   column, or a legacy pixel value) for better readability on wide screens.
+   Applied to each child of .innernote rather than to .innernote itself so
+   the sticky toolbar (.note-header) keeps the full column width; only the
+   tags row, title and content shrink. .note-scroll-edge-controls is
    position: fixed and must keep its own size. Desktop only: below 800px the
    note already fills the screen and a percentage would only shrink it.
 
@@ -98,20 +98,39 @@
    would win over margin-left/right: auto and leave the title flush left
    while the content centers.
    ============================================ */
+
+/* Effective width for the open note, resolved once so every consumer reads a
+   single value (the note body below, and the markdown split panes in
+   css/markdown.css). Order matters: the per-note toolbar override is last and
+   therefore beats the global setting from settings.php. */
+#right_col .notecard {
+    --note-width: 100%;
+}
+
+body.center-note-content #right_col .notecard {
+    --note-width: var(--note-max-width, 800px);
+}
+
+#right_col .notecard[data-content-width] {
+    --note-width: var(--note-content-width, 100%);
+}
+
 @media (min-width: 801px) {
-    body.center-note-content #right_col .innernote > :not(.note-header):not(.note-scroll-edge-controls) {
+    #right_col .innernote > :not(.note-header):not(.note-scroll-edge-controls) {
         width: 100%;
-        max-width: var(--note-max-width, 800px);
+        max-width: var(--note-width, 100%);
         align-self: center;
     }
 
-    /* Per-note override (entries.content_width, a percentage) set from the
-       toolbar toggle. Wins over the global setting above whatever its value;
-       100% renders as full width. */
-    #right_col .notecard[data-content-width] .innernote > :not(.note-header):not(.note-scroll-edge-controls) {
-        width: 100%;
-        max-width: var(--note-content-width, none);
-        align-self: center;
+    /* The markdown split view keeps the full column, and so does everything
+       around it (title, tags, attachments): halving an already narrowed note
+       would leave two unusable panes, and the surroundings have to match the
+       full-width panes below them. The width setting is carried by the panes
+       themselves, which inset their own content to --note-width (see
+       css/markdown.css), so the editor and the preview each get the
+       configured share of their own half. */
+    #right_col .innernote:has(.noteentry.markdown-split-mode) > :not(.note-header):not(.note-scroll-edge-controls) {
+        max-width: none;
     }
 }
 

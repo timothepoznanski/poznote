@@ -952,6 +952,43 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
 }
 
+/* Note content width inside the split view.
+ *
+ * The note itself spans the full column here (css/utilities.css), and each
+ * pane insets its own content instead, so the editor and the preview each
+ * show the configured share of their own half and look like a narrowed note.
+ *
+ * The inset is a percentage, which resolves against .noteentry (the panes'
+ * containing block), and each pane is half of it, hence halving --note-width
+ * before comparing. Two clamps: content never drops below
+ * --note-split-pane-min, and the inset never goes negative, which is how a
+ * column too narrow to honour the share falls back to the full pane.
+ *
+ * Both panes are border-box at width: 50%, so padding eats into the content
+ * and the divider stays on the true half.
+ */
+@media (min-width: 801px) {
+    .noteentry.markdown-split-mode {
+        --note-split-pane-min: 360px;
+        --note-split-pane-inset: max(
+            0px,
+            calc((50% - max(var(--note-width, 100%) / 2, var(--note-split-pane-min))) / 2)
+        );
+    }
+
+    #right_col .noteentry.markdown-split-mode > .markdown-preview {
+        padding-left: calc(24px + var(--note-split-pane-inset)) !important;
+        padding-right: calc(10px + var(--note-split-pane-inset)) !important;
+    }
+
+    /* The editor pane carries no padding of its own: the .markdown-editor it
+       wraps does, so only the inset is added here. */
+    #right_col .noteentry.markdown-split-mode > .markdown-editor-container {
+        padding-left: var(--note-split-pane-inset) !important;
+        padding-right: var(--note-split-pane-inset) !important;
+    }
+}
+
 /* Dark mode border for split view */
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
 [data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {

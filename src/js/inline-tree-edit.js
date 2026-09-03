@@ -62,6 +62,12 @@
      * carries data-action="load-note" or "toggle-folder", which would fire on
      * every click made to place the caret. contextmenu is stopped too so the
      * native menu (paste) wins over the row's actions menu.
+     *
+     * A note row wraps its title in <a href="index.php?note=...">, and an
+     * anchor is activated by a click on anything inside it: stopping the event
+     * is not enough, because navigation is the click's default action rather
+     * than a listener. So the activating events are cancelled too, which the
+     * caret does not need (mousedown places it and keeps its default).
      */
     function buildInput(value, placeholder) {
         var input = document.createElement('input');
@@ -77,6 +83,9 @@
         ['click', 'dblclick', 'mousedown', 'mouseup', 'auxclick', 'contextmenu'].forEach(function (type) {
             input.addEventListener(type, function (event) {
                 event.stopPropagation();
+                if (type === 'click' || type === 'dblclick' || type === 'auxclick') {
+                    event.preventDefault();
+                }
             });
         });
 
