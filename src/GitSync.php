@@ -821,33 +821,48 @@ class GitSync {
             $skipAttachments = $this->attachmentsInS3();
             if ($skipAttachments) $attachmentFiles = [];
 
-            // Per-workspace scope: only files belonging to synced workspaces are
-            // pushed. Out-of-scope files already in the repo become orphans below
-            // and get pruned, so the repo always mirrors the synced set exactly.
+            // Scope the disk listing through the DB: only non-trashed notes in
+            // synced workspaces are pushed. A trashed note's file stays on disk,
+            // so without the trash = 0 check a full push would re-add the note
+            // right after its "Deleted" commit (#1314). Out-of-scope files
+            // already in the repo become orphans below and get pruned, so the
+            // repo always mirrors the synced set exactly.
             $syncedWorkspaces = $this->getSyncedWorkspaces();
+            $workspaceFilter  = '';
+            $workspaceParams  = [];
             if ($syncedWorkspaces !== null) {
-                $placeholders = implode(',', array_fill(0, count($syncedWorkspaces), '?'));
-                $stmt = $this->con->prepare("SELECT id, attachments FROM entries WHERE COALESCE(workspace, 'Poznote') IN ($placeholders)");
-                $stmt->execute($syncedWorkspaces);
-                $syncedNoteIds = [];
-                $syncedAttachmentNames = [];
-                foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                    $syncedNoteIds[(int) $row['id']] = true;
-                    if (!empty($row['attachments'])) {
-                        $atts = json_decode($row['attachments'], true);
-                        if (is_array($atts)) {
-                            foreach ($atts as $att) {
-                                if (!empty($att['filename'])) $syncedAttachmentNames[$att['filename']] = true;
-                            }
+                $placeholders    = implode(',', array_fill(0, count($syncedWorkspaces), '?'));
+                $workspaceFilter = " WHERE COALESCE(workspace, 'Poznote') IN ($placeholders)";
+                $workspaceParams = $syncedWorkspaces;
+            }
+            $stmt = $this->con->prepare("SELECT id, attachments, trash FROM entries" . $workspaceFilter);
+            $stmt->execute($workspaceParams);
+            $activeNoteIds         = [];
+            $activeAttachmentNames = [];
+            $syncedAttachmentNames = []; // trashed rows included: feeds the bucket-history protection below
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $attNames = [];
+                if (!empty($row['attachments'])) {
+                    $atts = json_decode($row['attachments'], true);
+                    if (is_array($atts)) {
+                        foreach ($atts as $att) {
+                            if (!empty($att['filename'])) $attNames[] = $att['filename'];
                         }
                     }
                 }
-                $entryFiles = array_values(array_filter($entryFiles, function ($f) use ($syncedNoteIds) {
-                    return isset($syncedNoteIds[(int) pathinfo($f, PATHINFO_FILENAME)]);
-                }));
-                $attachmentFiles = array_values(array_filter($attachmentFiles, function ($f) use ($syncedAttachmentNames) {
-                    return isset($syncedAttachmentNames[$f]);
-                }));
+                foreach ($attNames as $name) $syncedAttachmentNames[$name] = true;
+                if (empty($row['trash'])) {
+                    $activeNoteIds[(int) $row['id']] = true;
+                    foreach ($attNames as $name) $activeAttachmentNames[$name] = true;
+                }
+            }
+            $entryFiles = array_values(array_filter($entryFiles, function ($f) use ($activeNoteIds) {
+                return isset($activeNoteIds[(int) pathinfo($f, PATHINFO_FILENAME)]);
+            }));
+            $attachmentFiles = array_values(array_filter($attachmentFiles, function ($f) use ($activeAttachmentNames) {
+                return isset($activeAttachmentNames[$f]);
+            }));
+            if ($syncedWorkspaces !== null) {
                 $results['debug'][] = 'Workspace scope: ' . implode(', ', $syncedWorkspaces);
             }
 
