@@ -1152,6 +1152,20 @@ function parseMarkdown($text) {
                 }
                 
                 if (!$listMatch) {
+                    // Wrapped continuation line (issue #1312): a non-blank line with no
+                    // list marker, indented deeper than the list's base indent, joins the
+                    // previous item instead of ending the list.
+                    if ($baseIndent !== null && count($listItems) > 0 && trim($currentLine) !== '' &&
+                        !preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $currentLine)) {
+                        $contIndent = strlen($currentLine) - strlen(ltrim($currentLine, " \t"));
+                        if ($contIndent > $baseIndent) {
+                            $lastIdx = count($listItems) - 1;
+                            $listItems[$lastIdx] = preg_replace('/<\/li>$/', '', $listItems[$lastIdx])
+                                . ' ' . $applyInlineStyles(trim($currentLine)) . '</li>';
+                            $currentIndex++;
+                            continue;
+                        }
+                    }
                     break; // Not a list item
                 }
                 
