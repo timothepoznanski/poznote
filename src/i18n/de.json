@@ -622,6 +622,7 @@
       "new_workspace": "Neuer Arbeitsbereich"
     },
     "errors": {
+      "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
       "name_empty": "Arbeitsbereichsname darf nicht leer sein",
       "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",

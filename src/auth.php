@@ -1647,8 +1647,11 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
 }
 
 function requireApiAuth() {
-    // For API endpoints, check session first
-    if (isAuthenticated()) {
+    // Header credentials take precedence over an existing session: API clients
+    // that keep cookies between requests (e.g. the MCP server's HTTP client)
+    // would otherwise stay pinned to the first profile they targeted, making
+    // X-User-ID silently ignored on every later request.
+    if (isAuthenticated() && !hasApiAuthCredentials()) {
         if (isPublicWorkspaceAccessActive()) {
             $requestMethod = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
             if (!in_array($requestMethod, ['GET', 'HEAD', 'OPTIONS'], true)) {
@@ -1719,8 +1722,8 @@ function requireApiAuth() {
  * Used for /users/me, /users/profiles, /system/version
  */
 function requireApiAuthUser() {
-    // For API endpoints, check session first
-    if (isAuthenticated()) {
+    // Header credentials take precedence over an existing session (see requireApiAuth)
+    if (isAuthenticated() && !hasApiAuthCredentials()) {
         return;
     }
     
@@ -1829,8 +1832,8 @@ function requireAdmin() {
  * Used for /admin/* and /users/profiles endpoints that access master.db, not user data
  */
 function requireApiAuthAdmin() {
-    // For API endpoints, check session first
-    if (isAuthenticated()) {
+    // Header credentials take precedence over an existing session (see requireApiAuth)
+    if (isAuthenticated() && !hasApiAuthCredentials()) {
         if (isPublicWorkspaceAccessActive()) {
             denyPublicWorkspaceAccessResponse('This endpoint is not available in public workspace mode', 403);
         }

@@ -4,6 +4,10 @@
 // Global workspace state
 var selectedWorkspace = '';
 
+// Names shown the last time the sidebar workspace menu was populated. Used to
+// reject a duplicate in the create modal before the round trip.
+var knownWorkspaceNames = [];
+
 // Use global translation function from globals.js
 var wsTr = window.t || function (key, vars, fallback) {
     return fallback || key;
@@ -186,6 +190,8 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
         return a.name.localeCompare(b.name);
     });
 
+    knownWorkspaceNames = workspaces.map(function (w) { return w.name; });
+
     // Create menu elements
     for (var i = 0; i < workspaces.length; i++) {
         var workspace = workspaces[i];
@@ -205,8 +211,8 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     if (menuHtml !== '') {
         menuHtml += '<div class="workspace-menu-divider"></div>';
     }
-    menuHtml += workspaceMenuActionHtml('workspaces.php', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
-    menuHtml += workspaceMenuActionHtml('workspaces.php?new=1', 'lucide-plus-circle', wsTr('workspaces.menu.new_workspace', {}, 'New workspace'));
+    menuHtml += workspaceMenuActionHtml('data-workspace-url', 'workspaces.php', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
+    menuHtml += workspaceMenuActionHtml('data-workspace-action', 'create', 'lucide-plus-circle', wsTr('workspaces.menu.new_workspace', {}, 'New workspace'));
 
     menu.innerHTML = menuHtml;
 
@@ -224,13 +230,124 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
             window.location.href = url;
         });
     });
+
+    menu.querySelectorAll('.workspace-menu-item[data-workspace-action="create"]').forEach(function (item) {
+        item.addEventListener('click', function () {
+            closeWorkspaceMenus();
+            openCreateWorkspaceModal();
+        });
+    });
 }
 
-function workspaceMenuActionHtml(url, icon, label) {
-    return '<div class="workspace-menu-item workspace-menu-action" data-workspace-url="' + escapeWorkspaceMenuText(url) + '">'
+function workspaceMenuActionHtml(attribute, value, icon, label) {
+    return '<div class="workspace-menu-item workspace-menu-action" ' + attribute + '="' + escapeWorkspaceMenuText(value) + '">'
         + '<i class="' + icon + '"></i>'
         + '<span>' + escapeWorkspaceMenuText(label) + '</span>'
         + '</div>';
+}
+
+// ========== CREATE WORKSPACE MODAL ==========
+// A workspace is just a name, so it is created in place rather than by sending
+// the user to workspaces.php. That page is still the fallback on any page that
+// does not include modals.php.
+
+function showCreateWorkspaceError(message) {
+    var box = document.getElementById('createWorkspaceError');
+    if (!box) return;
+    box.textContent = message || '';
+    box.style.display = message ? 'block' : 'none';
+}
+
+function openCreateWorkspaceModal() {
+    var modal = document.getElementById('createWorkspaceModal');
+    var input = document.getElementById('createWorkspaceInput');
+    var confirmBtn = document.getElementById('confirmCreateWorkspaceBtn');
+    if (!modal || !input || !confirmBtn) {
+        window.location.href = 'workspaces.php?new=1';
+        return;
+    }
+
+    input.value = '';
+    confirmBtn.disabled = false;
+    showCreateWorkspaceError('');
+    modal.style.display = 'flex';
+    input.focus();
+
+    confirmBtn.onclick = submitCreateWorkspaceModal;
+    input.onkeydown = function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            submitCreateWorkspaceModal();
+        }
+    };
+}
+
+function submitCreateWorkspaceModal() {
+    var input = document.getElementById('createWorkspaceInput');
+    var confirmBtn = document.getElementById('confirmCreateWorkspaceBtn');
+    if (!input) return;
+
+    var name = input.value.trim();
+    if (name === '') {
+        showCreateWorkspaceError(wsTr('workspaces.validation.enter_name', {}, 'Enter a workspace name'));
+        return;
+    }
+    if (!isValidWorkspaceName(name)) {
+        showCreateWorkspaceError(wsTr('workspaces.validation.invalid_name', {}, 'Invalid name: use letters, numbers, spaces, dash or underscore only'));
+        return;
+    }
+    if (knownWorkspaceNames.indexOf(name) !== -1) {
+        showCreateWorkspaceError(wsTr('workspaces.errors.already_exists', {}, 'A workspace with this name already exists'));
+        return;
+    }
+
+    showCreateWorkspaceError('');
+    if (confirmBtn) confirmBtn.disabled = true;
+
+    fetch('/api/v1/workspaces', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ name: name })
+    })
+        .then(function (response) {
+            return response.json().catch(function () { return {}; }).then(function (data) {
+                return { status: response.status, data: data || {} };
+            });
+        })
+        .then(function (result) {
+            if (confirmBtn) confirmBtn.disabled = false;
+
+            if (result.data.success) {
+                if (typeof closeModal === 'function') {
+                    closeModal('createWorkspaceModal');
+                } else {
+                    document.getElementById('createWorkspaceModal').style.display = 'none';
+                }
+                // Land in the new workspace: the sidebar switching over is the
+                // confirmation that it was created. The in-place switch only
+                // works where the note sidebar is rendered (index.php); the
+                // create menu also lives on pages without it.
+                var created = result.data.name || name;
+                if (document.getElementById('left_col')) {
+                    switchToWorkspace(created);
+                } else {
+                    window.location.href = 'index.php?workspace=' + encodeURIComponent(created);
+                }
+                return;
+            }
+
+            if (result.status === 409) {
+                showCreateWorkspaceError(wsTr('workspaces.errors.already_exists', {}, 'A workspace with this name already exists'));
+                return;
+            }
+            showCreateWorkspaceError(result.data.message || wsTr('workspaces.alerts.create_error', {}, 'Error creating workspace'));
+        })
+        .catch(function (error) {
+            if (confirmBtn) confirmBtn.disabled = false;
+            console.error('Error creating workspace:', error);
+            showCreateWorkspaceError(wsTr('workspaces.alerts.create_error', {}, 'Error creating workspace'));
+        });
 }
 
 function switchToWorkspace(workspaceName) {
@@ -2043,6 +2160,7 @@ function initializeWorkspacesPage() {
 // Expose functions globally
 window.loadDefaultWorkspaceSetting = loadDefaultWorkspaceSetting;
 window.handleCreateWorkspace = handleCreateWorkspace;
+window.openCreateWorkspaceModal = openCreateWorkspaceModal;
 
 // Auto-initialize workspaces page on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', initializeWorkspacesPage);

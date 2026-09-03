@@ -466,7 +466,9 @@ body.dark-mode #moveFolderFilesModal .modal-buttons .btn-primary:hover {
 }
 
 html[data-theme='dark'] #moveFolderFilesModal .modal-error-message,
-body.dark-mode #moveFolderFilesModal .modal-error-message {
+html[data-theme='dark'] #createWorkspaceModal .modal-error-message,
+body.dark-mode #moveFolderFilesModal .modal-error-message,
+body.dark-mode #createWorkspaceModal .modal-error-message {
     background-color: rgba(255, 77, 77, 0.08);
     color: #ff7b7b;
     border: 1px solid #7a2e2e;

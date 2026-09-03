@@ -275,10 +275,11 @@
     /* avoid interfering with folder clicks */
 }
 
+/* Keyed on .folder-toggle (the visible row), NOT .folder-header: the header
+   wraps .folder-content and thus the whole subtree, so hovering or focusing
+   any note revealed every ancestor folder's count at once. */
 .hide-folder-counts .folder-toggle:hover .folder-note-count,
-.hide-folder-counts .folder-toggle:focus-within .folder-note-count,
-.hide-folder-counts .folder-header:focus-within .folder-note-count,
-.hide-folder-counts .folder-header:hover .folder-note-count {
+.hide-folder-counts .folder-toggle:focus-within .folder-note-count {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;

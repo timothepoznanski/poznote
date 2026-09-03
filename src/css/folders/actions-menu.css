@@ -52,8 +52,10 @@
 /* Reveal on folder row hover, or while this folder's menu is open: the pointer
    then sits over the menu, not the row, so the toggle would otherwise vanish
    from under its own open menu. .open is set by toggleFolderActionsMenu() in
-   js/utils.js, mirroring .note-actions-toggle.open. */
-.folder-header:hover .folder-actions-toggle,
+   js/utils.js, mirroring .note-actions-toggle.open. Keyed on .folder-toggle
+   (the visible row), NOT .folder-header: the header wraps .folder-content and
+   thus the whole subtree, so hovering any note lit up every ancestor folder's
+   toggle at once. */
 .folder-toggle:hover .folder-actions-toggle,
 .folder-actions-toggle.open {
     display: inline-flex;

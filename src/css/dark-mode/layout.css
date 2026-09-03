@@ -257,6 +257,13 @@ body.dark-mode .folder-toggle {
     color: var(--dm-text);
 }
 
+/* Dark counterpart of the light grey row hover in drag-drop.css: the light
+   rgba(55,53,47,.08) overlay is invisible on a dark ground. */
+html[data-theme='dark'] .folder-toggle:hover,
+body.dark-mode .folder-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
 html[data-theme='dark'] .folder-name,
 body.dark-mode .folder-name {
     color: var(--dm-text);

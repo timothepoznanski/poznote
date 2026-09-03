@@ -1363,6 +1363,9 @@ function poznoteGetNonHideableUiKeys() {
         // so preferences saved before the removal stop applying.
         'card:icon_sidebar' => true,
         'card:iconSidebarSettingsBtn' => true,
+        // The folder icon click now always opens the icon/color modal; the
+        // old "open Kanban on icon click" toggle no longer exists.
+        'panel:folder-icon-kanban' => true,
     ];
 }
 
@@ -1818,10 +1821,6 @@ function poznoteRenderUiCustomizationBootstrap() {
     if ($rules !== '') {
         echo '<style id="ui-customization-styles">' . htmlspecialchars($rules, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</style>' . "\n";
     }
-}
-
-function poznoteUsesFolderIconKanban() {
-    return !in_array('panel:folder-icon-kanban', poznoteGetHiddenUiElements(), true);
 }
 
 /**

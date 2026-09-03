@@ -277,6 +277,9 @@
       "edit_workspaces": "Edit workspaces",
       "new_workspace": "New workspace"
     },
+    "errors": {
+      "already_exists": "A workspace with this name already exists"
+    },
     "share": {
       "actions": {
         "enable": "Share",

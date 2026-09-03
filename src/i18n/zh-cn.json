@@ -624,6 +624,7 @@
       "new_workspace": "新建工作区"
     },
     "errors": {
+      "already_exists": "同名工作区已存在",
       "name_empty": "工作区名称不能为空",
       "invalid_name": "工作区名称无效。仅限使用字母、数字、连字符和下划线（无空格）。",
       "name_required": "需要工作区名称",

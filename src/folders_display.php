@@ -555,12 +555,6 @@ function renderFolderActionsMenu() {
     $menu .= "<span>" . t_h('notes_list.folder_actions.rename_folder', [], 'Rename') . "</span>";
     $menu .= "</div>";
 
-    // Change folder icon action
-    $menu .= "<div class='folder-actions-menu-item' data-action='change-folder-icon'>";
-    $menu .= "<i class='lucide lucide-palette'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
-    $menu .= "</div>";
-
     // Sort Options Definition
     $sortTypes = [
         'alphabet' => ['icon' => 'lucide lucide-arrow-down-a-z', 'label' => t_h('sort.alphabet', [], 'Name')],
@@ -668,24 +662,15 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // syncActionsMenuSeparators() in js/utils.js, so UI customization can
     // uncheck whole groups without leaving a stray rule behind.
 
-    // --- Open ---
+    // --- Open, name and appearance in the tree ---
     $menu .= "<div class='note-actions-menu-item' data-action='open-note-new-tab'>";
     $menu .= "<i class='lucide lucide-external-link'></i>";
     $menu .= "<span>" . t_h('notes_list.note_actions.open_in_new_tab', [], 'Open in new tab') . "</span>";
     $menu .= "</div>";
 
-    $menu .= "<div class='note-actions-menu-separator'></div>";
-
-    // --- Name and appearance in the tree ---
     $menu .= "<div class='note-actions-menu-item' data-action='rename-note'>";
     $menu .= "<i class='lucide lucide-pencil'></i>";
     $menu .= "<span>" . t_h('notes_list.note_actions.rename_note', [], 'Rename note') . "</span>";
-    $menu .= "</div>";
-
-    // Change icon (same picker as clicking the icon in the tree)
-    $menu .= "<div class='note-actions-menu-item' data-action='open-note-icon-picker'>";
-    $menu .= "<i class='lucide lucide-palette'></i>";
-    $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
     $menu .= "</div>";
 
     // Favorite: two variants, populateNoteActionsMenu() shows the one matching
@@ -744,6 +729,9 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<span class='actions-menu-shortcut'>Ctrl+V</span>";
     $menu .= "</div>";
 
+    $menu .= "<div class='note-actions-menu-separator'></div>";
+
+    // --- Take out of the tree ---
     // Archive note: moves it to the archive workspace, folder path included.
     // Pointless once the note is already there, so the entry is dropped when
     // that workspace is the one on screen.
@@ -754,9 +742,6 @@ function renderNoteActionsMenu($currentWorkspace = '') {
         $menu .= "</div>";
     }
 
-    $menu .= "<div class='note-actions-menu-separator'></div>";
-
-    // --- Delete ---
     // Delete note (moves to trash, like the toolbar's delete button)
     $menu .= "<div class='note-actions-menu-item danger' data-action='delete-note'>";
     $menu .= "<i class='lucide lucide-trash-2'></i>";

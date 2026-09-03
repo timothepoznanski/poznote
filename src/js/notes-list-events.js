@@ -64,17 +64,6 @@
         }
     }
 
-    function shouldOpenFolderIconPicker(element) {
-        return !!(
-            element &&
-            element.classList &&
-            element.classList.contains('folder-list-click-action') &&
-            window.PoznoteUiCustomization &&
-            typeof window.PoznoteUiCustomization.usesFolderIconKanban === 'function' &&
-            !window.PoznoteUiCustomization.usesFolderIconKanban()
-        );
-    }
-
     function getNoteIconActionElement(target) {
         if (!target || !target.closest) return null;
         return target.closest('.note-icon[data-action="open-note-icon-picker"]');
@@ -372,13 +361,6 @@
         event.stopImmediatePropagation();
 
         var folderData = getFolderData(element);
-
-        if (shouldOpenFolderIconPicker(element)) {
-            if (folderData.id && typeof window.showChangeFolderIconModal === 'function') {
-                window.showChangeFolderIconModal(folderData.id, folderData.name);
-            }
-            return;
-        }
 
         // Close folder actions menu if opened from there
         if (folderData.id && typeof window.closeFolderActionsMenu === 'function') {
@@ -713,21 +695,53 @@
     }
 
     /**
-     * Handle middle-click on a note in the tree: open it in a new in-app tab,
-     * exactly like a double-click does, instead of letting the browser open a
-     * real browser tab.
+     * Resolve a middle-clicked tree element to its target: a note link, or a
+     * folder row (regular header or favorite-folder shortcut, never a system
+     * folder and never the folder ⋮ actions area).
+     * @param {EventTarget} target - The event target
+     * @returns {{type: string, element: HTMLElement}|null}
+     */
+    function getMiddleClickTreeTarget(target) {
+        if (!target || !target.closest) return null;
+
+        var noteEl = target.closest('a[data-dblaction="open-note-new-tab"]');
+        if (noteEl) return { type: 'note', element: noteEl };
+
+        if (target.closest('.folder-actions')) return null;
+        var folderEl = target.closest('.folder-header:not(.system-folder), a.favorite-folder-link');
+        if (folderEl && folderEl.getAttribute('data-folder-id')) {
+            return { type: 'folder', element: folderEl };
+        }
+
+        return null;
+    }
+
+    /**
+     * Handle middle-click in the tree: a note opens in a new in-app tab,
+     * exactly like a double-click does, and a folder opens its Kanban view.
+     * The browser's own middle-click defaults (open link in a real browser
+     * tab) are cancelled.
      * @param {MouseEvent} event - The auxclick event
      */
     function handleNotesListAuxClick(event) {
         if (event.button !== 1) return;
 
-        var actionElement = event.target.closest('a[data-dblaction="open-note-new-tab"]');
-        if (!actionElement) return;
+        var treeTarget = getMiddleClickTreeTarget(event.target);
+        if (!treeTarget) return;
 
-        // Cancel the browser's own "open link in a new tab" default
         event.preventDefault();
         event.stopPropagation();
 
+        if (treeTarget.type === 'folder') {
+            var folderId = treeTarget.element.getAttribute('data-folder-id');
+            var folderName = treeTarget.element.getAttribute('data-folder');
+            if (folderId && typeof window.openKanbanView === 'function') {
+                window.openKanbanView(parseInt(folderId, 10), folderName);
+            }
+            return;
+        }
+
+        var actionElement = treeTarget.element;
         var noteId = actionElement.getAttribute('data-note-id');
         if (!noteId) return;
 
@@ -740,13 +754,13 @@
     }
 
     /**
-     * Swallow the middle-button mousedown on note links so the browser doesn't
-     * start autoscroll before handleNotesListAuxClick opens the tab.
+     * Swallow the middle-button mousedown on note links and folder rows so the
+     * browser doesn't start autoscroll before handleNotesListAuxClick acts.
      * @param {MouseEvent} event - The mousedown event
      */
     function preventNoteMiddleClickAutoscroll(event) {
         if (event.button !== 1) return;
-        if (!event.target.closest('a[data-dblaction="open-note-new-tab"]')) return;
+        if (!getMiddleClickTreeTarget(event.target)) return;
         event.preventDefault();
     }
 
@@ -904,7 +918,7 @@
         // Double-click event delegation
         document.addEventListener('dblclick', handleNotesListDblClick);
 
-        // Middle-click on a note opens it in a new in-app tab
+        // Middle-click: a note opens in a new in-app tab, a folder in Kanban view
         document.addEventListener('mousedown', preventNoteMiddleClickAutoscroll);
         document.addEventListener('auxclick', handleNotesListAuxClick);
 

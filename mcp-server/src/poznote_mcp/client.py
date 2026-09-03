@@ -34,8 +34,13 @@ class PoznoteClient:
         self.password = password or ""
 
         # By default the MCP server operates as the first admin profile.
-        # The X-User-ID header can target other profiles on a per-request basis.
-        self.user_id = "1"
+        # POZNOTE_USER_ID pins the server to another profile globally; the
+        # X-User-ID header can still target other profiles per request.
+        env_user_id = (os.getenv("POZNOTE_USER_ID") or "").strip()
+        if env_user_id and not env_user_id.isdigit():
+            logger.warning("Ignoring non-numeric POZNOTE_USER_ID value: %r", env_user_id)
+            env_user_id = ""
+        self.user_id = env_user_id or "1"
         self.username = str(username or self.user_id)
         
         # Configure HTTP client authentication.
@@ -61,7 +66,14 @@ class PoznoteClient:
             timeout=DEFAULT_TIMEOUT,
             headers=self._base_headers,
             transport=transport,
+            # Poznote sets a session cookie on API responses; replaying it would
+            # pin every later request to the first profile targeted, so X-User-ID
+            # would be ignored. Discard cookies after each response.
+            event_hooks={"response": [self._discard_cookies]},
         )
+
+    def _discard_cookies(self, response: httpx.Response) -> None:
+        self.client.cookies.clear()
 
     @staticmethod
     def _load_service_token(token_file: str | None) -> str:
