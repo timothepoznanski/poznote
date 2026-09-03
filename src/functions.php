@@ -301,6 +301,21 @@ function poznoteAttachmentIsImage(array $attachment) {
     return in_array(poznoteAttachmentExtension($attachment), ['avif', 'bmp', 'gif', 'heic', 'heif', 'ico', 'jpg', 'jpeg', 'png', 'svg', 'webp'], true);
 }
 
+function poznoteAttachmentIsSvg(array $attachment) {
+    if (strpos(poznoteAttachmentMimeType($attachment), 'svg') !== false) {
+        return true;
+    }
+
+    return in_array(poznoteAttachmentExtension($attachment), ['svg', 'svgz'], true);
+}
+
+function poznoteSendSvgAttachmentSecurityHeaders() {
+    // Unlike raster images, SVG is an active XML document: opened directly it
+    // runs <script> in the app's origin. Sandbox it and block everything but
+    // its own inline styles; an <img>-embedded SVG never ran scripts anyway.
+    header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox");
+}
+
 function poznoteAttachmentIsReferencedInContent(array $attachment, $content) {
     $attachmentId = (string)($attachment['id'] ?? '');
     if ($attachmentId === '') {

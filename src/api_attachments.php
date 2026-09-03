@@ -409,10 +409,15 @@ function handleDownload() {
                     $stat = $storage->statForHeaders($attachment);
                     sendLegacyAttachmentCacheHeaders($stat, $attachment, !$isInlineView);
 
+                    header('X-Content-Type-Options: nosniff');
+
                     // For PDFs and images, allow inline viewing
                     if ($isInlineView) {
                         header('Content-Type: ' . $file_type);
                         header('Content-Disposition: inline; filename="' . $safeFilename . '"');
+                        if (poznoteAttachmentIsSvg($attachment)) {
+                            poznoteSendSvgAttachmentSecurityHeaders();
+                        }
                     } else {
                         // For other files, force download
                         header('Content-Type: application/octet-stream');
