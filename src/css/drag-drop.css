@@ -163,8 +163,15 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
     display: flex;
     align-items: center;
     /* 3px vertical like the note rows (a.links_arbo_left in toolbar.css), so
-       both hover backgrounds are the same height. */
+       both hover backgrounds are the same height. The margins rebuild, outside
+       the hover band, the row spacing that shrank when the box did (rows used
+       to be 32px tall: 22px in-flow .folder-actions + 5px paddings). The big
+       side sits ON TOP, the 4px below: a folder title hugs its contents, and
+       a modest 6px above separates it from the section before.
+       Between two bare folder rows the margins collapse through the
+       padding-less .folder-header, so the gap is max(6, 4), not 10. */
     padding: 3px 6px;
+    margin: 6px 0 4px;
     cursor: pointer;
     border-radius: 8px;
     background-color: transparent;

@@ -10,12 +10,17 @@
     margin-bottom: 5px;
 }
 
+/* Nudge subfolders (and their subtree) slightly further right than sibling notes */
+.folder-content > .folder-header {
+    margin-left: 6px;
+}
+
 .note-in-folder {
     margin-bottom: 0px !important;
     position: relative;
     display: flex !important;
     align-items: center !important;
-    padding-left: 10px !important;
+    padding-left: 14px !important;
     transition: padding-left 0.2s;
 }
 
