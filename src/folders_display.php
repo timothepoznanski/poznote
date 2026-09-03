@@ -473,8 +473,10 @@ function renderFolderActionsMenu() {
     $menu .= "<div class='folder-actions-menu-separator'></div>";
 
     // Favorite folder action: two variants, the client shows the one matching
-    // the folder's favorite state (data-favorite on the toggle)
-    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite' data-action='favorite-folder'>";
+    // the folder's favorite state (data-favorite on the toggle). Removing is
+    // shown in red (.danger) like the other "undo" entries, so the current
+    // state reads at a glance.
+    $menu .= "<div class='folder-actions-menu-item favorite-state-favorite danger' data-action='favorite-folder'>";
     $menu .= "<i class='lucide lucide-star'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
     $menu .= "</div>";
@@ -534,8 +536,7 @@ function renderFolderActionsMenu() {
 }
 
 /**
- * Generate the per-note controls on a tree row: the favorite star and the
- * three-dot actions toggle.
+ * Generate the three-dot actions toggle for a note row in the tree.
  *
  * Mirrors generateFolderActions(): only the toggle is emitted per note, and it
  * carries everything populateNoteActionsMenu() needs to fill the single shared
@@ -546,50 +547,26 @@ function renderFolderActionsMenu() {
  * @param string $noteType Note type ('note', 'markdown', 'tasklist', ...)
  * @param int|string|null $folderId Containing folder ID
  * @param string $folderName Containing folder name
- * @param bool $isFavorite Whether the note is marked as favorite, which the
- *                         star renders and toggles
- * @param bool $showFavoriteStar Whether to render the star at all. False
- *                                inside the Favorites section itself, where
- *                                every row is already a favorite and the star
- *                                would be redundant on every single line.
- * @return string HTML for the note row controls
+ * @param bool $isFavorite Whether the note is marked as favorite, which picks
+ *                         the favorite variant shown by the menu
+ * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $showFavoriteStar = true) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
     $htmlFolderId = htmlspecialchars((string)$folderId, ENT_QUOTES);
     $htmlFolderName = htmlspecialchars((string)$folderName, ENT_QUOTES);
 
-    // Favorite is a one-click star on the row instead of a menu entry: it is
-    // the state the tree itself shows, so it reads better next to the title
-    // than buried in the dropdown. Hidden until the row is hovered, except on
-    // favorites, where it stays lit so the tree marks them at a glance.
-    // btn-favorite rides along for the shared .is-favorite icon colour, whose
-    // dark-mode rule in css/dark-mode/icons.css keys on that class.
-    $favoriteClass = $isFavorite ? ' is-favorite' : '';
-    $favoriteLabel = $isFavorite
-        ? t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites')
-        : t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites');
-
-    $favoriteButton = $showFavoriteStar
-        ? "<button type='button' class='note-favorite-toggle btn-favorite$favoriteClass'"
-            . " data-action='toggle-favorite' data-note-id='$htmlNoteId'"
-            . " aria-pressed='" . ($isFavorite ? 'true' : 'false') . "'"
-            . " title='$favoriteLabel' aria-label='$favoriteLabel'>"
-            . "<i class='lucide lucide-star'></i>"
-            . "</button>"
-        : "";
-
     // No data-filename here, unlike the note toolbar: showExportModal() stores
     // that argument and never reads it, so emitting the on-disk path on every
     // row of the tree would leak the entries directory for nothing.
     return "<div class='note-actions'>"
-        . $favoriteButton
         . "<button type='button' class='note-actions-toggle' data-action='toggle-note-actions-menu'"
         . " data-note-id='$htmlNoteId' data-note-title='$htmlNoteTitle'"
         . " data-note-type='$htmlNoteType'"
         . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName'"
+        . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " title='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'"
         . " aria-label='" . t_h('notes_list.note_actions.menu', [], 'Note actions') . "'>"
         . "<i class='lucide lucide-more-vertical'></i>"
@@ -616,8 +593,8 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // and removing it. Everything that acts on the note's content or exposes
     // it elsewhere (attachments, share, snapshots, search and replace,
     // information, print, download, convert, reminder) stays in the opened
-    // note's toolbar and its own three-dot menu, and Favorite moved to the
-    // star button on the row itself (see generateNoteActions).
+    // note's toolbar and its own three-dot menu. Favorite stays here because
+    // it decides where the note shows up in the tree (the Favorites section).
     //
     // The groups below are separated by .note-actions-menu-separator; a
     // separator left with no visible item on one side is hidden on open by
@@ -642,6 +619,18 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item' data-action='open-note-icon-picker'>";
     $menu .= "<i class='lucide lucide-palette'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
+    $menu .= "</div>";
+
+    // Favorite: two variants, populateNoteActionsMenu() shows the one matching
+    // the note's favorite state (data-favorite on the toggle). Removing is
+    // shown in red (.danger), same as the folder menu.
+    $menu .= "<div class='note-actions-menu-item favorite-state-favorite danger' data-action='toggle-favorite'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.remove_favorite', [], 'Remove from favorites') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item favorite-state-not-favorite' data-action='toggle-favorite'>";
+    $menu .= "<i class='lucide lucide-star'></i>";
+    $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
     $menu .= "</div>";
 
     $menu .= "<div class='note-actions-menu-separator'></div>";

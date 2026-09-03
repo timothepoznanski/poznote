@@ -834,6 +834,20 @@
         var target = event.target;
         if (!target || !target.closest) return;
 
+        // Folder shortcuts in the Favorites section share the note row markup
+        // but carry no toggle of their own (renderFavoriteFolderItems in
+        // notes_list.php): open the folder menu through the folder's real
+        // toggle in the tree instead, keyed by data-folder-id on the link.
+        var favoriteFolderLink = target.closest('.favorite-folder-link');
+        if (favoriteFolderLink) {
+            var favoriteFolderId = parseInt(favoriteFolderLink.getAttribute('data-folder-id'), 10);
+            if (favoriteFolderId && typeof window.openFolderActionsMenuAtPoint === 'function' &&
+                window.openFolderActionsMenuAtPoint(favoriteFolderId, event.clientX, event.clientY)) {
+                event.preventDefault();
+            }
+            return;
+        }
+
         var noteItem = target.closest('.note-list-item');
         if (noteItem) {
             var noteToggle = noteItem.querySelector('.note-actions-toggle');
@@ -877,13 +891,9 @@
         document.addEventListener('mousedown', preventNoteMiddleClickAutoscroll);
         document.addEventListener('auxclick', handleNotesListAuxClick);
 
-        // Close note action menus when clicking outside, on a menu item, or on
-        // the favorite star, which sits inside .note-actions but acts on its
-        // own row rather than opening anything.
+        // Close note action menus when clicking outside or on a menu item
         document.addEventListener('click', function (e) {
-            if (!e.target.closest('.note-actions') ||
-                e.target.closest('.note-actions-menu-item') ||
-                e.target.closest('.note-favorite-toggle')) {
+            if (!e.target.closest('.note-actions') || e.target.closest('.note-actions-menu-item')) {
                 closeAllNoteActionMenus();
             }
         });

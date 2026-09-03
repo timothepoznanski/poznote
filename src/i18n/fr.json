@@ -1193,7 +1193,6 @@
       "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?",
       "folder_actions_toggle": "Bouton de menu (⋮) sur les dossiers",
       "note_actions_toggle": "Bouton de menu (⋮) sur les notes",
-      "note_favorite_star": "Étoile de favori (★) sur les notes",
       "note_actions_hint": "Éléments du menu ⋮ de chaque note dans la barre latérale. Tout décocher masque le bouton du menu.",
       "theme_toggle": "Bouton de thème"
     },

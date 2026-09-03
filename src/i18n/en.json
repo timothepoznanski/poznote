@@ -656,7 +656,6 @@
       "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?",
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
-      "note_favorite_star": "Favorite star (★) on notes",
       "note_actions_hint": "Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.",
       "theme_toggle": "Theme toggle"
     },

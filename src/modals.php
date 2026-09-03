@@ -1751,9 +1751,9 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.note_actions_hint', [], 'Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.'); ?></p>
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-favorite-star" checked><span><?php echo t_h('modals.ui_customization.note_favorite_star', [], 'Favorite star (★) on notes'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-note-icon-picker" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>

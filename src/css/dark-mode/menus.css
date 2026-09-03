@@ -323,24 +323,6 @@ body.dark-mode .note-actions-item:hover [class*="lucide-"] {
     color: #38bdf8;
 }
 
-html[data-theme='dark'] .note-favorite-toggle,
-body.dark-mode .note-favorite-toggle {
-    color: #b0b0b0;
-}
-
-html[data-theme='dark'] .note-favorite-toggle:hover,
-body.dark-mode .note-favorite-toggle:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--dm-text);
-}
-
-html[data-theme='dark'] .note-favorite-toggle:hover i,
-html[data-theme='dark'] .note-favorite-toggle:hover [class*="lucide-"],
-body.dark-mode .note-favorite-toggle:hover i,
-body.dark-mode .note-favorite-toggle:hover [class*="lucide-"] {
-    color: #38bdf8;
-}
-
 /* Group separators of both menus (light rule in css/folders/actions-menu.css):
    the light grey would read as a hard line on the dark surface. */
 html[data-theme='dark'] .folder-actions-menu-separator,

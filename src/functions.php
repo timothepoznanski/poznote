@@ -1365,9 +1365,6 @@ function poznoteNormalizeHiddenUiKey($key) {
         // Notifications and AI chat moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn' => 'card:sidebarNotificationsBtn',
         'card:iconSidebarAiChatBtn' => 'card:sidebarAiChatBtn',
-        // Favorite left the note ⋮ menu for the star on the row itself, so a
-        // user who had hidden the menu entry keeps the row free of it.
-        'note:toggle-favorite' => 'panel:note-favorite-star',
     ];
 
     return $renamed[$key] ?? $key;
@@ -1751,11 +1748,6 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // The ⋮ button on note rows. body.note-actions-hidden gives the
                 // titles back the strip reserved for it (css/tabs.css).
                 $rules[] = '.note-actions-toggle { display: none !important; }';
-            } elseif ($id === 'note-favorite-star') {
-                // The favorite star on note rows, next to the ⋮ button.
-                // !important beats the hover and .is-favorite reveals in
-                // css/folders/actions-menu.css.
-                $rules[] = '.note-favorite-toggle { display: none !important; }';
             } elseif ($id === 'note-created-date') {
                 // Creation date under the note title. Overrides
                 // body.show-note-created in css/notes/subline.css, which the

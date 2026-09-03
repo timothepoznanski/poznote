@@ -1167,7 +1167,6 @@
       "toggle_all_warning": "Esta ação fará perder todas as suas personalizações existentes. Deseja continuar?",
       "folder_actions_toggle": "Botão de menu (⋮) nas pastas",
       "note_actions_toggle": "Botão de menu (⋮) nas notas",
-      "note_favorite_star": "Estrela de favorito (★) nas notas",
       "note_actions_hint": "Itens do menu ⋮ de cada nota na barra lateral. Desmarcar todos oculta o botão do menu.",
       "theme_toggle": "Botão de tema"
     },

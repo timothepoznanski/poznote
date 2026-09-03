@@ -3476,6 +3476,7 @@ function populateNoteActionsMenu(menu, toggle) {
     var noteType = toggle.getAttribute('data-note-type') || 'note';
     var folderId = toggle.getAttribute('data-folder-id') || '';
     var folderName = toggle.getAttribute('data-folder') || '';
+    var isFavorite = toggle.getAttribute('data-favorite') === '1';
 
     menu.setAttribute('data-note-id', noteId);
 
@@ -3484,6 +3485,14 @@ function populateNoteActionsMenu(menu, toggle) {
     var isLinkedNote = noteType === 'linked';
     menu.querySelectorAll('.note-real-only').forEach(function (item) {
         item.style.display = isLinkedNote ? 'none' : '';
+    });
+
+    // Favorite item: show the variant matching the note's favorite state
+    menu.querySelectorAll('.favorite-state-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? '' : 'none';
+    });
+    menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
+        item.style.display = isFavorite ? 'none' : '';
     });
 
     // Copy note identity onto every action item (handlers read it there).
