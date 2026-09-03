@@ -607,11 +607,11 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
         <div class="form-group">
             <input id="createWorkspaceInput" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name'); ?>" />
         </div>
-        <div id="createWorkspaceError" class="modal-error-message"></div>
-        <div class="buttons-with-margin">
-            <button type="button" id="confirmCreateWorkspaceBtn" class="btn btn-primary"><?php echo t_h('common.create', [], 'Create'); ?></button>
-            <button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="createWorkspaceModal"><?php echo t_h('common.cancel'); ?></button>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="createWorkspaceModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="confirmCreateWorkspaceBtn"><?php echo t_h('common.create', [], 'Create'); ?></button>
         </div>
+        <div id="createWorkspaceError" class="modal-error-message"></div>
     </div>
 </div>
 
