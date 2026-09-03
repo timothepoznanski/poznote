@@ -7,7 +7,7 @@
 
 /* Shared Notes List */
 .shared-notes-list {
-    --shared-column-gap: 16px;
+    --shared-column-gap: 48px;
     --shared-divider-padding: 14px;
     --shared-name-width: 220px;
     --shared-folder-width: 190px;
