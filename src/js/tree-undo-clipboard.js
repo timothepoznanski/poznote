@@ -646,7 +646,7 @@
     /**
      * Paste the clipboard into a folder (null for the root of the current
      * workspace). Copies duplicate, cuts move; both are recorded so Ctrl+Z
-     * takes them back.
+     * takes them back, and both consume the clipboard on success.
      */
     function paste(targetFolderId) {
         if (isReadOnly() || running) return;
@@ -684,7 +684,6 @@
                     from: { folderId: noteFrom.folderId, workspace: noteFrom.workspace },
                     to: { folderId: dest.folderId, workspace: dest.workspace }
                 });
-                clearClipboard();
             });
         } else if (item.mode === 'copy') {
             request = duplicateFolderInto(item.id, item.workspace, dest).then(function (newId) {
@@ -712,12 +711,14 @@
                     },
                     to: { parentId: dest.parentId, workspace: dest.workspace }
                 });
-                clearClipboard();
             });
         }
 
         running = true;
         request.then(function () {
+            // Paste is a one-time action: consume the clipboard so a stale
+            // Copy/Cut cannot be pasted again later by accident
+            clearClipboard();
             rememberFolderOpen(dest.folderId);
             toastAfterReload(item.type === 'note'
                 ? tr('tree_clipboard.pasted_note', 'Pasted "{{name}}"', { name: item.name })
