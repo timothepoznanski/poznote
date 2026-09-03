@@ -474,6 +474,25 @@ body.dark-mode .markdown-preview pre.indented-pre {
     list-style-type: decimal;
 }
 
+/* checklists.css restyles every .noteentry ol for the rich-text editor's
+   hierarchical numbering (list-style none, padding 0, li display:block with an
+   inline ::before counter). Inside the markdown preview that layout loses the
+   hanging indent: wrapped lines slide back under the number. Restore native
+   ordered-list rendering there; the extra .noteentry ancestor outweighs those
+   rules at equal cascade position. */
+.noteentry .markdown-preview ol {
+    list-style-type: decimal;
+    padding-left: 2em;
+}
+
+.noteentry .markdown-preview ol>li {
+    display: list-item;
+}
+
+.noteentry .markdown-preview ol>li::before {
+    content: none;
+}
+
 .markdown-preview a {
     color: #007bff;
     text-decoration: none;

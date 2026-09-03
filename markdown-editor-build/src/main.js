@@ -150,13 +150,28 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
 // at column 0, visually detached from its list. A hanging indent keeps wrapped
 // display lines under the item's text: padding-left pushes the whole line right
 // by the marker prefix width and the negative text-indent pulls only the first
-// display line back, so the source text is untouched. Width is measured in ch,
-// an approximation in the proportional app font. Inline padding is safe because
-// markdown.css zeroes .cm-line padding for these hosts.
+// display line back, so the source text is untouched. The prefix width is
+// measured in px with a canvas using the editor's computed font (ch units
+// overshoot badly in the proportional app font), cached per font + prefix.
+// Inline padding is safe because markdown.css zeroes .cm-line padding here.
 const listMarkerPrefixRegex = /^([ \t]*)(?:[-*+]|\d+(?:\.\d+)*\.)[ \t]+(?:\[[ xX]\][ \t]+)?/
+
+let hangingIndentMeasure = null
+
+function getHangingIndentMeasure(view) {
+  const style = window.getComputedStyle(view.contentDOM)
+  const font = style.fontStyle + ' ' + style.fontWeight + ' ' + style.fontSize + ' ' + style.fontFamily
+  if (!hangingIndentMeasure || hangingIndentMeasure.font !== font) {
+    const context = document.createElement('canvas').getContext('2d')
+    context.font = font
+    hangingIndentMeasure = { font, context, widths: new Map() }
+  }
+  return hangingIndentMeasure
+}
 
 function buildHangingIndentDecorations(view) {
   const builder = new RangeSetBuilder()
+  const measure = getHangingIndentMeasure(view)
   let lastLineFrom = -1
 
   for (const range of view.visibleRanges) {
@@ -166,9 +181,13 @@ function buildHangingIndentDecorations(view) {
       if (line.from > lastLineFrom) {
         const match = listMarkerPrefixRegex.exec(line.text)
         if (match && match[0].length < line.text.length) {
-          const width = Math.min(match[0].replace(/\t/g, '    ').length, 32)
+          let width = measure.widths.get(match[0])
+          if (width === undefined) {
+            width = Math.min(Math.round(measure.context.measureText(match[0].replace(/\t/g, '    ')).width * 100) / 100, 240)
+            measure.widths.set(match[0], width)
+          }
           builder.add(line.from, line.from, Decoration.line({
-            attributes: { style: 'text-indent:-' + width + 'ch;padding-left:' + width + 'ch;' }
+            attributes: { style: 'text-indent:-' + width + 'px;padding-left:' + width + 'px;' }
           }))
           lastLineFrom = line.from
         }
@@ -186,7 +205,7 @@ const hangingIndentPlugin = ViewPlugin.fromClass(class {
   }
 
   update(update) {
-    if (update.docChanged || update.viewportChanged) {
+    if (update.docChanged || update.viewportChanged || update.geometryChanged) {
       this.decorations = buildHangingIndentDecorations(update.view)
     }
   }
