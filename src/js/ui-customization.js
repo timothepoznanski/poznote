@@ -11,7 +11,10 @@
         // its Settings icon left no way back into the settings page. Listed here
         // so preferences saved before the removal stop applying.
         'card:icon_sidebar': true,
-        'card:iconSidebarSettingsBtn': true
+        'card:iconSidebarSettingsBtn': true,
+        // The folder icon click now always opens the icon/color modal; the
+        // old "open Kanban on icon click" toggle no longer exists.
+        'panel:folder-icon-kanban': true
     };
 
     var CUSTOMIZABLE_TOOLBAR_BUTTONS = {
@@ -107,9 +110,6 @@
             hiddenKeyMap: hiddenKeyMap,
             isHidden: function (key) {
                 return !!hiddenKeyMap[key];
-            },
-            usesFolderIconKanban: function () {
-                return !hiddenKeyMap['panel:folder-icon-kanban'];
             }
         };
 
@@ -188,26 +188,6 @@
 
         toolbars.forEach(function (toolbar) {
             toolbar.classList.remove('ui-customization-force-formatting-toolbar');
-        });
-    }
-
-    function syncFolderIconClickBehavior() {
-        var config = window.PoznoteUiCustomization;
-        var usesFolderIconKanban = !config || typeof config.usesFolderIconKanban !== 'function'
-            ? true
-            : config.usesFolderIconKanban();
-
-        var folderIcons = document.querySelectorAll('.folder-list-click-action[data-folder-id]');
-        folderIcons.forEach(function (icon) {
-            icon.setAttribute('data-action', usesFolderIconKanban ? 'open-kanban-view' : 'open-folder-icon-picker');
-
-            var title = usesFolderIconKanban
-                ? icon.getAttribute('data-kanban-title')
-                : icon.getAttribute('data-change-icon-title');
-
-            if (title) {
-                icon.setAttribute('title', title);
-            }
         });
     }
 
@@ -356,7 +336,6 @@
         window.requestAnimationFrame(function () {
             syncScheduled = false;
             syncToolbarFormattingVisibility();
-            syncFolderIconClickBehavior();
             syncToolbarOverflowButtons();
             syncFolderActionToggles();
             syncNoteActionToggles();

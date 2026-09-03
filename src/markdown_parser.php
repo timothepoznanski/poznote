@@ -1147,11 +1147,31 @@ function parseMarkdown($text) {
                     }
 
                     $listMatch = preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $currentLine, $matches);
+                    if (!$listMatch && preg_match('/^(\s*)(\d+(?:\.\d+)+\.)[ \t]*$/', $currentLine, $bareMatches)) {
+                        // A bare dotted marker like "2.1." with nothing after it is an
+                        // empty hierarchical item, not continuation text.
+                        $listMatch = 1;
+                        $matches = [$bareMatches[0], $bareMatches[1], $bareMatches[2], ''];
+                    }
                     $marker = isset($matches[2]) ? $matches[2] : null;
                     $markerType = ($marker && preg_match('/\d+(?:\.\d+)*\./', $marker)) ? 'number' : 'bullet';
                 }
                 
                 if (!$listMatch) {
+                    // Wrapped continuation line (issue #1312): a non-blank line with no
+                    // list marker, indented deeper than the list's base indent, joins the
+                    // previous item instead of ending the list.
+                    if ($baseIndent !== null && count($listItems) > 0 && trim($currentLine) !== '' &&
+                        !preg_match('/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/', $currentLine)) {
+                        $contIndent = strlen($currentLine) - strlen(ltrim($currentLine, " \t"));
+                        if ($contIndent > $baseIndent) {
+                            $lastIdx = count($listItems) - 1;
+                            $listItems[$lastIdx] = preg_replace('/<\/li>$/', '', $listItems[$lastIdx])
+                                . ' ' . $applyInlineStyles(trim($currentLine)) . '</li>';
+                            $currentIndex++;
+                            continue;
+                        }
+                    }
                     break; // Not a list item
                 }
                 
@@ -1248,8 +1268,22 @@ function parseMarkdown($text) {
                     // Less indented, end of current list
                     break;
                 } else {
-                    // This shouldn't happen if we're parsing correctly
-                    break;
+                    // Deeper-indented item reached at loop top: continuation lines
+                    // separated it from its parent, so the parent's nested-list
+                    // lookahead never saw it. Attach it to the last item.
+                    if (count($listItems) === 0) {
+                        break;
+                    }
+                    $nestedIsTask = !$isTaskList && preg_match($taskListLinePattern, $currentLine) === 1;
+                    $nestedResult = $parseNestedList($currentIndex, $isTaskList || $nestedIsTask);
+                    $isOrderedNested = !$isTaskList && !$nestedIsTask && $markerType === 'number';
+                    $listTag = $isOrderedNested ? 'ol' : 'ul';
+                    $listClass = ($isTaskList || $nestedIsTask) ? ' class="task-list"' : '';
+                    $lastIdx = count($listItems) - 1;
+                    $listItems[$lastIdx] = preg_replace('/<\/li>$/', '', $listItems[$lastIdx])
+                        . '<' . $listTag . $listClass . '>' . implode('', $nestedResult['items']) . '</' . $listTag . '></li>';
+                    $currentIndex = $nestedResult['endIndex'] + 1;
+                    continue;
                 }
                 
                 $currentIndex++;

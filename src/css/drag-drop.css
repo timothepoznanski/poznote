@@ -162,7 +162,9 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
 .folder-toggle {
     display: flex;
     align-items: center;
-    padding: 5px 6px;
+    /* 3px vertical like the note rows (a.links_arbo_left in toolbar.css), so
+       both hover backgrounds are the same height. */
+    padding: 3px 6px;
     cursor: pointer;
     border-radius: 8px;
     background-color: transparent;
@@ -172,8 +174,10 @@ body.dark-mode .folder-header.folder-drop-after>.folder-toggle::after {
     width: 100%;
 }
 
+/* Row hover feedback, like the notes' blue (rgba(0,123,255,.1) below) but a
+   neutral grey so folder rows read differently from note rows. */
 .folder-toggle:hover {
-    background-color: transparent;
+    background-color: rgba(55, 53, 47, 0.08);
 }
 
 .folder-icon {

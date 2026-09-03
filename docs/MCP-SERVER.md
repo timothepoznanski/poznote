@@ -92,7 +92,7 @@ The MCP server acts as a bridge between AI assistants and your Poznote instance.
 
 The task tools operate on one task at a time, so there is no need to read and rewrite a tasklist's whole content array: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder.
 
-Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, `create_backup` and `delete_backup`, which do not take `user_id`.
+Most tools accept an optional `user_id` argument to target a specific user profile. When provided, the MCP server sends the `X-User-ID` header for that request, allowing you to create or read notes across different profiles without changing the global MCP environment. The exceptions are the system-level tools `get_system_info`, `list_backups`, `create_backup` and `delete_backup`, which do not take `user_id`. To change the default profile used when no `user_id` is passed, see [Default user profile](#default-user-profile).
 
 ---
 
@@ -118,6 +118,16 @@ POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate m
 ```
 
 A simple `docker compose restart mcp-server` does not reload updated environment variables.
+
+#### Default user profile
+
+By default the MCP server operates as user profile `1` (the first admin). To pin the server to a different profile, set `POZNOTE_USER_ID` when starting the container:
+
+```bash
+POZNOTE_USER_ID=2 docker compose up -d --force-recreate mcp-server
+```
+
+All tool calls then apply to that profile unless a request passes an explicit `user_id` argument, which still takes precedence for that request. The value must be a numeric profile ID; anything else is ignored with a warning in the MCP logs and the default of `1` is used.
 
 #### Debug mode
 

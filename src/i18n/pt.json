@@ -621,6 +621,7 @@
       "new_workspace": "Novo espaço de trabalho"
     },
     "errors": {
+      "already_exists": "Já existe um espaço de trabalho com este nome",
       "name_empty": "O nome do espaço de trabalho não pode estar vazio",
       "invalid_name": "Nome de espaço de trabalho inválido. Use apenas letras, números, traço e sublinhado (sem espaços).",
       "name_required": "Nome do espaço de trabalho obrigatório",

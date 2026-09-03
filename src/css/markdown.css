@@ -474,6 +474,33 @@ body.dark-mode .markdown-preview pre.indented-pre {
     list-style-type: decimal;
 }
 
+/* checklists.css restyles every .noteentry ol for the rich-text editor's
+   hierarchical numbering (list-style none, padding 0, li display:block with an
+   inline ::before counter). Inside the markdown preview that layout loses the
+   hanging indent: wrapped lines slide back under the number. Restore native
+   list-item rendering there but keep the hierarchical numbers by drawing them
+   with ::marker, which hangs outside the text like a native marker. Browsers
+   without content support in ::marker fall back to plain decimal markers.
+   The extra .noteentry ancestor outweighs the checklists.css rules. */
+.noteentry .markdown-preview ol {
+    list-style-type: decimal;
+    padding-left: 2em;
+    counter-reset: item;
+}
+
+.noteentry .markdown-preview ol>li {
+    display: list-item;
+    counter-increment: item;
+}
+
+.noteentry .markdown-preview ol>li::marker {
+    content: counters(item, ".") ". ";
+}
+
+.noteentry .markdown-preview ol>li::before {
+    content: none;
+}
+
 .markdown-preview a {
     color: #007bff;
     text-decoration: none;
@@ -923,6 +950,43 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
     padding: 10px 10px 44px 24px !important;
     box-sizing: border-box !important;
     max-height: var(--markdown-split-pane-height, calc(100vh - 200px)) !important;
+}
+
+/* Note content width inside the split view.
+ *
+ * The note itself spans the full column here (css/utilities.css), and each
+ * pane insets its own content instead, so the editor and the preview each
+ * show the configured share of their own half and look like a narrowed note.
+ *
+ * The inset is a percentage, which resolves against .noteentry (the panes'
+ * containing block), and each pane is half of it, hence halving --note-width
+ * before comparing. Two clamps: content never drops below
+ * --note-split-pane-min, and the inset never goes negative, which is how a
+ * column too narrow to honour the share falls back to the full pane.
+ *
+ * Both panes are border-box at width: 50%, so padding eats into the content
+ * and the divider stays on the true half.
+ */
+@media (min-width: 801px) {
+    .noteentry.markdown-split-mode {
+        --note-split-pane-min: 360px;
+        --note-split-pane-inset: max(
+            0px,
+            calc((50% - max(var(--note-width, 100%) / 2, var(--note-split-pane-min))) / 2)
+        );
+    }
+
+    #right_col .noteentry.markdown-split-mode > .markdown-preview {
+        padding-left: calc(24px + var(--note-split-pane-inset)) !important;
+        padding-right: calc(10px + var(--note-split-pane-inset)) !important;
+    }
+
+    /* The editor pane carries no padding of its own: the .markdown-editor it
+       wraps does, so only the inset is added here. */
+    #right_col .noteentry.markdown-split-mode > .markdown-editor-container {
+        padding-left: var(--note-split-pane-inset) !important;
+        padding-right: var(--note-split-pane-inset) !important;
+    }
 }
 
 /* Dark mode border for split view */

@@ -86,7 +86,10 @@ class AttachmentsController {
             'txt' => 'text/plain; charset=utf-8',
             'json' => 'application/json; charset=utf-8',
             'csv' => 'text/csv; charset=utf-8',
-            'xml' => 'application/xml; charset=utf-8',
+            // text/plain on purpose: served as application/xml the browser
+            // treats it as a live document, and an SVG/XHTML root or an
+            // xml-stylesheet reference can execute script in the app origin.
+            'xml' => 'text/plain; charset=utf-8',
             'md' => 'text/plain; charset=utf-8',
             'markdown' => 'text/plain; charset=utf-8',
             'log' => 'text/plain; charset=utf-8',
@@ -493,6 +496,9 @@ class AttachmentsController {
                                 strpos($file_type, 'audio/') !== false) {
                                 header('Content-Type: ' . $file_type);
                                 header('Content-Disposition: inline; filename="' . $safeFilename . '"');
+                                if (poznoteAttachmentIsSvg($attachment)) {
+                                    poznoteSendSvgAttachmentSecurityHeaders();
+                                }
                             } else {
                                 // For other files, force download
                                 header('Content-Type: application/octet-stream');

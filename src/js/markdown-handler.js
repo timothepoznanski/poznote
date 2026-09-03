@@ -3378,6 +3378,14 @@ function parseMarkdown(text) {
                     }
 
                     listMatch = currentLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/);
+                    if (!listMatch) {
+                        // A bare dotted marker like "2.1." with nothing after it is an
+                        // empty hierarchical item, not continuation text.
+                        let bareMatch = currentLine.match(/^(\s*)(\d+(?:\.\d+)+\.)[ \t]*$/);
+                        if (bareMatch) {
+                            listMatch = [bareMatch[0], bareMatch[1], bareMatch[2], ''];
+                        }
+                    }
                     if (listMatch) {
                         marker = listMatch[2];
                         markerType = marker.match(/\d+(?:\.\d+)*\./) ? 'number' : 'bullet';
@@ -3385,6 +3393,20 @@ function parseMarkdown(text) {
                 }
 
                 if (!listMatch) {
+                    // Wrapped continuation line (issue #1312): a non-blank line with no
+                    // list marker, indented deeper than the list's base indent, joins the
+                    // previous item instead of ending the list.
+                    if (baseIndent !== null && listItems.length > 0 && currentLine.trim() !== '' &&
+                        !currentLine.match(/^(\s*)([\*\-\+]|\d+(?:\.\d+)*\.)\s+(.+)$/)) {
+                        let contIndent = currentLine.match(/^\s*/)[0].length;
+                        if (contIndent > baseIndent) {
+                            let lastIdx = listItems.length - 1;
+                            listItems[lastIdx] = listItems[lastIdx].replace(/<\/li>$/, '') +
+                                ' ' + applyInlineStyles(currentLine.trim()) + '</li>';
+                            currentIndex++;
+                            continue;
+                        }
+                    }
                     break; // Not a list item, end of list
                 }
 
@@ -3484,8 +3506,22 @@ function parseMarkdown(text) {
                     // Less indented, end of current list
                     break;
                 } else {
-                    // This shouldn't happen if we're parsing correctly
-                    break;
+                    // Deeper-indented item reached at loop top: continuation lines
+                    // separated it from its parent, so the parent's nested-list
+                    // lookahead never saw it. Attach it to the last item.
+                    if (listItems.length === 0) {
+                        break;
+                    }
+                    let nestedIsTask = !isTaskList && !!currentLine.match(taskListLineRegex);
+                    let nestedResult = parseNestedList(currentIndex, isTaskList || nestedIsTask);
+                    let isOrderedNested = !isTaskList && !nestedIsTask && markerType === 'number';
+                    let listTag = isOrderedNested ? 'ol' : 'ul';
+                    let listClass = (isTaskList || nestedIsTask) ? ' class="task-list"' : '';
+                    let lastIdx = listItems.length - 1;
+                    listItems[lastIdx] = listItems[lastIdx].replace(/<\/li>$/, '') +
+                        '<' + listTag + listClass + '>' + nestedResult.items.join('') + '</' + listTag + '></li>';
+                    currentIndex = nestedResult.endIndex + 1;
+                    continue;
                 }
 
                 currentIndex++;

@@ -301,6 +301,21 @@ function poznoteAttachmentIsImage(array $attachment) {
     return in_array(poznoteAttachmentExtension($attachment), ['avif', 'bmp', 'gif', 'heic', 'heif', 'ico', 'jpg', 'jpeg', 'png', 'svg', 'webp'], true);
 }
 
+function poznoteAttachmentIsSvg(array $attachment) {
+    if (strpos(poznoteAttachmentMimeType($attachment), 'svg') !== false) {
+        return true;
+    }
+
+    return in_array(poznoteAttachmentExtension($attachment), ['svg', 'svgz'], true);
+}
+
+function poznoteSendSvgAttachmentSecurityHeaders() {
+    // Unlike raster images, SVG is an active XML document: opened directly it
+    // runs <script> in the app's origin. Sandbox it and block everything but
+    // its own inline styles; an <img>-embedded SVG never ran scripts anyway.
+    header("Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox");
+}
+
 function poznoteAttachmentIsReferencedInContent(array $attachment, $content) {
     $attachmentId = (string)($attachment['id'] ?? '');
     if ($attachmentId === '') {
@@ -1348,6 +1363,9 @@ function poznoteGetNonHideableUiKeys() {
         // so preferences saved before the removal stop applying.
         'card:icon_sidebar' => true,
         'card:iconSidebarSettingsBtn' => true,
+        // The folder icon click now always opens the icon/color modal; the
+        // old "open Kanban on icon click" toggle no longer exists.
+        'panel:folder-icon-kanban' => true,
     ];
 }
 
@@ -1803,10 +1821,6 @@ function poznoteRenderUiCustomizationBootstrap() {
     if ($rules !== '') {
         echo '<style id="ui-customization-styles">' . htmlspecialchars($rules, ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</style>' . "\n";
     }
-}
-
-function poznoteUsesFolderIconKanban() {
-    return !in_array('panel:folder-icon-kanban', poznoteGetHiddenUiElements(), true);
 }
 
 /**
@@ -4859,12 +4873,95 @@ function sanitizeHtml($html) {
 }
 
 /**
+ * Replace fenced code blocks and single-backtick code spans with opaque
+ * placeholders.
+ *
+ * Both Markdown renderers (markdown_parser.php and js/markdown-handler.js)
+ * HTML-escape code, so markup quoted as a code sample can never execute and
+ * must survive sanitizeMarkdownContent() verbatim (issue #1313). Only a
+ * properly closed fence is masked: an unterminated one would otherwise
+ * exempt the rest of the note from sanitization.
+ *
+ * @param string $markdown Raw Markdown, already stripped of NUL bytes
+ * @param array $segments Receives the masked segments, indexed by placeholder id
+ * @return string The Markdown with code segments replaced by placeholders
+ */
+function maskMarkdownCodeSegments($markdown, array &$segments) {
+    $segments = [];
+    $store = function($code) use (&$segments) {
+        $index = count($segments);
+        $segments[$index] = $code;
+        return "\x00MDCODE" . $index . "\x00";
+    };
+    // Mirrors markdown_parser.php: single backticks, no newline inside.
+    $maskInline = function($line) use ($store) {
+        return preg_replace_callback('/(?<!\\\\)`([^`\n]+?)(?<!\\\\)`/', function($m) use ($store) {
+            return $store($m[0]);
+        }, $line);
+    };
+
+    $lines = explode("\n", $markdown);
+    $output = [];
+    $pending = [];   // lines buffered since an opening fence
+    $inFence = false;
+
+    foreach ($lines as $line) {
+        if (!$inFence) {
+            if (preg_match('/^[ \t]*```/', $line)) {
+                $inFence = true;
+                $pending = [$line];
+            } else {
+                $output[] = $maskInline($line);
+            }
+            continue;
+        }
+
+        $pending[] = $line;
+        if (preg_match('/^[ \t]*```[ \t\r]*$/', $line)) {
+            $output[] = $store(implode("\n", $pending));
+            $inFence = false;
+            $pending = [];
+        }
+    }
+
+    // Unterminated fence: not a code block for the renderers either, so the
+    // buffered lines stay sanitizable.
+    foreach ($pending as $line) {
+        $output[] = $maskInline($line);
+    }
+
+    return implode("\n", $output);
+}
+
+/**
+ * Put back the code segments masked by maskMarkdownCodeSegments().
+ *
+ * @param string $markdown The masked Markdown
+ * @param array $segments The segments returned by maskMarkdownCodeSegments()
+ * @return string The Markdown with its code segments restored
+ */
+function restoreMarkdownCodeSegments($markdown, array $segments) {
+    if (empty($segments)) {
+        return $markdown;
+    }
+    return preg_replace_callback('/\x00MDCODE(\d+)\x00/', function($m) use ($segments) {
+        $index = (int)$m[1];
+        return array_key_exists($index, $segments) ? $segments[$index] : '';
+    }, $markdown);
+}
+
+/**
  * Sanitize Markdown content to prevent XSS attacks
  * 
  * Unlike sanitizeHtml(), this function works on raw Markdown text without
  * using DOMDocument, which would mangle Markdown syntax characters like >.
  * It removes dangerous HTML patterns that could be embedded in Markdown
  * while preserving all Markdown syntax.
+ *
+ * Two rules keep it from eating the author's text (issue #1313): code samples
+ * are masked out first, and a dangerous tag pair only matches while its
+ * content stays inside one paragraph, so a lone "<script>" mentioned in prose
+ * cannot swallow everything up to an unrelated closing tag further down.
  * 
  * @param string $markdown The raw Markdown content to sanitize
  * @return string The sanitized Markdown content
@@ -4874,29 +4971,40 @@ function sanitizeMarkdownContent($markdown) {
         return $markdown;
     }
 
+    // NUL never belongs to Markdown text, and a note containing one could
+    // forge the code placeholders used below.
+    $markdown = str_replace("\x00", '', $markdown);
+
+    $codeSegments = [];
+    $markdown = maskMarkdownCodeSegments($markdown, $codeSegments);
+
+    // Tag content, bounded to a single paragraph: newlines are allowed, a
+    // blank line is not.
+    $content = '(?:[^\n]|\n(?![ \t]*\n))*?';
+
     // Remove <script> tags and their content
-    $markdown = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $markdown);
+    $markdown = preg_replace('/<script\b[^<>]*>' . $content . '<\/script\s*>/i', '', $markdown);
 
     // Remove <style> tags and their content
-    $markdown = preg_replace('/<style\b[^>]*>.*?<\/style>/is', '', $markdown);
+    $markdown = preg_replace('/<style\b[^<>]*>' . $content . '<\/style\s*>/i', '', $markdown);
 
     // Remove <object>, <embed>, <applet> tags and their content
-    $markdown = preg_replace('/<(object|embed|applet)\b[^>]*>.*?<\/\1>/is', '', $markdown);
-    $markdown = preg_replace('/<(object|embed|applet)\b[^>]*\/?>/is', '', $markdown);
+    $markdown = preg_replace('/<(object|embed|applet)\b[^<>]*>' . $content . '<\/\1\s*>/i', '', $markdown);
+    $markdown = preg_replace('/<(object|embed|applet)\b[^<>]*\/?>/i', '', $markdown);
 
     // Remove <form> tags and their content
-    $markdown = preg_replace('/<form\b[^>]*>.*?<\/form>/is', '', $markdown);
+    $markdown = preg_replace('/<form\b[^<>]*>' . $content . '<\/form\s*>/i', '', $markdown);
 
     // Remove on* event handlers from any HTML tags embedded in markdown
     // ("/" is an attribute separator for browsers too: <details/onclick=...>)
-    $markdown = preg_replace('/(<[^>]*)[\s\/]+on\w+\s*=\s*(["\']).*?\2/is', '$1', $markdown);
-    $markdown = preg_replace('/(<[^>]*)[\s\/]+on\w+\s*=\s*[^\s>]*/is', '$1', $markdown);
+    $markdown = preg_replace('/(<[a-zA-Z][^<>]*?)[\s\/]+on\w+\s*=\s*(["\']).*?\2/i', '$1', $markdown);
+    $markdown = preg_replace('/(<[a-zA-Z][^<>]*?)[\s\/]+on\w+\s*=\s*[^\s<>]*/i', '$1', $markdown);
 
     // Remove javascript: and vbscript: protocols from href/src attributes
-    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:/is', '$1=$2', $markdown);
-    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*vbscript:/is', '$1=$2', $markdown);
+    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*javascript:/i', '$1=$2', $markdown);
+    $markdown = preg_replace('/(href|src)\s*=\s*(["\'])\s*vbscript:/i', '$1=$2', $markdown);
 
-    return $markdown;
+    return restoreMarkdownCodeSegments($markdown, $codeSegments);
 }
 
 /**

@@ -597,6 +597,24 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Create workspace modal, opened from the sidebar workspace menu and from
+     the create (+) menu on index.php. Creating a workspace is a single field,
+     so it does not warrant a trip to workspaces.php; that page stays the place
+     to rename, move, share and delete. -->
+<div id="createWorkspaceModal" class="modal initially-hidden">
+    <div class="modal-content">
+        <h3><?php echo t_h('workspaces.sections.create.title', [], 'Create a new workspace'); ?></h3>
+        <div class="form-group">
+            <input id="createWorkspaceInput" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name'); ?>" />
+        </div>
+        <div id="createWorkspaceError" class="modal-error-message"></div>
+        <div class="buttons-with-margin">
+            <button type="button" id="confirmCreateWorkspaceBtn" class="btn btn-primary"><?php echo t_h('common.create', [], 'Create'); ?></button>
+            <button type="button" class="btn btn-secondary" data-action="close-modal" data-modal="createWorkspaceModal"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Move notes modal (for workspaces.php) -->
 <div id="moveNotesModal" class="modal initially-hidden">
     <div class="modal-content">
@@ -1666,7 +1684,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-icon-kanban" checked><span><?php echo t_h('home.kanban', [], 'Kanban'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:mini-calendar" checked><span><?php echo t_h('common.calendar', [], 'Calendar'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
@@ -1749,7 +1766,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:download-folder" checked><span><?php echo t_h('notes_list.folder_actions.download_folder', [], 'Download folder'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:share-folder" checked><span><?php echo t_h('notes_list.folder_actions.share_folder', [], 'Make public'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:rename-folder" checked><span><?php echo t_h('notes_list.folder_actions.rename_folder', [], 'Rename'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:change-folder-icon" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:toggle-sort-submenu" checked><span><?php echo t_h('sort.header', [], 'Sort by'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:delete-folder" checked><span><?php echo t_h('notes_list.folder_actions.delete_folder', [], 'Delete'); ?></span></label>
                 </div>
@@ -1762,7 +1778,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-items">
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
-                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-note-icon-picker" checked><span><?php echo t_h('notes_list.folder_actions.change_icon', [], 'Change icon'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>

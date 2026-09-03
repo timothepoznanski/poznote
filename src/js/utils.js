@@ -3170,12 +3170,19 @@ function createMarkdownNoteInUtils() {
 }
 
 function createWorkspace() {
+    // Same small modal as the sidebar workspace menu (js/workspaces.js), so
+    // both entry points create a workspace the same way. Pages that do not
+    // include modals.php fall back to the workspaces page.
+    if (typeof window.openCreateWorkspaceModal === 'function') {
+        window.openCreateWorkspaceModal();
+        return;
+    }
+
     if (typeof window.showNoteCreationLoading === 'function') {
         window.showNoteCreationLoading();
     }
 
-    // Navigate to the workspaces management page
-    window.location = 'workspaces.php';
+    window.location = 'workspaces.php?new=1';
 }
 
 // Legacy function for backwards compatibility
