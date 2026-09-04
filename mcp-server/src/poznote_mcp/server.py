@@ -16,11 +16,18 @@ Tools:
   - create_folder: Create a new folder in Poznote
 
 Usage:
-    poznote-mcp serve --host=0.0.0.0 --port=YOUR_POZNOTE_MCP_PORT
+    poznote-mcp serve --host=127.0.0.1 --port=YOUR_POZNOTE_MCP_PORT
+
+Inbound authentication:
+    The endpoint is open to any client that can reach it. Set
+    POZNOTE_MCP_AUTH_TOKEN to require "Authorization: Bearer <token>" on
+    every request. Without it, keep the server bound to 127.0.0.1 (the
+    default) or behind a port mapping / tunnel that only you can reach.
 """
 
 import argparse
 import atexit
+import hmac
 import json
 import logging
 import os
@@ -30,6 +37,7 @@ from typing import Optional, Union
 
 import httpx
 from fastmcp import FastMCP
+from fastmcp.server.auth import AccessToken, TokenVerifier
 
 from .client import PoznoteClient
 
@@ -135,12 +143,64 @@ def _assert_port_available(host: str, port: int) -> None:
     if last_error is not None:
         raise last_error
 
+DEFAULT_HOST = "127.0.0.1"
+DEFAULT_PORT = 8045
+AUTH_TOKEN_ENV = "POZNOTE_MCP_AUTH_TOKEN"
+
+
+def _is_loopback_host(host: str) -> bool:
+    """True when host only accepts connections from the local machine."""
+    value = (host or "").strip().lower()
+    if value.startswith("[") and value.endswith("]"):
+        value = value[1:-1]
+    return value == "localhost" or value == "::1" or value.startswith("127.")
+
+
+def _load_inbound_auth_token(env_value: str | None = None) -> str | None:
+    """Return the bearer token clients must present, or None when auth is off.
+
+    Reads POZNOTE_MCP_AUTH_TOKEN. An unset or blank value disables inbound
+    authentication (the historical behaviour); whitespace is stripped so a
+    trailing newline from a secrets file does not lock everyone out.
+    """
+    raw = os.getenv(AUTH_TOKEN_ENV) if env_value is None else env_value
+    token = (raw or "").strip()
+    return token or None
+
+
+class StaticBearerTokenVerifier(TokenVerifier):
+    """Accept exactly one pre-shared bearer token.
+
+    FastMCP ships a StaticTokenVerifier for tests, but it compares with a dict
+    lookup; this one uses a constant-time comparison and needs no scopes or
+    OAuth metadata, which keeps the wire behaviour to a plain 401 on mismatch.
+    """
+
+    def __init__(self, token: str):
+        super().__init__()
+        if not token:
+            raise ValueError("StaticBearerTokenVerifier needs a non-empty token")
+        self._token = token.encode("utf-8")
+
+    async def verify_token(self, token: str) -> AccessToken | None:
+        if hmac.compare_digest(token.encode("utf-8"), self._token):
+            return AccessToken(token=token, client_id="poznote-mcp-client", scopes=[])
+        return None
+
+
+def _build_auth_provider(token: str | None) -> StaticBearerTokenVerifier | None:
+    return StaticBearerTokenVerifier(token) if token else None
+
+
+_inbound_auth_token = _load_inbound_auth_token()
+
 # Initialize FastMCP server.
 #
 # FastMCP 3.x: host/port/stateless_http are no longer constructor options —
 # they are passed to mcp.run() in main(), which stays the single source of
-# truth for network settings.
-mcp = FastMCP("poznote-mcp")
+# truth for network settings. Inbound auth, on the other hand, is baked into
+# the HTTP app at construction time, so it is decided here from the env.
+mcp = FastMCP("poznote-mcp", auth=_build_auth_provider(_inbound_auth_token))
 
 # Poznote client (initialized lazily)
 _client: PoznoteClient | None = None
@@ -1633,6 +1693,34 @@ def list_shared(workspace: Optional[str] = None, user_id: Optional[int] = None) 
 # CLI & MAIN
 # =============================================================================
 
+def _log_inbound_auth_status(host: str, token: str | None) -> None:
+    """Tell the operator, once at startup, how the endpoint is protected."""
+    if token:
+        logger.info(
+            "Inbound authentication enabled: clients must send "
+            "'Authorization: Bearer <%s>'.",
+            AUTH_TOKEN_ENV,
+        )
+        return
+    if _is_loopback_host(host):
+        logger.info(
+            "Inbound authentication disabled; the server only accepts connections "
+            "from this machine (%s).",
+            host,
+        )
+        return
+    logger.warning(
+        "Listening on %s without %s: anyone who can reach this port can read, "
+        "edit and delete every note. That is fine inside Docker when the port is "
+        "published on 127.0.0.1 (the default docker-compose.yml), or behind a "
+        "tunnel/VPN. If the port is reachable from your network, set %s or bind "
+        "to 127.0.0.1.",
+        host,
+        AUTH_TOKEN_ENV,
+        AUTH_TOKEN_ENV,
+    )
+
+
 def create_parser() -> argparse.ArgumentParser:
     """Create the CLI argument parser"""
     parser = argparse.ArgumentParser(
@@ -1646,14 +1734,18 @@ def create_parser() -> argparse.ArgumentParser:
     serve_parser = subparsers.add_parser("serve", help="Start the MCP server")
     serve_parser.add_argument(
         "--host",
-        default="0.0.0.0",
-        help="Host to bind to (default: 0.0.0.0)",
+        default=DEFAULT_HOST,
+        help=(
+            f"Host to bind to (default: {DEFAULT_HOST}, local machine only). "
+            "Use 0.0.0.0 only behind a port mapping, a tunnel or with "
+            f"{AUTH_TOKEN_ENV} set."
+        ),
     )
     serve_parser.add_argument(
         "--port",
         type=int,
-        default=8045,
-        help="Port to listen on (default: 8045)",
+        default=DEFAULT_PORT,
+        help=f"Port to listen on (default: {DEFAULT_PORT})",
     )
     
     return parser
@@ -1670,11 +1762,12 @@ def main():
         port = args.port
     else:
         # Backward compatibility: no subcommand means use env vars
-        host = os.getenv("MCP_HOST", "0.0.0.0")
-        port = int(os.getenv("MCP_PORT", "8045"))
+        host = os.getenv("MCP_HOST", DEFAULT_HOST)
+        port = int(os.getenv("MCP_PORT", str(DEFAULT_PORT)))
     
     try:
         logger.info("Starting Poznote MCP Server (HTTP mode on %s:%s)...", host, port)
+        _log_inbound_auth_status(host, _inbound_auth_token)
         try:
             _assert_port_available(host, port)
         except OSError:

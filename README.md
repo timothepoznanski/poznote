@@ -44,6 +44,12 @@ https://demo.poznote.com
 
 https://poznote.com/press.html
 
+### Discord
+
+Join the community to ask questions, share feedback or follow the development:
+
+https://discord.gg/AWhWWSEkJ
+
 ## Table of content
 
 - [Install](#install)
@@ -1103,6 +1109,8 @@ POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate m
 These are container/runtime overrides, not Poznote UI settings. You can pass them inline as shown above or place them in `.env` before recreating the `mcp-server` container.
 
 Only the exact lowercase values `true` and `false` are recognized for `POZNOTE_DEBUG`. After changing settings, recreate the container; a simple restart does not reload environment variables.
+
+**Security:** the MCP port is published on `127.0.0.1` only, so by default nothing outside your machine can reach it. If you expose it further (reverse proxy, LAN, or a non-Docker install), set `POZNOTE_MCP_AUTH_TOKEN` in `.env` and the server will require an `Authorization: Bearer <token>` header from every client. When run outside Docker, `poznote-mcp serve` binds to `127.0.0.1` by default. Details in the [Security section](docs/MCP-SERVER.md#security) of the MCP documentation.
 
 ## Chrome Extension
 

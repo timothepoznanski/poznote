@@ -129,6 +129,25 @@ POZNOTE_USER_ID=2 docker compose up -d --force-recreate mcp-server
 
 All tool calls then apply to that profile unless a request passes an explicit `user_id` argument, which still takes precedence for that request. The value must be a numeric profile ID; anything else is ignored with a warning in the MCP logs and the default of `1` is used.
 
+#### Inbound authentication token
+
+By default the MCP endpoint accepts any client that can reach it, which is safe because the port is only published on `127.0.0.1`. If you expose the port beyond your machine (reverse proxy, LAN, bare-metal install), set `POZNOTE_MCP_AUTH_TOKEN` and the server will require an `Authorization: Bearer <token>` header on every request, answering `401 Unauthorized` otherwise:
+
+```bash
+# Generate a strong token once
+openssl rand -hex 32
+
+# Put it in .env
+POZNOTE_MCP_AUTH_TOKEN=paste-the-token-here
+
+# Recreate the MCP container so it picks up the new environment
+docker compose up -d --force-recreate mcp-server
+```
+
+Then add the same header to your client configuration: see [VS Code Copilot](VSCODE-COPILOT.md#using-an-authentication-token) and [Claude CLI](CLAUDE-CLI.md#using-an-authentication-token). Leading and trailing whitespace is ignored, so a token read from a secrets file with a trailing newline still works. An empty value keeps the endpoint open. The startup log line tells you which mode is active.
+
+This token is separate from `data/.mcp_token`: that one is used by the MCP server to talk *to* the Poznote API, this one is what *your AI assistant* must present to the MCP server.
+
 #### Debug mode
 
 Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
@@ -173,18 +192,31 @@ Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
 ## Security
 
-The MCP server starts automatically with Poznote and listens on **127.0.0.1 only**, it is not reachable from the outside. This is the correct, secure default: only your local machine (or an SSH tunnel you set up yourself) can reach it. The 127.0.0.1 port mapping is defined in `docker-compose.yml`, while the internal MCP service token is generated automatically in `data/.mcp_token`.
+Anyone who can reach the MCP endpoint can read, create, modify and delete every note of every profile (tools accept a `user_id` argument), and can also trigger backups, restores and settings changes. Two layers keep that from being a problem:
+
+1. **Network reachability.** The endpoint is only reachable from the local machine by default.
+2. **Inbound bearer token** (optional). Set `POZNOTE_MCP_AUTH_TOKEN` and every request must carry `Authorization: Bearer <token>`.
+
+With the default `docker-compose.yml`, layer 1 alone is enough. Add layer 2 whenever the port becomes reachable from somewhere you do not fully control.
 
 ### Why 127.0.0.1-only is both normal and secure
 
-By default, the MCP server listens **only on `127.0.0.1`** (your local machine), never on a public interface:
+The MCP container listens on `0.0.0.0` *inside* the container, which Docker needs for the port mapping to work, but the port is published **only on `127.0.0.1`** of the host, never on a public interface:
 
 ```yaml
 ports:
   - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
 ```
 
-This is intentional and the correct setup. The MCP server does not implement its own authentication for incoming connections, any client that can reach the endpoint can read, create, modify, and delete notes. Binding to 127.0.0.1 guarantees that only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration: the server is not reachable from the outside.
+This is intentional and the correct setup: only processes running on the same machine (or SSH tunnels you explicitly set up) can connect. There is nothing to worry about with the default configuration.
+
+### Running the MCP server outside Docker
+
+If you install the MCP server with `pip` and run `poznote-mcp serve` yourself (systemd, Proxmox LXC, ...), there is no Docker port mapping in front of it, so the bind address matters:
+
+- `poznote-mcp serve` binds to **`127.0.0.1` by default**. Keep that default unless you know why you need otherwise.
+- If you must bind to `0.0.0.0` (a reverse proxy on another host, a VPN interface), set `POZNOTE_MCP_AUTH_TOKEN` too. The server logs a warning at startup when it listens on a non-loopback address without a token.
+- Older releases bound to `0.0.0.0` by default: pass `--host=127.0.0.1` explicitly (or set `MCP_HOST=127.0.0.1` when running without the `serve` subcommand).
 
 ### Remote access
 
@@ -199,8 +231,9 @@ Then point your AI assistant to `http://127.0.0.1:8045/mcp` as usual.
 ### Production environments
 
 If you must route the MCP server through a network, protect it with:
-- A reverse proxy with authentication (nginx, Caddy)
+- `POZNOTE_MCP_AUTH_TOKEN` (see [Inbound authentication token](#inbound-authentication-token)), and HTTPS in front of it so the token is not sent in clear
 - A VPN (Tailscale, WireGuard)
+- Optionally a reverse proxy with its own authentication or IP allowlist (nginx, Caddy) as an extra layer
 
 ### How the MCP server authenticates to Poznote
 

@@ -34,6 +34,15 @@ claude mcp add --transport http poznote http://127.0.0.1:8045/mcp
 
 > **Note:** Replace `8045` with your actual MCP server port if you've customized it in your `docker-compose.yml`.
 
+#### Using an authentication token
+
+If the MCP server was started with `POZNOTE_MCP_AUTH_TOKEN` (see [Inbound authentication token](MCP-SERVER.md#inbound-authentication-token)), pass the same token as a header, otherwise every call is rejected with `401 Unauthorized`:
+
+```bash
+claude mcp add --transport http poznote http://127.0.0.1:8045/mcp \
+  --header "Authorization: Bearer YOUR_TOKEN"
+```
+
 The configuration will be saved to either:
 - **Project-level:** `/your/project/.claude.json` (when run from within a project)
 - **User-level:** `~/.claude.json` (global configuration)
@@ -319,7 +328,7 @@ docker compose logs -f mcp-server
 
 ## Security Notes
 
-⚠️ **Important:** The MCP server does not implement authentication for incoming requests. It should only be accessible from 127.0.0.1 or through a secure tunnel.
+⚠️ **Important:** Anyone who can reach the MCP endpoint can manage every note. By default it is only reachable from 127.0.0.1; if you expose it further, set `POZNOTE_MCP_AUTH_TOKEN` so clients must present a bearer token (see [Using an authentication token](#using-an-authentication-token)).
 
 **Default configuration (secure):**
 ```yaml
@@ -331,6 +340,8 @@ ports:
 ```bash
 ssh -L 8045:127.0.0.1:8045 user@your-server
 ```
+
+Full details: [MCP Server Security](MCP-SERVER.md#security).
 
 ## Available MCP Tools
 
@@ -412,7 +423,7 @@ claude "List notes for user 2 in Poznote"
 
 - [Main MCP Server Documentation](MCP-SERVER.md)
 - [VS Code Copilot Setup](VSCODE-COPILOT.md)
-- [Security Considerations](MCP-SERVER.md#security-considerations)
+- [Security Considerations](MCP-SERVER.md#security)
 
 ## Support
 
