@@ -3978,6 +3978,7 @@
     "title": "AI 助手",
     "toolbar_button": "AI 助手",
     "empty": "提出问题。\n助手可以搜索、阅读、创建、重命名和编辑你的笔记。",
+    "empty_open_note": "说“这条笔记”即可指当前打开的笔记。",
     "placeholder": "向助手提问...",
     "send": "发送",
     "stop": "停止",

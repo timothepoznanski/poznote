@@ -3857,6 +3857,7 @@
     "title": "KI-Assistent",
     "toolbar_button": "KI-Assistent",
     "empty": "Stellen Sie eine Frage.\nDer Assistent kann Ihre Notizen durchsuchen, lesen, erstellen, umbenennen und bearbeiten.",
+    "empty_open_note": "Sagen Sie „diese Notiz“, wenn Sie die gerade geöffnete meinen.",
     "placeholder": "Fragen Sie den Assistenten...",
     "send": "Senden",
     "stop": "Stoppen",

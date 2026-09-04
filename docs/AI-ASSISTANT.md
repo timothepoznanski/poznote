@@ -11,6 +11,8 @@ Once configured, an **AI** button appears in the dashboard toolbar and opens the
 
 The assistant has tools to **search and read your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. When you explicitly ask for it, it can also **create a note, rename one, or rewrite its content** (there is deliberately no delete tool). Answers are streamed and rendered as Markdown.
 
+The note you have open is part of the context: say "improve the formatting of this note" or "add a conclusion here" and the assistant works on it, no id or title needed. It reads the version last saved by the editor, and "this note" follows you if you open another note during the conversation. Naming another note in your question still takes precedence.
+
 When the assistant edits or creates a note, the open note and the sidebar refresh on their own once the answer is complete, no page reload needed. If you have unsaved changes in the note it just edited, a banner appears instead: reload the note, or keep and save your own version.
 
 The assistant reads and writes note content as Markdown. Rich-text (HTML) notes are converted on the fly in both directions, with the same converter as the **Convert note** action, so a rewrite keeps headings, lists, links, tables and images; rich formatting such as colors or fonts is not kept. A note too long for the assistant to read in full is refused for rewriting rather than truncated.

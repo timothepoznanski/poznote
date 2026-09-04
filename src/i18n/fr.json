@@ -4080,6 +4080,7 @@
     "title": "Assistant IA",
     "toolbar_button": "Assistant IA",
     "empty": "Posez une question.\nL'assistant peut chercher, lire, créer, renommer et modifier vos notes.",
+    "empty_open_note": "Dites « cette note » pour parler de celle qui est ouverte.",
     "placeholder": "Demandez à l'assistant...",
     "send": "Envoyer",
     "stop": "Arrêter",

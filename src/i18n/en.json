@@ -3587,6 +3587,7 @@
     "title": "AI Assistant",
     "toolbar_button": "AI assistant",
     "empty": "Ask a question.\nThe assistant can search, read, create, rename and edit your notes.",
+    "empty_open_note": "Say \"this note\" for the one you have open.",
     "placeholder": "Ask the assistant...",
     "send": "Send",
     "stop": "Stop",

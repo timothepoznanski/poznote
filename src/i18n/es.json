@@ -3857,6 +3857,7 @@
     "title": "Asistente IA",
     "toolbar_button": "Asistente IA",
     "empty": "Haz una pregunta.\nEl asistente puede buscar, leer, crear, renombrar y editar tus notas.",
+    "empty_open_note": "Di \"esta nota\" para referirte a la que tienes abierta.",
     "placeholder": "Pregunta al asistente...",
     "send": "Enviar",
     "stop": "Detener",
