@@ -349,6 +349,11 @@ $router->get('/notes/{id}', function($params) use ($notesController) {
     $notesController->show($params['id']);
 });
 
+// Change-detection probe for the web UI (sidebar tree + note version tokens)
+$router->get('/changes', function($params) use ($notesController) {
+    $notesController->changes();
+});
+
 // Acquire an exclusive edit lock for a note
 $router->post('/notes/{id}/lock', function($params) use ($notesController) {
     $notesController->acquireLock($params['id']);

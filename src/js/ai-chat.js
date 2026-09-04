@@ -404,6 +404,11 @@
             bubble.classList.remove('ai-chat-pending');
             setStreaming(false);
             abortController = null;
+            // Tool calls may have edited notes or folders: let the live
+            // refresh poller (js/live-refresh.js) pick them up right away.
+            try {
+                document.dispatchEvent(new CustomEvent('poznoteExternalChangeHint'));
+            } catch (e) { /* ignore */ }
             if (!failed) {
                 if (answer) {
                     renderAssistantBubble(bubble, answer);

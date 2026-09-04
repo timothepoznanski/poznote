@@ -3742,6 +3742,16 @@
     "lost_to_user": "Você não tem mais o bloqueio de edição desta nota. {{user}} está editando-a agora.",
     "public_visitor": "um visitante do link de compartilhamento público"
   },
+  "live_refresh": {
+    "note_changed": "Esta nota foi modificada fora desta aba.",
+    "note_changed_unsaved": "Esta nota foi modificada fora desta aba enquanto você tem alterações não salvas aqui.",
+    "note_removed": "Esta nota foi excluída ou movida para a lixeira fora desta aba.",
+    "reload": "Recarregar",
+    "keep_mine": "Manter a minha versão",
+    "discard_confirm": "Recarregar vai descartar as alterações que você fez aqui. Continuar?",
+    "discard_title": "Descartar alterações não salvas?",
+    "note_refreshed": "Atualizada com as alterações feitas fora desta aba."
+  },
   "dashboard": {
     "title": "Quadro de notas",
     "empty": "Ainda não há notas favoritas. Marque notas como favoritas para fixá-las neste quadro.",

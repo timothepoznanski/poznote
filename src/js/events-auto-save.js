@@ -530,6 +530,13 @@ function emergencySave(noteId) {
         editor_session_id: (typeof window.getCurrentEditorSessionId === 'function') ? window.getCurrentEditorSessionId() : ''
     };
 
+    // Never overwrite an edit made elsewhere on the way out either (409 is
+    // then silently accepted: nobody is left to arbitrate).
+    var expectedVersion = (typeof window.getLiveNoteContentVersion === 'function') ? window.getLiveNoteContentVersion(noteId) : null;
+    if (expectedVersion) {
+        updates.if_version = expectedVersion;
+    }
+
     // Strategy 1: Try fetch with keepalive (most reliable)
     try {
         fetch("/api/v1/notes/" + noteId, {
