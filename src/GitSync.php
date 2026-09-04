@@ -1740,12 +1740,26 @@ class GitSync {
         }
 
         $response = $this->apiRequest('GET', "/repos/{$this->repo}/git/trees/{$this->branch}?recursive=1");
-        
+
         if (isset($response['tree'])) {
             return $response['tree'];
         }
-        
-        return ['error' => $response['message'] ?? 'Unable to get repository tree'];
+
+        // A repository without any commit has no tree yet: Gitea/Forgejo
+        // answer 400, GitHub 409 ("Git Repository is empty."). Treat it as
+        // empty so the first push creates the initial commit instead of
+        // failing (#1319). 404 also qualifies, but only when the repo itself
+        // confirms it is empty: a misspelled branch on a non-empty repo must
+        // keep reporting the error.
+        $status = $response['status'] ?? 0;
+        if (in_array($status, [400, 404, 409], true)) {
+            $info = $this->apiRequest('GET', "/repos/{$this->repo}");
+            $isEmpty = !empty($info['empty'])
+                || ($status === 409 && stripos($response['error'] ?? '', 'empty') !== false);
+            if ($isEmpty) return [];
+        }
+
+        return ['error' => $response['error'] ?? $response['message'] ?? 'Unable to get repository tree'];
     }
     
     /**

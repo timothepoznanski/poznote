@@ -108,6 +108,7 @@
             'center_note_content',
             'note_list_sort',
             'note_age_filter_days',
+            'snapshots_keep_count',
             'tasklist_insert_order',
             'diary_default_note_type',
             'diary_date_format',
@@ -796,6 +797,35 @@
 
             badge.textContent = getNoteAgeFilterLabel(value || '0');
             badge.className = 'setting-status enabled';
+        });
+    }
+
+    var SNAPSHOTS_DEFAULT_COUNT = 3;
+    var SNAPSHOTS_MAX_COUNT = 30;
+
+    function getSnapshotsKeepCount(value) {
+        var count = parseInt(value, 10);
+        return (count >= 1 && count <= SNAPSHOTS_MAX_COUNT) ? count : SNAPSHOTS_DEFAULT_COUNT;
+    }
+
+    function refreshSnapshotsBadge() {
+        getSetting('snapshots_keep_count', function (value) {
+            var badge = document.getElementById('snapshots-badge');
+            if (!badge) return;
+
+            var count = getSnapshotsKeepCount(value);
+            badge.textContent = tr('modals.snapshots.badge', { count: count }, count + ' automatic per note');
+            badge.className = 'setting-status enabled';
+        });
+    }
+
+    function openSnapshotsSettingsModal() {
+        var modal = document.getElementById('snapshotsSettingsModal');
+        if (!modal) return;
+        getSetting('snapshots_keep_count', function (value) {
+            var input = document.getElementById('snapshotsKeepCountInput');
+            if (input) input.value = String(getSnapshotsKeepCount(value));
+            modal.style.display = 'flex';
         });
     }
 
@@ -1905,6 +1935,21 @@
             noteAgeFilterCard.addEventListener('click', openNoteAgeFilterModal);
         }
 
+        var snapshotsCard = document.getElementById('snapshots-card');
+        if (snapshotsCard) {
+            snapshotsCard.addEventListener('click', openSnapshotsSettingsModal);
+        }
+
+        // Deep link from the note's Snapshots modal: settings.php?open=snapshots
+        if (new URLSearchParams(window.location.search || '').get('open') === 'snapshots') {
+            openSnapshotsSettingsModal();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanSnapshotsUrl = new URL(window.location.href);
+                cleanSnapshotsUrl.searchParams.delete('open');
+                window.history.replaceState({}, '', cleanSnapshotsUrl.toString());
+            }
+        }
+
         var noteColorPaletteCard = document.getElementById('note-color-palette-card');
         if (noteColorPaletteCard) {
             noteColorPaletteCard.addEventListener('click', openNoteColorPaletteModal);
@@ -2292,6 +2337,22 @@
             });
         }
 
+        var saveSnapshotsBtn = document.getElementById('saveSnapshotsSettingsModalBtn');
+        if (saveSnapshotsBtn) {
+            saveSnapshotsBtn.addEventListener('click', function () {
+                var input = document.getElementById('snapshotsKeepCountInput');
+                var selected = String(getSnapshotsKeepCount(input ? input.value : ''));
+                setSetting('snapshots_keep_count', selected, function (success) {
+                    if (success) {
+                        try { closeModal('snapshotsSettingsModal'); } catch (e) { }
+                        refreshSnapshotsBadge();
+                    } else {
+                        alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    }
+                });
+            });
+        }
+
         // Save language modal button
         var saveLangBtn = document.getElementById('saveLanguageModalBtn');
         if (saveLangBtn) {
@@ -2645,6 +2706,7 @@
             refreshMarkdownFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
+            refreshSnapshotsBadge();
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshDiaryNoteTypeBadge();
@@ -3141,6 +3203,7 @@
             refreshMarkdownFontBadge();
             refreshNoteSortBadge();
             refreshNoteAgeFilterBadge();
+            refreshSnapshotsBadge();
             refreshNoteColorPaletteBadge();
             refreshTasklistInsertOrderBadge();
             refreshDiaryNoteTypeBadge();
@@ -3243,7 +3306,8 @@
     // Keys renamed after release, so preferences saved under the old name keep
     // working. See poznoteNormalizeHiddenUiKey() in functions.php.
     var RENAMED_UI_KEYS = {
-        'toolbar:btn-share': 'toolbar:btn-publish'
+        'toolbar:btn-share': 'toolbar:btn-publish',
+        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
     };
 
     function normalizeHiddenUiKey(key) {

@@ -565,6 +565,20 @@
     color: inherit !important;
 }
 
+/* Kept-count number in the description, links to its setting */
+.snapshot-keep-count-link {
+    color: var(--pz-accent);
+    font-weight: 600;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.snapshot-keep-count-link:hover {
+    color: var(--pz-accent-hover);
+    text-decoration-style: solid;
+}
+
 /* ---- Actions bar ---- */
 .snapshot-modal-actions {
     padding: 16px 24px !important;

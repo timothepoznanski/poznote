@@ -29,7 +29,7 @@ Go to **Settings → Admin Tools → AI Assistant** (administrator only) and pic
 | **OpenAI** (cloud) | Set automatically | Required |
 | **Custom** | Any OpenAI-compatible base URL | Depends on the server |
 
-Then use **Test connection**, which verifies the server is reachable and lists its available models so you can pick one with a click.
+Then use **Check access and list models**, which verifies the server is reachable and fills the **Model** dropdown with the models it offers. The dropdown stays empty until that check succeeds, so this is the step that lets you choose a model.
 
 The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
 
@@ -161,7 +161,7 @@ docker exec <poznote-webserver-container> curl -s -m 3 http://172.17.0.1:11434/
 # "Ollama is running"
 ```
 
-If this returns nothing, the problem is the Ollama binding or a firewall, not Poznote. The **Test connection** button in the settings page performs the same check and lists the available models on success.
+If this returns nothing, the problem is the Ollama binding or a firewall, not Poznote. The **Check access and list models** button in the settings page performs the same check and fills the model dropdown on success.
 
 ## Privacy
 

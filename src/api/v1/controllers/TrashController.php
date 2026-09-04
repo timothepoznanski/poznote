@@ -162,17 +162,8 @@ class TrashController {
                     @unlink($filePath);
                 }
                 
-                // Delete attachment files (local disk or S3 bucket)
-                $attachments = $row['attachments'] ? json_decode($row['attachments'], true) : [];
-                if (is_array($attachments) && !empty($attachments)) {
-                    foreach ($attachments as $attachment) {
-                        if (isset($attachment['filename'])) {
-                            poznoteDeleteAttachmentFile($attachment['filename']);
-                        }
-                    }
-                }
-
-                deleteNoteSnapshots((int) $row['id']);
+                // Delete attachment files (local disk or S3 bucket) and snapshots
+                deleteNoteFilesForGood((int) $row['id'], $row['attachments'] ?? '');
                 
                 $deletedCount++;
             }
@@ -243,25 +234,16 @@ class TrashController {
                 return;
             }
             
-            $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
             $noteType = $note['type'] ?? 'note';
-            
-            // Delete attachment files (local disk or S3 bucket)
-            if (is_array($attachments) && !empty($attachments)) {
-                foreach ($attachments as $attachment) {
-                    if (isset($attachment['filename'])) {
-                        poznoteDeleteAttachmentFile($attachment['filename']);
-                    }
-                }
-            }
-            
+
+            // Delete attachment files (local disk or S3 bucket) and snapshots
+            deleteNoteFilesForGood($noteId, $note['attachments'] ?? '');
+
             // Delete note file
             $filename = getEntryFilename($noteId, $noteType);
             if (file_exists($filename)) {
                 @unlink($filename);
             }
-
-            deleteNoteSnapshots($noteId);
 
             // Free any share token in the master registry before the entry is
             // deleted (the ON DELETE CASCADE only removes the shared_notes row)

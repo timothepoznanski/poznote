@@ -253,6 +253,14 @@ class SettingsController {
             return (string) $intVal;
         }
 
+        if ($key === 'snapshots_keep_count') {
+            $intVal = (int) $value;
+            if ($intVal < POZNOTE_SNAPSHOTS_MIN_COUNT || $intVal > POZNOTE_SNAPSHOTS_MAX_COUNT) {
+                throw new InvalidArgumentException('value must be between ' . POZNOTE_SNAPSHOTS_MIN_COUNT . ' and ' . POZNOTE_SNAPSHOTS_MAX_COUNT, 400);
+            }
+            return (string) $intVal;
+        }
+
         if ($key === 'date_time_format') {
             $normalized = trim((string) $value);
             $allowedFormats = ['default', 'ymd_hi', 'ymd_his', 'dmy_hi', 'mdy_hia'];

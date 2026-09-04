@@ -761,7 +761,9 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 
 ## Snapshots
 
-Snapshots preserve daily versions of a note's content. One automatic snapshot is kept per day; manual snapshots can be added on demand.
+Snapshots preserve daily versions of a note's content. One automatic snapshot is taken per day; the most recent automatic snapshots are kept per note, 3 by default (user setting `snapshots_keep_count`, 1 to 30, also available from Settings > Snapshots). Manual snapshots can be added on demand without limit and do not count toward that number. Every snapshot, automatic or manual, expires 30 days after it was taken.
+
+An attachment or image deleted from a note is kept on disk (hidden from the note) as long as a snapshot still references it, so restoring that snapshot brings it back. The file is removed for good once no snapshot references it any more (the last one expired or was purged), or when the note is permanently deleted.
 
 ### Create Snapshot
 
@@ -833,6 +835,26 @@ Restore a note to a snapshot state.
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/123/snapshot/restore?date=2026-07-01"
+```
+
+### Delete Snapshot
+
+```
+DELETE /notes/{id}/snapshot
+```
+
+Delete one snapshot, manual or automatic. Attachments and images that only this snapshot still kept are deleted with it.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `snapshot_key` | string | Snapshot key from the list endpoint |
+| `date` | date | Snapshot date (`YYYY-MM-DD`), used when `snapshot_key` is omitted |
+
+```bash
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/123/snapshot?snapshot_key=2026-07-01--143022123-a1b2"
 ```
 
 ---
@@ -2183,7 +2205,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 DELETE /notes/{noteId}/attachments/{attachmentId}
 ```
 
-Delete an attachment from a note.
+Delete an attachment from a note. References to it are removed from the note content. If a snapshot of the note still contains the attachment, the file is kept on disk (hidden from the note) until that snapshot expires, and the response carries `"retained_for_snapshots": true`; otherwise the file is deleted immediately.
 
 ```bash
 curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
@@ -3146,6 +3168,7 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/notes/{id}/snapshots` | List snapshots |
 | `GET` | `/notes/{id}/snapshot` | Get snapshot |
 | `POST` | `/notes/{id}/snapshot/restore` | Restore snapshot |
+| `DELETE` | `/notes/{id}/snapshot` | Delete snapshot |
 
 ### Tasks
 | Method | Endpoint | Description |

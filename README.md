@@ -42,6 +42,7 @@ https://poznote.com/press.html
 - [Update application](#update-application)
 - [Authentication](#authentication)
 - [Note types](#note-types)
+- [Snapshots](#snapshots)
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
 - [Activity Log](#activity-log)
@@ -559,6 +560,15 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Format:** New entries are created as HTML or Markdown notes, depending on the "Diary entry format" setting under **Settings > Display**.
 </details>
 
+## Snapshots
+
+Snapshots keep earlier versions of a note's content so you can go back to a previous state from the note's **Snapshots** menu.
+
+*   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Behavior > Snapshots**.
+*   **Manual:** "Take snapshot now" adds a snapshot at any time. Manual snapshots are unlimited and do not count toward that number.
+*   **Expiry:** every snapshot, automatic or manual, is deleted 30 days after it was taken. A snapshot can also be deleted by hand from the Snapshots modal.
+*   **Attachments and images:** a file removed from a note stays on disk, hidden from the note, as long as a snapshot still contains it, so restoring that snapshot brings it back. It is deleted for good once the last snapshot containing it expires or is deleted, or when the note is permanently deleted. Keeping many snapshots can therefore use more storage.
+
 ## Personalization
 
 Poznote offers several built-in personalization options directly from the application, without requiring any configuration file changes.
@@ -1053,7 +1063,7 @@ The assistant is global, MCP-style: it has tools to **search and read your notes
 
 The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first.
 
-To enable it, go to **Settings → Admin Tools → AI Assistant** (administrator only), pick a provider and use **Test connection** to verify the server and choose a model. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
+To enable it, go to **Settings → Admin Tools → AI Assistant** (administrator only), pick a provider and use **Check access and list models** to verify the server and choose a model from the ones it offers. The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
 
 For the full configuration guide, covering providers, choosing a model, and how to connect a local Ollama/LM Studio server from the Poznote container (finding the right URL, `OLLAMA_HOST`, Docker networking), see the [AI Assistant documentation](docs/AI-ASSISTANT.md).
 

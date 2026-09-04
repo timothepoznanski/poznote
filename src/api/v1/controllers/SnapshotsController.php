@@ -5,15 +5,21 @@
  * Manages automatic daily snapshots and extra manual snapshots of note content.
  * A snapshot captures the note content at first open of the day,
  * and users can also add more snapshots manually during the same day.
- * Keeps up to 7 snapshots of history per note.
+ * Keeps up to getSnapshotsKeepCount() automatic snapshots per note (3 by
+ * default, user setting snapshots_keep_count); manual snapshots are not
+ * limited. Every snapshot expires after POZNOTE_SNAPSHOTS_MAX_AGE_DAYS.
+ * Attachments and images removed from a note stay on disk while a snapshot
+ * references them (see poznotePruneSnapshotOnlyAttachments), so an older
+ * state can be restored.
  */
 
 class SnapshotsController {
     private PDO $con;
-     private int $maxSnapshots = 7;
-    
+    private int $maxSnapshots;
+
     public function __construct(PDO $con) {
         $this->con = $con;
+        $this->maxSnapshots = getSnapshotsKeepCount();
     }
     
     /**
@@ -27,9 +33,13 @@ class SnapshotsController {
     }
     
     /**
-     * Purge snapshots beyond the newest $maxSnapshots for a given note.
+     * Expire snapshots older than POZNOTE_SNAPSHOTS_MAX_AGE_DAYS, then purge
+     * automatic (daily) snapshots beyond the newest $maxSnapshots for a given
+     * note. Manual snapshots only expire and do not count toward the limit.
      */
     private function purgeOldSnapshots(string $noteSnapshotDir): void {
+        poznoteExpireNoteSnapshots($this->con, (int) basename($noteSnapshotDir));
+
         if (!is_dir($noteSnapshotDir)) return;
 
         $this->normalizeMalformedSnapshotFiles($noteSnapshotDir);
@@ -54,6 +64,10 @@ class SnapshotsController {
 
             $paths = $this->getSnapshotPaths($noteSnapshotDir, $parsed['key'], $parsed['extension']);
             $meta = $this->readSnapshotMeta($paths['meta']);
+
+            if ((bool) ($meta['manual'] ?? $parsed['manual'])) {
+                continue;
+            }
 
             $snapshots[] = [
                 'key' => $parsed['key'],
@@ -91,6 +105,8 @@ class SnapshotsController {
             @unlink((string) $snapshot['snapshot_file']);
             @unlink((string) $snapshot['meta_file']);
         }
+
+        poznotePruneSnapshotOnlyAttachments($this->con, (int) basename($noteSnapshotDir));
     }
 
     /**
@@ -621,7 +637,6 @@ class SnapshotsController {
             // Write meta file
             file_put_contents($snapshotPaths['meta'], json_encode($meta, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             
-            // Purge snapshots older than 7 days
             $this->purgeOldSnapshots($noteSnapshotDir);
             
             return [
@@ -673,7 +688,7 @@ class SnapshotsController {
     
     /**
      * GET /api/v1/notes/{id}/snapshots
-    * List all available snapshots for a note (latest 7 snapshots max).
+    * List all available snapshots for a note (latest getSnapshotsKeepCount() automatic ones plus every manual one).
      */
     public function listSnapshots(string $id): void {
         $noteId = (int)$id;
@@ -830,15 +845,15 @@ class SnapshotsController {
         
         try {
             // Get note data
-            $stmt = $this->con->prepare("SELECT id, heading, type FROM entries WHERE id = ? AND trash = 0");
+            $stmt = $this->con->prepare("SELECT id, heading, type, attachments FROM entries WHERE id = ? AND trash = 0");
             $stmt->execute([$noteId]);
             $note = $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
             if (!$note) {
                 $this->sendError(404, t('snapshot.api.note_not_found', [], 'Note not found'));
                 return;
             }
-            
+
             $noteType = $note['type'] ?? 'note';
             $snapshotKey = trim((string) ($_GET['snapshot_key'] ?? ''));
             $date = $_GET['date'] ?? $this->getSnapshotDateForUser();
@@ -847,16 +862,16 @@ class SnapshotsController {
                 $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid snapshot key'));
                 return;
             }
-            
+
             // Validate date format
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
                 $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid date format'));
                 return;
             }
-            
+
             $snapshotsDir = $this->getSnapshotsPath();
             $noteSnapshotDir = $snapshotsDir . '/' . $noteId;
-            
+
             $extension = ($noteType === 'markdown') ? '.md' : '.html';
             $snapshotRecord = $this->findSnapshotRecord(
                 $noteSnapshotDir,
@@ -864,7 +879,7 @@ class SnapshotsController {
                 $snapshotKey !== '' ? $snapshotKey : null,
                 $date
             );
-            
+
             if ($snapshotRecord === null || !file_exists((string) $snapshotRecord['snapshot_file'])) {
                 $this->sendError(404, t('snapshot.api.not_found_today', [], 'No snapshot found for today'));
                 return;
@@ -900,7 +915,9 @@ class SnapshotsController {
             // Also update the database entry column
             $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
             $stmt->execute([$snapshotContent, $noteId]);
-            
+
+            $this->revealAttachmentsReferencedBy($noteId, $note['attachments'] ?? '', $snapshotContent);
+
             echo json_encode([
                 'success' => true,
                 'message' => t('snapshot.api.restore_success', [], 'Note restored to snapshot state')
@@ -912,6 +929,100 @@ class SnapshotsController {
         }
     }
     
+    /**
+     * DELETE /api/v1/notes/{id}/snapshot
+     * Delete one snapshot (manual or automatic). Accepts ?snapshot_key=... or ?date=YYYY-MM-DD.
+     */
+    public function destroy(string $id): void {
+        $noteId = (int)$id;
+        if ($noteId <= 0) {
+            $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid note ID'));
+            return;
+        }
+
+        try {
+            $stmt = $this->con->prepare("SELECT id, type FROM entries WHERE id = ? AND trash = 0");
+            $stmt->execute([$noteId]);
+            $note = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$note) {
+                $this->sendError(404, t('snapshot.api.note_not_found', [], 'Note not found'));
+                return;
+            }
+
+            $noteType = $note['type'] ?? 'note';
+            $snapshotKey = trim((string) ($_GET['snapshot_key'] ?? ''));
+            $date = trim((string) ($_GET['date'] ?? ''));
+
+            if ($snapshotKey !== '' && !$this->isValidSnapshotKey($snapshotKey)) {
+                $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid snapshot key'));
+                return;
+            }
+
+            if ($snapshotKey === '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $this->sendError(400, t('snapshot.api.invalid_note_id', [], 'Invalid date format'));
+                return;
+            }
+
+            $noteSnapshotDir = $this->getSnapshotsPath() . '/' . $noteId;
+            $snapshotRecord = $this->findSnapshotRecord(
+                $noteSnapshotDir,
+                ($noteType === 'markdown') ? 'md' : 'html',
+                $snapshotKey !== '' ? $snapshotKey : null,
+                $date !== '' ? $date : null
+            );
+
+            if ($snapshotRecord === null || !is_file((string) $snapshotRecord['snapshot_file'])) {
+                $this->sendError(404, t('snapshot.api.not_found', [], 'Snapshot not found'));
+                return;
+            }
+
+            if (!@unlink((string) $snapshotRecord['snapshot_file'])) {
+                $this->sendError(500, t('snapshot.api.delete_failed', [], 'Failed to delete snapshot'));
+                return;
+            }
+            @unlink((string) $snapshotRecord['meta_file']);
+
+            // Attachments this snapshot was the last to reference go with it
+            poznotePruneSnapshotOnlyAttachments($this->con, $noteId);
+            if (is_dir($noteSnapshotDir) && count(scandir($noteSnapshotDir) ?: []) <= 2) {
+                @rmdir($noteSnapshotDir);
+            }
+
+            echo json_encode([
+                'success' => true,
+                'snapshot_key' => $snapshotRecord['key'],
+                'message' => t('snapshot.api.deleted', [], 'Snapshot deleted')
+            ], JSON_UNESCAPED_UNICODE);
+
+        } catch (Exception $e) {
+            error_log("Snapshot delete error: " . $e->getMessage());
+            $this->sendError(500, t('snapshot.api.delete_failed', [], 'Failed to delete snapshot'));
+        }
+    }
+
+    /**
+     * Attachments that were removed from the note but kept for its snapshots
+     * become regular attachments again once the restored content uses them.
+     */
+    private function revealAttachmentsReferencedBy(int $noteId, $attachmentsJson, string $content): void {
+        $attachments = poznoteDecodeAttachments($attachmentsJson);
+        $changed = false;
+
+        foreach ($attachments as &$attachment) {
+            if (poznoteAttachmentIsSnapshotOnly($attachment) && poznoteAttachmentIsReferencedInContent($attachment, $content)) {
+                unset($attachment['snapshot_only']);
+                $changed = true;
+            }
+        }
+        unset($attachment);
+
+        if ($changed) {
+            $stmt = $this->con->prepare("UPDATE entries SET attachments = ? WHERE id = ?");
+            $stmt->execute([json_encode($attachments), $noteId]);
+        }
+    }
+
     private function sendError(int $code, string $message): void {
         http_response_code($code);
         echo json_encode([

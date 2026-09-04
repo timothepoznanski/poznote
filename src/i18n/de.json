@@ -83,7 +83,7 @@
     "menu_item": "Schnappschüsse",
     "modal": {
       "title": "Schnappschüsse",
-      "description": "Nur der Textinhalt der Notiz wird gespeichert (keine Anhänge oder Bilder). Wurde ein Anhang oder Bild gelöscht, kann es nicht aus einem Schnappschuss wiederhergestellt werden.\nAutomatisch beim ersten Öffnen jeden Tag erstellt. „Jetzt Schnappschuss erstellen“ fügt einen zusätzlichen hinzu, ohne die heutigen zu ersetzen. Max. 7.",
+      "description": "Automatisch beim ersten Öffnen jeden Tag erstellt, die letzten {{count}} werden behalten. „Jetzt Schnappschuss erstellen“ fügt einen manuellen Schnappschuss hinzu. Jeder Schnappschuss läuft nach {{days}} Tagen ab.",
       "loading": "Schnappschuss wird geladen...",
       "history": "Verlauf",
       "markdown_preview": "Vorschau",
@@ -96,23 +96,29 @@
       "empty_content": "(Leerer Inhalt)",
       "take_now": "Jetzt Schnappschuss erstellen",
       "copy_content": "Inhalt kopieren",
-      "restore_state": "Zu diesem Zustand zurückkehren"
+      "restore_state": "Zu diesem Zustand zurückkehren",
+      "delete": "Diesen Schnappschuss löschen",
+      "keep_count_link_title": "Anzahl der behaltenen automatischen Schnappschüsse ändern"
     },
     "messages": {
       "content_copied": "Inhalt kopiert",
-      "created_now": "Schnappschuss hinzugefügt"
+      "created_now": "Schnappschuss hinzugefügt",
+      "deleted": "Schnappschuss gelöscht"
     },
     "errors": {
       "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
       "create_failed": "Schnappschuss konnte nicht erstellt werden",
-      "copy_failed": "Kopieren fehlgeschlagen"
+      "copy_failed": "Kopieren fehlgeschlagen",
+      "delete_failed": "Schnappschuss konnte nicht gelöscht werden"
     },
     "confirm": {
       "title": "Bestätigung",
       "restore_message": "Die Notiz auf den Stand des Schnappschusses zurücksetzen? Aktuelle Änderungen gehen verloren.",
       "restore_button": "Zu diesem Zustand zurückkehren",
       "take_now_message": "Einen zusätzlichen Schnappschuss mit dem aktuellen Notizinhalt erstellen? Bereits vorhandene Schnappschüsse von heute bleiben erhalten.",
-      "take_now_button": "Jetzt Schnappschuss erstellen"
+      "take_now_button": "Jetzt Schnappschuss erstellen",
+      "delete_message": "Diesen Schnappschuss löschen?",
+      "delete_button": "Diesen Schnappschuss löschen"
     },
     "api": {
       "invalid_note_id": "Ungültige Notiz-ID",
@@ -128,7 +134,10 @@
       "invalid_entries_path": "Ungültiger Notizpfad",
       "restore_note_file_failed": "Notizdatei konnte nicht wiederhergestellt werden",
       "restore_success": "Die Notiz wurde auf den Stand des Schnappschusses zurückgesetzt",
-      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden"
+      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
+      "not_found": "Schnappschuss nicht gefunden",
+      "delete_failed": "Schnappschuss konnte nicht gelöscht werden",
+      "deleted": "Schnappschuss gelöscht"
     }
   },
   "kanban": {
@@ -472,7 +481,8 @@
       "support": "Unterstützen Sie die Entwicklung von Poznote mit einer Spende.",
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
-      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, abschwächen."
+      "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, abschwächen.",
+      "snapshots": "Festlegen, wie viele automatische tägliche Schnappschüsse pro Notiz behalten werden."
     },
     "title": "Einstellungen",
     "collapse_section": "Bereich einklappen",
@@ -718,7 +728,8 @@
       "note_color_palette": "Notizfarben",
       "slash_menu_require_alt": "Tastenkürzel für das Befehlsmenü",
       "note_nav_shortcuts": "Notizen wechseln mit Alt + ↑/↓",
-      "ctrl_s_save": "Notiz mit Strg + S speichern"
+      "ctrl_s_save": "Notiz mit Strg + S speichern",
+      "snapshots": "Schnappschüsse"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -1561,6 +1572,16 @@
     "note": {
       "rename_title": "Notiz umbenennen",
       "rename_placeholder": "Neuer Notiztitel"
+    },
+    "snapshots": {
+      "title": "Schnappschüsse",
+      "description": "Anzahl der automatischen Schnappschüsse pro Notiz (einer wird täglich beim ersten Öffnen der Notiz erstellt). Manuelle Schnappschüsse über „Jetzt Schnappschuss erstellen“ zählen nicht mit. Jeder Schnappschuss läuft nach {{days}} Tagen ab:",
+      "options": {
+        "unit": "automatische Schnappschüsse"
+      },
+      "badge": "{{count}} automatische pro Notiz",
+      "warning_title": "Mehr Schnappschüsse können viel Speicherplatz belegen.",
+      "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
     }
   },
   "notes_list": {
@@ -3778,6 +3799,8 @@
     "url_label": "Server-URL",
     "url_description": "Basis-URL einer OpenAI-kompatiblen API. Für Ollama auf dem Docker-Host: http://host.docker.internal:11434",
     "model_label": "Modell",
+    "model_empty_hint": "Klicken Sie oben auf „{{button}}“ und wählen Sie dann eines aus.",
+    "model_none_found": "Dieser Server hat keine Modelle zurückgegeben.",
     "api_key_label": "API-Schlüssel (optional)",
     "api_key_description": "Für einen lokalen Ollama-Server leer lassen. Für Cloud-Anbieter erforderlich.",
     "save": "Konfiguration speichern",

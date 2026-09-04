@@ -45,6 +45,10 @@ require_once 'version_helper.php';
 
 require_once 'db_connect.php';
 
+// No scheduler: old snapshots (and the attachments only they keep) are
+// expired for this user once a day, from here.
+poznoteExpireAllSnapshotsOccasionally($con);
+
 // Include new modular files
 require_once 'page_init.php';
 require_once 'search_handler.php';
