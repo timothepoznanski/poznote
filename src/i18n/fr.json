@@ -3962,6 +3962,16 @@
     "lost_to_user": "Vous n'avez plus le verrou d'édition sur cette note. {{user}} la modifie maintenant.",
     "public_visitor": "un visiteur du lien de partage public"
   },
+  "live_refresh": {
+    "note_changed": "Cette note a été modifiée en dehors de cet onglet.",
+    "note_changed_unsaved": "Cette note a été modifiée en dehors de cet onglet alors que vous avez des modifications non enregistrées ici.",
+    "note_removed": "Cette note a été supprimée ou mise à la corbeille en dehors de cet onglet.",
+    "reload": "Recharger",
+    "keep_mine": "Garder ma version",
+    "discard_confirm": "Recharger va abandonner les modifications faites ici. Continuer ?",
+    "discard_title": "Abandonner les modifications non enregistrées ?",
+    "note_refreshed": "Actualisée avec les modifications faites en dehors de cet onglet."
+  },
   "dashboard": {
     "title": "Tableau de notes",
     "empty": "Aucune note favorite pour le moment. Ajoutez des notes aux favoris pour les épingler sur ce tableau.",
@@ -4070,6 +4080,7 @@
     "title": "Assistant IA",
     "toolbar_button": "Assistant IA",
     "empty": "Posez une question.\nL'assistant peut chercher, lire, créer, renommer et modifier vos notes.",
+    "empty_open_note": "Dites « cette note » pour parler de celle qui est ouverte.",
     "placeholder": "Demandez à l'assistant...",
     "send": "Envoyer",
     "stop": "Arrêter",

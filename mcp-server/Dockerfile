@@ -55,5 +55,8 @@ EXPOSE $MCP_PORT
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD nc -z 127.0.0.1 ${MCP_PORT} || exit 1
 
-# Run the MCP server
+# Run the MCP server.
+# 0.0.0.0 is required inside the container so the Docker port mapping can reach
+# it; isolation comes from publishing the port on 127.0.0.1 in docker-compose.yml.
+# Set POZNOTE_MCP_AUTH_TOKEN to require a bearer token from MCP clients.
 CMD ["sh", "-c", "poznote-mcp serve --host=0.0.0.0 --port=${MCP_PORT}"]

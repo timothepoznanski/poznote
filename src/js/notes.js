@@ -312,6 +312,15 @@ function saveNoteToServer(options) {
         editor_session_id: editorSessionId
     };
 
+    // Optimistic concurrency: send the server version this tab is in sync
+    // with (tracked by js/live-refresh.js). The API refuses the save with a
+    // 409 if the note changed elsewhere since, instead of overwriting it.
+    var expectedVersion = options.retryVersion
+        || ((typeof window.getLiveNoteContentVersion === 'function') ? window.getLiveNoteContentVersion(noteid) : null);
+    if (expectedVersion) {
+        updates.if_version = expectedVersion;
+    }
+
     // Use RESTful API: PATCH /api/v1/notes/{id}
     fetch("/api/v1/notes/" + noteid, {
         method: "PATCH",
@@ -336,6 +345,9 @@ function saveNoteToServer(options) {
         .then(function (result) {
             var data = result.data || {};
             if (result.ok && data.success) {
+                if (data.note && data.note.version && typeof window.setLiveNoteContentVersion === 'function') {
+                    window.setLiveNoteContentVersion(noteid, data.note.version);
+                }
                 var responseTitle = (data.note && data.note.heading) ? data.note.heading : headi;
                 handleSaveResponse(JSON.stringify({ date: new Date().toLocaleDateString(), title: responseTitle, original_title: headi }));
 
@@ -378,6 +390,26 @@ function saveNoteToServer(options) {
                     window.refreshKanbanView();
                 }
             } else {
+                if (data.code === 'version_conflict') {
+                    var currentVersion = (data.current && data.current.version) || null;
+                    // Our own write through another path (task toggle, kanban
+                    // move...) just bumped the version and the poller has not
+                    // caught up yet: retry once with the version it reports.
+                    if (!options.retriedVersion && currentVersion
+                        && typeof window.liveRefreshShouldRetryVersionConflict === 'function'
+                        && window.liveRefreshShouldRetryVersionConflict(noteid)) {
+                        saveNoteToServer({ retriedVersion: true, retryVersion: currentVersion });
+                        return;
+                    }
+                    // Real conflict: keep the local edits unsaved and let the
+                    // user decide from the banner (reload, or keep this tab's
+                    // version and overwrite).
+                    if (typeof window.handleNoteVersionConflict === 'function') {
+                        window.handleNoteVersionConflict(noteid, currentVersion);
+                        return;
+                    }
+                }
+
                 if (!options.retriedEditLock && _canRecoverOwnEditLock(data.lock)) {
                     _recoverOwnEditLock(noteid, editorSessionId).then(function (recovered) {
                         if (recovered) {

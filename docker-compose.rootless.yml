@@ -52,6 +52,7 @@ services:
       POZNOTE_API_URL: http://webserver:8080/api/v1
       POZNOTE_DEBUG: ${POZNOTE_DEBUG:-false}
       POZNOTE_USER_ID: ${POZNOTE_USER_ID:-1}
+      POZNOTE_MCP_AUTH_TOKEN: ${POZNOTE_MCP_AUTH_TOKEN:-}
     ports:
       - "127.0.0.1:${POZNOTE_MCP_PORT:-8045}:8045"
     volumes:

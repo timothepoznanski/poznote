@@ -3860,6 +3860,16 @@
     "lost_to_user": "您已不再持有这条笔记的编辑锁。现在 {{user}} 正在编辑它。",
     "public_visitor": "公开分享链接的访客"
   },
+  "live_refresh": {
+    "note_changed": "此笔记已在本标签页之外被修改。",
+    "note_changed_unsaved": "此笔记已在本标签页之外被修改，而这里还有未保存的更改。",
+    "note_removed": "此笔记已在本标签页之外被删除或移入回收站。",
+    "reload": "重新加载",
+    "keep_mine": "保留我的版本",
+    "discard_confirm": "重新加载将丢弃你在这里所做的更改。是否继续？",
+    "discard_title": "放弃未保存的更改？",
+    "note_refreshed": "已更新为本标签页之外所做的更改。"
+  },
   "dashboard": {
     "title": "笔记看板",
     "empty": "还没有收藏的笔记。将笔记标记为收藏即可固定到此便签板。",
@@ -3968,6 +3978,7 @@
     "title": "AI 助手",
     "toolbar_button": "AI 助手",
     "empty": "提出问题。\n助手可以搜索、阅读、创建、重命名和编辑你的笔记。",
+    "empty_open_note": "说“这条笔记”即可指当前打开的笔记。",
     "placeholder": "向助手提问...",
     "send": "发送",
     "stop": "停止",

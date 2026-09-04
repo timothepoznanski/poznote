@@ -3739,6 +3739,16 @@
     "lost_to_user": "Sie haben die Bearbeitungssperre für diese Notiz nicht mehr. {{user}} bearbeitet sie jetzt.",
     "public_visitor": "ein Besucher über den öffentlichen Freigabelink"
   },
+  "live_refresh": {
+    "note_changed": "Diese Notiz wurde außerhalb dieses Tabs geändert.",
+    "note_changed_unsaved": "Diese Notiz wurde außerhalb dieses Tabs geändert, während hier nicht gespeicherte Änderungen vorliegen.",
+    "note_removed": "Diese Notiz wurde außerhalb dieses Tabs gelöscht oder in den Papierkorb verschoben.",
+    "reload": "Neu laden",
+    "keep_mine": "Meine Version behalten",
+    "discard_confirm": "Beim Neuladen gehen die hier vorgenommenen Änderungen verloren. Fortfahren?",
+    "discard_title": "Nicht gespeicherte Änderungen verwerfen?",
+    "note_refreshed": "Mit den außerhalb dieses Tabs vorgenommenen Änderungen aktualisiert."
+  },
   "dashboard": {
     "title": "Notiz-Board",
     "empty": "Noch keine favorisierten Notizen. Markieren Sie Notizen als Favoriten, um sie an dieses Board zu heften.",
@@ -3847,6 +3857,7 @@
     "title": "KI-Assistent",
     "toolbar_button": "KI-Assistent",
     "empty": "Stellen Sie eine Frage.\nDer Assistent kann Ihre Notizen durchsuchen, lesen, erstellen, umbenennen und bearbeiten.",
+    "empty_open_note": "Sagen Sie „diese Notiz“, wenn Sie die gerade geöffnete meinen.",
     "placeholder": "Fragen Sie den Assistenten...",
     "send": "Senden",
     "stop": "Stoppen",

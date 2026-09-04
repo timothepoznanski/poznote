@@ -2,8 +2,10 @@
  * AI Chat Panel
  *
  * Chat with the configured OpenAI-compatible AI server (see ai_settings.php)
- * about the currently opened note. The backend (api_ai_chat.php) proxies the
- * conversation and streams the answer back as Server-Sent Events.
+ * about the notes of the current workspace. The id of the note open in the
+ * editor travels with every message so the user can say "this note" without
+ * naming it. The backend (api_ai_chat.php) proxies the conversation and
+ * streams the answer back as Server-Sent Events.
  */
 (function () {
     'use strict';
@@ -25,6 +27,16 @@
         if (typeof window.getSelectedWorkspace === 'function') ws = window.getSelectedWorkspace() || '';
         if (!ws && document.body && document.body.dataset) ws = document.body.dataset.workspace || '';
         return ws;
+    }
+
+    /**
+     * Note open in the editor, resolved at send time so it follows the user
+     * from note to note within one conversation. window.noteid is -1 (or
+     * absent) when the right column shows no note.
+     */
+    function currentNoteId() {
+        var id = parseInt(window.noteid, 10);
+        return id > 0 ? id : 0;
     }
 
     /** One stored conversation per workspace, so switching back restores it. */
@@ -260,6 +272,9 @@
             b.classList.toggle('ai-chat-active', open);
         });
         if (open) {
+            // The empty hint mentions the open note, which changed since the
+            // panel was last rendered: redraw it while the chat is still empty.
+            if (!conversation.length) resetMessages();
             var input = document.getElementById('ai-chat-input');
             if (input && window.matchMedia('(min-width: 801px)').matches) input.focus();
         }
@@ -271,7 +286,11 @@
         el.innerHTML = '';
         var hint = document.createElement('div');
         hint.className = 'ai-chat-empty';
-        hint.textContent = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, rename and edit your notes.');
+        var text = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, rename and edit your notes.');
+        if (currentNoteId()) {
+            text += '\n' + t('ai_chat.empty_open_note', {}, 'Say "this note" for the one you have open.');
+        }
+        hint.textContent = text;
         el.appendChild(hint);
     }
 
@@ -316,6 +335,10 @@
         var workspace = currentWorkspace();
         if (workspace) {
             body.workspace = workspace;
+        }
+        var openNoteId = currentNoteId();
+        if (openNoteId) {
+            body.note_id = openNoteId;
         }
 
         var bubble = appendBubble('ai-chat-msg-assistant ai-chat-pending', '');
@@ -404,6 +427,11 @@
             bubble.classList.remove('ai-chat-pending');
             setStreaming(false);
             abortController = null;
+            // Tool calls may have edited notes or folders: let the live
+            // refresh poller (js/live-refresh.js) pick them up right away.
+            try {
+                document.dispatchEvent(new CustomEvent('poznoteExternalChangeHint'));
+            } catch (e) { /* ignore */ }
             if (!failed) {
                 if (answer) {
                     renderAssistantBubble(bubble, answer);

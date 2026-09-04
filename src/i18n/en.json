@@ -3457,6 +3457,16 @@
     "lost_to_user": "You no longer hold the edit lock for this note. {{user}} is now editing it.",
     "public_visitor": "a visitor on the public share link"
   },
+  "live_refresh": {
+    "note_changed": "This note was modified outside this tab.",
+    "note_changed_unsaved": "This note was modified outside this tab while you have unsaved changes here.",
+    "note_removed": "This note was deleted or moved to trash outside this tab.",
+    "reload": "Reload",
+    "keep_mine": "Keep my version",
+    "discard_confirm": "Reloading will discard the changes you made here. Continue?",
+    "discard_title": "Discard unsaved changes?",
+    "note_refreshed": "Refreshed with changes made outside this tab."
+  },
   "dashboard": {
     "title": "Notes board",
     "empty": "No favorite notes yet. Mark notes as favorites to pin them to this board.",
@@ -3577,6 +3587,7 @@
     "title": "AI Assistant",
     "toolbar_button": "AI assistant",
     "empty": "Ask a question.\nThe assistant can search, read, create, rename and edit your notes.",
+    "empty_open_note": "Say \"this note\" for the one you have open.",
     "placeholder": "Ask the assistant...",
     "send": "Send",
     "stop": "Stop",

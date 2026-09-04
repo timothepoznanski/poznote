@@ -299,6 +299,139 @@ class NotesController {
         ]);
     }
 
+    /**
+     * GET /api/v1/changes?workspace=<name>&note_ids=1,2,3
+     *
+     * Cheap change-detection probe polled by the web UI (js/live-refresh.js)
+     * so a tab can notice edits made elsewhere: the built-in AI chat, the MCP
+     * server, another tab or another user. Returns an opaque token for the
+     * sidebar tree of the workspace (folders, note rows, workspace list) and
+     * one per requested note (content, title, tags, folder, attachments...).
+     * Each note also carries "content_version", the same token show() and
+     * update() return, which the autosave sends back as "if_version".
+     * Tokens only need to change when the underlying data changes; callers
+     * compare them against the values from their previous poll.
+     */
+    public function changes(): void {
+        // A public share link is read-only and must not become a probe for
+        // notes outside the workspace it exposes (or older than its age
+        // filter), so the workspace is forced and the lookup is scoped.
+        $publicAccess = function_exists('isPublicWorkspaceAccessActive') && isPublicWorkspaceAccessActive();
+        if ($publicAccess) {
+            $workspace = (string) (function_exists('getPublicWorkspaceName') ? getPublicWorkspaceName() : '');
+        } else {
+            $workspace = trim((string)($_GET['workspace'] ?? ''));
+        }
+        if ($workspace === '') {
+            $workspace = 'Poznote';
+        }
+
+        $noteIds = [];
+        foreach (explode(',', (string)($_GET['note_ids'] ?? '')) as $rawId) {
+            $rawId = trim($rawId);
+            if ($rawId !== '' && ctype_digit($rawId)) {
+                $noteIds[(int)$rawId] = true;
+            }
+        }
+        $noteIds = array_slice(array_keys($noteIds), 0, 20);
+
+        $notes = [];
+        if (!empty($noteIds)) {
+            $placeholders = implode(',', array_fill(0, count($noteIds), '?'));
+            $sql = "SELECT id, heading, entry, updated, type, trash, tags, folder_id, workspace, attachments, "
+                . "icon, icon_color, color, favorite, pinned, content_width, reminder_at, linked_note_id "
+                . "FROM entries WHERE id IN ($placeholders)";
+            $params = $noteIds;
+            if ($publicAccess) {
+                $sql .= " AND workspace = ?";
+                $params[] = $workspace;
+                $this->appendPublicWorkspaceAgeFilter($sql, $params);
+            }
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute($params);
+            $found = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $noteId = (int)$row['id'];
+                $noteType = $row['type'] ?? 'note';
+                $content = $this->loadNoteContentForVersion($noteId, $noteType, $row['entry'] ?? null);
+                $contentVersion = $this->computeNoteVersion((string)($row['updated'] ?? ''), (string)($row['heading'] ?? ''), $content);
+                $meta = implode("\x1f", [
+                    $noteType,
+                    (string)($row['tags'] ?? ''),
+                    (string)($row['folder_id'] ?? ''),
+                    (string)($row['workspace'] ?? ''),
+                    (string)($row['attachments'] ?? ''),
+                    (string)($row['icon'] ?? ''),
+                    (string)($row['icon_color'] ?? ''),
+                    (string)($row['color'] ?? ''),
+                    (string)($row['favorite'] ?? '0'),
+                    (string)($row['pinned'] ?? '0'),
+                    (string)($row['content_width'] ?? ''),
+                    (string)($row['reminder_at'] ?? ''),
+                    (string)($row['linked_note_id'] ?? ''),
+                    (string)($row['trash'] ?? '0'),
+                ]);
+                $found[$noteId] = [
+                    'version' => md5($contentVersion . '|' . md5($meta)),
+                    // Same token as show()/update(): usable as "if_version"
+                    'content_version' => $contentVersion,
+                    'exists' => true,
+                    'trash' => (int)($row['trash'] ?? 0) === 1,
+                ];
+            }
+            foreach ($noteIds as $noteId) {
+                $notes[(string)$noteId] = $found[$noteId] ?? ['version' => 'missing', 'content_version' => null, 'exists' => false, 'trash' => false];
+            }
+        }
+
+        $this->sendSuccess([
+            'workspace' => $workspace,
+            'tree_version' => $this->computeTreeVersion($workspace),
+            'notes' => (object)$notes,
+        ]);
+    }
+
+    /**
+     * Hash of everything the sidebar renders for a workspace: the workspace
+     * list, the folder rows and the note rows (without note content). "updated"
+     * is part of it because the note list can be sorted by it.
+     */
+    private function computeTreeVersion(string $workspace): string {
+        $hash = hash_init('md5');
+        $feed = function (array $row) use ($hash): void {
+            hash_update($hash, implode("\x1f", array_map('strval', $row)) . "\x1e");
+        };
+
+        $stmt = $this->con->query("SELECT name FROM workspaces ORDER BY name");
+        foreach ($stmt->fetchAll(PDO::FETCH_NUM) as $row) {
+            $feed($row);
+        }
+
+        $stmt = $this->con->prepare(
+            "SELECT id, name, parent_id, display_order, pinned, favorite, icon, icon_color, color, kanban_enabled, sort_setting, is_diary "
+            . "FROM folders WHERE workspace = ? ORDER BY id"
+        );
+        $stmt->execute([$workspace]);
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $feed($row);
+        }
+
+        $stmt = $this->con->prepare(
+            "SELECT id, heading, folder_id, trash, favorite, pinned, display_order, icon, icon_color, color, type, "
+            . "linked_note_id, reminder_at, tags, updated "
+            . "FROM entries WHERE workspace = ? ORDER BY id"
+        );
+        $stmt->execute([$workspace]);
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $feed($row);
+        }
+
+        $sharedCount = $this->con->query("SELECT COUNT(*) FROM shared_notes")->fetchColumn();
+        $feed(['shared', $sharedCount]);
+
+        return hash_final($hash);
+    }
+
     public function heartbeatLock(string $id): void {
         if (!is_numeric($id)) {
             $this->sendError(400, 'Invalid note ID');

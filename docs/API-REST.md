@@ -12,6 +12,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [Interactive Documentation (Swagger)](#interactive-documentation-swagger)
 - [Notes](#notes)
 - [Note Locks](#note-locks)
+- [Change Detection](#change-detection)
 - [Snapshots](#snapshots)
 - [Tasks](#tasks)
 - [Reminders](#reminders)
@@ -758,6 +759,42 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 ```
 
 ---
+
+## Change Detection
+
+The web UI polls this endpoint to notice changes made outside the current tab (AI chat, MCP server, REST API, another tab or user) and refresh the sidebar or the open note in place. It returns opaque tokens that only change when the underlying data changes; compare them with the values from a previous call.
+
+```
+GET /changes?workspace={name}&note_ids={id,id,...}
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `workspace` | string | No | Workspace whose sidebar tree is hashed (default: `Poznote`) |
+| `note_ids` | string | No | Comma-separated note IDs to get a version token for (max 20) |
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "https://your-poznote-instance.com/api/v1/changes?workspace=Poznote&note_ids=42,57"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "workspace": "Poznote",
+  "tree_version": "3ee64a2b6a43cbfb8815cc864d2ae957",
+  "notes": {
+    "42": { "version": "8b03f2cfdfd041732b3534f0cddbb3e2", "content_version": "2a8d3b8d4e8ad894cb2872ef143824ee", "exists": true, "trash": false },
+    "57": { "version": "missing", "content_version": null, "exists": false, "trash": false }
+  }
+}
+```
+
+`tree_version` covers the workspace list, the folders and the note rows of the workspace (titles, folder, icons, order, tags, update time, trash state...). A note `version` covers its title, content, tags, folder, attachments and display attributes. `content_version` is the same token `GET /notes/{id}` and `PATCH /notes/{id}` return, so it can be sent back as `if_version` (see [Update Note](#update-note)); the web UI autosave does exactly that, so a save never silently overwrites an edit made elsewhere.
 
 ## Snapshots
 

@@ -44,6 +44,26 @@ If the file doesn't exist, create it with the following configuration :
 
 > **Note:** Replace `8045` with your actual MCP server port if you've customized it in your `docker-compose.yml`.
 
+#### Using an authentication token
+
+If the MCP server was started with `POZNOTE_MCP_AUTH_TOKEN` (see [Inbound authentication token](MCP-SERVER.md#inbound-authentication-token)), add the matching header, otherwise every call is rejected with `401 Unauthorized`:
+
+```json
+{
+  "servers": {
+    "poznote": {
+      "type": "http",
+      "url": "http://127.0.0.1:8045/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_TOKEN"
+      }
+    }
+  }
+}
+```
+
+To keep the token out of `mcp.json`, VS Code can prompt for it instead: declare an `inputs` entry with `"password": true` and reference it as `"Authorization": "Bearer ${input:poznote-token}"`.
+
 ### 3. Reload VS Code
 
 After updating `mcp.json`, reload VS Code for the changes to take effect:
@@ -417,7 +437,7 @@ If your MCP server runs on a different port, update the URL in `mcp.json`:
 
 ## Security Notes
 
-⚠️ **Important:** The MCP server does not implement authentication for incoming requests. It should only be accessible from 127.0.0.1 or through a secure tunnel.
+⚠️ **Important:** Anyone who can reach the MCP endpoint can manage every note. By default it is only reachable from 127.0.0.1; if you expose it further, set `POZNOTE_MCP_AUTH_TOKEN` so clients must present a bearer token (see [Using an authentication token](#using-an-authentication-token)).
 
 **Default configuration (secure):**
 ```yaml
@@ -426,6 +446,8 @@ ports:
 ```
 
 **For remote access, always use SSH tunneling** as described in the [Remote Server Setup](#remote-server-setup) section.
+
+Full details: [MCP Server Security](MCP-SERVER.md#security).
 
 ## Resources
 
