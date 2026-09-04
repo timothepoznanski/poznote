@@ -82,7 +82,7 @@
     "menu_item": "Instantâneos",
     "modal": {
       "title": "Instantâneos",
-      "description": "Apenas o conteúdo de texto da nota é guardado (não os anexos nem as imagens). Se um anexo ou imagem foi eliminado, não poderá ser recuperado a partir de um instantâneo.\nCriados automaticamente na primeira abertura de cada dia. \"Criar instantâneo agora\" adiciona um extra sem substituir os de hoje. Máx. 7.",
+      "description": "Criados automaticamente na primeira abertura de cada dia, os últimos {{count}} são guardados. \"Criar instantâneo agora\" adiciona um instantâneo manual. Todos os instantâneos expiram ao fim de {{days}} dias.",
       "loading": "Carregando instantâneo...",
       "history": "Histórico",
       "markdown_preview": "Pré-visualização",
@@ -95,23 +95,29 @@
       "empty_content": "(Conteúdo vazio)",
       "take_now": "Criar instantâneo agora",
       "copy_content": "Copiar conteúdo",
-      "restore_state": "Voltar para este estado"
+      "restore_state": "Voltar para este estado",
+      "delete": "Eliminar este instantâneo",
+      "keep_count_link_title": "Alterar quantos instantâneos automáticos são guardados"
     },
     "messages": {
       "content_copied": "Conteúdo copiado",
-      "created_now": "Instantâneo adicionado"
+      "created_now": "Instantâneo adicionado",
+      "deleted": "Instantâneo eliminado"
     },
     "errors": {
       "restore_failed": "Não foi possível restaurar o instantâneo",
       "create_failed": "Não foi possível criar o instantâneo",
-      "copy_failed": "Não foi possível copiar"
+      "copy_failed": "Não foi possível copiar",
+      "delete_failed": "Falha ao eliminar o instantâneo"
     },
     "confirm": {
       "title": "Confirmação",
       "restore_message": "Restaurar a nota para o estado do instantâneo? As alterações atuais serão perdidas.",
       "restore_button": "Voltar para este estado",
       "take_now_message": "Criar um instantâneo adicional com o conteúdo atual da nota? Os instantâneos que já existem hoje serão mantidos.",
-      "take_now_button": "Criar instantâneo agora"
+      "take_now_button": "Criar instantâneo agora",
+      "delete_message": "Eliminar este instantâneo?",
+      "delete_button": "Eliminar este instantâneo"
     },
     "api": {
       "invalid_note_id": "ID da nota inválido",
@@ -127,7 +133,10 @@
       "invalid_entries_path": "Caminho das notas inválido",
       "restore_note_file_failed": "Não foi possível restaurar o arquivo da nota",
       "restore_success": "A nota foi restaurada para o estado do instantâneo",
-      "restore_failed": "Não foi possível restaurar o instantâneo"
+      "restore_failed": "Não foi possível restaurar o instantâneo",
+      "not_found": "Instantâneo não encontrado",
+      "delete_failed": "Falha ao eliminar o instantâneo",
+      "deleted": "Instantâneo eliminado"
     }
   },
   "kanban": {
@@ -471,7 +480,8 @@
       "support": "Apoie o desenvolvimento do Poznote com uma doação.",
       "s3_storage": "Armazenar os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",
       "s3_backup": "Envia arquivos de backup completos para um bucket compatível com S3, manualmente ou conforme um agendamento.",
-      "highlight_current_folder_tree": "Esbater as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar."
+      "highlight_current_folder_tree": "Esbater as notas e pastas que estão fora da hierarquia de pastas em que está a trabalhar.",
+      "snapshots": "Escolher quantos instantâneos automáticos diários são guardados por nota."
     },
     "title": "Configurações",
     "collapse_section": "Recolher a seção",
@@ -716,7 +726,8 @@
       "note_color_palette": "Cores das notas",
       "slash_menu_require_alt": "Atalho do menu de comandos",
       "note_nav_shortcuts": "Alternar notas com Alt + ↑/↓",
-      "ctrl_s_save": "Salvar nota com Ctrl + S"
+      "ctrl_s_save": "Salvar nota com Ctrl + S",
+      "snapshots": "Instantâneos"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -1560,6 +1571,16 @@
     "note": {
       "rename_title": "Renomear Nota",
       "rename_placeholder": "Novo título da nota"
+    },
+    "snapshots": {
+      "title": "Instantâneos",
+      "description": "Número de instantâneos automáticos guardados por nota (um é criado por dia na primeira abertura da nota). Os instantâneos manuais criados com \"Criar instantâneo agora\" não contam. Todos os instantâneos expiram ao fim de {{days}} dias:",
+      "options": {
+        "unit": "instantâneos automáticos"
+      },
+      "badge": "{{count}} automáticos por nota",
+      "warning_title": "Guardar mais instantâneos pode usar muito armazenamento.",
+      "warning": "Os anexos e as imagens são mantidos no disco mesmo depois de removidos de uma nota, enquanto um dos seus instantâneos ainda os contiver. Só são libertados quando o último instantâneo que os contém expira (no máximo ao fim de {{days}} dias) ou quando a nota é eliminada definitivamente."
     }
   },
   "notes_list": {
@@ -3781,6 +3802,8 @@
     "url_label": "URL do servidor",
     "url_description": "URL base de uma API compatível com OpenAI. Para o Ollama no host Docker, use http://host.docker.internal:11434",
     "model_label": "Modelo",
+    "model_empty_hint": "Clique em \"{{button}}\" acima e depois selecione um.",
+    "model_none_found": "Este servidor não retornou nenhum modelo.",
     "api_key_label": "Chave de API (opcional)",
     "api_key_description": "Deixe vazio para um servidor Ollama local. Necessária para provedores na nuvem.",
     "save": "Salvar configuração",

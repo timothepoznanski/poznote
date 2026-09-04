@@ -141,20 +141,9 @@ if ($_POST) {
             $attachmentsPath = getAttachmentsPath();
             $entriesPath = getEntriesPath();
 
-            // Delete physical attachment files referenced in entries
+            // Delete attachment files and snapshots of every note
         foreach ($entries as $entry) {
-                // attachments stored as JSON array in `attachments` column
-                if (!empty($entry['attachments'])) {
-                    $attList = json_decode($entry['attachments'], true);
-                    if (is_array($attList)) {
-                        foreach ($attList as $att) {
-                            if (is_array($att) && !empty($att['filename'])) {
-                                // Local disk or S3 bucket
-                                poznoteDeleteAttachmentFile($att['filename']);
-                            }
-                        }
-                    }
-                }
+                deleteNoteFilesForGood((int) ($entry['id'] ?? 0), $entry['attachments'] ?? '');
 
                 // Delete entry files if present (entries can be .html or .md based on type)
             if (!empty($entry['id'])) {

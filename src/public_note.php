@@ -724,7 +724,7 @@ $attachmentsData = !empty($note['attachments']) ? json_decode($note['attachments
 
 if (is_array($attachmentsData)) {
     foreach ($attachmentsData as $attachment) {
-        if (!is_array($attachment) || empty($attachment['id'])) {
+        if (!is_array($attachment) || empty($attachment['id']) || poznoteAttachmentIsSnapshotOnly($attachment)) {
             continue;
         }
         if (publicNoteAttachmentIsInline($attachment, $contentForAttachmentDetection)) {

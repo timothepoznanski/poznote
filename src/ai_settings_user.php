@@ -109,24 +109,6 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
     <link rel="stylesheet" href="css/icon-sidebar-page.css?v=<?php echo $cache_v; ?>">
     <link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <style>
-    /* Clickable model suggestions under the connection-test result (the
-       native datalist is filtered by the input's current value, so it can
-       look empty when a model is already typed) */
-    #ai-test-result { flex-wrap: wrap; }
-    .ai-model-suggestions { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .ai-model-suggestion {
-        border: 1px solid #b6d4ea; background: #ffffff; color: #1a56db;
-        border-radius: 12px; padding: 3px 10px; font-size: 0.85rem; cursor: pointer;
-    }
-    .ai-model-suggestion:hover { background: #e7f1fb; }
-    html[data-theme='dark'] .ai-model-suggestion,
-    body.dark-mode .ai-model-suggestion {
-        background: transparent; border-color: #3d5a75; color: #7fb3e3;
-    }
-    html[data-theme='dark'] .ai-model-suggestion:hover,
-    body.dark-mode .ai-model-suggestion:hover { background: rgba(127, 179, 227, 0.12); }
-    </style>
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include 'icon_sidebar.php'; ?>
@@ -221,10 +203,12 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
 
                     <div class="git-field-group">
                         <label class="git-field-label" for="ai_model"><?php echo t_h('ai_settings.model_label', [], 'Model'); ?></label>
-                        <input type="text" name="ai_model" id="ai_model" class="git-field-input" list="ai-model-list"
-                               value="<?php echo htmlspecialchars($aiConfig['model']); ?>"
-                               placeholder="llama3.1" autocomplete="off">
-                        <datalist id="ai-model-list"></datalist>
+                        <select name="ai_model" id="ai_model" class="git-field-input" <?php echo $aiConfig['model'] === '' ? 'hidden' : ''; ?>>
+                            <?php if ($aiConfig['model'] !== ''): ?>
+                            <option value="<?php echo htmlspecialchars($aiConfig['model']); ?>" selected><?php echo htmlspecialchars($aiConfig['model']); ?></option>
+                            <?php endif; ?>
+                        </select>
+                        <p class="config-hint config-hint-error" id="ai-model-empty-msg" <?php echo $aiConfig['model'] === '' ? '' : 'hidden'; ?>><?php echo t_h('ai_settings.model_empty_hint', ['button' => t('ai_settings.test', [], 'Check access and list models')], 'Click "{{button}}" above, then select one.'); ?></p>
                     </div>
 
                     <div class="git-field-group">
@@ -263,6 +247,8 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
         testing: <?php echo json_encode(t('ai_settings.testing', [], 'Testing connection...')); ?>,
         success: <?php echo json_encode(t('ai_settings.test_success', [], 'Connection successful. {{count}} model(s) available. Click a model below and save.')); ?>,
         failure: <?php echo json_encode(t('ai_settings.test_failure', [], 'Connection failed: {{error}}')); ?>,
+        modelHint: <?php echo json_encode(t('ai_settings.model_empty_hint', ['button' => t('ai_settings.test', [], 'Check access and list models')], 'Click "{{button}}" above, then select one.')); ?>,
+        modelNoneFound: <?php echo json_encode(t('ai_settings.model_none_found', [], 'No models were returned by this server.')); ?>,
         apiKeyOptional: <?php echo json_encode(t('ai_settings.api_key_label', [], 'API key (optional)')); ?>,
         apiKeyRequired: <?php echo json_encode(t('ai_settings.api_key_label_required', [], 'API key')); ?>
     };

@@ -478,10 +478,7 @@ function pruneExportAttachmentLinks($html, $attachments, $addedAttachmentIds) {
  * exportAsHtmlZip() and exportAsMarkdownZip() name the files they add.
  */
 function buildExportAttachmentList($note) {
-    $attachments = (!empty($note['attachments'])) ? json_decode($note['attachments'], true) : [];
-    if (!is_array($attachments)) {
-        return [];
-    }
+    $attachments = poznoteFilterVisibleAttachments($note['attachments'] ?? '');
 
     $list = [];
     foreach ($attachments as $attachment) {
@@ -904,7 +901,7 @@ function exportAsHtmlZip($htmlContent, $note, $con) {
 
     $noteId = $note['id'];
     $title = $note['heading'] ?? 'New note';
-    $attachments = (!empty($note['attachments'])) ? json_decode($note['attachments'], true) : [];
+    $attachments = poznoteFilterVisibleAttachments($note['attachments'] ?? '');
 
     // If no attachments, just export HTML without ZIP
     if (empty($attachments) || !is_array($attachments)) {
@@ -1085,8 +1082,8 @@ function exportAsMarkdown($content, $note, $con) {
 function exportAsMarkdownZip($content, $note, $con) {
     $noteId = $note['id'];
     $title = $note['heading'] ?? 'New note';
-    $attachments = (!empty($note['attachments'])) ? json_decode($note['attachments'], true) : [];
-    
+    $attachments = poznoteFilterVisibleAttachments($note['attachments'] ?? '');
+
     // If no ZipArchive or no attachments, export as simple markdown
     if (!class_exists('ZipArchive') || empty($attachments) || !is_array($attachments)) {
         exportAsMarkdown($content, $note, $con);

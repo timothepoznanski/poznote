@@ -125,10 +125,7 @@ if (!empty($note['attachments']) && $note['attachments'] !== '[]') {
     // Handle both comma-separated format and JSON format
     if (substr($note['attachments'], 0, 1) === '[' && substr($note['attachments'], -1) === ']') {
         // JSON format - decode and count
-        $attachmentsArray = json_decode($note['attachments'], true);
-        if (is_array($attachmentsArray)) {
-            $attachmentsCount = count(array_filter($attachmentsArray));
-        }
+        $attachmentsCount = count(array_filter(poznoteFilterVisibleAttachments($note['attachments'])));
     } else {
         // Comma-separated format
         $attachmentsArray = explode(',', $note['attachments']);

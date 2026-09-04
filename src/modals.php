@@ -942,6 +942,27 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Snapshots settings modal -->
+<div id="snapshotsSettingsModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.snapshots.title', [], 'Snapshots'); ?></h3>
+        <div class="modal-body">
+            <p><?php echo t_h('modals.snapshots.description', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Number of automatic snapshots kept per note (one is taken per day when the note is first opened). Manual snapshots taken with "Take snapshot now" are not counted. Every snapshot expires after {{days}} days:'); ?></p>
+            <div class="radio-options">
+                <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'automatic snapshots'); ?></label>
+            </div>
+            <div class="delete-warning-box">
+                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'More snapshots can use a lot of storage.'); ?></p>
+                <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="snapshotsSettingsModal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveSnapshotsSettingsModalBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Language selection modal -->
 <div id="languageModal" class="modal">
     <div class="modal-content">
@@ -1535,6 +1556,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:settings-recent-section" checked><span><?php echo t_h('settings.categories.recent', [], 'Recent'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:welcome-setup-card" checked><span><?php echo t_h('settings.cards.welcome_setup', [], 'Startup guide'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
@@ -1559,6 +1581,7 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-sort-card" checked><span><?php echo t_h('display.cards.note_sort_order', [], 'Note sorting'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
+                        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:snapshots-card" checked><span><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
                         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
@@ -1644,7 +1667,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-uncheck-all" checked><span><?php echo t_h('tasklist.uncheck_all', [], 'Uncheck all tasks'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-snapshot" checked><span><?php echo t_h('snapshot.menu_item', [], 'Snapshots'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-split-view" checked><span><?php echo t_h('editor.toolbar.split_view', [], 'Toggle split view'); ?></span></label>
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-home"><span><?php echo t_h('icon_names.home', [], 'Home'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-trash" checked><span><?php echo t_h('common.delete', [], 'Delete'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-info" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-note-width" checked><span><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span></label>
@@ -1707,7 +1729,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.workspace_menu', [], 'Workspace Menu'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:goto-workspaces" checked><span><?php echo t_h('workspace_menu.workspaces', [], 'Workspaces'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:edit-workspaces" checked><span><?php echo t_h('workspaces.menu.edit_workspaces', [], 'Edit workspaces'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:new-workspace" checked><span><?php echo t_h('workspaces.menu.new_workspace', [], 'New workspace'); ?></span></label>
                 </div>
                 </div>
 
@@ -1715,7 +1738,6 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                 <div class="ui-custom-section">
                 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon sidebar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
                 <div class="ui-custom-items">
-                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarHomeBtn" checked><span><?php echo t_h('common.home', [], 'Home'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDashboardBtn" checked><span><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarFavoritesBtn" checked><span><?php echo t_h('notes_list.system_folders.favorites', [], 'Favorites'); ?></span></label>
@@ -1862,7 +1884,13 @@ $iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
                 <div class="snapshot-modal-title-row">
                     <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
                 </div>
-                <p class="snapshot-modal-description"><?php echo t_h('snapshot.modal.description', [], "Only the note's text content is saved (not attachments or images). If an attachment or image was deleted, it cannot be recovered from a snapshot.\nCreated automatically on first open each day. \"Take snapshot now\" adds an extra snapshot without replacing today's. Up to 7 kept."); ?></p>
+                <?php
+                // The kept count links to its setting: the number is injected
+                // after escaping so the surrounding translated text stays safe.
+                $snapshotModalDescription = t_h('snapshot.modal.description', ['count' => '%%COUNT%%', 'days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" adds a manual snapshot. Every snapshot expires after {{days}} days.");
+                $snapshotKeepCountLink = '<a href="settings.php?open=snapshots#snapshots-card" class="snapshot-keep-count-link" onclick="return openSnapshotsKeepCountSettings(event)" title="' . t_h('snapshot.modal.keep_count_link_title', [], 'Change how many automatic snapshots are kept') . '">' . getSnapshotsKeepCount() . '</a>';
+                ?>
+                <p class="snapshot-modal-description"><?php echo str_replace('%%COUNT%%', $snapshotKeepCountLink, $snapshotModalDescription); ?></p>
             </div>
         </div>
 
@@ -1904,9 +1932,10 @@ $iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
                     </div>
                     <div class="modal-buttons snapshot-modal-actions">
                         <button type="button" id="snapshotMarkdownPreviewToggle" class="btn-cancel snapshot-markdown-preview-btn" onclick="toggleSnapshotMarkdownPreview()" hidden data-preview-label="<?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?>" data-source-label="<?php echo t_h('snapshot.modal.markdown_source', [], 'Source view'); ?>"><?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?></button>
-                        <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><i class="lucide lucide-x"></i><span><?php echo t_h('common.close'); ?></span></button>
+                        <button type="button" class="btn-danger snapshot-delete-btn" onclick="deleteSnapshot()"><i class="lucide lucide-trash-2"></i><span><?php echo t_h('snapshot.modal.delete', [], 'Delete this snapshot'); ?></span></button>
                         <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><i class="lucide lucide-camera"></i><span><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></span></button>
                         <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><i class="lucide lucide-rotate-ccw"></i><span><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></span></button>
+                        <button type="button" class="btn-danger" onclick="closeSnapshotModal()"><i class="lucide lucide-x"></i><span><?php echo t_h('common.close'); ?></span></button>
                     </div>
                 </div>
             </div>

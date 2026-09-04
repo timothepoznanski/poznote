@@ -86,7 +86,7 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Seul le contenu texte de la note est sauvegardé (pas les pièces jointes ni les images). Si une pièce jointe ou une image a été supprimée, elle ne pourra pas être récupérée via un snapshot.\nCréés automatiquement à la première ouverture chaque jour. « Prendre un snapshot maintenant » ajoute un snapshot sans remplacer ceux du jour. 7 maximum.",
+      "description": "Créés automatiquement à la première ouverture chaque jour, les {{count}} derniers sont conservés. « Prendre un snapshot maintenant » ajoute un snapshot manuel. Tout snapshot expire au bout de {{days}} jours.",
       "loading": "Chargement du snapshot...",
       "history": "Historique",
       "markdown_preview": "Aperçu",
@@ -99,23 +99,29 @@
       "empty_content": "(Contenu vide)",
       "take_now": "Prendre un snapshot maintenant",
       "copy_content": "Copier le contenu",
-      "restore_state": "Revenir à cet état"
+      "restore_state": "Revenir à cet état",
+      "delete": "Supprimer ce snapshot",
+      "keep_count_link_title": "Modifier le nombre de snapshots automatiques conservés"
     },
     "messages": {
       "content_copied": "Contenu copié",
-      "created_now": "Snapshot ajouté"
+      "created_now": "Snapshot ajouté",
+      "deleted": "Snapshot supprimé"
     },
     "errors": {
       "restore_failed": "Échec de la restauration du snapshot",
       "create_failed": "Impossible de prendre le snapshot",
-      "copy_failed": "Copie impossible"
+      "copy_failed": "Copie impossible",
+      "delete_failed": "Échec de la suppression du snapshot"
     },
     "confirm": {
       "title": "Confirmation",
       "restore_message": "Restaurer la note à l'état du snapshot ? Les modifications actuelles seront perdues.",
       "restore_button": "Revenir à cet état",
       "take_now_message": "Créer un snapshot supplémentaire avec le contenu actuel de la note ? Les snapshots déjà pris aujourd'hui seront conservés.",
-      "take_now_button": "Prendre un snapshot maintenant"
+      "take_now_button": "Prendre un snapshot maintenant",
+      "delete_message": "Supprimer ce snapshot ?",
+      "delete_button": "Supprimer ce snapshot"
     },
     "api": {
       "invalid_note_id": "ID de note invalide",
@@ -131,7 +137,10 @@
       "invalid_entries_path": "Chemin des notes invalide",
       "restore_note_file_failed": "Impossible de restaurer le fichier de la note",
       "restore_success": "La note a été restaurée à l'état du snapshot",
-      "restore_failed": "Impossible de restaurer le snapshot"
+      "restore_failed": "Impossible de restaurer le snapshot",
+      "not_found": "Snapshot introuvable",
+      "delete_failed": "Échec de la suppression du snapshot",
+      "deleted": "Snapshot supprimé"
     }
   },
   "kanban": {
@@ -484,7 +493,8 @@
       "support": "Soutenez le développement de Poznote par un don.",
       "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification.",
-      "highlight_current_folder_tree": "Estomper les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez."
+      "highlight_current_folder_tree": "Estomper les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
+      "snapshots": "Choisir combien de snapshots automatiques quotidiens sont conservés par note."
     },
     "title": "Paramètres",
     "collapse_section": "Réduire la section",
@@ -732,7 +742,8 @@
       "spellcheck_html_notes": "Vérification orthographique",
       "slash_menu_require_alt": "Raccourci du menu de commandes",
       "note_nav_shortcuts": "Changer de note avec Alt + ↑/↓",
-      "ctrl_s_save": "Enregistrer la note avec Ctrl + S"
+      "ctrl_s_save": "Enregistrer la note avec Ctrl + S",
+      "snapshots": "Snapshots"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -1593,6 +1604,16 @@
     "note": {
       "rename_title": "Renommer la note",
       "rename_placeholder": "Nouveau titre de la note"
+    },
+    "snapshots": {
+      "title": "Snapshots",
+      "description": "Nombre de snapshots automatiques conservés par note (un est pris chaque jour à la première ouverture de la note). Les snapshots manuels pris avec « Prendre un snapshot maintenant » ne sont pas comptés. Tout snapshot expire au bout de {{days}} jours :",
+      "options": {
+        "unit": "snapshots automatiques"
+      },
+      "badge": "{{count}} automatiques par note",
+      "warning_title": "Conserver plus de snapshots peut utiliser beaucoup de stockage.",
+      "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'un de ses snapshots les contient encore. Elles ne sont libérées que lorsque le dernier snapshot qui les contient expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
     }
   },
   "notes_list": {
@@ -4001,6 +4022,8 @@
     "url_label": "URL du serveur",
     "url_description": "URL de base d'une API compatible OpenAI. Pour Ollama sur l'hôte Docker, utilisez http://host.docker.internal:11434",
     "model_label": "Modèle",
+    "model_empty_hint": "Cliquez sur « {{button}} » ci-dessus, puis sélectionnez-en un.",
+    "model_none_found": "Ce serveur n'a retourné aucun modèle.",
     "api_key_label": "Clé API (optionnelle)",
     "api_key_description": "Laissez vide pour un serveur Ollama local. Requise pour les fournisseurs cloud.",
     "save": "Enregistrer la configuration",

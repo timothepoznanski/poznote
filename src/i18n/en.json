@@ -63,7 +63,7 @@
     "menu_item": "Snapshots",
     "modal": {
       "title": "Snapshots",
-      "description": "Only the note's text content is saved (not attachments or images). If an attachment or image was deleted, it cannot be recovered from a snapshot.\nCreated automatically on first open each day. \"Take snapshot now\" adds an extra snapshot without replacing today's. Up to 7 kept.",
+      "description": "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" adds a manual snapshot. Every snapshot expires after {{days}} days.",
       "loading": "Loading snapshot...",
       "history": "History",
       "markdown_preview": "Preview",
@@ -76,23 +76,29 @@
       "empty_content": "(Empty content)",
       "take_now": "Take snapshot now",
       "copy_content": "Copy content",
-      "restore_state": "Restore this state"
+      "restore_state": "Restore this state",
+      "delete": "Delete this snapshot",
+      "keep_count_link_title": "Change how many automatic snapshots are kept"
     },
     "messages": {
       "content_copied": "Content copied",
-      "created_now": "Snapshot added"
+      "created_now": "Snapshot added",
+      "deleted": "Snapshot deleted"
     },
     "errors": {
       "restore_failed": "Failed to restore snapshot",
       "create_failed": "Failed to take snapshot",
-      "copy_failed": "Copy failed"
+      "copy_failed": "Copy failed",
+      "delete_failed": "Failed to delete snapshot"
     },
     "confirm": {
       "title": "Confirmation",
       "restore_message": "Restore the note to the snapshot state? Current changes will be lost.",
       "restore_button": "Restore this state",
       "take_now_message": "Create an additional snapshot with the current note content? Existing snapshots for today will be kept.",
-      "take_now_button": "Take snapshot now"
+      "take_now_button": "Take snapshot now",
+      "delete_message": "Delete this snapshot?",
+      "delete_button": "Delete this snapshot"
     },
     "api": {
       "invalid_note_id": "Invalid note ID",
@@ -108,7 +114,10 @@
       "invalid_entries_path": "Invalid entries path",
       "restore_note_file_failed": "Failed to restore note file",
       "restore_success": "Note restored to snapshot state",
-      "restore_failed": "Failed to restore snapshot"
+      "restore_failed": "Failed to restore snapshot",
+      "not_found": "Snapshot not found",
+      "delete_failed": "Failed to delete snapshot",
+      "deleted": "Snapshot deleted"
     }
   },
   "settings": {
@@ -187,7 +196,8 @@
       "support": "Support the development of Poznote with a donation.",
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
-      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in."
+      "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in.",
+      "snapshots": "Choose how many automatic daily snapshots are kept per note."
     },
     "title": "Settings",
     "collapse_section": "Collapse section",
@@ -355,7 +365,8 @@
       "spellcheck_html_notes": "Spell check",
       "slash_menu_require_alt": "Command menu shortcut",
       "note_nav_shortcuts": "Switch notes with Alt + ↑/↓",
-      "ctrl_s_save": "Save note with Ctrl + S"
+      "ctrl_s_save": "Save note with Ctrl + S",
+      "snapshots": "Snapshots"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -512,7 +523,7 @@
       "upload_section_title": "Choose a new attachment",
       "drag_drop_info": "You can drag and drop your file below:",
       "all_types_accepted": "All file types accepted (max 200 MB)",
-      "note_taking_notice": "Poznote is a note-taking app: you can store media, but large files fill up your space quickly.",
+      "note_taking_notice": "You can store media, but large files fill up your space quickly.",
       "note_taking_notice_link": "View my storage",
       "upload_button": "Attach",
       "current_attachments": "Current attachments",
@@ -1084,6 +1095,16 @@
     "note": {
       "rename_title": "Rename Note",
       "rename_placeholder": "New note title"
+    },
+    "snapshots": {
+      "title": "Snapshots",
+      "description": "Number of automatic snapshots kept per note (one is taken per day when the note is first opened). Manual snapshots taken with \"Take snapshot now\" are not counted. Every snapshot expires after {{days}} days:",
+      "options": {
+        "unit": "automatic snapshots"
+      },
+      "badge": "{{count}} automatic per note",
+      "warning_title": "More snapshots can use a lot of storage.",
+      "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted."
     }
   },
   "notes_list": {
@@ -3508,6 +3529,8 @@
     "url_label": "Server URL",
     "url_description": "Base URL of an OpenAI-compatible API. For Ollama running on the Docker host, use http://host.docker.internal:11434",
     "model_label": "Model",
+    "model_empty_hint": "Click \"{{button}}\" above, then select one.",
+    "model_none_found": "No models were returned by this server.",
     "api_key_label": "API key (optional)",
     "api_key_description": "Leave empty for a local Ollama server. Required for cloud providers.",
     "save": "Save Configuration",

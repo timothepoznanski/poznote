@@ -207,12 +207,17 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     }
 
     // Management entries, always the last ones: the menu opens even when the
-    // account has a single workspace (or none), so these stay reachable.
-    if (menuHtml !== '') {
+    // account has a single workspace (or none), so these stay reachable. The
+    // data-action values are the wsmenu:* keys of the UI Customization modal,
+    // which hides them through .workspace-menu-item[data-action="..."].
+    var uiCustomization = window.PoznoteUiCustomization;
+    var editHidden = !!(uiCustomization && uiCustomization.isHidden('wsmenu:edit-workspaces'));
+    var createHidden = !!(uiCustomization && uiCustomization.isHidden('wsmenu:new-workspace'));
+    if (menuHtml !== '' && !(editHidden && createHidden)) {
         menuHtml += '<div class="workspace-menu-divider"></div>';
     }
-    menuHtml += workspaceMenuActionHtml('data-workspace-url', 'workspaces.php', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
-    menuHtml += workspaceMenuActionHtml('data-workspace-action', 'create', 'lucide-plus-circle', wsTr('workspaces.menu.new_workspace', {}, 'New workspace'));
+    menuHtml += workspaceMenuActionHtml('data-workspace-url', 'workspaces.php', 'edit-workspaces', 'lucide-settings', wsTr('workspaces.menu.edit_workspaces', {}, 'Edit workspaces'));
+    menuHtml += workspaceMenuActionHtml('data-workspace-action', 'create', 'new-workspace', 'lucide-plus-circle', wsTr('workspaces.menu.new_workspace', {}, 'New workspace'));
 
     menu.innerHTML = menuHtml;
 
@@ -239,8 +244,8 @@ function displayWorkspaceMenu(menu, workspaces, username, actingAs) {
     });
 }
 
-function workspaceMenuActionHtml(attribute, value, icon, label) {
-    return '<div class="workspace-menu-item workspace-menu-action" ' + attribute + '="' + escapeWorkspaceMenuText(value) + '">'
+function workspaceMenuActionHtml(attribute, value, action, icon, label) {
+    return '<div class="workspace-menu-item workspace-menu-action" ' + attribute + '="' + escapeWorkspaceMenuText(value) + '" data-action="' + escapeWorkspaceMenuText(action) + '">'
         + '<i class="' + icon + '"></i>'
         + '<span>' + escapeWorkspaceMenuText(label) + '</span>'
         + '</div>';

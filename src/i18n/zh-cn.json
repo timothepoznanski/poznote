@@ -84,7 +84,7 @@
     "menu_item": "快照",
     "modal": {
       "title": "快照",
-      "description": "仅保存笔记的文本内容（不含附件和图片）。如果附件或图片已被删除，将无法通过快照恢复。\n每天首次打开时自动创建。「立即创建快照」可额外新增，不会替换当天的快照。最多保留 7 个。",
+      "description": "每天首次打开时自动创建，保留最近 {{count}} 个。「立即创建快照」会添加一个手动快照。所有快照在 {{days}} 天后过期。",
       "loading": "正在加载快照...",
       "history": "历史记录",
       "markdown_preview": "预览",
@@ -97,23 +97,29 @@
       "empty_content": "（内容为空）",
       "take_now": "立即创建快照",
       "copy_content": "复制内容",
-      "restore_state": "恢复到此状态"
+      "restore_state": "恢复到此状态",
+      "delete": "删除此快照",
+      "keep_count_link_title": "更改保留的自动快照数量"
     },
     "messages": {
       "content_copied": "内容已复制",
-      "created_now": "快照已添加"
+      "created_now": "快照已添加",
+      "deleted": "快照已删除"
     },
     "errors": {
       "restore_failed": "无法恢复快照",
       "create_failed": "无法创建快照",
-      "copy_failed": "复制失败"
+      "copy_failed": "复制失败",
+      "delete_failed": "删除快照失败"
     },
     "confirm": {
       "title": "确认",
       "restore_message": "要将笔记恢复到快照状态吗？当前更改将会丢失。",
       "restore_button": "恢复到此状态",
       "take_now_message": "要用笔记当前内容再创建一个快照吗？今天已有的快照会被保留。",
-      "take_now_button": "立即创建快照"
+      "take_now_button": "立即创建快照",
+      "delete_message": "删除此快照？",
+      "delete_button": "删除此快照"
     },
     "api": {
       "invalid_note_id": "无效的笔记 ID",
@@ -129,7 +135,10 @@
       "invalid_entries_path": "无效的笔记路径",
       "restore_note_file_failed": "无法恢复笔记文件",
       "restore_success": "笔记已恢复到快照状态",
-      "restore_failed": "无法恢复快照"
+      "restore_failed": "无法恢复快照",
+      "not_found": "未找到快照",
+      "delete_failed": "删除快照失败",
+      "deleted": "快照已删除"
     }
   },
   "kanban": {
@@ -474,7 +483,8 @@
       "support": "通过捐赠支持 Poznote 的开发。",
       "s3_storage": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",
       "s3_backup": "将完整备份归档上传到 S3 兼容的存储桶,可手动或按计划执行。",
-      "highlight_current_folder_tree": "淡化当前所在文件夹层级之外的笔记和文件夹。"
+      "highlight_current_folder_tree": "淡化当前所在文件夹层级之外的笔记和文件夹。",
+      "snapshots": "选择每条笔记保留多少个每日自动快照。"
     },
     "title": "设置",
     "collapse_section": "折叠此部分",
@@ -719,7 +729,8 @@
       "note_color_palette": "笔记颜色",
       "slash_menu_require_alt": "命令菜单快捷键",
       "note_nav_shortcuts": "Alt + ↑/↓ 切换笔记",
-      "ctrl_s_save": "Ctrl + S 保存笔记"
+      "ctrl_s_save": "Ctrl + S 保存笔记",
+      "snapshots": "快照"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -1554,6 +1565,16 @@
     "note": {
       "rename_title": "重命名笔记",
       "rename_placeholder": "新笔记标题"
+    },
+    "snapshots": {
+      "title": "快照",
+      "description": "每条笔记保留的自动快照数量（每天首次打开笔记时创建一个）。通过「立即创建快照」创建的手动快照不计入其中。所有快照在 {{days}} 天后过期：",
+      "options": {
+        "unit": "个自动快照"
+      },
+      "badge": "每条笔记 {{count}} 个自动快照",
+      "warning_title": "保留更多快照可能占用大量存储空间。",
+      "warning": "附件和图片即使已从笔记中移除，只要仍被某个快照包含，就会继续保留在磁盘上。只有在包含它们的最后一个快照过期（最多 {{days}} 天）或笔记被永久删除后才会释放。"
     }
   },
   "notes_list": {
@@ -3899,6 +3920,8 @@
     "url_label": "服务器 URL",
     "url_description": "兼容 OpenAI 的 API 基础 URL。若 Ollama 运行在 Docker 主机上，请使用 http://host.docker.internal:11434",
     "model_label": "模型",
+    "model_empty_hint": "点击上方的“{{button}}”,然后选择一个。",
+    "model_none_found": "该服务器未返回任何模型。",
     "api_key_label": "API 密钥（可选）",
     "api_key_description": "本地 Ollama 服务器可留空。云服务商需要填写。",
     "save": "保存配置",

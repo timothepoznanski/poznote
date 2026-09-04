@@ -631,6 +631,76 @@
     };
 
     /**
+     * Delete the selected snapshot (manual or automatic).
+     */
+    window.deleteSnapshot = function () {
+        if (isSnapshotAccessBlocked()) return;
+
+        var modal = document.getElementById('snapshotModal');
+        if (!modal) return;
+
+        var noteId = modal.dataset.noteId;
+        var selectedSnapshotKey = modal.dataset.selectedSnapshotKey || '';
+        var selectedDate = modal.dataset.selectedDate || '';
+        if (!noteId || (!selectedSnapshotKey && !selectedDate)) return;
+
+        var deleteQuery = selectedSnapshotKey
+            ? '?snapshot_key=' + encodeURIComponent(selectedSnapshotKey)
+            : '?date=' + encodeURIComponent(selectedDate);
+
+        var confirmDelete = function () {
+            fetch(getSnapshotUrl(noteId, deleteQuery.slice(1)), {
+                method: 'DELETE',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    showSnapshotToast(tr('snapshot.messages.deleted', 'Snapshot deleted'));
+                    showSnapshotModal(noteId);
+                } else {
+                    showSnapshotError(data.error || tr('snapshot.errors.delete_failed', 'Failed to delete snapshot'));
+                }
+            })
+            .catch(function () {
+                showSnapshotError(tr('snapshot.errors.delete_failed', 'Failed to delete snapshot'));
+            });
+        };
+
+        var message = tr('snapshot.confirm.delete_message', 'Delete this snapshot?');
+        if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
+            window.modalAlert.confirm(
+                message,
+                tr('snapshot.confirm.title', 'Confirmation'),
+                {
+                    modalClass: 'snapshot-restore-confirm',
+                    confirmButtonClass: 'snapshot-restore-confirm-button',
+                    confirmText: tr('snapshot.confirm.delete_button', 'Delete this snapshot')
+                }
+            ).then(function (confirmed) {
+                if (confirmed) {
+                    confirmDelete();
+                }
+            });
+        } else if (confirm(message)) {
+            confirmDelete();
+        }
+    };
+
+    /**
+     * The kept-count number in the description: close this modal and open
+     * the matching setting on the settings page.
+     */
+    window.openSnapshotsKeepCountSettings = function (event) {
+        if (event && typeof event.preventDefault === 'function') {
+            event.preventDefault();
+        }
+        closeSnapshotModal();
+        window.location.href = 'settings.php?open=snapshots#snapshots-card';
+        return false;
+    };
+
+    /**
      * Close the snapshot modal
      */
     window.closeSnapshotModal = function () {

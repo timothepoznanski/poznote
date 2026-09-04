@@ -1611,18 +1611,8 @@ class NotesController {
                 unlink($linked_file_path);
             }
             
-            // Delete linked note's attachments
-            $linkedAttachments = $linkedNote['attachments'] ? json_decode($linkedNote['attachments'], true) : [];
-            if (is_array($linkedAttachments) && !empty($linkedAttachments)) {
-                foreach ($linkedAttachments as $attachment) {
-                    if (isset($attachment['filename'])) {
-                        // Local disk or S3 bucket
-                        poznoteDeleteAttachmentFile($attachment['filename']);
-                    }
-                }
-            }
-
-            deleteNoteSnapshots($linkedId);
+            // Delete linked note's attachments (local disk or S3 bucket) and snapshots
+            deleteNoteFilesForGood((int) $linkedId, $linkedNote['attachments'] ?? '');
             
             // Delete linked note from database
             if ($workspace) {
@@ -1635,20 +1625,15 @@ class NotesController {
             $deletedLinkedCount++;
         }
         
-        // Delete attachments of the main note
-        $attachments = $note['attachments'] ? json_decode($note['attachments'], true) : [];
+        // Delete attachments (local disk or S3 bucket) and snapshots of the main note
         $deleted_attachments = [];
-        
-        if (is_array($attachments) && !empty($attachments)) {
-            foreach ($attachments as $attachment) {
-                if (isset($attachment['filename'])) {
-                    // Local disk or S3 bucket
-                    poznoteDeleteAttachmentFile($attachment['filename']);
-                    $deleted_attachments[] = $attachment['filename'];
-                }
+        foreach (poznoteDecodeAttachments($note['attachments'] ?? '') as $attachment) {
+            if (is_array($attachment) && !empty($attachment['filename'])) {
+                $deleted_attachments[] = $attachment['filename'];
             }
         }
-        
+        deleteNoteFilesForGood($noteId, $note['attachments'] ?? '');
+
         // Delete note file
         $noteType = $note['type'] ?? 'note';
         $note_file_path = getEntryFilename($noteId, $noteType);
@@ -1664,8 +1649,6 @@ class NotesController {
         if (file_exists($png_file_path)) {
             $png_deleted = unlink($png_file_path);
         }
-
-        deleteNoteSnapshots($noteId);
 
         // Delete database entry
         if ($workspace) {
@@ -2183,8 +2166,8 @@ class NotesController {
             
             $notes = [];
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $attachments = json_decode($row['attachments'], true);
-                if (is_array($attachments) && count($attachments) > 0) {
+                $attachments = poznoteFilterVisibleAttachments($row['attachments']);
+                if (count($attachments) > 0) {
                     $notes[] = [
                         'id' => $row['id'],
                         'heading' => $row['heading'],

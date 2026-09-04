@@ -31,6 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
     var keyGroup = document.getElementById('ai-key-group');
     var keyLabel = document.getElementById('ai-key-label');
     var keyDesc = document.getElementById('ai-key-desc');
+    var modelSelect = document.getElementById('ai_model');
+    var modelMsg = document.getElementById('ai-model-empty-msg');
+
+    function resetModelField() {
+        modelSelect.innerHTML = '';
+        modelSelect.hidden = true;
+        modelMsg.textContent = i18n.modelHint;
+        modelMsg.hidden = false;
+    }
 
     function applyProvider(initial) {
         var p = PROVIDERS[providerSel.value] || PROVIDERS.custom;
@@ -44,9 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
         keyLabel.textContent = (p.key === 'required') ? i18n.apiKeyRequired : i18n.apiKeyOptional;
         keyDesc.style.display = (p.key === 'optional') ? '' : 'none';
         if (!initial) {
-            // The model and any listed models belong to the previous server
-            document.getElementById('ai_model').value = '';
-            document.getElementById('ai-model-list').innerHTML = '';
+            // The model belongs to the previous server
+            resetModelField();
             resultEl.hidden = true;
             resultEl.textContent = '';
         }
@@ -65,8 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
         var apiKey = document.getElementById('ai_api_key').value;
         if (apiKey === '••••••••') apiKey = '';
 
-        // The model is picked from the results of this test
-        document.getElementById('ai_model').value = '';
+        // Read before the list is replaced: a failed test must leave the
+        // configured model alone, a successful one re-selects it if still offered
+        var previousModel = modelSelect.value;
 
         resultEl.hidden = false;
         resultEl.textContent = i18n.testing;
@@ -85,25 +94,27 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(function(r) { return r.json(); })
         .then(function(data) {
             if (data.success) {
-                resultEl.textContent = i18n.success.replace('{{count}}', (data.models || []).length);
-                var datalist = document.getElementById('ai-model-list');
-                datalist.innerHTML = '';
-                var suggestions = document.createElement('div');
-                suggestions.className = 'ai-model-suggestions';
-                (data.models || []).forEach(function(m) {
+                var models = data.models || [];
+                resultEl.textContent = i18n.success.replace('{{count}}', models.length);
+                modelSelect.innerHTML = '';
+                models.forEach(function(m) {
                     var opt = document.createElement('option');
                     opt.value = m;
-                    datalist.appendChild(opt);
-                    var chip = document.createElement('button');
-                    chip.type = 'button';
-                    chip.className = 'ai-model-suggestion';
-                    chip.textContent = m;
-                    chip.addEventListener('click', function() {
-                        document.getElementById('ai_model').value = m;
-                    });
-                    suggestions.appendChild(chip);
+                    opt.textContent = m;
+                    modelSelect.appendChild(opt);
                 });
-                resultEl.appendChild(suggestions);
+                if (models.length) {
+                    modelSelect.hidden = false;
+                    modelMsg.hidden = true;
+                    // Keep the previously configured model selected if this server still offers it
+                    if (previousModel && models.indexOf(previousModel) !== -1) {
+                        modelSelect.value = previousModel;
+                    }
+                } else {
+                    modelSelect.hidden = true;
+                    modelMsg.textContent = i18n.modelNoneFound;
+                    modelMsg.hidden = false;
+                }
             } else {
                 resultEl.textContent = i18n.failure.replace('{{error}}', data.error || 'unknown');
             }

@@ -12,9 +12,13 @@
         // so preferences saved before the removal stop applying.
         'card:icon_sidebar': true,
         'card:iconSidebarSettingsBtn': true,
+        'card:iconSidebarHomeBtn': true,
         // The folder icon click now always opens the icon/color modal; the
         // old "open Kanban on icon click" toggle no longer exists.
-        'panel:folder-icon-kanban': true
+        'panel:folder-icon-kanban': true,
+        // The mobile "back to notes" toolbar button is the way back to the
+        // note list on small screens, so it is no longer offered for hiding.
+        'toolbar:btn-home': true
     };
 
     var CUSTOMIZABLE_TOOLBAR_BUTTONS = {
@@ -50,7 +54,6 @@
         'btn-info': 'action',
         'btn-note-width': 'action',
         'btn-split-view': 'action',
-        'btn-home': 'action',
         'btn-audio': 'action'
     };
 
@@ -81,7 +84,10 @@
         'toolbar:btn-share': 'toolbar:btn-publish',
         // Notifications and AI chat moved from the icon rail to the sidebar header.
         'card:iconSidebarNotificationsBtn': 'card:sidebarNotificationsBtn',
-        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn'
+        'card:iconSidebarAiChatBtn': 'card:sidebarAiChatBtn',
+        // The workspace menu's single "Workspaces" entry became "Edit
+        // workspaces" once "New workspace" got its own entry.
+        'wsmenu:goto-workspaces': 'wsmenu:edit-workspaces'
     };
 
     function sanitizeHiddenKeys(hidden) {
@@ -438,6 +444,8 @@
                         rules.push('#outlineMobileBackdrop { display: none !important; }');
                     } else if (id === 'tasklist-progress') {
                         rules.push('.tasklist-progress { display: none !important; }');
+                    } else if (id === 'settings-recent-section') {
+                        rules.push('#settings-recent-section-title, #settings-recent-section-grid { display: none !important; }');
                     }
                 }
             });

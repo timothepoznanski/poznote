@@ -489,3 +489,9 @@ body.dark-mode .home-card.is-pinned .settings-card-pin i {
     font-size: 0.9rem;
     font-weight: 500;
 }
+
+/* Snapshots settings modal: the warning is the last thing in the body, so it
+   carries the gap to the Cancel/Save buttons that .radio-options usually does. */
+#snapshotsSettingsModal .delete-warning-box {
+    margin-bottom: 24px;
+}

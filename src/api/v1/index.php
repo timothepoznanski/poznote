@@ -460,6 +460,11 @@ $router->get('/notes/{id}/snapshot', function($params) use ($snapshotsController
     $snapshotsController->show($params['id']);
 });
 
+// Delete one snapshot of a note (?snapshot_key=... or ?date=YYYY-MM-DD)
+$router->delete('/notes/{id}/snapshot', function($params) use ($snapshotsController) {
+    $snapshotsController->destroy($params['id']);
+});
+
 // Restore a note to a snapshot state (?snapshot_key=... or ?date=YYYY-MM-DD)
 $router->post('/notes/{id}/snapshot/restore', function($params) use ($snapshotsController) {
     $snapshotsController->restore($params['id']);

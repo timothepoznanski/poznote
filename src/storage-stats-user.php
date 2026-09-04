@@ -475,7 +475,7 @@ if ($backupsColumnVisible) {
             <?php if (poznoteSaasNoticesEnabled()): ?>
             <div class="attachment-usage-notice">
                 <i class="lucide lucide-alert-triangle"></i>
-                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'Poznote is a note-taking app: you can store media, but large files fill up your space quickly.'); ?></span>
+                <span><?php echo t_h('attachments.page.note_taking_notice', [], 'You can store media, but large files fill up your space quickly.'); ?></span>
             </div>
             <?php endif; ?>
         </div>

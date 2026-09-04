@@ -196,7 +196,7 @@ class AttachmentsController {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($result) {
-                $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
+                $attachments = poznoteFilterVisibleAttachments($result['attachments'] ?? '');
                 $entry = $result['entry'] ?? '';
                 echo json_encode(['success' => true, 'attachments' => $attachments, 'entry' => $entry]);
             } else {
@@ -464,6 +464,13 @@ class AttachmentsController {
                 
                 foreach ($attachments as $attachment) {
                     if ($attachment['id'] === $attachmentId) {
+                        // A file removed from the note and only kept for its
+                        // snapshots is no longer part of what a share exposes.
+                        if ($isPubliclyShared && poznoteAttachmentIsSnapshotOnly($attachment)) {
+                            http_response_code(404);
+                            exit('Attachment not found');
+                        }
+
                         $storage = $this->storage();
                         $attachmentFilename = (string)($attachment['filename'] ?? '');
 
@@ -844,13 +851,21 @@ class AttachmentsController {
             if ($result) {
                 $attachments = $result['attachments'] ? json_decode($result['attachments'], true) : [];
                 
-                // Find and remove attachment
+                // Find and remove attachment. A file that a snapshot still
+                // references stays on disk (hidden from the note) so that
+                // restoring the snapshot brings it back.
                 $file_to_delete = null;
+                $retained = false;
                 $updated_attachments = [];
-                
+
                 foreach ($attachments as $attachment) {
                     if ($attachment['id'] === $attachmentId) {
                         $file_to_delete = $attachment['filename'] ?? null;
+                        if ($file_to_delete && poznoteAttachmentIsReferencedInSnapshots((int)$noteId, $attachment)) {
+                            $retained = true;
+                            $attachment['snapshot_only'] = true;
+                            $updated_attachments[] = $attachment;
+                        }
                     } else {
                         $updated_attachments[] = $attachment;
                     }
@@ -858,7 +873,9 @@ class AttachmentsController {
 
                 if ($file_to_delete) {
                     // Delete physical file (local disk or S3 bucket)
-                    $this->storage()->delete($file_to_delete);
+                    if (!$retained) {
+                        $this->storage()->delete($file_to_delete);
+                    }
 
                     // Clean up inline references from note content to prevent 404s
                     $entry = $result['entry'] ?? '';
@@ -917,8 +934,8 @@ class AttachmentsController {
                     }
                     
                     if ($success) {
-                        $this->triggerGitSync((int)$noteId, 'delete', $attachment['filename']);
-                        echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully']);
+                        $this->triggerGitSync((int)$noteId, 'delete', $retained ? '' : $file_to_delete);
+                        echo json_encode(['success' => true, 'message' => 'Attachment deleted successfully', 'retained_for_snapshots' => $retained]);
                     } else {
                         http_response_code(500);
                         echo json_encode(['success' => false, 'message' => 'Database update failed']);
