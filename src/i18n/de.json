@@ -1580,7 +1580,7 @@
         "unit": "automatische Schnappschüsse"
       },
       "badge": "{{count}} automatische pro Notiz",
-      "warning_title": "Mehr Schnappschüsse können viel Speicherplatz belegen.",
+      "warning_title": "Schnappschüsse speichern nur den Text der Notiz. Anhänge werden nie kopiert.",
       "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
     }
   },

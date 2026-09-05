@@ -1581,7 +1581,7 @@
         "unit": "instantáneas automáticas"
       },
       "badge": "{{count}} automáticas por nota",
-      "warning_title": "Conservar más instantáneas puede usar mucho almacenamiento.",
+      "warning_title": "Las instantáneas solo guardan el texto de la nota. Los archivos adjuntos nunca se copian.",
       "warning": "Los archivos adjuntos y las imágenes se conservan en el disco incluso después de eliminarlos de una nota, mientras alguna de sus instantáneas todavía los contenga. Solo se liberan cuando caduca la última instantánea que los contiene (como máximo a los {{days}} días) o cuando la nota se elimina definitivamente."
     }
   },

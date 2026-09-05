@@ -1612,7 +1612,7 @@
         "unit": "snapshots automatiques"
       },
       "badge": "{{count}} automatiques par note",
-      "warning_title": "Conserver plus de snapshots peut utiliser beaucoup de stockage.",
+      "warning_title": "Les snapshots ne stockent que le texte de la note. Les pièces jointes ne sont jamais copiées.",
       "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'un de ses snapshots les contient encore. Elles ne sont libérées que lorsque le dernier snapshot qui les contient expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
     }
   },

@@ -583,7 +583,7 @@ Snapshots keep earlier versions of a note's content so you can go back to a prev
 *   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Behavior > Snapshots**.
 *   **Manual:** "Take snapshot now" adds a snapshot at any time. Manual snapshots are unlimited and do not count toward that number.
 *   **Expiry:** every snapshot, automatic or manual, is deleted 30 days after it was taken. A snapshot can also be deleted by hand from the Snapshots modal.
-*   **Attachments and images:** a file removed from a note stays on disk, hidden from the note, as long as a snapshot still contains it, so restoring that snapshot brings it back. It is deleted for good once the last snapshot containing it expires or is deleted, or when the note is permanently deleted. Keeping many snapshots can therefore use more storage.
+*   **Attachments and images:** snapshots only store the note text. Attachments are never copied, so a file referenced by several snapshots exists once on disk. A file removed from a note stays on disk, hidden from the note, as long as a snapshot still contains it, so restoring that snapshot brings it back. It is deleted for good once the last snapshot containing it expires or is deleted, or when the note is permanently deleted. Keeping more snapshots therefore never duplicates files. It only keeps removed files around for longer, 30 days at most.
 
 ## Personalization
 

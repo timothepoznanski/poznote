@@ -1103,7 +1103,7 @@
         "unit": "automatic snapshots"
       },
       "badge": "{{count}} automatic per note",
-      "warning_title": "More snapshots can use a lot of storage.",
+      "warning_title": "Snapshots only store the note text. Attachments are never copied.",
       "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted."
     }
   },

@@ -952,7 +952,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'automatic snapshots'); ?></label>
             </div>
             <div class="delete-warning-box">
-                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'More snapshots can use a lot of storage.'); ?></p>
+                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments are never copied.'); ?></p>
                 <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
             </div>
         </div>
