@@ -250,13 +250,6 @@ body.attachments-page {
     display: block;
 }
 
-.empty-message i {
-    font-size: 64px;
-    margin-bottom: 20px;
-    display: block;
-    opacity: 0.5;
-}
-
 .empty-message p {
     font-size: 18px;
     margin: 10px 0;

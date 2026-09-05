@@ -101,6 +101,9 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'tags'      => $tags,
         'search'    => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
+        // Unix time of the last change, for the "modified since" filter
+        'updatedAt' => (int)(strtotime((string)($note['updated'] ?? '') . ' UTC') ?: 0),
+        'workspace' => $pageWorkspace,
         'icon'      => $iconRaw,
         'iconColor' => $iconColor,
         // 'color' is the stored value (palette id or custom hex); 'colorHex' is
@@ -195,15 +198,28 @@ function dashboardGetCurrentUsername(): string {
     return '';
 }
 
-function dashboardBuildContextItems(string $pageWorkspace): array {
-    $items = [];
-    if ($pageWorkspace !== '') {
-        $items[] = [
-            'icon'  => 'lucide-layers',
-            'label' => 'Workspace',
-            'value' => $pageWorkspace,
-        ];
+function dashboardScopeLabel(array $scope, string $pageWorkspace): string {
+    switch ($scope['mode'] ?? 'single') {
+        case 'all':
+            return t('dashboard.scope.all', [], 'All workspaces');
+        case 'tag':
+            return t('dashboard.scope.tag_label', ['tag' => $scope['tag']], 'Tag: {{tag}}');
+        case 'list':
+            return t('dashboard.scope.count_label', ['count' => count($scope['workspaces'])], '{{count}} workspaces');
+        default:
+            return $pageWorkspace !== '' ? $pageWorkspace : t('dashboard.scope.title', [], 'Scope');
     }
+}
+
+function dashboardBuildContextItems(string $pageWorkspace, array $scope = []): array {
+    $items = [];
+    // The scope button is always there: it is the way to the multi-workspace
+    // selector even when no workspace is set
+    $items[] = [
+        'icon'  => 'lucide-layers',
+        'label' => t('dashboard.scope.title', [], 'Scope'),
+        'value' => dashboardScopeLabel($scope, $pageWorkspace),
+    ];
 
     $username = dashboardGetCurrentUsername();
     if ($username !== '') {
@@ -435,109 +451,169 @@ function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
 }
 
 $favoritesOnly = isset($_GET['favorites']) && $_GET['favorites'] === '1';
-$dashboardData = ['folders' => [], 'notes' => []];
+
+/**
+ * Folder tree and loose notes of one workspace (or of every workspace when
+ * $pageWorkspace is empty), ready for the board JS.
+ * @return array{folders: array, notes: array}
+ */
+function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $favoritesOnly): array {
+    $board = ['folders' => [], 'notes' => []];
+
+    $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
+    $stmtF = $con->prepare(
+        "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned, favorite FROM folders" . $folderWhere .
+        " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
+    );
+    $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
+
+    $folders = [];
+    $folderInsertOrder = [];
+    $pos = 0;
+    while ($f = $stmtF->fetch(PDO::FETCH_ASSOC)) {
+        $id = (int)$f['id'];
+        $folders[$id] = [
+            'id'       => $id,
+            'name'     => trim($f['name']),
+            'parent'   => $f['parent_id'] !== null ? (int)$f['parent_id'] : null,
+            'icon'     => !empty($f['icon']) ? convertFontAwesomeToLucide($f['icon']) : 'lucide lucide-folder',
+            // 'color' is the icon color (legacy name); 'cardColor'/'cardColorHex'
+            // carry the card background color, like notes.
+            'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
+            'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
+            'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
+            'pinned'   => !empty($f['pinned']),
+            // Only meaningful in favorites mode: keeps the folder on the
+            // board even when none of its notes are favorites.
+            'favorite' => $favoritesOnly && !empty($f['favorite']),
+            'notes'    => [],
+            'children' => [],
+        ];
+        $folderInsertOrder[$id] = $pos++;
+    }
+
+    foreach ($folders as $id => &$fd) {
+        if ($fd['parent'] !== null && isset($folders[$fd['parent']])) {
+            $folders[$fd['parent']]['children'][] = $id;
+        }
+    }
+    unset($fd);
+
+    $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned FROM entries WHERE trash = 0";
+    $params = [];
+    if ($favoritesOnly) {
+        // A favorite note qualifies on its own; a note also qualifies when it
+        // lives in a favorite folder, so that folder's card is not empty.
+        $favoriteFolderIds = array_keys(array_filter($folders, fn($fd) => !empty($fd['favorite'])));
+        if (!empty($favoriteFolderIds)) {
+            $placeholders = implode(',', array_fill(0, count($favoriteFolderIds), '?'));
+            $query .= " AND (favorite = 1 OR folder_id IN ($placeholders))";
+            $params = array_merge($params, $favoriteFolderIds);
+        } else {
+            $query .= " AND favorite = 1";
+        }
+    }
+    if (!empty($pageWorkspace)) {
+        $query .= " AND workspace = ?";
+        $params[] = $pageWorkspace;
+    }
+    $query .= " ORDER BY updated DESC";
+    $stmt = $con->prepare($query);
+    $stmt->execute($params);
+
+    $noFolderNotes = [];
+    // Rank in the query's updated-DESC order, before the rows are split by
+    // folder. The filtered board mixes notes from the whole tree, so it
+    // needs this tree-wide rank rather than the per-folder one.
+    $globalOrder = 0;
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $row['globalOrder'] = $globalOrder++;
+        $fid = $row['folder_id'] !== null ? (int)$row['folder_id'] : null;
+        if ($fid !== null && isset($folders[$fid])) {
+            $folders[$fid]['notes'][] = $row;
+        } else {
+            $noFolderNotes[] = $row;
+        }
+    }
+
+    $rootIds = array_filter(array_keys($folders), fn($id) => $folders[$id]['parent'] === null);
+    usort($rootIds, fn($a, $b) => ($folderInsertOrder[$a] ?? 0) - ($folderInsertOrder[$b] ?? 0));
+
+    foreach ($rootIds as $rootId) {
+        if (!dashboardFolderHasNotes($rootId, $folders)) continue;
+        $board['folders'][] = dashboardBuildTree($rootId, $folders, $folderInsertOrder, $pageWorkspace);
+    }
+
+    foreach ($noFolderNotes as $note) {
+        $board['notes'][] = dashboardBuildNoteData($note, $pageWorkspace);
+    }
+    $board['notes'] = dashboardSortPinnedFirst($board['notes']);
+
+    return $board;
+}
+
+// Scope: one workspace (default), every workspace, the workspaces carrying a
+// tag, or an explicit list (see poznoteResolveWorkspaceScope). A multi
+// workspace scope renders one group per workspace.
+$dashboardScope = ['mode' => 'single', 'workspaces' => $pageWorkspace !== '' ? [$pageWorkspace] : [], 'tag' => '', 'query' => [], 'key' => '', 'tags_map' => []];
+try {
+    if (isset($con)) {
+        $dashboardScope = poznoteResolveWorkspaceScope($con, $_GET, $pageWorkspace);
+    }
+} catch (Exception $e) {}
+$dashboardScopeIsMulti = $dashboardScope['mode'] !== 'single';
+if (!$dashboardScopeIsMulti) {
+    $pageWorkspace = $dashboardScope['workspaces'][0] ?? $pageWorkspace;
+}
+
+$dashboardData = ['folders' => [], 'notes' => [], 'groups' => []];
 $isEmpty = true;
 $dashboardTopbarCounts = [];
 
 try {
     if (isset($con)) {
-        $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
-        $stmtF = $con->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned, favorite FROM folders" . $folderWhere .
-            " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
-        );
-        $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
-
-        $folders = [];
-        $folderInsertOrder = [];
-        $pos = 0;
-        while ($f = $stmtF->fetch(PDO::FETCH_ASSOC)) {
-            $id = (int)$f['id'];
-            $folders[$id] = [
-                'id'       => $id,
-                'name'     => trim($f['name']),
-                'parent'   => $f['parent_id'] !== null ? (int)$f['parent_id'] : null,
-                'icon'     => !empty($f['icon']) ? convertFontAwesomeToLucide($f['icon']) : 'lucide lucide-folder',
-                // 'color' is the icon color (legacy name); 'cardColor'/'cardColorHex'
-                // carry the card background color, like notes.
-                'color'    => !empty($f['icon_color']) ? $f['icon_color'] : null,
-                'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
-                'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
-                'pinned'   => !empty($f['pinned']),
-                // Only meaningful in favorites mode: keeps the folder on the
-                // board even when none of its notes are favorites.
-                'favorite' => $favoritesOnly && !empty($f['favorite']),
-                'notes'    => [],
-                'children' => [],
-            ];
-            $folderInsertOrder[$id] = $pos++;
-        }
-
-        foreach ($folders as $id => &$fd) {
-            if ($fd['parent'] !== null && isset($folders[$fd['parent']])) {
-                $folders[$fd['parent']]['children'][] = $id;
+        if ($dashboardScopeIsMulti) {
+            foreach ($dashboardScope['workspaces'] as $scopeWorkspace) {
+                $board = dashboardBuildWorkspaceBoard($con, $scopeWorkspace, $favoritesOnly);
+                $dashboardData['groups'][] = [
+                    'workspace' => $scopeWorkspace,
+                    'tags'      => $dashboardScope['tags_map'][$scopeWorkspace] ?? [],
+                    'folders'   => $board['folders'],
+                    'notes'     => $board['notes'],
+                ];
+                if (!empty($board['folders']) || !empty($board['notes'])) {
+                    $isEmpty = false;
+                }
             }
+        } else {
+            $board = dashboardBuildWorkspaceBoard($con, $pageWorkspace, $favoritesOnly);
+            $dashboardData['folders'] = $board['folders'];
+            $dashboardData['notes'] = $board['notes'];
+            $isEmpty = empty($board['folders']) && empty($board['notes']);
         }
-        unset($fd);
-
-        $query = "SELECT id, heading, type, tags, folder_id, folder, updated, icon, icon_color, color, pinned FROM entries WHERE trash = 0";
-        $params = [];
-        if ($favoritesOnly) {
-            // A favorite note qualifies on its own; a note also qualifies when it
-            // lives in a favorite folder, so that folder's card is not empty.
-            $favoriteFolderIds = array_keys(array_filter($folders, fn($fd) => !empty($fd['favorite'])));
-            if (!empty($favoriteFolderIds)) {
-                $placeholders = implode(',', array_fill(0, count($favoriteFolderIds), '?'));
-                $query .= " AND (favorite = 1 OR folder_id IN ($placeholders))";
-                $params = array_merge($params, $favoriteFolderIds);
-            } else {
-                $query .= " AND favorite = 1";
-            }
-        }
-        if (!empty($pageWorkspace)) {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $query .= " ORDER BY updated DESC";
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-
-        $noFolderNotes = [];
-        // Rank in the query's updated-DESC order, before the rows are split by
-        // folder. The filtered board mixes notes from the whole tree, so it
-        // needs this tree-wide rank rather than the per-folder one.
-        $globalOrder = 0;
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $row['globalOrder'] = $globalOrder++;
-            $fid = $row['folder_id'] !== null ? (int)$row['folder_id'] : null;
-            if ($fid !== null && isset($folders[$fid])) {
-                $folders[$fid]['notes'][] = $row;
-            } else {
-                $noFolderNotes[] = $row;
-            }
-        }
-
-        $rootIds = array_filter(array_keys($folders), fn($id) => $folders[$id]['parent'] === null);
-        usort($rootIds, fn($a, $b) => ($folderInsertOrder[$a] ?? 0) - ($folderInsertOrder[$b] ?? 0));
-
-        foreach ($rootIds as $rootId) {
-            if (!dashboardFolderHasNotes($rootId, $folders)) continue;
-            $dashboardData['folders'][] = dashboardBuildTree($rootId, $folders, $folderInsertOrder, $pageWorkspace);
-        }
-
-        foreach ($noFolderNotes as $note) {
-            $dashboardData['notes'][] = dashboardBuildNoteData($note, $pageWorkspace);
-        }
-        $dashboardData['notes'] = dashboardSortPinnedFirst($dashboardData['notes']);
-
-        $isEmpty = empty($dashboardData['folders']) && empty($dashboardData['notes']);
     }
 } catch (Exception $e) {
-    $dashboardData = ['folders' => [], 'notes' => []];
+    $dashboardData = ['folders' => [], 'notes' => [], 'groups' => []];
     $isEmpty = true;
 }
 
-$dashboardTopbarCounts = dashboardGetTopbarCounts($con ?? null, $pageWorkspace);
+$dashboardData['scope'] = [
+    'mode'       => $dashboardScope['mode'],
+    'tag'        => $dashboardScope['tag'],
+    'workspaces' => $dashboardScope['workspaces'],
+    'key'        => $dashboardScope['key'],
+];
+
+// Tag scope with no workspace carrying the tag: say so instead of the
+// generic "no favorites" hint
+$dashboardEmptyMessage = $favoritesOnly || !$dashboardScopeIsMulti
+    ? t_h('dashboard.empty', [], 'No favorite notes yet. Mark notes as favorites to pin them to this board.')
+    : t_h('dashboard.scope.empty', [], 'No notes in this scope yet.');
+if ($dashboardScope['mode'] === 'tag' && empty($dashboardScope['workspaces'])) {
+    $dashboardEmptyMessage = t_h('dashboard.scope.no_workspace_for_tag', ['tag' => $dashboardScope['tag']], 'No workspace carries the tag "{{tag}}".');
+}
+
+$dashboardTopbarCounts = dashboardGetTopbarCounts($con ?? null, $dashboardScopeIsMulti ? '' : $pageWorkspace);
 
 $rawVersion = @file_get_contents('version.txt');
 if ($rawVersion === false) $rawVersion = '0.0.0';
@@ -572,11 +648,12 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<link rel="stylesheet" href="css/icon-sidebar-mobile.css?v=<?php echo $cache_v; ?>">
 </head>
 <body class="favorites-page dashboard-page has-icon-sidebar"
-      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
+      data-scope="<?php echo htmlspecialchars($dashboardScope['key'], ENT_QUOTES, 'UTF-8'); ?>">
     <?php include 'icon_sidebar.php'; ?>
 
 		<div class="favorites-container dashboard-container">
-			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace); ?>
+			<?php $dashboardContextItems = dashboardBuildContextItems($pageWorkspace, $dashboardScope); ?>
 			<div class="dashboard-top-info">
 				<?php foreach ($dashboardContextItems as $item): ?>
 					<?php if ($item['icon'] === 'lucide-layers'): ?>
@@ -608,6 +685,18 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 					</button>
 					<div id="dashboardColorFilterMenu" class="dashboard-color-filter-menu" hidden></div>
 				</div>
+				<div class="dashboard-color-filter-wrap">
+					<button type="button" id="dashboardModifiedFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?>" aria-label="<?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?>" aria-haspopup="true" aria-expanded="false">
+						<i class="lucide lucide-clock"></i>
+					</button>
+					<div id="dashboardModifiedFilterMenu" class="dashboard-color-filter-menu" hidden></div>
+				</div>
+				<div class="dashboard-color-filter-wrap">
+					<button type="button" id="dashboardTagFilterBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?>" aria-label="<?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?>" aria-haspopup="true" aria-expanded="false">
+						<i class="lucide lucide-tag"></i>
+					</button>
+					<div id="dashboardTagFilterMenu" class="dashboard-color-filter-menu dashboard-tag-filter-menu" hidden></div>
+				</div>
 				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 					<i class="lucide lucide-search dashboard-filter-icon"></i>
 					<input
@@ -627,8 +716,8 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 
 		<?php if ($isEmpty): ?>
 			<div class="dashboard-empty">
-				<i class="lucide lucide-star"></i>
-				<p><?php echo t_h('dashboard.empty', [], 'No favorite notes yet. Mark notes as favorites to pin them to this board.'); ?></p>
+				<i class="lucide <?php echo $dashboardScopeIsMulti && !$favoritesOnly ? 'lucide-layers' : 'lucide-star'; ?>"></i>
+				<p><?php echo $dashboardEmptyMessage; ?></p>
 			</div>
 		<?php else: ?>
 			<div id="dashboardNoResults" class="empty-message initially-hidden">
@@ -641,13 +730,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 
 
 		<div id="workspaceSwitcherModal" class="modal">
-			<div class="modal-content">
-				<h3><?php echo t_h('workspaces.switcher_title', [], 'Switch workspace'); ?></h3>
-				<div id="workspaceSwitcherList" class="workspace-switcher-list">
-					<div class="workspace-switcher-loading"><?php echo t_h('common.loading', [], 'Loading...'); ?></div>
+			<div class="modal-content dashboard-scope-modal">
+				<h3><?php echo t_h('dashboard.scope.title', [], 'Scope'); ?></h3>
+				<div class="modal-body">
+					<p><?php echo t_h('dashboard.scope.hint', [], 'Show one workspace, several, all of them, or every workspace carrying a tag.'); ?></p>
+					<div id="workspaceSwitcherList" class="dashboard-scope-body">
+						<div class="move-task-empty"><?php echo t_h('common.loading', [], 'Loading...'); ?></div>
+					</div>
 				</div>
 				<div class="modal-buttons">
 					<button type="button" class="btn-cancel" data-action="close-workspace-switcher-modal"><?php echo t_h('common.close'); ?></button>
+					<button type="button" class="btn-primary" id="dashboardScopeApplyBtn" disabled><?php echo t_h('common.apply', [], 'Apply'); ?></button>
 				</div>
 			</div>
 		</div>
@@ -702,6 +795,32 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 			unpin: <?php echo json_encode(t('dashboard.unpin_note', [], 'Unpin')); ?>,
 			error: <?php echo json_encode(t('dashboard.pin_error', [], 'Could not update the pinned state.')); ?>,
 			others: <?php echo json_encode(t('dashboard.others_section', [], 'Others')); ?>
+		};
+		window.DASHBOARD_SCOPE_TXT = {
+			all: <?php echo json_encode(t('dashboard.scope.all', [], 'All workspaces')); ?>,
+			byTag: <?php echo json_encode(t('dashboard.scope.by_tag', [], 'By tag')); ?>,
+			workspaces: <?php echo json_encode(t('dashboard.scope.workspaces', [], 'Workspaces')); ?>,
+			noTags: <?php echo json_encode(t('dashboard.scope.no_tags', [], 'No workspace has tags yet. Add tags to your workspaces from the Workspaces page.')); ?>,
+			open: <?php echo json_encode(t('dashboard.scope.open', [], 'Open only this workspace')); ?>,
+			manageWorkspaces: <?php echo json_encode(t('dashboard.scope.manage_workspaces', [], 'Manage workspaces')); ?>,
+			loading: <?php echo json_encode(t('common.loading', [], 'Loading...')); ?>,
+			loadError: <?php echo json_encode(t('dashboard.scope.load_error', [], 'Could not load the workspaces.')); ?>,
+			empty: <?php echo json_encode(t('dashboard.scope.no_workspaces', [], 'No workspaces available')); ?>,
+			groupEmpty: <?php echo json_encode(t('dashboard.scope.group_empty', [], 'Nothing here yet.')); ?>
+		};
+		window.DASHBOARD_MODIFIED_TXT = {
+			any: <?php echo json_encode(t('dashboard.modified.any', [], 'Any time')); ?>,
+			today: <?php echo json_encode(t('dashboard.modified.today', [], 'Today')); ?>,
+			week: <?php echo json_encode(t('dashboard.modified.week', [], 'Last 7 days')); ?>,
+			month: <?php echo json_encode(t('dashboard.modified.month', [], 'Last 30 days')); ?>,
+			quarter: <?php echo json_encode(t('dashboard.modified.quarter', [], 'Last 90 days')); ?>,
+			year: <?php echo json_encode(t('dashboard.modified.year', [], 'Last 12 months')); ?>
+		};
+		window.DASHBOARD_TAG_FILTER_TXT = {
+			all: <?php echo json_encode(t('dashboard.tag_filter.all', [], 'All tags')); ?>,
+			empty: <?php echo json_encode(t('dashboard.tag_filter.empty', [], 'No tags on this board.')); ?>,
+			search: <?php echo json_encode(t('dashboard.tag_filter.search', [], 'Filter tags...')); ?>,
+			noMatch: <?php echo json_encode(t('dashboard.tag_filter.no_match', [], 'No matching tag.')); ?>
 		};
 		window.DASHBOARD_USER = {
 			isAdmin: <?php echo (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) ? 'true' : 'false'; ?>

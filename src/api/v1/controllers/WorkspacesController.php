@@ -3,9 +3,9 @@
  * WorkspacesController - RESTful API controller for workspaces
  * 
  * Endpoints:
- *   GET    /api/v1/workspaces          - List all workspaces
- *   POST   /api/v1/workspaces          - Create a new workspace
- *   PATCH  /api/v1/workspaces/{name}   - Rename a workspace
+ *   GET    /api/v1/workspaces          - List all workspaces (with their tags)
+ *   POST   /api/v1/workspaces          - Create a new workspace (optional tags)
+ *   PATCH  /api/v1/workspaces/{name}   - Rename a workspace and/or set its tags
  *   DELETE /api/v1/workspaces/{name}   - Delete a workspace
  */
 
@@ -40,14 +40,20 @@ class WorkspacesController {
                 $rows = [];
 
                 if (is_string($publicWorkspaceName) && $publicWorkspaceName !== '') {
-                    $stmt = $this->con->prepare('SELECT name, created FROM workspaces WHERE name = ? ORDER BY name');
+                    $stmt = $this->con->prepare('SELECT name, created, tags FROM workspaces WHERE name = ? ORDER BY name');
                     $stmt->execute([$publicWorkspaceName]);
                     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             } else {
-                $stmt = $this->con->query("SELECT name, created FROM workspaces ORDER BY name");
+                $stmt = $this->con->query("SELECT name, created, tags FROM workspaces ORDER BY name");
                 $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
+
+            // Tags are stored comma-separated; expose them as a list
+            $rows = array_map(function ($row) {
+                $row['tags'] = poznoteParseWorkspaceTags($row['tags'] ?? '');
+                return $row;
+            }, $rows);
             
             // Get current user
             $currentUser = getCurrentUser();
@@ -82,7 +88,8 @@ class WorkspacesController {
     /**
      * POST /api/v1/workspaces
      * Create a new workspace
-     * Body: { "name": "workspace_name" }
+     * Body: { "name": "workspace_name", "tags": ["school", "psycho"] }
+     * (tags optional: an array or a comma-separated string)
      */
     public function store() {
         if (!$this->requireActiveAccountOwner()) {
@@ -124,13 +131,15 @@ class WorkspacesController {
                 return;
             }
             
-            $stmt = $this->con->prepare("INSERT INTO workspaces (name) VALUES (?)");
-            if ($stmt->execute([$name])) {
+            $tags = poznoteParseWorkspaceTags($input['tags'] ?? []);
+
+            $stmt = $this->con->prepare("INSERT INTO workspaces (name, tags) VALUES (?, ?)");
+            if ($stmt->execute([$name, poznoteSerializeWorkspaceTags($tags)])) {
                 require_once dirname(__DIR__, 3) . '/ActivityLog.php';
                 logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name], 'api');
 
                 http_response_code(201);
-                echo json_encode(['success' => true, 'name' => $name]);
+                echo json_encode(['success' => true, 'name' => $name, 'tags' => $tags]);
             } else {
                 http_response_code(500);
                 echo json_encode(['success' => false, 'message' => 'Error creating workspace']);
@@ -143,8 +152,9 @@ class WorkspacesController {
     
     /**
      * PATCH /api/v1/workspaces/{name}
-     * Rename a workspace
-     * Body: { "new_name": "new_workspace_name" }
+     * Rename a workspace and/or replace its tags
+     * Body: { "new_name": "new_workspace_name", "tags": ["school"] }
+     * (both optional, at least one required; tags replace the whole list)
      */
     public function update($name) {
         if (!$this->requireActiveAccountOwner()) {
@@ -161,14 +171,22 @@ class WorkspacesController {
         }
         
         $newName = trim($input['new_name'] ?? '');
-        
-        if ($name === '' || $newName === '') {
+        $hasTags = array_key_exists('tags', $input);
+        $tags = $hasTags ? poznoteParseWorkspaceTags($input['tags']) : null;
+
+        if ($name === '') {
             http_response_code(400);
-            echo json_encode(['success' => false, 'message' => 'Both old and new names are required']);
+            echo json_encode(['success' => false, 'message' => 'Workspace name is required']);
             return;
         }
-        
-        if (!preg_match('/^[\p{L}0-9 _-]+$/u', $newName)) {
+
+        if ($newName === '' && !$hasTags) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'new_name or tags is required']);
+            return;
+        }
+
+        if ($newName !== '' && !preg_match('/^[\p{L}0-9 _-]+$/u', $newName)) {
             http_response_code(400);
             echo json_encode([
                 'success' => false,
@@ -190,6 +208,19 @@ class WorkspacesController {
                 return;
             }
             
+            // Tags only: no rename involved
+            if ($newName === '' || $newName === $name) {
+                $stmt = $this->con->prepare("UPDATE workspaces SET tags = ? WHERE name = ?");
+                $stmt->execute([poznoteSerializeWorkspaceTags($tags ?? []), $name]);
+                echo json_encode([
+                    'success' => true,
+                    'old_name' => $name,
+                    'new_name' => $name,
+                    'tags' => $tags ?? []
+                ]);
+                return;
+            }
+
             // Ensure the target name does not already exist
             $checkNew = $this->con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
             $checkNew->execute([$newName]);
@@ -221,10 +252,15 @@ class WorkspacesController {
             
             $stmt = $this->con->prepare("UPDATE workspaces SET name = ? WHERE name = ?");
             if ($stmt->execute([$newName, $name])) {
+                if ($hasTags) {
+                    $stmt = $this->con->prepare("UPDATE workspaces SET tags = ? WHERE name = ?");
+                    $stmt->execute([poznoteSerializeWorkspaceTags($tags), $newName]);
+                }
                 echo json_encode([
                     'success' => true,
                     'old_name' => $name,
-                    'new_name' => $newName
+                    'new_name' => $newName,
+                    'tags' => $hasTags ? $tags : null
                 ]);
             } else {
                 http_response_code(500);

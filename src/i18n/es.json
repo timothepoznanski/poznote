@@ -689,6 +689,15 @@
         "users_loading": "Cargando usuarios...",
         "no_users_found": "No se encontraron otros usuarios"
       }
+    },
+    "tags": {
+      "action": "Etiquetas",
+      "modal_title": "Etiquetas del espacio de trabajo",
+      "placeholder": "Etiquetas separadas por comas (opcional, p. ej. escuela, psico)",
+      "help": "Las etiquetas agrupan espacios de trabajo en el panel: elige allí una etiqueta para ver todos los espacios que la llevan.",
+      "saved": "Etiquetas actualizadas",
+      "save_error": "No se pudieron actualizar las etiquetas",
+      "empty": "Todavía no hay etiquetas."
     }
   },
   "display": {
@@ -1581,7 +1590,7 @@
         "unit": "instantáneas automáticas"
       },
       "badge": "{{count}} automáticas por nota",
-      "warning_title": "Conservar más instantáneas puede usar mucho almacenamiento.",
+      "warning_title": "Las instantáneas solo guardan el texto de la nota. Los archivos adjuntos nunca se copian.",
       "warning": "Los archivos adjuntos y las imágenes se conservan en el disco incluso después de eliminarlos de una nota, mientras alguna de sus instantáneas todavía los contenga. Solo se liberan cuando caduca la última instantánea que los contiene (como máximo a los {{days}} días) o cuando la nota se elimina definitivamente."
     }
   },
@@ -3771,6 +3780,39 @@
       "layout": "Disposición",
       "layout_grid": "Cuadrícula",
       "layout_list": "Lista"
+    },
+    "scope": {
+      "title": "Ámbito",
+      "hint": "Elige los espacios de trabajo que quieres ver. Una etiqueta selecciona todos los que la llevan.",
+      "all": "Todos los espacios de trabajo",
+      "by_tag": "Por etiqueta",
+      "workspaces": "Espacios de trabajo",
+      "tag_label": "Etiqueta: {{tag}}",
+      "count_label": "{{count}} espacios de trabajo",
+      "no_tags": "Ningún espacio de trabajo tiene etiquetas todavía.",
+      "open": "Abrir solo este espacio de trabajo",
+      "load_error": "No se pudieron cargar los espacios de trabajo.",
+      "no_workspaces": "No hay espacios de trabajo disponibles",
+      "empty": "Aún no hay notas en este ámbito.",
+      "no_workspace_for_tag": "Ningún espacio de trabajo lleva la etiqueta «{{tag}}».",
+      "group_empty": "Nada aquí todavía.",
+      "manage_workspaces": "Gestionar espacios de trabajo"
+    },
+    "modified": {
+      "button": "Filtrar por última modificación",
+      "any": "Cualquier fecha",
+      "today": "Hoy",
+      "week": "Últimos 7 días",
+      "month": "Últimos 30 días",
+      "quarter": "Últimos 90 días",
+      "year": "Últimos 12 meses"
+    },
+    "tag_filter": {
+      "button": "Filtrar por etiqueta",
+      "all": "Todas las etiquetas",
+      "empty": "No hay etiquetas en este tablero.",
+      "search": "Filtrar etiquetas...",
+      "no_match": "Ninguna etiqueta coincide."
     }
   },
   "graph": {
@@ -4042,7 +4084,9 @@
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tareas ya no está disponible.",
-    "empty": "Aún no hay tareas en esta lista."
+    "empty": "Aún no hay tareas en esta lista.",
+    "add_placeholder": "Añadir una tarea...",
+    "save_error": "No se pudo guardar la lista de tareas."
   },
   "saas": {
     "description": "Elementos de visualización útiles cuando esta instancia se ofrece como servicio alojado (SaaS). Todo está oculto por defecto.",

@@ -70,7 +70,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <?php include 'icon_sidebar.php'; ?>
     <div class="home-container">
 
-        <h1 class="poznote-page-title"><i class="lucide lucide-plus-circle"></i> <?php echo t_h('sidebar.create', [], 'Create'); ?></h1>
+        <h1 class="poznote-page-title"><i class="lucide lucide-plus-circle"></i> <?php echo t_h('sidebar.create', [], 'Create'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
         <div class="home-grid">
 

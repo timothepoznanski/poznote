@@ -587,6 +587,24 @@
     flex-shrink: 0;
 }
 
+/* Keep every action on one row: longer translated labels (French, Spanish)
+   overflow the 16px/20px sizing that modals/responsive.css forces on all
+   modal buttons, so this bar opts back down to the base 14px. "safe" keeps
+   the first button reachable if a locale still overflows and the bar scrolls. */
+#snapshotModal .snapshot-modal-actions {
+    flex-wrap: nowrap;
+    justify-content: safe flex-end;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+#snapshotModal .snapshot-modal-actions button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+}
+
 .snapshot-restore-btn {
     display: inline-flex !important;
     align-items: center;

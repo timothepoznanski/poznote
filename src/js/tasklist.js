@@ -605,11 +605,15 @@ function toggleTask(taskId, noteId) {
     markTaskListAsModified(noteId);
 }
 
+// onSave: optional callback that persists the new text itself (used by the
+// embedded task list widget, whose list is not the open note); without it the
+// edit goes through saveTaskEdit on #entry{noteId}.
 let taskEditState = {
     taskId: null,
     noteId: null,
     originalText: '',
-    lastFocusedElement: null
+    lastFocusedElement: null,
+    onSave: null
 };
 
 function getTaskEditEmptyError() {
@@ -667,7 +671,8 @@ function closeTaskEditModal() {
         taskId: null,
         noteId: null,
         originalText: '',
-        lastFocusedElement: null
+        lastFocusedElement: null,
+        onSave: null
     };
     setTaskEditError('');
 
@@ -690,11 +695,19 @@ function saveTaskEditFromModal() {
     }
 
     const savedTaskId = taskEditState.taskId;
+    const onSave = taskEditState.onSave;
     if (newText !== taskEditState.originalText) {
-        saveTaskEdit(taskEditState.taskId, taskEditState.noteId, newText);
+        if (typeof onSave === 'function') {
+            onSave(newText);
+        } else {
+            saveTaskEdit(taskEditState.taskId, taskEditState.noteId, newText);
+        }
     }
 
     closeTaskEditModal();
+
+    // A custom saver re-renders its own UI
+    if (typeof onSave === 'function') return;
 
     // Restore focus to the re-rendered task text span (saveTaskEdit replaced the old span).
     const newTaskItem = savedTaskId !== null ? document.querySelector('[data-task-id="' + savedTaskId + '"]') : null;
@@ -745,7 +758,7 @@ function attachTaskEditModalHandlers(modal) {
     modal.dataset.handlersAttached = 'true';
 }
 
-function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement) {
+function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement, options) {
     const modal = document.getElementById('taskEditModal');
     const textarea = document.getElementById('taskEditTextarea');
     const saveBtn = document.getElementById('saveTaskEditBtn');
@@ -757,7 +770,8 @@ function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement) {
         taskId: taskId,
         noteId: noteId,
         originalText: currentText,
-        lastFocusedElement: lastFocusedElement || document.activeElement
+        lastFocusedElement: lastFocusedElement || document.activeElement,
+        onSave: (options && typeof options.onSave === 'function') ? options.onSave : null
     };
 
     setTaskEditError('');
@@ -1673,6 +1687,7 @@ function linkifyHtml(text) {
 
 // Export functions globally
 window.initializeTaskList = initializeTaskList;
+window.openTaskEditModal = openTaskEditModal;
 window.addTask = addTask;
 window.toggleTask = toggleTask;
 window.editTask = editTask;

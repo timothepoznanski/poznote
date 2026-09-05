@@ -964,7 +964,9 @@ body.dark-mode .tasklist-embed-widget {
 }
 
 html[data-theme='dark'] .tasklist-embed-task:hover,
-body.dark-mode .tasklist-embed-task:hover {
+body.dark-mode .tasklist-embed-task:hover,
+html[data-theme='dark'] .tasklist-embed-task:focus-within,
+body.dark-mode .tasklist-embed-task:focus-within {
     background: rgba(255, 255, 255, 0.05);
 }
 
@@ -1002,4 +1004,58 @@ body.dark-mode .tasklist-embed-empty:is(#pz-specificity-boost, *),
 html[data-theme='dark'] .tasklist-embed-unavailable:is(#pz-specificity-boost, *),
 body.dark-mode .tasklist-embed-unavailable:is(#pz-specificity-boost, *) {
     color: #8a8a8a !important;
+}
+
+
+/* Inline editing controls of the embedded task list. The `.noteentry *`
+   --dm-text blanket also hits the buttons, so their colors need the :is()
+   ID boost + !important; the icons simply inherit from their control. */
+html[data-theme='dark'] .tasklist-embed-add-input:focus,
+body.dark-mode .tasklist-embed-add-input:focus {
+    border-bottom-color: var(--dm-border);
+}
+
+html[data-theme='dark'] .tasklist-embed-add-input::placeholder,
+body.dark-mode .tasklist-embed-add-input::placeholder {
+    color: #8a8a8a;
+}
+
+html[data-theme='dark'] .tasklist-embed-action i:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-action i:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .tasklist-embed-due i:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-due i:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .tasklist-embed-add > i:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-add > i:is(#pz-specificity-boost, *) {
+    color: inherit !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-action:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-action:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-add:is(#pz-specificity-boost, *) {
+    color: #a8a8a8 !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *) {
+    color: #f39c12 !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),
+html[data-theme='dark'] button.tasklist-embed-due:hover:is(#pz-specificity-boost, *),
+body.dark-mode button.tasklist-embed-due:hover:is(#pz-specificity-boost, *) {
+    color: #4da3d0 !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-action-delete:hover:is(#pz-specificity-boost, *) {
+    color: #ff6b6b !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-error:is(#pz-specificity-boost, *),
+body.dark-mode .tasklist-embed-error:is(#pz-specificity-boost, *) {
+    color: #ff6b6b !important;
 }

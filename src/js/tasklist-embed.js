@@ -7,6 +7,12 @@
 // The interactive widget rendered inside (.tasklist-embed-widget) is runtime
 // UI: the server strips it on save (sanitizeHtml) and this file rebuilds it
 // on load. The fallback link keeps public and exported notes usable.
+//
+// The widget is a live editor of the source tasklist note: tasks can be
+// added, renamed (shared "Edit task" modal), completed, starred, dated and
+// deleted without leaving the host note. Every change is a read-modify-write of the source note through
+// the notes API (same flow as the global tasks page), so the host note never
+// carries task data itself.
 (function () {
     'use strict';
 
@@ -22,6 +28,11 @@
         return (typeof window.getCurrentEditorSessionId === 'function')
             ? window.getCurrentEditorSessionId()
             : '';
+    }
+
+    function noteUrlFor(noteId) {
+        return 'index.php?note=' + noteId
+            + (currentWorkspace() ? '&workspace=' + encodeURIComponent(currentWorkspace()) : '');
     }
 
     function localDateStringNow() {
@@ -69,6 +80,17 @@
         return Array.isArray(tasks) ? tasks : [];
     }
 
+    function findTask(tasks, taskId) {
+        return tasks.find(function (item) { return String(item.id) === String(taskId); }) || null;
+    }
+
+    // The task may have been deleted from the tasklist note meanwhile
+    function requireTask(tasks, taskId) {
+        var task = findTask(tasks, taskId);
+        if (!task) throw new Error('tasklist embed: task not found');
+        return task;
+    }
+
     // Per-list collapsed state, persisted per user (same pattern as the
     // dashboard tasks page)
     var COLLAPSED_KEY = 'poznote-tasklist-embed-collapsed';
@@ -92,6 +114,153 @@
         } catch (e) { }
     }
 
+    // ===== Task ordering (mirrors the tasklist note and the tasks page) =====
+
+    // Where new tasks go (global setting). Loaded once in the background so
+    // adding a task never waits on a settings round-trip after the first one.
+    var insertOrder = null;
+    var insertOrderRequest = null;
+
+    function loadInsertOrder() {
+        if (insertOrderRequest) return insertOrderRequest;
+        insertOrderRequest = fetch('/api/v1/settings/tasklist_insert_order', { credentials: 'same-origin' })
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                insertOrder = (data && data.success && data.value === 'top') ? 'top' : 'bottom';
+            })
+            .catch(function () {
+                if (insertOrder === null) insertOrder = 'bottom';
+            });
+        return insertOrderRequest;
+    }
+
+    function getInsertOrder() {
+        return insertOrder === 'top' ? 'top' : 'bottom';
+    }
+
+    function groupTasks(tasks) {
+        var important = [], normal = [], completed = [];
+        tasks.forEach(function (task) {
+            if (task.completed) completed.push(task);
+            else if (task.important) important.push(task);
+            else normal.push(task);
+        });
+        return { important: important, normal: normal, completed: completed };
+    }
+
+    // Important open tasks first, then the other open tasks, completed last
+    function regroupTasks(tasks) {
+        var groups = groupTasks(tasks);
+        return [].concat(groups.important, groups.normal, groups.completed);
+    }
+
+    // A newly completed task lands at the top of the completed group (bottom
+    // insert order) or at its end (top insert order); a reopened task rejoins
+    // the end of its group
+    function reorderAfterToggle(tasks, toggled) {
+        var groups = groupTasks(tasks.filter(function (task) {
+            return String(task.id) !== String(toggled.id);
+        }));
+        if (toggled.completed) {
+            if (getInsertOrder() === 'bottom') groups.completed.unshift(toggled);
+            else groups.completed.push(toggled);
+        } else if (toggled.important) {
+            groups.important.push(toggled);
+        } else {
+            groups.normal.push(toggled);
+        }
+        return [].concat(groups.important, groups.normal, groups.completed);
+    }
+
+    // ===== Source note access =====
+
+    // Resolves to the tasklist note, or null when it is gone or not a task
+    // list anymore. Network errors propagate.
+    async function fetchTaskListNote(noteId) {
+        var response = await fetch('/api/v1/notes/' + encodeURIComponent(noteId)
+            + '?workspace=' + encodeURIComponent(currentWorkspace()), { credentials: 'same-origin' });
+        var data = await response.json();
+        if (!data || !data.success || !data.note || data.note.type !== 'tasklist') {
+            return null;
+        }
+        return data.note;
+    }
+
+    async function saveTaskListNote(noteId, tasks) {
+        var sessionId = editorSessionId();
+        var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+        var payload = { content: JSON.stringify(tasks) };
+        if (sessionId) {
+            headers['X-Editor-Session-ID'] = sessionId;
+            payload.editor_session_id = sessionId;
+        }
+
+        var response = await fetch('/api/v1/notes/' + encodeURIComponent(noteId), {
+            method: 'PATCH',
+            headers: headers,
+            credentials: 'same-origin',
+            body: JSON.stringify(payload)
+        });
+        var data = await response.json();
+        if (!data || !data.success) {
+            throw new Error('tasklist embed: save failed');
+        }
+    }
+
+    // Read-modify-write of the source list: `mutate(tasks)` returns the new
+    // task array (or null to leave the list untouched). Every embed of that
+    // list on the page is re-rendered from the saved state afterwards.
+    async function mutateTaskList(noteId, mutate) {
+        var note = await fetchTaskListNote(noteId);
+        if (!note) throw new Error('tasklist embed: target unavailable');
+
+        var tasks = mutate(parseTasks(note.content));
+        if (!tasks) return null;
+
+        await saveTaskListNote(noteId, tasks);
+
+        // The tasklist note may sit in the in-app DOM cache; drop it so
+        // navigating there (e.g. via the widget title) shows fresh state
+        if (typeof window.invalidateNoteDomCache === 'function') {
+            window.invalidateNoteDomCache(noteId);
+        }
+
+        refreshEmbedsForNote(noteId);
+        return tasks;
+    }
+
+    // Completing or deleting a task cancels its pending reminder
+    function cancelTaskReminder(noteId, taskId) {
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/task-reminder', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ task_id: String(taskId) })
+        }).catch(function () { });
+    }
+
+    function canOpenDueModal() {
+        return typeof window.openTaskDueModal === 'function' && !!document.getElementById('taskDueModal');
+    }
+
+    // Transient error line under the widget (the edit lock of the source
+    // note, a network failure...). The next re-render clears it.
+    function showEmbedError(embed, message) {
+        var widget = embed.querySelector(':scope > .tasklist-embed-widget');
+        if (!widget) return;
+
+        var box = widget.querySelector('.tasklist-embed-error');
+        if (!box) {
+            box = document.createElement('div');
+            box.className = 'tasklist-embed-error';
+            widget.appendChild(box);
+        }
+        box.textContent = message || t('tasklist_embed.save_error', null, 'Could not save the task list.');
+
+        if (box._hideTimer) clearTimeout(box._hideTimer);
+        box._hideTimer = setTimeout(function () { box.remove(); }, 5000);
+    }
+
     // ===== Hydration =====
 
     function initializeTaskListEmbeds(root) {
@@ -109,17 +278,15 @@
         // The marker itself must always stay atomic in the editor
         embed.setAttribute('contenteditable', 'false');
 
-        try {
-            var response = await fetch('/api/v1/notes/' + encodeURIComponent(noteId)
-                + '?workspace=' + encodeURIComponent(currentWorkspace()), { credentials: 'same-origin' });
-            var data = await response.json();
+        loadInsertOrder();
 
-            if (!data || !data.success || !data.note || data.note.type !== 'tasklist') {
+        try {
+            var note = await fetchTaskListNote(noteId);
+            if (!note) {
                 renderUnavailable(embed);
                 return;
             }
-
-            renderWidget(embed, data.note, parseTasks(data.note.content));
+            renderWidget(embed, note, parseTasks(note.content));
         } catch (e) {
             // Network error: keep the fallback link untouched
         }
@@ -145,11 +312,36 @@
         replaceWidget(embed, widget);
     }
 
+    // A re-render (after any save) must not eat what the user is typing in
+    // the "add a task" field of the widget being replaced
+    function captureAddInputState(embed) {
+        var input = embed.querySelector('.tasklist-embed-add-input');
+        if (!input) return null;
+        return {
+            value: input.value,
+            focused: document.activeElement === input,
+            selectionStart: input.selectionStart,
+            selectionEnd: input.selectionEnd
+        };
+    }
+
+    function restoreAddInputState(widget, state) {
+        if (!state) return;
+        var input = widget.querySelector('.tasklist-embed-add-input');
+        if (!input) return;
+        input.value = state.value;
+        if (state.focused) {
+            input.focus();
+            try {
+                input.setSelectionRange(state.selectionStart, state.selectionEnd);
+            } catch (e) { }
+        }
+    }
+
     function renderWidget(embed, note, tasks) {
         var noteId = note.id;
         var heading = note.heading || t('note_reference.untitled', null, 'Untitled');
-        var noteUrl = 'index.php?note=' + noteId
-            + (currentWorkspace() ? '&workspace=' + encodeURIComponent(currentWorkspace()) : '');
+        var noteUrl = noteUrlFor(noteId);
 
         // Keep the persisted fallback link in sync with the list's current name
         var fallback = embed.querySelector(':scope > .tasklist-embed-link');
@@ -157,6 +349,8 @@
             fallback.textContent = heading;
             fallback.href = noteUrl;
         }
+
+        var addState = captureAddInputState(embed);
 
         var widget = document.createElement('div');
         widget.className = 'tasklist-embed-widget';
@@ -193,6 +387,7 @@
         });
         header.appendChild(toggle);
 
+        // The title is the way to the source note (rows edit in place)
         var title = document.createElement('a');
         title.className = 'tasklist-embed-title';
         title.href = noteUrl;
@@ -207,21 +402,47 @@
 
         widget.appendChild(header);
 
+        var body = document.createElement('div');
+        body.className = 'tasklist-embed-body';
+
         if (tasks.length > 0) {
             var list = document.createElement('div');
             list.className = 'tasklist-embed-list';
             tasks.forEach(function (task) {
                 list.appendChild(renderTaskRow(embed, noteId, task));
             });
-            widget.appendChild(list);
+            body.appendChild(list);
         } else {
             var empty = document.createElement('div');
             empty.className = 'tasklist-embed-empty';
             empty.textContent = t('tasklist_embed.empty', null, 'No tasks in this list yet.');
-            widget.appendChild(empty);
+            body.appendChild(empty);
         }
 
+        body.appendChild(renderAddRow(embed, noteId));
+        widget.appendChild(body);
+
         replaceWidget(embed, widget);
+        restoreAddInputState(widget, addState);
+    }
+
+    function actionButton(icon, label, className, onClick) {
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'tasklist-embed-action ' + className;
+        button.title = label;
+        button.setAttribute('aria-label', label);
+
+        var i = document.createElement('i');
+        i.className = 'lucide ' + icon;
+        button.appendChild(i);
+
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            onClick();
+        });
+        return button;
     }
 
     function renderTaskRow(embed, noteId, task) {
@@ -229,22 +450,7 @@
         row.className = 'tasklist-embed-task'
             + (task.completed ? ' completed' : '')
             + (task.important && !task.completed ? ' important' : '');
-
-        // Clicking the row (outside the checkbox and links) opens the source
-        // tasklist note. stopPropagation keeps the markdown split-mode
-        // click-to-editor-line handler from hijacking the click.
-        row.addEventListener('click', function (e) {
-            if (e.target.closest('a, button, input')) return;
-            e.preventDefault();
-            e.stopPropagation();
-            var url = 'index.php?note=' + noteId
-                + (currentWorkspace() ? '&workspace=' + encodeURIComponent(currentWorkspace()) : '');
-            if (typeof window.navigateToNote === 'function') {
-                window.navigateToNote(noteId);
-            } else {
-                window.location.href = url;
-            }
-        });
+        row.setAttribute('data-task-id', String(task.id));
 
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -255,95 +461,244 @@
         });
         row.appendChild(checkbox);
 
+        // Click the text to rename the task (same modal as the tasklist note)
         var text = document.createElement('span');
         text.className = 'tasklist-embed-text';
         text.textContent = task.text || '';
+        text.title = t('tasklist.edit_task', null, 'Edit task');
+        text.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            openEmbedEditModal(embed, noteId, task, text);
+        });
         row.appendChild(text);
 
-        if (task.important && !task.completed) {
-            var star = document.createElement('i');
-            star.className = 'lucide lucide-star tasklist-embed-star';
-            row.appendChild(star);
-        }
-
         if (task.dueAt) {
-            var due = document.createElement('span');
+            var due = document.createElement(canOpenDueModal() ? 'button' : 'span');
+            if (due.tagName === 'BUTTON') due.type = 'button';
             due.className = 'tasklist-embed-due' + (isOverdue(task) ? ' overdue' : '');
+            due.title = t('tasklist.due_date', null, 'Due date');
             var dueIcon = document.createElement('i');
             dueIcon.className = 'lucide lucide-calendar-alt';
             due.appendChild(dueIcon);
             due.appendChild(document.createTextNode(formatDueDate(task.dueAt)));
+            if (task.dueReminder) {
+                var bell = document.createElement('i');
+                bell.className = 'lucide lucide-bell';
+                due.appendChild(bell);
+            }
+            due.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                openEmbedDueModal(embed, noteId, task);
+            });
             row.appendChild(due);
         }
+
+        // Same per-row controls as the tasklist note: open tasks get the due
+        // date and important toggles, completed tasks can be deleted
+        var actions = document.createElement('div');
+        actions.className = 'tasklist-embed-actions';
+        if (task.completed) {
+            actions.appendChild(actionButton('lucide-trash-2', t('common.delete', null, 'Delete'),
+                'tasklist-embed-action-delete', function () {
+                    deleteEmbedTask(embed, noteId, task);
+                }));
+        } else {
+            if (!task.dueAt && canOpenDueModal()) {
+                actions.appendChild(actionButton('lucide-calendar-alt', t('tasklist.due_date', null, 'Due date'),
+                    'tasklist-embed-action-due', function () {
+                        openEmbedDueModal(embed, noteId, task);
+                    }));
+            }
+            var starLabel = task.important
+                ? t('tasklist.unmark_important', null, 'Remove important')
+                : t('tasklist.mark_important', null, 'Mark as important');
+            actions.appendChild(actionButton('lucide-star', starLabel,
+                'tasklist-embed-action-important' + (task.important ? ' is-active' : ''), function () {
+                    toggleEmbedImportant(embed, noteId, task);
+                }));
+        }
+        row.appendChild(actions);
 
         return row;
     }
 
-    // Toggle a task in the source tasklist note (read-modify-write through the
-    // notes API, same flow as the global tasks page), then re-render every
-    // embed of that list.
+    // "Add a task" field at the bottom of the list
+    function renderAddRow(embed, noteId) {
+        var form = document.createElement('form');
+        form.className = 'tasklist-embed-add';
+        form.setAttribute('action', 'javascript:void(0);');
+
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-plus';
+        form.appendChild(icon);
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'tasklist-embed-add-input';
+        input.placeholder = t('tasklist_embed.add_placeholder', null, 'Add a task...');
+        input.maxLength = 4000;
+        input.setAttribute('autocomplete', 'off');
+        input.setAttribute('enterkeyhint', 'go');
+        form.appendChild(input);
+
+        function submitAdd() {
+            var text = input.value.trim();
+            if (!text) return;
+
+            // Clear right away so the next task can be typed while this one
+            // saves; the value comes back if the save fails
+            input.value = '';
+            addEmbedTask(embed, noteId, text).catch(function () {
+                var current = embed.querySelector('.tasklist-embed-add-input');
+                if (current && !current.value) current.value = text;
+                showEmbedError(embed);
+            });
+            input.focus();
+        }
+
+        // Implicit form submission is what mobile virtual keyboards trigger
+        // reliably (see tasklist.js); the keydown handler covers desktop
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitAdd();
+        });
+        input.addEventListener('keydown', function (e) {
+            // Keys typed here belong to this field: the host note editor's
+            // keydown handlers (Enter/Tab/Backspace logic, shortcuts) must
+            // not act on them
+            e.stopPropagation();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitAdd();
+            }
+        });
+
+        return form;
+    }
+
+    // Rename through the shared "Edit task" modal of tasklist.js (multi-line
+    // text, Ctrl+Enter saves); the modal hands the new text back and the
+    // widget persists it itself
+    function openEmbedEditModal(embed, noteId, task, textEl) {
+        if (typeof window.openTaskEditModal !== 'function') return;
+
+        var original = task.text || '';
+        window.openTaskEditModal(task.id, noteId, original, textEl, {
+            onSave: function (newText) {
+                textEl.textContent = newText;
+                saveEmbedTaskText(embed, noteId, task, newText, original, textEl);
+            }
+        });
+    }
+
+    // ===== Mutations =====
+
     async function toggleEmbedTask(embed, noteId, task, checkbox) {
         var newCompleted = checkbox.checked;
         checkbox.disabled = true;
 
+        var clearReminder = false;
         try {
-            var noteResp = await fetch('/api/v1/notes/' + encodeURIComponent(noteId)
-                + '?workspace=' + encodeURIComponent(currentWorkspace()), { credentials: 'same-origin' });
-            var noteData = await noteResp.json();
-            if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
-                throw new Error('embed target unavailable');
-            }
-
-            var tasks = parseTasks(noteData.note.content);
-            var target = tasks.find(function (item) { return String(item.id) === String(task.id); });
-            if (!target) {
-                throw new Error('task not found');
-            }
-
-            target.completed = newCompleted;
-            var clearReminder = newCompleted && target.dueReminder;
-            if (clearReminder) target.dueReminder = false;
-
-            var sessionId = editorSessionId();
-            var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-            var payload = { content: JSON.stringify(tasks) };
-            if (sessionId) {
-                headers['X-Editor-Session-ID'] = sessionId;
-                payload.editor_session_id = sessionId;
-            }
-
-            var updateResp = await fetch('/api/v1/notes/' + encodeURIComponent(noteId), {
-                method: 'PATCH',
-                headers: headers,
-                credentials: 'same-origin',
-                body: JSON.stringify(payload)
+            await mutateTaskList(noteId, function (tasks) {
+                var target = requireTask(tasks, task.id);
+                target.completed = newCompleted;
+                clearReminder = newCompleted && !!target.dueReminder;
+                if (clearReminder) target.dueReminder = false;
+                return reorderAfterToggle(tasks, target);
             });
-            var updateData = await updateResp.json();
-            if (!updateData || !updateData.success) {
-                throw new Error('embed task save failed');
-            }
-
-            // The tasklist note may sit in the in-app DOM cache; drop it so
-            // navigating there (e.g. via the widget title) shows fresh state
-            if (typeof window.invalidateNoteDomCache === 'function') {
-                window.invalidateNoteDomCache(noteId);
-            }
-
-            if (clearReminder) {
-                // Completing a task cancels its pending reminder
-                fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/task-reminder', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ task_id: String(task.id) })
-                }).catch(function () { });
-            }
-
-            refreshEmbedsForNote(noteId);
+            if (clearReminder) cancelTaskReminder(noteId, task.id);
         } catch (e) {
             checkbox.checked = !newCompleted;
             checkbox.disabled = false;
+            showEmbedError(embed);
         }
+    }
+
+    async function addEmbedTask(embed, noteId, text) {
+        await loadInsertOrder();
+        await mutateTaskList(noteId, function (tasks) {
+            var groups = groupTasks(tasks);
+            var task = {
+                id: Date.now() + Math.random(),
+                text: text,
+                completed: false,
+                noteId: Number(noteId) || noteId,
+                important: false,
+                dueAt: null
+            };
+            if (getInsertOrder() === 'top') {
+                groups.normal.unshift(task);
+            } else {
+                groups.normal.push(task);
+            }
+            return [].concat(groups.important, groups.normal, groups.completed);
+        });
+    }
+
+    async function saveEmbedTaskText(embed, noteId, task, newText, originalText, textEl) {
+        try {
+            await mutateTaskList(noteId, function (tasks) {
+                requireTask(tasks, task.id).text = newText;
+                return tasks;
+            });
+        } catch (e) {
+            textEl.textContent = originalText;
+            showEmbedError(embed);
+        }
+    }
+
+    async function deleteEmbedTask(embed, noteId, task) {
+        var hadReminder = false;
+        try {
+            await mutateTaskList(noteId, function (tasks) {
+                var target = requireTask(tasks, task.id);
+                hadReminder = !!target.dueReminder;
+                return tasks.filter(function (item) { return item !== target; });
+            });
+            if (hadReminder) cancelTaskReminder(noteId, task.id);
+        } catch (e) {
+            showEmbedError(embed);
+        }
+    }
+
+    async function toggleEmbedImportant(embed, noteId, task) {
+        try {
+            await mutateTaskList(noteId, function (tasks) {
+                var target = requireTask(tasks, task.id);
+                target.important = !target.important;
+                return regroupTasks(tasks);
+            });
+        } catch (e) {
+            showEmbedError(embed);
+        }
+    }
+
+    // Shared due-date modal (date + time + reminder). The modal materializes
+    // the reminder itself once onSave resolved, so a failed save must reject
+    // to keep the reminder in step with the stored due date.
+    function openEmbedDueModal(embed, noteId, task) {
+        if (!canOpenDueModal()) return;
+
+        window.openTaskDueModal({
+            noteId: noteId,
+            taskId: task.id,
+            task: task,
+            onSave: function (payload) {
+                return mutateTaskList(noteId, function (tasks) {
+                    var target = requireTask(tasks, task.id);
+                    target.dueAt = payload.dueAt;
+                    target.dueReminder = payload.dueReminder;
+                    target.dueReminderEmail = payload.dueReminderEmail;
+                    target.dueRecurrence = payload.dueRecurrence;
+                    return tasks;
+                }).catch(function (e) {
+                    showEmbedError(embed);
+                    throw e;
+                });
+            }
+        });
     }
 
     function refreshEmbedsForNote(noteId) {

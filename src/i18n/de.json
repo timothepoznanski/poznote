@@ -688,6 +688,15 @@
         "users_loading": "Benutzer werden geladen...",
         "no_users_found": "Keine anderen Benutzer gefunden"
       }
+    },
+    "tags": {
+      "action": "Tags",
+      "modal_title": "Tags des Arbeitsbereichs",
+      "placeholder": "Tags, durch Kommas getrennt (optional, z. B. schule, psycho)",
+      "help": "Tags gruppieren Arbeitsbereiche im Dashboard: Wähle dort einen Tag, um alle Arbeitsbereiche mit diesem Tag zu sehen.",
+      "saved": "Tags aktualisiert",
+      "save_error": "Die Tags konnten nicht aktualisiert werden",
+      "empty": "Noch keine Tags."
     }
   },
   "display": {
@@ -1580,7 +1589,7 @@
         "unit": "automatische Schnappschüsse"
       },
       "badge": "{{count}} automatische pro Notiz",
-      "warning_title": "Mehr Schnappschüsse können viel Speicherplatz belegen.",
+      "warning_title": "Schnappschüsse speichern nur den Text der Notiz. Anhänge werden nie kopiert.",
       "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
     }
   },
@@ -3771,6 +3780,39 @@
       "layout": "Anordnung",
       "layout_grid": "Raster",
       "layout_list": "Liste"
+    },
+    "scope": {
+      "title": "Bereich",
+      "hint": "Wähle die anzuzeigenden Arbeitsbereiche. Ein Tag wählt alle Arbeitsbereiche aus, die ihn tragen.",
+      "all": "Alle Arbeitsbereiche",
+      "by_tag": "Nach Tag",
+      "workspaces": "Arbeitsbereiche",
+      "tag_label": "Tag: {{tag}}",
+      "count_label": "{{count}} Arbeitsbereiche",
+      "no_tags": "Noch kein Arbeitsbereich hat Tags.",
+      "open": "Nur diesen Arbeitsbereich öffnen",
+      "load_error": "Die Arbeitsbereiche konnten nicht geladen werden.",
+      "no_workspaces": "Keine Arbeitsbereiche verfügbar",
+      "empty": "Noch keine Notizen in diesem Bereich.",
+      "no_workspace_for_tag": "Kein Arbeitsbereich trägt den Tag „{{tag}}“.",
+      "group_empty": "Noch nichts hier.",
+      "manage_workspaces": "Arbeitsbereiche verwalten"
+    },
+    "modified": {
+      "button": "Nach letzter Änderung filtern",
+      "any": "Jederzeit",
+      "today": "Heute",
+      "week": "Letzte 7 Tage",
+      "month": "Letzte 30 Tage",
+      "quarter": "Letzte 90 Tage",
+      "year": "Letzte 12 Monate"
+    },
+    "tag_filter": {
+      "button": "Nach Tag filtern",
+      "all": "Alle Tags",
+      "empty": "Keine Tags auf diesem Board.",
+      "search": "Tags filtern...",
+      "no_match": "Kein passender Tag."
     }
   },
   "graph": {
@@ -4042,7 +4084,9 @@
   },
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",
-    "empty": "Noch keine Aufgaben in dieser Liste."
+    "empty": "Noch keine Aufgaben in dieser Liste.",
+    "add_placeholder": "Aufgabe hinzufügen...",
+    "save_error": "Die Aufgabenliste konnte nicht gespeichert werden."
   },
   "saas": {
     "description": "Anzeigeelemente, die sinnvoll sind, wenn diese Instanz als gehosteter Dienst (SaaS) angeboten wird. Standardmäßig ist alles ausgeblendet.",

@@ -57,9 +57,15 @@ body {
     font-weight: bold;
 }
 
+/* The inputs and the button share one row; the tags hint sits under the whole
+   row, so it cannot push the tags field out of line with the name field. */
 #create-workspace-form {
+    display: block;
+}
+
+.ws-create-row {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 12px;
 }
 
@@ -104,22 +110,105 @@ body {
     min-width: 200px;
 }
 
-.ws-col-action {
-    flex: 1;
-    justify-content: flex-end;
-    min-width: 150px;
-}
-
 .ws-col-background {
     flex: 0 0 auto;
     justify-content: center;
     min-width: 50px;
 }
 
-.ws-col-share {
+/* Row actions: one icon per action (share, rename, tags, background, move
+   notes, delete). The delegated click handlers read the button from
+   event.target, hence the pointer-events on the icons. */
+.ws-col-actions {
     flex: 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ws-icon-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ws-icon-btn {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    min-width: 90px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.ws-icon-btn .lucide {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+.ws-icon-btn:hover,
+.ws-icon-btn:focus-visible {
+    background: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-text);
+}
+
+/* A public workspace: the share icon stays tinted */
+.ws-icon-btn.is-shared {
+    color: #d97706;
+}
+
+.ws-icon-btn.is-shared:hover,
+.ws-icon-btn.is-shared:focus-visible {
+    color: #b45309;
+}
+
+.ws-icon-btn.ws-icon-btn-danger:hover,
+.ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: var(--pz-danger);
+    background: rgba(220, 53, 69, 0.08);
+    border-color: transparent;
+}
+
+.ws-icon-btn[disabled] {
+    opacity: 0.4;
+    cursor: default;
+    background: transparent;
+    border-color: transparent;
+    color: var(--pz-text-muted);
+}
+
+:root[data-theme='dark'] .ws-icon-btn,
+body.dark-mode .ws-icon-btn {
+    color: #a8a8a8;
+}
+
+:root[data-theme='dark'] .ws-icon-btn:hover,
+body.dark-mode .ws-icon-btn:hover,
+:root[data-theme='dark'] .ws-icon-btn:focus-visible,
+body.dark-mode .ws-icon-btn:focus-visible {
+    background: var(--dm-surface-hover);
+    border-color: var(--dm-border);
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .ws-icon-btn.is-shared,
+body.dark-mode .ws-icon-btn.is-shared {
+    color: #fbbf24;
+}
+
+:root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:hover,
+body.dark-mode .ws-icon-btn.ws-icon-btn-danger:hover,
+:root[data-theme='dark'] .ws-icon-btn.ws-icon-btn-danger:focus-visible,
+body.dark-mode .ws-icon-btn.ws-icon-btn-danger:focus-visible {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
 }
 
 .workspace-share-toggle-form {
@@ -144,6 +233,21 @@ body {
     font-size: 16px;
 }
 
+/* The name opens the workspace */
+a.workspace-name-link {
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+}
+
+a.workspace-name-link:hover,
+a.workspace-name-link:focus-visible {
+    color: var(--pz-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .workspace-count {
     font-size: 12px;
     color: #666;
@@ -151,6 +255,53 @@ body {
     padding: 2px 8px;
     border-radius: 12px;
     margin-left: 8px;
+}
+
+/* Workspace tags (dashboard scope groups) */
+.ws-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.ws-tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #4b5563;
+    background: #eef2f7;
+    border-radius: 12px;
+    padding: 2px 9px;
+}
+
+.ws-tag-chip .lucide {
+    width: 12px;
+    height: 12px;
+}
+
+.ws-tags-help {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Tags modal: Poznote button row (right-aligned), spaced from the list */
+#workspaceTagsModal .modal-buttons {
+    margin-top: 20px;
+}
+
+:root[data-theme='dark'] .ws-tag-chip,
+body.dark-mode .ws-tag-chip {
+    color: #c9d1d9;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .ws-tags-help,
+body.dark-mode .ws-tags-help {
+    color: #9aa4b2;
 }
 
 .workspace-share-panel {
@@ -933,10 +1084,19 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         flex-basis: auto !important;
     }
 
-    .workspace-list .ws-col-select,
-    .workspace-list .ws-col-share,
-    .workspace-list .ws-col-action {
+    .workspace-list .ws-col-actions {
         flex-basis: auto !important;
+        justify-content: flex-start;
+    }
+
+    .workspace-list .ws-icon-actions {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .workspace-list .ws-icon-btn {
+        width: 40px;
+        height: 40px;
     }
     
     .workspace-list .btn {
@@ -966,7 +1126,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     }
     
     /* Form styling for mobile */
-    #create-workspace-form {
+    .ws-create-row {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;

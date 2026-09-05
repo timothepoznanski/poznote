@@ -25,6 +25,15 @@ body.dark-mode .poznote-page-title {
     color: var(--dm-text);
 }
 
+/* --dm-text-muted is *brighter* than --dm-text in the dark theme, so it would
+   make the suffix stand out rather than recede. Dim the heading colour instead,
+   which behaves the same way in the dark and black themes. */
+html[data-theme='dark'] .poznote-page-title-workspace,
+body.dark-mode .poznote-page-title-workspace {
+    color: var(--dm-text);
+    opacity: 0.65;
+}
+
 html[data-theme='dark'] .settings-current-user-badge,
 body.dark-mode .settings-current-user-badge {
     background: var(--dm-surface-hover);

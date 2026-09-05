@@ -646,6 +646,25 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Workspace tags modal (for workspaces.php): same list as the note
+     "Manage tags" modal (css/notes/tags.css), saved as a whole on Save -->
+<div id="workspaceTagsModal" class="modal initially-hidden">
+    <div class="modal-content">
+        <h3><?php echo t_h('workspaces.tags.modal_title', [], 'Workspace tags'); ?> <span id="workspaceTagsSource"></span></h3>
+        <p class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.'); ?></p>
+        <div class="modal-body">
+            <div id="workspaceTagsList" class="tags-modal-list"></div>
+            <div class="tags-modal-input-wrapper">
+                <input id="workspaceTagsInput" type="text" autocomplete="off" placeholder="<?php echo t_h('tags.add_single', [], 'Add tag...'); ?>" />
+            </div>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" data-action="close-workspace-tags-modal"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="confirmWorkspaceTagsBtn"><?php echo t_h('common.save', [], 'Save'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Delete confirmation modal (for workspaces.php) -->
 <div id="deleteModal" class="modal initially-hidden">
     <div class="modal-content">
@@ -952,7 +971,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
                 <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'automatic snapshots'); ?></label>
             </div>
             <div class="delete-warning-box">
-                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'More snapshots can use a lot of storage.'); ?></p>
+                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments are never copied.'); ?></p>
                 <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
             </div>
         </div>
@@ -1768,6 +1787,8 @@ include __DIR__ . '/modals/folder_icon_modal.php';
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewColumnsBtn" checked><span><?php echo t_h('dashboard.view.columns', [], 'Maximum columns'); ?></span></label>
                     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardColorFilterBtn" checked><span><?php echo t_h('note_color.filter', [], 'Filter by color'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardModifiedFilterBtn" checked><span><?php echo t_h('dashboard.modified.button', [], 'Filter by last modification'); ?></span></label>
+                    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTagFilterBtn" checked><span><?php echo t_h('dashboard.tag_filter.button', [], 'Filter by tag'); ?></span></label>
                 </div>
                 </div>
 

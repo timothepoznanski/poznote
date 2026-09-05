@@ -991,8 +991,7 @@ body.dark-mode .toggle-block[open]>summary {
     transform: rotate(-90deg);
 }
 
-.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-list,
-.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-empty {
+.noteentry .tasklist-embed-widget.collapsed .tasklist-embed-body {
     display: none;
 }
 
@@ -1033,11 +1032,10 @@ body.dark-mode .toggle-block[open]>summary {
     padding: 4px 2px;
     border-radius: 4px;
     min-width: 0;
-    /* The row opens the source tasklist note */
-    cursor: pointer;
 }
 
-.noteentry .tasklist-embed-task:hover {
+.noteentry .tasklist-embed-task:hover,
+.noteentry .tasklist-embed-task:focus-within {
     background: rgba(0, 0, 0, 0.03);
 }
 
@@ -1051,10 +1049,15 @@ body.dark-mode .toggle-block[open]>summary {
     margin: 3px 0 0;
 }
 
+/* Clicking the text opens the shared "Edit task" modal; pre-wrap keeps the
+   line breaks typed there */
 .noteentry .tasklist-embed-text {
     flex: 1;
+    min-width: 0;
     line-height: 1.4;
+    white-space: pre-wrap;
     overflow-wrap: anywhere;
+    cursor: pointer;
 }
 
 .noteentry .tasklist-embed-task.completed .tasklist-embed-text {
@@ -1062,11 +1065,7 @@ body.dark-mode .toggle-block[open]>summary {
     color: #888;
 }
 
-.noteentry .tasklist-embed-star {
-    color: #f39c12;
-    flex-shrink: 0;
-}
-
+/* Due date chip (a button opening the due-date modal) */
 .noteentry .tasklist-embed-due:is(#pz-specificity-boost, *) {
     font-size: 12px !important;
 }
@@ -1075,12 +1074,130 @@ body.dark-mode .toggle-block[open]>summary {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    margin: 2px 0 0;
+    padding: 0;
+    border: none;
+    background: transparent;
     color: #666;
+    font-family: inherit;
     flex-shrink: 0;
     white-space: nowrap;
 }
 
+.noteentry button.tasklist-embed-due {
+    cursor: pointer;
+}
+
+.noteentry button.tasklist-embed-due:hover {
+    color: var(--pz-accent);
+}
+
 .noteentry .tasklist-embed-due.overdue {
+    color: var(--pz-danger);
+}
+
+/* Row controls (due date, important, delete): revealed while the row is
+   hovered or focused; the star of an important task stays visible */
+.noteentry .tasklist-embed-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.noteentry .tasklist-embed-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #999;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.noteentry .tasklist-embed-task:hover .tasklist-embed-action,
+.noteentry .tasklist-embed-task:focus-within .tasklist-embed-action,
+.noteentry .tasklist-embed-action.is-active {
+    opacity: 1;
+}
+
+/* Touch screens have no hover: keep the controls reachable */
+@media (hover: none) {
+    .noteentry .tasklist-embed-action {
+        opacity: 0.6;
+    }
+}
+
+.noteentry .tasklist-embed-action-important.is-active,
+.noteentry .tasklist-embed-action-important:hover {
+    color: #f39c12;
+}
+
+.noteentry .tasklist-embed-action-due:hover {
+    color: var(--pz-accent);
+}
+
+.noteentry .tasklist-embed-action-delete:hover {
+    color: var(--pz-danger);
+}
+
+/* "Add a task" field at the bottom of the list */
+.noteentry .tasklist-embed-add {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 4px 0 0;
+    padding: 4px 2px;
+    color: #999;
+}
+
+.noteentry .tasklist-embed-add:focus-within {
+    color: #666;
+}
+
+/* Same footprint as the row checkboxes so the field lines up with the tasks */
+.noteentry .tasklist-embed-add > i {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.noteentry .tasklist-embed-add-input {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 2px 0;
+    border: none;
+    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: 1.4;
+    outline: none;
+}
+
+.noteentry .tasklist-embed-add-input:focus {
+    border-bottom-color: var(--pz-border);
+}
+
+.noteentry .tasklist-embed-add-input::placeholder {
+    color: #999;
+    opacity: 1;
+}
+
+.noteentry .tasklist-embed-error:is(#pz-specificity-boost, *) {
+    font-size: 12px !important;
+}
+
+.noteentry .tasklist-embed-error {
+    margin-top: 6px;
     color: var(--pz-danger);
 }
 
