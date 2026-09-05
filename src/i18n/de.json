@@ -4042,7 +4042,9 @@
   },
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",
-    "empty": "Noch keine Aufgaben in dieser Liste."
+    "empty": "Noch keine Aufgaben in dieser Liste.",
+    "add_placeholder": "Aufgabe hinzufügen...",
+    "save_error": "Die Aufgabenliste konnte nicht gespeichert werden."
   },
   "saas": {
     "description": "Anzeigeelemente, die sinnvoll sind, wenn diese Instanz als gehosteter Dienst (SaaS) angeboten wird. Standardmäßig ist alles ausgeblendet.",

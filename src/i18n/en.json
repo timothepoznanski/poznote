@@ -3778,7 +3778,9 @@
   },
   "tasklist_embed": {
     "unavailable": "This task list is no longer available.",
-    "empty": "No tasks in this list yet."
+    "empty": "No tasks in this list yet.",
+    "add_placeholder": "Add a task...",
+    "save_error": "Could not save the task list."
   },
   "trash": {
     "count_one": "1 note in trash",

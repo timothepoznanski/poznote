@@ -4265,7 +4265,9 @@
   },
   "tasklist_embed": {
     "unavailable": "Cette liste de tâches n'est plus disponible.",
-    "empty": "Aucune tâche dans cette liste pour le moment."
+    "empty": "Aucune tâche dans cette liste pour le moment.",
+    "add_placeholder": "Ajouter une tâche...",
+    "save_error": "Impossible d'enregistrer la liste de tâches."
   },
   "saas": {
     "description": "Éléments d'affichage utiles lorsque cette instance est proposée en service hébergé (SaaS). Tout est masqué par défaut.",

@@ -4163,7 +4163,9 @@
   },
   "tasklist_embed": {
     "unavailable": "此任务列表已不可用。",
-    "empty": "此列表中还没有任务。"
+    "empty": "此列表中还没有任务。",
+    "add_placeholder": "添加任务...",
+    "save_error": "无法保存任务列表。"
   },
   "saas": {
     "description": "当此实例作为托管服务（SaaS）提供时有用的显示元素。默认全部隐藏。",

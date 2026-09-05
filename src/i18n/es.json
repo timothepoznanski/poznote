@@ -4042,7 +4042,9 @@
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tareas ya no está disponible.",
-    "empty": "Aún no hay tareas en esta lista."
+    "empty": "Aún no hay tareas en esta lista.",
+    "add_placeholder": "Añadir una tarea...",
+    "save_error": "No se pudo guardar la lista de tareas."
   },
   "saas": {
     "description": "Elementos de visualización útiles cuando esta instancia se ofrece como servicio alojado (SaaS). Todo está oculto por defecto.",
