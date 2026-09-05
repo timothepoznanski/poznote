@@ -103,7 +103,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	include 'icon_sidebar.php';
 	?>
 	<div class="tags-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-tags"></i> <?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></h1>
+		<h1 class="poznote-page-title"><i class="lucide lucide-tags"></i> <?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
 
 		
 		

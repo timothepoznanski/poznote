@@ -180,7 +180,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 34; // 34: entries.display_order (manual note ordering)
+    $CURRENT_SCHEMA_VERSION = 35; // 35: workspaces.tags (dashboard scope by tag)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -633,6 +633,18 @@ try {
             $con->exec('CREATE INDEX IF NOT EXISTS idx_notifications_email_due ON notifications(trigger_at, dismissed, email_sent_at, email_attempts)');
         } catch (Exception $e) {
             error_log('Could not ensure reminder email columns: ' . $e->getMessage());
+        }
+
+        // Workspace tags: comma-separated labels used by the dashboard scope
+        // selector to group workspaces ("every workspace tagged school").
+        try {
+            $cols = $con->query("PRAGMA table_info(workspaces)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('tags', $existingColumns)) {
+                $con->exec("ALTER TABLE workspaces ADD COLUMN tags TEXT");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add workspaces.tags column: ' . $e->getMessage());
         }
 
         // Ensure linked_note_id column exists (may be missing from restored backups)

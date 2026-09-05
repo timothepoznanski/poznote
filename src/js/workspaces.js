@@ -1665,18 +1665,103 @@ function handleRenameButtonClick(e) {
     }
 }
 
-// Handle select button clicks
-function handleSelectButtonClick(e) {
-    if (e.target && e.target.classList && e.target.classList.contains('btn-select')) {
-        var name = e.target.getAttribute('data-ws');
-        if (!name) return;
-        // Save to database
-        if (typeof saveLastOpenedWorkspace === 'function') {
-            saveLastOpenedWorkspace(name);
-        }
-        // Navigate to main notes page with workspace filter
-        window.location = 'index.php?workspace=' + encodeURIComponent(name);
+// Workspace tags modal ("Tags" entry of the Actions menu): comma-separated
+// list, replaced as a whole through the set_tags action
+function closeWorkspaceTagsModal() {
+    var modal = document.getElementById('workspaceTagsModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function handleWorkspaceTagsButtonClick(e) {
+    var closeBtn = e.target && e.target.closest ? e.target.closest('[data-action="close-workspace-tags-modal"]') : null;
+    if (closeBtn) {
+        e.preventDefault();
+        closeWorkspaceTagsModal();
+        return;
     }
+
+    var button = e.target && e.target.closest ? e.target.closest('.workspace-tags-action') : null;
+    if (!button) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    var workspaceName = button.getAttribute('data-ws');
+    var modal = document.getElementById('workspaceTagsModal');
+    var input = document.getElementById('workspaceTagsInput');
+    var confirmBtn = document.getElementById('confirmWorkspaceTagsBtn');
+    if (!workspaceName || !modal || !input || !confirmBtn) return;
+
+    var source = document.getElementById('workspaceTagsSource');
+    if (source) source.textContent = workspaceName;
+    input.value = button.getAttribute('data-tags') || '';
+
+    modal.style.display = 'flex';
+    setTimeout(function () { input.focus(); }, 0);
+
+    input.onkeydown = function (event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            confirmBtn.click();
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            closeWorkspaceTagsModal();
+        }
+    };
+
+    confirmBtn.onclick = function () {
+        confirmBtn.disabled = true;
+
+        var params = new URLSearchParams({
+            action: 'set_tags',
+            name: workspaceName,
+            tags: input.value.trim()
+        });
+
+        fetch('workspaces.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: params.toString()
+        })
+            .then(function (resp) { return resp.json(); })
+            .then(function (json) {
+                confirmBtn.disabled = false;
+                if (json && json.success) {
+                    closeWorkspaceTagsModal();
+                    showAjaxAlert(wsTr('workspaces.tags.saved', {}, 'Tags updated'), 'success');
+                    // Reload so the row chips and the Actions entry reflect the new list
+                    setTimeout(function () { window.location.reload(); }, 600);
+                } else {
+                    showAjaxAlert(wsTr('workspaces.alerts.error_prefix', { error: (json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error') }, 'Error: {{error}}'), 'danger');
+                }
+            })
+            .catch(function () {
+                confirmBtn.disabled = false;
+                showAjaxAlert(wsTr('workspaces.tags.save_error', {}, 'Could not update the tags'), 'danger');
+            });
+    };
+}
+
+// The workspace name is the link that opens it (a plain click; modified
+// clicks keep the browser's open-in-new-tab behaviour)
+function handleSelectButtonClick(e) {
+    var link = e.target && e.target.closest ? e.target.closest('.workspace-name-link') : null;
+    if (!link) return;
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+
+    var name = link.getAttribute('data-ws');
+    if (!name) return;
+    e.preventDefault();
+
+    // Save to database
+    if (typeof saveLastOpenedWorkspace === 'function') {
+        saveLastOpenedWorkspace(name);
+    }
+    // Navigate to main notes page with workspace filter
+    window.location = 'index.php?workspace=' + encodeURIComponent(name);
 }
 
 // Handle delete button clicks
@@ -1805,6 +1890,10 @@ function handleCreateWorkspace(event) {
         action: 'create',
         name: name
     });
+    var tagsInput = document.getElementById('workspace-tags');
+    if (tagsInput) {
+        params.set('tags', tagsInput.value.trim());
+    }
 
     fetch('workspaces.php', {
         method: 'POST',
@@ -1823,8 +1912,9 @@ function handleCreateWorkspace(event) {
             if (json && json.success) {
                 showAjaxAlert(wsTr('workspaces.messages.created', {}, 'Workspace created'), 'success');
 
-                // Clear input
+                // Clear inputs
                 nameInput.value = '';
+                if (tagsInput) tagsInput.value = '';
 
                 // Reload page to show the new workspace in the list
                 setTimeout(function () {
@@ -2092,6 +2182,7 @@ function initializeWorkspacesPage() {
 
     // Add event listeners for buttons
     document.addEventListener('click', handleRenameButtonClick);
+    document.addEventListener('click', handleWorkspaceTagsButtonClick);
     document.addEventListener('click', handleSelectButtonClick);
     document.addEventListener('click', handleDeleteButtonClick);
     document.addEventListener('click', handleMoveButtonClick);

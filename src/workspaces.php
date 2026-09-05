@@ -75,8 +75,9 @@ if ($_POST) {
             if ($name === '') throw new Exception(t('workspaces.errors.name_empty', [], 'Workspace name cannot be empty', $currentLang));
             // validate allowed characters: letters (including accented), digits, space, hyphen, underscore
             if (!preg_match('/^[\p{L}0-9 _-]+$/u', $name)) throw new Exception(t('workspaces.errors.invalid_name', [], 'Invalid workspace name. Letters, numbers, spaces, dash and underscore are allowed.', $currentLang));
-            $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name) VALUES (?)');
-            $stmt->execute([$name]);
+            $tags = poznoteParseWorkspaceTags($_POST['tags'] ?? '');
+            $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name, tags) VALUES (?, ?)');
+            $stmt->execute([$name, poznoteSerializeWorkspaceTags($tags)]);
 
             // OR IGNORE makes a duplicate name a silent no-op, so only log when
             // a row was actually inserted.
@@ -310,6 +311,28 @@ if ($_POST) {
             }
             // If this was a non-AJAX delete, instruct client to clear selected workspace (so UI doesn't keep showing deleted workspace)
             $clearSelectedWorkspace = true;
+        } elseif (isset($_POST['action']) && $_POST['action'] === 'set_tags') {
+            // Replace the tag list of a workspace (tags group workspaces on
+            // the dashboard scope selector)
+            $name = trim($_POST['name'] ?? '');
+            if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
+
+            $workspaceCheck = $con->prepare('SELECT COUNT(*) FROM workspaces WHERE name = ?');
+            $workspaceCheck->execute([$name]);
+            if ((int)$workspaceCheck->fetchColumn() === 0) {
+                throw new Exception(t('api.errors.workspace_not_found', [], 'Workspace not found', $currentLang));
+            }
+
+            $tags = poznoteParseWorkspaceTags($_POST['tags'] ?? '');
+            $upd = $con->prepare('UPDATE workspaces SET tags = ? WHERE name = ?');
+            $upd->execute([poznoteSerializeWorkspaceTags($tags), $name]);
+
+            $message = t('workspaces.tags.saved', [], 'Tags updated', $currentLang);
+            if (!empty($isAjax)) {
+                header('Content-Type: application/json');
+                echo json_encode(['success' => true, 'message' => $message, 'name' => $name, 'tags' => $tags]);
+                exit;
+            }
         } elseif (isset($_POST['action']) && $_POST['action'] === 'rename') {
             $name = trim($_POST['name'] ?? '');
             $new_name = trim($_POST['new_name'] ?? '');
@@ -709,13 +732,14 @@ if (!function_exists('buildWorkspaceShareRegistryKey')) {
 // Read existing workspaces and share state
 $workspaces = [];
 $workspaceRows = [];
-$stmt = $con->query('SELECT w.name, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY w.name');
+$stmt = $con->query('SELECT w.name, w.tags, sw.token AS readonly_token, sw.password AS readonly_password, sw.password_encrypted AS readonly_password_encrypted, sw.login_required AS readonly_login_required, sw.allowed_users AS readonly_allowed_users FROM workspaces w LEFT JOIN shared_workspaces sw ON sw.workspace_name = w.name ORDER BY w.name');
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $workspaceName = $row['name'];
     $readonlyToken = $row['readonly_token'] ?? '';
     $readonlyAllowedUsers = !empty($row['readonly_allowed_users']) ? json_decode($row['readonly_allowed_users'], true) : null;
     $workspaceRows[] = [
         'name' => $workspaceName,
+        'tags' => poznoteParseWorkspaceTags($row['tags'] ?? ''),
         'readonly_token' => $readonlyToken,
         'readonly_url' => $readonlyToken !== '' ? buildWorkspaceSharePublicUrl($workspaceName) : '',
         'readonly_preview_url' => buildWorkspaceSharePublicUrl($workspaceName),
@@ -825,10 +849,16 @@ try {
         <div class="settings-section">
             <h3><?php echo t_h('workspaces.sections.create.title', [], 'Create a new workspace', $currentLang); ?></h3>
             <form id="create-workspace-form">
-                <div class="form-group">
-                    <input id="workspace-name" name="name" type="text" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name', $currentLang); ?>" />
+                <div class="ws-create-row">
+                    <div class="form-group">
+                        <input id="workspace-name" name="name" type="text" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name', $currentLang); ?>" />
+                    </div>
+                    <div class="form-group">
+                        <input id="workspace-tags" name="tags" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.tags.placeholder', [], 'Tags, comma separated (optional, e.g. school, psycho)', $currentLang); ?>" />
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="createWorkspaceBtn"> <?php echo t_h('common.create', [], 'Create', $currentLang); ?></button>
                 </div>
-                <button type="submit" class="btn btn-primary" id="createWorkspaceBtn"> <?php echo t_h('common.create', [], 'Create', $currentLang); ?></button>
+                <small class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.', $currentLang); ?></small>
             </form>
         </div>
 
@@ -860,17 +890,18 @@ try {
                                 <div class="ws-col ws-col-name">
                                     <div class="ws-name-block">
                                         <div class="ws-name-row">
-                                            <span class="workspace-name-item"><?php echo $ws_display; ?></span>
+                                            <a class="workspace-name-item workspace-name-link" href="index.php?workspace=<?php echo rawurlencode($ws); ?>" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?>"><?php echo $ws_display; ?></a>
                                             <span class="workspace-count"><?php echo htmlspecialchars($cnt_text); ?></span>
                                         </div>
+                                        <?php $wsTags = $workspaceRow['tags'] ?? []; ?>
+                                        <?php if (!empty($wsTags)): ?>
+                                        <div class="ws-tags-row">
+                                            <?php foreach ($wsTags as $wsTag): ?>
+                                                <span class="ws-tag-chip"><i class="lucide lucide-tag"></i><?php echo htmlspecialchars($wsTag, ENT_QUOTES, 'UTF-8'); ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <?php endif; ?>
                                     </div>
-                                </div>
-                                <div class="ws-col ws-col-select">
-                                    <?php if ($ws !== ''): ?>
-                                        <button type="button" class="btn btn-primary action-btn btn-select" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                            <?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?>
-                                        </button>
-                                    <?php endif; ?>
                                 </div>
                                 <div class="ws-col ws-col-share">
                                     <button type="button"
@@ -898,6 +929,10 @@ try {
                                         <div class="dropdown-menu">
                                             <button class="dropdown-item dropdown-item-neutral workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
                                                 <i class="lucide lucide-pencil"></i> <?php echo t_h('common.rename', [], 'Rename', $currentLang); ?>
+                                            </button>
+
+                                            <button class="dropdown-item dropdown-item-neutral workspace-tags-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-tags="<?php echo htmlspecialchars(implode(', ', $workspaceRow['tags'] ?? []), ENT_QUOTES, 'UTF-8'); ?>">
+                                                <i class="lucide lucide-tag"></i> <?php echo t_h('workspaces.tags.action', [], 'Tags', $currentLang); ?>
                                             </button>
                                             
                                             <button class="dropdown-item dropdown-item-neutral workspace-background-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">

@@ -701,6 +701,16 @@
         "users_loading": "Chargement des utilisateurs...",
         "no_users_found": "Aucun autre utilisateur trouvé"
       }
+    },
+    "tags": {
+      "label": "Tags",
+      "action": "Tags",
+      "modal_title": "Tags de l’espace de travail",
+      "placeholder": "Tags séparés par des virgules (optionnel, ex. école, psycho)",
+      "input_placeholder": "école, psycho",
+      "help": "Les tags regroupent les espaces de travail sur le dashboard : choisissez-y un tag pour voir tous les espaces qui le portent.",
+      "saved": "Tags mis à jour",
+      "save_error": "Impossible de mettre à jour les tags"
     }
   },
   "display": {
@@ -3994,6 +4004,32 @@
       "layout": "Disposition",
       "layout_grid": "Grille",
       "layout_list": "Liste"
+    },
+    "scope": {
+      "title": "Périmètre",
+      "hint": "Choisissez les espaces de travail à afficher. Un tag sélectionne tous ceux qui le portent.",
+      "all": "Tous les espaces de travail",
+      "by_tag": "Par tag",
+      "workspaces": "Espaces de travail",
+      "tag_label": "Tag : {{tag}}",
+      "count_label": "{{count}} espaces de travail",
+      "no_tags": "Aucun espace de travail n’a de tag pour le moment.",
+      "open": "Ouvrir uniquement cet espace de travail",
+      "load_error": "Impossible de charger les espaces de travail.",
+      "no_workspaces": "Aucun espace de travail disponible",
+      "empty": "Aucune note dans ce périmètre pour le moment.",
+      "no_workspace_for_tag": "Aucun espace de travail ne porte le tag « {{tag}} ».",
+      "group_empty": "Rien ici pour le moment.",
+      "manage_workspaces": "Gérer les espaces de travail"
+    },
+    "modified": {
+      "button": "Filtrer par dernière modification",
+      "any": "Toutes les dates",
+      "today": "Aujourd’hui",
+      "week": "7 derniers jours",
+      "month": "30 derniers jours",
+      "quarter": "90 derniers jours",
+      "year": "12 derniers mois"
     }
   },
   "graph": {

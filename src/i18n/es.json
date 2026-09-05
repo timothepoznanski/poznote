@@ -689,6 +689,16 @@
         "users_loading": "Cargando usuarios...",
         "no_users_found": "No se encontraron otros usuarios"
       }
+    },
+    "tags": {
+      "label": "Etiquetas",
+      "action": "Etiquetas",
+      "modal_title": "Etiquetas del espacio de trabajo",
+      "placeholder": "Etiquetas separadas por comas (opcional, p. ej. escuela, psico)",
+      "input_placeholder": "escuela, psico",
+      "help": "Las etiquetas agrupan espacios de trabajo en el panel: elige allí una etiqueta para ver todos los espacios que la llevan.",
+      "saved": "Etiquetas actualizadas",
+      "save_error": "No se pudieron actualizar las etiquetas"
     }
   },
   "display": {
@@ -3771,6 +3781,32 @@
       "layout": "Disposición",
       "layout_grid": "Cuadrícula",
       "layout_list": "Lista"
+    },
+    "scope": {
+      "title": "Ámbito",
+      "hint": "Elige los espacios de trabajo que quieres ver. Una etiqueta selecciona todos los que la llevan.",
+      "all": "Todos los espacios de trabajo",
+      "by_tag": "Por etiqueta",
+      "workspaces": "Espacios de trabajo",
+      "tag_label": "Etiqueta: {{tag}}",
+      "count_label": "{{count}} espacios de trabajo",
+      "no_tags": "Ningún espacio de trabajo tiene etiquetas todavía.",
+      "open": "Abrir solo este espacio de trabajo",
+      "load_error": "No se pudieron cargar los espacios de trabajo.",
+      "no_workspaces": "No hay espacios de trabajo disponibles",
+      "empty": "Aún no hay notas en este ámbito.",
+      "no_workspace_for_tag": "Ningún espacio de trabajo lleva la etiqueta «{{tag}}».",
+      "group_empty": "Nada aquí todavía.",
+      "manage_workspaces": "Gestionar espacios de trabajo"
+    },
+    "modified": {
+      "button": "Filtrar por última modificación",
+      "any": "Cualquier fecha",
+      "today": "Hoy",
+      "week": "Últimos 7 días",
+      "month": "Últimos 30 días",
+      "quarter": "Últimos 90 días",
+      "year": "Últimos 12 meses"
     }
   },
   "graph": {

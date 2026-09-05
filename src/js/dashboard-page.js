@@ -5,6 +5,7 @@
     var FILTER_VALUE_KEY = 'dashboard_filter_value';
     var NAV_PATH_KEY = 'dashboard_nav_path';
     var COLOR_FILTER_KEY = 'dashboard_color_filter';
+    var MODIFIED_FILTER_KEY = 'dashboard_modified_filter';
 
     // The favorites preference used to be persisted for a toggle button in the
     // dashboard topbar, and was replayed onto the URL on every load. That button
@@ -27,6 +28,29 @@
         return navStack.length === 0 ? rootData : navStack[navStack.length - 1];
     }
 
+    // Multi-workspace scope (see poznoteResolveWorkspaceScope in PHP): the
+    // board holds one level per workspace in rootData.groups and the root
+    // folders/notes stay empty. A single workspace keeps the old flat shape.
+    function isMultiScope() {
+        return !!(rootData.scope && rootData.scope.mode && rootData.scope.mode !== 'single');
+    }
+
+    function rootLevels() {
+        return isMultiScope() ? (rootData.groups || []) : [rootData];
+    }
+
+    // Stamp every folder with its workspace so the breadcrumb and the mixed
+    // (filtered) views can say where an item comes from
+    function annotateWorkspace(level, workspace) {
+        (level.folders || []).forEach(function (folder) {
+            folder.workspace = workspace;
+            annotateWorkspace(folder, workspace);
+        });
+    }
+    rootLevels().forEach(function (level) {
+        if (level.workspace) annotateWorkspace(level, level.workspace);
+    });
+
     // --- Helpers ---
 
     function esc(str) {
@@ -43,16 +67,20 @@
         return total;
     }
 
+    // Preferences are kept per scope: a multi-workspace scope has its own key
+    // (data-scope), a single workspace keeps its historical key
     function dashboardStorageKey(baseKey) {
         var workspace = '';
+        var scope = '';
         var favoritesMode = 'all';
 
         try {
             workspace = document.body && document.body.dataset ? (document.body.dataset.workspace || '') : '';
+            scope = document.body && document.body.dataset ? (document.body.dataset.scope || '') : '';
             favoritesMode = new URL(window.location.href).searchParams.get('favorites') === '1' ? 'favorites' : 'all';
         } catch (err) { /* ignore */ }
 
-        return baseKey + ':' + encodeURIComponent(workspace) + ':' + favoritesMode;
+        return baseKey + ':' + encodeURIComponent(scope || workspace) + ':' + favoritesMode;
     }
 
     function normalizeSearchText(value) {
@@ -80,7 +108,7 @@
     function getAllNotes() {
         if (!allNotesCache) {
             allNotesCache = [];
-            collectNotes(rootData, allNotesCache);
+            rootLevels().forEach(function (level) { collectNotes(level, allNotesCache); });
         }
         return allNotesCache;
     }
@@ -144,7 +172,7 @@
         return lines.join('\n');
     }
 
-    function buildNoteCard(note) {
+    function buildNoteCard(note, showWorkspace) {
         var tags      = note.tags || [];
         var searchVal = getNoteSearchValue(note);
         var tooltip   = buildNoteTooltip(note, tags);
@@ -171,8 +199,14 @@
         }
 
         var footer = '';
-        if (tags.length > 0 || note.updated) {
+        var workspaceBadge = showWorkspace && note.workspace;
+        if (tags.length > 0 || note.updated || workspaceBadge) {
             footer = '<div class="board-card-footer">';
+            // Mixed views list notes from several workspaces: say which one
+            if (workspaceBadge) {
+                footer += '<span class="board-card-tag board-card-ws" title="' + esc(note.workspace) + '">' +
+                    '<i class="lucide lucide-layers"></i>' + esc(note.workspace) + '</span>';
+            }
             tags.slice(0, 3).forEach(function (tag) {
                 var tagHex = resolveDashboardTagColorHex(tag);
                 if (tagHex) {
@@ -236,21 +270,34 @@
 
     // --- Render ---
 
+    // Heading of one workspace group in a multi-workspace scope
+    function buildGroupTitle(group) {
+        var html = '<div class="dash-section-title dash-group-title">' +
+            '<i class="lucide lucide-layers"></i>' +
+            '<span class="dash-group-name">' + esc(group.workspace || '') + '</span>';
+        (group.tags || []).forEach(function (tag) {
+            html += '<span class="dash-group-tag">' + esc(tag) + '</span>';
+        });
+        html += '<span class="dash-group-count">' + countNotes(group) + '</span></div>';
+        return html;
+    }
+
     function renderGrid(level) {
         var grid = document.getElementById('dashboardGrid');
         if (!grid) return;
 
         var html = '';
         var sectioned = false;
-        // A text term or a color filter both search the whole tree rather than
-        // the current folder, so results are never hidden behind navigation.
-        if (activeFilterTerm || activeColorFilter) {
+        // A text term, a color filter or a modification-date filter all search
+        // the whole tree rather than the current folder, so results are never
+        // hidden behind navigation.
+        if (activeFilterTerm || activeColorFilter || activeModifiedFilter) {
             // Folders carry colors too, so a pure color filter lists the
-            // matching folders alongside the matching notes. A text term still
-            // searches notes only, as before.
+            // matching folders alongside the matching notes. A text term or a
+            // date filter searches notes only.
             var matchingFolders = [];
-            if (activeColorFilter && !activeFilterTerm) {
-                collectFolders(rootData, matchingFolders);
+            if (activeColorFilter && !activeFilterTerm && !activeModifiedFilter) {
+                collectAllFolders(matchingFolders);
                 matchingFolders = matchingFolders.filter(folderMatchesColor);
             }
 
@@ -258,14 +305,31 @@
             // baseOrder is only meaningful among siblings.
             var matchingNotes = sortPinnedFirst(getAllNotes().filter(function (note) {
                 if (activeFilterTerm && !noteMatchesSearch(note, activeFilterTerm)) return false;
+                if (!noteMatchesModified(note)) return false;
                 return noteMatchesColor(note);
             }), 'globalOrder');
 
+            // Several workspaces mixed together: each card says which one
+            var showWorkspace = isMultiScope();
             matchingFolders.forEach(function (folder) {
                 html += buildFolderCard(folder, findFolderIndexInParent(folder));
             });
-            matchingNotes.forEach(function (note) { html += buildNoteCard(note); });
+            matchingNotes.forEach(function (note) { html += buildNoteCard(note, showWorkspace); });
             setNoResultsVisible(matchingFolders.length === 0 && matchingNotes.length === 0);
+        } else if (navStack.length === 0 && isMultiScope()) {
+            // Root of a multi-workspace scope: one titled section per workspace
+            sectioned = true;
+            var groupEmptyTxt = (window.DASHBOARD_SCOPE_TXT && window.DASHBOARD_SCOPE_TXT.groupEmpty) || 'Nothing here yet.';
+            rootLevels().forEach(function (group) {
+                var cards = '';
+                (group.folders || []).forEach(function (folder, i) { cards += buildFolderCard(folder, i); });
+                (group.notes || []).forEach(function (note) { cards += buildNoteCard(note); });
+                html += buildGroupTitle(group) +
+                    '<div class="dashboard-grid-container dash-grid-section dash-group-grid">' +
+                    (cards || '<div class="dash-group-empty">' + esc(groupEmptyTxt) + '</div>') +
+                    '</div>';
+            });
+            setNoResultsVisible(false);
         } else {
             // Pinned folders and notes get their own section at the top;
             // everything else (folders, then unpinned notes) goes below an
@@ -308,7 +372,7 @@
         var bc = document.getElementById('dashboardBreadcrumb');
         if (!bc) return;
 
-        if (activeFilterTerm || activeColorFilter || navStack.length === 0) {
+        if (activeFilterTerm || activeColorFilter || activeModifiedFilter || navStack.length === 0) {
             bc.style.display = 'none';
             bc.innerHTML = '';
             return;
@@ -316,6 +380,11 @@
 
         bc.style.display = '';
         var html = '<button class="bc-home" data-depth="0"><i class="lucide lucide-home"></i></button>';
+        // Inside a multi-workspace scope, say which workspace the path belongs to
+        if (isMultiScope() && navStack[0] && navStack[0].workspace) {
+            html += '<i class="lucide lucide-chevron-right bc-sep"></i>' +
+                '<span class="bc-workspace"><i class="lucide lucide-layers"></i>' + esc(navStack[0].workspace) + '</span>';
+        }
         navStack.forEach(function (folder, i) {
             html += '<i class="lucide lucide-chevron-right bc-sep"></i>';
             if (i === navStack.length - 1) {
@@ -345,6 +414,26 @@
         return null;
     }
 
+    // Top-level folder lookup: spans every workspace group of the scope
+    function findFolderAtRoot(folderId) {
+        var levels = rootLevels();
+        for (var i = 0; i < levels.length; i++) {
+            var folder = findFolderAtLevel(levels[i], folderId);
+            if (folder) return folder;
+        }
+        return null;
+    }
+
+    // The root level a top-level folder belongs to (its workspace group, or
+    // rootData in a single-workspace scope)
+    function rootLevelOf(folder) {
+        var levels = rootLevels();
+        for (var i = 0; i < levels.length; i++) {
+            if (findFolderAtLevel(levels[i], folder.id) === folder) return levels[i];
+        }
+        return rootData;
+    }
+
     function saveNavigationPath() {
         try {
             var path = navStack.map(function (folder) { return folder.id; });
@@ -364,10 +453,10 @@
             storedPath = [];
         }
 
-        var level = rootData;
+        var level = null;
         var restoredStack = [];
         for (var i = 0; i < storedPath.length; i++) {
-            var folder = findFolderAtLevel(level, storedPath[i]);
+            var folder = i === 0 ? findFolderAtRoot(storedPath[i]) : findFolderAtLevel(level, storedPath[i]);
             if (!folder) break;
             restoredStack.push(folder);
             level = folder;
@@ -393,7 +482,15 @@
     // tree, so the positional index above no longer identifies a folder.
     // Rebuilds the whole ancestor chain so the breadcrumb stays correct.
     function buildFolderPath(folderId, level, trail) {
-        var node = level || rootData;
+        if (!level) {
+            var levels = rootLevels();
+            for (var k = 0; k < levels.length; k++) {
+                var path = buildFolderPath(folderId, levels[k], []);
+                if (path) return path;
+            }
+            return null;
+        }
+        var node = level;
         var folders = node.folders || [];
         for (var i = 0; i < folders.length; i++) {
             var next = (trail || []).concat([folders[i]]);
@@ -407,12 +504,17 @@
     function navigateIntoById(folderId) {
         var path = buildFolderPath(folderId);
         if (!path) return false;
-        // Entering a folder from a filtered view drops the color filter,
-        // otherwise the folder would open onto a filtered subset.
+        // Entering a folder from a filtered view drops the color and date
+        // filters, otherwise the folder would open onto a filtered subset.
         if (activeColorFilter) {
             activeColorFilter = null;
             saveColorFilter();
             updateColorFilterButtonState();
+        }
+        if (activeModifiedFilter) {
+            activeModifiedFilter = null;
+            saveModifiedFilter();
+            updateModifiedFilterButtonState();
         }
         navStack = path;
         saveNavigationPath();
@@ -428,11 +530,15 @@
         });
     }
 
+    function collectAllFolders(out) {
+        rootLevels().forEach(function (level) { collectFolders(level, out); });
+    }
+
     // Position of a folder within its own parent, for the index-based path.
     function findFolderIndexInParent(folder) {
         var path = buildFolderPath(folder.id);
         if (!path) return 0;
-        var parent = path.length > 1 ? path[path.length - 2] : rootData;
+        var parent = path.length > 1 ? path[path.length - 2] : rootLevelOf(folder);
         var siblings = parent.folders || [];
         for (var i = 0; i < siblings.length; i++) {
             if (String(siblings[i].id) === String(folder.id)) return i;
@@ -467,6 +573,48 @@
     // '__any__' / '__none__'. Persisted per workspace so the board comes back
     // filtered the way it was left.
     var activeColorFilter = null;
+
+    // "Modified since" filter: null (any time) or one of the period keys
+    // below. Persisted per scope like the color filter.
+    var activeModifiedFilter = null;
+    var MODIFIED_FILTER_DAYS = { week: 7, month: 30, quarter: 90, year: 365 };
+
+    function saveModifiedFilter() {
+        try {
+            var key = dashboardStorageKey(MODIFIED_FILTER_KEY);
+            if (activeModifiedFilter) {
+                localStorage.setItem(key, activeModifiedFilter);
+            } else {
+                localStorage.removeItem(key);
+            }
+        } catch (e) { /* localStorage unavailable */ }
+    }
+
+    function restoreModifiedFilter() {
+        try {
+            var stored = localStorage.getItem(dashboardStorageKey(MODIFIED_FILTER_KEY)) || null;
+            activeModifiedFilter = (stored === 'today' || MODIFIED_FILTER_DAYS[stored]) ? stored : null;
+        } catch (e) {
+            activeModifiedFilter = null;
+        }
+        updateModifiedFilterButtonState();
+    }
+
+    // Unix time (seconds) a note must have been modified after to pass
+    function modifiedFilterThreshold() {
+        if (!activeModifiedFilter) return 0;
+        var now = new Date();
+        if (activeModifiedFilter === 'today') {
+            return Math.floor(new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000);
+        }
+        var days = MODIFIED_FILTER_DAYS[activeModifiedFilter] || 0;
+        return Math.floor(now.getTime() / 1000) - days * 86400;
+    }
+
+    function noteMatchesModified(note) {
+        if (!activeModifiedFilter) return true;
+        return (note.updatedAt || 0) >= modifiedFilterThreshold();
+    }
 
     function saveColorFilter() {
         try {
@@ -579,7 +727,7 @@
             return response.json();
         }).then(function (data) {
             note.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
-            resortLevel(rootData);
+            rootLevels().forEach(resortLevel);
             renderAll();
         }).catch(function () {
             var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
@@ -622,7 +770,15 @@
     // Depth-first search over the whole tree: the picker may be opened on a
     // folder that is not in the level currently displayed.
     function findFolderById(folderId, level) {
-        var node = level || rootData;
+        if (!level) {
+            var levels = rootLevels();
+            for (var k = 0; k < levels.length; k++) {
+                var hit = findFolderById(folderId, levels[k]);
+                if (hit) return hit;
+            }
+            return null;
+        }
+        var node = level;
         var folders = node.folders || [];
         for (var i = 0; i < folders.length; i++) {
             if (String(folders[i].id) === String(folderId)) return folders[i];
@@ -751,26 +907,59 @@
         menu.innerHTML = '';
 
         var txt = window.NOTE_COLOR_TXT || {};
-        var entries = [
-            { value: null, label: txt.filterAll || 'All notes', hex: null },
-            { value: '__any__', label: txt.filterAnyColor || 'Any color', hex: null },
-            { value: '__none__', label: txt.filterNoColor || 'No color', hex: null }
-        ].concat(getPalette().map(function (entry) {
-            return { value: entry.id, label: entry.name, hex: entry.hex };
-        }));
 
-        // Custom per-note colors belong to no palette entry, so they would
-        // otherwise be unfilterable. List every custom hex actually in use,
-        // sorted so the menu order stays stable between openings.
-        var customHexes = {};
+        // Only the colors actually on the board: listing the whole palette
+        // would offer filters that match nothing. Notes carry 'color',
+        // folders carry 'cardColor'; both hold a palette id or a custom hex.
+        var usedColors = {};
         getAllNotes().forEach(function (note) {
-            if (note.color && String(note.color).charAt(0) === '#') {
-                customHexes[note.color] = true;
-            }
+            if (note.color) usedColors[String(note.color)] = true;
         });
-        Object.keys(customHexes).sort().forEach(function (hex) {
-            entries.push({ value: hex, label: hex, hex: hex });
+        var boardFolders = [];
+        collectAllFolders(boardFolders);
+        boardFolders.forEach(function (folder) {
+            if (folder.cardColor) usedColors[String(folder.cardColor)] = true;
         });
+
+        function isColorUsed(value) {
+            var key = String(value);
+            return !!(usedColors[key] || usedColors[key.toLowerCase()]);
+        }
+
+        var entries = [{ value: null, label: txt.filterAll || 'All notes', hex: null }];
+
+        if (Object.keys(usedColors).length > 0) {
+            entries.push({ value: '__any__', label: txt.filterAnyColor || 'Any color', hex: null });
+            entries.push({ value: '__none__', label: txt.filterNoColor || 'No color', hex: null });
+
+            getPalette().forEach(function (entry) {
+                if (isColorUsed(entry.id)) {
+                    entries.push({ value: entry.id, label: entry.name, hex: entry.hex });
+                }
+            });
+
+            // Custom colors belong to no palette entry, so they would otherwise
+            // be unfilterable. Sorted so the menu order stays stable.
+            Object.keys(usedColors).filter(function (value) {
+                return value.charAt(0) === '#';
+            }).sort().forEach(function (hex) {
+                entries.push({ value: hex, label: hex, hex: hex });
+            });
+        }
+
+        // A filter restored from a previous visit may target a color nothing
+        // carries any more; keep its entry so the menu still shows what is on.
+        if (activeColorFilter && !entries.some(function (entry) { return entry.value === activeColorFilter; })) {
+            var stale = null;
+            getPalette().forEach(function (entry) {
+                if (entry.id === activeColorFilter) stale = { value: entry.id, label: entry.name, hex: entry.hex };
+            });
+            entries.push(stale || {
+                value: activeColorFilter,
+                label: String(activeColorFilter).charAt(0) === '#' ? activeColorFilter : (txt.filterAnyColor || activeColorFilter),
+                hex: String(activeColorFilter).charAt(0) === '#' ? activeColorFilter : null
+            });
+        }
 
         entries.forEach(function (entry) {
             var item = document.createElement('button');
@@ -792,11 +981,9 @@
         });
     }
 
-    // The menu is position:fixed (the topbar clips absolute children), so it is
-    // anchored to the button here and kept inside the viewport.
-    function positionColorFilterMenu() {
-        var btn = document.getElementById('dashboardColorFilterBtn');
-        var menu = document.getElementById('dashboardColorFilterMenu');
+    // The menus are position:fixed (the topbar clips absolute children), so
+    // they are anchored to their button here and kept inside the viewport.
+    function positionFilterMenu(btn, menu) {
         if (!btn || !menu || menu.hidden) return;
 
         var rect = btn.getBoundingClientRect();
@@ -809,6 +996,90 @@
         var width = menu.offsetWidth || 180;
         var left = Math.min(rect.left, window.innerWidth - width - 8);
         menu.style.left = Math.max(8, left) + 'px';
+    }
+
+    function positionColorFilterMenu() {
+        positionFilterMenu(document.getElementById('dashboardColorFilterBtn'),
+            document.getElementById('dashboardColorFilterMenu'));
+    }
+
+    function positionModifiedFilterMenu() {
+        positionFilterMenu(document.getElementById('dashboardModifiedFilterBtn'),
+            document.getElementById('dashboardModifiedFilterMenu'));
+    }
+
+    function updateModifiedFilterButtonState() {
+        var btn = document.getElementById('dashboardModifiedFilterBtn');
+        if (btn) btn.classList.toggle('active', !!activeModifiedFilter);
+    }
+
+    function closeModifiedFilterMenu() {
+        var menu = document.getElementById('dashboardModifiedFilterMenu');
+        var btn = document.getElementById('dashboardModifiedFilterBtn');
+        if (menu) menu.hidden = true;
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+
+    function buildModifiedFilterMenu() {
+        var menu = document.getElementById('dashboardModifiedFilterMenu');
+        if (!menu) return;
+        menu.innerHTML = '';
+
+        var txt = window.DASHBOARD_MODIFIED_TXT || {};
+        var entries = [
+            { value: null, label: txt.any || 'Any time' },
+            { value: 'today', label: txt.today || 'Today' },
+            { value: 'week', label: txt.week || 'Last 7 days' },
+            { value: 'month', label: txt.month || 'Last 30 days' },
+            { value: 'quarter', label: txt.quarter || 'Last 90 days' },
+            { value: 'year', label: txt.year || 'Last 12 months' }
+        ];
+
+        entries.forEach(function (entry) {
+            var item = document.createElement('button');
+            item.type = 'button';
+            item.className = 'dashboard-color-filter-item dashboard-modified-filter-item' +
+                (activeModifiedFilter === entry.value ? ' active' : '');
+            item.innerHTML = '<i class="lucide ' + (entry.value ? 'lucide-clock' : 'lucide-infinity') + '"></i>' +
+                '<span>' + esc(entry.label) + '</span>';
+            item.addEventListener('click', function () {
+                activeModifiedFilter = entry.value;
+                saveModifiedFilter();
+                closeModifiedFilterMenu();
+                updateModifiedFilterButtonState();
+                renderAll();
+            });
+            menu.appendChild(item);
+        });
+    }
+
+    function initModifiedFilter() {
+        var btn = document.getElementById('dashboardModifiedFilterBtn');
+        var menu = document.getElementById('dashboardModifiedFilterMenu');
+        if (!btn || !menu) return;
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (menu.hidden) {
+                closeColorFilterMenu();
+                buildModifiedFilterMenu();
+                menu.hidden = false;
+                positionModifiedFilterMenu();
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                closeModifiedFilterMenu();
+            }
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!menu.hidden && !menu.contains(e.target) && !btn.contains(e.target)) {
+                closeModifiedFilterMenu();
+            }
+        });
+
+        window.addEventListener('resize', positionModifiedFilterMenu);
+        window.addEventListener('scroll', positionModifiedFilterMenu, true);
     }
 
     function updateColorFilterButtonState() {
@@ -832,6 +1103,7 @@
             e.preventDefault();
             e.stopPropagation();
             if (menu.hidden) {
+                closeModifiedFilterMenu();
                 buildColorFilterMenu();
                 menu.hidden = false;
                 positionColorFilterMenu();
@@ -915,11 +1187,53 @@
         if (modal) modal.style.display = 'none';
     }
 
+    // Scope selector: the current scope comes with the board data; the
+    // workspace list (with tags) is fetched when the modal opens.
+    function scopeInfo() {
+        return rootData.scope || { mode: 'single', workspaces: [], tag: '' };
+    }
+
+    function buildDashboardUrl(params) {
+        var url = new URL('dashboard.php', window.location.href);
+        try {
+            if (new URL(window.location.href).searchParams.get('favorites') === '1') {
+                url.searchParams.set('favorites', '1');
+            }
+        } catch (e) { /* ignore */ }
+        Object.keys(params).forEach(function (key) {
+            var value = params[key];
+            if (Array.isArray(value)) {
+                value.forEach(function (v) { url.searchParams.append(key, v); });
+            } else {
+                url.searchParams.set(key, value);
+            }
+        });
+        return url.toString();
+    }
+
+    // Checked workspaces to URL: one is a plain workspace, every one is
+    // scope=all, anything else an explicit list
+    function applyScopeSelection(names, allNames) {
+        if (!names.length) return;
+        if (names.length === 1) {
+            window.location.href = buildDashboardUrl({ workspace: names[0] });
+        } else if (names.length === allNames.length) {
+            window.location.href = buildDashboardUrl({ scope: 'all' });
+        } else {
+            window.location.href = buildDashboardUrl({ scope: 'list', 'ws[]': names });
+        }
+    }
+
     function loadWorkspaces() {
         var list = document.getElementById('workspaceSwitcherList');
+        var applyBtn = document.getElementById('dashboardScopeApplyBtn');
         if (!list) return;
-        list.innerHTML = '<div class="workspace-switcher-loading">Loading...</div>';
 
+        var txt = window.DASHBOARD_SCOPE_TXT || {};
+        list.innerHTML = '<div class="move-task-empty">' + esc(txt.loading || 'Loading...') + '</div>';
+        if (applyBtn) applyBtn.disabled = true;
+
+        var scope = scopeInfo();
         var currentWs = document.body.getAttribute('data-workspace') || '';
 
         fetch('api/v1/workspaces', { credentials: 'same-origin' })
@@ -928,37 +1242,182 @@
                 return r.json();
             })
             .then(function (data) {
-                if (!data.success || !Array.isArray(data.workspaces)) {
-                    list.innerHTML = '<div class="workspace-switcher-loading">No workspaces found</div>';
+                if (!data.success || !Array.isArray(data.workspaces) || !data.workspaces.length) {
+                    list.innerHTML = '<div class="move-task-empty">' + esc(txt.empty || 'No workspaces available') + '</div>';
                     return;
                 }
-                var html = '';
-                data.workspaces.forEach(function (ws) {
-                    var isCurrent = ws.name === currentWs;
-                    html += '<button type="button" class="workspace-switcher-item' + (isCurrent ? ' is-current' : '') + '"'
-                        + ' data-workspace="' + ws.name.replace(/"/g, '&quot;') + '"'
-                        + (isCurrent ? ' disabled' : '')
-                        + '>'
-                        + '<i class="lucide ' + (isCurrent ? 'lucide-check' : 'lucide-layers') + '"></i>'
-                        + ws.name
-                        + '</button>';
-                });
-                if (!data.workspaces.length) {
-                    html = '<div class="workspace-switcher-loading">No workspaces available</div>';
-                }
-                list.innerHTML = html;
+                var workspaces = data.workspaces;
+                var allNames = workspaces.map(function (ws) { return ws.name; });
 
-                Array.prototype.forEach.call(list.querySelectorAll('.workspace-switcher-item:not(.is-current)'), function (btn) {
-                    btn.addEventListener('click', function () {
-                        var ws = btn.getAttribute('data-workspace');
-                        if (ws) {
-                            window.location.href = 'dashboard.php?workspace=' + encodeURIComponent(ws);
-                        }
+                // What the board currently shows, so the checkboxes start from it
+                var selected = {};
+                (scope.mode === 'single' ? [currentWs] : (scope.workspaces || [])).forEach(function (name) {
+                    if (name) selected[name] = true;
+                });
+                var initialSelection = Object.keys(selected).sort().join('\n');
+
+                var html = '';
+
+                // Tags: every distinct workspace tag, with the workspaces that
+                // carry it. Chips drive the checkboxes: the checked workspaces
+                // are the union of the active tags, and Apply is what switches
+                // the board.
+                var tagIndex = {};
+                workspaces.forEach(function (ws) {
+                    (ws.tags || []).forEach(function (tag) {
+                        var key = String(tag).toLowerCase();
+                        if (!tagIndex[key]) tagIndex[key] = { label: tag, names: [] };
+                        tagIndex[key].names.push(ws.name);
                     });
                 });
+                var tagKeys = Object.keys(tagIndex).sort();
+
+                html += '<div class="dashboard-scope-section-title">' + esc(txt.byTag || 'By tag') + '</div>';
+                if (tagKeys.length) {
+                    html += '<div class="dashboard-scope-tags">';
+                    tagKeys.forEach(function (key) {
+                        var entry = tagIndex[key];
+                        html += '<button type="button" class="dashboard-scope-tag"' +
+                            ' data-tag-key="' + esc(key) + '" aria-pressed="false">' +
+                            '<i class="lucide lucide-tag"></i>' + esc(entry.label) +
+                            '<span class="dashboard-scope-tag-count">' + entry.names.length + '</span></button>';
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<p class="dashboard-scope-empty">' + esc(txt.noTags || 'No workspace has tags yet.') +
+                        ' <a href="workspaces.php">' + esc(txt.manageWorkspaces || 'Manage workspaces') + '</a></p>';
+                }
+
+                // Workspaces: a checklist in the picker list style, with a
+                // select-all row on top and an arrow to open one right away
+                html += '<div class="dashboard-scope-section-title">' + esc(txt.workspaces || 'Workspaces') + '</div>';
+                html += '<div class="move-task-list dashboard-scope-list">';
+                html += '<label class="move-task-item dashboard-scope-row dashboard-scope-row-all">' +
+                    '<span class="dashboard-scope-row-main">' +
+                        '<input type="checkbox" class="dashboard-scope-check-all">' +
+                        '<i class="lucide lucide-layers"></i>' +
+                        '<span class="dashboard-scope-name">' + esc(txt.all || 'All workspaces') + '</span>' +
+                    '</span></label>';
+                workspaces.forEach(function (ws) {
+                    var isSelected = !!selected[ws.name];
+                    var tags = (ws.tags || []).join(', ');
+                    html += '<div class="move-task-item dashboard-scope-row' + (isSelected ? ' selected' : '') + '">' +
+                        '<label class="dashboard-scope-row-main">' +
+                            '<input type="checkbox" class="dashboard-scope-check" value="' + esc(ws.name) + '"' + (isSelected ? ' checked' : '') + '>' +
+                            '<span class="dashboard-scope-name">' + esc(ws.name) + '</span>' +
+                            (tags ? '<small>' + esc(tags) + '</small>' : '') +
+                        '</label>' +
+                        '<button type="button" class="dashboard-scope-open" data-workspace="' + esc(ws.name) + '"' +
+                            ' title="' + esc(txt.open || 'Open only this workspace') + '" aria-label="' + esc(txt.open || 'Open only this workspace') + '">' +
+                            '<i class="lucide lucide-arrow-right"></i></button>' +
+                    '</div>';
+                });
+                html += '</div>';
+
+                list.innerHTML = html;
+
+                Array.prototype.forEach.call(list.querySelectorAll('.dashboard-scope-open'), function (btn) {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        var ws = btn.getAttribute('data-workspace');
+                        if (ws) window.location.href = buildDashboardUrl({ workspace: ws });
+                    });
+                });
+
+                var boxes = Array.prototype.slice.call(list.querySelectorAll('.dashboard-scope-check'));
+                var allBox = list.querySelector('.dashboard-scope-check-all');
+                var tagChips = Array.prototype.slice.call(list.querySelectorAll('.dashboard-scope-tag'));
+
+                var boxByName = {};
+                boxes.forEach(function (box) { boxByName[box.value] = box; });
+
+                function tagBoxes(chip) {
+                    var entry = tagIndex[chip.getAttribute('data-tag-key')] || { names: [] };
+                    return entry.names.map(function (name) { return boxByName[name]; })
+                        .filter(function (box) { return !!box; });
+                }
+
+                function checkedNames() {
+                    return boxes.filter(function (box) { return box.checked; }).map(function (box) { return box.value; });
+                }
+
+                function updateApplyState() {
+                    var names = checkedNames();
+                    boxes.forEach(function (box) {
+                        var row = box.closest('.dashboard-scope-row');
+                        if (row) row.classList.toggle('selected', box.checked);
+                    });
+                    if (allBox) {
+                        allBox.checked = names.length === boxes.length;
+                        allBox.indeterminate = names.length > 0 && names.length < boxes.length;
+                    }
+                    // A chip is on when all of its workspaces are checked, and
+                    // half-on when only some of them are
+                    tagChips.forEach(function (chip) {
+                        var group = tagBoxes(chip);
+                        var checked = group.filter(function (box) { return box.checked; }).length;
+                        var isAll = group.length > 0 && checked === group.length;
+                        chip.classList.toggle('is-active', isAll);
+                        chip.classList.toggle('is-partial', checked > 0 && !isAll);
+                        chip.setAttribute('aria-pressed', isAll ? 'true' : 'false');
+                    });
+                    if (applyBtn) {
+                        var unchanged = names.slice().sort().join('\n') === initialSelection;
+                        applyBtn.disabled = names.length === 0 || unchanged;
+                    }
+                }
+
+                function chipIsActive(chip) {
+                    var group = tagBoxes(chip);
+                    return group.length > 0 && group.every(function (box) { return box.checked; });
+                }
+
+                // The checked workspaces always match the active tags: a
+                // clicked tag adds its workspaces to those of the other active
+                // tags (anything picked by hand outside a tag is dropped), and
+                // an active tag clicked again removes its workspaces unless
+                // another active tag still needs them.
+                tagChips.forEach(function (chip) {
+                    chip.addEventListener('click', function () {
+                        var group = tagBoxes(chip);
+                        if (!group.length) return;
+
+                        var wasActive = chipIsActive(chip);
+                        var keep = {};
+                        tagChips.forEach(function (other) {
+                            if (other !== chip && chipIsActive(other)) {
+                                tagBoxes(other).forEach(function (box) { keep[box.value] = true; });
+                            }
+                        });
+                        if (!wasActive) {
+                            group.forEach(function (box) { keep[box.value] = true; });
+                        }
+
+                        boxes.forEach(function (box) { box.checked = !!keep[box.value]; });
+                        updateApplyState();
+                    });
+                });
+
+                boxes.forEach(function (box) {
+                    box.addEventListener('change', updateApplyState);
+                });
+                if (allBox) {
+                    allBox.addEventListener('change', function () {
+                        var check = allBox.checked;
+                        boxes.forEach(function (box) { box.checked = check; });
+                        updateApplyState();
+                    });
+                }
+                updateApplyState();
+
+                if (applyBtn) {
+                    applyBtn.onclick = function () {
+                        applyScopeSelection(checkedNames(), allNames);
+                    };
+                }
             })
             .catch(function () {
-                list.innerHTML = '<div class="workspace-switcher-loading">Failed to load workspaces</div>';
+                list.innerHTML = '<div class="move-task-empty">' + esc(txt.loadError || 'Failed to load workspaces') + '</div>';
             });
     }
 
@@ -968,9 +1427,11 @@
         restoreNavigationPath();
         // Restore before the first render so the board comes up already filtered.
         restoreColorFilter();
+        restoreModifiedFilter();
         renderAll();
         initNoteColorPicker();
         initColorFilter();
+        initModifiedFilter();
         window.addEventListener('pagehide', saveNavigationPath);
 
         var filterInput     = document.getElementById('filterInput');

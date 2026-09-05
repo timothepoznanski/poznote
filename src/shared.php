@@ -222,7 +222,7 @@ usort($shared_folders, function($a, $b) {
 	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="shared-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-share-2"></i> <?php echo t_h('home.shares', [], 'Shares'); ?></h1>
+		<h1 class="poznote-page-title"><i class="lucide lucide-share-2"></i> <?php echo t_h('home.shares', [], 'Shares'); ?> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		
 		<div class="shared-filter-bar initially-hidden" id="sharedFilterBar">

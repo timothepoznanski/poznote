@@ -2043,11 +2043,23 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 GET /workspaces
 ```
 
-Get all workspaces.
+Get all workspaces. Each workspace carries its `tags` (a list of labels, empty when none). Tags group workspaces on the dashboard scope selector.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/workspaces
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "workspaces": [
+    { "name": "Psycho 101", "created": "2026-09-01 10:00:00", "tags": ["school", "psycho"] },
+    { "name": "Poznote", "created": "2026-01-01 09:00:00", "tags": [] }
+  ]
+}
 ```
 
 ### Create Workspace
@@ -2061,31 +2073,38 @@ POST /workspaces
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | Yes | Workspace name |
+| `tags` | array or string | No | Tags of the workspace, as a list or a comma-separated string (max 20 tags, 50 characters each) |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
-  -d '{"name": "MyProject"}' \
+  -d '{"name": "MyProject", "tags": ["school", "psycho"]}' \
   http://YOUR_SERVER/api/v1/workspaces
 ```
 
-### Rename Workspace
+### Rename Workspace / Set Tags
 
 ```
 PATCH /workspaces/{name}
 ```
 
-**Request Body (JSON):**
+**Request Body (JSON):** at least one field is required.
 
 | Field | Type | Description |
 |-------|------|-------------|
 | `new_name` | string | New workspace name |
+| `tags` | array or string | Replaces the whole tag list (send an empty list to clear the tags) |
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"new_name": "NewName"}' \
   http://YOUR_SERVER/api/v1/workspaces/OldName
+
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"tags": ["school", "psycho"]}' \
+  http://YOUR_SERVER/api/v1/workspaces/Psycho%20101
 ```
 
 ### Delete Workspace

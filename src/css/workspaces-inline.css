@@ -35,13 +35,13 @@
     padding-top: 0 !important;
 }
 
+/* Name and note count on one line (the count wraps under it only when the
+   column gets too narrow) */
 .ws-name-row {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
 }
 
 .workspace-name-item {
@@ -51,9 +51,8 @@
 
 .workspace-count {
     color: #8a8f92;
-    display: block;
-    margin-top: 4px;
     font-size: 0.92em;
+    margin-top: 0;
     margin-left: 0;
 }
 
@@ -65,14 +64,12 @@
 
 /* Action buttons */
 .workspace-list .ws-col-action,
-.workspace-list .ws-col-select,
 .workspace-list .ws-col-share,
 .workspace-list .ws-col-move,
 .workspace-list .ws-col-delete {
     flex: 0 0 auto;
 }
 
-.workspace-list .ws-col-select,
 .workspace-list .ws-col-share,
 .workspace-list .ws-col-action {
     flex-basis: var(--ws-action-control-width);
@@ -82,14 +79,12 @@
     min-width: 110px;
 }
 
-.workspace-list .ws-col-select .btn,
 .workspace-list .ws-col-share .btn,
 .workspace-list .ws-col-action .ws-action-dropdown,
 .workspace-list .ws-col-action .dropdown-toggle-btn {
     width: 100%;
 }
 
-.workspace-list .ws-col-select .btn,
 .workspace-list .ws-col-share .btn,
 .workspace-list .ws-col-action .dropdown-toggle-btn {
     min-width: 0 !important;

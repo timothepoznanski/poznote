@@ -3707,6 +3707,30 @@ function getWorkspaceFilter() {
 }
 
 /**
+ * Render the current workspace name as a discreet suffix for a page title.
+ *
+ * The workspace-scoped pages (Notes, Folders, Tags, Tasks, ...) all show the
+ * same heading whatever workspace is open, so the name is the only thing that
+ * tells two visits apart. Returns an empty string when there is no workspace to
+ * name, which leaves pages reached without one untouched.
+ *
+ * @param string|null $workspace Workspace name; defaults to getWorkspaceFilter().
+ * @return string HTML fragment, or '' when there is nothing to show.
+ */
+function poznoteRenderPageTitleWorkspace($workspace = null) {
+    if ($workspace === null) {
+        $workspace = getWorkspaceFilter();
+    }
+    $workspace = trim((string)$workspace);
+    if ($workspace === '' || $workspace === '__last_opened__') {
+        return '';
+    }
+
+    $escaped = htmlspecialchars($workspace, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    return '<span class="poznote-page-title-workspace" title="' . $escaped . '">(' . $escaped . ')</span>';
+}
+
+/**
  * Return a filesystem-safe, deterministic segment for workspace background files.
  */
 function getWorkspaceBackgroundSegment($workspace) {
@@ -5509,6 +5533,135 @@ function extractMarkdownChecklistItems(string $markdown): array {
  * (grid small/medium/large, then list); the columns button caps the grid
  * width and is hidden in list layout (board-view-menu.js drives both).
  */
+// ============================================================================
+// Workspace tags and multi-workspace scope
+// ============================================================================
+//
+// workspaces.tags holds a comma-separated list of labels ("school,psycho").
+// Tags group workspaces on pages that can show several of them at once: the
+// dashboard scope selector lists them and "scope=tag&tag=school" opens every
+// workspace carrying that tag.
+
+/**
+ * Normalize a raw tags value (array or comma-separated string) into a clean
+ * list: trimmed, non-empty, deduplicated case-insensitively, capped in size.
+ */
+function poznoteParseWorkspaceTags($raw): array {
+    $parts = is_array($raw) ? $raw : explode(',', (string)$raw);
+    $tags = [];
+    $seen = [];
+    foreach ($parts as $part) {
+        $tag = trim((string)preg_replace('/\s+/u', ' ', (string)$part));
+        if ($tag === '') continue;
+        $tag = mb_substr($tag, 0, 50);
+        $key = mb_strtolower($tag);
+        if (isset($seen[$key])) continue;
+        $seen[$key] = true;
+        $tags[] = $tag;
+        if (count($tags) >= 20) break;
+    }
+    return $tags;
+}
+
+function poznoteSerializeWorkspaceTags(array $tags): string {
+    return implode(',', poznoteParseWorkspaceTags($tags));
+}
+
+/**
+ * Tags of every workspace, keyed by workspace name (workspace list order).
+ */
+function poznoteGetWorkspaceTagsMap(PDO $con): array {
+    $map = [];
+    try {
+        $stmt = $con->query('SELECT name, tags FROM workspaces ORDER BY name COLLATE NOCASE');
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $map[(string)$row['name']] = poznoteParseWorkspaceTags($row['tags'] ?? '');
+        }
+    } catch (Exception $e) {
+        // Column missing on a not-yet-migrated database: no tags
+        try {
+            $stmt = $con->query('SELECT name FROM workspaces ORDER BY name COLLATE NOCASE');
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $map[(string)$row['name']] = [];
+            }
+        } catch (Exception $e2) {}
+    }
+    return $map;
+}
+
+/**
+ * Resolve which workspaces a multi-workspace page shows, from its request
+ * parameters:
+ *   workspace=X                 one workspace (the default)
+ *   scope=all                   every workspace
+ *   scope=tag&tag=T             every workspace carrying tag T
+ *   scope=list&ws[]=A&ws[]=B    an explicit list (one name falls back to single)
+ *
+ * Returns:
+ *   mode        'single' | 'all' | 'tag' | 'list'
+ *   workspaces  matching workspace names, in workspace list order
+ *   tag         the requested tag (tag mode)
+ *   query       the URL parameters reproducing this scope
+ *   key         a short stable identifier for per-scope client preferences
+ *   tags_map    name => tags for every workspace (for selectors)
+ */
+function poznoteResolveWorkspaceScope(PDO $con, array $params, string $fallbackWorkspace): array {
+    $mode = isset($params['scope']) ? strtolower(trim((string)$params['scope'])) : '';
+    $tagsMap = poznoteGetWorkspaceTagsMap($con);
+    $allNames = array_keys($tagsMap);
+
+    $scope = ['mode' => 'single', 'workspaces' => [], 'tag' => '', 'query' => [], 'key' => '', 'tags_map' => $tagsMap];
+
+    if ($mode === 'all' && !empty($allNames)) {
+        $scope['mode'] = 'all';
+        $scope['workspaces'] = $allNames;
+        $scope['query'] = ['scope' => 'all'];
+        $scope['key'] = 'all';
+    } elseif ($mode === 'tag') {
+        $tag = trim((string)($params['tag'] ?? ''));
+        if ($tag !== '') {
+            $needle = mb_strtolower($tag);
+            $matches = [];
+            foreach ($tagsMap as $name => $tags) {
+                foreach ($tags as $candidate) {
+                    if (mb_strtolower($candidate) === $needle) {
+                        $matches[] = $name;
+                        break;
+                    }
+                }
+            }
+            // Kept even without a match so the page can say so
+            $scope['mode'] = 'tag';
+            $scope['tag'] = $tag;
+            $scope['workspaces'] = $matches;
+            $scope['query'] = ['scope' => 'tag', 'tag' => $tag];
+            $scope['key'] = 'tag:' . $needle;
+        }
+    } elseif ($mode === 'list') {
+        $wanted = $params['ws'] ?? [];
+        if (!is_array($wanted)) $wanted = [$wanted];
+        $wanted = array_map('strval', $wanted);
+        $matches = array_values(array_filter($allNames, fn($n) => in_array($n, $wanted, true)));
+        if (count($matches) === 1) {
+            $scope['workspaces'] = $matches;
+        } elseif (count($matches) > 1) {
+            $scope['mode'] = 'list';
+            $scope['workspaces'] = $matches;
+            $scope['query'] = ['scope' => 'list', 'ws' => $matches];
+            $scope['key'] = 'list:' . implode('|', $matches);
+        }
+    }
+
+    if ($scope['mode'] === 'single') {
+        if (empty($scope['workspaces']) && $fallbackWorkspace !== '') {
+            $scope['workspaces'] = [$fallbackWorkspace];
+        }
+        $scope['query'] = !empty($scope['workspaces']) ? ['workspace' => $scope['workspaces'][0]] : [];
+    }
+
+    return $scope;
+}
+
 function renderBoardViewMenu(string $prefix) {
     $idPrefix = htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8');
     echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '">' .

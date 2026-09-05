@@ -1972,64 +1972,6 @@ body.dark-mode .dashboard-version-badge {
     }
 }
 
-/* Workspace switcher modal */
-.workspace-switcher-list {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin: 16px 0;
-    max-height: 320px;
-    overflow-y: auto;
-}
-
-.workspace-switcher-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 6px;
-    background: none;
-    border: 1px solid transparent;
-    font-family: inherit;
-    font-size: 14px;
-    color: #374151;
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-    transition: background 0.12s ease, border-color 0.12s ease;
-}
-
-.workspace-switcher-item:hover {
-    background: var(--pz-surface-hover);
-    border-color: var(--pz-border-strong);
-}
-
-.workspace-switcher-item.is-current {
-    background: #eff6ff;
-    border-color: #93c5fd;
-    color: #1d4ed8;
-    font-weight: 600;
-    cursor: default;
-}
-
-.workspace-switcher-item .lucide {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    color: var(--pz-text-subtle);
-}
-
-.workspace-switcher-item.is-current .lucide {
-    color: #3b82f6;
-}
-
-.workspace-switcher-loading {
-    text-align: center;
-    padding: 20px;
-    color: var(--pz-text-subtle);
-    font-size: 14px;
-}
-
 /* Dark mode */
 :root[data-theme='dark'] .dashboard-workspace-trigger:hover,
 body.dark-mode .dashboard-workspace-trigger:hover,
@@ -2043,29 +1985,6 @@ body.dark-mode .dashboard-workspace-trigger:hover .lucide,
 :root[data-theme='dark'] .dashboard-user-trigger:hover .lucide,
 body.dark-mode .dashboard-user-trigger:hover .lucide {
     color: var(--dm-accent, #60a5fa);
-}
-
-:root[data-theme='dark'] .workspace-switcher-item,
-body.dark-mode .workspace-switcher-item {
-    color: var(--dm-text);
-}
-
-:root[data-theme='dark'] .workspace-switcher-item:hover,
-body.dark-mode .workspace-switcher-item:hover {
-    background: var(--dm-surface-hover);
-    border-color: var(--dm-border);
-}
-
-:root[data-theme='dark'] .workspace-switcher-item.is-current,
-body.dark-mode .workspace-switcher-item.is-current {
-    background: rgba(59, 130, 246, 0.15);
-    border-color: rgba(59, 130, 246, 0.4);
-    color: #60a5fa;
-}
-
-:root[data-theme='dark'] .workspace-switcher-item.is-current .lucide,
-body.dark-mode .workspace-switcher-item.is-current .lucide {
-    color: #60a5fa;
 }
 
 :root[data-theme='dark'] .dashboard-top-info,
@@ -2089,4 +2008,302 @@ body.dark-mode .dashboard-mobile-back:hover {
 }
 
 
+/* ============================================
+   Multi-workspace scope (dashboard.php ?scope=...)
+   ============================================ */
 
+/* One titled section per workspace at the root of a multi-workspace scope */
+.dash-group-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--pz-text);
+}
+
+.dash-group-title > .lucide {
+    width: 16px;
+    height: 16px;
+    color: var(--pz-text-subtle);
+}
+
+.dash-group-tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 9px;
+    color: #4b5563;
+    background: var(--pz-surface-hover);
+}
+
+.dash-group-count {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pz-text-muted);
+}
+
+.dash-group-empty {
+    grid-column: 1 / -1;
+    padding: 6px 2px 10px;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--pz-text-subtle);
+}
+
+/* Workspace badge on cards of a mixed (filtered) multi-workspace view */
+.board-card-ws {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.board-card-ws .lucide {
+    width: 10px;
+    height: 10px;
+}
+
+/* Workspace crumb ahead of the folder path */
+.bc-workspace {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 6px;
+    font-size: 14px;
+    color: var(--pz-text-muted);
+}
+
+.bc-workspace .lucide {
+    width: 15px;
+    height: 15px;
+}
+/* Scope modal: reuses the picker list (.move-task-list / .move-task-item
+   from modals/base.css) with checkboxes, plus tag chips */
+.dashboard-scope-section-title {
+    margin: 22px 0 8px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-scope-body > .dashboard-scope-section-title:first-child {
+    margin-top: 4px;
+}
+
+.dashboard-scope-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dashboard-scope-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: 14px;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: inherit;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.dashboard-scope-tag:hover {
+    background: var(--pz-surface-hover);
+}
+
+.dashboard-scope-tag.is-active {
+    background: #e0f2fe;
+    border-color: #7dd3fc;
+}
+
+/* Only some of the tag's workspaces are checked */
+.dashboard-scope-tag.is-partial {
+    border-color: #7dd3fc;
+}
+
+.dashboard-scope-tag .lucide {
+    width: 13px;
+    height: 13px;
+}
+
+.dashboard-scope-tag-count {
+    font-size: 11px;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-scope-empty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--pz-text-muted);
+}
+
+.dashboard-scope-empty a {
+    color: var(--pz-accent);
+}
+
+.dashboard-scope-list {
+    max-height: min(48vh, 360px);
+    margin-top: 0;
+}
+
+/* .modal-buttons only carries margin-top: auto, which collapses to 0 here
+   (the modal content is not a flex column), so the row would touch the list */
+.dashboard-scope-modal .modal-buttons {
+    margin-top: 20px;
+}
+
+/* Rows are divs (a button cannot nest the arrow button), so they need the
+   border-box the picker's <button> rows get for free */
+.move-task-item.dashboard-scope-row {
+    box-sizing: border-box;
+    cursor: default;
+}
+
+.dashboard-scope-row-main {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.dashboard-scope-row-main .lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--pz-text-subtle);
+}
+
+.dashboard-scope-row input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--pz-accent);
+}
+
+.dashboard-scope-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-scope-row small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-scope-row-all {
+    font-weight: 600;
+    border-bottom: 1px solid var(--pz-border);
+    border-radius: 4px 4px 0 0;
+    margin-bottom: 4px;
+}
+
+/* "Open only this workspace": shown while the row is hovered or focused */
+.dashboard-scope-open {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.12s ease, background 0.12s ease;
+}
+
+.dashboard-scope-row:hover .dashboard-scope-open,
+.dashboard-scope-row:focus-within .dashboard-scope-open {
+    opacity: 1;
+}
+
+@media (hover: none) {
+    .dashboard-scope-open {
+        opacity: 1;
+    }
+}
+
+.dashboard-scope-open:hover {
+    background: var(--pz-surface-hover);
+    color: var(--pz-accent);
+}
+
+/* Modified-since menu entries carry an icon instead of a swatch */
+.dashboard-modified-filter-item .lucide {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    color: var(--pz-text-subtle);
+}
+
+/* Dark mode */
+:root[data-theme='dark'] .dash-group-title,
+body.dark-mode .dash-group-title {
+    color: var(--dm-text);
+}
+
+:root[data-theme='dark'] .dash-group-tag,
+body.dark-mode .dash-group-tag {
+    color: #c9d1d9;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .dashboard-scope-section-title,
+body.dark-mode .dashboard-scope-section-title,
+:root[data-theme='dark'] .dashboard-scope-empty,
+body.dark-mode .dashboard-scope-empty {
+    color: #a8a8a8;
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag,
+body.dark-mode .dashboard-scope-tag {
+    color: var(--dm-text);
+    border-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag:hover,
+body.dark-mode .dashboard-scope-tag:hover {
+    background: var(--dm-surface-hover);
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag.is-active,
+body.dark-mode .dashboard-scope-tag.is-active {
+    background: var(--dm-active);
+    border-color: #4da3d0;
+}
+
+:root[data-theme='dark'] .dashboard-scope-tag.is-partial,
+body.dark-mode .dashboard-scope-tag.is-partial {
+    border-color: #4da3d0;
+}
+
+:root[data-theme='dark'] .dashboard-scope-row-all,
+body.dark-mode .dashboard-scope-row-all {
+    border-bottom-color: var(--dm-border);
+}
+
+:root[data-theme='dark'] .dashboard-scope-row-main .lucide,
+body.dark-mode .dashboard-scope-row-main .lucide,
+:root[data-theme='dark'] .dashboard-scope-open,
+body.dark-mode .dashboard-scope-open {
+    color: #a8a8a8;
+}
+
+:root[data-theme='dark'] .dashboard-scope-open:hover,
+body.dark-mode .dashboard-scope-open:hover {
+    background: var(--dm-surface-hover);
+    color: var(--dm-accent, #60a5fa);
+}

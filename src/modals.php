@@ -646,6 +646,22 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Workspace tags modal (for workspaces.php) -->
+<div id="workspaceTagsModal" class="modal initially-hidden">
+    <div class="modal-content">
+        <h3><?php echo t_h('workspaces.tags.modal_title', [], 'Workspace tags'); ?> <span id="workspaceTagsSource"></span></h3>
+        <p class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.'); ?></p>
+        <div class="form-group">
+            <label for="workspaceTagsInput"><?php echo t_h('workspaces.tags.label', [], 'Tags'); ?></label>
+            <input id="workspaceTagsInput" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.tags.input_placeholder', [], 'school, psycho'); ?>" />
+        </div>
+        <div class="buttons-with-margin">
+            <button id="confirmWorkspaceTagsBtn" class="btn btn-primary"><?php echo t_h('common.save', [], 'Save'); ?></button>
+            <button data-action="close-workspace-tags-modal" class="btn btn-secondary"><?php echo t_h('common.cancel'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Delete confirmation modal (for workspaces.php) -->
 <div id="deleteModal" class="modal initially-hidden">
     <div class="modal-content">

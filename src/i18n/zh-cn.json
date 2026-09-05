@@ -689,6 +689,16 @@
         "users_loading": "正在加载用户...",
         "no_users_found": "未找到其他用户"
       }
+    },
+    "tags": {
+      "label": "标签",
+      "action": "标签",
+      "modal_title": "工作区标签",
+      "placeholder": "标签，用逗号分隔（可选，例如：学校, 心理）",
+      "input_placeholder": "学校, 心理",
+      "help": "标签用于在仪表盘中对工作区分组：在仪表盘选择一个标签，即可查看所有带该标签的工作区。",
+      "saved": "标签已更新",
+      "save_error": "无法更新标签"
     }
   },
   "display": {
@@ -3892,6 +3902,32 @@
       "layout": "布局",
       "layout_grid": "网格",
       "layout_list": "列表"
+    },
+    "scope": {
+      "title": "范围",
+      "hint": "选择要显示的工作区。点击标签会选中所有带该标签的工作区。",
+      "all": "全部工作区",
+      "by_tag": "按标签",
+      "workspaces": "工作区",
+      "tag_label": "标签：{{tag}}",
+      "count_label": "{{count}} 个工作区",
+      "no_tags": "还没有工作区带标签。",
+      "open": "仅打开此工作区",
+      "load_error": "无法加载工作区。",
+      "no_workspaces": "没有可用的工作区",
+      "empty": "此范围内还没有笔记。",
+      "no_workspace_for_tag": "没有工作区带有标签“{{tag}}”。",
+      "group_empty": "这里还没有内容。",
+      "manage_workspaces": "管理工作区"
+    },
+    "modified": {
+      "button": "按最后修改时间筛选",
+      "any": "任意时间",
+      "today": "今天",
+      "week": "最近 7 天",
+      "month": "最近 30 天",
+      "quarter": "最近 90 天",
+      "year": "最近 12 个月"
     }
   },
   "graph": {

@@ -688,6 +688,16 @@
         "users_loading": "Benutzer werden geladen...",
         "no_users_found": "Keine anderen Benutzer gefunden"
       }
+    },
+    "tags": {
+      "label": "Tags",
+      "action": "Tags",
+      "modal_title": "Tags des Arbeitsbereichs",
+      "placeholder": "Tags, durch Kommas getrennt (optional, z. B. schule, psycho)",
+      "input_placeholder": "schule, psycho",
+      "help": "Tags gruppieren Arbeitsbereiche im Dashboard: Wähle dort einen Tag, um alle Arbeitsbereiche mit diesem Tag zu sehen.",
+      "saved": "Tags aktualisiert",
+      "save_error": "Die Tags konnten nicht aktualisiert werden"
     }
   },
   "display": {
@@ -3771,6 +3781,32 @@
       "layout": "Anordnung",
       "layout_grid": "Raster",
       "layout_list": "Liste"
+    },
+    "scope": {
+      "title": "Bereich",
+      "hint": "Wähle die anzuzeigenden Arbeitsbereiche. Ein Tag wählt alle Arbeitsbereiche aus, die ihn tragen.",
+      "all": "Alle Arbeitsbereiche",
+      "by_tag": "Nach Tag",
+      "workspaces": "Arbeitsbereiche",
+      "tag_label": "Tag: {{tag}}",
+      "count_label": "{{count}} Arbeitsbereiche",
+      "no_tags": "Noch kein Arbeitsbereich hat Tags.",
+      "open": "Nur diesen Arbeitsbereich öffnen",
+      "load_error": "Die Arbeitsbereiche konnten nicht geladen werden.",
+      "no_workspaces": "Keine Arbeitsbereiche verfügbar",
+      "empty": "Noch keine Notizen in diesem Bereich.",
+      "no_workspace_for_tag": "Kein Arbeitsbereich trägt den Tag „{{tag}}“.",
+      "group_empty": "Noch nichts hier.",
+      "manage_workspaces": "Arbeitsbereiche verwalten"
+    },
+    "modified": {
+      "button": "Nach letzter Änderung filtern",
+      "any": "Jederzeit",
+      "today": "Heute",
+      "week": "Letzte 7 Tage",
+      "month": "Letzte 30 Tage",
+      "quarter": "Letzte 90 Tage",
+      "year": "Letzte 12 Monate"
     }
   },
   "graph": {

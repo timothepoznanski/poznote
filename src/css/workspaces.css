@@ -57,9 +57,15 @@ body {
     font-weight: bold;
 }
 
+/* The inputs and the button share one row; the tags hint sits under the whole
+   row, so it cannot push the tags field out of line with the name field. */
 #create-workspace-form {
+    display: block;
+}
+
+.ws-create-row {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 12px;
 }
 
@@ -144,6 +150,21 @@ body {
     font-size: 16px;
 }
 
+/* The name opens the workspace */
+a.workspace-name-link {
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s ease;
+}
+
+a.workspace-name-link:hover,
+a.workspace-name-link:focus-visible {
+    color: var(--pz-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
 .workspace-count {
     font-size: 12px;
     color: #666;
@@ -151,6 +172,48 @@ body {
     padding: 2px 8px;
     border-radius: 12px;
     margin-left: 8px;
+}
+
+/* Workspace tags (dashboard scope groups) */
+.ws-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.ws-tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #4b5563;
+    background: #eef2f7;
+    border-radius: 12px;
+    padding: 2px 9px;
+}
+
+.ws-tag-chip .lucide {
+    width: 12px;
+    height: 12px;
+}
+
+.ws-tags-help {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+:root[data-theme='dark'] .ws-tag-chip,
+body.dark-mode .ws-tag-chip {
+    color: #c9d1d9;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='dark'] .ws-tags-help,
+body.dark-mode .ws-tags-help {
+    color: #9aa4b2;
 }
 
 .workspace-share-panel {
@@ -933,7 +996,6 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
         flex-basis: auto !important;
     }
 
-    .workspace-list .ws-col-select,
     .workspace-list .ws-col-share,
     .workspace-list .ws-col-action {
         flex-basis: auto !important;
@@ -966,7 +1028,7 @@ body.dark-mode .shared-edit-token-modal .share-user-list-message.is-error {
     }
     
     /* Form styling for mobile */
-    #create-workspace-form {
+    .ws-create-row {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;

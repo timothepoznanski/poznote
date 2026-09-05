@@ -324,6 +324,16 @@
         "users_loading": "Loading users...",
         "no_users_found": "No other users found"
       }
+    },
+    "tags": {
+      "label": "Tags",
+      "action": "Tags",
+      "modal_title": "Workspace tags",
+      "placeholder": "Tags, comma separated (optional, e.g. school, psycho)",
+      "input_placeholder": "school, psycho",
+      "help": "Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.",
+      "saved": "Tags updated",
+      "save_error": "Could not update the tags"
     }
   },
   "display": {
@@ -3489,6 +3499,32 @@
       "layout": "Layout",
       "layout_grid": "Grid",
       "layout_list": "List"
+    },
+    "scope": {
+      "title": "Scope",
+      "hint": "Pick the workspaces to show. A tag selects every workspace carrying it.",
+      "all": "All workspaces",
+      "by_tag": "By tag",
+      "workspaces": "Workspaces",
+      "tag_label": "Tag: {{tag}}",
+      "count_label": "{{count}} workspaces",
+      "no_tags": "No workspace has tags yet.",
+      "open": "Open only this workspace",
+      "load_error": "Could not load the workspaces.",
+      "no_workspaces": "No workspaces available",
+      "empty": "No notes in this scope yet.",
+      "no_workspace_for_tag": "No workspace carries the tag \"{{tag}}\".",
+      "group_empty": "Nothing here yet.",
+      "manage_workspaces": "Manage workspaces"
+    },
+    "modified": {
+      "button": "Filter by last modification",
+      "any": "Any time",
+      "today": "Today",
+      "week": "Last 7 days",
+      "month": "Last 30 days",
+      "quarter": "Last 90 days",
+      "year": "Last 12 months"
     }
   },
   "graph": {

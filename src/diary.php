@@ -176,7 +176,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion($rawVersion));
 	<?php include 'icon_sidebar.php'; ?>
 
 	<div class="favorites-container dashboard-container">
-		<h1 class="poznote-page-title"><i class="lucide lucide-book-open"></i> <?php echo t_h('diary.title', [], 'Diary'); ?></h1>
+		<h1 class="poznote-page-title"><i class="lucide lucide-book-open"></i> <?php echo t_h('diary.title', [], 'Diary'); ?> <?php echo poznoteRenderPageTitleWorkspace($diaryWorkspace); ?></h1>
 
 		<header class="dashboard-topbar">
 			<div class="diary-actions">

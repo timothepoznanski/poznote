@@ -370,6 +370,24 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
     top: 2px;
 }
 
+/* Name of the workspace the page is scoped to, appended by
+   poznoteRenderPageTitleWorkspace(). Deliberately quiet: the page name stays
+   what you read first. The negative margin trims the flex gap above, which is
+   sized for the icon and reads as too wide between two pieces of text. */
+.poznote-page-title-workspace {
+    margin-left: -4px;
+    /* A long workspace name must not push the page name off screen: cap it and
+       let the ellipsis take over (the full name stays in the tooltip). */
+    min-width: 0;
+    max-width: 40vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--pz-text-muted, #6b7280);
+}
+
 /* trash.php, diary.php and graph.php give their container no top padding, so
    the title would sit flush against the top edge. The other hosts pad by 20px. */
 .trash-container > .poznote-page-title,
