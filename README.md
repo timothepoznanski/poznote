@@ -27,7 +27,7 @@ A free, self-hosted, open-source alternative to Notion, Obsidian, Evernote, or O
 
 ### Features
 
-Discover all the features [here](https://poznote.com/selfhosting.html).
+Discover all the features [here](https://poznote.com/#features).
 
 ### Screenshots
 
